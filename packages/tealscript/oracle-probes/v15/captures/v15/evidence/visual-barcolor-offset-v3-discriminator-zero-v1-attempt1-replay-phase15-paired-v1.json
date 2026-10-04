@@ -1,0 +1,5572 @@
+{
+  "browser_utc": "2026-10-04T19:40:21.980Z",
+  "title": "V13 barcolor v3 zero",
+  "symbol": "BINANCE:BTCUSDT",
+  "interval": "2",
+  "timezone": "Etc/UTC",
+  "replay": true,
+  "native_replay_status": 3,
+  "source_status": {
+    "type": 2
+  },
+  "source_plots": [
+    {
+      "id": "plot_0",
+      "palette": "palette_0",
+      "type": "bar_colorer"
+    },
+    {
+      "id": "plot_1",
+      "type": "line"
+    },
+    {
+      "id": "plot_2",
+      "type": "line"
+    },
+    {
+      "id": "plot_3",
+      "type": "line"
+    }
+  ],
+  "palettes": {
+    "palette_0": {
+      "addDefaultColor": true,
+      "colors": {
+        "0": {
+          "name": "Color 0"
+        },
+        "1": {
+          "name": "Color 1"
+        },
+        "2": {
+          "name": "Color 2"
+        },
+        "3": {
+          "name": "Color 3"
+        }
+      },
+      "valToIndex": {
+        "0": 0,
+        "1": 1,
+        "2": 2,
+        "3": 3
+      }
+    }
+  },
+  "default_palettes": {
+    "palette_0": {
+      "colors": {
+        "0": {
+          "color": "#FF0000",
+          "style": 0,
+          "width": 1
+        },
+        "1": {
+          "color": "#0000FF",
+          "style": 0,
+          "width": 1
+        },
+        "2": {
+          "color": "#00FF00",
+          "style": 0,
+          "width": 1
+        },
+        "3": {
+          "color": "#FF7F00",
+          "style": 0,
+          "width": 1
+        }
+      }
+    }
+  },
+  "host_first": {
+    "index": 0,
+    "value": [
+      1790863200,
+      83938.6,
+      83958.01,
+      83694.77,
+      83722.01,
+      49.42632
+    ]
+  },
+  "host_last": {
+    "index": 315,
+    "value": [
+      1790901000,
+      84802.02,
+      84802.03,
+      84730.29,
+      84748.72,
+      23.17591
+    ]
+  },
+  "source_first": {
+    "index": -1000100,
+    "value": [
+      1790851200,
+      null,
+      22640,
+      0,
+      2
+    ]
+  },
+  "source_last": {
+    "index": 315,
+    "value": [
+      1790901000,
+      null,
+      23055,
+      0,
+      -2
+    ]
+  },
+  "native_end_of_data": false,
+  "rows": [
+    {
+      "native_index": 279,
+      "host": [
+        1790896680,
+        84695.17,
+        84763.59,
+        84695.17,
+        84763.59,
+        8.414
+      ],
+      "source": [
+        1790896680,
+        null,
+        23019,
+        0,
+        -2
+      ],
+      "x": -193.78125
+    },
+    {
+      "native_index": 280,
+      "host": [
+        1790896800,
+        84763.58,
+        84763.59,
+        84733.23,
+        84733.23,
+        6.78398
+      ],
+      "source": [
+        1790896800,
+        null,
+        23020,
+        0,
+        -2
+      ],
+      "x": -163.96875
+    },
+    {
+      "native_index": 281,
+      "host": [
+        1790896920,
+        84733.23,
+        84755.17,
+        84733.23,
+        84755.16,
+        2.31971
+      ],
+      "source": [
+        1790896920,
+        3,
+        23021,
+        4,
+        -2
+      ],
+      "x": -134.15625
+    },
+    {
+      "native_index": 282,
+      "host": [
+        1790897040,
+        84755.17,
+        84755.17,
+        84755.16,
+        84755.16,
+        1.05374
+      ],
+      "source": [
+        1790897040,
+        null,
+        23022,
+        0,
+        -2
+      ],
+      "x": -104.34375
+    },
+    {
+      "native_index": 283,
+      "host": [
+        1790897160,
+        84755.16,
+        84760,
+        84754,
+        84760,
+        4.42828
+      ],
+      "source": [
+        1790897160,
+        null,
+        23023,
+        0,
+        -2
+      ],
+      "x": -74.53125
+    },
+    {
+      "native_index": 284,
+      "host": [
+        1790897280,
+        84760,
+        84769,
+        84729.98,
+        84729.98,
+        61.30645
+      ],
+      "source": [
+        1790897280,
+        null,
+        23024,
+        0,
+        2
+      ],
+      "x": -44.71875
+    },
+    {
+      "native_index": 285,
+      "host": [
+        1790897400,
+        84729.99,
+        84745.71,
+        84703.48,
+        84745.7,
+        12.91307
+      ],
+      "source": [
+        1790897400,
+        null,
+        23025,
+        0,
+        2
+      ],
+      "x": -14.90625
+    },
+    {
+      "native_index": 286,
+      "host": [
+        1790897520,
+        84745.71,
+        84794.01,
+        84745.7,
+        84794.01,
+        8.17445
+      ],
+      "source": [
+        1790897520,
+        0,
+        23026,
+        1,
+        2
+      ],
+      "x": 14.90625
+    },
+    {
+      "native_index": 287,
+      "host": [
+        1790897640,
+        84794.01,
+        84841.06,
+        84794,
+        84828.46,
+        12.03899
+      ],
+      "source": [
+        1790897640,
+        null,
+        23027,
+        0,
+        2
+      ],
+      "x": 44.71875
+    },
+    {
+      "native_index": 288,
+      "host": [
+        1790897760,
+        84828.46,
+        84828.46,
+        84796,
+        84796,
+        7.1417
+      ],
+      "source": [
+        1790897760,
+        null,
+        23028,
+        0,
+        2
+      ],
+      "x": 74.53125
+    },
+    {
+      "native_index": 289,
+      "host": [
+        1790897880,
+        84796.01,
+        84832.01,
+        84796,
+        84830.65,
+        34.95191
+      ],
+      "source": [
+        1790897880,
+        1,
+        23029,
+        2,
+        2
+      ],
+      "x": 104.34375
+    },
+    {
+      "native_index": 290,
+      "host": [
+        1790898000,
+        84830.65,
+        84830.65,
+        84810.34,
+        84810.34,
+        5.67215
+      ],
+      "source": [
+        1790898000,
+        null,
+        23030,
+        0,
+        2
+      ],
+      "x": 134.15625
+    },
+    {
+      "native_index": 291,
+      "host": [
+        1790898120,
+        84810.34,
+        84847.89,
+        84803.9,
+        84847.89,
+        6.64017
+      ],
+      "source": [
+        1790898120,
+        null,
+        23031,
+        0,
+        2
+      ],
+      "x": 163.96875
+    },
+    {
+      "native_index": 292,
+      "host": [
+        1790898240,
+        84847.89,
+        84858.57,
+        84796,
+        84796,
+        12.16926
+      ],
+      "source": [
+        1790898240,
+        null,
+        23032,
+        0,
+        -2
+      ],
+      "x": 193.78125
+    },
+    {
+      "native_index": 293,
+      "host": [
+        1790898360,
+        84796.01,
+        84796.01,
+        84790,
+        84790.01,
+        3.92676
+      ],
+      "source": [
+        1790898360,
+        null,
+        23033,
+        0,
+        -2
+      ],
+      "x": 223.59375
+    },
+    {
+      "native_index": 294,
+      "host": [
+        1790898480,
+        84790,
+        84836.94,
+        84790,
+        84836.94,
+        6.40408
+      ],
+      "source": [
+        1790898480,
+        2,
+        23034,
+        3,
+        -2
+      ],
+      "x": 253.40625
+    },
+    {
+      "native_index": 295,
+      "host": [
+        1790898600,
+        84836.93,
+        84849.11,
+        84810.35,
+        84849.1,
+        7.55401
+      ],
+      "source": [
+        1790898600,
+        null,
+        23035,
+        0,
+        -2
+      ],
+      "x": 283.21875
+    },
+    {
+      "native_index": 296,
+      "host": [
+        1790898720,
+        84849.11,
+        84849.11,
+        84808,
+        84845.63,
+        10.5178
+      ],
+      "source": [
+        1790898720,
+        null,
+        23036,
+        0,
+        -2
+      ],
+      "x": 313.03125
+    },
+    {
+      "native_index": 297,
+      "host": [
+        1790898840,
+        84845.63,
+        84845.63,
+        84807.22,
+        84841.67,
+        23.20954
+      ],
+      "source": [
+        1790898840,
+        3,
+        23037,
+        4,
+        -2
+      ],
+      "x": 342.84375
+    },
+    {
+      "native_index": 298,
+      "host": [
+        1790898960,
+        84841.67,
+        84858.03,
+        84841.66,
+        84858.02,
+        4.53524
+      ],
+      "source": [
+        1790898960,
+        null,
+        23038,
+        0,
+        -2
+      ],
+      "x": 372.65625
+    },
+    {
+      "native_index": 299,
+      "host": [
+        1790899080,
+        84858.03,
+        84900,
+        84858.03,
+        84880.05,
+        18.49361
+      ],
+      "source": [
+        1790899080,
+        null,
+        23039,
+        0,
+        -2
+      ],
+      "x": 402.46875
+    },
+    {
+      "native_index": 300,
+      "host": [
+        1790899200,
+        84880.05,
+        84880.05,
+        84808.76,
+        84831.19,
+        17.90663
+      ],
+      "source": [
+        1790899200,
+        null,
+        23040,
+        0,
+        2
+      ],
+      "x": 432.28125
+    },
+    {
+      "native_index": 301,
+      "host": [
+        1790899320,
+        84831.19,
+        84831.19,
+        84792.7,
+        84792.7,
+        14.84236
+      ],
+      "source": [
+        1790899320,
+        null,
+        23041,
+        0,
+        2
+      ],
+      "x": 462.09375
+    },
+    {
+      "native_index": 302,
+      "host": [
+        1790899440,
+        84792.7,
+        84816.01,
+        84772.21,
+        84816,
+        12.74841
+      ],
+      "source": [
+        1790899440,
+        0,
+        23042,
+        1,
+        2
+      ],
+      "x": 491.90625
+    },
+    {
+      "native_index": 303,
+      "host": [
+        1790899560,
+        84816.01,
+        84838.89,
+        84809.36,
+        84809.36,
+        9.1854
+      ],
+      "source": [
+        1790899560,
+        null,
+        23043,
+        0,
+        2
+      ],
+      "x": 521.71875
+    },
+    {
+      "native_index": 304,
+      "host": [
+        1790899680,
+        84809.36,
+        84809.37,
+        84780,
+        84794.35,
+        7.98957
+      ],
+      "source": [
+        1790899680,
+        null,
+        23044,
+        0,
+        2
+      ],
+      "x": 551.53125
+    },
+    {
+      "native_index": 305,
+      "host": [
+        1790899800,
+        84794.35,
+        84843.56,
+        84794.35,
+        84824.16,
+        7.68667
+      ],
+      "source": [
+        1790899800,
+        1,
+        23045,
+        2,
+        2
+      ],
+      "x": 581.34375
+    },
+    {
+      "native_index": 306,
+      "host": [
+        1790899920,
+        84824.16,
+        84917.24,
+        84816,
+        84903,
+        213.08421
+      ],
+      "source": [
+        1790899920,
+        null,
+        23046,
+        0,
+        2
+      ],
+      "x": 611.15625
+    },
+    {
+      "native_index": 307,
+      "host": [
+        1790900040,
+        84903.01,
+        84936.81,
+        84860.71,
+        84936.8,
+        139.96128
+      ],
+      "source": [
+        1790900040,
+        null,
+        23047,
+        0,
+        2
+      ],
+      "x": 640.96875
+    },
+    {
+      "native_index": 308,
+      "host": [
+        1790900160,
+        84936.81,
+        84958.48,
+        84834.48,
+        84902.01,
+        25.63493
+      ],
+      "source": [
+        1790900160,
+        null,
+        23048,
+        0,
+        -2
+      ],
+      "x": 670.78125
+    },
+    {
+      "native_index": 309,
+      "host": [
+        1790900280,
+        84902.01,
+        84940,
+        84898,
+        84939.98,
+        40.17851
+      ],
+      "source": [
+        1790900280,
+        null,
+        23049,
+        0,
+        -2
+      ],
+      "x": 700.59375
+    },
+    {
+      "native_index": 310,
+      "host": [
+        1790900400,
+        84939.98,
+        84939.99,
+        84864.53,
+        84869.01,
+        86.60318
+      ],
+      "source": [
+        1790900400,
+        2,
+        23050,
+        3,
+        -2
+      ],
+      "x": 730.40625
+    },
+    {
+      "native_index": 311,
+      "host": [
+        1790900520,
+        84869,
+        84898,
+        84847.43,
+        84898,
+        12.58015
+      ],
+      "source": [
+        1790900520,
+        null,
+        23051,
+        0,
+        -2
+      ],
+      "x": 760.21875
+    },
+    {
+      "native_index": 312,
+      "host": [
+        1790900640,
+        84898,
+        84898,
+        84845.83,
+        84856,
+        10.37544
+      ],
+      "source": [
+        1790900640,
+        null,
+        23052,
+        0,
+        -2
+      ],
+      "x": 790.03125
+    },
+    {
+      "native_index": 313,
+      "host": [
+        1790900760,
+        84856,
+        84863.87,
+        84804,
+        84821.21,
+        13.18809
+      ],
+      "source": [
+        1790900760,
+        3,
+        23053,
+        4,
+        -2
+      ],
+      "x": 819.84375
+    },
+    {
+      "native_index": 314,
+      "host": [
+        1790900880,
+        84821.21,
+        84840.41,
+        84802.02,
+        84802.02,
+        10.93774
+      ],
+      "source": [
+        1790900880,
+        null,
+        23054,
+        0,
+        -2
+      ],
+      "x": 849.65625
+    },
+    {
+      "native_index": 315,
+      "host": [
+        1790901000,
+        84802.02,
+        84802.03,
+        84730.29,
+        84748.72,
+        23.17591
+      ],
+      "source": [
+        1790901000,
+        null,
+        23055,
+        0,
+        -2
+      ],
+      "x": 879.46875
+    }
+  ],
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  },
+  "zoom": {
+    "range": {
+      "_firstBar": 286,
+      "_lastBar": 317
+    },
+    "spacing": 29.8125,
+    "right_offset": 2
+  },
+  "panes": [
+    {
+      "width": 954,
+      "height": 700,
+      "main_bar_views": [
+        {
+          "class": "c",
+          "keys": [
+            "_bars",
+            "_invalidated",
+            "_isMarkersEnabled",
+            "_selectionData",
+            "_source",
+            "_model",
+            "_selectionIndexer",
+            "_scaleCoeff"
+          ],
+          "bars": [
+            {
+              "center": 14.90625,
+              "open": 71.43498730233159,
+              "high": 71.10923702408468,
+              "low": 71.43505474545339,
+              "close": 71.10923702408468,
+              "left": 0,
+              "right": 29.8125,
+              "timePointIndex": 286,
+              "color": "#FF0000",
+              "borderColor": "#089981",
+              "wickColor": "#089981"
+            },
+            {
+              "center": 44.71875,
+              "open": 71.10923702408468,
+              "high": 70.79191713606144,
+              "low": 71.10930446720636,
+              "close": 70.87689546951708,
+              "left": 29.8125,
+              "right": 59.625,
+              "timePointIndex": 287,
+              "color": "#089981",
+              "borderColor": "#089981",
+              "wickColor": "#089981"
+            },
+            {
+              "center": 74.53125,
+              "open": 70.87689546951708,
+              "high": 70.87689546951708,
+              "low": 71.09581584284831,
+              "close": 71.09581584284831,
+              "left": 59.625,
+              "right": 89.4375,
+              "timePointIndex": 288,
+              "color": "#F23645",
+              "borderColor": "#F23645",
+              "wickColor": "#F23645"
+            },
+            {
+              "center": 104.34375,
+              "open": 71.09574839972663,
+              "high": 70.85295316128156,
+              "low": 71.09581584284831,
+              "close": 70.86212542584508,
+              "left": 89.4375,
+              "right": 119.25,
+              "timePointIndex": 289,
+              "color": "#0000FF",
+              "borderColor": "#089981",
+              "wickColor": "#089981"
+            },
+            {
+              "center": 134.15625,
+              "open": 70.86212542584508,
+              "high": 70.86212542584508,
+              "low": 70.99910240620113,
+              "close": 70.99910240620113,
+              "left": 119.25,
+              "right": 149.0625,
+              "timePointIndex": 290,
+              "color": "#F23645",
+              "borderColor": "#F23645",
+              "wickColor": "#F23645"
+            },
+            {
+              "center": 163.96875,
+              "open": 70.99910240620113,
+              "high": 70.74585348387859,
+              "low": 71.04253577663405,
+              "close": 70.74585348387859,
+              "left": 149.0625,
+              "right": 178.875,
+              "timePointIndex": 291,
+              "color": "#089981",
+              "borderColor": "#089981",
+              "wickColor": "#089981"
+            },
+            {
+              "center": 193.78125,
+              "open": 70.74585348387859,
+              "high": 70.67382422980654,
+              "low": 71.09581584284831,
+              "close": 71.09581584284831,
+              "left": 178.875,
+              "right": 208.6875,
+              "timePointIndex": 292,
+              "color": "#F23645",
+              "borderColor": "#F23645",
+              "wickColor": "#F23645"
+            },
+            {
+              "center": 223.59375,
+              "open": 71.09574839972663,
+              "high": 71.09574839972663,
+              "low": 71.13628171592245,
+              "close": 71.13621427280077,
+              "left": 208.6875,
+              "right": 238.5,
+              "timePointIndex": 293,
+              "color": "#F23645",
+              "borderColor": "#F23645",
+              "wickColor": "#F23645"
+            },
+            {
+              "center": 253.40625,
+              "open": 71.13628171592245,
+              "high": 70.81970370223894,
+              "low": 71.13628171592245,
+              "close": 70.81970370223894,
+              "left": 238.5,
+              "right": 268.3125,
+              "timePointIndex": 294,
+              "color": "#00FF00",
+              "borderColor": "#089981",
+              "wickColor": "#089981"
+            },
+            {
+              "center": 283.21875,
+              "open": 70.81977114536085,
+              "high": 70.73762542302018,
+              "low": 70.99903496307923,
+              "close": 70.73769286614197,
+              "left": 268.3125,
+              "right": 298.125,
+              "timePointIndex": 295,
+              "color": "#089981",
+              "borderColor": "#089981",
+              "wickColor": "#089981"
+            },
+            {
+              "center": 313.03125,
+              "open": 70.73762542302018,
+              "high": 70.73762542302018,
+              "low": 71.01488409670003,
+              "close": 70.76109562940314,
+              "left": 298.125,
+              "right": 327.9375,
+              "timePointIndex": 296,
+              "color": "#F23645",
+              "borderColor": "#F23645",
+              "wickColor": "#F23645"
+            },
+            {
+              "center": 342.84375,
+              "open": 70.76109562940314,
+              "high": 70.76109562940314,
+              "low": 71.02014466019966,
+              "close": 70.78780310563218,
+              "left": 327.9375,
+              "right": 357.75,
+              "timePointIndex": 297,
+              "color": "#FF7F00",
+              "borderColor": "#F23645",
+              "wickColor": "#F23645"
+            },
+            {
+              "center": 372.65625,
+              "open": 70.78780310563218,
+              "high": 70.67746615838325,
+              "low": 70.78787054875397,
+              "close": 70.67753360150505,
+              "left": 357.75,
+              "right": 387.5625,
+              "timePointIndex": 298,
+              "color": "#089981",
+              "borderColor": "#089981",
+              "wickColor": "#089981"
+            },
+            {
+              "center": 402.46875,
+              "open": 70.67746615838325,
+              "high": 70.39440737622954,
+              "low": 70.67746615838325,
+              "close": 70.52895640420104,
+              "left": 387.5625,
+              "right": 417.375,
+              "timePointIndex": 299,
+              "color": "#089981",
+              "borderColor": "#089981",
+              "wickColor": "#089981"
+            },
+            {
+              "center": 432.28125,
+              "open": 70.52895640420104,
+              "high": 70.52895640420104,
+              "low": 71.00975841944398,
+              "close": 70.85848349726837,
+              "left": 417.375,
+              "right": 447.1875,
+              "timePointIndex": 300,
+              "color": "#F23645",
+              "borderColor": "#F23645",
+              "wickColor": "#F23645"
+            },
+            {
+              "center": 462.09375,
+              "open": 70.85848349726837,
+              "high": 70.85848349726837,
+              "low": 71.11807207303912,
+              "close": 71.11807207303912,
+              "left": 447.1875,
+              "right": 477,
+              "timePointIndex": 301,
+              "color": "#F23645",
+              "borderColor": "#F23645",
+              "wickColor": "#F23645"
+            },
+            {
+              "center": 491.90625,
+              "open": 71.11807207303912,
+              "high": 70.96086215614605,
+              "low": 71.25626302958733,
+              "close": 70.96092959926784,
+              "left": 477,
+              "right": 506.8125,
+              "timePointIndex": 302,
+              "color": "#FF0000",
+              "borderColor": "#089981",
+              "wickColor": "#089981"
+            },
+            {
+              "center": 521.71875,
+              "open": 70.96086215614605,
+              "high": 70.80655229348986,
+              "low": 71.00571183213651,
+              "close": 71.00571183213651,
+              "left": 506.8125,
+              "right": 536.625,
+              "timePointIndex": 303,
+              "color": "#F23645",
+              "borderColor": "#F23645",
+              "wickColor": "#F23645"
+            },
+            {
+              "center": 551.53125,
+              "open": 71.00571183213651,
+              "high": 71.00564438901483,
+              "low": 71.2037248377128,
+              "close": 71.10694395794371,
+              "left": 536.625,
+              "right": 566.4375,
+              "timePointIndex": 304,
+              "color": "#F23645",
+              "borderColor": "#F23645",
+              "wickColor": "#F23645"
+            },
+            {
+              "center": 581.34375,
+              "open": 71.10694395794371,
+              "high": 70.77505635561386,
+              "low": 71.10694395794371,
+              "close": 70.90589601188697,
+              "left": 566.4375,
+              "right": 596.25,
+              "timePointIndex": 305,
+              "color": "#0000FF",
+              "borderColor": "#089981",
+              "wickColor": "#089981"
+            },
+            {
+              "center": 611.15625,
+              "open": 70.90589601188697,
+              "high": 70.27813543426305,
+              "low": 70.96092959926784,
+              "close": 70.37417443969241,
+              "left": 596.25,
+              "right": 626.0625,
+              "timePointIndex": 306,
+              "color": "#089981",
+              "borderColor": "#089981",
+              "wickColor": "#089981"
+            },
+            {
+              "center": 640.96875,
+              "open": 70.37410699657062,
+              "high": 70.14614924491957,
+              "low": 70.65939140174339,
+              "close": 70.14621668804125,
+              "left": 626.0625,
+              "right": 655.875,
+              "timePointIndex": 307,
+              "color": "#089981",
+              "borderColor": "#089981",
+              "wickColor": "#089981"
+            },
+            {
+              "center": 670.78125,
+              "open": 70.14614924491957,
+              "high": 70,
+              "low": 70.83629471019935,
+              "close": 70.3808513087497,
+              "left": 655.875,
+              "right": 685.6875,
+              "timePointIndex": 308,
+              "color": "#F23645",
+              "borderColor": "#F23645",
+              "wickColor": "#F23645"
+            },
+            {
+              "center": 700.59375,
+              "open": 70.3808513087497,
+              "high": 70.12463488906837,
+              "low": 70.40789600058758,
+              "close": 70.12476977531207,
+              "left": 685.6875,
+              "right": 715.5,
+              "timePointIndex": 309,
+              "color": "#089981",
+              "borderColor": "#089981",
+              "wickColor": "#089981"
+            },
+            {
+              "center": 730.40625,
+              "open": 70.12476977531207,
+              "high": 70.12470233219017,
+              "low": 70.63362812921957,
+              "close": 70.60341361065764,
+              "left": 715.5,
+              "right": 745.3125,
+              "timePointIndex": 310,
+              "color": "#00FF00",
+              "borderColor": "#F23645",
+              "wickColor": "#F23645"
+            },
+            {
+              "center": 760.21875,
+              "open": 70.60348105377932,
+              "high": 70.40789600058758,
+              "low": 70.74895586748107,
+              "close": 70.40789600058758,
+              "left": 745.3125,
+              "right": 775.125,
+              "timePointIndex": 311,
+              "color": "#089981",
+              "borderColor": "#089981",
+              "wickColor": "#089981"
+            },
+            {
+              "center": 790.03125,
+              "open": 70.40789600058758,
+              "high": 70.40789600058758,
+              "low": 70.7597467669674,
+              "close": 70.69115711210668,
+              "left": 775.125,
+              "right": 804.9375,
+              "timePointIndex": 312,
+              "color": "#F23645",
+              "borderColor": "#F23645",
+              "wickColor": "#F23645"
+            },
+            {
+              "center": 819.84375,
+              "open": 70.69115711210668,
+              "high": 70.6380793752578,
+              "low": 71.04186134541612,
+              "close": 70.92579173281501,
+              "left": 804.9375,
+              "right": 834.75,
+              "timePointIndex": 313,
+              "color": "#FF7F00",
+              "borderColor": "#F23645",
+              "wickColor": "#F23645"
+            },
+            {
+              "center": 849.65625,
+              "open": 70.92579173281501,
+              "high": 70.79630093897777,
+              "low": 71.05521508353058,
+              "close": 71.05521508353058,
+              "left": 834.75,
+              "right": 864.5625,
+              "timePointIndex": 314,
+              "color": "#F23645",
+              "borderColor": "#F23645",
+              "wickColor": "#F23645"
+            },
+            {
+              "center": 879.46875,
+              "open": 71.05521508353058,
+              "high": 71.05514764040879,
+              "low": 71.53898459613231,
+              "close": 71.41468692267279,
+              "left": 864.5625,
+              "right": 894.375,
+              "timePointIndex": 315,
+              "color": "#F23645",
+              "borderColor": "#F23645",
+              "wickColor": "#F23645"
+            }
+          ]
+        }
+      ],
+      "scale": {
+        "_minValue": -2,
+        "_maxValue": 84958.48
+      },
+      "mode": {
+        "autoScale": true,
+        "lockScale": false,
+        "percentage": false,
+        "indexedTo100": false,
+        "log": false
+      },
+      "views": [
+        {
+          "class": "F",
+          "keys": [
+            "_series",
+            "_model",
+            "_plotName",
+            "_selectionData",
+            "_dataInvalidated",
+            "_viewportInvalidated",
+            "_items",
+            "_selectionIndexer",
+            "_histogramBase",
+            "_lineColor",
+            "_lineWidth",
+            "_color1",
+            "_color2",
+            "_renderer",
+            "_isMarkersEnabled",
+            "_study",
+            "_plotIndex",
+            "_colorProvider",
+            "_extendStepLineToBarsEndings",
+            "_isFundamental",
+            "_isStepLinePlot"
+          ],
+          "plot": "plot_1",
+          "items": [
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 22956,
+              "timePointIndex": 216,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 22957,
+              "timePointIndex": 217,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 22958,
+              "timePointIndex": 218,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 22959,
+              "timePointIndex": 219,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 22960,
+              "timePointIndex": 220,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 22961,
+              "timePointIndex": 221,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 22962,
+              "timePointIndex": 222,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 22963,
+              "timePointIndex": 223,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 22964,
+              "timePointIndex": 224,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 22965,
+              "timePointIndex": 225,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 22966,
+              "timePointIndex": 226,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 22967,
+              "timePointIndex": 227,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 22968,
+              "timePointIndex": 228,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 22969,
+              "timePointIndex": 229,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 22970,
+              "timePointIndex": 230,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 22971,
+              "timePointIndex": 231,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 22972,
+              "timePointIndex": 232,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 22973,
+              "timePointIndex": 233,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 22974,
+              "timePointIndex": 234,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 22975,
+              "timePointIndex": 235,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 22976,
+              "timePointIndex": 236,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 22977,
+              "timePointIndex": 237,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 22978,
+              "timePointIndex": 238,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 22979,
+              "timePointIndex": 239,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 22980,
+              "timePointIndex": 240,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 22981,
+              "timePointIndex": 241,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 22982,
+              "timePointIndex": 242,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 22983,
+              "timePointIndex": 243,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 22984,
+              "timePointIndex": 244,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 22985,
+              "timePointIndex": 245,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 22986,
+              "timePointIndex": 246,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 22987,
+              "timePointIndex": 247,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 22988,
+              "timePointIndex": 248,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 22989,
+              "timePointIndex": 249,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 22990,
+              "timePointIndex": 250,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 22991,
+              "timePointIndex": 251,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 22992,
+              "timePointIndex": 252,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 22993,
+              "timePointIndex": 253,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 22994,
+              "timePointIndex": 254,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 22995,
+              "timePointIndex": 255,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 22996,
+              "timePointIndex": 256,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 22997,
+              "timePointIndex": 257,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 22998,
+              "timePointIndex": 258,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 22999,
+              "timePointIndex": 259,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 23000,
+              "timePointIndex": 260,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 23001,
+              "timePointIndex": 261,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 23002,
+              "timePointIndex": 262,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 23003,
+              "timePointIndex": 263,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 23004,
+              "timePointIndex": 264,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 23005,
+              "timePointIndex": 265,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 23006,
+              "timePointIndex": 266,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 23007,
+              "timePointIndex": 267,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 23008,
+              "timePointIndex": 268,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 23009,
+              "timePointIndex": 269,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 23010,
+              "timePointIndex": 270,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 23011,
+              "timePointIndex": 271,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 23012,
+              "timePointIndex": 272,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 23013,
+              "timePointIndex": 273,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 23014,
+              "timePointIndex": 274,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 23015,
+              "timePointIndex": 275,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 23016,
+              "timePointIndex": 276,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 23017,
+              "timePointIndex": 277,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 23018,
+              "timePointIndex": 278,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 23019,
+              "timePointIndex": 279,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 23020,
+              "timePointIndex": 280,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 23021,
+              "timePointIndex": 281,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 23022,
+              "timePointIndex": 282,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 23023,
+              "timePointIndex": 283,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 23024,
+              "timePointIndex": 284,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 487.6987234535398,
+              "left": -29.8125,
+              "center": -14.90625,
+              "right": 0,
+              "price": 23025,
+              "timePointIndex": 285,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 487.6919791413608,
+              "left": 0,
+              "center": 14.90625,
+              "right": 29.8125,
+              "price": 23026,
+              "timePointIndex": 286,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 487.68523482918175,
+              "left": 29.8125,
+              "center": 44.71875,
+              "right": 59.625,
+              "price": 23027,
+              "timePointIndex": 287,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 487.67849051700273,
+              "left": 59.625,
+              "center": 74.53125,
+              "right": 89.4375,
+              "price": 23028,
+              "timePointIndex": 288,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 487.6717462048237,
+              "left": 89.4375,
+              "center": 104.34375,
+              "right": 119.25,
+              "price": 23029,
+              "timePointIndex": 289,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 487.6650018926447,
+              "left": 119.25,
+              "center": 134.15625,
+              "right": 149.0625,
+              "price": 23030,
+              "timePointIndex": 290,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 487.65825758046566,
+              "left": 149.0625,
+              "center": 163.96875,
+              "right": 178.875,
+              "price": 23031,
+              "timePointIndex": 291,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 487.65151326828664,
+              "left": 178.875,
+              "center": 193.78125,
+              "right": 208.6875,
+              "price": 23032,
+              "timePointIndex": 292,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 487.64476895610755,
+              "left": 208.6875,
+              "center": 223.59375,
+              "right": 238.5,
+              "price": 23033,
+              "timePointIndex": 293,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 487.6380246439286,
+              "left": 238.5,
+              "center": 253.40625,
+              "right": 268.3125,
+              "price": 23034,
+              "timePointIndex": 294,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 487.6312803317495,
+              "left": 268.3125,
+              "center": 283.21875,
+              "right": 298.125,
+              "price": 23035,
+              "timePointIndex": 295,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 487.62453601957054,
+              "left": 298.125,
+              "center": 313.03125,
+              "right": 327.9375,
+              "price": 23036,
+              "timePointIndex": 296,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 487.61779170739146,
+              "left": 327.9375,
+              "center": 342.84375,
+              "right": 357.75,
+              "price": 23037,
+              "timePointIndex": 297,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 487.6110473952125,
+              "left": 357.75,
+              "center": 372.65625,
+              "right": 387.5625,
+              "price": 23038,
+              "timePointIndex": 298,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 487.6043030830334,
+              "left": 387.5625,
+              "center": 402.46875,
+              "right": 417.375,
+              "price": 23039,
+              "timePointIndex": 299,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 487.5975587708544,
+              "left": 417.375,
+              "center": 432.28125,
+              "right": 447.1875,
+              "price": 23040,
+              "timePointIndex": 300,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 487.59081445867537,
+              "left": 447.1875,
+              "center": 462.09375,
+              "right": 477,
+              "price": 23041,
+              "timePointIndex": 301,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 487.58407014649634,
+              "left": 477,
+              "center": 491.90625,
+              "right": 506.8125,
+              "price": 23042,
+              "timePointIndex": 302,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 487.5773258343173,
+              "left": 506.8125,
+              "center": 521.71875,
+              "right": 536.625,
+              "price": 23043,
+              "timePointIndex": 303,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 487.5705815221383,
+              "left": 536.625,
+              "center": 551.53125,
+              "right": 566.4375,
+              "price": 23044,
+              "timePointIndex": 304,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 487.5638372099593,
+              "left": 566.4375,
+              "center": 581.34375,
+              "right": 596.25,
+              "price": 23045,
+              "timePointIndex": 305,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 487.55709289778025,
+              "left": 596.25,
+              "center": 611.15625,
+              "right": 626.0625,
+              "price": 23046,
+              "timePointIndex": 306,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 487.5503485856012,
+              "left": 626.0625,
+              "center": 640.96875,
+              "right": 655.875,
+              "price": 23047,
+              "timePointIndex": 307,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 487.54360427342215,
+              "left": 655.875,
+              "center": 670.78125,
+              "right": 685.6875,
+              "price": 23048,
+              "timePointIndex": 308,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 487.5368599612432,
+              "left": 685.6875,
+              "center": 700.59375,
+              "right": 715.5,
+              "price": 23049,
+              "timePointIndex": 309,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 487.5301156490641,
+              "left": 715.5,
+              "center": 730.40625,
+              "right": 745.3125,
+              "price": 23050,
+              "timePointIndex": 310,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 487.52337133688513,
+              "left": 745.3125,
+              "center": 760.21875,
+              "right": 775.125,
+              "price": 23051,
+              "timePointIndex": 311,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 487.51662702470605,
+              "left": 775.125,
+              "center": 790.03125,
+              "right": 804.9375,
+              "price": 23052,
+              "timePointIndex": 312,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 487.5098827125271,
+              "left": 804.9375,
+              "center": 819.84375,
+              "right": 834.75,
+              "price": 23053,
+              "timePointIndex": 313,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 487.503138400348,
+              "left": 834.75,
+              "center": 849.65625,
+              "right": 864.5625,
+              "price": 23054,
+              "timePointIndex": 314,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 487.496394088169,
+              "left": 864.5625,
+              "center": 879.46875,
+              "right": 894.375,
+              "price": 23055,
+              "timePointIndex": 315,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            }
+          ],
+          "renderer_data": null,
+          "renderer_keys": [
+            "_renderers",
+            "_globalAlpha"
+          ]
+        },
+        {
+          "class": "F",
+          "keys": [
+            "_series",
+            "_model",
+            "_plotName",
+            "_selectionData",
+            "_dataInvalidated",
+            "_viewportInvalidated",
+            "_items",
+            "_selectionIndexer",
+            "_histogramBase",
+            "_lineColor",
+            "_lineWidth",
+            "_color1",
+            "_color2",
+            "_renderer",
+            "_isMarkersEnabled",
+            "_study",
+            "_plotIndex",
+            "_colorProvider",
+            "_extendStepLineToBarsEndings",
+            "_isFundamental",
+            "_isStepLinePlot"
+          ],
+          "plot": "plot_2",
+          "items": [
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 0,
+              "timePointIndex": 216,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 4,
+              "timePointIndex": 217,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 0,
+              "timePointIndex": 218,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 0,
+              "timePointIndex": 219,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 0,
+              "timePointIndex": 220,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 0,
+              "timePointIndex": 221,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 1,
+              "timePointIndex": 222,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 0,
+              "timePointIndex": 223,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 0,
+              "timePointIndex": 224,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 2,
+              "timePointIndex": 225,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 0,
+              "timePointIndex": 226,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 0,
+              "timePointIndex": 227,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 0,
+              "timePointIndex": 228,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 0,
+              "timePointIndex": 229,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 3,
+              "timePointIndex": 230,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 0,
+              "timePointIndex": 231,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 0,
+              "timePointIndex": 232,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 4,
+              "timePointIndex": 233,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 0,
+              "timePointIndex": 234,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 0,
+              "timePointIndex": 235,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 0,
+              "timePointIndex": 236,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 0,
+              "timePointIndex": 237,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 1,
+              "timePointIndex": 238,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 0,
+              "timePointIndex": 239,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 0,
+              "timePointIndex": 240,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 2,
+              "timePointIndex": 241,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 0,
+              "timePointIndex": 242,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 0,
+              "timePointIndex": 243,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 0,
+              "timePointIndex": 244,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 0,
+              "timePointIndex": 245,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 3,
+              "timePointIndex": 246,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 0,
+              "timePointIndex": 247,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 0,
+              "timePointIndex": 248,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 4,
+              "timePointIndex": 249,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 0,
+              "timePointIndex": 250,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 0,
+              "timePointIndex": 251,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 0,
+              "timePointIndex": 252,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 0,
+              "timePointIndex": 253,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 1,
+              "timePointIndex": 254,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 0,
+              "timePointIndex": 255,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 0,
+              "timePointIndex": 256,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 2,
+              "timePointIndex": 257,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 0,
+              "timePointIndex": 258,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 0,
+              "timePointIndex": 259,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 0,
+              "timePointIndex": 260,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 0,
+              "timePointIndex": 261,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 3,
+              "timePointIndex": 262,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 0,
+              "timePointIndex": 263,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 0,
+              "timePointIndex": 264,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 4,
+              "timePointIndex": 265,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 0,
+              "timePointIndex": 266,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 0,
+              "timePointIndex": 267,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 0,
+              "timePointIndex": 268,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 0,
+              "timePointIndex": 269,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 1,
+              "timePointIndex": 270,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 0,
+              "timePointIndex": 271,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 0,
+              "timePointIndex": 272,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 2,
+              "timePointIndex": 273,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 0,
+              "timePointIndex": 274,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 0,
+              "timePointIndex": 275,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 0,
+              "timePointIndex": 276,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 0,
+              "timePointIndex": 277,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 3,
+              "timePointIndex": 278,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 0,
+              "timePointIndex": 279,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 0,
+              "timePointIndex": 280,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 4,
+              "timePointIndex": 281,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 0,
+              "timePointIndex": 282,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 0,
+              "timePointIndex": 283,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 0,
+              "timePointIndex": 284,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 642.986511375642,
+              "left": -29.8125,
+              "center": -14.90625,
+              "right": 0,
+              "price": 0,
+              "timePointIndex": 285,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 642.9797670634629,
+              "left": 0,
+              "center": 14.90625,
+              "right": 29.8125,
+              "price": 1,
+              "timePointIndex": 286,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 642.986511375642,
+              "left": 29.8125,
+              "center": 44.71875,
+              "right": 59.625,
+              "price": 0,
+              "timePointIndex": 287,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 642.986511375642,
+              "left": 59.625,
+              "center": 74.53125,
+              "right": 89.4375,
+              "price": 0,
+              "timePointIndex": 288,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 642.9730227512839,
+              "left": 89.4375,
+              "center": 104.34375,
+              "right": 119.25,
+              "price": 2,
+              "timePointIndex": 289,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 642.986511375642,
+              "left": 119.25,
+              "center": 134.15625,
+              "right": 149.0625,
+              "price": 0,
+              "timePointIndex": 290,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 642.986511375642,
+              "left": 149.0625,
+              "center": 163.96875,
+              "right": 178.875,
+              "price": 0,
+              "timePointIndex": 291,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 642.986511375642,
+              "left": 178.875,
+              "center": 193.78125,
+              "right": 208.6875,
+              "price": 0,
+              "timePointIndex": 292,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 642.986511375642,
+              "left": 208.6875,
+              "center": 223.59375,
+              "right": 238.5,
+              "price": 0,
+              "timePointIndex": 293,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 642.9662784391048,
+              "left": 238.5,
+              "center": 253.40625,
+              "right": 268.3125,
+              "price": 3,
+              "timePointIndex": 294,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 642.986511375642,
+              "left": 268.3125,
+              "center": 283.21875,
+              "right": 298.125,
+              "price": 0,
+              "timePointIndex": 295,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 642.986511375642,
+              "left": 298.125,
+              "center": 313.03125,
+              "right": 327.9375,
+              "price": 0,
+              "timePointIndex": 296,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 642.9595341269259,
+              "left": 327.9375,
+              "center": 342.84375,
+              "right": 357.75,
+              "price": 4,
+              "timePointIndex": 297,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 642.986511375642,
+              "left": 357.75,
+              "center": 372.65625,
+              "right": 387.5625,
+              "price": 0,
+              "timePointIndex": 298,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 642.986511375642,
+              "left": 387.5625,
+              "center": 402.46875,
+              "right": 417.375,
+              "price": 0,
+              "timePointIndex": 299,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 642.986511375642,
+              "left": 417.375,
+              "center": 432.28125,
+              "right": 447.1875,
+              "price": 0,
+              "timePointIndex": 300,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 642.986511375642,
+              "left": 447.1875,
+              "center": 462.09375,
+              "right": 477,
+              "price": 0,
+              "timePointIndex": 301,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 642.9797670634629,
+              "left": 477,
+              "center": 491.90625,
+              "right": 506.8125,
+              "price": 1,
+              "timePointIndex": 302,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 642.986511375642,
+              "left": 506.8125,
+              "center": 521.71875,
+              "right": 536.625,
+              "price": 0,
+              "timePointIndex": 303,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 642.986511375642,
+              "left": 536.625,
+              "center": 551.53125,
+              "right": 566.4375,
+              "price": 0,
+              "timePointIndex": 304,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 642.9730227512839,
+              "left": 566.4375,
+              "center": 581.34375,
+              "right": 596.25,
+              "price": 2,
+              "timePointIndex": 305,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 642.986511375642,
+              "left": 596.25,
+              "center": 611.15625,
+              "right": 626.0625,
+              "price": 0,
+              "timePointIndex": 306,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 642.986511375642,
+              "left": 626.0625,
+              "center": 640.96875,
+              "right": 655.875,
+              "price": 0,
+              "timePointIndex": 307,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 642.986511375642,
+              "left": 655.875,
+              "center": 670.78125,
+              "right": 685.6875,
+              "price": 0,
+              "timePointIndex": 308,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 642.986511375642,
+              "left": 685.6875,
+              "center": 700.59375,
+              "right": 715.5,
+              "price": 0,
+              "timePointIndex": 309,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 642.9662784391048,
+              "left": 715.5,
+              "center": 730.40625,
+              "right": 745.3125,
+              "price": 3,
+              "timePointIndex": 310,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 642.986511375642,
+              "left": 745.3125,
+              "center": 760.21875,
+              "right": 775.125,
+              "price": 0,
+              "timePointIndex": 311,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 642.986511375642,
+              "left": 775.125,
+              "center": 790.03125,
+              "right": 804.9375,
+              "price": 0,
+              "timePointIndex": 312,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 642.9595341269259,
+              "left": 804.9375,
+              "center": 819.84375,
+              "right": 834.75,
+              "price": 4,
+              "timePointIndex": 313,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 642.986511375642,
+              "left": 834.75,
+              "center": 849.65625,
+              "right": 864.5625,
+              "price": 0,
+              "timePointIndex": 314,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 642.986511375642,
+              "left": 864.5625,
+              "center": 879.46875,
+              "right": 894.375,
+              "price": 0,
+              "timePointIndex": 315,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            }
+          ],
+          "renderer_data": null,
+          "renderer_keys": [
+            "_renderers",
+            "_globalAlpha"
+          ]
+        },
+        {
+          "class": "F",
+          "keys": [
+            "_series",
+            "_model",
+            "_plotName",
+            "_selectionData",
+            "_dataInvalidated",
+            "_viewportInvalidated",
+            "_items",
+            "_selectionIndexer",
+            "_histogramBase",
+            "_lineColor",
+            "_lineWidth",
+            "_color1",
+            "_color2",
+            "_renderer",
+            "_isMarkersEnabled",
+            "_study",
+            "_plotIndex",
+            "_colorProvider",
+            "_extendStepLineToBarsEndings",
+            "_isFundamental",
+            "_isStepLinePlot"
+          ],
+          "plot": "plot_3",
+          "items": [
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": -2,
+              "timePointIndex": 216,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": -2,
+              "timePointIndex": 217,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": -2,
+              "timePointIndex": 218,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": -2,
+              "timePointIndex": 219,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 2,
+              "timePointIndex": 220,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 2,
+              "timePointIndex": 221,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 2,
+              "timePointIndex": 222,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 2,
+              "timePointIndex": 223,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 2,
+              "timePointIndex": 224,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 2,
+              "timePointIndex": 225,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 2,
+              "timePointIndex": 226,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 2,
+              "timePointIndex": 227,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": -2,
+              "timePointIndex": 228,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": -2,
+              "timePointIndex": 229,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": -2,
+              "timePointIndex": 230,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": -2,
+              "timePointIndex": 231,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": -2,
+              "timePointIndex": 232,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": -2,
+              "timePointIndex": 233,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": -2,
+              "timePointIndex": 234,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": -2,
+              "timePointIndex": 235,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 2,
+              "timePointIndex": 236,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 2,
+              "timePointIndex": 237,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 2,
+              "timePointIndex": 238,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 2,
+              "timePointIndex": 239,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 2,
+              "timePointIndex": 240,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 2,
+              "timePointIndex": 241,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 2,
+              "timePointIndex": 242,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 2,
+              "timePointIndex": 243,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": -2,
+              "timePointIndex": 244,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": -2,
+              "timePointIndex": 245,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": -2,
+              "timePointIndex": 246,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": -2,
+              "timePointIndex": 247,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": -2,
+              "timePointIndex": 248,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": -2,
+              "timePointIndex": 249,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": -2,
+              "timePointIndex": 250,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": -2,
+              "timePointIndex": 251,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 2,
+              "timePointIndex": 252,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 2,
+              "timePointIndex": 253,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 2,
+              "timePointIndex": 254,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 2,
+              "timePointIndex": 255,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 2,
+              "timePointIndex": 256,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 2,
+              "timePointIndex": 257,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 2,
+              "timePointIndex": 258,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 2,
+              "timePointIndex": 259,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": -2,
+              "timePointIndex": 260,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": -2,
+              "timePointIndex": 261,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": -2,
+              "timePointIndex": 262,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": -2,
+              "timePointIndex": 263,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": -2,
+              "timePointIndex": 264,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": -2,
+              "timePointIndex": 265,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": -2,
+              "timePointIndex": 266,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": -2,
+              "timePointIndex": 267,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 2,
+              "timePointIndex": 268,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 2,
+              "timePointIndex": 269,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 2,
+              "timePointIndex": 270,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 2,
+              "timePointIndex": 271,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 2,
+              "timePointIndex": 272,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 2,
+              "timePointIndex": 273,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 2,
+              "timePointIndex": 274,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 2,
+              "timePointIndex": 275,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": -2,
+              "timePointIndex": 276,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": -2,
+              "timePointIndex": 277,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": -2,
+              "timePointIndex": 278,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": -2,
+              "timePointIndex": 279,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": -2,
+              "timePointIndex": 280,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": -2,
+              "timePointIndex": 281,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": -2,
+              "timePointIndex": 282,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": -2,
+              "timePointIndex": 283,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": null,
+              "left": null,
+              "center": null,
+              "right": null,
+              "price": 2,
+              "timePointIndex": 284,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 642.9730227512839,
+              "left": -29.8125,
+              "center": -14.90625,
+              "right": 0,
+              "price": 2,
+              "timePointIndex": 285,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 642.9730227512839,
+              "left": 0,
+              "center": 14.90625,
+              "right": 29.8125,
+              "price": 2,
+              "timePointIndex": 286,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 642.9730227512839,
+              "left": 29.8125,
+              "center": 44.71875,
+              "right": 59.625,
+              "price": 2,
+              "timePointIndex": 287,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 642.9730227512839,
+              "left": 59.625,
+              "center": 74.53125,
+              "right": 89.4375,
+              "price": 2,
+              "timePointIndex": 288,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 642.9730227512839,
+              "left": 89.4375,
+              "center": 104.34375,
+              "right": 119.25,
+              "price": 2,
+              "timePointIndex": 289,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 642.9730227512839,
+              "left": 119.25,
+              "center": 134.15625,
+              "right": 149.0625,
+              "price": 2,
+              "timePointIndex": 290,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 642.9730227512839,
+              "left": 149.0625,
+              "center": 163.96875,
+              "right": 178.875,
+              "price": 2,
+              "timePointIndex": 291,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 643,
+              "left": 178.875,
+              "center": 193.78125,
+              "right": 208.6875,
+              "price": -2,
+              "timePointIndex": 292,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 643,
+              "left": 208.6875,
+              "center": 223.59375,
+              "right": 238.5,
+              "price": -2,
+              "timePointIndex": 293,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 643,
+              "left": 238.5,
+              "center": 253.40625,
+              "right": 268.3125,
+              "price": -2,
+              "timePointIndex": 294,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 643,
+              "left": 268.3125,
+              "center": 283.21875,
+              "right": 298.125,
+              "price": -2,
+              "timePointIndex": 295,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 643,
+              "left": 298.125,
+              "center": 313.03125,
+              "right": 327.9375,
+              "price": -2,
+              "timePointIndex": 296,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 643,
+              "left": 327.9375,
+              "center": 342.84375,
+              "right": 357.75,
+              "price": -2,
+              "timePointIndex": 297,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 643,
+              "left": 357.75,
+              "center": 372.65625,
+              "right": 387.5625,
+              "price": -2,
+              "timePointIndex": 298,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 643,
+              "left": 387.5625,
+              "center": 402.46875,
+              "right": 417.375,
+              "price": -2,
+              "timePointIndex": 299,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 642.9730227512839,
+              "left": 417.375,
+              "center": 432.28125,
+              "right": 447.1875,
+              "price": 2,
+              "timePointIndex": 300,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 642.9730227512839,
+              "left": 447.1875,
+              "center": 462.09375,
+              "right": 477,
+              "price": 2,
+              "timePointIndex": 301,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 642.9730227512839,
+              "left": 477,
+              "center": 491.90625,
+              "right": 506.8125,
+              "price": 2,
+              "timePointIndex": 302,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 642.9730227512839,
+              "left": 506.8125,
+              "center": 521.71875,
+              "right": 536.625,
+              "price": 2,
+              "timePointIndex": 303,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 642.9730227512839,
+              "left": 536.625,
+              "center": 551.53125,
+              "right": 566.4375,
+              "price": 2,
+              "timePointIndex": 304,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 642.9730227512839,
+              "left": 566.4375,
+              "center": 581.34375,
+              "right": 596.25,
+              "price": 2,
+              "timePointIndex": 305,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 642.9730227512839,
+              "left": 596.25,
+              "center": 611.15625,
+              "right": 626.0625,
+              "price": 2,
+              "timePointIndex": 306,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 642.9730227512839,
+              "left": 626.0625,
+              "center": 640.96875,
+              "right": 655.875,
+              "price": 2,
+              "timePointIndex": 307,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 643,
+              "left": 655.875,
+              "center": 670.78125,
+              "right": 685.6875,
+              "price": -2,
+              "timePointIndex": 308,
+              "valIsNotSameAsPrev": true,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 643,
+              "left": 685.6875,
+              "center": 700.59375,
+              "right": 715.5,
+              "price": -2,
+              "timePointIndex": 309,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 643,
+              "left": 715.5,
+              "center": 730.40625,
+              "right": 745.3125,
+              "price": -2,
+              "timePointIndex": 310,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 643,
+              "left": 745.3125,
+              "center": 760.21875,
+              "right": 775.125,
+              "price": -2,
+              "timePointIndex": 311,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 643,
+              "left": 775.125,
+              "center": 790.03125,
+              "right": 804.9375,
+              "price": -2,
+              "timePointIndex": 312,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 643,
+              "left": 804.9375,
+              "center": 819.84375,
+              "right": 834.75,
+              "price": -2,
+              "timePointIndex": 313,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 643,
+              "left": 834.75,
+              "center": 849.65625,
+              "right": 864.5625,
+              "price": -2,
+              "timePointIndex": 314,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            },
+            {
+              "y": 643,
+              "left": 864.5625,
+              "center": 879.46875,
+              "right": 894.375,
+              "price": -2,
+              "timePointIndex": 315,
+              "valIsNotSameAsPrev": false,
+              "style": {
+                "color": "rgba(41, 98, 255, 0)",
+                "width": 1,
+                "style": 0
+              }
+            }
+          ],
+          "renderer_data": null,
+          "renderer_keys": [
+            "_renderers",
+            "_globalAlpha"
+          ]
+        }
+      ]
+    }
+  ],
+  "limit": "Native index and coordinates kept separate from literal exported n. Same32-bar viewport,2future bars. Sampled historical replay source/destination placement only; no live update or universal offset policy."
+}

@@ -1,0 +1,3293 @@
+[
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T19:19:28.724Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "arm",
+        "bitness": "64",
+        "brands": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156"
+          }
+        ],
+        "fullVersionList": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8.0.0.0"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156.0.8075.0"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156.0.8075.0"
+          }
+        ],
+        "mobile": false,
+        "platform": "macOS",
+        "platformVersion": "27.2.0"
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v15 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "visual-bgcolor-offset-v3-n-series-v1.pine",
+    "attempt": 1,
+    "source_sha256": "4850d8ce57afa860182d2bb072218757497e56800a65a2e1913d4357707e1ddf",
+    "indicator_title": "V13 bgcolor offset v3 series",
+    "status": "RUNS",
+    "csv_file": "captures/v15/visual-bgcolor-offset-v3-n-series-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-05T031927.980.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "minmove": 1,
+      "pricescale": 100,
+      "pointvalue": 1,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V13 bgcolor offset v3 series",
+      "dataset_start_utc": "2026-09-07T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -19720,
+        "value": [
+          1788739200,
+          80341.83,
+          80356,
+          80230.29,
+          80293.23,
+          37.66955
+        ]
+      },
+      "chart_bars": 20020,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T19:19:20.829Z",
+    "live_candle_open_utc": "2026-10-04T19:18:00.000Z",
+    "export_utc": "2026-10-04T19:19:28.338Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt1-setup.png",
+      "captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt1-export.png",
+      "captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt1-logs.txt",
+      "captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt1-logs-v1.json",
+      "captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt1-logs.png",
+      "captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt1-visual.png",
+      "captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt1-data-window-v1.png",
+      "captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt1-data-window-v1.json",
+      "captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt1-data-window-v1.txt",
+      "captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt1-authority-object-geometry-v1.json",
+      "captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt1-authority-object-geometry-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T19:19:21.699Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790836320,
+            84288.96,
+            84288.97,
+            84177.33,
+            84228,
+            31.21338
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791141480,
+            85391.22,
+            85391.22,
+            85391.21,
+            85391.22,
+            0.73669
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V13 bgcolor offset v3 series",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790836320,
+                null,
+                17476,
+                4,
+                0,
+                2
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791141480,
+                null,
+                20019,
+                19,
+                0,
+                -3
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T19:19:22.881Z",
+        "bars": 20020,
+        "end": true,
+        "first": {
+          "index": -19720,
+          "value": [
+            1788739200,
+            80341.83,
+            80356,
+            80230.29,
+            80293.23,
+            37.66955
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791141480,
+            85391.22,
+            85391.22,
+            85391.21,
+            85391.22,
+            0.73793
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V13 bgcolor offset v3 series",
+            "status": {
+              "type": 2
+            },
+            "size": 20020,
+            "first": {
+              "index": -19720,
+              "value": [
+                1788739200,
+                null,
+                0,
+                0,
+                0,
+                2
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791141480,
+                null,
+                20019,
+                19,
+                0,
+                -3
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///6679ca0d-2740-4beb-92e7-4d45e68234b5.pine?placement%3Ddialog",
+          "path": "/6679ca0d-2740-4beb-92e7-4d45e68234b5.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 3 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "live_tooltip": "Sun 04 Oct '26   19:18",
+    "historical_compare_before_unix_seconds": 1791141480,
+    "pine_logs": {
+      "paths": [
+        "evidence/visual-bgcolor-offset-v3-n-series-v1-attempt1-logs.txt",
+        "evidence/visual-bgcolor-offset-v3-n-series-v1-attempt1-logs-v1.json",
+        "evidence/visual-bgcolor-offset-v3-n-series-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "all_exported_column_occurrences": [
+      {
+        "title": "time",
+        "occurrence": 1,
+        "position": 0
+      },
+      {
+        "title": "open",
+        "occurrence": 1,
+        "position": 1
+      },
+      {
+        "title": "high",
+        "occurrence": 1,
+        "position": 2
+      },
+      {
+        "title": "low",
+        "occurrence": 1,
+        "position": 3
+      },
+      {
+        "title": "close",
+        "occurrence": 1,
+        "position": 4
+      },
+      {
+        "title": "BAR_INDEX",
+        "occurrence": 1,
+        "position": 5
+      },
+      {
+        "title": "PHASE",
+        "occurrence": 1,
+        "position": 6
+      },
+      {
+        "title": "SOURCE_CODE",
+        "occurrence": 1,
+        "position": 7
+      },
+      {
+        "title": "SERIES_OFFSET",
+        "occurrence": 1,
+        "position": 8
+      }
+    ],
+    "declared_to_native_column_occurrences": [
+      {
+        "declared_title": "BAR_INDEX",
+        "native_title": "BAR_INDEX",
+        "occurrence": 1,
+        "position": 5
+      },
+      {
+        "declared_title": "PHASE",
+        "native_title": "PHASE",
+        "occurrence": 1,
+        "position": 6
+      },
+      {
+        "declared_title": "SOURCE_CODE",
+        "native_title": "SOURCE_CODE",
+        "occurrence": 1,
+        "position": 7
+      },
+      {
+        "declared_title": "SERIES_OFFSET",
+        "native_title": "SERIES_OFFSET",
+        "occurrence": 1,
+        "position": 8
+      }
+    ],
+    "named_value_map_scope": "Legacy title maps show the first occurrence only; original positional cells and occurrence tables retain every duplicate without renaming.",
+    "csv_sha256": "19610c5e245d3055b95dd22175c75bcea0de074dbc7a367854eba1fdc045245e",
+    "csv_bytes": 1145004,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "BAR_INDEX",
+      "PHASE",
+      "SOURCE_CODE",
+      "SERIES_OFFSET"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "BAR_INDEX": 5,
+      "PHASE": 6,
+      "SOURCE_CODE": 7,
+      "SERIES_OFFSET": 8
+    },
+    "first_historical_cells": [
+      "1788739200",
+      "80341.83",
+      "80356",
+      "80230.29",
+      "80293.23",
+      "0",
+      "0",
+      "0",
+      "2"
+    ],
+    "last_historical_cells": [
+      "1791141360",
+      "85391.21",
+      "85391.22",
+      "85391.2",
+      "85391.21",
+      "20018",
+      "18",
+      "0",
+      "-3"
+    ],
+    "declared_to_native_header_mapping": {
+      "BAR_INDEX": "BAR_INDEX",
+      "PHASE": "PHASE",
+      "SOURCE_CODE": "SOURCE_CODE",
+      "SERIES_OFFSET": "SERIES_OFFSET"
+    },
+    "csv_rows": 20020,
+    "historical_rows": 20019,
+    "first_csv_timestamp_seconds": 1788739200,
+    "last_csv_timestamp_seconds": 1791141480,
+    "first_csv_time_raw": "1788739200",
+    "last_csv_time_raw": "1791141480",
+    "first_historical_values": {
+      "BAR_INDEX": "0",
+      "PHASE": "0",
+      "SOURCE_CODE": "0",
+      "SERIES_OFFSET": "2"
+    },
+    "last_historical_values": {
+      "BAR_INDEX": "20018",
+      "PHASE": "18",
+      "SOURCE_CODE": "0",
+      "SERIES_OFFSET": "-3"
+    },
+    "declared_unexported_columns": [],
+    "data_window_witness": "captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T19:22:38.386Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "arm",
+        "bitness": "64",
+        "brands": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156"
+          }
+        ],
+        "fullVersionList": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8.0.0.0"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156.0.8075.0"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156.0.8075.0"
+          }
+        ],
+        "mobile": false,
+        "platform": "macOS",
+        "platformVersion": "27.2.0"
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v15 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "visual-bgcolor-offset-v3-n-series-v1.pine",
+    "attempt": 2,
+    "source_sha256": "4850d8ce57afa860182d2bb072218757497e56800a65a2e1913d4357707e1ddf",
+    "indicator_title": "V13 bgcolor offset v3 series",
+    "status": "RUNS",
+    "csv_file": "captures/v15/visual-bgcolor-offset-v3-n-series-v1-attempt2.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-05T032237.740.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": true,
+      "minmove": 1,
+      "pricescale": 100,
+      "pointvalue": 1,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V13 bgcolor offset v3 series",
+      "dataset_start_utc": "2026-10-01T14:00:00.000Z",
+      "first_chart_bar": {
+        "index": 0,
+        "value": [
+          1790863200,
+          83938.6,
+          83958.01,
+          83694.77,
+          83722.01,
+          49.42632
+        ]
+      },
+      "chart_bars": 300,
+      "subscription": "pro_premium",
+      "native_end_of_data": false,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": "2026-10-01T23:58:00.000Z",
+    "export_utc": "2026-10-04T19:22:38.004Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt2-setup.png",
+      "captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt2-export.png",
+      "captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt2-logs.txt",
+      "captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt2-logs-v1.json",
+      "captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt2-logs.png",
+      "captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt2-visual.png",
+      "captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt2-data-window-v1.png",
+      "captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt2-data-window-v1.json",
+      "captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt2-data-window-v1.txt",
+      "captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt2-replay-phase31-before-v1.json",
+      "captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt2-replay-phase31-before-v1.png",
+      "captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt2-replay-phase9-after-v1.json",
+      "captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt2-replay-phase9-after-v1.png",
+      "captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt2-replay-phase11-after-v1.json",
+      "captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt2-replay-phase11-after-v1.png",
+      "captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt2-replay-phase12-after-v1.json",
+      "captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt2-replay-phase12-after-v1.png",
+      "captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt2-replay-phase31-after-v1.json",
+      "captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt2-replay-phase31-after-v1.png"
+    ],
+    "notes": "Required native Bar Replay visual context. Date selection 2026-10-02 00:00 UTC; actual source n/host/source timestamp and32barviewport retained at each required phase. Native replay history origin not inferred from ordinal rows.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": null,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///6679ca0d-2740-4beb-92e7-4d45e68234b5.pine?placement%3Ddialog",
+          "path": "/6679ca0d-2740-4beb-92e7-4d45e68234b5.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 3 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "live_tooltip": "Thu 01 Oct '26   23:58",
+    "historical_compare_before_unix_seconds": 1790899080,
+    "pine_logs": {
+      "paths": [
+        "evidence/visual-bgcolor-offset-v3-n-series-v1-attempt2-logs.txt",
+        "evidence/visual-bgcolor-offset-v3-n-series-v1-attempt2-logs-v1.json",
+        "evidence/visual-bgcolor-offset-v3-n-series-v1-attempt2-logs.png"
+      ],
+      "entries": 0
+    },
+    "all_exported_column_occurrences": [
+      {
+        "title": "time",
+        "occurrence": 1,
+        "position": 0
+      },
+      {
+        "title": "open",
+        "occurrence": 1,
+        "position": 1
+      },
+      {
+        "title": "high",
+        "occurrence": 1,
+        "position": 2
+      },
+      {
+        "title": "low",
+        "occurrence": 1,
+        "position": 3
+      },
+      {
+        "title": "close",
+        "occurrence": 1,
+        "position": 4
+      },
+      {
+        "title": "BAR_INDEX",
+        "occurrence": 1,
+        "position": 5
+      },
+      {
+        "title": "PHASE",
+        "occurrence": 1,
+        "position": 6
+      },
+      {
+        "title": "SOURCE_CODE",
+        "occurrence": 1,
+        "position": 7
+      },
+      {
+        "title": "SERIES_OFFSET",
+        "occurrence": 1,
+        "position": 8
+      }
+    ],
+    "declared_to_native_column_occurrences": [
+      {
+        "declared_title": "BAR_INDEX",
+        "native_title": "BAR_INDEX",
+        "occurrence": 1,
+        "position": 5
+      },
+      {
+        "declared_title": "PHASE",
+        "native_title": "PHASE",
+        "occurrence": 1,
+        "position": 6
+      },
+      {
+        "declared_title": "SOURCE_CODE",
+        "native_title": "SOURCE_CODE",
+        "occurrence": 1,
+        "position": 7
+      },
+      {
+        "declared_title": "SERIES_OFFSET",
+        "native_title": "SERIES_OFFSET",
+        "occurrence": 1,
+        "position": 8
+      }
+    ],
+    "named_value_map_scope": "Legacy title maps show the first occurrence only; original positional cells and occurrence tables retain every duplicate without renaming.",
+    "csv_sha256": "c88f0f08ea72cc7988bd2a7a43331120fc09678d02d351163e06dcae6e8e6b17",
+    "csv_bytes": 17402,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "BAR_INDEX",
+      "PHASE",
+      "SOURCE_CODE",
+      "SERIES_OFFSET"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "BAR_INDEX": 5,
+      "PHASE": 6,
+      "SOURCE_CODE": 7,
+      "SERIES_OFFSET": 8
+    },
+    "first_historical_cells": [
+      "1790863200",
+      "83938.6",
+      "83958.01",
+      "83694.77",
+      "83722.01",
+      "22740",
+      "20",
+      "0",
+      "-3"
+    ],
+    "last_historical_cells": [
+      "1790898960",
+      "84841.67",
+      "84858.03",
+      "84841.66",
+      "84858.02",
+      "23038",
+      "30",
+      "0",
+      "-3"
+    ],
+    "declared_to_native_header_mapping": {
+      "BAR_INDEX": "BAR_INDEX",
+      "PHASE": "PHASE",
+      "SOURCE_CODE": "SOURCE_CODE",
+      "SERIES_OFFSET": "SERIES_OFFSET"
+    },
+    "csv_rows": 300,
+    "historical_rows": 299,
+    "first_csv_timestamp_seconds": 1790863200,
+    "last_csv_timestamp_seconds": 1790899080,
+    "first_csv_time_raw": "1790863200",
+    "last_csv_time_raw": "1790899080",
+    "first_historical_values": {
+      "BAR_INDEX": "22740",
+      "PHASE": "20",
+      "SOURCE_CODE": "0",
+      "SERIES_OFFSET": "-3"
+    },
+    "last_historical_values": {
+      "BAR_INDEX": "23038",
+      "PHASE": "30",
+      "SOURCE_CODE": "0",
+      "SERIES_OFFSET": "-3"
+    },
+    "declared_unexported_columns": [],
+    "data_window_witness": "captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt2-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T19:25:50.465Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "arm",
+        "bitness": "64",
+        "brands": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156"
+          }
+        ],
+        "fullVersionList": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8.0.0.0"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156.0.8075.0"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156.0.8075.0"
+          }
+        ],
+        "mobile": false,
+        "platform": "macOS",
+        "platformVersion": "27.2.0"
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v15 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "visual-bgcolor-offset-v3-n-zero-control-v1.pine",
+    "attempt": 1,
+    "source_sha256": "400360578ab6995216212851ec88b1afba82f92fbfeefc1a8fbea42fc0a1a887",
+    "indicator_title": "V13 bgcolor offset v3 zero-control",
+    "status": "RUNS",
+    "csv_file": "captures/v15/visual-bgcolor-offset-v3-n-zero-control-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-05T032549.671.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": true,
+      "minmove": 1,
+      "pricescale": 100,
+      "pointvalue": 1,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V13 bgcolor offset v3 zero-control",
+      "dataset_start_utc": "2026-10-01T14:00:00.000Z",
+      "first_chart_bar": {
+        "index": 0,
+        "value": [
+          1790863200,
+          83938.6,
+          83958.01,
+          83694.77,
+          83722.01,
+          49.42632
+        ]
+      },
+      "chart_bars": 332,
+      "subscription": "pro_premium",
+      "native_end_of_data": false,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": "2026-10-02T01:02:00.000Z",
+    "export_utc": "2026-10-04T19:25:50.104Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v15/evidence/visual-bgcolor-offset-v3-n-zero-control-v1-attempt1-setup.png",
+      "captures/v15/evidence/visual-bgcolor-offset-v3-n-zero-control-v1-attempt1-export.png",
+      "captures/v15/evidence/visual-bgcolor-offset-v3-n-zero-control-v1-attempt1-logs.txt",
+      "captures/v15/evidence/visual-bgcolor-offset-v3-n-zero-control-v1-attempt1-logs-v1.json",
+      "captures/v15/evidence/visual-bgcolor-offset-v3-n-zero-control-v1-attempt1-logs.png",
+      "captures/v15/evidence/visual-bgcolor-offset-v3-n-zero-control-v1-attempt1-visual.png",
+      "captures/v15/evidence/visual-bgcolor-offset-v3-n-zero-control-v1-attempt1-data-window-v1.png",
+      "captures/v15/evidence/visual-bgcolor-offset-v3-n-zero-control-v1-attempt1-data-window-v1.json",
+      "captures/v15/evidence/visual-bgcolor-offset-v3-n-zero-control-v1-attempt1-data-window-v1.txt",
+      "captures/v15/evidence/visual-bgcolor-offset-v3-n-zero-control-v1-attempt1-replay-phase31-after-v1.json",
+      "captures/v15/evidence/visual-bgcolor-offset-v3-n-zero-control-v1-attempt1-replay-phase31-after-v1.png",
+      "captures/v15/evidence/visual-bgcolor-offset-v3-n-zero-control-v1-attempt1-replay-phase31-before-v1.json",
+      "captures/v15/evidence/visual-bgcolor-offset-v3-n-zero-control-v1-attempt1-replay-phase31-before-v1.png",
+      "captures/v15/evidence/visual-bgcolor-offset-v3-n-zero-control-v1-attempt1-replay-phase9-matched-v1.json",
+      "captures/v15/evidence/visual-bgcolor-offset-v3-n-zero-control-v1-attempt1-replay-phase9-matched-v1.png",
+      "captures/v15/evidence/visual-bgcolor-offset-v3-n-zero-control-v1-attempt1-replay-phase9-paired-v1.json",
+      "captures/v15/evidence/visual-bgcolor-offset-v3-n-zero-control-v1-attempt1-replay-phase9-paired-v1.png",
+      "captures/v15/evidence/visual-bgcolor-offset-v3-n-zero-control-v1-attempt1-replay-phase11-paired-v1.json",
+      "captures/v15/evidence/visual-bgcolor-offset-v3-n-zero-control-v1-attempt1-replay-phase11-paired-v1.png",
+      "captures/v15/evidence/visual-bgcolor-offset-v3-n-zero-control-v1-attempt1-replay-phase12-paired-v1.json",
+      "captures/v15/evidence/visual-bgcolor-offset-v3-n-zero-control-v1-attempt1-replay-phase12-paired-v1.png",
+      "captures/v15/evidence/visual-bgcolor-offset-v3-n-zero-control-v1-attempt1-replay-phase31-paired-v1.json",
+      "captures/v15/evidence/visual-bgcolor-offset-v3-n-zero-control-v1-attempt1-replay-phase31-paired-v1.png"
+    ],
+    "notes": "Required native Bar Replay visual context. Date selection 2026-10-02 00:00 UTC; actual source n/host/source timestamp and32barviewport retained at each required phase. Native replay history origin not inferred from ordinal rows.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": null,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///5eb4c135-fb8e-4329-8afd-63f169b0c5a2.pine?placement%3Ddialog",
+          "path": "/5eb4c135-fb8e-4329-8afd-63f169b0c5a2.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 3 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "live_tooltip": "Fri 02 Oct '26   01:02",
+    "historical_compare_before_unix_seconds": 1790902920,
+    "pine_logs": {
+      "paths": [
+        "evidence/visual-bgcolor-offset-v3-n-zero-control-v1-attempt1-logs.txt",
+        "evidence/visual-bgcolor-offset-v3-n-zero-control-v1-attempt1-logs-v1.json",
+        "evidence/visual-bgcolor-offset-v3-n-zero-control-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "all_exported_column_occurrences": [
+      {
+        "title": "time",
+        "occurrence": 1,
+        "position": 0
+      },
+      {
+        "title": "open",
+        "occurrence": 1,
+        "position": 1
+      },
+      {
+        "title": "high",
+        "occurrence": 1,
+        "position": 2
+      },
+      {
+        "title": "low",
+        "occurrence": 1,
+        "position": 3
+      },
+      {
+        "title": "close",
+        "occurrence": 1,
+        "position": 4
+      },
+      {
+        "title": "BAR_INDEX",
+        "occurrence": 1,
+        "position": 5
+      },
+      {
+        "title": "PHASE",
+        "occurrence": 1,
+        "position": 6
+      },
+      {
+        "title": "SOURCE_CODE",
+        "occurrence": 1,
+        "position": 7
+      },
+      {
+        "title": "SERIES_OFFSET",
+        "occurrence": 1,
+        "position": 8
+      }
+    ],
+    "declared_to_native_column_occurrences": [
+      {
+        "declared_title": "BAR_INDEX",
+        "native_title": "BAR_INDEX",
+        "occurrence": 1,
+        "position": 5
+      },
+      {
+        "declared_title": "PHASE",
+        "native_title": "PHASE",
+        "occurrence": 1,
+        "position": 6
+      },
+      {
+        "declared_title": "SOURCE_CODE",
+        "native_title": "SOURCE_CODE",
+        "occurrence": 1,
+        "position": 7
+      },
+      {
+        "declared_title": "SERIES_OFFSET",
+        "native_title": "SERIES_OFFSET",
+        "occurrence": 1,
+        "position": 8
+      }
+    ],
+    "named_value_map_scope": "Legacy title maps show the first occurrence only; original positional cells and occurrence tables retain every duplicate without renaming.",
+    "csv_sha256": "ad0755f239d80ccfca8baecf5599f54940303fcb3fc3ab463e96a6ee5e7e6a66",
+    "csv_bytes": 19256,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "BAR_INDEX",
+      "PHASE",
+      "SOURCE_CODE",
+      "SERIES_OFFSET"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "BAR_INDEX": 5,
+      "PHASE": 6,
+      "SOURCE_CODE": 7,
+      "SERIES_OFFSET": 8
+    },
+    "first_historical_cells": [
+      "1790863200",
+      "83938.6",
+      "83958.01",
+      "83694.77",
+      "83722.01",
+      "22740",
+      "20",
+      "0",
+      "-3"
+    ],
+    "last_historical_cells": [
+      "1790902800",
+      "84784.89",
+      "84792.7",
+      "84744",
+      "84756.82",
+      "23070",
+      "30",
+      "0",
+      "-3"
+    ],
+    "declared_to_native_header_mapping": {
+      "BAR_INDEX": "BAR_INDEX",
+      "PHASE": "PHASE",
+      "SOURCE_CODE": "SOURCE_CODE",
+      "SERIES_OFFSET": "SERIES_OFFSET"
+    },
+    "csv_rows": 332,
+    "historical_rows": 331,
+    "first_csv_timestamp_seconds": 1790863200,
+    "last_csv_timestamp_seconds": 1790902920,
+    "first_csv_time_raw": "1790863200",
+    "last_csv_time_raw": "1790902920",
+    "first_historical_values": {
+      "BAR_INDEX": "22740",
+      "PHASE": "20",
+      "SOURCE_CODE": "0",
+      "SERIES_OFFSET": "-3"
+    },
+    "last_historical_values": {
+      "BAR_INDEX": "23070",
+      "PHASE": "30",
+      "SOURCE_CODE": "0",
+      "SERIES_OFFSET": "-3"
+    },
+    "declared_unexported_columns": [],
+    "data_window_witness": "captures/v15/evidence/visual-bgcolor-offset-v3-n-zero-control-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T19:34:08.835Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "arm",
+        "bitness": "64",
+        "brands": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156"
+          }
+        ],
+        "fullVersionList": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8.0.0.0"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156.0.8075.0"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156.0.8075.0"
+          }
+        ],
+        "mobile": false,
+        "platform": "macOS",
+        "platformVersion": "27.2.0"
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v15 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "visual-bgcolor-offset-v3-n-series-v1.pine",
+    "attempt": 3,
+    "source_sha256": "4850d8ce57afa860182d2bb072218757497e56800a65a2e1913d4357707e1ddf",
+    "indicator_title": "V13 bgcolor offset v3 series",
+    "status": "RUNS",
+    "csv_file": "captures/v15/visual-bgcolor-offset-v3-n-series-v1-attempt3.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-05T033408.201.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": true,
+      "minmove": 1,
+      "pricescale": 100,
+      "pointvalue": 1,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V13 bgcolor offset v3 series",
+      "dataset_start_utc": "2026-10-01T14:00:00.000Z",
+      "first_chart_bar": {
+        "index": 0,
+        "value": [
+          1790863200,
+          83938.6,
+          83958.01,
+          83694.77,
+          83722.01,
+          49.42632
+        ]
+      },
+      "chart_bars": 300,
+      "subscription": "pro_premium",
+      "native_end_of_data": false,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": "2026-10-01T23:58:00.000Z",
+    "export_utc": "2026-10-04T19:34:08.418Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt3-setup.png",
+      "captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt3-export.png",
+      "captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt3-logs.txt",
+      "captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt3-logs-v1.json",
+      "captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt3-logs.png",
+      "captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt3-visual.png",
+      "captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt3-data-window-v1.png",
+      "captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt3-data-window-v1.json",
+      "captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt3-data-window-v1.txt",
+      "captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt3-replay-phase31-before-v1.json",
+      "captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt3-replay-phase31-before-v1.png",
+      "captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt3-replay-phase9-paired-v1.json",
+      "captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt3-replay-phase9-paired-v1.png",
+      "captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt3-replay-phase11-paired-v1.json",
+      "captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt3-replay-phase11-paired-v1.png",
+      "captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt3-replay-phase12-paired-v1.json",
+      "captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt3-replay-phase12-paired-v1.png",
+      "captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt3-replay-phase31-paired-v1.json",
+      "captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt3-replay-phase31-paired-v1.png"
+    ],
+    "notes": "Frozen source unchanged. Historical Replay matched pair uses 954px pane width, standard closed editor and collapsed bottom panel, phases9/11/12/31; native index is separate from literal n. No live-tick claim.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": null,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///5dbf69c3-04da-46bb-8afc-2117078d5502.pine?placement%3Ddialog",
+          "path": "/5dbf69c3-04da-46bb-8afc-2117078d5502.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 3 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "live_tooltip": "Thu 01 Oct '26   23:58",
+    "historical_compare_before_unix_seconds": 1790899080,
+    "pine_logs": {
+      "paths": [
+        "evidence/visual-bgcolor-offset-v3-n-series-v1-attempt3-logs.txt",
+        "evidence/visual-bgcolor-offset-v3-n-series-v1-attempt3-logs-v1.json",
+        "evidence/visual-bgcolor-offset-v3-n-series-v1-attempt3-logs.png"
+      ],
+      "entries": 0
+    },
+    "all_exported_column_occurrences": [
+      {
+        "title": "time",
+        "occurrence": 1,
+        "position": 0
+      },
+      {
+        "title": "open",
+        "occurrence": 1,
+        "position": 1
+      },
+      {
+        "title": "high",
+        "occurrence": 1,
+        "position": 2
+      },
+      {
+        "title": "low",
+        "occurrence": 1,
+        "position": 3
+      },
+      {
+        "title": "close",
+        "occurrence": 1,
+        "position": 4
+      },
+      {
+        "title": "BAR_INDEX",
+        "occurrence": 1,
+        "position": 5
+      },
+      {
+        "title": "PHASE",
+        "occurrence": 1,
+        "position": 6
+      },
+      {
+        "title": "SOURCE_CODE",
+        "occurrence": 1,
+        "position": 7
+      },
+      {
+        "title": "SERIES_OFFSET",
+        "occurrence": 1,
+        "position": 8
+      }
+    ],
+    "declared_to_native_column_occurrences": [
+      {
+        "declared_title": "BAR_INDEX",
+        "native_title": "BAR_INDEX",
+        "occurrence": 1,
+        "position": 5
+      },
+      {
+        "declared_title": "PHASE",
+        "native_title": "PHASE",
+        "occurrence": 1,
+        "position": 6
+      },
+      {
+        "declared_title": "SOURCE_CODE",
+        "native_title": "SOURCE_CODE",
+        "occurrence": 1,
+        "position": 7
+      },
+      {
+        "declared_title": "SERIES_OFFSET",
+        "native_title": "SERIES_OFFSET",
+        "occurrence": 1,
+        "position": 8
+      }
+    ],
+    "named_value_map_scope": "Legacy title maps show the first occurrence only; original positional cells and occurrence tables retain every duplicate without renaming.",
+    "csv_sha256": "c88f0f08ea72cc7988bd2a7a43331120fc09678d02d351163e06dcae6e8e6b17",
+    "csv_bytes": 17402,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "BAR_INDEX",
+      "PHASE",
+      "SOURCE_CODE",
+      "SERIES_OFFSET"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "BAR_INDEX": 5,
+      "PHASE": 6,
+      "SOURCE_CODE": 7,
+      "SERIES_OFFSET": 8
+    },
+    "first_historical_cells": [
+      "1790863200",
+      "83938.6",
+      "83958.01",
+      "83694.77",
+      "83722.01",
+      "22740",
+      "20",
+      "0",
+      "-3"
+    ],
+    "last_historical_cells": [
+      "1790898960",
+      "84841.67",
+      "84858.03",
+      "84841.66",
+      "84858.02",
+      "23038",
+      "30",
+      "0",
+      "-3"
+    ],
+    "declared_to_native_header_mapping": {
+      "BAR_INDEX": "BAR_INDEX",
+      "PHASE": "PHASE",
+      "SOURCE_CODE": "SOURCE_CODE",
+      "SERIES_OFFSET": "SERIES_OFFSET"
+    },
+    "csv_rows": 300,
+    "historical_rows": 299,
+    "first_csv_timestamp_seconds": 1790863200,
+    "last_csv_timestamp_seconds": 1790899080,
+    "first_csv_time_raw": "1790863200",
+    "last_csv_time_raw": "1790899080",
+    "first_historical_values": {
+      "BAR_INDEX": "22740",
+      "PHASE": "20",
+      "SOURCE_CODE": "0",
+      "SERIES_OFFSET": "-3"
+    },
+    "last_historical_values": {
+      "BAR_INDEX": "23038",
+      "PHASE": "30",
+      "SOURCE_CODE": "0",
+      "SERIES_OFFSET": "-3"
+    },
+    "declared_unexported_columns": [],
+    "data_window_witness": "captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt3-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T19:35:57.861Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "arm",
+        "bitness": "64",
+        "brands": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156"
+          }
+        ],
+        "fullVersionList": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8.0.0.0"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156.0.8075.0"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156.0.8075.0"
+          }
+        ],
+        "mobile": false,
+        "platform": "macOS",
+        "platformVersion": "27.2.0"
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v15 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "visual-plotarrow-offset-v3-n-series-v1.pine",
+    "attempt": 1,
+    "source_sha256": "a5c3293682093528667f5b39c5681d63e515b9256401e54d547ba4f777f3622d",
+    "indicator_title": "V13 plotarrow offset v3 series",
+    "status": "RUNS",
+    "csv_file": "captures/v15/visual-plotarrow-offset-v3-n-series-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-05T033557.237.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": true,
+      "minmove": 1,
+      "pricescale": 100,
+      "pointvalue": 1,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V13 plotarrow offset v3 series",
+      "dataset_start_utc": "2026-10-01T14:00:00.000Z",
+      "first_chart_bar": {
+        "index": 0,
+        "value": [
+          1790863200,
+          83938.6,
+          83958.01,
+          83694.77,
+          83722.01,
+          49.42632
+        ]
+      },
+      "chart_bars": 300,
+      "subscription": "pro_premium",
+      "native_end_of_data": false,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": "2026-10-01T23:58:00.000Z",
+    "export_utc": "2026-10-04T19:35:57.436Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v15/evidence/visual-plotarrow-offset-v3-n-series-v1-attempt1-setup.png",
+      "captures/v15/evidence/visual-plotarrow-offset-v3-n-series-v1-attempt1-export.png",
+      "captures/v15/evidence/visual-plotarrow-offset-v3-n-series-v1-attempt1-logs.txt",
+      "captures/v15/evidence/visual-plotarrow-offset-v3-n-series-v1-attempt1-logs-v1.json",
+      "captures/v15/evidence/visual-plotarrow-offset-v3-n-series-v1-attempt1-logs.png",
+      "captures/v15/evidence/visual-plotarrow-offset-v3-n-series-v1-attempt1-visual.png",
+      "captures/v15/evidence/visual-plotarrow-offset-v3-n-series-v1-attempt1-data-window-v1.png",
+      "captures/v15/evidence/visual-plotarrow-offset-v3-n-series-v1-attempt1-data-window-v1.json",
+      "captures/v15/evidence/visual-plotarrow-offset-v3-n-series-v1-attempt1-data-window-v1.txt",
+      "captures/v15/evidence/visual-plotarrow-offset-v3-n-series-v1-attempt1-replay-phase9-paired-v1.json",
+      "captures/v15/evidence/visual-plotarrow-offset-v3-n-series-v1-attempt1-replay-phase9-paired-v1.png",
+      "captures/v15/evidence/visual-plotarrow-offset-v3-n-series-v1-attempt1-replay-phase11-paired-v1.json",
+      "captures/v15/evidence/visual-plotarrow-offset-v3-n-series-v1-attempt1-replay-phase11-paired-v1.png",
+      "captures/v15/evidence/visual-plotarrow-offset-v3-n-series-v1-attempt1-replay-phase12-paired-v1.json",
+      "captures/v15/evidence/visual-plotarrow-offset-v3-n-series-v1-attempt1-replay-phase12-paired-v1.png",
+      "captures/v15/evidence/visual-plotarrow-offset-v3-n-series-v1-attempt1-replay-phase31-paired-v1.json",
+      "captures/v15/evidence/visual-plotarrow-offset-v3-n-series-v1-attempt1-replay-phase31-paired-v1.png",
+      "captures/v15/evidence/visual-plotarrow-offset-v3-n-series-v1-attempt1-renderer-phase9-v1.json",
+      "captures/v15/evidence/visual-plotarrow-offset-v3-n-series-v1-attempt1-renderer-phase9-v1.png",
+      "captures/v15/evidence/visual-plotarrow-offset-v3-n-series-v1-attempt1-renderer-phase11-v1.json",
+      "captures/v15/evidence/visual-plotarrow-offset-v3-n-series-v1-attempt1-renderer-phase11-v1.png",
+      "captures/v15/evidence/visual-plotarrow-offset-v3-n-series-v1-attempt1-renderer-phase12-v1.json",
+      "captures/v15/evidence/visual-plotarrow-offset-v3-n-series-v1-attempt1-renderer-phase12-v1.png",
+      "captures/v15/evidence/visual-plotarrow-offset-v3-n-series-v1-attempt1-renderer-phase31-v1.json",
+      "captures/v15/evidence/visual-plotarrow-offset-v3-n-series-v1-attempt1-renderer-phase31-v1.png",
+      "captures/v15/evidence/visual-plotarrow-offset-v3-n-series-v1-attempt1-renderer-phase11-settled-v1.json",
+      "captures/v15/evidence/visual-plotarrow-offset-v3-n-series-v1-attempt1-renderer-phase11-settled-v1.png"
+    ],
+    "notes": "Frozen source unchanged. Historical Replay frames use same32-bar viewport/2future bars and pair symbol/interval/cutoffs. Native renderer geometry and source rows retained separately from literal source index. No live-tick claim.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": null,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///370d97c4-92fe-4ed5-b97a-8935afef8e44.pine?placement%3Ddialog",
+          "path": "/370d97c4-92fe-4ed5-b97a-8935afef8e44.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 3 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "live_tooltip": "Thu 01 Oct '26   23:58",
+    "historical_compare_before_unix_seconds": 1790899080,
+    "pine_logs": {
+      "paths": [
+        "evidence/visual-plotarrow-offset-v3-n-series-v1-attempt1-logs.txt",
+        "evidence/visual-plotarrow-offset-v3-n-series-v1-attempt1-logs-v1.json",
+        "evidence/visual-plotarrow-offset-v3-n-series-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "all_exported_column_occurrences": [
+      {
+        "title": "time",
+        "occurrence": 1,
+        "position": 0
+      },
+      {
+        "title": "open",
+        "occurrence": 1,
+        "position": 1
+      },
+      {
+        "title": "high",
+        "occurrence": 1,
+        "position": 2
+      },
+      {
+        "title": "low",
+        "occurrence": 1,
+        "position": 3
+      },
+      {
+        "title": "close",
+        "occurrence": 1,
+        "position": 4
+      },
+      {
+        "title": "Arrows",
+        "occurrence": 1,
+        "position": 5
+      },
+      {
+        "title": "BAR_INDEX",
+        "occurrence": 1,
+        "position": 6
+      },
+      {
+        "title": "SOURCE",
+        "occurrence": 1,
+        "position": 7
+      },
+      {
+        "title": "OFFSET",
+        "occurrence": 1,
+        "position": 8
+      },
+      {
+        "title": "MINHEIGHT",
+        "occurrence": 1,
+        "position": 9
+      },
+      {
+        "title": "MAXHEIGHT",
+        "occurrence": 1,
+        "position": 10
+      }
+    ],
+    "declared_to_native_column_occurrences": [
+      {
+        "declared_title": "BAR_INDEX",
+        "native_title": "BAR_INDEX",
+        "occurrence": 1,
+        "position": 6
+      },
+      {
+        "declared_title": "SOURCE",
+        "native_title": "SOURCE",
+        "occurrence": 1,
+        "position": 7
+      },
+      {
+        "declared_title": "OFFSET",
+        "native_title": "OFFSET",
+        "occurrence": 1,
+        "position": 8
+      },
+      {
+        "declared_title": "MINHEIGHT",
+        "native_title": "MINHEIGHT",
+        "occurrence": 1,
+        "position": 9
+      },
+      {
+        "declared_title": "MAXHEIGHT",
+        "native_title": "MAXHEIGHT",
+        "occurrence": 1,
+        "position": 10
+      }
+    ],
+    "named_value_map_scope": "Legacy title maps show the first occurrence only; original positional cells and occurrence tables retain every duplicate without renaming.",
+    "csv_sha256": "5648f9baac093b18d3e83c84aeb60e9cf01ff03cd71f5f95a25562f176a52924",
+    "csv_bytes": 19034,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "Arrows",
+      "BAR_INDEX",
+      "SOURCE",
+      "OFFSET",
+      "MINHEIGHT",
+      "MAXHEIGHT"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "BAR_INDEX": 6,
+      "SOURCE": 7,
+      "OFFSET": 8,
+      "MINHEIGHT": 9,
+      "MAXHEIGHT": 10
+    },
+    "first_historical_cells": [
+      "1790863200",
+      "83938.6",
+      "83958.01",
+      "83694.77",
+      "83722.01",
+      "0",
+      "22740",
+      "0",
+      "-3",
+      "10",
+      "50"
+    ],
+    "last_historical_cells": [
+      "1790898960",
+      "84841.67",
+      "84858.03",
+      "84841.66",
+      "84858.02",
+      "",
+      "23038",
+      "0",
+      "-3",
+      "10",
+      "50"
+    ],
+    "declared_to_native_header_mapping": {
+      "BAR_INDEX": "BAR_INDEX",
+      "SOURCE": "SOURCE",
+      "OFFSET": "OFFSET",
+      "MINHEIGHT": "MINHEIGHT",
+      "MAXHEIGHT": "MAXHEIGHT"
+    },
+    "csv_rows": 300,
+    "historical_rows": 299,
+    "first_csv_timestamp_seconds": 1790863200,
+    "last_csv_timestamp_seconds": 1790899080,
+    "first_csv_time_raw": "1790863200",
+    "last_csv_time_raw": "1790899080",
+    "first_historical_values": {
+      "BAR_INDEX": "22740",
+      "SOURCE": "0",
+      "OFFSET": "-3",
+      "MINHEIGHT": "10",
+      "MAXHEIGHT": "50"
+    },
+    "last_historical_values": {
+      "BAR_INDEX": "23038",
+      "SOURCE": "0",
+      "OFFSET": "-3",
+      "MINHEIGHT": "10",
+      "MAXHEIGHT": "50"
+    },
+    "declared_unexported_columns": [],
+    "data_window_witness": "captures/v15/evidence/visual-plotarrow-offset-v3-n-series-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T19:37:11.599Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "arm",
+        "bitness": "64",
+        "brands": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156"
+          }
+        ],
+        "fullVersionList": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8.0.0.0"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156.0.8075.0"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156.0.8075.0"
+          }
+        ],
+        "mobile": false,
+        "platform": "macOS",
+        "platformVersion": "27.2.0"
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v15 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "visual-plotarrow-offset-v3-n-zero-control-v1.pine",
+    "attempt": 1,
+    "source_sha256": "4e2c0628e124d5a8af6ed88d03a01ed1603a16c3c34f9370d92f2232f9ae757d",
+    "indicator_title": "V13 plotarrow offset v3 zero-control",
+    "status": "RUNS",
+    "csv_file": "captures/v15/visual-plotarrow-offset-v3-n-zero-control-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-05T033710.845.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": true,
+      "minmove": 1,
+      "pricescale": 100,
+      "pointvalue": 1,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V13 plotarrow offset v3 zero-control",
+      "dataset_start_utc": "2026-10-01T14:00:00.000Z",
+      "first_chart_bar": {
+        "index": 0,
+        "value": [
+          1790863200,
+          83938.6,
+          83958.01,
+          83694.77,
+          83722.01,
+          49.42632
+        ]
+      },
+      "chart_bars": 300,
+      "subscription": "pro_premium",
+      "native_end_of_data": false,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": "2026-10-01T23:58:00.000Z",
+    "export_utc": "2026-10-04T19:37:11.205Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v15/evidence/visual-plotarrow-offset-v3-n-zero-control-v1-attempt1-setup.png",
+      "captures/v15/evidence/visual-plotarrow-offset-v3-n-zero-control-v1-attempt1-export.png",
+      "captures/v15/evidence/visual-plotarrow-offset-v3-n-zero-control-v1-attempt1-logs.txt",
+      "captures/v15/evidence/visual-plotarrow-offset-v3-n-zero-control-v1-attempt1-logs-v1.json",
+      "captures/v15/evidence/visual-plotarrow-offset-v3-n-zero-control-v1-attempt1-logs.png",
+      "captures/v15/evidence/visual-plotarrow-offset-v3-n-zero-control-v1-attempt1-visual.png",
+      "captures/v15/evidence/visual-plotarrow-offset-v3-n-zero-control-v1-attempt1-data-window-v1.png",
+      "captures/v15/evidence/visual-plotarrow-offset-v3-n-zero-control-v1-attempt1-data-window-v1.json",
+      "captures/v15/evidence/visual-plotarrow-offset-v3-n-zero-control-v1-attempt1-data-window-v1.txt",
+      "captures/v15/evidence/visual-plotarrow-offset-v3-n-zero-control-v1-attempt1-replay-phase9-paired-v1.json",
+      "captures/v15/evidence/visual-plotarrow-offset-v3-n-zero-control-v1-attempt1-replay-phase9-paired-v1.png",
+      "captures/v15/evidence/visual-plotarrow-offset-v3-n-zero-control-v1-attempt1-replay-phase11-paired-v1.json",
+      "captures/v15/evidence/visual-plotarrow-offset-v3-n-zero-control-v1-attempt1-replay-phase11-paired-v1.png",
+      "captures/v15/evidence/visual-plotarrow-offset-v3-n-zero-control-v1-attempt1-replay-phase12-paired-v1.json",
+      "captures/v15/evidence/visual-plotarrow-offset-v3-n-zero-control-v1-attempt1-replay-phase12-paired-v1.png",
+      "captures/v15/evidence/visual-plotarrow-offset-v3-n-zero-control-v1-attempt1-replay-phase31-paired-v1.json",
+      "captures/v15/evidence/visual-plotarrow-offset-v3-n-zero-control-v1-attempt1-replay-phase31-paired-v1.png",
+      "captures/v15/evidence/visual-plotarrow-offset-v3-n-zero-control-v1-attempt1-renderer-phase9-v1.json",
+      "captures/v15/evidence/visual-plotarrow-offset-v3-n-zero-control-v1-attempt1-renderer-phase9-v1.png",
+      "captures/v15/evidence/visual-plotarrow-offset-v3-n-zero-control-v1-attempt1-renderer-phase11-v1.json",
+      "captures/v15/evidence/visual-plotarrow-offset-v3-n-zero-control-v1-attempt1-renderer-phase11-v1.png",
+      "captures/v15/evidence/visual-plotarrow-offset-v3-n-zero-control-v1-attempt1-renderer-phase12-v1.json",
+      "captures/v15/evidence/visual-plotarrow-offset-v3-n-zero-control-v1-attempt1-renderer-phase12-v1.png",
+      "captures/v15/evidence/visual-plotarrow-offset-v3-n-zero-control-v1-attempt1-renderer-phase31-v1.json",
+      "captures/v15/evidence/visual-plotarrow-offset-v3-n-zero-control-v1-attempt1-renderer-phase31-v1.png"
+    ],
+    "notes": "Frozen source unchanged. Historical Replay frames use same32-bar viewport/2future bars and pair symbol/interval/cutoffs. Native renderer geometry and source rows retained separately from literal source index. No live-tick claim.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": null,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///7cbcba73-d7c5-4ad6-8333-652e366faf8c.pine?placement%3Ddialog",
+          "path": "/7cbcba73-d7c5-4ad6-8333-652e366faf8c.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 3 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "live_tooltip": "Thu 01 Oct '26   23:58",
+    "historical_compare_before_unix_seconds": 1790899080,
+    "pine_logs": {
+      "paths": [
+        "evidence/visual-plotarrow-offset-v3-n-zero-control-v1-attempt1-logs.txt",
+        "evidence/visual-plotarrow-offset-v3-n-zero-control-v1-attempt1-logs-v1.json",
+        "evidence/visual-plotarrow-offset-v3-n-zero-control-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "all_exported_column_occurrences": [
+      {
+        "title": "time",
+        "occurrence": 1,
+        "position": 0
+      },
+      {
+        "title": "open",
+        "occurrence": 1,
+        "position": 1
+      },
+      {
+        "title": "high",
+        "occurrence": 1,
+        "position": 2
+      },
+      {
+        "title": "low",
+        "occurrence": 1,
+        "position": 3
+      },
+      {
+        "title": "close",
+        "occurrence": 1,
+        "position": 4
+      },
+      {
+        "title": "Arrows",
+        "occurrence": 1,
+        "position": 5
+      },
+      {
+        "title": "BAR_INDEX",
+        "occurrence": 1,
+        "position": 6
+      },
+      {
+        "title": "SOURCE",
+        "occurrence": 1,
+        "position": 7
+      },
+      {
+        "title": "OFFSET",
+        "occurrence": 1,
+        "position": 8
+      },
+      {
+        "title": "MINHEIGHT",
+        "occurrence": 1,
+        "position": 9
+      },
+      {
+        "title": "MAXHEIGHT",
+        "occurrence": 1,
+        "position": 10
+      }
+    ],
+    "declared_to_native_column_occurrences": [
+      {
+        "declared_title": "BAR_INDEX",
+        "native_title": "BAR_INDEX",
+        "occurrence": 1,
+        "position": 6
+      },
+      {
+        "declared_title": "SOURCE",
+        "native_title": "SOURCE",
+        "occurrence": 1,
+        "position": 7
+      },
+      {
+        "declared_title": "OFFSET",
+        "native_title": "OFFSET",
+        "occurrence": 1,
+        "position": 8
+      },
+      {
+        "declared_title": "MINHEIGHT",
+        "native_title": "MINHEIGHT",
+        "occurrence": 1,
+        "position": 9
+      },
+      {
+        "declared_title": "MAXHEIGHT",
+        "native_title": "MAXHEIGHT",
+        "occurrence": 1,
+        "position": 10
+      }
+    ],
+    "named_value_map_scope": "Legacy title maps show the first occurrence only; original positional cells and occurrence tables retain every duplicate without renaming.",
+    "csv_sha256": "80644b5a81785e79d9b370eba166473ec7582a0ed7162e8e030633b1a9e0ad56",
+    "csv_bytes": 18827,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "Arrows",
+      "BAR_INDEX",
+      "SOURCE",
+      "OFFSET",
+      "MINHEIGHT",
+      "MAXHEIGHT"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "BAR_INDEX": 6,
+      "SOURCE": 7,
+      "OFFSET": 8,
+      "MINHEIGHT": 9,
+      "MAXHEIGHT": 10
+    },
+    "first_historical_cells": [
+      "1790863200",
+      "83938.6",
+      "83958.01",
+      "83694.77",
+      "83722.01",
+      "0",
+      "22740",
+      "0",
+      "0",
+      "10",
+      "50"
+    ],
+    "last_historical_cells": [
+      "1790898960",
+      "84841.67",
+      "84858.03",
+      "84841.66",
+      "84858.02",
+      "0",
+      "23038",
+      "0",
+      "0",
+      "10",
+      "50"
+    ],
+    "declared_to_native_header_mapping": {
+      "BAR_INDEX": "BAR_INDEX",
+      "SOURCE": "SOURCE",
+      "OFFSET": "OFFSET",
+      "MINHEIGHT": "MINHEIGHT",
+      "MAXHEIGHT": "MAXHEIGHT"
+    },
+    "csv_rows": 300,
+    "historical_rows": 299,
+    "first_csv_timestamp_seconds": 1790863200,
+    "last_csv_timestamp_seconds": 1790899080,
+    "first_csv_time_raw": "1790863200",
+    "last_csv_time_raw": "1790899080",
+    "first_historical_values": {
+      "BAR_INDEX": "22740",
+      "SOURCE": "0",
+      "OFFSET": "0",
+      "MINHEIGHT": "10",
+      "MAXHEIGHT": "50"
+    },
+    "last_historical_values": {
+      "BAR_INDEX": "23038",
+      "SOURCE": "0",
+      "OFFSET": "0",
+      "MINHEIGHT": "10",
+      "MAXHEIGHT": "50"
+    },
+    "declared_unexported_columns": [],
+    "data_window_witness": "captures/v15/evidence/visual-plotarrow-offset-v3-n-zero-control-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T19:39:03.935Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "arm",
+        "bitness": "64",
+        "brands": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156"
+          }
+        ],
+        "fullVersionList": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8.0.0.0"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156.0.8075.0"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156.0.8075.0"
+          }
+        ],
+        "mobile": false,
+        "platform": "macOS",
+        "platformVersion": "27.2.0"
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v15 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "visual-barcolor-offset-v3-discriminator-series-v1.pine",
+    "attempt": 1,
+    "source_sha256": "a45f9c91b3180867e8bc7cc51d9d0155e84253bd5d0ba9d1c11dc0dc0658c266",
+    "indicator_title": "V13 barcolor v3 series",
+    "status": "RUNS",
+    "csv_file": "captures/v15/visual-barcolor-offset-v3-discriminator-series-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-05T033903.359.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": true,
+      "minmove": 1,
+      "pricescale": 100,
+      "pointvalue": 1,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V13 barcolor v3 series",
+      "dataset_start_utc": "2026-10-01T14:00:00.000Z",
+      "first_chart_bar": {
+        "index": 0,
+        "value": [
+          1790863200,
+          83938.6,
+          83958.01,
+          83694.77,
+          83722.01,
+          49.42632
+        ]
+      },
+      "chart_bars": 300,
+      "subscription": "pro_premium",
+      "native_end_of_data": false,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": "2026-10-01T23:58:00.000Z",
+    "export_utc": "2026-10-04T19:39:03.559Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v15/evidence/visual-barcolor-offset-v3-discriminator-series-v1-attempt1-setup.png",
+      "captures/v15/evidence/visual-barcolor-offset-v3-discriminator-series-v1-attempt1-export.png",
+      "captures/v15/evidence/visual-barcolor-offset-v3-discriminator-series-v1-attempt1-logs.txt",
+      "captures/v15/evidence/visual-barcolor-offset-v3-discriminator-series-v1-attempt1-logs-v1.json",
+      "captures/v15/evidence/visual-barcolor-offset-v3-discriminator-series-v1-attempt1-logs.png",
+      "captures/v15/evidence/visual-barcolor-offset-v3-discriminator-series-v1-attempt1-visual.png",
+      "captures/v15/evidence/visual-barcolor-offset-v3-discriminator-series-v1-attempt1-data-window-v1.png",
+      "captures/v15/evidence/visual-barcolor-offset-v3-discriminator-series-v1-attempt1-data-window-v1.json",
+      "captures/v15/evidence/visual-barcolor-offset-v3-discriminator-series-v1-attempt1-data-window-v1.txt",
+      "captures/v15/evidence/visual-barcolor-offset-v3-discriminator-series-v1-attempt1-replay-phase7-paired-v1.json",
+      "captures/v15/evidence/visual-barcolor-offset-v3-discriminator-series-v1-attempt1-replay-phase7-paired-v1.png",
+      "captures/v15/evidence/visual-barcolor-offset-v3-discriminator-series-v1-attempt1-replay-phase15-paired-v1.json",
+      "captures/v15/evidence/visual-barcolor-offset-v3-discriminator-series-v1-attempt1-replay-phase15-paired-v1.png"
+    ],
+    "notes": "Frozen source unchanged. Historical Replay frames use same32-bar viewport/2future bars and pair symbol/interval/cutoffs. Native renderer geometry and source rows retained separately from literal source index. No live-tick claim.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": null,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///6ba76faa-18c8-4816-8ab2-5a1fcead1080.pine?placement%3Ddialog",
+          "path": "/6ba76faa-18c8-4816-8ab2-5a1fcead1080.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 3 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "live_tooltip": "Thu 01 Oct '26   23:58",
+    "historical_compare_before_unix_seconds": 1790899080,
+    "pine_logs": {
+      "paths": [
+        "evidence/visual-barcolor-offset-v3-discriminator-series-v1-attempt1-logs.txt",
+        "evidence/visual-barcolor-offset-v3-discriminator-series-v1-attempt1-logs-v1.json",
+        "evidence/visual-barcolor-offset-v3-discriminator-series-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "all_exported_column_occurrences": [
+      {
+        "title": "time",
+        "occurrence": 1,
+        "position": 0
+      },
+      {
+        "title": "open",
+        "occurrence": 1,
+        "position": 1
+      },
+      {
+        "title": "high",
+        "occurrence": 1,
+        "position": 2
+      },
+      {
+        "title": "low",
+        "occurrence": 1,
+        "position": 3
+      },
+      {
+        "title": "close",
+        "occurrence": 1,
+        "position": 4
+      },
+      {
+        "title": "N",
+        "occurrence": 1,
+        "position": 5
+      },
+      {
+        "title": "SOURCE_CODE",
+        "occurrence": 1,
+        "position": 6
+      },
+      {
+        "title": "SOURCE_OFFSET",
+        "occurrence": 1,
+        "position": 7
+      }
+    ],
+    "declared_to_native_column_occurrences": [
+      {
+        "declared_title": "N",
+        "native_title": "N",
+        "occurrence": 1,
+        "position": 5
+      },
+      {
+        "declared_title": "SOURCE_CODE",
+        "native_title": "SOURCE_CODE",
+        "occurrence": 1,
+        "position": 6
+      },
+      {
+        "declared_title": "SOURCE_OFFSET",
+        "native_title": "SOURCE_OFFSET",
+        "occurrence": 1,
+        "position": 7
+      }
+    ],
+    "named_value_map_scope": "Legacy title maps show the first occurrence only; original positional cells and occurrence tables retain every duplicate without renaming.",
+    "csv_sha256": "25366dd33132a2f5221fc441f60a79b75a04707ea8a43e492484e7177dca30c6",
+    "csv_bytes": 16520,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "N",
+      "SOURCE_CODE",
+      "SOURCE_OFFSET"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "N": 5,
+      "SOURCE_CODE": 6,
+      "SOURCE_OFFSET": 7
+    },
+    "first_historical_cells": [
+      "1790863200",
+      "83938.6",
+      "83958.01",
+      "83694.77",
+      "83722.01",
+      "22740",
+      "0",
+      "2"
+    ],
+    "last_historical_cells": [
+      "1790898960",
+      "84841.67",
+      "84858.03",
+      "84841.66",
+      "84858.02",
+      "23038",
+      "0",
+      "-2"
+    ],
+    "declared_to_native_header_mapping": {
+      "N": "N",
+      "SOURCE_CODE": "SOURCE_CODE",
+      "SOURCE_OFFSET": "SOURCE_OFFSET"
+    },
+    "csv_rows": 300,
+    "historical_rows": 299,
+    "first_csv_timestamp_seconds": 1790863200,
+    "last_csv_timestamp_seconds": 1790899080,
+    "first_csv_time_raw": "1790863200",
+    "last_csv_time_raw": "1790899080",
+    "first_historical_values": {
+      "N": "22740",
+      "SOURCE_CODE": "0",
+      "SOURCE_OFFSET": "2"
+    },
+    "last_historical_values": {
+      "N": "23038",
+      "SOURCE_CODE": "0",
+      "SOURCE_OFFSET": "-2"
+    },
+    "declared_unexported_columns": [],
+    "data_window_witness": "captures/v15/evidence/visual-barcolor-offset-v3-discriminator-series-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T19:39:53.758Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "arm",
+        "bitness": "64",
+        "brands": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156"
+          }
+        ],
+        "fullVersionList": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8.0.0.0"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156.0.8075.0"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156.0.8075.0"
+          }
+        ],
+        "mobile": false,
+        "platform": "macOS",
+        "platformVersion": "27.2.0"
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v15 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "visual-barcolor-offset-v3-discriminator-zero-v1.pine",
+    "attempt": 1,
+    "source_sha256": "02af1a42c56b854b8a78d77b1f60b8fe16198281c1106cdea10946fc428d74b1",
+    "indicator_title": "V13 barcolor v3 zero",
+    "status": "RUNS",
+    "csv_file": "captures/v15/visual-barcolor-offset-v3-discriminator-zero-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-05T033952.996.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": true,
+      "minmove": 1,
+      "pricescale": 100,
+      "pointvalue": 1,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V13 barcolor v3 zero",
+      "dataset_start_utc": "2026-10-01T14:00:00.000Z",
+      "first_chart_bar": {
+        "index": 0,
+        "value": [
+          1790863200,
+          83938.6,
+          83958.01,
+          83694.77,
+          83722.01,
+          49.42632
+        ]
+      },
+      "chart_bars": 300,
+      "subscription": "pro_premium",
+      "native_end_of_data": false,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": "2026-10-01T23:58:00.000Z",
+    "export_utc": "2026-10-04T19:39:53.356Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v15/evidence/visual-barcolor-offset-v3-discriminator-zero-v1-attempt1-setup.png",
+      "captures/v15/evidence/visual-barcolor-offset-v3-discriminator-zero-v1-attempt1-export.png",
+      "captures/v15/evidence/visual-barcolor-offset-v3-discriminator-zero-v1-attempt1-logs.txt",
+      "captures/v15/evidence/visual-barcolor-offset-v3-discriminator-zero-v1-attempt1-logs-v1.json",
+      "captures/v15/evidence/visual-barcolor-offset-v3-discriminator-zero-v1-attempt1-logs.png",
+      "captures/v15/evidence/visual-barcolor-offset-v3-discriminator-zero-v1-attempt1-visual.png",
+      "captures/v15/evidence/visual-barcolor-offset-v3-discriminator-zero-v1-attempt1-data-window-v1.png",
+      "captures/v15/evidence/visual-barcolor-offset-v3-discriminator-zero-v1-attempt1-data-window-v1.json",
+      "captures/v15/evidence/visual-barcolor-offset-v3-discriminator-zero-v1-attempt1-data-window-v1.txt",
+      "captures/v15/evidence/visual-barcolor-offset-v3-discriminator-zero-v1-attempt1-replay-phase7-paired-v1.json",
+      "captures/v15/evidence/visual-barcolor-offset-v3-discriminator-zero-v1-attempt1-replay-phase7-paired-v1.png",
+      "captures/v15/evidence/visual-barcolor-offset-v3-discriminator-zero-v1-attempt1-replay-phase15-paired-v1.json",
+      "captures/v15/evidence/visual-barcolor-offset-v3-discriminator-zero-v1-attempt1-replay-phase15-paired-v1.png"
+    ],
+    "notes": "Frozen source unchanged. Historical Replay frames use same32-bar viewport/2future bars and pair symbol/interval/cutoffs. Native renderer geometry and source rows retained separately from literal source index. No live-tick claim.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": null,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///b6a08a5f-0070-4cb0-8a9d-fb0f92918322.pine?placement%3Ddialog",
+          "path": "/b6a08a5f-0070-4cb0-8a9d-fb0f92918322.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 3 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "live_tooltip": "Thu 01 Oct '26   23:58",
+    "historical_compare_before_unix_seconds": 1790899080,
+    "pine_logs": {
+      "paths": [
+        "evidence/visual-barcolor-offset-v3-discriminator-zero-v1-attempt1-logs.txt",
+        "evidence/visual-barcolor-offset-v3-discriminator-zero-v1-attempt1-logs-v1.json",
+        "evidence/visual-barcolor-offset-v3-discriminator-zero-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "all_exported_column_occurrences": [
+      {
+        "title": "time",
+        "occurrence": 1,
+        "position": 0
+      },
+      {
+        "title": "open",
+        "occurrence": 1,
+        "position": 1
+      },
+      {
+        "title": "high",
+        "occurrence": 1,
+        "position": 2
+      },
+      {
+        "title": "low",
+        "occurrence": 1,
+        "position": 3
+      },
+      {
+        "title": "close",
+        "occurrence": 1,
+        "position": 4
+      },
+      {
+        "title": "N",
+        "occurrence": 1,
+        "position": 5
+      },
+      {
+        "title": "SOURCE_CODE",
+        "occurrence": 1,
+        "position": 6
+      },
+      {
+        "title": "SOURCE_OFFSET",
+        "occurrence": 1,
+        "position": 7
+      }
+    ],
+    "declared_to_native_column_occurrences": [
+      {
+        "declared_title": "N",
+        "native_title": "N",
+        "occurrence": 1,
+        "position": 5
+      },
+      {
+        "declared_title": "SOURCE_CODE",
+        "native_title": "SOURCE_CODE",
+        "occurrence": 1,
+        "position": 6
+      },
+      {
+        "declared_title": "SOURCE_OFFSET",
+        "native_title": "SOURCE_OFFSET",
+        "occurrence": 1,
+        "position": 7
+      }
+    ],
+    "named_value_map_scope": "Legacy title maps show the first occurrence only; original positional cells and occurrence tables retain every duplicate without renaming.",
+    "csv_sha256": "25366dd33132a2f5221fc441f60a79b75a04707ea8a43e492484e7177dca30c6",
+    "csv_bytes": 16520,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "N",
+      "SOURCE_CODE",
+      "SOURCE_OFFSET"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "N": 5,
+      "SOURCE_CODE": 6,
+      "SOURCE_OFFSET": 7
+    },
+    "first_historical_cells": [
+      "1790863200",
+      "83938.6",
+      "83958.01",
+      "83694.77",
+      "83722.01",
+      "22740",
+      "0",
+      "2"
+    ],
+    "last_historical_cells": [
+      "1790898960",
+      "84841.67",
+      "84858.03",
+      "84841.66",
+      "84858.02",
+      "23038",
+      "0",
+      "-2"
+    ],
+    "declared_to_native_header_mapping": {
+      "N": "N",
+      "SOURCE_CODE": "SOURCE_CODE",
+      "SOURCE_OFFSET": "SOURCE_OFFSET"
+    },
+    "csv_rows": 300,
+    "historical_rows": 299,
+    "first_csv_timestamp_seconds": 1790863200,
+    "last_csv_timestamp_seconds": 1790899080,
+    "first_csv_time_raw": "1790863200",
+    "last_csv_time_raw": "1790899080",
+    "first_historical_values": {
+      "N": "22740",
+      "SOURCE_CODE": "0",
+      "SOURCE_OFFSET": "2"
+    },
+    "last_historical_values": {
+      "N": "23038",
+      "SOURCE_CODE": "0",
+      "SOURCE_OFFSET": "-2"
+    },
+    "declared_unexported_columns": [],
+    "data_window_witness": "captures/v15/evidence/visual-barcolor-offset-v3-discriminator-zero-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T19:40:42.177Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "arm",
+        "bitness": "64",
+        "brands": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156"
+          }
+        ],
+        "fullVersionList": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8.0.0.0"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156.0.8075.0"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156.0.8075.0"
+          }
+        ],
+        "mobile": false,
+        "platform": "macOS",
+        "platformVersion": "27.2.0"
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v15 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "visual-plotchar-offset-v3-discriminator-series-v1.pine",
+    "attempt": 1,
+    "source_sha256": "78e29b9a9b696ed493a49689a927e462af1f2fb848eedafb53c4a318798aef95",
+    "indicator_title": "V13 plotchar v3 series",
+    "status": "RUNS",
+    "csv_file": "captures/v15/visual-plotchar-offset-v3-discriminator-series-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-05T034041.590.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": true,
+      "minmove": 1,
+      "pricescale": 100,
+      "pointvalue": 1,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V13 plotchar v3 series",
+      "dataset_start_utc": "2026-10-01T14:00:00.000Z",
+      "first_chart_bar": {
+        "index": 0,
+        "value": [
+          1790863200,
+          83938.6,
+          83958.01,
+          83694.77,
+          83722.01,
+          49.42632
+        ]
+      },
+      "chart_bars": 300,
+      "subscription": "pro_premium",
+      "native_end_of_data": false,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": "2026-10-01T23:58:00.000Z",
+    "export_utc": "2026-10-04T19:40:41.795Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v15/evidence/visual-plotchar-offset-v3-discriminator-series-v1-attempt1-setup.png",
+      "captures/v15/evidence/visual-plotchar-offset-v3-discriminator-series-v1-attempt1-export.png",
+      "captures/v15/evidence/visual-plotchar-offset-v3-discriminator-series-v1-attempt1-logs.txt",
+      "captures/v15/evidence/visual-plotchar-offset-v3-discriminator-series-v1-attempt1-logs-v1.json",
+      "captures/v15/evidence/visual-plotchar-offset-v3-discriminator-series-v1-attempt1-logs.png",
+      "captures/v15/evidence/visual-plotchar-offset-v3-discriminator-series-v1-attempt1-visual.png",
+      "captures/v15/evidence/visual-plotchar-offset-v3-discriminator-series-v1-attempt1-data-window-v1.png",
+      "captures/v15/evidence/visual-plotchar-offset-v3-discriminator-series-v1-attempt1-data-window-v1.json",
+      "captures/v15/evidence/visual-plotchar-offset-v3-discriminator-series-v1-attempt1-data-window-v1.txt",
+      "captures/v15/evidence/visual-plotchar-offset-v3-discriminator-series-v1-attempt1-replay-phase7-paired-v1.json",
+      "captures/v15/evidence/visual-plotchar-offset-v3-discriminator-series-v1-attempt1-replay-phase7-paired-v1.png",
+      "captures/v15/evidence/visual-plotchar-offset-v3-discriminator-series-v1-attempt1-replay-phase15-paired-v1.json",
+      "captures/v15/evidence/visual-plotchar-offset-v3-discriminator-series-v1-attempt1-replay-phase15-paired-v1.png",
+      "captures/v15/evidence/visual-plotchar-offset-v3-discriminator-series-v1-attempt1-renderer-phase7-v1.json",
+      "captures/v15/evidence/visual-plotchar-offset-v3-discriminator-series-v1-attempt1-renderer-phase7-v1.png",
+      "captures/v15/evidence/visual-plotchar-offset-v3-discriminator-series-v1-attempt1-renderer-phase15-v1.json",
+      "captures/v15/evidence/visual-plotchar-offset-v3-discriminator-series-v1-attempt1-renderer-phase15-v1.png"
+    ],
+    "notes": "Frozen source unchanged. Historical Replay frames use same32-bar viewport/2future bars and pair symbol/interval/cutoffs. Native renderer geometry and source rows retained separately from literal source index. No live-tick claim.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": null,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///c13bfcbd-83de-470b-8472-4677d1fa9ea3.pine?placement%3Ddialog",
+          "path": "/c13bfcbd-83de-470b-8472-4677d1fa9ea3.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 3 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "live_tooltip": "Thu 01 Oct '26   23:58",
+    "historical_compare_before_unix_seconds": 1790899080,
+    "pine_logs": {
+      "paths": [
+        "evidence/visual-plotchar-offset-v3-discriminator-series-v1-attempt1-logs.txt",
+        "evidence/visual-plotchar-offset-v3-discriminator-series-v1-attempt1-logs-v1.json",
+        "evidence/visual-plotchar-offset-v3-discriminator-series-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "all_exported_column_occurrences": [
+      {
+        "title": "time",
+        "occurrence": 1,
+        "position": 0
+      },
+      {
+        "title": "open",
+        "occurrence": 1,
+        "position": 1
+      },
+      {
+        "title": "high",
+        "occurrence": 1,
+        "position": 2
+      },
+      {
+        "title": "low",
+        "occurrence": 1,
+        "position": 3
+      },
+      {
+        "title": "close",
+        "occurrence": 1,
+        "position": 4
+      },
+      {
+        "title": "TARGET",
+        "occurrence": 1,
+        "position": 5
+      },
+      {
+        "title": "N",
+        "occurrence": 1,
+        "position": 6
+      },
+      {
+        "title": "SOURCE_CODE",
+        "occurrence": 1,
+        "position": 7
+      },
+      {
+        "title": "SOURCE_OFFSET",
+        "occurrence": 1,
+        "position": 8
+      }
+    ],
+    "declared_to_native_column_occurrences": [
+      {
+        "declared_title": "TARGET",
+        "native_title": "TARGET",
+        "occurrence": 1,
+        "position": 5
+      },
+      {
+        "declared_title": "N",
+        "native_title": "N",
+        "occurrence": 1,
+        "position": 6
+      },
+      {
+        "declared_title": "SOURCE_CODE",
+        "native_title": "SOURCE_CODE",
+        "occurrence": 1,
+        "position": 7
+      },
+      {
+        "declared_title": "SOURCE_OFFSET",
+        "native_title": "SOURCE_OFFSET",
+        "occurrence": 1,
+        "position": 8
+      }
+    ],
+    "named_value_map_scope": "Legacy title maps show the first occurrence only; original positional cells and occurrence tables retain every duplicate without renaming.",
+    "csv_sha256": "27cc3e95d59fb1a23959982cbe32b258808f4309787260ab4c955f7d18ad74a4",
+    "csv_bytes": 17125,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "TARGET",
+      "N",
+      "SOURCE_CODE",
+      "SOURCE_OFFSET"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "TARGET": 5,
+      "N": 6,
+      "SOURCE_CODE": 7,
+      "SOURCE_OFFSET": 8
+    },
+    "first_historical_cells": [
+      "1790863200",
+      "83938.6",
+      "83958.01",
+      "83694.77",
+      "83722.01",
+      "0",
+      "22740",
+      "0",
+      "2"
+    ],
+    "last_historical_cells": [
+      "1790898960",
+      "84841.67",
+      "84858.03",
+      "84841.66",
+      "84858.02",
+      "",
+      "23038",
+      "0",
+      "-2"
+    ],
+    "declared_to_native_header_mapping": {
+      "TARGET": "TARGET",
+      "N": "N",
+      "SOURCE_CODE": "SOURCE_CODE",
+      "SOURCE_OFFSET": "SOURCE_OFFSET"
+    },
+    "csv_rows": 300,
+    "historical_rows": 299,
+    "first_csv_timestamp_seconds": 1790863200,
+    "last_csv_timestamp_seconds": 1790899080,
+    "first_csv_time_raw": "1790863200",
+    "last_csv_time_raw": "1790899080",
+    "first_historical_values": {
+      "TARGET": "0",
+      "N": "22740",
+      "SOURCE_CODE": "0",
+      "SOURCE_OFFSET": "2"
+    },
+    "last_historical_values": {
+      "TARGET": "",
+      "N": "23038",
+      "SOURCE_CODE": "0",
+      "SOURCE_OFFSET": "-2"
+    },
+    "declared_unexported_columns": [],
+    "data_window_witness": "captures/v15/evidence/visual-plotchar-offset-v3-discriminator-series-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T19:41:31.599Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "arm",
+        "bitness": "64",
+        "brands": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156"
+          }
+        ],
+        "fullVersionList": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8.0.0.0"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156.0.8075.0"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156.0.8075.0"
+          }
+        ],
+        "mobile": false,
+        "platform": "macOS",
+        "platformVersion": "27.2.0"
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v15 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "visual-plotchar-offset-v3-discriminator-zero-v1.pine",
+    "attempt": 1,
+    "source_sha256": "d61b33befbf91d8dda8c366ae6a0099fd5b4cffc1605779eb68bfa795ae60a9c",
+    "indicator_title": "V13 plotchar v3 zero",
+    "status": "RUNS",
+    "csv_file": "captures/v15/visual-plotchar-offset-v3-discriminator-zero-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-05T034130.956.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": true,
+      "minmove": 1,
+      "pricescale": 100,
+      "pointvalue": 1,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V13 plotchar v3 zero",
+      "dataset_start_utc": "2026-10-01T14:00:00.000Z",
+      "first_chart_bar": {
+        "index": 0,
+        "value": [
+          1790863200,
+          83938.6,
+          83958.01,
+          83694.77,
+          83722.01,
+          49.42632
+        ]
+      },
+      "chart_bars": 300,
+      "subscription": "pro_premium",
+      "native_end_of_data": false,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": "2026-10-01T23:58:00.000Z",
+    "export_utc": "2026-10-04T19:41:31.208Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v15/evidence/visual-plotchar-offset-v3-discriminator-zero-v1-attempt1-setup.png",
+      "captures/v15/evidence/visual-plotchar-offset-v3-discriminator-zero-v1-attempt1-export.png",
+      "captures/v15/evidence/visual-plotchar-offset-v3-discriminator-zero-v1-attempt1-logs.txt",
+      "captures/v15/evidence/visual-plotchar-offset-v3-discriminator-zero-v1-attempt1-logs-v1.json",
+      "captures/v15/evidence/visual-plotchar-offset-v3-discriminator-zero-v1-attempt1-logs.png",
+      "captures/v15/evidence/visual-plotchar-offset-v3-discriminator-zero-v1-attempt1-visual.png",
+      "captures/v15/evidence/visual-plotchar-offset-v3-discriminator-zero-v1-attempt1-data-window-v1.png",
+      "captures/v15/evidence/visual-plotchar-offset-v3-discriminator-zero-v1-attempt1-data-window-v1.json",
+      "captures/v15/evidence/visual-plotchar-offset-v3-discriminator-zero-v1-attempt1-data-window-v1.txt",
+      "captures/v15/evidence/visual-plotchar-offset-v3-discriminator-zero-v1-attempt1-replay-phase7-paired-v1.json",
+      "captures/v15/evidence/visual-plotchar-offset-v3-discriminator-zero-v1-attempt1-replay-phase7-paired-v1.png",
+      "captures/v15/evidence/visual-plotchar-offset-v3-discriminator-zero-v1-attempt1-replay-phase15-paired-v1.json",
+      "captures/v15/evidence/visual-plotchar-offset-v3-discriminator-zero-v1-attempt1-replay-phase15-paired-v1.png",
+      "captures/v15/evidence/visual-plotchar-offset-v3-discriminator-zero-v1-attempt1-rendered-phase15-v1.json",
+      "captures/v15/evidence/visual-plotchar-offset-v3-discriminator-zero-v1-attempt1-rendered-phase15-v1.png",
+      "captures/v15/evidence/visual-plotchar-offset-v3-discriminator-zero-v1-attempt1-renderer-phase7-v1.json",
+      "captures/v15/evidence/visual-plotchar-offset-v3-discriminator-zero-v1-attempt1-renderer-phase7-v1.png",
+      "captures/v15/evidence/visual-plotchar-offset-v3-discriminator-zero-v1-attempt1-renderer-phase15-v1.json",
+      "captures/v15/evidence/visual-plotchar-offset-v3-discriminator-zero-v1-attempt1-renderer-phase15-v1.png"
+    ],
+    "notes": "Frozen source unchanged. Historical Replay frames use same32-bar viewport/2future bars and pair symbol/interval/cutoffs. Native renderer geometry and source rows retained separately from literal source index. No live-tick claim.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": null,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///48890799-6270-4274-b82e-9a45df8bd92d.pine?placement%3Ddialog",
+          "path": "/48890799-6270-4274-b82e-9a45df8bd92d.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 3 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "live_tooltip": "Thu 01 Oct '26   23:58",
+    "historical_compare_before_unix_seconds": 1790899080,
+    "pine_logs": {
+      "paths": [
+        "evidence/visual-plotchar-offset-v3-discriminator-zero-v1-attempt1-logs.txt",
+        "evidence/visual-plotchar-offset-v3-discriminator-zero-v1-attempt1-logs-v1.json",
+        "evidence/visual-plotchar-offset-v3-discriminator-zero-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "all_exported_column_occurrences": [
+      {
+        "title": "time",
+        "occurrence": 1,
+        "position": 0
+      },
+      {
+        "title": "open",
+        "occurrence": 1,
+        "position": 1
+      },
+      {
+        "title": "high",
+        "occurrence": 1,
+        "position": 2
+      },
+      {
+        "title": "low",
+        "occurrence": 1,
+        "position": 3
+      },
+      {
+        "title": "close",
+        "occurrence": 1,
+        "position": 4
+      },
+      {
+        "title": "TARGET",
+        "occurrence": 1,
+        "position": 5
+      },
+      {
+        "title": "N",
+        "occurrence": 1,
+        "position": 6
+      },
+      {
+        "title": "SOURCE_CODE",
+        "occurrence": 1,
+        "position": 7
+      },
+      {
+        "title": "SOURCE_OFFSET",
+        "occurrence": 1,
+        "position": 8
+      }
+    ],
+    "declared_to_native_column_occurrences": [
+      {
+        "declared_title": "TARGET",
+        "native_title": "TARGET",
+        "occurrence": 1,
+        "position": 5
+      },
+      {
+        "declared_title": "N",
+        "native_title": "N",
+        "occurrence": 1,
+        "position": 6
+      },
+      {
+        "declared_title": "SOURCE_CODE",
+        "native_title": "SOURCE_CODE",
+        "occurrence": 1,
+        "position": 7
+      },
+      {
+        "declared_title": "SOURCE_OFFSET",
+        "native_title": "SOURCE_OFFSET",
+        "occurrence": 1,
+        "position": 8
+      }
+    ],
+    "named_value_map_scope": "Legacy title maps show the first occurrence only; original positional cells and occurrence tables retain every duplicate without renaming.",
+    "csv_sha256": "9634269cc806cc7315455f3296278057c19cc438a83ae83986074f85836ebbfa",
+    "csv_bytes": 17127,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "TARGET",
+      "N",
+      "SOURCE_CODE",
+      "SOURCE_OFFSET"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "TARGET": 5,
+      "N": 6,
+      "SOURCE_CODE": 7,
+      "SOURCE_OFFSET": 8
+    },
+    "first_historical_cells": [
+      "1790863200",
+      "83938.6",
+      "83958.01",
+      "83694.77",
+      "83722.01",
+      "0",
+      "22740",
+      "0",
+      "2"
+    ],
+    "last_historical_cells": [
+      "1790898960",
+      "84841.67",
+      "84858.03",
+      "84841.66",
+      "84858.02",
+      "0",
+      "23038",
+      "0",
+      "-2"
+    ],
+    "declared_to_native_header_mapping": {
+      "TARGET": "TARGET",
+      "N": "N",
+      "SOURCE_CODE": "SOURCE_CODE",
+      "SOURCE_OFFSET": "SOURCE_OFFSET"
+    },
+    "csv_rows": 300,
+    "historical_rows": 299,
+    "first_csv_timestamp_seconds": 1790863200,
+    "last_csv_timestamp_seconds": 1790899080,
+    "first_csv_time_raw": "1790863200",
+    "last_csv_time_raw": "1790899080",
+    "first_historical_values": {
+      "TARGET": "0",
+      "N": "22740",
+      "SOURCE_CODE": "0",
+      "SOURCE_OFFSET": "2"
+    },
+    "last_historical_values": {
+      "TARGET": "0",
+      "N": "23038",
+      "SOURCE_CODE": "0",
+      "SOURCE_OFFSET": "-2"
+    },
+    "declared_unexported_columns": [],
+    "data_window_witness": "captures/v15/evidence/visual-plotchar-offset-v3-discriminator-zero-v1-attempt1-data-window-v1.json"
+  }
+]

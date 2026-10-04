@@ -1,0 +1,602 @@
+{
+  "artifact": "V15 capture plan v1",
+  "batch_start_utc": "2026-10-04T19:18:19.836356+00:00",
+  "source_master": "dce789781a",
+  "canonical_manifest": "bundle-manifest-v9.json",
+  "scripts": [
+    {
+      "script": "visual-bgcolor-offset-v3-n-series-v1.pine",
+      "sha256": "4850d8ce57afa860182d2bb072218757497e56800a65a2e1913d4357707e1ddf",
+      "title": "V13 bgcolor offset v3 series",
+      "shorttitle": null,
+      "columns": [
+        "BAR_INDEX",
+        "PHASE",
+        "SOURCE_CODE",
+        "SERIES_OFFSET"
+      ],
+      "minimumHistoryBars": 128,
+      "manifestMinimumHistoryBars": 128,
+      "instructions": "instructions/visual-bgcolor-offset-v3-n-series-v1.md",
+      "pineVersion": 3,
+      "captureKind": "compile-and-screenshot"
+    },
+    {
+      "script": "visual-bgcolor-offset-v3-n-zero-control-v1.pine",
+      "sha256": "400360578ab6995216212851ec88b1afba82f92fbfeefc1a8fbea42fc0a1a887",
+      "title": "V13 bgcolor offset v3 zero-control",
+      "shorttitle": null,
+      "columns": [
+        "BAR_INDEX",
+        "PHASE",
+        "SOURCE_CODE",
+        "SERIES_OFFSET"
+      ],
+      "minimumHistoryBars": 128,
+      "manifestMinimumHistoryBars": 128,
+      "instructions": "instructions/visual-bgcolor-offset-v3-n-zero-control-v1.md",
+      "pineVersion": 3,
+      "captureKind": "compile-and-screenshot"
+    },
+    {
+      "script": "visual-plotarrow-offset-v3-n-series-v1.pine",
+      "sha256": "a5c3293682093528667f5b39c5681d63e515b9256401e54d547ba4f777f3622d",
+      "title": "V13 plotarrow offset v3 series",
+      "shorttitle": null,
+      "columns": [
+        "BAR_INDEX",
+        "SOURCE",
+        "OFFSET",
+        "MINHEIGHT",
+        "MAXHEIGHT"
+      ],
+      "minimumHistoryBars": 128,
+      "manifestMinimumHistoryBars": 128,
+      "instructions": "instructions/visual-plotarrow-offset-v3-n-series-v1.md",
+      "pineVersion": 3,
+      "captureKind": "compile-and-screenshot"
+    },
+    {
+      "script": "visual-plotarrow-offset-v3-n-zero-control-v1.pine",
+      "sha256": "4e2c0628e124d5a8af6ed88d03a01ed1603a16c3c34f9370d92f2232f9ae757d",
+      "title": "V13 plotarrow offset v3 zero-control",
+      "shorttitle": null,
+      "columns": [
+        "BAR_INDEX",
+        "SOURCE",
+        "OFFSET",
+        "MINHEIGHT",
+        "MAXHEIGHT"
+      ],
+      "minimumHistoryBars": 128,
+      "manifestMinimumHistoryBars": 128,
+      "instructions": "instructions/visual-plotarrow-offset-v3-n-zero-control-v1.md",
+      "pineVersion": 3,
+      "captureKind": "compile-and-screenshot"
+    },
+    {
+      "script": "visual-chart-fg-solid-numeric-v6-v1.pine",
+      "sha256": "e06c22d15ffd722684e8cdfeb3331b5d7d853eb0ad7986cf6d9645dfd51fa5f7",
+      "title": "V13 chart foreground numeric channels",
+      "shorttitle": null,
+      "columns": [
+        "BG_R",
+        "BG_G",
+        "BG_B",
+        "FG_R",
+        "FG_G",
+        "FG_B",
+        "FG_T"
+      ],
+      "minimumHistoryBars": 16,
+      "manifestMinimumHistoryBars": 16,
+      "instructions": "instructions/visual-chart-fg-solid-numeric-v6-v1.md",
+      "pineVersion": 6,
+      "captureKind": "numeric-and-host-settings"
+    },
+    {
+      "script": "visual-barcolor-offset-v3-discriminator-series-v1.pine",
+      "sha256": "a45f9c91b3180867e8bc7cc51d9d0155e84253bd5d0ba9d1c11dc0dc0658c266",
+      "title": "V13 barcolor v3 series",
+      "shorttitle": null,
+      "columns": [
+        "N",
+        "SOURCE_CODE",
+        "SOURCE_OFFSET"
+      ],
+      "minimumHistoryBars": 128,
+      "manifestMinimumHistoryBars": 128,
+      "instructions": "instructions/visual-barcolor-offset-v3-discriminator-series-v1.md",
+      "pineVersion": 3,
+      "captureKind": "compile-and-screenshot"
+    },
+    {
+      "script": "visual-barcolor-offset-v3-discriminator-zero-v1.pine",
+      "sha256": "02af1a42c56b854b8a78d77b1f60b8fe16198281c1106cdea10946fc428d74b1",
+      "title": "V13 barcolor v3 zero",
+      "shorttitle": null,
+      "columns": [
+        "N",
+        "SOURCE_CODE",
+        "SOURCE_OFFSET"
+      ],
+      "minimumHistoryBars": 128,
+      "manifestMinimumHistoryBars": 128,
+      "instructions": "instructions/visual-barcolor-offset-v3-discriminator-zero-v1.md",
+      "pineVersion": 3,
+      "captureKind": "compile-and-screenshot"
+    },
+    {
+      "script": "visual-plotchar-offset-v3-discriminator-series-v1.pine",
+      "sha256": "78e29b9a9b696ed493a49689a927e462af1f2fb848eedafb53c4a318798aef95",
+      "title": "V13 plotchar v3 series",
+      "shorttitle": null,
+      "columns": [
+        "TARGET",
+        "N",
+        "SOURCE_CODE",
+        "SOURCE_OFFSET"
+      ],
+      "minimumHistoryBars": 128,
+      "manifestMinimumHistoryBars": 128,
+      "instructions": "instructions/visual-plotchar-offset-v3-discriminator-series-v1.md",
+      "pineVersion": 3,
+      "captureKind": "compile-and-screenshot"
+    },
+    {
+      "script": "visual-plotchar-offset-v3-discriminator-zero-v1.pine",
+      "sha256": "d61b33befbf91d8dda8c366ae6a0099fd5b4cffc1605779eb68bfa795ae60a9c",
+      "title": "V13 plotchar v3 zero",
+      "shorttitle": null,
+      "columns": [
+        "TARGET",
+        "N",
+        "SOURCE_CODE",
+        "SOURCE_OFFSET"
+      ],
+      "minimumHistoryBars": 128,
+      "manifestMinimumHistoryBars": 128,
+      "instructions": "instructions/visual-plotchar-offset-v3-discriminator-zero-v1.md",
+      "pineVersion": 3,
+      "captureKind": "compile-and-screenshot"
+    },
+    {
+      "script": "visual-polyline-curved-native-path-v6-v1.pine",
+      "sha256": "0ff689fc06741d057c8eb353f2b88e7069aedcb371df615e6e263bb23932af5e",
+      "title": "V13 polyline curved native path",
+      "shorttitle": null,
+      "columns": [
+        "Plot"
+      ],
+      "minimumHistoryBars": 32,
+      "manifestMinimumHistoryBars": 32,
+      "instructions": "instructions/visual-polyline-curved-native-path-v6-v1.md",
+      "pineVersion": 6,
+      "captureKind": "screenshot-and-native-path"
+    },
+    {
+      "script": "corpus-v56-1979-continuation-v1.pine",
+      "sha256": "52b92cdd620a3f5f25477e9ec0e72798641da4b8e4d873b0add71d6da9fe46d6",
+      "title": "V14 corpus 1979 continuation",
+      "shorttitle": null,
+      "columns": [
+        "OUTCOME"
+      ],
+      "minimumHistoryBars": 1,
+      "manifestMinimumHistoryBars": 1,
+      "instructions": "instructions/corpus-v56-1979-continuation-v1.md",
+      "pineVersion": 6,
+      "captureKind": "compile-or-runtime-outcome"
+    },
+    {
+      "script": "drawing-gc-label-quota-1-v2.pine",
+      "sha256": "4f1e46b795f46856b6c9f8977992174d73c954bf95dbc63c61f6e30c48aeecfa",
+      "title": "Drawing GC label quota 1 v2",
+      "shorttitle": null,
+      "columns": [
+        "VISIBLE_COUNT",
+        "OLDEST_INDEX"
+      ],
+      "minimumHistoryBars": 1538,
+      "manifestMinimumHistoryBars": 1538,
+      "instructions": "instructions/drawing-gc-label-quota-1-v2.md",
+      "pineVersion": 6,
+      "captureKind": "compile-and-count-csv"
+    },
+    {
+      "script": "drawing-gc-label-quota-5-v2.pine",
+      "sha256": "912a023e54ffddb0b77af9bce37609e4750eb48221bbde27dc8643c137215612",
+      "title": "Drawing GC label quota 5 v2",
+      "shorttitle": null,
+      "columns": [
+        "VISIBLE_COUNT",
+        "OLDEST_INDEX"
+      ],
+      "minimumHistoryBars": 1538,
+      "manifestMinimumHistoryBars": 1538,
+      "instructions": "instructions/drawing-gc-label-quota-5-v2.md",
+      "pineVersion": 6,
+      "captureKind": "compile-and-count-csv"
+    },
+    {
+      "script": "drawing-gc-label-quota-10-v2.pine",
+      "sha256": "8a9d95c70a8fc10791c9ea4ec5fa1ef7e66e9c1e11e608473da685e674f2d031",
+      "title": "Drawing GC label quota 10 v2",
+      "shorttitle": null,
+      "columns": [
+        "VISIBLE_COUNT",
+        "OLDEST_INDEX"
+      ],
+      "minimumHistoryBars": 1538,
+      "manifestMinimumHistoryBars": 1538,
+      "instructions": "instructions/drawing-gc-label-quota-10-v2.md",
+      "pineVersion": 6,
+      "captureKind": "compile-and-count-csv"
+    },
+    {
+      "script": "drawing-gc-label-quota-50-v2.pine",
+      "sha256": "9af6cca7f530adb1b671c0824cff1f3026eb795a3a3bfcf2f5d9935356095bb8",
+      "title": "Drawing GC label quota 50 v2",
+      "shorttitle": null,
+      "columns": [
+        "VISIBLE_COUNT",
+        "OLDEST_INDEX"
+      ],
+      "minimumHistoryBars": 1538,
+      "manifestMinimumHistoryBars": 1538,
+      "instructions": "instructions/drawing-gc-label-quota-50-v2.md",
+      "pineVersion": 6,
+      "captureKind": "compile-and-count-csv"
+    },
+    {
+      "script": "drawing-gc-label-quota-500-v2.pine",
+      "sha256": "deb5ce25f4a070996b984626071fde674429e14d6d5d6afbe7105a6f3d4bb8a0",
+      "title": "Drawing GC label quota 500 v2",
+      "shorttitle": null,
+      "columns": [
+        "VISIBLE_COUNT",
+        "OLDEST_INDEX"
+      ],
+      "minimumHistoryBars": 1538,
+      "manifestMinimumHistoryBars": 1538,
+      "instructions": "instructions/drawing-gc-label-quota-500-v2.md",
+      "pineVersion": 6,
+      "captureKind": "compile-and-count-csv"
+    },
+    {
+      "script": "drawing-gc-line-quota-1-v2.pine",
+      "sha256": "db3887cc052724569bd26e2d429ba48f50a9e9e3ba9c9124de4e62d4687de5c3",
+      "title": "Drawing GC line quota 1 v2",
+      "shorttitle": null,
+      "columns": [
+        "VISIBLE_COUNT",
+        "OLDEST_INDEX"
+      ],
+      "minimumHistoryBars": 1538,
+      "manifestMinimumHistoryBars": 1538,
+      "instructions": "instructions/drawing-gc-line-quota-1-v2.md",
+      "pineVersion": 6,
+      "captureKind": "compile-and-count-csv"
+    },
+    {
+      "script": "drawing-gc-line-quota-5-v2.pine",
+      "sha256": "0df13a49979995de3ffe93125ff5e4ea4c5047f32a41ed8e758942812724e921",
+      "title": "Drawing GC line quota 5 v2",
+      "shorttitle": null,
+      "columns": [
+        "VISIBLE_COUNT",
+        "OLDEST_INDEX"
+      ],
+      "minimumHistoryBars": 1538,
+      "manifestMinimumHistoryBars": 1538,
+      "instructions": "instructions/drawing-gc-line-quota-5-v2.md",
+      "pineVersion": 6,
+      "captureKind": "compile-and-count-csv"
+    },
+    {
+      "script": "drawing-gc-line-quota-10-v2.pine",
+      "sha256": "f19eb59639611bd613496e933450aa57bd0882e31780f452b793e89b39cbd577",
+      "title": "Drawing GC line quota 10 v2",
+      "shorttitle": null,
+      "columns": [
+        "VISIBLE_COUNT",
+        "OLDEST_INDEX"
+      ],
+      "minimumHistoryBars": 1538,
+      "manifestMinimumHistoryBars": 1538,
+      "instructions": "instructions/drawing-gc-line-quota-10-v2.md",
+      "pineVersion": 6,
+      "captureKind": "compile-and-count-csv"
+    },
+    {
+      "script": "drawing-gc-line-quota-50-v2.pine",
+      "sha256": "5aa9e72626606ca5b0abc512fe1f9b08548465b318a39363470fc0e61a22affd",
+      "title": "Drawing GC line quota 50 v2",
+      "shorttitle": null,
+      "columns": [
+        "VISIBLE_COUNT",
+        "OLDEST_INDEX"
+      ],
+      "minimumHistoryBars": 1538,
+      "manifestMinimumHistoryBars": 1538,
+      "instructions": "instructions/drawing-gc-line-quota-50-v2.md",
+      "pineVersion": 6,
+      "captureKind": "compile-and-count-csv"
+    },
+    {
+      "script": "drawing-gc-line-quota-500-v2.pine",
+      "sha256": "52fc80d894af2d472078900f46e7931b0fad4ba8179c581e0dab9497bfc8fbdd",
+      "title": "Drawing GC line quota 500 v2",
+      "shorttitle": null,
+      "columns": [
+        "VISIBLE_COUNT",
+        "OLDEST_INDEX"
+      ],
+      "minimumHistoryBars": 1538,
+      "manifestMinimumHistoryBars": 1538,
+      "instructions": "instructions/drawing-gc-line-quota-500-v2.md",
+      "pineVersion": 6,
+      "captureKind": "compile-and-count-csv"
+    },
+    {
+      "script": "drawing-gc-box-quota-1-v2.pine",
+      "sha256": "56682a03074265d8f03563a39cb8af3ee59081e3d1caacffbef1b4aa040aa819",
+      "title": "Drawing GC box quota 1 v2",
+      "shorttitle": null,
+      "columns": [
+        "VISIBLE_COUNT",
+        "OLDEST_INDEX"
+      ],
+      "minimumHistoryBars": 1538,
+      "manifestMinimumHistoryBars": 1538,
+      "instructions": "instructions/drawing-gc-box-quota-1-v2.md",
+      "pineVersion": 6,
+      "captureKind": "compile-and-count-csv"
+    },
+    {
+      "script": "drawing-gc-box-quota-5-v2.pine",
+      "sha256": "b36f4d52c7eb25e1da92862ee35645aad450af9f4770760ec718514934ede17a",
+      "title": "Drawing GC box quota 5 v2",
+      "shorttitle": null,
+      "columns": [
+        "VISIBLE_COUNT",
+        "OLDEST_INDEX"
+      ],
+      "minimumHistoryBars": 1538,
+      "manifestMinimumHistoryBars": 1538,
+      "instructions": "instructions/drawing-gc-box-quota-5-v2.md",
+      "pineVersion": 6,
+      "captureKind": "compile-and-count-csv"
+    },
+    {
+      "script": "drawing-gc-box-quota-10-v2.pine",
+      "sha256": "8daebfbbabb9f0b6535711f364217f61f9dccf860deca274c7319725c4e1d27d",
+      "title": "Drawing GC box quota 10 v2",
+      "shorttitle": null,
+      "columns": [
+        "VISIBLE_COUNT",
+        "OLDEST_INDEX"
+      ],
+      "minimumHistoryBars": 1538,
+      "manifestMinimumHistoryBars": 1538,
+      "instructions": "instructions/drawing-gc-box-quota-10-v2.md",
+      "pineVersion": 6,
+      "captureKind": "compile-and-count-csv"
+    },
+    {
+      "script": "drawing-gc-box-quota-50-v2.pine",
+      "sha256": "1081f395ff092caa8f1e15dba1c2861d297266dacc03fcce0a9db384f15b40a0",
+      "title": "Drawing GC box quota 50 v2",
+      "shorttitle": null,
+      "columns": [
+        "VISIBLE_COUNT",
+        "OLDEST_INDEX"
+      ],
+      "minimumHistoryBars": 1538,
+      "manifestMinimumHistoryBars": 1538,
+      "instructions": "instructions/drawing-gc-box-quota-50-v2.md",
+      "pineVersion": 6,
+      "captureKind": "compile-and-count-csv"
+    },
+    {
+      "script": "drawing-gc-box-quota-500-v2.pine",
+      "sha256": "a6ea95c19a097db1e25d0db7e6696fc442bd7cb1f1ca7df685056608cfee01b3",
+      "title": "Drawing GC box quota 500 v2",
+      "shorttitle": null,
+      "columns": [
+        "VISIBLE_COUNT",
+        "OLDEST_INDEX"
+      ],
+      "minimumHistoryBars": 1538,
+      "manifestMinimumHistoryBars": 1538,
+      "instructions": "instructions/drawing-gc-box-quota-500-v2.md",
+      "pineVersion": 6,
+      "captureKind": "compile-and-count-csv"
+    },
+    {
+      "script": "drawing-gc-polyline-quota-1-v2.pine",
+      "sha256": "8d606686d4f04de65567fee80dba3db2119f0029a1073d44f64029052dad33fb",
+      "title": "Drawing GC polyline quota 1 v2",
+      "shorttitle": null,
+      "columns": [
+        "VISIBLE_COUNT",
+        "OLDEST_INDEX"
+      ],
+      "minimumHistoryBars": 1538,
+      "manifestMinimumHistoryBars": 1538,
+      "instructions": "instructions/drawing-gc-polyline-quota-1-v2.md",
+      "pineVersion": 6,
+      "captureKind": "compile-and-count-csv"
+    },
+    {
+      "script": "drawing-gc-polyline-quota-5-v2.pine",
+      "sha256": "8f114061bad80aab41d63a3bbcbf6b3074d18fb1df896ab0e5f6aea07e46abfa",
+      "title": "Drawing GC polyline quota 5 v2",
+      "shorttitle": null,
+      "columns": [
+        "VISIBLE_COUNT",
+        "OLDEST_INDEX"
+      ],
+      "minimumHistoryBars": 1538,
+      "manifestMinimumHistoryBars": 1538,
+      "instructions": "instructions/drawing-gc-polyline-quota-5-v2.md",
+      "pineVersion": 6,
+      "captureKind": "compile-and-count-csv"
+    },
+    {
+      "script": "drawing-gc-polyline-quota-10-v2.pine",
+      "sha256": "c287d228628c611d4974fb0641c80b423bed4b6742d61a335fdfd94b746ecda4",
+      "title": "Drawing GC polyline quota 10 v2",
+      "shorttitle": null,
+      "columns": [
+        "VISIBLE_COUNT",
+        "OLDEST_INDEX"
+      ],
+      "minimumHistoryBars": 1538,
+      "manifestMinimumHistoryBars": 1538,
+      "instructions": "instructions/drawing-gc-polyline-quota-10-v2.md",
+      "pineVersion": 6,
+      "captureKind": "compile-and-count-csv"
+    },
+    {
+      "script": "drawing-gc-polyline-quota-50-v2.pine",
+      "sha256": "2ee36c89877e7c024ab0d5ec8b678907ae8d6c0a48ba34ffb58725755cf9a158",
+      "title": "Drawing GC polyline quota 50 v2",
+      "shorttitle": null,
+      "columns": [
+        "VISIBLE_COUNT",
+        "OLDEST_INDEX"
+      ],
+      "minimumHistoryBars": 1538,
+      "manifestMinimumHistoryBars": 1538,
+      "instructions": "instructions/drawing-gc-polyline-quota-50-v2.md",
+      "pineVersion": 6,
+      "captureKind": "compile-and-count-csv"
+    },
+    {
+      "script": "drawing-gc-polyline-quota-500-v2.pine",
+      "sha256": "7060907344a0e59957d39efeea4905fc06e217c26f87eb121d476ce9000f596c",
+      "title": "Drawing GC polyline quota 500 v2",
+      "shorttitle": null,
+      "columns": [
+        "VISIBLE_COUNT",
+        "OLDEST_INDEX"
+      ],
+      "minimumHistoryBars": 1538,
+      "manifestMinimumHistoryBars": 1538,
+      "instructions": "instructions/drawing-gc-polyline-quota-500-v2.md",
+      "pineVersion": 6,
+      "captureKind": "compile-and-count-csv"
+    },
+    {
+      "script": "market-profile-fractional-price-dedup-v2.pine",
+      "sha256": "ac751323265c94cfa3bb0cf7aab36f82685b327574eb98cdd85468d8d2f6aed3",
+      "title": "Market profile fractional price deduplication v2",
+      "shorttitle": null,
+      "columns": [
+        "FIRST_PASS_SIZE",
+        "OVERLAP_PASS_SIZE",
+        "NEAR_INDEX",
+        "NEAR_EQUAL",
+        "AFTER_CLEAR_SIZE",
+        "SHIFT_VALUE",
+        "AFTER_SHIFT_SIZE",
+        "INDEX_DELTA_1E12",
+        "EQUAL_DELTA_1E12",
+        "INDEX_DELTA_1E9",
+        "EQUAL_DELTA_1E9",
+        "INDEX_BOUNDARY_1E10",
+        "EQUAL_BOUNDARY_1E10"
+      ],
+      "minimumHistoryBars": 32,
+      "manifestMinimumHistoryBars": 32,
+      "instructions": "instructions/V15-CAPTURE-INSTRUCTIONS-v2.md",
+      "pineVersion": 5,
+      "captureKind": "compile-and-numeric-csv"
+    },
+    {
+      "script": "corpus-v56-835-continuation-v15-v1.pine",
+      "sha256": "962fc70c9cf6b48a81585c7be7e4e74f8c433962eb4b76936a1baaab105063f3",
+      "title": "India Stock Screener - Winning Setup",
+      "shorttitle": null,
+      "columns": [
+        "MA 20",
+        "MA 50",
+        "MA 200"
+      ],
+      "minimumHistoryBars": 1,
+      "manifestMinimumHistoryBars": 1,
+      "instructions": "instructions/corpus-v56-835-continuation-v15-v1.md",
+      "pineVersion": 5,
+      "captureKind": "compile-only"
+    },
+    {
+      "script": "corpus-v56-1349-continuation-v15-v1.pine",
+      "sha256": "fe503e4940fba9c900c2adbba899d8f3ccd1834d0a27ede674b03e7b3c544b24",
+      "title": "CTA Context (Zones + SMAs + VIX)",
+      "shorttitle": null,
+      "columns": [
+        "SMA 20",
+        "SMA 50",
+        "SMA 120",
+        "SMA 200"
+      ],
+      "minimumHistoryBars": 1,
+      "manifestMinimumHistoryBars": 1,
+      "instructions": "instructions/corpus-v56-1349-continuation-v15-v1.md",
+      "pineVersion": 5,
+      "captureKind": "compile-only"
+    },
+    {
+      "script": "corpus-v56-1463-continuation-v15-v1.pine",
+      "sha256": "c0a2c8f85fe73e5bef30ae94a18001cecf63e2ae0b5aa9447028371bfcccf49d",
+      "title": "BTC Dip Alerts HQ",
+      "shorttitle": null,
+      "columns": [
+        "Intraday Change From Daily Open (%)",
+        "Daily Close Threshold Marker"
+      ],
+      "minimumHistoryBars": 1,
+      "manifestMinimumHistoryBars": 1,
+      "instructions": "instructions/corpus-v56-1463-continuation-v15-v1.md",
+      "pineVersion": 5,
+      "captureKind": "compile-only"
+    },
+    {
+      "script": "corpus-v56-1642-continuation-v15-v1.pine",
+      "sha256": "1186490efc89bfb0a90fc0a72f6023cc477d78fa71d52bb07458d18dc1012ff1",
+      "title": "LOCAL_AI_ENGINE A/D Context v20.8",
+      "shorttitle": null,
+      "columns": [
+        "Raw Flow",
+        "Smoothed",
+        "CMF",
+        "flow_z",
+        "flow_pct"
+      ],
+      "minimumHistoryBars": 1,
+      "manifestMinimumHistoryBars": 1,
+      "instructions": "instructions/corpus-v56-1642-continuation-v15-v1.md",
+      "pineVersion": 5,
+      "captureKind": "compile-only"
+    },
+    {
+      "script": "corpus-v56-1643-continuation-v15-v1.pine",
+      "sha256": "a21d412ce136086433fd6aeb7fcf2079c72290cba96eb2bbb9c077d9d3cea59f",
+      "title": "LOCAL_AI_ENGINE A/D Context v20.8",
+      "shorttitle": null,
+      "columns": [
+        "Raw Flow",
+        "Smoothed",
+        "CMF",
+        "flow_z",
+        "flow_pct"
+      ],
+      "minimumHistoryBars": 1,
+      "manifestMinimumHistoryBars": 1,
+      "instructions": "instructions/corpus-v56-1643-continuation-v15-v1.md",
+      "pineVersion": 5,
+      "captureKind": "compile-only"
+    }
+  ]
+}

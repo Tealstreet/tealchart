@@ -1,0 +1,33 @@
+{
+  "index": 330,
+  "bar": [
+    1790902800,
+    84784.89,
+    84792.7,
+    84744,
+    84756.82,
+    6.27942
+  ],
+  "source_row": [
+    1790902800,
+    null,
+    23070,
+    30,
+    0,
+    -3
+  ],
+  "browser_utc": "2026-10-04T19:25:54.141Z",
+  "title": "V13 bgcolor offset v3 zero-control",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Fri 02 Oct '26   01:00",
+  "visible_range": {
+    "_firstBar": 295,
+    "_lastBar": 333
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}

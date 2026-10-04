@@ -1,0 +1,462 @@
+{
+  "artifact": "v15 visual pair integrity v1",
+  "pairs": [
+    {
+      "series": "evidence/visual-bgcolor-offset-v3-n-series-v1-attempt3-replay-phase9-paired-v1.json",
+      "zero_control": "evidence/visual-bgcolor-offset-v3-n-zero-control-v1-attempt1-replay-phase9-paired-v1.json",
+      "phase": 9,
+      "matched": [
+        "symbol",
+        "interval",
+        "timezone",
+        "replay",
+        "host_first",
+        "host_last",
+        "zoom",
+        "viewport",
+        "pane_dimensions"
+      ],
+      "source_last_series": {
+        "index": 309,
+        "value": [
+          1790900280,
+          1,
+          23049,
+          9,
+          2,
+          2
+        ]
+      },
+      "source_last_control": {
+        "index": 309,
+        "value": [
+          1790900280,
+          1,
+          23049,
+          9,
+          2,
+          2
+        ]
+      }
+    },
+    {
+      "series": "evidence/visual-bgcolor-offset-v3-n-series-v1-attempt3-replay-phase11-paired-v1.json",
+      "zero_control": "evidence/visual-bgcolor-offset-v3-n-zero-control-v1-attempt1-replay-phase11-paired-v1.json",
+      "phase": 11,
+      "matched": [
+        "symbol",
+        "interval",
+        "timezone",
+        "replay",
+        "host_first",
+        "host_last",
+        "zoom",
+        "viewport",
+        "pane_dimensions"
+      ],
+      "source_last_series": {
+        "index": 311,
+        "value": [
+          1790900520,
+          2,
+          23051,
+          11,
+          3,
+          -1
+        ]
+      },
+      "source_last_control": {
+        "index": 311,
+        "value": [
+          1790900520,
+          2,
+          23051,
+          11,
+          3,
+          -1
+        ]
+      }
+    },
+    {
+      "series": "evidence/visual-bgcolor-offset-v3-n-series-v1-attempt3-replay-phase12-paired-v1.json",
+      "zero_control": "evidence/visual-bgcolor-offset-v3-n-zero-control-v1-attempt1-replay-phase12-paired-v1.json",
+      "phase": 12,
+      "matched": [
+        "symbol",
+        "interval",
+        "timezone",
+        "replay",
+        "host_first",
+        "host_last",
+        "zoom",
+        "viewport",
+        "pane_dimensions"
+      ],
+      "source_last_series": {
+        "index": 312,
+        "value": [
+          1790900640,
+          3,
+          23052,
+          12,
+          4,
+          -3
+        ]
+      },
+      "source_last_control": {
+        "index": 312,
+        "value": [
+          1790900640,
+          3,
+          23052,
+          12,
+          4,
+          -3
+        ]
+      }
+    },
+    {
+      "series": "evidence/visual-bgcolor-offset-v3-n-series-v1-attempt3-replay-phase31-paired-v1.json",
+      "zero_control": "evidence/visual-bgcolor-offset-v3-n-zero-control-v1-attempt1-replay-phase31-paired-v1.json",
+      "phase": 31,
+      "matched": [
+        "symbol",
+        "interval",
+        "timezone",
+        "replay",
+        "host_first",
+        "host_last",
+        "zoom",
+        "viewport",
+        "pane_dimensions"
+      ],
+      "source_last_series": {
+        "index": 331,
+        "value": [
+          1790902920,
+          null,
+          23071,
+          31,
+          0,
+          -3
+        ]
+      },
+      "source_last_control": {
+        "index": 331,
+        "value": [
+          1790902920,
+          null,
+          23071,
+          31,
+          0,
+          -3
+        ]
+      }
+    },
+    {
+      "series": "evidence/visual-plotarrow-offset-v3-n-series-v1-attempt1-renderer-phase9-v1.json",
+      "zero_control": "evidence/visual-plotarrow-offset-v3-n-zero-control-v1-attempt1-renderer-phase9-v1.json",
+      "phase": 9,
+      "matched": [
+        "symbol",
+        "interval",
+        "timezone",
+        "replay",
+        "host_first",
+        "host_last",
+        "zoom",
+        "viewport",
+        "pane_dimensions"
+      ],
+      "source_last_series": {
+        "index": 309,
+        "value": [
+          1790900280,
+          -1,
+          23049,
+          -1,
+          2,
+          10,
+          50
+        ]
+      },
+      "source_last_control": {
+        "index": 309,
+        "value": [
+          1790900280,
+          -1,
+          23049,
+          -1,
+          0,
+          10,
+          50
+        ]
+      }
+    },
+    {
+      "series": "evidence/visual-plotarrow-offset-v3-n-series-v1-attempt1-renderer-phase11-settled-v1.json",
+      "zero_control": "evidence/visual-plotarrow-offset-v3-n-zero-control-v1-attempt1-renderer-phase11-v1.json",
+      "phase": 11,
+      "matched": [
+        "symbol",
+        "interval",
+        "timezone",
+        "replay",
+        "host_first",
+        "host_last",
+        "zoom",
+        "viewport",
+        "pane_dimensions"
+      ],
+      "source_last_series": {
+        "index": 311,
+        "value": [
+          1790900520,
+          4,
+          23051,
+          4,
+          -1,
+          10,
+          50
+        ]
+      },
+      "source_last_control": {
+        "index": 311,
+        "value": [
+          1790900520,
+          4,
+          23051,
+          4,
+          0,
+          10,
+          50
+        ]
+      }
+    },
+    {
+      "series": "evidence/visual-plotarrow-offset-v3-n-series-v1-attempt1-renderer-phase12-v1.json",
+      "zero_control": "evidence/visual-plotarrow-offset-v3-n-zero-control-v1-attempt1-renderer-phase12-v1.json",
+      "phase": 12,
+      "matched": [
+        "symbol",
+        "interval",
+        "timezone",
+        "replay",
+        "host_first",
+        "host_last",
+        "zoom",
+        "viewport",
+        "pane_dimensions"
+      ],
+      "source_last_series": {
+        "index": 312,
+        "value": [
+          1790900640,
+          -4,
+          23052,
+          -4,
+          -3,
+          10,
+          50
+        ]
+      },
+      "source_last_control": {
+        "index": 312,
+        "value": [
+          1790900640,
+          -4,
+          23052,
+          -4,
+          0,
+          10,
+          50
+        ]
+      }
+    },
+    {
+      "series": "evidence/visual-plotarrow-offset-v3-n-series-v1-attempt1-renderer-phase31-v1.json",
+      "zero_control": "evidence/visual-plotarrow-offset-v3-n-zero-control-v1-attempt1-renderer-phase31-v1.json",
+      "phase": 31,
+      "matched": [
+        "symbol",
+        "interval",
+        "timezone",
+        "replay",
+        "host_first",
+        "host_last",
+        "zoom",
+        "viewport",
+        "pane_dimensions"
+      ],
+      "source_last_series": {
+        "index": 331,
+        "value": [
+          1790902920,
+          0,
+          23071,
+          0,
+          -3,
+          10,
+          50
+        ]
+      },
+      "source_last_control": {
+        "index": 331,
+        "value": [
+          1790902920,
+          0,
+          23071,
+          0,
+          0,
+          10,
+          50
+        ]
+      }
+    },
+    {
+      "series": "evidence/visual-barcolor-offset-v3-discriminator-series-v1-attempt1-replay-phase7-paired-v1.json",
+      "zero_control": "evidence/visual-barcolor-offset-v3-discriminator-zero-v1-attempt1-replay-phase7-paired-v1.json",
+      "phase": 7,
+      "matched": [
+        "symbol",
+        "interval",
+        "timezone",
+        "replay",
+        "host_first",
+        "host_last",
+        "zoom",
+        "viewport",
+        "pane_dimensions"
+      ],
+      "source_last_series": {
+        "index": 307,
+        "value": [
+          1790900040,
+          null,
+          23047,
+          0,
+          2
+        ]
+      },
+      "source_last_control": {
+        "index": 307,
+        "value": [
+          1790900040,
+          null,
+          23047,
+          0,
+          2
+        ]
+      }
+    },
+    {
+      "series": "evidence/visual-barcolor-offset-v3-discriminator-series-v1-attempt1-replay-phase15-paired-v1.json",
+      "zero_control": "evidence/visual-barcolor-offset-v3-discriminator-zero-v1-attempt1-replay-phase15-paired-v1.json",
+      "phase": 15,
+      "matched": [
+        "symbol",
+        "interval",
+        "timezone",
+        "replay",
+        "host_first",
+        "host_last",
+        "zoom",
+        "viewport",
+        "pane_dimensions"
+      ],
+      "source_last_series": {
+        "index": 315,
+        "value": [
+          1790901000,
+          null,
+          23055,
+          0,
+          -2
+        ]
+      },
+      "source_last_control": {
+        "index": 315,
+        "value": [
+          1790901000,
+          null,
+          23055,
+          0,
+          -2
+        ]
+      }
+    },
+    {
+      "series": "evidence/visual-plotchar-offset-v3-discriminator-series-v1-attempt1-renderer-phase7-v1.json",
+      "zero_control": "evidence/visual-plotchar-offset-v3-discriminator-zero-v1-attempt1-renderer-phase7-v1.json",
+      "phase": 7,
+      "matched": [
+        "symbol",
+        "interval",
+        "timezone",
+        "replay",
+        "host_first",
+        "host_last",
+        "zoom",
+        "viewport",
+        "pane_dimensions"
+      ],
+      "source_last_series": {
+        "index": 307,
+        "value": [
+          1790900040,
+          0,
+          23047,
+          0,
+          2
+        ]
+      },
+      "source_last_control": {
+        "index": 307,
+        "value": [
+          1790900040,
+          0,
+          23047,
+          0,
+          2
+        ]
+      }
+    },
+    {
+      "series": "evidence/visual-plotchar-offset-v3-discriminator-series-v1-attempt1-renderer-phase15-v1.json",
+      "zero_control": "evidence/visual-plotchar-offset-v3-discriminator-zero-v1-attempt1-renderer-phase15-v1.json",
+      "phase": 15,
+      "matched": [
+        "symbol",
+        "interval",
+        "timezone",
+        "replay",
+        "host_first",
+        "host_last",
+        "zoom",
+        "viewport",
+        "pane_dimensions"
+      ],
+      "source_last_series": {
+        "index": 315,
+        "value": [
+          1790901000,
+          0,
+          23055,
+          0,
+          -2
+        ]
+      },
+      "source_last_control": {
+        "index": 315,
+        "value": [
+          1790901000,
+          0,
+          23055,
+          0,
+          -2
+        ]
+      }
+    }
+  ],
+  "limit": "Matched sampled historical contexts; no live or universal policy inference."
+}
