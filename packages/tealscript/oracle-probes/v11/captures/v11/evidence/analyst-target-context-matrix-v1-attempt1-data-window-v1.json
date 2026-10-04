@@ -1,0 +1,42 @@
+{
+  "index": 298,
+  "bar": [
+    1791132000,
+    85323.09,
+    85330.43,
+    85323.09,
+    85330.43,
+    3.88041
+  ],
+  "source_row": [
+    1791132000,
+    null,
+    1,
+    null,
+    1,
+    null,
+    1,
+    null,
+    1,
+    null,
+    1,
+    null,
+    1,
+    1791132000000,
+    1791132226599
+  ],
+  "browser_utc": "2026-10-04T16:43:59.026Z",
+  "title": "V11 analyst-target-context-matrix-v1",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   16:40",
+  "visible_range": {
+    "_firstBar": 263,
+    "_lastBar": 301
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}

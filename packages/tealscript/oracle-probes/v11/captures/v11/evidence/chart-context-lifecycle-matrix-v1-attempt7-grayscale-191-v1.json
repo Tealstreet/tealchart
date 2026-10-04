@@ -1,0 +1,201 @@
+{
+  "artifact": "V11 grayscale chart context v1",
+  "configured_rgb": 191,
+  "setting_event": {
+    "utc": "2026-10-04T16:52:34.851Z",
+    "settings": {
+      "backgroundType": "solid",
+      "vertGridProperties": {
+        "style": 0,
+        "visible": true,
+        "color": "rgba(242, 242, 242, 0.06)"
+      },
+      "horzGridProperties": {
+        "style": 0,
+        "visible": true,
+        "color": "rgba(242, 242, 242, 0.06)"
+      },
+      "crossHairProperties": {
+        "style": 2,
+        "transparency": 0,
+        "width": 1,
+        "color": "#9C9C9C"
+      },
+      "topMargin": 10,
+      "bottomMargin": 8,
+      "axisProperties": {
+        "autoScale": true,
+        "autoScaleDisabled": false,
+        "lockScale": false,
+        "percentage": false,
+        "percentageDisabled": false,
+        "indexedTo100": false,
+        "log": false,
+        "logDisabled": false,
+        "alignLabels": true,
+        "isInverted": false
+      },
+      "legendProperties": {
+        "showStudyArguments": true,
+        "showStudyTitles": true,
+        "showStudyValues": true,
+        "showSeriesTitle": true,
+        "showSeriesOHLC": true,
+        "showLegend": true,
+        "showLastDayChange": false,
+        "showBarChange": true,
+        "showVolume": false,
+        "showBackground": true,
+        "showPriceSource": true,
+        "backgroundTransparency": 50,
+        "showLogo": true,
+        "showTradingButtons": true,
+        "showTradingButtonsMobile": true,
+        "showSeriesLegendCloseOnMobile": true,
+        "barChangeUpColor": "#089981",
+        "barChangeDownColor": "#F23645",
+        "useBarChangeCustomColors": false
+      },
+      "separatorColor": "#2E2E2E",
+      "background": "rgb(191,191,191)",
+      "backgroundGradientStartColor": "#1F1F1F",
+      "backgroundGradientEndColor": "#0F0F0F"
+    }
+  },
+  "observed_native": {
+    "utc": "2026-10-04T16:52:36.698Z",
+    "values": {
+      "BAR_INDEX": 24986,
+      "BAR_TIME": 1791132720000,
+      "CLOCK": 1791132756568,
+      "LIVE_UPDATES": 24989,
+      "VISIBLE_LEFT": 1791128280000,
+      "VISIBLE_RIGHT": 1791132720000,
+      "BG_R": 191,
+      "BG_G": 191,
+      "BG_B": 191,
+      "FG_R": 15,
+      "FG_G": 15,
+      "FG_B": 15,
+      "EXECUTION_COUNT": 24987,
+      "RESET_DISPLAY": 17
+    },
+    "row": {
+      "index": 300,
+      "value": [
+        1791132720,
+        24986,
+        1791132720000,
+        1791132756568,
+        24989,
+        1791128280000,
+        1791132720000,
+        191,
+        191,
+        191,
+        15,
+        15,
+        15,
+        24987,
+        17
+      ]
+    },
+    "background": {
+      "backgroundType": "solid",
+      "vertGridProperties": {
+        "style": 0,
+        "visible": true,
+        "color": "rgba(242, 242, 242, 0.06)"
+      },
+      "horzGridProperties": {
+        "style": 0,
+        "visible": true,
+        "color": "rgba(242, 242, 242, 0.06)"
+      },
+      "crossHairProperties": {
+        "style": 2,
+        "transparency": 0,
+        "width": 1,
+        "color": "#9C9C9C"
+      },
+      "topMargin": 10,
+      "bottomMargin": 8,
+      "axisProperties": {
+        "autoScale": true,
+        "autoScaleDisabled": false,
+        "lockScale": false,
+        "percentage": false,
+        "percentageDisabled": false,
+        "indexedTo100": false,
+        "log": false,
+        "logDisabled": false,
+        "alignLabels": true,
+        "isInverted": false
+      },
+      "legendProperties": {
+        "showStudyArguments": true,
+        "showStudyTitles": true,
+        "showStudyValues": true,
+        "showSeriesTitle": true,
+        "showSeriesOHLC": true,
+        "showLegend": true,
+        "showLastDayChange": false,
+        "showBarChange": true,
+        "showVolume": false,
+        "showBackground": true,
+        "showPriceSource": true,
+        "backgroundTransparency": 50,
+        "showLogo": true,
+        "showTradingButtons": true,
+        "showTradingButtonsMobile": true,
+        "showSeriesLegendCloseOnMobile": true,
+        "barChangeUpColor": "#089981",
+        "barChangeDownColor": "#F23645",
+        "useBarChangeCustomColors": false
+      },
+      "separatorColor": "#2E2E2E",
+      "background": "rgb(191,191,191)",
+      "backgroundGradientStartColor": "#1F1F1F",
+      "backgroundGradientEndColor": "#0F0F0F"
+    }
+  },
+  "environment": {
+    "browser_utc": "2026-10-04T16:52:47.386Z",
+    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+    "platform": "MacIntel",
+    "user_agent_data": {
+      "architecture": "",
+      "bitness": "",
+      "brands": [],
+      "fullVersionList": [],
+      "mobile": false,
+      "platform": "",
+      "platformVersion": ""
+    },
+    "device_pixel_ratio": 2,
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "visual_viewport_scale": 1
+    },
+    "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v11 batch; visualViewport scale recorded independently.",
+    "tradingview_build": null,
+    "tradingview_script_urls": [
+      "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+      "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+      "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+      "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+      "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+      "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+      "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+      "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+      "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+      "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+      "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+      "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+    ],
+    "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+  },
+  "ui_snapshot": "Emulating viewport: {\"deviceScaleFactor\":2,\"isMobile\":false,\"hasTouch\":false,\"isLandscape\":false,\"width\":1440,\"height\":900}\n## Latest page snapshot\nuid=8087_0 RootWebArea \"BTCUSDT 85,390.00 ▲ +0.75% basic\" url=\"https://www.tradingview.com/chart/xlvYwHdH/?symbol=BINANCE%3ABTCUSDT&interval=2\"\n  uid=8087_1 button \"Logged in as sours-lat Active layout: basic\" haspopup=\"menu\"\n  uid=8087_2 StaticText \"11\"\n  uid=8087_3 button \"BTCUSDT\" description=\"Symbol search\"\n  uid=8087_4 button \"Switch data type\"\n  uid=8087_5 button \"Compare symbols\" haspopup=\"dialog\"\n  uid=8087_6 radio \"3 minutes\"\n  uid=8087_7 radio \"5 minutes\"\n  uid=8087_8 radio \"15 minutes\"\n  uid=8087_9 radio \"30 minutes\"\n  uid=8087_10 radio \"45 minutes\"\n  uid=8087_11 radio \"1 hour\"\n  uid=8087_12 radio \"2 hours\"\n  uid=8087_13 radio \"3 hours\"\n  uid=8087_14 radio \"4 hours\"\n  uid=8087_15 radio \"8 hours\"\n  uid=8087_16 radio \"10 hours\"\n  uid=8087_17 radio \"12 hours\"\n  uid=8087_18 radio \"1 day\"\n  uid=8087_19 radio \"3 days\"\n  uid=8087_20 radio \"10 days\"\n  uid=8087_21 radio \"1 week\"\n  uid=8087_22 radio \"1 month\"\n  uid=8087_23 radio \"2 minutes\" checked\n  uid=8087_24 button \"Chart interval\" haspopup=\"menu\"\n  uid=8087_25 radio \"Candles\" checked\n  uid=8087_26 radio \"Line\"\n  uid=8087_27 radio \"High-low\"\n  uid=8087_28 button \"Bar's style\" haspopup=\"menu\"\n  uid=8087_29 button \"Indicators, metrics, and strategies\"\n  uid=8087_30 button \"Favorite indicators\" haspopup=\"menu\"\n  uid=8087_31 button \"Indicator templates\" haspopup=\"menu\"\n  uid=8087_32 button \"Create alert\"\n  uid=8087_33 button \"Bar replay\"\n  uid=8087_34 button disableable disabled\n  uid=8087_35 button disableable disabled\n  uid=8087_36 button \"Layout setup\" haspopup=\"menu\"\n  uid=8087_37 button \"All changes saved\" disableable disabled\n  uid=8087_38 button \"Manage layouts\" haspopup=\"menu\"\n  uid=8087_39 button \"Quick search\"\n  uid=8087_40 button \"Settings\"\n  uid=8087_41 button \"Fullscreen mode\"\n  uid=8087_42 button \"Take a snapshot\" haspopup=\"menu\"\n  uid=8087_43 button \"Share your idea with the trade community\" haspopup=\"menu\"\n  uid=8087_44 button \"Trade\"\n  uid=8087_45 button \"Cross\"\n  uid=8087_46 button \"Cursors\" pressed\n  uid=8087_47 button \"Trendline\"\n  uid=8087_48 button \"Trend tools\"\n  uid=8087_49 button \"Fib retracement\"\n  uid=8087_50 button \"Gann and Fibonacci tools\"\n  uid=8087_51 button \"XABCD pattern\"\n  uid=8087_52 button \"Patterns\"\n  uid=8087_53 button \"Long position\"\n  uid=8087_54 button \"Forecasting and measurement tools\"\n  uid=8087_55 button \"Brush\"\n  uid=8087_56 button \"Geometric shapes\"\n  uid=8087_57 button \"Text\"\n  uid=8087_58 button \"Annotation tools\"\n  uid=8087_59 button \"Icon\"\n  uid=8087_60 button \"Icons\"\n  uid=8087_61 button \"Measure\"\n  uid=8087_62 button \"Zoom in\"\n  uid=8087_63 button \"Magnet mode snaps drawings placed near price bars to the closest OHLC value\" pressed\n  uid=8087_64 button \"Magnets\" pressed\n  uid=8087_65 button \"Keep drawing\"\n  uid=8087_66 button \"Lock drawings and indicators\"\n  uid=8087_67 button \"Lock options\"\n  uid=8087_68 button \"Hide all drawings, indicators, positions, and orders\"\n  uid=8087_69 button \"Hide options\"\n  uid=8087_70 button \"New drawings will not be synced\"\n  uid=8087_71 button \"Sync drawings options\"\n  uid=8087_72 button \"Remove objects\"\n  uid=8087_73 button \"Remove options\"\n  uid=8087_74 button \"Show Favorite Drawing Tools Toolbar\"\n  uid=8087_75 region \"Chart #1\"\n    uid=8087_76 StaticText \"B\"\n    uid=8087_77 button \"Change symbol\"\n    uid=8087_78 StaticText \"·\"\n    uid=8087_79 button \"Change interval\"\n    uid=8087_78 StaticText \"·\"\n    uid=8087_80 StaticText \"Binance\"\n    uid=8087_81 button \"Unflag symbol\"\n    uid=8087_82 button \"More\" description=\"More\"\n    uid=8087_83 button \"Market open\"\n    uid=8087_84 StaticText \"O\"\n    uid=8087_85 StaticText \"85,432.01\"\n    uid=8087_86 StaticText \"H\"\n    uid=8087_87 StaticText \"85,432.01\"\n    uid=8087_88 StaticText \"L\"\n    uid=8087_89 StaticText \"85,382.00\"\n    uid=8087_90 StaticText \"C\"\n    uid=8087_91 StaticText \"85,394.01\"\n    uid=8087_92 StaticText \"−38.00 (−0.04%)\"\n    uid=8087_93 StaticText \"85,390.00\"\n    uid=8115_0 StaticText \"SELL\"\n    uid=8087_95 StaticText \"0.01\"\n    uid=8087_96 StaticText \"85,390.01\"\n    uid=8115_1 StaticText \"BUY\"\n    uid=8087_98 Canvas \"Chart for BINANCE:BTCUSDT, 2 minutes\"\n    uid=8087_99 StaticText \"V11 chart-context-lifecycle-matrix-v1\"\n    uid=8087_100 button \"Hide\" description=\"Hide\"\n    uid=8087_101 button \"Settings\" description=\"Settings\"\n    uid=8087_102 button \"Remove\" description=\"Remove\"\n    uid=8087_103 button \"More\" description=\"More\"\n    uid=8087_104 StaticText \"24,985.00\"\n    uid=8087_105 StaticText \"1,791,132,600,000.00\"\n    uid=8087_106 StaticText \"1,791,132,755,715.00\"\n    uid=8087_107 StaticText \"24,986.00\"\n    uid=8087_108 StaticText \"1,791,128,280,000.00\"\n    uid=8087_109 StaticText \"1,791,132,720,000.00\"\n    uid=8087_110 StaticText \"191.00\"\n    uid=8087_111 StaticText \"191.00\"\n    uid=8087_112 StaticText \"191.00\"\n    uid=8087_113 StaticText \"15.00\"\n    uid=8087_114 StaticText \"15.00\"\n    uid=8087_115 StaticText \"15.00\"\n    uid=8087_116 StaticText \"24,986.00\"\n  uid=8087_117 button \"1 day in 1 minute intervals\"\n  uid=8087_118 button \"5 days in 5 minutes intervals\"\n  uid=8087_119 button \"1 month in 30 minutes intervals\"\n  uid=8087_120 button \"3 months in 1 hour intervals\"\n  uid=8087_121 button \"6 months in 2 hours intervals\"\n  uid=8087_122 button \"Year to day in 1 day intervals\"\n  uid=8087_123 button \"1 year in 1 day intervals\"\n  uid=8087_124 button \"5 years in 1 week intervals\"\n  uid=8087_125 button \"All data in 1 month intervals\"\n  uid=8087_126 button \"Go to\"\n  uid=8087_127 button \"Timezone\"\n  uid=8087_128 button \"Watchlist, details, and news\"\n  uid=8087_129 button \"Alerts\"\n  uid=8087_130 button \"Object tree and data window\" pressed\n  uid=8087_131 button \"AI Copilot\"\n  uid=8087_132 button \"Screeners\"\n  uid=8087_133 button \"Pine\"\n  uid=8087_134 button \"Calendars\"\n  uid=8087_135 button \"Community\"\n  uid=8087_136 button \"Notifications\"\n  uid=8087_137 button \"Chats\"\n  uid=8087_138 button \"Products\" haspopup=\"menu\"\n  uid=8087_139 button \"Help Center\"\n  uid=8104_0 tab \"Object tree\" selectable\n  uid=8104_1 tab \"Data window\" selectable selected\n  uid=8104_2 generic disableable disabled\n    uid=8104_3 StaticText \"Date\"\n    uid=8104_4 StaticText \"Sun 04 Oct '26\"\n    uid=8104_5 StaticText \"Time\"\n    uid=8104_6 StaticText \"16:50\"\n  uid=8104_7 row \"BTCUSDT · 2 · Binance Open 85,432.01 High 85,432.01 Low 85,382.00 Close 85,394.01 Change −38.00 (−0.04%) Vol 8.03 Last day change +636.44 (+0.75%)\"\n    uid=8104_8 StaticText \"BTCUSDT · 2 · Binance\"\n    uid=8104_9 button \"Hide data\"\n    uid=8104_10 StaticText \"Open\"\n    uid=8104_11 StaticText \"85,432.01\"\n    uid=8104_12 StaticText \"High\"\n    uid=8104_13 StaticText \"85,432.01\"\n    uid=8104_14 StaticText \"Low\"\n    uid=8104_15 StaticText \"85,382.00\"\n    uid=8104_16 StaticText \"Close\"\n    uid=8104_17 StaticText \"85,394.01\"\n    uid=8104_18 StaticText \"Change\"\n    uid=8104_19 StaticText \"−38.00 (−0.04%)\"\n    uid=8104_20 StaticText \"Vol\"\n    uid=8104_21 StaticText \"8.03\"\n    uid=8104_22 StaticText \"Last day change\"\n    uid=8104_23 StaticText \"+636.44 (+0.75%)\"\n  uid=8104_24 row \"V11 chart-context-lifecycle-matrix-v1 BAR_INDEX 24,985.00 BAR_TIME 1,791,132,600,000.00 CLOCK 1,791,132,755,715.00 LIVE_UPDATES 24,986.00 VISIBLE_LEFT 1,791,128,280,000.00 VISIBLE_RIGHT 1,791,132,720,000.00 BG_R 191.00 BG_G 191.00 BG_B 191.00 FG_R 15.00 FG_G 15.00 FG_B 15.00\"\n    uid=8104_25 StaticText \"V11 chart-context-lifecycle-matrix-v1\"\n    uid=8104_26 button \"Hide data\"\n    uid=8104_27 StaticText \"BAR_INDEX\"\n    uid=8104_28 StaticText \"24,985.00\"\n    uid=8104_29 StaticText \"BAR_TIME\"\n    uid=8104_30 StaticText \"1,791,132,600,000.00\"\n    uid=8104_31 StaticText \"CLOCK\"\n    uid=8104_32 StaticText \"1,791,132,755,715.00\"\n    uid=8104_33 StaticText \"LIVE_UPDATES\"\n    uid=8104_34 StaticText \"24,986.00\"\n    uid=8104_35 StaticText \"VISIBLE_LEFT\"\n    uid=8104_36 StaticText \"1,791,128,280,000.00\"\n    uid=8104_37 StaticText \"VISIBLE_RIGHT\"\n    uid=8104_38 StaticText \"1,791,132,720,000.00\"\n    uid=8104_39 StaticText \"BG_R\"\n    uid=8104_40 StaticText \"191.00\"\n    uid=8104_41 StaticText \"BG_G\"\n    uid=8104_42 StaticText \"191.00\"\n    uid=8104_43 StaticText \"BG_B\"\n    uid=8104_44 StaticText \"191.00\"\n    uid=8104_45 StaticText \"FG_R\"\n    uid=8104_46 StaticText \"15.00\"\n    uid=8104_47 StaticText \"FG_G\"\n    uid=8104_48 StaticText \"15.00\"\n    uid=8104_49 StaticText \"FG_B\"\n    uid=8104_50 StaticText \"15.00\"\n  uid=8087_140 generic \"Trading panel\"\n    uid=8087_141 generic\n  uid=8087_142 generic live=\"polite\" relevant=\"additions\"\n  uid=8087_143 generic live=\"polite\" relevant=\"additions\"\n  uid=8087_144 generic live=\"assertive\" relevant=\"additions\"\n  uid=8087_145 generic live=\"assertive\" relevant=\"additions\"\n  uid=8135_0 StaticText \"Help Center\"\n  uid=8087_146 generic live=\"polite\" relevant=\"additions text\"\n  uid=8087_147 log live=\"polite\" relevant=\"additions text\"\n  uid=8087_148 log live=\"polite\" relevant=\"additions text\"\n  uid=8087_149 log live=\"polite\" relevant=\"additions text\"\n  uid=8087_150 log live=\"polite\" relevant=\"additions text\"\n  uid=8087_151 log live=\"polite\" relevant=\"additions text\"\n  uid=8087_152 log live=\"polite\" relevant=\"additions text\"\n  uid=8087_153 log live=\"polite\" relevant=\"additions text\"\n  uid=8087_154 log live=\"polite\" relevant=\"additions text\"\n  uid=8087_155 log live=\"polite\" relevant=\"additions text\"\n  uid=8087_156 log live=\"polite\" relevant=\"additions text\"\n  uid=8087_157 log live=\"polite\" relevant=\"additions text\"\n  uid=8087_158 log live=\"polite\" relevant=\"additions text\"\n  uid=8087_159 log live=\"polite\" relevant=\"additions text\"\n  uid=8087_160 log live=\"polite\" relevant=\"additions text\"\n  uid=8087_161 log live=\"polite\" relevant=\"additions text\"\n  uid=8087_162 log live=\"polite\" relevant=\"additions text\"\n  uid=8087_163 log live=\"polite\" relevant=\"additions text\"\n  uid=8087_164 log live=\"polite\" relevant=\"additions text\"\n  uid=8087_165 log live=\"polite\" relevant=\"additions text\"\n  uid=8087_166 log live=\"polite\" relevant=\"additions text\"\n  uid=8087_167 log live=\"polite\" relevant=\"additions text\"\n",
+  "limits": "Native chart property setter and actual source BG/FG channels are recorded. Six samples cannot establish a universal darkness threshold, cache mechanism or provider latency. No source alteration."
+}

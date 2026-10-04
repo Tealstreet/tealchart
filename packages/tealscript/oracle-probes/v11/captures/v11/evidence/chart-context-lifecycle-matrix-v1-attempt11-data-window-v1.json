@@ -1,0 +1,42 @@
+{
+  "index": 301,
+  "bar": [
+    1791132840,
+    85372,
+    85372.01,
+    85348.51,
+    85361.84,
+    6.30224
+  ],
+  "source_row": [
+    1791132840,
+    24987,
+    1791132840000,
+    1791132962088,
+    24988,
+    1791132360000,
+    1791132960000,
+    255,
+    255,
+    255,
+    15,
+    15,
+    15,
+    24988,
+    17
+  ],
+  "browser_utc": "2026-10-04T16:57:16.828Z",
+  "title": "V11 chart-context-lifecycle-matrix-v1",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   16:54",
+  "visible_range": {
+    "_firstBar": 266,
+    "_lastBar": 304
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}

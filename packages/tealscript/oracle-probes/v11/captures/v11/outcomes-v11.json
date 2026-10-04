@@ -28306,5 +28306,4953 @@
     },
     "data_window_witness": "captures/v11/evidence/provider6m-direct-feed-v6-v1-attempt3-data-window-v1.json",
     "capture_stage": "POST-BOUNDARY-RELOADED"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T16:43:54.348Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v11 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "analyst-target-context-matrix-v1.pine",
+    "attempt": 1,
+    "source_sha256": "775ca708549742f1fe32849d4b013cccbd6bbd06a1b12aa9f102dd18302c2be1",
+    "indicator_title": "V11 analyst-target-context-matrix-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v11/analyst-target-context-matrix-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-05T004353.614.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V11 analyst-target-context-matrix-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24682,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24982,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T16:43:46.430Z",
+    "live_candle_open_utc": "2026-10-04T16:42:00.000Z",
+    "export_utc": "2026-10-04T16:43:53.971Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v11/evidence/analyst-target-context-matrix-v1-attempt1-setup.png",
+      "captures/v11/evidence/analyst-target-context-matrix-v1-attempt1-export.png",
+      "captures/v11/evidence/analyst-target-context-matrix-v1-attempt1-logs.txt",
+      "captures/v11/evidence/analyst-target-context-matrix-v1-attempt1-logs-v1.json",
+      "captures/v11/evidence/analyst-target-context-matrix-v1-attempt1-logs.png",
+      "captures/v11/evidence/analyst-target-context-matrix-v1-attempt1-visual.png",
+      "captures/v11/evidence/analyst-target-context-matrix-v1-attempt1-data-window-v1.png",
+      "captures/v11/evidence/analyst-target-context-matrix-v1-attempt1-data-window-v1.json",
+      "captures/v11/evidence/analyst-target-context-matrix-v1-attempt1-data-window-v1.txt",
+      "captures/v11/evidence/analyst-target-context-matrix-v1-attempt1-authority-object-geometry-v1.json",
+      "captures/v11/evidence/analyst-target-context-matrix-v1-attempt1-authority-object-geometry-v1.png"
+    ],
+    "notes": "Frozen source unchanged. Six analyst fields and their missing flags exported; actual provider/session/account observation retained. A successful capture does not settle paired eligibility/availability facets.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T16:43:47.426Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790826960,
+            83718.3,
+            83776.01,
+            83718.29,
+            83773.6,
+            8.29856
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791132120,
+            85330.42,
+            85337.78,
+            85330.42,
+            85337.78,
+            3.43962
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 analyst-target-context-matrix-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790826960,
+                null,
+                1,
+                null,
+                1,
+                null,
+                1,
+                null,
+                1,
+                null,
+                1,
+                null,
+                1,
+                1790826960000,
+                1791132226598
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791132120,
+                null,
+                1,
+                null,
+                1,
+                null,
+                1,
+                null,
+                1,
+                null,
+                1,
+                null,
+                1,
+                1791132120000,
+                1791132226599
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T16:43:48.426Z",
+        "bars": 24982,
+        "end": true,
+        "first": {
+          "index": -24682,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791132120,
+            85330.42,
+            85337.78,
+            85330.42,
+            85337.78,
+            3.48711
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 analyst-target-context-matrix-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24982,
+            "first": {
+              "index": -24682,
+              "value": [
+                1788134400,
+                null,
+                1,
+                null,
+                1,
+                null,
+                1,
+                null,
+                1,
+                null,
+                1,
+                null,
+                1,
+                1788134400000,
+                1791132226582
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791132120,
+                null,
+                1,
+                null,
+                1,
+                null,
+                1,
+                null,
+                1,
+                null,
+                1,
+                null,
+                1,
+                1791132120000,
+                1791132227676
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   16:42",
+    "historical_compare_before_unix_seconds": 1791132120,
+    "pine_logs": {
+      "paths": [
+        "evidence/analyst-target-context-matrix-v1-attempt1-logs.txt",
+        "evidence/analyst-target-context-matrix-v1-attempt1-logs-v1.json",
+        "evidence/analyst-target-context-matrix-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "de1b0b6af089514d42769d5beb0b2c4522d57fe35c5cf54b9dd084f89c7fd1a0",
+    "csv_bytes": 2254872,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "TARGET_AVERAGE",
+      "AVERAGE_MISSING",
+      "TARGET_MEDIAN",
+      "MEDIAN_MISSING",
+      "TARGET_DATE",
+      "DATE_MISSING",
+      "TARGET_ESTIMATES",
+      "ESTIMATES_MISSING",
+      "TARGET_HIGH",
+      "HIGH_MISSING",
+      "TARGET_LOW",
+      "LOW_MISSING",
+      "BAR_TIME",
+      "OBSERVATION_TIME"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "TARGET_AVERAGE": 5,
+      "AVERAGE_MISSING": 6,
+      "TARGET_MEDIAN": 7,
+      "MEDIAN_MISSING": 8,
+      "TARGET_DATE": 9,
+      "DATE_MISSING": 10,
+      "TARGET_ESTIMATES": 11,
+      "ESTIMATES_MISSING": 12,
+      "TARGET_HIGH": 13,
+      "HIGH_MISSING": 14,
+      "TARGET_LOW": 15,
+      "LOW_MISSING": 16,
+      "BAR_TIME": 17,
+      "OBSERVATION_TIME": 18
+    },
+    "first_historical_cells": [
+      "1788134400",
+      "77682",
+      "77682.01",
+      "77572",
+      "77674.04",
+      "",
+      "1",
+      "",
+      "1",
+      "",
+      "1",
+      "",
+      "1",
+      "",
+      "1",
+      "",
+      "1",
+      "1788134400000",
+      "1791132226582"
+    ],
+    "last_historical_cells": [
+      "1791132000",
+      "85323.09",
+      "85330.43",
+      "85323.09",
+      "85330.43",
+      "",
+      "1",
+      "",
+      "1",
+      "",
+      "1",
+      "",
+      "1",
+      "",
+      "1",
+      "",
+      "1",
+      "1791132000000",
+      "1791132226599"
+    ],
+    "declared_to_native_header_mapping": {
+      "TARGET_AVERAGE": "TARGET_AVERAGE",
+      "AVERAGE_MISSING": "AVERAGE_MISSING",
+      "TARGET_MEDIAN": "TARGET_MEDIAN",
+      "MEDIAN_MISSING": "MEDIAN_MISSING",
+      "TARGET_DATE": "TARGET_DATE",
+      "DATE_MISSING": "DATE_MISSING",
+      "TARGET_ESTIMATES": "TARGET_ESTIMATES",
+      "ESTIMATES_MISSING": "ESTIMATES_MISSING",
+      "TARGET_HIGH": "TARGET_HIGH",
+      "HIGH_MISSING": "HIGH_MISSING",
+      "TARGET_LOW": "TARGET_LOW",
+      "LOW_MISSING": "LOW_MISSING",
+      "BAR_TIME": "BAR_TIME",
+      "OBSERVATION_TIME": "OBSERVATION_TIME"
+    },
+    "csv_rows": 24982,
+    "historical_rows": 24981,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791132120,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791132120",
+    "first_historical_values": {
+      "TARGET_AVERAGE": "",
+      "AVERAGE_MISSING": "1",
+      "TARGET_MEDIAN": "",
+      "MEDIAN_MISSING": "1",
+      "TARGET_DATE": "",
+      "DATE_MISSING": "1",
+      "TARGET_ESTIMATES": "",
+      "ESTIMATES_MISSING": "1",
+      "TARGET_HIGH": "",
+      "HIGH_MISSING": "1",
+      "TARGET_LOW": "",
+      "LOW_MISSING": "1",
+      "BAR_TIME": "1788134400000",
+      "OBSERVATION_TIME": "1791132226582"
+    },
+    "last_historical_values": {
+      "TARGET_AVERAGE": "",
+      "AVERAGE_MISSING": "1",
+      "TARGET_MEDIAN": "",
+      "MEDIAN_MISSING": "1",
+      "TARGET_DATE": "",
+      "DATE_MISSING": "1",
+      "TARGET_ESTIMATES": "",
+      "ESTIMATES_MISSING": "1",
+      "TARGET_HIGH": "",
+      "HIGH_MISSING": "1",
+      "TARGET_LOW": "",
+      "LOW_MISSING": "1",
+      "BAR_TIME": "1791132000000",
+      "OBSERVATION_TIME": "1791132226599"
+    },
+    "data_window_witness": "captures/v11/evidence/analyst-target-context-matrix-v1-attempt1-data-window-v1.json",
+    "capture_context": "Crypto negative availability control",
+    "unobserved_required_contexts": [
+      "Eligible after-next-regular-open capture on same settings",
+      "Independent analyst-data entitlement verification",
+      "Literal Pine execution origin; source does not plot index"
+    ]
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T16:46:29.894Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v11 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "analyst-target-context-matrix-v1.pine",
+    "attempt": 2,
+    "source_sha256": "775ca708549742f1fe32849d4b013cccbd6bbd06a1b12aa9f102dd18302c2be1",
+    "indicator_title": "V11 analyst-target-context-matrix-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v11/analyst-target-context-matrix-v1-attempt2.csv",
+    "original_download_filename": "BATS_AAPL, 1.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BATS:AAPL",
+      "timeframe": "1",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V11 analyst-target-context-matrix-v1",
+      "dataset_start_utc": "2026-07-20T13:30:00.000Z",
+      "first_chart_bar": {
+        "index": -20760,
+        "value": [
+          1784554200,
+          333.39,
+          333.75,
+          331.17,
+          332.88,
+          74486
+        ]
+      },
+      "chart_bars": 21060,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "America/New_York",
+      "exchange_session": "0930-1600",
+      "currency": "USD",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T16:46:22.062Z",
+    "live_candle_open_utc": "2026-10-02T19:59:00.000Z",
+    "export_utc": "2026-10-04T16:46:29.532Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v11/evidence/analyst-target-context-matrix-v1-attempt2-setup.png",
+      "captures/v11/evidence/analyst-target-context-matrix-v1-attempt2-export.png",
+      "captures/v11/evidence/analyst-target-context-matrix-v1-attempt2-logs.txt",
+      "captures/v11/evidence/analyst-target-context-matrix-v1-attempt2-logs-v1.json",
+      "captures/v11/evidence/analyst-target-context-matrix-v1-attempt2-logs.png",
+      "captures/v11/evidence/analyst-target-context-matrix-v1-attempt2-visual.png",
+      "captures/v11/evidence/analyst-target-context-matrix-v1-attempt2-data-window-v1.png",
+      "captures/v11/evidence/analyst-target-context-matrix-v1-attempt2-data-window-v1.json",
+      "captures/v11/evidence/analyst-target-context-matrix-v1-attempt2-data-window-v1.txt",
+      "captures/v11/evidence/analyst-target-context-matrix-v1-attempt2-authority-object-geometry-v1.json",
+      "captures/v11/evidence/analyst-target-context-matrix-v1-attempt2-authority-object-geometry-v1.png",
+      "captures/v11/evidence/analyst-target-context-matrix-v1-attempt2-outside-session-host-context-v1.json",
+      "captures/v11/evidence/analyst-target-context-matrix-v1-attempt2-outside-session-host-context-v1.png"
+    ],
+    "notes": "Frozen source unchanged. Six analyst fields and their missing flags exported; actual provider/session/account observation retained. A successful capture does not settle paired eligibility/availability facets.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T16:46:23.186Z",
+        "bars": 2556,
+        "end": false,
+        "first": {
+          "index": -2256,
+          "value": [
+            1790267040,
+            337.6,
+            337.73,
+            337.5,
+            337.72,
+            3834
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1790971140,
+            333.68,
+            333.8,
+            333.46,
+            333.775,
+            64939
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 analyst-target-context-matrix-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2556,
+            "first": {
+              "index": -2256,
+              "value": [
+                1790267040,
+                null,
+                1,
+                null,
+                1,
+                null,
+                1,
+                null,
+                1,
+                null,
+                1,
+                null,
+                1,
+                1790267040000,
+                1791132382372
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1790971140,
+                335.751907,
+                0,
+                340,
+                0,
+                1790899200000,
+                0,
+                35,
+                0,
+                405,
+                0,
+                245,
+                0,
+                1790971140000,
+                1791132382408
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T16:46:24.199Z",
+        "bars": 21060,
+        "end": true,
+        "first": {
+          "index": -20760,
+          "value": [
+            1784554200,
+            333.39,
+            333.75,
+            331.17,
+            332.88,
+            74486
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1790971140,
+            333.68,
+            333.8,
+            333.46,
+            333.775,
+            64939
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 analyst-target-context-matrix-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 21060,
+            "first": {
+              "index": -20760,
+              "value": [
+                1784554200,
+                null,
+                1,
+                null,
+                1,
+                null,
+                1,
+                null,
+                1,
+                null,
+                1,
+                null,
+                1,
+                1784554200000,
+                1791132382135
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1790971140,
+                335.751907,
+                0,
+                340,
+                0,
+                1790899200000,
+                0,
+                35,
+                0,
+                405,
+                0,
+                245,
+                0,
+                1790971140000,
+                1791132382408
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Fri 02 Oct '26   19:59",
+    "historical_compare_before_unix_seconds": 1790971140,
+    "pine_logs": {
+      "paths": [
+        "evidence/analyst-target-context-matrix-v1-attempt2-logs.txt",
+        "evidence/analyst-target-context-matrix-v1-attempt2-logs-v1.json",
+        "evidence/analyst-target-context-matrix-v1-attempt2-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "93c70a70492b597204b1dcd512e21798d7f0bb5c50d6ffa9d72032efba6f5386",
+    "csv_bytes": 1799140,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "TARGET_AVERAGE",
+      "AVERAGE_MISSING",
+      "TARGET_MEDIAN",
+      "MEDIAN_MISSING",
+      "TARGET_DATE",
+      "DATE_MISSING",
+      "TARGET_ESTIMATES",
+      "ESTIMATES_MISSING",
+      "TARGET_HIGH",
+      "HIGH_MISSING",
+      "TARGET_LOW",
+      "LOW_MISSING",
+      "BAR_TIME",
+      "OBSERVATION_TIME"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "TARGET_AVERAGE": 5,
+      "AVERAGE_MISSING": 6,
+      "TARGET_MEDIAN": 7,
+      "MEDIAN_MISSING": 8,
+      "TARGET_DATE": 9,
+      "DATE_MISSING": 10,
+      "TARGET_ESTIMATES": 11,
+      "ESTIMATES_MISSING": 12,
+      "TARGET_HIGH": 13,
+      "HIGH_MISSING": 14,
+      "TARGET_LOW": 15,
+      "LOW_MISSING": 16,
+      "BAR_TIME": 17,
+      "OBSERVATION_TIME": 18
+    },
+    "first_historical_cells": [
+      "1784554200",
+      "333.39",
+      "333.75",
+      "331.17",
+      "332.88",
+      "",
+      "1",
+      "",
+      "1",
+      "",
+      "1",
+      "",
+      "1",
+      "",
+      "1",
+      "",
+      "1",
+      "1784554200000",
+      "1791132382135"
+    ],
+    "last_historical_cells": [
+      "1790971080",
+      "333.21",
+      "333.73",
+      "333.21",
+      "333.69",
+      "335.751907",
+      "0",
+      "340",
+      "0",
+      "1790899200000",
+      "0",
+      "35",
+      "0",
+      "405",
+      "0",
+      "245",
+      "0",
+      "1790971080000",
+      "1791132382408"
+    ],
+    "declared_to_native_header_mapping": {
+      "TARGET_AVERAGE": "TARGET_AVERAGE",
+      "AVERAGE_MISSING": "AVERAGE_MISSING",
+      "TARGET_MEDIAN": "TARGET_MEDIAN",
+      "MEDIAN_MISSING": "MEDIAN_MISSING",
+      "TARGET_DATE": "TARGET_DATE",
+      "DATE_MISSING": "DATE_MISSING",
+      "TARGET_ESTIMATES": "TARGET_ESTIMATES",
+      "ESTIMATES_MISSING": "ESTIMATES_MISSING",
+      "TARGET_HIGH": "TARGET_HIGH",
+      "HIGH_MISSING": "HIGH_MISSING",
+      "TARGET_LOW": "TARGET_LOW",
+      "LOW_MISSING": "LOW_MISSING",
+      "BAR_TIME": "BAR_TIME",
+      "OBSERVATION_TIME": "OBSERVATION_TIME"
+    },
+    "csv_rows": 21060,
+    "historical_rows": 21059,
+    "first_csv_timestamp_seconds": 1784554200,
+    "last_csv_timestamp_seconds": 1790971140,
+    "first_csv_time_raw": "1784554200",
+    "last_csv_time_raw": "1790971140",
+    "first_historical_values": {
+      "TARGET_AVERAGE": "",
+      "AVERAGE_MISSING": "1",
+      "TARGET_MEDIAN": "",
+      "MEDIAN_MISSING": "1",
+      "TARGET_DATE": "",
+      "DATE_MISSING": "1",
+      "TARGET_ESTIMATES": "",
+      "ESTIMATES_MISSING": "1",
+      "TARGET_HIGH": "",
+      "HIGH_MISSING": "1",
+      "TARGET_LOW": "",
+      "LOW_MISSING": "1",
+      "BAR_TIME": "1784554200000",
+      "OBSERVATION_TIME": "1791132382135"
+    },
+    "last_historical_values": {
+      "TARGET_AVERAGE": "335.751907",
+      "AVERAGE_MISSING": "0",
+      "TARGET_MEDIAN": "340",
+      "MEDIAN_MISSING": "0",
+      "TARGET_DATE": "1790899200000",
+      "DATE_MISSING": "0",
+      "TARGET_ESTIMATES": "35",
+      "ESTIMATES_MISSING": "0",
+      "TARGET_HIGH": "405",
+      "HIGH_MISSING": "0",
+      "TARGET_LOW": "245",
+      "LOW_MISSING": "0",
+      "BAR_TIME": "1790971080000",
+      "OBSERVATION_TIME": "1791132382408"
+    },
+    "data_window_witness": "captures/v11/evidence/analyst-target-context-matrix-v1-attempt2-data-window-v1.json",
+    "capture_context": "Outside-session AAPL context; native BATS resolution",
+    "unobserved_required_contexts": [
+      "Eligible after-next-regular-open capture on same settings",
+      "Independent analyst-data entitlement verification",
+      "Literal Pine execution origin; source does not plot index"
+    ]
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T16:49:20.640Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v11 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "chart-context-lifecycle-matrix-v1.pine",
+    "attempt": 1,
+    "source_sha256": "72d27050859eed864c1966a2ceefcdfce45487a005380a816c15ea23b52d6b98",
+    "indicator_title": "V11 chart-context-lifecycle-matrix-v1",
+    "status": "UNKNOWN",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": "captures/v11/chart-context-lifecycle-matrix-v1-attempt1.csv",
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V11 chart-context-lifecycle-matrix-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24685,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24985,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T16:48:20.281Z",
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v11/chart-context-lifecycle-matrix-v1-attempt1.csv",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt1-setup.png",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt1-export.png",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt1-logs.txt",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt1-logs-v1.json",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt1-logs.png",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt1-collector-hidden-export-v1.json",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt1-collector-hidden-export-v1.png"
+    ],
+    "notes": "Native source runs; CSV copied unchanged before collector required-column assertion refused absence of RESET_DISPLAY. Native style declares it display=0. This is a collector issue, not a Pine compile/runtime refusal. Raw export and native omission are retained.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T16:48:21.370Z",
+        "bars": 2556,
+        "end": false,
+        "first": {
+          "index": -2256,
+          "value": [
+            1790825880,
+            83586.01,
+            83622.38,
+            83582.89,
+            83622.38,
+            9.39295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791132480,
+            85340.01,
+            85340.01,
+            85340,
+            85340.01,
+            0.27103
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 chart-context-lifecycle-matrix-v1",
+            "status": {
+              "type": 1,
+              "startTime": 1791132501053
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T16:48:22.443Z",
+        "bars": 24985,
+        "end": true,
+        "first": {
+          "index": -24685,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791132480,
+            85340.01,
+            85340.01,
+            85340,
+            85340.01,
+            0.30127
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 chart-context-lifecycle-matrix-v1",
+            "status": {
+              "type": 1,
+              "startTime": 1791132501782
+            },
+            "size": 4912,
+            "first": {
+              "index": -4612,
+              "value": [
+                1790543160,
+                20073,
+                1790543160000,
+                1791132501072,
+                20074,
+                1790832600000,
+                1791132480000,
+                15,
+                15,
+                15,
+                219,
+                219,
+                219,
+                20074,
+                17
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791132480,
+                24984,
+                1791132480000,
+                1791132501139,
+                24986,
+                1790832600000,
+                1791132480000,
+                15,
+                15,
+                15,
+                219,
+                219,
+                219,
+                24985,
+                17
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T16:48:23.242Z",
+        "bars": 24985,
+        "end": true,
+        "first": {
+          "index": -24685,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791132480,
+            85340.01,
+            85340.01,
+            85340,
+            85340.01,
+            0.3143
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 chart-context-lifecycle-matrix-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24985,
+            "first": {
+              "index": -24685,
+              "value": [
+                1788134400,
+                0,
+                1788134400000,
+                1791132501053,
+                1,
+                1790832600000,
+                1791132480000,
+                15,
+                15,
+                15,
+                219,
+                219,
+                219,
+                1,
+                17
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791132480,
+                24984,
+                1791132480000,
+                1791132502493,
+                24988,
+                1790832600000,
+                1791132480000,
+                15,
+                15,
+                15,
+                219,
+                219,
+                219,
+                24985,
+                17
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "collector_failure": {
+      "message": "Declared RESET_DISPLAY absent from native default export",
+      "native": {
+        "status": {
+          "type": 2
+        },
+        "plots": [
+          {
+            "id": "plot_0",
+            "type": "line"
+          },
+          {
+            "id": "plot_1",
+            "type": "line"
+          },
+          {
+            "id": "plot_2",
+            "type": "line"
+          },
+          {
+            "id": "plot_3",
+            "type": "line"
+          },
+          {
+            "id": "plot_4",
+            "type": "line"
+          },
+          {
+            "id": "plot_5",
+            "type": "line"
+          },
+          {
+            "id": "plot_6",
+            "type": "line"
+          },
+          {
+            "id": "plot_7",
+            "type": "line"
+          },
+          {
+            "id": "plot_8",
+            "type": "line"
+          },
+          {
+            "id": "plot_9",
+            "type": "line"
+          },
+          {
+            "id": "plot_10",
+            "type": "line"
+          },
+          {
+            "id": "plot_11",
+            "type": "line"
+          },
+          {
+            "id": "plot_12",
+            "type": "line"
+          },
+          {
+            "id": "plot_13",
+            "type": "line"
+          }
+        ],
+        "styles": {
+          "plot_0": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "BAR_INDEX"
+          },
+          "plot_1": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "BAR_TIME"
+          },
+          "plot_10": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "FG_G"
+          },
+          "plot_11": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "FG_B"
+          },
+          "plot_12": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "EXECUTION_COUNT"
+          },
+          "plot_13": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "RESET_DISPLAY"
+          },
+          "plot_2": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "CLOCK"
+          },
+          "plot_3": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "LIVE_UPDATES"
+          },
+          "plot_4": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "VISIBLE_LEFT"
+          },
+          "plot_5": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "VISIBLE_RIGHT"
+          },
+          "plot_6": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "BG_R"
+          },
+          "plot_7": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "BG_G"
+          },
+          "plot_8": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "BG_B"
+          },
+          "plot_9": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "FG_R"
+          }
+        },
+        "native_style_settings": {
+          "plot_0": {
+            "color": "#2962FF",
+            "display": 4294967295,
+            "linestyle": 0,
+            "linewidth": 1,
+            "plottype": 0,
+            "trackPrice": false,
+            "title": "plot_0"
+          },
+          "plot_1": {
+            "color": "#2962FF",
+            "display": 4294967295,
+            "linestyle": 0,
+            "linewidth": 1,
+            "plottype": 0,
+            "trackPrice": false,
+            "title": "plot_1"
+          },
+          "plot_10": {
+            "color": "#2962FF",
+            "display": 4294967295,
+            "linestyle": 0,
+            "linewidth": 1,
+            "plottype": 0,
+            "trackPrice": false,
+            "title": "plot_10"
+          },
+          "plot_11": {
+            "color": "#2962FF",
+            "display": 4294967295,
+            "linestyle": 0,
+            "linewidth": 1,
+            "plottype": 0,
+            "trackPrice": false,
+            "title": "plot_11"
+          },
+          "plot_12": {
+            "color": "#2962FF",
+            "display": 8,
+            "linestyle": 0,
+            "linewidth": 1,
+            "plottype": 0,
+            "trackPrice": false,
+            "title": "plot_12"
+          },
+          "plot_13": {
+            "color": "#2962FF",
+            "display": 0,
+            "linestyle": 0,
+            "linewidth": 1,
+            "plottype": 0,
+            "trackPrice": false,
+            "title": "plot_13"
+          },
+          "plot_2": {
+            "color": "#2962FF",
+            "display": 4294967295,
+            "linestyle": 0,
+            "linewidth": 1,
+            "plottype": 0,
+            "trackPrice": false,
+            "title": "plot_2"
+          },
+          "plot_3": {
+            "color": "#2962FF",
+            "display": 4294967295,
+            "linestyle": 0,
+            "linewidth": 1,
+            "plottype": 0,
+            "trackPrice": false,
+            "title": "plot_3"
+          },
+          "plot_4": {
+            "color": "#2962FF",
+            "display": 4294967295,
+            "linestyle": 0,
+            "linewidth": 1,
+            "plottype": 0,
+            "trackPrice": false,
+            "title": "plot_4"
+          },
+          "plot_5": {
+            "color": "#2962FF",
+            "display": 4294967295,
+            "linestyle": 0,
+            "linewidth": 1,
+            "plottype": 0,
+            "trackPrice": false,
+            "title": "plot_5"
+          },
+          "plot_6": {
+            "color": "#2962FF",
+            "display": 4294967295,
+            "linestyle": 0,
+            "linewidth": 1,
+            "plottype": 0,
+            "trackPrice": false,
+            "title": "plot_6"
+          },
+          "plot_7": {
+            "color": "#2962FF",
+            "display": 4294967295,
+            "linestyle": 0,
+            "linewidth": 1,
+            "plottype": 0,
+            "trackPrice": false,
+            "title": "plot_7"
+          },
+          "plot_8": {
+            "color": "#2962FF",
+            "display": 4294967295,
+            "linestyle": 0,
+            "linewidth": 1,
+            "plottype": 0,
+            "trackPrice": false,
+            "title": "plot_8"
+          },
+          "plot_9": {
+            "color": "#2962FF",
+            "display": 4294967295,
+            "linestyle": 0,
+            "linewidth": 1,
+            "plottype": 0,
+            "trackPrice": false,
+            "title": "plot_9"
+          }
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791132480,
+            24984,
+            1791132480000,
+            1791132559583,
+            25045,
+            1790849400000,
+            1791132480000,
+            15,
+            15,
+            15,
+            219,
+            219,
+            219,
+            24985,
+            17
+          ]
+        }
+      }
+    }
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T16:50:33.059Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v11 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "chart-context-lifecycle-matrix-v1.pine",
+    "attempt": 2,
+    "source_sha256": "72d27050859eed864c1966a2ceefcdfce45487a005380a816c15ea23b52d6b98",
+    "indicator_title": "V11 chart-context-lifecycle-matrix-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v11/chart-context-lifecycle-matrix-v1-attempt2.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-05T005032.334.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V11 chart-context-lifecycle-matrix-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24686,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24986,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T16:50:24.980Z",
+    "live_candle_open_utc": "2026-10-04T16:50:00.000Z",
+    "export_utc": "2026-10-04T16:50:32.580Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt2-setup.png",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt2-export.png",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt2-logs.txt",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt2-logs-v1.json",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt2-logs.png",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt2-visual.png",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt2-data-window-v1.png",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt2-data-window-v1.json",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt2-data-window-v1.txt",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt2-authority-object-geometry-v1.json",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt2-authority-object-geometry-v1.png"
+    ],
+    "notes": "Native default CSV omits the display.none RESET_DISPLAY plot; its native value/style and requested visibility controls are recorded separately. Frozen source unchanged.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T16:50:25.971Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790827440,
+            83765.07,
+            83788.01,
+            83760.7,
+            83782,
+            14.5392
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791132600,
+            85432.01,
+            85432.01,
+            85385.11,
+            85385.12,
+            3.9008
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 chart-context-lifecycle-matrix-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 4888,
+            "first": {
+              "index": -1002344,
+              "value": [
+                1790546160,
+                20098,
+                1790546160000,
+                1791132625490,
+                20099,
+                1790832720000,
+                1791132600000,
+                15,
+                15,
+                15,
+                219,
+                219,
+                219,
+                20099,
+                17
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791132600,
+                24985,
+                1791132600000,
+                1791132625498,
+                24987,
+                1790832720000,
+                1791132600000,
+                15,
+                15,
+                15,
+                219,
+                219,
+                219,
+                24986,
+                17
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T16:50:27.258Z",
+        "bars": 24986,
+        "end": true,
+        "first": {
+          "index": -24686,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791132600,
+            85432.01,
+            85432.01,
+            85385.11,
+            85385.12,
+            3.96545
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 chart-context-lifecycle-matrix-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24986,
+            "first": {
+              "index": -24686,
+              "value": [
+                1788134400,
+                0,
+                1788134400000,
+                1791132625479,
+                1,
+                1790832720000,
+                1791132600000,
+                15,
+                15,
+                15,
+                219,
+                219,
+                219,
+                1,
+                17
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791132600,
+                24985,
+                1791132600000,
+                1791132626378,
+                24988,
+                1790832720000,
+                1791132600000,
+                15,
+                15,
+                15,
+                219,
+                219,
+                219,
+                24986,
+                17
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   16:50",
+    "historical_compare_before_unix_seconds": 1791132600,
+    "pine_logs": {
+      "paths": [
+        "evidence/chart-context-lifecycle-matrix-v1-attempt2-logs.txt",
+        "evidence/chart-context-lifecycle-matrix-v1-attempt2-logs-v1.json",
+        "evidence/chart-context-lifecycle-matrix-v1-attempt2-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "b9e9dd92a82f8da24cb2fee0f1b87d45daeb4628a7790f71f0d7fc7bb2dade99",
+    "csv_bytes": 3446149,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "BAR_INDEX",
+      "BAR_TIME",
+      "CLOCK",
+      "LIVE_UPDATES",
+      "VISIBLE_LEFT",
+      "VISIBLE_RIGHT",
+      "BG_R",
+      "BG_G",
+      "BG_B",
+      "FG_R",
+      "FG_G",
+      "FG_B",
+      "EXECUTION_COUNT"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "BAR_INDEX": 5,
+      "BAR_TIME": 6,
+      "CLOCK": 7,
+      "LIVE_UPDATES": 8,
+      "VISIBLE_LEFT": 9,
+      "VISIBLE_RIGHT": 10,
+      "BG_R": 11,
+      "BG_G": 12,
+      "BG_B": 13,
+      "FG_R": 14,
+      "FG_G": 15,
+      "FG_B": 16,
+      "EXECUTION_COUNT": 17
+    },
+    "first_historical_cells": [
+      "1788134400",
+      "77682",
+      "77682.01",
+      "77572",
+      "77674.04",
+      "0",
+      "1788134400000",
+      "1791132629605",
+      "1",
+      "1790849520000",
+      "1791132600000",
+      "15",
+      "15",
+      "15",
+      "219",
+      "219",
+      "219",
+      "1"
+    ],
+    "last_historical_cells": [
+      "1791132480",
+      "85340.01",
+      "85433.16",
+      "85340",
+      "85432.01",
+      "24984",
+      "1791132480000",
+      "1791132629618",
+      "24985",
+      "1790849520000",
+      "1791132600000",
+      "15",
+      "15",
+      "15",
+      "219",
+      "219",
+      "219",
+      "24985"
+    ],
+    "declared_to_native_header_mapping": {
+      "BAR_INDEX": "BAR_INDEX",
+      "BAR_TIME": "BAR_TIME",
+      "CLOCK": "CLOCK",
+      "LIVE_UPDATES": "LIVE_UPDATES",
+      "VISIBLE_LEFT": "VISIBLE_LEFT",
+      "VISIBLE_RIGHT": "VISIBLE_RIGHT",
+      "BG_R": "BG_R",
+      "BG_G": "BG_G",
+      "BG_B": "BG_B",
+      "FG_R": "FG_R",
+      "FG_G": "FG_G",
+      "FG_B": "FG_B",
+      "EXECUTION_COUNT": "EXECUTION_COUNT"
+    },
+    "csv_rows": 24986,
+    "historical_rows": 24985,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791132600,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791132600",
+    "first_historical_values": {
+      "BAR_INDEX": "0",
+      "BAR_TIME": "1788134400000",
+      "CLOCK": "1791132629605",
+      "LIVE_UPDATES": "1",
+      "VISIBLE_LEFT": "1790849520000",
+      "VISIBLE_RIGHT": "1791132600000",
+      "BG_R": "15",
+      "BG_G": "15",
+      "BG_B": "15",
+      "FG_R": "219",
+      "FG_G": "219",
+      "FG_B": "219",
+      "EXECUTION_COUNT": "1"
+    },
+    "last_historical_values": {
+      "BAR_INDEX": "24984",
+      "BAR_TIME": "1791132480000",
+      "CLOCK": "1791132629618",
+      "LIVE_UPDATES": "24985",
+      "VISIBLE_LEFT": "1790849520000",
+      "VISIBLE_RIGHT": "1791132600000",
+      "BG_R": "15",
+      "BG_G": "15",
+      "BG_B": "15",
+      "FG_R": "219",
+      "FG_G": "219",
+      "FG_B": "219",
+      "EXECUTION_COUNT": "24985"
+    },
+    "declared_unexported_columns": [
+      "RESET_DISPLAY"
+    ],
+    "data_window_witness": "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt2-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T16:51:46.876Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v11 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "chart-context-lifecycle-matrix-v1.pine",
+    "attempt": 3,
+    "source_sha256": "72d27050859eed864c1966a2ceefcdfce45487a005380a816c15ea23b52d6b98",
+    "indicator_title": "V11 chart-context-lifecycle-matrix-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v11/chart-context-lifecycle-matrix-v1-attempt3.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-05T005145.929.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V11 chart-context-lifecycle-matrix-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24686,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24986,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": "2026-10-04T16:50:00.000Z",
+    "export_utc": "2026-10-04T16:51:46.345Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt3-setup.png",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt3-export.png",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt3-logs.txt",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt3-logs-v1.json",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt3-logs.png",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt3-visual.png",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt3-data-window-v1.png",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt3-data-window-v1.json",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt3-data-window-v1.txt",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt3-grayscale-0-v1.json",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt3-grayscale-0-v1.png"
+    ],
+    "notes": "Native default CSV omits the display.none RESET_DISPLAY plot; its native value/style and requested visibility controls are recorded separately. Frozen source unchanged.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": null,
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   16:50",
+    "historical_compare_before_unix_seconds": 1791132600,
+    "pine_logs": {
+      "paths": [
+        "evidence/chart-context-lifecycle-matrix-v1-attempt3-logs.txt",
+        "evidence/chart-context-lifecycle-matrix-v1-attempt3-logs-v1.json",
+        "evidence/chart-context-lifecycle-matrix-v1-attempt3-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "c06081883b14621b1f4c0bb1724a070dd441c8b5d95a758f512e2320e8e7d32e",
+    "csv_bytes": 3371189,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "BAR_INDEX",
+      "BAR_TIME",
+      "CLOCK",
+      "LIVE_UPDATES",
+      "VISIBLE_LEFT",
+      "VISIBLE_RIGHT",
+      "BG_R",
+      "BG_G",
+      "BG_B",
+      "FG_R",
+      "FG_G",
+      "FG_B",
+      "EXECUTION_COUNT"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "BAR_INDEX": 5,
+      "BAR_TIME": 6,
+      "CLOCK": 7,
+      "LIVE_UPDATES": 8,
+      "VISIBLE_LEFT": 9,
+      "VISIBLE_RIGHT": 10,
+      "BG_R": 11,
+      "BG_G": 12,
+      "BG_B": 13,
+      "FG_R": 14,
+      "FG_G": 15,
+      "FG_B": 16,
+      "EXECUTION_COUNT": 17
+    },
+    "first_historical_cells": [
+      "1788134400",
+      "77682",
+      "77682.01",
+      "77572",
+      "77674.04",
+      "0",
+      "1788134400000",
+      "1791132700121",
+      "1",
+      "1791130200000",
+      "1791132600000",
+      "0",
+      "0",
+      "0",
+      "219",
+      "219",
+      "219",
+      "1"
+    ],
+    "last_historical_cells": [
+      "1791132480",
+      "85340.01",
+      "85433.16",
+      "85340",
+      "85432.01",
+      "24984",
+      "1791132480000",
+      "1791132700134",
+      "24985",
+      "1791130200000",
+      "1791132600000",
+      "0",
+      "0",
+      "0",
+      "219",
+      "219",
+      "219",
+      "24985"
+    ],
+    "declared_to_native_header_mapping": {
+      "BAR_INDEX": "BAR_INDEX",
+      "BAR_TIME": "BAR_TIME",
+      "CLOCK": "CLOCK",
+      "LIVE_UPDATES": "LIVE_UPDATES",
+      "VISIBLE_LEFT": "VISIBLE_LEFT",
+      "VISIBLE_RIGHT": "VISIBLE_RIGHT",
+      "BG_R": "BG_R",
+      "BG_G": "BG_G",
+      "BG_B": "BG_B",
+      "FG_R": "FG_R",
+      "FG_G": "FG_G",
+      "FG_B": "FG_B",
+      "EXECUTION_COUNT": "EXECUTION_COUNT"
+    },
+    "csv_rows": 24986,
+    "historical_rows": 24985,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791132600,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791132600",
+    "first_historical_values": {
+      "BAR_INDEX": "0",
+      "BAR_TIME": "1788134400000",
+      "CLOCK": "1791132700121",
+      "LIVE_UPDATES": "1",
+      "VISIBLE_LEFT": "1791130200000",
+      "VISIBLE_RIGHT": "1791132600000",
+      "BG_R": "0",
+      "BG_G": "0",
+      "BG_B": "0",
+      "FG_R": "219",
+      "FG_G": "219",
+      "FG_B": "219",
+      "EXECUTION_COUNT": "1"
+    },
+    "last_historical_values": {
+      "BAR_INDEX": "24984",
+      "BAR_TIME": "1791132480000",
+      "CLOCK": "1791132700134",
+      "LIVE_UPDATES": "24985",
+      "VISIBLE_LEFT": "1791130200000",
+      "VISIBLE_RIGHT": "1791132600000",
+      "BG_R": "0",
+      "BG_G": "0",
+      "BG_B": "0",
+      "FG_R": "219",
+      "FG_G": "219",
+      "FG_B": "219",
+      "EXECUTION_COUNT": "24985"
+    },
+    "declared_unexported_columns": [
+      "RESET_DISPLAY"
+    ],
+    "data_window_witness": "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt3-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T16:52:01.393Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v11 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "chart-context-lifecycle-matrix-v1.pine",
+    "attempt": 4,
+    "source_sha256": "72d27050859eed864c1966a2ceefcdfce45487a005380a816c15ea23b52d6b98",
+    "indicator_title": "V11 chart-context-lifecycle-matrix-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v11/chart-context-lifecycle-matrix-v1-attempt4.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-05T005200.642.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V11 chart-context-lifecycle-matrix-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24686,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24987,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": "2026-10-04T16:50:00.000Z",
+    "export_utc": "2026-10-04T16:52:01.027Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt4-setup.png",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt4-export.png",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt4-logs.txt",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt4-logs-v1.json",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt4-logs.png",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt4-visual.png",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt4-data-window-v1.png",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt4-data-window-v1.json",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt4-data-window-v1.txt",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt4-grayscale-63-v1.json",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt4-grayscale-63-v1.png"
+    ],
+    "notes": "Native default CSV omits the display.none RESET_DISPLAY plot; its native value/style and requested visibility controls are recorded separately. Frozen source unchanged.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": null,
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   16:50",
+    "historical_compare_before_unix_seconds": 1791132600,
+    "pine_logs": {
+      "paths": [
+        "evidence/chart-context-lifecycle-matrix-v1-attempt4-logs.txt",
+        "evidence/chart-context-lifecycle-matrix-v1-attempt4-logs-v1.json",
+        "evidence/chart-context-lifecycle-matrix-v1-attempt4-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "4b30cc6404d3efccce5322ac6a9ebd962a29a2e870fd091a57716e5878385f5e",
+    "csv_bytes": 3446144,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "BAR_INDEX",
+      "BAR_TIME",
+      "CLOCK",
+      "LIVE_UPDATES",
+      "VISIBLE_LEFT",
+      "VISIBLE_RIGHT",
+      "BG_R",
+      "BG_G",
+      "BG_B",
+      "FG_R",
+      "FG_G",
+      "FG_B",
+      "EXECUTION_COUNT"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "BAR_INDEX": 5,
+      "BAR_TIME": 6,
+      "CLOCK": 7,
+      "LIVE_UPDATES": 8,
+      "VISIBLE_LEFT": 9,
+      "VISIBLE_RIGHT": 10,
+      "BG_R": 11,
+      "BG_G": 12,
+      "BG_B": 13,
+      "FG_R": 14,
+      "FG_G": 15,
+      "FG_B": 16,
+      "EXECUTION_COUNT": 17
+    },
+    "first_historical_cells": [
+      "1788134400",
+      "77682",
+      "77682.01",
+      "77572",
+      "77674.04",
+      "0",
+      "1788134400000",
+      "1791132714587",
+      "1",
+      "1791128280000",
+      "1791132600000",
+      "63",
+      "63",
+      "63",
+      "219",
+      "219",
+      "219",
+      "1"
+    ],
+    "last_historical_cells": [
+      "1791132480",
+      "85340.01",
+      "85433.16",
+      "85340",
+      "85432.01",
+      "24984",
+      "1791132480000",
+      "1791132714600",
+      "24985",
+      "1791128280000",
+      "1791132600000",
+      "63",
+      "63",
+      "63",
+      "219",
+      "219",
+      "219",
+      "24985"
+    ],
+    "declared_to_native_header_mapping": {
+      "BAR_INDEX": "BAR_INDEX",
+      "BAR_TIME": "BAR_TIME",
+      "CLOCK": "CLOCK",
+      "LIVE_UPDATES": "LIVE_UPDATES",
+      "VISIBLE_LEFT": "VISIBLE_LEFT",
+      "VISIBLE_RIGHT": "VISIBLE_RIGHT",
+      "BG_R": "BG_R",
+      "BG_G": "BG_G",
+      "BG_B": "BG_B",
+      "FG_R": "FG_R",
+      "FG_G": "FG_G",
+      "FG_B": "FG_B",
+      "EXECUTION_COUNT": "EXECUTION_COUNT"
+    },
+    "csv_rows": 24986,
+    "historical_rows": 24985,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791132600,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791132600",
+    "first_historical_values": {
+      "BAR_INDEX": "0",
+      "BAR_TIME": "1788134400000",
+      "CLOCK": "1791132714587",
+      "LIVE_UPDATES": "1",
+      "VISIBLE_LEFT": "1791128280000",
+      "VISIBLE_RIGHT": "1791132600000",
+      "BG_R": "63",
+      "BG_G": "63",
+      "BG_B": "63",
+      "FG_R": "219",
+      "FG_G": "219",
+      "FG_B": "219",
+      "EXECUTION_COUNT": "1"
+    },
+    "last_historical_values": {
+      "BAR_INDEX": "24984",
+      "BAR_TIME": "1791132480000",
+      "CLOCK": "1791132714600",
+      "LIVE_UPDATES": "24985",
+      "VISIBLE_LEFT": "1791128280000",
+      "VISIBLE_RIGHT": "1791132600000",
+      "BG_R": "63",
+      "BG_G": "63",
+      "BG_B": "63",
+      "FG_R": "219",
+      "FG_G": "219",
+      "FG_B": "219",
+      "EXECUTION_COUNT": "24985"
+    },
+    "declared_unexported_columns": [
+      "RESET_DISPLAY"
+    ],
+    "data_window_witness": "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt4-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T16:52:15.525Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v11 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "chart-context-lifecycle-matrix-v1.pine",
+    "attempt": 5,
+    "source_sha256": "72d27050859eed864c1966a2ceefcdfce45487a005380a816c15ea23b52d6b98",
+    "indicator_title": "V11 chart-context-lifecycle-matrix-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v11/chart-context-lifecycle-matrix-v1-attempt5.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-05T005214.758.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V11 chart-context-lifecycle-matrix-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24686,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24987,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": "2026-10-04T16:52:00.000Z",
+    "export_utc": "2026-10-04T16:52:15.165Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt5-setup.png",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt5-export.png",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt5-logs.txt",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt5-logs-v1.json",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt5-logs.png",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt5-visual.png",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt5-data-window-v1.png",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt5-data-window-v1.json",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt5-data-window-v1.txt",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt5-grayscale-127-v1.json",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt5-grayscale-127-v1.png"
+    ],
+    "notes": "Native default CSV omits the display.none RESET_DISPLAY plot; its native value/style and requested visibility controls are recorded separately. Frozen source unchanged.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": null,
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   16:52",
+    "historical_compare_before_unix_seconds": 1791132720,
+    "pine_logs": {
+      "paths": [
+        "evidence/chart-context-lifecycle-matrix-v1-attempt5-logs.txt",
+        "evidence/chart-context-lifecycle-matrix-v1-attempt5-logs-v1.json",
+        "evidence/chart-context-lifecycle-matrix-v1-attempt5-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "4aeb700c068c64099382c5a2e060e674bacc3d6a0d0effc262df597bdd7d544e",
+    "csv_bytes": 3521244,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "BAR_INDEX",
+      "BAR_TIME",
+      "CLOCK",
+      "LIVE_UPDATES",
+      "VISIBLE_LEFT",
+      "VISIBLE_RIGHT",
+      "BG_R",
+      "BG_G",
+      "BG_B",
+      "FG_R",
+      "FG_G",
+      "FG_B",
+      "EXECUTION_COUNT"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "BAR_INDEX": 5,
+      "BAR_TIME": 6,
+      "CLOCK": 7,
+      "LIVE_UPDATES": 8,
+      "VISIBLE_LEFT": 9,
+      "VISIBLE_RIGHT": 10,
+      "BG_R": 11,
+      "BG_G": 12,
+      "BG_B": 13,
+      "FG_R": 14,
+      "FG_G": 15,
+      "FG_B": 16,
+      "EXECUTION_COUNT": 17
+    },
+    "first_historical_cells": [
+      "1788134400",
+      "77682",
+      "77682.01",
+      "77572",
+      "77674.04",
+      "0",
+      "1788134400000",
+      "1791132728545",
+      "1",
+      "1791128280000",
+      "1791132720000",
+      "127",
+      "127",
+      "127",
+      "219",
+      "219",
+      "219",
+      "1"
+    ],
+    "last_historical_cells": [
+      "1791132600",
+      "85432.01",
+      "85432.01",
+      "85382",
+      "85394.01",
+      "24985",
+      "1791132600000",
+      "1791132728557",
+      "24986",
+      "1791128280000",
+      "1791132720000",
+      "127",
+      "127",
+      "127",
+      "219",
+      "219",
+      "219",
+      "24986"
+    ],
+    "declared_to_native_header_mapping": {
+      "BAR_INDEX": "BAR_INDEX",
+      "BAR_TIME": "BAR_TIME",
+      "CLOCK": "CLOCK",
+      "LIVE_UPDATES": "LIVE_UPDATES",
+      "VISIBLE_LEFT": "VISIBLE_LEFT",
+      "VISIBLE_RIGHT": "VISIBLE_RIGHT",
+      "BG_R": "BG_R",
+      "BG_G": "BG_G",
+      "BG_B": "BG_B",
+      "FG_R": "FG_R",
+      "FG_G": "FG_G",
+      "FG_B": "FG_B",
+      "EXECUTION_COUNT": "EXECUTION_COUNT"
+    },
+    "csv_rows": 24987,
+    "historical_rows": 24986,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791132720,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791132720",
+    "first_historical_values": {
+      "BAR_INDEX": "0",
+      "BAR_TIME": "1788134400000",
+      "CLOCK": "1791132728545",
+      "LIVE_UPDATES": "1",
+      "VISIBLE_LEFT": "1791128280000",
+      "VISIBLE_RIGHT": "1791132720000",
+      "BG_R": "127",
+      "BG_G": "127",
+      "BG_B": "127",
+      "FG_R": "219",
+      "FG_G": "219",
+      "FG_B": "219",
+      "EXECUTION_COUNT": "1"
+    },
+    "last_historical_values": {
+      "BAR_INDEX": "24985",
+      "BAR_TIME": "1791132600000",
+      "CLOCK": "1791132728557",
+      "LIVE_UPDATES": "24986",
+      "VISIBLE_LEFT": "1791128280000",
+      "VISIBLE_RIGHT": "1791132720000",
+      "BG_R": "127",
+      "BG_G": "127",
+      "BG_B": "127",
+      "FG_R": "219",
+      "FG_G": "219",
+      "FG_B": "219",
+      "EXECUTION_COUNT": "24986"
+    },
+    "declared_unexported_columns": [
+      "RESET_DISPLAY"
+    ],
+    "data_window_witness": "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt5-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T16:52:28.892Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v11 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "chart-context-lifecycle-matrix-v1.pine",
+    "attempt": 6,
+    "source_sha256": "72d27050859eed864c1966a2ceefcdfce45487a005380a816c15ea23b52d6b98",
+    "indicator_title": "V11 chart-context-lifecycle-matrix-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v11/chart-context-lifecycle-matrix-v1-attempt6.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-05T005227.998.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V11 chart-context-lifecycle-matrix-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24686,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24987,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": "2026-10-04T16:52:00.000Z",
+    "export_utc": "2026-10-04T16:52:28.386Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt6-setup.png",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt6-export.png",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt6-logs.txt",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt6-logs-v1.json",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt6-logs.png",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt6-visual.png",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt6-data-window-v1.png",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt6-data-window-v1.json",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt6-data-window-v1.txt",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt6-grayscale-128-v1.json",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt6-grayscale-128-v1.png"
+    ],
+    "notes": "Native default CSV omits the display.none RESET_DISPLAY plot; its native value/style and requested visibility controls are recorded separately. Frozen source unchanged.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": null,
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   16:52",
+    "historical_compare_before_unix_seconds": 1791132720,
+    "pine_logs": {
+      "paths": [
+        "evidence/chart-context-lifecycle-matrix-v1-attempt6-logs.txt",
+        "evidence/chart-context-lifecycle-matrix-v1-attempt6-logs-v1.json",
+        "evidence/chart-context-lifecycle-matrix-v1-attempt6-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "e3bc6fa3a14b6e39e9ef5f669974212d539875e306c41ecfbf37da70d877267d",
+    "csv_bytes": 3521244,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "BAR_INDEX",
+      "BAR_TIME",
+      "CLOCK",
+      "LIVE_UPDATES",
+      "VISIBLE_LEFT",
+      "VISIBLE_RIGHT",
+      "BG_R",
+      "BG_G",
+      "BG_B",
+      "FG_R",
+      "FG_G",
+      "FG_B",
+      "EXECUTION_COUNT"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "BAR_INDEX": 5,
+      "BAR_TIME": 6,
+      "CLOCK": 7,
+      "LIVE_UPDATES": 8,
+      "VISIBLE_LEFT": 9,
+      "VISIBLE_RIGHT": 10,
+      "BG_R": 11,
+      "BG_G": 12,
+      "BG_B": 13,
+      "FG_R": 14,
+      "FG_G": 15,
+      "FG_B": 16,
+      "EXECUTION_COUNT": 17
+    },
+    "first_historical_cells": [
+      "1788134400",
+      "77682",
+      "77682.01",
+      "77572",
+      "77674.04",
+      "0",
+      "1788134400000",
+      "1791132742347",
+      "1",
+      "1791128280000",
+      "1791132720000",
+      "128",
+      "128",
+      "128",
+      "219",
+      "219",
+      "219",
+      "1"
+    ],
+    "last_historical_cells": [
+      "1791132600",
+      "85432.01",
+      "85432.01",
+      "85382",
+      "85394.01",
+      "24985",
+      "1791132600000",
+      "1791132742364",
+      "24986",
+      "1791128280000",
+      "1791132720000",
+      "128",
+      "128",
+      "128",
+      "219",
+      "219",
+      "219",
+      "24986"
+    ],
+    "declared_to_native_header_mapping": {
+      "BAR_INDEX": "BAR_INDEX",
+      "BAR_TIME": "BAR_TIME",
+      "CLOCK": "CLOCK",
+      "LIVE_UPDATES": "LIVE_UPDATES",
+      "VISIBLE_LEFT": "VISIBLE_LEFT",
+      "VISIBLE_RIGHT": "VISIBLE_RIGHT",
+      "BG_R": "BG_R",
+      "BG_G": "BG_G",
+      "BG_B": "BG_B",
+      "FG_R": "FG_R",
+      "FG_G": "FG_G",
+      "FG_B": "FG_B",
+      "EXECUTION_COUNT": "EXECUTION_COUNT"
+    },
+    "csv_rows": 24987,
+    "historical_rows": 24986,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791132720,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791132720",
+    "first_historical_values": {
+      "BAR_INDEX": "0",
+      "BAR_TIME": "1788134400000",
+      "CLOCK": "1791132742347",
+      "LIVE_UPDATES": "1",
+      "VISIBLE_LEFT": "1791128280000",
+      "VISIBLE_RIGHT": "1791132720000",
+      "BG_R": "128",
+      "BG_G": "128",
+      "BG_B": "128",
+      "FG_R": "219",
+      "FG_G": "219",
+      "FG_B": "219",
+      "EXECUTION_COUNT": "1"
+    },
+    "last_historical_values": {
+      "BAR_INDEX": "24985",
+      "BAR_TIME": "1791132600000",
+      "CLOCK": "1791132742364",
+      "LIVE_UPDATES": "24986",
+      "VISIBLE_LEFT": "1791128280000",
+      "VISIBLE_RIGHT": "1791132720000",
+      "BG_R": "128",
+      "BG_G": "128",
+      "BG_B": "128",
+      "FG_R": "219",
+      "FG_G": "219",
+      "FG_B": "219",
+      "EXECUTION_COUNT": "24986"
+    },
+    "declared_unexported_columns": [
+      "RESET_DISPLAY"
+    ],
+    "data_window_witness": "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt6-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T16:52:42.556Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v11 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "chart-context-lifecycle-matrix-v1.pine",
+    "attempt": 7,
+    "source_sha256": "72d27050859eed864c1966a2ceefcdfce45487a005380a816c15ea23b52d6b98",
+    "indicator_title": "V11 chart-context-lifecycle-matrix-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v11/chart-context-lifecycle-matrix-v1-attempt7.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-05T005241.710.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V11 chart-context-lifecycle-matrix-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24686,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24987,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": "2026-10-04T16:52:00.000Z",
+    "export_utc": "2026-10-04T16:52:42.204Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt7-setup.png",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt7-export.png",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt7-logs.txt",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt7-logs-v1.json",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt7-logs.png",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt7-visual.png",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt7-data-window-v1.png",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt7-data-window-v1.json",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt7-data-window-v1.txt",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt7-grayscale-191-v1.json",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt7-grayscale-191-v1.png"
+    ],
+    "notes": "Native default CSV omits the display.none RESET_DISPLAY plot; its native value/style and requested visibility controls are recorded separately. Frozen source unchanged.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": null,
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   16:52",
+    "historical_compare_before_unix_seconds": 1791132720,
+    "pine_logs": {
+      "paths": [
+        "evidence/chart-context-lifecycle-matrix-v1-attempt7-logs.txt",
+        "evidence/chart-context-lifecycle-matrix-v1-attempt7-logs-v1.json",
+        "evidence/chart-context-lifecycle-matrix-v1-attempt7-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "c29e2b40005662c000774caffcf860091a09ebbbab04e010af8d5dd1e1f0ff1e",
+    "csv_bytes": 3446283,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "BAR_INDEX",
+      "BAR_TIME",
+      "CLOCK",
+      "LIVE_UPDATES",
+      "VISIBLE_LEFT",
+      "VISIBLE_RIGHT",
+      "BG_R",
+      "BG_G",
+      "BG_B",
+      "FG_R",
+      "FG_G",
+      "FG_B",
+      "EXECUTION_COUNT"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "BAR_INDEX": 5,
+      "BAR_TIME": 6,
+      "CLOCK": 7,
+      "LIVE_UPDATES": 8,
+      "VISIBLE_LEFT": 9,
+      "VISIBLE_RIGHT": 10,
+      "BG_R": 11,
+      "BG_G": 12,
+      "BG_B": 13,
+      "FG_R": 14,
+      "FG_G": 15,
+      "FG_B": 16,
+      "EXECUTION_COUNT": 17
+    },
+    "first_historical_cells": [
+      "1788134400",
+      "77682",
+      "77682.01",
+      "77572",
+      "77674.04",
+      "0",
+      "1788134400000",
+      "1791132755702",
+      "1",
+      "1791128280000",
+      "1791132720000",
+      "191",
+      "191",
+      "191",
+      "15",
+      "15",
+      "15",
+      "1"
+    ],
+    "last_historical_cells": [
+      "1791132600",
+      "85432.01",
+      "85432.01",
+      "85382",
+      "85394.01",
+      "24985",
+      "1791132600000",
+      "1791132755715",
+      "24986",
+      "1791128280000",
+      "1791132720000",
+      "191",
+      "191",
+      "191",
+      "15",
+      "15",
+      "15",
+      "24986"
+    ],
+    "declared_to_native_header_mapping": {
+      "BAR_INDEX": "BAR_INDEX",
+      "BAR_TIME": "BAR_TIME",
+      "CLOCK": "CLOCK",
+      "LIVE_UPDATES": "LIVE_UPDATES",
+      "VISIBLE_LEFT": "VISIBLE_LEFT",
+      "VISIBLE_RIGHT": "VISIBLE_RIGHT",
+      "BG_R": "BG_R",
+      "BG_G": "BG_G",
+      "BG_B": "BG_B",
+      "FG_R": "FG_R",
+      "FG_G": "FG_G",
+      "FG_B": "FG_B",
+      "EXECUTION_COUNT": "EXECUTION_COUNT"
+    },
+    "csv_rows": 24987,
+    "historical_rows": 24986,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791132720,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791132720",
+    "first_historical_values": {
+      "BAR_INDEX": "0",
+      "BAR_TIME": "1788134400000",
+      "CLOCK": "1791132755702",
+      "LIVE_UPDATES": "1",
+      "VISIBLE_LEFT": "1791128280000",
+      "VISIBLE_RIGHT": "1791132720000",
+      "BG_R": "191",
+      "BG_G": "191",
+      "BG_B": "191",
+      "FG_R": "15",
+      "FG_G": "15",
+      "FG_B": "15",
+      "EXECUTION_COUNT": "1"
+    },
+    "last_historical_values": {
+      "BAR_INDEX": "24985",
+      "BAR_TIME": "1791132600000",
+      "CLOCK": "1791132755715",
+      "LIVE_UPDATES": "24986",
+      "VISIBLE_LEFT": "1791128280000",
+      "VISIBLE_RIGHT": "1791132720000",
+      "BG_R": "191",
+      "BG_G": "191",
+      "BG_B": "191",
+      "FG_R": "15",
+      "FG_G": "15",
+      "FG_B": "15",
+      "EXECUTION_COUNT": "24986"
+    },
+    "declared_unexported_columns": [
+      "RESET_DISPLAY"
+    ],
+    "data_window_witness": "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt7-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T16:52:56.233Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v11 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "chart-context-lifecycle-matrix-v1.pine",
+    "attempt": 8,
+    "source_sha256": "72d27050859eed864c1966a2ceefcdfce45487a005380a816c15ea23b52d6b98",
+    "indicator_title": "V11 chart-context-lifecycle-matrix-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v11/chart-context-lifecycle-matrix-v1-attempt8.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-05T005255.501.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V11 chart-context-lifecycle-matrix-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24686,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24987,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": "2026-10-04T16:52:00.000Z",
+    "export_utc": "2026-10-04T16:52:55.776Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt8-setup.png",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt8-export.png",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt8-logs.txt",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt8-logs-v1.json",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt8-logs.png",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt8-visual.png",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt8-data-window-v1.png",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt8-data-window-v1.json",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt8-data-window-v1.txt",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt8-grayscale-255-v1.json",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt8-grayscale-255-v1.png"
+    ],
+    "notes": "Native default CSV omits the display.none RESET_DISPLAY plot; its native value/style and requested visibility controls are recorded separately. Frozen source unchanged.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": null,
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   16:52",
+    "historical_compare_before_unix_seconds": 1791132720,
+    "pine_logs": {
+      "paths": [
+        "evidence/chart-context-lifecycle-matrix-v1-attempt8-logs.txt",
+        "evidence/chart-context-lifecycle-matrix-v1-attempt8-logs-v1.json",
+        "evidence/chart-context-lifecycle-matrix-v1-attempt8-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "36fd9125ad657779a32d7ea1cead2293482eb77f78b187097ddb04442c3ce7f0",
+    "csv_bytes": 3446287,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "BAR_INDEX",
+      "BAR_TIME",
+      "CLOCK",
+      "LIVE_UPDATES",
+      "VISIBLE_LEFT",
+      "VISIBLE_RIGHT",
+      "BG_R",
+      "BG_G",
+      "BG_B",
+      "FG_R",
+      "FG_G",
+      "FG_B",
+      "EXECUTION_COUNT"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "BAR_INDEX": 5,
+      "BAR_TIME": 6,
+      "CLOCK": 7,
+      "LIVE_UPDATES": 8,
+      "VISIBLE_LEFT": 9,
+      "VISIBLE_RIGHT": 10,
+      "BG_R": 11,
+      "BG_G": 12,
+      "BG_B": 13,
+      "FG_R": 14,
+      "FG_G": 15,
+      "FG_B": 16,
+      "EXECUTION_COUNT": 17
+    },
+    "first_historical_cells": [
+      "1788134400",
+      "77682",
+      "77682.01",
+      "77572",
+      "77674.04",
+      "0",
+      "1788134400000",
+      "1791132769405",
+      "1",
+      "1791128280000",
+      "1791132720000",
+      "255",
+      "255",
+      "255",
+      "15",
+      "15",
+      "15",
+      "1"
+    ],
+    "last_historical_cells": [
+      "1791132600",
+      "85432.01",
+      "85432.01",
+      "85382",
+      "85394.01",
+      "24985",
+      "1791132600000",
+      "1791132769417",
+      "24986",
+      "1791128280000",
+      "1791132720000",
+      "255",
+      "255",
+      "255",
+      "15",
+      "15",
+      "15",
+      "24986"
+    ],
+    "declared_to_native_header_mapping": {
+      "BAR_INDEX": "BAR_INDEX",
+      "BAR_TIME": "BAR_TIME",
+      "CLOCK": "CLOCK",
+      "LIVE_UPDATES": "LIVE_UPDATES",
+      "VISIBLE_LEFT": "VISIBLE_LEFT",
+      "VISIBLE_RIGHT": "VISIBLE_RIGHT",
+      "BG_R": "BG_R",
+      "BG_G": "BG_G",
+      "BG_B": "BG_B",
+      "FG_R": "FG_R",
+      "FG_G": "FG_G",
+      "FG_B": "FG_B",
+      "EXECUTION_COUNT": "EXECUTION_COUNT"
+    },
+    "csv_rows": 24987,
+    "historical_rows": 24986,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791132720,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791132720",
+    "first_historical_values": {
+      "BAR_INDEX": "0",
+      "BAR_TIME": "1788134400000",
+      "CLOCK": "1791132769405",
+      "LIVE_UPDATES": "1",
+      "VISIBLE_LEFT": "1791128280000",
+      "VISIBLE_RIGHT": "1791132720000",
+      "BG_R": "255",
+      "BG_G": "255",
+      "BG_B": "255",
+      "FG_R": "15",
+      "FG_G": "15",
+      "FG_B": "15",
+      "EXECUTION_COUNT": "1"
+    },
+    "last_historical_values": {
+      "BAR_INDEX": "24985",
+      "BAR_TIME": "1791132600000",
+      "CLOCK": "1791132769417",
+      "LIVE_UPDATES": "24986",
+      "VISIBLE_LEFT": "1791128280000",
+      "VISIBLE_RIGHT": "1791132720000",
+      "BG_R": "255",
+      "BG_G": "255",
+      "BG_B": "255",
+      "FG_R": "15",
+      "FG_G": "15",
+      "FG_B": "15",
+      "EXECUTION_COUNT": "24986"
+    },
+    "declared_unexported_columns": [
+      "RESET_DISPLAY"
+    ],
+    "data_window_witness": "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt8-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T16:54:20.443Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v11 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "chart-context-lifecycle-matrix-v1.pine",
+    "attempt": 9,
+    "source_sha256": "72d27050859eed864c1966a2ceefcdfce45487a005380a816c15ea23b52d6b98",
+    "indicator_title": "V11 chart-context-lifecycle-matrix-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v11/chart-context-lifecycle-matrix-v1-attempt9.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-05T005419.877.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V11 chart-context-lifecycle-matrix-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24686,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24988,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": "2026-10-04T16:54:00.000Z",
+    "export_utc": "2026-10-04T16:54:20.056Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt9-setup.png",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt9-export.png",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt9-logs.txt",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt9-logs-v1.json",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt9-logs.png",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt9-visual.png",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt9-data-window-v1.png",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt9-data-window-v1.json",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt9-data-window-v1.txt",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt9-style-enabled-state-v1.json",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt9-style-enabled-state-v1.png",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt9-native-style-enabled-v1.png"
+    ],
+    "notes": "Frozen source unchanged. Native Style checkbox RESET_DISPLAY enabled; this separate visibility control is retained with actual native settings and full raw CSV.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": null,
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   16:54",
+    "historical_compare_before_unix_seconds": 1791132840,
+    "pine_logs": {
+      "paths": [
+        "evidence/chart-context-lifecycle-matrix-v1-attempt9-logs.txt",
+        "evidence/chart-context-lifecycle-matrix-v1-attempt9-logs-v1.json",
+        "evidence/chart-context-lifecycle-matrix-v1-attempt9-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "737f2fb6c1c8114dc2ec1aedd388f14613c0ce936a524a752db101fda68f4b35",
+    "csv_bytes": 3521397,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "BAR_INDEX",
+      "BAR_TIME",
+      "CLOCK",
+      "LIVE_UPDATES",
+      "VISIBLE_LEFT",
+      "VISIBLE_RIGHT",
+      "BG_R",
+      "BG_G",
+      "BG_B",
+      "FG_R",
+      "FG_G",
+      "FG_B",
+      "EXECUTION_COUNT",
+      "RESET_DISPLAY"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "BAR_INDEX": 5,
+      "BAR_TIME": 6,
+      "CLOCK": 7,
+      "LIVE_UPDATES": 8,
+      "VISIBLE_LEFT": 9,
+      "VISIBLE_RIGHT": 10,
+      "BG_R": 11,
+      "BG_G": 12,
+      "BG_B": 13,
+      "FG_R": 14,
+      "FG_G": 15,
+      "FG_B": 16,
+      "EXECUTION_COUNT": 17,
+      "RESET_DISPLAY": 18
+    },
+    "first_historical_cells": [
+      "1788134400",
+      "77682",
+      "77682.01",
+      "77572",
+      "77674.04",
+      "0",
+      "1788134400000",
+      "1791132842075",
+      "1",
+      "1791128400000",
+      "1791132840000",
+      "255",
+      "255",
+      "255",
+      "15",
+      "15",
+      "15",
+      "1",
+      "17"
+    ],
+    "last_historical_cells": [
+      "1791132720",
+      "85394.01",
+      "85394.01",
+      "85372",
+      "85372",
+      "24986",
+      "1791132720000",
+      "1791132842087",
+      "24987",
+      "1791128400000",
+      "1791132840000",
+      "255",
+      "255",
+      "255",
+      "15",
+      "15",
+      "15",
+      "24987",
+      "17"
+    ],
+    "declared_to_native_header_mapping": {
+      "BAR_INDEX": "BAR_INDEX",
+      "BAR_TIME": "BAR_TIME",
+      "CLOCK": "CLOCK",
+      "LIVE_UPDATES": "LIVE_UPDATES",
+      "VISIBLE_LEFT": "VISIBLE_LEFT",
+      "VISIBLE_RIGHT": "VISIBLE_RIGHT",
+      "BG_R": "BG_R",
+      "BG_G": "BG_G",
+      "BG_B": "BG_B",
+      "FG_R": "FG_R",
+      "FG_G": "FG_G",
+      "FG_B": "FG_B",
+      "EXECUTION_COUNT": "EXECUTION_COUNT",
+      "RESET_DISPLAY": "RESET_DISPLAY"
+    },
+    "csv_rows": 24988,
+    "historical_rows": 24987,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791132840,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791132840",
+    "first_historical_values": {
+      "BAR_INDEX": "0",
+      "BAR_TIME": "1788134400000",
+      "CLOCK": "1791132842075",
+      "LIVE_UPDATES": "1",
+      "VISIBLE_LEFT": "1791128400000",
+      "VISIBLE_RIGHT": "1791132840000",
+      "BG_R": "255",
+      "BG_G": "255",
+      "BG_B": "255",
+      "FG_R": "15",
+      "FG_G": "15",
+      "FG_B": "15",
+      "EXECUTION_COUNT": "1",
+      "RESET_DISPLAY": "17"
+    },
+    "last_historical_values": {
+      "BAR_INDEX": "24986",
+      "BAR_TIME": "1791132720000",
+      "CLOCK": "1791132842087",
+      "LIVE_UPDATES": "24987",
+      "VISIBLE_LEFT": "1791128400000",
+      "VISIBLE_RIGHT": "1791132840000",
+      "BG_R": "255",
+      "BG_G": "255",
+      "BG_B": "255",
+      "FG_R": "15",
+      "FG_G": "15",
+      "FG_B": "15",
+      "EXECUTION_COUNT": "24987",
+      "RESET_DISPLAY": "17"
+    },
+    "declared_unexported_columns": [],
+    "data_window_witness": "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt9-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T16:55:12.259Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v11 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "chart-context-lifecycle-matrix-v1.pine",
+    "attempt": 10,
+    "source_sha256": "72d27050859eed864c1966a2ceefcdfce45487a005380a816c15ea23b52d6b98",
+    "indicator_title": "V11 chart-context-lifecycle-matrix-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v11/chart-context-lifecycle-matrix-v1-attempt10.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-05T005511.508.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V11 chart-context-lifecycle-matrix-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24686,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24988,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": "2026-10-04T16:54:00.000Z",
+    "export_utc": "2026-10-04T16:55:11.900Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt10-setup.png",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt10-export.png",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt10-logs.txt",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt10-logs-v1.json",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt10-logs.png",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt10-visual.png",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt10-data-window-v1.png",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt10-data-window-v1.json",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt10-data-window-v1.txt",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt10-style-reset-state-v1.json",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt10-style-reset-state-v1.png",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt10-native-profiler-toggle-v1.json",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt10-native-profiler-toggle-v1.png",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt10-native-style-reset-v1.png"
+    ],
+    "notes": "Native default CSV omits the display.none RESET_DISPLAY plot; its native value/style and requested visibility controls are recorded separately. Frozen source unchanged.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": null,
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   16:54",
+    "historical_compare_before_unix_seconds": 1791132840,
+    "pine_logs": {
+      "paths": [
+        "evidence/chart-context-lifecycle-matrix-v1-attempt10-logs.txt",
+        "evidence/chart-context-lifecycle-matrix-v1-attempt10-logs-v1.json",
+        "evidence/chart-context-lifecycle-matrix-v1-attempt10-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "8bcf177a4d038a1ddd4909814bffaaea81de4b0679fb822e29d4da49bd849033",
+    "csv_bytes": 3446422,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "BAR_INDEX",
+      "BAR_TIME",
+      "CLOCK",
+      "LIVE_UPDATES",
+      "VISIBLE_LEFT",
+      "VISIBLE_RIGHT",
+      "BG_R",
+      "BG_G",
+      "BG_B",
+      "FG_R",
+      "FG_G",
+      "FG_B",
+      "EXECUTION_COUNT"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "BAR_INDEX": 5,
+      "BAR_TIME": 6,
+      "CLOCK": 7,
+      "LIVE_UPDATES": 8,
+      "VISIBLE_LEFT": 9,
+      "VISIBLE_RIGHT": 10,
+      "BG_R": 11,
+      "BG_G": 12,
+      "BG_B": 13,
+      "FG_R": 14,
+      "FG_G": 15,
+      "FG_B": 16,
+      "EXECUTION_COUNT": 17
+    },
+    "first_historical_cells": [
+      "1788134400",
+      "77682",
+      "77682.01",
+      "77572",
+      "77674.04",
+      "0",
+      "1788134400000",
+      "1791132896887",
+      "1",
+      "1791128520000",
+      "1791132840000",
+      "255",
+      "255",
+      "255",
+      "15",
+      "15",
+      "15",
+      "1"
+    ],
+    "last_historical_cells": [
+      "1791132720",
+      "85394.01",
+      "85394.01",
+      "85372",
+      "85372",
+      "24986",
+      "1791132720000",
+      "1791132896905",
+      "24987",
+      "1791128520000",
+      "1791132840000",
+      "255",
+      "255",
+      "255",
+      "15",
+      "15",
+      "15",
+      "24987"
+    ],
+    "declared_to_native_header_mapping": {
+      "BAR_INDEX": "BAR_INDEX",
+      "BAR_TIME": "BAR_TIME",
+      "CLOCK": "CLOCK",
+      "LIVE_UPDATES": "LIVE_UPDATES",
+      "VISIBLE_LEFT": "VISIBLE_LEFT",
+      "VISIBLE_RIGHT": "VISIBLE_RIGHT",
+      "BG_R": "BG_R",
+      "BG_G": "BG_G",
+      "BG_B": "BG_B",
+      "FG_R": "FG_R",
+      "FG_G": "FG_G",
+      "FG_B": "FG_B",
+      "EXECUTION_COUNT": "EXECUTION_COUNT"
+    },
+    "csv_rows": 24988,
+    "historical_rows": 24987,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791132840,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791132840",
+    "first_historical_values": {
+      "BAR_INDEX": "0",
+      "BAR_TIME": "1788134400000",
+      "CLOCK": "1791132896887",
+      "LIVE_UPDATES": "1",
+      "VISIBLE_LEFT": "1791128520000",
+      "VISIBLE_RIGHT": "1791132840000",
+      "BG_R": "255",
+      "BG_G": "255",
+      "BG_B": "255",
+      "FG_R": "15",
+      "FG_G": "15",
+      "FG_B": "15",
+      "EXECUTION_COUNT": "1"
+    },
+    "last_historical_values": {
+      "BAR_INDEX": "24986",
+      "BAR_TIME": "1791132720000",
+      "CLOCK": "1791132896905",
+      "LIVE_UPDATES": "24987",
+      "VISIBLE_LEFT": "1791128520000",
+      "VISIBLE_RIGHT": "1791132840000",
+      "BG_R": "255",
+      "BG_G": "255",
+      "BG_B": "255",
+      "FG_R": "15",
+      "FG_G": "15",
+      "FG_B": "15",
+      "EXECUTION_COUNT": "24987"
+    },
+    "declared_unexported_columns": [
+      "RESET_DISPLAY"
+    ],
+    "data_window_witness": "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt10-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T16:57:12.961Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v11 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "chart-context-lifecycle-matrix-v1.pine",
+    "attempt": 11,
+    "source_sha256": "72d27050859eed864c1966a2ceefcdfce45487a005380a816c15ea23b52d6b98",
+    "indicator_title": "V11 chart-context-lifecycle-matrix-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v11/chart-context-lifecycle-matrix-v1-attempt11.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-05T005712.384.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V11 chart-context-lifecycle-matrix-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24686,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24989,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": "2026-10-04T16:56:00.000Z",
+    "export_utc": "2026-10-04T16:57:12.614Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt11-setup.png",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt11-export.png",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt11-logs.txt",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt11-logs-v1.json",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt11-logs.png",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt11-visual.png",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt11-data-window-v1.png",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt11-data-window-v1.json",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt11-data-window-v1.txt",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt11-profiler-context-v1.json",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt11-profiler-context-v1.png"
+    ],
+    "notes": "Native default CSV omits the display.none RESET_DISPLAY plot; its native value/style and requested visibility controls are recorded separately. Frozen source unchanged.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": null,
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   16:56",
+    "historical_compare_before_unix_seconds": 1791132960,
+    "pine_logs": {
+      "paths": [
+        "evidence/chart-context-lifecycle-matrix-v1-attempt11-logs.txt",
+        "evidence/chart-context-lifecycle-matrix-v1-attempt11-logs-v1.json",
+        "evidence/chart-context-lifecycle-matrix-v1-attempt11-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "afe6220954f5b006e9aeb9c0d61b27f82ccc21f7754ca6838031813fe4659b38",
+    "csv_bytes": 3446562,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "BAR_INDEX",
+      "BAR_TIME",
+      "CLOCK",
+      "LIVE_UPDATES",
+      "VISIBLE_LEFT",
+      "VISIBLE_RIGHT",
+      "BG_R",
+      "BG_G",
+      "BG_B",
+      "FG_R",
+      "FG_G",
+      "FG_B",
+      "EXECUTION_COUNT"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "BAR_INDEX": 5,
+      "BAR_TIME": 6,
+      "CLOCK": 7,
+      "LIVE_UPDATES": 8,
+      "VISIBLE_LEFT": 9,
+      "VISIBLE_RIGHT": 10,
+      "BG_R": 11,
+      "BG_G": 12,
+      "BG_B": 13,
+      "FG_R": 14,
+      "FG_G": 15,
+      "FG_B": 16,
+      "EXECUTION_COUNT": 17
+    },
+    "first_historical_cells": [
+      "1788134400",
+      "77682",
+      "77682.01",
+      "77572",
+      "77674.04",
+      "0",
+      "1788134400000",
+      "1791132962052",
+      "1",
+      "1791132360000",
+      "1791132960000",
+      "255",
+      "255",
+      "255",
+      "15",
+      "15",
+      "15",
+      "1"
+    ],
+    "last_historical_cells": [
+      "1791132840",
+      "85372",
+      "85372.01",
+      "85348.51",
+      "85361.84",
+      "24987",
+      "1791132840000",
+      "1791132962088",
+      "24988",
+      "1791132360000",
+      "1791132960000",
+      "255",
+      "255",
+      "255",
+      "15",
+      "15",
+      "15",
+      "24988"
+    ],
+    "declared_to_native_header_mapping": {
+      "BAR_INDEX": "BAR_INDEX",
+      "BAR_TIME": "BAR_TIME",
+      "CLOCK": "CLOCK",
+      "LIVE_UPDATES": "LIVE_UPDATES",
+      "VISIBLE_LEFT": "VISIBLE_LEFT",
+      "VISIBLE_RIGHT": "VISIBLE_RIGHT",
+      "BG_R": "BG_R",
+      "BG_G": "BG_G",
+      "BG_B": "BG_B",
+      "FG_R": "FG_R",
+      "FG_G": "FG_G",
+      "FG_B": "FG_B",
+      "EXECUTION_COUNT": "EXECUTION_COUNT"
+    },
+    "csv_rows": 24989,
+    "historical_rows": 24988,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791132960,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791132960",
+    "first_historical_values": {
+      "BAR_INDEX": "0",
+      "BAR_TIME": "1788134400000",
+      "CLOCK": "1791132962052",
+      "LIVE_UPDATES": "1",
+      "VISIBLE_LEFT": "1791132360000",
+      "VISIBLE_RIGHT": "1791132960000",
+      "BG_R": "255",
+      "BG_G": "255",
+      "BG_B": "255",
+      "FG_R": "15",
+      "FG_G": "15",
+      "FG_B": "15",
+      "EXECUTION_COUNT": "1"
+    },
+    "last_historical_values": {
+      "BAR_INDEX": "24987",
+      "BAR_TIME": "1791132840000",
+      "CLOCK": "1791132962088",
+      "LIVE_UPDATES": "24988",
+      "VISIBLE_LEFT": "1791132360000",
+      "VISIBLE_RIGHT": "1791132960000",
+      "BG_R": "255",
+      "BG_G": "255",
+      "BG_B": "255",
+      "FG_R": "15",
+      "FG_G": "15",
+      "FG_B": "15",
+      "EXECUTION_COUNT": "24988"
+    },
+    "declared_unexported_columns": [
+      "RESET_DISPLAY"
+    ],
+    "data_window_witness": "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt11-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T16:58:17.737Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v11 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "chart-context-lifecycle-matrix-v1.pine",
+    "attempt": 12,
+    "source_sha256": "72d27050859eed864c1966a2ceefcdfce45487a005380a816c15ea23b52d6b98",
+    "indicator_title": "V11 chart-context-lifecycle-matrix-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v11/chart-context-lifecycle-matrix-v1-attempt12.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-05T005817.060.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V11 chart-context-lifecycle-matrix-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24690,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24990,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T16:58:08.680Z",
+    "live_candle_open_utc": "2026-10-04T16:58:00.000Z",
+    "export_utc": "2026-10-04T16:58:17.310Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt12-setup.png",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt12-export.png",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt12-logs.txt",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt12-logs-v1.json",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt12-logs.png",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt12-visual.png",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt12-data-window-v1.png",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt12-data-window-v1.json",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt12-data-window-v1.txt",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt12-identical-settings-reload-v1.json",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt12-identical-settings-reload-v1.png"
+    ],
+    "notes": "Native default CSV omits the display.none RESET_DISPLAY plot; its native value/style and requested visibility controls are recorded separately. Frozen source unchanged.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T16:58:09.134Z",
+        "bars": 300,
+        "end": false,
+        "first": {
+          "index": 0,
+          "value": [
+            1791097200,
+            85031.74,
+            85031.74,
+            85026.01,
+            85026.01,
+            4.54478
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791133080,
+            85377.79,
+            85377.8,
+            85377.79,
+            85377.8,
+            0.08739
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 chart-context-lifecycle-matrix-v1",
+            "status": {
+              "type": 0
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T16:58:10.390Z",
+        "bars": 24990,
+        "end": true,
+        "first": {
+          "index": -24690,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791133080,
+            85377.79,
+            85377.8,
+            85377.79,
+            85377.8,
+            0.09241
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 chart-context-lifecycle-matrix-v1",
+            "status": {
+              "type": 0
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T16:58:11.218Z",
+        "bars": 24990,
+        "end": true,
+        "first": {
+          "index": -24690,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791133080,
+            85377.79,
+            85377.8,
+            85377.79,
+            85377.79,
+            0.09804
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 chart-context-lifecycle-matrix-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24990,
+            "first": {
+              "index": -24690,
+              "value": [
+                1788134400,
+                0,
+                1788134400000,
+                1791133090479,
+                1,
+                1791127680000,
+                1791133080000,
+                255,
+                255,
+                255,
+                15,
+                15,
+                15,
+                1,
+                17
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791133080,
+                24989,
+                1791133080000,
+                1791133091139,
+                24992,
+                1791127680000,
+                1791133080000,
+                255,
+                255,
+                255,
+                15,
+                15,
+                15,
+                24990,
+                17
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   16:58",
+    "historical_compare_before_unix_seconds": 1791133080,
+    "pine_logs": {
+      "paths": [
+        "evidence/chart-context-lifecycle-matrix-v1-attempt12-logs.txt",
+        "evidence/chart-context-lifecycle-matrix-v1-attempt12-logs-v1.json",
+        "evidence/chart-context-lifecycle-matrix-v1-attempt12-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "1f1ca08a0236e95755267b8d3e3538d1e7f9d2ddb6e03bca2d27d5a01e074aa4",
+    "csv_bytes": 3446703,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "BAR_INDEX",
+      "BAR_TIME",
+      "CLOCK",
+      "LIVE_UPDATES",
+      "VISIBLE_LEFT",
+      "VISIBLE_RIGHT",
+      "BG_R",
+      "BG_G",
+      "BG_B",
+      "FG_R",
+      "FG_G",
+      "FG_B",
+      "EXECUTION_COUNT"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "BAR_INDEX": 5,
+      "BAR_TIME": 6,
+      "CLOCK": 7,
+      "LIVE_UPDATES": 8,
+      "VISIBLE_LEFT": 9,
+      "VISIBLE_RIGHT": 10,
+      "BG_R": 11,
+      "BG_G": 12,
+      "BG_B": 13,
+      "FG_R": 14,
+      "FG_G": 15,
+      "FG_B": 16,
+      "EXECUTION_COUNT": 17
+    },
+    "first_historical_cells": [
+      "1788134400",
+      "77682",
+      "77682.01",
+      "77572",
+      "77674.04",
+      "0",
+      "1788134400000",
+      "1791133093541",
+      "1",
+      "1791129720000",
+      "1791133080000",
+      "255",
+      "255",
+      "255",
+      "15",
+      "15",
+      "15",
+      "1"
+    ],
+    "last_historical_cells": [
+      "1791132960",
+      "85361.84",
+      "85377.8",
+      "85361.84",
+      "85377.79",
+      "24988",
+      "1791132960000",
+      "1791133093553",
+      "24989",
+      "1791129720000",
+      "1791133080000",
+      "255",
+      "255",
+      "255",
+      "15",
+      "15",
+      "15",
+      "24989"
+    ],
+    "declared_to_native_header_mapping": {
+      "BAR_INDEX": "BAR_INDEX",
+      "BAR_TIME": "BAR_TIME",
+      "CLOCK": "CLOCK",
+      "LIVE_UPDATES": "LIVE_UPDATES",
+      "VISIBLE_LEFT": "VISIBLE_LEFT",
+      "VISIBLE_RIGHT": "VISIBLE_RIGHT",
+      "BG_R": "BG_R",
+      "BG_G": "BG_G",
+      "BG_B": "BG_B",
+      "FG_R": "FG_R",
+      "FG_G": "FG_G",
+      "FG_B": "FG_B",
+      "EXECUTION_COUNT": "EXECUTION_COUNT"
+    },
+    "csv_rows": 24990,
+    "historical_rows": 24989,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791133080,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791133080",
+    "first_historical_values": {
+      "BAR_INDEX": "0",
+      "BAR_TIME": "1788134400000",
+      "CLOCK": "1791133093541",
+      "LIVE_UPDATES": "1",
+      "VISIBLE_LEFT": "1791129720000",
+      "VISIBLE_RIGHT": "1791133080000",
+      "BG_R": "255",
+      "BG_G": "255",
+      "BG_B": "255",
+      "FG_R": "15",
+      "FG_G": "15",
+      "FG_B": "15",
+      "EXECUTION_COUNT": "1"
+    },
+    "last_historical_values": {
+      "BAR_INDEX": "24988",
+      "BAR_TIME": "1791132960000",
+      "CLOCK": "1791133093553",
+      "LIVE_UPDATES": "24989",
+      "VISIBLE_LEFT": "1791129720000",
+      "VISIBLE_RIGHT": "1791133080000",
+      "BG_R": "255",
+      "BG_G": "255",
+      "BG_B": "255",
+      "FG_R": "15",
+      "FG_G": "15",
+      "FG_B": "15",
+      "EXECUTION_COUNT": "24989"
+    },
+    "declared_unexported_columns": [
+      "RESET_DISPLAY"
+    ],
+    "data_window_witness": "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt12-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T16:59:53.889Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v11 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "chart-context-lifecycle-matrix-v1.pine",
+    "attempt": 13,
+    "source_sha256": "72d27050859eed864c1966a2ceefcdfce45487a005380a816c15ea23b52d6b98",
+    "indicator_title": "V11 chart-context-lifecycle-matrix-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v11/chart-context-lifecycle-matrix-v1-attempt13.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-05T005953.084.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V11 chart-context-lifecycle-matrix-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24690,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24990,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T16:58:08.680Z",
+    "live_candle_open_utc": "2026-10-04T16:58:00.000Z",
+    "export_utc": "2026-10-04T16:59:53.448Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt13-setup.png",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt13-export.png",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt13-logs.txt",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt13-logs-v1.json",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt13-logs.png",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt13-visual.png",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt13-data-window-v1.png",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt13-data-window-v1.json",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt13-data-window-v1.txt",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt13-profiler-restored-after-reload-v1.json",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt13-profiler-restored-after-reload-v1.png",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt13-lifecycle-pan-wide-v1.json",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt13-lifecycle-pan-wide-v1.png",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt13-lifecycle-zoom-narrow-v1.json",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt13-lifecycle-zoom-narrow-v1.png",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt13-native-ui-pan-wide-v1.json",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt13-native-ui-pan-wide-v1.png",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt13-native-ui-zoom-narrow-v1.json",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt13-native-ui-zoom-narrow-v1.png",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt13-original-settings-restored-v1.json",
+      "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt13-original-settings-restored-v1.png"
+    ],
+    "notes": "Native default CSV omits the display.none RESET_DISPLAY plot; its native value/style and requested visibility controls are recorded separately. Frozen source unchanged.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T16:58:09.134Z",
+        "bars": 300,
+        "end": false,
+        "first": {
+          "index": 0,
+          "value": [
+            1791097200,
+            85031.74,
+            85031.74,
+            85026.01,
+            85026.01,
+            4.54478
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791133080,
+            85377.79,
+            85377.8,
+            85377.79,
+            85377.8,
+            0.08739
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 chart-context-lifecycle-matrix-v1",
+            "status": {
+              "type": 0
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T16:58:10.390Z",
+        "bars": 24990,
+        "end": true,
+        "first": {
+          "index": -24690,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791133080,
+            85377.79,
+            85377.8,
+            85377.79,
+            85377.8,
+            0.09241
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 chart-context-lifecycle-matrix-v1",
+            "status": {
+              "type": 0
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T16:58:11.218Z",
+        "bars": 24990,
+        "end": true,
+        "first": {
+          "index": -24690,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791133080,
+            85377.79,
+            85377.8,
+            85377.79,
+            85377.79,
+            0.09804
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 chart-context-lifecycle-matrix-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24990,
+            "first": {
+              "index": -24690,
+              "value": [
+                1788134400,
+                0,
+                1788134400000,
+                1791133090479,
+                1,
+                1791127680000,
+                1791133080000,
+                255,
+                255,
+                255,
+                15,
+                15,
+                15,
+                1,
+                17
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791133080,
+                24989,
+                1791133080000,
+                1791133091139,
+                24992,
+                1791127680000,
+                1791133080000,
+                255,
+                255,
+                255,
+                15,
+                15,
+                15,
+                24990,
+                17
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   16:58",
+    "historical_compare_before_unix_seconds": 1791133080,
+    "pine_logs": {
+      "paths": [
+        "evidence/chart-context-lifecycle-matrix-v1-attempt13-logs.txt",
+        "evidence/chart-context-lifecycle-matrix-v1-attempt13-logs-v1.json",
+        "evidence/chart-context-lifecycle-matrix-v1-attempt13-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "b6760f6c749a1492a8ab9b955385d8f3da79ef00e3825b0dcd16795e246bccd4",
+    "csv_bytes": 3446698,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "BAR_INDEX",
+      "BAR_TIME",
+      "CLOCK",
+      "LIVE_UPDATES",
+      "VISIBLE_LEFT",
+      "VISIBLE_RIGHT",
+      "BG_R",
+      "BG_G",
+      "BG_B",
+      "FG_R",
+      "FG_G",
+      "FG_B",
+      "EXECUTION_COUNT"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "BAR_INDEX": 5,
+      "BAR_TIME": 6,
+      "CLOCK": 7,
+      "LIVE_UPDATES": 8,
+      "VISIBLE_LEFT": 9,
+      "VISIBLE_RIGHT": 10,
+      "BG_R": 11,
+      "BG_G": 12,
+      "BG_B": 13,
+      "FG_R": 14,
+      "FG_G": 15,
+      "FG_B": 16,
+      "EXECUTION_COUNT": 17
+    },
+    "first_historical_cells": [
+      "1788134400",
+      "77682",
+      "77682.01",
+      "77572",
+      "77674.04",
+      "0",
+      "1788134400000",
+      "1791133173998",
+      "1",
+      "1791129720000",
+      "1791133080000",
+      "255",
+      "255",
+      "255",
+      "15",
+      "15",
+      "15",
+      "1"
+    ],
+    "last_historical_cells": [
+      "1791132960",
+      "85361.84",
+      "85377.8",
+      "85361.84",
+      "85377.79",
+      "24988",
+      "1791132960000",
+      "1791133174027",
+      "24989",
+      "1791129720000",
+      "1791133080000",
+      "255",
+      "255",
+      "255",
+      "15",
+      "15",
+      "15",
+      "24989"
+    ],
+    "declared_to_native_header_mapping": {
+      "BAR_INDEX": "BAR_INDEX",
+      "BAR_TIME": "BAR_TIME",
+      "CLOCK": "CLOCK",
+      "LIVE_UPDATES": "LIVE_UPDATES",
+      "VISIBLE_LEFT": "VISIBLE_LEFT",
+      "VISIBLE_RIGHT": "VISIBLE_RIGHT",
+      "BG_R": "BG_R",
+      "BG_G": "BG_G",
+      "BG_B": "BG_B",
+      "FG_R": "FG_R",
+      "FG_G": "FG_G",
+      "FG_B": "FG_B",
+      "EXECUTION_COUNT": "EXECUTION_COUNT"
+    },
+    "csv_rows": 24990,
+    "historical_rows": 24989,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791133080,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791133080",
+    "first_historical_values": {
+      "BAR_INDEX": "0",
+      "BAR_TIME": "1788134400000",
+      "CLOCK": "1791133173998",
+      "LIVE_UPDATES": "1",
+      "VISIBLE_LEFT": "1791129720000",
+      "VISIBLE_RIGHT": "1791133080000",
+      "BG_R": "255",
+      "BG_G": "255",
+      "BG_B": "255",
+      "FG_R": "15",
+      "FG_G": "15",
+      "FG_B": "15",
+      "EXECUTION_COUNT": "1"
+    },
+    "last_historical_values": {
+      "BAR_INDEX": "24988",
+      "BAR_TIME": "1791132960000",
+      "CLOCK": "1791133174027",
+      "LIVE_UPDATES": "24989",
+      "VISIBLE_LEFT": "1791129720000",
+      "VISIBLE_RIGHT": "1791133080000",
+      "BG_R": "255",
+      "BG_G": "255",
+      "BG_B": "255",
+      "FG_R": "15",
+      "FG_G": "15",
+      "FG_B": "15",
+      "EXECUTION_COUNT": "24989"
+    },
+    "declared_unexported_columns": [
+      "RESET_DISPLAY"
+    ],
+    "data_window_witness": "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt13-data-window-v1.json"
   }
 ]
