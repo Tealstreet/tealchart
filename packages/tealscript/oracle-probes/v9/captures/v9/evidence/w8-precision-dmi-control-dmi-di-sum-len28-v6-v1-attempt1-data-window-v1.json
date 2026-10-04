@@ -1,0 +1,55 @@
+{
+  "index": 299,
+  "bar": [
+    1791121200,
+    85258.47,
+    85258.48,
+    85216,
+    85216,
+    17.58165
+  ],
+  "source_row": [
+    1791121200,
+    85258.47,
+    85258.48,
+    85216,
+    85216,
+    17.58165,
+    1791121200000,
+    24890,
+    0,
+    72.028123699183,
+    0,
+    0,
+    null,
+    null,
+    0,
+    null,
+    null,
+    0,
+    null,
+    null,
+    0,
+    null,
+    null,
+    0,
+    null,
+    null,
+    1791121200000,
+    24890
+  ],
+  "browser_utc": "2026-10-04T13:42:17.058Z",
+  "title": "TA coverage 3 v1",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   13:40",
+  "visible_range": {
+    "_firstBar": 264,
+    "_lastBar": 302
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}
