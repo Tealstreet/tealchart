@@ -1,6 +1,6 @@
-# TradingView v16 capture handoff v1
+# TradingView v16 capture handoff v2
 
-FROZEN: 13 indicator/study sources. Canonical manifest: bundle-manifest-v4.json.
+FROZEN: 13 indicator/study sources. Canonical manifest: bundle-manifest-v5.json.
 
 1. Run `sha256sum -c SHA256SUMS`. Preserve exact source bytes, versions and indentation.
 2. Follow each source's instructions. Remove the previous indicator before each attempt; paste separately. Do not repair refusals.
@@ -11,3 +11,5 @@ FROZEN: 13 indicator/study sources. Canonical manifest: bundle-manifest-v4.json.
 7. Return raw evidence under `v16/captures/v16/` and write `v16/captures/v16/RESPONSE-v16.md` with source hash, attempt, phase and evidence paths.
 
 Native outcomes remain UNOBSERVED/UNSPECIFIED. Hypothesized outputs in contributor decisions are discriminators, not native predictions. Local preflights are instrument evidence only. Quota and fractional-price probes remain in shipped v15; do not duplicate them here. Late arrivals go to v17.
+
+Visual deduplication correction: five visual context variants are reserves. Reuse the shipped v15 source observations first and do not paste these variants if v15 supplies the required evidence. The curve is an optional second asymmetric stencil; native pre-raster path controls remain required. All six local predicted outcomes are separate from UNSPECIFIED native outcomes. No shipped source is withdrawn.

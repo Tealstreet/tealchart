@@ -1,7 +1,7 @@
-HANDOFF-v16.md
+HANDOFF-v16-v2.md
 SHA256SUMS
-SHIP-FILES-v1.txt
-bundle-manifest-v4.json
+SHIP-FILES-v2.txt
+bundle-manifest-v5.json
 htf-context-10m-v16-v1.pine
 htf-context-30m-v16-v1.pine
 htf-context-6m-v16-v1.pine

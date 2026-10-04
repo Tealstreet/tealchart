@@ -31,7 +31,7 @@
 > **Then round v15.** After v14, do [`v15/HANDOFF-v15.md`](v15/HANDOFF-v15.md) — 37 scripts; per-script steps in
 > `v15/instructions/` (`SHA256SUMS` pins every source). Reply at `v15/captures/v15/RESPONSE-v15.md`.
 >
-> **Then round v16.** After v15, do [`v16/HANDOFF-v16.md`](v16/HANDOFF-v16.md) — 13 scripts; per-script steps in
+> **Then round v16.** After v15, do [`v16/HANDOFF-v16-v2.md`](v16/HANDOFF-v16-v2.md) — 13 scripts; per-script steps in
 > `v16/instructions/` (`SHA256SUMS` pins every source). Reply at `v16/captures/v16/RESPONSE-v16.md`.
 
 Agent exchange: [capture response v1](RESPONSE-v1.md). The next reply belongs in

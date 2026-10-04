@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "bundle": "v16",
-  "version": 4,
+  "version": 5,
   "status": "FROZEN",
   "frozen": true,
   "scripts": [
@@ -193,10 +193,6 @@
       "indicatorOnly": true,
       "captureKind": "compile-and-native-renderer-geometry",
       "nativeStatus": "UNOBSERVED",
-      "expectedOutcome": {
-        "phase": "COMPILE or RUNS",
-        "observation": "Final-offset destinations0/3 versus per-source4/7; same-source zero-input control2/5, relative to observed cycle start."
-      },
       "instructions": "instructions/visual21-199-bgcolor-v3-offset-discriminator-v1.md",
       "instructionSha256": "14c246e762957631de3d076659f689fee3b01c5163f057217e6f93021aa94ada",
       "minimumHistoryBars": 64,
@@ -220,7 +216,36 @@
           5
         ]
       },
-      "authorPreflightReceipt": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v16-outcomes/contributors/v6aeqx-visual21-holds-v1/PREFLIGHT-v2.json"
+      "authorPreflightReceipt": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v16-outcomes/contributors/v6aeqx-visual21-holds-v1/PREFLIGHT-v2.json",
+      "localPredictedOutcome": {
+        "phase": "COMPILE or RUNS",
+        "observation": "Final-offset destinations0/3 versus per-source4/7; same-source zero-input control2/5, relative to observed cycle start."
+      },
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "observation": "UNSPECIFIED native outcome; compare observations with the separately labelled local model."
+      },
+      "priorShippedReferences": [
+        {
+          "path": "packages/tealscript/oracle-probes/v15/visual-bgcolor-offset-v3-n-series-v1.pine",
+          "sourceSHA256": "4850d8ce57afa860182d2bb072218757497e56800a65a2e1913d4357707e1ddf",
+          "instructions": "packages/tealscript/oracle-probes/v15/instructions/visual-bgcolor-offset-v3-n-series-v1.md",
+          "instructionSHA256": "73f5963737863e5b47384f46b8bcf5b836e5e776cf623d68acd916338907314c",
+          "question": "UNSPECIFIED; corrected legacy n counter removes unrelated undeclared bar_index error. Record compile phase/text first, then timestamped source/destination geometry if it runs.",
+          "nativeOutcome": "UNSPECIFIED"
+        },
+        {
+          "path": "packages/tealscript/oracle-probes/v15/visual-bgcolor-offset-v3-n-zero-control-v1.pine",
+          "sourceSHA256": "400360578ab6995216212851ec88b1afba82f92fbfeefc1a8fbea42fc0a1a887",
+          "instructions": "packages/tealscript/oracle-probes/v15/instructions/visual-bgcolor-offset-v3-n-zero-control-v1.md",
+          "instructionSHA256": "f58f69fee5adca3c6a418d2ac563ee0b60534e78ba09ccee17f3bf01e3149e0e",
+          "question": "UNSPECIFIED; corrected legacy n counter removes unrelated undeclared bar_index error. Record compile phase/text first, then timestamped source/destination geometry if it runs.",
+          "nativeOutcome": "UNSPECIFIED"
+        }
+      ],
+      "dedupQuestion": "v3 bgcolor offset admission and final-offset versus per-source historical placement",
+      "contextDifference": "Two sparse impulses at phases2/5, disjoint model destinations0/3 versus4/7, same-source input zero control2/5; v15 already has a richer four-impulse paired-source discriminator.",
+      "intakeRecommendation": "Reuse v15 for the shared question first; v16 source is a reserve context variant, not an independent new question. Avoid duplicate capture if v15 already supplies the required evidence."
     },
     {
       "probe": "visual21-513-barcolor-v3-offset-discriminator-v1.pine",
@@ -234,10 +259,6 @@
       "indicatorOnly": true,
       "captureKind": "compile-and-native-renderer-geometry",
       "nativeStatus": "UNOBSERVED",
-      "expectedOutcome": {
-        "phase": "COMPILE or RUNS",
-        "observation": "Final-offset destinations0/3 versus per-source4/7; same-source zero-input control2/5, relative to observed cycle start."
-      },
       "instructions": "instructions/visual21-513-barcolor-v3-offset-discriminator-v1.md",
       "instructionSha256": "3e6fb17ef0a7b37b30099c16888ae206cdec9dc0883b41d27043934e7de385ae",
       "minimumHistoryBars": 64,
@@ -261,7 +282,36 @@
           5
         ]
       },
-      "authorPreflightReceipt": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v16-outcomes/contributors/v6aeqx-visual21-holds-v1/PREFLIGHT-v2.json"
+      "authorPreflightReceipt": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v16-outcomes/contributors/v6aeqx-visual21-holds-v1/PREFLIGHT-v2.json",
+      "localPredictedOutcome": {
+        "phase": "COMPILE or RUNS",
+        "observation": "Final-offset destinations0/3 versus per-source4/7; same-source zero-input control2/5, relative to observed cycle start."
+      },
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "observation": "UNSPECIFIED native outcome; compare observations with the separately labelled local model."
+      },
+      "priorShippedReferences": [
+        {
+          "path": "packages/tealscript/oracle-probes/v15/visual-barcolor-offset-v3-discriminator-series-v1.pine",
+          "sourceSHA256": "a45f9c91b3180867e8bc7cc51d9d0155e84253bd5d0ba9d1c11dc0dc0658c266",
+          "instructions": "packages/tealscript/oracle-probes/v15/instructions/visual-barcolor-offset-v3-discriminator-series-v1.md",
+          "instructionSHA256": "72f978221ae2a4b836cc073f7d73fead68fe2e66e48737be399571f3b1f1f5b5",
+          "question": "UNSPECIFIED: determine whether all historical colors/glyphs use final offset or each source offset.",
+          "nativeOutcome": "UNSPECIFIED"
+        },
+        {
+          "path": "packages/tealscript/oracle-probes/v15/visual-barcolor-offset-v3-discriminator-zero-v1.pine",
+          "sourceSHA256": "02af1a42c56b854b8a78d77b1f60b8fe16198281c1106cdea10946fc428d74b1",
+          "instructions": "packages/tealscript/oracle-probes/v15/instructions/visual-barcolor-offset-v3-discriminator-zero-v1.md",
+          "instructionSHA256": "30cd4a3360de0cec239645c5408f36a6c72f202301f9dda919375100ccc076f4",
+          "question": "UNSPECIFIED: determine whether all historical colors/glyphs use final offset or each source offset.",
+          "nativeOutcome": "UNSPECIFIED"
+        }
+      ],
+      "dedupQuestion": "v3 barcolor offset admission and final-offset versus per-source historical placement",
+      "contextDifference": "Two early-cycle impulses and same-source input zero control; v15 already tests this question with four impulses and separate zero source.",
+      "intakeRecommendation": "Reuse v15 for the shared question first; v16 source is a reserve context variant, not an independent new question. Avoid duplicate capture if v15 already supplies the required evidence."
     },
     {
       "probe": "visual21-736-plotchar-v3-offset-discriminator-v1.pine",
@@ -275,10 +325,6 @@
       "indicatorOnly": true,
       "captureKind": "compile-and-native-renderer-geometry",
       "nativeStatus": "UNOBSERVED",
-      "expectedOutcome": {
-        "phase": "COMPILE or RUNS",
-        "observation": "Final-offset destinations0/3 versus per-source4/7; same-source zero-input control2/5, relative to observed cycle start."
-      },
       "instructions": "instructions/visual21-736-plotchar-v3-offset-discriminator-v1.md",
       "instructionSha256": "058119b35f9314bf85dec35610b32c52e4e68418b8e07fd500743dd38fb5092d",
       "minimumHistoryBars": 64,
@@ -302,7 +348,36 @@
           5
         ]
       },
-      "authorPreflightReceipt": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v16-outcomes/contributors/v6aeqx-visual21-holds-v1/PREFLIGHT-v2.json"
+      "authorPreflightReceipt": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v16-outcomes/contributors/v6aeqx-visual21-holds-v1/PREFLIGHT-v2.json",
+      "localPredictedOutcome": {
+        "phase": "COMPILE or RUNS",
+        "observation": "Final-offset destinations0/3 versus per-source4/7; same-source zero-input control2/5, relative to observed cycle start."
+      },
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "observation": "UNSPECIFIED native outcome; compare observations with the separately labelled local model."
+      },
+      "priorShippedReferences": [
+        {
+          "path": "packages/tealscript/oracle-probes/v15/visual-plotchar-offset-v3-discriminator-series-v1.pine",
+          "sourceSHA256": "78e29b9a9b696ed493a49689a927e462af1f2fb848eedafb53c4a318798aef95",
+          "instructions": "packages/tealscript/oracle-probes/v15/instructions/visual-plotchar-offset-v3-discriminator-series-v1.md",
+          "instructionSHA256": "35635a9a0e700aa8f9425ea1491ddf62fec177d975ce9bc36dd48eab4c636933",
+          "question": "UNSPECIFIED: determine whether all historical colors/glyphs use final offset or each source offset.",
+          "nativeOutcome": "UNSPECIFIED"
+        },
+        {
+          "path": "packages/tealscript/oracle-probes/v15/visual-plotchar-offset-v3-discriminator-zero-v1.pine",
+          "sourceSHA256": "d61b33befbf91d8dda8c366ae6a0099fd5b4cffc1605779eb68bfa795ae60a9c",
+          "instructions": "packages/tealscript/oracle-probes/v15/instructions/visual-plotchar-offset-v3-discriminator-zero-v1.md",
+          "instructionSHA256": "73ee35302e47eb428796beeb44a7aacd316cae2227e3bfb152f52b63fb08d2bd",
+          "question": "UNSPECIFIED: determine whether all historical colors/glyphs use final offset or each source offset.",
+          "nativeOutcome": "UNSPECIFIED"
+        }
+      ],
+      "dedupQuestion": "v3 plotchar offset admission and final-offset versus per-source historical placement",
+      "contextDifference": "Two sparse X glyphs and same-source input zero control; v15 already tests this question with four glyphs and separate zero source.",
+      "intakeRecommendation": "Reuse v15 for the shared question first; v16 source is a reserve context variant, not an independent new question. Avoid duplicate capture if v15 already supplies the required evidence."
     },
     {
       "probe": "visual21-1370-plotarrow-v3-offset-discriminator-v1.pine",
@@ -316,10 +391,6 @@
       "indicatorOnly": true,
       "captureKind": "compile-and-native-renderer-geometry",
       "nativeStatus": "UNOBSERVED",
-      "expectedOutcome": {
-        "phase": "COMPILE or RUNS",
-        "observation": "Final-offset destinations0/3 versus per-source4/7; same-source zero-input control2/5, relative to observed cycle start."
-      },
       "instructions": "instructions/visual21-1370-plotarrow-v3-offset-discriminator-v1.md",
       "instructionSha256": "c851d96130d652c02881eeb4ecad9f1a6f484f6d0c703d79a6e9814f22feed6e",
       "minimumHistoryBars": 64,
@@ -343,7 +414,36 @@
           5
         ]
       },
-      "authorPreflightReceipt": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v16-outcomes/contributors/v6aeqx-visual21-holds-v1/PREFLIGHT-v2.json"
+      "authorPreflightReceipt": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v16-outcomes/contributors/v6aeqx-visual21-holds-v1/PREFLIGHT-v2.json",
+      "localPredictedOutcome": {
+        "phase": "COMPILE or RUNS",
+        "observation": "Final-offset destinations0/3 versus per-source4/7; same-source zero-input control2/5, relative to observed cycle start."
+      },
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "observation": "UNSPECIFIED native outcome; compare observations with the separately labelled local model."
+      },
+      "priorShippedReferences": [
+        {
+          "path": "packages/tealscript/oracle-probes/v15/visual-plotarrow-offset-v3-n-series-v1.pine",
+          "sourceSHA256": "a5c3293682093528667f5b39c5681d63e515b9256401e54d547ba4f777f3622d",
+          "instructions": "packages/tealscript/oracle-probes/v15/instructions/visual-plotarrow-offset-v3-n-series-v1.md",
+          "instructionSHA256": "914bd6e39f32dc156a2ec1b6dd3a17228ae586bfa40f5cbd1af8014cdc85d4c8",
+          "question": "UNSPECIFIED; corrected legacy n counter removes unrelated undeclared bar_index error. Record compile phase/text first, then timestamped source/destination geometry if it runs.",
+          "nativeOutcome": "UNSPECIFIED"
+        },
+        {
+          "path": "packages/tealscript/oracle-probes/v15/visual-plotarrow-offset-v3-n-zero-control-v1.pine",
+          "sourceSHA256": "4e2c0628e124d5a8af6ed88d03a01ed1603a16c3c34f9370d92f2232f9ae757d",
+          "instructions": "packages/tealscript/oracle-probes/v15/instructions/visual-plotarrow-offset-v3-n-zero-control-v1.md",
+          "instructionSHA256": "f560934e5e961c36fa128ae607c5e6a2036c867d5d6c76d7f38882c553366bf7",
+          "question": "UNSPECIFIED; corrected legacy n counter removes unrelated undeclared bar_index error. Record compile phase/text first, then timestamped source/destination geometry if it runs.",
+          "nativeOutcome": "UNSPECIFIED"
+        }
+      ],
+      "dedupQuestion": "v3 plotarrow offset admission and final-offset versus per-source historical placement",
+      "contextDifference": "Fixed equal16px arrow heights remove magnitude normalization as a placement confound; same-source zero input control. v15 tests placement plus variable magnitude10..50.",
+      "intakeRecommendation": "Reuse v15 for the shared question first; v16 source is a reserve context variant, not an independent new question. Avoid duplicate capture if v15 already supplies the required evidence."
     },
     {
       "probe": "visual21-705-chart-foreground-threshold-v6-v1.pine",
@@ -357,10 +457,6 @@
       "indicatorOnly": true,
       "captureKind": "numeric-and-host-settings",
       "nativeStatus": "UNOBSERVED",
-      "expectedOutcome": {
-        "phase": "RUNS",
-        "observation": "Neighboring solid grays127/128 distinguish brightness<128; literal numeric BG/FG channels eliminate unrelated tostring(color) refusal."
-      },
       "instructions": "instructions/visual21-705-chart-foreground-threshold-v6-v1.md",
       "instructionSha256": "b5b3a4970532dc8313eb322fd614ce970fcbb26dd07d839028514ee6050afd4b",
       "minimumHistoryBars": 16,
@@ -395,7 +491,28 @@
         ],
         "expectedTransparency": 0
       },
-      "authorPreflightReceipt": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v16-outcomes/contributors/v6aeqx-visual21-holds-v1/PREFLIGHT-v2.json"
+      "authorPreflightReceipt": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v16-outcomes/contributors/v6aeqx-visual21-holds-v1/PREFLIGHT-v2.json",
+      "localPredictedOutcome": {
+        "phase": "RUNS",
+        "observation": "Neighboring solid grays127/128 distinguish brightness<128; literal numeric BG/FG channels eliminate unrelated tostring(color) refusal."
+      },
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "observation": "UNSPECIFIED native outcome; compare observations with the separately labelled local model."
+      },
+      "priorShippedReferences": [
+        {
+          "path": "packages/tealscript/oracle-probes/v15/visual-chart-fg-solid-numeric-v6-v1.pine",
+          "sourceSHA256": "e06c22d15ffd722684e8cdfeb3331b5d7d853eb0ad7986cf6d9645dfd51fa5f7",
+          "instructions": "packages/tealscript/oracle-probes/v15/instructions/visual-chart-fg-solid-numeric-v6-v1.md",
+          "instructionSHA256": "b95de73ecd3ffe47aaaee7b4aa1425f791d99db35595ffe57d4e57c20424b2d2",
+          "question": "UNSPECIFIED exact native foreground values. Prior v4 source was blocked by str.tostring(color); numeric channels avoid that unrelated refusal.",
+          "nativeOutcome": "UNSPECIFIED"
+        }
+      ],
+      "dedupQuestion": "chart foreground numeric channels versus solid background and grayscale threshold",
+      "contextDifference": "Data-window-only seven channels and explicit four-setting predictions; v15 already requests these exact settings, additional colors and same-source grayscale bracketing. No additional question.",
+      "intakeRecommendation": "Reuse v15 for the shared question first; v16 source is a reserve context variant, not an independent new question. Avoid duplicate capture if v15 already supplies the required evidence."
     },
     {
       "probe": "visual21-856-polyline-kernel-trace-v6-v1.pine",
@@ -409,10 +526,6 @@
       "indicatorOnly": true,
       "captureKind": "native-pre-raster-path-trace",
       "nativeStatus": "UNOBSERVED",
-      "expectedOutcome": {
-        "phase": "RUNS plus TRACE",
-        "observation": "Asymmetric four-point stencil distinguishes the frozen uniform Catmull-Rom cubic controls from a different native path basis."
-      },
       "instructions": "instructions/visual21-856-polyline-kernel-trace-v6-v2.md",
       "instructionSha256": "78723eb5d99ca410b6c177d2a2fe9f760a3f7840df08f2b4a6e6ae5ff592c6c3",
       "minimumHistoryBars": 32,
@@ -494,7 +607,28 @@
         "coordinates": "x relative to anchorN; y literal indicator prices. Apply the observed same-frame affine projection to compare native controls.",
         "requiredNativeEvidence": "native commands/control points or sampled pre-raster path with interpolation basis; vertices/CSV/screenshot alone are insufficient."
       },
-      "authorPreflightReceipt": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v16-outcomes/contributors/v6aeqx-visual21-holds-v1/PREFLIGHT-v2.json"
+      "authorPreflightReceipt": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v16-outcomes/contributors/v6aeqx-visual21-holds-v1/PREFLIGHT-v2.json",
+      "localPredictedOutcome": {
+        "phase": "RUNS plus TRACE",
+        "observation": "Asymmetric four-point stencil distinguishes the frozen uniform Catmull-Rom cubic controls from a different native path basis."
+      },
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "observation": "UNSPECIFIED native outcome; compare observations with the separately labelled local model."
+      },
+      "priorShippedReferences": [
+        {
+          "path": "packages/tealscript/oracle-probes/v15/visual-polyline-curved-native-path-v6-v1.pine",
+          "sourceSHA256": "0ff689fc06741d057c8eb353f2b88e7069aedcb371df615e6e263bb23932af5e",
+          "instructions": "packages/tealscript/oracle-probes/v15/instructions/visual-polyline-curved-native-path-v6-v1.md",
+          "instructionSHA256": "3bb0771eb0da0a5c6143cc0c31dcb09683c6c1b16848da86cc503c327ae084b4",
+          "question": "UNSPECIFIED: exact native curved path control coordinates on this bounded four-vertex stimulus.",
+          "nativeOutcome": "UNSPECIFIED"
+        }
+      ],
+      "dedupQuestion": "native curved polyline path controls on a bounded four-point stimulus",
+      "contextDifference": "Second asymmetric stimulus with x gaps2/6/3, prices0/80/-20/40 and explicit three-segment predicted controls. v15 already requests native path extraction on x gaps2/3/3, prices1/4/-2/2 and changed spacing.",
+      "intakeRecommendation": "Optional second-stimulus path-control capture only when supported native pre-raster trace is available; no vertices-only closure."
     },
     {
       "probe": "inherited-box-split-alias-v6-v1.pine",
@@ -550,5 +684,7 @@
       "manifest": "bundle-manifest-v9.json",
       "question": "20 UK quota probes and fractional-price v2 already shipped dce789781a; no repeat paste"
     }
-  ]
+  ],
+  "dedupPolicy": "Source SHA plus question/context. These sources do not supersede the shipped v15 questions; simplified controls alone are not a new question.",
+  "newVisualQuestions": 0
 }
