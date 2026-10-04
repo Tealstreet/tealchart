@@ -1,0 +1,2249 @@
+{
+  "artifact": "V11 synchronized provider live witness v1",
+  "sample": {
+    "sample": 0,
+    "wall_utc": "2026-10-04T16:25:18.284Z",
+    "charts": [
+      {
+        "page": 2,
+        "script": "provider6m-snapshot-pack-v6-v1.pine",
+        "attempt": 1,
+        "interval": "2",
+        "observed_utc": "2026-10-04T16:25:17.618Z",
+        "url": "https://www.tradingview.com/chart/xlvYwHdH/?symbol=BINANCE%3ABTCUSDT&interval=2",
+        "ticker": "BINANCE:BTCUSDT",
+        "timezone": "Etc/UTC",
+        "replay": false,
+        "title": "V11 requested6m snapshot pack",
+        "status": {
+          "type": 2
+        },
+        "study_first": {
+          "index": -24672,
+          "value": [
+            1788134400,
+            77740.01,
+            null,
+            null,
+            255.99000000000524,
+            77699.995,
+            77713.33333333333,
+            77705.5,
+            null,
+            1788134760000,
+            2,
+            1788134400000,
+            77740.01,
+            77682,
+            77827.99,
+            77572,
+            118.48272,
+            1788134400000,
+            0,
+            1788134400000,
+            77740.01,
+            null,
+            null,
+            255.99000000000524,
+            77699.995,
+            77713.33333333333,
+            77705.5,
+            null,
+            1788134760000,
+            2,
+            1788134400000,
+            77740.01,
+            77682,
+            77827.99,
+            77572,
+            118.48272,
+            1788134400000,
+            0,
+            1788134400000,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295,
+            1788134400000,
+            1788134520000,
+            0,
+            1791130948511
+          ]
+        },
+        "study_last": {
+          "index": 300,
+          "value": [
+            1791131040,
+            85235.37,
+            255737.9300000015,
+            255737.93000000002,
+            0.010000000009313226,
+            85235.375,
+            85235.37333333334,
+            85235.3725,
+            85267.19,
+            1791131400000,
+            1,
+            1791072000000,
+            85235.37,
+            85235.37,
+            85235.38,
+            85235.37,
+            2.39381,
+            1791131040000,
+            8324,
+            1788134400000,
+            85235.37,
+            255737.9300000015,
+            255737.93000000002,
+            0.010000000009313226,
+            85235.375,
+            85235.37333333334,
+            85235.3725,
+            85267.19,
+            1791131400000,
+            1,
+            1791072000000,
+            85235.37,
+            85235.37,
+            85235.38,
+            85235.37,
+            2.39381,
+            1791131040000,
+            8324,
+            1788134400000,
+            85235.37,
+            85235.38,
+            85235.37,
+            85235.37,
+            2.39575,
+            1791131040000,
+            1791131160000,
+            24972,
+            1791131117522
+          ]
+        },
+        "host_first": {
+          "index": -24672,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "host_last": {
+          "index": 300,
+          "value": [
+            1791131040,
+            85235.37,
+            85235.38,
+            85235.37,
+            85235.37,
+            2.39575
+          ]
+        },
+        "plots": [
+          {
+            "id": "plot_0",
+            "type": "line"
+          },
+          {
+            "id": "plot_1",
+            "type": "line"
+          },
+          {
+            "id": "plot_2",
+            "type": "line"
+          },
+          {
+            "id": "plot_3",
+            "type": "line"
+          },
+          {
+            "id": "plot_4",
+            "type": "line"
+          },
+          {
+            "id": "plot_5",
+            "type": "line"
+          },
+          {
+            "id": "plot_6",
+            "type": "line"
+          },
+          {
+            "id": "plot_7",
+            "type": "line"
+          },
+          {
+            "id": "plot_8",
+            "type": "line"
+          },
+          {
+            "id": "plot_9",
+            "type": "line"
+          },
+          {
+            "id": "plot_10",
+            "type": "line"
+          },
+          {
+            "id": "plot_11",
+            "type": "line"
+          },
+          {
+            "id": "plot_12",
+            "type": "line"
+          },
+          {
+            "id": "plot_13",
+            "type": "line"
+          },
+          {
+            "id": "plot_14",
+            "type": "line"
+          },
+          {
+            "id": "plot_15",
+            "type": "line"
+          },
+          {
+            "id": "plot_16",
+            "type": "line"
+          },
+          {
+            "id": "plot_17",
+            "type": "line"
+          },
+          {
+            "id": "plot_18",
+            "type": "line"
+          },
+          {
+            "id": "plot_19",
+            "type": "line"
+          },
+          {
+            "id": "plot_20",
+            "type": "line"
+          },
+          {
+            "id": "plot_21",
+            "type": "line"
+          },
+          {
+            "id": "plot_22",
+            "type": "line"
+          },
+          {
+            "id": "plot_23",
+            "type": "line"
+          },
+          {
+            "id": "plot_24",
+            "type": "line"
+          },
+          {
+            "id": "plot_25",
+            "type": "line"
+          },
+          {
+            "id": "plot_26",
+            "type": "line"
+          },
+          {
+            "id": "plot_27",
+            "type": "line"
+          },
+          {
+            "id": "plot_28",
+            "type": "line"
+          },
+          {
+            "id": "plot_29",
+            "type": "line"
+          },
+          {
+            "id": "plot_30",
+            "type": "line"
+          },
+          {
+            "id": "plot_31",
+            "type": "line"
+          },
+          {
+            "id": "plot_32",
+            "type": "line"
+          },
+          {
+            "id": "plot_33",
+            "type": "line"
+          },
+          {
+            "id": "plot_34",
+            "type": "line"
+          },
+          {
+            "id": "plot_35",
+            "type": "line"
+          },
+          {
+            "id": "plot_36",
+            "type": "line"
+          },
+          {
+            "id": "plot_37",
+            "type": "line"
+          },
+          {
+            "id": "plot_38",
+            "type": "line"
+          },
+          {
+            "id": "plot_39",
+            "type": "line"
+          },
+          {
+            "id": "plot_40",
+            "type": "line"
+          },
+          {
+            "id": "plot_41",
+            "type": "line"
+          },
+          {
+            "id": "plot_42",
+            "type": "line"
+          },
+          {
+            "id": "plot_43",
+            "type": "line"
+          },
+          {
+            "id": "plot_44",
+            "type": "line"
+          },
+          {
+            "id": "plot_45",
+            "type": "line"
+          },
+          {
+            "id": "plot_46",
+            "type": "line"
+          }
+        ],
+        "styles": {
+          "plot_0": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "htf6_goff_lon_close_clean"
+          },
+          "plot_1": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "htf6_goff_lon_sum_close_len3_clean"
+          },
+          "plot_10": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "htf6_goff_lon_daily_open"
+          },
+          "plot_11": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "htf6_goff_lon_close_hole97"
+          },
+          "plot_12": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "htf6_goff_lon_INPUT_open"
+          },
+          "plot_13": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "htf6_goff_lon_INPUT_high"
+          },
+          "plot_14": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "htf6_goff_lon_INPUT_low"
+          },
+          "plot_15": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "htf6_goff_lon_INPUT_volume"
+          },
+          "plot_16": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "htf6_goff_lon_INPUT_time"
+          },
+          "plot_17": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "htf6_goff_lon_INPUT_index"
+          },
+          "plot_18": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "htf6_goff_lon_INPUT_first_time"
+          },
+          "plot_19": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "htf6_gon_lon_close_clean"
+          },
+          "plot_2": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "htf6_goff_lon_sum_close_len3_hole"
+          },
+          "plot_20": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "htf6_gon_lon_sum_close_len3_clean"
+          },
+          "plot_21": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "htf6_gon_lon_sum_close_len3_hole"
+          },
+          "plot_22": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "htf6_gon_lon_range"
+          },
+          "plot_23": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "htf6_gon_lon_hl2"
+          },
+          "plot_24": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "htf6_gon_lon_hlc3"
+          },
+          "plot_25": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "htf6_gon_lon_ohlc4"
+          },
+          "plot_26": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "htf6_gon_lon_close_history2"
+          },
+          "plot_27": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "htf6_gon_lon_time_close"
+          },
+          "plot_28": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "htf6_gon_lon_dayofweek"
+          },
+          "plot_29": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "htf6_gon_lon_daily_open"
+          },
+          "plot_3": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "htf6_goff_lon_range"
+          },
+          "plot_30": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "htf6_gon_lon_close_hole97"
+          },
+          "plot_31": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "htf6_gon_lon_INPUT_open"
+          },
+          "plot_32": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "htf6_gon_lon_INPUT_high"
+          },
+          "plot_33": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "htf6_gon_lon_INPUT_low"
+          },
+          "plot_34": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "htf6_gon_lon_INPUT_volume"
+          },
+          "plot_35": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "htf6_gon_lon_INPUT_time"
+          },
+          "plot_36": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "htf6_gon_lon_INPUT_index"
+          },
+          "plot_37": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "htf6_gon_lon_INPUT_first_time"
+          },
+          "plot_38": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "CHART_open"
+          },
+          "plot_39": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "CHART_high"
+          },
+          "plot_4": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "htf6_goff_lon_hl2"
+          },
+          "plot_40": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "CHART_low"
+          },
+          "plot_41": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "CHART_close"
+          },
+          "plot_42": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "CHART_volume"
+          },
+          "plot_43": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "CHART_time"
+          },
+          "plot_44": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "CHART_time_close"
+          },
+          "plot_45": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "CHART_bar_index"
+          },
+          "plot_46": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "CHART_timenow"
+          },
+          "plot_5": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "htf6_goff_lon_hlc3"
+          },
+          "plot_6": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "htf6_goff_lon_ohlc4"
+          },
+          "plot_7": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "htf6_goff_lon_close_history2"
+          },
+          "plot_8": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "htf6_goff_lon_time_close"
+          },
+          "plot_9": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "htf6_goff_lon_dayofweek"
+          }
+        },
+        "tail": [
+          {
+            "native_index": 294,
+            "host": [
+              1791130320,
+              85259.37,
+              85259.38,
+              85259.37,
+              85259.37,
+              1.73761
+            ],
+            "study": [
+              1791130320,
+              85267.19,
+              255710.57000000152,
+              255710.57000000004,
+              50.529999999998836,
+              85284.635,
+              85278.81999999999,
+              85273.95749999999,
+              85184,
+              1791130680000,
+              1,
+              1791072000000,
+              85267.19,
+              85259.37,
+              85309.9,
+              85259.37,
+              18.76535,
+              1791130320000,
+              8322,
+              1788134400000,
+              85267.19,
+              255710.57000000152,
+              255710.57000000004,
+              50.529999999998836,
+              85284.635,
+              85278.81999999999,
+              85273.95749999999,
+              85184,
+              1791130680000,
+              1,
+              1791072000000,
+              85267.19,
+              85259.37,
+              85309.9,
+              85259.37,
+              18.76535,
+              1791130320000,
+              8322,
+              1788134400000,
+              85259.37,
+              85259.38,
+              85259.37,
+              85259.37,
+              1.73761,
+              1791130320000,
+              1791130440000,
+              24966,
+              1791130948732
+            ]
+          },
+          {
+            "native_index": 295,
+            "host": [
+              1791130440,
+              85259.38,
+              85296.01,
+              85259.37,
+              85296.01,
+              10.54402
+            ],
+            "study": [
+              1791130440,
+              85267.19,
+              255710.57000000152,
+              255710.57000000004,
+              50.529999999998836,
+              85284.635,
+              85278.81999999999,
+              85273.95749999999,
+              85184,
+              1791130680000,
+              1,
+              1791072000000,
+              85267.19,
+              85259.37,
+              85309.9,
+              85259.37,
+              18.76535,
+              1791130320000,
+              8322,
+              1788134400000,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              85259.38,
+              85296.01,
+              85259.37,
+              85296.01,
+              10.54402,
+              1791130440000,
+              1791130560000,
+              24967,
+              1791130948732
+            ]
+          },
+          {
+            "native_index": 296,
+            "host": [
+              1791130560,
+              85296.01,
+              85309.9,
+              85267.19,
+              85267.19,
+              6.48372
+            ],
+            "study": [
+              1791130560,
+              85267.19,
+              255710.57000000152,
+              255710.57000000004,
+              50.529999999998836,
+              85284.635,
+              85278.81999999999,
+              85273.95749999999,
+              85184,
+              1791130680000,
+              1,
+              1791072000000,
+              85267.19,
+              85259.37,
+              85309.9,
+              85259.37,
+              18.76535,
+              1791130320000,
+              8322,
+              1788134400000,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              85296.01,
+              85309.9,
+              85267.19,
+              85267.19,
+              6.48372,
+              1791130560000,
+              1791130680000,
+              24968,
+              1791130948732
+            ]
+          },
+          {
+            "native_index": 297,
+            "host": [
+              1791130680,
+              85267.2,
+              85270.01,
+              85267.19,
+              85270.01,
+              2.83217
+            ],
+            "study": [
+              1791130680,
+              85234.85,
+              255761.4200000015,
+              255761.42000000004,
+              35.15999999998894,
+              85252.43,
+              85246.56999999999,
+              85251.72750000001,
+              85259.38,
+              1791131040000,
+              1,
+              1791072000000,
+              85234.85,
+              85267.2,
+              85270.01,
+              85234.85,
+              12.34908,
+              1791130680000,
+              8323,
+              1788134400000,
+              85234.85,
+              255761.4200000015,
+              255761.42000000004,
+              35.15999999998894,
+              85252.43,
+              85246.56999999999,
+              85251.72750000001,
+              85259.38,
+              1791131040000,
+              1,
+              1791072000000,
+              85234.85,
+              85267.2,
+              85270.01,
+              85234.85,
+              12.34908,
+              1791130680000,
+              8323,
+              1788134400000,
+              85267.2,
+              85270.01,
+              85267.19,
+              85270.01,
+              2.83217,
+              1791130680000,
+              1791130800000,
+              24969,
+              1791130948732
+            ]
+          },
+          {
+            "native_index": 298,
+            "host": [
+              1791130800,
+              85270,
+              85270.01,
+              85234.85,
+              85234.86,
+              8.60397
+            ],
+            "study": [
+              1791130800,
+              85234.85,
+              255761.4200000015,
+              255761.42000000004,
+              35.15999999998894,
+              85252.43,
+              85246.56999999999,
+              85251.72750000001,
+              85259.38,
+              1791131040000,
+              1,
+              1791072000000,
+              85234.85,
+              85267.2,
+              85270.01,
+              85234.85,
+              12.34908,
+              1791130680000,
+              8323,
+              1788134400000,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              85270,
+              85270.01,
+              85234.85,
+              85234.86,
+              8.60397,
+              1791130800000,
+              1791130920000,
+              24970,
+              1791130948732
+            ]
+          },
+          {
+            "native_index": 299,
+            "host": [
+              1791130920,
+              85234.85,
+              85235.38,
+              85208,
+              85235.37,
+              9.23643
+            ],
+            "study": [
+              1791130920,
+              85235.38,
+              255761.95000000153,
+              255761.95000000004,
+              62.00999999999476,
+              85239.005,
+              85237.79666666668,
+              85245.14749999999,
+              85259.38,
+              1791131040000,
+              1,
+              1791072000000,
+              85235.38,
+              85267.2,
+              85270.01,
+              85208,
+              20.6671,
+              1791130680000,
+              8323,
+              1788134400000,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              85234.85,
+              85235.38,
+              85208,
+              85235.37,
+              9.23643,
+              1791130920000,
+              1791131040000,
+              24971,
+              1791131041323
+            ]
+          },
+          {
+            "native_index": 300,
+            "host": [
+              1791131040,
+              85235.37,
+              85235.38,
+              85235.37,
+              85235.37,
+              2.39575
+            ],
+            "study": [
+              1791131040,
+              85235.37,
+              255737.9300000015,
+              255737.93000000002,
+              0.010000000009313226,
+              85235.375,
+              85235.37333333334,
+              85235.3725,
+              85267.19,
+              1791131400000,
+              1,
+              1791072000000,
+              85235.37,
+              85235.37,
+              85235.38,
+              85235.37,
+              2.39381,
+              1791131040000,
+              8324,
+              1788134400000,
+              85235.37,
+              255737.9300000015,
+              255737.93000000002,
+              0.010000000009313226,
+              85235.375,
+              85235.37333333334,
+              85235.3725,
+              85267.19,
+              1791131400000,
+              1,
+              1791072000000,
+              85235.37,
+              85235.37,
+              85235.38,
+              85235.37,
+              2.39381,
+              1791131040000,
+              8324,
+              1788134400000,
+              85235.37,
+              85235.38,
+              85235.37,
+              85235.37,
+              2.39575,
+              1791131040000,
+              1791131160000,
+              24972,
+              1791131117522
+            ]
+          }
+        ]
+      },
+      {
+        "page": 17,
+        "script": "provider6m-revision-pack-v6-v1.pine",
+        "attempt": 1,
+        "interval": "2",
+        "observed_utc": "2026-10-04T16:25:17.863Z",
+        "url": "https://www.tradingview.com/chart/xlvYwHdH/?symbol=BINANCE%3ABTCUSDT&interval=2",
+        "ticker": "BINANCE:BTCUSDT",
+        "timezone": "Etc/UTC",
+        "replay": false,
+        "title": "V11 requested6m revision pack",
+        "status": {
+          "type": 2
+        },
+        "study_first": {
+          "index": -24671,
+          "value": [
+            1788134400,
+            77740.01,
+            77740.01,
+            null,
+            null,
+            77682,
+            77827.99,
+            77572,
+            118.48272,
+            1788134400000,
+            1788134760000,
+            0,
+            1788134400000,
+            77740.01,
+            77740.01,
+            null,
+            null,
+            77682,
+            77827.99,
+            77572,
+            118.48272,
+            1788134400000,
+            1788134760000,
+            0,
+            1788134400000,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295,
+            1788134400000,
+            1788134520000,
+            0,
+            1791130897693
+          ]
+        },
+        "study_last": {
+          "index": 301,
+          "value": [
+            1791131040,
+            85235.37,
+            85235.37,
+            85249.32750000006,
+            85255.13091270172,
+            85235.37,
+            85235.38,
+            85235.37,
+            2.39575,
+            1791131040000,
+            1791131400000,
+            8324,
+            1788134400000,
+            85235.37,
+            85235.37,
+            85249.32750000006,
+            85255.13091270172,
+            85235.37,
+            85235.38,
+            85235.37,
+            2.39575,
+            1791131040000,
+            1791131400000,
+            8324,
+            1788134400000,
+            85235.37,
+            85235.38,
+            85235.37,
+            85235.37,
+            2.39575,
+            1791131040000,
+            1791131160000,
+            24972,
+            1791131117602
+          ]
+        },
+        "host_first": {
+          "index": -24671,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "host_last": {
+          "index": 301,
+          "value": [
+            1791131040,
+            85235.37,
+            85235.38,
+            85235.37,
+            85235.37,
+            2.39575
+          ]
+        },
+        "plots": [
+          {
+            "id": "plot_0",
+            "type": "line"
+          },
+          {
+            "id": "plot_1",
+            "type": "line"
+          },
+          {
+            "id": "plot_2",
+            "type": "line"
+          },
+          {
+            "id": "plot_3",
+            "type": "line"
+          },
+          {
+            "id": "plot_4",
+            "type": "line"
+          },
+          {
+            "id": "plot_5",
+            "type": "line"
+          },
+          {
+            "id": "plot_6",
+            "type": "line"
+          },
+          {
+            "id": "plot_7",
+            "type": "line"
+          },
+          {
+            "id": "plot_8",
+            "type": "line"
+          },
+          {
+            "id": "plot_9",
+            "type": "line"
+          },
+          {
+            "id": "plot_10",
+            "type": "line"
+          },
+          {
+            "id": "plot_11",
+            "type": "line"
+          },
+          {
+            "id": "plot_12",
+            "type": "line"
+          },
+          {
+            "id": "plot_13",
+            "type": "line"
+          },
+          {
+            "id": "plot_14",
+            "type": "line"
+          },
+          {
+            "id": "plot_15",
+            "type": "line"
+          },
+          {
+            "id": "plot_16",
+            "type": "line"
+          },
+          {
+            "id": "plot_17",
+            "type": "line"
+          },
+          {
+            "id": "plot_18",
+            "type": "line"
+          },
+          {
+            "id": "plot_19",
+            "type": "line"
+          },
+          {
+            "id": "plot_20",
+            "type": "line"
+          },
+          {
+            "id": "plot_21",
+            "type": "line"
+          },
+          {
+            "id": "plot_22",
+            "type": "line"
+          },
+          {
+            "id": "plot_23",
+            "type": "line"
+          },
+          {
+            "id": "plot_24",
+            "type": "line"
+          },
+          {
+            "id": "plot_25",
+            "type": "line"
+          },
+          {
+            "id": "plot_26",
+            "type": "line"
+          },
+          {
+            "id": "plot_27",
+            "type": "line"
+          },
+          {
+            "id": "plot_28",
+            "type": "line"
+          },
+          {
+            "id": "plot_29",
+            "type": "line"
+          },
+          {
+            "id": "plot_30",
+            "type": "line"
+          },
+          {
+            "id": "plot_31",
+            "type": "line"
+          },
+          {
+            "id": "plot_32",
+            "type": "line"
+          }
+        ],
+        "styles": {
+          "plot_0": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "htf6_gapsoff_clean"
+          },
+          "plot_1": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "htf6_gapsoff_hole"
+          },
+          "plot_10": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "htf6_gapsoff_INPUT_index"
+          },
+          "plot_11": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "htf6_gapsoff_INPUT_first_time"
+          },
+          "plot_12": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "htf6_gapson_clean"
+          },
+          "plot_13": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "htf6_gapson_hole"
+          },
+          "plot_14": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "htf6_gapson_sma4"
+          },
+          "plot_15": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "htf6_gapson_rma4"
+          },
+          "plot_16": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "htf6_gapson_INPUT_open"
+          },
+          "plot_17": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "htf6_gapson_INPUT_high"
+          },
+          "plot_18": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "htf6_gapson_INPUT_low"
+          },
+          "plot_19": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "htf6_gapson_INPUT_volume"
+          },
+          "plot_2": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "htf6_gapsoff_sma4"
+          },
+          "plot_20": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "htf6_gapson_INPUT_time"
+          },
+          "plot_21": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "htf6_gapson_INPUT_time_close"
+          },
+          "plot_22": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "htf6_gapson_INPUT_index"
+          },
+          "plot_23": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "htf6_gapson_INPUT_first_time"
+          },
+          "plot_24": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "CHART_open"
+          },
+          "plot_25": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "CHART_high"
+          },
+          "plot_26": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "CHART_low"
+          },
+          "plot_27": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "CHART_close"
+          },
+          "plot_28": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "CHART_volume"
+          },
+          "plot_29": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "CHART_time"
+          },
+          "plot_3": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "htf6_gapsoff_rma4"
+          },
+          "plot_30": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "CHART_time_close"
+          },
+          "plot_31": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "CHART_bar_index"
+          },
+          "plot_32": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "CHART_timenow"
+          },
+          "plot_4": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "htf6_gapsoff_INPUT_open"
+          },
+          "plot_5": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "htf6_gapsoff_INPUT_high"
+          },
+          "plot_6": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "htf6_gapsoff_INPUT_low"
+          },
+          "plot_7": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "htf6_gapsoff_INPUT_volume"
+          },
+          "plot_8": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "htf6_gapsoff_INPUT_time"
+          },
+          "plot_9": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "htf6_gapsoff_INPUT_time_close"
+          }
+        },
+        "tail": [
+          {
+            "native_index": 295,
+            "host": [
+              1791130320,
+              85259.37,
+              85259.38,
+              85259.37,
+              85259.37,
+              1.73761
+            ],
+            "study": [
+              1791130320,
+              85267.19,
+              85267.19,
+              85241.64500000005,
+              85270.50051146973,
+              85259.37,
+              85309.9,
+              85259.37,
+              18.76535,
+              1791130320000,
+              1791130680000,
+              8322,
+              1788134400000,
+              85267.19,
+              85267.19,
+              85241.64500000005,
+              85270.50051146973,
+              85259.37,
+              85309.9,
+              85259.37,
+              18.76535,
+              1791130320000,
+              1791130680000,
+              8322,
+              1788134400000,
+              85259.37,
+              85259.38,
+              85259.37,
+              85259.37,
+              1.73761,
+              1791130320000,
+              1791130440000,
+              24966,
+              1791130897806
+            ]
+          },
+          {
+            "native_index": 296,
+            "host": [
+              1791130440,
+              85259.38,
+              85296.01,
+              85259.37,
+              85296.01,
+              10.54402
+            ],
+            "study": [
+              1791130440,
+              85267.19,
+              85267.19,
+              85241.64500000005,
+              85270.50051146973,
+              85259.37,
+              85309.9,
+              85259.37,
+              18.76535,
+              1791130320000,
+              1791130680000,
+              8322,
+              1788134400000,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              85259.38,
+              85296.01,
+              85259.37,
+              85296.01,
+              10.54402,
+              1791130440000,
+              1791130560000,
+              24967,
+              1791130897806
+            ]
+          },
+          {
+            "native_index": 297,
+            "host": [
+              1791130560,
+              85296.01,
+              85309.9,
+              85267.19,
+              85267.19,
+              6.48372
+            ],
+            "study": [
+              1791130560,
+              85267.19,
+              85267.19,
+              85241.64500000005,
+              85270.50051146973,
+              85259.37,
+              85309.9,
+              85259.37,
+              18.76535,
+              1791130320000,
+              1791130680000,
+              8322,
+              1788134400000,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              85296.01,
+              85309.9,
+              85267.19,
+              85267.19,
+              6.48372,
+              1791130560000,
+              1791130680000,
+              24968,
+              1791130897806
+            ]
+          },
+          {
+            "native_index": 298,
+            "host": [
+              1791130680,
+              85267.2,
+              85270.01,
+              85267.19,
+              85270.01,
+              2.83217
+            ],
+            "study": [
+              1791130680,
+              85257.05,
+              85257.05,
+              85241.90500000006,
+              85267.13788360229,
+              85267.2,
+              85270.01,
+              85257.05,
+              6.36313,
+              1791130680000,
+              1791131040000,
+              8323,
+              1788134400000,
+              85257.05,
+              85257.05,
+              85241.90500000006,
+              85267.13788360229,
+              85267.2,
+              85270.01,
+              85257.05,
+              6.36313,
+              1791130680000,
+              1791131040000,
+              8323,
+              1788134400000,
+              85267.2,
+              85270.01,
+              85267.19,
+              85270.01,
+              2.83217,
+              1791130680000,
+              1791130800000,
+              24969,
+              1791130897806
+            ]
+          },
+          {
+            "native_index": 299,
+            "host": [
+              1791130800,
+              85270,
+              85270.01,
+              85234.85,
+              85234.86,
+              8.60397
+            ],
+            "study": [
+              1791130800,
+              85234.86,
+              85234.86,
+              85236.35750000006,
+              85261.59038360229,
+              85267.2,
+              85270.01,
+              85234.85,
+              11.4353,
+              1791130680000,
+              1791131040000,
+              8323,
+              1788134400000,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              85270,
+              85270.01,
+              85234.85,
+              85234.86,
+              8.60397,
+              1791130800000,
+              1791130920000,
+              24970,
+              1791130921273
+            ]
+          },
+          {
+            "native_index": 300,
+            "host": [
+              1791130920,
+              85234.85,
+              85235.38,
+              85208,
+              85235.37,
+              9.23643
+            ],
+            "study": [
+              1791130920,
+              85235.37,
+              85235.37,
+              85236.48500000006,
+              85261.7178836023,
+              85267.2,
+              85270.01,
+              85208,
+              20.67257,
+              1791130680000,
+              1791131040000,
+              8323,
+              1788134400000,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              85234.85,
+              85235.38,
+              85208,
+              85235.37,
+              9.23643,
+              1791130920000,
+              1791131040000,
+              24971,
+              1791131041336
+            ]
+          },
+          {
+            "native_index": 301,
+            "host": [
+              1791131040,
+              85235.37,
+              85235.38,
+              85235.37,
+              85235.37,
+              2.39575
+            ],
+            "study": [
+              1791131040,
+              85235.37,
+              85235.37,
+              85249.32750000006,
+              85255.13091270172,
+              85235.37,
+              85235.38,
+              85235.37,
+              2.39575,
+              1791131040000,
+              1791131400000,
+              8324,
+              1788134400000,
+              85235.37,
+              85235.37,
+              85249.32750000006,
+              85255.13091270172,
+              85235.37,
+              85235.38,
+              85235.37,
+              2.39575,
+              1791131040000,
+              1791131400000,
+              8324,
+              1788134400000,
+              85235.37,
+              85235.38,
+              85235.37,
+              85235.37,
+              2.39575,
+              1791131040000,
+              1791131160000,
+              24972,
+              1791131117602
+            ]
+          }
+        ]
+      },
+      {
+        "page": 16,
+        "script": "provider6m-direct-feed-v6-v1.pine",
+        "attempt": 1,
+        "interval": "6",
+        "observed_utc": "2026-10-04T16:25:18.113Z",
+        "url": "https://www.tradingview.com/chart/xlvYwHdH/?symbol=BINANCE%3ABTCUSDT&interval=6",
+        "ticker": "BINANCE:BTCUSDT",
+        "timezone": "Etc/UTC",
+        "replay": false,
+        "title": "V11 direct6m provider feed",
+        "status": {
+          "type": 2
+        },
+        "study_first": {
+          "index": -19784,
+          "value": [
+            1783900800,
+            63780,
+            64038,
+            63725.37,
+            63979.84,
+            116.44631,
+            1783900800000,
+            1783901160000,
+            0,
+            1791130840516,
+            1783900800000
+          ]
+        },
+        "study_last": {
+          "index": 300,
+          "value": [
+            1791131040,
+            85235.37,
+            85235.38,
+            85235.37,
+            85235.37,
+            2.39575,
+            1791131040000,
+            1791131400000,
+            20084,
+            1791131117535,
+            1783900800000
+          ]
+        },
+        "host_first": {
+          "index": -19784,
+          "value": [
+            1783900800,
+            63780,
+            64038,
+            63725.37,
+            63979.84,
+            116.44631
+          ]
+        },
+        "host_last": {
+          "index": 300,
+          "value": [
+            1791131040,
+            85235.37,
+            85235.38,
+            85235.37,
+            85235.37,
+            2.39575
+          ]
+        },
+        "plots": [
+          {
+            "id": "plot_0",
+            "type": "line"
+          },
+          {
+            "id": "plot_1",
+            "type": "line"
+          },
+          {
+            "id": "plot_2",
+            "type": "line"
+          },
+          {
+            "id": "plot_3",
+            "type": "line"
+          },
+          {
+            "id": "plot_4",
+            "type": "line"
+          },
+          {
+            "id": "plot_5",
+            "type": "line"
+          },
+          {
+            "id": "plot_6",
+            "type": "line"
+          },
+          {
+            "id": "plot_7",
+            "type": "line"
+          },
+          {
+            "id": "plot_8",
+            "type": "line"
+          },
+          {
+            "id": "plot_9",
+            "type": "line"
+          }
+        ],
+        "styles": {
+          "plot_0": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "FEED_open"
+          },
+          "plot_1": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "FEED_high"
+          },
+          "plot_2": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "FEED_low"
+          },
+          "plot_3": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "FEED_close"
+          },
+          "plot_4": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "FEED_volume"
+          },
+          "plot_5": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "FEED_time"
+          },
+          "plot_6": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "FEED_time_close"
+          },
+          "plot_7": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "FEED_bar_index"
+          },
+          "plot_8": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "FEED_timenow"
+          },
+          "plot_9": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "FEED_first_time"
+          }
+        },
+        "tail": [
+          {
+            "native_index": 294,
+            "host": [
+              1791128880,
+              85342.78,
+              85398.33,
+              85340.58,
+              85340.59,
+              31.27351
+            ],
+            "study": [
+              1791128880,
+              85342.78,
+              85398.33,
+              85340.58,
+              85340.59,
+              31.27351,
+              1791128880000,
+              1791129240000,
+              20078,
+              1791130840529,
+              1783900800000
+            ]
+          },
+          {
+            "native_index": 295,
+            "host": [
+              1791129240,
+              85340.58,
+              85340.59,
+              85256,
+              85256.01,
+              13.82761
+            ],
+            "study": [
+              1791129240,
+              85340.58,
+              85340.59,
+              85256,
+              85256.01,
+              13.82761,
+              1791129240000,
+              1791129600000,
+              20079,
+              1791130840529,
+              1783900800000
+            ]
+          },
+          {
+            "native_index": 296,
+            "host": [
+              1791129600,
+              85256.01,
+              85263.91,
+              85178.49,
+              85184,
+              34.09316
+            ],
+            "study": [
+              1791129600,
+              85256.01,
+              85263.91,
+              85178.49,
+              85184,
+              34.09316,
+              1791129600000,
+              1791129960000,
+              20080,
+              1791130840529,
+              1783900800000
+            ]
+          },
+          {
+            "native_index": 297,
+            "host": [
+              1791129960,
+              85184.01,
+              85295.3,
+              85184,
+              85259.38,
+              23.30053
+            ],
+            "study": [
+              1791129960,
+              85184.01,
+              85295.3,
+              85184,
+              85259.38,
+              23.30053,
+              1791129960000,
+              1791130320000,
+              20081,
+              1791130840529,
+              1783900800000
+            ]
+          },
+          {
+            "native_index": 298,
+            "host": [
+              1791130320,
+              85259.37,
+              85309.9,
+              85259.37,
+              85267.19,
+              18.76535
+            ],
+            "study": [
+              1791130320,
+              85259.37,
+              85309.9,
+              85259.37,
+              85267.19,
+              18.76535,
+              1791130320000,
+              1791130680000,
+              20082,
+              1791130840529,
+              1783900800000
+            ]
+          },
+          {
+            "native_index": 299,
+            "host": [
+              1791130680,
+              85267.2,
+              85270.01,
+              85208,
+              85235.37,
+              20.67257
+            ],
+            "study": [
+              1791130680,
+              85267.2,
+              85270.01,
+              85208,
+              85235.37,
+              20.67257,
+              1791130680000,
+              1791131040000,
+              20083,
+              1791131041336,
+              1783900800000
+            ]
+          },
+          {
+            "native_index": 300,
+            "host": [
+              1791131040,
+              85235.37,
+              85235.38,
+              85235.37,
+              85235.37,
+              2.39575
+            ],
+            "study": [
+              1791131040,
+              85235.37,
+              85235.38,
+              85235.37,
+              85235.37,
+              2.39575,
+              1791131040000,
+              1791131400000,
+              20084,
+              1791131117535,
+              1783900800000
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "context": {
+    "page": 17,
+    "script": "provider6m-revision-pack-v6-v1.pine",
+    "attempt": 1,
+    "interval": "2"
+  },
+  "environment": {
+    "browser_utc": "2026-10-04T16:25:19.869Z",
+    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+    "platform": "MacIntel",
+    "user_agent_data": {
+      "architecture": "arm",
+      "bitness": "64",
+      "brands": [
+        {
+          "brand": "Not:A-Brand",
+          "version": "8"
+        },
+        {
+          "brand": "Chromium",
+          "version": "156"
+        },
+        {
+          "brand": "Google Chrome",
+          "version": "156"
+        }
+      ],
+      "fullVersionList": [
+        {
+          "brand": "Not:A-Brand",
+          "version": "8.0.0.0"
+        },
+        {
+          "brand": "Chromium",
+          "version": "156.0.8075.0"
+        },
+        {
+          "brand": "Google Chrome",
+          "version": "156.0.8075.0"
+        }
+      ],
+      "mobile": false,
+      "platform": "macOS",
+      "platformVersion": "27.2.0"
+    },
+    "device_pixel_ratio": 2,
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "visual_viewport_scale": 1
+    },
+    "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v11 batch; visualViewport scale recorded independently.",
+    "tradingview_build": null,
+    "tradingview_script_urls": [
+      "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+      "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+      "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+      "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+      "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+      "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+      "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+      "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+      "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+      "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+      "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+      "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+    ],
+    "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+  },
+  "ui_snapshot": "## Latest page snapshot\nuid=7877_0 RootWebArea \"BTCUSDT 85,235.37 ▲ +0.57% basic\" url=\"https://www.tradingview.com/chart/xlvYwHdH/?symbol=BINANCE%3ABTCUSDT&interval=2\"\n  uid=7877_1 button \"Logged in as sours-lat Active layout: basic\" haspopup=\"menu\"\n  uid=7877_2 StaticText \"11\"\n  uid=7877_3 button \"BTCUSDT\" description=\"Symbol search\"\n  uid=7877_4 button \"Switch data type\"\n  uid=7877_5 button \"Compare symbols\" haspopup=\"dialog\"\n  uid=7877_6 radio \"3 minutes\"\n  uid=7877_7 radio \"5 minutes\"\n  uid=7877_8 radio \"15 minutes\"\n  uid=7877_9 radio \"30 minutes\"\n  uid=7877_10 radio \"45 minutes\"\n  uid=7877_11 radio \"1 hour\"\n  uid=7877_12 radio \"2 hours\"\n  uid=7877_13 radio \"3 hours\"\n  uid=7877_14 radio \"4 hours\"\n  uid=7877_15 radio \"8 hours\"\n  uid=7877_16 radio \"10 hours\"\n  uid=7877_17 radio \"12 hours\"\n  uid=7877_18 radio \"1 day\"\n  uid=7877_19 radio \"3 days\"\n  uid=7877_20 radio \"10 days\"\n  uid=7877_21 radio \"1 week\"\n  uid=7877_22 radio \"1 month\"\n  uid=7877_23 radio \"2 minutes\" checked\n  uid=7877_24 button \"Chart interval\" haspopup=\"menu\"\n  uid=7877_25 radio \"Candles\" checked\n  uid=7877_26 radio \"Line\"\n  uid=7877_27 radio \"High-low\"\n  uid=7877_28 button \"Bar's style\" haspopup=\"menu\"\n  uid=7877_29 button \"Indicators, metrics, and strategies\"\n  uid=7877_30 button \"Favorite indicators\" haspopup=\"menu\"\n  uid=7877_31 button \"Indicator templates\" haspopup=\"menu\"\n  uid=7877_32 button \"Create alert\"\n  uid=7877_33 button \"Bar replay\"\n  uid=7877_34 button disableable disabled\n  uid=7877_35 button disableable disabled\n  uid=7877_36 button \"Layout setup\" haspopup=\"menu\"\n  uid=7877_37 button \"All changes saved\" disableable disabled\n  uid=7877_38 button \"Manage layouts\" haspopup=\"menu\"\n  uid=7877_39 button \"Quick search\"\n  uid=7877_40 button \"Settings\"\n  uid=7877_41 button \"Fullscreen mode\"\n  uid=7877_42 button \"Take a snapshot\" haspopup=\"menu\"\n  uid=7877_43 button \"Share your idea with the trade community\" haspopup=\"menu\"\n  uid=7877_44 button \"Trade\"\n  uid=7877_45 button \"Cross\"\n  uid=7877_46 button \"Cursors\" pressed\n  uid=7877_47 button \"Trendline\"\n  uid=7877_48 button \"Trend tools\"\n  uid=7877_49 button \"Fib retracement\"\n  uid=7877_50 button \"Gann and Fibonacci tools\"\n  uid=7877_51 button \"XABCD pattern\"\n  uid=7877_52 button \"Patterns\"\n  uid=7877_53 button \"Long position\"\n  uid=7877_54 button \"Forecasting and measurement tools\"\n  uid=7877_55 button \"Brush\"\n  uid=7877_56 button \"Geometric shapes\"\n  uid=7877_57 button \"Text\"\n  uid=7877_58 button \"Annotation tools\"\n  uid=7877_59 button \"Icon\"\n  uid=7877_60 button \"Icons\"\n  uid=7877_61 button \"Measure\"\n  uid=7877_62 button \"Zoom in\"\n  uid=7877_63 button \"Magnet mode snaps drawings placed near price bars to the closest OHLC value\" pressed\n  uid=7877_64 button \"Magnets\" pressed\n  uid=7877_65 button \"Keep drawing\"\n  uid=7877_66 button \"Lock drawings and indicators\"\n  uid=7877_67 button \"Lock options\"\n  uid=7877_68 button \"Hide all drawings, indicators, positions, and orders\"\n  uid=7877_69 button \"Hide options\"\n  uid=7877_70 button \"New drawings will not be synced\"\n  uid=7877_71 button \"Sync drawings options\"\n  uid=7877_72 button \"Remove objects\"\n  uid=7877_73 button \"Remove options\"\n  uid=7877_74 button \"Show Favorite Drawing Tools Toolbar\"\n  uid=7877_75 region \"Chart #1\"\n    uid=7877_76 StaticText \"B\"\n    uid=7877_77 button \"Change symbol\"\n    uid=7877_78 StaticText \"·\"\n    uid=7877_79 button \"Change interval\"\n    uid=7877_78 StaticText \"·\"\n    uid=7877_80 StaticText \"Binance\"\n    uid=7877_81 button \"Unflag symbol\"\n    uid=7877_82 button \"More\" description=\"More\"\n    uid=7877_83 button \"Market open\"\n    uid=7877_84 StaticText \"O\"\n    uid=7877_85 StaticText \"85,235.37\"\n    uid=7877_86 StaticText \"H\"\n    uid=7877_87 StaticText \"85,235.38\"\n    uid=7877_88 StaticText \"L\"\n    uid=7877_89 StaticText \"85,235.37\"\n    uid=7877_90 StaticText \"C\"\n    uid=7877_91 StaticText \"85,235.37\"\n    uid=7877_92 StaticText \"0.00 (0.00%)\"\n    uid=7877_93 StaticText \"85,235.37\"\n    uid=7915_0 StaticText \"SELL\"\n    uid=7877_95 StaticText \"0.01\"\n    uid=7877_96 StaticText \"85,235.38\"\n    uid=7915_1 StaticText \"BUY\"\n    uid=7877_98 Canvas \"Chart for BINANCE:BTCUSDT, 2 minutes\"\n    uid=7877_99 StaticText \"V11 requested6m revision pack\"\n    uid=7877_100 button \"Hide\" description=\"Hide\"\n    uid=7877_101 button \"Settings\" description=\"Settings\"\n    uid=7877_102 button \"Remove\" description=\"Remove\"\n    uid=7877_103 button \"More\" description=\"More\"\n  uid=7877_104 button \"1 day in 1 minute intervals\"\n  uid=7877_105 button \"5 days in 5 minutes intervals\"\n  uid=7877_106 button \"1 month in 30 minutes intervals\"\n  uid=7877_107 button \"3 months in 1 hour intervals\"\n  uid=7877_108 button \"6 months in 2 hours intervals\"\n  uid=7877_109 button \"Year to day in 1 day intervals\"\n  uid=7877_110 button \"1 year in 1 day intervals\"\n  uid=7877_111 button \"5 years in 1 week intervals\"\n  uid=7877_112 button \"All data in 1 month intervals\"\n  uid=7877_113 button \"Go to\"\n  uid=7877_114 button \"Timezone\"\n  uid=7877_115 button \"Watchlist, details, and news\"\n  uid=7877_116 button \"Alerts\"\n  uid=7877_117 button \"Object tree and data window\" pressed\n  uid=7877_118 button \"AI Copilot\"\n  uid=7877_119 button \"Screeners\"\n  uid=7877_120 button \"Pine\"\n  uid=7877_121 button \"Calendars\"\n  uid=7877_122 button \"Community\"\n  uid=7877_123 button \"Notifications\"\n  uid=7877_124 button \"Chats\"\n  uid=7877_125 button \"Products\" haspopup=\"menu\"\n  uid=7877_126 button \"Help Center\"\n  uid=7917_0 tab \"Object tree\" selectable\n  uid=7917_1 tab \"Data window\" selectable selected\n  uid=7917_2 generic disableable disabled\n    uid=7917_3 StaticText \"Date\"\n    uid=7917_4 StaticText \"Sun 04 Oct '26\"\n    uid=7917_5 StaticText \"Time\"\n    uid=7917_6 StaticText \"16:24\"\n  uid=7917_7 row \"BTCUSDT · 2 · Binance Open 85,235.37 High 85,235.38 Low 85,235.37 Close 85,235.37 Change 0.00 (0.00%) Vol 2.42 Last day change +481.81 (+0.57%)\"\n    uid=7917_8 StaticText \"BTCUSDT · 2 · Binance\"\n    uid=7917_9 button \"Hide data\"\n    uid=7917_10 StaticText \"Open\"\n    uid=7917_11 StaticText \"85,235.37\"\n    uid=7917_12 StaticText \"High\"\n    uid=7917_13 StaticText \"85,235.38\"\n    uid=7917_14 StaticText \"Low\"\n    uid=7917_15 StaticText \"85,235.37\"\n    uid=7917_16 StaticText \"Close\"\n    uid=7917_17 StaticText \"85,235.37\"\n    uid=7917_18 StaticText \"Change\"\n    uid=7917_19 StaticText \"0.00 (0.00%)\"\n    uid=7917_20 StaticText \"Vol\"\n    uid=7917_21 StaticText \"2.42\"\n    uid=7917_22 StaticText \"Last day change\"\n    uid=7917_23 StaticText \"+481.81 (+0.57%)\"\n  uid=7917_24 row \"V11 requested6m revision pack htf6_gapsoff_clean 85,235.370000000000 htf6_gapsoff_hole 85,235.370000000000 htf6_gapsoff_sma4 85,249.327500000064 htf6_gapsoff_rma4 85,255.130912701712 htf6_gapsoff_INPUT_open 85,235.370000000000 htf6_gapsoff_INPUT_high 85,235.380000000000 htf6_gapsoff_INPUT_low 85,235.370000000000 htf6_gapsoff_INPUT_volume 2.417020000000 htf6_gapsoff_INPUT_time 1,791,131,040,000.000000000000 htf6_gapsoff_INPUT_time_close 1,791,131,400,000.000000000000 htf6_gapsoff_INPUT_index 8,324.000000000000 htf6_gapsoff_INPUT_first_time 1,788,134,400,000.000000000000 htf6_gapson_clean 85,235.370000000000 htf6_gapson_hole 85,235.370000000000 htf6_gapson_sma4 85,249.327500000064 htf6_gapson_rma4 85,255.130912701712 htf6_gapson_INPUT_open 85,235.370000000000 htf6_gapson_INPUT_high 85,235.380000000000 htf6_gapson_INPUT_low 85,235.370000000000\"\n    uid=7917_25 StaticText \"V11 requested6m revision pack\"\n    uid=7917_26 button \"Hide data\"\n    uid=7917_27 StaticText \"htf6_gapsoff_clean\"\n    uid=7917_28 StaticText \"85,235.370000000000\"\n    uid=7917_29 StaticText \"htf6_gapsoff_hole\"\n    uid=7917_30 StaticText \"85,235.370000000000\"\n    uid=7917_31 StaticText \"htf6_gapsoff_sma4\"\n    uid=7917_32 StaticText \"85,249.327500000064\"\n    uid=7917_33 StaticText \"htf6_gapsoff_rma4\"\n    uid=7917_34 StaticText \"85,255.130912701712\"\n    uid=7917_35 StaticText \"htf6_gapsoff_INPUT_open\"\n    uid=7917_36 StaticText \"85,235.370000000000\"\n    uid=7917_37 StaticText \"htf6_gapsoff_INPUT_high\"\n    uid=7917_38 StaticText \"85,235.380000000000\"\n    uid=7917_39 StaticText \"htf6_gapsoff_INPUT_low\"\n    uid=7917_40 StaticText \"85,235.370000000000\"\n    uid=7917_41 StaticText \"htf6_gapsoff_INPUT_volume\"\n    uid=7917_42 StaticText \"2.417020000000\"\n    uid=7917_43 StaticText \"htf6_gapsoff_INPUT_time\"\n    uid=7917_44 StaticText \"1,791,131,040,000.000000000000\"\n    uid=7917_45 StaticText \"htf6_gapsoff_INPUT_time_close\"\n    uid=7917_46 StaticText \"1,791,131,400,000.000000000000\"\n    uid=7917_47 StaticText \"htf6_gapsoff_INPUT_index\"\n    uid=7917_48 StaticText \"8,324.000000000000\"\n    uid=7917_49 StaticText \"htf6_gapsoff_INPUT_first_time\"\n    uid=7917_50 StaticText \"1,788,134,400,000.000000000000\"\n    uid=7917_51 StaticText \"htf6_gapson_clean\"\n    uid=7917_52 StaticText \"85,235.370000000000\"\n    uid=7917_53 StaticText \"htf6_gapson_hole\"\n    uid=7917_54 StaticText \"85,235.370000000000\"\n    uid=7917_55 StaticText \"htf6_gapson_sma4\"\n    uid=7917_56 StaticText \"85,249.327500000064\"\n    uid=7917_57 StaticText \"htf6_gapson_rma4\"\n    uid=7917_58 StaticText \"85,255.130912701712\"\n    uid=7917_59 StaticText \"htf6_gapson_INPUT_open\"\n    uid=7917_60 StaticText \"85,235.370000000000\"\n    uid=7917_61 StaticText \"htf6_gapson_INPUT_high\"\n    uid=7917_62 StaticText \"85,235.380000000000\"\n    uid=7917_63 StaticText \"htf6_gapson_INPUT_low\"\n    uid=7917_64 StaticText \"85,235.370000000000\"\n    uid=7917_65 StaticText \"htf6_gapson_INPUT_volume\"\n    uid=7917_66 StaticText \"2.417020000000\"\n    uid=7917_67 StaticText \"htf6_gapson_INPUT_time\"\n    uid=7917_68 StaticText \"1,791,131,040,000.000000000000\"\n    uid=7917_69 StaticText \"htf6_gapson_INPUT_time_close\"\n    uid=7917_70 StaticText \"1,791,131,400,000.000000000000\"\n    uid=7917_71 StaticText \"htf6_gapson_INPUT_index\"\n    uid=7917_72 StaticText \"8,324.000000000000\"\n    uid=7917_73 StaticText \"htf6_gapson_INPUT_first_time\"\n    uid=7917_74 StaticText \"1,788,134,400,000.000000000000\"\n    uid=7917_75 StaticText \"CHART_open\"\n    uid=7917_76 StaticText \"85,235.370000000000\"\n    uid=7917_77 StaticText \"CHART_high\"\n    uid=7917_78 StaticText \"85,235.380000000000\"\n    uid=7917_79 StaticText \"CHART_low\"\n    uid=7917_80 StaticText \"85,235.370000000000\"\n    uid=7917_81 StaticText \"CHART_close\"\n    uid=7917_82 StaticText \"85,235.370000000000\"\n    uid=7917_83 StaticText \"CHART_volume\"\n    uid=7917_84 StaticText \"2.417020000000\"\n    uid=7917_85 StaticText \"CHART_time\"\n    uid=7917_86 StaticText \"1,791,131,040,000.000000000000\"\n    uid=7917_87 StaticText \"CHART_time_close\"\n    uid=7917_88 StaticText \"1,791,131,160,000.000000000000\"\n    uid=7917_89 StaticText \"CHART_bar_index\"\n    uid=7917_90 StaticText \"24,972.000000000000\"\n    uid=7917_91 StaticText \"CHART_timenow\"\n    uid=7917_92 StaticText \"1,791,131,119,809.000000000000\"\n  uid=7877_127 generic \"Trading panel\"\n    uid=7877_128 generic\n  uid=7877_129 generic live=\"polite\" relevant=\"additions\"\n  uid=7877_130 generic live=\"polite\" relevant=\"additions\"\n  uid=7877_131 generic live=\"assertive\" relevant=\"additions\"\n  uid=7877_132 generic live=\"assertive\" relevant=\"additions\"\n  uid=7877_133 generic live=\"polite\" relevant=\"additions text\"\n  uid=7877_134 log live=\"polite\" relevant=\"additions text\"\n  uid=7877_135 log live=\"polite\" relevant=\"additions text\"\n  uid=7877_136 log live=\"polite\" relevant=\"additions text\"\n  uid=7877_137 log live=\"polite\" relevant=\"additions text\"\n  uid=7877_138 log live=\"polite\" relevant=\"additions text\"\n  uid=7877_139 log live=\"polite\" relevant=\"additions text\"\n  uid=7877_140 log live=\"polite\" relevant=\"additions text\"\n  uid=7877_141 log live=\"polite\" relevant=\"additions text\"\n  uid=7877_142 log live=\"polite\" relevant=\"additions text\"\n  uid=7877_143 log live=\"polite\" relevant=\"additions text\"\n  uid=7877_144 log live=\"polite\" relevant=\"additions text\"\n  uid=7877_145 log live=\"polite\" relevant=\"additions text\"\n  uid=7877_146 log live=\"polite\" relevant=\"additions text\"\n  uid=7877_147 log live=\"polite\" relevant=\"additions text\"\n  uid=7877_148 log live=\"polite\" relevant=\"additions text\"\n  uid=7877_149 log live=\"polite\" relevant=\"additions text\"\n  uid=7877_150 log live=\"polite\" relevant=\"additions text\"\n  uid=7877_151 log live=\"polite\" relevant=\"additions text\"\n  uid=7877_152 log live=\"polite\" relevant=\"additions text\"\n  uid=7877_153 log live=\"polite\" relevant=\"additions text\"\n  uid=7877_154 log live=\"polite\" relevant=\"additions text\"\n",
+  "limits": "Each native chart is observed at its own returned UTC. Readings are acquired concurrently but browser/worker ticks are not assumed atomic or identical."
+}

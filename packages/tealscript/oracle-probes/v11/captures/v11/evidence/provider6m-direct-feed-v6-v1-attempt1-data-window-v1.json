@@ -1,0 +1,38 @@
+{
+  "index": 298,
+  "bar": [
+    1791130320,
+    85259.37,
+    85309.9,
+    85259.37,
+    85267.19,
+    18.76535
+  ],
+  "source_row": [
+    1791130320,
+    85259.37,
+    85309.9,
+    85259.37,
+    85267.19,
+    18.76535,
+    1791130320000,
+    1791130680000,
+    20082,
+    1791130840529,
+    1783900800000
+  ],
+  "browser_utc": "2026-10-04T16:20:55.884Z",
+  "title": "V11 direct6m provider feed",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   16:12",
+  "visible_range": {
+    "_firstBar": 263,
+    "_lastBar": 301
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}
