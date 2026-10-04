@@ -1,0 +1,366 @@
+{
+  "schemaVersion": 1,
+  "artifact": "bundle-manifest-v8",
+  "bundle": "v10",
+  "version": 8,
+  "status": "FROZEN",
+  "frozen": true,
+  "lock": "/home/sam/.cache/fleet-tmp/v3-bundle.lock",
+  "scope": "Drawn indicators only; no strategy declarations/calls. Native outcomes remain unspecified until exact-source capture.",
+  "chart": {
+    "symbol": "BINANCE:BTCUSDT",
+    "timeframe": "2",
+    "timezone": "UTC",
+    "type": "standard candles"
+  },
+  "scriptCount": 13,
+  "counts": {
+    "sources": 13,
+    "instructions": 13
+  },
+  "scripts": [
+    {
+      "probe": "input-generic-computed-source-v5-v1.pine",
+      "path": "input-generic-computed-source-v5-v1.pine",
+      "sourceSHA256": "acf96853695ed7f29f4bd473a258e9dfea7e1e3c0ffb69b0a10cf534196aee23",
+      "sourceSha256": "acf96853695ed7f29f4bd473a258e9dfea7e1e3c0ffb69b0a10cf534196aee23",
+      "owner": "codex-g6qooy",
+      "captureRecipient": "codex-6y3sjh",
+      "pineVersion": 5,
+      "rowIds": [
+        "native-v4-input-owner-hold"
+      ],
+      "question": "Does v5 generic input(close*2,...) compile or refuse? Native CE10212 currently settles only v6.",
+      "captureGroup": "outcome",
+      "captureKind": "OUTCOME-AND-NUMERIC-CSV",
+      "originalCaptureKind": "compile-or-error",
+      "nativeStatus": "UNOBSERVED",
+      "minimumHistoryBars": 10,
+      "instructions": "instructions/input-generic-computed-source-v5-v1.md",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED",
+        "columns": {}
+      },
+      "limits": "Compilation outcome only; does not certify all computed forms or v3/v4."
+    },
+    {
+      "probe": "input-generic-source-metadata-v5-v1.pine",
+      "path": "input-generic-source-metadata-v5-v1.pine",
+      "sourceSHA256": "43e3b883d20d2aac3170536afd3b661268ac95c52faca5f2153f7c4767e609c4",
+      "sourceSha256": "43e3b883d20d2aac3170536afd3b661268ac95c52faca5f2153f7c4767e609c4",
+      "owner": "codex-g6qooy",
+      "captureRecipient": "codex-6y3sjh",
+      "pineVersion": 5,
+      "rowIds": [
+        "native-v4-input-owner-hold"
+      ],
+      "question": "What are v5 generic source input inline/group/tooltip positions? The v6 native source5645 settles only v6.",
+      "captureGroup": "outcome",
+      "captureKind": "OUTCOME-AND-NUMERIC-CSV",
+      "originalCaptureKind": "compile-or-error",
+      "nativeStatus": "UNOBSERVED",
+      "minimumHistoryBars": 10,
+      "instructions": "instructions/input-generic-source-metadata-v5-v1.md",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED",
+        "columns": {}
+      },
+      "limits": "Generic input(close,...) only; typed input.source is a separate overload. Capture definition fields and UI evidence, not just numeric CSV."
+    },
+    {
+      "probe": "input-generic-bare-volume-v6-v1.pine",
+      "path": "input-generic-bare-volume-v6-v1.pine",
+      "sourceSHA256": "76040577a1a98568306699adf575323cd9511743bbf1adb9ac7fef0d40e847d3",
+      "sourceSha256": "76040577a1a98568306699adf575323cd9511743bbf1adb9ac7fef0d40e847d3",
+      "owner": "codex-g6qooy",
+      "captureRecipient": "codex-6y3sjh",
+      "pineVersion": 6,
+      "rowIds": [
+        "native-v4-input-owner-hold"
+      ],
+      "question": "Does v6 generic input(volume,...) compile or refuse? Existing v56:384 admission is retained; close*2 refusal does not settle bare volume.",
+      "captureGroup": "outcome",
+      "captureKind": "OUTCOME-AND-NUMERIC-CSV",
+      "originalCaptureKind": "compile-or-error",
+      "nativeStatus": "UNOBSERVED",
+      "minimumHistoryBars": 10,
+      "instructions": "instructions/input-generic-bare-volume-v6-v1.md",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED",
+        "columns": {}
+      },
+      "limits": "Bare volume compile admission only. OUTCOME intentionally uses close so a missing volume feed cannot masquerade as a refusal."
+    },
+    {
+      "probe": "tuple-udf-64-plus63-v6-v1.pine",
+      "path": "tuple-udf-64-plus63-v6-v1.pine",
+      "sourceSHA256": "0bdcb58b48f9604aca0c597ea7992096b194deda63ceffa776dbcde39c3f530e",
+      "sourceSha256": "0bdcb58b48f9604aca0c597ea7992096b194deda63ceffa776dbcde39c3f530e",
+      "owner": "codex-p4250m",
+      "captureRecipient": "codex-6y3sjh",
+      "pineVersion": 6,
+      "rowIds": [
+        "packet012:UDF-tuple-accounting",
+        "corpus:v7:357",
+        "corpus:v7:387",
+        "corpus:v7:388"
+      ],
+      "question": "Adjudicate UDF returned tuple accounting and compiler/runtime error phase before promoting the broadened127 guard. Both plots consume every element, avoiding unused-value ambiguity. Corpus sources357/387/388 remain unadjudicated; this minimal probe is not whole-source proof.",
+      "captureKind": "OUTCOME-AND-NUMERIC-CSV",
+      "nativeStatus": "UNOBSERVED",
+      "minimumHistoryBars": 4,
+      "instructions": "instructions/tuple-udf-64-plus63-v6-v1.md",
+      "outputs": [
+        "a sum",
+        "b sum"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED",
+        "columns": {}
+      },
+      "limits": "Minimal UDF returned tuple accounting only; full corpus sources and unused-value behavior remain unadjudicated."
+    },
+    {
+      "probe": "tuple-udf-64-plus64-v6-v1.pine",
+      "path": "tuple-udf-64-plus64-v6-v1.pine",
+      "sourceSHA256": "7d0f86049693210a22628f71ee8a248c4287d982fb16499c2334306778eb74ea",
+      "sourceSha256": "7d0f86049693210a22628f71ee8a248c4287d982fb16499c2334306778eb74ea",
+      "owner": "codex-p4250m",
+      "captureRecipient": "codex-6y3sjh",
+      "pineVersion": 6,
+      "rowIds": [
+        "packet012:UDF-tuple-accounting",
+        "corpus:v7:357",
+        "corpus:v7:387",
+        "corpus:v7:388"
+      ],
+      "question": "Adjudicate UDF returned tuple accounting and compiler/runtime error phase before promoting the broadened127 guard. Both plots consume every element, avoiding unused-value ambiguity. Corpus sources357/387/388 remain unadjudicated; this minimal probe is not whole-source proof.",
+      "captureKind": "OUTCOME-AND-NUMERIC-CSV",
+      "nativeStatus": "UNOBSERVED",
+      "minimumHistoryBars": 4,
+      "instructions": "instructions/tuple-udf-64-plus64-v6-v1.md",
+      "outputs": [
+        "a sum",
+        "b sum"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED",
+        "columns": {}
+      },
+      "limits": "Minimal UDF returned tuple accounting only; full corpus sources and unused-value behavior remain unadjudicated."
+    },
+    {
+      "probe": "plot-magnitude-cutoff-signed-v6-v1.pine",
+      "path": "plot-magnitude-cutoff-signed-v6-v1.pine",
+      "sourceSHA256": "864e406f04f713e7ecaa790d3090188b81239cb5c75abba13b1e76170d72d3b7",
+      "sourceSha256": "864e406f04f713e7ecaa790d3090188b81239cb5c75abba13b1e76170d72d3b7",
+      "owner": "codex-6y3sjh",
+      "captureRecipient": "codex-6y3sjh",
+      "pineVersion": 6,
+      "rowIds": [
+        "native:plot-magnitude-gap-threshold"
+      ],
+      "question": "At which of the sampled positive/negative magnitudes between9.26e99 and1.000001e100 does TradingView suppress plot output or glyphs, including9.27e99,9.9e99,9.99e99 and exact1.0e100?",
+      "captureKind": "SCREENSHOT-AND-OUTCOME-AND-NUMERIC-CSV",
+      "nativeStatus": "UNOBSERVED",
+      "minimumHistoryBars": 156,
+      "instructions": "instructions/plot-magnitude-cutoff-signed-v6-v1.md",
+      "caseCycle": 26,
+      "outputs": [
+        "Raw signed magnitude",
+        "Magnitude scaled by 1e99",
+        "Source is NA",
+        "Magnitude case index",
+        "Input bar index"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED",
+        "columns": {}
+      },
+      "limits": "Bracketed plot presence only; CSV missingness, readout and rendered glyphs recorded separately. Explicit NA and scaled controls prevent missing-source inference. No universal storage threshold/version or sign-symmetry claim."
+    },
+    {
+      "probe": "nvi-formula-holes-magnitude-v6-v1.pine",
+      "path": "nvi-formula-holes-magnitude-v6-v1.pine",
+      "sourceSHA256": "13ef354f125e70dc1e96565fcb9aa973d0c3e5136e499420bb55c9d2276faee2",
+      "sourceSha256": "13ef354f125e70dc1e96565fcb9aa973d0c3e5136e499420bb55c9d2276faee2",
+      "owner": "codex-be9795",
+      "stagingOwner": "codex-6y3sjh",
+      "captureRecipient": "codex-6y3sjh",
+      "pineVersion": 6,
+      "rowIds": [
+        "native:coverage-register-ta-1-v1.pine:29:nvi_na_synthetic_doc",
+        "native:coverage-register-ta-1-v1.pine:30:nvi_na_synthetic_legacy"
+      ],
+      "question": "Do the captured synthetic NVI formula controls become genuinely missing, or only lose raw plot/readout output as their finite magnitudes grow? Preserve both formula bodies and original64-bar inputs.",
+      "captureKind": "SCREENSHOT-AND-OUTCOME-AND-NUMERIC-CSV",
+      "nativeStatus": "UNOBSERVED",
+      "minimumHistoryBars": 24000,
+      "instructions": "instructions/nvi-formula-holes-magnitude-v6-v1.md",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED",
+        "columns": {}
+      },
+      "limits": "Copied captured v2 formula controls; no native builtin arithmetic claim. Magnitude bracket has a separate signed v10 probe."
+    },
+    {
+      "probe": "corpus-framework-exact-v5-v1.pine",
+      "path": "corpus-framework-exact-v5-v1.pine",
+      "sourceSHA256": "02b9dcd04cd5ea2990297dd7d216f00f294ed2fa7c745489a58a0bd8492c82ce",
+      "sourceSha256": "02b9dcd04cd5ea2990297dd7d216f00f294ed2fa7c745489a58a0bd8492c82ce",
+      "owner": "codex-776dnu",
+      "stagingOwner": "codex-6y3sjh",
+      "captureRecipient": "codex-6y3sjh",
+      "pineVersion": 5,
+      "rowIds": [
+        "corpus:v56:475",
+        "corpus:v56:1225"
+      ],
+      "question": "Does the exact published/corpus Unit Testing Framework source compile and complete natively, or reach an array index-1 error? Source identical for475/1225.",
+      "captureKind": "SCREENSHOT-AND-OUTCOME",
+      "nativeStatus": "UNOBSERVED",
+      "minimumHistoryBars": 64,
+      "instructions": "instructions/corpus-framework-exact-v5-v1.md",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED",
+        "columns": {}
+      },
+      "limits": "Full source preserves original native runtime path; reduced v8 probes remain independent rule controls. Earlier compiled publication is not fresh editor/runtime evidence."
+    },
+    {
+      "probe": "sort-v56-815-exact-v5-v1.pine",
+      "path": "sort-v56-815-exact-v5-v1.pine",
+      "sourceSHA256": "a8193da177a20a6d127b90a9cae826152ca53f601c69bbdcbbe2608b6b553263",
+      "sourceSha256": "a8193da177a20a6d127b90a9cae826152ca53f601c69bbdcbbe2608b6b553263",
+      "owner": "codex-be9795",
+      "captureRecipient": "codex-6y3sjh",
+      "pineVersion": 5,
+      "rowIds": [
+        "v56:815"
+      ],
+      "question": "Record whether this exact v5 v56:815 source compiles; retain every native diagnostic code, text, line and column. If accepted, record runtime outcome and plot close. Filename and local checker refusal do not establish native phase.",
+      "captureKind": "COMPILE-OUTCOME-AND-PINE-LOGS",
+      "nativeStatus": "UNOBSERVED",
+      "minimumHistoryBars": 10,
+      "instructions": "instructions/sort-v56-815-exact-v5-v1.md",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED",
+        "columns": {}
+      },
+      "limits": "Exact source admission only; preserve phase and earlier-error masking. No native validity claim from documentation or fixture naming."
+    },
+    {
+      "probe": "sort-v56-977-exact-v5-v1.pine",
+      "path": "sort-v56-977-exact-v5-v1.pine",
+      "sourceSHA256": "08ba449094ca10e33c5a6060132cc4c0e670c99c65786353a2ff17b64fbf97cf",
+      "sourceSha256": "08ba449094ca10e33c5a6060132cc4c0e670c99c65786353a2ff17b64fbf97cf",
+      "owner": "codex-be9795",
+      "captureRecipient": "codex-6y3sjh",
+      "pineVersion": 5,
+      "rowIds": [
+        "v56:977"
+      ],
+      "question": "Record whether this exact v5 v56:977 source compiles; retain every native diagnostic code, text, line and column. If accepted, record runtime outcome and plot close. Filename and local checker refusal do not establish native phase.",
+      "captureKind": "COMPILE-OUTCOME-AND-PINE-LOGS",
+      "nativeStatus": "UNOBSERVED",
+      "minimumHistoryBars": 10,
+      "instructions": "instructions/sort-v56-977-exact-v5-v1.md",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED",
+        "columns": {}
+      },
+      "limits": "Exact source admission only; preserve phase and earlier-error masking. No native validity claim from documentation or fixture naming."
+    },
+    {
+      "probe": "sort-v56-1676-exact-v5-v1.pine",
+      "path": "sort-v56-1676-exact-v5-v1.pine",
+      "sourceSHA256": "691a3257f554680771afa786fb1d95c870ff49c1a2ffc6deba9a53acc7e85922",
+      "sourceSha256": "691a3257f554680771afa786fb1d95c870ff49c1a2ffc6deba9a53acc7e85922",
+      "owner": "codex-be9795",
+      "captureRecipient": "codex-6y3sjh",
+      "pineVersion": 5,
+      "rowIds": [
+        "v56:1676"
+      ],
+      "question": "Record whether this exact v5 v56:1676 source compiles; retain every native diagnostic code, text, line and column. If accepted, record runtime outcome and plot close. Filename and local checker refusal do not establish native phase.",
+      "captureKind": "COMPILE-OUTCOME-AND-PINE-LOGS",
+      "nativeStatus": "UNOBSERVED",
+      "minimumHistoryBars": 10,
+      "instructions": "instructions/sort-v56-1676-exact-v5-v1.md",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED",
+        "columns": {}
+      },
+      "limits": "Exact source admission only; preserve phase and earlier-error masking. No native validity claim from documentation or fixture naming."
+    },
+    {
+      "probe": "documented49-corpus-v7-258-exact-v6-v1.pine",
+      "path": "documented49-corpus-v7-258-exact-v6-v1.pine",
+      "sourceSHA256": "d36a0afcb55f15a1e94a3eeeedfcd917409506d3862be0d9cc7e42cd68fc43f1",
+      "sourceSha256": "d36a0afcb55f15a1e94a3eeeedfcd917409506d3862be0d9cc7e42cd68fc43f1",
+      "owner": "codex-9tqhik",
+      "captureRecipient": "codex-6y3sjh",
+      "pineVersion": 6,
+      "rowIds": [
+        "v7:258"
+      ],
+      "question": "Add these exact bytes to v10 and record native compilation status, every diagnostic line/code/text, and Pine Logs if it runs; no edits/added plot/version conversion",
+      "captureKind": "COMPILE-OUTCOME-AND-PINE-LOGS",
+      "nativeStatus": "UNOBSERVED",
+      "minimumHistoryBars": 10,
+      "instructions": "instructions/documented49-corpus-v7-258-exact-v6-v1.md",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED",
+        "columns": {}
+      },
+      "limits": "Exact source admission only; preserve phase and earlier-error masking. No native validity claim from documentation or fixture naming."
+    },
+    {
+      "probe": "ledger-909-max-bars-back-10001-v6-v1.pine",
+      "path": "ledger-909-max-bars-back-10001-v6-v1.pine",
+      "sourceSHA256": "fa1228c3f06d67b1eb5e0eb29f50d896467bff3d5c0b884ab2a53d958d03c1de",
+      "sourceSha256": "fa1228c3f06d67b1eb5e0eb29f50d896467bff3d5c0b884ab2a53d958d03c1de",
+      "owner": "codex-uk9554",
+      "stagingOwner": "codex-ymk07v",
+      "captureRecipient": "codex-6y3sjh",
+      "pineVersion": 6,
+      "rowIds": [
+        "ledger:909"
+      ],
+      "question": "What exact phase and diagnostic does max_bars_back(close,10001) produce in native v6?",
+      "captureKind": "RUNTIME-OUTCOME-OR-COMPILE-REFUSAL",
+      "nativeStatus": "UNOBSERVED",
+      "minimumHistoryBars": 10,
+      "instructions": "instructions/ledger-909-max-bars-back-10001-v6-v1.md",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED",
+        "columns": {}
+      },
+      "limits": "Minimal literal allocation call; no history lookup or 10000 acceptance claim."
+    }
+  ],
+  "expectedNativeResults": "UNSPECIFIED",
+  "stagedAt": "2026-10-04T06:24:56.028728+00:00",
+  "precedingFrozenBundle": {
+    "bundle": "v9",
+    "manifest": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v9-outcomes/bundle-manifest-v6.json",
+    "manifestSHA256": "938f0c915c1ce7a70590dd8b4f647b2688d5ab6140ef1d04d63814b5f1570d0b"
+  },
+  "updatedAt": "2026-10-04T06:42:55.558024+00:00",
+  "supersedes": "bundle-manifest-v7.json",
+  "frozenAt": "2026-10-04T07:33:50.745225+00:00",
+  "responsePath": "v10/captures/v10/RESPONSE-v10.md"
+}
