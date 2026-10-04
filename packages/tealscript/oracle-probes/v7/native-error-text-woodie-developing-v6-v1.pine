@@ -1,4 +1,0 @@
-//@version=6
-indicator("V7 native-error-text-woodie-developing-v6-v1")
-levels = ta.pivot_point_levels("Woodie",true,developing=true)
-plot(array.get(levels,0),"TARGET")

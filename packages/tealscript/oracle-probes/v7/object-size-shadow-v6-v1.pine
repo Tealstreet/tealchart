@@ -1,7 +1,0 @@
-//@version=6
-indicator("V7 object-size-shadow-v6-v1")
-type Font
-    float normal = 3.0
-Font size = Font.new()
-float value = size.normal
-plot(value,"FIELD")

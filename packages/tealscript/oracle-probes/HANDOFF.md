@@ -10,9 +10,6 @@
 > 14 screenshot, 96 outcome (`SHA256SUMS-v2.txt` pins every source). Reply at `v5/captures/v5/RESPONSE-v5.md`.
 > **Then round v6.** After v5, do [`v6/HANDOFF-v6.md`](v6/HANDOFF-v6.md) — 18 scripts: 8 numeric CSV, 10 outcome
 > (`SHA256SUMS` pins every source). Reply at `v6/captures/v6/RESPONSE-v6.md`.
-> **Then round v7.** After v6, do [`v7/HANDOFF-v7.md`](v7/HANDOFF-v7.md) — 215 scripts: 42 numeric CSV,
-> 55 screenshot, 118 outcome; per-script steps in `v7/instructions/` (`SHA256SUMS` pins every source).
-> Reply at `v7/captures/v7/RESPONSE-v7.md`.
 
 Agent exchange: [capture response v1](RESPONSE-v1.md). The next reply belongs in
 `RESPONSE-v2.md` beside this handoff; commit responses so both machines can read them.

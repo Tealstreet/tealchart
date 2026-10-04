@@ -1,0 +1,47 @@
+Cannot call "array.get" with argument "index"="call "operator -" (const float)". An argument of "const float" type was used but a "series int"  is expected.
+{
+  "error": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+  "editorError": {
+    "code": "CE10123",
+    "ctx": {
+      "argDisplayName": "index",
+      "argUserFriendlyRepresentation": "call \"operator -\" (const float)",
+      "argumentType": "const float",
+      "currentTypeDocStr": "series int",
+      "funId": "array.get",
+      "typePostfix": ""
+    },
+    "end": {
+      "column": 22,
+      "line": 4
+    },
+    "message": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+    "start": {
+      "column": 19,
+      "line": 4
+    },
+    "id": "USER;8d13f72b59854193bd28ee1a6bbd2d63"
+  },
+  "title": "Compilation error",
+  "compiler_markers": [
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///67092165-3413-4ead-9fb4-20fb776ef4fc.pine?placement%3Ddialog",
+        "path": "/67092165-3413-4ead-9fb4-20fb776ef4fc.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "code": "CE10123",
+      "severity": 8,
+      "message": "Cannot call \"array.get\" with argument \"index\"=\"call \"operator -\" (const float)\". An argument of \"const float\" type was used but a \"series int\"  is expected.",
+      "startLineNumber": 4,
+      "startColumn": 19,
+      "endLineNumber": 4,
+      "endColumn": 23
+    }
+  ],
+  "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,802.17\nH\n84,802.17\nL\n84,802.16\nC\n84,802.16\n0.00 (0.00%)\n84,802.16\nSELL\n0.01\n84,802.17\nBUY\nUSDT\ncorpus-array-get-negative-fraction-v6-v1.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n03:09:11 UTC\n99+\nPine Editor\ncorpus-array-get-negative-fraction-v6-v1.pine\nPublish script\n1\n2\n3\n4\n5\n//@version=6\nindicator(\"corpus-array-get-negative-fraction-v6-v1\")\na = array.from(10, 20, 30)\nplot(array.get(a, -0.5), \"negative_fraction\")\n1 of 1 problem\nCannot call \"array.get\" with argument \"index\"=\"call \"operator -\" (const float)\". An argument of \"const float\" type was used but a \"series int\" is expected.(CE10123)\n1 ∙ Today, 11:09\nLine 4, Col 19\nPine Script® v6\nCompilation error: CE10123\n\nCannot call \"array.get\" with argument \"index\"=\"call \"operator -\" (const float)\". An argument of \"const float\" type was used but a \"series int\" is expected.\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+  "context_substituted_message": "Cannot call \"array.get\" with argument \"index\"=\"call \"operator -\" (const float)\". An argument of \"const float\" type was used but a \"series int\"  is expected."
+}

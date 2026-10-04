@@ -1,5 +1,0 @@
-//@version=6
-indicator("V7 table-dimension-float-v6-v1")
-n = bar_index % 2 == 0 ? 1.5 : 1
-var t = table.new(position.top_right,n,1)
-plot(n,"DIMENSION")

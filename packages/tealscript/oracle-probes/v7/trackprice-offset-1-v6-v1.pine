@@ -1,5 +1,0 @@
-//@version=6
-indicator("V7 trackprice-offset-1-v6-v1")
-distance = last_bar_index - bar_index
-s = distance == 2 ? 100.0 : distance == 1 ? 110.0 : distance == 0 ? 120.0 : na
-plot(s,"TRACKED_SOURCE",offset=1,trackprice=true,show_last=3,linewidth=2,color=color.red)

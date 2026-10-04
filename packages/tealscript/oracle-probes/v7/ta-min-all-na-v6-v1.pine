@@ -1,4 +1,0 @@
-//@version=6
-indicator("V7 ta-min-all-na-v6-v1")
-float s = na
-plot(ta.min(s),"TARGET")

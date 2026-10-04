@@ -1,5 +1,0 @@
-//@version=6
-indicator("V3-CONST-REF-MAP-REPLACE-ID")
-const map<string, float> value = map.new<string, float>()
-value := map.new<string, float>()
-plot(map.get(value, "key"), "OUTCOME")

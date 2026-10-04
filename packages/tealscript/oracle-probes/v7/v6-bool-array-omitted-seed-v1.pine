@@ -1,4 +1,0 @@
-//@version=6
-indicator("V7 v6-bool-array-omitted-seed-v1")
-a = array.new<bool>(1)
-plot(array.get(a,0) ? 1 : 0,"BOOL")

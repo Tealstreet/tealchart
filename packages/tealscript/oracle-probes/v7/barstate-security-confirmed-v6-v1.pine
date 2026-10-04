@@ -1,5 +1,0 @@
-//@version=6
-indicator("V7 barstate-security-confirmed-v6-v1")
-requested = request.security(syminfo.tickerid,"5",barstate.isconfirmed ? 1 : 0)
-plot(barstate.isconfirmed ? 1 : 0,"CHART_CONFIRMED")
-plot(requested,"REQUESTED_CONFIRMED")

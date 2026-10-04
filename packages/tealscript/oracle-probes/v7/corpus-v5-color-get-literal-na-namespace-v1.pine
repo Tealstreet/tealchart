@@ -1,4 +1,0 @@
-//@version=5
-indicator("corpus-v5-color-get-literal-na-namespace-v1")
-colors = array.from(color.red, color.green, color.blue)
-plot(na(array.get(colors, na)) ? 1 : 0, "OUTCOME")

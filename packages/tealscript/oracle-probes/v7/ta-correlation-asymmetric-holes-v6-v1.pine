@@ -1,8 +1,0 @@
-//@version=6
-indicator("V7 ta-correlation-asymmetric-holes-v6-v1")
-phase = bar_index % 16
-a = phase == 4 or phase == 8 ? na : phase * 1.0
-b = phase == 5 or phase == 8 ? na : phase * phase * 1.0
-plot(a, "A")
-plot(b, "B")
-plot(ta.correlation(a,b,4), "TARGET")

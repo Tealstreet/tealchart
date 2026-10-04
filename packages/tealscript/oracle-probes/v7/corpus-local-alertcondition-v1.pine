@@ -1,5 +1,0 @@
-//@version=5
-indicator("V7 corpus-local-alertcondition-v1")
-if close > open
-    alertcondition(true,"X","X")
-plot(close)

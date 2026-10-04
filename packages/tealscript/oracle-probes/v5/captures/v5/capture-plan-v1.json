@@ -1,0 +1,2774 @@
+{
+  "artifact": "Native capture execution plan v1",
+  "source_master": "74f113d7a4",
+  "manifest": "bundle-manifest-v2.json",
+  "manifest_sha256": "248a266490d352750c82977b40cc3e9eaaf47801e5e1c71e110f4d55de965d32",
+  "batch_start_utc": "2026-10-04T03:01:07.128005+00:00",
+  "scripts": [
+    {
+      "script": "collection-ranked01-from-empty-v1.pine",
+      "sha256": "e8c9e59218139b25d4600cc5410f29eda76d38dd1e8b0f2d73ebac1988892dda",
+      "title": "Empty from outcome",
+      "columns": [
+        "EMPTY_SIZE",
+        "INDEX"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": 0,
+      "indexColumn": "INDEX",
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [
+        "Capture unchanged source and all diagnostics;2-minute standard BINANCE:BTCUSDT UTC, at least20historicalbars.",
+        "No source repairs; preserve CSV when compilation succeeds."
+      ],
+      "relatedNotes": []
+    },
+    {
+      "script": "collection-ranked01-from-single-control-v1.pine",
+      "sha256": "e03432c9962a83a8bcd718e11060cebb3264b9bbe6282559462c40b664148672",
+      "title": "Singleton from control",
+      "columns": [
+        "SIZE",
+        "VALUE"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [
+        "Capture unchanged source and all diagnostics;2-minute standard BINANCE:BTCUSDT UTC, at least20historicalbars.",
+        "No source repairs; preserve CSV when compilation succeeds."
+      ],
+      "relatedNotes": []
+    },
+    {
+      "script": "collection-ranked22-mode-outcomes-v1.pine",
+      "sha256": "2ab22b09a0224db80cc8bea242b1d58238b5a2e5210fe912bbd0e0cbf5e54d24",
+      "title": "Collection22 mode outcomes",
+      "columns": [
+        "int_unique",
+        "int_tie",
+        "int_single",
+        "int_distinct_namespace",
+        "int_distinct_method",
+        "int_empty",
+        "float_unique",
+        "float_tie",
+        "float_single",
+        "float_distinct_namespace",
+        "float_distinct_method",
+        "float_empty"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "numeric",
+      "record": [
+        "Record complete native diagnostic or all 12 CSV columns unchanged.",
+        "No archive candidate is native authority."
+      ],
+      "relatedNotes": [
+        "notes/COLLECTION-RANKED22-MODE-PROBES-v1.md"
+      ]
+    },
+    {
+      "script": "collection11-symmetric-eigenvectors-integer-pinv-v1.pine",
+      "sha256": "e8a6fe4efd7b7adf7528ab218e63375b60fae5d094a5c47e9dcc836240bbb20f",
+      "title": "Collection11 eigenvectors and integer pinv",
+      "columns": [
+        "V00",
+        "V10",
+        "V20",
+        "V01",
+        "V11",
+        "V21",
+        "V02",
+        "V12",
+        "V22",
+        "INT_PINV00",
+        "INT_PINV11"
+      ],
+      "minimumHistoryBars": 160,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "numeric",
+      "record": [
+        "Exact CSV columns and source hash",
+        "First diagnostic and bar if refused",
+        "No LIVE ticks or screenshots required"
+      ],
+      "relatedNotes": [
+        "notes/COLLECTION11-PROBES-v1.md"
+      ]
+    },
+    {
+      "script": "compound-additive-grouping-v1.pine",
+      "sha256": "58150e75dd6ced3e5320eceb78fd7186b54db89fcae8801a751d0b4a05eb8596",
+      "title": "V5 compound additive grouping",
+      "columns": [
+        "input_time",
+        "input_bar_index",
+        "root_plain",
+        "root_grouped",
+        "control_left",
+        "control_right",
+        "udf_plain",
+        "udf_grouped"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": 0,
+      "indexColumn": "input_bar_index",
+      "supersededBy": null,
+      "captureKind": "numeric",
+      "record": [],
+      "relatedNotes": []
+    },
+    {
+      "script": "compound-operator-association-pine-v5-v1.pine",
+      "sha256": "c46298afc7724a0cb2c2d856b8c08c48196f57379912fb7d03927456dde8ff46",
+      "title": "V5 compound operator generalization",
+      "columns": [
+        "input_time",
+        "input_bar_index",
+        "add_plain",
+        "add_grouped",
+        "add_two_subtractions",
+        "subtract_plain",
+        "subtract_grouped",
+        "multiply_plain_subtraction",
+        "multiply_grouped_subtraction",
+        "divide_plain_subtraction",
+        "divide_grouped_subtraction",
+        "multiply_then_divide",
+        "divide_then_multiply",
+        "add_left_control",
+        "add_grouped_control",
+        "subtract_left_control",
+        "subtract_grouped_control",
+        "multiply_left_control",
+        "divide_left_control",
+        "multiply_divide_left_control",
+        "multiply_divide_grouped_control",
+        "divide_multiply_left_control",
+        "divide_multiply_grouped_control"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": 0,
+      "indexColumn": "input_bar_index",
+      "supersededBy": null,
+      "captureKind": "numeric",
+      "record": [],
+      "relatedNotes": []
+    },
+    {
+      "script": "compound-operator-association-pine-v6-v1.pine",
+      "sha256": "53fe243fb89dba8831789ea290ba9977b25532749053ddccf492cc8c4107e737",
+      "title": "V5 compound operator generalization",
+      "columns": [
+        "input_time",
+        "input_bar_index",
+        "add_plain",
+        "add_grouped",
+        "add_two_subtractions",
+        "subtract_plain",
+        "subtract_grouped",
+        "multiply_plain_subtraction",
+        "multiply_grouped_subtraction",
+        "divide_plain_subtraction",
+        "divide_grouped_subtraction",
+        "multiply_then_divide",
+        "divide_then_multiply",
+        "add_left_control",
+        "add_grouped_control",
+        "subtract_left_control",
+        "subtract_grouped_control",
+        "multiply_left_control",
+        "divide_left_control",
+        "multiply_divide_left_control",
+        "multiply_divide_grouped_control",
+        "divide_multiply_left_control",
+        "divide_multiply_grouped_control"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": 0,
+      "indexColumn": "input_bar_index",
+      "supersededBy": null,
+      "captureKind": "numeric",
+      "record": [],
+      "relatedNotes": []
+    },
+    {
+      "script": "corpus-array-get-division-v5-v1.pine",
+      "sha256": "0c3ecc9c55dc5280f24310dddebbdbc5a7a5f947076f48e006081889d25ab090",
+      "title": "corpus-array-get-division-v5-v1",
+      "columns": [
+        "division"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [
+        "First native diagnostic/phase; if admitted export all plot columns.",
+        "Negative -0.5 distinguishes floor(-1,wrappedlast) from trunc(0,first); do not infer from positive-only control."
+      ],
+      "relatedNotes": []
+    },
+    {
+      "script": "corpus-array-get-division-v6-v1.pine",
+      "sha256": "994df1d5ab2444fc59e4316dd992785e5be66a0e732f9fb30e9696977de0aaf3",
+      "title": "corpus-array-get-division-v6-v1",
+      "columns": [
+        "division"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [
+        "First native diagnostic/phase; if admitted export all plot columns.",
+        "Negative -0.5 distinguishes floor(-1,wrappedlast) from trunc(0,first); do not infer from positive-only control."
+      ],
+      "relatedNotes": []
+    },
+    {
+      "script": "corpus-array-get-fraction-v5-v1.pine",
+      "sha256": "54e0c2b81f1ff2ab0da213d8cef336b87fb3c721d45c49b052834b45aa1911ef",
+      "title": "corpus-array-get-fraction-v5-v1",
+      "columns": [
+        "fraction"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [
+        "First native diagnostic/phase; if admitted export all plot columns.",
+        "Negative -0.5 distinguishes floor(-1,wrappedlast) from trunc(0,first); do not infer from positive-only control."
+      ],
+      "relatedNotes": []
+    },
+    {
+      "script": "corpus-array-get-fraction-v6-v1.pine",
+      "sha256": "330b1c7c87a00212c355d74bc2668446f06b8294ba46f1ae4d752592841ade66",
+      "title": "corpus-array-get-fraction-v6-v1",
+      "columns": [
+        "fraction"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [
+        "First native diagnostic/phase; if admitted export all plot columns.",
+        "Negative -0.5 distinguishes floor(-1,wrappedlast) from trunc(0,first); do not infer from positive-only control."
+      ],
+      "relatedNotes": []
+    },
+    {
+      "script": "corpus-array-get-integer-controls-v6-v1.pine",
+      "sha256": "929476ce0c26364f3aee28063647c635701aca5deca3164d0f3eb6374c502c6c",
+      "title": "corpus-array-get-integer-controls-v6-v1",
+      "columns": [
+        "floor_control",
+        "ceil_control",
+        "negative_floor_control",
+        "negative_trunc_control"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [
+        "First native diagnostic/phase; if admitted export all plot columns.",
+        "Negative -0.5 distinguishes floor(-1,wrappedlast) from trunc(0,first); do not infer from positive-only control."
+      ],
+      "relatedNotes": []
+    },
+    {
+      "script": "corpus-array-get-loop-int-controls-v5-v1.pine",
+      "sha256": "ca0eb1ff42fd6570245f8353582e52729bea83890e1ea91bd856f89905519290",
+      "title": "corpus-array-get-loop-int-controls-v5-v1",
+      "columns": [
+        "loop_explicit_int",
+        "const_int_division"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [
+        "First native diagnostic/phase; if admitted export all plots.",
+        "Read alongside the original6revision13 scripts; this is one class, not competing probes."
+      ],
+      "relatedNotes": []
+    },
+    {
+      "script": "corpus-array-get-loop-var-division-v5-v1.pine",
+      "sha256": "fd43b9d746244f30ee28e2fb4d784ac033523d22c5b83327b4761465b6234e3e",
+      "title": "corpus-array-get-loop-var-division-v5-v1",
+      "columns": [
+        "loop_var_division"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [
+        "First native diagnostic/phase; if admitted export all plots.",
+        "Read alongside the original6revision13 scripts; this is one class, not competing probes."
+      ],
+      "relatedNotes": []
+    },
+    {
+      "script": "corpus-array-get-negative-fraction-v6-v1.pine",
+      "sha256": "ac6f2f8782e5d77259a5e1a387e88e255ac5e124b734064e7c036a80a0c07fc6",
+      "title": "corpus-array-get-negative-fraction-v6-v1",
+      "columns": [
+        "negative_fraction"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [
+        "First native diagnostic/phase; if admitted export all plot columns.",
+        "Negative -0.5 distinguishes floor(-1,wrappedlast) from trunc(0,first); do not infer from positive-only control."
+      ],
+      "relatedNotes": []
+    },
+    {
+      "script": "corpus-array-get-series-division-v5-v1.pine",
+      "sha256": "f5d6cb3020a0278375d5d6cf18fe3316d96f5cdeee29b98104390e428db403d9",
+      "title": "corpus-array-get-series-division-v5-v1",
+      "columns": [
+        "series_division"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [
+        "First native diagnostic/phase; if admitted export all plots.",
+        "Read alongside the original6revision13 scripts; this is one class, not competing probes."
+      ],
+      "relatedNotes": []
+    },
+    {
+      "script": "corpus-array-get-size-division-v6-v1.pine",
+      "sha256": "96fbd243384b8d19225a33f7a46ca3fe32fdcfb24393ca44ad058382d8a60324",
+      "title": "corpus-array-get-size-division-v6-v1",
+      "columns": [
+        "size_division"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [
+        "First native diagnostic/phase; if admitted export all plots.",
+        "Read alongside the original6revision13 scripts; this is one class, not competing probes."
+      ],
+      "relatedNotes": []
+    },
+    {
+      "script": "corpus-array-get-size-series-controls-v6-v1.pine",
+      "sha256": "0f13f6c9bfb6c616eba2e2ec8111db5be41adc20753d5c713c3c8eedb8221283",
+      "title": "corpus-array-get-size-series-controls-v6-v1",
+      "columns": [
+        "size_floor",
+        "size_ceil",
+        "series_floor",
+        "series_ceil"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [
+        "First native diagnostic/phase; if admitted export all plots.",
+        "Read alongside the original6revision13 scripts; this is one class, not competing probes."
+      ],
+      "relatedNotes": []
+    },
+    {
+      "script": "corpus-array-median-float-control-v1.pine",
+      "sha256": "e45cfd7872034f55036909961988b43dd505931522e0d684cd64b69e4bbe7f5a",
+      "title": "corpus-array-median-float-control-v1",
+      "columns": [
+        "median_0",
+        "median_1",
+        "median_2"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [
+        "First native diagnostic and phase.",
+        "If admitted export all3plot columns; preserve negative even-array discriminator."
+      ],
+      "relatedNotes": []
+    },
+    {
+      "script": "corpus-array-median-integer-v1.pine",
+      "sha256": "d51a120fcbd99c95bb12e3eca309cbfa137974aa4799e972ee3817e8ce097bd4",
+      "title": "corpus-array-median-integer-v1",
+      "columns": [
+        "median_0",
+        "median_1",
+        "median_2"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [
+        "First native diagnostic and phase.",
+        "If admitted export all3plot columns; preserve negative even-array discriminator."
+      ],
+      "relatedNotes": []
+    },
+    {
+      "script": "corpus-array-standardize-float-control-v1.pine",
+      "sha256": "cf553cf4388957021450dda513aa646a173a94f55ef41719e798c1e644969f79",
+      "title": "corpus-array-standardize-float-control-v1",
+      "columns": [
+        "first",
+        "middle",
+        "last"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [
+        "First native diagnostic/phase; if admitted export all plots.",
+        "Read alongside the original6revision13 scripts; this is one class, not competing probes."
+      ],
+      "relatedNotes": []
+    },
+    {
+      "script": "corpus-array-standardize-int-inferred-v1.pine",
+      "sha256": "25129e5f6c4a9100f8fa99bd906629fd55f09bf8454669de7bc6d0595c0926b8",
+      "title": "corpus-array-standardize-int-inferred-v1",
+      "columns": [
+        "size",
+        "first",
+        "middle",
+        "last"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [
+        "First native diagnostic/phase; if admitted export all plots.",
+        "Read alongside the original6revision13 scripts; this is one class, not competing probes."
+      ],
+      "relatedNotes": []
+    },
+    {
+      "script": "corpus-array-standardize-int-typed-v1.pine",
+      "sha256": "70b808427a5139ecbbaeba70bcdfa056f878a7f257370101f0fb3631bd7824df",
+      "title": "corpus-array-standardize-int-typed-v1",
+      "columns": [
+        "first",
+        "middle",
+        "last"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [
+        "First native diagnostic/phase; if admitted export all plots.",
+        "Read alongside the original6revision13 scripts; this is one class, not competing probes."
+      ],
+      "relatedNotes": []
+    },
+    {
+      "script": "corpus-array-standardize-mixed-na-v1.pine",
+      "sha256": "9873aad7f160e77962c1159d0aa72efc7e5467c12d476a52fa22768c1e34bd12",
+      "title": "Corpus array standardize mixed NA v1",
+      "columns": [
+        "middle_size",
+        "middle_slot0",
+        "middle_slot1",
+        "middle_slot2",
+        "first_size",
+        "first_slot0",
+        "first_slot1",
+        "first_slot2",
+        "last_size",
+        "last_slot0",
+        "last_slot1",
+        "last_slot2",
+        "all_size",
+        "all_slot0",
+        "all_slot1",
+        "all_slot2",
+        "finite_size",
+        "finite_slot0",
+        "finite_slot1",
+        "finite_slot2"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "numeric",
+      "record": [
+        "Capture unchanged source and all20 columns.",
+        "No engine/test behavior pin until native adjudication."
+      ],
+      "relatedNotes": []
+    },
+    {
+      "script": "corpus-color-new-linewidth-control-v6-v1.pine",
+      "sha256": "43a06b69c6e7fe0c5aa529066c6c3855cf312ef11a65dd53abc52586d7e32cfc",
+      "title": "corpus-color-new-linewidth-control-v6-v1",
+      "columns": [
+        "close"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [
+        "First native diagnostic and phase; if admitted capture plot and table screenshot.",
+        "Control admission does not establish target admission."
+      ],
+      "relatedNotes": []
+    },
+    {
+      "script": "corpus-color-new-linewidth-v6-v1.pine",
+      "sha256": "0a8d7255ba7e9f8f045e10fea725f870c4bc98b2eda3ec8b56e10d3da5c0f2e8",
+      "title": "corpus-color-new-linewidth-v6-v1",
+      "columns": [
+        "close"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [
+        "First native diagnostic and phase; if admitted capture plot and table screenshot.",
+        "Control admission does not establish target admission."
+      ],
+      "relatedNotes": []
+    },
+    {
+      "script": "corpus-compile-third-v5-ascii-comment-control-v1.pine",
+      "sha256": "a6175aa9b22381c5d1cd0074501e35acc3d2c410b92c93dedaa869a3f112552d",
+      "title": "corpus-compile-third-v5-ascii-comment-control-v1",
+      "columns": [
+        "PRICE_CONTROL",
+        "STRING_LENGTH_CONTROL"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [
+        "Preserve source hash and first native diagnostic/phase/bar.",
+        "If admitted, export every output column; controls cannot prove target admission."
+      ],
+      "relatedNotes": [
+        "notes/CORPUS-COMPILE-THIRD-PROBES-v1.md"
+      ]
+    },
+    {
+      "script": "corpus-compile-third-v5-comma-imports-v1.pine",
+      "sha256": "8c0c2ad05d2ef21f829a80d83dd889410979e5ed6b8261e95d943c4fa9dee311",
+      "title": "corpus-compile-third-v5-comma-imports-v1",
+      "columns": [
+        "TARGET"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [
+        "Preserve source hash and first native diagnostic/phase/bar.",
+        "If admitted, export every output column; controls cannot prove target admission."
+      ],
+      "relatedNotes": [
+        "notes/CORPUS-COMPILE-THIRD-PROBES-v1.md"
+      ]
+    },
+    {
+      "script": "corpus-compile-third-v5-fill-modern-title-control-v1.pine",
+      "sha256": "8e2d7e4aa8ee8394aad3b4329a16139ee43717ced257118c37777f2943d278c3",
+      "title": "corpus-compile-third-v5-fill-modern-title-control-v1",
+      "columns": [
+        "UPPER",
+        "LOWER"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [
+        "Preserve source hash and first native diagnostic/phase/bar.",
+        "If admitted, export every output column; controls cannot prove target admission."
+      ],
+      "relatedNotes": [
+        "notes/CORPUS-COMPILE-THIRD-FILL-PROBES-v1.md"
+      ]
+    },
+    {
+      "script": "corpus-compile-third-v5-fill-named-title-transp-control-v1.pine",
+      "sha256": "127b6195e40b0656a7d0f377bf292bff6b3e343b7e338b126b5abeb16ce0f519",
+      "title": "corpus-compile-third-v5-fill-named-title-transp-control-v1",
+      "columns": [
+        "UPPER",
+        "LOWER"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [
+        "Preserve source hash and first native diagnostic/phase/bar.",
+        "If admitted, export every output column; controls cannot prove target admission."
+      ],
+      "relatedNotes": [
+        "notes/CORPUS-COMPILE-THIRD-FILL-PROBES-v1.md"
+      ]
+    },
+    {
+      "script": "corpus-compile-third-v5-fill-positional-title-named-transp-v1.pine",
+      "sha256": "7b37a2b022153916638e32327b52953b512b6ab4ef11501cda80d1934c93fa4a",
+      "title": "corpus-compile-third-v5-fill-positional-title-named-transp-v1",
+      "columns": [
+        "UPPER",
+        "LOWER"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [
+        "Preserve source hash and first native diagnostic/phase/bar.",
+        "If admitted, export every output column; controls cannot prove target admission."
+      ],
+      "relatedNotes": [
+        "notes/CORPUS-COMPILE-THIRD-FILL-PROBES-v1.md"
+      ]
+    },
+    {
+      "script": "corpus-compile-third-v5-fill-positional-transp-named-title-v1.pine",
+      "sha256": "736e2369f4f6a0e8b45c21be4efe1f91ba90a88ea39a5b461206928d38f25628",
+      "title": "corpus-compile-third-v5-fill-positional-transp-named-title-v1",
+      "columns": [
+        "UPPER",
+        "LOWER"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [
+        "Preserve source hash and first native diagnostic/phase/bar.",
+        "If admitted, export every output column; controls cannot prove target admission."
+      ],
+      "relatedNotes": [
+        "notes/CORPUS-COMPILE-THIRD-FILL-PROBES-v1.md"
+      ]
+    },
+    {
+      "script": "corpus-compile-third-v5-fullwidth-comment-layout-v1.pine",
+      "sha256": "5446685af1e58e9eb41bb2cf1289e3378c2371e1f01a8ca5c050982df43616b8",
+      "title": "corpus-compile-third-v5-fullwidth-comment-layout-v1",
+      "columns": [
+        "TARGET"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [
+        "Preserve source hash and first native diagnostic/phase/bar.",
+        "If admitted, export every output column; controls cannot prove target admission."
+      ],
+      "relatedNotes": [
+        "notes/CORPUS-COMPILE-THIRD-PROBES-v1.md"
+      ]
+    },
+    {
+      "script": "corpus-compile-third-v5-polyline-existing-id-cast-v1.pine",
+      "sha256": "14be2fd85b121dabe14fe44fd2c70d3d42b86d79f83768956c23d61a0818359d",
+      "title": "corpus-compile-third-v5-polyline-existing-id-cast-v1",
+      "columns": [
+        "TARGET_MISSING"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [
+        "Preserve source hash and first native diagnostic/phase/bar.",
+        "If admitted, export every output column; controls cannot prove target admission."
+      ],
+      "relatedNotes": [
+        "notes/CORPUS-COMPILE-THIRD-POLYLINE-PROBES-v1.md"
+      ]
+    },
+    {
+      "script": "corpus-compile-third-v5-polyline-missing-id-cast-v1.pine",
+      "sha256": "c0d5271b41c1c33d4a914a9b05e7e77bdadad2a14914c63a50c38452e69b36fb",
+      "title": "corpus-compile-third-v5-polyline-missing-id-cast-v1",
+      "columns": [
+        "TARGET_MISSING"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [
+        "Preserve source hash and first native diagnostic/phase/bar.",
+        "If admitted, export every output column; controls cannot prove target admission."
+      ],
+      "relatedNotes": [
+        "notes/CORPUS-COMPILE-THIRD-POLYLINE-PROBES-v1.md"
+      ]
+    },
+    {
+      "script": "corpus-compile-third-v5-polyline-typed-na-control-v1.pine",
+      "sha256": "a249bc44f77eb3a8e9dc40f193b361b5ad2314b9a5305dbb2ac5e1ef2e0a18a0",
+      "title": "corpus-compile-third-v5-polyline-typed-na-control-v1",
+      "columns": [
+        "TYPED_MISSING_CONTROL"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [
+        "Preserve source hash and first native diagnostic/phase/bar.",
+        "If admitted, export every output column; controls cannot prove target admission."
+      ],
+      "relatedNotes": [
+        "notes/CORPUS-COMPILE-THIRD-POLYLINE-PROBES-v1.md"
+      ]
+    },
+    {
+      "script": "corpus-compile-third-v5-separate-import-controls-v1.pine",
+      "sha256": "3960bb61afaf44ef108a5952e899a2d030a9bd9f2f166cebb62119483c8db1d6",
+      "title": "corpus-compile-third-v5-separate-import-controls-v1",
+      "columns": [
+        "TARGET"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [
+        "Preserve source hash and first native diagnostic/phase/bar.",
+        "If admitted, export every output column; controls cannot prove target admission."
+      ],
+      "relatedNotes": [
+        "notes/CORPUS-COMPILE-THIRD-PROBES-v1.md"
+      ]
+    },
+    {
+      "script": "corpus-compile-third-v6-color-linewidth-v1.pine",
+      "sha256": "6e4574a1ae16ffdd28029c4cc7400b0e950483927b996684000cb87794fd8522",
+      "title": "corpus-compile-third-v6-color-linewidth-v1",
+      "columns": [
+        "TARGET"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [
+        "Preserve source hash and first native diagnostic/phase/bar.",
+        "If admitted, export every output column; controls cannot prove target admission."
+      ],
+      "relatedNotes": [
+        "notes/CORPUS-COMPILE-THIRD-PROBES-v1.md"
+      ]
+    },
+    {
+      "script": "corpus-compile-third-v6-duplicate-plot-color-v1.pine",
+      "sha256": "1fb9bd0f467011415066faf5fef14daf1d881daba9a4bf3f7526c3d5fb570c08",
+      "title": "corpus-compile-third-v6-duplicate-plot-color-v1",
+      "columns": [
+        "TARGET"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [
+        "Preserve source hash and first native diagnostic/phase/bar.",
+        "If admitted, export every output column; controls cannot prove target admission."
+      ],
+      "relatedNotes": [
+        "notes/CORPUS-COMPILE-THIRD-PROBES-v1.md"
+      ]
+    },
+    {
+      "script": "corpus-compile-third-v6-forward-global-v1.pine",
+      "sha256": "05645b64f7e8c91d2fbef3e6b1da19d323914127bf537ac5980be8e44f825326",
+      "title": "corpus-compile-third-v6-forward-global-v1",
+      "columns": [
+        "TARGET"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [
+        "Preserve source hash and first native diagnostic/phase/bar.",
+        "If admitted, export every output column; controls cannot prove target admission."
+      ],
+      "relatedNotes": [
+        "notes/CORPUS-COMPILE-THIRD-PROBES-v1.md"
+      ]
+    },
+    {
+      "script": "corpus-compile-third-v6-leading-comma-declaration-v1.pine",
+      "sha256": "3a00966b52082a5ab6821304a05bdb6f324774efd94d774c03b15a57fda288c0",
+      "title": "corpus-compile-third-v6-leading-comma-declaration-v1",
+      "columns": [
+        "TARGET"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [
+        "Preserve source hash and first native diagnostic/phase/bar.",
+        "If admitted, export every output column; controls cannot prove target admission."
+      ],
+      "relatedNotes": [
+        "notes/CORPUS-COMPILE-THIRD-PROBES-v1.md"
+      ]
+    },
+    {
+      "script": "corpus-compile-third-v6-name-binding-controls-v1.pine",
+      "sha256": "fe6e581e1981d20b3567856d2e0021f025744663321148eb37cbd277bd843756",
+      "title": "corpus-compile-third-v6-name-binding-controls-v1",
+      "columns": [
+        "EARLIER_GLOBAL_CONTROL",
+        "DECLARED_VALUE_CONTROL",
+        "COLOR_CONTROL",
+        "SINGLE_COLOR_CONTROL"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [
+        "Preserve source hash and first native diagnostic/phase/bar.",
+        "If admitted, export every output column; controls cannot prove target admission."
+      ],
+      "relatedNotes": [
+        "notes/CORPUS-COMPILE-THIRD-PROBES-v1.md"
+      ]
+    },
+    {
+      "script": "corpus-compile-third-v6-undeclared-global-v1.pine",
+      "sha256": "b1e319d2214f4fa0bedca748e46ed20744c489ff6cc9933e3ac3076b005fc60a",
+      "title": "corpus-compile-third-v6-undeclared-global-v1",
+      "columns": [
+        "TARGET"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [
+        "Preserve source hash and first native diagnostic/phase/bar.",
+        "If admitted, export every output column; controls cannot prove target admission."
+      ],
+      "relatedNotes": [
+        "notes/CORPUS-COMPILE-THIRD-PROBES-v1.md"
+      ]
+    },
+    {
+      "script": "corpus-compile-v5-series-int-division-v1.pine",
+      "sha256": "d0b0d478d19b7a548d3589e64f2489a34154f58401b5cf66a0bdf484ec8cc944",
+      "title": "corpus-compile-v5-series-int-division-v1",
+      "columns": [
+        "target",
+        "explicit_int_control",
+        "floor_control",
+        "unannotated_control"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [
+        "Preserve first native diagnostic and phase/bar",
+        "If admitted capture all four outputs; controls cannot prove target admission"
+      ],
+      "relatedNotes": []
+    },
+    {
+      "script": "corpus-compile-v5-simple-int-division-v1.pine",
+      "sha256": "5067f0f8566a91a6e8b55d79ab9441c6b7264acfcf330c1b19679127631b0ebd",
+      "title": "corpus-compile-v5-simple-int-division-v1",
+      "columns": [
+        "target",
+        "explicit_int_control",
+        "floor_control",
+        "unannotated_control"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [
+        "Preserve first native diagnostic and phase/bar",
+        "If admitted capture all four outputs; controls cannot prove target admission"
+      ],
+      "relatedNotes": []
+    },
+    {
+      "script": "corpus-continuous-session-boundaries-v5-v1.pine",
+      "sha256": "95d590453f730366a7a29bed3c78e1079062e68f46f3c5f006c851e8ec5307c5",
+      "title": "Corpus continuous session boundaries v5",
+      "columns": [
+        "INDEX",
+        "CLOSE",
+        "TIME",
+        "DAY_OPEN",
+        "FIRST",
+        "FIRST_REGULAR",
+        "LAST",
+        "LAST_REGULAR",
+        "PREVIOUS_HIGH",
+        "PREVIOUS_LOW"
+      ],
+      "minimumHistoryBars": 3000,
+      "requiredFirstBarIndex": 0,
+      "indexColumn": "INDEX",
+      "supersededBy": null,
+      "captureKind": "numeric",
+      "record": [
+        "BINANCE:BTCUSDT standard2m UTC with at least3000 historical bars and INDEX0.",
+        "Preserve TIME/DAY_OPEN, all four flags and prior range including leading missing values.",
+        "Record syminfo timezone/session and chart regular/extended configuration; native outcome settles calendar root independently of synthetic provider."
+      ],
+      "relatedNotes": []
+    },
+    {
+      "script": "corpus-continuous-session-boundaries-v6-v1.pine",
+      "sha256": "29ecf55c61423cbf6cba97f1f986c8d91e2aa926bec26774435f040ace6228b9",
+      "title": "Corpus continuous session boundaries v6",
+      "columns": [
+        "INDEX",
+        "CLOSE",
+        "TIME",
+        "DAY_OPEN",
+        "FIRST",
+        "FIRST_REGULAR",
+        "LAST",
+        "LAST_REGULAR",
+        "PREVIOUS_HIGH",
+        "PREVIOUS_LOW"
+      ],
+      "minimumHistoryBars": 3000,
+      "requiredFirstBarIndex": 0,
+      "indexColumn": "INDEX",
+      "supersededBy": null,
+      "captureKind": "numeric",
+      "record": [
+        "BINANCE:BTCUSDT standard2m UTC with at least3000 historical bars and INDEX0.",
+        "Preserve TIME/DAY_OPEN, all four flags and prior range including leading missing values.",
+        "Record syminfo timezone/session and chart regular/extended configuration; native outcome settles calendar root independently of synthetic provider."
+      ],
+      "relatedNotes": []
+    },
+    {
+      "script": "corpus-gaps43-duplicate-method-distinct-control-v5.pine",
+      "sha256": "6a04067473aa5f1f9786f16138d1ec0b65e53574aa7f86b8237d162215d72b0c",
+      "title": "Corpus distinct method signature control",
+      "columns": [
+        "ONE",
+        "TWO"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [
+        "Preserve source hash and native compile diagnostic screenshot",
+        "Exact-source success also must be recorded; controls do not settle exact-source admissibility"
+      ],
+      "relatedNotes": [
+        "notes/GAPS43-CORPUS-REFUSAL-BLOCKERS-v1.md"
+      ]
+    },
+    {
+      "script": "corpus-gaps43-duplicate-method-exact-v5.pine",
+      "sha256": "7ba22e4d2286acb6d0c7a51ca15c0b0c94d0549f4c9977634bcfc31e48c04937",
+      "title": "Unsupported duplicate user method",
+      "columns": [],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [
+        "Preserve source hash and native compile diagnostic screenshot",
+        "Exact-source success also must be recorded; controls do not settle exact-source admissibility"
+      ],
+      "relatedNotes": [
+        "notes/GAPS43-CORPUS-REFUSAL-BLOCKERS-v1.md"
+      ]
+    },
+    {
+      "script": "corpus-gaps43-local-udf-exact-v6.pine",
+      "sha256": "e8015eb9373e922265ecc5079f1d7c247c6ef799f4f89b94198b828269c74396",
+      "title": "Neural Network ML Indicator \u2014 Extended",
+      "columns": [
+        "ML Smooth Score",
+        "Buy Signal",
+        "Sell Signal"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [
+        "Preserve source hash and native compile diagnostic screenshot",
+        "Exact-source success also must be recorded; controls do not settle exact-source admissibility"
+      ],
+      "relatedNotes": [
+        "notes/GAPS43-CORPUS-REFUSAL-BLOCKERS-v1.md"
+      ]
+    },
+    {
+      "script": "corpus-gaps43-local-udf-global-control-v6.pine",
+      "sha256": "2a1404c55f83e97183785cec82c15b91c6248f24237f279444f05f5da6a91c97",
+      "title": "Corpus global UDF scope control",
+      "columns": [
+        "CONTROL"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [
+        "Preserve source hash and native compile diagnostic screenshot",
+        "Exact-source success also must be recorded; controls do not settle exact-source admissibility"
+      ],
+      "relatedNotes": [
+        "notes/GAPS43-CORPUS-REFUSAL-BLOCKERS-v1.md"
+      ]
+    },
+    {
+      "script": "corpus-gaps43-local-udf-minimal-v6.pine",
+      "sha256": "4ffd885ebdbb49e348e042dc9d7b28d658890e9841b3149be3164e043f0e2233",
+      "title": "Corpus local UDF scope discriminator",
+      "columns": [
+        "CONTROL"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [
+        "Preserve source hash and native compile diagnostic screenshot",
+        "Exact-source success also must be recorded; controls do not settle exact-source admissibility"
+      ],
+      "relatedNotes": [
+        "notes/GAPS43-CORPUS-REFUSAL-BLOCKERS-v1.md"
+      ]
+    },
+    {
+      "script": "corpus-length-atr-series-float-v6-v1.pine",
+      "sha256": "9d42991c109fb386fb0347a73a80319d6d0bdfde61c2126d79f29c49ab5c53b5",
+      "title": "V5-CORPUS-ATR-SERIES-FLOAT-V1",
+      "columns": [
+        "OUTCOME"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [],
+      "relatedNotes": []
+    },
+    {
+      "script": "corpus-length-atr-series-int-v6-v1.pine",
+      "sha256": "774cff0a875f5602f584a5fe59326628bb75149c294c0f284a329a6aa51c829d",
+      "title": "V5-CORPUS-ATR-SERIES-INT-V1",
+      "columns": [
+        "OUTCOME"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [],
+      "relatedNotes": []
+    },
+    {
+      "script": "corpus-length-sma-simple-float-v6-v1.pine",
+      "sha256": "d22e6f126e8128e2b5f274588e395dceaab3cf7e5e4616940a6effc79ab253ab",
+      "title": "V5-CORPUS-SMA-SIMPLE-FLOAT-V1",
+      "columns": [
+        "OUTCOME"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [],
+      "relatedNotes": []
+    },
+    {
+      "script": "corpus-matrix-remove_col-missing-index-v1.pine",
+      "sha256": "2a8b8faa130c55771ed1908ba7a7dea68638bde86b50ee264e281b687bbd8100",
+      "title": "Corpus matrix remove_col missing index v1",
+      "columns": [
+        "columns_after",
+        "close_control"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [
+        "Capture unchanged source; preserve diagnostic and first runtime bar, or successful CSV."
+      ],
+      "relatedNotes": []
+    },
+    {
+      "script": "corpus-matrix-swap_columns-missing-index-v1.pine",
+      "sha256": "0c35b64206521a4f6bbeced7dea44c81dd259b1acbc8f6f2be3af39e0ddde773",
+      "title": "Corpus matrix swap_columns missing index v1",
+      "columns": [
+        "columns_after",
+        "close_control"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [
+        "Capture unchanged source; preserve diagnostic and first runtime bar, or successful CSV."
+      ],
+      "relatedNotes": []
+    },
+    {
+      "script": "corpus-table-text-wrap-control-v5-v1.pine",
+      "sha256": "7cb75b06da98169599e0e9712165430b4d33d796ef43f56f59b1a97110ec2982",
+      "title": "corpus-table-text-wrap-control-v5-v1",
+      "columns": [
+        "close"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [
+        "First native diagnostic and phase; if admitted capture plot and table screenshot.",
+        "Control admission does not establish target admission."
+      ],
+      "relatedNotes": []
+    },
+    {
+      "script": "corpus-table-text-wrap-control-v6-v1.pine",
+      "sha256": "66f2aab2638df7fead47ff1ffa40253f70fa607c21dfd53651e03b0c31b71090",
+      "title": "corpus-table-text-wrap-control-v6-v1",
+      "columns": [
+        "close"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [
+        "First native diagnostic and phase; if admitted capture plot and table screenshot.",
+        "Control admission does not establish target admission."
+      ],
+      "relatedNotes": []
+    },
+    {
+      "script": "corpus-table-text-wrap-v5-v1.pine",
+      "sha256": "5bb44856f338a56bff85df1df5b4d9c1994fbde0028c4c42af5c8b61b78cd0b6",
+      "title": "corpus-table-text-wrap-v5-v1",
+      "columns": [
+        "close"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [
+        "First native diagnostic and phase; if admitted capture plot and table screenshot.",
+        "Control admission does not establish target admission."
+      ],
+      "relatedNotes": []
+    },
+    {
+      "script": "corpus-table-text-wrap-v6-v1.pine",
+      "sha256": "50713ee238ad762544abda07edd1110f30e02815a77e4c441930380486ddcbe5",
+      "title": "corpus-table-text-wrap-v6-v1",
+      "columns": [
+        "close"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [
+        "First native diagnostic and phase; if admitted capture plot and table screenshot.",
+        "Control admission does not establish target admission."
+      ],
+      "relatedNotes": []
+    },
+    {
+      "script": "corpus5-v5-bb-zero-v1.pine",
+      "sha256": "10cc32ae5b828cf1c83a324d84ede19130d596ff0f312f5a386239cb26c9d608",
+      "title": "corpus5-v5-bb-zero-v1",
+      "columns": [
+        "BASIS_TARGET",
+        "UPPER_TARGET",
+        "LOWER_TARGET",
+        "LENGTH1_CONTROL"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [],
+      "relatedNotes": []
+    },
+    {
+      "script": "corpus5-v5-extrema-warmup1000-v1.pine",
+      "sha256": "4e71d6380325c068c408a274842f871d80a47332a1030a44b3f6d62cb6897309",
+      "title": "corpus5-v5-extrema-warmup1000-v1",
+      "columns": [
+        "BAR_INDEX",
+        "HIGH1000",
+        "LOW1000",
+        "HIGH10_CONTROL",
+        "LOW10_CONTROL"
+      ],
+      "minimumHistoryBars": 1200,
+      "requiredFirstBarIndex": null,
+      "indexColumn": "BAR_INDEX",
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [],
+      "relatedNotes": []
+    },
+    {
+      "script": "corpus5-v5-sma-zero-v1.pine",
+      "sha256": "48e898e2b4540054263a88fef9df77e5c67609dc1f81216d31080b5b0461dc65",
+      "title": "corpus5-v5-sma-zero-v1",
+      "columns": [
+        "TARGET",
+        "LENGTH1_CONTROL"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [],
+      "relatedNotes": []
+    },
+    {
+      "script": "corpus5-v6-exp-price-overflow-v1.pine",
+      "sha256": "ab253584ddae18ab3d2c002cf77ef95d3024c2de39ff9a7e211c4c1db30cf894",
+      "title": "corpus5-v6-exp-price-overflow-v1",
+      "columns": [
+        "PRICE_EXP_TARGET",
+        "FINITE_CONTROL",
+        "TARGET_IS_NA"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [],
+      "relatedNotes": []
+    },
+    {
+      "script": "currency-constant-literal-values-v1.pine",
+      "sha256": "028304f62c24c56df10cbc732d001e3b083fbab67c25af5905b15b1c9e0b4fab",
+      "title": "V5-CURRENCY-CONSTANT-LITERAL-VALUES-V1",
+      "columns": [
+        "CONTROL_ABC",
+        "CONTROL_AZZ",
+        "CONTROL_ZZZ",
+        "ARS_CODE",
+        "AUD_CODE",
+        "BDT_CODE",
+        "BHD_CODE",
+        "BRL_CODE",
+        "CAD_CODE",
+        "CLP_CODE",
+        "CNY_CODE",
+        "COP_CODE",
+        "CZK_CODE",
+        "DKK_CODE",
+        "EGP_CODE",
+        "ETH_CODE",
+        "GBP_CODE",
+        "HKD_CODE",
+        "HUF_CODE",
+        "IDR_CODE",
+        "ILS_CODE",
+        "INR_CODE",
+        "ISK_CODE",
+        "KES_CODE",
+        "KRW_CODE",
+        "KWD_CODE",
+        "LKR_CODE",
+        "MAD_CODE",
+        "MXN_CODE",
+        "MYR_CODE",
+        "NGN_CODE",
+        "NOK_CODE",
+        "NZD_CODE",
+        "PEN_CODE",
+        "PHP_CODE",
+        "PKR_CODE",
+        "PLN_CODE",
+        "QAR_CODE",
+        "RON_CODE",
+        "RSD_CODE",
+        "RUB_CODE",
+        "SAR_CODE",
+        "SEK_CODE"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "numeric",
+      "record": [],
+      "relatedNotes": [
+        "notes/currency-constant-literal-values-v1.capture-v1.md"
+      ]
+    },
+    {
+      "script": "drawing-coordinate-backquant-float-x-v1.pine",
+      "sha256": "6a7537b70ad28ad819cc93aa17a6367f6b8f11d79d039f270a70b76ceca6cff0",
+      "title": "BackQuant coordinate v1",
+      "columns": [],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [],
+      "relatedNotes": []
+    },
+    {
+      "script": "drawing-coordinate-point-index-active-v5-length50-v1.pine",
+      "sha256": "ffa5628632bebdaba2a8e5c6eb53cfbdb220fd503e136226cd8757284d744531",
+      "title": "Point index active input division 50",
+      "columns": [
+        "POINT_INDEX",
+        "CHART_INDEX",
+        "INPUT_TIME"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [],
+      "relatedNotes": []
+    },
+    {
+      "script": "drawing-coordinate-point-index-active-v5-length51-v1.pine",
+      "sha256": "e34138eb126b476e220cdfabe3f1551781d09ac35a99afdc6f7d1a0487d5e0ff",
+      "title": "Point index active input division 51",
+      "columns": [
+        "POINT_INDEX",
+        "CHART_INDEX",
+        "INPUT_TIME"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [],
+      "relatedNotes": []
+    },
+    {
+      "script": "drawing-coordinate-profile-float-right-v1.pine",
+      "sha256": "26fcaadce0aebc1e20634f983e394bbd48dab6c2857d309dde8eb14a85167518",
+      "title": "Profile coordinate v1",
+      "columns": [],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [],
+      "relatedNotes": []
+    },
+    {
+      "script": "drawing-coordinate-sabres-input-division-v1.pine",
+      "sha256": "4cfcf8d804c92e16ca4b385f5dd684dafa761a2aeecaa217115da4181d831808",
+      "title": "Sabres point v1",
+      "columns": [],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [],
+      "relatedNotes": []
+    },
+    {
+      "script": "drawing-default-blue-v5-v2.pine",
+      "sha256": "b4bc6878af440096452e0a6576c9ff2d001af0a5054c71de75e76fa07d8c57c1",
+      "title": "Drawing default blue v5 v2",
+      "columns": [
+        "OUTCOME"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "screenshot",
+      "record": [
+        "Retain unmodified source and exact compile/runtime outcome. Export OUTCOME close as anchor control.",
+        "Capture screenshot with all five rows and four columns visible: DEFAULT, color.blue, #2196F3, #2962FF. Do not derive drawing colors from OUTCOME; it is only an execution/price control.",
+        "Rows isolate coordinate/point box border and background defaults, plus polyline line_color. Record browser/theme/background and lossless screenshot. Exact pixel dimensions are not under test.",
+        "v2 is registered for v5 capture per overseer routing; identical constructor comparisons to immutable v4 originals, only indicator title version changes."
+      ],
+      "relatedNotes": []
+    },
+    {
+      "script": "drawing-default-blue-v6-v2.pine",
+      "sha256": "eabb8499d58e33aa4f2d0f7158cb8d125fb30ca503a880555f927ec0cd3cbb27",
+      "title": "Drawing default blue v6 v2",
+      "columns": [
+        "OUTCOME"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "screenshot",
+      "record": [
+        "Retain unmodified source and exact compile/runtime outcome. Export OUTCOME close as anchor control.",
+        "Capture screenshot with all five rows and four columns visible: DEFAULT, color.blue, #2196F3, #2962FF. Do not derive drawing colors from OUTCOME; it is only an execution/price control.",
+        "Rows isolate coordinate/point box border and background defaults, plus polyline line_color. Record browser/theme/background and lossless screenshot. Exact pixel dimensions are not under test.",
+        "v2 is registered for v5 capture per overseer routing; identical constructor comparisons to immutable v4 originals, only indicator title version changes."
+      ],
+      "relatedNotes": []
+    },
+    {
+      "script": "drawing-future-index-first-last-v1.pine",
+      "sha256": "c63b8704de16e05496a105a47039335eafb836e9ce63dd4d2bc09563c664dde3",
+      "title": "V5 drawing future index first-last",
+      "columns": [
+        "BAR_INDEX",
+        "LAST_BAR_INDEX",
+        "OUTCOME"
+      ],
+      "minimumHistoryBars": 600,
+      "requiredFirstBarIndex": null,
+      "indexColumn": "BAR_INDEX",
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [],
+      "relatedNotes": []
+    },
+    {
+      "script": "drawing-future-index-first-local-v1.pine",
+      "sha256": "3a4c0743e976160a9b6e352feea6522a5d33a5d44ff72f88dc4e531626e20825",
+      "title": "V5 drawing future index first-local",
+      "columns": [
+        "BAR_INDEX",
+        "LAST_BAR_INDEX",
+        "OUTCOME"
+      ],
+      "minimumHistoryBars": 600,
+      "requiredFirstBarIndex": null,
+      "indexColumn": "BAR_INDEX",
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [],
+      "relatedNotes": []
+    },
+    {
+      "script": "drawing-method-distinct-v5-control-v1.pine",
+      "sha256": "db1fc63dee03de48f6b3e6a17a6053fa89182fa02a2a6dfcc8f99f3972b98c34",
+      "title": "Distinct user method overload control",
+      "columns": [
+        "ZERO_ARGUMENT",
+        "ONE_ARGUMENT",
+        "INPUT_TIME"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [],
+      "relatedNotes": []
+    },
+    {
+      "script": "drawing-method-identical-v5-invoked-v1.pine",
+      "sha256": "d4ecb67b99abd0fcc859f3b5133f2ef6f33e7755f827bd08fcbda8f9f55a21cd",
+      "title": "Identical user method invocation probe",
+      "columns": [
+        "SELECTED_BODY",
+        "INPUT_TIME"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [],
+      "relatedNotes": []
+    },
+    {
+      "script": "drawing-method-identical-v56-1376-exact-v1.pine",
+      "sha256": "7ba22e4d2286acb6d0c7a51ca15c0b0c94d0549f4c9977634bcfc31e48c04937",
+      "title": "Unsupported duplicate user method",
+      "columns": [],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [],
+      "relatedNotes": []
+    },
+    {
+      "script": "float-equality-nonzero-discriminator-v3.pine",
+      "sha256": "9780d704a83e9ecf4b80724b5cc63ae49054fcec68b05949e971f86145bb09f3",
+      "title": "V5-FLOAT-EQUALITY-NONZERO-DISCRIMINATOR-V3",
+      "columns": [
+        "PHASE",
+        "EQ",
+        "NE",
+        "LT",
+        "LE",
+        "GT",
+        "GE",
+        "ABS_DIFF_SCALED",
+        "input_time",
+        "input_bar_index",
+        "input_close",
+        "x_scaled_1e10",
+        "x_eq_zero",
+        "x_neq_zero",
+        "zero_eq_x",
+        "zero_neq_x",
+        "normalized_scaled_1e10",
+        "normalized_eq_zero",
+        "normalized_neq_zero",
+        "literal_eq_zero",
+        "literal_neq_zero",
+        "x_na"
+      ],
+      "minimumHistoryBars": 112,
+      "requiredFirstBarIndex": 0,
+      "indexColumn": "input_bar_index",
+      "supersededBy": null,
+      "captureKind": "numeric",
+      "record": [
+        "Export all22 mapped columns from unchanged source, at least112 bars beginning index0. Preserve timestamps/source hash/compile-runtime diagnostics. This single probe supersedes the v2 discriminator and direct-boundary v1 registration."
+      ],
+      "relatedNotes": []
+    },
+    {
+      "script": "fractional-int-division-const-control-v1.pine",
+      "sha256": "b11eaa62dcf9da3d2b150ac5f9b45d1c467d882d59454dbd1b6ceafdd29a394d",
+      "title": "V5-FRACTIONAL-INT-DIVISION-CONST-CONTROL-V1",
+      "columns": [
+        "INPUT_TIME",
+        "NUMERATOR",
+        "RAW",
+        "ASSIGNED",
+        "RESIDUAL"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [],
+      "relatedNotes": []
+    },
+    {
+      "script": "fractional-int-division-explicit-cast-control-v1.pine",
+      "sha256": "607325515ca02368831d1ee51c28b00af77c4ef58703deb45f7da0078184b65b",
+      "title": "V5-FRACTIONAL-INT-DIVISION-EXPLICIT-CAST-CONTROL-V1",
+      "columns": [
+        "INPUT_TIME",
+        "NUMERATOR",
+        "RAW",
+        "ASSIGNED",
+        "RESIDUAL"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [],
+      "relatedNotes": []
+    },
+    {
+      "script": "fractional-int-division-float-control-v1.pine",
+      "sha256": "0599362b0f0e6f2b48cd9fdd051a6a277c9d9d48012f8205137ed88d17110ed0",
+      "title": "V5-FRACTIONAL-INT-DIVISION-FLOAT-CONTROL-V1",
+      "columns": [
+        "INPUT_TIME",
+        "NUMERATOR",
+        "RAW",
+        "ASSIGNED",
+        "RESIDUAL"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [],
+      "relatedNotes": []
+    },
+    {
+      "script": "fractional-int-division-input-control-v1.pine",
+      "sha256": "0be552431104ad91c6be4da8bceab266a3c2907710efe5dc948ab17848a30e89",
+      "title": "V5-FRACTIONAL-INT-DIVISION-INPUT-CONTROL-V1",
+      "columns": [
+        "INPUT_TIME",
+        "NUMERATOR",
+        "RAW",
+        "ASSIGNED",
+        "RESIDUAL"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [],
+      "relatedNotes": []
+    },
+    {
+      "script": "fractional-int-division-series-negative-v1.pine",
+      "sha256": "5ccc81574d4cd8f5556d82d7133fc37ac1ae50fc67e2131c5f0dfc544629deaa",
+      "title": "V5-FRACTIONAL-INT-DIVISION-SERIES-NEGATIVE-V1",
+      "columns": [
+        "INPUT_TIME",
+        "NUMERATOR",
+        "RAW",
+        "ASSIGNED",
+        "RESIDUAL"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [],
+      "relatedNotes": []
+    },
+    {
+      "script": "fractional-int-division-series-positive-v1.pine",
+      "sha256": "846ebaee826838aa88985f8e6fbc2f85f77bfbc65b7845d3787b658834f3a976",
+      "title": "V5-FRACTIONAL-INT-DIVISION-SERIES-POSITIVE-V1",
+      "columns": [
+        "INPUT_TIME",
+        "NUMERATOR",
+        "RAW",
+        "ASSIGNED",
+        "RESIDUAL"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [],
+      "relatedNotes": []
+    },
+    {
+      "script": "fractional-int-division-simple-negative-v1.pine",
+      "sha256": "33fa321ba02b132ae2efca8ce486858634896cc18b62f6b698d861b9ed94e3c3",
+      "title": "V5-FRACTIONAL-INT-DIVISION-SIMPLE-NEGATIVE-V1",
+      "columns": [
+        "INPUT_TIME",
+        "NUMERATOR",
+        "RAW",
+        "ASSIGNED",
+        "RESIDUAL"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [],
+      "relatedNotes": []
+    },
+    {
+      "script": "fractional-int-division-simple-positive-v1.pine",
+      "sha256": "447b38266dcdd6dd8ebe87b8c248a4d51621370026f753438edcef7e9a4c9369",
+      "title": "V5-FRACTIONAL-INT-DIVISION-SIMPLE-POSITIVE-V1",
+      "columns": [
+        "INPUT_TIME",
+        "NUMERATOR",
+        "RAW",
+        "ASSIGNED",
+        "RESIDUAL"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [],
+      "relatedNotes": []
+    },
+    {
+      "script": "ledger47-zero-div-v5-compound-zero-v1.pine",
+      "sha256": "c5de25080e3ee41186414b4fa5e41be518045cf184b3ad9c5b32e3c378007728",
+      "title": "ledger47-zero-div-v5-compound-zero-v1",
+      "columns": [
+        "INPUT_TIME",
+        "NUMERATOR_CLOSE",
+        "RAW",
+        "IS_NA",
+        "NZ_42"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [],
+      "relatedNotes": []
+    },
+    {
+      "script": "ledger47-zero-div-v5-dynamic-negative-zero-v1.pine",
+      "sha256": "a805da2449743d9bf19e3d0c5e9d110cd5d8c3bceb651e1b5440da9ac46055cf",
+      "title": "ledger47-zero-div-v5-dynamic-negative-zero-v1",
+      "columns": [
+        "INPUT_TIME",
+        "NUMERATOR_CLOSE",
+        "RAW",
+        "IS_NA",
+        "NZ_42"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [],
+      "relatedNotes": []
+    },
+    {
+      "script": "ledger47-zero-div-v5-dynamic-positive-zero-v1.pine",
+      "sha256": "4b3330d4f5920fa44d2ccf4f3fdb2e4b640d1e68487863f5cfbc6b1e827b3972",
+      "title": "ledger47-zero-div-v5-dynamic-positive-zero-v1",
+      "columns": [
+        "INPUT_TIME",
+        "NUMERATOR_CLOSE",
+        "RAW",
+        "IS_NA",
+        "NZ_42"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [],
+      "relatedNotes": []
+    },
+    {
+      "script": "ledger47-zero-div-v5-finite-control-v1.pine",
+      "sha256": "9771856344ebcf270c9f5542f7466c2d6e6f9002487eb590295555e6f0c5d59d",
+      "title": "ledger47-zero-div-v5-finite-control-v1",
+      "columns": [
+        "INPUT_TIME",
+        "NUMERATOR_CLOSE",
+        "RAW",
+        "IS_NA",
+        "NZ_42"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [],
+      "relatedNotes": []
+    },
+    {
+      "script": "ledger47-zero-div-v5-literal-negative-zero-v1.pine",
+      "sha256": "667c51db28ae47d343148d07893bd217064ee982830cf7c48a30d6470a90a8e6",
+      "title": "ledger47-zero-div-v5-literal-negative-zero-v1",
+      "columns": [
+        "INPUT_TIME",
+        "NUMERATOR_CLOSE",
+        "RAW",
+        "IS_NA",
+        "NZ_42"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [],
+      "relatedNotes": []
+    },
+    {
+      "script": "ledger47-zero-div-v5-literal-positive-zero-v1.pine",
+      "sha256": "16ed7d48e7718f030245ff85b887edb29e5d69c8d66c7127dad1570d6f3c4af9",
+      "title": "ledger47-zero-div-v5-literal-positive-zero-v1",
+      "columns": [
+        "INPUT_TIME",
+        "NUMERATOR_CLOSE",
+        "RAW",
+        "IS_NA",
+        "NZ_42"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [],
+      "relatedNotes": []
+    },
+    {
+      "script": "ledger47-zero-div-v5-missing-numerator-control-v1.pine",
+      "sha256": "3a06ad2800003911fda5f13807c3225f0df7d34b3190eb9528c4b8cea212a3e6",
+      "title": "ledger47-zero-div-v5-missing-numerator-control-v1",
+      "columns": [
+        "INPUT_TIME",
+        "NUMERATOR_CLOSE",
+        "RAW",
+        "IS_NA",
+        "NZ_42"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [],
+      "relatedNotes": []
+    },
+    {
+      "script": "ledger47-zero-div-v5-udf-zero-v1.pine",
+      "sha256": "ec2f93dbf2de2548fcc274ca69c86aea341e3a14a264725e3ebdbfc38392893c",
+      "title": "ledger47-zero-div-v5-udf-zero-v1",
+      "columns": [
+        "INPUT_TIME",
+        "NUMERATOR_CLOSE",
+        "RAW",
+        "IS_NA",
+        "NZ_42"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [],
+      "relatedNotes": []
+    },
+    {
+      "script": "percentile-hole-linear_interpolation-len14-p25-v1.pine",
+      "sha256": "53072e3396c9f80a2dd2d4b91ae5e8d121070aad3ae727ab823c459c5b253f3f",
+      "title": "Percentile hole linear_interpolation length14 p25 v1",
+      "columns": [
+        "input_bar_index",
+        "input_time",
+        "input_close",
+        "input_source",
+        "input_missing",
+        "percentile_linear_interpolation_len14_pct25_hole40_41",
+        "clean_control"
+      ],
+      "minimumHistoryBars": 256,
+      "requiredFirstBarIndex": 0,
+      "indexColumn": "input_bar_index",
+      "supersededBy": null,
+      "captureKind": "numeric",
+      "record": [
+        "Save untouched source and full raw CSV, including empty NA cells.",
+        "Retain compiler/runtime diagnostics, input timestamps and chart start.",
+        "Inspect requested hole and recovery bars; do not infer missing results from local engine output."
+      ],
+      "relatedNotes": []
+    },
+    {
+      "script": "percentile-hole-linear_interpolation-len14-p75-v1.pine",
+      "sha256": "75c0248f5e8cdc8ae4395cb6e504d911abe587e34b144949d735ed8e68da3414",
+      "title": "Percentile hole linear_interpolation length14 p75 v1",
+      "columns": [
+        "input_bar_index",
+        "input_time",
+        "input_close",
+        "input_source",
+        "input_missing",
+        "percentile_linear_interpolation_len14_pct75_hole40_41",
+        "clean_control"
+      ],
+      "minimumHistoryBars": 256,
+      "requiredFirstBarIndex": 0,
+      "indexColumn": "input_bar_index",
+      "supersededBy": null,
+      "captureKind": "numeric",
+      "record": [
+        "Save untouched source and full raw CSV, including empty NA cells.",
+        "Retain compiler/runtime diagnostics, input timestamps and chart start.",
+        "Inspect requested hole and recovery bars; do not infer missing results from local engine output."
+      ],
+      "relatedNotes": []
+    },
+    {
+      "script": "percentile-hole-linear_interpolation-len4-p75-v1.pine",
+      "sha256": "53b257187796099d667dc44d2a33cc4d04a42d54be740695a314e86c7aa469b8",
+      "title": "Percentile hole linear_interpolation length4 p75 v1",
+      "columns": [
+        "input_bar_index",
+        "input_time",
+        "input_close",
+        "input_source",
+        "input_missing",
+        "linear_hole_builtin",
+        "clean_control"
+      ],
+      "minimumHistoryBars": 256,
+      "requiredFirstBarIndex": 0,
+      "indexColumn": "input_bar_index",
+      "supersededBy": null,
+      "captureKind": "numeric",
+      "record": [
+        "Save untouched source and full raw CSV, including empty NA cells.",
+        "Retain compiler/runtime diagnostics, input timestamps and chart start.",
+        "Inspect requested hole and recovery bars; do not infer missing results from local engine output."
+      ],
+      "relatedNotes": []
+    },
+    {
+      "script": "percentile-hole-nearest_rank-len14-p25-v1.pine",
+      "sha256": "d778cd8fe30793bc831a1b1b6696482b7cd4e8834f28950f67d5d3046732b0f8",
+      "title": "Percentile hole nearest_rank length14 p25 v1",
+      "columns": [
+        "input_bar_index",
+        "input_time",
+        "input_close",
+        "input_source",
+        "input_missing",
+        "percentile_nearest_rank_len14_pct25_hole40_41",
+        "clean_control"
+      ],
+      "minimumHistoryBars": 256,
+      "requiredFirstBarIndex": 0,
+      "indexColumn": "input_bar_index",
+      "supersededBy": null,
+      "captureKind": "numeric",
+      "record": [
+        "Save untouched source and full raw CSV, including empty NA cells.",
+        "Retain compiler/runtime diagnostics, input timestamps and chart start.",
+        "Inspect requested hole and recovery bars; do not infer missing results from local engine output."
+      ],
+      "relatedNotes": []
+    },
+    {
+      "script": "percentile-hole-nearest_rank-len14-p75-v1.pine",
+      "sha256": "3feff77726fad1b5c5a6189b99b985659a173369099c0cec9e66a16a9d681280",
+      "title": "Percentile hole nearest_rank length14 p75 v1",
+      "columns": [
+        "input_bar_index",
+        "input_time",
+        "input_close",
+        "input_source",
+        "input_missing",
+        "percentile_nearest_rank_len14_pct75_hole40_41",
+        "clean_control"
+      ],
+      "minimumHistoryBars": 256,
+      "requiredFirstBarIndex": 0,
+      "indexColumn": "input_bar_index",
+      "supersededBy": null,
+      "captureKind": "numeric",
+      "record": [
+        "Save untouched source and full raw CSV, including empty NA cells.",
+        "Retain compiler/runtime diagnostics, input timestamps and chart start.",
+        "Inspect requested hole and recovery bars; do not infer missing results from local engine output."
+      ],
+      "relatedNotes": []
+    },
+    {
+      "script": "percentile-rank-readout-v1.pine",
+      "sha256": "ad748e178a99fa681eae9f00304d19bb793bdf09ab6dd4bb971a5ddfe78f15ad",
+      "title": "Percentile rank readout v1",
+      "columns": [
+        "input_bar_index",
+        "input_hole20_21",
+        "input_lead0_4",
+        "nearest_len14_rank01_clean",
+        "nearest_len14_rank02_clean",
+        "nearest_len14_rank03_clean",
+        "nearest_len14_rank04_clean",
+        "nearest_len14_rank05_clean",
+        "nearest_len14_rank06_clean",
+        "nearest_len14_rank07_clean",
+        "nearest_len14_rank08_clean",
+        "nearest_len14_rank09_clean",
+        "nearest_len14_rank10_clean",
+        "nearest_len14_rank11_clean",
+        "nearest_len14_rank12_clean",
+        "nearest_len14_rank13_clean",
+        "nearest_len14_rank14_clean",
+        "nearest_len14_rank01_hole20_21",
+        "nearest_len14_rank02_hole20_21",
+        "nearest_len14_rank03_hole20_21",
+        "nearest_len14_rank04_hole20_21",
+        "nearest_len14_rank05_hole20_21",
+        "nearest_len14_rank06_hole20_21",
+        "nearest_len14_rank07_hole20_21",
+        "nearest_len14_rank08_hole20_21",
+        "nearest_len14_rank09_hole20_21",
+        "nearest_len14_rank10_hole20_21",
+        "nearest_len14_rank11_hole20_21",
+        "nearest_len14_rank12_hole20_21",
+        "nearest_len14_rank13_hole20_21",
+        "nearest_len14_rank14_hole20_21",
+        "nearest_len14_rank01_lead0_4",
+        "nearest_len14_rank02_lead0_4",
+        "nearest_len14_rank03_lead0_4",
+        "nearest_len14_rank04_lead0_4",
+        "nearest_len14_rank05_lead0_4",
+        "nearest_len14_rank06_lead0_4",
+        "nearest_len14_rank07_lead0_4",
+        "nearest_len14_rank08_lead0_4",
+        "nearest_len14_rank09_lead0_4",
+        "nearest_len14_rank10_lead0_4",
+        "nearest_len14_rank11_lead0_4",
+        "nearest_len14_rank12_lead0_4",
+        "nearest_len14_rank13_lead0_4",
+        "nearest_len14_rank14_lead0_4",
+        "linear_len14_rank01_hole20_21",
+        "linear_len14_rank02_hole20_21",
+        "linear_len14_rank03_hole20_21",
+        "linear_len14_rank04_hole20_21",
+        "linear_len14_rank05_hole20_21",
+        "linear_len14_rank06_hole20_21",
+        "linear_len14_rank07_hole20_21",
+        "linear_len14_rank08_hole20_21",
+        "linear_len14_rank09_hole20_21",
+        "linear_len14_rank10_hole20_21",
+        "linear_len14_rank11_hole20_21",
+        "linear_len14_rank12_hole20_21",
+        "linear_len14_rank13_hole20_21",
+        "linear_len14_rank14_hole20_21"
+      ],
+      "minimumHistoryBars": 256,
+      "requiredFirstBarIndex": 0,
+      "indexColumn": "input_bar_index",
+      "supersededBy": null,
+      "captureKind": "numeric",
+      "record": [],
+      "relatedNotes": [
+        "notes/PERCENTILE-RANK-READOUT-v1.md"
+      ]
+    },
+    {
+      "script": "rci-missing-sign-discriminator-v1.pine",
+      "sha256": "555e8f46c934824e534d781da79e1a8ece78c00e19158b198658057ea48f788f",
+      "title": "RCI missing sign discriminator v1",
+      "columns": [
+        "input_bar_index",
+        "input_positive_clean",
+        "rci_len4_positive_clean",
+        "rci_len14_positive_clean",
+        "input_positive_leading",
+        "rci_len4_positive_leading",
+        "rci_len14_positive_leading",
+        "input_positive_hole",
+        "rci_len4_positive_hole",
+        "rci_len14_positive_hole",
+        "input_negative_clean",
+        "rci_len4_negative_clean",
+        "rci_len14_negative_clean",
+        "input_negative_leading",
+        "rci_len4_negative_leading",
+        "rci_len14_negative_leading",
+        "input_negative_hole",
+        "rci_len4_negative_hole",
+        "rci_len14_negative_hole",
+        "input_crossing_clean",
+        "rci_len4_crossing_clean",
+        "rci_len14_crossing_clean",
+        "input_crossing_leading",
+        "rci_len4_crossing_leading",
+        "rci_len14_crossing_leading",
+        "input_crossing_hole",
+        "rci_len4_crossing_hole",
+        "rci_len14_crossing_hole"
+      ],
+      "minimumHistoryBars": 256,
+      "requiredFirstBarIndex": 0,
+      "indexColumn": "input_bar_index",
+      "supersededBy": null,
+      "captureKind": "numeric",
+      "record": [],
+      "relatedNotes": [
+        "notes/RCI-MISSING-SIGN-DISCRIMINATOR-v1.md"
+      ]
+    },
+    {
+      "script": "row1654-explicit-int-control-v1.pine",
+      "sha256": "b930c1143fa285a8ece85b54a31ab54a522266e5bb9705e5f258b7091a191984",
+      "title": "row1654-explicit-int-control-v1",
+      "columns": [
+        "explicit_int_control"
+      ],
+      "minimumHistoryBars": 160,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [],
+      "relatedNotes": []
+    },
+    {
+      "script": "row1654-label-timeframe-division-v1.pine",
+      "sha256": "70c812965639a6e8a70befdd635e29850b276243175f176db0233386c0de77fc",
+      "title": "row1654-label-timeframe-division-v1",
+      "columns": [
+        "compile_control"
+      ],
+      "minimumHistoryBars": 160,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [],
+      "relatedNotes": []
+    },
+    {
+      "script": "row1654-line-timeframe-division-v1.pine",
+      "sha256": "83022a368f0b48b4912cfebe7b5fe3653738b8a5e05ca26382fa744a93d49eed",
+      "title": "row1654-line-timeframe-division-v1",
+      "columns": [
+        "compile_control"
+      ],
+      "minimumHistoryBars": 160,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [],
+      "relatedNotes": []
+    },
+    {
+      "script": "row1654-lowest-timeframe-division-v1.pine",
+      "sha256": "daf522ddcb753a60cab9021fc3769aed70fafaa5a72d0f4d940a4331f94862c2",
+      "title": "row1654-lowest-timeframe-division-v1",
+      "columns": [
+        "target",
+        "explicit_int_control",
+        "division_value"
+      ],
+      "minimumHistoryBars": 160,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [],
+      "relatedNotes": []
+    },
+    {
+      "script": "row1654-original-v1.pine",
+      "sha256": "114e422f2fff6c14a67c2d4ac39754ee34a9f38853f842a61de2d40e4bbae806",
+      "title": "Day Trading Booster by DGT",
+      "columns": [],
+      "minimumHistoryBars": 160,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [],
+      "relatedNotes": [
+        "notes/corpus390-1654-SPEC-v1.md"
+      ]
+    },
+    {
+      "script": "row390-explicit-int-control-v1.pine",
+      "sha256": "4e7127e3ef48f7d73403f0aaa115b8dbf256aa23b23e599f1e767fb64d453ec8",
+      "title": "row390-explicit-int-control-v1",
+      "columns": [
+        "compile_control"
+      ],
+      "minimumHistoryBars": 160,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [],
+      "relatedNotes": []
+    },
+    {
+      "script": "row390-label-new-midpoint-v1.pine",
+      "sha256": "0d5a0a6829e11e6b086c8ebe054f575b7439326112c843ec1b5666832ebc23a1",
+      "title": "row390-label-new-midpoint-v1",
+      "columns": [
+        "compile_control"
+      ],
+      "minimumHistoryBars": 160,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [],
+      "relatedNotes": []
+    },
+    {
+      "script": "row390-label-set-x-midpoint-v1.pine",
+      "sha256": "1ea87e3c8987ddb2ce0e7ce4717d9a1c1154d1f648ec42044900889f9a5b081f",
+      "title": "row390-label-set-x-midpoint-v1",
+      "columns": [
+        "compile_control"
+      ],
+      "minimumHistoryBars": 160,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [],
+      "relatedNotes": []
+    },
+    {
+      "script": "row390-original-v1.pine",
+      "sha256": "5feaafffa8cc030d94161b47c821c8635cea9a5970830fb3a6411f996b61888c",
+      "title": "STATIC MODEL",
+      "columns": [
+        "HH",
+        "HL",
+        "LH",
+        "LL"
+      ],
+      "minimumHistoryBars": 160,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [],
+      "relatedNotes": [
+        "notes/corpus390-1654-SPEC-v1.md"
+      ]
+    },
+    {
+      "script": "supertrend-factor-alone-first3-v1.pine",
+      "sha256": "cd4c4ee7b2d6f865fba61f52b360d0bfc68f23ab71bc8700827511f4e73dcb97",
+      "title": "Supertrend factor alone-first3 v1",
+      "columns": [
+        "input_time_ms",
+        "input_bar_index",
+        "input_open",
+        "input_high",
+        "input_low",
+        "input_close",
+        "input_volume",
+        "input_factor",
+        "dynamic_line",
+        "dynamic_direction"
+      ],
+      "minimumHistoryBars": 256,
+      "requiredFirstBarIndex": 0,
+      "indexColumn": "input_bar_index",
+      "supersededBy": null,
+      "captureKind": "numeric",
+      "record": [],
+      "relatedNotes": [
+        "notes/SUPERTREND-FACTOR-PROBES-v1.md"
+      ]
+    },
+    {
+      "script": "supertrend-factor-alone-v1.pine",
+      "sha256": "ddcbaaee153d6f33693fdd3b2ee285e1422bd5fb71ce653620f80dedcd724885",
+      "title": "Supertrend factor alone v1",
+      "columns": [
+        "input_time_ms",
+        "input_bar_index",
+        "input_open",
+        "input_high",
+        "input_low",
+        "input_close",
+        "input_volume",
+        "input_factor",
+        "dynamic_line",
+        "dynamic_direction"
+      ],
+      "minimumHistoryBars": 256,
+      "requiredFirstBarIndex": 0,
+      "indexColumn": "input_bar_index",
+      "supersededBy": null,
+      "captureKind": "numeric",
+      "record": [],
+      "relatedNotes": [
+        "notes/SUPERTREND-FACTOR-PROBES-v1.md"
+      ]
+    },
+    {
+      "script": "supertrend-factor-paired-fixed2-v1.pine",
+      "sha256": "d21cdc8ae28b7e646846c421c848b6d6795314827bf8641b901fe36eb302d879",
+      "title": "Supertrend factor paired-fixed2 v1",
+      "columns": [
+        "input_time_ms",
+        "input_bar_index",
+        "input_open",
+        "input_high",
+        "input_low",
+        "input_close",
+        "input_volume",
+        "input_factor",
+        "dynamic_line",
+        "dynamic_direction",
+        "fixed2_line",
+        "fixed2_direction"
+      ],
+      "minimumHistoryBars": 256,
+      "requiredFirstBarIndex": 0,
+      "indexColumn": "input_bar_index",
+      "supersededBy": null,
+      "captureKind": "numeric",
+      "record": [],
+      "relatedNotes": [
+        "notes/SUPERTREND-FACTOR-PROBES-v1.md"
+      ]
+    },
+    {
+      "script": "trace-accdist-host-missing-v1.pine",
+      "sha256": "79a500069d2befbaa9f956182e982cd318bb63a8e8d9d2b8f659d05864bf5a23",
+      "title": "trace-accdist-host-missing-v1",
+      "columns": [
+        "ACCDIST",
+        "ACCDIST_MISSING",
+        "VOLUME_MISSING",
+        "PRICE_MISSING",
+        "FLAT_RANGE"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": 0,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [
+        "Export every unchanged plotted channel, native missing cells, timestamps, full compile/runtime diagnostics and exact source hash.",
+        "Builtin OHLCV cannot be replaced by an artificial source. Capture the unchanged script on standard instruments with native unavailable volume/flat ranges if available. Absent qualifying native bars, hole/recovery remains TRACE-REQUIRED."
+      ],
+      "relatedNotes": []
+    },
+    {
+      "script": "trace-corporate-eps-revenue-exdate-v1.pine",
+      "sha256": "3713a67f59f76a6b0ddd69af1c6b51b57c065ebbb34a5d68d9d282344c2e51fb",
+      "title": "trace-corporate-eps-revenue-exdate-v1",
+      "columns": [
+        "EPS",
+        "EPS_MISSING",
+        "REVENUE",
+        "REVENUE_MISSING",
+        "EX_DATE",
+        "EX_DATE_MISSING"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": 0,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [
+        "Export every unchanged plotted channel, native missing cells, timestamps, full compile/runtime diagnostics and exact source hash.",
+        "Provider values/availability are unobserved. Export unchanged future EPS/revenue/ex-date and masks on a supported equity; record symbol/currency/initial-calculation time and fresh recalculation separately. No fabricated event or guessed live forecast."
+      ],
+      "relatedNotes": []
+    },
+    {
+      "script": "trace-matrix-predicate-epsilon-v1.pine",
+      "sha256": "b6f13be8a1990dc708a6df05aec2d4d3ffddeb36b17aab7f3d6b1aebcede547d",
+      "title": "trace-matrix-predicate-epsilon-v1",
+      "columns": [
+        "PHASE",
+        "VALUE",
+        "ZERO_POSITIVE",
+        "ZERO_NEGATIVE",
+        "BINARY_NEAR_ONE"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": 0,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [
+        "Export every unchanged plotted channel, native missing cells, timestamps, full compile/runtime diagnostics and exact source hash.",
+        "Numeric predicate tolerance is unobserved. Sweep exact0 and1 controls plus1e-15..1e-6 perturbations; preserve source literals and CSV outputs rather than choosing a tolerance."
+      ],
+      "relatedNotes": []
+    },
+    {
+      "script": "trace-max-all-na-seed-v1.pine",
+      "sha256": "e5479d200d0ab2799d4b4f5f47c01ccab22bbd7ec2fb8edfd91fc63962af18a8",
+      "title": "trace-max-all-na-seed-v1",
+      "columns": [
+        "ALL_VALUE",
+        "ALL_MISSING",
+        "LEADING_VALUE",
+        "LEADING_MISSING"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": 0,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [
+        "Export every unchanged plotted channel, native missing cells, timestamps, full compile/runtime diagnostics and exact source hash.",
+        "All-na seed and recovery are unobserved; retain actual missing masks and finite values without choosing zero, missing or another seed."
+      ],
+      "relatedNotes": []
+    },
+    {
+      "script": "trace-plotarrow-height-negative-max-v6.pine",
+      "sha256": "beb9a94a39cad057f2ddab98ff12d3df4ce1c0adf0cc59b6e37243c05162e15f",
+      "title": "trace-plotarrow-height-negative-max-v6",
+      "columns": [
+        "BAR_INDEX",
+        "SOURCE",
+        "OFFSET",
+        "MINHEIGHT",
+        "MAXHEIGHT"
+      ],
+      "minimumHistoryBars": 160,
+      "requiredFirstBarIndex": null,
+      "indexColumn": "BAR_INDEX",
+      "supersededBy": null,
+      "captureKind": "screenshot",
+      "record": [
+        "Preserve untouched source, warnings and compile/runtime diagnostics.",
+        "Save full CSV plus timestamped screenshots; numeric values do not observe arrow location or pixel height.",
+        "Local success is readiness, not native evidence."
+      ],
+      "relatedNotes": []
+    },
+    {
+      "script": "trace-plotarrow-height-negative-min-v6.pine",
+      "sha256": "05220bc4434ca10eb9f285bf1cb8a4200d73c0ade51cc94e377c68b1112f344e",
+      "title": "trace-plotarrow-height-negative-min-v6",
+      "columns": [
+        "BAR_INDEX",
+        "SOURCE",
+        "OFFSET",
+        "MINHEIGHT",
+        "MAXHEIGHT"
+      ],
+      "minimumHistoryBars": 160,
+      "requiredFirstBarIndex": null,
+      "indexColumn": "BAR_INDEX",
+      "supersededBy": null,
+      "captureKind": "screenshot",
+      "record": [
+        "Preserve untouched source, warnings and compile/runtime diagnostics.",
+        "Save full CSV plus timestamped screenshots; numeric values do not observe arrow location or pixel height.",
+        "Local success is readiness, not native evidence."
+      ],
+      "relatedNotes": []
+    },
+    {
+      "script": "trace-plotarrow-height-reversed-v6.pine",
+      "sha256": "69bbdb91dcee95bf14cfdc7ede14535aaa27c3dd4a88ce46a53c8fef344a2f00",
+      "title": "trace-plotarrow-height-reversed-v6",
+      "columns": [
+        "BAR_INDEX",
+        "SOURCE",
+        "OFFSET",
+        "MINHEIGHT",
+        "MAXHEIGHT"
+      ],
+      "minimumHistoryBars": 160,
+      "requiredFirstBarIndex": null,
+      "indexColumn": "BAR_INDEX",
+      "supersededBy": null,
+      "captureKind": "screenshot",
+      "record": [
+        "Preserve untouched source, warnings and compile/runtime diagnostics.",
+        "Save full CSV plus timestamped screenshots; numeric values do not observe arrow location or pixel height.",
+        "Local success is readiness, not native evidence."
+      ],
+      "relatedNotes": []
+    },
+    {
+      "script": "trace-plotarrow-height-valid-control-v6.pine",
+      "sha256": "dc737d70d34b5ced1ea628af2fb68ec6f32d8d4218184cd4327ecd8f48ea1100",
+      "title": "trace-plotarrow-height-valid-control-v6",
+      "columns": [
+        "BAR_INDEX",
+        "SOURCE",
+        "OFFSET",
+        "MINHEIGHT",
+        "MAXHEIGHT"
+      ],
+      "minimumHistoryBars": 160,
+      "requiredFirstBarIndex": null,
+      "indexColumn": "BAR_INDEX",
+      "supersededBy": null,
+      "captureKind": "screenshot",
+      "record": [
+        "Preserve untouched source, warnings and compile/runtime diagnostics.",
+        "Save full CSV plus timestamped screenshots; numeric values do not observe arrow location or pixel height.",
+        "Local success is readiness, not native evidence."
+      ],
+      "relatedNotes": []
+    },
+    {
+      "script": "trace-plotarrow-normalization-domain-v6.pine",
+      "sha256": "3333ed38aa675e9f59f81cf15a5bb158cb4aec4c893e1fd1308f70ff0a9d195e",
+      "title": "trace-plotarrow-normalization-domain-v6",
+      "columns": [
+        "BAR_INDEX",
+        "SOURCE",
+        "OFFSET",
+        "MINHEIGHT",
+        "MAXHEIGHT"
+      ],
+      "minimumHistoryBars": 160,
+      "requiredFirstBarIndex": null,
+      "indexColumn": "BAR_INDEX",
+      "supersededBy": null,
+      "captureKind": "screenshot",
+      "record": [
+        "Preserve untouched source, warnings and compile/runtime diagnostics.",
+        "Save full CSV plus timestamped screenshots; numeric values do not observe arrow location or pixel height.",
+        "Local success is readiness, not native evidence."
+      ],
+      "relatedNotes": []
+    },
+    {
+      "script": "trace-plotarrow-offset-v3-series.pine",
+      "sha256": "ddeb5c627fc9d59c1680aac3a5c6382945af7135c98bffa47445d27fbd27c6b4",
+      "title": "trace-plotarrow-offset-v3-series",
+      "columns": [
+        "BAR_INDEX",
+        "SOURCE",
+        "OFFSET",
+        "MINHEIGHT",
+        "MAXHEIGHT"
+      ],
+      "minimumHistoryBars": 160,
+      "requiredFirstBarIndex": null,
+      "indexColumn": "BAR_INDEX",
+      "supersededBy": null,
+      "captureKind": "screenshot",
+      "record": [
+        "Preserve untouched source, warnings and compile/runtime diagnostics.",
+        "Save full CSV plus timestamped screenshots; numeric values do not observe arrow location or pixel height.",
+        "Local success is readiness, not native evidence."
+      ],
+      "relatedNotes": []
+    },
+    {
+      "script": "trace-plotarrow-offset-v3-zero-control.pine",
+      "sha256": "16ea944933815e1624890c1be8271fd7787cb14a8b43e26b59426110e31c062b",
+      "title": "trace-plotarrow-offset-v3-zero-control",
+      "columns": [
+        "BAR_INDEX",
+        "SOURCE",
+        "OFFSET",
+        "MINHEIGHT",
+        "MAXHEIGHT"
+      ],
+      "minimumHistoryBars": 160,
+      "requiredFirstBarIndex": null,
+      "indexColumn": "BAR_INDEX",
+      "supersededBy": null,
+      "captureKind": "screenshot",
+      "record": [
+        "Preserve untouched source, warnings and compile/runtime diagnostics.",
+        "Save full CSV plus timestamped screenshots; numeric values do not observe arrow location or pixel height.",
+        "Local success is readiness, not native evidence."
+      ],
+      "relatedNotes": []
+    },
+    {
+      "script": "trace-plotarrow-offset-v4-series.pine",
+      "sha256": "17cb201fa4d79d1d8828a7891f88360edafdb6075f400bded9afb6fe0af02159",
+      "title": "trace-plotarrow-offset-v4-series",
+      "columns": [
+        "BAR_INDEX",
+        "SOURCE",
+        "OFFSET",
+        "MINHEIGHT",
+        "MAXHEIGHT"
+      ],
+      "minimumHistoryBars": 160,
+      "requiredFirstBarIndex": null,
+      "indexColumn": "BAR_INDEX",
+      "supersededBy": null,
+      "captureKind": "screenshot",
+      "record": [
+        "Preserve untouched source, warnings and compile/runtime diagnostics.",
+        "Save full CSV plus timestamped screenshots; numeric values do not observe arrow location or pixel height.",
+        "Local success is readiness, not native evidence."
+      ],
+      "relatedNotes": []
+    },
+    {
+      "script": "trace-plotarrow-offset-v4-zero-control.pine",
+      "sha256": "aad604922304d261666c3f24157024735d19f456ae7335681a8c4b9af3d484ec",
+      "title": "trace-plotarrow-offset-v4-zero-control",
+      "columns": [
+        "BAR_INDEX",
+        "SOURCE",
+        "OFFSET",
+        "MINHEIGHT",
+        "MAXHEIGHT"
+      ],
+      "minimumHistoryBars": 160,
+      "requiredFirstBarIndex": null,
+      "indexColumn": "BAR_INDEX",
+      "supersededBy": null,
+      "captureKind": "screenshot",
+      "record": [
+        "Preserve untouched source, warnings and compile/runtime diagnostics.",
+        "Save full CSV plus timestamped screenshots; numeric values do not observe arrow location or pixel height.",
+        "Local success is readiness, not native evidence."
+      ],
+      "relatedNotes": []
+    },
+    {
+      "script": "trace-plotarrow-offset-v5-series.pine",
+      "sha256": "133c009810e42fb845c0cba1c06ffedc2082e5f19d8ba628c000144168e3979a",
+      "title": "trace-plotarrow-offset-v5-series",
+      "columns": [
+        "BAR_INDEX",
+        "SOURCE",
+        "OFFSET",
+        "MINHEIGHT",
+        "MAXHEIGHT"
+      ],
+      "minimumHistoryBars": 160,
+      "requiredFirstBarIndex": null,
+      "indexColumn": "BAR_INDEX",
+      "supersededBy": null,
+      "captureKind": "screenshot",
+      "record": [
+        "Preserve untouched source, warnings and compile/runtime diagnostics.",
+        "Save full CSV plus timestamped screenshots; numeric values do not observe arrow location or pixel height.",
+        "Local success is readiness, not native evidence."
+      ],
+      "relatedNotes": []
+    },
+    {
+      "script": "trace-plotarrow-offset-v5-zero-control.pine",
+      "sha256": "f3ea399de058dd7018e8085ee530dc967d59ac7102b775829d232b267af8ca71",
+      "title": "trace-plotarrow-offset-v5-zero-control",
+      "columns": [
+        "BAR_INDEX",
+        "SOURCE",
+        "OFFSET",
+        "MINHEIGHT",
+        "MAXHEIGHT"
+      ],
+      "minimumHistoryBars": 160,
+      "requiredFirstBarIndex": null,
+      "indexColumn": "BAR_INDEX",
+      "supersededBy": null,
+      "captureKind": "screenshot",
+      "record": [
+        "Preserve untouched source, warnings and compile/runtime diagnostics.",
+        "Save full CSV plus timestamped screenshots; numeric values do not observe arrow location or pixel height.",
+        "Local success is readiness, not native evidence."
+      ],
+      "relatedNotes": []
+    },
+    {
+      "script": "trace-polyline-point-array-mutation-v1.pine",
+      "sha256": "089f2667794f2b45da18a00396ea757cd85dbc01f82aa448e91394fae8f33c86",
+      "title": "Polyline point mutation outcome",
+      "columns": [
+        "READINESS_CLOSE"
+      ],
+      "minimumHistoryBars": 160,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "screenshot",
+      "record": [
+        "Save exact untouched source and diagnostics.",
+        "Save screenshot with last confirmed historical bar visible and all three color locations identifiable. If green or blue is hidden by red, record that overlap.",
+        "CSV is readiness only; it does not settle red polyline geometry."
+      ],
+      "relatedNotes": []
+    }
+  ]
+}

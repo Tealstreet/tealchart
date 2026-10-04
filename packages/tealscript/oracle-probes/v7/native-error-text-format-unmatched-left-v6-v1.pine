@@ -1,4 +1,0 @@
-//@version=6
-indicator("V7 native-error-text-format-unmatched-left-v6-v1")
-value = str.format("{",1)
-plot(str.length(value),"TARGET")

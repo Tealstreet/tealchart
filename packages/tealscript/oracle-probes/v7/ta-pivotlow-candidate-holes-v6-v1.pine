@@ -1,9 +1,0 @@
-//@version=6
-indicator("V7 ta-pivotlow-candidate-holes-v6-v1")
-phase = bar_index % 16
-clean = 10.0 + phase
-s = phase < 3 or phase == 8 or phase == 9 ? na : clean
-plot(s, "SOURCE")
-plot(clean, "CLEAN")
-plot(ta.pivotlow(s, 2, 2), "TARGET")
-plot(ta.pivotlow(clean, 2, 2), "CONTROL")

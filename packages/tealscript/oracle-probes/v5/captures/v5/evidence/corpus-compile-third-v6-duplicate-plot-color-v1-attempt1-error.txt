@@ -1,0 +1,42 @@
+Two or more arguments are passed to the "color" parameter. You can pass only one argument.
+{
+  "error": "Two or more arguments are passed to the \"{argName}\" parameter. You can pass only one argument.",
+  "editorError": {
+    "code": "CE10072",
+    "ctx": {
+      "argName": "color"
+    },
+    "end": {
+      "column": 52,
+      "line": 3
+    },
+    "message": "Two or more arguments are passed to the \"{argName}\" parameter. You can pass only one argument.",
+    "start": {
+      "column": 41,
+      "line": 3
+    },
+    "id": "USER;64eb9fe01ecd4728859be8cb120fa590"
+  },
+  "title": "Compilation error",
+  "compiler_markers": [
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///e9bb311d-c726-4b10-9de9-fe0c99dcaef4.pine?placement%3Ddialog",
+        "path": "/e9bb311d-c726-4b10-9de9-fe0c99dcaef4.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "code": "CE10072",
+      "severity": 8,
+      "message": "Two or more arguments are passed to the \"color\" parameter. You can pass only one argument.",
+      "startLineNumber": 3,
+      "startColumn": 41,
+      "endLineNumber": 3,
+      "endColumn": 53
+    }
+  ],
+  "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,800.05\nH\n84,800.05\nL\n84,800.04\nC\n84,800.05\n0.00 (0.00%)\n84,800.04\nSELL\n0.01\n84,800.05\nBUY\nUSDT\nOracle na holes crosses v1\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n03:19:29 UTC\n99+\nPine Editor\ncorpus-compile-third-v6-duplicate-plot-color-v1.pine\nPublish script\n1\n2\n3\n4\n//@version=6\nindicator(\"corpus-compile-third-v6-duplicate-plot-color-v1\")\nplot(close, \"TARGET\",  color.blue, color=color.yellow, linewidth=2)\n1 of 1 problem\nTwo or more arguments are passed to the \"color\" parameter. You can pass only one argument.(CE10072)\n1 ∙ Today, 11:19\nLine 3, Col 41\nPine Script® v6\nCompilation error: CE10072\nCompilation error: CE10072\n\nTwo or more arguments are passed to the \"color\" parameter. You can pass only one argument.\n\nOpen in editor",
+  "context_substituted_message": "Two or more arguments are passed to the \"color\" parameter. You can pass only one argument."
+}

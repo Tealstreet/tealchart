@@ -1,0 +1,45 @@
+Too many arguments passed into the "color.new()" function call. Passed 4 arguments but expected 2.
+{
+  "error": "Too many arguments passed into the \"{funName}()\" function call. Passed {passedArgsCount} arguments{expectMsg}{expectArgsCount}.",
+  "editorError": {
+    "code": "CE10115",
+    "ctx": {
+      "expectArgsCount": 2,
+      "expectMsg": " but expected ",
+      "funName": "color.new",
+      "passedArgsCount": 4
+    },
+    "end": {
+      "column": 75,
+      "line": 3
+    },
+    "message": "Too many arguments passed into the \"{funName}()\" function call. Passed {passedArgsCount} arguments{expectMsg}{expectArgsCount}.",
+    "start": {
+      "column": 29,
+      "line": 3
+    },
+    "id": "USER;8620761086294c29adde9dbe9b982843"
+  },
+  "title": "Compilation error",
+  "compiler_markers": [
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///c37f8a0f-993d-4520-89f8-5bad67f9aac1.pine?placement%3Ddialog",
+        "path": "/c37f8a0f-993d-4520-89f8-5bad67f9aac1.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "code": "CE10115",
+      "severity": 8,
+      "message": "Too many arguments passed into the \"color.new()\" function call. Passed 4 arguments but expected 2.",
+      "startLineNumber": 3,
+      "startColumn": 29,
+      "endLineNumber": 3,
+      "endColumn": 76
+    }
+  ],
+  "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,802.17\nH\n84,810.01\nL\n84,802.16\nC\n84,810.01\n+7.84 (+0.01%)\n84,810.00\nSELL\n0.01\n84,810.01\nBUY\nUSDT\ncorpus-color-new-linewidth-v6-v1.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n03:13:57 UTC\n99+\nPine Editor\ncorpus-color-new-linewidth-v6-v1.pine\nPublish script\n1\n2\n3\n4\n//@version=6\nindicator(\"corpus-color-new-linewidth-v6-v1\")\nplot(close, color= color.new(color.blue, 60, color=color.yellow, linewidth=2), linewidth=2)\n1 of 1 problem\nToo many arguments passed into the \"color.new()\" function call. Passed 4 arguments but expected 2.(CE10115)\n1 ∙ Today, 11:13\nLine 3, Col 29\nPine Script® v6\nCompilation error: CE10115\n\nToo many arguments passed into the \"color.new()\" function call. Passed 4 arguments but expected 2.\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+  "context_substituted_message": "Too many arguments passed into the \"color.new()\" function call. Passed 4 arguments but expected 2."
+}

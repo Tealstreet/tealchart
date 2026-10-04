@@ -1,0 +1,51 @@
+{
+  "browser_utc": "2026-10-04T03:15:46.342Z",
+  "source": "corpus-compile-third-v5-fill-modern-title-control-v1",
+  "native_last_bar": {
+    "index": 299,
+    "value": [
+      1791083640,
+      84810,
+      84812.36,
+      84808,
+      84812.36,
+      23.81189
+    ]
+  },
+  "plots": [
+    {
+      "id": "plot_0",
+      "type": "line"
+    },
+    {
+      "id": "plot_1",
+      "type": "line"
+    }
+  ],
+  "styles": {
+    "plot_0": {
+      "color": "#2962FF",
+      "display": 15,
+      "linestyle": 0,
+      "linewidth": 1,
+      "plottype": 0,
+      "trackPrice": false,
+      "transparency": 0,
+      "title": "plot_0"
+    },
+    "plot_1": {
+      "color": "#2962FF",
+      "display": 15,
+      "linestyle": 0,
+      "linewidth": 1,
+      "plottype": 0,
+      "trackPrice": false,
+      "transparency": 0,
+      "title": "plot_1"
+    }
+  },
+  "visible_range": {
+    "_firstBar": 254,
+    "_lastBar": 304
+  }
+}

@@ -1,0 +1,59 @@
+Wrong number of args: 0
+{
+  "error": "Wrong number of args: {count}",
+  "editorError": {
+    "code": "CE10118",
+    "ctx": {
+      "count": 0
+    },
+    "end": {
+      "column": 21,
+      "line": 3
+    },
+    "message": "Wrong number of args: {count}",
+    "start": {
+      "column": 10,
+      "line": 3
+    },
+    "id": "USER;9f86a7d487494128896714ee3f2e5b54"
+  },
+  "title": "Compilation error",
+  "compiler_markers": [
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///0d689236-7a81-42f3-85f7-443d8854b28f.pine?placement%3Ddialog",
+        "path": "/0d689236-7a81-42f3-85f7-443d8854b28f.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "code": "CE10118",
+      "severity": 8,
+      "message": "Wrong number of args: 0",
+      "startLineNumber": 3,
+      "startColumn": 10,
+      "endLineNumber": 3,
+      "endColumn": 22
+    },
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///0d689236-7a81-42f3-85f7-443d8854b28f.pine?placement%3Ddialog",
+        "path": "/0d689236-7a81-42f3-85f7-443d8854b28f.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "code": "CE10165",
+      "severity": 8,
+      "message": "No value assigned to the \"arg0, arg1, ...\" parameter in array.from()",
+      "startLineNumber": 3,
+      "startColumn": 10,
+      "endLineNumber": 3,
+      "endColumn": 22
+    }
+  ],
+  "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,802.17\nH\n84,802.17\nL\n84,802.16\nC\n84,802.16\n−0.01 (−0.00%)\n84,802.16\nSELL\n0.01\n84,802.17\nBUY\nUSDT\ncollection-ranked01-from-empty-v1.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n03:01:34 UTC\n99+\nPine Editor\ncollection-ranked01-from-empty-v1.pine\nPublish script\n1\n2\n3\n4\n5\n6\n//@version=6\nindicator(\"Empty from outcome\")\nvalues = array.from()\nplot(array.size(values), \"EMPTY_SIZE\")\nplot(bar_index, \"INDEX\")\n1 of 2 problems\nWrong number of args: 0(CE10118)\n1 ∙ Today, 11:01\nLine 3, Col 10\nPine Script® v6\nCompilation error: CE10118\n\nWrong number of args: 0\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+  "context_substituted_message": "Wrong number of args: 0"
+}
