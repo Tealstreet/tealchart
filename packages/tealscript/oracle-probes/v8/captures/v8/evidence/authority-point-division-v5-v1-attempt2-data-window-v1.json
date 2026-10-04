@@ -1,0 +1,29 @@
+{
+  "index": 298,
+  "bar": [
+    1791114120,
+    85275.82,
+    85285.49,
+    85267.86,
+    85267.87,
+    19.68918
+  ],
+  "source_row": [
+    1791114120,
+    1.5
+  ],
+  "browser_utc": "2026-10-04T11:44:58.363Z",
+  "title": "Authority point division v1",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   11:42",
+  "visible_range": {
+    "_firstBar": 263,
+    "_lastBar": 301
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}
