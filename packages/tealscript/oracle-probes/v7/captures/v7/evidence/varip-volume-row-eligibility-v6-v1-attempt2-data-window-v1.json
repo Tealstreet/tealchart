@@ -1,0 +1,29 @@
+{
+  "index": 298,
+  "bar": [
+    1791099480,
+    84953.98,
+    84953.98,
+    84935.38,
+    84935.54,
+    7.26305
+  ],
+  "source_row": [
+    1791099480,
+    1
+  ],
+  "browser_utc": "2026-10-04T07:41:43.841Z",
+  "title": "V7 varip-volume-row-eligibility-v6-v1",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   07:38",
+  "visible_range": {
+    "_firstBar": 263,
+    "_lastBar": 301
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}

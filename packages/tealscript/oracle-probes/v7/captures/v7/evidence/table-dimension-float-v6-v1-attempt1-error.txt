@@ -1,0 +1,47 @@
+Cannot call "table.new" with argument "columns"="n". An argument of "series float" type was used but a "series int"  is expected.
+{
+  "error": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+  "editorError": {
+    "code": "CE10123",
+    "ctx": {
+      "argDisplayName": "columns",
+      "argUserFriendlyRepresentation": "n",
+      "argumentType": "series float",
+      "currentTypeDocStr": "series int",
+      "funId": "table.new",
+      "typePostfix": ""
+    },
+    "end": {
+      "column": 38,
+      "line": 4
+    },
+    "message": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+    "start": {
+      "column": 38,
+      "line": 4
+    },
+    "id": "USER;5545494ca832409d9c4550313b3b07f3"
+  },
+  "title": "Compilation error",
+  "compiler_markers": [
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///afb73342-f057-41f2-bc2c-d9b77c647000.pine?placement%3Ddialog",
+        "path": "/afb73342-f057-41f2-bc2c-d9b77c647000.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "code": "CE10123",
+      "severity": 8,
+      "message": "Cannot call \"table.new\" with argument \"columns\"=\"n\". An argument of \"series float\" type was used but a \"series int\"  is expected.",
+      "startLineNumber": 4,
+      "startColumn": 38,
+      "endLineNumber": 4,
+      "endColumn": 39
+    }
+  ],
+  "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\nC\n84,949.10\n+22.39 (+0.03%)\n84,953.97\nSELL\n0.01\n84,953.98\nBUY\nUSDT\ntable-dimension-float-v6-v1.pine\nDate Range\n07:36:46 UTC\n99+\nObject tree\nData window\nDate\nSun 04 Oct '26\nTime\n07:34\nBTCUSDT · 2 · Binance\nOpen\n84,926.71\nHigh\n84,949.11\nLow\n84,924.51\nClose\n84,949.10\nChange\n+22.39 (+0.03%)\nVol\n8.46\nLast day change\n+200.42 (+0.24%)\ntable-dimension-float-v6-v1.pine\nPlot\n∅\nPine Editor\ntable-dimension-float-v6-v1.pine\nPublish script\n1\n2\n3\n4\n5\n6\n//@version=6\nindicator(\"V7 table-dimension-float-v6-v1\")\nn = bar_index % 2 == 0 ? 1.5 : 1\nvar t = table.new(position.top_right,n,1)\nplot(n,\"DIMENSION\")\n1 of 1 problem\nCannot call \"table.new\" with argument \"columns\"=\"n\". An argument of \"series float\" type was used but a \"series int\" is expected.(CE10123)\n1 ∙ Today, 15:36\nLine 4, Col 38\nPine Script® v6\nCompilation error: CE10123\n\nCannot call \"table.new\" with argument \"columns\"=\"n\". An argument of \"series float\" type was used but a \"series int\" is expected.\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+  "context_substituted_message": "Cannot call \"table.new\" with argument \"columns\"=\"n\". An argument of \"series float\" type was used but a \"series int\"  is expected."
+}
