@@ -2620,5 +2620,3655 @@
     "data_window_witness": "captures/v11/evidence/corpus-909-history-limit-v1-attempt1-data-window-v1.json",
     "submitted_source_sha256": "b24f7fea74f8750d9b4729273c61c59010e297f6bb0af6cd32ef1be7d1430234",
     "editor_source_sha256": "4971e9d4c5294cac47c458ef25e31bcbe1b83dd20cf8ba8c47994ba9d0452c71"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T15:33:20.233Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v11 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "ternary-int-string-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "a248a4930909cae257bbccf20fad6470da39a3c319b6f8e4171ea8961eeb4fb2",
+    "indicator_title": "V6 ternary int-string",
+    "status": "COMPILE-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": "CE10123",
+      "text": "Cannot call \"operator ?:\" with argument \"expr2\"=\"one\". An argument of \"literal string\" type was used but a \"simple int\"  is expected.",
+      "line": 3,
+      "column": 28,
+      "first_bar_index": null,
+      "first_bar_time_utc": null,
+      "native": {
+        "error": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+        "editorError": {
+          "code": "CE10123",
+          "ctx": {
+            "argDisplayName": "expr2",
+            "argUserFriendlyRepresentation": "one",
+            "argumentType": "literal string",
+            "currentTypeDocStr": "simple int",
+            "funId": "operator ?:",
+            "typePostfix": ""
+          },
+          "end": {
+            "column": 32,
+            "line": 3
+          },
+          "message": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+          "start": {
+            "column": 28,
+            "line": 3
+          },
+          "id": "USER;ac5d8d120f814e3d93c92753c5dcf499"
+        },
+        "title": "Compilation error",
+        "compiler_markers": [
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///6b89c14b-8ba1-48cb-bd06-9011ef5ff000.pine?placement%3Ddialog",
+              "path": "/6b89c14b-8ba1-48cb-bd06-9011ef5ff000.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "code": "CE10123",
+            "severity": 8,
+            "message": "Cannot call \"operator ?:\" with argument \"expr2\"=\"one\". An argument of \"literal string\" type was used but a \"simple int\"  is expected.",
+            "startLineNumber": 3,
+            "startColumn": 28,
+            "endLineNumber": 3,
+            "endColumn": 33
+          }
+        ],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,124.01\nH\n85,163.46\nL\n85,124.00\nC\n85,163.46\n+39.45 (+0.05%)\n85,304.79\nSELL\n0.01\n85,304.80\nBUY\nUSDT\nternary-int-string-v6-v1.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n15:33:23 UTC\n99+\nPine Editor\nternary-int-string-v6-v1.pine\nPublish script\n1\n2\n3\n4\n5\n//@version=6\nindicator(\"V6\u00a0ternary\u00a0int-string\")\nvalue\u00a0=\u00a0close\u00a0>\u00a0open\u00a0?\u00a01\u00a0:\u00a0\"one\"\nplot(close,\u00a0display=display.data_window)\n1 of 1 problem\nCannot call \"operator ?:\" with argument \"expr2\"=\"one\". An argument of \"literal string\" type was used but a \"simple int\" is expected.(CE10123)\n1 \u2219 Today, 23:33\nLine 3, Col 28\nPine Script\u00ae v6\nCompilation error: CE10123\n\nCannot call \"operator ?:\" with argument \"expr2\"=\"one\". An argument of \"literal string\" type was used but a \"simple int\" is expected.\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+        "context_substituted_message": "Cannot call \"operator ?:\" with argument \"expr2\"=\"one\". An argument of \"literal string\" type was used but a \"simple int\"  is expected."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "ternary-int-string-v6-v1.pine",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24645,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24947,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v11/evidence/ternary-int-string-v6-v1-attempt1-error.png",
+      "captures/v11/evidence/ternary-int-string-v6-v1-attempt1-error.txt",
+      "captures/v11/evidence/ternary-int-string-v6-v1-attempt1-logs.txt",
+      "captures/v11/evidence/ternary-int-string-v6-v1-attempt1-logs-v1.json",
+      "captures/v11/evidence/ternary-int-string-v6-v1-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": null,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///6b89c14b-8ba1-48cb-bd06-9011ef5ff000.pine?placement%3Ddialog",
+          "path": "/6b89c14b-8ba1-48cb-bd06-9011ef5ff000.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "CE10123",
+        "severity": 8,
+        "message": "Cannot call \"operator ?:\" with argument \"expr2\"=\"one\". An argument of \"literal string\" type was used but a \"simple int\"  is expected.",
+        "startLineNumber": 3,
+        "startColumn": 28,
+        "endLineNumber": 3,
+        "endColumn": 33
+      }
+    ],
+    "error_observed_utc": "2026-10-04T15:33:25.823Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/ternary-int-string-v6-v1-attempt1-logs.txt",
+        "evidence/ternary-int-string-v6-v1-attempt1-logs-v1.json",
+        "evidence/ternary-int-string-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T15:33:35.774Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v11 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "ternary-float-bool-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "7458063a4bcf8bf1a5a7d89fc2ff719d3b89b8d41c1d99bef7a28a76da8e764d",
+    "indicator_title": "V6 ternary float-bool",
+    "status": "COMPILE-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": "CE10123",
+      "text": "Cannot call \"operator ?:\" with argument \"expr1\"=\"1.5\". An argument of \"literal float\" type was used but a \"simple bool\"  is expected.",
+      "line": 3,
+      "column": 24,
+      "first_bar_index": null,
+      "first_bar_time_utc": null,
+      "native": {
+        "error": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+        "editorError": {
+          "code": "CE10123",
+          "ctx": {
+            "argDisplayName": "expr1",
+            "argUserFriendlyRepresentation": 1.5,
+            "argumentType": "literal float",
+            "currentTypeDocStr": "simple bool",
+            "funId": "operator ?:",
+            "typePostfix": ""
+          },
+          "end": {
+            "column": 26,
+            "line": 3
+          },
+          "message": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+          "start": {
+            "column": 24,
+            "line": 3
+          },
+          "id": "USER;42f7daec9380466a8bb4025b2682759f"
+        },
+        "title": "Compilation error",
+        "compiler_markers": [
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///8f9255a3-bb48-4caa-9b30-8fbe01a73148.pine?placement%3Ddialog",
+              "path": "/8f9255a3-bb48-4caa-9b30-8fbe01a73148.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "code": "CE10123",
+            "severity": 8,
+            "message": "Cannot call \"operator ?:\" with argument \"expr1\"=\"1.5\". An argument of \"literal float\" type was used but a \"simple bool\"  is expected.",
+            "startLineNumber": 3,
+            "startColumn": 24,
+            "endLineNumber": 3,
+            "endColumn": 27
+          }
+        ],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,299.38\nH\n85,314.58\nL\n85,299.37\nC\n85,304.79\n+5.41 (+0.01%)\n85,304.79\nSELL\n0.01\n85,304.80\nBUY\nUSDT\nternary-float-bool-v6-v1.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n15:33:38 UTC\n99+\nPine Editor\nternary-float-bool-v6-v1.pine\nPublish script\n1\n2\n3\n4\n5\n//@version=6\nindicator(\"V6\u00a0ternary\u00a0float-bool\")\nvalue\u00a0=\u00a0close\u00a0>\u00a0open\u00a0?\u00a01.5\u00a0:\u00a0true\nplot(close,\u00a0display=display.data_window)\n1 of 1 problem\nCannot call \"operator ?:\" with argument \"expr1\"=\"1.5\". An argument of \"literal float\" type was used but a \"simple bool\" is expected.(CE10123)\n1 \u2219 Today, 23:33\nLine 3, Col 24\nPine Script\u00ae v6\nCompilation error: CE10123\n\nCannot call \"operator ?:\" with argument \"expr1\"=\"1.5\". An argument of \"literal float\" type was used but a \"simple bool\" is expected.\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+        "context_substituted_message": "Cannot call \"operator ?:\" with argument \"expr1\"=\"1.5\". An argument of \"literal float\" type was used but a \"simple bool\"  is expected."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "ternary-float-bool-v6-v1.pine",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24645,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24947,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v11/evidence/ternary-float-bool-v6-v1-attempt1-error.png",
+      "captures/v11/evidence/ternary-float-bool-v6-v1-attempt1-error.txt",
+      "captures/v11/evidence/ternary-float-bool-v6-v1-attempt1-logs.txt",
+      "captures/v11/evidence/ternary-float-bool-v6-v1-attempt1-logs-v1.json",
+      "captures/v11/evidence/ternary-float-bool-v6-v1-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": null,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///8f9255a3-bb48-4caa-9b30-8fbe01a73148.pine?placement%3Ddialog",
+          "path": "/8f9255a3-bb48-4caa-9b30-8fbe01a73148.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "CE10123",
+        "severity": 8,
+        "message": "Cannot call \"operator ?:\" with argument \"expr1\"=\"1.5\". An argument of \"literal float\" type was used but a \"simple bool\"  is expected.",
+        "startLineNumber": 3,
+        "startColumn": 24,
+        "endLineNumber": 3,
+        "endColumn": 27
+      }
+    ],
+    "error_observed_utc": "2026-10-04T15:33:40.885Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/ternary-float-bool-v6-v1-attempt1-logs.txt",
+        "evidence/ternary-float-bool-v6-v1-attempt1-logs-v1.json",
+        "evidence/ternary-float-bool-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T15:33:50.269Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v11 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "ternary-color-int-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "bcfafc256becbec63d47b444eeaa8dcba647bdd65d0c0dfd3f2b236d99b82e77",
+    "indicator_title": "V6 ternary color-int",
+    "status": "COMPILE-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": "CE10123",
+      "text": "Cannot call \"operator ?:\" with argument \"expr2\"=\"1\". An argument of \"literal int\" type was used but a \"simple color\"  is expected.",
+      "line": 3,
+      "column": 36,
+      "first_bar_index": null,
+      "first_bar_time_utc": null,
+      "native": {
+        "error": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+        "editorError": {
+          "code": "CE10123",
+          "ctx": {
+            "argDisplayName": "expr2",
+            "argUserFriendlyRepresentation": 1,
+            "argumentType": "literal int",
+            "currentTypeDocStr": "simple color",
+            "funId": "operator ?:",
+            "typePostfix": ""
+          },
+          "end": {
+            "column": 36,
+            "line": 3
+          },
+          "message": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+          "start": {
+            "column": 36,
+            "line": 3
+          },
+          "id": "USER;64eb9fe01ecd4728859be8cb120fa590"
+        },
+        "title": "Compilation error",
+        "compiler_markers": [
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///5c4e43fb-ba72-464b-ac81-ed281542b75b.pine?placement%3Ddialog",
+              "path": "/5c4e43fb-ba72-464b-ac81-ed281542b75b.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "code": "CE10123",
+            "severity": 8,
+            "message": "Cannot call \"operator ?:\" with argument \"expr2\"=\"1\". An argument of \"literal int\" type was used but a \"simple color\"  is expected.",
+            "startLineNumber": 3,
+            "startColumn": 36,
+            "endLineNumber": 3,
+            "endColumn": 37
+          }
+        ],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,299.38\nH\n85,314.58\nL\n85,299.37\nC\n85,300.23\n+0.85 (+0.00%)\n85,300.22\nSELL\n0.01\n85,300.23\nBUY\nUSDT\nOracle na holes crosses v1\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n15:33:52 UTC\n99+\nPine Editor\nternary-color-int-v6-v1.pine\nPublish script\n1\n2\n3\n4\n5\n//@version=6\nindicator(\"V6\u00a0ternary\u00a0color-int\")\nvalue\u00a0=\u00a0close\u00a0>\u00a0open\u00a0?\u00a0\u00a0color.red\u00a0:\u00a01\nplot(close,\u00a0display=display.data_window)\n1 of 1 problem\nCannot call \"operator ?:\" with argument \"expr2\"=\"1\". An argument of \"literal int\" type was used but a \"simple color\" is expected.(CE10123)\n1 \u2219 Today, 23:33\nLine 3, Col 36\nPine Script\u00ae v6\nCompilation error: CE10123\nCompilation error: CE10123\n\nCannot call \"operator ?:\" with argument \"expr2\"=\"1\". An argument of \"literal int\" type was used but a \"simple color\" is expected.\n\nOpen in editor",
+        "context_substituted_message": "Cannot call \"operator ?:\" with argument \"expr2\"=\"1\". An argument of \"literal int\" type was used but a \"simple color\"  is expected."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "Oracle na holes crosses v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24645,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24947,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v11/evidence/ternary-color-int-v6-v1-attempt1-error.png",
+      "captures/v11/evidence/ternary-color-int-v6-v1-attempt1-error.txt",
+      "captures/v11/evidence/ternary-color-int-v6-v1-attempt1-logs.txt",
+      "captures/v11/evidence/ternary-color-int-v6-v1-attempt1-logs-v1.json",
+      "captures/v11/evidence/ternary-color-int-v6-v1-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": null,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///5c4e43fb-ba72-464b-ac81-ed281542b75b.pine?placement%3Ddialog",
+          "path": "/5c4e43fb-ba72-464b-ac81-ed281542b75b.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "CE10123",
+        "severity": 8,
+        "message": "Cannot call \"operator ?:\" with argument \"expr2\"=\"1\". An argument of \"literal int\" type was used but a \"simple color\"  is expected.",
+        "startLineNumber": 3,
+        "startColumn": 36,
+        "endLineNumber": 3,
+        "endColumn": 37
+      }
+    ],
+    "error_observed_utc": "2026-10-04T15:33:55.723Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/ternary-color-int-v6-v1-attempt1-logs.txt",
+        "evidence/ternary-color-int-v6-v1-attempt1-logs-v1.json",
+        "evidence/ternary-color-int-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T15:34:06.757Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v11 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "ternary-string-bool-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "295f5fa08433d07734975a15910aac13640243bc74cca0553c98cd8f0d043723",
+    "indicator_title": "V6 ternary string-bool",
+    "status": "COMPILE-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": "CE10123",
+      "text": "Cannot call \"operator ?:\" with argument \"expr1\"=\"one\". An argument of \"literal string\" type was used but a \"simple bool\"  is expected.",
+      "line": 3,
+      "column": 24,
+      "first_bar_index": null,
+      "first_bar_time_utc": null,
+      "native": {
+        "error": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+        "editorError": {
+          "code": "CE10123",
+          "ctx": {
+            "argDisplayName": "expr1",
+            "argUserFriendlyRepresentation": "one",
+            "argumentType": "literal string",
+            "currentTypeDocStr": "simple bool",
+            "funId": "operator ?:",
+            "typePostfix": ""
+          },
+          "end": {
+            "column": 28,
+            "line": 3
+          },
+          "message": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+          "start": {
+            "column": 24,
+            "line": 3
+          },
+          "id": "USER;282f8f4cb3bc47599e276f1e2f0d7bbf"
+        },
+        "title": "Compilation error",
+        "compiler_markers": [
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///0c5f27f9-7568-42bf-9442-3545475a52d8.pine?placement%3Ddialog",
+              "path": "/0c5f27f9-7568-42bf-9442-3545475a52d8.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "code": "CE10123",
+            "severity": 8,
+            "message": "Cannot call \"operator ?:\" with argument \"expr1\"=\"one\". An argument of \"literal string\" type was used but a \"simple bool\"  is expected.",
+            "startLineNumber": 3,
+            "startColumn": 24,
+            "endLineNumber": 3,
+            "endColumn": 29
+          }
+        ],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,299.39\nH\n85,299.39\nL\n85,299.38\nC\n85,299.38\n0.00 (0.00%)\n85,299.38\nSELL\n0.01\n85,299.39\nBUY\nUSDT\nternary-string-bool-v6-v1.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n15:34:08 UTC\n99+\nPine Editor\nternary-string-bool-v6-v1.pine\nPublish script\n1\n2\n3\n4\n5\n//@version=6\nindicator(\"V6\u00a0ternary\u00a0string-bool\")\nvalue\u00a0=\u00a0close\u00a0>\u00a0open\u00a0?\u00a0\"one\"\u00a0:\u00a0false\nplot(close,\u00a0display=display.data_window)\n1 of 1 problem\nCannot call \"operator ?:\" with argument \"expr1\"=\"one\". An argument of \"literal string\" type was used but a \"simple bool\" is expected.(CE10123)\n1 \u2219 Today, 23:34\nLine 3, Col 24\nPine Script\u00ae v6\nCompilation error: CE10123\n\nCannot call \"operator ?:\" with argument \"expr1\"=\"one\". An argument of \"literal string\" type was used but a \"simple bool\" is expected.\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+        "context_substituted_message": "Cannot call \"operator ?:\" with argument \"expr1\"=\"one\". An argument of \"literal string\" type was used but a \"simple bool\"  is expected."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "ternary-string-bool-v6-v1.pine",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24645,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24948,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v11/evidence/ternary-string-bool-v6-v1-attempt1-error.png",
+      "captures/v11/evidence/ternary-string-bool-v6-v1-attempt1-error.txt",
+      "captures/v11/evidence/ternary-string-bool-v6-v1-attempt1-logs.txt",
+      "captures/v11/evidence/ternary-string-bool-v6-v1-attempt1-logs-v1.json",
+      "captures/v11/evidence/ternary-string-bool-v6-v1-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": null,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///0c5f27f9-7568-42bf-9442-3545475a52d8.pine?placement%3Ddialog",
+          "path": "/0c5f27f9-7568-42bf-9442-3545475a52d8.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "CE10123",
+        "severity": 8,
+        "message": "Cannot call \"operator ?:\" with argument \"expr1\"=\"one\". An argument of \"literal string\" type was used but a \"simple bool\"  is expected.",
+        "startLineNumber": 3,
+        "startColumn": 24,
+        "endLineNumber": 3,
+        "endColumn": 29
+      }
+    ],
+    "error_observed_utc": "2026-10-04T15:34:11.294Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/ternary-string-bool-v6-v1-attempt1-logs.txt",
+        "evidence/ternary-string-bool-v6-v1-attempt1-logs-v1.json",
+        "evidence/ternary-string-bool-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T15:34:22.952Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v11 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "ternary-bool-int-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "d44793e6a01fd2664cdf359e94cde5c82abb5feff4582c075bf066dcd5abe5a8",
+    "indicator_title": "V6 ternary bool-int",
+    "status": "COMPILE-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": "CE10123",
+      "text": "Cannot call \"operator ?:\" with argument \"expr2\"=\"1\". An argument of \"literal int\" type was used but a \"simple bool\"  is expected.",
+      "line": 3,
+      "column": 31,
+      "first_bar_index": null,
+      "first_bar_time_utc": null,
+      "native": {
+        "error": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+        "editorError": {
+          "code": "CE10123",
+          "ctx": {
+            "argDisplayName": "expr2",
+            "argUserFriendlyRepresentation": 1,
+            "argumentType": "literal int",
+            "currentTypeDocStr": "simple bool",
+            "funId": "operator ?:",
+            "typePostfix": ""
+          },
+          "end": {
+            "column": 31,
+            "line": 3
+          },
+          "message": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+          "start": {
+            "column": 31,
+            "line": 3
+          },
+          "id": "USER;497338571d1644f0a1aba851adeff772"
+        },
+        "title": "Compilation error",
+        "compiler_markers": [
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///c6deb57c-a81c-4ea9-9e98-1a713aea2126.pine?placement%3Ddialog",
+              "path": "/c6deb57c-a81c-4ea9-9e98-1a713aea2126.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "code": "CE10123",
+            "severity": 8,
+            "message": "Cannot call \"operator ?:\" with argument \"expr2\"=\"1\". An argument of \"literal int\" type was used but a \"simple bool\"  is expected.",
+            "startLineNumber": 3,
+            "startColumn": 31,
+            "endLineNumber": 3,
+            "endColumn": 32
+          }
+        ],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,299.39\nH\n85,299.39\nL\n85,299.38\nC\n85,299.38\n0.00 (0.00%)\n85,299.38\nSELL\n0.01\n85,299.39\nBUY\nUSDT\nternary-bool-int-v6-v1.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n15:34:25 UTC\n99+\nPine Editor\nternary-bool-int-v6-v1.pine\nPublish script\n1\n2\n3\n4\n5\n//@version=6\nindicator(\"V6\u00a0ternary\u00a0bool-int\")\nvalue\u00a0=\u00a0close\u00a0>\u00a0open\u00a0?\u00a0true\u00a0:\u00a01\nplot(close,\u00a0display=display.data_window)\n1 of 1 problem\nCannot call \"operator ?:\" with argument \"expr2\"=\"1\". An argument of \"literal int\" type was used but a \"simple bool\" is expected.(CE10123)\n1 \u2219 Today, 23:34\nLine 3, Col 31\nPine Script\u00ae v6\nCompilation error: CE10123\n\nCannot call \"operator ?:\" with argument \"expr2\"=\"1\". An argument of \"literal int\" type was used but a \"simple bool\" is expected.\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+        "context_substituted_message": "Cannot call \"operator ?:\" with argument \"expr2\"=\"1\". An argument of \"literal int\" type was used but a \"simple bool\"  is expected."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "ternary-bool-int-v6-v1.pine",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24645,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24948,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v11/evidence/ternary-bool-int-v6-v1-attempt1-error.png",
+      "captures/v11/evidence/ternary-bool-int-v6-v1-attempt1-error.txt",
+      "captures/v11/evidence/ternary-bool-int-v6-v1-attempt1-logs.txt",
+      "captures/v11/evidence/ternary-bool-int-v6-v1-attempt1-logs-v1.json",
+      "captures/v11/evidence/ternary-bool-int-v6-v1-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": null,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///c6deb57c-a81c-4ea9-9e98-1a713aea2126.pine?placement%3Ddialog",
+          "path": "/c6deb57c-a81c-4ea9-9e98-1a713aea2126.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "CE10123",
+        "severity": 8,
+        "message": "Cannot call \"operator ?:\" with argument \"expr2\"=\"1\". An argument of \"literal int\" type was used but a \"simple bool\"  is expected.",
+        "startLineNumber": 3,
+        "startColumn": 31,
+        "endLineNumber": 3,
+        "endColumn": 32
+      }
+    ],
+    "error_observed_utc": "2026-10-04T15:34:28.604Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/ternary-bool-int-v6-v1-attempt1-logs.txt",
+        "evidence/ternary-bool-int-v6-v1-attempt1-logs-v1.json",
+        "evidence/ternary-bool-int-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T15:34:39.757Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v11 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "ternary-color-string-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "df7705c525fcf3bbcd34702b3d84c3e1409895167622b2c98ae962888160fc8e",
+    "indicator_title": "V6 ternary color-string",
+    "status": "COMPILE-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": "CE10123",
+      "text": "Cannot call \"operator ?:\" with argument \"expr2\"=\"red\". An argument of \"literal string\" type was used but a \"simple color\"  is expected.",
+      "line": 3,
+      "column": 36,
+      "first_bar_index": null,
+      "first_bar_time_utc": null,
+      "native": {
+        "error": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+        "editorError": {
+          "code": "CE10123",
+          "ctx": {
+            "argDisplayName": "expr2",
+            "argUserFriendlyRepresentation": "red",
+            "argumentType": "literal string",
+            "currentTypeDocStr": "simple color",
+            "funId": "operator ?:",
+            "typePostfix": ""
+          },
+          "end": {
+            "column": 40,
+            "line": 3
+          },
+          "message": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+          "start": {
+            "column": 36,
+            "line": 3
+          },
+          "id": "USER;2a250a10864b4a6b9c4c5115f6d292d4"
+        },
+        "title": "Compilation error",
+        "compiler_markers": [
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///1983feae-4c04-477a-9d40-c713651d9de0.pine?placement%3Ddialog",
+              "path": "/1983feae-4c04-477a-9d40-c713651d9de0.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "code": "CE10123",
+            "severity": 8,
+            "message": "Cannot call \"operator ?:\" with argument \"expr2\"=\"red\". An argument of \"literal string\" type was used but a \"simple color\"  is expected.",
+            "startLineNumber": 3,
+            "startColumn": 36,
+            "endLineNumber": 3,
+            "endColumn": 41
+          }
+        ],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,299.39\nH\n85,299.39\nL\n85,299.38\nC\n85,299.39\n+0.01 (+0.00%)\n85,299.38\nSELL\n0.01\n85,299.39\nBUY\nUSDT\nternary-color-string-v6-v1.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n15:34:45 UTC\n99+\nPine Editor\nternary-color-string-v6-v1.pine\nPublish script\n1\n2\n3\n4\n5\n//@version=6\nindicator(\"V6\u00a0ternary\u00a0color-string\")\nvalue\u00a0=\u00a0close\u00a0>\u00a0open\u00a0?\u00a0\u00a0color.red\u00a0:\u00a0\"red\"\nplot(close,\u00a0display=display.data_window)\n1 of 1 problem\nCannot call \"operator ?:\" with argument \"expr2\"=\"red\". An argument of \"literal string\" type was used but a \"simple color\" is expected.(CE10123)\n1 \u2219 Today, 23:34\nLine 3, Col 36\nPine Script\u00ae v6\nCompilation error: CE10123\n\nCannot call \"operator ?:\" with argument \"expr2\"=\"red\". An argument of \"literal string\" type was used but a \"simple color\" is expected.\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+        "context_substituted_message": "Cannot call \"operator ?:\" with argument \"expr2\"=\"red\". An argument of \"literal string\" type was used but a \"simple color\"  is expected."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "ternary-color-string-v6-v1.pine",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24645,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24948,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v11/evidence/ternary-color-string-v6-v1-attempt1-error.png",
+      "captures/v11/evidence/ternary-color-string-v6-v1-attempt1-error.txt",
+      "captures/v11/evidence/ternary-color-string-v6-v1-attempt1-logs.txt",
+      "captures/v11/evidence/ternary-color-string-v6-v1-attempt1-logs-v1.json",
+      "captures/v11/evidence/ternary-color-string-v6-v1-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": null,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///1983feae-4c04-477a-9d40-c713651d9de0.pine?placement%3Ddialog",
+          "path": "/1983feae-4c04-477a-9d40-c713651d9de0.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "CE10123",
+        "severity": 8,
+        "message": "Cannot call \"operator ?:\" with argument \"expr2\"=\"red\". An argument of \"literal string\" type was used but a \"simple color\"  is expected.",
+        "startLineNumber": 3,
+        "startColumn": 36,
+        "endLineNumber": 3,
+        "endColumn": 41
+      }
+    ],
+    "error_observed_utc": "2026-10-04T15:34:51.742Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/ternary-color-string-v6-v1-attempt1-logs.txt",
+        "evidence/ternary-color-string-v6-v1-attempt1-logs-v1.json",
+        "evidence/ternary-color-string-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T15:35:22.736Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v11 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "ternary-compatible-v6-control-v1.pine",
+    "attempt": 1,
+    "source_sha256": "d91dd989b660b9d99f34fa44b2114d959eaa1e3aa9079e4ec1021d7fb4e84ec5",
+    "indicator_title": "V6 ternary compatible control",
+    "status": "RUNS",
+    "csv_file": "captures/v11/ternary-compatible-v6-control-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T233520.693.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V6 ternary compatible control",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24648,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24948,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T15:35:11.817Z",
+    "live_candle_open_utc": "2026-10-04T15:34:00.000Z",
+    "export_utc": "2026-10-04T15:35:20.998Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v11/evidence/ternary-compatible-v6-control-v1-attempt1-setup.png",
+      "captures/v11/evidence/ternary-compatible-v6-control-v1-attempt1-export.png",
+      "captures/v11/evidence/ternary-compatible-v6-control-v1-attempt1-logs.txt",
+      "captures/v11/evidence/ternary-compatible-v6-control-v1-attempt1-logs-v1.json",
+      "captures/v11/evidence/ternary-compatible-v6-control-v1-attempt1-logs.png",
+      "captures/v11/evidence/ternary-compatible-v6-control-v1-attempt1-visual.png",
+      "captures/v11/evidence/ternary-compatible-v6-control-v1-attempt1-data-window-v1.png",
+      "captures/v11/evidence/ternary-compatible-v6-control-v1-attempt1-data-window-v1.json",
+      "captures/v11/evidence/ternary-compatible-v6-control-v1-attempt1-data-window-v1.txt",
+      "captures/v11/evidence/ternary-compatible-v6-control-v1-attempt1-authority-object-geometry-v1.json",
+      "captures/v11/evidence/ternary-compatible-v6-control-v1-attempt1-authority-object-geometry-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T15:35:12.606Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790822880,
+            83423.81,
+            83444.27,
+            83410.39,
+            83410.4,
+            7.29582
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791128040,
+            85299.39,
+            85299.39,
+            85299.38,
+            85299.39,
+            0.41402
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V6 ternary compatible control",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790822880,
+                4.5
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791128040,
+                4.5
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T15:35:14.195Z",
+        "bars": 24948,
+        "end": true,
+        "first": {
+          "index": -24648,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791128040,
+            85299.39,
+            85299.39,
+            85299.38,
+            85299.38,
+            0.41402
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V6 ternary compatible control",
+            "status": {
+              "type": 2
+            },
+            "size": 24948,
+            "first": {
+              "index": -24648,
+              "value": [
+                1788134400,
+                4.5
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791128040,
+                4.5
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   15:34",
+    "historical_compare_before_unix_seconds": 1791128040,
+    "pine_logs": {
+      "paths": [
+        "evidence/ternary-compatible-v6-control-v1-attempt1-logs.txt",
+        "evidence/ternary-compatible-v6-control-v1-attempt1-logs-v1.json",
+        "evidence/ternary-compatible-v6-control-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "fb65aa9778b5d3b45d0dd12dc7aa1f57ca1d24c0e353ab7ebc38b33fc2fff16c",
+    "csv_bytes": 1179287,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "Plot"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {},
+    "first_historical_cells": [
+      "1788134400",
+      "77682",
+      "77682.01",
+      "77572",
+      "77674.04",
+      "4.5"
+    ],
+    "last_historical_cells": [
+      "1791127920",
+      "85299.38",
+      "85314.58",
+      "85299.37",
+      "85299.38",
+      "4.5"
+    ],
+    "declared_to_native_header_mapping": {},
+    "csv_rows": 24948,
+    "historical_rows": 24947,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791128040,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791128040",
+    "first_historical_values": {},
+    "last_historical_values": {},
+    "data_window_witness": "captures/v11/evidence/ternary-compatible-v6-control-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T15:36:26.255Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v11 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "source-window-hole-matrix-v1.pine",
+    "attempt": 1,
+    "source_sha256": "20b43a7a1c1f73848ad1b3c962cf1d7e5c1f219c6cab549aab8369519ee1a1a1",
+    "indicator_title": "V11 source-window-hole-matrix-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v11/source-window-hole-matrix-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T233624.751.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V11 source-window-hole-matrix-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24649,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24949,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T15:36:16.605Z",
+    "live_candle_open_utc": "2026-10-04T15:36:00.000Z",
+    "export_utc": "2026-10-04T15:36:25.329Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v11/evidence/source-window-hole-matrix-v1-attempt1-setup.png",
+      "captures/v11/evidence/source-window-hole-matrix-v1-attempt1-export.png",
+      "captures/v11/evidence/source-window-hole-matrix-v1-attempt1-logs.txt",
+      "captures/v11/evidence/source-window-hole-matrix-v1-attempt1-logs-v1.json",
+      "captures/v11/evidence/source-window-hole-matrix-v1-attempt1-logs.png",
+      "captures/v11/evidence/source-window-hole-matrix-v1-attempt1-visual.png",
+      "captures/v11/evidence/source-window-hole-matrix-v1-attempt1-data-window-v1.png",
+      "captures/v11/evidence/source-window-hole-matrix-v1-attempt1-data-window-v1.json",
+      "captures/v11/evidence/source-window-hole-matrix-v1-attempt1-data-window-v1.txt",
+      "captures/v11/evidence/source-window-hole-matrix-v1-attempt1-authority-object-geometry-v1.json",
+      "captures/v11/evidence/source-window-hole-matrix-v1-attempt1-authority-object-geometry-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T15:36:17.539Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790823000,
+            83410.4,
+            83456.76,
+            83410.39,
+            83451.06,
+            7.66661
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791128160,
+            85289.74,
+            85289.74,
+            85288,
+            85288.01,
+            0.49381
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 source-window-hole-matrix-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790823000,
+                22405,
+                13,
+                13,
+                16,
+                null,
+                -26.31578947368421,
+                14.366666666666665,
+                0,
+                0,
+                -2.7222888638395637,
+                0,
+                18,
+                null,
+                null,
+                10,
+                -79.99999999999999
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791128160,
+                24948,
+                17,
+                17,
+                20,
+                60.72023222964556,
+                -26.31578947368421,
+                12.455555555555556,
+                0,
+                -1,
+                -3.862140472880041,
+                0,
+                16,
+                null,
+                null,
+                10,
+                39.99999999999999
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T15:36:18.585Z",
+        "bars": 24949,
+        "end": true,
+        "first": {
+          "index": -24649,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791128160,
+            85289.74,
+            85289.74,
+            85288,
+            85288,
+            0.49381
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 source-window-hole-matrix-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24949,
+            "first": {
+              "index": -24649,
+              "value": [
+                1788134400,
+                0,
+                10,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                0,
+                null,
+                null,
+                null,
+                null,
+                null
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791128160,
+                24948,
+                17,
+                17,
+                20,
+                60.72023222964556,
+                -26.31578947368421,
+                12.455555555555556,
+                0,
+                -1,
+                -3.862140472880041,
+                0,
+                16,
+                null,
+                null,
+                10,
+                39.99999999999999
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   15:36",
+    "historical_compare_before_unix_seconds": 1791128160,
+    "pine_logs": {
+      "paths": [
+        "evidence/source-window-hole-matrix-v1-attempt1-logs.txt",
+        "evidence/source-window-hole-matrix-v1-attempt1-logs-v1.json",
+        "evidence/source-window-hole-matrix-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "665d2212315d3fbfaa14f07e05f2e88c9e792e55918f5829068b334f9584b359",
+    "csv_bytes": 3734098,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "BAR_INDEX",
+      "CLEAN",
+      "SOURCE",
+      "PEER",
+      "RSI4",
+      "CMO4",
+      "HMA4",
+      "HIGHESTBARS4",
+      "LOWESTBARS4",
+      "CORRELATION4",
+      "RISING4",
+      "NEAREST4P50",
+      "PIVOTLOW2",
+      "PIVOTHIGH2",
+      "MIN",
+      "RCI4"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "BAR_INDEX": 5,
+      "CLEAN": 6,
+      "SOURCE": 7,
+      "PEER": 8,
+      "RSI4": 9,
+      "CMO4": 10,
+      "HMA4": 11,
+      "HIGHESTBARS4": 12,
+      "LOWESTBARS4": 13,
+      "CORRELATION4": 14,
+      "RISING4": 15,
+      "NEAREST4P50": 16,
+      "PIVOTLOW2": 17,
+      "PIVOTHIGH2": 18,
+      "MIN": 19,
+      "RCI4": 20
+    },
+    "first_historical_cells": [
+      "1788134400",
+      "77682",
+      "77682.01",
+      "77572",
+      "77674.04",
+      "0",
+      "10",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "0",
+      "",
+      "",
+      "",
+      "",
+      ""
+    ],
+    "last_historical_cells": [
+      "1791128040",
+      "85299.39",
+      "85299.39",
+      "85289.71",
+      "85289.74",
+      "24947",
+      "10",
+      "10",
+      "23",
+      "46.4585906816824",
+      "-100",
+      "11.37777777777778",
+      "-1",
+      "0",
+      "-1.21356455507736",
+      "0",
+      "16",
+      "",
+      "",
+      "10",
+      "-79.99999999999999"
+    ],
+    "declared_to_native_header_mapping": {
+      "BAR_INDEX": "BAR_INDEX",
+      "CLEAN": "CLEAN",
+      "SOURCE": "SOURCE",
+      "PEER": "PEER",
+      "RSI4": "RSI4",
+      "CMO4": "CMO4",
+      "HMA4": "HMA4",
+      "HIGHESTBARS4": "HIGHESTBARS4",
+      "LOWESTBARS4": "LOWESTBARS4",
+      "CORRELATION4": "CORRELATION4",
+      "RISING4": "RISING4",
+      "NEAREST4P50": "NEAREST4P50",
+      "PIVOTLOW2": "PIVOTLOW2",
+      "PIVOTHIGH2": "PIVOTHIGH2",
+      "MIN": "MIN",
+      "RCI4": "RCI4"
+    },
+    "csv_rows": 24949,
+    "historical_rows": 24948,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791128160,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791128160",
+    "first_historical_values": {
+      "BAR_INDEX": "0",
+      "CLEAN": "10",
+      "SOURCE": "",
+      "PEER": "",
+      "RSI4": "",
+      "CMO4": "",
+      "HMA4": "",
+      "HIGHESTBARS4": "",
+      "LOWESTBARS4": "",
+      "CORRELATION4": "",
+      "RISING4": "0",
+      "NEAREST4P50": "",
+      "PIVOTLOW2": "",
+      "PIVOTHIGH2": "",
+      "MIN": "",
+      "RCI4": ""
+    },
+    "last_historical_values": {
+      "BAR_INDEX": "24947",
+      "CLEAN": "10",
+      "SOURCE": "10",
+      "PEER": "23",
+      "RSI4": "46.4585906816824",
+      "CMO4": "-100",
+      "HMA4": "11.37777777777778",
+      "HIGHESTBARS4": "-1",
+      "LOWESTBARS4": "0",
+      "CORRELATION4": "-1.21356455507736",
+      "RISING4": "0",
+      "NEAREST4P50": "16",
+      "PIVOTLOW2": "",
+      "PIVOTHIGH2": "",
+      "MIN": "10",
+      "RCI4": "-79.99999999999999"
+    },
+    "data_window_witness": "captures/v11/evidence/source-window-hole-matrix-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T15:37:05.305Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v11 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "source-stateful-hole-matrix-v1.pine",
+    "attempt": 1,
+    "source_sha256": "b4e7554dc489c8fd96b7bc718cc401b27975234058db6cb29719b2023fbcc367",
+    "indicator_title": "V11 source-stateful-hole-matrix-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v11/source-stateful-hole-matrix-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T233704.225.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V11 source-stateful-hole-matrix-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24649,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24949,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T15:36:56.009Z",
+    "live_candle_open_utc": "2026-10-04T15:36:00.000Z",
+    "export_utc": "2026-10-04T15:37:04.488Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v11/evidence/source-stateful-hole-matrix-v1-attempt1-setup.png",
+      "captures/v11/evidence/source-stateful-hole-matrix-v1-attempt1-export.png",
+      "captures/v11/evidence/source-stateful-hole-matrix-v1-attempt1-logs.txt",
+      "captures/v11/evidence/source-stateful-hole-matrix-v1-attempt1-logs-v1.json",
+      "captures/v11/evidence/source-stateful-hole-matrix-v1-attempt1-logs.png",
+      "captures/v11/evidence/source-stateful-hole-matrix-v1-attempt1-visual.png",
+      "captures/v11/evidence/source-stateful-hole-matrix-v1-attempt1-data-window-v1.png",
+      "captures/v11/evidence/source-stateful-hole-matrix-v1-attempt1-data-window-v1.json",
+      "captures/v11/evidence/source-stateful-hole-matrix-v1-attempt1-data-window-v1.txt",
+      "captures/v11/evidence/source-stateful-hole-matrix-v1-attempt1-authority-object-geometry-v1.json",
+      "captures/v11/evidence/source-stateful-hole-matrix-v1-attempt1-authority-object-geometry-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T15:36:56.907Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790823000,
+            83410.4,
+            83456.76,
+            83410.39,
+            83451.06,
+            7.66661
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791128160,
+            85289.74,
+            85289.74,
+            85284.98,
+            85289.74,
+            2.23333
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 source-stateful-hole-matrix-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790823000,
+                22405,
+                13,
+                13,
+                16,
+                293264,
+                13,
+                13,
+                12,
+                -0.4392065245645913,
+                -0.36439811442668124,
+                -0.07480841013791006
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791128160,
+                24948,
+                17,
+                17,
+                20,
+                326570,
+                17,
+                null,
+                21,
+                -0.2659118425674247,
+                -0.44905348176739623,
+                0.1831416391999715
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T15:36:57.896Z",
+        "bars": 24949,
+        "end": true,
+        "first": {
+          "index": -24649,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791128160,
+            85289.74,
+            85289.74,
+            85284.98,
+            85289.74,
+            2.24416
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 source-stateful-hole-matrix-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24949,
+            "first": {
+              "index": -24649,
+              "value": [
+                1788134400,
+                0,
+                10,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791128160,
+                24948,
+                17,
+                17,
+                20,
+                326570,
+                17,
+                null,
+                21,
+                -0.2659118425674247,
+                -0.44905348176739623,
+                0.1831416391999715
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   15:36",
+    "historical_compare_before_unix_seconds": 1791128160,
+    "pine_logs": {
+      "paths": [
+        "evidence/source-stateful-hole-matrix-v1-attempt1-logs.txt",
+        "evidence/source-stateful-hole-matrix-v1-attempt1-logs-v1.json",
+        "evidence/source-stateful-hole-matrix-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "b9fe350f434a044bafcd7cbdde6d1e1752968a2fe2f53e86de4c625b9f06127a",
+    "csv_bytes": 3030456,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "BAR_INDEX",
+      "CLEAN",
+      "SOURCE",
+      "PEER",
+      "CUM",
+      "FIXNAN",
+      "VALUEWHEN0",
+      "VALUEWHEN3",
+      "MACD",
+      "SIGNAL",
+      "HISTOGRAM"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "BAR_INDEX": 5,
+      "CLEAN": 6,
+      "SOURCE": 7,
+      "PEER": 8,
+      "CUM": 9,
+      "FIXNAN": 10,
+      "VALUEWHEN0": 11,
+      "VALUEWHEN3": 12,
+      "MACD": 13,
+      "SIGNAL": 14,
+      "HISTOGRAM": 15
+    },
+    "first_historical_cells": [
+      "1788134400",
+      "77682",
+      "77682.01",
+      "77572",
+      "77674.04",
+      "0",
+      "10",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""
+    ],
+    "last_historical_cells": [
+      "1791128040",
+      "85299.39",
+      "85299.39",
+      "85289.71",
+      "85289.74",
+      "24947",
+      "10",
+      "10",
+      "23",
+      "326553",
+      "10",
+      "",
+      "21",
+      "-1.3961531991904437",
+      "-0.8153367601673391",
+      "-0.5808164390231045"
+    ],
+    "declared_to_native_header_mapping": {
+      "BAR_INDEX": "BAR_INDEX",
+      "CLEAN": "CLEAN",
+      "SOURCE": "SOURCE",
+      "PEER": "PEER",
+      "CUM": "CUM",
+      "FIXNAN": "FIXNAN",
+      "VALUEWHEN0": "VALUEWHEN0",
+      "VALUEWHEN3": "VALUEWHEN3",
+      "MACD": "MACD",
+      "SIGNAL": "SIGNAL",
+      "HISTOGRAM": "HISTOGRAM"
+    },
+    "csv_rows": 24949,
+    "historical_rows": 24948,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791128160,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791128160",
+    "first_historical_values": {
+      "BAR_INDEX": "0",
+      "CLEAN": "10",
+      "SOURCE": "",
+      "PEER": "",
+      "CUM": "",
+      "FIXNAN": "",
+      "VALUEWHEN0": "",
+      "VALUEWHEN3": "",
+      "MACD": "",
+      "SIGNAL": "",
+      "HISTOGRAM": ""
+    },
+    "last_historical_values": {
+      "BAR_INDEX": "24947",
+      "CLEAN": "10",
+      "SOURCE": "10",
+      "PEER": "23",
+      "CUM": "326553",
+      "FIXNAN": "10",
+      "VALUEWHEN0": "",
+      "VALUEWHEN3": "21",
+      "MACD": "-1.3961531991904437",
+      "SIGNAL": "-0.8153367601673391",
+      "HISTOGRAM": "-0.5808164390231045"
+    },
+    "data_window_witness": "captures/v11/evidence/source-stateful-hole-matrix-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T15:37:44.145Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v11 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "array-linear-standardize-matrix-v1.pine",
+    "attempt": 1,
+    "source_sha256": "eb5ecbaadd3dd02ad2bd67f0eea65adf60358558ae637bbeb064f4479ece6053",
+    "indicator_title": "V11 array-linear-standardize-matrix-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v11/array-linear-standardize-matrix-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T233743.561.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V11 array-linear-standardize-matrix-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24649,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24949,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T15:37:35.210Z",
+    "live_candle_open_utc": "2026-10-04T15:36:00.000Z",
+    "export_utc": "2026-10-04T15:37:43.739Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v11/evidence/array-linear-standardize-matrix-v1-attempt1-setup.png",
+      "captures/v11/evidence/array-linear-standardize-matrix-v1-attempt1-export.png",
+      "captures/v11/evidence/array-linear-standardize-matrix-v1-attempt1-logs.txt",
+      "captures/v11/evidence/array-linear-standardize-matrix-v1-attempt1-logs-v1.json",
+      "captures/v11/evidence/array-linear-standardize-matrix-v1-attempt1-logs.png",
+      "captures/v11/evidence/array-linear-standardize-matrix-v1-attempt1-visual.png",
+      "captures/v11/evidence/array-linear-standardize-matrix-v1-attempt1-data-window-v1.png",
+      "captures/v11/evidence/array-linear-standardize-matrix-v1-attempt1-data-window-v1.json",
+      "captures/v11/evidence/array-linear-standardize-matrix-v1-attempt1-data-window-v1.txt",
+      "captures/v11/evidence/array-linear-standardize-matrix-v1-attempt1-authority-object-geometry-v1.json",
+      "captures/v11/evidence/array-linear-standardize-matrix-v1-attempt1-authority-object-geometry-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T15:37:35.999Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790823000,
+            83410.4,
+            83456.76,
+            83410.39,
+            83451.06,
+            7.66661
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791128160,
+            85289.74,
+            85289.74,
+            85284.98,
+            85289.73,
+            2.92325
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 array-linear-standardize-matrix-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790823000,
+                4,
+                -1.1111677990074322,
+                null,
+                1.3131983079178744,
+                -0.2020305089104423,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                2.5,
+                2.5,
+                6.5,
+                6.5,
+                10.5,
+                10.5
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791128160,
+                4,
+                -1.1111677990074322,
+                null,
+                1.3131983079178744,
+                -0.2020305089104423,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                2.5,
+                2.5,
+                6.5,
+                6.5,
+                10.5,
+                10.5
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T15:37:37.363Z",
+        "bars": 24949,
+        "end": true,
+        "first": {
+          "index": -24649,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791128160,
+            85289.74,
+            85289.74,
+            85284.98,
+            85289.74,
+            2.93174
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 array-linear-standardize-matrix-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24949,
+            "first": {
+              "index": -24649,
+              "value": [
+                1788134400,
+                4,
+                -1.1111677990074322,
+                null,
+                1.3131983079178744,
+                -0.2020305089104423,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                2.5,
+                2.5,
+                6.5,
+                6.5,
+                10.5,
+                10.5
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791128160,
+                4,
+                -1.1111677990074322,
+                null,
+                1.3131983079178744,
+                -0.2020305089104423,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                2.5,
+                2.5,
+                6.5,
+                6.5,
+                10.5,
+                10.5
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   15:36",
+    "historical_compare_before_unix_seconds": 1791128160,
+    "pine_logs": {
+      "paths": [
+        "evidence/array-linear-standardize-matrix-v1-attempt1-logs.txt",
+        "evidence/array-linear-standardize-matrix-v1-attempt1-logs-v1.json",
+        "evidence/array-linear-standardize-matrix-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "6b68f4bad7b976e1f52f97b058449c68a7fe829ef3d4ddb66462ca711b92df5a",
+    "csv_bytes": 3449413,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "STANDARD_SIZE",
+      "STANDARD_0",
+      "STANDARD_1",
+      "STANDARD_2",
+      "STANDARD_3",
+      "AF_P25_NS",
+      "AF_P25_METHOD",
+      "AF_P50_NS",
+      "AF_P50_METHOD",
+      "AF_P75_NS",
+      "AF_P75_METHOD",
+      "AI_P25_NS",
+      "AI_P25_METHOD",
+      "AI_P50_NS",
+      "AI_P50_METHOD",
+      "AI_P75_NS",
+      "AI_P75_METHOD"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "STANDARD_SIZE": 5,
+      "STANDARD_0": 6,
+      "STANDARD_1": 7,
+      "STANDARD_2": 8,
+      "STANDARD_3": 9,
+      "AF_P25_NS": 10,
+      "AF_P25_METHOD": 11,
+      "AF_P50_NS": 12,
+      "AF_P50_METHOD": 13,
+      "AF_P75_NS": 14,
+      "AF_P75_METHOD": 15,
+      "AI_P25_NS": 16,
+      "AI_P25_METHOD": 17,
+      "AI_P50_NS": 18,
+      "AI_P50_METHOD": 19,
+      "AI_P75_NS": 20,
+      "AI_P75_METHOD": 21
+    },
+    "first_historical_cells": [
+      "1788134400",
+      "77682",
+      "77682.01",
+      "77572",
+      "77674.04",
+      "4",
+      "-1.1111677990074322",
+      "",
+      "1.3131983079178744",
+      "-0.2020305089104423",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "2.5",
+      "2.5",
+      "6.5",
+      "6.5",
+      "10.5",
+      "10.5"
+    ],
+    "last_historical_cells": [
+      "1791128040",
+      "85299.39",
+      "85299.39",
+      "85289.71",
+      "85289.74",
+      "4",
+      "-1.1111677990074322",
+      "",
+      "1.3131983079178744",
+      "-0.2020305089104423",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "2.5",
+      "2.5",
+      "6.5",
+      "6.5",
+      "10.5",
+      "10.5"
+    ],
+    "declared_to_native_header_mapping": {
+      "STANDARD_SIZE": "STANDARD_SIZE",
+      "STANDARD_0": "STANDARD_0",
+      "STANDARD_1": "STANDARD_1",
+      "STANDARD_2": "STANDARD_2",
+      "STANDARD_3": "STANDARD_3",
+      "AF_P25_NS": "AF_P25_NS",
+      "AF_P25_METHOD": "AF_P25_METHOD",
+      "AF_P50_NS": "AF_P50_NS",
+      "AF_P50_METHOD": "AF_P50_METHOD",
+      "AF_P75_NS": "AF_P75_NS",
+      "AF_P75_METHOD": "AF_P75_METHOD",
+      "AI_P25_NS": "AI_P25_NS",
+      "AI_P25_METHOD": "AI_P25_METHOD",
+      "AI_P50_NS": "AI_P50_NS",
+      "AI_P50_METHOD": "AI_P50_METHOD",
+      "AI_P75_NS": "AI_P75_NS",
+      "AI_P75_METHOD": "AI_P75_METHOD"
+    },
+    "csv_rows": 24949,
+    "historical_rows": 24948,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791128160,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791128160",
+    "first_historical_values": {
+      "STANDARD_SIZE": "4",
+      "STANDARD_0": "-1.1111677990074322",
+      "STANDARD_1": "",
+      "STANDARD_2": "1.3131983079178744",
+      "STANDARD_3": "-0.2020305089104423",
+      "AF_P25_NS": "",
+      "AF_P25_METHOD": "",
+      "AF_P50_NS": "",
+      "AF_P50_METHOD": "",
+      "AF_P75_NS": "",
+      "AF_P75_METHOD": "",
+      "AI_P25_NS": "2.5",
+      "AI_P25_METHOD": "2.5",
+      "AI_P50_NS": "6.5",
+      "AI_P50_METHOD": "6.5",
+      "AI_P75_NS": "10.5",
+      "AI_P75_METHOD": "10.5"
+    },
+    "last_historical_values": {
+      "STANDARD_SIZE": "4",
+      "STANDARD_0": "-1.1111677990074322",
+      "STANDARD_1": "",
+      "STANDARD_2": "1.3131983079178744",
+      "STANDARD_3": "-0.2020305089104423",
+      "AF_P25_NS": "",
+      "AF_P25_METHOD": "",
+      "AF_P50_NS": "",
+      "AF_P50_METHOD": "",
+      "AF_P75_NS": "",
+      "AF_P75_METHOD": "",
+      "AI_P25_NS": "2.5",
+      "AI_P25_METHOD": "2.5",
+      "AI_P50_NS": "6.5",
+      "AI_P50_METHOD": "6.5",
+      "AI_P75_NS": "10.5",
+      "AI_P75_METHOD": "10.5"
+    },
+    "data_window_witness": "captures/v11/evidence/array-linear-standardize-matrix-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T15:38:24.158Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v11 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "hline-gradient-six-slots-v1.pine",
+    "attempt": 1,
+    "source_sha256": "910fef2fe25495b79d98db55be06f7879eadf1c3a67aa0af2a0d2d944bb5d877",
+    "indicator_title": "V11 hline-gradient-six-slots-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v11/hline-gradient-six-slots-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T233822.545.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V11 hline-gradient-six-slots-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24650,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24950,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T15:38:13.217Z",
+    "live_candle_open_utc": "2026-10-04T15:38:00.000Z",
+    "export_utc": "2026-10-04T15:38:23.011Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v11/evidence/hline-gradient-six-slots-v1-attempt1-setup.png",
+      "captures/v11/evidence/hline-gradient-six-slots-v1-attempt1-export.png",
+      "captures/v11/evidence/hline-gradient-six-slots-v1-attempt1-logs.txt",
+      "captures/v11/evidence/hline-gradient-six-slots-v1-attempt1-logs-v1.json",
+      "captures/v11/evidence/hline-gradient-six-slots-v1-attempt1-logs.png",
+      "captures/v11/evidence/hline-gradient-six-slots-v1-attempt1-visual.png",
+      "captures/v11/evidence/hline-gradient-six-slots-v1-attempt1-data-window-v1.png",
+      "captures/v11/evidence/hline-gradient-six-slots-v1-attempt1-data-window-v1.json",
+      "captures/v11/evidence/hline-gradient-six-slots-v1-attempt1-data-window-v1.txt",
+      "captures/v11/evidence/hline-gradient-six-slots-v1-attempt1-authority-object-geometry-v1.json",
+      "captures/v11/evidence/hline-gradient-six-slots-v1-attempt1-authority-object-geometry-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T15:38:14.221Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790823120,
+            83451.06,
+            83497.55,
+            83451.05,
+            83495.54,
+            5.30592
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791128280,
+            85286.56,
+            85296.57,
+            85286.55,
+            85296.57,
+            0.83046
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 hline-gradient-six-slots-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790823120,
+                50
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791128280,
+                50
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T15:38:15.409Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790823120,
+            83451.06,
+            83497.55,
+            83451.05,
+            83495.54,
+            5.30592
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791128280,
+            85286.56,
+            85296.57,
+            85286.55,
+            85296.56,
+            0.83094
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 hline-gradient-six-slots-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24950,
+            "first": {
+              "index": -1022406,
+              "value": [
+                1788134400,
+                50
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791128280,
+                50
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T15:38:16.327Z",
+        "bars": 24950,
+        "end": true,
+        "first": {
+          "index": -24650,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791128280,
+            85286.56,
+            85296.57,
+            85286.55,
+            85296.57,
+            0.83727
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 hline-gradient-six-slots-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24950,
+            "first": {
+              "index": -24650,
+              "value": [
+                1788134400,
+                50
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791128280,
+                50
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   15:38",
+    "historical_compare_before_unix_seconds": 1791128280,
+    "pine_logs": {
+      "paths": [
+        "evidence/hline-gradient-six-slots-v1-attempt1-logs.txt",
+        "evidence/hline-gradient-six-slots-v1-attempt1-logs-v1.json",
+        "evidence/hline-gradient-six-slots-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "e847c382311d812a75147ace258e3f22af6edc4732dd90b8a714aa221486497f",
+    "csv_bytes": 1178911,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "MIDPOINT"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "MIDPOINT": 5
+    },
+    "first_historical_cells": [
+      "1788134400",
+      "77682",
+      "77682.01",
+      "77572",
+      "77674.04",
+      "50"
+    ],
+    "last_historical_cells": [
+      "1791128160",
+      "85289.74",
+      "85289.74",
+      "85284.98",
+      "85286.55",
+      "50"
+    ],
+    "declared_to_native_header_mapping": {
+      "MIDPOINT": "MIDPOINT"
+    },
+    "csv_rows": 24950,
+    "historical_rows": 24949,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791128280,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791128280",
+    "first_historical_values": {
+      "MIDPOINT": "50"
+    },
+    "last_historical_values": {
+      "MIDPOINT": "50"
+    },
+    "data_window_witness": "captures/v11/evidence/hline-gradient-six-slots-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T15:39:08.990Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v11 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "all-na-seed-matrix-v1.pine",
+    "attempt": 1,
+    "source_sha256": "91e15a50011ee88e0fc141d68afc15f46a4a0ff02152da57bbbf651be39c575c",
+    "indicator_title": "V11 all-na-seed-matrix-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v11/all-na-seed-matrix-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T233907.576.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V11 all-na-seed-matrix-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24650,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24950,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T15:38:56.076Z",
+    "live_candle_open_utc": "2026-10-04T15:38:00.000Z",
+    "export_utc": "2026-10-04T15:39:08.234Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v11/evidence/all-na-seed-matrix-v1-attempt1-setup.png",
+      "captures/v11/evidence/all-na-seed-matrix-v1-attempt1-export.png",
+      "captures/v11/evidence/all-na-seed-matrix-v1-attempt1-logs.txt",
+      "captures/v11/evidence/all-na-seed-matrix-v1-attempt1-logs-v1.json",
+      "captures/v11/evidence/all-na-seed-matrix-v1-attempt1-logs.png",
+      "captures/v11/evidence/all-na-seed-matrix-v1-attempt1-visual.png",
+      "captures/v11/evidence/all-na-seed-matrix-v1-attempt1-data-window-v1.png",
+      "captures/v11/evidence/all-na-seed-matrix-v1-attempt1-data-window-v1.json",
+      "captures/v11/evidence/all-na-seed-matrix-v1-attempt1-data-window-v1.txt",
+      "captures/v11/evidence/all-na-seed-matrix-v1-attempt1-authority-object-geometry-v1.json",
+      "captures/v11/evidence/all-na-seed-matrix-v1-attempt1-authority-object-geometry-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T15:38:57.078Z",
+        "bars": 2556,
+        "end": false,
+        "first": {
+          "index": -2256,
+          "value": [
+            1790821680,
+            83425.82,
+            83541.32,
+            83425.82,
+            83541.31,
+            21.23233
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791128280,
+            85286.56,
+            85296.57,
+            85286.55,
+            85296.56,
+            1.72949
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 all-na-seed-matrix-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2556,
+            "first": {
+              "index": -2256,
+              "value": [
+                1790821680,
+                22394,
+                null,
+                null,
+                null
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791128280,
+                24949,
+                null,
+                null,
+                null
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T15:38:58.510Z",
+        "bars": 2556,
+        "end": false,
+        "first": {
+          "index": -2256,
+          "value": [
+            1790821680,
+            83425.82,
+            83541.32,
+            83425.82,
+            83541.31,
+            21.23233
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791128280,
+            85286.56,
+            85296.57,
+            85286.55,
+            85296.56,
+            1.73245
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 all-na-seed-matrix-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24950,
+            "first": {
+              "index": -1022394,
+              "value": [
+                1788134400,
+                0,
+                null,
+                null,
+                null
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791128280,
+                24949,
+                null,
+                null,
+                null
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T15:38:59.539Z",
+        "bars": 24950,
+        "end": true,
+        "first": {
+          "index": -24650,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791128280,
+            85286.56,
+            85296.57,
+            85286.55,
+            85296.56,
+            1.74937
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 all-na-seed-matrix-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24950,
+            "first": {
+              "index": -24650,
+              "value": [
+                1788134400,
+                0,
+                null,
+                null,
+                null
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791128280,
+                24949,
+                null,
+                null,
+                null
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   15:38",
+    "historical_compare_before_unix_seconds": 1791128280,
+    "pine_logs": {
+      "paths": [
+        "evidence/all-na-seed-matrix-v1-attempt1-logs.txt",
+        "evidence/all-na-seed-matrix-v1-attempt1-logs-v1.json",
+        "evidence/all-na-seed-matrix-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "a6953ec23dbee0fb3f7358c46af6d5e71beccce2e8c548155dec23b9731e30e6",
+    "csv_bytes": 1317538,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "BAR_INDEX",
+      "FIXNAN_ALL_NA",
+      "MAX_ALL_NA",
+      "MIN_ALL_NA"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "BAR_INDEX": 5,
+      "FIXNAN_ALL_NA": 6,
+      "MAX_ALL_NA": 7,
+      "MIN_ALL_NA": 8
+    },
+    "first_historical_cells": [
+      "1788134400",
+      "77682",
+      "77682.01",
+      "77572",
+      "77674.04",
+      "0",
+      "",
+      "",
+      ""
+    ],
+    "last_historical_cells": [
+      "1791128160",
+      "85289.74",
+      "85289.74",
+      "85284.98",
+      "85286.55",
+      "24948",
+      "",
+      "",
+      ""
+    ],
+    "declared_to_native_header_mapping": {
+      "BAR_INDEX": "BAR_INDEX",
+      "FIXNAN_ALL_NA": "FIXNAN_ALL_NA",
+      "MAX_ALL_NA": "MAX_ALL_NA",
+      "MIN_ALL_NA": "MIN_ALL_NA"
+    },
+    "csv_rows": 24950,
+    "historical_rows": 24949,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791128280,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791128280",
+    "first_historical_values": {
+      "BAR_INDEX": "0",
+      "FIXNAN_ALL_NA": "",
+      "MAX_ALL_NA": "",
+      "MIN_ALL_NA": ""
+    },
+    "last_historical_values": {
+      "BAR_INDEX": "24948",
+      "FIXNAN_ALL_NA": "",
+      "MAX_ALL_NA": "",
+      "MIN_ALL_NA": ""
+    },
+    "data_window_witness": "captures/v11/evidence/all-na-seed-matrix-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T15:39:55.598Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v11 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "legacy-cross-hole-matrix-v1.pine",
+    "attempt": 1,
+    "source_sha256": "69af5cc922092d1ffe462d6aab104d896eddf9977bb3d2d25dad4d4187b6b9fb",
+    "indicator_title": "V11 legacy-cross-hole-matrix-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v11/legacy-cross-hole-matrix-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T233954.083.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V11 legacy-cross-hole-matrix-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24650,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24950,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T15:39:39.100Z",
+    "live_candle_open_utc": "2026-10-04T15:38:00.000Z",
+    "export_utc": "2026-10-04T15:39:54.791Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v11/evidence/legacy-cross-hole-matrix-v1-attempt1-setup.png",
+      "captures/v11/evidence/legacy-cross-hole-matrix-v1-attempt1-export.png",
+      "captures/v11/evidence/legacy-cross-hole-matrix-v1-attempt1-logs.txt",
+      "captures/v11/evidence/legacy-cross-hole-matrix-v1-attempt1-logs-v1.json",
+      "captures/v11/evidence/legacy-cross-hole-matrix-v1-attempt1-logs.png",
+      "captures/v11/evidence/legacy-cross-hole-matrix-v1-attempt1-visual.png",
+      "captures/v11/evidence/legacy-cross-hole-matrix-v1-attempt1-data-window-v1.png",
+      "captures/v11/evidence/legacy-cross-hole-matrix-v1-attempt1-data-window-v1.json",
+      "captures/v11/evidence/legacy-cross-hole-matrix-v1-attempt1-data-window-v1.txt",
+      "captures/v11/evidence/legacy-cross-hole-matrix-v1-attempt1-authority-object-geometry-v1.json",
+      "captures/v11/evidence/legacy-cross-hole-matrix-v1-attempt1-authority-object-geometry-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T15:39:40.080Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790823120,
+            83451.06,
+            83497.55,
+            83451.05,
+            83495.54,
+            5.30592
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791128280,
+            85286.56,
+            85300,
+            85286.55,
+            85299.99,
+            2.42678
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 legacy-cross-hole-matrix-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790823120,
+                22406,
+                -1,
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791128280,
+                24949,
+                2,
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T15:39:41.166Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790823120,
+            83451.06,
+            83497.55,
+            83451.05,
+            83495.54,
+            5.30592
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791128280,
+            85286.56,
+            85300,
+            85286.55,
+            85300,
+            2.44124
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 legacy-cross-hole-matrix-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24950,
+            "first": {
+              "index": -1022406,
+              "value": [
+                1788134400,
+                0,
+                null,
+                0,
+                -1,
+                -1,
+                -1
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791128280,
+                24949,
+                2,
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T15:39:42.332Z",
+        "bars": 24950,
+        "end": true,
+        "first": {
+          "index": -24650,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791128280,
+            85286.56,
+            85300,
+            85286.55,
+            85300,
+            2.45213
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 legacy-cross-hole-matrix-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24950,
+            "first": {
+              "index": -24650,
+              "value": [
+                1788134400,
+                0,
+                null,
+                0,
+                -1,
+                -1,
+                -1
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791128280,
+                24949,
+                2,
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///bf971a2b-84e7-484e-bbcb-fc2a3284c9cf.pine?placement%3Ddialog",
+          "path": "/bf971a2b-84e7-484e-bbcb-fc2a3284c9cf.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "live_tooltip": "Sun 04 Oct '26   15:38",
+    "historical_compare_before_unix_seconds": 1791128280,
+    "pine_logs": {
+      "paths": [
+        "evidence/legacy-cross-hole-matrix-v1-attempt1-logs.txt",
+        "evidence/legacy-cross-hole-matrix-v1-attempt1-logs-v1.json",
+        "evidence/legacy-cross-hole-matrix-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "3b021fff7d56f4f79f5ba12c165bf2ea99a9c005d61be1b38cfd06f93d79a4c8",
+    "csv_bytes": 1512239,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "BAR_INDEX",
+      "X",
+      "Y",
+      "CROSSOVER_STATE",
+      "CROSSUNDER_STATE",
+      "CROSS_STATE"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "BAR_INDEX": 5,
+      "X": 6,
+      "Y": 7,
+      "CROSSOVER_STATE": 8,
+      "CROSSUNDER_STATE": 9,
+      "CROSS_STATE": 10
+    },
+    "first_historical_cells": [
+      "1788134400",
+      "77682",
+      "77682.01",
+      "77572",
+      "77674.04",
+      "0",
+      "",
+      "0",
+      "-1",
+      "-1",
+      "-1"
+    ],
+    "last_historical_cells": [
+      "1791128160",
+      "85289.74",
+      "85289.74",
+      "85284.98",
+      "85286.55",
+      "24948",
+      "1",
+      "0",
+      "1",
+      "0",
+      "1"
+    ],
+    "declared_to_native_header_mapping": {
+      "BAR_INDEX": "BAR_INDEX",
+      "X": "X",
+      "Y": "Y",
+      "CROSSOVER_STATE": "CROSSOVER_STATE",
+      "CROSSUNDER_STATE": "CROSSUNDER_STATE",
+      "CROSS_STATE": "CROSS_STATE"
+    },
+    "csv_rows": 24950,
+    "historical_rows": 24949,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791128280,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791128280",
+    "first_historical_values": {
+      "BAR_INDEX": "0",
+      "X": "",
+      "Y": "0",
+      "CROSSOVER_STATE": "-1",
+      "CROSSUNDER_STATE": "-1",
+      "CROSS_STATE": "-1"
+    },
+    "last_historical_values": {
+      "BAR_INDEX": "24948",
+      "X": "1",
+      "Y": "0",
+      "CROSSOVER_STATE": "1",
+      "CROSSUNDER_STATE": "0",
+      "CROSS_STATE": "1"
+    },
+    "data_window_witness": "captures/v11/evidence/legacy-cross-hole-matrix-v1-attempt1-data-window-v1.json"
   }
 ]

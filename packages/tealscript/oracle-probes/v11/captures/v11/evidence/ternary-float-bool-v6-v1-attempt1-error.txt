@@ -1,0 +1,47 @@
+Cannot call "operator ?:" with argument "expr1"="1.5". An argument of "literal float" type was used but a "simple bool"  is expected.
+{
+  "error": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+  "editorError": {
+    "code": "CE10123",
+    "ctx": {
+      "argDisplayName": "expr1",
+      "argUserFriendlyRepresentation": 1.5,
+      "argumentType": "literal float",
+      "currentTypeDocStr": "simple bool",
+      "funId": "operator ?:",
+      "typePostfix": ""
+    },
+    "end": {
+      "column": 26,
+      "line": 3
+    },
+    "message": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+    "start": {
+      "column": 24,
+      "line": 3
+    },
+    "id": "USER;42f7daec9380466a8bb4025b2682759f"
+  },
+  "title": "Compilation error",
+  "compiler_markers": [
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///8f9255a3-bb48-4caa-9b30-8fbe01a73148.pine?placement%3Ddialog",
+        "path": "/8f9255a3-bb48-4caa-9b30-8fbe01a73148.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "code": "CE10123",
+      "severity": 8,
+      "message": "Cannot call \"operator ?:\" with argument \"expr1\"=\"1.5\". An argument of \"literal float\" type was used but a \"simple bool\"  is expected.",
+      "startLineNumber": 3,
+      "startColumn": 24,
+      "endLineNumber": 3,
+      "endColumn": 27
+    }
+  ],
+  "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,299.38\nH\n85,314.58\nL\n85,299.37\nC\n85,304.79\n+5.41 (+0.01%)\n85,304.79\nSELL\n0.01\n85,304.80\nBUY\nUSDT\nternary-float-bool-v6-v1.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n15:33:38 UTC\n99+\nPine Editor\nternary-float-bool-v6-v1.pine\nPublish script\n1\n2\n3\n4\n5\n//@version=6\nindicator(\"V6 ternary float-bool\")\nvalue = close > open ? 1.5 : true\nplot(close, display=display.data_window)\n1 of 1 problem\nCannot call \"operator ?:\" with argument \"expr1\"=\"1.5\". An argument of \"literal float\" type was used but a \"simple bool\" is expected.(CE10123)\n1 ∙ Today, 23:33\nLine 3, Col 24\nPine Script® v6\nCompilation error: CE10123\n\nCannot call \"operator ?:\" with argument \"expr1\"=\"1.5\". An argument of \"literal float\" type was used but a \"simple bool\" is expected.\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+  "context_substituted_message": "Cannot call \"operator ?:\" with argument \"expr1\"=\"1.5\". An argument of \"literal float\" type was used but a \"simple bool\"  is expected."
+}

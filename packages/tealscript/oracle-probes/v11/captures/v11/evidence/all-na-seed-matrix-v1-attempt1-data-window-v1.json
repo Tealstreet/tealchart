@@ -1,0 +1,32 @@
+{
+  "index": 298,
+  "bar": [
+    1791128160,
+    85289.74,
+    85289.74,
+    85284.98,
+    85286.55,
+    5.07602
+  ],
+  "source_row": [
+    1791128160,
+    24948,
+    null,
+    null,
+    null
+  ],
+  "browser_utc": "2026-10-04T15:39:15.543Z",
+  "title": "V11 all-na-seed-matrix-v1",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   15:36",
+  "visible_range": {
+    "_firstBar": 263,
+    "_lastBar": 301
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}

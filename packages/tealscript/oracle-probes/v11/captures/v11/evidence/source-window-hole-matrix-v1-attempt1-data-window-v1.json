@@ -1,0 +1,44 @@
+{
+  "index": 298,
+  "bar": [
+    1791128040,
+    85299.39,
+    85299.39,
+    85289.71,
+    85289.74,
+    2.22837
+  ],
+  "source_row": [
+    1791128040,
+    24947,
+    10,
+    10,
+    23,
+    46.4585906816824,
+    -100,
+    11.37777777777778,
+    -1,
+    0,
+    -1.21356455507736,
+    0,
+    16,
+    null,
+    null,
+    10,
+    -79.99999999999999
+  ],
+  "browser_utc": "2026-10-04T15:36:32.288Z",
+  "title": "V11 source-window-hole-matrix-v1",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   15:34",
+  "visible_range": {
+    "_firstBar": 263,
+    "_lastBar": 301
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}
