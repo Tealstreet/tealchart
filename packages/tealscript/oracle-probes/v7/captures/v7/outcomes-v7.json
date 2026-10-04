@@ -8790,5 +8790,2808 @@
       "OFFSET": "299"
     },
     "data_window_witness": "captures/v7/evidence/history-buffer-late-jump-v6-v1-attempt3-data-window-v1.json"
+  },
+  {
+    "script": "ta-rising-leading-interior-holes-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "6aa265219b7a1a08aa15ff8cf5e60d02383c4e4e4c5726fedf39aa9a532f0409",
+    "indicator_title": "V7 ta-rising-leading-interior-holes-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/ta-rising-leading-interior-holes-v6-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T134757.587.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 ta-rising-leading-interior-holes-v6-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24354,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24654,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T05:47:50.258Z",
+    "live_candle_open_utc": "2026-10-04T05:46:00.000Z",
+    "export_utc": "2026-10-04T05:47:58.053Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/ta-rising-leading-interior-holes-v6-v1-attempt1-setup.png",
+      "captures/v7/evidence/ta-rising-leading-interior-holes-v6-v1-attempt1-export.png",
+      "captures/v7/evidence/ta-rising-leading-interior-holes-v6-v1-attempt1-logs.txt",
+      "captures/v7/evidence/ta-rising-leading-interior-holes-v6-v1-attempt1-logs-v1.json",
+      "captures/v7/evidence/ta-rising-leading-interior-holes-v6-v1-attempt1-logs.png",
+      "captures/v7/evidence/ta-rising-leading-interior-holes-v6-v1-attempt1-visual.png",
+      "captures/v7/evidence/ta-rising-leading-interior-holes-v6-v1-attempt1-data-window-v1.png",
+      "captures/v7/evidence/ta-rising-leading-interior-holes-v6-v1-attempt1-data-window-v1.json",
+      "captures/v7/evidence/ta-rising-leading-interior-holes-v6-v1-attempt1-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T05:47:51.092Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790787600,
+            84349.44,
+            84356.02,
+            84320.29,
+            84329.99,
+            23.1666
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791092760,
+            84923.67,
+            84923.68,
+            84916,
+            84916.01,
+            2.89768
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-rising-leading-interior-holes-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790787600,
+                24,
+                24,
+                1,
+                1
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791092760,
+                23,
+                23,
+                1,
+                1
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T05:47:52.089Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790787600,
+            84349.44,
+            84356.02,
+            84320.29,
+            84329.99,
+            23.1666
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791092760,
+            84923.67,
+            84923.68,
+            84916,
+            84916.01,
+            2.89768
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-rising-leading-interior-holes-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24654,
+            "first": {
+              "index": -1022110,
+              "value": [
+                1788134400,
+                null,
+                10,
+                0,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791092760,
+                23,
+                23,
+                1,
+                1
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T05:47:52.956Z",
+        "bars": 24654,
+        "end": true,
+        "first": {
+          "index": -24354,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791092760,
+            84923.67,
+            84923.68,
+            84916,
+            84916,
+            2.90885
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-rising-leading-interior-holes-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24654,
+            "first": {
+              "index": -24354,
+              "value": [
+                1788134400,
+                null,
+                10,
+                0,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791092760,
+                23,
+                23,
+                1,
+                1
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   05:46",
+    "historical_compare_before_unix_seconds": 1791092760,
+    "pine_logs": {
+      "paths": [
+        "evidence/ta-rising-leading-interior-holes-v6-v1-attempt1-logs.txt",
+        "evidence/ta-rising-leading-interior-holes-v6-v1-attempt1-logs-v1.json",
+        "evidence/ta-rising-leading-interior-holes-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "7361d3afe8f3a22019d598def032527154a7c553450e3c63236dfa013cc49353",
+    "csv_bytes": 1321926,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "SOURCE",
+      "CLEAN",
+      "TARGET",
+      "CONTROL"
+    ],
+    "declared_to_native_header_mapping": {
+      "SOURCE": "SOURCE",
+      "CLEAN": "CLEAN",
+      "TARGET": "TARGET",
+      "CONTROL": "CONTROL"
+    },
+    "csv_rows": 24654,
+    "historical_rows": 24653,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791092760,
+    "first_historical_values": {
+      "SOURCE": "",
+      "CLEAN": "10",
+      "TARGET": "0",
+      "CONTROL": "0"
+    },
+    "last_historical_values": {
+      "SOURCE": "22",
+      "CLEAN": "22",
+      "TARGET": "1",
+      "CONTROL": "1"
+    },
+    "data_window_witness": "captures/v7/evidence/ta-rising-leading-interior-holes-v6-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "script": "ta-rising-leading-interior-holes-v6-v1.pine",
+    "attempt": 2,
+    "source_sha256": "6aa265219b7a1a08aa15ff8cf5e60d02383c4e4e4c5726fedf39aa9a532f0409",
+    "indicator_title": "V7 ta-rising-leading-interior-holes-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/ta-rising-leading-interior-holes-v6-v1-attempt2.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T134825.465.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 ta-rising-leading-interior-holes-v6-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24355,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24655,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T05:48:18.007Z",
+    "live_candle_open_utc": "2026-10-04T05:48:00.000Z",
+    "export_utc": "2026-10-04T05:48:26.088Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/ta-rising-leading-interior-holes-v6-v1-attempt2-setup.png",
+      "captures/v7/evidence/ta-rising-leading-interior-holes-v6-v1-attempt2-export.png",
+      "captures/v7/evidence/ta-rising-leading-interior-holes-v6-v1-attempt2-logs.txt",
+      "captures/v7/evidence/ta-rising-leading-interior-holes-v6-v1-attempt2-logs-v1.json",
+      "captures/v7/evidence/ta-rising-leading-interior-holes-v6-v1-attempt2-logs.png",
+      "captures/v7/evidence/ta-rising-leading-interior-holes-v6-v1-attempt2-visual.png",
+      "captures/v7/evidence/ta-rising-leading-interior-holes-v6-v1-attempt2-data-window-v1.png",
+      "captures/v7/evidence/ta-rising-leading-interior-holes-v6-v1-attempt2-data-window-v1.json",
+      "captures/v7/evidence/ta-rising-leading-interior-holes-v6-v1-attempt2-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T05:48:18.812Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790787720,
+            84329.99,
+            84334.01,
+            84294.11,
+            84334,
+            19.82165
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791092880,
+            84916.01,
+            84916.01,
+            84916,
+            84916.01,
+            0.38346
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-rising-leading-interior-holes-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790787720,
+                25,
+                25,
+                1,
+                1
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791092880,
+                24,
+                24,
+                1,
+                1
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T05:48:19.973Z",
+        "bars": 24655,
+        "end": true,
+        "first": {
+          "index": -24355,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791092880,
+            84916.01,
+            84916.01,
+            84916,
+            84916,
+            0.38584
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-rising-leading-interior-holes-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24655,
+            "first": {
+              "index": -24355,
+              "value": [
+                1788134400,
+                null,
+                10,
+                0,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791092880,
+                24,
+                24,
+                1,
+                1
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   05:48",
+    "historical_compare_before_unix_seconds": 1791092880,
+    "pine_logs": {
+      "paths": [
+        "evidence/ta-rising-leading-interior-holes-v6-v1-attempt2-logs.txt",
+        "evidence/ta-rising-leading-interior-holes-v6-v1-attempt2-logs-v1.json",
+        "evidence/ta-rising-leading-interior-holes-v6-v1-attempt2-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "a86149523f579946d451964cec009e4d1c1c084709ed6784605672f42f5cbab8",
+    "csv_bytes": 1321983,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "SOURCE",
+      "CLEAN",
+      "TARGET",
+      "CONTROL"
+    ],
+    "declared_to_native_header_mapping": {
+      "SOURCE": "SOURCE",
+      "CLEAN": "CLEAN",
+      "TARGET": "TARGET",
+      "CONTROL": "CONTROL"
+    },
+    "csv_rows": 24655,
+    "historical_rows": 24654,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791092880,
+    "first_historical_values": {
+      "SOURCE": "",
+      "CLEAN": "10",
+      "TARGET": "0",
+      "CONTROL": "0"
+    },
+    "last_historical_values": {
+      "SOURCE": "23",
+      "CLEAN": "23",
+      "TARGET": "1",
+      "CONTROL": "1"
+    },
+    "data_window_witness": "captures/v7/evidence/ta-rising-leading-interior-holes-v6-v1-attempt2-data-window-v1.json"
+  },
+  {
+    "script": "ta-falling-leading-interior-holes-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "dae03bb83bcb074788291cfba35a26b73a30cd223645e7b848b9e3b28fe04bf6",
+    "indicator_title": "V7 ta-falling-leading-interior-holes-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/ta-falling-leading-interior-holes-v6-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T134856.306.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 ta-falling-leading-interior-holes-v6-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24355,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24655,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T05:48:48.802Z",
+    "live_candle_open_utc": "2026-10-04T05:48:00.000Z",
+    "export_utc": "2026-10-04T05:48:56.533Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/ta-falling-leading-interior-holes-v6-v1-attempt1-setup.png",
+      "captures/v7/evidence/ta-falling-leading-interior-holes-v6-v1-attempt1-export.png",
+      "captures/v7/evidence/ta-falling-leading-interior-holes-v6-v1-attempt1-logs.txt",
+      "captures/v7/evidence/ta-falling-leading-interior-holes-v6-v1-attempt1-logs-v1.json",
+      "captures/v7/evidence/ta-falling-leading-interior-holes-v6-v1-attempt1-logs.png",
+      "captures/v7/evidence/ta-falling-leading-interior-holes-v6-v1-attempt1-visual.png",
+      "captures/v7/evidence/ta-falling-leading-interior-holes-v6-v1-attempt1-data-window-v1.png",
+      "captures/v7/evidence/ta-falling-leading-interior-holes-v6-v1-attempt1-data-window-v1.json",
+      "captures/v7/evidence/ta-falling-leading-interior-holes-v6-v1-attempt1-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T05:48:49.581Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790787720,
+            84329.99,
+            84334.01,
+            84294.11,
+            84334,
+            19.82165
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791092880,
+            84916.01,
+            84916.01,
+            84909.59,
+            84909.59,
+            1.36898
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-falling-leading-interior-holes-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790787720,
+                25,
+                25,
+                0,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791092880,
+                24,
+                24,
+                0,
+                0
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T05:48:50.681Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790787720,
+            84329.99,
+            84334.01,
+            84294.11,
+            84334,
+            19.82165
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791092880,
+            84916.01,
+            84916.01,
+            84909.59,
+            84909.6,
+            1.37546
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-falling-leading-interior-holes-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24655,
+            "first": {
+              "index": -1022111,
+              "value": [
+                1788134400,
+                null,
+                10,
+                0,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791092880,
+                24,
+                24,
+                0,
+                0
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T05:48:51.650Z",
+        "bars": 24655,
+        "end": true,
+        "first": {
+          "index": -24355,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791092880,
+            84916.01,
+            84916.01,
+            84909.59,
+            84909.6,
+            1.38162
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-falling-leading-interior-holes-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24655,
+            "first": {
+              "index": -24355,
+              "value": [
+                1788134400,
+                null,
+                10,
+                0,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791092880,
+                24,
+                24,
+                0,
+                0
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   05:48",
+    "historical_compare_before_unix_seconds": 1791092880,
+    "pine_logs": {
+      "paths": [
+        "evidence/ta-falling-leading-interior-holes-v6-v1-attempt1-logs.txt",
+        "evidence/ta-falling-leading-interior-holes-v6-v1-attempt1-logs-v1.json",
+        "evidence/ta-falling-leading-interior-holes-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "3dd0e89bccb1ebbc7ef0719a4c3b528b52ac9536e068c4a52a374f76819ce6bc",
+    "csv_bytes": 1321985,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "SOURCE",
+      "CLEAN",
+      "TARGET",
+      "CONTROL"
+    ],
+    "declared_to_native_header_mapping": {
+      "SOURCE": "SOURCE",
+      "CLEAN": "CLEAN",
+      "TARGET": "TARGET",
+      "CONTROL": "CONTROL"
+    },
+    "csv_rows": 24655,
+    "historical_rows": 24654,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791092880,
+    "first_historical_values": {
+      "SOURCE": "",
+      "CLEAN": "10",
+      "TARGET": "0",
+      "CONTROL": "0"
+    },
+    "last_historical_values": {
+      "SOURCE": "23",
+      "CLEAN": "23",
+      "TARGET": "0",
+      "CONTROL": "0"
+    },
+    "data_window_witness": "captures/v7/evidence/ta-falling-leading-interior-holes-v6-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "script": "ta-falling-leading-interior-holes-v6-v1.pine",
+    "attempt": 2,
+    "source_sha256": "dae03bb83bcb074788291cfba35a26b73a30cd223645e7b848b9e3b28fe04bf6",
+    "indicator_title": "V7 ta-falling-leading-interior-holes-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/ta-falling-leading-interior-holes-v6-v1-attempt2.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T134923.583.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 ta-falling-leading-interior-holes-v6-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24355,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24655,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T05:49:16.127Z",
+    "live_candle_open_utc": "2026-10-04T05:48:00.000Z",
+    "export_utc": "2026-10-04T05:49:24.069Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/ta-falling-leading-interior-holes-v6-v1-attempt2-setup.png",
+      "captures/v7/evidence/ta-falling-leading-interior-holes-v6-v1-attempt2-export.png",
+      "captures/v7/evidence/ta-falling-leading-interior-holes-v6-v1-attempt2-logs.txt",
+      "captures/v7/evidence/ta-falling-leading-interior-holes-v6-v1-attempt2-logs-v1.json",
+      "captures/v7/evidence/ta-falling-leading-interior-holes-v6-v1-attempt2-logs.png",
+      "captures/v7/evidence/ta-falling-leading-interior-holes-v6-v1-attempt2-visual.png",
+      "captures/v7/evidence/ta-falling-leading-interior-holes-v6-v1-attempt2-data-window-v1.png",
+      "captures/v7/evidence/ta-falling-leading-interior-holes-v6-v1-attempt2-data-window-v1.json",
+      "captures/v7/evidence/ta-falling-leading-interior-holes-v6-v1-attempt2-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T05:49:17.023Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790787720,
+            84329.99,
+            84334.01,
+            84294.11,
+            84334,
+            19.82165
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791092880,
+            84916.01,
+            84916.01,
+            84909.59,
+            84909.59,
+            1.50371
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-falling-leading-interior-holes-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790787720,
+                25,
+                25,
+                0,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791092880,
+                24,
+                24,
+                0,
+                0
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T05:49:18.083Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790787720,
+            84329.99,
+            84334.01,
+            84294.11,
+            84334,
+            19.82165
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791092880,
+            84916.01,
+            84916.01,
+            84909.59,
+            84909.59,
+            1.50371
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-falling-leading-interior-holes-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24655,
+            "first": {
+              "index": -1022111,
+              "value": [
+                1788134400,
+                null,
+                10,
+                0,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791092880,
+                24,
+                24,
+                0,
+                0
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T05:49:18.830Z",
+        "bars": 24655,
+        "end": true,
+        "first": {
+          "index": -24355,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791092880,
+            84916.01,
+            84916.01,
+            84909.59,
+            84909.6,
+            1.51057
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-falling-leading-interior-holes-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24655,
+            "first": {
+              "index": -24355,
+              "value": [
+                1788134400,
+                null,
+                10,
+                0,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791092880,
+                24,
+                24,
+                0,
+                0
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   05:48",
+    "historical_compare_before_unix_seconds": 1791092880,
+    "pine_logs": {
+      "paths": [
+        "evidence/ta-falling-leading-interior-holes-v6-v1-attempt2-logs.txt",
+        "evidence/ta-falling-leading-interior-holes-v6-v1-attempt2-logs-v1.json",
+        "evidence/ta-falling-leading-interior-holes-v6-v1-attempt2-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "8b721d611e78aaa34072f7f923cac85ea2defb3d89658be0afd7908fa1ddbd3e",
+    "csv_bytes": 1321986,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "SOURCE",
+      "CLEAN",
+      "TARGET",
+      "CONTROL"
+    ],
+    "declared_to_native_header_mapping": {
+      "SOURCE": "SOURCE",
+      "CLEAN": "CLEAN",
+      "TARGET": "TARGET",
+      "CONTROL": "CONTROL"
+    },
+    "csv_rows": 24655,
+    "historical_rows": 24654,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791092880,
+    "first_historical_values": {
+      "SOURCE": "",
+      "CLEAN": "10",
+      "TARGET": "0",
+      "CONTROL": "0"
+    },
+    "last_historical_values": {
+      "SOURCE": "23",
+      "CLEAN": "23",
+      "TARGET": "0",
+      "CONTROL": "0"
+    },
+    "data_window_witness": "captures/v7/evidence/ta-falling-leading-interior-holes-v6-v1-attempt2-data-window-v1.json"
+  },
+  {
+    "script": "ta-highest-leading-interior-holes-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "f8903d2c938a8c3fc57bbf66ca152409f4edbdf53e20bba99738202ef5cf5c9c",
+    "indicator_title": "V7 ta-highest-leading-interior-holes-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/ta-highest-leading-interior-holes-v6-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T134951.417.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 ta-highest-leading-interior-holes-v6-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24355,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24655,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T05:49:43.941Z",
+    "live_candle_open_utc": "2026-10-04T05:48:00.000Z",
+    "export_utc": "2026-10-04T05:49:51.834Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/ta-highest-leading-interior-holes-v6-v1-attempt1-setup.png",
+      "captures/v7/evidence/ta-highest-leading-interior-holes-v6-v1-attempt1-export.png",
+      "captures/v7/evidence/ta-highest-leading-interior-holes-v6-v1-attempt1-logs.txt",
+      "captures/v7/evidence/ta-highest-leading-interior-holes-v6-v1-attempt1-logs-v1.json",
+      "captures/v7/evidence/ta-highest-leading-interior-holes-v6-v1-attempt1-logs.png",
+      "captures/v7/evidence/ta-highest-leading-interior-holes-v6-v1-attempt1-visual.png",
+      "captures/v7/evidence/ta-highest-leading-interior-holes-v6-v1-attempt1-data-window-v1.png",
+      "captures/v7/evidence/ta-highest-leading-interior-holes-v6-v1-attempt1-data-window-v1.json",
+      "captures/v7/evidence/ta-highest-leading-interior-holes-v6-v1-attempt1-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T05:49:44.728Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790787720,
+            84329.99,
+            84334.01,
+            84294.11,
+            84334,
+            19.82165
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791092880,
+            84916.01,
+            84916.01,
+            84909.59,
+            84909.6,
+            1.71707
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-highest-leading-interior-holes-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790787720,
+                25,
+                25,
+                25,
+                25
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791092880,
+                24,
+                24,
+                24,
+                24
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T05:49:45.898Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790787720,
+            84329.99,
+            84334.01,
+            84294.11,
+            84334,
+            19.82165
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791092880,
+            84916.01,
+            84916.01,
+            84909.59,
+            84909.59,
+            1.71707
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-highest-leading-interior-holes-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24655,
+            "first": {
+              "index": -1022111,
+              "value": [
+                1788134400,
+                null,
+                10,
+                null,
+                null
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791092880,
+                24,
+                24,
+                24,
+                24
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T05:49:46.660Z",
+        "bars": 24655,
+        "end": true,
+        "first": {
+          "index": -24355,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791092880,
+            84916.01,
+            84916.01,
+            84909.59,
+            84909.6,
+            1.71997
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-highest-leading-interior-holes-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24655,
+            "first": {
+              "index": -24355,
+              "value": [
+                1788134400,
+                null,
+                10,
+                null,
+                null
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791092880,
+                24,
+                24,
+                24,
+                24
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   05:48",
+    "historical_compare_before_unix_seconds": 1791092880,
+    "pine_logs": {
+      "paths": [
+        "evidence/ta-highest-leading-interior-holes-v6-v1-attempt1-logs.txt",
+        "evidence/ta-highest-leading-interior-holes-v6-v1-attempt1-logs-v1.json",
+        "evidence/ta-highest-leading-interior-holes-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "74441a7717dd96f9b002fe19ddff30fd2f4440af52ec7e81a2389b9060c3862c",
+    "csv_bytes": 1355880,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "SOURCE",
+      "CLEAN",
+      "TARGET",
+      "CONTROL"
+    ],
+    "declared_to_native_header_mapping": {
+      "SOURCE": "SOURCE",
+      "CLEAN": "CLEAN",
+      "TARGET": "TARGET",
+      "CONTROL": "CONTROL"
+    },
+    "csv_rows": 24655,
+    "historical_rows": 24654,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791092880,
+    "first_historical_values": {
+      "SOURCE": "",
+      "CLEAN": "10",
+      "TARGET": "",
+      "CONTROL": ""
+    },
+    "last_historical_values": {
+      "SOURCE": "23",
+      "CLEAN": "23",
+      "TARGET": "23",
+      "CONTROL": "23"
+    },
+    "data_window_witness": "captures/v7/evidence/ta-highest-leading-interior-holes-v6-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "script": "ta-highest-leading-interior-holes-v6-v1.pine",
+    "attempt": 2,
+    "source_sha256": "f8903d2c938a8c3fc57bbf66ca152409f4edbdf53e20bba99738202ef5cf5c9c",
+    "indicator_title": "V7 ta-highest-leading-interior-holes-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/ta-highest-leading-interior-holes-v6-v1-attempt2.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T135018.496.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 ta-highest-leading-interior-holes-v6-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24356,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24656,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T05:50:11.406Z",
+    "live_candle_open_utc": "2026-10-04T05:50:00.000Z",
+    "export_utc": "2026-10-04T05:50:18.936Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/ta-highest-leading-interior-holes-v6-v1-attempt2-setup.png",
+      "captures/v7/evidence/ta-highest-leading-interior-holes-v6-v1-attempt2-export.png",
+      "captures/v7/evidence/ta-highest-leading-interior-holes-v6-v1-attempt2-logs.txt",
+      "captures/v7/evidence/ta-highest-leading-interior-holes-v6-v1-attempt2-logs-v1.json",
+      "captures/v7/evidence/ta-highest-leading-interior-holes-v6-v1-attempt2-logs.png",
+      "captures/v7/evidence/ta-highest-leading-interior-holes-v6-v1-attempt2-visual.png",
+      "captures/v7/evidence/ta-highest-leading-interior-holes-v6-v1-attempt2-data-window-v1.png",
+      "captures/v7/evidence/ta-highest-leading-interior-holes-v6-v1-attempt2-data-window-v1.json",
+      "captures/v7/evidence/ta-highest-leading-interior-holes-v6-v1-attempt2-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T05:50:12.107Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790787840,
+            84334.01,
+            84353.9,
+            84283.57,
+            84316.46,
+            26.47668
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791093000,
+            84909.6,
+            84909.6,
+            84909.59,
+            84909.6,
+            0.05312
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-highest-leading-interior-holes-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790787840,
+                null,
+                10,
+                null,
+                25
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791093000,
+                25,
+                25,
+                25,
+                25
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T05:50:13.097Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790787840,
+            84334.01,
+            84353.9,
+            84283.57,
+            84316.46,
+            26.47668
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791093000,
+            84909.6,
+            84909.6,
+            84909.59,
+            84909.6,
+            0.05312
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-highest-leading-interior-holes-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24656,
+            "first": {
+              "index": -1022112,
+              "value": [
+                1788134400,
+                null,
+                10,
+                null,
+                null
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791093000,
+                25,
+                25,
+                25,
+                25
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T05:50:13.801Z",
+        "bars": 24656,
+        "end": true,
+        "first": {
+          "index": -24356,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791093000,
+            84909.6,
+            84909.6,
+            84909.59,
+            84909.6,
+            0.07292
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-highest-leading-interior-holes-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24656,
+            "first": {
+              "index": -24356,
+              "value": [
+                1788134400,
+                null,
+                10,
+                null,
+                null
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791093000,
+                25,
+                25,
+                25,
+                25
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   05:50",
+    "historical_compare_before_unix_seconds": 1791093000,
+    "pine_logs": {
+      "paths": [
+        "evidence/ta-highest-leading-interior-holes-v6-v1-attempt2-logs.txt",
+        "evidence/ta-highest-leading-interior-holes-v6-v1-attempt2-logs-v1.json",
+        "evidence/ta-highest-leading-interior-holes-v6-v1-attempt2-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "d7d311771b9c8a51e8cb07b2560f45b33a68775258ddea5dbec678814b6c9216",
+    "csv_bytes": 1355936,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "SOURCE",
+      "CLEAN",
+      "TARGET",
+      "CONTROL"
+    ],
+    "declared_to_native_header_mapping": {
+      "SOURCE": "SOURCE",
+      "CLEAN": "CLEAN",
+      "TARGET": "TARGET",
+      "CONTROL": "CONTROL"
+    },
+    "csv_rows": 24656,
+    "historical_rows": 24655,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791093000,
+    "first_historical_values": {
+      "SOURCE": "",
+      "CLEAN": "10",
+      "TARGET": "",
+      "CONTROL": ""
+    },
+    "last_historical_values": {
+      "SOURCE": "24",
+      "CLEAN": "24",
+      "TARGET": "24",
+      "CONTROL": "24"
+    },
+    "data_window_witness": "captures/v7/evidence/ta-highest-leading-interior-holes-v6-v1-attempt2-data-window-v1.json"
+  },
+  {
+    "script": "ta-highestbars-leading-interior-holes-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "498ba4249f51c08357dcd21788dbc2a367f71b0d23d59fb22d745cbc740b5b5d",
+    "indicator_title": "V7 ta-highestbars-leading-interior-holes-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/ta-highestbars-leading-interior-holes-v6-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T135046.866.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 ta-highestbars-leading-interior-holes-v6-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24356,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24656,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T05:50:39.474Z",
+    "live_candle_open_utc": "2026-10-04T05:50:00.000Z",
+    "export_utc": "2026-10-04T05:50:47.290Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/ta-highestbars-leading-interior-holes-v6-v1-attempt1-setup.png",
+      "captures/v7/evidence/ta-highestbars-leading-interior-holes-v6-v1-attempt1-export.png",
+      "captures/v7/evidence/ta-highestbars-leading-interior-holes-v6-v1-attempt1-logs.txt",
+      "captures/v7/evidence/ta-highestbars-leading-interior-holes-v6-v1-attempt1-logs-v1.json",
+      "captures/v7/evidence/ta-highestbars-leading-interior-holes-v6-v1-attempt1-logs.png",
+      "captures/v7/evidence/ta-highestbars-leading-interior-holes-v6-v1-attempt1-visual.png",
+      "captures/v7/evidence/ta-highestbars-leading-interior-holes-v6-v1-attempt1-data-window-v1.png",
+      "captures/v7/evidence/ta-highestbars-leading-interior-holes-v6-v1-attempt1-data-window-v1.json",
+      "captures/v7/evidence/ta-highestbars-leading-interior-holes-v6-v1-attempt1-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T05:50:40.522Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790787840,
+            84334.01,
+            84353.9,
+            84283.57,
+            84316.46,
+            26.47668
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791093000,
+            84909.6,
+            84909.6,
+            84909.59,
+            84909.6,
+            0.25848
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-highestbars-leading-interior-holes-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790787840,
+                null,
+                10,
+                0,
+                -1
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791093000,
+                25,
+                25,
+                0,
+                0
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T05:50:41.509Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790787840,
+            84334.01,
+            84353.9,
+            84283.57,
+            84316.46,
+            26.47668
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791093000,
+            84909.6,
+            84909.6,
+            84909.59,
+            84909.59,
+            0.26107
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-highestbars-leading-interior-holes-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24656,
+            "first": {
+              "index": -1022112,
+              "value": [
+                1788134400,
+                null,
+                10,
+                null,
+                null
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791093000,
+                25,
+                25,
+                0,
+                0
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T05:50:42.175Z",
+        "bars": 24656,
+        "end": true,
+        "first": {
+          "index": -24356,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791093000,
+            84909.6,
+            84909.6,
+            84909.59,
+            84909.6,
+            0.26285
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-highestbars-leading-interior-holes-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24656,
+            "first": {
+              "index": -24356,
+              "value": [
+                1788134400,
+                null,
+                10,
+                null,
+                null
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791093000,
+                25,
+                25,
+                0,
+                0
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   05:50",
+    "historical_compare_before_unix_seconds": 1791093000,
+    "pine_logs": {
+      "paths": [
+        "evidence/ta-highestbars-leading-interior-holes-v6-v1-attempt1-logs.txt",
+        "evidence/ta-highestbars-leading-interior-holes-v6-v1-attempt1-logs-v1.json",
+        "evidence/ta-highestbars-leading-interior-holes-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "c1a46ace52b8c2d10faaa1e0560824809b2195ff6e4824b7db63de8d09d5290b",
+    "csv_bytes": 1326654,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "SOURCE",
+      "CLEAN",
+      "TARGET",
+      "CONTROL"
+    ],
+    "declared_to_native_header_mapping": {
+      "SOURCE": "SOURCE",
+      "CLEAN": "CLEAN",
+      "TARGET": "TARGET",
+      "CONTROL": "CONTROL"
+    },
+    "csv_rows": 24656,
+    "historical_rows": 24655,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791093000,
+    "first_historical_values": {
+      "SOURCE": "",
+      "CLEAN": "10",
+      "TARGET": "",
+      "CONTROL": ""
+    },
+    "last_historical_values": {
+      "SOURCE": "24",
+      "CLEAN": "24",
+      "TARGET": "0",
+      "CONTROL": "0"
+    },
+    "data_window_witness": "captures/v7/evidence/ta-highestbars-leading-interior-holes-v6-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "script": "ta-highestbars-leading-interior-holes-v6-v1.pine",
+    "attempt": 2,
+    "source_sha256": "498ba4249f51c08357dcd21788dbc2a367f71b0d23d59fb22d745cbc740b5b5d",
+    "indicator_title": "V7 ta-highestbars-leading-interior-holes-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/ta-highestbars-leading-interior-holes-v6-v1-attempt2.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T135115.018.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 ta-highestbars-leading-interior-holes-v6-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24356,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24656,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T05:51:07.601Z",
+    "live_candle_open_utc": "2026-10-04T05:50:00.000Z",
+    "export_utc": "2026-10-04T05:51:15.435Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/ta-highestbars-leading-interior-holes-v6-v1-attempt2-setup.png",
+      "captures/v7/evidence/ta-highestbars-leading-interior-holes-v6-v1-attempt2-export.png",
+      "captures/v7/evidence/ta-highestbars-leading-interior-holes-v6-v1-attempt2-logs.txt",
+      "captures/v7/evidence/ta-highestbars-leading-interior-holes-v6-v1-attempt2-logs-v1.json",
+      "captures/v7/evidence/ta-highestbars-leading-interior-holes-v6-v1-attempt2-logs.png",
+      "captures/v7/evidence/ta-highestbars-leading-interior-holes-v6-v1-attempt2-visual.png",
+      "captures/v7/evidence/ta-highestbars-leading-interior-holes-v6-v1-attempt2-data-window-v1.png",
+      "captures/v7/evidence/ta-highestbars-leading-interior-holes-v6-v1-attempt2-data-window-v1.json",
+      "captures/v7/evidence/ta-highestbars-leading-interior-holes-v6-v1-attempt2-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T05:51:08.559Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790787840,
+            84334.01,
+            84353.9,
+            84283.57,
+            84316.46,
+            26.47668
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791093000,
+            84909.6,
+            84909.6,
+            84909.59,
+            84909.6,
+            0.43793
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-highestbars-leading-interior-holes-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790787840,
+                null,
+                10,
+                0,
+                -1
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791093000,
+                25,
+                25,
+                0,
+                0
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T05:51:09.575Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790787840,
+            84334.01,
+            84353.9,
+            84283.57,
+            84316.46,
+            26.47668
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791093000,
+            84909.6,
+            84909.6,
+            84909.59,
+            84909.6,
+            0.4481
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-highestbars-leading-interior-holes-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24656,
+            "first": {
+              "index": -1022112,
+              "value": [
+                1788134400,
+                null,
+                10,
+                null,
+                null
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791093000,
+                25,
+                25,
+                0,
+                0
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T05:51:10.542Z",
+        "bars": 24656,
+        "end": true,
+        "first": {
+          "index": -24356,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791093000,
+            84909.6,
+            84909.6,
+            84909.59,
+            84909.6,
+            0.4537
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-highestbars-leading-interior-holes-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24656,
+            "first": {
+              "index": -24356,
+              "value": [
+                1788134400,
+                null,
+                10,
+                null,
+                null
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791093000,
+                25,
+                25,
+                0,
+                0
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   05:50",
+    "historical_compare_before_unix_seconds": 1791093000,
+    "pine_logs": {
+      "paths": [
+        "evidence/ta-highestbars-leading-interior-holes-v6-v1-attempt2-logs.txt",
+        "evidence/ta-highestbars-leading-interior-holes-v6-v1-attempt2-logs-v1.json",
+        "evidence/ta-highestbars-leading-interior-holes-v6-v1-attempt2-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "06781da3a1dcb5a3f8c837d8a88eebae24ecf4bcf2e385241013cc2adea83207",
+    "csv_bytes": 1326655,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "SOURCE",
+      "CLEAN",
+      "TARGET",
+      "CONTROL"
+    ],
+    "declared_to_native_header_mapping": {
+      "SOURCE": "SOURCE",
+      "CLEAN": "CLEAN",
+      "TARGET": "TARGET",
+      "CONTROL": "CONTROL"
+    },
+    "csv_rows": 24656,
+    "historical_rows": 24655,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791093000,
+    "first_historical_values": {
+      "SOURCE": "",
+      "CLEAN": "10",
+      "TARGET": "",
+      "CONTROL": ""
+    },
+    "last_historical_values": {
+      "SOURCE": "24",
+      "CLEAN": "24",
+      "TARGET": "0",
+      "CONTROL": "0"
+    },
+    "data_window_witness": "captures/v7/evidence/ta-highestbars-leading-interior-holes-v6-v1-attempt2-data-window-v1.json"
+  },
+  {
+    "script": "ta-lowestbars-leading-interior-holes-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "c2ffff4c53b944c15d38bb443e8b59da6632a1f9e4e7405ad9ad2ea4dbe875b2",
+    "indicator_title": "V7 ta-lowestbars-leading-interior-holes-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/ta-lowestbars-leading-interior-holes-v6-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T135142.569.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 ta-lowestbars-leading-interior-holes-v6-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24356,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24656,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T05:51:35.053Z",
+    "live_candle_open_utc": "2026-10-04T05:50:00.000Z",
+    "export_utc": "2026-10-04T05:51:42.764Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/ta-lowestbars-leading-interior-holes-v6-v1-attempt1-setup.png",
+      "captures/v7/evidence/ta-lowestbars-leading-interior-holes-v6-v1-attempt1-export.png",
+      "captures/v7/evidence/ta-lowestbars-leading-interior-holes-v6-v1-attempt1-logs.txt",
+      "captures/v7/evidence/ta-lowestbars-leading-interior-holes-v6-v1-attempt1-logs-v1.json",
+      "captures/v7/evidence/ta-lowestbars-leading-interior-holes-v6-v1-attempt1-logs.png",
+      "captures/v7/evidence/ta-lowestbars-leading-interior-holes-v6-v1-attempt1-visual.png",
+      "captures/v7/evidence/ta-lowestbars-leading-interior-holes-v6-v1-attempt1-data-window-v1.png",
+      "captures/v7/evidence/ta-lowestbars-leading-interior-holes-v6-v1-attempt1-data-window-v1.json",
+      "captures/v7/evidence/ta-lowestbars-leading-interior-holes-v6-v1-attempt1-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T05:51:35.942Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790787840,
+            84334.01,
+            84353.9,
+            84283.57,
+            84316.46,
+            26.47668
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791093000,
+            84909.6,
+            84909.6,
+            84909.59,
+            84909.6,
+            1.22277
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-lowestbars-leading-interior-holes-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790787840,
+                null,
+                10,
+                0,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791093000,
+                25,
+                25,
+                -3,
+                -3
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T05:51:36.989Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790787840,
+            84334.01,
+            84353.9,
+            84283.57,
+            84316.46,
+            26.47668
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791093000,
+            84909.6,
+            84909.6,
+            84909.59,
+            84909.6,
+            1.22277
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-lowestbars-leading-interior-holes-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24656,
+            "first": {
+              "index": -1022112,
+              "value": [
+                1788134400,
+                null,
+                10,
+                null,
+                null
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791093000,
+                25,
+                25,
+                -3,
+                -3
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T05:51:37.674Z",
+        "bars": 24656,
+        "end": true,
+        "first": {
+          "index": -24356,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791093000,
+            84909.6,
+            84909.6,
+            84909.59,
+            84909.59,
+            1.22759
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-lowestbars-leading-interior-holes-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24656,
+            "first": {
+              "index": -24356,
+              "value": [
+                1788134400,
+                null,
+                10,
+                null,
+                null
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791093000,
+                25,
+                25,
+                -3,
+                -3
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   05:50",
+    "historical_compare_before_unix_seconds": 1791093000,
+    "pine_logs": {
+      "paths": [
+        "evidence/ta-lowestbars-leading-interior-holes-v6-v1-attempt1-logs.txt",
+        "evidence/ta-lowestbars-leading-interior-holes-v6-v1-attempt1-logs-v1.json",
+        "evidence/ta-lowestbars-leading-interior-holes-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "acd116f274ed491eafb9c7255689ae9f901bee68e75f30925595e21ce7226de7",
+    "csv_bytes": 1359017,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "SOURCE",
+      "CLEAN",
+      "TARGET",
+      "CONTROL"
+    ],
+    "declared_to_native_header_mapping": {
+      "SOURCE": "SOURCE",
+      "CLEAN": "CLEAN",
+      "TARGET": "TARGET",
+      "CONTROL": "CONTROL"
+    },
+    "csv_rows": 24656,
+    "historical_rows": 24655,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791093000,
+    "first_historical_values": {
+      "SOURCE": "",
+      "CLEAN": "10",
+      "TARGET": "",
+      "CONTROL": ""
+    },
+    "last_historical_values": {
+      "SOURCE": "24",
+      "CLEAN": "24",
+      "TARGET": "-3",
+      "CONTROL": "-3"
+    },
+    "data_window_witness": "captures/v7/evidence/ta-lowestbars-leading-interior-holes-v6-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "script": "ta-lowestbars-leading-interior-holes-v6-v1.pine",
+    "attempt": 2,
+    "source_sha256": "c2ffff4c53b944c15d38bb443e8b59da6632a1f9e4e7405ad9ad2ea4dbe875b2",
+    "indicator_title": "V7 ta-lowestbars-leading-interior-holes-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/ta-lowestbars-leading-interior-holes-v6-v1-attempt2.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T135209.648.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 ta-lowestbars-leading-interior-holes-v6-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24357,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24657,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T05:52:02.078Z",
+    "live_candle_open_utc": "2026-10-04T05:52:00.000Z",
+    "export_utc": "2026-10-04T05:52:10.034Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/ta-lowestbars-leading-interior-holes-v6-v1-attempt2-setup.png",
+      "captures/v7/evidence/ta-lowestbars-leading-interior-holes-v6-v1-attempt2-export.png",
+      "captures/v7/evidence/ta-lowestbars-leading-interior-holes-v6-v1-attempt2-logs.txt",
+      "captures/v7/evidence/ta-lowestbars-leading-interior-holes-v6-v1-attempt2-logs-v1.json",
+      "captures/v7/evidence/ta-lowestbars-leading-interior-holes-v6-v1-attempt2-logs.png",
+      "captures/v7/evidence/ta-lowestbars-leading-interior-holes-v6-v1-attempt2-visual.png",
+      "captures/v7/evidence/ta-lowestbars-leading-interior-holes-v6-v1-attempt2-data-window-v1.png",
+      "captures/v7/evidence/ta-lowestbars-leading-interior-holes-v6-v1-attempt2-data-window-v1.json",
+      "captures/v7/evidence/ta-lowestbars-leading-interior-holes-v6-v1-attempt2-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T05:52:03.196Z",
+        "bars": 2556,
+        "end": false,
+        "first": {
+          "index": -2256,
+          "value": [
+            1790786520,
+            84270.25,
+            84344.71,
+            84266.72,
+            84344.7,
+            9.33132
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791093120,
+            84909.6,
+            84909.6,
+            84909.59,
+            84909.59,
+            0.00246
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-lowestbars-leading-interior-holes-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2556,
+            "first": {
+              "index": -2256,
+              "value": [
+                1790786520,
+                15,
+                15,
+                -2,
+                -3
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791093120,
+                null,
+                10,
+                0,
+                0
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T05:52:04.210Z",
+        "bars": 2556,
+        "end": false,
+        "first": {
+          "index": -2256,
+          "value": [
+            1790786520,
+            84270.25,
+            84344.71,
+            84266.72,
+            84344.7,
+            9.33132
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791093120,
+            84909.6,
+            84909.6,
+            84909.59,
+            84909.6,
+            0.00424
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-lowestbars-leading-interior-holes-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24657,
+            "first": {
+              "index": -1022101,
+              "value": [
+                1788134400,
+                null,
+                10,
+                null,
+                null
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791093120,
+                null,
+                10,
+                0,
+                0
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T05:52:04.880Z",
+        "bars": 24657,
+        "end": true,
+        "first": {
+          "index": -24357,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791093120,
+            84909.6,
+            84909.6,
+            84909.59,
+            84909.59,
+            0.01175
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-lowestbars-leading-interior-holes-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24657,
+            "first": {
+              "index": -24357,
+              "value": [
+                1788134400,
+                null,
+                10,
+                null,
+                null
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791093120,
+                null,
+                10,
+                0,
+                0
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   05:52",
+    "historical_compare_before_unix_seconds": 1791093120,
+    "pine_logs": {
+      "paths": [
+        "evidence/ta-lowestbars-leading-interior-holes-v6-v1-attempt2-logs.txt",
+        "evidence/ta-lowestbars-leading-interior-holes-v6-v1-attempt2-logs-v1.json",
+        "evidence/ta-lowestbars-leading-interior-holes-v6-v1-attempt2-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "bfca60178f2cc18d79ddbd8888e717eba02c4d5d7f308cb818527beafa323637",
+    "csv_bytes": 1359069,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "SOURCE",
+      "CLEAN",
+      "TARGET",
+      "CONTROL"
+    ],
+    "declared_to_native_header_mapping": {
+      "SOURCE": "SOURCE",
+      "CLEAN": "CLEAN",
+      "TARGET": "TARGET",
+      "CONTROL": "CONTROL"
+    },
+    "csv_rows": 24657,
+    "historical_rows": 24656,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791093120,
+    "first_historical_values": {
+      "SOURCE": "",
+      "CLEAN": "10",
+      "TARGET": "",
+      "CONTROL": ""
+    },
+    "last_historical_values": {
+      "SOURCE": "25",
+      "CLEAN": "25",
+      "TARGET": "-3",
+      "CONTROL": "-3"
+    },
+    "data_window_witness": "captures/v7/evidence/ta-lowestbars-leading-interior-holes-v6-v1-attempt2-data-window-v1.json"
   }
 ]

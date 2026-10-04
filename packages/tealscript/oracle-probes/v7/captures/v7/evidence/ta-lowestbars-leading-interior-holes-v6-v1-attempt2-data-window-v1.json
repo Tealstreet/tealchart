@@ -1,0 +1,32 @@
+{
+  "index": 298,
+  "bar": [
+    1791093000,
+    84909.6,
+    84909.6,
+    84909.59,
+    84909.59,
+    1.37769
+  ],
+  "source_row": [
+    1791093000,
+    25,
+    25,
+    -3,
+    -3
+  ],
+  "browser_utc": "2026-10-04T05:52:14.875Z",
+  "title": "V7 ta-lowestbars-leading-interior-holes-v6-v1",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   05:50",
+  "visible_range": {
+    "_firstBar": 263,
+    "_lastBar": 301
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}
