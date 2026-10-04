@@ -1,0 +1,6 @@
+//@version=6
+indicator("Authority box division v1", overlay=true)
+width = input.int(5)
+if barstate.islast
+    box.new(bar_index, high, bar_index + width / 2, low)
+plot(close)

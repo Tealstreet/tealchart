@@ -1,0 +1,7 @@
+//@version=6
+indicator("Authority label division v1", overlay=true)
+const int LEFT = 1
+const int RIGHT = 4
+if barstate.islast
+    label.new(bar_index + (LEFT + RIGHT) / 2, high, "division")
+plot(close)

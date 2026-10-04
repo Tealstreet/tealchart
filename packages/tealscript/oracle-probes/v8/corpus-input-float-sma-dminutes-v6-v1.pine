@@ -1,0 +1,16 @@
+//@version=6
+indicator("Input float SMA dminutes v1")
+openHours = input(defval=6.5, title="Open: Hours a Day")
+dayMinutes = math.round(openHours * 60)
+intraDayLength = 5
+dminutes = intraDayLength * dayMinutes
+dlen = dminutes / timeframe.multiplier
+targetValue = ta.sma(close, dlen)
+floorValue = ta.sma(close, int(math.floor(dlen)))
+ceilValue = ta.sma(close, int(math.ceil(dlen)))
+plot(targetValue, title="OUTCOME", display=display.data_window)
+plot(dlen, title="INPUT_LENGTH", display=display.data_window)
+plot(floorValue, title="FLOOR_CONTROL", display=display.data_window)
+plot(ceilValue, title="CEIL_CONTROL", display=display.data_window)
+plot(close, title="INPUT_CLOSE", display=display.data_window)
+plot(bar_index, title="BAR_INDEX", display=display.data_window)

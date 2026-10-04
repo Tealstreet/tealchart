@@ -1,0 +1,3 @@
+//@version=5
+indicator("Authority negative index control v1")
+plot(array.get(array.from(1), -1))

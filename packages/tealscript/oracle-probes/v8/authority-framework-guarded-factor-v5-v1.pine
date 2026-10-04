@@ -1,0 +1,6 @@
+//@version=5
+indicator("Guarded factor lookup")
+f() =>
+    factors = array.new_int(0)
+    array.size(factors) == 0 ? 0 : 1 + array.get(factors, array.size(factors) - 1)
+plot(f())

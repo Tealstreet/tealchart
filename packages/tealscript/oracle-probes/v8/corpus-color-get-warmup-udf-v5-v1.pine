@@ -1,0 +1,11 @@
+//@version=5
+indicator("V5 color missing-index v1")
+colors = array.new_color(101, color.blue)
+array.set(colors, 100, color.red)
+other = array.new_color(101, color.red)
+f_clrSlct(_percent, _select, _type, _solid, _array1, _array2) =>
+    _select == "Solid" ? _solid : array.get(_type == "Blue Green Red" ? _array1 : _array2, math.round(_percent))
+percent = bar_index < 3 ? na : 100.0
+value = f_clrSlct(percent, "Gradient", "Blue Green Red", color.green, colors, other)
+plot(array.size(colors), title="size")
+plot(na(value) ? -1 : value == color.blue ? 0 : value == color.red ? 100 : 999, title="color_code")

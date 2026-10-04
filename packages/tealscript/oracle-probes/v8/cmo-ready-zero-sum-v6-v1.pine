@@ -1,0 +1,20 @@
+//@version=6
+indicator("CMO ready zero sum v1")
+int length = 2
+float source = bar_index < 4 ? float(bar_index) : 3.0
+float change = ta.change(source)
+float gains = math.sum(change >= 0 ? change : 0.0, length)
+float losses = math.sum(change >= 0 ? 0.0 : -change, length)
+bool ready = not na(gains) and not na(losses)
+float builtin = ta.cmo(source, length)
+float formula = 100.0 * (gains - losses) / (gains + losses)
+float movingControl = ta.cmo(float(bar_index), length)
+plot(source, "Source")
+plot(gains, "Gains")
+plot(losses, "Losses")
+plot(ready ? 1 : 0, "Ready")
+plot(builtin, "Builtin")
+plot(formula, "Formula")
+plot(ready ? (na(builtin) ? 1 : 0) : na, "Ready builtin is NA")
+plot(ready ? (na(formula) ? 1 : 0) : na, "Ready formula is NA")
+plot(movingControl, "Moving control")

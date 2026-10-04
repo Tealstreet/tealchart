@@ -1,0 +1,6 @@
+//@version=6
+indicator("Authority ATR mutable length v1")
+int length = input.int(14)
+if close > open
+    length := 10
+plot(ta.atr(length))

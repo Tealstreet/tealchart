@@ -1,0 +1,8 @@
+//@version=5
+indicator("V5 color missing-index v1")
+colors = array.new_color(101, color.blue)
+array.set(colors, 100, color.red)
+value = array.get(colors, 100)
+plot(array.size(colors), title="size")
+plot(na(value) ? -1 : value == color.blue ? 0 : value == color.red ? 100 : 999, title="color_code")
+plot(array.get(colors, 0) == color.blue ? 1 : 0, title="first_blue")

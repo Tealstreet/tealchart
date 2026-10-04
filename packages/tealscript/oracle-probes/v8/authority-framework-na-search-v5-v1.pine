@@ -1,0 +1,5 @@
+//@version=5
+indicator("NA search consistency v1")
+a = array.new_float(2, na)
+plot(array.includes(a, na) ? 1 : 0, "includes")
+plot(array.indexof(a, na), "indexof")
