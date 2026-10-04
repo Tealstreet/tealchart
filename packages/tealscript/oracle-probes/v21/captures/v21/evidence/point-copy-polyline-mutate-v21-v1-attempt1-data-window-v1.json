@@ -1,0 +1,55 @@
+{
+  "index": 298,
+  "bar": [
+    1791153240,
+    86370,
+    86461.46,
+    86359.66,
+    86410,
+    24.72604
+  ],
+  "source_row": [
+    1791153240,
+    20117,
+    1,
+    4,
+    3,
+    20093,
+    20093,
+    1,
+    6,
+    20101,
+    20105,
+    4,
+    8,
+    20109,
+    20109,
+    2,
+    7,
+    20117,
+    20117,
+    5,
+    9,
+    20117,
+    1791153240000,
+    1791153360000,
+    0,
+    1,
+    0,
+    10
+  ],
+  "browser_utc": "2026-10-04T22:37:49.542Z",
+  "title": "Polyline point mutate isolation v21 v1",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   22:34",
+  "visible_range": {
+    "_firstBar": 263,
+    "_lastBar": 301
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}

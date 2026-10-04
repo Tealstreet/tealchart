@@ -1,0 +1,51 @@
+{
+  "index": 298,
+  "bar": [
+    1791153000,
+    86244.83,
+    86317.85,
+    86235.99,
+    86276.01,
+    24.87141
+  ],
+  "source_row": [
+    1791153000,
+    20115,
+    1791153000000,
+    1791153120000,
+    0,
+    1,
+    50,
+    1,
+    0,
+    194,
+    55,
+    55,
+    0,
+    55,
+    91,
+    145,
+    140,
+    194,
+    50,
+    55,
+    50,
+    1,
+    1,
+    7
+  ],
+  "browser_utc": "2026-10-04T22:33:59.751Z",
+  "title": "Cadence label same-bar-burst quota 50 v21 v1",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   22:30",
+  "visible_range": {
+    "_firstBar": 263,
+    "_lastBar": 301
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}

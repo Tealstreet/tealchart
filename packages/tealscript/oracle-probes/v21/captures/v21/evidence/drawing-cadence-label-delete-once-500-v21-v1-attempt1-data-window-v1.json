@@ -1,0 +1,51 @@
+{
+  "index": 298,
+  "bar": [
+    1791153240,
+    86370,
+    86461.46,
+    86359.66,
+    86410,
+    24.72604
+  ],
+  "source_row": [
+    1791153240,
+    20117,
+    1791153240000,
+    1791153360000,
+    0,
+    1,
+    500,
+    0,
+    0,
+    1097,
+    501,
+    501,
+    0,
+    501,
+    520,
+    595,
+    597,
+    1097,
+    503,
+    502,
+    503,
+    518,
+    524,
+    524
+  ],
+  "browser_utc": "2026-10-04T22:36:38.382Z",
+  "title": "Cadence label delete-once quota 500 v21 v1",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   22:34",
+  "visible_range": {
+    "_firstBar": 263,
+    "_lastBar": 301
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}

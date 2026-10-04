@@ -1,0 +1,337 @@
+{
+  "artifact": "Native point-copy fixed pane rendering v1",
+  "utc": "2026-10-04T22:39:02.404Z",
+  "title": "Line point-copy control v21 v1",
+  "status": {
+    "type": 2
+  },
+  "host_last": {
+    "index": 299,
+    "value": [
+      1791153480,
+      86424.01,
+      86468.01,
+      86373.4,
+      86373.4,
+      15.45214
+    ]
+  },
+  "source_last": {
+    "index": 299,
+    "value": [
+      1791153480,
+      20118,
+      1,
+      20106,
+      10,
+      20114,
+      4,
+      20094,
+      20094,
+      1,
+      1,
+      20118,
+      20118,
+      5,
+      5,
+      20119,
+      1791153480000,
+      1791153600000,
+      1,
+      0,
+      0,
+      12
+    ]
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  },
+  "panes": [
+    {
+      "height": 0,
+      "width": 1177,
+      "range": {
+        "_minValue": 85820,
+        "_maxValue": 86686.39
+      },
+      "mode": {
+        "autoScale": true,
+        "lockScale": false,
+        "percentage": false,
+        "indexedTo100": false,
+        "log": false
+      }
+    },
+    {
+      "height": 791,
+      "width": 1177,
+      "range": {
+        "_minValue": 0,
+        "_maxValue": 12
+      },
+      "mode": {
+        "autoScale": false,
+        "lockScale": false,
+        "percentage": false,
+        "indexedTo100": false,
+        "log": false
+      }
+    }
+  ],
+  "canvas_rectangles": [
+    {
+      "width": 2354,
+      "height": 1053,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      }
+    },
+    {
+      "width": 2354,
+      "height": 1053,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      }
+    },
+    {
+      "width": 316,
+      "height": 1053,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      }
+    },
+    {
+      "width": 316,
+      "height": 1053,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      }
+    },
+    {
+      "width": 2354,
+      "height": 1582,
+      "rect": {
+        "x": 56,
+        "y": 42,
+        "width": 1177,
+        "height": 791
+      }
+    },
+    {
+      "width": 2354,
+      "height": 1582,
+      "rect": {
+        "x": 56,
+        "y": 42,
+        "width": 1177,
+        "height": 791
+      }
+    },
+    {
+      "width": 316,
+      "height": 1582,
+      "rect": {
+        "x": 1233,
+        "y": 42,
+        "width": 158,
+        "height": 791
+      }
+    },
+    {
+      "width": 316,
+      "height": 1582,
+      "rect": {
+        "x": 1233,
+        "y": 42,
+        "width": 158,
+        "height": 791
+      }
+    },
+    {
+      "width": 2354,
+      "height": 56,
+      "rect": {
+        "x": 56,
+        "y": 833,
+        "width": 1177,
+        "height": 28
+      }
+    },
+    {
+      "width": 2354,
+      "height": 56,
+      "rect": {
+        "x": 56,
+        "y": 833,
+        "width": 1177,
+        "height": 28
+      }
+    },
+    {
+      "width": 316,
+      "height": 56,
+      "rect": {
+        "x": 1233,
+        "y": 833,
+        "width": 158,
+        "height": 28
+      }
+    },
+    {
+      "width": 0,
+      "height": 0,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      }
+    }
+  ],
+  "zoom": {
+    "range": {
+      "_firstBar": 266,
+      "_lastBar": 301
+    },
+    "spacing": 32.69444444444444
+  },
+  "line_scan_x": 375.9861111111112,
+  "box_scan_x": [
+    32.69444444444457,
+    751.9722222222222
+  ],
+  "price_y": [
+    {
+      "price": 2,
+      "y": 618.7833333333333
+    },
+    {
+      "price": 8,
+      "y": 294.97333333333336
+    }
+  ],
+  "lines": [
+    {
+      "name": "lines",
+      "collections": [
+        {
+          "key": false,
+          "raw": [
+            [
+              1,
+              {
+                "id": 1,
+                "x1": 0,
+                "y1": 1,
+                "x2": 3,
+                "y2": 5,
+                "ex": "n",
+                "st": "sol",
+                "ci": 0,
+                "w": 6
+              }
+            ],
+            [
+              2,
+              {
+                "id": 2,
+                "x1": 0,
+                "y1": 1,
+                "x2": 3,
+                "y2": 5,
+                "ex": "n",
+                "st": "sol",
+                "ci": 1,
+                "w": 2
+              }
+            ],
+            [
+              3,
+              {
+                "id": 3,
+                "x1": 1,
+                "y1": 10,
+                "x2": 2,
+                "y2": 4,
+                "ex": "n",
+                "st": "sol",
+                "ci": 2,
+                "w": 2
+              }
+            ]
+          ],
+          "materialized": [
+            {
+              "id": 1,
+              "x1": 274,
+              "y1": 1,
+              "x2": 298,
+              "y2": 5,
+              "style": "sol",
+              "extend": "n",
+              "width": 6,
+              "colorIndex": 0
+            },
+            {
+              "id": 2,
+              "x1": 274,
+              "y1": 1,
+              "x2": 298,
+              "y2": 5,
+              "style": "sol",
+              "extend": "n",
+              "width": 2,
+              "colorIndex": 1
+            },
+            {
+              "id": 3,
+              "x1": 286,
+              "y1": 10,
+              "x2": 294,
+              "y2": 4,
+              "style": "sol",
+              "extend": "n",
+              "width": 2,
+              "colorIndex": 2
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "boxes": [],
+  "polylines": [],
+  "tables": [],
+  "cells": [],
+  "graphic_index_map": [
+    274,
+    286,
+    294,
+    298
+  ],
+  "before": [
+    {
+      "height": 526.5,
+      "width": 1177
+    },
+    {
+      "height": 263.5,
+      "width": 1177
+    }
+  ],
+  "limits": "Original untouched PNG and actual materialized renderer paths establish this source-specific point-copy observation. Polyline CSV reports source coordinates/existence, not a polyline getter. Genuine line/box getter controls remain separate. Native renderer indices are not Pine indices."
+}
