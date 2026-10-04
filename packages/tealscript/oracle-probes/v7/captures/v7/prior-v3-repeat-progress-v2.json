@@ -1,0 +1,858 @@
+{
+  "artifact": "Prior v3 fresh repeat progress v2",
+  "linked_source_count": 26,
+  "fresh_repeat_sources": 26,
+  "pending_fresh_repeats": [],
+  "fresh_attempts": [
+    {
+      "script": "array-02-get-index-literal-na.pine",
+      "attempt": 2,
+      "status": "RUNS",
+      "diagnostic": {
+        "code": null,
+        "text": null,
+        "line": null,
+        "column": null,
+        "first_bar_index": null,
+        "first_bar_time_utc": null
+      },
+      "first_values": {
+        "OUTCOME": ""
+      },
+      "last_values": {
+        "OUTCOME": ""
+      },
+      "export_or_error_utc": "2026-10-04T09:31:41.399Z",
+      "independent_reload_utc": "2026-10-04T09:31:06.609Z"
+    },
+    {
+      "script": "array-03-get-index-math-round-na.pine",
+      "attempt": 2,
+      "status": "RUNS",
+      "diagnostic": {
+        "code": null,
+        "text": null,
+        "line": null,
+        "column": null,
+        "first_bar_index": null,
+        "first_bar_time_utc": null
+      },
+      "first_values": {
+        "OUTCOME": ""
+      },
+      "last_values": {
+        "OUTCOME": ""
+      },
+      "export_or_error_utc": "2026-10-04T09:32:24.226Z",
+      "independent_reload_utc": "2026-10-04T09:31:53.090Z"
+    },
+    {
+      "script": "plot-01-series-offset-v3.pine",
+      "attempt": 2,
+      "status": "RUNS",
+      "diagnostic": {
+        "code": null,
+        "text": null,
+        "line": null,
+        "column": null,
+        "first_bar_index": null,
+        "first_bar_time_utc": null
+      },
+      "first_values": {
+        "OUTCOME": ""
+      },
+      "last_values": {
+        "OUTCOME": "85264.07"
+      },
+      "export_or_error_utc": "2026-10-04T09:33:14.133Z",
+      "independent_reload_utc": "2026-10-04T09:32:37.970Z"
+    },
+    {
+      "script": "plot-02-series-offset-v4.pine",
+      "attempt": 2,
+      "status": "RUNS",
+      "diagnostic": {
+        "code": null,
+        "text": null,
+        "line": null,
+        "column": null,
+        "first_bar_index": null,
+        "first_bar_time_utc": null
+      },
+      "first_values": {
+        "OUTCOME": "77758.24"
+      },
+      "last_values": {
+        "OUTCOME": "85226"
+      },
+      "export_or_error_utc": "2026-10-04T09:34:35.781Z",
+      "independent_reload_utc": "2026-10-04T09:33:34.127Z"
+    },
+    {
+      "script": "strings-01-tostring-default-precision.pine",
+      "attempt": 2,
+      "status": "RUNS",
+      "diagnostic": {
+        "code": null,
+        "text": null,
+        "line": null,
+        "column": null,
+        "first_bar_index": null,
+        "first_bar_time_utc": null
+      },
+      "first_values": {
+        "OUTCOME": "1"
+      },
+      "last_values": {
+        "OUTCOME": "1"
+      },
+      "export_or_error_utc": "2026-10-04T09:35:35.643Z",
+      "independent_reload_utc": "2026-10-04T09:34:56.499Z"
+    },
+    {
+      "script": "strings-03-tostring-eleven-decimal-rounding.pine",
+      "attempt": 2,
+      "status": "RUNS",
+      "diagnostic": {
+        "code": null,
+        "text": null,
+        "line": null,
+        "column": null,
+        "first_bar_index": null,
+        "first_bar_time_utc": null
+      },
+      "first_values": {
+        "OUTCOME": "1"
+      },
+      "last_values": {
+        "OUTCOME": "1"
+      },
+      "export_or_error_utc": "2026-10-04T09:36:19.502Z",
+      "independent_reload_utc": "2026-10-04T09:35:47.579Z"
+    },
+    {
+      "script": "conditional-01-unmatched-string-if.pine",
+      "attempt": 2,
+      "status": "RUNS",
+      "diagnostic": {
+        "code": null,
+        "text": null,
+        "line": null,
+        "column": null,
+        "first_bar_index": null,
+        "first_bar_time_utc": null
+      },
+      "first_values": {
+        "OUTCOME": "1"
+      },
+      "last_values": {
+        "OUTCOME": "1"
+      },
+      "export_or_error_utc": "2026-10-04T09:37:14.966Z",
+      "independent_reload_utc": "2026-10-04T09:36:30.679Z"
+    },
+    {
+      "script": "const-reference-array-accept-mutate.pine",
+      "attempt": 3,
+      "status": "RUNS",
+      "diagnostic": {
+        "code": null,
+        "text": null,
+        "line": null,
+        "column": null,
+        "first_bar_index": null,
+        "first_bar_time_utc": null
+      },
+      "first_values": {
+        "OUTCOME": "77675.04"
+      },
+      "last_values": {
+        "OUTCOME": "85233.37"
+      },
+      "export_or_error_utc": "2026-10-04T09:38:52.347Z",
+      "independent_reload_utc": "2026-10-04T09:37:28.775Z"
+    },
+    {
+      "script": "const-reference-array-qualifier-diagnostic.pine",
+      "attempt": 2,
+      "status": "COMPILE-ERROR",
+      "diagnostic": {
+        "code": "CE10123",
+        "text": "Cannot call \"plot\" with argument \"series\"=\"value\". An argument of \"array<float>\" type was used but a \"series float\"  is expected.",
+        "line": 4,
+        "column": 6,
+        "first_bar_index": null,
+        "first_bar_time_utc": null,
+        "native": {
+          "error": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+          "editorError": {
+            "code": "CE10123",
+            "ctx": {
+              "argDisplayName": "series",
+              "argUserFriendlyRepresentation": "value",
+              "argumentType": "array<float>",
+              "currentTypeDocStr": "series float",
+              "funId": "plot",
+              "typePostfix": ""
+            },
+            "end": {
+              "column": 10,
+              "line": 4
+            },
+            "message": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+            "start": {
+              "column": 6,
+              "line": 4
+            },
+            "id": "USER;64eb9fe01ecd4728859be8cb120fa590"
+          },
+          "title": "Compilation error",
+          "compiler_markers": [
+            {
+              "resource": {
+                "$mid": 1,
+                "external": "file:///02cf058c-ac3e-4fb1-97c1-5d72e4901c68.pine?placement%3Ddialog",
+                "path": "/02cf058c-ac3e-4fb1-97c1-5d72e4901c68.pine",
+                "scheme": "file",
+                "query": "placement=dialog"
+              },
+              "owner": "_generated_diagnostic_collection_name_#0",
+              "code": "CE10123",
+              "severity": 8,
+              "message": "Cannot call \"plot\" with argument \"series\"=\"value\". An argument of \"array<float>\" type was used but a \"series float\"  is expected.",
+              "startLineNumber": 4,
+              "startColumn": 6,
+              "endLineNumber": 4,
+              "endColumn": 11
+            }
+          ],
+          "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\nC\n85,210.01\n\u221222.36 (\u22120.03%)\n85,210.00\nSELL\n0.01\n85,210.01\nBUY\nUSDT\nOracle na holes crosses v1\nDate Range\n09:39:30 UTC\n99+\nObject tree\nData window\nDate\nSun 04 Oct '26\nTime\n09:38\nBTCUSDT \u00b7 2 \u00b7 Binance\nOpen\n85,232.36\nHigh\n85,232.37\nLow\n85,210.00\nClose\n85,210.01\nChange\n\u221222.36 (\u22120.03%)\nVol\n5.4\nLast day change\n+456.45 (+0.54%)\nOracle na holes crosses v1\nPine Editor\nUntitled script\nPublish script\n1\n2\n3\n4\n5\n//@version=6\nindicator(\"V3-CONST-REF-ARRAY-QUALIFIER-DIAGNOSTIC\")\nconst\u00a0array<float>\u00a0value\u00a0=\u00a0array.new<float>(1,\u00a0close)\nplot(value,\u00a0\"OUTCOME\")\n1 of 1 problem\nCannot call \"plot\" with argument \"series\"=\"value\". An argument of \"array<float>\" type was used but a \"series float\" is expected.(CE10123)\nLine 4, Col 6\nPine Script\u00ae v6\nCompilation error: CE10123\n\nCannot call \"plot\" with argument \"series\"=\"value\". An argument of \"array<float>\" type was used but a \"series float\" is expected.\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+          "context_substituted_message": "Cannot call \"plot\" with argument \"series\"=\"value\". An argument of \"array<float>\" type was used but a \"series float\"  is expected."
+        }
+      },
+      "first_values": null,
+      "last_values": null,
+      "export_or_error_utc": "2026-10-04T09:39:32.062Z",
+      "independent_reload_utc": "2026-10-04T09:39:13.981Z"
+    },
+    {
+      "script": "const-reference-array-replace-id.pine",
+      "attempt": 2,
+      "status": "COMPILE-ERROR",
+      "diagnostic": {
+        "code": "CE10085",
+        "text": "A variable declared with the \"const\" type form cannot be modified.",
+        "line": 4,
+        "column": 1,
+        "first_bar_index": null,
+        "first_bar_time_utc": null,
+        "native": {
+          "error": "A variable declared with the \"const\" type form cannot be modified.",
+          "editorError": {
+            "code": "CE10085",
+            "end": {
+              "column": 5,
+              "line": 4
+            },
+            "message": "A variable declared with the \"const\" type form cannot be modified.",
+            "start": {
+              "column": 1,
+              "line": 4
+            },
+            "id": "USER;64eb9fe01ecd4728859be8cb120fa590"
+          },
+          "title": "Compilation error",
+          "compiler_markers": [
+            {
+              "resource": {
+                "$mid": 1,
+                "external": "file:///bbc95c46-f6fb-4d8c-9d82-8e8701b35f2d.pine?placement%3Ddialog",
+                "path": "/bbc95c46-f6fb-4d8c-9d82-8e8701b35f2d.pine",
+                "scheme": "file",
+                "query": "placement=dialog"
+              },
+              "owner": "_generated_diagnostic_collection_name_#0",
+              "code": "CE10085",
+              "severity": 8,
+              "message": "A variable declared with the \"const\" type form cannot be modified.",
+              "startLineNumber": 4,
+              "startColumn": 1,
+              "endLineNumber": 4,
+              "endColumn": 6
+            }
+          ],
+          "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\nC\n85,227.04\n\u22125.33 (\u22120.01%)\n85,227.04\nSELL\n0.01\n85,227.05\nBUY\nUSDT\nOracle na holes crosses v1\nDate Range\n09:39:52 UTC\n99+\nObject tree\nData window\nDate\nSun 04 Oct '26\nTime\n09:38\nBTCUSDT \u00b7 2 \u00b7 Binance\nOpen\n85,232.36\nHigh\n85,232.37\nLow\n85,210.00\nClose\n85,227.04\nChange\n\u22125.33 (\u22120.01%)\nVol\n9.23\nLast day change\n+473.48 (+0.56%)\nOracle na holes crosses v1\nPine Editor\nUntitled script\nPublish script\n1\n2\n3\n4\n5\n6\n//@version=6\nindicator(\"V3-CONST-REF-ARRAY-REPLACE-ID\")\nconst\u00a0array<float>\u00a0value\u00a0=\u00a0array.new<float>(1,\u00a0close)\nvalue\u00a0:=\u00a0array.new<float>(1,\u00a0close)\nplot(array.get(value,\u00a00),\u00a0\"OUTCOME\")\n1 of 1 problem\nA variable declared with the \"const\" type form cannot be modified.(CE10085)\nLine 4, Col 1\nPine Script\u00ae v6\nCompilation error: CE10085\n\nA variable declared with the \"const\" type form cannot be modified.\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+          "context_substituted_message": "A variable declared with the \"const\" type form cannot be modified."
+        }
+      },
+      "first_values": null,
+      "last_values": null,
+      "export_or_error_utc": "2026-10-04T09:39:56.600Z",
+      "independent_reload_utc": "2026-10-04T09:39:34.484Z"
+    },
+    {
+      "script": "const-reference-matrix-accept-mutate.pine",
+      "attempt": 2,
+      "status": "RUNS",
+      "diagnostic": {
+        "code": null,
+        "text": null,
+        "line": null,
+        "column": null,
+        "first_bar_index": null,
+        "first_bar_time_utc": null
+      },
+      "first_values": {
+        "OUTCOME": "77675.04"
+      },
+      "last_values": {
+        "OUTCOME": "85281"
+      },
+      "export_or_error_utc": "2026-10-04T09:42:53.916Z",
+      "independent_reload_utc": "2026-10-04T09:42:17.983Z"
+    },
+    {
+      "script": "const-reference-matrix-qualifier-diagnostic.pine",
+      "attempt": 2,
+      "status": "COMPILE-ERROR",
+      "diagnostic": {
+        "code": "CE10123",
+        "text": "Cannot call \"plot\" with argument \"series\"=\"value\". An argument of \"matrix<float>\" type was used but a \"series float\"  is expected.",
+        "line": 4,
+        "column": 6,
+        "first_bar_index": null,
+        "first_bar_time_utc": null,
+        "native": {
+          "error": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+          "editorError": {
+            "code": "CE10123",
+            "ctx": {
+              "argDisplayName": "series",
+              "argUserFriendlyRepresentation": "value",
+              "argumentType": "matrix<float>",
+              "currentTypeDocStr": "series float",
+              "funId": "plot",
+              "typePostfix": ""
+            },
+            "end": {
+              "column": 10,
+              "line": 4
+            },
+            "message": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+            "start": {
+              "column": 6,
+              "line": 4
+            },
+            "id": "USER;64eb9fe01ecd4728859be8cb120fa590"
+          },
+          "title": "Compilation error",
+          "compiler_markers": [
+            {
+              "resource": {
+                "$mid": 1,
+                "external": "file:///0945b94c-69e7-4e7c-932f-836f2828c51a.pine?placement%3Ddialog",
+                "path": "/0945b94c-69e7-4e7c-932f-836f2828c51a.pine",
+                "scheme": "file",
+                "query": "placement=dialog"
+              },
+              "owner": "_generated_diagnostic_collection_name_#0",
+              "code": "CE10123",
+              "severity": 8,
+              "message": "Cannot call \"plot\" with argument \"series\"=\"value\". An argument of \"matrix<float>\" type was used but a \"series float\"  is expected.",
+              "startLineNumber": 4,
+              "startColumn": 6,
+              "endLineNumber": 4,
+              "endColumn": 11
+            }
+          ],
+          "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\nC\n85,260.25\n\u221219.75 (\u22120.02%)\n85,260.25\nSELL\n0.01\n85,260.26\nBUY\nUSDT\nOracle na holes crosses v1\nDate Range\n09:43:31 UTC\n99+\nObject tree\nData window\nDate\nSun 04 Oct '26\nTime\n09:42\nBTCUSDT \u00b7 2 \u00b7 Binance\nOpen\n85,280.00\nHigh\n85,294.01\nLow\n85,260.25\nClose\n85,260.25\nChange\n\u221219.75 (\u22120.02%)\nVol\n17.57\nLast day change\n+506.69 (+0.60%)\nOracle na holes crosses v1\nPine Editor\nUntitled script\nPublish script\n1\n2\n3\n4\n5\n//@version=6\nindicator(\"V3-CONST-REF-MATRIX-QUALIFIER-DIAGNOSTIC\")\nconst\u00a0matrix<float>\u00a0value\u00a0=\u00a0matrix.new<float>(1,\u00a01,\u00a0close)\nplot(value,\u00a0\"OUTCOME\")\n1 of 1 problem\nCannot call \"plot\" with argument \"series\"=\"value\". An argument of \"matrix<float>\" type was used but a \"series float\" is expected.(CE10123)\nLine 4, Col 6\nPine Script\u00ae v6\nCompilation error: CE10123\n\nCannot call \"plot\" with argument \"series\"=\"value\". An argument of \"matrix<float>\" type was used but a \"series float\" is expected.\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+          "context_substituted_message": "Cannot call \"plot\" with argument \"series\"=\"value\". An argument of \"matrix<float>\" type was used but a \"series float\"  is expected."
+        }
+      },
+      "first_values": null,
+      "last_values": null,
+      "export_or_error_utc": "2026-10-04T09:43:33.459Z",
+      "independent_reload_utc": "2026-10-04T09:43:13.949Z"
+    },
+    {
+      "script": "const-reference-matrix-replace-id.pine",
+      "attempt": 2,
+      "status": "COMPILE-ERROR",
+      "diagnostic": {
+        "code": "CE10085",
+        "text": "A variable declared with the \"const\" type form cannot be modified.",
+        "line": 4,
+        "column": 1,
+        "first_bar_index": null,
+        "first_bar_time_utc": null,
+        "native": {
+          "error": "A variable declared with the \"const\" type form cannot be modified.",
+          "editorError": {
+            "code": "CE10085",
+            "end": {
+              "column": 5,
+              "line": 4
+            },
+            "message": "A variable declared with the \"const\" type form cannot be modified.",
+            "start": {
+              "column": 1,
+              "line": 4
+            },
+            "id": "USER;64eb9fe01ecd4728859be8cb120fa590"
+          },
+          "title": "Compilation error",
+          "compiler_markers": [
+            {
+              "resource": {
+                "$mid": 1,
+                "external": "file:///ad411306-ff08-43b4-b358-62a0d125ba15.pine?placement%3Ddialog",
+                "path": "/ad411306-ff08-43b4-b358-62a0d125ba15.pine",
+                "scheme": "file",
+                "query": "placement=dialog"
+              },
+              "owner": "_generated_diagnostic_collection_name_#0",
+              "code": "CE10085",
+              "severity": 8,
+              "message": "A variable declared with the \"const\" type form cannot be modified.",
+              "startLineNumber": 4,
+              "startColumn": 1,
+              "endLineNumber": 4,
+              "endColumn": 6
+            }
+          ],
+          "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\nC\n85,272.46\n\u22127.54 (\u22120.01%)\n85,272.46\nSELL\n0.01\n85,272.47\nBUY\nUSDT\nOracle na holes crosses v1\nDate Range\n09:43:49 UTC\n99+\nObject tree\nData window\nDate\nSun 04 Oct '26\nTime\n09:42\nBTCUSDT \u00b7 2 \u00b7 Binance\nOpen\n85,280.00\nHigh\n85,294.01\nLow\n85,260.25\nClose\n85,272.46\nChange\n\u22127.54 (\u22120.01%)\nVol\n19.04\nLast day change\n+518.90 (+0.61%)\nOracle na holes crosses v1\nPine Editor\nUntitled script\nPublish script\n1\n2\n3\n4\n5\n6\n//@version=6\nindicator(\"V3-CONST-REF-MATRIX-REPLACE-ID\")\nconst\u00a0matrix<float>\u00a0value\u00a0=\u00a0matrix.new<float>(1,\u00a01,\u00a0close)\nvalue\u00a0:=\u00a0matrix.new<float>(1,\u00a01,\u00a0close)\nplot(matrix.get(value,\u00a00,\u00a00),\u00a0\"OUTCOME\")\n1 of 1 problem\nA variable declared with the \"const\" type form cannot be modified.(CE10085)\nLine 4, Col 1\nPine Script\u00ae v6\nCompilation error: CE10085\n\nA variable declared with the \"const\" type form cannot be modified.\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+          "context_substituted_message": "A variable declared with the \"const\" type form cannot be modified."
+        }
+      },
+      "first_values": null,
+      "last_values": null,
+      "export_or_error_utc": "2026-10-04T09:43:55.343Z",
+      "independent_reload_utc": "2026-10-04T09:43:35.993Z"
+    },
+    {
+      "script": "const-reference-map-accept-mutate.pine",
+      "attempt": 2,
+      "status": "RUNS",
+      "diagnostic": {
+        "code": null,
+        "text": null,
+        "line": null,
+        "column": null,
+        "first_bar_index": null,
+        "first_bar_time_utc": null
+      },
+      "first_values": {
+        "OUTCOME": "77675.04"
+      },
+      "last_values": {
+        "OUTCOME": "85273.47"
+      },
+      "export_or_error_utc": "2026-10-04T09:44:37.119Z",
+      "independent_reload_utc": "2026-10-04T09:43:57.845Z"
+    },
+    {
+      "script": "const-reference-map-qualifier-diagnostic.pine",
+      "attempt": 2,
+      "status": "COMPILE-ERROR",
+      "diagnostic": {
+        "code": "CE10123",
+        "text": "Cannot call \"plot\" with argument \"series\"=\"value\". An argument of \"map<string, float>\" type was used but a \"series float\"  is expected.",
+        "line": 4,
+        "column": 6,
+        "first_bar_index": null,
+        "first_bar_time_utc": null,
+        "native": {
+          "error": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+          "editorError": {
+            "code": "CE10123",
+            "ctx": {
+              "argDisplayName": "series",
+              "argUserFriendlyRepresentation": "value",
+              "argumentType": "map<string, float>",
+              "currentTypeDocStr": "series float",
+              "funId": "plot",
+              "typePostfix": ""
+            },
+            "end": {
+              "column": 10,
+              "line": 4
+            },
+            "message": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+            "start": {
+              "column": 6,
+              "line": 4
+            },
+            "id": "USER;64eb9fe01ecd4728859be8cb120fa590"
+          },
+          "title": "Compilation error",
+          "compiler_markers": [
+            {
+              "resource": {
+                "$mid": 1,
+                "external": "file:///3d6183dc-6747-4cd8-9772-cfc14ae55d6f.pine?placement%3Ddialog",
+                "path": "/3d6183dc-6747-4cd8-9772-cfc14ae55d6f.pine",
+                "scheme": "file",
+                "query": "placement=dialog"
+              },
+              "owner": "_generated_diagnostic_collection_name_#0",
+              "code": "CE10123",
+              "severity": 8,
+              "message": "Cannot call \"plot\" with argument \"series\"=\"value\". An argument of \"map<string, float>\" type was used but a \"series float\"  is expected.",
+              "startLineNumber": 4,
+              "startColumn": 6,
+              "endLineNumber": 4,
+              "endColumn": 11
+            }
+          ],
+          "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\nC\n85,276.00\n+3.53 (+0.00%)\n85,276.00\nSELL\n0.01\n85,276.01\nBUY\nUSDT\nOracle na holes crosses v1\nDate Range\n09:45:07 UTC\n99+\nObject tree\nData window\nDate\nSun 04 Oct '26\nTime\n09:44\nBTCUSDT \u00b7 2 \u00b7 Binance\nOpen\n85,272.46\nHigh\n85,280.01\nLow\n85,272.46\nClose\n85,276.00\nChange\n+3.53 (+0.00%)\nVol\n6.34\nLast day change\n+522.44 (+0.62%)\nOracle na holes crosses v1\nPine Editor\nUntitled script\nPublish script\n1\n2\n3\n4\n5\n//@version=6\nindicator(\"V3-CONST-REF-MAP-QUALIFIER-DIAGNOSTIC\")\nconst\u00a0map<string,\u00a0float>\u00a0value\u00a0=\u00a0map.new<string,\u00a0float>()\nplot(value,\u00a0\"OUTCOME\")\n1 of 1 problem\nCannot call \"plot\" with argument \"series\"=\"value\". An argument of \"map<string, float>\" type was used but a \"series float\" is expected.(CE10123)\nLine 4, Col 6\nPine Script\u00ae v6\nCompilation error: CE10123\n\nCannot call \"plot\" with argument \"series\"=\"value\". An argument of \"map<string, float>\" type was used but a \"series float\" is expected.\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+          "context_substituted_message": "Cannot call \"plot\" with argument \"series\"=\"value\". An argument of \"map<string, float>\" type was used but a \"series float\"  is expected."
+        }
+      },
+      "first_values": null,
+      "last_values": null,
+      "export_or_error_utc": "2026-10-04T09:45:10.001Z",
+      "independent_reload_utc": "2026-10-04T09:44:53.998Z"
+    },
+    {
+      "script": "const-reference-map-replace-id.pine",
+      "attempt": 2,
+      "status": "COMPILE-ERROR",
+      "diagnostic": {
+        "code": "CE10085",
+        "text": "A variable declared with the \"const\" type form cannot be modified.",
+        "line": 4,
+        "column": 1,
+        "first_bar_index": null,
+        "first_bar_time_utc": null,
+        "native": {
+          "error": "A variable declared with the \"const\" type form cannot be modified.",
+          "editorError": {
+            "code": "CE10085",
+            "end": {
+              "column": 5,
+              "line": 4
+            },
+            "message": "A variable declared with the \"const\" type form cannot be modified.",
+            "start": {
+              "column": 1,
+              "line": 4
+            },
+            "id": "USER;64eb9fe01ecd4728859be8cb120fa590"
+          },
+          "title": "Compilation error",
+          "compiler_markers": [
+            {
+              "resource": {
+                "$mid": 1,
+                "external": "file:///d4be22a9-f661-40f5-88a8-86c687f65138.pine?placement%3Ddialog",
+                "path": "/d4be22a9-f661-40f5-88a8-86c687f65138.pine",
+                "scheme": "file",
+                "query": "placement=dialog"
+              },
+              "owner": "_generated_diagnostic_collection_name_#0",
+              "code": "CE10085",
+              "severity": 8,
+              "message": "A variable declared with the \"const\" type form cannot be modified.",
+              "startLineNumber": 4,
+              "startColumn": 1,
+              "endLineNumber": 4,
+              "endColumn": 6
+            }
+          ],
+          "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\nC\n85,283.46\n+10.99 (+0.01%)\n85,283.45\nSELL\n0.01\n85,283.46\nBUY\nUSDT\nOracle na holes crosses v1\nDate Range\n09:45:27 UTC\n99+\nObject tree\nData window\nDate\nSun 04 Oct '26\nTime\n09:44\nBTCUSDT \u00b7 2 \u00b7 Binance\nOpen\n85,272.46\nHigh\n85,283.46\nLow\n85,272.46\nClose\n85,283.46\nChange\n+10.99 (+0.01%)\nVol\n6.98\nLast day change\n+529.90 (+0.63%)\nOracle na holes crosses v1\nPine Editor\nUntitled script\nPublish script\n1\n2\n3\n4\n5\n6\n//@version=6\nindicator(\"V3-CONST-REF-MAP-REPLACE-ID\")\nconst\u00a0map<string,\u00a0float>\u00a0value\u00a0=\u00a0map.new<string,\u00a0float>()\nvalue\u00a0:=\u00a0map.new<string,\u00a0float>()\nplot(map.get(value,\u00a0\"key\"),\u00a0\"OUTCOME\")\n1 of 1 problem\nA variable declared with the \"const\" type form cannot be modified.(CE10085)\nLine 4, Col 1\nPine Script\u00ae v6\nCompilation error: CE10085\n\nA variable declared with the \"const\" type form cannot be modified.\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+          "context_substituted_message": "A variable declared with the \"const\" type form cannot be modified."
+        }
+      },
+      "first_values": null,
+      "last_values": null,
+      "export_or_error_utc": "2026-10-04T09:45:30.255Z",
+      "independent_reload_utc": "2026-10-04T09:45:11.997Z"
+    },
+    {
+      "script": "const-reference-line-accept-mutate.pine",
+      "attempt": 3,
+      "status": "RUNS",
+      "diagnostic": {
+        "code": null,
+        "text": null,
+        "line": null,
+        "column": null,
+        "first_bar_index": null,
+        "first_bar_time_utc": null
+      },
+      "first_values": {
+        "OUTCOME": "77675.04"
+      },
+      "last_values": {
+        "OUTCOME": "85289.85"
+      },
+      "export_or_error_utc": "2026-10-04T09:46:44.481Z",
+      "independent_reload_utc": "2026-10-04T09:45:32.847Z"
+    },
+    {
+      "script": "const-reference-line-qualifier-diagnostic.pine",
+      "attempt": 2,
+      "status": "COMPILE-ERROR",
+      "diagnostic": {
+        "code": "CE10123",
+        "text": "Cannot call \"plot\" with argument \"series\"=\"value\". An argument of \"series line\" type was used but a \"series float\"  is expected.",
+        "line": 4,
+        "column": 6,
+        "first_bar_index": null,
+        "first_bar_time_utc": null,
+        "native": {
+          "error": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+          "editorError": {
+            "code": "CE10123",
+            "ctx": {
+              "argDisplayName": "series",
+              "argUserFriendlyRepresentation": "value",
+              "argumentType": "series line",
+              "currentTypeDocStr": "series float",
+              "funId": "plot",
+              "typePostfix": ""
+            },
+            "end": {
+              "column": 10,
+              "line": 4
+            },
+            "message": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+            "start": {
+              "column": 6,
+              "line": 4
+            },
+            "id": "USER;64eb9fe01ecd4728859be8cb120fa590"
+          },
+          "title": "Compilation error",
+          "compiler_markers": [
+            {
+              "resource": {
+                "$mid": 1,
+                "external": "file:///f0e0d312-1608-4cd8-94ff-3069f6840fb1.pine?placement%3Ddialog",
+                "path": "/f0e0d312-1608-4cd8-94ff-3069f6840fb1.pine",
+                "scheme": "file",
+                "query": "placement=dialog"
+              },
+              "owner": "_generated_diagnostic_collection_name_#0",
+              "code": "CE10123",
+              "severity": 8,
+              "message": "Cannot call \"plot\" with argument \"series\"=\"value\". An argument of \"series line\" type was used but a \"series float\"  is expected.",
+              "startLineNumber": 4,
+              "startColumn": 6,
+              "endLineNumber": 4,
+              "endColumn": 11
+            }
+          ],
+          "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\nC\n85,288.90\n+0.05 (+0.00%)\n85,288.89\nSELL\n0.01\n85,288.90\nBUY\nUSDT\nOracle na holes crosses v1\nDate Range\n09:47:12 UTC\n99+\nObject tree\nData window\nDate\nSun 04 Oct '26\nTime\n09:46\nBTCUSDT \u00b7 2 \u00b7 Binance\nOpen\n85,288.85\nHigh\n85,288.90\nLow\n85,288.84\nClose\n85,288.90\nChange\n+0.05 (+0.00%)\nVol\n5\nLast day change\n+535.34 (+0.63%)\nOracle na holes crosses v1\nPine Editor\nUntitled script\nPublish script\n1\n2\n3\n4\n5\n//@version=6\nindicator(\"V3-CONST-REF-LINE-QUALIFIER-DIAGNOSTIC\")\nconst\u00a0line\u00a0value\u00a0=\u00a0line.new(bar_index,\u00a0close,\u00a0bar_index\u00a0+\u00a01,\u00a0close)\nplot(value,\u00a0\"OUTCOME\")\n1 of 1 problem\nCannot call \"plot\" with argument \"series\"=\"value\". An argument of \"series line\" type was used but a \"series float\" is expected.(CE10123)\nLine 4, Col 6\nPine Script\u00ae v6\nCompilation error: CE10123\n\nCannot call \"plot\" with argument \"series\"=\"value\". An argument of \"series line\" type was used but a \"series float\" is expected.\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+          "context_substituted_message": "Cannot call \"plot\" with argument \"series\"=\"value\". An argument of \"series line\" type was used but a \"series float\"  is expected."
+        }
+      },
+      "first_values": null,
+      "last_values": null,
+      "export_or_error_utc": "2026-10-04T09:47:15.327Z",
+      "independent_reload_utc": "2026-10-04T09:46:57.352Z"
+    },
+    {
+      "script": "const-reference-line-replace-id.pine",
+      "attempt": 2,
+      "status": "COMPILE-ERROR",
+      "diagnostic": {
+        "code": "CE10085",
+        "text": "A variable declared with the \"const\" type form cannot be modified.",
+        "line": 4,
+        "column": 1,
+        "first_bar_index": null,
+        "first_bar_time_utc": null,
+        "native": {
+          "error": "A variable declared with the \"const\" type form cannot be modified.",
+          "editorError": {
+            "code": "CE10085",
+            "end": {
+              "column": 5,
+              "line": 4
+            },
+            "message": "A variable declared with the \"const\" type form cannot be modified.",
+            "start": {
+              "column": 1,
+              "line": 4
+            },
+            "id": "USER;64eb9fe01ecd4728859be8cb120fa590"
+          },
+          "title": "Compilation error",
+          "compiler_markers": [
+            {
+              "resource": {
+                "$mid": 1,
+                "external": "file:///aeebfaeb-8e8a-4af0-aca6-64b8c8930e13.pine?placement%3Ddialog",
+                "path": "/aeebfaeb-8e8a-4af0-aca6-64b8c8930e13.pine",
+                "scheme": "file",
+                "query": "placement=dialog"
+              },
+              "owner": "_generated_diagnostic_collection_name_#0",
+              "code": "CE10085",
+              "severity": 8,
+              "message": "A variable declared with the \"const\" type form cannot be modified.",
+              "startLineNumber": 4,
+              "startColumn": 1,
+              "endLineNumber": 4,
+              "endColumn": 6
+            }
+          ],
+          "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\nC\n85,314.00\n+25.15 (+0.03%)\n85,314.00\nSELL\n0.01\n85,314.01\nBUY\nUSDT\nOracle na holes crosses v1\nDate Range\n09:47:32 UTC\n99+\nObject tree\nData window\nDate\nSun 04 Oct '26\nTime\n09:46\nBTCUSDT \u00b7 2 \u00b7 Binance\nOpen\n85,288.85\nHigh\n85,314.01\nLow\n85,288.84\nClose\n85,314.00\nChange\n+25.15 (+0.03%)\nVol\n15.35\nLast day change\n+560.44 (+0.66%)\nOracle na holes crosses v1\nPine Editor\nUntitled script\nPublish script\n1\n2\n3\n4\n5\n6\n//@version=6\nindicator(\"V3-CONST-REF-LINE-REPLACE-ID\")\nconst\u00a0line\u00a0value\u00a0=\u00a0line.new(bar_index,\u00a0close,\u00a0bar_index\u00a0+\u00a01,\u00a0close)\nvalue\u00a0:=\u00a0line.new(bar_index,\u00a0close,\u00a0bar_index\u00a0+\u00a01,\u00a0close)\nplot(line.get_y1(value),\u00a0\"OUTCOME\")\n1 of 1 problem\nA variable declared with the \"const\" type form cannot be modified.(CE10085)\nLine 4, Col 1\nPine Script\u00ae v6\nCompilation error: CE10085\n\nA variable declared with the \"const\" type form cannot be modified.\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+          "context_substituted_message": "A variable declared with the \"const\" type form cannot be modified."
+        }
+      },
+      "first_values": null,
+      "last_values": null,
+      "export_or_error_utc": "2026-10-04T09:47:35.077Z",
+      "independent_reload_utc": "2026-10-04T09:47:17.564Z"
+    },
+    {
+      "script": "ledger-division-v4-positive-const.pine",
+      "attempt": 2,
+      "status": "RUNS",
+      "diagnostic": {
+        "code": null,
+        "text": null,
+        "line": null,
+        "column": null,
+        "first_bar_index": null,
+        "first_bar_time_utc": null
+      },
+      "first_values": {
+        "OUTCOME": "2"
+      },
+      "last_values": {
+        "OUTCOME": "2"
+      },
+      "export_or_error_utc": "2026-10-04T09:48:42.207Z",
+      "independent_reload_utc": "2026-10-04T09:47:37.895Z"
+    },
+    {
+      "script": "ledger-division-v4-negative-numerator.pine",
+      "attempt": 2,
+      "status": "RUNS",
+      "diagnostic": {
+        "code": null,
+        "text": null,
+        "line": null,
+        "column": null,
+        "first_bar_index": null,
+        "first_bar_time_utc": null
+      },
+      "first_values": {
+        "OUTCOME": "-2"
+      },
+      "last_values": {
+        "OUTCOME": "-2"
+      },
+      "export_or_error_utc": "2026-10-04T09:49:24.738Z",
+      "independent_reload_utc": "2026-10-04T09:48:55.167Z"
+    },
+    {
+      "script": "ledger-division-v4-negative-denominator.pine",
+      "attempt": 2,
+      "status": "RUNS",
+      "diagnostic": {
+        "code": null,
+        "text": null,
+        "line": null,
+        "column": null,
+        "first_bar_index": null,
+        "first_bar_time_utc": null
+      },
+      "first_values": {
+        "OUTCOME": "-2"
+      },
+      "last_values": {
+        "OUTCOME": "-2"
+      },
+      "export_or_error_utc": "2026-10-04T09:50:28.712Z",
+      "independent_reload_utc": "2026-10-04T09:49:36.866Z"
+    },
+    {
+      "script": "ledger-division-v4-both-negative.pine",
+      "attempt": 2,
+      "status": "RUNS",
+      "diagnostic": {
+        "code": null,
+        "text": null,
+        "line": null,
+        "column": null,
+        "first_bar_index": null,
+        "first_bar_time_utc": null
+      },
+      "first_values": {
+        "OUTCOME": "2"
+      },
+      "last_values": {
+        "OUTCOME": "2"
+      },
+      "export_or_error_utc": "2026-10-04T09:51:23.320Z",
+      "independent_reload_utc": "2026-10-04T09:50:43.145Z"
+    },
+    {
+      "script": "ledger-division-v4-negative-exact.pine",
+      "attempt": 2,
+      "status": "RUNS",
+      "diagnostic": {
+        "code": null,
+        "text": null,
+        "line": null,
+        "column": null,
+        "first_bar_index": null,
+        "first_bar_time_utc": null
+      },
+      "first_values": {
+        "OUTCOME": "-3"
+      },
+      "last_values": {
+        "OUTCOME": "-3"
+      },
+      "export_or_error_utc": "2026-10-04T09:51:59.641Z",
+      "independent_reload_utc": "2026-10-04T09:51:33.185Z"
+    },
+    {
+      "script": "ledger-division-v4-float-control.pine",
+      "attempt": 2,
+      "status": "RUNS",
+      "diagnostic": {
+        "code": null,
+        "text": null,
+        "line": null,
+        "column": null,
+        "first_bar_index": null,
+        "first_bar_time_utc": null
+      },
+      "first_values": {
+        "OUTCOME": "-2.5"
+      },
+      "last_values": {
+        "OUTCOME": "-2.5"
+      },
+      "export_or_error_utc": "2026-10-04T09:52:37.287Z",
+      "independent_reload_utc": "2026-10-04T09:52:09.816Z"
+    },
+    {
+      "script": "ledger-division-v4-input-control.pine",
+      "attempt": 2,
+      "status": "RUNS",
+      "diagnostic": {
+        "code": null,
+        "text": null,
+        "line": null,
+        "column": null,
+        "first_bar_index": null,
+        "first_bar_time_utc": null
+      },
+      "first_values": {
+        "OUTCOME": "-2.5"
+      },
+      "last_values": {
+        "OUTCOME": "-2.5"
+      },
+      "export_or_error_utc": "2026-10-04T09:53:11.309Z",
+      "independent_reload_utc": "2026-10-04T09:52:47.116Z"
+    }
+  ]
+}

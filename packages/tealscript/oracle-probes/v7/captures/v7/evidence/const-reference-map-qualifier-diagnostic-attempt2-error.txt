@@ -1,0 +1,47 @@
+Cannot call "plot" with argument "series"="value". An argument of "map<string, float>" type was used but a "series float"  is expected.
+{
+  "error": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+  "editorError": {
+    "code": "CE10123",
+    "ctx": {
+      "argDisplayName": "series",
+      "argUserFriendlyRepresentation": "value",
+      "argumentType": "map<string, float>",
+      "currentTypeDocStr": "series float",
+      "funId": "plot",
+      "typePostfix": ""
+    },
+    "end": {
+      "column": 10,
+      "line": 4
+    },
+    "message": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+    "start": {
+      "column": 6,
+      "line": 4
+    },
+    "id": "USER;64eb9fe01ecd4728859be8cb120fa590"
+  },
+  "title": "Compilation error",
+  "compiler_markers": [
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///3d6183dc-6747-4cd8-9772-cfc14ae55d6f.pine?placement%3Ddialog",
+        "path": "/3d6183dc-6747-4cd8-9772-cfc14ae55d6f.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "code": "CE10123",
+      "severity": 8,
+      "message": "Cannot call \"plot\" with argument \"series\"=\"value\". An argument of \"map<string, float>\" type was used but a \"series float\"  is expected.",
+      "startLineNumber": 4,
+      "startColumn": 6,
+      "endLineNumber": 4,
+      "endColumn": 11
+    }
+  ],
+  "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\nC\n85,276.00\n+3.53 (+0.00%)\n85,276.00\nSELL\n0.01\n85,276.01\nBUY\nUSDT\nOracle na holes crosses v1\nDate Range\n09:45:07 UTC\n99+\nObject tree\nData window\nDate\nSun 04 Oct '26\nTime\n09:44\nBTCUSDT · 2 · Binance\nOpen\n85,272.46\nHigh\n85,280.01\nLow\n85,272.46\nClose\n85,276.00\nChange\n+3.53 (+0.00%)\nVol\n6.34\nLast day change\n+522.44 (+0.62%)\nOracle na holes crosses v1\nPine Editor\nUntitled script\nPublish script\n1\n2\n3\n4\n5\n//@version=6\nindicator(\"V3-CONST-REF-MAP-QUALIFIER-DIAGNOSTIC\")\nconst map<string, float> value = map.new<string, float>()\nplot(value, \"OUTCOME\")\n1 of 1 problem\nCannot call \"plot\" with argument \"series\"=\"value\". An argument of \"map<string, float>\" type was used but a \"series float\" is expected.(CE10123)\nLine 4, Col 6\nPine Script® v6\nCompilation error: CE10123\n\nCannot call \"plot\" with argument \"series\"=\"value\". An argument of \"map<string, float>\" type was used but a \"series float\" is expected.\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+  "context_substituted_message": "Cannot call \"plot\" with argument \"series\"=\"value\". An argument of \"map<string, float>\" type was used but a \"series float\"  is expected."
+}

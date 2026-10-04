@@ -1,0 +1,39 @@
+A variable declared with the "const" type form cannot be modified.
+{
+  "error": "A variable declared with the \"const\" type form cannot be modified.",
+  "editorError": {
+    "code": "CE10085",
+    "end": {
+      "column": 5,
+      "line": 4
+    },
+    "message": "A variable declared with the \"const\" type form cannot be modified.",
+    "start": {
+      "column": 1,
+      "line": 4
+    },
+    "id": "USER;64eb9fe01ecd4728859be8cb120fa590"
+  },
+  "title": "Compilation error",
+  "compiler_markers": [
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///d4be22a9-f661-40f5-88a8-86c687f65138.pine?placement%3Ddialog",
+        "path": "/d4be22a9-f661-40f5-88a8-86c687f65138.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "code": "CE10085",
+      "severity": 8,
+      "message": "A variable declared with the \"const\" type form cannot be modified.",
+      "startLineNumber": 4,
+      "startColumn": 1,
+      "endLineNumber": 4,
+      "endColumn": 6
+    }
+  ],
+  "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\nC\n85,283.46\n+10.99 (+0.01%)\n85,283.45\nSELL\n0.01\n85,283.46\nBUY\nUSDT\nOracle na holes crosses v1\nDate Range\n09:45:27 UTC\n99+\nObject tree\nData window\nDate\nSun 04 Oct '26\nTime\n09:44\nBTCUSDT · 2 · Binance\nOpen\n85,272.46\nHigh\n85,283.46\nLow\n85,272.46\nClose\n85,283.46\nChange\n+10.99 (+0.01%)\nVol\n6.98\nLast day change\n+529.90 (+0.63%)\nOracle na holes crosses v1\nPine Editor\nUntitled script\nPublish script\n1\n2\n3\n4\n5\n6\n//@version=6\nindicator(\"V3-CONST-REF-MAP-REPLACE-ID\")\nconst map<string, float> value = map.new<string, float>()\nvalue := map.new<string, float>()\nplot(map.get(value, \"key\"), \"OUTCOME\")\n1 of 1 problem\nA variable declared with the \"const\" type form cannot be modified.(CE10085)\nLine 4, Col 1\nPine Script® v6\nCompilation error: CE10085\n\nA variable declared with the \"const\" type form cannot be modified.\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+  "context_substituted_message": "A variable declared with the \"const\" type form cannot be modified."
+}
