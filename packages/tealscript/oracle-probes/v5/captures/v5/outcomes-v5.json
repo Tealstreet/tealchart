@@ -7967,5 +7967,4598 @@
       ],
       "entries": 0
     }
+  },
+  {
+    "script": "corpus-table-text-wrap-control-v5-v1.pine",
+    "attempt": 3,
+    "source_sha256": "7cb75b06da98169599e0e9712165430b4d33d796ef43f56f59b1a97110ec2982",
+    "indicator_title": "corpus-table-text-wrap-control-v5-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v5/corpus-table-text-wrap-control-v5-v1-attempt3.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T113148.353.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "corpus-table-text-wrap-control-v5-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24286,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24586,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T03:31:38.857Z",
+    "live_candle_open_utc": "2026-10-04T03:30:00.000Z",
+    "export_utc": "2026-10-04T03:31:48.612Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v5/evidence/corpus-table-text-wrap-control-v5-v1-attempt3-setup.png",
+      "captures/v5/evidence/corpus-table-text-wrap-control-v5-v1-attempt3-export.png",
+      "captures/v5/evidence/corpus-table-text-wrap-control-v5-v1-attempt3-logs.txt",
+      "captures/v5/evidence/corpus-table-text-wrap-control-v5-v1-attempt3-logs-v1.json",
+      "captures/v5/evidence/corpus-table-text-wrap-control-v5-v1-attempt3-logs.png",
+      "captures/v5/evidence/corpus-table-text-wrap-control-v5-v1-attempt3-visual.png",
+      "captures/v5/evidence/corpus-table-text-wrap-control-v5-v1-attempt3-table-white-v1.json",
+      "captures/v5/evidence/corpus-table-text-wrap-control-v5-v1-attempt3-table-white-v1.png",
+      "captures/v5/evidence/table-view-clarification-v2.json"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///8a7312af-fb89-4243-bc99-9c2ec3e2e2ef.pine?placement%3Ddialog",
+          "path": "/8a7312af-fb89-4243-bc99-9c2ec3e2e2ef.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "live_tooltip": "Sun 04 Oct '26   03:30",
+    "historical_compare_before_unix_seconds": 1791084600,
+    "pine_logs": {
+      "paths": [
+        "evidence/corpus-table-text-wrap-control-v5-v1-attempt3-logs.txt",
+        "evidence/corpus-table-text-wrap-control-v5-v1-attempt3-logs-v1.json",
+        "evidence/corpus-table-text-wrap-control-v5-v1-attempt3-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "ac733f828d22a1a154db77cbe66cee5398ed4a562e8f027667fbb0760f77ac1a",
+    "csv_bytes": 1294425,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "Plot"
+    ],
+    "declared_to_native_header_mapping": {
+      "close": "close"
+    },
+    "csv_rows": 24586,
+    "historical_rows": 24585,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791084600,
+    "first_historical_values": {
+      "close": "77674.04"
+    },
+    "last_historical_values": {
+      "close": "84796.41"
+    },
+    "table_witness": "captures/v5/evidence/corpus-table-text-wrap-control-v5-v1-attempt3-table-white-v1.json",
+    "visual_limit": "Parent showLegend=false did not hide native source legend; table text slightly overlaps it. See clarification v2."
+  },
+  {
+    "script": "corpus-table-text-wrap-control-v6-v1.pine",
+    "attempt": 2,
+    "source_sha256": "66f2aab2638df7fead47ff1ffa40253f70fa607c21dfd53651e03b0c31b71090",
+    "indicator_title": "corpus-table-text-wrap-control-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v5/corpus-table-text-wrap-control-v6-v1-attempt2.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T113215.951.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "corpus-table-text-wrap-control-v6-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24287,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24587,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T03:32:09.275Z",
+    "live_candle_open_utc": "2026-10-04T03:32:00.000Z",
+    "export_utc": "2026-10-04T03:32:16.523Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v5/evidence/corpus-table-text-wrap-control-v6-v1-attempt2-setup.png",
+      "captures/v5/evidence/corpus-table-text-wrap-control-v6-v1-attempt2-export.png",
+      "captures/v5/evidence/corpus-table-text-wrap-control-v6-v1-attempt2-logs.txt",
+      "captures/v5/evidence/corpus-table-text-wrap-control-v6-v1-attempt2-logs-v1.json",
+      "captures/v5/evidence/corpus-table-text-wrap-control-v6-v1-attempt2-logs.png",
+      "captures/v5/evidence/corpus-table-text-wrap-control-v6-v1-attempt2-visual.png",
+      "captures/v5/evidence/corpus-table-text-wrap-control-v6-v1-attempt2-table-white-v1.json",
+      "captures/v5/evidence/corpus-table-text-wrap-control-v6-v1-attempt2-table-white-v1.png",
+      "captures/v5/evidence/table-view-clarification-v2.json"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   03:32",
+    "historical_compare_before_unix_seconds": 1791084720,
+    "pine_logs": {
+      "paths": [
+        "evidence/corpus-table-text-wrap-control-v6-v1-attempt2-logs.txt",
+        "evidence/corpus-table-text-wrap-control-v6-v1-attempt2-logs-v1.json",
+        "evidence/corpus-table-text-wrap-control-v6-v1-attempt2-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "2e1bfe8ed42ac71650b5c81169c6b93ca23f6853c279eb10146a0402d0846288",
+    "csv_bytes": 1294481,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "Plot"
+    ],
+    "declared_to_native_header_mapping": {
+      "close": "close"
+    },
+    "csv_rows": 24587,
+    "historical_rows": 24586,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791084720,
+    "first_historical_values": {
+      "close": "77674.04"
+    },
+    "last_historical_values": {
+      "close": "84825.48"
+    },
+    "table_witness": "captures/v5/evidence/corpus-table-text-wrap-control-v6-v1-attempt2-table-white-v1.json",
+    "visual_limit": "Parent showLegend=false did not hide native source legend; table text slightly overlaps it. See clarification v2."
+  },
+  {
+    "script": "corpus5-v5-bb-zero-v1.pine",
+    "attempt": 1,
+    "source_sha256": "10cc32ae5b828cf1c83a324d84ede19130d596ff0f312f5a386239cb26c9d608",
+    "indicator_title": "corpus5-v5-bb-zero-v1",
+    "status": "RUNTIME-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": "Error on bar 0: Invalid value of the 'length' argument (0) in the ''bb'' function. It must be > 0.",
+      "line": 3,
+      "column": null,
+      "first_bar_index": 0,
+      "first_bar_time_utc": null,
+      "native": {
+        "ctx": {
+          "op": ">",
+          "code": "RE10001",
+          "argName": "length",
+          "bar_index": 0,
+          "value": 0,
+          "funName": "'bb'"
+        },
+        "error": "Error on bar {bar_index}: Invalid value of the '{argName}' argument ({value}) in the '{funName}' function. It must be {op} 0.",
+        "stack_trace": [
+          {
+            "n": "#main",
+            "p": 3
+          }
+        ],
+        "title": "Runtime error",
+        "showReportItButton": false,
+        "studyAccessBlocked": false,
+        "compiler_markers": [],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,825.48\nH\n84,825.48\nL\n84,825.47\nC\n84,825.47\n\u22120.01 (\u22120.00%)\n84,825.47\nSELL\n0.01\n84,825.48\nBUY\nUSDT\ncorpus5-v5-bb-zero-v1\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n03:32:41 UTC\n99+\nRuntime error: RE10001\nRuntime error: RE10001\nError on bar 0: Invalid value of the 'length' argument (0) in the ''bb'' function. It must be > 0.\nat #main():3\nOpen in editor",
+        "context_substituted_message": "Error on bar 0: Invalid value of the 'length' argument (0) in the ''bb'' function. It must be > 0."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "corpus5-v5-bb-zero-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24287,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24587,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T03:32:39.040Z",
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v5/evidence/corpus5-v5-bb-zero-v1-attempt1-error.png",
+      "captures/v5/evidence/corpus5-v5-bb-zero-v1-attempt1-error.txt",
+      "captures/v5/evidence/corpus5-v5-bb-zero-v1-attempt1-logs.txt",
+      "captures/v5/evidence/corpus5-v5-bb-zero-v1-attempt1-logs-v1.json",
+      "captures/v5/evidence/corpus5-v5-bb-zero-v1-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///befba2c9-a31e-4f2e-b152-3b703b5cb5f2.pine?placement%3Ddialog",
+          "path": "/befba2c9-a31e-4f2e-b152-3b703b5cb5f2.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "error_observed_utc": "2026-10-04T03:32:43.826Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/corpus5-v5-bb-zero-v1-attempt1-logs.txt",
+        "evidence/corpus5-v5-bb-zero-v1-attempt1-logs-v1.json",
+        "evidence/corpus5-v5-bb-zero-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "script": "corpus5-v5-extrema-warmup1000-v1.pine",
+    "attempt": 1,
+    "source_sha256": "4e71d6380325c068c408a274842f871d80a47332a1030a44b3f6d62cb6897309",
+    "indicator_title": "corpus5-v5-extrema-warmup1000-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v5/corpus5-v5-extrema-warmup1000-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T113306.318.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "corpus5-v5-extrema-warmup1000-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24287,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24587,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T03:32:59.679Z",
+    "live_candle_open_utc": "2026-10-04T03:32:00.000Z",
+    "export_utc": "2026-10-04T03:33:06.726Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v5/evidence/corpus5-v5-extrema-warmup1000-v1-attempt1-setup.png",
+      "captures/v5/evidence/corpus5-v5-extrema-warmup1000-v1-attempt1-export.png",
+      "captures/v5/evidence/corpus5-v5-extrema-warmup1000-v1-attempt1-logs.txt",
+      "captures/v5/evidence/corpus5-v5-extrema-warmup1000-v1-attempt1-logs-v1.json",
+      "captures/v5/evidence/corpus5-v5-extrema-warmup1000-v1-attempt1-logs.png",
+      "captures/v5/evidence/corpus5-v5-extrema-warmup1000-v1-attempt1-visual.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///9def2a61-b225-4c1d-ad44-1f657b08c710.pine?placement%3Ddialog",
+          "path": "/9def2a61-b225-4c1d-ad44-1f657b08c710.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "live_tooltip": "Sun 04 Oct '26   03:32",
+    "historical_compare_before_unix_seconds": 1791084720,
+    "pine_logs": {
+      "paths": [
+        "evidence/corpus5-v5-extrema-warmup1000-v1-attempt1-logs.txt",
+        "evidence/corpus5-v5-extrema-warmup1000-v1-attempt1-logs-v1.json",
+        "evidence/corpus5-v5-extrema-warmup1000-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "9971d562338de697f7997a03ebed564f4d1a114588482080542879da3bb621aa",
+    "csv_bytes": 1981406,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "BAR_INDEX",
+      "HIGH1000",
+      "LOW1000",
+      "HIGH10_CONTROL",
+      "LOW10_CONTROL"
+    ],
+    "declared_to_native_header_mapping": {
+      "BAR_INDEX": "BAR_INDEX",
+      "HIGH1000": "HIGH1000",
+      "LOW1000": "LOW1000",
+      "HIGH10_CONTROL": "HIGH10_CONTROL",
+      "LOW10_CONTROL": "LOW10_CONTROL"
+    },
+    "csv_rows": 24587,
+    "historical_rows": 24586,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791084720,
+    "first_historical_values": {
+      "BAR_INDEX": "0",
+      "HIGH1000": "",
+      "LOW1000": "",
+      "HIGH10_CONTROL": "",
+      "LOW10_CONTROL": ""
+    },
+    "last_historical_values": {
+      "BAR_INDEX": "24585",
+      "HIGH1000": "85037.63",
+      "LOW1000": "83888",
+      "HIGH10_CONTROL": "84825.48",
+      "LOW10_CONTROL": "84796.41"
+    }
+  },
+  {
+    "script": "corpus5-v5-sma-zero-v1.pine",
+    "attempt": 1,
+    "source_sha256": "48e898e2b4540054263a88fef9df77e5c67609dc1f81216d31080b5b0461dc65",
+    "indicator_title": "corpus5-v5-sma-zero-v1",
+    "status": "RUNTIME-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": "Error on bar 0: Invalid value of the 'length' argument (0) in the ''sma'' function. It must be > 0.",
+      "line": 3,
+      "column": null,
+      "first_bar_index": 0,
+      "first_bar_time_utc": null,
+      "native": {
+        "ctx": {
+          "op": ">",
+          "code": "RE10001",
+          "argName": "length",
+          "bar_index": 0,
+          "value": 0,
+          "funName": "'sma'"
+        },
+        "error": "Error on bar {bar_index}: Invalid value of the '{argName}' argument ({value}) in the '{funName}' function. It must be {op} 0.",
+        "stack_trace": [
+          {
+            "n": "#main",
+            "p": 3
+          }
+        ],
+        "title": "Runtime error",
+        "showReportItButton": false,
+        "studyAccessBlocked": false,
+        "compiler_markers": [],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,825.48\nH\n84,825.48\nL\n84,825.47\nC\n84,825.48\n0.00 (0.00%)\n84,825.47\nSELL\n0.01\n84,825.48\nBUY\nUSDT\ncorpus5-v5-sma-zero-v1\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n03:33:28 UTC\n99+\nRuntime error: RE10001\nRuntime error: RE10001\nError on bar 0: Invalid value of the 'length' argument (0) in the ''sma'' function. It must be > 0.\nat #main():3\nOpen in editor",
+        "context_substituted_message": "Error on bar 0: Invalid value of the 'length' argument (0) in the ''sma'' function. It must be > 0."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "corpus5-v5-sma-zero-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24287,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24587,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T03:33:25.185Z",
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v5/evidence/corpus5-v5-sma-zero-v1-attempt1-error.png",
+      "captures/v5/evidence/corpus5-v5-sma-zero-v1-attempt1-error.txt",
+      "captures/v5/evidence/corpus5-v5-sma-zero-v1-attempt1-logs.txt",
+      "captures/v5/evidence/corpus5-v5-sma-zero-v1-attempt1-logs-v1.json",
+      "captures/v5/evidence/corpus5-v5-sma-zero-v1-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///265fb540-70df-43d9-9d42-ef2db0053d9a.pine?placement%3Ddialog",
+          "path": "/265fb540-70df-43d9-9d42-ef2db0053d9a.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "error_observed_utc": "2026-10-04T03:33:29.919Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/corpus5-v5-sma-zero-v1-attempt1-logs.txt",
+        "evidence/corpus5-v5-sma-zero-v1-attempt1-logs-v1.json",
+        "evidence/corpus5-v5-sma-zero-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "script": "corpus5-v6-exp-price-overflow-v1.pine",
+    "attempt": 1,
+    "source_sha256": "ab253584ddae18ab3d2c002cf77ef95d3024c2de39ff9a7e211c4c1db30cf894",
+    "indicator_title": "corpus5-v6-exp-price-overflow-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v5/corpus5-v6-exp-price-overflow-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T113354.095.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "corpus5-v6-exp-price-overflow-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24287,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24587,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T03:33:46.970Z",
+    "live_candle_open_utc": "2026-10-04T03:32:00.000Z",
+    "export_utc": "2026-10-04T03:33:54.516Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v5/evidence/corpus5-v6-exp-price-overflow-v1-attempt1-setup.png",
+      "captures/v5/evidence/corpus5-v6-exp-price-overflow-v1-attempt1-export.png",
+      "captures/v5/evidence/corpus5-v6-exp-price-overflow-v1-attempt1-logs.txt",
+      "captures/v5/evidence/corpus5-v6-exp-price-overflow-v1-attempt1-logs-v1.json",
+      "captures/v5/evidence/corpus5-v6-exp-price-overflow-v1-attempt1-logs.png",
+      "captures/v5/evidence/corpus5-v6-exp-price-overflow-v1-attempt1-visual.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   03:32",
+    "historical_compare_before_unix_seconds": 1791084720,
+    "pine_logs": {
+      "paths": [
+        "evidence/corpus5-v6-exp-price-overflow-v1-attempt1-logs.txt",
+        "evidence/corpus5-v6-exp-price-overflow-v1-attempt1-logs-v1.json",
+        "evidence/corpus5-v6-exp-price-overflow-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "be74d6ef11cf90458e42b6d52156cd789d1e2c60c5456148e286ccdad16ad6b6",
+    "csv_bytes": 1604125,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "PRICE_EXP_TARGET",
+      "FINITE_CONTROL",
+      "TARGET_IS_NA"
+    ],
+    "declared_to_native_header_mapping": {
+      "PRICE_EXP_TARGET": "PRICE_EXP_TARGET",
+      "FINITE_CONTROL": "FINITE_CONTROL",
+      "TARGET_IS_NA": "TARGET_IS_NA"
+    },
+    "csv_rows": 24587,
+    "historical_rows": 24586,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791084720,
+    "first_historical_values": {
+      "PRICE_EXP_TARGET": "",
+      "FINITE_CONTROL": "2.718281828459045",
+      "TARGET_IS_NA": "1"
+    },
+    "last_historical_values": {
+      "PRICE_EXP_TARGET": "",
+      "FINITE_CONTROL": "2.718281828459045",
+      "TARGET_IS_NA": "1"
+    }
+  },
+  {
+    "script": "currency-constant-literal-values-v1.pine",
+    "attempt": 1,
+    "source_sha256": "028304f62c24c56df10cbc732d001e3b083fbab67c25af5905b15b1c9e0b4fab",
+    "indicator_title": "V5-CURRENCY-CONSTANT-LITERAL-VALUES-V1",
+    "status": "RUNS",
+    "csv_file": "captures/v5/currency-constant-literal-values-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T113432.805.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V5-CURRENCY-CONSTANT-LITERAL-VALUES-V1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24288,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24588,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T03:34:25.092Z",
+    "live_candle_open_utc": "2026-10-04T03:34:00.000Z",
+    "export_utc": "2026-10-04T03:34:33.267Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v5/evidence/currency-constant-literal-values-v1-attempt1-setup.png",
+      "captures/v5/evidence/currency-constant-literal-values-v1-attempt1-export.png",
+      "captures/v5/evidence/currency-constant-literal-values-v1-attempt1-logs.txt",
+      "captures/v5/evidence/currency-constant-literal-values-v1-attempt1-logs-v1.json",
+      "captures/v5/evidence/currency-constant-literal-values-v1-attempt1-logs.png",
+      "captures/v5/evidence/currency-constant-literal-values-v1-attempt1-visual.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   03:34",
+    "historical_compare_before_unix_seconds": 1791084840,
+    "pine_logs": {
+      "paths": [
+        "evidence/currency-constant-literal-values-v1-attempt1-logs.txt",
+        "evidence/currency-constant-literal-values-v1-attempt1-logs-v1.json",
+        "evidence/currency-constant-literal-values-v1-attempt1-logs.png"
+      ],
+      "entries": 40,
+      "last_message_time_ms": 1788134400000,
+      "last_bar_time_ms": 1788134400000
+    },
+    "csv_sha256": "1ccc719a5108df415a17707c9602fc667944098484fe534a409b05a45794504c",
+    "csv_bytes": 6472965,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "CONTROL_ABC",
+      "CONTROL_AZZ",
+      "CONTROL_ZZZ",
+      "ARS_CODE",
+      "AUD_CODE",
+      "BDT_CODE",
+      "BHD_CODE",
+      "BRL_CODE",
+      "CAD_CODE",
+      "CLP_CODE",
+      "CNY_CODE",
+      "COP_CODE",
+      "CZK_CODE",
+      "DKK_CODE",
+      "EGP_CODE",
+      "ETH_CODE",
+      "GBP_CODE",
+      "HKD_CODE",
+      "HUF_CODE",
+      "IDR_CODE",
+      "ILS_CODE",
+      "INR_CODE",
+      "ISK_CODE",
+      "KES_CODE",
+      "KRW_CODE",
+      "KWD_CODE",
+      "LKR_CODE",
+      "MAD_CODE",
+      "MXN_CODE",
+      "MYR_CODE",
+      "NGN_CODE",
+      "NOK_CODE",
+      "NZD_CODE",
+      "PEN_CODE",
+      "PHP_CODE",
+      "PKR_CODE",
+      "PLN_CODE",
+      "QAR_CODE",
+      "RON_CODE",
+      "RSD_CODE",
+      "RUB_CODE",
+      "SAR_CODE",
+      "SEK_CODE"
+    ],
+    "declared_to_native_header_mapping": {
+      "CONTROL_ABC": "CONTROL_ABC",
+      "CONTROL_AZZ": "CONTROL_AZZ",
+      "CONTROL_ZZZ": "CONTROL_ZZZ",
+      "ARS_CODE": "ARS_CODE",
+      "AUD_CODE": "AUD_CODE",
+      "BDT_CODE": "BDT_CODE",
+      "BHD_CODE": "BHD_CODE",
+      "BRL_CODE": "BRL_CODE",
+      "CAD_CODE": "CAD_CODE",
+      "CLP_CODE": "CLP_CODE",
+      "CNY_CODE": "CNY_CODE",
+      "COP_CODE": "COP_CODE",
+      "CZK_CODE": "CZK_CODE",
+      "DKK_CODE": "DKK_CODE",
+      "EGP_CODE": "EGP_CODE",
+      "ETH_CODE": "ETH_CODE",
+      "GBP_CODE": "GBP_CODE",
+      "HKD_CODE": "HKD_CODE",
+      "HUF_CODE": "HUF_CODE",
+      "IDR_CODE": "IDR_CODE",
+      "ILS_CODE": "ILS_CODE",
+      "INR_CODE": "INR_CODE",
+      "ISK_CODE": "ISK_CODE",
+      "KES_CODE": "KES_CODE",
+      "KRW_CODE": "KRW_CODE",
+      "KWD_CODE": "KWD_CODE",
+      "LKR_CODE": "LKR_CODE",
+      "MAD_CODE": "MAD_CODE",
+      "MXN_CODE": "MXN_CODE",
+      "MYR_CODE": "MYR_CODE",
+      "NGN_CODE": "NGN_CODE",
+      "NOK_CODE": "NOK_CODE",
+      "NZD_CODE": "NZD_CODE",
+      "PEN_CODE": "PEN_CODE",
+      "PHP_CODE": "PHP_CODE",
+      "PKR_CODE": "PKR_CODE",
+      "PLN_CODE": "PLN_CODE",
+      "QAR_CODE": "QAR_CODE",
+      "RON_CODE": "RON_CODE",
+      "RSD_CODE": "RSD_CODE",
+      "RUB_CODE": "RUB_CODE",
+      "SAR_CODE": "SAR_CODE",
+      "SEK_CODE": "SEK_CODE"
+    },
+    "csv_rows": 24588,
+    "historical_rows": 24587,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791084840,
+    "first_historical_values": {
+      "CONTROL_ABC": "28",
+      "CONTROL_AZZ": "675",
+      "CONTROL_ZZZ": "17575",
+      "ARS_CODE": "460",
+      "AUD_CODE": "523",
+      "BDT_CODE": "773",
+      "BHD_CODE": "861",
+      "BRL_CODE": "1129",
+      "CAD_CODE": "1355",
+      "CLP_CODE": "1653",
+      "CNY_CODE": "1714",
+      "COP_CODE": "1731",
+      "CZK_CODE": "2012",
+      "DKK_CODE": "2298",
+      "EGP_CODE": "2875",
+      "ETH_CODE": "3205",
+      "GBP_CODE": "4097",
+      "HKD_CODE": "4995",
+      "HUF_CODE": "5257",
+      "IDR_CODE": "5503",
+      "ILS_CODE": "5712",
+      "INR_CODE": "5763",
+      "ISK_CODE": "5886",
+      "KES_CODE": "6882",
+      "KRW_CODE": "7224",
+      "KWD_CODE": "7335",
+      "LKR_CODE": "7713",
+      "MAD_CODE": "8115",
+      "MXN_CODE": "8723",
+      "MYR_CODE": "8753",
+      "NGN_CODE": "8957",
+      "NOK_CODE": "9162",
+      "NZD_CODE": "9441",
+      "PEN_CODE": "10257",
+      "PHP_CODE": "10337",
+      "PKR_CODE": "10417",
+      "PLN_CODE": "10439",
+      "QAR_CODE": "10833",
+      "RON_CODE": "11869",
+      "RSD_CODE": "11963",
+      "RUB_CODE": "12013",
+      "SAR_CODE": "12185",
+      "SEK_CODE": "12282"
+    },
+    "last_historical_values": {
+      "CONTROL_ABC": "28",
+      "CONTROL_AZZ": "675",
+      "CONTROL_ZZZ": "17575",
+      "ARS_CODE": "460",
+      "AUD_CODE": "523",
+      "BDT_CODE": "773",
+      "BHD_CODE": "861",
+      "BRL_CODE": "1129",
+      "CAD_CODE": "1355",
+      "CLP_CODE": "1653",
+      "CNY_CODE": "1714",
+      "COP_CODE": "1731",
+      "CZK_CODE": "2012",
+      "DKK_CODE": "2298",
+      "EGP_CODE": "2875",
+      "ETH_CODE": "3205",
+      "GBP_CODE": "4097",
+      "HKD_CODE": "4995",
+      "HUF_CODE": "5257",
+      "IDR_CODE": "5503",
+      "ILS_CODE": "5712",
+      "INR_CODE": "5763",
+      "ISK_CODE": "5886",
+      "KES_CODE": "6882",
+      "KRW_CODE": "7224",
+      "KWD_CODE": "7335",
+      "LKR_CODE": "7713",
+      "MAD_CODE": "8115",
+      "MXN_CODE": "8723",
+      "MYR_CODE": "8753",
+      "NGN_CODE": "8957",
+      "NOK_CODE": "9162",
+      "NZD_CODE": "9441",
+      "PEN_CODE": "10257",
+      "PHP_CODE": "10337",
+      "PKR_CODE": "10417",
+      "PLN_CODE": "10439",
+      "QAR_CODE": "10833",
+      "RON_CODE": "11869",
+      "RSD_CODE": "11963",
+      "RUB_CODE": "12013",
+      "SAR_CODE": "12185",
+      "SEK_CODE": "12282"
+    }
+  },
+  {
+    "script": "drawing-coordinate-backquant-float-x-v1.pine",
+    "attempt": 1,
+    "source_sha256": "6a7537b70ad28ad819cc93aa17a6367f6b8f11d79d039f270a70b76ceca6cff0",
+    "indicator_title": "BackQuant coordinate v1",
+    "status": "RUNS",
+    "csv_file": "captures/v5/drawing-coordinate-backquant-float-x-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T113457.010.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "BackQuant coordinate v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24288,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24588,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T03:34:50.445Z",
+    "live_candle_open_utc": "2026-10-04T03:34:00.000Z",
+    "export_utc": "2026-10-04T03:34:57.495Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v5/evidence/drawing-coordinate-backquant-float-x-v1-attempt1-setup.png",
+      "captures/v5/evidence/drawing-coordinate-backquant-float-x-v1-attempt1-export.png",
+      "captures/v5/evidence/drawing-coordinate-backquant-float-x-v1-attempt1-logs.txt",
+      "captures/v5/evidence/drawing-coordinate-backquant-float-x-v1-attempt1-logs-v1.json",
+      "captures/v5/evidence/drawing-coordinate-backquant-float-x-v1-attempt1-logs.png",
+      "captures/v5/evidence/drawing-coordinate-backquant-float-x-v1-attempt1-visual.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   03:34",
+    "historical_compare_before_unix_seconds": 1791084840,
+    "pine_logs": {
+      "paths": [
+        "evidence/drawing-coordinate-backquant-float-x-v1-attempt1-logs.txt",
+        "evidence/drawing-coordinate-backquant-float-x-v1-attempt1-logs-v1.json",
+        "evidence/drawing-coordinate-backquant-float-x-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "25756a90075e3e8dd025463a6af557ef4364697cc89fba5bbb3e944304647f93",
+    "csv_bytes": 1087800,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "declared_to_native_header_mapping": {},
+    "csv_rows": 24588,
+    "historical_rows": 24587,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791084840,
+    "first_historical_values": {},
+    "last_historical_values": {}
+  },
+  {
+    "script": "drawing-coordinate-point-index-active-v5-length50-v1.pine",
+    "attempt": 1,
+    "source_sha256": "ffa5628632bebdaba2a8e5c6eb53cfbdb220fd503e136226cd8757284d744531",
+    "indicator_title": "Point index active input division 50",
+    "status": "RUNS",
+    "csv_file": "captures/v5/drawing-coordinate-point-index-active-v5-length50-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T113522.649.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [
+        {
+          "id": "in_0",
+          "name": "length",
+          "value": 50,
+          "default": 50
+        }
+      ],
+      "observed_indicator_title": "Point index active input division 50",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24288,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24588,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T03:35:15.560Z",
+    "live_candle_open_utc": "2026-10-04T03:34:00.000Z",
+    "export_utc": "2026-10-04T03:35:23.044Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v5/evidence/drawing-coordinate-point-index-active-v5-length50-v1-attempt1-setup.png",
+      "captures/v5/evidence/drawing-coordinate-point-index-active-v5-length50-v1-attempt1-export.png",
+      "captures/v5/evidence/drawing-coordinate-point-index-active-v5-length50-v1-attempt1-logs.txt",
+      "captures/v5/evidence/drawing-coordinate-point-index-active-v5-length50-v1-attempt1-logs-v1.json",
+      "captures/v5/evidence/drawing-coordinate-point-index-active-v5-length50-v1-attempt1-logs.png",
+      "captures/v5/evidence/drawing-coordinate-point-index-active-v5-length50-v1-attempt1-inputs.png",
+      "captures/v5/evidence/drawing-coordinate-point-index-active-v5-length50-v1-attempt1-visual.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///b3449344-2cf5-4d91-9765-8a5651be4386.pine?placement%3Ddialog",
+          "path": "/b3449344-2cf5-4d91-9765-8a5651be4386.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "live_tooltip": "Sun 04 Oct '26   03:34",
+    "historical_compare_before_unix_seconds": 1791084840,
+    "pine_logs": {
+      "paths": [
+        "evidence/drawing-coordinate-point-index-active-v5-length50-v1-attempt1-logs.txt",
+        "evidence/drawing-coordinate-point-index-active-v5-length50-v1-attempt1-logs-v1.json",
+        "evidence/drawing-coordinate-point-index-active-v5-length50-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "0f98268d79e79967d44e2213b5c6f3ab3303a297cd1a9f1a75dc3476d47b01b2",
+    "csv_bytes": 1704982,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "POINT_INDEX",
+      "CHART_INDEX",
+      "INPUT_TIME"
+    ],
+    "declared_to_native_header_mapping": {
+      "POINT_INDEX": "POINT_INDEX",
+      "CHART_INDEX": "CHART_INDEX",
+      "INPUT_TIME": "INPUT_TIME"
+    },
+    "csv_rows": 24588,
+    "historical_rows": 24587,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791084840,
+    "first_historical_values": {
+      "POINT_INDEX": "24",
+      "CHART_INDEX": "0",
+      "INPUT_TIME": "1788134400000"
+    },
+    "last_historical_values": {
+      "POINT_INDEX": "24610",
+      "CHART_INDEX": "24586",
+      "INPUT_TIME": "1791084720000"
+    }
+  },
+  {
+    "script": "drawing-coordinate-point-index-active-v5-length51-v1.pine",
+    "attempt": 1,
+    "source_sha256": "e34138eb126b476e220cdfabe3f1551781d09ac35a99afdc6f7d1a0487d5e0ff",
+    "indicator_title": "Point index active input division 51",
+    "status": "RUNS",
+    "csv_file": "captures/v5/drawing-coordinate-point-index-active-v5-length51-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T113553.335.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [
+        {
+          "id": "in_0",
+          "name": "length",
+          "value": 51,
+          "default": 51
+        }
+      ],
+      "observed_indicator_title": "Point index active input division 51",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24288,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24588,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T03:35:45.929Z",
+    "live_candle_open_utc": "2026-10-04T03:34:00.000Z",
+    "export_utc": "2026-10-04T03:35:53.784Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v5/evidence/drawing-coordinate-point-index-active-v5-length51-v1-attempt1-setup.png",
+      "captures/v5/evidence/drawing-coordinate-point-index-active-v5-length51-v1-attempt1-export.png",
+      "captures/v5/evidence/drawing-coordinate-point-index-active-v5-length51-v1-attempt1-logs.txt",
+      "captures/v5/evidence/drawing-coordinate-point-index-active-v5-length51-v1-attempt1-logs-v1.json",
+      "captures/v5/evidence/drawing-coordinate-point-index-active-v5-length51-v1-attempt1-logs.png",
+      "captures/v5/evidence/drawing-coordinate-point-index-active-v5-length51-v1-attempt1-inputs.png",
+      "captures/v5/evidence/drawing-coordinate-point-index-active-v5-length51-v1-attempt1-visual.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///095da564-a439-46a6-ac3f-0ebd205042d0.pine?placement%3Ddialog",
+          "path": "/095da564-a439-46a6-ac3f-0ebd205042d0.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "live_tooltip": "Sun 04 Oct '26   03:34",
+    "historical_compare_before_unix_seconds": 1791084840,
+    "pine_logs": {
+      "paths": [
+        "evidence/drawing-coordinate-point-index-active-v5-length51-v1-attempt1-logs.txt",
+        "evidence/drawing-coordinate-point-index-active-v5-length51-v1-attempt1-logs-v1.json",
+        "evidence/drawing-coordinate-point-index-active-v5-length51-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "2cfe6f999c250a7430c66aaf88bfd264fa58886a79b8c32d3efd780e9186b0d7",
+    "csv_bytes": 1754161,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "POINT_INDEX",
+      "CHART_INDEX",
+      "INPUT_TIME"
+    ],
+    "declared_to_native_header_mapping": {
+      "POINT_INDEX": "POINT_INDEX",
+      "CHART_INDEX": "CHART_INDEX",
+      "INPUT_TIME": "INPUT_TIME"
+    },
+    "csv_rows": 24588,
+    "historical_rows": 24587,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791084840,
+    "first_historical_values": {
+      "POINT_INDEX": "24.5",
+      "CHART_INDEX": "0",
+      "INPUT_TIME": "1788134400000"
+    },
+    "last_historical_values": {
+      "POINT_INDEX": "24610.5",
+      "CHART_INDEX": "24586",
+      "INPUT_TIME": "1791084720000"
+    }
+  },
+  {
+    "script": "drawing-coordinate-profile-float-right-v1.pine",
+    "attempt": 1,
+    "source_sha256": "26fcaadce0aebc1e20634f983e394bbd48dab6c2857d309dde8eb14a85167518",
+    "indicator_title": "Profile coordinate v1",
+    "status": "RUNS",
+    "csv_file": "captures/v5/drawing-coordinate-profile-float-right-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T113625.579.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [
+        {
+          "id": "in_0",
+          "name": "width",
+          "value": 6,
+          "default": 6
+        }
+      ],
+      "observed_indicator_title": "Profile coordinate v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24289,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24589,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T03:36:18.149Z",
+    "live_candle_open_utc": "2026-10-04T03:36:00.000Z",
+    "export_utc": "2026-10-04T03:36:25.995Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v5/evidence/drawing-coordinate-profile-float-right-v1-attempt1-setup.png",
+      "captures/v5/evidence/drawing-coordinate-profile-float-right-v1-attempt1-export.png",
+      "captures/v5/evidence/drawing-coordinate-profile-float-right-v1-attempt1-logs.txt",
+      "captures/v5/evidence/drawing-coordinate-profile-float-right-v1-attempt1-logs-v1.json",
+      "captures/v5/evidence/drawing-coordinate-profile-float-right-v1-attempt1-logs.png",
+      "captures/v5/evidence/drawing-coordinate-profile-float-right-v1-attempt1-inputs.png",
+      "captures/v5/evidence/drawing-coordinate-profile-float-right-v1-attempt1-visual.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   03:36",
+    "historical_compare_before_unix_seconds": 1791084960,
+    "pine_logs": {
+      "paths": [
+        "evidence/drawing-coordinate-profile-float-right-v1-attempt1-logs.txt",
+        "evidence/drawing-coordinate-profile-float-right-v1-attempt1-logs-v1.json",
+        "evidence/drawing-coordinate-profile-float-right-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "d320f19aeb1dcaf6cb0455db8ee61b86208a36cc0a8da8ca5d5a26012d997178",
+    "csv_bytes": 1087847,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "declared_to_native_header_mapping": {},
+    "csv_rows": 24589,
+    "historical_rows": 24588,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791084960,
+    "first_historical_values": {},
+    "last_historical_values": {}
+  },
+  {
+    "script": "drawing-coordinate-sabres-input-division-v1.pine",
+    "attempt": 1,
+    "source_sha256": "4cfcf8d804c92e16ca4b385f5dd684dafa761a2aeecaa217115da4181d831808",
+    "indicator_title": "Sabres point v1",
+    "status": "RUNS",
+    "csv_file": "captures/v5/drawing-coordinate-sabres-input-division-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T113658.796.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [
+        {
+          "id": "in_0",
+          "name": "length",
+          "value": 50,
+          "default": 50
+        }
+      ],
+      "observed_indicator_title": "Sabres point v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24289,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24589,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T03:36:50.988Z",
+    "live_candle_open_utc": "2026-10-04T03:36:00.000Z",
+    "export_utc": "2026-10-04T03:36:59.412Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v5/evidence/drawing-coordinate-sabres-input-division-v1-attempt1-setup.png",
+      "captures/v5/evidence/drawing-coordinate-sabres-input-division-v1-attempt1-export.png",
+      "captures/v5/evidence/drawing-coordinate-sabres-input-division-v1-attempt1-logs.txt",
+      "captures/v5/evidence/drawing-coordinate-sabres-input-division-v1-attempt1-logs-v1.json",
+      "captures/v5/evidence/drawing-coordinate-sabres-input-division-v1-attempt1-logs.png",
+      "captures/v5/evidence/drawing-coordinate-sabres-input-division-v1-attempt1-inputs.png",
+      "captures/v5/evidence/drawing-coordinate-sabres-input-division-v1-attempt1-visual.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///70f0e7ce-da21-4121-b9fe-3a4825caa02d.pine?placement%3Ddialog",
+          "path": "/70f0e7ce-da21-4121-b9fe-3a4825caa02d.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "live_tooltip": "Sun 04 Oct '26   03:36",
+    "historical_compare_before_unix_seconds": 1791084960,
+    "pine_logs": {
+      "paths": [
+        "evidence/drawing-coordinate-sabres-input-division-v1-attempt1-logs.txt",
+        "evidence/drawing-coordinate-sabres-input-division-v1-attempt1-logs-v1.json",
+        "evidence/drawing-coordinate-sabres-input-division-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "c06fabf1071dcd05398071c6d1a1b1a59442c48cd0f2def2e92d1003acbf1445",
+    "csv_bytes": 1294593,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "Plot"
+    ],
+    "declared_to_native_header_mapping": {},
+    "csv_rows": 24589,
+    "historical_rows": 24588,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791084960,
+    "first_historical_values": {},
+    "last_historical_values": {}
+  },
+  {
+    "script": "drawing-default-blue-v5-v2.pine",
+    "attempt": 1,
+    "source_sha256": "b4bc6878af440096452e0a6576c9ff2d001af0a5054c71de75e76fa07d8c57c1",
+    "indicator_title": "Drawing default blue v5 v2",
+    "status": "RUNS",
+    "csv_file": "captures/v5/drawing-default-blue-v5-v2-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T113742.368.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "Drawing default blue v5 v2",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24289,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24589,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T03:37:34.409Z",
+    "live_candle_open_utc": "2026-10-04T03:36:00.000Z",
+    "export_utc": "2026-10-04T03:37:42.762Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v5/evidence/drawing-default-blue-v5-v2-attempt1-setup.png",
+      "captures/v5/evidence/drawing-default-blue-v5-v2-attempt1-export.png",
+      "captures/v5/evidence/drawing-default-blue-v5-v2-attempt1-logs.txt",
+      "captures/v5/evidence/drawing-default-blue-v5-v2-attempt1-logs-v1.json",
+      "captures/v5/evidence/drawing-default-blue-v5-v2-attempt1-logs.png",
+      "captures/v5/evidence/drawing-default-blue-v5-v2-attempt1-visual.png",
+      "captures/v5/evidence/drawing-default-blue-v5-v2-attempt1-colors-v1.json",
+      "captures/v5/evidence/drawing-default-blue-v5-v2-attempt1-grid-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///2ca22330-1286-48e8-b2d4-5dacffb928c7.pine?placement%3Ddialog",
+          "path": "/2ca22330-1286-48e8-b2d4-5dacffb928c7.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "live_tooltip": "Sun 04 Oct '26   03:36",
+    "historical_compare_before_unix_seconds": 1791084960,
+    "pine_logs": {
+      "paths": [
+        "evidence/drawing-default-blue-v5-v2-attempt1-logs.txt",
+        "evidence/drawing-default-blue-v5-v2-attempt1-logs-v1.json",
+        "evidence/drawing-default-blue-v5-v2-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "a35accfe77dac443c1e4872d182522fc0fdaf2865b15f3203d820061f28a28a7",
+    "csv_bytes": 1294596,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "OUTCOME"
+    ],
+    "declared_to_native_header_mapping": {
+      "OUTCOME": "OUTCOME"
+    },
+    "csv_rows": 24589,
+    "historical_rows": 24588,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791084960,
+    "first_historical_values": {
+      "OUTCOME": "77674.04"
+    },
+    "last_historical_values": {
+      "OUTCOME": "84835.01"
+    },
+    "visual_witness": "captures/v5/evidence/drawing-default-blue-v5-v2-attempt1-colors-v1.json"
+  },
+  {
+    "script": "drawing-default-blue-v6-v2.pine",
+    "attempt": 1,
+    "source_sha256": "eabb8499d58e33aa4f2d0f7158cb8d125fb30ca503a880555f927ec0cd3cbb27",
+    "indicator_title": "Drawing default blue v6 v2",
+    "status": "RUNS",
+    "csv_file": "captures/v5/drawing-default-blue-v6-v2-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T113814.219.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "Drawing default blue v6 v2",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24290,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24590,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T03:38:06.999Z",
+    "live_candle_open_utc": "2026-10-04T03:38:00.000Z",
+    "export_utc": "2026-10-04T03:38:14.614Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v5/evidence/drawing-default-blue-v6-v2-attempt1-setup.png",
+      "captures/v5/evidence/drawing-default-blue-v6-v2-attempt1-export.png",
+      "captures/v5/evidence/drawing-default-blue-v6-v2-attempt1-logs.txt",
+      "captures/v5/evidence/drawing-default-blue-v6-v2-attempt1-logs-v1.json",
+      "captures/v5/evidence/drawing-default-blue-v6-v2-attempt1-logs.png",
+      "captures/v5/evidence/drawing-default-blue-v6-v2-attempt1-visual.png",
+      "captures/v5/evidence/drawing-default-blue-v6-v2-attempt1-colors-v1.json",
+      "captures/v5/evidence/drawing-default-blue-v6-v2-attempt1-grid-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   03:38",
+    "historical_compare_before_unix_seconds": 1791085080,
+    "pine_logs": {
+      "paths": [
+        "evidence/drawing-default-blue-v6-v2-attempt1-logs.txt",
+        "evidence/drawing-default-blue-v6-v2-attempt1-logs-v1.json",
+        "evidence/drawing-default-blue-v6-v2-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "d7455a81307e97aa37c99e42a51b89fca411ca05977f3f1e1b3941b748f32038",
+    "csv_bytes": 1294652,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "OUTCOME"
+    ],
+    "declared_to_native_header_mapping": {
+      "OUTCOME": "OUTCOME"
+    },
+    "csv_rows": 24590,
+    "historical_rows": 24589,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791085080,
+    "first_historical_values": {
+      "OUTCOME": "77674.04"
+    },
+    "last_historical_values": {
+      "OUTCOME": "84846.63"
+    },
+    "visual_witness": "captures/v5/evidence/drawing-default-blue-v6-v2-attempt1-colors-v1.json"
+  },
+  {
+    "script": "drawing-future-index-first-last-v1.pine",
+    "attempt": 1,
+    "source_sha256": "c63b8704de16e05496a105a47039335eafb836e9ce63dd4d2bc09563c664dde3",
+    "indicator_title": "V5 drawing future index first-last",
+    "status": "RUNTIME-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": "Error on bar 0: Objects positioned using xloc.bar_index cannot be drawn further than 500 bars into the future.",
+      "line": 4,
+      "column": null,
+      "first_bar_index": 0,
+      "first_bar_time_utc": null,
+      "native": {
+        "ctx": {
+          "bar_index": 0,
+          "maxOffsetInFutureForDrawings": 500,
+          "code": "RE10020"
+        },
+        "error": "Error on bar {bar_index}: Objects positioned using xloc.bar_index cannot be drawn further than {maxOffsetInFutureForDrawings} bars into the future.",
+        "stack_trace": [
+          {
+            "n": "#main",
+            "p": 4
+          }
+        ],
+        "title": "Runtime error",
+        "showReportItButton": false,
+        "studyAccessBlocked": false,
+        "compiler_markers": [],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,846.63\nH\n84,848.00\nL\n84,846.62\nC\n84,848.00\n+1.37 (+0.00%)\n84,847.99\nSELL\n0.01\n84,848.00\nBUY\nUSDT\nV5 drawing future index first-last\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n03:38:58 UTC\n99+\nRuntime error: RE10020\nRuntime error: RE10020\nError on bar 0: Objects positioned using xloc.bar_index cannot be drawn further than 500 bars into the future.\nat #main():4\nOpen in editor",
+        "context_substituted_message": "Error on bar 0: Objects positioned using xloc.bar_index cannot be drawn further than 500 bars into the future."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V5 drawing future index first-last",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24290,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24590,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T03:38:55.495Z",
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v5/evidence/drawing-future-index-first-last-v1-attempt1-error.png",
+      "captures/v5/evidence/drawing-future-index-first-last-v1-attempt1-error.txt",
+      "captures/v5/evidence/drawing-future-index-first-last-v1-attempt1-logs.txt",
+      "captures/v5/evidence/drawing-future-index-first-last-v1-attempt1-logs-v1.json",
+      "captures/v5/evidence/drawing-future-index-first-last-v1-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [],
+    "error_observed_utc": "2026-10-04T03:39:00.709Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/drawing-future-index-first-last-v1-attempt1-logs.txt",
+        "evidence/drawing-future-index-first-last-v1-attempt1-logs-v1.json",
+        "evidence/drawing-future-index-first-last-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "script": "drawing-future-index-first-local-v1.pine",
+    "attempt": 1,
+    "source_sha256": "3a4c0743e976160a9b6e352feea6522a5d33a5d44ff72f88dc4e531626e20825",
+    "indicator_title": "V5 drawing future index first-local",
+    "status": "RUNS",
+    "csv_file": "captures/v5/drawing-future-index-first-local-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T113927.088.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V5 drawing future index first-local",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24290,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24590,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T03:39:18.074Z",
+    "live_candle_open_utc": "2026-10-04T03:38:00.000Z",
+    "export_utc": "2026-10-04T03:39:27.358Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v5/evidence/drawing-future-index-first-local-v1-attempt1-setup.png",
+      "captures/v5/evidence/drawing-future-index-first-local-v1-attempt1-export.png",
+      "captures/v5/evidence/drawing-future-index-first-local-v1-attempt1-logs.txt",
+      "captures/v5/evidence/drawing-future-index-first-local-v1-attempt1-logs-v1.json",
+      "captures/v5/evidence/drawing-future-index-first-local-v1-attempt1-logs.png",
+      "captures/v5/evidence/drawing-future-index-first-local-v1-attempt1-visual.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   03:38",
+    "historical_compare_before_unix_seconds": 1791085080,
+    "pine_logs": {
+      "paths": [
+        "evidence/drawing-future-index-first-local-v1-attempt1-logs.txt",
+        "evidence/drawing-future-index-first-local-v1-attempt1-logs-v1.json",
+        "evidence/drawing-future-index-first-local-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "a5af5039be806b0148c78d4624e086e4fff7ee86814973e06829ffacf800b2fe",
+    "csv_bytes": 1421077,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "BAR_INDEX",
+      "LAST_BAR_INDEX",
+      "OUTCOME"
+    ],
+    "declared_to_native_header_mapping": {
+      "BAR_INDEX": "BAR_INDEX",
+      "LAST_BAR_INDEX": "LAST_BAR_INDEX",
+      "OUTCOME": "OUTCOME"
+    },
+    "csv_rows": 24590,
+    "historical_rows": 24589,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791085080,
+    "first_historical_values": {
+      "BAR_INDEX": "0",
+      "LAST_BAR_INDEX": "24589",
+      "OUTCOME": "1"
+    },
+    "last_historical_values": {
+      "BAR_INDEX": "24588",
+      "LAST_BAR_INDEX": "24589",
+      "OUTCOME": "1"
+    }
+  },
+  {
+    "script": "drawing-method-distinct-v5-control-v1.pine",
+    "attempt": 1,
+    "source_sha256": "db1fc63dee03de48f6b3e6a17a6053fa89182fa02a2a6dfcc8f99f3972b98c34",
+    "indicator_title": "Distinct user method overload control",
+    "status": "RUNS",
+    "csv_file": "captures/v5/drawing-method-distinct-v5-control-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T113955.732.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "Distinct user method overload control",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24290,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24590,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T03:39:47.519Z",
+    "live_candle_open_utc": "2026-10-04T03:38:00.000Z",
+    "export_utc": "2026-10-04T03:39:56.189Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v5/evidence/drawing-method-distinct-v5-control-v1-attempt1-setup.png",
+      "captures/v5/evidence/drawing-method-distinct-v5-control-v1-attempt1-export.png",
+      "captures/v5/evidence/drawing-method-distinct-v5-control-v1-attempt1-logs.txt",
+      "captures/v5/evidence/drawing-method-distinct-v5-control-v1-attempt1-logs-v1.json",
+      "captures/v5/evidence/drawing-method-distinct-v5-control-v1-attempt1-logs.png",
+      "captures/v5/evidence/drawing-method-distinct-v5-control-v1-attempt1-visual.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///9b032fba-e71a-4459-9af0-192a22595937.pine?placement%3Ddialog",
+          "path": "/9b032fba-e71a-4459-9af0-192a22595937.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "live_tooltip": "Sun 04 Oct '26   03:38",
+    "historical_compare_before_unix_seconds": 1791085080,
+    "pine_logs": {
+      "paths": [
+        "evidence/drawing-method-distinct-v5-control-v1-attempt1-logs.txt",
+        "evidence/drawing-method-distinct-v5-control-v1-attempt1-logs-v1.json",
+        "evidence/drawing-method-distinct-v5-control-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "dbb780be2b9d88c2e7c9051d1c30863fec907208af1e4370ef548d26d798ca14",
+    "csv_bytes": 1579732,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "ZERO_ARGUMENT",
+      "ONE_ARGUMENT",
+      "INPUT_TIME"
+    ],
+    "declared_to_native_header_mapping": {
+      "ZERO_ARGUMENT": "ZERO_ARGUMENT",
+      "ONE_ARGUMENT": "ONE_ARGUMENT",
+      "INPUT_TIME": "INPUT_TIME"
+    },
+    "csv_rows": 24590,
+    "historical_rows": 24589,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791085080,
+    "first_historical_values": {
+      "ZERO_ARGUMENT": "10",
+      "ONE_ARGUMENT": "12",
+      "INPUT_TIME": "1788134400000"
+    },
+    "last_historical_values": {
+      "ZERO_ARGUMENT": "10",
+      "ONE_ARGUMENT": "12",
+      "INPUT_TIME": "1791084960000"
+    }
+  },
+  {
+    "script": "drawing-method-identical-v5-invoked-v1.pine",
+    "attempt": 1,
+    "source_sha256": "d4ecb67b99abd0fcc859f3b5133f2ef6f33e7755f827bd08fcbda8f9f55a21cd",
+    "indicator_title": "Identical user method invocation probe",
+    "status": "COMPILE-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": "The 'shift' function has overloads with the same parameters. The type of parameters must be different in overloaded versions of functions.",
+      "line": 6,
+      "column": 13,
+      "first_bar_index": null,
+      "first_bar_time_utc": null,
+      "native": {
+        "error": "The 'shift' function has overloads with the same parameters. The type of parameters must be different in overloaded versions of functions.",
+        "editorError": {
+          "end": {
+            "column": 21,
+            "line": 6
+          },
+          "message": "The 'shift' function has overloads with the same parameters. The type of parameters must be different in overloaded versions of functions.",
+          "start": {
+            "column": 13,
+            "line": 6
+          },
+          "id": "USER;b067f6b7448e4ddcacdd613783e979ef"
+        },
+        "title": "Compilation error",
+        "compiler_markers": [
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///2cb5ad36-19e7-4881-9af2-93c24d7ba110.pine?placement%3Ddialog",
+              "path": "/2cb5ad36-19e7-4881-9af2-93c24d7ba110.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "code": "PINE_VERSION_OUTDATED",
+            "severity": 4,
+            "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+            "startLineNumber": 1,
+            "startColumn": 3,
+            "endLineNumber": 1,
+            "endColumn": 12
+          },
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///2cb5ad36-19e7-4881-9af2-93c24d7ba110.pine?placement%3Ddialog",
+              "path": "/2cb5ad36-19e7-4881-9af2-93c24d7ba110.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "severity": 8,
+            "message": "The 'shift' function has overloads with the same parameters. The type of parameters must be different in overloaded versions of functions.",
+            "startLineNumber": 6,
+            "startColumn": 13,
+            "endLineNumber": 6,
+            "endColumn": 22
+          }
+        ],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,850.88\nH\n84,850.88\nL\n84,850.87\nC\n84,850.88\n0.00 (0.00%)\n84,850.87\nSELL\n0.01\n84,850.88\nBUY\nUSDT\ndrawing-method-identical-v5-invoked-v1.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n03:40:12 UTC\n99+\nPine Editor\ndrawing-method-identical-v5-invoked-v1.pine\nPublish script\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n//@version=5\nindicator(\"Identical\u00a0user\u00a0method\u00a0invocation\u00a0probe\")\ntype\u00a0Point\n\u00a0\u00a0\u00a0\u00a0float\u00a0x\nmethod\u00a0shift(Point\u00a0p)\u00a0=>\u00a0p.x\nmethod\u00a0shift(Point\u00a0p)\u00a0=>\u00a0p.x\u00a0+\u00a01\np\u00a0=\u00a0Point.new(10)\nplot(p.shift(),\u00a0title=\"SELECTED_BODY\")\nplot(time,\u00a0title=\"INPUT_TIME\")\n1 of 2 problems\nThe 'shift' function has overloads with the same parameters. The type of parameters must be different in overloaded versions of functions.\n1 \u2219 Today, 11:40\nLine 6, Col 13\nPine Script\u00ae v5\nCompilation error\n\nThe 'shift' function has overloads with the same parameters. The type of parameters must be different in overloaded versions of functions.\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+        "context_substituted_message": "The 'shift' function has overloads with the same parameters. The type of parameters must be different in overloaded versions of functions."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "drawing-method-identical-v5-invoked-v1.pine",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24290,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24591,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v5/evidence/drawing-method-identical-v5-invoked-v1-attempt1-error.png",
+      "captures/v5/evidence/drawing-method-identical-v5-invoked-v1-attempt1-error.txt",
+      "captures/v5/evidence/drawing-method-identical-v5-invoked-v1-attempt1-logs.txt",
+      "captures/v5/evidence/drawing-method-identical-v5-invoked-v1-attempt1-logs-v1.json",
+      "captures/v5/evidence/drawing-method-identical-v5-invoked-v1-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///2cb5ad36-19e7-4881-9af2-93c24d7ba110.pine?placement%3Ddialog",
+          "path": "/2cb5ad36-19e7-4881-9af2-93c24d7ba110.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      },
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///2cb5ad36-19e7-4881-9af2-93c24d7ba110.pine?placement%3Ddialog",
+          "path": "/2cb5ad36-19e7-4881-9af2-93c24d7ba110.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "severity": 8,
+        "message": "The 'shift' function has overloads with the same parameters. The type of parameters must be different in overloaded versions of functions.",
+        "startLineNumber": 6,
+        "startColumn": 13,
+        "endLineNumber": 6,
+        "endColumn": 22
+      }
+    ],
+    "error_observed_utc": "2026-10-04T03:40:14.036Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/drawing-method-identical-v5-invoked-v1-attempt1-logs.txt",
+        "evidence/drawing-method-identical-v5-invoked-v1-attempt1-logs-v1.json",
+        "evidence/drawing-method-identical-v5-invoked-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "script": "drawing-method-identical-v56-1376-exact-v1.pine",
+    "attempt": 1,
+    "source_sha256": "7ba22e4d2286acb6d0c7a51ca15c0b0c94d0549f4c9977634bcfc31e48c04937",
+    "indicator_title": "Unsupported duplicate user method",
+    "status": "COMPILE-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": "The 'shift' function has overloads with the same parameters. The type of parameters must be different in overloaded versions of functions.",
+      "line": 7,
+      "column": 13,
+      "first_bar_index": null,
+      "first_bar_time_utc": null,
+      "native": {
+        "error": "The 'shift' function has overloads with the same parameters. The type of parameters must be different in overloaded versions of functions.",
+        "editorError": {
+          "end": {
+            "column": 21,
+            "line": 7
+          },
+          "message": "The 'shift' function has overloads with the same parameters. The type of parameters must be different in overloaded versions of functions.",
+          "start": {
+            "column": 13,
+            "line": 7
+          },
+          "id": "USER;546b7fc22bc7468a895ec38e5d3d342c"
+        },
+        "title": "Compilation error",
+        "compiler_markers": [
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///59474811-b22d-4dc1-a210-816b1f5db926.pine?placement%3Ddialog",
+              "path": "/59474811-b22d-4dc1-a210-816b1f5db926.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "code": "PINE_VERSION_OUTDATED",
+            "severity": 4,
+            "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+            "startLineNumber": 1,
+            "startColumn": 3,
+            "endLineNumber": 1,
+            "endColumn": 12
+          },
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///59474811-b22d-4dc1-a210-816b1f5db926.pine?placement%3Ddialog",
+              "path": "/59474811-b22d-4dc1-a210-816b1f5db926.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "severity": 8,
+            "message": "The 'shift' function has overloads with the same parameters. The type of parameters must be different in overloaded versions of functions.",
+            "startLineNumber": 7,
+            "startColumn": 13,
+            "endLineNumber": 7,
+            "endColumn": 22
+          }
+        ],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,850.88\nH\n84,859.36\nL\n84,850.87\nC\n84,859.36\n+8.48 (+0.01%)\n84,859.35\nSELL\n0.01\n84,859.36\nBUY\nUSDT\ndrawing-method-identical-v56-1376-exact-v1.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n03:40:27 UTC\n99+\nPine Editor\ndrawing-method-identical-v56-1376-exact-v1.pine\nPublish script\n1\n2\n3\n4\n5\n6\n7\n8\n9\n//@version=5\nindicator(\"Unsupported\u00a0duplicate\u00a0user\u00a0method\")\ntype\u00a0Point\n\u00a0\u00a0\u00a0\u00a0float\u00a0x\nmethod\u00a0shift(Point\u00a0p)\u00a0=>\u00a0p.x\nmethod\u00a0shift(Point\u00a0p)\u00a0=>\u00a0p.x\u00a0+\u00a01\nplot(close)\n2 of 2 problems\nVersion 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.(PINE_VERSION_OUTDATED)\n1 \u2219 Today, 11:40\nLine 1, Col 3\nPine Script\u00ae v5\nCompilation error\n\nThe 'shift' function has overloads with the same parameters. The type of parameters must be different in overloaded versions of functions.\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+        "context_substituted_message": "The 'shift' function has overloads with the same parameters. The type of parameters must be different in overloaded versions of functions."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "drawing-method-identical-v56-1376-exact-v1.pine",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24290,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24591,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v5/evidence/drawing-method-identical-v56-1376-exact-v1-attempt1-error.png",
+      "captures/v5/evidence/drawing-method-identical-v56-1376-exact-v1-attempt1-error.txt",
+      "captures/v5/evidence/drawing-method-identical-v56-1376-exact-v1-attempt1-logs.txt",
+      "captures/v5/evidence/drawing-method-identical-v56-1376-exact-v1-attempt1-logs-v1.json",
+      "captures/v5/evidence/drawing-method-identical-v56-1376-exact-v1-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///59474811-b22d-4dc1-a210-816b1f5db926.pine?placement%3Ddialog",
+          "path": "/59474811-b22d-4dc1-a210-816b1f5db926.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      },
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///59474811-b22d-4dc1-a210-816b1f5db926.pine?placement%3Ddialog",
+          "path": "/59474811-b22d-4dc1-a210-816b1f5db926.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "severity": 8,
+        "message": "The 'shift' function has overloads with the same parameters. The type of parameters must be different in overloaded versions of functions.",
+        "startLineNumber": 7,
+        "startColumn": 13,
+        "endLineNumber": 7,
+        "endColumn": 22
+      }
+    ],
+    "error_observed_utc": "2026-10-04T03:40:29.166Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/drawing-method-identical-v56-1376-exact-v1-attempt1-logs.txt",
+        "evidence/drawing-method-identical-v56-1376-exact-v1-attempt1-logs-v1.json",
+        "evidence/drawing-method-identical-v56-1376-exact-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "script": "float-equality-nonzero-discriminator-v3.pine",
+    "attempt": 1,
+    "source_sha256": "9780d704a83e9ecf4b80724b5cc63ae49054fcec68b05949e971f86145bb09f3",
+    "indicator_title": "V5-FLOAT-EQUALITY-NONZERO-DISCRIMINATOR-V3",
+    "status": "RUNS",
+    "csv_file": "captures/v5/float-equality-nonzero-discriminator-v3-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T114051.833.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V5-FLOAT-EQUALITY-NONZERO-DISCRIMINATOR-V3",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24291,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24591,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T03:40:44.254Z",
+    "live_candle_open_utc": "2026-10-04T03:40:00.000Z",
+    "export_utc": "2026-10-04T03:40:52.121Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v5/evidence/float-equality-nonzero-discriminator-v3-attempt1-setup.png",
+      "captures/v5/evidence/float-equality-nonzero-discriminator-v3-attempt1-export.png",
+      "captures/v5/evidence/float-equality-nonzero-discriminator-v3-attempt1-logs.txt",
+      "captures/v5/evidence/float-equality-nonzero-discriminator-v3-attempt1-logs-v1.json",
+      "captures/v5/evidence/float-equality-nonzero-discriminator-v3-attempt1-logs.png",
+      "captures/v5/evidence/float-equality-nonzero-discriminator-v3-attempt1-visual.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   03:40",
+    "historical_compare_before_unix_seconds": 1791085200,
+    "pine_logs": {
+      "paths": [
+        "evidence/float-equality-nonzero-discriminator-v3-attempt1-logs.txt",
+        "evidence/float-equality-nonzero-discriminator-v3-attempt1-logs-v1.json",
+        "evidence/float-equality-nonzero-discriminator-v3-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "fa30b91c525f86a74a756f32449bf0549dceb0637daaca2353110068a48a774a",
+    "csv_bytes": 3191359,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "PHASE",
+      "EQ",
+      "NE",
+      "LT",
+      "LE",
+      "GT",
+      "GE",
+      "ABS_DIFF_SCALED",
+      "input_time",
+      "input_bar_index",
+      "input_close",
+      "x_scaled_1e10",
+      "x_eq_zero",
+      "x_neq_zero",
+      "zero_eq_x",
+      "zero_neq_x",
+      "normalized_scaled_1e10",
+      "normalized_eq_zero",
+      "normalized_neq_zero",
+      "literal_eq_zero",
+      "literal_neq_zero",
+      "x_na"
+    ],
+    "declared_to_native_header_mapping": {
+      "PHASE": "PHASE",
+      "EQ": "EQ",
+      "NE": "NE",
+      "LT": "LT",
+      "LE": "LE",
+      "GT": "GT",
+      "GE": "GE",
+      "ABS_DIFF_SCALED": "ABS_DIFF_SCALED",
+      "input_time": "input_time",
+      "input_bar_index": "input_bar_index",
+      "input_close": "input_close",
+      "x_scaled_1e10": "x_scaled_1e10",
+      "x_eq_zero": "x_eq_zero",
+      "x_neq_zero": "x_neq_zero",
+      "zero_eq_x": "zero_eq_x",
+      "zero_neq_x": "zero_neq_x",
+      "normalized_scaled_1e10": "normalized_scaled_1e10",
+      "normalized_eq_zero": "normalized_eq_zero",
+      "normalized_neq_zero": "normalized_neq_zero",
+      "literal_eq_zero": "literal_eq_zero",
+      "literal_neq_zero": "literal_neq_zero",
+      "x_na": "x_na"
+    },
+    "csv_rows": 24591,
+    "historical_rows": 24590,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791085200,
+    "first_historical_values": {
+      "PHASE": "0",
+      "EQ": "1",
+      "NE": "0",
+      "LT": "0",
+      "LE": "1",
+      "GT": "0",
+      "GE": "1",
+      "ABS_DIFF_SCALED": "90",
+      "input_time": "1788134400000",
+      "input_bar_index": "0",
+      "input_close": "77674.04",
+      "x_scaled_1e10": "155348.08000000002",
+      "x_eq_zero": "0",
+      "x_neq_zero": "1",
+      "zero_eq_x": "0",
+      "zero_neq_x": "1",
+      "normalized_scaled_1e10": "2",
+      "normalized_eq_zero": "0",
+      "normalized_neq_zero": "1",
+      "literal_eq_zero": "0",
+      "literal_neq_zero": "1",
+      "x_na": "0"
+    },
+    "last_historical_values": {
+      "PHASE": "13",
+      "EQ": "0",
+      "NE": "1",
+      "LT": "0",
+      "LE": "0",
+      "GT": "1",
+      "GE": "1",
+      "ABS_DIFF_SCALED": "200",
+      "input_time": "1791085080000",
+      "input_bar_index": "24589",
+      "input_close": "84850.88",
+      "x_scaled_1e10": "169701.76",
+      "x_eq_zero": "0",
+      "x_neq_zero": "1",
+      "zero_eq_x": "0",
+      "zero_neq_x": "1",
+      "normalized_scaled_1e10": "2",
+      "normalized_eq_zero": "0",
+      "normalized_neq_zero": "1",
+      "literal_eq_zero": "0",
+      "literal_neq_zero": "1",
+      "x_na": "0"
+    }
+  },
+  {
+    "script": "fractional-int-division-const-control-v1.pine",
+    "attempt": 1,
+    "source_sha256": "b11eaa62dcf9da3d2b150ac5f9b45d1c467d882d59454dbd1b6ceafdd29a394d",
+    "indicator_title": "V5-FRACTIONAL-INT-DIVISION-CONST-CONTROL-V1",
+    "status": "RUNS",
+    "csv_file": "captures/v5/fractional-int-division-const-control-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T114129.665.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V5-FRACTIONAL-INT-DIVISION-CONST-CONTROL-V1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24291,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24591,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T03:41:22.194Z",
+    "live_candle_open_utc": "2026-10-04T03:40:00.000Z",
+    "export_utc": "2026-10-04T03:41:30.058Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v5/evidence/fractional-int-division-const-control-v1-attempt1-setup.png",
+      "captures/v5/evidence/fractional-int-division-const-control-v1-attempt1-export.png",
+      "captures/v5/evidence/fractional-int-division-const-control-v1-attempt1-logs.txt",
+      "captures/v5/evidence/fractional-int-division-const-control-v1-attempt1-logs-v1.json",
+      "captures/v5/evidence/fractional-int-division-const-control-v1-attempt1-logs.png",
+      "captures/v5/evidence/fractional-int-division-const-control-v1-attempt1-visual.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   03:40",
+    "historical_compare_before_unix_seconds": 1791085200,
+    "pine_logs": {
+      "paths": [
+        "evidence/fractional-int-division-const-control-v1-attempt1-logs.txt",
+        "evidence/fractional-int-division-const-control-v1-attempt1-logs-v1.json",
+        "evidence/fractional-int-division-const-control-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "f5d2add55b5e83675034ebf28eaacf026ba896f360e6a0f11547a1160cd8665e",
+    "csv_bytes": 1727344,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "INPUT_TIME",
+      "NUMERATOR",
+      "RAW",
+      "ASSIGNED",
+      "RESIDUAL"
+    ],
+    "declared_to_native_header_mapping": {
+      "INPUT_TIME": "INPUT_TIME",
+      "NUMERATOR": "NUMERATOR",
+      "RAW": "RAW",
+      "ASSIGNED": "ASSIGNED",
+      "RESIDUAL": "RESIDUAL"
+    },
+    "csv_rows": 24591,
+    "historical_rows": 24590,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791085200,
+    "first_historical_values": {
+      "INPUT_TIME": "1788134400000",
+      "NUMERATOR": "5",
+      "RAW": "2.5",
+      "ASSIGNED": "2.5",
+      "RESIDUAL": "0"
+    },
+    "last_historical_values": {
+      "INPUT_TIME": "1791085080000",
+      "NUMERATOR": "5",
+      "RAW": "2.5",
+      "ASSIGNED": "2.5",
+      "RESIDUAL": "0"
+    }
+  },
+  {
+    "script": "fractional-int-division-explicit-cast-control-v1.pine",
+    "attempt": 1,
+    "source_sha256": "607325515ca02368831d1ee51c28b00af77c4ef58703deb45f7da0078184b65b",
+    "indicator_title": "V5-FRACTIONAL-INT-DIVISION-EXPLICIT-CAST-CONTROL-V1",
+    "status": "RUNS",
+    "csv_file": "captures/v5/fractional-int-division-explicit-cast-control-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T114156.852.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V5-FRACTIONAL-INT-DIVISION-EXPLICIT-CAST-CONTROL-V1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24291,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24591,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T03:41:49.359Z",
+    "live_candle_open_utc": "2026-10-04T03:40:00.000Z",
+    "export_utc": "2026-10-04T03:41:57.396Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v5/evidence/fractional-int-division-explicit-cast-control-v1-attempt1-setup.png",
+      "captures/v5/evidence/fractional-int-division-explicit-cast-control-v1-attempt1-export.png",
+      "captures/v5/evidence/fractional-int-division-explicit-cast-control-v1-attempt1-logs.txt",
+      "captures/v5/evidence/fractional-int-division-explicit-cast-control-v1-attempt1-logs-v1.json",
+      "captures/v5/evidence/fractional-int-division-explicit-cast-control-v1-attempt1-logs.png",
+      "captures/v5/evidence/fractional-int-division-explicit-cast-control-v1-attempt1-visual.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   03:40",
+    "historical_compare_before_unix_seconds": 1791085200,
+    "pine_logs": {
+      "paths": [
+        "evidence/fractional-int-division-explicit-cast-control-v1-attempt1-logs.txt",
+        "evidence/fractional-int-division-explicit-cast-control-v1-attempt1-logs-v1.json",
+        "evidence/fractional-int-division-explicit-cast-control-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "53c7a3e493e5223a9854dbe31f6fd8a4f5c59ca133270147d946d30c0b4d772c",
+    "csv_bytes": 1751935,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "INPUT_TIME",
+      "NUMERATOR",
+      "RAW",
+      "ASSIGNED",
+      "RESIDUAL"
+    ],
+    "declared_to_native_header_mapping": {
+      "INPUT_TIME": "INPUT_TIME",
+      "NUMERATOR": "NUMERATOR",
+      "RAW": "RAW",
+      "ASSIGNED": "ASSIGNED",
+      "RESIDUAL": "RESIDUAL"
+    },
+    "csv_rows": 24591,
+    "historical_rows": 24590,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791085200,
+    "first_historical_values": {
+      "INPUT_TIME": "1788134400000",
+      "NUMERATOR": "-5",
+      "RAW": "-2.5",
+      "ASSIGNED": "-2",
+      "RESIDUAL": "1"
+    },
+    "last_historical_values": {
+      "INPUT_TIME": "1791085080000",
+      "NUMERATOR": "-5",
+      "RAW": "-2.5",
+      "ASSIGNED": "-2",
+      "RESIDUAL": "1"
+    }
+  },
+  {
+    "script": "fractional-int-division-float-control-v1.pine",
+    "attempt": 1,
+    "source_sha256": "0599362b0f0e6f2b48cd9fdd051a6a277c9d9d48012f8205137ed88d17110ed0",
+    "indicator_title": "V5-FRACTIONAL-INT-DIVISION-FLOAT-CONTROL-V1",
+    "status": "COMPILE-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": "CE10173",
+      "text": "Cannot assign a value of the \"series float\" type to the \"assigned\" variable. The variable is declared with the \"const int\" type.",
+      "line": 4,
+      "column": 1,
+      "first_bar_index": null,
+      "first_bar_time_utc": null,
+      "native": {
+        "error": "Cannot assign a value of the \"{assignedValueType}\" type to the \"{variableName}\" variable. The variable is declared with the \"{ownValueType}\" type.",
+        "editorError": {
+          "code": "CE10173",
+          "ctx": {
+            "assignedValueType": "series float",
+            "ownValueType": "const int",
+            "variableName": "assigned"
+          },
+          "end": {
+            "column": 28,
+            "line": 4
+          },
+          "message": "Cannot assign a value of the \"{assignedValueType}\" type to the \"{variableName}\" variable. The variable is declared with the \"{ownValueType}\" type.",
+          "start": {
+            "column": 1,
+            "line": 4
+          },
+          "id": "USER;4301d65c285d4392b5f12d563aad3efd"
+        },
+        "title": "Compilation error",
+        "compiler_markers": [
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///b138aeab-4c5b-42ac-8254-a47b9d883884.pine?placement%3Ddialog",
+              "path": "/b138aeab-4c5b-42ac-8254-a47b9d883884.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "code": "CE10173",
+            "severity": 8,
+            "message": "Cannot assign a value of the \"series float\" type to the \"assigned\" variable. The variable is declared with the \"const int\" type.",
+            "startLineNumber": 4,
+            "startColumn": 1,
+            "endLineNumber": 4,
+            "endColumn": 29
+          }
+        ],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,850.88\nH\n84,890.00\nL\n84,850.87\nC\n84,876.00\n+25.12 (+0.03%)\n84,884.96\nSELL\n0.01\n84,884.97\nBUY\nUSDT\nfractional-int-division-float-control-v1.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n03:42:12 UTC\n99+\nPine Editor\nfractional-int-division-float-control-v1.pine\nPublish script\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n//@version=6\nindicator(\"V5-FRACTIONAL-INT-DIVISION-FLOAT-CONTROL-V1\",\u00a0precision=16)\nfloat\u00a0numerator\u00a0=\u00a0(close\u00a0/\u00a0close)\u00a0*\u00a05.0\nint\u00a0assigned\u00a0=\u00a0numerator\u00a0/\u00a02\nplot(time,\u00a0\"INPUT_TIME\")\nplot(numerator,\u00a0\"NUMERATOR\")\nplot(numerator\u00a0/\u00a02,\u00a0\"RAW\")\nplot(assigned,\u00a0\"ASSIGNED\")\nplot(assigned\u00a0*\u00a02\u00a0-\u00a0numerator,\u00a0\"RESIDUAL\")\n1 of 1 problem\nCannot assign a value of the \"series float\" type to the \"assigned\" variable. The variable is declared with the \"const int\" type.(CE10173)\n1 \u2219 Today, 11:42\nLine 4, Col 1\nPine Script\u00ae v6\nCompilation error: CE10173\n\nCannot assign a value of the \"series float\" type to the \"assigned\" variable. The variable is declared with the \"const int\" type.\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+        "context_substituted_message": "Cannot assign a value of the \"series float\" type to the \"assigned\" variable. The variable is declared with the \"const int\" type."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "fractional-int-division-float-control-v1.pine",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24291,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24592,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v5/evidence/fractional-int-division-float-control-v1-attempt1-error.png",
+      "captures/v5/evidence/fractional-int-division-float-control-v1-attempt1-error.txt",
+      "captures/v5/evidence/fractional-int-division-float-control-v1-attempt1-logs.txt",
+      "captures/v5/evidence/fractional-int-division-float-control-v1-attempt1-logs-v1.json",
+      "captures/v5/evidence/fractional-int-division-float-control-v1-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///b138aeab-4c5b-42ac-8254-a47b9d883884.pine?placement%3Ddialog",
+          "path": "/b138aeab-4c5b-42ac-8254-a47b9d883884.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "CE10173",
+        "severity": 8,
+        "message": "Cannot assign a value of the \"series float\" type to the \"assigned\" variable. The variable is declared with the \"const int\" type.",
+        "startLineNumber": 4,
+        "startColumn": 1,
+        "endLineNumber": 4,
+        "endColumn": 29
+      }
+    ],
+    "error_observed_utc": "2026-10-04T03:42:14.718Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/fractional-int-division-float-control-v1-attempt1-logs.txt",
+        "evidence/fractional-int-division-float-control-v1-attempt1-logs-v1.json",
+        "evidence/fractional-int-division-float-control-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "script": "fractional-int-division-input-control-v1.pine",
+    "attempt": 1,
+    "source_sha256": "0be552431104ad91c6be4da8bceab266a3c2907710efe5dc948ab17848a30e89",
+    "indicator_title": "V5-FRACTIONAL-INT-DIVISION-INPUT-CONTROL-V1",
+    "status": "RUNS",
+    "csv_file": "captures/v5/fractional-int-division-input-control-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T114238.813.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [
+        {
+          "id": "in_0",
+          "name": "Numerator",
+          "value": 5,
+          "default": 5
+        }
+      ],
+      "observed_indicator_title": "V5-FRACTIONAL-INT-DIVISION-INPUT-CONTROL-V1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24292,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24592,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T03:42:31.504Z",
+    "live_candle_open_utc": "2026-10-04T03:42:00.000Z",
+    "export_utc": "2026-10-04T03:42:39.196Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v5/evidence/fractional-int-division-input-control-v1-attempt1-setup.png",
+      "captures/v5/evidence/fractional-int-division-input-control-v1-attempt1-export.png",
+      "captures/v5/evidence/fractional-int-division-input-control-v1-attempt1-logs.txt",
+      "captures/v5/evidence/fractional-int-division-input-control-v1-attempt1-logs-v1.json",
+      "captures/v5/evidence/fractional-int-division-input-control-v1-attempt1-logs.png",
+      "captures/v5/evidence/fractional-int-division-input-control-v1-attempt1-inputs.png",
+      "captures/v5/evidence/fractional-int-division-input-control-v1-attempt1-visual.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   03:42",
+    "historical_compare_before_unix_seconds": 1791085320,
+    "pine_logs": {
+      "paths": [
+        "evidence/fractional-int-division-input-control-v1-attempt1-logs.txt",
+        "evidence/fractional-int-division-input-control-v1-attempt1-logs-v1.json",
+        "evidence/fractional-int-division-input-control-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "9e86e7b553f4f7e185a3c6ec27a37b7710be4f4c651d284370d774ddd592c207",
+    "csv_bytes": 1727414,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "INPUT_TIME",
+      "NUMERATOR",
+      "RAW",
+      "ASSIGNED",
+      "RESIDUAL"
+    ],
+    "declared_to_native_header_mapping": {
+      "INPUT_TIME": "INPUT_TIME",
+      "NUMERATOR": "NUMERATOR",
+      "RAW": "RAW",
+      "ASSIGNED": "ASSIGNED",
+      "RESIDUAL": "RESIDUAL"
+    },
+    "csv_rows": 24592,
+    "historical_rows": 24591,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791085320,
+    "first_historical_values": {
+      "INPUT_TIME": "1788134400000",
+      "NUMERATOR": "5",
+      "RAW": "2.5",
+      "ASSIGNED": "2.5",
+      "RESIDUAL": "0"
+    },
+    "last_historical_values": {
+      "INPUT_TIME": "1791085200000",
+      "NUMERATOR": "5",
+      "RAW": "2.5",
+      "ASSIGNED": "2.5",
+      "RESIDUAL": "0"
+    }
+  },
+  {
+    "script": "fractional-int-division-series-negative-v1.pine",
+    "attempt": 1,
+    "source_sha256": "5ccc81574d4cd8f5556d82d7133fc37ac1ae50fc67e2131c5f0dfc544629deaa",
+    "indicator_title": "V5-FRACTIONAL-INT-DIVISION-SERIES-NEGATIVE-V1",
+    "status": "RUNS",
+    "csv_file": "captures/v5/fractional-int-division-series-negative-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T114310.596.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V5-FRACTIONAL-INT-DIVISION-SERIES-NEGATIVE-V1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24292,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24592,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T03:43:02.153Z",
+    "live_candle_open_utc": "2026-10-04T03:42:00.000Z",
+    "export_utc": "2026-10-04T03:43:11.701Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v5/evidence/fractional-int-division-series-negative-v1-attempt1-setup.png",
+      "captures/v5/evidence/fractional-int-division-series-negative-v1-attempt1-export.png",
+      "captures/v5/evidence/fractional-int-division-series-negative-v1-attempt1-logs.txt",
+      "captures/v5/evidence/fractional-int-division-series-negative-v1-attempt1-logs-v1.json",
+      "captures/v5/evidence/fractional-int-division-series-negative-v1-attempt1-logs.png",
+      "captures/v5/evidence/fractional-int-division-series-negative-v1-attempt1-visual.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   03:42",
+    "historical_compare_before_unix_seconds": 1791085320,
+    "pine_logs": {
+      "paths": [
+        "evidence/fractional-int-division-series-negative-v1-attempt1-logs.txt",
+        "evidence/fractional-int-division-series-negative-v1-attempt1-logs-v1.json",
+        "evidence/fractional-int-division-series-negative-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "d7b25d9d0736f9a62e6e170f15f3ee670f5f5748f5ddf9873b678bf5f147d297",
+    "csv_bytes": 1801190,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "INPUT_TIME",
+      "NUMERATOR",
+      "RAW",
+      "ASSIGNED",
+      "RESIDUAL"
+    ],
+    "declared_to_native_header_mapping": {
+      "INPUT_TIME": "INPUT_TIME",
+      "NUMERATOR": "NUMERATOR",
+      "RAW": "RAW",
+      "ASSIGNED": "ASSIGNED",
+      "RESIDUAL": "RESIDUAL"
+    },
+    "csv_rows": 24592,
+    "historical_rows": 24591,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791085320,
+    "first_historical_values": {
+      "INPUT_TIME": "1788134400000",
+      "NUMERATOR": "-5",
+      "RAW": "-2.5",
+      "ASSIGNED": "-2.5",
+      "RESIDUAL": "0"
+    },
+    "last_historical_values": {
+      "INPUT_TIME": "1791085200000",
+      "NUMERATOR": "-5",
+      "RAW": "-2.5",
+      "ASSIGNED": "-2.5",
+      "RESIDUAL": "0"
+    }
+  },
+  {
+    "script": "fractional-int-division-series-positive-v1.pine",
+    "attempt": 1,
+    "source_sha256": "846ebaee826838aa88985f8e6fbc2f85f77bfbc65b7845d3787b658834f3a976",
+    "indicator_title": "V5-FRACTIONAL-INT-DIVISION-SERIES-POSITIVE-V1",
+    "status": "RUNS",
+    "csv_file": "captures/v5/fractional-int-division-series-positive-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T114343.790.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V5-FRACTIONAL-INT-DIVISION-SERIES-POSITIVE-V1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24292,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24592,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T03:43:31.428Z",
+    "live_candle_open_utc": "2026-10-04T03:42:00.000Z",
+    "export_utc": "2026-10-04T03:43:44.041Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v5/evidence/fractional-int-division-series-positive-v1-attempt1-setup.png",
+      "captures/v5/evidence/fractional-int-division-series-positive-v1-attempt1-export.png",
+      "captures/v5/evidence/fractional-int-division-series-positive-v1-attempt1-logs.txt",
+      "captures/v5/evidence/fractional-int-division-series-positive-v1-attempt1-logs-v1.json",
+      "captures/v5/evidence/fractional-int-division-series-positive-v1-attempt1-logs.png",
+      "captures/v5/evidence/fractional-int-division-series-positive-v1-attempt1-visual.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   03:42",
+    "historical_compare_before_unix_seconds": 1791085320,
+    "pine_logs": {
+      "paths": [
+        "evidence/fractional-int-division-series-positive-v1-attempt1-logs.txt",
+        "evidence/fractional-int-division-series-positive-v1-attempt1-logs-v1.json",
+        "evidence/fractional-int-division-series-positive-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "153ab310e09deedb5479da1df94518f0fb66833e90ca0c5f5e20110c4b4472db",
+    "csv_bytes": 1727414,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "INPUT_TIME",
+      "NUMERATOR",
+      "RAW",
+      "ASSIGNED",
+      "RESIDUAL"
+    ],
+    "declared_to_native_header_mapping": {
+      "INPUT_TIME": "INPUT_TIME",
+      "NUMERATOR": "NUMERATOR",
+      "RAW": "RAW",
+      "ASSIGNED": "ASSIGNED",
+      "RESIDUAL": "RESIDUAL"
+    },
+    "csv_rows": 24592,
+    "historical_rows": 24591,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791085320,
+    "first_historical_values": {
+      "INPUT_TIME": "1788134400000",
+      "NUMERATOR": "5",
+      "RAW": "2.5",
+      "ASSIGNED": "2.5",
+      "RESIDUAL": "0"
+    },
+    "last_historical_values": {
+      "INPUT_TIME": "1791085200000",
+      "NUMERATOR": "5",
+      "RAW": "2.5",
+      "ASSIGNED": "2.5",
+      "RESIDUAL": "0"
+    }
+  },
+  {
+    "script": "fractional-int-division-simple-negative-v1.pine",
+    "attempt": 1,
+    "source_sha256": "33fa321ba02b132ae2efca8ce486858634896cc18b62f6b698d861b9ed94e3c3",
+    "indicator_title": "V5-FRACTIONAL-INT-DIVISION-SIMPLE-NEGATIVE-V1",
+    "status": "RUNS",
+    "csv_file": "captures/v5/fractional-int-division-simple-negative-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T114411.055.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V5-FRACTIONAL-INT-DIVISION-SIMPLE-NEGATIVE-V1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24293,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24593,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T03:44:03.757Z",
+    "live_candle_open_utc": "2026-10-04T03:44:00.000Z",
+    "export_utc": "2026-10-04T03:44:11.513Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v5/evidence/fractional-int-division-simple-negative-v1-attempt1-setup.png",
+      "captures/v5/evidence/fractional-int-division-simple-negative-v1-attempt1-export.png",
+      "captures/v5/evidence/fractional-int-division-simple-negative-v1-attempt1-logs.txt",
+      "captures/v5/evidence/fractional-int-division-simple-negative-v1-attempt1-logs-v1.json",
+      "captures/v5/evidence/fractional-int-division-simple-negative-v1-attempt1-logs.png",
+      "captures/v5/evidence/fractional-int-division-simple-negative-v1-attempt1-visual.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   03:44",
+    "historical_compare_before_unix_seconds": 1791085440,
+    "pine_logs": {
+      "paths": [
+        "evidence/fractional-int-division-simple-negative-v1-attempt1-logs.txt",
+        "evidence/fractional-int-division-simple-negative-v1-attempt1-logs-v1.json",
+        "evidence/fractional-int-division-simple-negative-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "15922c32588abaef55b91960406f596697ab5a86ecbd610ff13116fde3a82c4a",
+    "csv_bytes": 1801266,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "INPUT_TIME",
+      "NUMERATOR",
+      "RAW",
+      "ASSIGNED",
+      "RESIDUAL"
+    ],
+    "declared_to_native_header_mapping": {
+      "INPUT_TIME": "INPUT_TIME",
+      "NUMERATOR": "NUMERATOR",
+      "RAW": "RAW",
+      "ASSIGNED": "ASSIGNED",
+      "RESIDUAL": "RESIDUAL"
+    },
+    "csv_rows": 24593,
+    "historical_rows": 24592,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791085440,
+    "first_historical_values": {
+      "INPUT_TIME": "1788134400000",
+      "NUMERATOR": "-5",
+      "RAW": "-2.5",
+      "ASSIGNED": "-2.5",
+      "RESIDUAL": "0"
+    },
+    "last_historical_values": {
+      "INPUT_TIME": "1791085320000",
+      "NUMERATOR": "-5",
+      "RAW": "-2.5",
+      "ASSIGNED": "-2.5",
+      "RESIDUAL": "0"
+    }
+  },
+  {
+    "script": "fractional-int-division-simple-positive-v1.pine",
+    "attempt": 1,
+    "source_sha256": "447b38266dcdd6dd8ebe87b8c248a4d51621370026f753438edcef7e9a4c9369",
+    "indicator_title": "V5-FRACTIONAL-INT-DIVISION-SIMPLE-POSITIVE-V1",
+    "status": "RUNS",
+    "csv_file": "captures/v5/fractional-int-division-simple-positive-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T114437.467.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V5-FRACTIONAL-INT-DIVISION-SIMPLE-POSITIVE-V1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24293,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24593,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T03:44:30.266Z",
+    "live_candle_open_utc": "2026-10-04T03:44:00.000Z",
+    "export_utc": "2026-10-04T03:44:37.906Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v5/evidence/fractional-int-division-simple-positive-v1-attempt1-setup.png",
+      "captures/v5/evidence/fractional-int-division-simple-positive-v1-attempt1-export.png",
+      "captures/v5/evidence/fractional-int-division-simple-positive-v1-attempt1-logs.txt",
+      "captures/v5/evidence/fractional-int-division-simple-positive-v1-attempt1-logs-v1.json",
+      "captures/v5/evidence/fractional-int-division-simple-positive-v1-attempt1-logs.png",
+      "captures/v5/evidence/fractional-int-division-simple-positive-v1-attempt1-visual.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   03:44",
+    "historical_compare_before_unix_seconds": 1791085440,
+    "pine_logs": {
+      "paths": [
+        "evidence/fractional-int-division-simple-positive-v1-attempt1-logs.txt",
+        "evidence/fractional-int-division-simple-positive-v1-attempt1-logs-v1.json",
+        "evidence/fractional-int-division-simple-positive-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "616589207cef96ff20264c6243204ca18fa9960bb302d890e767696ae90c7e9e",
+    "csv_bytes": 1727487,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "INPUT_TIME",
+      "NUMERATOR",
+      "RAW",
+      "ASSIGNED",
+      "RESIDUAL"
+    ],
+    "declared_to_native_header_mapping": {
+      "INPUT_TIME": "INPUT_TIME",
+      "NUMERATOR": "NUMERATOR",
+      "RAW": "RAW",
+      "ASSIGNED": "ASSIGNED",
+      "RESIDUAL": "RESIDUAL"
+    },
+    "csv_rows": 24593,
+    "historical_rows": 24592,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791085440,
+    "first_historical_values": {
+      "INPUT_TIME": "1788134400000",
+      "NUMERATOR": "5",
+      "RAW": "2.5",
+      "ASSIGNED": "2.5",
+      "RESIDUAL": "0"
+    },
+    "last_historical_values": {
+      "INPUT_TIME": "1791085320000",
+      "NUMERATOR": "5",
+      "RAW": "2.5",
+      "ASSIGNED": "2.5",
+      "RESIDUAL": "0"
+    }
+  },
+  {
+    "script": "ledger47-zero-div-v5-compound-zero-v1.pine",
+    "attempt": 1,
+    "source_sha256": "c5de25080e3ee41186414b4fa5e41be518045cf184b3ad9c5b32e3c378007728",
+    "indicator_title": "ledger47-zero-div-v5-compound-zero-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v5/ledger47-zero-div-v5-compound-zero-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T114511.010.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "ledger47-zero-div-v5-compound-zero-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24293,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24593,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T03:45:03.616Z",
+    "live_candle_open_utc": "2026-10-04T03:44:00.000Z",
+    "export_utc": "2026-10-04T03:45:11.385Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v5/evidence/ledger47-zero-div-v5-compound-zero-v1-attempt1-setup.png",
+      "captures/v5/evidence/ledger47-zero-div-v5-compound-zero-v1-attempt1-export.png",
+      "captures/v5/evidence/ledger47-zero-div-v5-compound-zero-v1-attempt1-logs.txt",
+      "captures/v5/evidence/ledger47-zero-div-v5-compound-zero-v1-attempt1-logs-v1.json",
+      "captures/v5/evidence/ledger47-zero-div-v5-compound-zero-v1-attempt1-logs.png",
+      "captures/v5/evidence/ledger47-zero-div-v5-compound-zero-v1-attempt1-visual.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///8cea110e-5ef0-4494-b0ab-b9609767cb42.pine?placement%3Ddialog",
+          "path": "/8cea110e-5ef0-4494-b0ab-b9609767cb42.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "live_tooltip": "Sun 04 Oct '26   03:44",
+    "historical_compare_before_unix_seconds": 1791085440,
+    "pine_logs": {
+      "paths": [
+        "evidence/ledger47-zero-div-v5-compound-zero-v1-attempt1-logs.txt",
+        "evidence/ledger47-zero-div-v5-compound-zero-v1-attempt1-logs-v1.json",
+        "evidence/ledger47-zero-div-v5-compound-zero-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "9cc91992689be0cf42578de2b03f6c708d4654acd0854aef0cd3e0ce57bc5e0e",
+    "csv_bytes": 1786703,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "INPUT_TIME",
+      "NUMERATOR_CLOSE",
+      "RAW",
+      "IS_NA",
+      "NZ_42"
+    ],
+    "declared_to_native_header_mapping": {
+      "INPUT_TIME": "INPUT_TIME",
+      "NUMERATOR_CLOSE": "NUMERATOR_CLOSE",
+      "RAW": "RAW",
+      "IS_NA": "IS_NA",
+      "NZ_42": "NZ_42"
+    },
+    "csv_rows": 24593,
+    "historical_rows": 24592,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791085440,
+    "first_historical_values": {
+      "INPUT_TIME": "1788134400000",
+      "NUMERATOR_CLOSE": "77674.04",
+      "RAW": "",
+      "IS_NA": "1",
+      "NZ_42": "42"
+    },
+    "last_historical_values": {
+      "INPUT_TIME": "1791085320000",
+      "NUMERATOR_CLOSE": "84884.96",
+      "RAW": "",
+      "IS_NA": "1",
+      "NZ_42": "42"
+    }
+  },
+  {
+    "script": "ledger47-zero-div-v5-dynamic-negative-zero-v1.pine",
+    "attempt": 1,
+    "source_sha256": "a805da2449743d9bf19e3d0c5e9d110cd5d8c3bceb651e1b5440da9ac46055cf",
+    "indicator_title": "ledger47-zero-div-v5-dynamic-negative-zero-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v5/ledger47-zero-div-v5-dynamic-negative-zero-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T114537.792.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "ledger47-zero-div-v5-dynamic-negative-zero-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24293,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24593,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T03:45:30.248Z",
+    "live_candle_open_utc": "2026-10-04T03:44:00.000Z",
+    "export_utc": "2026-10-04T03:45:38.265Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v5/evidence/ledger47-zero-div-v5-dynamic-negative-zero-v1-attempt1-setup.png",
+      "captures/v5/evidence/ledger47-zero-div-v5-dynamic-negative-zero-v1-attempt1-export.png",
+      "captures/v5/evidence/ledger47-zero-div-v5-dynamic-negative-zero-v1-attempt1-logs.txt",
+      "captures/v5/evidence/ledger47-zero-div-v5-dynamic-negative-zero-v1-attempt1-logs-v1.json",
+      "captures/v5/evidence/ledger47-zero-div-v5-dynamic-negative-zero-v1-attempt1-logs.png",
+      "captures/v5/evidence/ledger47-zero-div-v5-dynamic-negative-zero-v1-attempt1-visual.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///57ddfdde-c204-4008-bebb-2d8ad5a415c0.pine?placement%3Ddialog",
+          "path": "/57ddfdde-c204-4008-bebb-2d8ad5a415c0.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "live_tooltip": "Sun 04 Oct '26   03:44",
+    "historical_compare_before_unix_seconds": 1791085440,
+    "pine_logs": {
+      "paths": [
+        "evidence/ledger47-zero-div-v5-dynamic-negative-zero-v1-attempt1-logs.txt",
+        "evidence/ledger47-zero-div-v5-dynamic-negative-zero-v1-attempt1-logs-v1.json",
+        "evidence/ledger47-zero-div-v5-dynamic-negative-zero-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "58bab83787bf95a0ee0c95f6681243cf7715065dbfcd85c60795368f68c2eb32",
+    "csv_bytes": 1786703,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "INPUT_TIME",
+      "NUMERATOR_CLOSE",
+      "RAW",
+      "IS_NA",
+      "NZ_42"
+    ],
+    "declared_to_native_header_mapping": {
+      "INPUT_TIME": "INPUT_TIME",
+      "NUMERATOR_CLOSE": "NUMERATOR_CLOSE",
+      "RAW": "RAW",
+      "IS_NA": "IS_NA",
+      "NZ_42": "NZ_42"
+    },
+    "csv_rows": 24593,
+    "historical_rows": 24592,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791085440,
+    "first_historical_values": {
+      "INPUT_TIME": "1788134400000",
+      "NUMERATOR_CLOSE": "77674.04",
+      "RAW": "",
+      "IS_NA": "1",
+      "NZ_42": "42"
+    },
+    "last_historical_values": {
+      "INPUT_TIME": "1791085320000",
+      "NUMERATOR_CLOSE": "84884.96",
+      "RAW": "",
+      "IS_NA": "1",
+      "NZ_42": "42"
+    }
+  },
+  {
+    "script": "ledger47-zero-div-v5-dynamic-positive-zero-v1.pine",
+    "attempt": 1,
+    "source_sha256": "4b3330d4f5920fa44d2ccf4f3fdb2e4b640d1e68487863f5cfbc6b1e827b3972",
+    "indicator_title": "ledger47-zero-div-v5-dynamic-positive-zero-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v5/ledger47-zero-div-v5-dynamic-positive-zero-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T114604.292.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "ledger47-zero-div-v5-dynamic-positive-zero-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24293,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24594,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T03:45:56.545Z",
+    "live_candle_open_utc": "2026-10-04T03:44:00.000Z",
+    "export_utc": "2026-10-04T03:46:04.548Z",
+    "live_boundary_confirmed_unchanged": false,
+    "evidence_files": [
+      "captures/v5/evidence/ledger47-zero-div-v5-dynamic-positive-zero-v1-attempt1-setup.png",
+      "captures/v5/evidence/ledger47-zero-div-v5-dynamic-positive-zero-v1-attempt1-export.png",
+      "captures/v5/evidence/ledger47-zero-div-v5-dynamic-positive-zero-v1-attempt1-logs.txt",
+      "captures/v5/evidence/ledger47-zero-div-v5-dynamic-positive-zero-v1-attempt1-logs-v1.json",
+      "captures/v5/evidence/ledger47-zero-div-v5-dynamic-positive-zero-v1-attempt1-logs.png",
+      "captures/v5/evidence/ledger47-zero-div-v5-dynamic-positive-zero-v1-attempt1-visual.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///a22e2688-6e2c-4637-8c15-6dcf70d7f149.pine?placement%3Ddialog",
+          "path": "/a22e2688-6e2c-4637-8c15-6dcf70d7f149.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "live_tooltip": "Sun 04 Oct '26   03:44",
+    "historical_compare_before_unix_seconds": 1791085440,
+    "pine_logs": {
+      "paths": [
+        "evidence/ledger47-zero-div-v5-dynamic-positive-zero-v1-attempt1-logs.txt",
+        "evidence/ledger47-zero-div-v5-dynamic-positive-zero-v1-attempt1-logs-v1.json",
+        "evidence/ledger47-zero-div-v5-dynamic-positive-zero-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "00401c3a4a51cdd18cdbc2549c80ec757fa36e85fdd17a7f4fe76f519da0768c",
+    "csv_bytes": 1786779,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "INPUT_TIME",
+      "NUMERATOR_CLOSE",
+      "RAW",
+      "IS_NA",
+      "NZ_42"
+    ],
+    "declared_to_native_header_mapping": {
+      "INPUT_TIME": "INPUT_TIME",
+      "NUMERATOR_CLOSE": "NUMERATOR_CLOSE",
+      "RAW": "RAW",
+      "IS_NA": "IS_NA",
+      "NZ_42": "NZ_42"
+    },
+    "csv_rows": 24594,
+    "historical_rows": 24592,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791085560,
+    "first_historical_values": {
+      "INPUT_TIME": "1788134400000",
+      "NUMERATOR_CLOSE": "77674.04",
+      "RAW": "",
+      "IS_NA": "1",
+      "NZ_42": "42"
+    },
+    "last_historical_values": {
+      "INPUT_TIME": "1791085320000",
+      "NUMERATOR_CLOSE": "84884.96",
+      "RAW": "",
+      "IS_NA": "1",
+      "NZ_42": "42"
+    }
+  },
+  {
+    "script": "ledger47-zero-div-v5-dynamic-positive-zero-v1.pine",
+    "attempt": 2,
+    "source_sha256": "4b3330d4f5920fa44d2ccf4f3fdb2e4b640d1e68487863f5cfbc6b1e827b3972",
+    "indicator_title": "ledger47-zero-div-v5-dynamic-positive-zero-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v5/ledger47-zero-div-v5-dynamic-positive-zero-v1-attempt2.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T114639.637.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "ledger47-zero-div-v5-dynamic-positive-zero-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24294,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24594,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T03:46:22.680Z",
+    "live_candle_open_utc": "2026-10-04T03:46:00.000Z",
+    "export_utc": "2026-10-04T03:46:40.000Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v5/evidence/ledger47-zero-div-v5-dynamic-positive-zero-v1-attempt2-setup.png",
+      "captures/v5/evidence/ledger47-zero-div-v5-dynamic-positive-zero-v1-attempt2-export.png",
+      "captures/v5/evidence/ledger47-zero-div-v5-dynamic-positive-zero-v1-attempt2-logs.txt",
+      "captures/v5/evidence/ledger47-zero-div-v5-dynamic-positive-zero-v1-attempt2-logs-v1.json",
+      "captures/v5/evidence/ledger47-zero-div-v5-dynamic-positive-zero-v1-attempt2-logs.png",
+      "captures/v5/evidence/ledger47-zero-div-v5-dynamic-positive-zero-v1-attempt2-visual.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///43661560-2d51-4812-8ad7-b80c98c746d8.pine?placement%3Ddialog",
+          "path": "/43661560-2d51-4812-8ad7-b80c98c746d8.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "live_tooltip": "Sun 04 Oct '26   03:46",
+    "historical_compare_before_unix_seconds": 1791085560,
+    "pine_logs": {
+      "paths": [
+        "evidence/ledger47-zero-div-v5-dynamic-positive-zero-v1-attempt2-logs.txt",
+        "evidence/ledger47-zero-div-v5-dynamic-positive-zero-v1-attempt2-logs-v1.json",
+        "evidence/ledger47-zero-div-v5-dynamic-positive-zero-v1-attempt2-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "52e1969786eda0397cfe18b38dc0904dbebdd78220d6d598adb0bb63a4810d65",
+    "csv_bytes": 1786779,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "INPUT_TIME",
+      "NUMERATOR_CLOSE",
+      "RAW",
+      "IS_NA",
+      "NZ_42"
+    ],
+    "declared_to_native_header_mapping": {
+      "INPUT_TIME": "INPUT_TIME",
+      "NUMERATOR_CLOSE": "NUMERATOR_CLOSE",
+      "RAW": "RAW",
+      "IS_NA": "IS_NA",
+      "NZ_42": "NZ_42"
+    },
+    "csv_rows": 24594,
+    "historical_rows": 24593,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791085560,
+    "first_historical_values": {
+      "INPUT_TIME": "1788134400000",
+      "NUMERATOR_CLOSE": "77674.04",
+      "RAW": "",
+      "IS_NA": "1",
+      "NZ_42": "42"
+    },
+    "last_historical_values": {
+      "INPUT_TIME": "1791085440000",
+      "NUMERATOR_CLOSE": "84884.97",
+      "RAW": "",
+      "IS_NA": "1",
+      "NZ_42": "42"
+    }
+  },
+  {
+    "script": "ledger47-zero-div-v5-finite-control-v1.pine",
+    "attempt": 1,
+    "source_sha256": "9771856344ebcf270c9f5542f7466c2d6e6f9002487eb590295555e6f0c5d59d",
+    "indicator_title": "ledger47-zero-div-v5-finite-control-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v5/ledger47-zero-div-v5-finite-control-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T114703.772.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "ledger47-zero-div-v5-finite-control-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24294,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24594,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T03:46:57.277Z",
+    "live_candle_open_utc": "2026-10-04T03:46:00.000Z",
+    "export_utc": "2026-10-04T03:47:04.170Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v5/evidence/ledger47-zero-div-v5-finite-control-v1-attempt1-setup.png",
+      "captures/v5/evidence/ledger47-zero-div-v5-finite-control-v1-attempt1-export.png",
+      "captures/v5/evidence/ledger47-zero-div-v5-finite-control-v1-attempt1-logs.txt",
+      "captures/v5/evidence/ledger47-zero-div-v5-finite-control-v1-attempt1-logs-v1.json",
+      "captures/v5/evidence/ledger47-zero-div-v5-finite-control-v1-attempt1-logs.png",
+      "captures/v5/evidence/ledger47-zero-div-v5-finite-control-v1-attempt1-visual.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///c3295ab5-e447-485f-b250-979956ad5f91.pine?placement%3Ddialog",
+          "path": "/c3295ab5-e447-485f-b250-979956ad5f91.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "live_tooltip": "Sun 04 Oct '26   03:46",
+    "historical_compare_before_unix_seconds": 1791085560,
+    "pine_logs": {
+      "paths": [
+        "evidence/ledger47-zero-div-v5-finite-control-v1-attempt1-logs.txt",
+        "evidence/ledger47-zero-div-v5-finite-control-v1-attempt1-logs-v1.json",
+        "evidence/ledger47-zero-div-v5-finite-control-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "1d9caeb6732b41ba68e1352d34d7a86d3047161ebc3e5c5e99ca829979b9c7eb",
+    "csv_bytes": 2129078,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "INPUT_TIME",
+      "NUMERATOR_CLOSE",
+      "RAW",
+      "IS_NA",
+      "NZ_42"
+    ],
+    "declared_to_native_header_mapping": {
+      "INPUT_TIME": "INPUT_TIME",
+      "NUMERATOR_CLOSE": "NUMERATOR_CLOSE",
+      "RAW": "RAW",
+      "IS_NA": "IS_NA",
+      "NZ_42": "NZ_42"
+    },
+    "csv_rows": 24594,
+    "historical_rows": 24593,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791085560,
+    "first_historical_values": {
+      "INPUT_TIME": "1788134400000",
+      "NUMERATOR_CLOSE": "77674.04",
+      "RAW": "38837.02",
+      "IS_NA": "0",
+      "NZ_42": "38837.02"
+    },
+    "last_historical_values": {
+      "INPUT_TIME": "1791085440000",
+      "NUMERATOR_CLOSE": "84884.97",
+      "RAW": "42442.485",
+      "IS_NA": "0",
+      "NZ_42": "42442.485"
+    }
+  },
+  {
+    "script": "ledger47-zero-div-v5-literal-negative-zero-v1.pine",
+    "attempt": 1,
+    "source_sha256": "667c51db28ae47d343148d07893bd217064ee982830cf7c48a30d6470a90a8e6",
+    "indicator_title": "ledger47-zero-div-v5-literal-negative-zero-v1",
+    "status": "COMPILE-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": "Division by zero",
+      "line": 3,
+      "column": 9,
+      "first_bar_index": null,
+      "first_bar_time_utc": null,
+      "native": {
+        "error": "Division by zero",
+        "editorError": {
+          "end": {
+            "column": 20,
+            "line": 3
+          },
+          "message": "Division by zero",
+          "start": {
+            "column": 9,
+            "line": 3
+          },
+          "id": "USER;64eb9fe01ecd4728859be8cb120fa590"
+        },
+        "title": "Compilation error",
+        "compiler_markers": [
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///4388d2a2-c0b6-427f-81a6-2227401eaf3c.pine?placement%3Ddialog",
+              "path": "/4388d2a2-c0b6-427f-81a6-2227401eaf3c.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "code": "PINE_VERSION_OUTDATED",
+            "severity": 4,
+            "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+            "startLineNumber": 1,
+            "startColumn": 3,
+            "endLineNumber": 1,
+            "endColumn": 12
+          }
+        ],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,884.96\nH\n84,884.97\nL\n84,866.80\nC\n84,866.81\n\u221218.16 (\u22120.02%)\n84,866.80\nSELL\n0.01\n84,866.81\nBUY\nUSDT\nOracle na holes crosses v1\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n03:47:17 UTC\n99+\nPine Editor\nledger47-zero-div-v5-literal-negative-zero-v1.pine\nPublish script\n1\n2\n3\n4\n5\n6\n7\n8\n9\n//@version=5\nindicator(\"ledger47-zero-div-v5-literal-negative-zero-v1\",\u00a0overlay=false)\nvalue\u00a0=\u00a0close\u00a0/\u00a0-0.0\nplot(time,\u00a0title=\"INPUT_TIME\")\nplot(close,\u00a0title=\"NUMERATOR_CLOSE\")\nplot(value,\u00a0title=\"RAW\")\nplot(na(value)\u00a0?\u00a01\u00a0:\u00a00,\u00a0title=\"IS_NA\")\nplot(nz(value,\u00a042.0),\u00a0title=\"NZ_42\")\n1 of 1 problem\nVersion 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.(PINE_VERSION_OUTDATED)\n1 \u2219 Today, 11:47\nLine 1, Col 3\nPine Script\u00ae v5\nCompilation error\nCompilation error\n\nDivision by zero\n\nOpen in editor",
+        "context_substituted_message": "Division by zero"
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "Oracle na holes crosses v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24294,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24594,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v5/evidence/ledger47-zero-div-v5-literal-negative-zero-v1-attempt1-error.png",
+      "captures/v5/evidence/ledger47-zero-div-v5-literal-negative-zero-v1-attempt1-error.txt",
+      "captures/v5/evidence/ledger47-zero-div-v5-literal-negative-zero-v1-attempt1-logs.txt",
+      "captures/v5/evidence/ledger47-zero-div-v5-literal-negative-zero-v1-attempt1-logs-v1.json",
+      "captures/v5/evidence/ledger47-zero-div-v5-literal-negative-zero-v1-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///4388d2a2-c0b6-427f-81a6-2227401eaf3c.pine?placement%3Ddialog",
+          "path": "/4388d2a2-c0b6-427f-81a6-2227401eaf3c.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "error_observed_utc": "2026-10-04T03:47:19.242Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/ledger47-zero-div-v5-literal-negative-zero-v1-attempt1-logs.txt",
+        "evidence/ledger47-zero-div-v5-literal-negative-zero-v1-attempt1-logs-v1.json",
+        "evidence/ledger47-zero-div-v5-literal-negative-zero-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "script": "ledger47-zero-div-v5-literal-positive-zero-v1.pine",
+    "attempt": 1,
+    "source_sha256": "16ed7d48e7718f030245ff85b887edb29e5d69c8d66c7127dad1570d6f3c4af9",
+    "indicator_title": "ledger47-zero-div-v5-literal-positive-zero-v1",
+    "status": "COMPILE-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": "Division by zero",
+      "line": 3,
+      "column": 9,
+      "first_bar_index": null,
+      "first_bar_time_utc": null,
+      "native": {
+        "error": "Division by zero",
+        "editorError": {
+          "end": {
+            "column": 19,
+            "line": 3
+          },
+          "message": "Division by zero",
+          "start": {
+            "column": 9,
+            "line": 3
+          },
+          "id": "USER;121773049baf48409aa348e4edaeec1d"
+        },
+        "title": "Compilation error",
+        "compiler_markers": [
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///b5e5f02f-3fd5-4bb3-836d-f908d53da180.pine?placement%3Ddialog",
+              "path": "/b5e5f02f-3fd5-4bb3-836d-f908d53da180.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "code": "PINE_VERSION_OUTDATED",
+            "severity": 4,
+            "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+            "startLineNumber": 1,
+            "startColumn": 3,
+            "endLineNumber": 1,
+            "endColumn": 12
+          },
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///b5e5f02f-3fd5-4bb3-836d-f908d53da180.pine?placement%3Ddialog",
+              "path": "/b5e5f02f-3fd5-4bb3-836d-f908d53da180.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "severity": 8,
+            "message": "Division by zero",
+            "startLineNumber": 3,
+            "startColumn": 9,
+            "endLineNumber": 3,
+            "endColumn": 20
+          }
+        ],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,884.96\nH\n84,884.97\nL\n84,866.80\nC\n84,866.81\n\u221218.16 (\u22120.02%)\n84,866.80\nSELL\n0.01\n84,866.81\nBUY\nUSDT\nledger47-zero-div-v5-literal-positive-zero-v1.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n03:47:34 UTC\n99+\nPine Editor\nledger47-zero-div-v5-literal-positive-zero-v1.pine\nPublish script\n1\n2\n3\n4\n5\n6\n7\n8\n9\n//@version=5\nindicator(\"ledger47-zero-div-v5-literal-positive-zero-v1\",\u00a0overlay=false)\nvalue\u00a0=\u00a0close\u00a0/\u00a00.0\nplot(time,\u00a0title=\"INPUT_TIME\")\nplot(close,\u00a0title=\"NUMERATOR_CLOSE\")\nplot(value,\u00a0title=\"RAW\")\nplot(na(value)\u00a0?\u00a01\u00a0:\u00a00,\u00a0title=\"IS_NA\")\nplot(nz(value,\u00a042.0),\u00a0title=\"NZ_42\")\n1 of 2 problems\nDivision by zero\n1 \u2219 Today, 11:47\nLine 3, Col 9\nPine Script\u00ae v5\nCompilation error\n\nDivision by zero\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+        "context_substituted_message": "Division by zero"
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "ledger47-zero-div-v5-literal-positive-zero-v1.pine",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24294,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24594,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v5/evidence/ledger47-zero-div-v5-literal-positive-zero-v1-attempt1-error.png",
+      "captures/v5/evidence/ledger47-zero-div-v5-literal-positive-zero-v1-attempt1-error.txt",
+      "captures/v5/evidence/ledger47-zero-div-v5-literal-positive-zero-v1-attempt1-logs.txt",
+      "captures/v5/evidence/ledger47-zero-div-v5-literal-positive-zero-v1-attempt1-logs-v1.json",
+      "captures/v5/evidence/ledger47-zero-div-v5-literal-positive-zero-v1-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///b5e5f02f-3fd5-4bb3-836d-f908d53da180.pine?placement%3Ddialog",
+          "path": "/b5e5f02f-3fd5-4bb3-836d-f908d53da180.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      },
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///b5e5f02f-3fd5-4bb3-836d-f908d53da180.pine?placement%3Ddialog",
+          "path": "/b5e5f02f-3fd5-4bb3-836d-f908d53da180.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "severity": 8,
+        "message": "Division by zero",
+        "startLineNumber": 3,
+        "startColumn": 9,
+        "endLineNumber": 3,
+        "endColumn": 20
+      }
+    ],
+    "error_observed_utc": "2026-10-04T03:47:36.128Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/ledger47-zero-div-v5-literal-positive-zero-v1-attempt1-logs.txt",
+        "evidence/ledger47-zero-div-v5-literal-positive-zero-v1-attempt1-logs-v1.json",
+        "evidence/ledger47-zero-div-v5-literal-positive-zero-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "script": "ledger47-zero-div-v5-missing-numerator-control-v1.pine",
+    "attempt": 1,
+    "source_sha256": "3a06ad2800003911fda5f13807c3225f0df7d34b3190eb9528c4b8cea212a3e6",
+    "indicator_title": "ledger47-zero-div-v5-missing-numerator-control-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v5/ledger47-zero-div-v5-missing-numerator-control-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T114801.964.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "ledger47-zero-div-v5-missing-numerator-control-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24294,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24595,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T03:47:54.017Z",
+    "live_candle_open_utc": "2026-10-04T03:46:00.000Z",
+    "export_utc": "2026-10-04T03:48:02.531Z",
+    "live_boundary_confirmed_unchanged": false,
+    "evidence_files": [
+      "captures/v5/evidence/ledger47-zero-div-v5-missing-numerator-control-v1-attempt1-setup.png",
+      "captures/v5/evidence/ledger47-zero-div-v5-missing-numerator-control-v1-attempt1-export.png",
+      "captures/v5/evidence/ledger47-zero-div-v5-missing-numerator-control-v1-attempt1-logs.txt",
+      "captures/v5/evidence/ledger47-zero-div-v5-missing-numerator-control-v1-attempt1-logs-v1.json",
+      "captures/v5/evidence/ledger47-zero-div-v5-missing-numerator-control-v1-attempt1-logs.png",
+      "captures/v5/evidence/ledger47-zero-div-v5-missing-numerator-control-v1-attempt1-visual.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///ecc38d12-128e-4913-9a16-641f9f2a427b.pine?placement%3Ddialog",
+          "path": "/ecc38d12-128e-4913-9a16-641f9f2a427b.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "live_tooltip": "Sun 04 Oct '26   03:46",
+    "historical_compare_before_unix_seconds": 1791085560,
+    "pine_logs": {
+      "paths": [
+        "evidence/ledger47-zero-div-v5-missing-numerator-control-v1-attempt1-logs.txt",
+        "evidence/ledger47-zero-div-v5-missing-numerator-control-v1-attempt1-logs-v1.json",
+        "evidence/ledger47-zero-div-v5-missing-numerator-control-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "ddd66e8b59dd4d022669cd705b553d070259fe1b5c2ec627b9126e6de03142e5",
+    "csv_bytes": 1786839,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "INPUT_TIME",
+      "NUMERATOR_CLOSE",
+      "RAW",
+      "IS_NA",
+      "NZ_42"
+    ],
+    "declared_to_native_header_mapping": {
+      "INPUT_TIME": "INPUT_TIME",
+      "NUMERATOR_CLOSE": "NUMERATOR_CLOSE",
+      "RAW": "RAW",
+      "IS_NA": "IS_NA",
+      "NZ_42": "NZ_42"
+    },
+    "csv_rows": 24595,
+    "historical_rows": 24593,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791085680,
+    "first_historical_values": {
+      "INPUT_TIME": "1788134400000",
+      "NUMERATOR_CLOSE": "77674.04",
+      "RAW": "",
+      "IS_NA": "1",
+      "NZ_42": "42"
+    },
+    "last_historical_values": {
+      "INPUT_TIME": "1791085440000",
+      "NUMERATOR_CLOSE": "84884.97",
+      "RAW": "",
+      "IS_NA": "1",
+      "NZ_42": "42"
+    }
+  },
+  {
+    "script": "ledger47-zero-div-v5-missing-numerator-control-v1.pine",
+    "attempt": 2,
+    "source_sha256": "3a06ad2800003911fda5f13807c3225f0df7d34b3190eb9528c4b8cea212a3e6",
+    "indicator_title": "ledger47-zero-div-v5-missing-numerator-control-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v5/ledger47-zero-div-v5-missing-numerator-control-v1-attempt2.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T114835.510.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "ledger47-zero-div-v5-missing-numerator-control-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24295,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24595,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T03:48:29.151Z",
+    "live_candle_open_utc": "2026-10-04T03:48:00.000Z",
+    "export_utc": "2026-10-04T03:48:35.867Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v5/evidence/ledger47-zero-div-v5-missing-numerator-control-v1-attempt2-setup.png",
+      "captures/v5/evidence/ledger47-zero-div-v5-missing-numerator-control-v1-attempt2-export.png",
+      "captures/v5/evidence/ledger47-zero-div-v5-missing-numerator-control-v1-attempt2-logs.txt",
+      "captures/v5/evidence/ledger47-zero-div-v5-missing-numerator-control-v1-attempt2-logs-v1.json",
+      "captures/v5/evidence/ledger47-zero-div-v5-missing-numerator-control-v1-attempt2-logs.png",
+      "captures/v5/evidence/ledger47-zero-div-v5-missing-numerator-control-v1-attempt2-visual.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///57336de6-6949-4671-83fe-93a2e9fe0cf8.pine?placement%3Ddialog",
+          "path": "/57336de6-6949-4671-83fe-93a2e9fe0cf8.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "live_tooltip": "Sun 04 Oct '26   03:48",
+    "historical_compare_before_unix_seconds": 1791085680,
+    "pine_logs": {
+      "paths": [
+        "evidence/ledger47-zero-div-v5-missing-numerator-control-v1-attempt2-logs.txt",
+        "evidence/ledger47-zero-div-v5-missing-numerator-control-v1-attempt2-logs-v1.json",
+        "evidence/ledger47-zero-div-v5-missing-numerator-control-v1-attempt2-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "db27af56d2340c22c08f2e5e7a1edd21cfaf103a2aa206ceeac7f52ce8082080",
+    "csv_bytes": 1786842,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "INPUT_TIME",
+      "NUMERATOR_CLOSE",
+      "RAW",
+      "IS_NA",
+      "NZ_42"
+    ],
+    "declared_to_native_header_mapping": {
+      "INPUT_TIME": "INPUT_TIME",
+      "NUMERATOR_CLOSE": "NUMERATOR_CLOSE",
+      "RAW": "RAW",
+      "IS_NA": "IS_NA",
+      "NZ_42": "NZ_42"
+    },
+    "csv_rows": 24595,
+    "historical_rows": 24594,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791085680,
+    "first_historical_values": {
+      "INPUT_TIME": "1788134400000",
+      "NUMERATOR_CLOSE": "77674.04",
+      "RAW": "",
+      "IS_NA": "1",
+      "NZ_42": "42"
+    },
+    "last_historical_values": {
+      "INPUT_TIME": "1791085560000",
+      "NUMERATOR_CLOSE": "84870.01",
+      "RAW": "",
+      "IS_NA": "1",
+      "NZ_42": "42"
+    }
+  },
+  {
+    "script": "ledger47-zero-div-v5-udf-zero-v1.pine",
+    "attempt": 1,
+    "source_sha256": "ec2f93dbf2de2548fcc274ca69c86aea341e3a14a264725e3ebdbfc38392893c",
+    "indicator_title": "ledger47-zero-div-v5-udf-zero-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v5/ledger47-zero-div-v5-udf-zero-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T114859.065.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "ledger47-zero-div-v5-udf-zero-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24295,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24595,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T03:48:52.666Z",
+    "live_candle_open_utc": "2026-10-04T03:48:00.000Z",
+    "export_utc": "2026-10-04T03:48:59.301Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v5/evidence/ledger47-zero-div-v5-udf-zero-v1-attempt1-setup.png",
+      "captures/v5/evidence/ledger47-zero-div-v5-udf-zero-v1-attempt1-export.png",
+      "captures/v5/evidence/ledger47-zero-div-v5-udf-zero-v1-attempt1-logs.txt",
+      "captures/v5/evidence/ledger47-zero-div-v5-udf-zero-v1-attempt1-logs-v1.json",
+      "captures/v5/evidence/ledger47-zero-div-v5-udf-zero-v1-attempt1-logs.png",
+      "captures/v5/evidence/ledger47-zero-div-v5-udf-zero-v1-attempt1-visual.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///31bc00bf-35dd-4517-b0fe-66c3e904a8fe.pine?placement%3Ddialog",
+          "path": "/31bc00bf-35dd-4517-b0fe-66c3e904a8fe.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "live_tooltip": "Sun 04 Oct '26   03:48",
+    "historical_compare_before_unix_seconds": 1791085680,
+    "pine_logs": {
+      "paths": [
+        "evidence/ledger47-zero-div-v5-udf-zero-v1-attempt1-logs.txt",
+        "evidence/ledger47-zero-div-v5-udf-zero-v1-attempt1-logs-v1.json",
+        "evidence/ledger47-zero-div-v5-udf-zero-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "b02ac26c87a09d0ceefb054e84bf77fc1b6392f8e059d800fcb844dbc87781b1",
+    "csv_bytes": 1786848,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "INPUT_TIME",
+      "NUMERATOR_CLOSE",
+      "RAW",
+      "IS_NA",
+      "NZ_42"
+    ],
+    "declared_to_native_header_mapping": {
+      "INPUT_TIME": "INPUT_TIME",
+      "NUMERATOR_CLOSE": "NUMERATOR_CLOSE",
+      "RAW": "RAW",
+      "IS_NA": "IS_NA",
+      "NZ_42": "NZ_42"
+    },
+    "csv_rows": 24595,
+    "historical_rows": 24594,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791085680,
+    "first_historical_values": {
+      "INPUT_TIME": "1788134400000",
+      "NUMERATOR_CLOSE": "77674.04",
+      "RAW": "",
+      "IS_NA": "1",
+      "NZ_42": "42"
+    },
+    "last_historical_values": {
+      "INPUT_TIME": "1791085560000",
+      "NUMERATOR_CLOSE": "84870.01",
+      "RAW": "",
+      "IS_NA": "1",
+      "NZ_42": "42"
+    }
   }
 ]

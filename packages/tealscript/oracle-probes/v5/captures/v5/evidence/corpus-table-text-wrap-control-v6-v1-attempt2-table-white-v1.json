@@ -1,0 +1,14 @@
+{
+  "artifact": "Native table view witness v1",
+  "source": "corpus-table-text-wrap-control-v6-v1.pine",
+  "attempt": 2,
+  "prior": {
+    "background": "#0F0F0F",
+    "background_type": "solid",
+    "legend": true,
+    "theme": "is-authenticated is-pro theme-dark mac_os_system feature-no-touch feature-no-mobiletouch"
+  },
+  "view_change": "After raw CSV, solid white background and hidden legend make unchanged default black table text legible; native pane maximized. Original background and legend restored.",
+  "screenshot": "captures/v5/evidence/corpus-table-text-wrap-control-v6-v1-attempt2-table-white-v1.png",
+  "browser_utc": "2026-10-04T03:32:23.657Z"
+}
