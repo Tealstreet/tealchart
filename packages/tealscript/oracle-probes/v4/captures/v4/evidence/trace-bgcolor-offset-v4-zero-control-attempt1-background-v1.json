@@ -1,0 +1,200 @@
+{
+  "artifact": "Native background placement witness v1",
+  "script": "trace-bgcolor-offset-v4-zero-control.pine",
+  "attempt": 1,
+  "targets": {
+    "negative": {
+      "index": 280,
+      "value": [
+        1791077280,
+        3,
+        24524,
+        12,
+        4,
+        -3
+      ]
+    },
+    "positive": {
+      "index": 277,
+      "value": [
+        1791076920,
+        1,
+        24521,
+        9,
+        2,
+        2
+      ]
+    }
+  },
+  "native_plot_metadata": [
+    {
+      "id": "plot_0",
+      "palette": "palette_0",
+      "type": "bg_colorer"
+    },
+    {
+      "id": "plot_1",
+      "type": "line"
+    },
+    {
+      "id": "plot_2",
+      "type": "line"
+    },
+    {
+      "id": "plot_3",
+      "type": "line"
+    },
+    {
+      "id": "plot_4",
+      "type": "line"
+    }
+  ],
+  "native_styles": {
+    "plot_0": {
+      "isHidden": false,
+      "title": "Background Color"
+    },
+    "plot_1": {
+      "histogramBase": 0,
+      "isHidden": false,
+      "joinPoints": false,
+      "title": "BAR_INDEX"
+    },
+    "plot_2": {
+      "histogramBase": 0,
+      "isHidden": false,
+      "joinPoints": false,
+      "title": "PHASE"
+    },
+    "plot_3": {
+      "histogramBase": 0,
+      "isHidden": false,
+      "joinPoints": false,
+      "title": "SOURCE_CODE"
+    },
+    "plot_4": {
+      "histogramBase": 0,
+      "isHidden": false,
+      "joinPoints": false,
+      "title": "SERIES_OFFSET"
+    }
+  },
+  "observations": [
+    {
+      "sign": "positive",
+      "target": {
+        "index": 277,
+        "value": [
+          1791076920,
+          1,
+          24521,
+          9,
+          2,
+          2
+        ]
+      },
+      "observed_at_utc": "2026-10-04T02:07:15.871Z",
+      "rendered_time_tooltip": "Sun 04 Oct '26   01:22",
+      "native_background_offset": 0,
+      "native_last_plot_row": {
+        "index": 299,
+        "value": [
+          1791079560,
+          null,
+          24543,
+          31,
+          0,
+          -3
+        ]
+      },
+      "screenshot": "captures/v4/evidence/trace-bgcolor-offset-v4-zero-control-attempt1-positive-v1.png"
+    },
+    {
+      "sign": "negative",
+      "target": {
+        "index": 280,
+        "value": [
+          1791077280,
+          3,
+          24524,
+          12,
+          4,
+          -3
+        ]
+      },
+      "observed_at_utc": "2026-10-04T02:07:17.702Z",
+      "rendered_time_tooltip": "Sun 04 Oct '26   01:28",
+      "native_background_offset": 0,
+      "native_last_plot_row": {
+        "index": 299,
+        "value": [
+          1791079560,
+          null,
+          24543,
+          31,
+          0,
+          -3
+        ]
+      },
+      "screenshot": "captures/v4/evidence/trace-bgcolor-offset-v4-zero-control-attempt1-negative-v1.png"
+    }
+  ],
+  "updates": [
+    {
+      "observed_at_utc": "2026-10-04T02:07:18.883Z",
+      "native_chart_last": {
+        "index": 299,
+        "value": [
+          1791079560,
+          84869.85,
+          84869.85,
+          84832.49,
+          84832.5,
+          11.66429
+        ]
+      },
+      "native_plot_last": {
+        "index": 299,
+        "value": [
+          1791079560,
+          null,
+          24543,
+          31,
+          0,
+          -3
+        ]
+      },
+      "native_background_offset": 0,
+      "screenshot": "captures/v4/evidence/trace-bgcolor-offset-v4-zero-control-attempt1-update1-v1.png"
+    },
+    {
+      "observed_at_utc": "2026-10-04T02:07:25.226Z",
+      "native_chart_last": {
+        "index": 299,
+        "value": [
+          1791079560,
+          84869.85,
+          84869.85,
+          84832.49,
+          84832.5,
+          11.77019
+        ]
+      },
+      "native_plot_last": {
+        "index": 299,
+        "value": [
+          1791079560,
+          null,
+          24543,
+          31,
+          0,
+          -3
+        ]
+      },
+      "native_background_offset": 0,
+      "screenshot": "captures/v4/evidence/trace-bgcolor-offset-v4-zero-control-attempt1-update2-v1.png"
+    }
+  ],
+  "view_change": "Post-export only: maximize dedicated pane,25-bar historical sign views and latest40+4 update views; repaint via native fullUpdate; source/defaults unchanged.",
+  "limitations": "Zero-control screenshots use the same source sign cases, while actual bgcolor source uses literal offset0. Native offsets and plotted phase/source data are recorded without treating CSV row positions as pixels."
+}

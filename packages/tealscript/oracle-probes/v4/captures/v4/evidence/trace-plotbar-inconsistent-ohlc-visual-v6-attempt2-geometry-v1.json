@@ -1,0 +1,205 @@
+{
+  "artifact": "Native OHLC geometry witness v1",
+  "script": "trace-plotbar-inconsistent-ohlc-visual-v6.pine",
+  "attempt": 2,
+  "full": {
+    "observed_at_utc": "2026-10-04T01:59:07.405Z",
+    "native_last_plot_row": {
+      "index": 300,
+      "value": [
+        1791079080,
+        110,
+        null,
+        100,
+        115,
+        5,
+        24539,
+        1791079080000,
+        110,
+        null,
+        100,
+        115,
+        1
+      ]
+    },
+    "native_plot_metadata": [
+      {
+        "id": "plot_0",
+        "target": "plotbar_0",
+        "type": "ohlc_open"
+      },
+      {
+        "id": "plot_1",
+        "target": "plotbar_0",
+        "type": "ohlc_high"
+      },
+      {
+        "id": "plot_2",
+        "target": "plotbar_0",
+        "type": "ohlc_low"
+      },
+      {
+        "id": "plot_3",
+        "target": "plotbar_0",
+        "type": "ohlc_close"
+      },
+      {
+        "id": "plot_4",
+        "type": "line"
+      },
+      {
+        "id": "plot_5",
+        "type": "line"
+      },
+      {
+        "id": "plot_6",
+        "type": "line"
+      },
+      {
+        "id": "plot_7",
+        "type": "line"
+      },
+      {
+        "id": "plot_8",
+        "type": "line"
+      },
+      {
+        "id": "plot_9",
+        "type": "line"
+      },
+      {
+        "id": "plot_10",
+        "type": "line"
+      },
+      {
+        "id": "plot_11",
+        "type": "line"
+      }
+    ]
+  },
+  "cases": [
+    {
+      "case_id": 1,
+      "observed_at_utc": "2026-10-04T01:59:08.226Z",
+      "target_native_plot_row": {
+        "index": 296,
+        "value": [
+          1791078600,
+          110,
+          112,
+          100,
+          118,
+          1,
+          24535,
+          1791078600000,
+          110,
+          112,
+          100,
+          118,
+          1
+        ]
+      },
+      "rendered_time_tooltip": "Sun 04 Oct '26   01:50",
+      "screenshot": "captures/v4/evidence/trace-plotbar-inconsistent-ohlc-visual-v6-attempt2-case1-v1.png"
+    },
+    {
+      "case_id": 2,
+      "observed_at_utc": "2026-10-04T01:59:09.041Z",
+      "target_native_plot_row": {
+        "index": 297,
+        "value": [
+          1791078720,
+          105,
+          120,
+          110,
+          115,
+          2,
+          24536,
+          1791078720000,
+          105,
+          120,
+          110,
+          115,
+          1
+        ]
+      },
+      "rendered_time_tooltip": "Sun 04 Oct '26   01:52",
+      "screenshot": "captures/v4/evidence/trace-plotbar-inconsistent-ohlc-visual-v6-attempt2-case2-v1.png"
+    },
+    {
+      "case_id": 3,
+      "observed_at_utc": "2026-10-04T01:59:09.862Z",
+      "target_native_plot_row": {
+        "index": 298,
+        "value": [
+          1791078840,
+          110,
+          103,
+          119,
+          115,
+          3,
+          24537,
+          1791078840000,
+          110,
+          103,
+          119,
+          115,
+          1
+        ]
+      },
+      "rendered_time_tooltip": "Sun 04 Oct '26   01:54",
+      "screenshot": "captures/v4/evidence/trace-plotbar-inconsistent-ohlc-visual-v6-attempt2-case3-v1.png"
+    },
+    {
+      "case_id": 4,
+      "observed_at_utc": "2026-10-04T01:59:10.689Z",
+      "target_native_plot_row": {
+        "index": 299,
+        "value": [
+          1791078960,
+          123,
+          114,
+          106,
+          97,
+          4,
+          24538,
+          1791078960000,
+          123,
+          114,
+          106,
+          97,
+          1
+        ]
+      },
+      "rendered_time_tooltip": "Sun 04 Oct '26   01:56",
+      "screenshot": "captures/v4/evidence/trace-plotbar-inconsistent-ohlc-visual-v6-attempt2-case4-v1.png"
+    },
+    {
+      "case_id": 5,
+      "observed_at_utc": "2026-10-04T01:59:11.510Z",
+      "target_native_plot_row": {
+        "index": 294,
+        "value": [
+          1791078360,
+          110,
+          null,
+          100,
+          115,
+          5,
+          24533,
+          1791078360000,
+          110,
+          null,
+          100,
+          115,
+          1
+        ]
+      },
+      "rendered_time_tooltip": "Sun 04 Oct '26   01:46",
+      "screenshot": "captures/v4/evidence/trace-plotbar-inconsistent-ohlc-visual-v6-attempt2-case5-v1.png"
+    }
+  ],
+  "view_change": "After export only: close Logs, hide favorite drawing toolbar, maximize dedicated indicator pane, latest18 bars plus2 right; case close-ups span4 bars. Source/inputs/styles unchanged. Pane restored after screenshots.",
+  "screenshot": "captures/v4/evidence/trace-plotbar-inconsistent-ohlc-visual-v6-attempt2-pane-v2.png",
+  "limitations": "Target CSV fields are supplied raw values; pixels establish geometry. Case5 missing high observed separately."
+}

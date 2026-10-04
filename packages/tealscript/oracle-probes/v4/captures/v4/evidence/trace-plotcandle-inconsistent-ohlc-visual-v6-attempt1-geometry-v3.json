@@ -1,0 +1,250 @@
+{
+  "artifact": "Native OHLC geometry witness v3",
+  "script": "trace-plotcandle-inconsistent-ohlc-visual-v6.pine",
+  "attempt": 1,
+  "full": {
+    "observed_at_utc": "2026-10-04T02:01:57.790Z",
+    "native_last_plot_row": {
+      "index": 300,
+      "value": [
+        1791079200,
+        110,
+        120,
+        100,
+        115,
+        0,
+        24540,
+        1791079200000,
+        110,
+        120,
+        100,
+        115,
+        1
+      ]
+    },
+    "native_plot_metadata": [
+      {
+        "id": "plot_0",
+        "target": "plotcandle_0",
+        "type": "ohlc_open"
+      },
+      {
+        "id": "plot_1",
+        "target": "plotcandle_0",
+        "type": "ohlc_high"
+      },
+      {
+        "id": "plot_2",
+        "target": "plotcandle_0",
+        "type": "ohlc_low"
+      },
+      {
+        "id": "plot_3",
+        "target": "plotcandle_0",
+        "type": "ohlc_close"
+      },
+      {
+        "id": "plot_4",
+        "type": "line"
+      },
+      {
+        "id": "plot_5",
+        "type": "line"
+      },
+      {
+        "id": "plot_6",
+        "type": "line"
+      },
+      {
+        "id": "plot_7",
+        "type": "line"
+      },
+      {
+        "id": "plot_8",
+        "type": "line"
+      },
+      {
+        "id": "plot_9",
+        "type": "line"
+      },
+      {
+        "id": "plot_10",
+        "type": "line"
+      },
+      {
+        "id": "plot_11",
+        "type": "line"
+      }
+    ]
+  },
+  "cases": [
+    {
+      "case_id": 1,
+      "observed_at_utc": "2026-10-04T02:01:58.919Z",
+      "target_native_plot_row": {
+        "index": 295,
+        "value": [
+          1791078600,
+          110,
+          112,
+          100,
+          118,
+          1,
+          24535,
+          1791078600000,
+          110,
+          112,
+          100,
+          118,
+          1
+        ]
+      },
+      "rendered_time_tooltip": "Sun 04 Oct '26   01:58",
+      "rendered": {
+        "selected_x": 637.5,
+        "time_scale_width": 1275,
+        "rendered_time_tooltip": "Sun 04 Oct '26   01:50",
+        "visible_range": {
+          "_firstBar": 293,
+          "_lastBar": 297
+        }
+      },
+      "screenshot": "captures/v4/evidence/trace-plotcandle-inconsistent-ohlc-visual-v6-attempt1-case1-v3.png"
+    },
+    {
+      "case_id": 2,
+      "observed_at_utc": "2026-10-04T02:02:00.574Z",
+      "target_native_plot_row": {
+        "index": 296,
+        "value": [
+          1791078720,
+          105,
+          120,
+          110,
+          115,
+          2,
+          24536,
+          1791078720000,
+          105,
+          120,
+          110,
+          115,
+          1
+        ]
+      },
+      "rendered_time_tooltip": "Sun 04 Oct '26   01:50",
+      "rendered": {
+        "selected_x": 637.5,
+        "time_scale_width": 1275,
+        "rendered_time_tooltip": "Sun 04 Oct '26   01:52",
+        "visible_range": {
+          "_firstBar": 294,
+          "_lastBar": 298
+        }
+      },
+      "screenshot": "captures/v4/evidence/trace-plotcandle-inconsistent-ohlc-visual-v6-attempt1-case2-v3.png"
+    },
+    {
+      "case_id": 3,
+      "observed_at_utc": "2026-10-04T02:02:02.253Z",
+      "target_native_plot_row": {
+        "index": 297,
+        "value": [
+          1791078840,
+          110,
+          103,
+          119,
+          115,
+          3,
+          24537,
+          1791078840000,
+          110,
+          103,
+          119,
+          115,
+          1
+        ]
+      },
+      "rendered_time_tooltip": "Sun 04 Oct '26   01:52",
+      "rendered": {
+        "selected_x": 637.5,
+        "time_scale_width": 1275,
+        "rendered_time_tooltip": "Sun 04 Oct '26   01:54",
+        "visible_range": {
+          "_firstBar": 295,
+          "_lastBar": 299
+        }
+      },
+      "screenshot": "captures/v4/evidence/trace-plotcandle-inconsistent-ohlc-visual-v6-attempt1-case3-v3.png"
+    },
+    {
+      "case_id": 4,
+      "observed_at_utc": "2026-10-04T02:02:03.923Z",
+      "target_native_plot_row": {
+        "index": 298,
+        "value": [
+          1791078960,
+          123,
+          114,
+          106,
+          97,
+          4,
+          24538,
+          1791078960000,
+          123,
+          114,
+          106,
+          97,
+          1
+        ]
+      },
+      "rendered_time_tooltip": "Sun 04 Oct '26   01:54",
+      "rendered": {
+        "selected_x": 637.5,
+        "time_scale_width": 1275,
+        "rendered_time_tooltip": "Sun 04 Oct '26   01:56",
+        "visible_range": {
+          "_firstBar": 296,
+          "_lastBar": 300
+        }
+      },
+      "screenshot": "captures/v4/evidence/trace-plotcandle-inconsistent-ohlc-visual-v6-attempt1-case4-v3.png"
+    },
+    {
+      "case_id": 5,
+      "observed_at_utc": "2026-10-04T02:02:05.597Z",
+      "target_native_plot_row": {
+        "index": 299,
+        "value": [
+          1791079080,
+          110,
+          null,
+          100,
+          115,
+          5,
+          24539,
+          1791079080000,
+          110,
+          null,
+          100,
+          115,
+          1
+        ]
+      },
+      "rendered_time_tooltip": "Sun 04 Oct '26   01:56",
+      "rendered": {
+        "selected_x": 637.5,
+        "time_scale_width": 1275,
+        "rendered_time_tooltip": "Sun 04 Oct '26   01:58",
+        "visible_range": {
+          "_firstBar": 297,
+          "_lastBar": 301
+        }
+      },
+      "screenshot": "captures/v4/evidence/trace-plotcandle-inconsistent-ohlc-visual-v6-attempt1-case5-v3.png"
+    }
+  ],
+  "view_change": "After export only: close Logs, hide favorite drawing toolbar, maximize dedicated indicator pane, latest18 bars plus2 right; case close-ups span4 bars. Source/inputs/styles unchanged. Pane restored after screenshots.",
+  "screenshot": "captures/v4/evidence/trace-plotcandle-inconsistent-ohlc-visual-v6-attempt1-pane-v3.png",
+  "limitations": "Target CSV fields are supplied raw values; pixels establish geometry. Case5 missing high observed separately."
+}

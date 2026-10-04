@@ -1,0 +1,20 @@
+Error on bar 0: In the 'matrix.pow()' function. The 'power' argument must be positive.
+{
+  "ctx": {
+    "bar_index": 0,
+    "code": "RE10090"
+  },
+  "error": "Error on bar {bar_index}: In the 'matrix.pow()' function. The 'power' argument must be positive.",
+  "stack_trace": [
+    {
+      "n": "#main",
+      "p": 3
+    }
+  ],
+  "title": "Runtime error",
+  "showReportItButton": false,
+  "studyAccessBlocked": false,
+  "compiler_markers": [],
+  "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,819.49\nH\n84,834.01\nL\n84,805.29\nC\n84,834.01\n+14.53 (+0.02%)\n84,834.00\nSELL\n0.01\n84,834.01\nBUY\nUSDT\nCORPUS5-MATRIX-NEGATIVE-IDENTITY-POWER-V1\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n02:11:08 UTC\n99+\nRuntime error: RE10090\nRuntime error: RE10090\nError on bar 0: In the 'matrix.pow()' function. The 'power' argument must be positive.\nat #main():3\nOpen in editor",
+  "context_substituted_message": "Error on bar 0: In the 'matrix.pow()' function. The 'power' argument must be positive."
+}
