@@ -1,0 +1,32 @@
+{
+  "index": 298,
+  "bar": [
+    1791093120,
+    84909.6,
+    84918.01,
+    84909.59,
+    84918.01,
+    5.15557
+  ],
+  "source_row": [
+    1791093120,
+    null,
+    10,
+    null,
+    null
+  ],
+  "browser_utc": "2026-10-04T05:55:54.011Z",
+  "title": "V7 ta-pivothigh-candidate-holes-v6-v1",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   05:52",
+  "visible_range": {
+    "_firstBar": 263,
+    "_lastBar": 301
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}
