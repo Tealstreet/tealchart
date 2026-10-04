@@ -1,0 +1,32 @@
+{
+  "index": 298,
+  "bar": [
+    1791099720,
+    84957.5,
+    84972.01,
+    84957.49,
+    84972,
+    5.03671
+  ],
+  "source_row": [
+    1791099720,
+    1,
+    84972,
+    84957.49,
+    1
+  ],
+  "browser_utc": "2026-10-04T07:44:44.856Z",
+  "title": "V7 nonstandard-history-ticks-v6-v1",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   07:42",
+  "visible_range": {
+    "_firstBar": 263,
+    "_lastBar": 301
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}
