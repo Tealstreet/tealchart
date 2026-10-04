@@ -1,0 +1,59 @@
+{
+  "artifact": "Independent native requested feed receipt v1",
+  "interval": "6",
+  "attempt": 1,
+  "original_download_filename": "BINANCE_BTCUSDT, 6 (3).csv",
+  "csv_file": "captures/v16/native-requested-6m-raw-v1-attempt1.csv",
+  "csv_sha256": "a2bb817e771664351a658759c3a520ec9cfb311b824cb6872ecb168e7f01c1bd",
+  "csv_headers": [
+    "time",
+    "open",
+    "high",
+    "low",
+    "close"
+  ],
+  "csv_rows": 20126,
+  "native_ohlcv_json": "captures/v16/evidence/native-requested-6m-raw-v1-attempt1-native-v1.json",
+  "native_ohlcv_sha256": "c8470da6ecebf48db210134d680d621e028fa19d6b09a5a7f6f72f1b768a5340",
+  "native_volume_origin": "Unmodified native main-series bars() values at position5; original CSV has five OHLC/time columns and is retained unchanged. Volume is supplied only by the independent native JSON feed, never an expected script output.",
+  "excluded_live_cutoff_unix_seconds": 1791145800,
+  "live_boundary_unchanged": true,
+  "settings": {
+    "symbol": "BINANCE:BTCUSDT",
+    "interval": "6",
+    "style": 1,
+    "timezone": "Etc/UTC",
+    "minmove": 1,
+    "pricescale": 100,
+    "currency": "USDT",
+    "session": "24x7",
+    "chart_session": "regular"
+  },
+  "first_native": {
+    "index": -19825,
+    "value": [
+      1783900800,
+      63780,
+      64038,
+      63725.37,
+      63979.84,
+      116.44631
+    ]
+  },
+  "last_native": {
+    "index": 300,
+    "value": [
+      1791145800,
+      85474.3,
+      85474.31,
+      85474.29,
+      85474.3,
+      6.89065
+    ]
+  },
+  "evidence_files": [
+    "captures/v16/evidence/native-requested-6m-raw-v1-attempt1-native-v1.json",
+    "captures/v16/evidence/native-requested-6m-raw-v1-attempt1-setup-v1.png",
+    "captures/v16/evidence/native-requested-6m-raw-v1-attempt1-export-v1.png"
+  ]
+}

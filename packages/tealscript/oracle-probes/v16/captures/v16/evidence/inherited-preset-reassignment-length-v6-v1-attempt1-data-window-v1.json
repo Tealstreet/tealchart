@@ -1,0 +1,35 @@
+{
+  "index": 298,
+  "bar": [
+    1791144960,
+    85444,
+    85472.1,
+    85444,
+    85472.1,
+    4.92885
+  ],
+  "source_row": [
+    1791144960,
+    19.34702062102675,
+    66.28097190385975,
+    85459.22490730147,
+    10,
+    9,
+    2,
+    20048
+  ],
+  "browser_utc": "2026-10-04T20:19:31.225Z",
+  "title": "Inherited preset reassignment qualifier v1",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   20:16",
+  "visible_range": {
+    "_firstBar": 263,
+    "_lastBar": 301
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}

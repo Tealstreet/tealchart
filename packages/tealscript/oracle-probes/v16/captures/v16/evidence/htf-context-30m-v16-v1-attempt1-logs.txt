@@ -1,0 +1,14 @@
+[2026-10-04T20:22:00.000Z]: CHART symbol=BINANCE:BTCUSDT standard=BINANCE:BTCUSDT period=2 timezone=Etc/UTC session=regular
+[2026-10-04T20:22:00.000Z]: REQUEST symbol=BINANCE:BTCUSDT period=30 timezone=Etc/UTC session=regular
+[2026-10-04T20:24:00.000Z]: CHART symbol=BINANCE:BTCUSDT standard=BINANCE:BTCUSDT period=2 timezone=Etc/UTC session=regular
+[2026-10-04T20:24:00.000Z]: REQUEST symbol=BINANCE:BTCUSDT period=30 timezone=Etc/UTC session=regular
+[2026-10-04T20:24:17.565Z]: CHART symbol=BINANCE:BTCUSDT standard=BINANCE:BTCUSDT period=2 timezone=Etc/UTC session=regular
+[2026-10-04T20:24:17.565Z]: REQUEST symbol=BINANCE:BTCUSDT period=30 timezone=Etc/UTC session=regular
+[2026-10-04T20:24:17.565Z]: CHART symbol=BINANCE:BTCUSDT standard=BINANCE:BTCUSDT period=2 timezone=Etc/UTC session=regular
+[2026-10-04T20:24:17.565Z]: REQUEST symbol=BINANCE:BTCUSDT period=30 timezone=Etc/UTC session=regular
+[2026-10-04T20:24:18.465Z]: CHART symbol=BINANCE:BTCUSDT standard=BINANCE:BTCUSDT period=2 timezone=Etc/UTC session=regular
+[2026-10-04T20:24:18.465Z]: REQUEST symbol=BINANCE:BTCUSDT period=30 timezone=Etc/UTC session=regular
+[2026-10-04T20:24:18.465Z]: CHART symbol=BINANCE:BTCUSDT standard=BINANCE:BTCUSDT period=2 timezone=Etc/UTC session=regular
+[2026-10-04T20:24:18.465Z]: REQUEST symbol=BINANCE:BTCUSDT period=30 timezone=Etc/UTC session=regular
+[2026-10-04T20:24:18.735Z]: CHART symbol=BINANCE:BTCUSDT standard=BINANCE:BTCUSDT period=2 timezone=Etc/UTC session=regular
+[2026-10-04T20:24:18.735Z]: REQUEST symbol=BINANCE:BTCUSDT period=30 timezone=Etc/UTC session=regular

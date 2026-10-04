@@ -1,0 +1,630 @@
+{
+  "artifact": "v16 actual HTF context pairing v1",
+  "original_manifest": "packages/tealscript/oracle-probes/captures/v1/manifest-v1.json",
+  "join": "Actual exported millisecond request_time/end, full native ticker/tick/session and complete independent feed cutoff; expected request columns never substituted for raw feed input.",
+  "contexts": [
+    {
+      "timeframe": "6",
+      "reloaded_attempt": 3,
+      "script": "htf-context-6m-v16-v1.pine",
+      "first_chart_index": "0",
+      "first_chart_time": "1788739200000",
+      "first_request_index": "0",
+      "first_request_time": "1788739200000",
+      "independent_raw_receipt": "native-requested-6m-raw-v1-attempt1-receipt-v1.json",
+      "matched_complete_closed_chart_rows": 20055,
+      "native_open_high_low_close_volume_mismatch_rows": [
+        {
+          "chart_time": "1790938080",
+          "request_time": "1790938080000",
+          "differences": [
+            {
+              "column": "request_volume",
+              "actual_csv": "33.56835",
+              "independent_native": "33.57039"
+            }
+          ]
+        },
+        {
+          "chart_time": "1790938200",
+          "request_time": "1790938080000",
+          "differences": [
+            {
+              "column": "request_volume",
+              "actual_csv": "33.56835",
+              "independent_native": "33.57039"
+            }
+          ]
+        },
+        {
+          "chart_time": "1790938320",
+          "request_time": "1790938080000",
+          "differences": [
+            {
+              "column": "request_volume",
+              "actual_csv": "33.56835",
+              "independent_native": "33.57039"
+            }
+          ]
+        },
+        {
+          "chart_time": "1791145440",
+          "request_time": "1791145440000",
+          "differences": [
+            {
+              "column": "request_volume",
+              "actual_csv": "29.129730000000002",
+              "independent_native": "29.12973"
+            }
+          ]
+        },
+        {
+          "chart_time": "1791145560",
+          "request_time": "1791145440000",
+          "differences": [
+            {
+              "column": "request_volume",
+              "actual_csv": "29.129730000000002",
+              "independent_native": "29.12973"
+            }
+          ]
+        },
+        {
+          "chart_time": "1791145680",
+          "request_time": "1791145440000",
+          "differences": [
+            {
+              "column": "request_volume",
+              "actual_csv": "29.129730000000002",
+              "independent_native": "29.12973"
+            }
+          ]
+        }
+      ],
+      "original_request_index_differences_on_matching_request_times": [
+        "-1680"
+      ],
+      "original_affected_interval_index_witnesses": [
+        {
+          "time": "1791003600",
+          "old_request_time": "1791003600000",
+          "old_request_index": "7970",
+          "observed_request_index": "6290",
+          "index_difference": "-1680"
+        },
+        {
+          "time": "1791003720",
+          "old_request_time": "1791003600000",
+          "old_request_index": "7970",
+          "observed_request_index": "6290",
+          "index_difference": "-1680"
+        },
+        {
+          "time": "1791003840",
+          "old_request_time": "1791003600000",
+          "old_request_index": "7970",
+          "observed_request_index": "6290",
+          "index_difference": "-1680"
+        },
+        {
+          "time": "1791003960",
+          "old_request_time": "1791003960000",
+          "old_request_index": "7971",
+          "observed_request_index": "6291",
+          "index_difference": "-1680"
+        },
+        {
+          "time": "1791004080",
+          "old_request_time": "1791003960000",
+          "old_request_index": "7971",
+          "observed_request_index": "6291",
+          "index_difference": "-1680"
+        },
+        {
+          "time": "1791004200",
+          "old_request_time": "1791003960000",
+          "old_request_index": "7971",
+          "observed_request_index": "6291",
+          "index_difference": "-1680"
+        },
+        {
+          "time": "1791004320",
+          "old_request_time": "1791004320000",
+          "old_request_index": "7972",
+          "observed_request_index": "6292",
+          "index_difference": "-1680"
+        },
+        {
+          "time": "1791004440",
+          "old_request_time": "1791004320000",
+          "old_request_index": "7972",
+          "observed_request_index": "6292",
+          "index_difference": "-1680"
+        },
+        {
+          "time": "1791004560",
+          "old_request_time": "1791004320000",
+          "old_request_index": "7972",
+          "observed_request_index": "6292",
+          "index_difference": "-1680"
+        },
+        {
+          "time": "1791004680",
+          "old_request_time": "1791004680000",
+          "old_request_index": "7973",
+          "observed_request_index": "6293",
+          "index_difference": "-1680"
+        },
+        {
+          "time": "1791004800",
+          "old_request_time": "1791004680000",
+          "old_request_index": "7973",
+          "observed_request_index": "6293",
+          "index_difference": "-1680"
+        },
+        {
+          "time": "1791004920",
+          "old_request_time": "1791004680000",
+          "old_request_index": "7973",
+          "observed_request_index": "6293",
+          "index_difference": "-1680"
+        },
+        {
+          "time": "1791005040",
+          "old_request_time": "1791005040000",
+          "old_request_index": "7974",
+          "observed_request_index": "6294",
+          "index_difference": "-1680"
+        },
+        {
+          "time": "1791005160",
+          "old_request_time": "1791005040000",
+          "old_request_index": "7974",
+          "observed_request_index": "6294",
+          "index_difference": "-1680"
+        },
+        {
+          "time": "1791005280",
+          "old_request_time": "1791005040000",
+          "old_request_index": "7974",
+          "observed_request_index": "6294",
+          "index_difference": "-1680"
+        }
+      ],
+      "developing_receipt": {
+        "attempt": 1,
+        "export_utc": "2026-10-04T20:23:26.959Z",
+        "csv_file": "captures/v16/htf-context-6m-v16-v1-attempt1.csv",
+        "live_cutoff": 1791145320,
+        "last_historical_values": {
+          "chart_time": "1791145200000",
+          "chart_end": "1791145320000",
+          "chart_index": "20050",
+          "chart_open": "85478.01",
+          "chart_high": "85492.23",
+          "chart_low": "85478",
+          "chart_close": "85492.22",
+          "chart_volume": "1.78422",
+          "chart_tick": "0.01",
+          "chart_minmove": "1",
+          "chart_pricescale": "100",
+          "chart_regular": "1",
+          "chart_premarket": "0",
+          "chart_postmarket": "0",
+          "request_open": "85472.1",
+          "request_high": "85492.23",
+          "request_low": "85472.08",
+          "request_close_goff_lon": "85478.02",
+          "request_volume": "9.19963",
+          "request_time": "1791145080000",
+          "request_end": "1791145440000",
+          "request_index": "6683",
+          "request_previous_close": "85472.1",
+          "request_hole_goff_lon": "85478.02",
+          "request_tick": "0.01",
+          "request_minmove": "1",
+          "request_pricescale": "100",
+          "request_close_gon_lon": "",
+          "request_hole_gon_lon": "",
+          "request_close_goff_loff": "85472.1",
+          "request_hole_goff_loff": "85472.1",
+          "chart_realtime": "0",
+          "chart_confirmed": "1"
+        }
+      },
+      "closed_and_reload_receipts": [
+        {
+          "attempt": 2,
+          "export_utc": "2026-10-04T20:35:03.045Z",
+          "csv_file": "captures/v16/htf-context-6m-v16-v1-attempt2.csv",
+          "live_cutoff": 1791146040,
+          "stable_boundary": true
+        },
+        {
+          "attempt": 3,
+          "export_utc": "2026-10-04T20:35:19.513Z",
+          "csv_file": "captures/v16/htf-context-6m-v16-v1-attempt3.csv",
+          "live_cutoff": 1791146040,
+          "stable_boundary": true
+        }
+      ],
+      "holds": [
+        "Old original tick cannot be recovered from later historical captures.",
+        "Original ticker modifiers/adjustment/currency/entitlement history are not fully exposed.",
+        "Independent feed native indices are not an independently plotted Pine origin.",
+        "Requested buckets ending beyond the raw feed explicit live cutoff remain incomplete feed holds; raw feed will be refreshed later."
+      ]
+    },
+    {
+      "timeframe": "10",
+      "reloaded_attempt": 3,
+      "script": "htf-context-10m-v16-v1.pine",
+      "first_chart_index": "0",
+      "first_chart_time": "1788739200000",
+      "first_request_index": "0",
+      "first_request_time": "1788739200000",
+      "independent_raw_receipt": "native-requested-10m-raw-v1-attempt1-receipt-v1.json",
+      "matched_complete_closed_chart_rows": 20055,
+      "native_open_high_low_close_volume_mismatch_rows": [],
+      "original_request_index_differences_on_matching_request_times": [
+        "-1008"
+      ],
+      "original_affected_interval_index_witnesses": [
+        {
+          "time": "1791003600",
+          "old_request_time": "1791003600000",
+          "old_request_index": "4782",
+          "observed_request_index": "3774",
+          "index_difference": "-1008"
+        },
+        {
+          "time": "1791003720",
+          "old_request_time": "1791003600000",
+          "old_request_index": "4782",
+          "observed_request_index": "3774",
+          "index_difference": "-1008"
+        },
+        {
+          "time": "1791003840",
+          "old_request_time": "1791003600000",
+          "old_request_index": "4782",
+          "observed_request_index": "3774",
+          "index_difference": "-1008"
+        },
+        {
+          "time": "1791003960",
+          "old_request_time": "1791003600000",
+          "old_request_index": "4782",
+          "observed_request_index": "3774",
+          "index_difference": "-1008"
+        },
+        {
+          "time": "1791004080",
+          "old_request_time": "1791003600000",
+          "old_request_index": "4782",
+          "observed_request_index": "3774",
+          "index_difference": "-1008"
+        },
+        {
+          "time": "1791004200",
+          "old_request_time": "1791004200000",
+          "old_request_index": "4783",
+          "observed_request_index": "3775",
+          "index_difference": "-1008"
+        },
+        {
+          "time": "1791004320",
+          "old_request_time": "1791004200000",
+          "old_request_index": "4783",
+          "observed_request_index": "3775",
+          "index_difference": "-1008"
+        },
+        {
+          "time": "1791004440",
+          "old_request_time": "1791004200000",
+          "old_request_index": "4783",
+          "observed_request_index": "3775",
+          "index_difference": "-1008"
+        },
+        {
+          "time": "1791004560",
+          "old_request_time": "1791004200000",
+          "old_request_index": "4783",
+          "observed_request_index": "3775",
+          "index_difference": "-1008"
+        },
+        {
+          "time": "1791004680",
+          "old_request_time": "1791004200000",
+          "old_request_index": "4783",
+          "observed_request_index": "3775",
+          "index_difference": "-1008"
+        },
+        {
+          "time": "1791004800",
+          "old_request_time": "1791004800000",
+          "old_request_index": "4784",
+          "observed_request_index": "3776",
+          "index_difference": "-1008"
+        },
+        {
+          "time": "1791004920",
+          "old_request_time": "1791004800000",
+          "old_request_index": "4784",
+          "observed_request_index": "3776",
+          "index_difference": "-1008"
+        },
+        {
+          "time": "1791005040",
+          "old_request_time": "1791004800000",
+          "old_request_index": "4784",
+          "observed_request_index": "3776",
+          "index_difference": "-1008"
+        },
+        {
+          "time": "1791005160",
+          "old_request_time": "1791004800000",
+          "old_request_index": "4784",
+          "observed_request_index": "3776",
+          "index_difference": "-1008"
+        },
+        {
+          "time": "1791005280",
+          "old_request_time": "1791004800000",
+          "old_request_index": "4784",
+          "observed_request_index": "3776",
+          "index_difference": "-1008"
+        }
+      ],
+      "developing_receipt": {
+        "attempt": 1,
+        "export_utc": "2026-10-04T20:23:56.029Z",
+        "csv_file": "captures/v16/htf-context-10m-v16-v1-attempt1.csv",
+        "live_cutoff": 1791145320,
+        "last_historical_values": {
+          "chart_time": "1791145200000",
+          "chart_end": "1791145320000",
+          "chart_index": "20050",
+          "chart_open": "85478.01",
+          "chart_high": "85492.23",
+          "chart_low": "85478",
+          "chart_close": "85492.22",
+          "chart_volume": "1.78422",
+          "chart_tick": "0.01",
+          "chart_minmove": "1",
+          "chart_pricescale": "100",
+          "chart_regular": "1",
+          "chart_premarket": "0",
+          "chart_postmarket": "0",
+          "request_open": "85478.01",
+          "request_high": "85492.23",
+          "request_low": "85478",
+          "request_close_goff_lon": "85478.01",
+          "request_volume": "4.25781",
+          "request_time": "1791145200000",
+          "request_end": "1791145800000",
+          "request_index": "4010",
+          "request_previous_close": "85478.01",
+          "request_hole_goff_lon": "85478.01",
+          "request_tick": "0.01",
+          "request_minmove": "1",
+          "request_pricescale": "100",
+          "request_close_gon_lon": "85478.01",
+          "request_hole_gon_lon": "85478.01",
+          "request_close_goff_loff": "85478.01",
+          "request_hole_goff_loff": "85478.01",
+          "chart_realtime": "0",
+          "chart_confirmed": "1"
+        }
+      },
+      "closed_and_reload_receipts": [
+        {
+          "attempt": 2,
+          "export_utc": "2026-10-04T20:35:31.215Z",
+          "csv_file": "captures/v16/htf-context-10m-v16-v1-attempt2.csv",
+          "live_cutoff": 1791146040,
+          "stable_boundary": true
+        },
+        {
+          "attempt": 3,
+          "export_utc": "2026-10-04T20:35:47.124Z",
+          "csv_file": "captures/v16/htf-context-10m-v16-v1-attempt3.csv",
+          "live_cutoff": 1791146040,
+          "stable_boundary": true
+        }
+      ],
+      "holds": [
+        "Old original tick cannot be recovered from later historical captures.",
+        "Original ticker modifiers/adjustment/currency/entitlement history are not fully exposed.",
+        "Independent feed native indices are not an independently plotted Pine origin.",
+        "Requested buckets ending beyond the raw feed explicit live cutoff remain incomplete feed holds; raw feed will be refreshed later."
+      ]
+    },
+    {
+      "timeframe": "30",
+      "reloaded_attempt": 3,
+      "script": "htf-context-30m-v16-v1.pine",
+      "first_chart_index": "0",
+      "first_chart_time": "1788739200000",
+      "first_request_index": "11952",
+      "first_request_time": "1788739200000",
+      "independent_raw_receipt": "native-requested-30m-raw-v1-attempt1-receipt-v1.json",
+      "matched_complete_closed_chart_rows": 20055,
+      "native_open_high_low_close_volume_mismatch_rows": [],
+      "original_request_index_differences_on_matching_request_times": [
+        "0"
+      ],
+      "original_affected_interval_index_witnesses": [
+        {
+          "time": "1791003600",
+          "old_request_time": "1791003600000",
+          "old_request_index": "13210",
+          "observed_request_index": "13210",
+          "index_difference": "0"
+        },
+        {
+          "time": "1791003720",
+          "old_request_time": "1791003600000",
+          "old_request_index": "13210",
+          "observed_request_index": "13210",
+          "index_difference": "0"
+        },
+        {
+          "time": "1791003840",
+          "old_request_time": "1791003600000",
+          "old_request_index": "13210",
+          "observed_request_index": "13210",
+          "index_difference": "0"
+        },
+        {
+          "time": "1791003960",
+          "old_request_time": "1791003600000",
+          "old_request_index": "13210",
+          "observed_request_index": "13210",
+          "index_difference": "0"
+        },
+        {
+          "time": "1791004080",
+          "old_request_time": "1791003600000",
+          "old_request_index": "13210",
+          "observed_request_index": "13210",
+          "index_difference": "0"
+        },
+        {
+          "time": "1791004200",
+          "old_request_time": "1791003600000",
+          "old_request_index": "13210",
+          "observed_request_index": "13210",
+          "index_difference": "0"
+        },
+        {
+          "time": "1791004320",
+          "old_request_time": "1791003600000",
+          "old_request_index": "13210",
+          "observed_request_index": "13210",
+          "index_difference": "0"
+        },
+        {
+          "time": "1791004440",
+          "old_request_time": "1791003600000",
+          "old_request_index": "13210",
+          "observed_request_index": "13210",
+          "index_difference": "0"
+        },
+        {
+          "time": "1791004560",
+          "old_request_time": "1791003600000",
+          "old_request_index": "13210",
+          "observed_request_index": "13210",
+          "index_difference": "0"
+        },
+        {
+          "time": "1791004680",
+          "old_request_time": "1791003600000",
+          "old_request_index": "13210",
+          "observed_request_index": "13210",
+          "index_difference": "0"
+        },
+        {
+          "time": "1791004800",
+          "old_request_time": "1791003600000",
+          "old_request_index": "13210",
+          "observed_request_index": "13210",
+          "index_difference": "0"
+        },
+        {
+          "time": "1791004920",
+          "old_request_time": "1791003600000",
+          "old_request_index": "13210",
+          "observed_request_index": "13210",
+          "index_difference": "0"
+        },
+        {
+          "time": "1791005040",
+          "old_request_time": "1791003600000",
+          "old_request_index": "13210",
+          "observed_request_index": "13210",
+          "index_difference": "0"
+        },
+        {
+          "time": "1791005160",
+          "old_request_time": "1791003600000",
+          "old_request_index": "13210",
+          "observed_request_index": "13210",
+          "index_difference": "0"
+        },
+        {
+          "time": "1791005280",
+          "old_request_time": "1791003600000",
+          "old_request_index": "13210",
+          "observed_request_index": "13210",
+          "index_difference": "0"
+        }
+      ],
+      "developing_receipt": {
+        "attempt": 1,
+        "export_utc": "2026-10-04T20:24:25.061Z",
+        "csv_file": "captures/v16/htf-context-30m-v16-v1-attempt1.csv",
+        "live_cutoff": 1791145440,
+        "last_historical_values": {
+          "chart_time": "1791145320000",
+          "chart_end": "1791145440000",
+          "chart_index": "20051",
+          "chart_open": "85492.23",
+          "chart_high": "85492.23",
+          "chart_low": "85478.01",
+          "chart_close": "85478.01",
+          "chart_volume": "2.54927",
+          "chart_tick": "0.01",
+          "chart_minmove": "1",
+          "chart_pricescale": "100",
+          "chart_regular": "1",
+          "chart_premarket": "0",
+          "chart_postmarket": "0",
+          "request_open": "85428",
+          "request_high": "85492.23",
+          "request_low": "85396.32",
+          "request_close_goff_lon": "85478.02",
+          "request_volume": "56.75179000000001",
+          "request_time": "1791144000000",
+          "request_end": "1791145800000",
+          "request_index": "13288",
+          "request_previous_close": "85428",
+          "request_hole_goff_lon": "85478.02",
+          "request_tick": "0.01",
+          "request_minmove": "1",
+          "request_pricescale": "100",
+          "request_close_gon_lon": "",
+          "request_hole_gon_lon": "",
+          "request_close_goff_loff": "85428",
+          "request_hole_goff_loff": "85428",
+          "chart_realtime": "0",
+          "chart_confirmed": "1"
+        }
+      },
+      "closed_and_reload_receipts": [
+        {
+          "attempt": 2,
+          "export_utc": "2026-10-04T20:35:58.125Z",
+          "csv_file": "captures/v16/htf-context-30m-v16-v1-attempt2.csv",
+          "live_cutoff": 1791146040,
+          "stable_boundary": true
+        },
+        {
+          "attempt": 3,
+          "export_utc": "2026-10-04T20:36:14.739Z",
+          "csv_file": "captures/v16/htf-context-30m-v16-v1-attempt3.csv",
+          "live_cutoff": 1791146160,
+          "stable_boundary": true
+        }
+      ],
+      "holds": [
+        "Old original tick cannot be recovered from later historical captures.",
+        "Original ticker modifiers/adjustment/currency/entitlement history are not fully exposed.",
+        "Independent feed native indices are not an independently plotted Pine origin.",
+        "Requested buckets ending beyond the raw feed explicit live cutoff remain incomplete feed holds; raw feed will be refreshed later."
+      ]
+    }
+  ],
+  "limits": "Fresh independent context evidence; no engine comparisons or retroactive clearance of old46cells. Gap modes and index-dependent holes remain distinct."
+}

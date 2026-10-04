@@ -1,0 +1,1914 @@
+{
+  "artifact": "v16 visual question reuse v1",
+  "authorization": "Frozen HANDOFF-v16-v2 and manifestv5 reserve/dedup policy; reuse shipped v15 observations first.",
+  "references": [
+    {
+      "reserved_variant": "visual21-199-bgcolor-v3-offset-discriminator-v1.pine",
+      "variant_source_sha256": "551480f18312e83306fbab44f5572c36b04dd3bed85a78aa8844711b4fd48511",
+      "disposition": "QUESTION-REUSE: this variant was not pasted or compiled; these are distinct-source v15 observations, not variant numeric outputs or exact-SHA reuse.",
+      "question": "v3 bgcolor offset admission and final-offset versus per-source historical placement",
+      "context_difference": "Two sparse impulses at phases2/5, disjoint model destinations0/3 versus4/7, same-source input zero control2/5; v15 already has a richer four-impulse paired-source discriminator.",
+      "frozen_intake_recommendation": "Reuse v15 for the shared question first; v16 source is a reserve context variant, not an independent new question. Avoid duplicate capture if v15 already supplies the required evidence.",
+      "original_observations": [
+        {
+          "original_source": "packages/tealscript/oracle-probes/v15/visual-bgcolor-offset-v3-n-series-v1.pine",
+          "original_source_sha256": "4850d8ce57afa860182d2bb072218757497e56800a65a2e1913d4357707e1ddf",
+          "attempt": 1,
+          "status": "RUNS",
+          "export_utc": "2026-10-04T19:19:28.338Z",
+          "csv_file": "packages/tealscript/oracle-probes/v15/captures/v15/visual-bgcolor-offset-v3-n-series-v1-attempt1.csv",
+          "csv_sha256": "19610c5e245d3055b95dd22175c75bcea0de074dbc7a367854eba1fdc045245e",
+          "evidence": [
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt1-setup.png",
+              "sha256": "fbef0ba3fe99fd796eabe358d8068aaeb4b69622e3f1393fae1f52a37d76a83c"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt1-export.png",
+              "sha256": "5f02fca0dd4898ce4891218cb1ccd8817c443b90261ad06580bf23d5364529ca"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt1-logs.txt",
+              "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt1-logs-v1.json",
+              "sha256": "f4f84b4fd00e808745971ed2fa1875a49673d6a49e36190816a652e32974a235"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt1-logs.png",
+              "sha256": "8a2a9aa45b54c899067d3e90747819cab025a6b19c1d217c20cde2ff7c6b5f10"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt1-visual.png",
+              "sha256": "6d04e0345f75693a3d7be4a28e7e86476df3410f10d3d0f2c4a3aa4914f562df"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt1-data-window-v1.png",
+              "sha256": "dd0bf7cbd78c29a58d048e35d5a2571f3dcbb8bd9e013d08d910605b4c069dfc"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt1-data-window-v1.json",
+              "sha256": "418cd3ac0fa23d25e5f2bb7543860b7fd26529f1f0d99833921a0a312f12d3c9"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt1-data-window-v1.txt",
+              "sha256": "09d8cee50cbce58173f5c3f667668e1343413f2fa6b09e4a27d68ec125a38ae7"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt1-authority-object-geometry-v1.json",
+              "sha256": "fc98983ac2ae0697e9b5f177938f48b16b9bfe97411ee721708b0cd19a8f96ce"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt1-authority-object-geometry-v1.png",
+              "sha256": "ab7571eb7e958c29497210e582a3206ae0cf15c00451536a28a8cd195b63b1d6"
+            }
+          ]
+        },
+        {
+          "original_source": "packages/tealscript/oracle-probes/v15/visual-bgcolor-offset-v3-n-series-v1.pine",
+          "original_source_sha256": "4850d8ce57afa860182d2bb072218757497e56800a65a2e1913d4357707e1ddf",
+          "attempt": 2,
+          "status": "RUNS",
+          "export_utc": "2026-10-04T19:22:38.004Z",
+          "csv_file": "packages/tealscript/oracle-probes/v15/captures/v15/visual-bgcolor-offset-v3-n-series-v1-attempt2.csv",
+          "csv_sha256": "c88f0f08ea72cc7988bd2a7a43331120fc09678d02d351163e06dcae6e8e6b17",
+          "evidence": [
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt2-setup.png",
+              "sha256": "3f5a7434adb51131579eefb27d65dab40ca89f5788f22d990c928052e8bc6176"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt2-export.png",
+              "sha256": "6be5eec1b55027eac2ac1ff260963d1edc1cc323c51d16e3a67f077bce558d37"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt2-logs.txt",
+              "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt2-logs-v1.json",
+              "sha256": "a533ebe3646c0f5da888e4e89f247bf80a0f1d79447b8a485d8ca369c5a00472"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt2-logs.png",
+              "sha256": "f373f38974b9033ccd56f0e260255bc90215969b375470f74a64be4e0821aff6"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt2-visual.png",
+              "sha256": "b593acd9f16dcca21dc2335da9bc91d40a9bde5abd292c4fb96e5aa213fbb56a"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt2-data-window-v1.png",
+              "sha256": "2c68468f5e5b60a27f0a15042d02ce0a1acb6ca5759d0ea06205edc5bd7cbbc2"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt2-data-window-v1.json",
+              "sha256": "d7054d600949893b3644cc8a0c8d7f71a1e6cd74bcffdbaf6f34d386106c25b5"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt2-data-window-v1.txt",
+              "sha256": "7b35a8efff3575ba1537e8025c89619d71eb24acc33775bf8df164b909cd29c1"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt2-replay-phase31-before-v1.json",
+              "sha256": "b4a0ab0767f1a9c8458a0b6ac2a82281bb0de35a46b92e5fdea7ae0247faf2d8"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt2-replay-phase31-before-v1.png",
+              "sha256": "b2eeebd626262d6a5f60073ffe4eb865f9d8d29afe3aae8482c957da9c15c777"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt2-replay-phase9-after-v1.json",
+              "sha256": "236191cd316e60dbd2c093688a7cd805615e2b49928ae144d5a5e42f31b679c3"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt2-replay-phase9-after-v1.png",
+              "sha256": "05f860a985ac531d670e02d54bd112052cef353f75b7eea151f9870d30215f69"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt2-replay-phase11-after-v1.json",
+              "sha256": "b6f5a0fca2d4c18d51c8dd1d9288e64ea45acd9158b95e5bff26ae2d9b6503f2"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt2-replay-phase11-after-v1.png",
+              "sha256": "4298aecd7e768d070d37b98e72a00b1595b39e56a8d2b173552a713d9a9f6d44"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt2-replay-phase12-after-v1.json",
+              "sha256": "1ecc325c910097597f4ba48e0c7c1a1724484746e261fdf6647573bc83f0a7cb"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt2-replay-phase12-after-v1.png",
+              "sha256": "bd0b1fc6dc682e5edcdeb2338746ff9529a479e7662e7aba363141b3e2799387"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt2-replay-phase31-after-v1.json",
+              "sha256": "0cb86198fde31856050dee44fec55a8f583c4934fcbf002bbd0828b746dd783e"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt2-replay-phase31-after-v1.png",
+              "sha256": "2f4132c118998569b25c28a6bca6791413236195376a6467a78bccd475009a6c"
+            }
+          ]
+        },
+        {
+          "original_source": "packages/tealscript/oracle-probes/v15/visual-bgcolor-offset-v3-n-series-v1.pine",
+          "original_source_sha256": "4850d8ce57afa860182d2bb072218757497e56800a65a2e1913d4357707e1ddf",
+          "attempt": 3,
+          "status": "RUNS",
+          "export_utc": "2026-10-04T19:34:08.418Z",
+          "csv_file": "packages/tealscript/oracle-probes/v15/captures/v15/visual-bgcolor-offset-v3-n-series-v1-attempt3.csv",
+          "csv_sha256": "c88f0f08ea72cc7988bd2a7a43331120fc09678d02d351163e06dcae6e8e6b17",
+          "evidence": [
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt3-setup.png",
+              "sha256": "ff5104e1a3ffc012f23311bd30577d11fd0b35ecc4f738680c7cc2d7c4bf02fa"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt3-export.png",
+              "sha256": "7bfa49fcbf531a9d470aba27b0e93f9e5ab828e8fc6696582b87fc6e6324fe61"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt3-logs.txt",
+              "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt3-logs-v1.json",
+              "sha256": "c385b6bcd89dfb737b2aa52d64a0c1757ba1c94531a5958643ba750b150ac1ad"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt3-logs.png",
+              "sha256": "f7ab5fb60e1091c644e8505fba40f3fd815119f0a9c6d33d62fe955e2a8f26d0"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt3-visual.png",
+              "sha256": "16bea4b2d4d2978be63b899806ba6c9886f7dabb01ced67d640e3ec5981e0239"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt3-data-window-v1.png",
+              "sha256": "21df822ef02cce7b42d12d1f5b468b894e720ad4f39dc32c8f46d302685ad07b"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt3-data-window-v1.json",
+              "sha256": "d324a9169046b2245157f30888158b7bb3423977fb83367de4f34776402b0e73"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt3-data-window-v1.txt",
+              "sha256": "cc684916ab0dc8cccbff254b76533d5a03e54ad72f4bde6ad6ca8fc8a67c7eae"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt3-replay-phase31-before-v1.json",
+              "sha256": "94bab9d7ab2f744b381734e371236f897d190c71eb1ab86d16c9575dda1aa626"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt3-replay-phase31-before-v1.png",
+              "sha256": "9991fd8db15230bde27fdb0d3c592ca35b29474e38007a02a633674cb260aa68"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt3-replay-phase9-paired-v1.json",
+              "sha256": "fba759ebe32b14b4b01514472e4ddd8cc9db6e33866d36552ca62eb599985594"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt3-replay-phase9-paired-v1.png",
+              "sha256": "d096660b13aa6c9522e3661adab07e4cb397ce6c87dd8a930e678325a1a2534a"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt3-replay-phase11-paired-v1.json",
+              "sha256": "f90e306e8f6b07e9f2ef61a3573112cadeea4d2819f67e9b6e818814941801fd"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt3-replay-phase11-paired-v1.png",
+              "sha256": "1972932ee54a52ee9289a5e8865c8c5508b51ca56503436ce0d6650a359718a4"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt3-replay-phase12-paired-v1.json",
+              "sha256": "6e364d0316d51942559018d58cdb9a67c7ef8780cc0720541afadb453ec55220"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt3-replay-phase12-paired-v1.png",
+              "sha256": "3190310d8997d7adc1cca71b38742b341f99a3e2aa6ce3e859095a08d45c1bdf"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt3-replay-phase31-paired-v1.json",
+              "sha256": "57fc1437b50979f45a8a2d89cf1d2966b6ccf977669193a24c6ca26245dbba5a"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-bgcolor-offset-v3-n-series-v1-attempt3-replay-phase31-paired-v1.png",
+              "sha256": "da88e9a2bae18623998fbfc4f60cc86999fbe0b2f55786859ae9db05db196166"
+            }
+          ]
+        },
+        {
+          "original_source": "packages/tealscript/oracle-probes/v15/visual-bgcolor-offset-v3-n-zero-control-v1.pine",
+          "original_source_sha256": "400360578ab6995216212851ec88b1afba82f92fbfeefc1a8fbea42fc0a1a887",
+          "attempt": 1,
+          "status": "RUNS",
+          "export_utc": "2026-10-04T19:25:50.104Z",
+          "csv_file": "packages/tealscript/oracle-probes/v15/captures/v15/visual-bgcolor-offset-v3-n-zero-control-v1-attempt1.csv",
+          "csv_sha256": "ad0755f239d80ccfca8baecf5599f54940303fcb3fc3ab463e96a6ee5e7e6a66",
+          "evidence": [
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-bgcolor-offset-v3-n-zero-control-v1-attempt1-setup.png",
+              "sha256": "3baad87be8243fc37cea672368feff8c3e2864d74f106797b61a42ec8b2b31b1"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-bgcolor-offset-v3-n-zero-control-v1-attempt1-export.png",
+              "sha256": "b2c1081476872557df24a644dd44453366fb3d835c9ef613056ba35d06293ac1"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-bgcolor-offset-v3-n-zero-control-v1-attempt1-logs.txt",
+              "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-bgcolor-offset-v3-n-zero-control-v1-attempt1-logs-v1.json",
+              "sha256": "fa17a128f22aaac6574b61457bd837158a0a94ad39fe32c3a7fc6461aed37ea7"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-bgcolor-offset-v3-n-zero-control-v1-attempt1-logs.png",
+              "sha256": "156011f9ef0bc2ee22d0e0ecdf0631a3a8233c26bc48e4be462917172b6c2837"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-bgcolor-offset-v3-n-zero-control-v1-attempt1-visual.png",
+              "sha256": "c5a33440b0b980c10c92f4778344319e836f1476d958f80b4d982af64247c532"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-bgcolor-offset-v3-n-zero-control-v1-attempt1-data-window-v1.png",
+              "sha256": "89b6ad816ec72c3f51f82b54ade626df565fdd98dfdfbbe139698f986e3ece01"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-bgcolor-offset-v3-n-zero-control-v1-attempt1-data-window-v1.json",
+              "sha256": "6209551df0ba50854c68dbf54b81741fe4cc59a76aafb1190b609f22005229aa"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-bgcolor-offset-v3-n-zero-control-v1-attempt1-data-window-v1.txt",
+              "sha256": "b95aee7600b81fa7f44c7710a1a3906bdefd987d9c684c016d82676fae0a3c98"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-bgcolor-offset-v3-n-zero-control-v1-attempt1-replay-phase31-after-v1.json",
+              "sha256": "e7b054661138ce72f4d59b6a4181e5ec3c386582dda2e76447ec52e8dee19751"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-bgcolor-offset-v3-n-zero-control-v1-attempt1-replay-phase31-after-v1.png",
+              "sha256": "d43575916291f5216a4ea7c2811bf89b00fdb768e5e6f00ae06054b97f61f827"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-bgcolor-offset-v3-n-zero-control-v1-attempt1-replay-phase31-before-v1.json",
+              "sha256": "a6ec47716f0abe39e22031a2ba6e55e2ebdea1f9422514e3176fabf47dc06cba"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-bgcolor-offset-v3-n-zero-control-v1-attempt1-replay-phase31-before-v1.png",
+              "sha256": "6506929b4498696b9c254cb148ede539f8b8f97640370dc356367d5e9a3b9eaf"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-bgcolor-offset-v3-n-zero-control-v1-attempt1-replay-phase9-matched-v1.json",
+              "sha256": "8f84512e4728e4f1cbc1406f472e8a0263862a7affaafc3ee16b7db01ef311b6"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-bgcolor-offset-v3-n-zero-control-v1-attempt1-replay-phase9-matched-v1.png",
+              "sha256": "b6a25931e63769c676496b25eebf8599e22dd5d0c3a5342ece826400fe9b5108"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-bgcolor-offset-v3-n-zero-control-v1-attempt1-replay-phase9-paired-v1.json",
+              "sha256": "bcc119d85826fd14de8e5534b0d648d958e24a2c1ce8496a26ec51466a0cd520"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-bgcolor-offset-v3-n-zero-control-v1-attempt1-replay-phase9-paired-v1.png",
+              "sha256": "f54d3b38f467aa1bc71ced1c636db1e76c9e253b9c7ce7dd83f26a1b9e7cb20f"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-bgcolor-offset-v3-n-zero-control-v1-attempt1-replay-phase11-paired-v1.json",
+              "sha256": "09b391269a1e2b6e1f874def7186e5f503ac654e5fc0220d6ad65646f2060a68"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-bgcolor-offset-v3-n-zero-control-v1-attempt1-replay-phase11-paired-v1.png",
+              "sha256": "6cd82ce2d9450b4d58c2395c44017f2aff428f3b87a6fc4be122d54063db5dd1"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-bgcolor-offset-v3-n-zero-control-v1-attempt1-replay-phase12-paired-v1.json",
+              "sha256": "d7d0763d6a526ccc6d7b699f2bd39b52e72291bd1d33c706e93aa65fcfa020f2"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-bgcolor-offset-v3-n-zero-control-v1-attempt1-replay-phase12-paired-v1.png",
+              "sha256": "d32b1b26208e040bc4f372a8c20c65d8b05e4c35b924cf8c79b49770d854488f"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-bgcolor-offset-v3-n-zero-control-v1-attempt1-replay-phase31-paired-v1.json",
+              "sha256": "e8e2016a1206ec546d763d9a7c34a30daf8fb471caf3c039ac6972b47cbce8e4"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-bgcolor-offset-v3-n-zero-control-v1-attempt1-replay-phase31-paired-v1.png",
+              "sha256": "037f9d123ada06670c058398ffb4699b92be5fecc5326f6fb3e43881f2110d9e"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "reserved_variant": "visual21-513-barcolor-v3-offset-discriminator-v1.pine",
+      "variant_source_sha256": "c84f7eeccf8575ce6d4f3483c903e25516984f0ef41e68d92ba276c05a10586b",
+      "disposition": "QUESTION-REUSE: this variant was not pasted or compiled; these are distinct-source v15 observations, not variant numeric outputs or exact-SHA reuse.",
+      "question": "v3 barcolor offset admission and final-offset versus per-source historical placement",
+      "context_difference": "Two early-cycle impulses and same-source input zero control; v15 already tests this question with four impulses and separate zero source.",
+      "frozen_intake_recommendation": "Reuse v15 for the shared question first; v16 source is a reserve context variant, not an independent new question. Avoid duplicate capture if v15 already supplies the required evidence.",
+      "original_observations": [
+        {
+          "original_source": "packages/tealscript/oracle-probes/v15/visual-barcolor-offset-v3-discriminator-series-v1.pine",
+          "original_source_sha256": "a45f9c91b3180867e8bc7cc51d9d0155e84253bd5d0ba9d1c11dc0dc0658c266",
+          "attempt": 1,
+          "status": "RUNS",
+          "export_utc": "2026-10-04T19:39:03.559Z",
+          "csv_file": "packages/tealscript/oracle-probes/v15/captures/v15/visual-barcolor-offset-v3-discriminator-series-v1-attempt1.csv",
+          "csv_sha256": "25366dd33132a2f5221fc441f60a79b75a04707ea8a43e492484e7177dca30c6",
+          "evidence": [
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-barcolor-offset-v3-discriminator-series-v1-attempt1-setup.png",
+              "sha256": "001d2e5ffeee29d57531c548bd2adc8b54627a2aff61d3c9ace532527c133af3"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-barcolor-offset-v3-discriminator-series-v1-attempt1-export.png",
+              "sha256": "4268f1e0d8639af3c0c7628db6a0519e8dc8fc33f45cc9a280ef8516093e9ae3"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-barcolor-offset-v3-discriminator-series-v1-attempt1-logs.txt",
+              "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-barcolor-offset-v3-discriminator-series-v1-attempt1-logs-v1.json",
+              "sha256": "f8a9e813bc40e7c7c30b66a843d366ca561caf5ff5fa59e9dbfa9909f42407f0"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-barcolor-offset-v3-discriminator-series-v1-attempt1-logs.png",
+              "sha256": "299bf5f21f74a8f258402082c7e86e6770d2b3bc6e693ea4723ddce79b6546d9"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-barcolor-offset-v3-discriminator-series-v1-attempt1-visual.png",
+              "sha256": "04ceaeb245ca5c9e98a14dc0484743f2622195be43a9134be991d1fd57ddc64f"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-barcolor-offset-v3-discriminator-series-v1-attempt1-data-window-v1.png",
+              "sha256": "9a5ff4c151577bdbe65aa782933689edff2abf31304a05a112a0463a17f70507"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-barcolor-offset-v3-discriminator-series-v1-attempt1-data-window-v1.json",
+              "sha256": "747c1249e59a64ca1882e60528177a07b253717c32f9a9b1f8f1fbae10aec469"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-barcolor-offset-v3-discriminator-series-v1-attempt1-data-window-v1.txt",
+              "sha256": "2dd30d998368a768e1c9709586636f863f3d07e2366e14eeb30ce4a26d77b65b"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-barcolor-offset-v3-discriminator-series-v1-attempt1-replay-phase7-paired-v1.json",
+              "sha256": "83f918590b3fd52c1e01734189190b9634bbb1270f7bb88c874e404bdd40b628"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-barcolor-offset-v3-discriminator-series-v1-attempt1-replay-phase7-paired-v1.png",
+              "sha256": "3515517d2c31173dc65fbe4c4f03bf4b832e239b6fe7f8437783b575fd70655a"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-barcolor-offset-v3-discriminator-series-v1-attempt1-replay-phase15-paired-v1.json",
+              "sha256": "849b4fc686a4145928fdd8000ee6aa900908b7ba5346f4d47e222ff51bd90326"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-barcolor-offset-v3-discriminator-series-v1-attempt1-replay-phase15-paired-v1.png",
+              "sha256": "fbab00e9719563be83177a7513502bce335e96e0b877e210d667c5fe3e545ed1"
+            }
+          ]
+        },
+        {
+          "original_source": "packages/tealscript/oracle-probes/v15/visual-barcolor-offset-v3-discriminator-zero-v1.pine",
+          "original_source_sha256": "02af1a42c56b854b8a78d77b1f60b8fe16198281c1106cdea10946fc428d74b1",
+          "attempt": 1,
+          "status": "RUNS",
+          "export_utc": "2026-10-04T19:39:53.356Z",
+          "csv_file": "packages/tealscript/oracle-probes/v15/captures/v15/visual-barcolor-offset-v3-discriminator-zero-v1-attempt1.csv",
+          "csv_sha256": "25366dd33132a2f5221fc441f60a79b75a04707ea8a43e492484e7177dca30c6",
+          "evidence": [
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-barcolor-offset-v3-discriminator-zero-v1-attempt1-setup.png",
+              "sha256": "8d3f72588159e96cf2501446608b8b4746a42efe01e814e488c5e23c6c318412"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-barcolor-offset-v3-discriminator-zero-v1-attempt1-export.png",
+              "sha256": "8574be0532ae5c4871c03d6f62477cc257372bfb63572349bfa9968bc7520e63"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-barcolor-offset-v3-discriminator-zero-v1-attempt1-logs.txt",
+              "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-barcolor-offset-v3-discriminator-zero-v1-attempt1-logs-v1.json",
+              "sha256": "8ff208cc6e3b9e84b8aa741854d8f43953864a140c57701716c2ca097257987c"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-barcolor-offset-v3-discriminator-zero-v1-attempt1-logs.png",
+              "sha256": "b4539c9f6b92a81f3f513a07a425c9403f2747229ebacf527d83e48cb553fa79"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-barcolor-offset-v3-discriminator-zero-v1-attempt1-visual.png",
+              "sha256": "62c2110db9504ec6e5d4265be81813e6f7b6c3581a4c6af6f532476e0546124a"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-barcolor-offset-v3-discriminator-zero-v1-attempt1-data-window-v1.png",
+              "sha256": "a58b9a95ba4966238c04e0cde516347babdcc59f10d66287015b48bc943da640"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-barcolor-offset-v3-discriminator-zero-v1-attempt1-data-window-v1.json",
+              "sha256": "f43c9364b1d885a1305a162dc1b61faec180c918c1b4df7440022c05800ab21a"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-barcolor-offset-v3-discriminator-zero-v1-attempt1-data-window-v1.txt",
+              "sha256": "d9f4264e8cf3c59eb1d1fee6d15ff11ef7b72e8b959ba77525cb4519c781bcfd"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-barcolor-offset-v3-discriminator-zero-v1-attempt1-replay-phase7-paired-v1.json",
+              "sha256": "e754da2d8cb5a6070f904f5aa5ed79a88c409c93fb185ea4f3d39cd4080143a7"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-barcolor-offset-v3-discriminator-zero-v1-attempt1-replay-phase7-paired-v1.png",
+              "sha256": "348283874c7eb232ae36db4b2fa09ccb25e0fe9689456b9727459640be85d081"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-barcolor-offset-v3-discriminator-zero-v1-attempt1-replay-phase15-paired-v1.json",
+              "sha256": "c59275f73c5c5b56c260d164ee2e6f519566f99fc794cd9a5daa8a0bb312685b"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-barcolor-offset-v3-discriminator-zero-v1-attempt1-replay-phase15-paired-v1.png",
+              "sha256": "c7e996c25c767d9248c611684f412a4a1316a46dd17504609bad076d1d0619cd"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "reserved_variant": "visual21-736-plotchar-v3-offset-discriminator-v1.pine",
+      "variant_source_sha256": "164e7b62ce24806d0fd26efd7f6f36a42ae265df12bfbe466c34631372746ecd",
+      "disposition": "QUESTION-REUSE: this variant was not pasted or compiled; these are distinct-source v15 observations, not variant numeric outputs or exact-SHA reuse.",
+      "question": "v3 plotchar offset admission and final-offset versus per-source historical placement",
+      "context_difference": "Two sparse X glyphs and same-source input zero control; v15 already tests this question with four glyphs and separate zero source.",
+      "frozen_intake_recommendation": "Reuse v15 for the shared question first; v16 source is a reserve context variant, not an independent new question. Avoid duplicate capture if v15 already supplies the required evidence.",
+      "original_observations": [
+        {
+          "original_source": "packages/tealscript/oracle-probes/v15/visual-plotchar-offset-v3-discriminator-series-v1.pine",
+          "original_source_sha256": "78e29b9a9b696ed493a49689a927e462af1f2fb848eedafb53c4a318798aef95",
+          "attempt": 1,
+          "status": "RUNS",
+          "export_utc": "2026-10-04T19:40:41.795Z",
+          "csv_file": "packages/tealscript/oracle-probes/v15/captures/v15/visual-plotchar-offset-v3-discriminator-series-v1-attempt1.csv",
+          "csv_sha256": "27cc3e95d59fb1a23959982cbe32b258808f4309787260ab4c955f7d18ad74a4",
+          "evidence": [
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotchar-offset-v3-discriminator-series-v1-attempt1-setup.png",
+              "sha256": "90f510827cc8e16f6c831d26091030f47a7f434c35e5e8956a5db15aa7912814"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotchar-offset-v3-discriminator-series-v1-attempt1-export.png",
+              "sha256": "2b6c1c3d5cd8bfc608c80c2226182bc4abf0251cb974d8f9b5adeb10655799d5"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotchar-offset-v3-discriminator-series-v1-attempt1-logs.txt",
+              "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotchar-offset-v3-discriminator-series-v1-attempt1-logs-v1.json",
+              "sha256": "bb73c4c10675d7eb463c7ac88fd8f6d79bb75c168b9d654cf7359f9b1ecf2f57"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotchar-offset-v3-discriminator-series-v1-attempt1-logs.png",
+              "sha256": "875f9979e2cf92678c87c1a7693e09019273e40c3766b13ed23b5e4895c37366"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotchar-offset-v3-discriminator-series-v1-attempt1-visual.png",
+              "sha256": "74ab95bc4341167f00da4d599b500964aef8bd89fdd5233c4b1628f9a2a2b3d7"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotchar-offset-v3-discriminator-series-v1-attempt1-data-window-v1.png",
+              "sha256": "09a9fa6a5f07ad0b37690c696c50016e6b9e0ac36ac7233a86cd48b7810cb1df"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotchar-offset-v3-discriminator-series-v1-attempt1-data-window-v1.json",
+              "sha256": "3ca4f4904bb1894c745abc55daeeb1376dd728290d8ed159b4ded91c95eaa034"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotchar-offset-v3-discriminator-series-v1-attempt1-data-window-v1.txt",
+              "sha256": "b91a5e3204162c99bef595c8157c21362589274200894ad4122f237cb23fdb74"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotchar-offset-v3-discriminator-series-v1-attempt1-replay-phase7-paired-v1.json",
+              "sha256": "c510a006fe9ac9555e1ff4a74744bf532a03a73736181f96ae3244c43a1adb06"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotchar-offset-v3-discriminator-series-v1-attempt1-replay-phase7-paired-v1.png",
+              "sha256": "6ab88b886a44fd83501cc0ff141564bde5f04201d63547f5e9bc0d3412f83990"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotchar-offset-v3-discriminator-series-v1-attempt1-replay-phase15-paired-v1.json",
+              "sha256": "ffc0a2535fc8ff639340ac1475b478d2d4cf257370466733fe21279cdcafc505"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotchar-offset-v3-discriminator-series-v1-attempt1-replay-phase15-paired-v1.png",
+              "sha256": "5b8f5cb8b74424d72fa144bcf8f140db7916ba008ebf3f57662c10776e9059cc"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotchar-offset-v3-discriminator-series-v1-attempt1-renderer-phase7-v1.json",
+              "sha256": "99669a14d626bf6ec8ae8758326641d950aac2416d6baeb9e5fd94f3d96249f9"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotchar-offset-v3-discriminator-series-v1-attempt1-renderer-phase7-v1.png",
+              "sha256": "64b7aac029d38bfdf1bf0c900f674f715882128766217dba99e7b887462703f2"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotchar-offset-v3-discriminator-series-v1-attempt1-renderer-phase15-v1.json",
+              "sha256": "66d90c683cf22d1698adb099abf059e87c8f0c2cdf32766c978e803643e7a996"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotchar-offset-v3-discriminator-series-v1-attempt1-renderer-phase15-v1.png",
+              "sha256": "bef75afee990e22609cf1aa643a938d34a973ba16a72ad6f95734168554ec3cb"
+            }
+          ]
+        },
+        {
+          "original_source": "packages/tealscript/oracle-probes/v15/visual-plotchar-offset-v3-discriminator-zero-v1.pine",
+          "original_source_sha256": "d61b33befbf91d8dda8c366ae6a0099fd5b4cffc1605779eb68bfa795ae60a9c",
+          "attempt": 1,
+          "status": "RUNS",
+          "export_utc": "2026-10-04T19:41:31.208Z",
+          "csv_file": "packages/tealscript/oracle-probes/v15/captures/v15/visual-plotchar-offset-v3-discriminator-zero-v1-attempt1.csv",
+          "csv_sha256": "9634269cc806cc7315455f3296278057c19cc438a83ae83986074f85836ebbfa",
+          "evidence": [
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotchar-offset-v3-discriminator-zero-v1-attempt1-setup.png",
+              "sha256": "3d6917db17d14617566df061d5a0a9d0bfd03567bf67f7b379b0dc7bd4892a59"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotchar-offset-v3-discriminator-zero-v1-attempt1-export.png",
+              "sha256": "cffbb50903b12172656e1023f6494f2fd1880c03d0bb529a4c56f7fa7f6ba98e"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotchar-offset-v3-discriminator-zero-v1-attempt1-logs.txt",
+              "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotchar-offset-v3-discriminator-zero-v1-attempt1-logs-v1.json",
+              "sha256": "240c663eed1c74cf0c9870f32883259c73b914c0b9e181bc23bbf0527f5a200a"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotchar-offset-v3-discriminator-zero-v1-attempt1-logs.png",
+              "sha256": "19e21f4bc70d7f9096b6871af5eb6f7c663f7e5360805b59f0e8930194a7bed2"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotchar-offset-v3-discriminator-zero-v1-attempt1-visual.png",
+              "sha256": "66b35053812e9adabf69204ef59a0e3a72d3211fd96269f86b925e6d3b3f9efb"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotchar-offset-v3-discriminator-zero-v1-attempt1-data-window-v1.png",
+              "sha256": "0344e66fb2cc1d55139c038f18622a3f508bd3341d5256b8f92ca19acae97baf"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotchar-offset-v3-discriminator-zero-v1-attempt1-data-window-v1.json",
+              "sha256": "cc6fab94e4a946831006610ea214ed86f467a9846172e09b7bd8f1896e05ed8e"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotchar-offset-v3-discriminator-zero-v1-attempt1-data-window-v1.txt",
+              "sha256": "3aa30334ae5a65bca7b2c8673a1f43e24c6f97fe188025f69b951ba86ae2dc8b"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotchar-offset-v3-discriminator-zero-v1-attempt1-replay-phase7-paired-v1.json",
+              "sha256": "277089103a11ef4e5cca06b958e037bdffca6e5d49255a4b6efa632e1c8b4671"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotchar-offset-v3-discriminator-zero-v1-attempt1-replay-phase7-paired-v1.png",
+              "sha256": "c153d2b19cb56ece7579af0fffb95e4fd07fc8ce7178ab53d659d24665b498fd"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotchar-offset-v3-discriminator-zero-v1-attempt1-replay-phase15-paired-v1.json",
+              "sha256": "7866b41f8d468519aa0f0de35d89ee10d77574af0ca3ab625dabc629e518121a"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotchar-offset-v3-discriminator-zero-v1-attempt1-replay-phase15-paired-v1.png",
+              "sha256": "5c9f68dda5880021b4f93b3cfe59358b0151705fc93604ecd1990cc28d6df3c7"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotchar-offset-v3-discriminator-zero-v1-attempt1-rendered-phase15-v1.json",
+              "sha256": "1cb4f3fc207bad3fd9debe327cb6671e52b68c309b0f7c1b5609526d27a25025"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotchar-offset-v3-discriminator-zero-v1-attempt1-rendered-phase15-v1.png",
+              "sha256": "edd8c53a0d3fd1eff7b97ba1c568353ad3cf083097e051afccde9f3f78d75d5b"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotchar-offset-v3-discriminator-zero-v1-attempt1-renderer-phase7-v1.json",
+              "sha256": "68f4dafe05df3f2bac7cd4167063fc306225e1dc266446022950cc9b713ea710"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotchar-offset-v3-discriminator-zero-v1-attempt1-renderer-phase7-v1.png",
+              "sha256": "6ea7f79a3ba226b0fdb93202212d5a09f7a88c8e6492f29060b85c120a112645"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotchar-offset-v3-discriminator-zero-v1-attempt1-renderer-phase15-v1.json",
+              "sha256": "f3470f81b31b6cf219d17d75951d7cd026786338a2faca5dcd403ef8c73ff0fb"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotchar-offset-v3-discriminator-zero-v1-attempt1-renderer-phase15-v1.png",
+              "sha256": "3be8bff74a2779564d41c43fc4894b9515f82920b62fc3697a67152d518058c2"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "reserved_variant": "visual21-1370-plotarrow-v3-offset-discriminator-v1.pine",
+      "variant_source_sha256": "48c476c26133e62d9ce7f53c93d4f8fc85ebe04aeeeb19c7d6df7c4ff0a49d63",
+      "disposition": "QUESTION-REUSE: this variant was not pasted or compiled; these are distinct-source v15 observations, not variant numeric outputs or exact-SHA reuse.",
+      "question": "v3 plotarrow offset admission and final-offset versus per-source historical placement",
+      "context_difference": "Fixed equal16px arrow heights remove magnitude normalization as a placement confound; same-source zero input control. v15 tests placement plus variable magnitude10..50.",
+      "frozen_intake_recommendation": "Reuse v15 for the shared question first; v16 source is a reserve context variant, not an independent new question. Avoid duplicate capture if v15 already supplies the required evidence.",
+      "original_observations": [
+        {
+          "original_source": "packages/tealscript/oracle-probes/v15/visual-plotarrow-offset-v3-n-series-v1.pine",
+          "original_source_sha256": "a5c3293682093528667f5b39c5681d63e515b9256401e54d547ba4f777f3622d",
+          "attempt": 1,
+          "status": "RUNS",
+          "export_utc": "2026-10-04T19:35:57.436Z",
+          "csv_file": "packages/tealscript/oracle-probes/v15/captures/v15/visual-plotarrow-offset-v3-n-series-v1-attempt1.csv",
+          "csv_sha256": "5648f9baac093b18d3e83c84aeb60e9cf01ff03cd71f5f95a25562f176a52924",
+          "evidence": [
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotarrow-offset-v3-n-series-v1-attempt1-setup.png",
+              "sha256": "8e026544681ac6d6d357ee2c2eaabbe750661c6670e4e37328415a92b57f09ae"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotarrow-offset-v3-n-series-v1-attempt1-export.png",
+              "sha256": "8ffb8a28a37abe54013fdaa0c549c6c371eb7ded13d1ff9b44cd748bed861f5a"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotarrow-offset-v3-n-series-v1-attempt1-logs.txt",
+              "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotarrow-offset-v3-n-series-v1-attempt1-logs-v1.json",
+              "sha256": "9434cf7dc51c0e1fb882362c503a17390b8de6b1fd974982726908efca6cc17b"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotarrow-offset-v3-n-series-v1-attempt1-logs.png",
+              "sha256": "cdb8552c8eacfd350cb3b420c3acd374cc67c1c053130a01c3417d276bc012ce"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotarrow-offset-v3-n-series-v1-attempt1-visual.png",
+              "sha256": "5ca1b0903e398ea81326811f31aac6b322b018f7d72d3d49b27a2f643bf7d4db"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotarrow-offset-v3-n-series-v1-attempt1-data-window-v1.png",
+              "sha256": "9300e55f41ff9a3d7cf6cff3e3138a8f5aac9d4115df2f5076e3853b504d485d"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotarrow-offset-v3-n-series-v1-attempt1-data-window-v1.json",
+              "sha256": "4f909ab4c75a6dfad3a6db984ebc48f338efe54fd08491840dd350169ea2fa60"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotarrow-offset-v3-n-series-v1-attempt1-data-window-v1.txt",
+              "sha256": "e6dda3e89cc8146d6aa4afdba636e2956766592491cf896fb42bb7778db02d77"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotarrow-offset-v3-n-series-v1-attempt1-replay-phase9-paired-v1.json",
+              "sha256": "dd3ab994a4d41e4d3e244695b49caccab4e58c701bde37ad6b68a61433e7b609"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotarrow-offset-v3-n-series-v1-attempt1-replay-phase9-paired-v1.png",
+              "sha256": "36cc6bfe4577cb66f92e0d167a6ff0293a4987f74d370c6bd03f7410dd40b4fa"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotarrow-offset-v3-n-series-v1-attempt1-replay-phase11-paired-v1.json",
+              "sha256": "9f62be1a8465a76f0626f7fd57331cfcabf65c64490616cd9a050113c37f52ba"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotarrow-offset-v3-n-series-v1-attempt1-replay-phase11-paired-v1.png",
+              "sha256": "c76d5194080f17ca1c8466987c1deb90f93598dffd58b8ef70e962b796bcd490"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotarrow-offset-v3-n-series-v1-attempt1-replay-phase12-paired-v1.json",
+              "sha256": "3b27994146391eb9e1751dbca43e9b0cb095e9d25630f4d4ba8a1099d94ca26b"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotarrow-offset-v3-n-series-v1-attempt1-replay-phase12-paired-v1.png",
+              "sha256": "0efbcbf2ebccee30b3b16ef1d0956f2ad790f514c2cb6aa4551f26763a9c3ac5"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotarrow-offset-v3-n-series-v1-attempt1-replay-phase31-paired-v1.json",
+              "sha256": "37311de46ac405d5e3a1970aa3cbfe8d07c91ab8a5b597a0e4c32a97b7fb4bcf"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotarrow-offset-v3-n-series-v1-attempt1-replay-phase31-paired-v1.png",
+              "sha256": "c1fa2a3cb336976d60806b2e599007b2c1b579d05694e65c81787bd5bdf2177f"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotarrow-offset-v3-n-series-v1-attempt1-renderer-phase9-v1.json",
+              "sha256": "aaa70b32e94b29c5334ec83e688d2488ce95f6d2f77c8ef5c9de39cf8d8d4285"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotarrow-offset-v3-n-series-v1-attempt1-renderer-phase9-v1.png",
+              "sha256": "32c818c7dc655b71ac4e2e2d4f0f07a7fff3876c3d3aafed23e56b6efeeebd0f"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotarrow-offset-v3-n-series-v1-attempt1-renderer-phase11-v1.json",
+              "sha256": "b650555f5c3f614d29928556259665b344f7cd05af01de6a22e11c2ffd238522"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotarrow-offset-v3-n-series-v1-attempt1-renderer-phase11-v1.png",
+              "sha256": "e9ab665d8e573896474d1f71dfe90c5b5930599aaa867720b0471fcb53b49601"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotarrow-offset-v3-n-series-v1-attempt1-renderer-phase12-v1.json",
+              "sha256": "865d574b610f6e59d00909a20d8c5126d60ee67ce9eca79040a7f2444a4480f1"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotarrow-offset-v3-n-series-v1-attempt1-renderer-phase12-v1.png",
+              "sha256": "bf3f986ad30921c3f406e5cfce1792ec27c560f1e8c8f180515a69a5a60947e8"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotarrow-offset-v3-n-series-v1-attempt1-renderer-phase31-v1.json",
+              "sha256": "1c660618f59efb8ce6d90d748f1a626d2e15e8efb17bf0843e97b63705662cc5"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotarrow-offset-v3-n-series-v1-attempt1-renderer-phase31-v1.png",
+              "sha256": "d1623bd5794222422ca7ea70055418750d3eab3216c0b657fb1aed7d85dfa656"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotarrow-offset-v3-n-series-v1-attempt1-renderer-phase11-settled-v1.json",
+              "sha256": "2a1a29f34b2cf359883279512f258a294e194f60e6b6623de11b3cbe0c31b4ea"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotarrow-offset-v3-n-series-v1-attempt1-renderer-phase11-settled-v1.png",
+              "sha256": "ea0e5560f581d7bd55a9b2e90dfc7018410ed426f65197a49acf7e9a6cf915ea"
+            }
+          ]
+        },
+        {
+          "original_source": "packages/tealscript/oracle-probes/v15/visual-plotarrow-offset-v3-n-zero-control-v1.pine",
+          "original_source_sha256": "4e2c0628e124d5a8af6ed88d03a01ed1603a16c3c34f9370d92f2232f9ae757d",
+          "attempt": 1,
+          "status": "RUNS",
+          "export_utc": "2026-10-04T19:37:11.205Z",
+          "csv_file": "packages/tealscript/oracle-probes/v15/captures/v15/visual-plotarrow-offset-v3-n-zero-control-v1-attempt1.csv",
+          "csv_sha256": "80644b5a81785e79d9b370eba166473ec7582a0ed7162e8e030633b1a9e0ad56",
+          "evidence": [
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotarrow-offset-v3-n-zero-control-v1-attempt1-setup.png",
+              "sha256": "b802e966130c609a8036b8219855e4ab4deebe3d88a02f2ec7a4a61cb6375f25"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotarrow-offset-v3-n-zero-control-v1-attempt1-export.png",
+              "sha256": "283f44fe7d99f2d77ba8b762917bf1f96fcff153d0745abb6263918b3e61bfc3"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotarrow-offset-v3-n-zero-control-v1-attempt1-logs.txt",
+              "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotarrow-offset-v3-n-zero-control-v1-attempt1-logs-v1.json",
+              "sha256": "7c20107c77bef8eb0f04aab921838a5a68a272948ffdbc68952242ea4772ee5a"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotarrow-offset-v3-n-zero-control-v1-attempt1-logs.png",
+              "sha256": "f6b76f80686ace1b2c2813f7e034db84378d6dafc44e9e9b6114846e41ad2862"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotarrow-offset-v3-n-zero-control-v1-attempt1-visual.png",
+              "sha256": "f75c9d3a9dae4d8d231752f6ce2708a5b0cff51ef84fcc8c355d53de50642c0e"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotarrow-offset-v3-n-zero-control-v1-attempt1-data-window-v1.png",
+              "sha256": "655481876992121a32f3ce29f48da4ee0951f156b1db47f7bb95823f622757c1"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotarrow-offset-v3-n-zero-control-v1-attempt1-data-window-v1.json",
+              "sha256": "a191c7d12e1a58c1414162bfa4c1f5b5070da169fb63389f5045bfd245dbc26d"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotarrow-offset-v3-n-zero-control-v1-attempt1-data-window-v1.txt",
+              "sha256": "1a72c2823ffa24ea38320a686025e0343b4f692e23461528113b7f7cce34de98"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotarrow-offset-v3-n-zero-control-v1-attempt1-replay-phase9-paired-v1.json",
+              "sha256": "87aa6d2121df423816d6c8dbfdcc228d02aa657854849d8db3d1de901de274fd"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotarrow-offset-v3-n-zero-control-v1-attempt1-replay-phase9-paired-v1.png",
+              "sha256": "f42995ef2ef7925ade9cd540991c7e57c091b474f8a0e250badf3ea0d6f5b4a0"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotarrow-offset-v3-n-zero-control-v1-attempt1-replay-phase11-paired-v1.json",
+              "sha256": "c96fe7ccece8dca582918c927426c50de4738ce0353c10dce4ee6b731b9bdbec"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotarrow-offset-v3-n-zero-control-v1-attempt1-replay-phase11-paired-v1.png",
+              "sha256": "e5ca8426f1da863f89b37d115f76bbaa6dd07b40cc037bb61d347bae2d941975"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotarrow-offset-v3-n-zero-control-v1-attempt1-replay-phase12-paired-v1.json",
+              "sha256": "0e17bbbf82119c8789655722c306ce5876c98227f3fa76dd1103f5721c7f5fac"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotarrow-offset-v3-n-zero-control-v1-attempt1-replay-phase12-paired-v1.png",
+              "sha256": "4a98e9679bc2a01378ae301e21b19e88d6e9e7473d858dcef1e2de1767071955"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotarrow-offset-v3-n-zero-control-v1-attempt1-replay-phase31-paired-v1.json",
+              "sha256": "264ace7362320be87b69fe163042114df588aa1fe4d2baae4c1ce5f114d16c8b"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotarrow-offset-v3-n-zero-control-v1-attempt1-replay-phase31-paired-v1.png",
+              "sha256": "c59f3aba2fe84565f94be5a998d91d93320b3cc8b1788f4bab9e91c99053186a"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotarrow-offset-v3-n-zero-control-v1-attempt1-renderer-phase9-v1.json",
+              "sha256": "27d3b7b1307d3d0cf2edff70ac1fc7b37c0e680ad29b196c3ca30c3e7180ac63"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotarrow-offset-v3-n-zero-control-v1-attempt1-renderer-phase9-v1.png",
+              "sha256": "eac9922bb289ddd56d438c04cac8ef528c03940e9754f825c4c518ffa894326e"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotarrow-offset-v3-n-zero-control-v1-attempt1-renderer-phase11-v1.json",
+              "sha256": "8b742ea27a68b3144bf000d9ab1f76c048e95627b354ed510ee40b621dda896f"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotarrow-offset-v3-n-zero-control-v1-attempt1-renderer-phase11-v1.png",
+              "sha256": "b79de53ce047392f85f434ae34e3a22ac09d0df5b36b633acfcebae7cfc4973a"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotarrow-offset-v3-n-zero-control-v1-attempt1-renderer-phase12-v1.json",
+              "sha256": "d152c42d57916ecae3009260da632e889c59c59cc758fbb6b1a3f02127d24415"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotarrow-offset-v3-n-zero-control-v1-attempt1-renderer-phase12-v1.png",
+              "sha256": "48dab47e34fa5a512fd0529dc9f3c4b8f946f4b8304cf5e79f68729821b675e6"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotarrow-offset-v3-n-zero-control-v1-attempt1-renderer-phase31-v1.json",
+              "sha256": "67c97c4c37b8614cb85a68b8181c48b25552876a1de57d77b84117cc961f4f49"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-plotarrow-offset-v3-n-zero-control-v1-attempt1-renderer-phase31-v1.png",
+              "sha256": "29661dfa8c1d1535fe9d03d6c6d9bf1c13024ad2fd584374eacb47b94c4cc659"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "reserved_variant": "visual21-705-chart-foreground-threshold-v6-v1.pine",
+      "variant_source_sha256": "7c6b4786d4f3d190f7dcb59845187a8087fabd5aef29823384feb8e930883190",
+      "disposition": "QUESTION-REUSE: this variant was not pasted or compiled; these are distinct-source v15 observations, not variant numeric outputs or exact-SHA reuse.",
+      "question": "chart foreground numeric channels versus solid background and grayscale threshold",
+      "context_difference": "Data-window-only seven channels and explicit four-setting predictions; v15 already requests these exact settings, additional colors and same-source grayscale bracketing. No additional question.",
+      "frozen_intake_recommendation": "Reuse v15 for the shared question first; v16 source is a reserve context variant, not an independent new question. Avoid duplicate capture if v15 already supplies the required evidence.",
+      "original_observations": [
+        {
+          "original_source": "packages/tealscript/oracle-probes/v15/visual-chart-fg-solid-numeric-v6-v1.pine",
+          "original_source_sha256": "e06c22d15ffd722684e8cdfeb3331b5d7d853eb0ad7986cf6d9645dfd51fa5f7",
+          "attempt": 1,
+          "status": "RUNS",
+          "export_utc": "2026-10-04T20:07:38.761Z",
+          "csv_file": "packages/tealscript/oracle-probes/v15/captures/v15/visual-chart-fg-solid-numeric-v6-v1-attempt1.csv",
+          "csv_sha256": "7be530bdfb28855e4499bf5fcd6161c73969fe5518737fea6fade159249ffdd2",
+          "evidence": [
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt1-setup.png",
+              "sha256": "6a3e1dc59bc57c4dd8091cee90c475b3534fbb53e3c1162cbf25b583d042393e"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt1-export.png",
+              "sha256": "270ba1bd0c39246ff758a217d053d553bea781f88e39108118f598ab1c737ea5"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt1-logs.txt",
+              "sha256": "19238f501e1e64a683648e8bd09e5443a2ccf4c28a70ea8f9f2d3dcd8ab8e34e"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt1-logs-v1.json",
+              "sha256": "06c70a14144b41c7cb994884be47784025b1f309dc4e10781d50825a0968e555"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt1-logs.png",
+              "sha256": "807f99cb213fa5e9641c4adf58f92adb6c7e36705ebbe7a009a661f667631fea"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt1-visual.png",
+              "sha256": "b50d9cd706555f8858d41481b86bb16f90820417ccfd426c46fd12cab331f267"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt1-data-window-v1.png",
+              "sha256": "4ed91f6ecb94f591c794db2bcf5e48721e36a2e25d9dc76a19ec0a4755dae426"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt1-data-window-v1.json",
+              "sha256": "76a2a0cc600bfa98df5bacd33bb4601ebd38a1b46fc7cba71a96107d26ec4855"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt1-data-window-v1.txt",
+              "sha256": "1d15db0cb315a2d521c8b59cb83598cb115d499216b24a003d434416549edc34"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt1-foreground-setting-v1.json",
+              "sha256": "77e351998084bfe04cea716abd5b399d8f1cfc28a8e50dd3216004a0e4f7ec70"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt1-foreground-setting-v1.png",
+              "sha256": "b3e770fe8e778926d4b620740e23703527515992818da3317f9ac523c5196626"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt1-background-settings-v1.png",
+              "sha256": "9641b4813e9aed56215e865df4b9eedb03505c7f36e3d36a5a0acf8e742d56dd"
+            }
+          ]
+        },
+        {
+          "original_source": "packages/tealscript/oracle-probes/v15/visual-chart-fg-solid-numeric-v6-v1.pine",
+          "original_source_sha256": "e06c22d15ffd722684e8cdfeb3331b5d7d853eb0ad7986cf6d9645dfd51fa5f7",
+          "attempt": 2,
+          "status": "RUNS",
+          "export_utc": "2026-10-04T20:08:04.977Z",
+          "csv_file": "packages/tealscript/oracle-probes/v15/captures/v15/visual-chart-fg-solid-numeric-v6-v1-attempt2.csv",
+          "csv_sha256": "0e3594763ebc78c0f6126ac218ac463242da1b2908bf87422d61f872225a45ec",
+          "evidence": [
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt2-setup.png",
+              "sha256": "0cce8769f5968b2fcac8e6f6cf81a43492975dd0068327cd5a0ac2dd1ce3f79f"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt2-export.png",
+              "sha256": "20bcea2cb8a324931d3f450d9af04371b475074dcec66698bb2ee21cc5a5e832"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt2-logs.txt",
+              "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt2-logs-v1.json",
+              "sha256": "18528bc842b054793f65cf890b52f5aead7e81495f59d1c534326418a61a72c8"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt2-logs.png",
+              "sha256": "1f6242a8a80477d95bcfe1139548c4ec8103afe82fe6c1e6c667a833898f20be"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt2-visual.png",
+              "sha256": "a575e27d6957952ad93398a8c516c290cd86ff1b8b02a7cfe8084654fc709cbb"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt2-data-window-v1.png",
+              "sha256": "87e7d5420dd8fdfdae09eba45743afbf7ec06bc5f7aaf3bbd549372df8f4355e"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt2-data-window-v1.json",
+              "sha256": "40b9d8927aeefd6daf4ec07bcbf1212ca935a101b2e1cacccdf67e084e8d4fe6"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt2-data-window-v1.txt",
+              "sha256": "f29e562338cb2480a6f0f22b1db9d6bc53be3c3d8275c743cb9c725b477f629c"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt2-foreground-setting-v1.json",
+              "sha256": "3c52a0d52c93fcdf706088aae56ed0329339036127ef79bf8084a66281934b25"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt2-foreground-setting-v1.png",
+              "sha256": "fc41128f73a99943318bdafed5b0ba97bcb287bd6cb4b02e1bfbd06db155ef08"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt2-background-settings-v1.png",
+              "sha256": "8b70925e3f6e4b9155f632560bbb635077c59d2b1134f514e84a39d6f921a520"
+            }
+          ]
+        },
+        {
+          "original_source": "packages/tealscript/oracle-probes/v15/visual-chart-fg-solid-numeric-v6-v1.pine",
+          "original_source_sha256": "e06c22d15ffd722684e8cdfeb3331b5d7d853eb0ad7986cf6d9645dfd51fa5f7",
+          "attempt": 3,
+          "status": "RUNS",
+          "export_utc": "2026-10-04T20:08:23.065Z",
+          "csv_file": "packages/tealscript/oracle-probes/v15/captures/v15/visual-chart-fg-solid-numeric-v6-v1-attempt3.csv",
+          "csv_sha256": "1bc3a5692c422f7824466e12274f72dd5131c16b4e6c3d6de0dfc8a6f31f31c5",
+          "evidence": [
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt3-setup.png",
+              "sha256": "ed13373bd3515494b2377ec083c2c8a49ea5dd0ec32c8efaac39ff68e1f303d5"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt3-export.png",
+              "sha256": "eb36ea081671d8d06c70156a2ecd2016349afe994677b4bad2bf751fc37705f8"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt3-logs.txt",
+              "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt3-logs-v1.json",
+              "sha256": "c19bcb9a0d12441db7ed55e672a3f4618af5451a8fd086e3b3f6e532c0799b28"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt3-logs.png",
+              "sha256": "846816a505f36b295e14ddc9f7140e7f9ecffd912ddd7a39503cde70b7952dd2"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt3-visual.png",
+              "sha256": "10132de02a2b8d5b6cc7ebd1e48e478d0fc1b10757ac6361e4f208a51df615b2"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt3-data-window-v1.png",
+              "sha256": "cc84130066eeab9e2ab9633c345a18ce8a87783e37012f818f938ae81e418143"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt3-data-window-v1.json",
+              "sha256": "e47c4efc33b467d5808811b08da20e83cc1eacbb2fa4d03df9f90cd559e01902"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt3-data-window-v1.txt",
+              "sha256": "02ec243fafcb86807ec8d874b3c16ab5e07bd713915439320c015f598dd1e5aa"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt3-foreground-setting-v1.json",
+              "sha256": "2e7272eb903834de359b9d78e1c9e7dd2555e788e40201fd3b24abe0ee287ffd"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt3-foreground-setting-v1.png",
+              "sha256": "437254541140ce7c4957bbcd8d83f461d450824e03018a635945063939a58fd9"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt3-background-settings-v1.png",
+              "sha256": "f62554e5eb08edc6076f0d64ec52181d8d17771d837bb8ae516bacae74d6fb96"
+            }
+          ]
+        },
+        {
+          "original_source": "packages/tealscript/oracle-probes/v15/visual-chart-fg-solid-numeric-v6-v1.pine",
+          "original_source_sha256": "e06c22d15ffd722684e8cdfeb3331b5d7d853eb0ad7986cf6d9645dfd51fa5f7",
+          "attempt": 4,
+          "status": "RUNS",
+          "export_utc": "2026-10-04T20:08:40.990Z",
+          "csv_file": "packages/tealscript/oracle-probes/v15/captures/v15/visual-chart-fg-solid-numeric-v6-v1-attempt4.csv",
+          "csv_sha256": "6656d1e0f4f18a71b941220df271d0b029eda1c6d7d8c70230274e1691cb6ac6",
+          "evidence": [
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt4-setup.png",
+              "sha256": "71cc6cbd435bc16c314860e9ad1feec582f62fa621b6d8d5970d9e006895e25f"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt4-export.png",
+              "sha256": "282e043c6faba0ef32a7c9044aacf699d68d200e8ce94a179f7b968e32c1ccac"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt4-logs.txt",
+              "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt4-logs-v1.json",
+              "sha256": "8b0a51c42457bc349013c57675c3535faa241c4a1183d8e492a2f21521b56989"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt4-logs.png",
+              "sha256": "b02895784ae3340d8dff61f0a312243364af989d943d9b8037db7930d84f5b90"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt4-visual.png",
+              "sha256": "119f4933160d5acfe4828f25daa7101994153a72ad0efd8c5f1488e94696bd9b"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt4-data-window-v1.png",
+              "sha256": "5d17e3846d0ee14b516c204e7d43d7d84295bc1a01266f48da810b09228f0410"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt4-data-window-v1.json",
+              "sha256": "7ade561d35a4e8986f9f50e4f5800b55b5d103451206a26767fbb106a1bb98e7"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt4-data-window-v1.txt",
+              "sha256": "8330b522d7fd30ea305b4ec668c0d117cbd13c5188504a9f9e9e7621e59fea04"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt4-foreground-setting-v1.json",
+              "sha256": "0547f3aa5fa758752658f61d4653dc5b51eb7f1c33c77d40eb91732a715d4c61"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt4-foreground-setting-v1.png",
+              "sha256": "5031cc8098c88f21ee2f85508078c19ce2df0e20e2c331d3b4c178da8d062f8a"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt4-background-settings-v1.png",
+              "sha256": "bb3684370beb5cc56cd1c62e25c3eecf38baedf0313b40c50447cb5c6c0430fa"
+            }
+          ]
+        },
+        {
+          "original_source": "packages/tealscript/oracle-probes/v15/visual-chart-fg-solid-numeric-v6-v1.pine",
+          "original_source_sha256": "e06c22d15ffd722684e8cdfeb3331b5d7d853eb0ad7986cf6d9645dfd51fa5f7",
+          "attempt": 5,
+          "status": "RUNS",
+          "export_utc": "2026-10-04T20:08:59.321Z",
+          "csv_file": "packages/tealscript/oracle-probes/v15/captures/v15/visual-chart-fg-solid-numeric-v6-v1-attempt5.csv",
+          "csv_sha256": "d39cfe3d2bec2d1913f7ac5ed211319e31d5147589ed2f6a927bcdcf552ac926",
+          "evidence": [
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt5-setup.png",
+              "sha256": "b7bd9054ca83953a980563c8d3918e69fb88c4d58d122a0cebd1c4ed8cbf0675"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt5-export.png",
+              "sha256": "1f75e2b7b6f4f289d87b58cc44ca39e3f52cd530e9f59aee46e8fefdfcd03256"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt5-logs.txt",
+              "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt5-logs-v1.json",
+              "sha256": "f53fca9952f2c8574ffaa1c8ad57d29af939b3faf6f2651dbd81919bad45de35"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt5-logs.png",
+              "sha256": "34d967eae9501e8e214923d40fc118042306a6ee63872f35c5ba86029b195e2a"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt5-visual.png",
+              "sha256": "dd8e06712bf0632734bf289e80dc23f4c30ecb00c94a66fcc7b23d779b667f60"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt5-data-window-v1.png",
+              "sha256": "1b68e7e8549a17545f87d8ccaccbe0dd73bcfa64309a9541e8b43fb4c83b0c55"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt5-data-window-v1.json",
+              "sha256": "68e5870c0683c21fce828c1fdb159ceaa4ee0a19285dc38ec5605ad644a27c3f"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt5-data-window-v1.txt",
+              "sha256": "2aa3429a7b43187f40c79ac1c188898f84da7439d8b5ef569b9e1e1efacc92db"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt5-foreground-setting-v1.json",
+              "sha256": "c922e1699df906386a57afe2211c713fcf1205ecd94163488cbcb5b4cfdcaaa7"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt5-foreground-setting-v1.png",
+              "sha256": "b7a209bc0c5555d5b1d0cba7910b7c2dc9af67702b1574dd056e1b8f5ca0f903"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt5-background-settings-v1.png",
+              "sha256": "29aba5422bf326336d78c32eb97d572d818ee7d5c228473fff45156f9686bd0f"
+            }
+          ]
+        },
+        {
+          "original_source": "packages/tealscript/oracle-probes/v15/visual-chart-fg-solid-numeric-v6-v1.pine",
+          "original_source_sha256": "e06c22d15ffd722684e8cdfeb3331b5d7d853eb0ad7986cf6d9645dfd51fa5f7",
+          "attempt": 6,
+          "status": "RUNS",
+          "export_utc": "2026-10-04T20:09:17.538Z",
+          "csv_file": "packages/tealscript/oracle-probes/v15/captures/v15/visual-chart-fg-solid-numeric-v6-v1-attempt6.csv",
+          "csv_sha256": "ba6a847d8bbea9189c769675b3f50c2e45f83758d292e17c71a100868a340eb6",
+          "evidence": [
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt6-setup.png",
+              "sha256": "f2a98e3d7df973db72dff4b28640ce196d8081560c51e59ee919619c62650073"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt6-export.png",
+              "sha256": "be0c5f89a073b2b2bee655a40fe1691786746cca66292acf892f552e7d3c6bf6"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt6-logs.txt",
+              "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt6-logs-v1.json",
+              "sha256": "200a29622b87e2e269741815bc97b6eb673bafbdffba258c032bb4393b721e29"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt6-logs.png",
+              "sha256": "03edb710e8d37e13a81b051d6a457f0390471f62c2acf5464332634f1a872208"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt6-visual.png",
+              "sha256": "c22431afbd1ad340a59492ab589223ec5f0fef041edac8da41341722aff151ec"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt6-data-window-v1.png",
+              "sha256": "ff457468fc79fb8ab9bcdb13c32ff88c2057cd7ae0522c39520683154524b00b"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt6-data-window-v1.json",
+              "sha256": "7d9470795e4698505f2b3b736f3574fb8f32a42ad0f798e142c0c4d0cfc3933a"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt6-data-window-v1.txt",
+              "sha256": "c52f89e0154dd0d2b9174751b7f203932bdd454d5ea62cbbae51e6373b69bead"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt6-foreground-setting-v1.json",
+              "sha256": "d41ce575013ba2ea89bc20cc8b6b171aa66e255d791bc2a3ff3d68cb1b5a48a9"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt6-foreground-setting-v1.png",
+              "sha256": "2ea8ad42fce8b7804608123093b09969210a2af494d6e2eb046543d8422a0499"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt6-background-settings-v1.png",
+              "sha256": "f41625dd4f4875752d940b9c96dbc8afff3c792c4fc3af1cbf6a056a98eb2133"
+            }
+          ]
+        },
+        {
+          "original_source": "packages/tealscript/oracle-probes/v15/visual-chart-fg-solid-numeric-v6-v1.pine",
+          "original_source_sha256": "e06c22d15ffd722684e8cdfeb3331b5d7d853eb0ad7986cf6d9645dfd51fa5f7",
+          "attempt": 7,
+          "status": "RUNS",
+          "export_utc": "2026-10-04T20:09:35.476Z",
+          "csv_file": "packages/tealscript/oracle-probes/v15/captures/v15/visual-chart-fg-solid-numeric-v6-v1-attempt7.csv",
+          "csv_sha256": "6184ac330ac289e7ded278bd67d69363dcfec84adcc12688e13df5c74e163be9",
+          "evidence": [
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt7-setup.png",
+              "sha256": "d903a7503ac763edba5a6733fcb7af451835063a078b47978411db59a3696f68"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt7-export.png",
+              "sha256": "3e837ceda6b7adf45713b3ffbaa329e21e14114002906569c9bfe66eaae71f66"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt7-logs.txt",
+              "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt7-logs-v1.json",
+              "sha256": "0399706b2e7a7b379ebae333f5b2bade3a3fddebcffdf927410f45a41aeaaf16"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt7-logs.png",
+              "sha256": "a4a1be80231c7f3a962d32578051b1676599189b1fb65621b8a54fdafb39f588"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt7-visual.png",
+              "sha256": "884abf4728c87fc0cd4a0373a64f7645a3779424cd54a7e1c9b4341d66331983"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt7-data-window-v1.png",
+              "sha256": "5c0a81646763211d0fb2640062c5a653e768d4c363f0dde9172358b398e8e066"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt7-data-window-v1.json",
+              "sha256": "581a5eea2199b9a5806f11a869b7b6e30278a4ac418b7201df9ad28f9ae9ecc0"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt7-data-window-v1.txt",
+              "sha256": "4884a409dd2b0630f004e67a62ddbec1d6519d3111e632d85e9f23c3c52e4c4f"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt7-foreground-setting-v1.json",
+              "sha256": "daf5d5d3c795e7d038709327bc71c35950acb83fd3944450a9d0ddca8a1d4b7e"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt7-foreground-setting-v1.png",
+              "sha256": "6685bd36b609cc611d50ceea37445b008334476bf9cbccc0d7589327ca6fc221"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt7-background-settings-v1.png",
+              "sha256": "7e807ef9ade2ea4dd0833d7c7e0b6eaaa9e175a90de2272233538f65023dec8a"
+            }
+          ]
+        },
+        {
+          "original_source": "packages/tealscript/oracle-probes/v15/visual-chart-fg-solid-numeric-v6-v1.pine",
+          "original_source_sha256": "e06c22d15ffd722684e8cdfeb3331b5d7d853eb0ad7986cf6d9645dfd51fa5f7",
+          "attempt": 8,
+          "status": "RUNS",
+          "export_utc": "2026-10-04T20:09:53.613Z",
+          "csv_file": "packages/tealscript/oracle-probes/v15/captures/v15/visual-chart-fg-solid-numeric-v6-v1-attempt8.csv",
+          "csv_sha256": "1733d6f3468bd25314afadef552f8e8c435dbf3fb37ff8ad5a39d2707ef457f7",
+          "evidence": [
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt8-setup.png",
+              "sha256": "0988bc202a75804f9d53414a41a68f38f8dc464065f8e1f962418d179907cd54"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt8-export.png",
+              "sha256": "71979e76b366fc2e683e510a3ec80cbc74888bddff5ab9f3cb59aac03280daf8"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt8-logs.txt",
+              "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt8-logs-v1.json",
+              "sha256": "ca9107676b6a93da61017532d5727e040b5a801cb4832a13714585e8519052bb"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt8-logs.png",
+              "sha256": "5a1a6195ba931875dc00b5fec46dd0ec5392cef91c3fb2dfd33d04f437fb57d4"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt8-visual.png",
+              "sha256": "be7006a8fe2e401c42dbf58b42555609177deec2e99c204f398fe6d8775abbd2"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt8-data-window-v1.png",
+              "sha256": "cee5d957d0207a7d867d1adfcf475becc4e1c65601c69e0f713eb6962697920b"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt8-data-window-v1.json",
+              "sha256": "352d38d0211657953408b57a205aaaf8e6ba230f8c9b4c25a247c5a2f714cc10"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt8-data-window-v1.txt",
+              "sha256": "527f3e1737f9fe0e6176bf113ba2ce95d1eafecf4e8781a2ca45bb2f95ff9592"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt8-foreground-setting-v1.json",
+              "sha256": "d4f1803bab9fc43ed6f5a9f9c22cf126abdf001b0d63d962e0ab1e747f75c2c6"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt8-foreground-setting-v1.png",
+              "sha256": "8b9873eecaf077f9f5b4ea88d2298fe2a038db24169da06bf8d90be634310c05"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt8-background-settings-v1.png",
+              "sha256": "c5c4dc47dad7710e0c643197e22fa6433efc09a03434dcc47f26377bbd44c2b9"
+            }
+          ]
+        },
+        {
+          "original_source": "packages/tealscript/oracle-probes/v15/visual-chart-fg-solid-numeric-v6-v1.pine",
+          "original_source_sha256": "e06c22d15ffd722684e8cdfeb3331b5d7d853eb0ad7986cf6d9645dfd51fa5f7",
+          "attempt": 9,
+          "status": "RUNS",
+          "export_utc": "2026-10-04T20:10:11.762Z",
+          "csv_file": "packages/tealscript/oracle-probes/v15/captures/v15/visual-chart-fg-solid-numeric-v6-v1-attempt9.csv",
+          "csv_sha256": "eb9f328520a22978e3670667734ec10fa3e8f84efef405268d7230fe61ca1469",
+          "evidence": [
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt9-setup.png",
+              "sha256": "e415f682670bdd82f44bc7d10bc72a8486b71229bd04f50d13f97d0d17dd4308"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt9-export.png",
+              "sha256": "7a882f3b13ffa22b6478320da281d6df9f0fd98ee6ea4cc6082734539440bad1"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt9-logs.txt",
+              "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt9-logs-v1.json",
+              "sha256": "d697f0d87d4608b54a862de3d282e07abdd182819060e4e3930f554332d15e41"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt9-logs.png",
+              "sha256": "98838547234487cec0dc57b347b1a76fbdf98bcd60dca181f14da506a8067206"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt9-visual.png",
+              "sha256": "fa61ec565f094725eae3c8ce3ff352486739e8e8da334fa2ca40e02497667c82"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt9-data-window-v1.png",
+              "sha256": "8a95c3cab9fe7a2c6ee186ec25bfdcc718284180a66b37f012d9ba17c6b4c178"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt9-data-window-v1.json",
+              "sha256": "4985b81cfacd92a9fa53390a8cf9c64ef542f0b215c6e86ebb9a88e353209f79"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt9-data-window-v1.txt",
+              "sha256": "b502480839369ce05bf692ea799292f10602e540aace4eece74a07701a5dccf6"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt9-foreground-setting-v1.json",
+              "sha256": "a219ba16a7c58d89d7a4d76fe30310e89c8e80cd66df28c16460f36ef29f670b"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt9-foreground-setting-v1.png",
+              "sha256": "2fac93647c172dd8d686707e66b5872ae1d8478f6f11c8c77021df0467db8510"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt9-background-settings-v1.png",
+              "sha256": "2d8f34262948fb85487b26c6a696ace632e8d848d83282f637aa8805a458eb78"
+            }
+          ]
+        },
+        {
+          "original_source": "packages/tealscript/oracle-probes/v15/visual-chart-fg-solid-numeric-v6-v1.pine",
+          "original_source_sha256": "e06c22d15ffd722684e8cdfeb3331b5d7d853eb0ad7986cf6d9645dfd51fa5f7",
+          "attempt": 10,
+          "status": "RUNS",
+          "export_utc": "2026-10-04T20:11:06.139Z",
+          "csv_file": "packages/tealscript/oracle-probes/v15/captures/v15/visual-chart-fg-solid-numeric-v6-v1-attempt10.csv",
+          "csv_sha256": "b6a0d7b6877ab31eff44a5b7ff5813b53cd2a9a8f33ce9cba9cee789b1dea3b1",
+          "evidence": [
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt10-setup.png",
+              "sha256": "792abec3e2edef05f6ffe1329e7cd48b854c2d72eb04612523812da0824e0b33"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt10-export.png",
+              "sha256": "ae5da593307083c28815ba509071a2874747c62a26ebc0ca7807ce2e04bc4668"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt10-logs.txt",
+              "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt10-logs-v1.json",
+              "sha256": "87738f029f45830d61575604ab94e7ad5adf17012deec314424a2b08819236aa"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt10-logs.png",
+              "sha256": "8290513da76dfcbae159a71f9d77d31f00fde59e8efe3535dbbc7a85dcf6e711"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt10-visual.png",
+              "sha256": "ae414c51ddac009b8445e461aadcdc35b432d1555af23498b596cb344fb7c592"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt10-data-window-v1.png",
+              "sha256": "5e56b1c81eb3818b82c9108b6def343df45ed7e9017944e93acad6bd2347ba1d"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt10-data-window-v1.json",
+              "sha256": "bfd6dba924e2ec00e40276d77151409f1c474e06b98abff57053f460009487bc"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt10-data-window-v1.txt",
+              "sha256": "0e2de412f3bf8fc5156b1bee198c9d37a01410496efd486684db0b136fb34115"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt10-foreground-setting-v1.json",
+              "sha256": "f5fbc2a5407edc592649aba88899586c4ac159b751ef265e788e92d02a6131aa"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt10-foreground-setting-v1.png",
+              "sha256": "87c913a878792ee8d6e4f1e89e7ef068618cf30a4ef0d3ffa9be57f29702e011"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt10-background-settings-v1.png",
+              "sha256": "d2ca1d806ab68bcfbc8aef96415748698fc2fce85303fb5986ac9ae290375f74"
+            }
+          ]
+        },
+        {
+          "original_source": "packages/tealscript/oracle-probes/v15/visual-chart-fg-solid-numeric-v6-v1.pine",
+          "original_source_sha256": "e06c22d15ffd722684e8cdfeb3331b5d7d853eb0ad7986cf6d9645dfd51fa5f7",
+          "attempt": 11,
+          "status": "RUNS",
+          "export_utc": "2026-10-04T20:11:24.792Z",
+          "csv_file": "packages/tealscript/oracle-probes/v15/captures/v15/visual-chart-fg-solid-numeric-v6-v1-attempt11.csv",
+          "csv_sha256": "85e6e7aceb866103db89374ded3667b3b16498c0d33ccf4677e6bdc4f36e142f",
+          "evidence": [
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt11-setup.png",
+              "sha256": "edfa6393d9849de0f6412efea1415e643456e403da2623c4dc22a4f23a7e4151"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt11-export.png",
+              "sha256": "e0df9e8c02a5a3b59db94447509b1832af1d2799cb9ed925503f9eedcf0d9f66"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt11-logs.txt",
+              "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt11-logs-v1.json",
+              "sha256": "0587d163a1b74145f0adf9f64ef8978c2e0360de280f92394c33893ad5cf07d8"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt11-logs.png",
+              "sha256": "64beb8b50bfc7c3f6ee888388c6d556e4f552b5afb111e098290d63807414641"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt11-visual.png",
+              "sha256": "a0d67b3f66324fbc0c82b426e103ff9a052a0310bcfd6f576692da5c36dda701"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt11-data-window-v1.png",
+              "sha256": "876932fa0be95c9db08c2d1fff5feaa4266d7aa21ca8ad4f10fc1f1e8193937b"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt11-data-window-v1.json",
+              "sha256": "e6ef68f3d7eb411a6c9424d140343b9103a992b45ecac94981d4366402fd4743"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt11-data-window-v1.txt",
+              "sha256": "a67e482b655e2c3f7abc5c5ad314cf03d5c6e19fea54e7db3dedc4c5bc6b0416"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt11-foreground-setting-v1.json",
+              "sha256": "4c7324a78674537eff88d4f0283a931c794991e916659efee5a236263e70f700"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt11-foreground-setting-v1.png",
+              "sha256": "44979320584f15138bbff43c58fb630f603bd6ebda93dd87277cf42c5414ba2f"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt11-background-settings-v1.png",
+              "sha256": "7a20b92f45606018b3cb362766e721c6a3692aebe5249d5281f7e35ffb416d33"
+            }
+          ]
+        },
+        {
+          "original_source": "packages/tealscript/oracle-probes/v15/visual-chart-fg-solid-numeric-v6-v1.pine",
+          "original_source_sha256": "e06c22d15ffd722684e8cdfeb3331b5d7d853eb0ad7986cf6d9645dfd51fa5f7",
+          "attempt": 12,
+          "status": "RUNS",
+          "export_utc": "2026-10-04T20:11:42.829Z",
+          "csv_file": "packages/tealscript/oracle-probes/v15/captures/v15/visual-chart-fg-solid-numeric-v6-v1-attempt12.csv",
+          "csv_sha256": "a0004d74356a07fb89697aab6eb7a5e5396ac7023ad5e8849cda54c6c9005a53",
+          "evidence": [
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt12-setup.png",
+              "sha256": "512b97756393bbf1efe1ba4f3a3f70af680b1d64cb0971df9a2dff34550c2963"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt12-export.png",
+              "sha256": "8d7e95294ea7cb1f1f9a7ffcc75c779bc8936014eb7536d6723dabb749a7008e"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt12-logs.txt",
+              "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt12-logs-v1.json",
+              "sha256": "06018ce6893da680a0b87135edabae54d5e44d431886a72030f15aa9a3be97e9"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt12-logs.png",
+              "sha256": "3fe4c83a4347a0e5c2dc5f50eb01d74578147da676d87e7ec34691d03fb0dadb"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt12-visual.png",
+              "sha256": "8c4a05355225ff91d0ded759be294407d324a101668329708cc8bf73016a016c"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt12-data-window-v1.png",
+              "sha256": "c296a75f2eb76a6fda6641adc39aab859b69385f67e5389fdeceb685fac80390"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt12-data-window-v1.json",
+              "sha256": "c22bb136e98c885534a0c35160d592e072df05abb8d1229ac2e78149f38c5a90"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt12-data-window-v1.txt",
+              "sha256": "354e763da2aa869f42d324ba336b48854a6cd54409f30212276d1c200d73c1e6"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt12-foreground-setting-v1.json",
+              "sha256": "0b8233b4e268a2e62f0ee52f88afc5d03691b878e9e76379a1fe3918b545990f"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt12-foreground-setting-v1.png",
+              "sha256": "7716580e332ba8f8efb0167e70778f1b1141aa5c2903f68eb0308b174de79e20"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt12-background-settings-v1.png",
+              "sha256": "a53321871f084b1309062dc9b91f1cd9caf6fcd23a9b88a91744c9a6d5d2cc56"
+            }
+          ]
+        },
+        {
+          "original_source": "packages/tealscript/oracle-probes/v15/visual-chart-fg-solid-numeric-v6-v1.pine",
+          "original_source_sha256": "e06c22d15ffd722684e8cdfeb3331b5d7d853eb0ad7986cf6d9645dfd51fa5f7",
+          "attempt": 13,
+          "status": "RUNS",
+          "export_utc": "2026-10-04T20:12:00.874Z",
+          "csv_file": "packages/tealscript/oracle-probes/v15/captures/v15/visual-chart-fg-solid-numeric-v6-v1-attempt13.csv",
+          "csv_sha256": "e2b2693362f683e78276a13fea14c640f34e89b7788dd478431a7317208cf152",
+          "evidence": [
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt13-setup.png",
+              "sha256": "1f53b01b0caa15bdc59067d57ba160f78bdd73d3f71efcee991f23a0b2f08257"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt13-export.png",
+              "sha256": "18ffe21328e717a967688c23ee9007d4cbe61010a252623609b2e3954a1691b7"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt13-logs.txt",
+              "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt13-logs-v1.json",
+              "sha256": "d0d4c06dfb2cfccdb0296613ce12319a5284d89dde35c9a3cb849383d7936726"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt13-logs.png",
+              "sha256": "7296bb35d2fb7d1856526fd0e7b3f7dec4ddf7b76661c2677d197571ae7e0dc4"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt13-visual.png",
+              "sha256": "4e0f4551e03803d8ac73d41eb266c4fd384d43bf2df8bb5088df8a89ea60dde0"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt13-data-window-v1.png",
+              "sha256": "3ca481ab7208ba48830880d0a0cad8f70dbca606ff116fb778fba6dd9c9e304b"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt13-data-window-v1.json",
+              "sha256": "0e9b8faf4ae82f2d6e4e6ad2ca62f83c5ac441deda4842872565f7460ecbf97d"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt13-data-window-v1.txt",
+              "sha256": "ac173b6e3672820fa7ab275b05ef480accaead18c33100c9057a52972ecb33b1"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt13-foreground-setting-v1.json",
+              "sha256": "8cfc7d2b225033a9c10eb5a5ea8e2ffc8ed103f5ad2dd9567e919ac571427b49"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt13-foreground-setting-v1.png",
+              "sha256": "338fd8d34ee7e65ab02c210e8709c41c0d63d064562a3341a7c0cd03243bf17b"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt13-background-settings-v1.png",
+              "sha256": "46d74bd2c24d37318e6a25a60d8f934ae9788380fc126361719d79e8d81d42e7"
+            }
+          ]
+        },
+        {
+          "original_source": "packages/tealscript/oracle-probes/v15/visual-chart-fg-solid-numeric-v6-v1.pine",
+          "original_source_sha256": "e06c22d15ffd722684e8cdfeb3331b5d7d853eb0ad7986cf6d9645dfd51fa5f7",
+          "attempt": 14,
+          "status": "RUNS",
+          "export_utc": "2026-10-04T20:12:18.645Z",
+          "csv_file": "packages/tealscript/oracle-probes/v15/captures/v15/visual-chart-fg-solid-numeric-v6-v1-attempt14.csv",
+          "csv_sha256": "35458f7b21a25e2484786eca6db5ebc1093af5c1ac20995439dc4e8035a6103f",
+          "evidence": [
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt14-setup.png",
+              "sha256": "c23ed5d1e812c02216ee156a0fcb360a445ed8e95ea8efb0c912332c1119ace0"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt14-export.png",
+              "sha256": "c55009b3518de3356661c01d638e34e18e2cdc7af09845f2bdcd4fe3ffc4fa65"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt14-logs.txt",
+              "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt14-logs-v1.json",
+              "sha256": "240bdc3785e6be3fab57a604870053fb1a84bdc1606d66ab3388e88e987231a7"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt14-logs.png",
+              "sha256": "a0a844484c7f46e480c03d41a84d3389202293236368e2a33d54772b030dc885"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt14-visual.png",
+              "sha256": "1ace8543a4b8006988bc9e5a7e0edf2857fc1d74ed5c3265b59cc722bb2fa331"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt14-data-window-v1.png",
+              "sha256": "42578f17c8ef62ea443bde7853de037cc715381cdca2861db5ccf8d6d3c1e182"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt14-data-window-v1.json",
+              "sha256": "898ed5ea64163f5c9ad561500b7cc7c55fd8af330fb917943a8687725ec52ace"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt14-data-window-v1.txt",
+              "sha256": "a5b029a1bda88cca0bafa8875b3464afa2f98af07a7444026156f196b7e44ab9"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt14-foreground-setting-v1.json",
+              "sha256": "6a1176afcc72c627274ffa8f0e73f9f7c8dfc70798f7bef788812d7295e063b5"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt14-foreground-setting-v1.png",
+              "sha256": "419d536c695b916e109c37745599a51e11dfd89ce95ed8d818bddd1e4c0b6fae"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt14-background-settings-v1.png",
+              "sha256": "2a7cfc73bf331a60e55156525809d5f68c21b2954c47fc30d11c6fb0adaf6791"
+            }
+          ]
+        },
+        {
+          "original_source": "packages/tealscript/oracle-probes/v15/visual-chart-fg-solid-numeric-v6-v1.pine",
+          "original_source_sha256": "e06c22d15ffd722684e8cdfeb3331b5d7d853eb0ad7986cf6d9645dfd51fa5f7",
+          "attempt": 15,
+          "status": "RUNS",
+          "export_utc": "2026-10-04T20:12:36.858Z",
+          "csv_file": "packages/tealscript/oracle-probes/v15/captures/v15/visual-chart-fg-solid-numeric-v6-v1-attempt15.csv",
+          "csv_sha256": "a06b8a03c6d48149008f480702305eaa370b84c4087281a6a7a0299045f1387a",
+          "evidence": [
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt15-setup.png",
+              "sha256": "63e93bdb25953a1ece56054fa056a4126774bb9f8e851ad64f1e4bf914f616a4"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt15-export.png",
+              "sha256": "ad98bb1b1bb6a9dce2aa45fd6ba6b00bbd3a78f106eda72b14d31c0c8ce4b1c0"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt15-logs.txt",
+              "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt15-logs-v1.json",
+              "sha256": "90664a91462b6983446ec855835b17b235295d95e058f40964205b028f3e34d9"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt15-logs.png",
+              "sha256": "53ce0f010763f517f0ec5da1dc6828d431e37552ddd53f716ed128c28b15a6ee"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt15-visual.png",
+              "sha256": "b38ed785f1eb5bec0c4880db3ef93ed0b049d102ae7143c7ad04958a07b4ecd1"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt15-data-window-v1.png",
+              "sha256": "bf8907d6fb6985f00f40d1c5b14e18ef82425e418eb6c753a06d0f5bf3fafd70"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt15-data-window-v1.json",
+              "sha256": "e3859186ddf52800cd0b0723a5a57c2033e2a733a97360cd404166169e6ee907"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt15-data-window-v1.txt",
+              "sha256": "9a4ac5319b2b00c5fe6448fb86d31912c9af6220365cf407c772e3db8b7e2aaa"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt15-foreground-setting-v1.json",
+              "sha256": "f51ab4549ab4eb9145228a84924e8917df69ff8322590865d24c8576c2439a5f"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt15-foreground-setting-v1.png",
+              "sha256": "841f0590ed071d601aac7329f8ae48abcbb973cc3f5b54876187ad86ec60d739"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt15-background-settings-v1.png",
+              "sha256": "4b730c22a78e2f8c1d3ffdaac113bef03cb5a2c8f7502aa123cf1e55f50205ff"
+            }
+          ]
+        },
+        {
+          "original_source": "packages/tealscript/oracle-probes/v15/visual-chart-fg-solid-numeric-v6-v1.pine",
+          "original_source_sha256": "e06c22d15ffd722684e8cdfeb3331b5d7d853eb0ad7986cf6d9645dfd51fa5f7",
+          "attempt": 16,
+          "status": "RUNS",
+          "export_utc": "2026-10-04T20:12:54.829Z",
+          "csv_file": "packages/tealscript/oracle-probes/v15/captures/v15/visual-chart-fg-solid-numeric-v6-v1-attempt16.csv",
+          "csv_sha256": "1358807522ef7643e0fe1285545aca1b48a4212caeeb0ffbff7eb6afb06da99b",
+          "evidence": [
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt16-setup.png",
+              "sha256": "13f49c2126c75150051335e64bc0257c1ac37f7178b6c6cb964fc7c7aba53953"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt16-export.png",
+              "sha256": "dd8d8459ce33d87cea64e5a682bcbea39a8db1d4e0c1d3003bb25f89f164bf3e"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt16-logs.txt",
+              "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt16-logs-v1.json",
+              "sha256": "6139b82f405b4df049a50e9c6238ebb8b95466b1069e6676dd26f8e5ca27302c"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt16-logs.png",
+              "sha256": "c7a9f67880cff6cb62e7ea9469f06de23df6cfce865ccf696a58db0792956586"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt16-visual.png",
+              "sha256": "c12da44b5c0501998ccc011ebaa74b1912f754c65496c104dc950abcb4b8dfab"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt16-data-window-v1.png",
+              "sha256": "c13deba9eaca309fa757bdfb2c6df67bdc8731eeb689f42895932e3996c53818"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt16-data-window-v1.json",
+              "sha256": "395d77314ca43933a3de0e600a0f6d747fdfcd12127bc73559dfd1924c5e0458"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt16-data-window-v1.txt",
+              "sha256": "2c193eb6b6d66d4aaeb9c23ace34d549e1693e56b7e69a7e1de17eff7f126bbc"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt16-foreground-setting-v1.json",
+              "sha256": "ac02800c341f49dac2621637b0cdd37fea3c5ae9726c5dd84f8e6fc6ba2bb984"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt16-foreground-setting-v1.png",
+              "sha256": "5e145e5886cf7d7eac967a48ce842a12b6c7179aad6795b28947aa5d33700856"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt16-background-settings-v1.png",
+              "sha256": "6d07ef5210112da3430dc74570b8df6184b7a82453533a5c441f0a27074b4c1b"
+            }
+          ]
+        },
+        {
+          "original_source": "packages/tealscript/oracle-probes/v15/visual-chart-fg-solid-numeric-v6-v1.pine",
+          "original_source_sha256": "e06c22d15ffd722684e8cdfeb3331b5d7d853eb0ad7986cf6d9645dfd51fa5f7",
+          "attempt": 17,
+          "status": "RUNS",
+          "export_utc": "2026-10-04T20:13:13.037Z",
+          "csv_file": "packages/tealscript/oracle-probes/v15/captures/v15/visual-chart-fg-solid-numeric-v6-v1-attempt17.csv",
+          "csv_sha256": "38cdf016ae9a02bdafa90c72fd3618c18d720ebb4dfdab74a7caae2c9139fcbd",
+          "evidence": [
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt17-setup.png",
+              "sha256": "a60e1de3b8e3975dabf8a2c34f6f10a85e78ef01533bf9e41987b81f39e4ed5b"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt17-export.png",
+              "sha256": "f31e09888dee790dc9632cba4c270a5e2a85e1ef845be8f6c3246906c8de7b01"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt17-logs.txt",
+              "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt17-logs-v1.json",
+              "sha256": "55c55efcc552720ae159257999a226925d89d90a884b028223bb66a544ab87cb"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt17-logs.png",
+              "sha256": "585f1cac5bba02735165c2733cef308a54561d214c09838be89f8f94e76a35b6"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt17-visual.png",
+              "sha256": "13392fc015af65781b4a8a9dc5e348d6d90e55ce12835cc2805213840d4bce86"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt17-data-window-v1.png",
+              "sha256": "5118da6fdb92b3a1a34e524ac8a158990d31bf0e2feae4837bd402665afb9039"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt17-data-window-v1.json",
+              "sha256": "470e07d57f2d160427012566e18ee33c6567284e0aaf74d974fc5ab886499068"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt17-data-window-v1.txt",
+              "sha256": "4574373f1d66b6d875854788818a25d1495170439b209f229fc4ebc138adccba"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt17-foreground-setting-v1.json",
+              "sha256": "01b03a4efd8c4e7acfe919febb46ac77a2d99855a05590f8d70540c2acbd1db3"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt17-foreground-setting-v1.png",
+              "sha256": "e768339e4a56d9c4a1742e9fad364ad9bbfb2e3a27526454640dc2def9a7fe90"
+            },
+            {
+              "file": "packages/tealscript/oracle-probes/v15/captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt17-background-settings-v1.png",
+              "sha256": "2c9ce8db60d243d6f94d3c45e4455130e680f7127405871101f8b14464f286b3"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "limits": "Five reserve variants remain unobserved as exact sources. No new-source compile acceptance, same-input true/false/true experiment, equal-height arrow control or universal policy is implied by distinct-source evidence. Existing native geometry and colors remain bounded to the v15 frozen sources and recorded contexts."
+}
