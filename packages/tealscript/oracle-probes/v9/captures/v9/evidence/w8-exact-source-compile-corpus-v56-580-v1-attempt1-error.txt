@@ -1,0 +1,178 @@
+Undeclared identifier "relVol"
+{
+  "error": "Undeclared identifier \"{identifier}\"",
+  "editorError": {
+    "code": "CE10272",
+    "ctx": {
+      "identifier": "relVol"
+    },
+    "end": {
+      "column": 89,
+      "line": 311
+    },
+    "message": "Undeclared identifier \"{identifier}\"",
+    "start": {
+      "column": 84,
+      "line": 311
+    },
+    "id": "USER;1796e61d7c1b46ef9dffe3ec5c71106c"
+  },
+  "title": "Compilation error",
+  "compiler_markers": [
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///edacae7a-4cc4-4de9-988e-cf595eba0c91.pine?placement%3Ddialog",
+        "path": "/edacae7a-4cc4-4de9-988e-cf595eba0c91.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "code": "SHORT_TITLE_TOO_LONG",
+      "severity": 4,
+      "message": "The shorttitle is too long (11 characters). It should be 10 characters or less.",
+      "startLineNumber": 24,
+      "startColumn": 53,
+      "endLineNumber": 24,
+      "endColumn": 64
+    },
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///edacae7a-4cc4-4de9-988e-cf595eba0c91.pine?placement%3Ddialog",
+        "path": "/edacae7a-4cc4-4de9-988e-cf595eba0c91.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "code": "CE10272",
+      "severity": 8,
+      "message": "Undeclared identifier \"relVol\"",
+      "startLineNumber": 311,
+      "startColumn": 84,
+      "endLineNumber": 311,
+      "endColumn": 90
+    },
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///edacae7a-4cc4-4de9-988e-cf595eba0c91.pine?placement%3Ddialog",
+        "path": "/edacae7a-4cc4-4de9-988e-cf595eba0c91.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "code": "CE10272",
+      "severity": 8,
+      "message": "Undeclared identifier \"relVol\"",
+      "startLineNumber": 312,
+      "startColumn": 87,
+      "endLineNumber": 312,
+      "endColumn": 93
+    },
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///edacae7a-4cc4-4de9-988e-cf595eba0c91.pine?placement%3Ddialog",
+        "path": "/edacae7a-4cc4-4de9-988e-cf595eba0c91.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "code": "CW10002",
+      "severity": 4,
+      "message": "The \"ta.crossover()\" call inside the conditional expression might not execute on every bar, which can cause inconsistent calculations because the function depends on historical results. For consistency, assign the call's result to a global variable and use that variable in the expression instead.",
+      "startLineNumber": 273,
+      "startColumn": 21,
+      "endLineNumber": 273,
+      "endColumn": 45
+    },
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///edacae7a-4cc4-4de9-988e-cf595eba0c91.pine?placement%3Ddialog",
+        "path": "/edacae7a-4cc4-4de9-988e-cf595eba0c91.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "code": "CW10002",
+      "severity": 4,
+      "message": "The \"ta.crossunder()\" call inside the conditional expression might not execute on every bar, which can cause inconsistent calculations because the function depends on historical results. For consistency, assign the call's result to a global variable and use that variable in the expression instead.",
+      "startLineNumber": 274,
+      "startColumn": 21,
+      "endLineNumber": 274,
+      "endColumn": 46
+    },
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///edacae7a-4cc4-4de9-988e-cf595eba0c91.pine?placement%3Ddialog",
+        "path": "/edacae7a-4cc4-4de9-988e-cf595eba0c91.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "code": "CW10002",
+      "severity": 4,
+      "message": "The \"ta.crossover()\" call inside the conditional expression might not execute on every bar, which can cause inconsistent calculations because the function depends on historical results. For consistency, assign the call's result to a global variable and use that variable in the expression instead.",
+      "startLineNumber": 278,
+      "startColumn": 23,
+      "endLineNumber": 278,
+      "endColumn": 53
+    },
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///edacae7a-4cc4-4de9-988e-cf595eba0c91.pine?placement%3Ddialog",
+        "path": "/edacae7a-4cc4-4de9-988e-cf595eba0c91.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "code": "CW10002",
+      "severity": 4,
+      "message": "The \"ta.crossunder()\" call inside the conditional expression might not execute on every bar, which can cause inconsistent calculations because the function depends on historical results. For consistency, assign the call's result to a global variable and use that variable in the expression instead.",
+      "startLineNumber": 279,
+      "startColumn": 23,
+      "endLineNumber": 279,
+      "endColumn": 54
+    },
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///edacae7a-4cc4-4de9-988e-cf595eba0c91.pine?placement%3Ddialog",
+        "path": "/edacae7a-4cc4-4de9-988e-cf595eba0c91.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "code": "CW10002",
+      "severity": 4,
+      "message": "The \"ta.crossover()\" call inside the conditional expression might not execute on every bar, which can cause inconsistent calculations because the function depends on historical results. For consistency, assign the call's result to a global variable and use that variable in the expression instead.",
+      "startLineNumber": 296,
+      "startColumn": 25,
+      "endLineNumber": 296,
+      "endColumn": 56
+    },
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///edacae7a-4cc4-4de9-988e-cf595eba0c91.pine?placement%3Ddialog",
+        "path": "/edacae7a-4cc4-4de9-988e-cf595eba0c91.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "code": "CW10002",
+      "severity": 4,
+      "message": "The \"ta.crossunder()\" call inside the conditional expression might not execute on every bar, which can cause inconsistent calculations because the function depends on historical results. For consistency, assign the call's result to a global variable and use that variable in the expression instead.",
+      "startLineNumber": 297,
+      "startColumn": 25,
+      "endLineNumber": 297,
+      "endColumn": 57
+    }
+  ],
+  "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,112.51\nH\n85,134.01\nL\n85,112.50\nC\n85,134.01\n+21.50 (+0.03%)\n85,134.00\nSELL\n0.01\n85,134.01\nBUY\nw8-exact-source-compile-corpus-v56-580-v1.pine\nUSDT\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n12:59:51 UTC\n99+\nPine Editor\nw8-exact-source-compile-corpus-v56-580-v1.pine\nPublish script\n303\n304\n305\n306\n307\n308\n309\n310\n311\n312\n313\n314\n315\n316\n317\n318\n319\n320\n321\n322\n323\n324\n325\n326\n327\n328\n329\n330\n331\n332\n333\n334\n335\n336\n337\n338\n339\n340\n341\n342\nbool trendShort = stShort\nbool structureLong = sweepLong\nbool structureShort = sweepShort\nbool triggerLong = emaLong\nbool triggerShort = emaShort\n// Confluence scoring based on role weights:\n// Structure (Sweep) = 3.0, Momentum (RSI/WT) = 2.0, Volatility (relVol > 1.2) = 2.0, MA/Trigger (EMA/MACD) = 2.0, Trend (ST flip) = 1.0\nfloat conflScoreLong = (structureLong ? 3.0 : 0.0) + (momentumLong ? 2.0 : 0.0) + (relVol > 1.2 ? 2.0 : 0.0) + (emaLong ? 2.0 : 0.0) + (stLong ? 1.0 : 0.0)\nfloat conflScoreShort = (structureShort ? 3.0 : 0.0) + (momentumShort ? 2.0 : 0.0) + (relVol > 1.2 ? 2.0 : 0.0) + (emaShort ? 2.0 : 0.0) + (stShort ? 1.0 : 0.0)\n// A valid reversal confluence requires at least 5.0 score AND a primary reversal catalyst (either structure sweep or momentum extreme).\nbool anyLong  = conflScoreLong >= 5.0 and (structureLong or momentumLong)\nbool anyShort = conflScoreShort >= 5.0 and (structureShort or momentumShort)\nfloat trigLong  = conflScoreLong\nfloat trigShort = conflScoreShort\n// ─── Zone Data Arrays ────────────────────────────────────────────────────────\nvar array<int>   _zDir      = array.new<int>()\nvar array<int>   _zGrade    = array.new<int>()\nvar array<float> _zUpper    = array.new<float>()\nvar array<float> _zLower    = array.new<float>()\nvar array<int>   _zTouches  = array.new<int>()\nvar array<bool>  _zInZone   = array.new<bool>()\nvar array<int>   _zTime     = array.new<int>()\n// Render handles rebuilt on barstate.islast\nvar array<box>   _rBox = array.new<box>()\nvar array<label> _rLbl = array.new<label>()\n// ─── Add Zone When Label Fires ────────────────────────────────────────────────\nif reversalLabel != 0\n    int   zDir   = reversalLabel > 0 ? 1 : -1\n    int   zGrade = math.abs(reversalLabel)\n    bool  doAdd  = (zDir ==  1 and zGrade == 2 and showStrongSupport) or\n                   (zDir ==  1 and zGrade == 1 and showWeakSupport)   or\n                   (zDir == -1 and zGrade == 2 and showStrongResist)  or\n                   (zDir == -1 and zGrade == 1 and showWeakResist)\n2 of 9 problems\nUndeclared identifier \"relVol\"(CE10272)\n1 ∙ Today, 20:59\nLine 312, Col 87\nPine Script® v6\nCompilation error: CE10272\n\nUndeclared identifier \"relVol\"\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+  "context_substituted_message": "Undeclared identifier \"relVol\""
+}

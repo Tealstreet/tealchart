@@ -1,0 +1,54 @@
+Undeclared identifier 'delta'
+{
+  "error": "Undeclared identifier 'delta'",
+  "editorError": {
+    "end": {
+      "column": 10,
+      "line": 3
+    },
+    "message": "Undeclared identifier 'delta'",
+    "start": {
+      "column": 6,
+      "line": 3
+    },
+    "id": "USER;64eb9fe01ecd4728859be8cb120fa590"
+  },
+  "title": "Compilation error",
+  "compiler_markers": [
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///bbde4b36-4981-4592-bfb0-ba3763875eb3.pine?placement%3Ddialog",
+        "path": "/bbde4b36-4981-4592-bfb0-ba3763875eb3.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "code": "PINE_VERSION_OUTDATED",
+      "severity": 4,
+      "message": "Version 5 of Pine Script® is outdated. We recommend using the current version, which is 6.",
+      "startLineNumber": 1,
+      "startColumn": 3,
+      "endLineNumber": 1,
+      "endColumn": 12
+    },
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///bbde4b36-4981-4592-bfb0-ba3763875eb3.pine?placement%3Ddialog",
+        "path": "/bbde4b36-4981-4592-bfb0-ba3763875eb3.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "severity": 8,
+      "message": "Undeclared identifier 'delta'",
+      "startLineNumber": 3,
+      "startColumn": 6,
+      "endLineNumber": 3,
+      "endColumn": 11
+    }
+  ],
+  "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,127.94\nH\n85,127.95\nL\n85,127.94\nC\n85,127.94\n0.00 (0.00%)\n85,122.64\nSELL\n0.01\n85,122.65\nBUY\nUSDT\nOracle na holes crosses v1\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n13:00:04 UTC\n99+\nPine Editor\nw8-exact-source-compile-corpus-v56-771-v1.pine\nPublish script\n1\n2\n3\n4\n5\n//@version=5\nindicator(\"Delta histogram\")\nplot(delta, title=\"delta\", style=plot.style_histogram, color= color.aqua)\nplot(ta.sma(delta, 20), title=\"delta avg\", color= color.orange)\n2 of 2 problems\nVersion 5 of Pine Script® is outdated. We recommend using the current version, which is 6.(PINE_VERSION_OUTDATED)\n1 ∙ Today, 21:00\nLine 1, Col 3\nPine Script® v5\nCompilation error\nCompilation error\n\nUndeclared identifier 'delta'\n\nOpen in editor",
+  "context_substituted_message": "Undeclared identifier 'delta'"
+}

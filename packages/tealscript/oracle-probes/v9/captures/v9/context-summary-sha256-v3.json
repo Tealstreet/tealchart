@@ -1,0 +1,10 @@
+{
+  "artifact": "v9 context summary SHA256 v3",
+  "sha256": {
+    "lexical-wma-context-summary-v1.json": "5d87961c7336aeb2595822e55c5d846b8c09f903d639632934ba9f64a8806245",
+    "pivot-candles-companion-context-v1.json": "5248d3a3983f5b1a867481b4d8b7c73e8353510be4e1fbdad9bb975593c4148a",
+    "context-summary-sha256-v1.json": "8389a9e9ca3e32e7283a6725d30f011db478f2a24d1e0c02994a01e5f6d7f209",
+    "corpus-native-context-summary-v1.json": "8d9d3a31e1a1771fbee548933d07eca57968fbfb1dff2058c8ee19caa1a2b88d",
+    "corpus-overflow-context-v1.json": "a096eb90f6c5c605bf051694194bee1e0dfe181a91562b02ecd03ba3046b781f"
+  }
+}

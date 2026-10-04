@@ -1,0 +1,110 @@
+Syntax error at input "end of line without line continuation"
+{
+  "error": "Syntax error at input {value}",
+  "editorError": {
+    "code": "CE10156",
+    "ctx": {
+      "value": "\"end of line without line continuation\""
+    },
+    "end": {
+      "column": 19,
+      "line": 263
+    },
+    "message": "Syntax error at input {value}",
+    "start": {
+      "column": 19,
+      "line": 263
+    },
+    "id": "USER;d29c46ab5c7f4206adf4b631a3d9add3"
+  },
+  "title": "Compilation error",
+  "compiler_markers": [
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///247c6d0a-5d03-4036-bdf6-5e37282677d9.pine?placement%3Ddialog",
+        "path": "/247c6d0a-5d03-4036-bdf6-5e37282677d9.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "code": "CE10156",
+      "severity": 8,
+      "message": "Syntax error at input \"end of line without line continuation\"",
+      "startLineNumber": 263,
+      "startColumn": 19,
+      "endLineNumber": 263,
+      "endColumn": 20
+    },
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///247c6d0a-5d03-4036-bdf6-5e37282677d9.pine?placement%3Ddialog",
+        "path": "/247c6d0a-5d03-4036-bdf6-5e37282677d9.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "code": "CE10271",
+      "severity": 8,
+      "message": "Could not find function or function reference 'ta.sum'",
+      "startLineNumber": 166,
+      "startColumn": 9,
+      "endLineNumber": 166,
+      "endColumn": 15
+    },
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///247c6d0a-5d03-4036-bdf6-5e37282677d9.pine?placement%3Ddialog",
+        "path": "/247c6d0a-5d03-4036-bdf6-5e37282677d9.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "code": "CE10095",
+      "severity": 8,
+      "message": "\"cBull\" is already defined",
+      "startLineNumber": 225,
+      "startColumn": 1,
+      "endLineNumber": 225,
+      "endColumn": 33
+    },
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///247c6d0a-5d03-4036-bdf6-5e37282677d9.pine?placement%3Ddialog",
+        "path": "/247c6d0a-5d03-4036-bdf6-5e37282677d9.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "code": "CE10095",
+      "severity": 8,
+      "message": "\"cBear\" is already defined",
+      "startLineNumber": 226,
+      "startColumn": 1,
+      "endLineNumber": 226,
+      "endColumn": 32
+    },
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///247c6d0a-5d03-4036-bdf6-5e37282677d9.pine?placement%3Ddialog",
+        "path": "/247c6d0a-5d03-4036-bdf6-5e37282677d9.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "code": "CE10188",
+      "severity": 8,
+      "message": "Cannot use \"bgcolor\" in local scope",
+      "startLineNumber": 234,
+      "startColumn": 5,
+      "endLineNumber": 234,
+      "endColumn": 53
+    }
+  ],
+  "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,112.51\nH\n85,133.41\nL\n85,112.50\nC\n85,133.41\n+20.90 (+0.02%)\n85,133.40\nSELL\n0.01\n85,133.41\nBUY\nUSDT\nw8-exact-source-compile-corpus-v56-483-v1.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n12:58:38 UTC\n99+\nPine Editor\nw8-exact-source-compile-corpus-v56-483-v1.pine\nPublish script\n157\n158\n159\n160\n161\n162\n163\n164\n165\n166\n167\n168\n169\n170\n171\n172\n173\n174\n175\n176\n177\n178\n179\n180\n181\n182\n183\n184\n185\n186\n187\n188\n189\n190\n191\n192\n193\n194\n195\n196\nRejBear_raw = 0.60 * (100.0 * clamp01(rejBearRaw)) + 0.40 * WickDomBear\nRejBull = calculateJMA(RejBull_raw, jLen, jPhase, jPower)\nRejBear = calculateJMA(RejBear_raw, jLen, jPhase, jPower)\n//──────────────────────────────────────────────────────────────────────────────\n// Directional Efficiency (signed displacement over path)\n//──────────────────────────────────────────────────────────────────────────────\ndisp  = close - close[mEff]\npath  = ta.sum(math.abs(close - close[1]), mEff)\neffS  = disp / math.max(path, eps)  // -1..+1\nnet1  = close - close[1]\neff1S = net1 / math.max(R, eps)     // approx -1..+1\nEffBull_raw = 100.0 * (0.70 * clamp01(effS)   + 0.30 * clamp01(eff1S))\nEffBear_raw = 100.0 * (0.70 * clamp01(-effS)  + 0.30 * clamp01(-eff1S))\nEffBull = calculateJMA(EffBull_raw, jLen, jPhase, jPower)\nEffBear = calculateJMA(EffBear_raw, jLen, jPhase, jPower)\n//──────────────────────────────────────────────────────────────────────────────\n// Regime: Compression / Expansion / Exhaustion\n//──────────────────────────────────────────────────────────────────────────────\nsmallRange = 1.0 - clamp01((R / math.max(ATR, eps)) / 1.0) // cap at 1 ATR\nlowEff     = 1.0 - (math.max(EffBull, EffBear) / 100.0)\nlowPress   = 1.0 - (math.max(PressureBull, PressureBear) / 100.0)\nCompression_raw = 100.0 * (0.45 * smallRange + 0.35 * lowEff + 0.20 * lowPress)\nCompression     = calculateJMA(Compression_raw, jLen, jPhase, jPower)\nExpansionBull_raw = 0.40 * RangeScore + 0.35 * EffBull + 0.25 * PressureBull\nExpansionBear_raw = 0.40 * RangeScore + 0.35 * EffBear + 0.25 * PressureBear\nExpansionBull     = calculateJMA(ExpansionBull_raw, jLen, jPhase, jPower)\nExpansionBear     = calculateJMA(ExpansionBear_raw, jLen, jPhase, jPower)\nExhBull_raw = 100.0 * (PressureBull / 100.0) * (1.0 - EffBull / 100.0) * (1.0 + 0.50 * (RejBear / 100.0))\nExhBear_raw = 100.0 * (PressureBear / 100.0) * (1.0 - EffBear / 100.0) * (1.0 + 0.50 * (RejBull / 100.0))\nExhaustBull = calculateJMA(clamp(ExhBull_raw, 0, 100), jLen, jPhase, jPower)\nExhaustBear = calculateJMA(clamp(ExhBear_raw, 0, 100), jLen, jPhase, jPower)\n1 of 5 problems\nCould not find function or function reference 'ta.sum'(CE10271)\n1 ∙ Today, 20:58\nLine 166, Col 9\nPine Script® v6\nCompilation error: CE10156\n\nSyntax error at input \"end of line without line continuation\"\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+  "context_substituted_message": "Syntax error at input \"end of line without line continuation\""
+}

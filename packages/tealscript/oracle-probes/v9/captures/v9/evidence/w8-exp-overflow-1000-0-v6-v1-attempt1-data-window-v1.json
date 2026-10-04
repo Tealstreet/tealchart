@@ -1,0 +1,31 @@
+{
+  "index": 298,
+  "bar": [
+    1791118800,
+    85127.94,
+    85132.01,
+    85122.64,
+    85132,
+    2.40052
+  ],
+  "source_row": [
+    1791118800,
+    1000,
+    null,
+    1
+  ],
+  "browser_utc": "2026-10-04T13:03:43.989Z",
+  "title": "W8 exp overflow 1000.0 v1",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   13:00",
+  "visible_range": {
+    "_firstBar": 263,
+    "_lastBar": 301
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}

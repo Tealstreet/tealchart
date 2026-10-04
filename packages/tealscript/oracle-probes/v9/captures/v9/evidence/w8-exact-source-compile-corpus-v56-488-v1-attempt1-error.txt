@@ -1,0 +1,76 @@
+Syntax error at input "end of line without line continuation"
+{
+  "error": "Syntax error at input {value}",
+  "editorError": {
+    "code": "CE10156",
+    "ctx": {
+      "value": "\"end of line without line continuation\""
+    },
+    "end": {
+      "column": 29,
+      "line": 430
+    },
+    "message": "Syntax error at input {value}",
+    "start": {
+      "column": 29,
+      "line": 430
+    },
+    "id": "USER;32167b7bc45243c98b6212f3a1f25296"
+  },
+  "title": "Compilation error",
+  "compiler_markers": [
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///7c157a20-e4fe-4756-9d8d-f8813da24c11.pine?placement%3Ddialog",
+        "path": "/7c157a20-e4fe-4756-9d8d-f8813da24c11.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "code": "CE10156",
+      "severity": 8,
+      "message": "Syntax error at input \"end of line without line continuation\"",
+      "startLineNumber": 430,
+      "startColumn": 29,
+      "endLineNumber": 430,
+      "endColumn": 30
+    },
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///7c157a20-e4fe-4756-9d8d-f8813da24c11.pine?placement%3Ddialog",
+        "path": "/7c157a20-e4fe-4756-9d8d-f8813da24c11.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "code": "CE10272",
+      "severity": 8,
+      "message": "Undeclared identifier \"rsiLen\"",
+      "startLineNumber": 160,
+      "startColumn": 21,
+      "endLineNumber": 160,
+      "endColumn": 27
+    },
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///7c157a20-e4fe-4756-9d8d-f8813da24c11.pine?placement%3Ddialog",
+        "path": "/7c157a20-e4fe-4756-9d8d-f8813da24c11.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "code": "CE10271",
+      "severity": 8,
+      "message": "Could not find function or function reference 'ta.sum'",
+      "startLineNumber": 164,
+      "startColumn": 7,
+      "endLineNumber": 164,
+      "endColumn": 13
+    }
+  ],
+  "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,112.51\nH\n85,133.41\nL\n85,112.50\nC\n85,133.40\n+20.89 (+0.02%)\n85,133.40\nSELL\n0.01\n85,133.41\nBUY\nUSDT\nw8-exact-source-compile-corpus-v56-488-v1.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n12:58:50 UTC\n99+\nPine Editor\nw8-exact-source-compile-corpus-v56-488-v1.pine\nPublish script\n421\n422\n423\n424\n425\n426\n427\n428\n429\n430\n431\n432\n433\n434\n435\n436\n437\n438\n439\n440\n441\n442\n443\n444\n445\n446\n447\n448\n449\n450\n451\n452\n453\n454\n455\n456\n457\n458\n459\n460\n// ============================================================================\n// MODULE: visualization\n// ============================================================================\n//──────────────────────────────────────────────────────────────────────────────\n// Labels with tooltips\n//──────────────────────────────────────────────────────────────────────────────\nmkTooltip(dir, s, kind) =>\n    \"Kind: \" + kind + \"\\n\" +\n    \"Mode: \" + mode + \"\\n\" +\n    \"Bias: \" + str.tostring(bias, format.mintick) + (useMTF ? (\"\\nBiasMTF: \" + str.tostring(biasMTF, format.mintick) + \" (\" + mtfTf + \")\") : \"\") + \"\\n\" +\n    \"CMF(n): \" + str.tostring(cmfNorm, format.mintick) + \"\\n\" +\n    \"UO(n): \" + str.tostring(uoNorm, format.mintick) + \"\\n\" +\n    \"VolΔ: \" + str.tostring(volDelta, format.mintick) + \"\\n\" +\n    \"Stoch(\" + stochUse + \"): \" + str.tostring(stochLine, format.mintick) + \"\\n\" +\n    \"Strength \" + dir + \": \" + str.tostring(s, format.mintick) + \"\\n\" +\n    \"Confirm rule: \" + confRuleResolved\nkindLong  = revStrengthLong  > trendStrengthLong  ? \"Reversal (Exhaustion)\" : \"Trend Pullback\"\nkindShort = revStrengthShort > trendStrengthShort ? \"Reversal (Exhaustion)\" : \"Trend Pullback\"\nif fireLong\n    lastSigBar := bar_index\n    longCycleArmed := false\n    label.new(bar_index, high, (kindLong == \"Reversal (Exhaustion)\" ? \"XR Long\" : \"PB Long\") + \"\\n\" + str.tostring(strengthLong, \"#.##\"),\n      style=label.style_label_up,\n      textcolor= color.white,\n      color=kindLong == \"Reversal (Exhaustion)\" ?  color.new(color.lime, 0) :  color.new(color.green, 0),\n      size=toSize(labelSize),\n      tooltip=mkTooltip(\"LONG\", strengthLong, kindLong),\n      force_overlay=forceOverlay)\nif fireShort\n    lastSigBar := bar_index\n    shortCycleArmed := false\n    label.new(bar_index, low, (kindShort == \"Reversal (Exhaustion)\" ? \"XR Short\" : \"PB Short\") + \"\\n\" + str.tostring(strengthShort, \"#.##\"),\n      style=label.style_label_down,\n      textcolor= color.white,\n      color=kindShort == \"Reversal (Exhaustion)\" ?  color.new(color.orange, 0) :  color.new(color.red, 0),\n3 of 3 problems\nSyntax error at input \"end of line without line continuation\"(CE10156)\n1 ∙ Today, 20:58\nLine 430, Col 29\nPine Script® v6\nCompilation error: CE10156\n\nSyntax error at input \"end of line without line continuation\"\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+  "context_substituted_message": "Syntax error at input \"end of line without line continuation\""
+}

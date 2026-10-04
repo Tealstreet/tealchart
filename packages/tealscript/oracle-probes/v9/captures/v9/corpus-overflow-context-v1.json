@@ -1,0 +1,1228 @@
+{
+  "artifact": "Native corpus refusal and overflow context v1",
+  "attempts": [
+    {
+      "script": "w8-exact-source-compile-corpus-v56-483-v1.pine",
+      "attempt": 1,
+      "status": "COMPILE-ERROR",
+      "source_sha256": "f2280a0c5b12599e7bd328596fb51eb888631fbb021ce57e92dacac2a4ddbbb2",
+      "csv_file": null,
+      "csv_sha256": null,
+      "setup": {
+        "tickerid": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chart_type": "standard candles",
+        "native_style": 1,
+        "timezone": "Etc/UTC",
+        "bar_replay": false,
+        "mintick": 0.01,
+        "defaults_confirmed": true,
+        "native_user_inputs": [],
+        "observed_indicator_title": "w8-exact-source-compile-corpus-v56-483-v1.pine",
+        "dataset_start_utc": "2026-10-04T00:52:00.000Z",
+        "first_chart_bar": {
+          "index": -63,
+          "value": [
+            1791075120,
+            84831.61,
+            84840,
+            84831.6,
+            84839.99,
+            11.35816
+          ]
+        },
+        "chart_bars": 364,
+        "subscription": "pro_premium",
+        "native_end_of_data": false,
+        "exchange_timezone": "Etc/UTC",
+        "exchange_session": "24x7",
+        "currency": "USDT",
+        "chart_session": "regular",
+        "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+      },
+      "historical_rows": null,
+      "live_boundary_confirmed_unchanged": null,
+      "first_historical_values": null,
+      "last_historical_values": null,
+      "diagnostic": {
+        "code": "CE10156",
+        "text": "Syntax error at input \"end of line without line continuation\"",
+        "line": 263,
+        "column": 19,
+        "first_bar_index": null,
+        "first_bar_time_utc": null
+      }
+    },
+    {
+      "script": "w8-exact-source-compile-corpus-v56-488-v1.pine",
+      "attempt": 1,
+      "status": "COMPILE-ERROR",
+      "source_sha256": "a8277fc24946c9a236ddbb3efe0fa4172d8c6bd49d1b2d4182a3d81a659756ac",
+      "csv_file": null,
+      "csv_sha256": null,
+      "setup": {
+        "tickerid": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chart_type": "standard candles",
+        "native_style": 1,
+        "timezone": "Etc/UTC",
+        "bar_replay": false,
+        "mintick": 0.01,
+        "defaults_confirmed": true,
+        "native_user_inputs": [],
+        "observed_indicator_title": "w8-exact-source-compile-corpus-v56-488-v1.pine",
+        "dataset_start_utc": "2026-10-04T00:52:00.000Z",
+        "first_chart_bar": {
+          "index": -63,
+          "value": [
+            1791075120,
+            84831.61,
+            84840,
+            84831.6,
+            84839.99,
+            11.35816
+          ]
+        },
+        "chart_bars": 364,
+        "subscription": "pro_premium",
+        "native_end_of_data": false,
+        "exchange_timezone": "Etc/UTC",
+        "exchange_session": "24x7",
+        "currency": "USDT",
+        "chart_session": "regular",
+        "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+      },
+      "historical_rows": null,
+      "live_boundary_confirmed_unchanged": null,
+      "first_historical_values": null,
+      "last_historical_values": null,
+      "diagnostic": {
+        "code": "CE10156",
+        "text": "Syntax error at input \"end of line without line continuation\"",
+        "line": 430,
+        "column": 29,
+        "first_bar_index": null,
+        "first_bar_time_utc": null
+      }
+    },
+    {
+      "script": "w8-exact-source-compile-corpus-v56-494-v1.pine",
+      "attempt": 1,
+      "status": "COMPILE-ERROR",
+      "source_sha256": "55cccc9a7b55364a6bd129d4dd7fddd8949c3fc6b467cff708a58bbe966d9961",
+      "csv_file": null,
+      "csv_sha256": null,
+      "setup": {
+        "tickerid": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chart_type": "standard candles",
+        "native_style": 1,
+        "timezone": "Etc/UTC",
+        "bar_replay": false,
+        "mintick": 0.01,
+        "defaults_confirmed": true,
+        "native_user_inputs": [],
+        "observed_indicator_title": "Oracle na holes crosses v1",
+        "dataset_start_utc": "2026-10-04T00:52:00.000Z",
+        "first_chart_bar": {
+          "index": -63,
+          "value": [
+            1791075120,
+            84831.61,
+            84840,
+            84831.6,
+            84839.99,
+            11.35816
+          ]
+        },
+        "chart_bars": 364,
+        "subscription": "pro_premium",
+        "native_end_of_data": false,
+        "exchange_timezone": "Etc/UTC",
+        "exchange_session": "24x7",
+        "currency": "USDT",
+        "chart_session": "regular",
+        "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+      },
+      "historical_rows": null,
+      "live_boundary_confirmed_unchanged": null,
+      "first_historical_values": null,
+      "last_historical_values": null,
+      "diagnostic": {
+        "code": "CE10272",
+        "text": "Undeclared identifier \"pivotsToKeep\"",
+        "line": 1255,
+        "column": 34,
+        "first_bar_index": null,
+        "first_bar_time_utc": null
+      }
+    },
+    {
+      "script": "w8-exact-source-compile-corpus-v56-519-v1.pine",
+      "attempt": 1,
+      "status": "COMPILE-ERROR",
+      "source_sha256": "dfc70b450a17778ec65cf01e5455eb47fae0df80be37ee6442872d15cdfb3b8d",
+      "csv_file": null,
+      "csv_sha256": null,
+      "setup": {
+        "tickerid": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chart_type": "standard candles",
+        "native_style": 1,
+        "timezone": "Etc/UTC",
+        "bar_replay": false,
+        "mintick": 0.01,
+        "defaults_confirmed": true,
+        "native_user_inputs": [],
+        "observed_indicator_title": "w8-exact-source-compile-corpus-v56-519-v1.pine",
+        "dataset_start_utc": "2026-10-04T00:52:00.000Z",
+        "first_chart_bar": {
+          "index": -63,
+          "value": [
+            1791075120,
+            84831.61,
+            84840,
+            84831.6,
+            84839.99,
+            11.35816
+          ]
+        },
+        "chart_bars": 364,
+        "subscription": "pro_premium",
+        "native_end_of_data": false,
+        "exchange_timezone": "Etc/UTC",
+        "exchange_session": "24x7",
+        "currency": "USDT",
+        "chart_session": "regular",
+        "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+      },
+      "historical_rows": null,
+      "live_boundary_confirmed_unchanged": null,
+      "first_historical_values": null,
+      "last_historical_values": null,
+      "diagnostic": {
+        "code": "CE10163",
+        "text": "Ternary operations cannot return tuples. Convert the expression into an `if` or `switch` conditional structure to return a tuple.",
+        "line": 235,
+        "column": 35,
+        "first_bar_index": null,
+        "first_bar_time_utc": null
+      }
+    },
+    {
+      "script": "w8-exact-source-compile-corpus-v56-580-v1.pine",
+      "attempt": 1,
+      "status": "COMPILE-ERROR",
+      "source_sha256": "abb8b8ecea0e2fd935f191b4a360158874e4e2629eff3f71f8af8e261aa417d2",
+      "csv_file": null,
+      "csv_sha256": null,
+      "setup": {
+        "tickerid": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chart_type": "standard candles",
+        "native_style": 1,
+        "timezone": "Etc/UTC",
+        "bar_replay": false,
+        "mintick": 0.01,
+        "defaults_confirmed": true,
+        "native_user_inputs": [],
+        "observed_indicator_title": "w8-exact-source-compile-corpus-v56-580-v1.pine",
+        "dataset_start_utc": "2026-10-04T00:52:00.000Z",
+        "first_chart_bar": {
+          "index": -63,
+          "value": [
+            1791075120,
+            84831.61,
+            84840,
+            84831.6,
+            84839.99,
+            11.35816
+          ]
+        },
+        "chart_bars": 364,
+        "subscription": "pro_premium",
+        "native_end_of_data": false,
+        "exchange_timezone": "Etc/UTC",
+        "exchange_session": "24x7",
+        "currency": "USDT",
+        "chart_session": "regular",
+        "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+      },
+      "historical_rows": null,
+      "live_boundary_confirmed_unchanged": null,
+      "first_historical_values": null,
+      "last_historical_values": null,
+      "diagnostic": {
+        "code": "CE10272",
+        "text": "Undeclared identifier \"relVol\"",
+        "line": 311,
+        "column": 84,
+        "first_bar_index": null,
+        "first_bar_time_utc": null
+      }
+    },
+    {
+      "script": "w8-exact-source-compile-corpus-v56-771-v1.pine",
+      "attempt": 1,
+      "status": "COMPILE-ERROR",
+      "source_sha256": "b17e5b4816bb044c216614cb70b818581d5de45d5588a68b4c1f295a1b591963",
+      "csv_file": null,
+      "csv_sha256": null,
+      "setup": {
+        "tickerid": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chart_type": "standard candles",
+        "native_style": 1,
+        "timezone": "Etc/UTC",
+        "bar_replay": false,
+        "mintick": 0.01,
+        "defaults_confirmed": true,
+        "native_user_inputs": [],
+        "observed_indicator_title": "Oracle na holes crosses v1",
+        "dataset_start_utc": "2026-10-04T00:52:00.000Z",
+        "first_chart_bar": {
+          "index": -63,
+          "value": [
+            1791075120,
+            84831.61,
+            84840,
+            84831.6,
+            84839.99,
+            11.35816
+          ]
+        },
+        "chart_bars": 365,
+        "subscription": "pro_premium",
+        "native_end_of_data": false,
+        "exchange_timezone": "Etc/UTC",
+        "exchange_session": "24x7",
+        "currency": "USDT",
+        "chart_session": "regular",
+        "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+      },
+      "historical_rows": null,
+      "live_boundary_confirmed_unchanged": null,
+      "first_historical_values": null,
+      "last_historical_values": null,
+      "diagnostic": {
+        "code": null,
+        "text": "Undeclared identifier 'delta'",
+        "line": 3,
+        "column": 6,
+        "first_bar_index": null,
+        "first_bar_time_utc": null
+      }
+    },
+    {
+      "script": "w8-exp-overflow-corpus-v56-160-v1.pine",
+      "attempt": 1,
+      "status": "RUNS",
+      "source_sha256": "9434593cc6da246700769219638dcb0f6100531a06d87f24084e55aaed6ed410",
+      "csv_file": "captures/v9/w8-exp-overflow-corpus-v56-160-v1-attempt1.csv",
+      "csv_sha256": "88a86647efbdb8fc6e8fdec83fb13c12d35500391d594ddf3626884d82b875ba",
+      "setup": {
+        "tickerid": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chart_type": "standard candles",
+        "native_style": 1,
+        "timezone": "Etc/UTC",
+        "bar_replay": false,
+        "mintick": 0.01,
+        "defaults_confirmed": true,
+        "native_user_inputs": [
+          {
+            "id": "in_0",
+            "name": "Source",
+            "value": "close",
+            "default": "close"
+          }
+        ],
+        "observed_indicator_title": "Exponential Transformation (EXP)",
+        "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+        "first_chart_bar": {
+          "index": -24571,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "chart_bars": 24871,
+        "subscription": "pro_premium",
+        "native_end_of_data": true,
+        "exchange_timezone": "Etc/UTC",
+        "exchange_session": "24x7",
+        "currency": "USDT",
+        "chart_session": "regular",
+        "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+      },
+      "historical_rows": 24870,
+      "live_boundary_confirmed_unchanged": true,
+      "first_historical_values": {
+        "Exponential Transformation": ""
+      },
+      "last_historical_values": {
+        "Exponential Transformation": ""
+      },
+      "diagnostic": {
+        "code": null,
+        "text": null,
+        "line": null,
+        "column": null,
+        "first_bar_index": null,
+        "first_bar_time_utc": null
+      },
+      "headers": [
+        "time",
+        "open",
+        "high",
+        "low",
+        "close",
+        "Exponential Transformation"
+      ],
+      "first_8_cells": [
+        [
+          "1788134400",
+          "77682",
+          "77682.01",
+          "77572",
+          "77674.04",
+          ""
+        ],
+        [
+          "1788134520",
+          "77674.5",
+          "77780.34",
+          "77646",
+          "77758.24",
+          ""
+        ],
+        [
+          "1788134640",
+          "77758.24",
+          "77827.99",
+          "77724",
+          "77740.01",
+          ""
+        ],
+        [
+          "1788134760",
+          "77740.01",
+          "77751.37",
+          "77490",
+          "77508.86",
+          ""
+        ],
+        [
+          "1788134880",
+          "77508.86",
+          "77525.28",
+          "77436.4",
+          "77437.58",
+          ""
+        ],
+        [
+          "1788135000",
+          "77437.57",
+          "77636",
+          "77436.41",
+          "77636",
+          ""
+        ],
+        [
+          "1788135120",
+          "77635.99",
+          "77726",
+          "77576",
+          "77725.99",
+          ""
+        ],
+        [
+          "1788135240",
+          "77726",
+          "77797.91",
+          "77720.88",
+          "77797.91",
+          ""
+        ]
+      ]
+    },
+    {
+      "script": "w8-exp-overflow-corpus-v56-162-v1.pine",
+      "attempt": 1,
+      "status": "RUNS",
+      "source_sha256": "37cc2f00ae9bd335226f721ac967e648216afa260814258888ab99c37db64e6c",
+      "csv_file": "captures/v9/w8-exp-overflow-corpus-v56-162-v1-attempt1.csv",
+      "csv_sha256": "2585bc46728aaea038971395976157c9208f195391a7d8a975875aa39268cda8",
+      "setup": {
+        "tickerid": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chart_type": "standard candles",
+        "native_style": 1,
+        "timezone": "Etc/UTC",
+        "bar_replay": false,
+        "mintick": 0.01,
+        "defaults_confirmed": true,
+        "native_user_inputs": [
+          {
+            "id": "in_0",
+            "name": "Source",
+            "value": "close",
+            "default": "close"
+          }
+        ],
+        "observed_indicator_title": "Exponential Transformation (EXP)",
+        "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+        "first_chart_bar": {
+          "index": -24571,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "chart_bars": 24871,
+        "subscription": "pro_premium",
+        "native_end_of_data": true,
+        "exchange_timezone": "Etc/UTC",
+        "exchange_session": "24x7",
+        "currency": "USDT",
+        "chart_session": "regular",
+        "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+      },
+      "historical_rows": 24870,
+      "live_boundary_confirmed_unchanged": true,
+      "first_historical_values": {
+        "Exponential Transformation": ""
+      },
+      "last_historical_values": {
+        "Exponential Transformation": ""
+      },
+      "diagnostic": {
+        "code": null,
+        "text": null,
+        "line": null,
+        "column": null,
+        "first_bar_index": null,
+        "first_bar_time_utc": null
+      },
+      "headers": [
+        "time",
+        "open",
+        "high",
+        "low",
+        "close",
+        "Exponential Transformation"
+      ],
+      "first_8_cells": [
+        [
+          "1788134400",
+          "77682",
+          "77682.01",
+          "77572",
+          "77674.04",
+          ""
+        ],
+        [
+          "1788134520",
+          "77674.5",
+          "77780.34",
+          "77646",
+          "77758.24",
+          ""
+        ],
+        [
+          "1788134640",
+          "77758.24",
+          "77827.99",
+          "77724",
+          "77740.01",
+          ""
+        ],
+        [
+          "1788134760",
+          "77740.01",
+          "77751.37",
+          "77490",
+          "77508.86",
+          ""
+        ],
+        [
+          "1788134880",
+          "77508.86",
+          "77525.28",
+          "77436.4",
+          "77437.58",
+          ""
+        ],
+        [
+          "1788135000",
+          "77437.57",
+          "77636",
+          "77436.41",
+          "77636",
+          ""
+        ],
+        [
+          "1788135120",
+          "77635.99",
+          "77726",
+          "77576",
+          "77725.99",
+          ""
+        ],
+        [
+          "1788135240",
+          "77726",
+          "77797.91",
+          "77720.88",
+          "77797.91",
+          ""
+        ]
+      ]
+    },
+    {
+      "script": "w8-exp-overflow-709-0-v6-v1.pine",
+      "attempt": 1,
+      "status": "RUNS",
+      "source_sha256": "9bae05da35dc71ab6f127c926c051b9db8e7be2ebb4bf02ccfc15fdb20c07cf5",
+      "csv_file": "captures/v9/w8-exp-overflow-709-0-v6-v1-attempt1.csv",
+      "csv_sha256": "da47745235f5442a8ce8e1fe2886f3e26ca5986e5ff5ed4b3cbf50653cccedb4",
+      "setup": {
+        "tickerid": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chart_type": "standard candles",
+        "native_style": 1,
+        "timezone": "Etc/UTC",
+        "bar_replay": false,
+        "mintick": 0.01,
+        "defaults_confirmed": true,
+        "native_user_inputs": [
+          {
+            "id": "in_0",
+            "name": "Argument",
+            "value": 709,
+            "default": 709
+          }
+        ],
+        "observed_indicator_title": "W8 exp overflow 709.0 v1",
+        "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+        "first_chart_bar": {
+          "index": -24572,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "chart_bars": 24872,
+        "subscription": "pro_premium",
+        "native_end_of_data": true,
+        "exchange_timezone": "Etc/UTC",
+        "exchange_session": "24x7",
+        "currency": "USDT",
+        "chart_session": "regular",
+        "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+      },
+      "historical_rows": 24871,
+      "live_boundary_confirmed_unchanged": true,
+      "first_historical_values": {
+        "ARGUMENT": "709",
+        "RESULT": "",
+        "RESULT_NA": "0"
+      },
+      "last_historical_values": {
+        "ARGUMENT": "709",
+        "RESULT": "",
+        "RESULT_NA": "0"
+      },
+      "diagnostic": {
+        "code": null,
+        "text": null,
+        "line": null,
+        "column": null,
+        "first_bar_index": null,
+        "first_bar_time_utc": null
+      },
+      "headers": [
+        "time",
+        "open",
+        "high",
+        "low",
+        "close",
+        "ARGUMENT",
+        "RESULT",
+        "RESULT_NA"
+      ],
+      "first_8_cells": [
+        [
+          "1788134400",
+          "77682",
+          "77682.01",
+          "77572",
+          "77674.04",
+          "709",
+          "",
+          "0"
+        ],
+        [
+          "1788134520",
+          "77674.5",
+          "77780.34",
+          "77646",
+          "77758.24",
+          "709",
+          "",
+          "0"
+        ],
+        [
+          "1788134640",
+          "77758.24",
+          "77827.99",
+          "77724",
+          "77740.01",
+          "709",
+          "",
+          "0"
+        ],
+        [
+          "1788134760",
+          "77740.01",
+          "77751.37",
+          "77490",
+          "77508.86",
+          "709",
+          "",
+          "0"
+        ],
+        [
+          "1788134880",
+          "77508.86",
+          "77525.28",
+          "77436.4",
+          "77437.58",
+          "709",
+          "",
+          "0"
+        ],
+        [
+          "1788135000",
+          "77437.57",
+          "77636",
+          "77436.41",
+          "77636",
+          "709",
+          "",
+          "0"
+        ],
+        [
+          "1788135120",
+          "77635.99",
+          "77726",
+          "77576",
+          "77725.99",
+          "709",
+          "",
+          "0"
+        ],
+        [
+          "1788135240",
+          "77726",
+          "77797.91",
+          "77720.88",
+          "77797.91",
+          "709",
+          "",
+          "0"
+        ]
+      ]
+    },
+    {
+      "script": "w8-exp-overflow-710-0-v6-v1.pine",
+      "attempt": 1,
+      "status": "RUNS",
+      "source_sha256": "8e6b85952bb7f1296c381a533422ee2cce897fc0cef799dd1fd3f3a72d54b7ce",
+      "csv_file": "captures/v9/w8-exp-overflow-710-0-v6-v1-attempt1.csv",
+      "csv_sha256": "4c31882fc0d3d7dd1671dffea79522a47d631b6a656634d659739a533e54cf57",
+      "setup": {
+        "tickerid": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chart_type": "standard candles",
+        "native_style": 1,
+        "timezone": "Etc/UTC",
+        "bar_replay": false,
+        "mintick": 0.01,
+        "defaults_confirmed": true,
+        "native_user_inputs": [
+          {
+            "id": "in_0",
+            "name": "Argument",
+            "value": 710,
+            "default": 710
+          }
+        ],
+        "observed_indicator_title": "W8 exp overflow 710.0 v1",
+        "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+        "first_chart_bar": {
+          "index": -24572,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "chart_bars": 24872,
+        "subscription": "pro_premium",
+        "native_end_of_data": true,
+        "exchange_timezone": "Etc/UTC",
+        "exchange_session": "24x7",
+        "currency": "USDT",
+        "chart_session": "regular",
+        "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+      },
+      "historical_rows": 24871,
+      "live_boundary_confirmed_unchanged": true,
+      "first_historical_values": {
+        "ARGUMENT": "710",
+        "RESULT": "",
+        "RESULT_NA": "1"
+      },
+      "last_historical_values": {
+        "ARGUMENT": "710",
+        "RESULT": "",
+        "RESULT_NA": "1"
+      },
+      "diagnostic": {
+        "code": null,
+        "text": null,
+        "line": null,
+        "column": null,
+        "first_bar_index": null,
+        "first_bar_time_utc": null
+      },
+      "headers": [
+        "time",
+        "open",
+        "high",
+        "low",
+        "close",
+        "ARGUMENT",
+        "RESULT",
+        "RESULT_NA"
+      ],
+      "first_8_cells": [
+        [
+          "1788134400",
+          "77682",
+          "77682.01",
+          "77572",
+          "77674.04",
+          "710",
+          "",
+          "1"
+        ],
+        [
+          "1788134520",
+          "77674.5",
+          "77780.34",
+          "77646",
+          "77758.24",
+          "710",
+          "",
+          "1"
+        ],
+        [
+          "1788134640",
+          "77758.24",
+          "77827.99",
+          "77724",
+          "77740.01",
+          "710",
+          "",
+          "1"
+        ],
+        [
+          "1788134760",
+          "77740.01",
+          "77751.37",
+          "77490",
+          "77508.86",
+          "710",
+          "",
+          "1"
+        ],
+        [
+          "1788134880",
+          "77508.86",
+          "77525.28",
+          "77436.4",
+          "77437.58",
+          "710",
+          "",
+          "1"
+        ],
+        [
+          "1788135000",
+          "77437.57",
+          "77636",
+          "77436.41",
+          "77636",
+          "710",
+          "",
+          "1"
+        ],
+        [
+          "1788135120",
+          "77635.99",
+          "77726",
+          "77576",
+          "77725.99",
+          "710",
+          "",
+          "1"
+        ],
+        [
+          "1788135240",
+          "77726",
+          "77797.91",
+          "77720.88",
+          "77797.91",
+          "710",
+          "",
+          "1"
+        ]
+      ]
+    },
+    {
+      "script": "w8-exp-overflow-1000-0-v6-v1.pine",
+      "attempt": 1,
+      "status": "RUNS",
+      "source_sha256": "77aa306cb4089ea78fd7c3cf7e2adfe6ed11dce96ca0d100077235f47dc7082b",
+      "csv_file": "captures/v9/w8-exp-overflow-1000-0-v6-v1-attempt1.csv",
+      "csv_sha256": "499e2912e080c6d36819469d838487c606bbf043300e2ffa22776e0533a8cfe3",
+      "setup": {
+        "tickerid": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chart_type": "standard candles",
+        "native_style": 1,
+        "timezone": "Etc/UTC",
+        "bar_replay": false,
+        "mintick": 0.01,
+        "defaults_confirmed": true,
+        "native_user_inputs": [
+          {
+            "id": "in_0",
+            "name": "Argument",
+            "value": 1000,
+            "default": 1000
+          }
+        ],
+        "observed_indicator_title": "W8 exp overflow 1000.0 v1",
+        "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+        "first_chart_bar": {
+          "index": -24572,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "chart_bars": 24872,
+        "subscription": "pro_premium",
+        "native_end_of_data": true,
+        "exchange_timezone": "Etc/UTC",
+        "exchange_session": "24x7",
+        "currency": "USDT",
+        "chart_session": "regular",
+        "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+      },
+      "historical_rows": 24871,
+      "live_boundary_confirmed_unchanged": true,
+      "first_historical_values": {
+        "ARGUMENT": "1000",
+        "RESULT": "",
+        "RESULT_NA": "1"
+      },
+      "last_historical_values": {
+        "ARGUMENT": "1000",
+        "RESULT": "",
+        "RESULT_NA": "1"
+      },
+      "diagnostic": {
+        "code": null,
+        "text": null,
+        "line": null,
+        "column": null,
+        "first_bar_index": null,
+        "first_bar_time_utc": null
+      },
+      "headers": [
+        "time",
+        "open",
+        "high",
+        "low",
+        "close",
+        "ARGUMENT",
+        "RESULT",
+        "RESULT_NA"
+      ],
+      "first_8_cells": [
+        [
+          "1788134400",
+          "77682",
+          "77682.01",
+          "77572",
+          "77674.04",
+          "1000",
+          "",
+          "1"
+        ],
+        [
+          "1788134520",
+          "77674.5",
+          "77780.34",
+          "77646",
+          "77758.24",
+          "1000",
+          "",
+          "1"
+        ],
+        [
+          "1788134640",
+          "77758.24",
+          "77827.99",
+          "77724",
+          "77740.01",
+          "1000",
+          "",
+          "1"
+        ],
+        [
+          "1788134760",
+          "77740.01",
+          "77751.37",
+          "77490",
+          "77508.86",
+          "1000",
+          "",
+          "1"
+        ],
+        [
+          "1788134880",
+          "77508.86",
+          "77525.28",
+          "77436.4",
+          "77437.58",
+          "1000",
+          "",
+          "1"
+        ],
+        [
+          "1788135000",
+          "77437.57",
+          "77636",
+          "77436.41",
+          "77636",
+          "1000",
+          "",
+          "1"
+        ],
+        [
+          "1788135120",
+          "77635.99",
+          "77726",
+          "77576",
+          "77725.99",
+          "1000",
+          "",
+          "1"
+        ],
+        [
+          "1788135240",
+          "77726",
+          "77797.91",
+          "77720.88",
+          "77797.91",
+          "1000",
+          "",
+          "1"
+        ]
+      ]
+    },
+    {
+      "script": "w8-exp-overflow-minus-1000-0-v6-v1.pine",
+      "attempt": 1,
+      "status": "RUNS",
+      "source_sha256": "874d51bebb59fa72c4f3b4a9c8cfa1847af38b9f5f19dc1f3a5c53b4699a12d1",
+      "csv_file": "captures/v9/w8-exp-overflow-minus-1000-0-v6-v1-attempt1.csv",
+      "csv_sha256": "9edd889b98b370a0876a4a7c468d72cc358858255604b54ebac007f481f9e93b",
+      "setup": {
+        "tickerid": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chart_type": "standard candles",
+        "native_style": 1,
+        "timezone": "Etc/UTC",
+        "bar_replay": false,
+        "mintick": 0.01,
+        "defaults_confirmed": true,
+        "native_user_inputs": [
+          {
+            "id": "in_0",
+            "name": "Argument",
+            "value": -1000,
+            "default": -1000
+          }
+        ],
+        "observed_indicator_title": "W8 exp overflow -1000.0 v1",
+        "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+        "first_chart_bar": {
+          "index": -24572,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "chart_bars": 24873,
+        "subscription": "pro_premium",
+        "native_end_of_data": true,
+        "exchange_timezone": "Etc/UTC",
+        "exchange_session": "24x7",
+        "currency": "USDT",
+        "chart_session": "regular",
+        "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+      },
+      "historical_rows": 24872,
+      "live_boundary_confirmed_unchanged": true,
+      "first_historical_values": {
+        "ARGUMENT": "-1000",
+        "RESULT": "0",
+        "RESULT_NA": "0"
+      },
+      "last_historical_values": {
+        "ARGUMENT": "-1000",
+        "RESULT": "0",
+        "RESULT_NA": "0"
+      },
+      "diagnostic": {
+        "code": null,
+        "text": null,
+        "line": null,
+        "column": null,
+        "first_bar_index": null,
+        "first_bar_time_utc": null
+      },
+      "headers": [
+        "time",
+        "open",
+        "high",
+        "low",
+        "close",
+        "ARGUMENT",
+        "RESULT",
+        "RESULT_NA"
+      ],
+      "first_8_cells": [
+        [
+          "1788134400",
+          "77682",
+          "77682.01",
+          "77572",
+          "77674.04",
+          "-1000",
+          "0",
+          "0"
+        ],
+        [
+          "1788134520",
+          "77674.5",
+          "77780.34",
+          "77646",
+          "77758.24",
+          "-1000",
+          "0",
+          "0"
+        ],
+        [
+          "1788134640",
+          "77758.24",
+          "77827.99",
+          "77724",
+          "77740.01",
+          "-1000",
+          "0",
+          "0"
+        ],
+        [
+          "1788134760",
+          "77740.01",
+          "77751.37",
+          "77490",
+          "77508.86",
+          "-1000",
+          "0",
+          "0"
+        ],
+        [
+          "1788134880",
+          "77508.86",
+          "77525.28",
+          "77436.4",
+          "77437.58",
+          "-1000",
+          "0",
+          "0"
+        ],
+        [
+          "1788135000",
+          "77437.57",
+          "77636",
+          "77436.41",
+          "77636",
+          "-1000",
+          "0",
+          "0"
+        ],
+        [
+          "1788135120",
+          "77635.99",
+          "77726",
+          "77576",
+          "77725.99",
+          "-1000",
+          "0",
+          "0"
+        ],
+        [
+          "1788135240",
+          "77726",
+          "77797.91",
+          "77720.88",
+          "77797.91",
+          "-1000",
+          "0",
+          "0"
+        ]
+      ]
+    }
+  ],
+  "limits": "Six original full corpus sources compile-refuse independently. Both original exponential transformations run with default close, blank target cells do not identify infinity. Four independent frozen series-valued overflow controls preserve literal ARGUMENT/RESULT/RESULT_NA. No repair, integer cast, input substitution or algorithm inference. Unplotted Pine execution origins remain UNKNOWN."
+}
