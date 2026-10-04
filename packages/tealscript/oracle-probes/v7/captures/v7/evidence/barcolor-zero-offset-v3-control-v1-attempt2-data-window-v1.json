@@ -1,0 +1,29 @@
+{
+  "index": 298,
+  "bar": [
+    1791091560,
+    84866.32,
+    84872.6,
+    84866.32,
+    84871.02,
+    13.64688
+  ],
+  "source_row": [
+    1791091560,
+    0
+  ],
+  "browser_utc": "2026-10-04T05:29:36.836Z",
+  "title": "V7 barcolor-zero-offset-v3-control-v1",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   05:26",
+  "visible_range": {
+    "_firstBar": 263,
+    "_lastBar": 301
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}
