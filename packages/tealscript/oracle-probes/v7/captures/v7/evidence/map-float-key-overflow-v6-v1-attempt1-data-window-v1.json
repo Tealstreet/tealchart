@@ -1,0 +1,31 @@
+{
+  "index": 298,
+  "bar": [
+    1791096000,
+    84980.01,
+    84980.01,
+    84978.35,
+    84978.36,
+    2.11768
+  ],
+  "source_row": [
+    1791096000,
+    null,
+    1,
+    7
+  ],
+  "browser_utc": "2026-10-04T06:44:02.094Z",
+  "title": "V7 map-float-key-overflow-v6-v1",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   06:40",
+  "visible_range": {
+    "_firstBar": 264,
+    "_lastBar": 302
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}

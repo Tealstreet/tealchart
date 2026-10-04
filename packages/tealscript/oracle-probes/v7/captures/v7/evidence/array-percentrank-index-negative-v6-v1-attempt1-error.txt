@@ -1,0 +1,23 @@
+Error on bar 3: In 'array.percentrank()' function. Index -1 is out of bounds, array size is 3.
+{
+  "ctx": {
+    "funcName": "percentrank",
+    "index": -1,
+    "code": "RE10045",
+    "size": 3,
+    "bar_index": 3
+  },
+  "error": "Error on bar {bar_index}: In 'array.{funcName}()' function. Index {index} is out of bounds, array size is {size}.",
+  "stack_trace": [
+    {
+      "n": "#main",
+      "p": 6
+    }
+  ],
+  "title": "Runtime error",
+  "showReportItButton": false,
+  "studyAccessBlocked": false,
+  "compiler_markers": [],
+  "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,022.01\nH\n85,029.20\nL\n84,989.04\nC\n84,989.04\n−32.97 (−0.04%)\n84,989.04\nSELL\n0.01\n84,989.05\nBUY\nUSDT\nV7 array-percentrank-index-negative-v6-v1\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n06:37:53 UTC\n99+\nRuntime error: RE10045\nRuntime error: RE10045\nError on bar 3: In 'array.percentrank()' function. Index -1 is out of bounds, array size is 3.\nat #main():6\nOpen in editor",
+  "context_substituted_message": "Error on bar 3: In 'array.percentrank()' function. Index -1 is out of bounds, array size is 3."
+}
