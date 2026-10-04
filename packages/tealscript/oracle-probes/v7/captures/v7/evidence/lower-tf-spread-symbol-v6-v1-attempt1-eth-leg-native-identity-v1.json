@@ -1,0 +1,78 @@
+{
+  "browser_utc": "2026-10-04T09:59:50.134Z",
+  "symbol_info": {
+    "source2": {
+      "country": "MT",
+      "description": "Binance",
+      "exchange-type": "exchange",
+      "id": "BINANCE",
+      "name": "Binance",
+      "url": "https://www.binance.com/en"
+    },
+    "currency_code": "USDT",
+    "source_id": "BINANCE",
+    "subsession_id": "regular",
+    "provider_id": "binance",
+    "base_currency_id": "XTVCETH",
+    "base_currency": "ETH",
+    "currency_id": "XTVCUSDT",
+    "format": "price",
+    "formatter": "price",
+    "pro_perm": "",
+    "volume_type": "base",
+    "measure": "price",
+    "allowed_adjustment": "none",
+    "short_description": "Ethereum / TetherUS",
+    "variable_tick_size": "",
+    "name": "ETHUSDT",
+    "full_name": "BINANCE:ETHUSDT",
+    "pro_name": "BINANCE:ETHUSDT",
+    "base_name": [
+      "BINANCE:ETHUSDT"
+    ],
+    "description": "Ethereum / TetherUS",
+    "exchange": "Binance",
+    "pricescale": 100,
+    "pointvalue": 1,
+    "minmov": 1,
+    "session": "24x7",
+    "session_display": "24x7",
+    "subsessions": [
+      {
+        "description": "Regular Trading Hours",
+        "id": "regular",
+        "private": false,
+        "session": "24x7",
+        "session-display": "24x7"
+      }
+    ],
+    "type": "spot",
+    "typespecs": [
+      "crypto",
+      "defi"
+    ],
+    "has_intraday": true,
+    "fractional": false,
+    "listed_exchange": "BINANCE",
+    "legs": [
+      "BINANCE:ETHUSDT"
+    ],
+    "is_tradable": true,
+    "minmove2": 0,
+    "timezone": "Etc/UTC",
+    "aliases": [],
+    "alternatives": [],
+    "is_replayable": true,
+    "has_adjustment": false,
+    "has_extended_hours": false,
+    "bar_source": "trade",
+    "bar_transform": "none",
+    "bar_fillgaps": false,
+    "visible_plots_set": "ohlcv",
+    "is-tickbars-available": true,
+    "exchange_listed_name": "Binance"
+  },
+  "interval": "2",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium"
+}

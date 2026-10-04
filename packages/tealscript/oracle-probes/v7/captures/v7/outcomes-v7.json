@@ -81615,5 +81615,3669 @@
       "OUTCOME": "-2.5"
     },
     "data_window_witness": "captures/v7/evidence/ledger-division-v4-input-control-attempt2-data-window-v1.json"
+  },
+  {
+    "script": "lower-tf-spread-symbol-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "0bff67fc1b5fe2aae7632d04c0f664b4bf9e957a542e5898cb24ec16ef9c99fa",
+    "indicator_title": "V7 lower-tf-spread-symbol-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/lower-tf-spread-symbol-v6-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T175623.599.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [
+        {
+          "id": "in_0",
+          "name": "Spread",
+          "value": "BINANCE:BTCUSDT-BINANCE:ETHUSDT",
+          "default": "BINANCE:BTCUSDT-BINANCE:ETHUSDT"
+        }
+      ],
+      "observed_indicator_title": "V7 lower-tf-spread-symbol-v6-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24479,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24779,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T09:56:14.446Z",
+    "live_candle_open_utc": "2026-10-04T09:56:00.000Z",
+    "export_utc": "2026-10-04T09:56:23.856Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/lower-tf-spread-symbol-v6-v1-attempt1-setup.png",
+      "captures/v7/evidence/lower-tf-spread-symbol-v6-v1-attempt1-export.png",
+      "captures/v7/evidence/lower-tf-spread-symbol-v6-v1-attempt1-logs.txt",
+      "captures/v7/evidence/lower-tf-spread-symbol-v6-v1-attempt1-logs-v1.json",
+      "captures/v7/evidence/lower-tf-spread-symbol-v6-v1-attempt1-logs.png",
+      "captures/v7/evidence/lower-tf-spread-symbol-v6-v1-attempt1-inputs.png",
+      "captures/v7/evidence/lower-tf-spread-symbol-v6-v1-attempt1-visual.png",
+      "captures/v7/evidence/lower-tf-spread-symbol-v6-v1-attempt1-data-window-v1.png",
+      "captures/v7/evidence/lower-tf-spread-symbol-v6-v1-attempt1-data-window-v1.json",
+      "captures/v7/evidence/lower-tf-spread-symbol-v6-v1-attempt1-data-window-v1.txt",
+      "captures/v7/evidence/lower-tf-spread-symbol-v6-v1-attempt1-resolved-spread-restored-v1.json",
+      "captures/v7/evidence/lower-tf-spread-symbol-v6-v1-attempt1-resolved-spread-restored-v1.png",
+      "captures/v7/evidence/lower-tf-spread-symbol-v6-v1-attempt1-eth-leg-native-identity-v1.json",
+      "captures/v7/evidence/lower-tf-spread-symbol-v6-v1-attempt1-eth-leg-native-identity-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T09:56:15.351Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790802600,
+            83746.67,
+            83775.04,
+            83734.05,
+            83764.3,
+            28.20244
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791107760,
+            85261.67,
+            85261.67,
+            85261.66,
+            85261.67,
+            0.06676
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 lower-tf-spread-symbol-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790802600,
+                2,
+                81065.87000000001,
+                81078.96
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791107760,
+                1,
+                82558.83,
+                82558.83
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T09:56:16.707Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790802600,
+            83746.67,
+            83775.04,
+            83734.05,
+            83764.3,
+            28.20244
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791107760,
+            85261.67,
+            85261.67,
+            85261.66,
+            85261.67,
+            0.08042
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 lower-tf-spread-symbol-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24779,
+            "first": {
+              "index": -1022235,
+              "value": [
+                1788134400,
+                0,
+                null,
+                null
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791107760,
+                1,
+                82558.81999999999,
+                82558.81999999999
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T09:56:17.560Z",
+        "bars": 24779,
+        "end": true,
+        "first": {
+          "index": -24479,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791107760,
+            85261.67,
+            85261.67,
+            85261.66,
+            85261.67,
+            0.09215
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 lower-tf-spread-symbol-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24779,
+            "first": {
+              "index": -24479,
+              "value": [
+                1788134400,
+                0,
+                null,
+                null
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791107760,
+                1,
+                82558.83,
+                82558.83
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   09:56",
+    "historical_compare_before_unix_seconds": 1791107760,
+    "pine_logs": {
+      "paths": [
+        "evidence/lower-tf-spread-symbol-v6-v1-attempt1-logs.txt",
+        "evidence/lower-tf-spread-symbol-v6-v1-attempt1-logs-v1.json",
+        "evidence/lower-tf-spread-symbol-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "07999ecc74222c7993fab8de9715dfc7ac962c35426b1053243023083fc4c701",
+    "csv_bytes": 1485885,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "INTRABARS",
+      "FIRST",
+      "LAST"
+    ],
+    "declared_to_native_header_mapping": {
+      "INTRABARS": "INTRABARS",
+      "FIRST": "FIRST",
+      "LAST": "LAST"
+    },
+    "csv_rows": 24779,
+    "historical_rows": 24778,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791107760,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791107760",
+    "first_historical_values": {
+      "INTRABARS": "0",
+      "FIRST": "",
+      "LAST": ""
+    },
+    "last_historical_values": {
+      "INTRABARS": "2",
+      "FIRST": "82549.43000000001",
+      "LAST": "82558.81999999999"
+    },
+    "data_window_witness": "captures/v7/evidence/lower-tf-spread-symbol-v6-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "script": "lower-tf-spread-symbol-v6-v1.pine",
+    "attempt": 2,
+    "source_sha256": "0bff67fc1b5fe2aae7632d04c0f664b4bf9e957a542e5898cb24ec16ef9c99fa",
+    "indicator_title": "V7 lower-tf-spread-symbol-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/lower-tf-spread-symbol-v6-v1-attempt2.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T175809.025.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": false,
+      "native_user_inputs": [
+        {
+          "id": "in_0",
+          "name": "Spread",
+          "value": "BINANCE:BTCUSDT",
+          "default": "BINANCE:BTCUSDT-BINANCE:ETHUSDT"
+        }
+      ],
+      "observed_indicator_title": "V7 lower-tf-spread-symbol-v6-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24479,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24780,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T09:57:58.457Z",
+    "live_candle_open_utc": "2026-10-04T09:58:00.000Z",
+    "export_utc": "2026-10-04T09:58:09.413Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/lower-tf-spread-symbol-v6-v1-attempt2-setup.png",
+      "captures/v7/evidence/lower-tf-spread-symbol-v6-v1-attempt2-export.png",
+      "captures/v7/evidence/lower-tf-spread-symbol-v6-v1-attempt2-logs.txt",
+      "captures/v7/evidence/lower-tf-spread-symbol-v6-v1-attempt2-logs-v1.json",
+      "captures/v7/evidence/lower-tf-spread-symbol-v6-v1-attempt2-logs.png",
+      "captures/v7/evidence/lower-tf-spread-symbol-v6-v1-attempt2-inputs.png",
+      "captures/v7/evidence/lower-tf-spread-symbol-v6-v1-attempt2-visual.png",
+      "captures/v7/evidence/lower-tf-spread-symbol-v6-v1-attempt2-data-window-v1.png",
+      "captures/v7/evidence/lower-tf-spread-symbol-v6-v1-attempt2-data-window-v1.json",
+      "captures/v7/evidence/lower-tf-spread-symbol-v6-v1-attempt2-data-window-v1.txt",
+      "captures/v7/evidence/lower-tf-spread-symbol-v6-v1-attempt2-single-symbol-control-v1.json",
+      "captures/v7/evidence/lower-tf-spread-symbol-v6-v1-attempt2-single-symbol-control-v1.png",
+      "captures/v7/evidence/lower-tf-spread-symbol-v6-v1-attempt2-resolved-single-symbol-control-v1.json",
+      "captures/v7/evidence/lower-tf-spread-symbol-v6-v1-attempt2-resolved-single-symbol-control-v1.png"
+    ],
+    "notes": "Unchanged whole frozen source. Spread input changed through native Inputs symbol picker to BINANCE:BTCUSDT as required valid control; actual/default values recorded in setup, defaults_confirmed=false. Raw CSV/PNG/logs preserved. Afterwards native Defaults/Reset settings restored the spread.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T09:57:59.480Z",
+        "bars": 1942,
+        "end": false,
+        "first": {
+          "index": -1642,
+          "value": [
+            1790874840,
+            84444.04,
+            84496.34,
+            84426.01,
+            84489.87,
+            25.83495
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791107760,
+            85261.67,
+            85261.67,
+            85228.39,
+            85228.4,
+            15.55713
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 lower-tf-spread-symbol-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 1942,
+            "first": {
+              "index": -1642,
+              "value": [
+                1790874840,
+                2,
+                84432.89,
+                84489.87
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791107760,
+                2,
+                85254,
+                85228.4
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T09:58:00.823Z",
+        "bars": 1942,
+        "end": false,
+        "first": {
+          "index": -1642,
+          "value": [
+            1790874840,
+            84444.04,
+            84496.34,
+            84426.01,
+            84489.87,
+            25.83495
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791107760,
+            85261.67,
+            85261.67,
+            85228.39,
+            85233.83,
+            16.10966
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 lower-tf-spread-symbol-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24779,
+            "first": {
+              "index": -1022837,
+              "value": [
+                1788134400,
+                2,
+                77625.93,
+                77674.04
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791107760,
+                2,
+                85254,
+                85233.83
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T09:58:02.288Z",
+        "bars": 24780,
+        "end": true,
+        "first": {
+          "index": -24479,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 300,
+          "value": [
+            1791107880,
+            85233.84,
+            85233.84,
+            85233.84,
+            85233.84,
+            0
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 lower-tf-spread-symbol-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24780,
+            "first": {
+              "index": -24479,
+              "value": [
+                1788134400,
+                2,
+                77625.93,
+                77674.04
+              ]
+            },
+            "last": {
+              "index": 300,
+              "value": [
+                1791107880,
+                1,
+                85233.84,
+                85233.84
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   09:58",
+    "historical_compare_before_unix_seconds": 1791107880,
+    "pine_logs": {
+      "paths": [
+        "evidence/lower-tf-spread-symbol-v6-v1-attempt2-logs.txt",
+        "evidence/lower-tf-spread-symbol-v6-v1-attempt2-logs-v1.json",
+        "evidence/lower-tf-spread-symbol-v6-v1-attempt2-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "64af77d98e9c09fd8f4b8790802a6a3a9b66aa6accadcbcad1ce61968ecc09e0",
+    "csv_bytes": 1562713,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "INTRABARS",
+      "FIRST",
+      "LAST"
+    ],
+    "declared_to_native_header_mapping": {
+      "INTRABARS": "INTRABARS",
+      "FIRST": "FIRST",
+      "LAST": "LAST"
+    },
+    "csv_rows": 24780,
+    "historical_rows": 24779,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791107880,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791107880",
+    "first_historical_values": {
+      "INTRABARS": "2",
+      "FIRST": "77625.93",
+      "LAST": "77674.04"
+    },
+    "last_historical_values": {
+      "INTRABARS": "2",
+      "FIRST": "85254",
+      "LAST": "85233.84"
+    },
+    "data_window_witness": "captures/v7/evidence/lower-tf-spread-symbol-v6-v1-attempt2-data-window-v1.json"
+  },
+  {
+    "script": "export-request-library-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "c761abcce4aa8f65394494016f50b755b5e9f65d1a758f2417a69608447b9cdb",
+    "indicator_title": "V7ExportRequest",
+    "status": "RUNS",
+    "csv_file": "captures/v7/export-request-library-v6-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T180122.487.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7ExportRequest",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24481,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24781,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T10:01:10.690Z",
+    "live_candle_open_utc": "2026-10-04T10:00:00.000Z",
+    "export_utc": "2026-10-04T10:01:23.910Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/export-request-library-v6-v1-attempt1-setup.png",
+      "captures/v7/evidence/export-request-library-v6-v1-attempt1-export.png",
+      "captures/v7/evidence/export-request-library-v6-v1-attempt1-logs.txt",
+      "captures/v7/evidence/export-request-library-v6-v1-attempt1-logs-v1.json",
+      "captures/v7/evidence/export-request-library-v6-v1-attempt1-logs.png",
+      "captures/v7/evidence/export-request-library-v6-v1-attempt1-visual.png",
+      "captures/v7/evidence/export-request-library-v6-v1-attempt1-data-window-v1.png",
+      "captures/v7/evidence/export-request-library-v6-v1-attempt1-data-window-v1.json",
+      "captures/v7/evidence/export-request-library-v6-v1-attempt1-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T10:01:11.650Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790802840,
+            83756.01,
+            83774.48,
+            83744,
+            83744,
+            17.41397
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791108000,
+            85233.84,
+            85244,
+            85233.83,
+            85234.04,
+            2.89744
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7ExportRequest",
+            "status": {
+              "type": 2
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T10:01:12.798Z",
+        "bars": 24781,
+        "end": true,
+        "first": {
+          "index": -24481,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791108000,
+            85233.84,
+            85244,
+            85233.83,
+            85234.03,
+            2.89827
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7ExportRequest",
+            "status": {
+              "type": 2
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T10:01:13.576Z",
+        "bars": 24781,
+        "end": true,
+        "first": {
+          "index": -24481,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791108000,
+            85233.84,
+            85244,
+            85233.83,
+            85234.03,
+            2.89827
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7ExportRequest",
+            "status": {
+              "type": 2
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T10:01:14.367Z",
+        "bars": 24781,
+        "end": true,
+        "first": {
+          "index": -24481,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791108000,
+            85233.84,
+            85244,
+            85233.83,
+            85234.03,
+            2.90072
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7ExportRequest",
+            "status": {
+              "type": 2
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T10:01:15.158Z",
+        "bars": 24781,
+        "end": true,
+        "first": {
+          "index": -24481,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791108000,
+            85233.84,
+            85244,
+            85233.83,
+            85234.03,
+            2.92011
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7ExportRequest",
+            "status": {
+              "type": 2
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   10:00",
+    "historical_compare_before_unix_seconds": 1791108000,
+    "pine_logs": {
+      "paths": [
+        "evidence/export-request-library-v6-v1-attempt1-logs.txt",
+        "evidence/export-request-library-v6-v1-attempt1-logs-v1.json",
+        "evidence/export-request-library-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "f77322904e01966e0dbb129e64e0740c0128a0f0f5259c4cc259a0636d105b0b",
+    "csv_bytes": 1096454,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "declared_to_native_header_mapping": {},
+    "csv_rows": 24781,
+    "historical_rows": 24780,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791108000,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791108000",
+    "first_historical_values": {},
+    "last_historical_values": {},
+    "data_window_witness": "captures/v7/evidence/export-request-library-v6-v1-attempt1-data-window-v1.json",
+    "library_capture_scope": "Native library declaration/compile admission only. Exported fetch() not called/imported; OHLC CSV contains no function result. No source published."
+  },
+  {
+    "script": "export-library-no-request-control-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "12e082ad18dc57cb518e7ee08014baf59e86e6442f2f826aabf3abdc537ce717",
+    "indicator_title": "V7ExportControl",
+    "status": "COMPILE-ACCEPTED",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7ExportControl",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24482,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24783,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v7/evidence/export-library-no-request-control-v6-v1-attempt1-compile.png",
+      "captures/v7/evidence/export-library-no-request-control-v6-v1-attempt1-compile.txt",
+      "captures/v7/evidence/export-library-no-request-control-v6-v1-attempt1-compile-v1.json"
+    ],
+    "notes": "Exact frozen library saved/applied; native generated metainfo matches title, source editor bytes match, native isLoading/isFailed/hasCompileError false, markers empty. No exported-call execution or import performed. Numeric RUNS readiness instrument timed out because this no-request library is inert with native status0/cache0; not a Pine error.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T10:03:02.276Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790802960,
+            83744,
+            83786,
+            83734.87,
+            83785.99,
+            13.94377
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791108120,
+            85234.03,
+            85250,
+            85234.03,
+            85250,
+            1.88495
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7ExportControl",
+            "status": {
+              "type": 0
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T10:03:03.387Z",
+        "bars": 24782,
+        "end": true,
+        "first": {
+          "index": -24482,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791108120,
+            85234.03,
+            85250,
+            85234.03,
+            85250,
+            1.8953
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7ExportControl",
+            "status": {
+              "type": 0
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T10:03:04.101Z",
+        "bars": 24782,
+        "end": true,
+        "first": {
+          "index": -24482,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791108120,
+            85234.03,
+            85250,
+            85234.03,
+            85250,
+            1.8953
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7ExportControl",
+            "status": {
+              "type": 0
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T10:03:05.176Z",
+        "bars": 24782,
+        "end": true,
+        "first": {
+          "index": -24482,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791108120,
+            85234.03,
+            85250.01,
+            85234.03,
+            85250,
+            2.10334
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7ExportControl",
+            "status": {
+              "type": 0
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T10:03:06.102Z",
+        "bars": 24782,
+        "end": true,
+        "first": {
+          "index": -24482,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791108120,
+            85234.03,
+            85250.01,
+            85234.03,
+            85250.01,
+            2.11873
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7ExportControl",
+            "status": {
+              "type": 0
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T10:03:07.185Z",
+        "bars": 24782,
+        "end": true,
+        "first": {
+          "index": -24482,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791108120,
+            85234.03,
+            85250.01,
+            85234.03,
+            85250.01,
+            2.1658
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7ExportControl",
+            "status": {
+              "type": 0
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T10:03:07.918Z",
+        "bars": 24782,
+        "end": true,
+        "first": {
+          "index": -24482,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791108120,
+            85234.03,
+            85250.01,
+            85234.03,
+            85250.01,
+            2.16665
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7ExportControl",
+            "status": {
+              "type": 0
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T10:03:08.622Z",
+        "bars": 24782,
+        "end": true,
+        "first": {
+          "index": -24482,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791108120,
+            85234.03,
+            85250.01,
+            85234.03,
+            85250.01,
+            2.17357
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7ExportControl",
+            "status": {
+              "type": 0
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T10:03:09.315Z",
+        "bars": 24782,
+        "end": true,
+        "first": {
+          "index": -24482,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791108120,
+            85234.03,
+            85250.01,
+            85234.03,
+            85250.01,
+            2.17357
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7ExportControl",
+            "status": {
+              "type": 0
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T10:03:10.024Z",
+        "bars": 24782,
+        "end": true,
+        "first": {
+          "index": -24482,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791108120,
+            85234.03,
+            85250.01,
+            85234.03,
+            85250.01,
+            2.17795
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7ExportControl",
+            "status": {
+              "type": 0
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T10:03:10.754Z",
+        "bars": 24782,
+        "end": true,
+        "first": {
+          "index": -24482,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791108120,
+            85234.03,
+            85250.01,
+            85234.03,
+            85250,
+            2.18382
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7ExportControl",
+            "status": {
+              "type": 0
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T10:03:11.515Z",
+        "bars": 24782,
+        "end": true,
+        "first": {
+          "index": -24482,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791108120,
+            85234.03,
+            85259.66,
+            85234.03,
+            85259.65,
+            2.5756
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7ExportControl",
+            "status": {
+              "type": 0
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T10:03:12.286Z",
+        "bars": 24782,
+        "end": true,
+        "first": {
+          "index": -24482,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791108120,
+            85234.03,
+            85259.66,
+            85234.03,
+            85259.66,
+            2.5756
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7ExportControl",
+            "status": {
+              "type": 0
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T10:03:13.020Z",
+        "bars": 24782,
+        "end": true,
+        "first": {
+          "index": -24482,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791108120,
+            85234.03,
+            85259.95,
+            85234.03,
+            85259.94,
+            2.86838
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7ExportControl",
+            "status": {
+              "type": 0
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T10:03:13.809Z",
+        "bars": 24782,
+        "end": true,
+        "first": {
+          "index": -24482,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791108120,
+            85234.03,
+            85259.95,
+            85234.03,
+            85259.94,
+            2.87436
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7ExportControl",
+            "status": {
+              "type": 0
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T10:03:14.547Z",
+        "bars": 24782,
+        "end": true,
+        "first": {
+          "index": -24482,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791108120,
+            85234.03,
+            85259.95,
+            85234.03,
+            85259.94,
+            2.87436
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7ExportControl",
+            "status": {
+              "type": 0
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T10:03:15.271Z",
+        "bars": 24782,
+        "end": true,
+        "first": {
+          "index": -24482,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791108120,
+            85234.03,
+            85259.95,
+            85234.03,
+            85259.95,
+            2.87556
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7ExportControl",
+            "status": {
+              "type": 0
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T10:03:16.019Z",
+        "bars": 24782,
+        "end": true,
+        "first": {
+          "index": -24482,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791108120,
+            85234.03,
+            85264.01,
+            85234.03,
+            85264,
+            3.30305
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7ExportControl",
+            "status": {
+              "type": 0
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T10:03:16.761Z",
+        "bars": 24782,
+        "end": true,
+        "first": {
+          "index": -24482,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791108120,
+            85234.03,
+            85264.01,
+            85234.03,
+            85264.01,
+            3.30952
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7ExportControl",
+            "status": {
+              "type": 0
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T10:03:17.494Z",
+        "bars": 24782,
+        "end": true,
+        "first": {
+          "index": -24482,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791108120,
+            85234.03,
+            85267.57,
+            85234.03,
+            85267.57,
+            3.44775
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7ExportControl",
+            "status": {
+              "type": 0
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T10:03:18.283Z",
+        "bars": 24782,
+        "end": true,
+        "first": {
+          "index": -24482,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791108120,
+            85234.03,
+            85267.57,
+            85234.03,
+            85267.56,
+            3.44775
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7ExportControl",
+            "status": {
+              "type": 0
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T10:03:19.183Z",
+        "bars": 24782,
+        "end": true,
+        "first": {
+          "index": -24482,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791108120,
+            85234.03,
+            85267.57,
+            85234.03,
+            85267.57,
+            3.44782
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7ExportControl",
+            "status": {
+              "type": 0
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T10:03:19.895Z",
+        "bars": 24782,
+        "end": true,
+        "first": {
+          "index": -24482,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791108120,
+            85234.03,
+            85271.53,
+            85234.03,
+            85271.53,
+            3.88429
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7ExportControl",
+            "status": {
+              "type": 0
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T10:03:20.824Z",
+        "bars": 24782,
+        "end": true,
+        "first": {
+          "index": -24482,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791108120,
+            85234.03,
+            85271.53,
+            85234.03,
+            85271.53,
+            3.89303
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7ExportControl",
+            "status": {
+              "type": 0
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T10:03:21.760Z",
+        "bars": 24782,
+        "end": true,
+        "first": {
+          "index": -24482,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791108120,
+            85234.03,
+            85271.53,
+            85234.03,
+            85271.52,
+            3.89333
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7ExportControl",
+            "status": {
+              "type": 0
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T10:03:22.561Z",
+        "bars": 24782,
+        "end": true,
+        "first": {
+          "index": -24482,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791108120,
+            85234.03,
+            85271.53,
+            85234.03,
+            85271.52,
+            3.89333
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7ExportControl",
+            "status": {
+              "type": 0
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T10:03:23.391Z",
+        "bars": 24782,
+        "end": true,
+        "first": {
+          "index": -24482,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791108120,
+            85234.03,
+            85271.53,
+            85234.03,
+            85271.53,
+            4.00986
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7ExportControl",
+            "status": {
+              "type": 0
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T10:03:24.079Z",
+        "bars": 24782,
+        "end": true,
+        "first": {
+          "index": -24482,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791108120,
+            85234.03,
+            85271.53,
+            85234.03,
+            85271.53,
+            4.00986
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7ExportControl",
+            "status": {
+              "type": 0
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T10:03:24.782Z",
+        "bars": 24782,
+        "end": true,
+        "first": {
+          "index": -24482,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791108120,
+            85234.03,
+            85271.53,
+            85234.03,
+            85271.53,
+            4.04559
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7ExportControl",
+            "status": {
+              "type": 0
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T10:03:25.519Z",
+        "bars": 24782,
+        "end": true,
+        "first": {
+          "index": -24482,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791108120,
+            85234.03,
+            85271.53,
+            85234.03,
+            85271.53,
+            4.04876
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7ExportControl",
+            "status": {
+              "type": 0
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T10:03:26.551Z",
+        "bars": 24782,
+        "end": true,
+        "first": {
+          "index": -24482,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791108120,
+            85234.03,
+            85271.53,
+            85234.03,
+            85271.53,
+            4.04876
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7ExportControl",
+            "status": {
+              "type": 0
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T10:03:27.291Z",
+        "bars": 24782,
+        "end": true,
+        "first": {
+          "index": -24482,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791108120,
+            85234.03,
+            85271.53,
+            85234.03,
+            85271.53,
+            4.05399
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7ExportControl",
+            "status": {
+              "type": 0
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T10:03:28.153Z",
+        "bars": 24782,
+        "end": true,
+        "first": {
+          "index": -24482,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791108120,
+            85234.03,
+            85271.53,
+            85234.03,
+            85271.52,
+            4.05692
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7ExportControl",
+            "status": {
+              "type": 0
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T10:03:28.885Z",
+        "bars": 24782,
+        "end": true,
+        "first": {
+          "index": -24482,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791108120,
+            85234.03,
+            85271.53,
+            85234.03,
+            85271.52,
+            4.0613
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7ExportControl",
+            "status": {
+              "type": 0
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T10:03:29.758Z",
+        "bars": 24782,
+        "end": true,
+        "first": {
+          "index": -24482,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791108120,
+            85234.03,
+            85271.53,
+            85234.03,
+            85271.53,
+            4.0613
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7ExportControl",
+            "status": {
+              "type": 0
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T10:03:30.566Z",
+        "bars": 24782,
+        "end": true,
+        "first": {
+          "index": -24482,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791108120,
+            85234.03,
+            85271.53,
+            85234.03,
+            85271.53,
+            4.07089
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7ExportControl",
+            "status": {
+              "type": 0
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T10:03:31.266Z",
+        "bars": 24782,
+        "end": true,
+        "first": {
+          "index": -24482,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791108120,
+            85234.03,
+            85271.53,
+            85234.03,
+            85271.53,
+            4.07089
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7ExportControl",
+            "status": {
+              "type": 0
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T10:03:32.025Z",
+        "bars": 24782,
+        "end": true,
+        "first": {
+          "index": -24482,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791108120,
+            85234.03,
+            85271.53,
+            85234.03,
+            85271.53,
+            4.07336
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7ExportControl",
+            "status": {
+              "type": 0
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T10:03:32.779Z",
+        "bars": 24782,
+        "end": true,
+        "first": {
+          "index": -24482,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791108120,
+            85234.03,
+            85271.53,
+            85234.03,
+            85271.53,
+            4.07861
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7ExportControl",
+            "status": {
+              "type": 0
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T10:03:33.571Z",
+        "bars": 24782,
+        "end": true,
+        "first": {
+          "index": -24482,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791108120,
+            85234.03,
+            85271.53,
+            85234.03,
+            85271.53,
+            4.07861
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7ExportControl",
+            "status": {
+              "type": 0
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "compile_observed_utc": "2026-10-04T10:05:17.381Z"
+  },
+  {
+    "script": "native-error-text-woodie-developing-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "be84148d36ec1d36cb37ec26ede08e9d6fbc9a6b82de06f4eb389e70487853ab",
+    "indicator_title": "V7 native-error-text-woodie-developing-v6-v1",
+    "status": "RUNTIME-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": "RE10128",
+      "text": "Error on bar 0: The `developing` parameter of the `ta.pivot_point_levels()` cannot be `true` when `type` is \"Woodie\".",
+      "line": 3,
+      "column": null,
+      "first_bar_index": 0,
+      "first_bar_time_utc": null,
+      "native": {
+        "ctx": {
+          "bar_index": 0,
+          "code": "RE10128"
+        },
+        "error": "Error on bar {bar_index}: The `developing` parameter of the `ta.pivot_point_levels()` cannot be `true` when `type` is \"Woodie\".",
+        "stack_trace": [
+          {
+            "n": "#main",
+            "p": 3
+          }
+        ],
+        "title": "Runtime error",
+        "showReportItButton": false,
+        "studyAccessBlocked": false,
+        "compiler_markers": [],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,271.52\nH\n85,272.51\nL\n85,262.36\nC\n85,272.51\n+0.98 (+0.00%)\n85,272.50\nSELL\n0.01\n85,272.51\nBUY\nUSDT\nV7 native-error-text-woodie-developing-v6-v1\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n10:05:48 UTC\n99+\nRuntime error: RE10128\nRuntime error: RE10128\nError on bar 0: The `developing` parameter of the `ta.pivot_point_levels()` cannot be `true` when `type` is \"Woodie\".\nat #main():3\nOpen in editor",
+        "context_substituted_message": "Error on bar 0: The `developing` parameter of the `ta.pivot_point_levels()` cannot be `true` when `type` is \"Woodie\"."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 native-error-text-woodie-developing-v6-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24483,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24783,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T10:05:40.918Z",
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v7/evidence/native-error-text-woodie-developing-v6-v1-attempt1-error.png",
+      "captures/v7/evidence/native-error-text-woodie-developing-v6-v1-attempt1-error.txt",
+      "captures/v7/evidence/native-error-text-woodie-developing-v6-v1-attempt1-logs.txt",
+      "captures/v7/evidence/native-error-text-woodie-developing-v6-v1-attempt1-logs-v1.json",
+      "captures/v7/evidence/native-error-text-woodie-developing-v6-v1-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T10:05:41.822Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790803080,
+            83785.99,
+            83818.83,
+            83785.99,
+            83790,
+            9.31894
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791108240,
+            85271.52,
+            85272.51,
+            85262.36,
+            85272.51,
+            4.37266
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 native-error-text-woodie-developing-v6-v1",
+            "status": {
+              "type": 3,
+              "errorDescription": {
+                "ctx": {
+                  "bar_index": 0,
+                  "code": "RE10128"
+                },
+                "error": "Error on bar {bar_index}: The `developing` parameter of the `ta.pivot_point_levels()` cannot be `true` when `type` is \"Woodie\".",
+                "stack_trace": [
+                  {
+                    "n": "#main",
+                    "p": 3
+                  }
+                ],
+                "title": "Runtime error",
+                "showReportItButton": false,
+                "studyAccessBlocked": false
+              }
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T10:05:42.946Z",
+        "bars": 24783,
+        "end": true,
+        "first": {
+          "index": -24483,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791108240,
+            85271.52,
+            85272.51,
+            85262.36,
+            85272.51,
+            4.3784
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 native-error-text-woodie-developing-v6-v1",
+            "status": {
+              "type": 3,
+              "errorDescription": {
+                "ctx": {
+                  "bar_index": 0,
+                  "code": "RE10128"
+                },
+                "error": "Error on bar {bar_index}: The `developing` parameter of the `ta.pivot_point_levels()` cannot be `true` when `type` is \"Woodie\".",
+                "stack_trace": [
+                  {
+                    "n": "#main",
+                    "p": 3
+                  }
+                ],
+                "title": "Runtime error",
+                "showReportItButton": false,
+                "studyAccessBlocked": false
+              }
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "error_observed_utc": "2026-10-04T10:05:50.596Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/native-error-text-woodie-developing-v6-v1-attempt1-logs.txt",
+        "evidence/native-error-text-woodie-developing-v6-v1-attempt1-logs-v1.json",
+        "evidence/native-error-text-woodie-developing-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "script": "native-error-text-line-price-bar-time-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "7f0effd950def2869232b5503ba41bb70feeea9d3009007836e1a9a1cda99444",
+    "indicator_title": "V7 native-error-text-line-price-bar-time-v6-v1",
+    "status": "RUNTIME-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": "RE10119",
+      "text": "Error on bar 0: 'line.get_price' must be used with lines created using 'xloc=xloc.bar_index'.",
+      "line": 4,
+      "column": null,
+      "first_bar_index": 0,
+      "first_bar_time_utc": null,
+      "native": {
+        "ctx": {
+          "bar_index": 0,
+          "code": "RE10119"
+        },
+        "error": "Error on bar {bar_index}: 'line.get_price' must be used with lines created using 'xloc=xloc.bar_index'.",
+        "stack_trace": [
+          {
+            "n": "#main",
+            "p": 4
+          }
+        ],
+        "title": "Runtime error",
+        "showReportItButton": false,
+        "studyAccessBlocked": false,
+        "compiler_markers": [],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,272.51\nH\n85,272.51\nL\n85,272.50\nC\n85,272.51\n+0.01 (+0.00%)\n85,272.50\nSELL\n0.01\n85,272.51\nBUY\nUSDT\nV7 native-error-text-line-price-bar-time-v6-v1\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n10:06:14 UTC\n99+\nRuntime error: RE10119\nRuntime error: RE10119\nError on bar 0: 'line.get_price' must be used with lines created using 'xloc=xloc.bar_index'.\nat #main():4\nOpen in editor",
+        "context_substituted_message": "Error on bar 0: 'line.get_price' must be used with lines created using 'xloc=xloc.bar_index'."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 native-error-text-line-price-bar-time-v6-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24484,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24784,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T10:06:10.517Z",
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v7/evidence/native-error-text-line-price-bar-time-v6-v1-attempt1-error.png",
+      "captures/v7/evidence/native-error-text-line-price-bar-time-v6-v1-attempt1-error.txt",
+      "captures/v7/evidence/native-error-text-line-price-bar-time-v6-v1-attempt1-logs.txt",
+      "captures/v7/evidence/native-error-text-line-price-bar-time-v6-v1-attempt1-logs-v1.json",
+      "captures/v7/evidence/native-error-text-line-price-bar-time-v6-v1-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T10:06:11.411Z",
+        "bars": 2556,
+        "end": false,
+        "first": {
+          "index": -2256,
+          "value": [
+            1790801760,
+            83672.01,
+            83672.01,
+            83638.38,
+            83641.06,
+            5.98478
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791108360,
+            85272.51,
+            85272.51,
+            85272.5,
+            85272.51,
+            0.15187
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 native-error-text-line-price-bar-time-v6-v1",
+            "status": {
+              "type": 3,
+              "errorDescription": {
+                "ctx": {
+                  "bar_index": 0,
+                  "code": "RE10119"
+                },
+                "error": "Error on bar {bar_index}: 'line.get_price' must be used with lines created using 'xloc=xloc.bar_index'.",
+                "stack_trace": [
+                  {
+                    "n": "#main",
+                    "p": 4
+                  }
+                ],
+                "title": "Runtime error",
+                "showReportItButton": false,
+                "studyAccessBlocked": false
+              }
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T10:06:12.478Z",
+        "bars": 24784,
+        "end": true,
+        "first": {
+          "index": -24484,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791108360,
+            85272.51,
+            85272.51,
+            85272.5,
+            85272.51,
+            0.15187
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 native-error-text-line-price-bar-time-v6-v1",
+            "status": {
+              "type": 3,
+              "errorDescription": {
+                "ctx": {
+                  "bar_index": 0,
+                  "code": "RE10119"
+                },
+                "error": "Error on bar {bar_index}: 'line.get_price' must be used with lines created using 'xloc=xloc.bar_index'.",
+                "stack_trace": [
+                  {
+                    "n": "#main",
+                    "p": 4
+                  }
+                ],
+                "title": "Runtime error",
+                "showReportItButton": false,
+                "studyAccessBlocked": false
+              }
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "error_observed_utc": "2026-10-04T10:06:16.958Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/native-error-text-line-price-bar-time-v6-v1-attempt1-logs.txt",
+        "evidence/native-error-text-line-price-bar-time-v6-v1-attempt1-logs-v1.json",
+        "evidence/native-error-text-line-price-bar-time-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "script": "native-error-text-table-overlap-merge-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "456812e6885c0dfa634693d9d0a59c693e8bf79a37dc2e7088af58e2cc0624bc",
+    "indicator_title": "V7 native-error-text-table-overlap-merge-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/native-error-text-table-overlap-merge-v6-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T180648.302.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 native-error-text-table-overlap-merge-v6-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24484,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24784,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T10:06:38.404Z",
+    "live_candle_open_utc": "2026-10-04T10:06:00.000Z",
+    "export_utc": "2026-10-04T10:06:48.644Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/native-error-text-table-overlap-merge-v6-v1-attempt1-setup.png",
+      "captures/v7/evidence/native-error-text-table-overlap-merge-v6-v1-attempt1-export.png",
+      "captures/v7/evidence/native-error-text-table-overlap-merge-v6-v1-attempt1-logs.txt",
+      "captures/v7/evidence/native-error-text-table-overlap-merge-v6-v1-attempt1-logs-v1.json",
+      "captures/v7/evidence/native-error-text-table-overlap-merge-v6-v1-attempt1-logs.png",
+      "captures/v7/evidence/native-error-text-table-overlap-merge-v6-v1-attempt1-visual.png",
+      "captures/v7/evidence/native-error-text-table-overlap-merge-v6-v1-attempt1-data-window-v1.png",
+      "captures/v7/evidence/native-error-text-table-overlap-merge-v6-v1-attempt1-data-window-v1.json",
+      "captures/v7/evidence/native-error-text-table-overlap-merge-v6-v1-attempt1-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T10:06:39.417Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790803200,
+            83790.01,
+            83791.92,
+            83786.7,
+            83786.71,
+            3.83125
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791108360,
+            85272.51,
+            85272.51,
+            85272.5,
+            85272.51,
+            0.5294
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 native-error-text-table-overlap-merge-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790803200,
+                83786.71
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791108360,
+                85272.51
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T10:06:40.725Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790803200,
+            83790.01,
+            83791.92,
+            83786.7,
+            83786.71,
+            3.83125
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791108360,
+            85272.51,
+            85272.51,
+            85272.5,
+            85272.51,
+            0.5294
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 native-error-text-table-overlap-merge-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24784,
+            "first": {
+              "index": -1022240,
+              "value": [
+                1788134400,
+                77674.04
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791108360,
+                85272.51
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T10:06:41.644Z",
+        "bars": 24784,
+        "end": true,
+        "first": {
+          "index": -24484,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791108360,
+            85272.51,
+            85272.51,
+            85272.5,
+            85272.51,
+            0.53245
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 native-error-text-table-overlap-merge-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24784,
+            "first": {
+              "index": -24484,
+              "value": [
+                1788134400,
+                77674.04
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791108360,
+                85272.51
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   10:06",
+    "historical_compare_before_unix_seconds": 1791108360,
+    "pine_logs": {
+      "paths": [
+        "evidence/native-error-text-table-overlap-merge-v6-v1-attempt1-logs.txt",
+        "evidence/native-error-text-table-overlap-merge-v6-v1-attempt1-logs-v1.json",
+        "evidence/native-error-text-table-overlap-merge-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "ee2e636ea6d98e3078cc74b0ed7bbb067345da18c2e7de6fd6562ff24340e451",
+    "csv_bytes": 1304997,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "Plot"
+    ],
+    "declared_to_native_header_mapping": {},
+    "csv_rows": 24784,
+    "historical_rows": 24783,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791108360,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791108360",
+    "first_historical_values": {},
+    "last_historical_values": {},
+    "data_window_witness": "captures/v7/evidence/native-error-text-table-overlap-merge-v6-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "script": "native-error-text-format-unmatched-left-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "a6cf61ce8c645e411d78ac5f369b1d2052d7596b0fe2cacddaa3c22f1e707a66",
+    "indicator_title": "V7 native-error-text-format-unmatched-left-v6-v1",
+    "status": "RUNTIME-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": "Error on bar 0: Unmatched braces in the pattern.",
+      "line": 3,
+      "column": null,
+      "first_bar_index": 0,
+      "first_bar_time_utc": null,
+      "native": {
+        "ctx": {
+          "bar_index": 0
+        },
+        "error": "Error on bar {bar_index}: Unmatched braces in the pattern.",
+        "stack_trace": [
+          {
+            "n": "#main",
+            "p": 3
+          }
+        ],
+        "title": "Runtime error",
+        "showReportItButton": false,
+        "studyAccessBlocked": false,
+        "compiler_markers": [],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,272.51\nH\n85,282.36\nL\n85,254.79\nC\n85,254.80\n\u221217.70 (\u22120.02%)\n85,254.79\nSELL\n0.01\n85,254.80\nBUY\nUSDT\nV7 native-error-text-format-unmatched-left-v6-v1\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n10:07:20 UTC\n99+\nRuntime error\nRuntime error\nError on bar 0: Unmatched braces in the pattern.\nat #main():3\nOpen in editor",
+        "context_substituted_message": "Error on bar 0: Unmatched braces in the pattern."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 native-error-text-format-unmatched-left-v6-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24484,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24784,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T10:07:15.053Z",
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v7/evidence/native-error-text-format-unmatched-left-v6-v1-attempt1-error.png",
+      "captures/v7/evidence/native-error-text-format-unmatched-left-v6-v1-attempt1-error.txt",
+      "captures/v7/evidence/native-error-text-format-unmatched-left-v6-v1-attempt1-logs.txt",
+      "captures/v7/evidence/native-error-text-format-unmatched-left-v6-v1-attempt1-logs-v1.json",
+      "captures/v7/evidence/native-error-text-format-unmatched-left-v6-v1-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T10:07:15.990Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790803200,
+            83790.01,
+            83791.92,
+            83786.7,
+            83786.71,
+            3.83125
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791108360,
+            85272.51,
+            85282.36,
+            85254.79,
+            85254.8,
+            3.8166
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 native-error-text-format-unmatched-left-v6-v1",
+            "status": {
+              "type": 3,
+              "errorDescription": {
+                "ctx": {
+                  "bar_index": 0
+                },
+                "error": "Error on bar {bar_index}: Unmatched braces in the pattern.",
+                "stack_trace": [
+                  {
+                    "n": "#main",
+                    "p": 3
+                  }
+                ],
+                "title": "Runtime error",
+                "showReportItButton": false,
+                "studyAccessBlocked": false
+              }
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T10:07:17.208Z",
+        "bars": 24784,
+        "end": true,
+        "first": {
+          "index": -24484,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791108360,
+            85272.51,
+            85282.36,
+            85254.79,
+            85254.79,
+            3.82924
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 native-error-text-format-unmatched-left-v6-v1",
+            "status": {
+              "type": 3,
+              "errorDescription": {
+                "ctx": {
+                  "bar_index": 0
+                },
+                "error": "Error on bar {bar_index}: Unmatched braces in the pattern.",
+                "stack_trace": [
+                  {
+                    "n": "#main",
+                    "p": 3
+                  }
+                ],
+                "title": "Runtime error",
+                "showReportItButton": false,
+                "studyAccessBlocked": false
+              }
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///c1019f53-6615-4657-911e-c3fcc0e8a191.pine?placement%3Ddialog",
+          "path": "/c1019f53-6615-4657-911e-c3fcc0e8a191.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "CW10023",
+        "severity": 4,
+        "message": "The argument for the `formatString` parameter for `str.format` expects 0 value(s), but received 1 value(s).",
+        "startLineNumber": 3,
+        "startColumn": 9,
+        "endLineNumber": 3,
+        "endColumn": 26
+      }
+    ],
+    "error_observed_utc": "2026-10-04T10:07:23.355Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/native-error-text-format-unmatched-left-v6-v1-attempt1-logs.txt",
+        "evidence/native-error-text-format-unmatched-left-v6-v1-attempt1-logs-v1.json",
+        "evidence/native-error-text-format-unmatched-left-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "script": "native-error-text-log-unmatched-right-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "dd7d898eb00172533e72f9b91d67d006863f7756a4d4eba508c5f289263c5d1d",
+    "indicator_title": "V7 native-error-text-log-unmatched-right-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/native-error-text-log-unmatched-right-v6-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T180921.159.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 native-error-text-log-unmatched-right-v6-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24484,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24785,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T10:07:43.033Z",
+    "live_candle_open_utc": "2026-10-04T10:08:00.000Z",
+    "export_utc": "2026-10-04T10:09:21.595Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/native-error-text-log-unmatched-right-v6-v1-attempt1-setup.png",
+      "captures/v7/evidence/native-error-text-log-unmatched-right-v6-v1-attempt1-export.png",
+      "captures/v7/evidence/native-error-text-log-unmatched-right-v6-v1-attempt1-logs.txt",
+      "captures/v7/evidence/native-error-text-log-unmatched-right-v6-v1-attempt1-logs-v1.json",
+      "captures/v7/evidence/native-error-text-log-unmatched-right-v6-v1-attempt1-logs.png",
+      "captures/v7/evidence/native-error-text-log-unmatched-right-v6-v1-attempt1-visual.png",
+      "captures/v7/evidence/native-error-text-log-unmatched-right-v6-v1-attempt1-data-window-v1.png",
+      "captures/v7/evidence/native-error-text-log-unmatched-right-v6-v1-attempt1-data-window-v1.json",
+      "captures/v7/evidence/native-error-text-log-unmatched-right-v6-v1-attempt1-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T10:07:43.885Z",
+        "bars": 1942,
+        "end": false,
+        "first": {
+          "index": -1642,
+          "value": [
+            1790875440,
+            84718.46,
+            84792.7,
+            84678.01,
+            84778.89,
+            15.84831
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791108360,
+            85272.51,
+            85282.36,
+            85254.79,
+            85254.79,
+            4.29466
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 native-error-text-log-unmatched-right-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 1942,
+            "first": {
+              "index": -1642,
+              "value": [
+                1790875440,
+                84778.89
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791108360,
+                85254.79
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T10:07:45.390Z",
+        "bars": 1942,
+        "end": false,
+        "first": {
+          "index": -1642,
+          "value": [
+            1790875440,
+            84718.46,
+            84792.7,
+            84678.01,
+            84778.89,
+            15.84831
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791108360,
+            85272.51,
+            85282.36,
+            85254.79,
+            85254.79,
+            4.30101
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 native-error-text-log-unmatched-right-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24784,
+            "first": {
+              "index": -1022842,
+              "value": [
+                1788134400,
+                77674.04
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791108360,
+                85254.79
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T10:07:46.590Z",
+        "bars": 24784,
+        "end": true,
+        "first": {
+          "index": -24484,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791108360,
+            85272.51,
+            85282.36,
+            85254.79,
+            85254.8,
+            4.30436
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 native-error-text-log-unmatched-right-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24784,
+            "first": {
+              "index": -24484,
+              "value": [
+                1788134400,
+                77674.04
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791108360,
+                85254.8
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///9db140b7-d2f5-4d8d-b605-1a40e179b94c.pine?placement%3Ddialog",
+          "path": "/9db140b7-d2f5-4d8d-b605-1a40e179b94c.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "CW10023",
+        "severity": 4,
+        "message": "The argument for the `formatString` parameter for `log.info` expects 0 value(s), but received 1 value(s).",
+        "startLineNumber": 3,
+        "startColumn": 1,
+        "endLineNumber": 3,
+        "endColumn": 16
+      }
+    ],
+    "live_tooltip": "Sun 04 Oct '26   10:08",
+    "historical_compare_before_unix_seconds": 1791108480,
+    "pine_logs": {
+      "paths": [
+        "evidence/native-error-text-log-unmatched-right-v6-v1-attempt1-logs.txt",
+        "evidence/native-error-text-log-unmatched-right-v6-v1-attempt1-logs-v1.json",
+        "evidence/native-error-text-log-unmatched-right-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 10000,
+      "last_message_time_ms": 1791108549661.018,
+      "last_bar_time_ms": 1791108480000
+    },
+    "csv_sha256": "593e4eef1b773a3694cc56e645a78a30f3e56c412f29cf8fe3871777f1c35c7d",
+    "csv_bytes": 1305048,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "Plot"
+    ],
+    "declared_to_native_header_mapping": {},
+    "csv_rows": 24785,
+    "historical_rows": 24784,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791108480,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791108480",
+    "first_historical_values": {},
+    "last_historical_values": {},
+    "data_window_witness": "captures/v7/evidence/native-error-text-log-unmatched-right-v6-v1-attempt1-data-window-v1.json"
   }
 ]

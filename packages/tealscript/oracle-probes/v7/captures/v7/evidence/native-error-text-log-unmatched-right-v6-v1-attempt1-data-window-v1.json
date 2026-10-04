@@ -1,0 +1,29 @@
+{
+  "index": 299,
+  "bar": [
+    1791108360,
+    85272.51,
+    85282.36,
+    85254.79,
+    85254.8,
+    4.55167
+  ],
+  "source_row": [
+    1791108360,
+    85254.8
+  ],
+  "browser_utc": "2026-10-04T10:09:37.279Z",
+  "title": "V7 native-error-text-log-unmatched-right-v6-v1",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   10:06",
+  "visible_range": {
+    "_firstBar": 264,
+    "_lastBar": 302
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}

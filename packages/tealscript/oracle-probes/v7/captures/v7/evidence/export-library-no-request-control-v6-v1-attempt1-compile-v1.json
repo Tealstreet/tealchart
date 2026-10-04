@@ -1,0 +1,56 @@
+{
+  "browser_utc": "2026-10-04T10:05:17.381Z",
+  "editor_source": "//@version=6\nlibrary(\"V7ExportControl\",overlay=false,dynamic_requests=true)\nexport fetch(simple string symbol) =>\n    str.length(symbol)\n",
+  "native_markers": [],
+  "source_name": "V7ExportControl",
+  "native_status": {
+    "type": 0
+  },
+  "is_loading": false,
+  "is_failed": false,
+  "has_compile_error": false,
+  "applied_compiled_metainfo": {
+    "id": "Script$USER;9aac6d23b931423bacc3d7f6be2fdf7e@tv-scripting",
+    "description": "V7ExportControl",
+    "plots": [],
+    "inputs": [
+      {
+        "defval": "",
+        "id": "pineId",
+        "isHidden": true,
+        "name": "pineId",
+        "type": "text",
+        "display": 15
+      },
+      {
+        "defval": "",
+        "id": "pineVersion",
+        "isHidden": true,
+        "name": "pineVersion",
+        "type": "text",
+        "display": 15
+      },
+      {
+        "defval": "{\"str\":1}",
+        "id": "pineFeatures",
+        "isFake": true,
+        "isHidden": true,
+        "name": "pineFeatures",
+        "type": "text",
+        "display": 15
+      },
+      {
+        "active": true,
+        "defval": false,
+        "id": "__profile",
+        "isFake": true,
+        "isHidden": true,
+        "migrate": true,
+        "name": "",
+        "type": "bool",
+        "display": 0
+      }
+    ]
+  },
+  "limits": "Library declaration compilation admitted. No exported function is called or imported; no publication performed. Inert native status0/empty cache is not a runtime timeout or compiler refusal."
+}

@@ -1,0 +1,59 @@
+{
+  "browser_utc": "2026-10-04T09:58:21.928Z",
+  "input_change": "Spread input changed through native Inputs symbol picker to BINANCE:BTCUSDT as required control. Frozen source unchanged; main host BTC2m standard UTC.",
+  "status": {
+    "browser_utc": "2026-10-04T09:58:22.362Z",
+    "bars": 24780,
+    "end": true,
+    "first": {
+      "index": -24479,
+      "value": [
+        1788134400,
+        77682,
+        77682.01,
+        77572,
+        77674.04,
+        51.86295
+      ]
+    },
+    "last": {
+      "index": 300,
+      "value": [
+        1791107880,
+        85233.84,
+        85233.84,
+        85233.83,
+        85233.83,
+        0.29584
+      ]
+    },
+    "timezone": "Etc/UTC",
+    "studies": [
+      {
+        "name": "V7 lower-tf-spread-symbol-v6-v1",
+        "status": {
+          "type": 2
+        },
+        "size": 24780,
+        "first": {
+          "index": -24479,
+          "value": [
+            1788134400,
+            2,
+            77625.93,
+            77674.04
+          ]
+        },
+        "last": {
+          "index": 300,
+          "value": [
+            1791107880,
+            1,
+            85233.83,
+            85233.83
+          ]
+        }
+      }
+    ]
+  }
+}

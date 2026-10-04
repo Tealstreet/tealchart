@@ -1,0 +1,26 @@
+{
+  "index": 298,
+  "bar": [
+    1791107880,
+    85233.84,
+    85249.96,
+    85233.83,
+    85233.84,
+    8.66732
+  ],
+  "source_row": null,
+  "browser_utc": "2026-10-04T10:01:32.760Z",
+  "title": "V7ExportRequest",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   09:58",
+  "visible_range": {
+    "_firstBar": 263,
+    "_lastBar": 301
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}
