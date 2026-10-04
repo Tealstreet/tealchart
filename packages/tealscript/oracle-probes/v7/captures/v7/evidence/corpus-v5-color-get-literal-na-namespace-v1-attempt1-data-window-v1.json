@@ -1,0 +1,29 @@
+{
+  "index": 298,
+  "bar": [
+    1791090480,
+    84828.85,
+    84842.01,
+    84828.84,
+    84835.16,
+    13.8419
+  ],
+  "source_row": [
+    1791090480,
+    1
+  ],
+  "browser_utc": "2026-10-04T05:11:08.942Z",
+  "title": "corpus-v5-color-get-literal-na-namespace-v1",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   05:08",
+  "visible_range": {
+    "_firstBar": 263,
+    "_lastBar": 301
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}
