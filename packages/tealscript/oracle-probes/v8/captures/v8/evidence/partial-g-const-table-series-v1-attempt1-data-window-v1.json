@@ -1,0 +1,29 @@
+{
+  "index": 298,
+  "bar": [
+    1791113760,
+    85299.68,
+    85299.69,
+    85299.25,
+    85299.26,
+    5.20064
+  ],
+  "source_row": [
+    1791113760,
+    1
+  ],
+  "browser_utc": "2026-10-04T11:38:41.851Z",
+  "title": "Const table reference",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   11:36",
+  "visible_range": {
+    "_firstBar": 263,
+    "_lastBar": 301
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}

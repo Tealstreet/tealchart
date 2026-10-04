@@ -1,0 +1,29 @@
+{
+  "index": 298,
+  "bar": [
+    1791113280,
+    85320.16,
+    85320.16,
+    85310,
+    85312.01,
+    4.60934
+  ],
+  "source_row": [
+    1791113280,
+    1
+  ],
+  "browser_utc": "2026-10-04T11:31:28.899Z",
+  "title": "Bool simple numeric return",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   11:28",
+  "visible_range": {
+    "_firstBar": 263,
+    "_lastBar": 301
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}
