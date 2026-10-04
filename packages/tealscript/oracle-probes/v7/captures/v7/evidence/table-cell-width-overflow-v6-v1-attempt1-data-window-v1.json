@@ -1,0 +1,29 @@
+{
+  "index": 298,
+  "bar": [
+    1791109440,
+    85375.09,
+    85396,
+    85375.08,
+    85396,
+    4.23376
+  ],
+  "source_row": [
+    1791109440,
+    0
+  ],
+  "browser_utc": "2026-10-04T10:27:00.002Z",
+  "title": "V7 table-cell-width-overflow-v6-v1",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   10:24",
+  "visible_range": {
+    "_firstBar": 263,
+    "_lastBar": 301
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}

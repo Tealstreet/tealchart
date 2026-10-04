@@ -1,0 +1,271 @@
+{
+  "artifact": "TradingView table dimension geometry v1",
+  "browser_utc": "2026-10-04T10:21:02.713Z",
+  "symbol": "BINANCE:BTCUSDT",
+  "timeframe": "2",
+  "timezone": "Etc/UTC",
+  "replay": true,
+  "end_of_data": true,
+  "host_first": {
+    "index": -24465,
+    "value": [
+      1788134400,
+      77682,
+      77682.01,
+      77572,
+      77674.04,
+      51.86295
+    ]
+  },
+  "host_last": {
+    "index": 303,
+    "value": [
+      1791106560,
+      85195.41,
+      85240.01,
+      85195.4,
+      85232.37,
+      10.75593
+    ]
+  },
+  "source_last": {
+    "index": 303,
+    "value": [
+      1791106560,
+      0
+    ]
+  },
+  "source_status": {
+    "type": 2
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  },
+  "panes": [
+    {
+      "width": 954,
+      "height": 446,
+      "range": {
+        "_minValue": 85058.34,
+        "_maxValue": 85289.63
+      },
+      "mode": {
+        "autoScale": true,
+        "lockScale": false,
+        "percentage": false,
+        "indexedTo100": false,
+        "log": false
+      }
+    },
+    {
+      "width": 954,
+      "height": 223,
+      "range": {
+        "_minValue": -1,
+        "_maxValue": 0
+      },
+      "mode": {
+        "autoScale": true,
+        "lockScale": false,
+        "percentage": false,
+        "indexedTo100": false,
+        "log": false
+      }
+    }
+  ],
+  "canvas_rects": [
+    {
+      "css": {
+        "x": 56,
+        "y": 42,
+        "width": 954,
+        "height": 446,
+        "top": 42,
+        "right": 1010,
+        "bottom": 488,
+        "left": 56
+      },
+      "bitmap": {
+        "width": 1908,
+        "height": 892
+      }
+    },
+    {
+      "css": {
+        "x": 56,
+        "y": 489,
+        "width": 954,
+        "height": 223,
+        "top": 489,
+        "right": 1010,
+        "bottom": 712,
+        "left": 56
+      },
+      "bitmap": {
+        "width": 1908,
+        "height": 446
+      }
+    }
+  ],
+  "table_views": [
+    {
+      "pane": 0,
+      "type": "b",
+      "data": [],
+      "renderers": []
+    },
+    {
+      "pane": 1,
+      "type": "b",
+      "data": [
+        {
+          "table": {
+            "id": 1,
+            "position": "top_right",
+            "rows": 1,
+            "columns": 1,
+            "backgroundColorIndex": null,
+            "frameColorIndex": null,
+            "frameWidth": 0,
+            "borderColorIndex": null,
+            "borderWidth": 0
+          },
+          "style": {
+            "backgroundColor": "transparent",
+            "borderColor": "transparent",
+            "frameColor": "transparent"
+          },
+          "cells": [
+            {
+              "cell": {
+                "tableId": 1,
+                "row": 0,
+                "column": 0,
+                "widthInPercentsOfPaneWidth": 0,
+                "heightInPercentOfPaneHeight": null,
+                "text": "WIDE TEXT",
+                "textColorIndex": 0,
+                "horizontalTextAlignment": "center",
+                "verticalTextAlignment": "center",
+                "fontSize": "auto",
+                "backgroundColorIndex": null,
+                "colSpan": 1,
+                "rowSpan": 1,
+                "tooltip": "",
+                "fontType": null,
+                "textFormatting": 0
+              },
+              "merged": false,
+              "style": {
+                "backgroundColor": "transparent",
+                "textColor": "rgba(54,58,69,1)"
+              }
+            }
+          ]
+        }
+      ],
+      "renderers": [
+        {
+          "data": {
+            "table": {
+              "id": 1,
+              "position": "top_right",
+              "rows": 1,
+              "columns": 1,
+              "backgroundColorIndex": null,
+              "frameColorIndex": null,
+              "frameWidth": 0,
+              "borderColorIndex": null,
+              "borderWidth": 0
+            },
+            "style": {
+              "backgroundColor": "transparent",
+              "borderColor": "transparent",
+              "frameColor": "transparent"
+            },
+            "cells": [
+              {
+                "cell": {
+                  "tableId": 1,
+                  "row": 0,
+                  "column": 0,
+                  "widthInPercentsOfPaneWidth": 0,
+                  "heightInPercentOfPaneHeight": null,
+                  "text": "WIDE TEXT",
+                  "textColorIndex": 0,
+                  "horizontalTextAlignment": "center",
+                  "verticalTextAlignment": "center",
+                  "fontSize": "auto",
+                  "backgroundColorIndex": null,
+                  "colSpan": 1,
+                  "rowSpan": 1,
+                  "tooltip": "",
+                  "fontType": null,
+                  "textFormatting": 0
+                },
+                "merged": false,
+                "style": {
+                  "backgroundColor": "transparent",
+                  "textColor": "rgba(54,58,69,1)"
+                }
+              }
+            ]
+          },
+          "precalculated": {
+            "position": {
+              "x": 1721,
+              "y": 20
+            },
+            "totalWidth": 167,
+            "totalHeight": 47,
+            "cells": [
+              [
+                {
+                  "mergedMainCell": null,
+                  "nextColumnCell": null,
+                  "nextRowCell": null,
+                  "startColumn": 0,
+                  "endColumn": 0,
+                  "startRow": 0,
+                  "endRow": 0,
+                  "width": 167,
+                  "height": 47,
+                  "offsetX": 0,
+                  "offsetY": 0,
+                  "colSpan": 1,
+                  "rowSpan": 1,
+                  "merged": false,
+                  "empty": false
+                }
+              ]
+            ],
+            "cellsWithTooltip": [],
+            "lastNonEmptyColumnEnd": 0,
+            "lastNonEmptyRowEnd": 0
+          }
+        }
+      ]
+    }
+  ],
+  "limits": "Native renderer precalculated coordinates are recorded without converting their units to CSS pixels. Pine phase is not inferred from native chart index; DIMENSION is the unchanged source plot.",
+  "replay_selection": {
+    "browser_utc": "2026-10-04T10:20:35.082Z",
+    "clicked_native_index": 278,
+    "host": [
+      1791106200,
+      85264.08,
+      85289.63,
+      85257.66,
+      85257.67,
+      15.85478
+    ],
+    "clicked_coordinates": {
+      "x": 312.8461538461539,
+      "y": 242
+    }
+  },
+  "replay_step": 4,
+  "ui_snapshot": "Emulating viewport: {\"deviceScaleFactor\":2,\"isMobile\":false,\"hasTouch\":false,\"isLandscape\":false,\"width\":1440,\"height\":900}\n## Latest page snapshot\nuid=2073_0 RootWebArea \"BTCUSDT 85,360.01 ▲ +0.72% basic\" url=\"https://www.tradingview.com/chart/xlvYwHdH/?symbol=BINANCE%3ABTCUSDT&interval=2\"\n  uid=2073_1 button \"Logged in as sours-lat Active layout: basic\" haspopup=\"menu\"\n  uid=2073_2 StaticText \"11\"\n  uid=2073_3 button \"BTCUSDT\" description=\"Symbol search\"\n  uid=2073_4 button \"Switch data type\"\n  uid=2073_5 button \"Compare symbols\" haspopup=\"dialog\"\n  uid=2073_6 radio \"3 minutes\"\n  uid=2073_7 radio \"5 minutes\"\n  uid=2073_8 radio \"15 minutes\"\n  uid=2073_9 radio \"30 minutes\"\n  uid=2073_10 radio \"45 minutes\"\n  uid=2073_11 radio \"1 hour\"\n  uid=2073_12 radio \"2 hours\"\n  uid=2073_13 radio \"3 hours\"\n  uid=2073_14 radio \"4 hours\"\n  uid=2073_15 radio \"8 hours\"\n  uid=2073_16 radio \"10 hours\"\n  uid=2073_17 radio \"12 hours\"\n  uid=2073_18 radio \"1 day\"\n  uid=2073_19 radio \"3 days\"\n  uid=2073_20 radio \"10 days\"\n  uid=2073_21 radio \"1 week\"\n  uid=2073_22 radio \"1 month\"\n  uid=2073_23 radio \"2 minutes\" checked\n  uid=2073_24 button \"Chart interval\" haspopup=\"menu\"\n  uid=2073_25 radio \"Candles\" checked\n  uid=2073_26 radio \"Line\"\n  uid=2073_27 radio \"High-low\"\n  uid=2073_28 button \"Bar's style\" haspopup=\"menu\"\n  uid=2073_29 button \"Indicators, metrics, and strategies\"\n  uid=2073_30 button \"Favorite indicators\" haspopup=\"menu\"\n  uid=2073_31 button \"Indicator templates\" haspopup=\"menu\"\n  uid=2073_32 button \"Create alert\"\n  uid=2073_33 button \"Bar replay\" pressed\n  uid=2073_34 button disableable disabled\n  uid=2073_35 button disableable disabled\n  uid=2073_36 button \"Layout setup\" haspopup=\"menu\"\n  uid=2073_37 button \"All changes saved\" disableable disabled\n  uid=2073_38 button \"Manage layouts\" haspopup=\"menu\"\n  uid=2073_39 button \"Quick search\"\n  uid=2073_40 button \"Settings\"\n  uid=2073_41 button \"Fullscreen mode\"\n  uid=2073_42 button \"Take a snapshot\" haspopup=\"menu\"\n  uid=2073_43 button \"Share your idea with the trade community\" haspopup=\"menu\"\n  uid=2073_44 button \"Trade\"\n  uid=2082_0 button \"Trading options\"\n  uid=2073_45 button \"Cross\"\n  uid=2073_46 button \"Cursors\" pressed\n  uid=2073_47 button \"Trendline\"\n  uid=2073_48 button \"Trend tools\"\n  uid=2073_49 button \"Fib retracement\"\n  uid=2073_50 button \"Gann and Fibonacci tools\"\n  uid=2073_51 button \"XABCD pattern\"\n  uid=2073_52 button \"Patterns\"\n  uid=2073_53 button \"Long position\"\n  uid=2073_54 button \"Forecasting and measurement tools\"\n  uid=2073_55 button \"Brush\"\n  uid=2073_56 button \"Geometric shapes\"\n  uid=2073_57 button \"Text\"\n  uid=2073_58 button \"Annotation tools\"\n  uid=2073_59 button \"Icon\"\n  uid=2073_60 button \"Icons\"\n  uid=2073_61 button \"Measure\"\n  uid=2073_62 button \"Zoom in\"\n  uid=2073_63 button \"Magnet mode snaps drawings placed near price bars to the closest OHLC value\" pressed\n  uid=2073_64 button \"Magnets\" pressed\n  uid=2073_65 button \"Keep drawing\"\n  uid=2073_66 button \"Lock drawings and indicators\"\n  uid=2073_67 button \"Lock options\"\n  uid=2073_68 button \"Hide all drawings, indicators, positions, and orders\"\n  uid=2073_69 button \"Hide options\"\n  uid=2073_70 button \"New drawings will not be synced\"\n  uid=2073_71 button \"Sync drawings options\"\n  uid=2073_72 button \"Remove objects\"\n  uid=2073_73 button \"Remove options\"\n  uid=2073_74 button \"Show Favorite Drawing Tools Toolbar\"\n  uid=2082_1 StaticText \"Select bar\"\n  uid=2082_2 generic description=\"Play\"\n  uid=2082_3 generic description=\"Forward\"\n  uid=2082_4 StaticText \"10x\"\n  uid=2082_5 StaticText \"2m\"\n  uid=2082_6 generic description=\"Jump to real-time chart\"\n  uid=2082_7 generic description=\"Exit Bar Replay\"\n  uid=2073_75 region \"Chart #1\"\n    uid=2073_76 StaticText \"B\"\n    uid=2073_77 button \"Change symbol\"\n    uid=2073_78 StaticText \"·\"\n    uid=2073_79 button \"Change interval\"\n    uid=2073_78 StaticText \"·\"\n    uid=2073_80 StaticText \"Binance\"\n    uid=2073_81 button \"Unflag symbol\"\n    uid=2073_82 button \"More\" description=\"More\"\n    uid=2082_8 button \"Replay mode\"\n    uid=2073_84 StaticText \"O\"\n    uid=2073_85 StaticText \"85,195.41\"\n    uid=2073_86 StaticText \"H\"\n    uid=2073_87 StaticText \"85,240.01\"\n    uid=2073_88 StaticText \"L\"\n    uid=2073_89 StaticText \"85,195.40\"\n    uid=2073_90 StaticText \"C\"\n    uid=2073_91 StaticText \"85,232.37\"\n    uid=2073_92 StaticText \"+36.96 (+0.04%)\"\n    uid=2073_93 StaticText \"85,232.37\"\n    uid=2086_0 StaticText \"SELL\"\n    uid=2073_95 StaticText \"0.00\"\n    uid=2073_96 StaticText \"85,232.37\"\n    uid=2086_1 StaticText \"BUY\"\n    uid=2073_98 Canvas \"Chart for BINANCE:BTCUSDT, 2 minutes\"\n    uid=2073_99 StaticText \"V7 table-cell-width-negative-v6-v1\"\n    uid=2073_100 button \"Hide\" description=\"Hide\"\n    uid=2073_101 button \"Settings\" description=\"Settings\"\n    uid=2073_102 button \"Remove\" description=\"Remove\"\n    uid=2073_103 button \"More\" description=\"More\"\n    uid=2073_104 StaticText \"0.00\"\n  uid=2073_105 button \"1 day in 1 minute intervals\"\n  uid=2073_106 button \"5 days in 5 minutes intervals\"\n  uid=2073_107 button \"1 month in 30 minutes intervals\"\n  uid=2073_108 button \"3 months in 1 hour intervals\"\n  uid=2073_109 button \"6 months in 2 hours intervals\"\n  uid=2073_110 button \"Year to day in 1 day intervals\"\n  uid=2073_111 button \"1 year in 1 day intervals\"\n  uid=2073_112 button \"5 years in 1 week intervals\"\n  uid=2073_113 button \"All data in 1 month intervals\"\n  uid=2073_114 button \"Go to\"\n  uid=2073_115 button \"Timezone\"\n  uid=2073_116 button \"Watchlist, details, and news\"\n  uid=2073_117 button \"Alerts\"\n  uid=2073_118 button \"Object tree and data window\" pressed\n  uid=2073_119 button \"AI Copilot\"\n  uid=2073_120 button \"Screeners\"\n  uid=2073_121 button \"Pine\"\n  uid=2073_122 button \"Calendars\"\n  uid=2073_123 button \"Community\"\n  uid=2073_124 button \"Notifications\"\n  uid=2073_125 button \"Chats\"\n  uid=2073_126 button \"Products\" haspopup=\"menu\"\n  uid=2073_127 button \"Help Center\"\n  uid=2079_0 tab \"Object tree\" selectable\n  uid=2079_1 tab \"Data window\" selectable selected\n  uid=2079_2 generic disableable disabled\n    uid=2079_3 StaticText \"Date\"\n    uid=2079_4 StaticText \"Sun 04 Oct '26\"\n    uid=2079_5 StaticText \"Time\"\n    uid=2079_6 StaticText \"09:36\"\n  uid=2079_7 row \"BTCUSDT · 2 · Binance Open 85,195.41 High 85,240.01 Low 85,195.40 Close 85,232.37 Change +36.96 (+0.04%) Vol 10.76 Last day change +606.45 (+0.72%)\"\n    uid=2079_8 StaticText \"BTCUSDT · 2 · Binance\"\n    uid=2079_9 button \"Hide data\"\n    uid=2079_10 StaticText \"Open\"\n    uid=2079_11 StaticText \"85,195.41\"\n    uid=2079_12 StaticText \"High\"\n    uid=2079_13 StaticText \"85,240.01\"\n    uid=2079_14 StaticText \"Low\"\n    uid=2079_15 StaticText \"85,195.40\"\n    uid=2079_16 StaticText \"Close\"\n    uid=2079_17 StaticText \"85,232.37\"\n    uid=2079_18 StaticText \"Change\"\n    uid=2079_19 StaticText \"+36.96 (+0.04%)\"\n    uid=2079_20 StaticText \"Vol\"\n    uid=2079_21 StaticText \"10.76\"\n    uid=2079_22 StaticText \"Last day change\"\n    uid=2079_23 StaticText \"+606.45 (+0.72%)\"\n  uid=2079_24 row \"V7 table-cell-width-negative-v6-v1 DIMENSION 0.00\"\n    uid=2079_25 StaticText \"V7 table-cell-width-negative-v6-v1\"\n    uid=2079_26 button \"Hide data\"\n    uid=2082_11 StaticText \"DIMENSION\"\n    uid=2082_12 StaticText \"0.00\"\n  uid=2082_13 button \"Close Replay Trading\"\n  uid=2082_14 button \"Open context menu\" expandable haspopup=\"menu\"\n  uid=2082_15 button \"Collapse panel\"\n  uid=2082_16 button \"Maximize panel\"\n  uid=2082_17 generic\n    uid=2082_18 tab selectable selected\n    uid=2082_19 tab selectable\n  uid=2073_128 generic \"Trading panel\"\n    uid=2073_129 generic\n  uid=2073_130 generic live=\"polite\" relevant=\"additions\"\n  uid=2073_131 generic live=\"polite\" relevant=\"additions\"\n  uid=2073_132 generic live=\"assertive\" relevant=\"additions\"\n  uid=2073_133 generic live=\"assertive\" relevant=\"additions\"\n  uid=2082_20 StaticText \"Bar replay\"\n  uid=2073_134 generic live=\"polite\" relevant=\"additions text\"\n  uid=2073_135 log live=\"polite\" relevant=\"additions text\"\n  uid=2073_136 log live=\"polite\" relevant=\"additions text\"\n  uid=2073_137 log live=\"polite\" relevant=\"additions text\"\n  uid=2073_138 log live=\"polite\" relevant=\"additions text\"\n  uid=2073_139 log live=\"polite\" relevant=\"additions text\"\n  uid=2073_140 log live=\"polite\" relevant=\"additions text\"\n  uid=2073_141 log live=\"polite\" relevant=\"additions text\"\n  uid=2073_142 log live=\"polite\" relevant=\"additions text\"\n  uid=2073_143 log live=\"polite\" relevant=\"additions text\"\n  uid=2073_144 log live=\"polite\" relevant=\"additions text\"\n  uid=2073_145 log live=\"polite\" relevant=\"additions text\"\n  uid=2073_146 log live=\"polite\" relevant=\"additions text\"\n  uid=2073_147 log live=\"polite\" relevant=\"additions text\"\n  uid=2073_148 log live=\"polite\" relevant=\"additions text\"\n  uid=2073_149 log live=\"polite\" relevant=\"additions text\"\n  uid=2073_150 log live=\"polite\" relevant=\"additions text\"\n  uid=2073_151 log live=\"polite\" relevant=\"additions text\"\n  uid=2073_152 log live=\"polite\" relevant=\"additions text\"\n  uid=2073_153 log live=\"polite\" relevant=\"additions text\"\n  uid=2073_154 log live=\"polite\" relevant=\"additions text\"\n  uid=2073_155 log live=\"polite\" relevant=\"additions text\"\n"
+}

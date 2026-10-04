@@ -85279,5 +85279,1707 @@
     "first_historical_values": {},
     "last_historical_values": {},
     "data_window_witness": "captures/v7/evidence/native-error-text-log-unmatched-right-v6-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "script": "table-cell-width-negative-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "a4fdb59676ccfda70fdae70c147dca9269742eb08849d9d3a0df3b2c0dafef4c",
+    "indicator_title": "V7 table-cell-width-negative-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/table-cell-width-negative-v6-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T181339.569.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 table-cell-width-negative-v6-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24487,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24787,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T10:13:29.673Z",
+    "live_candle_open_utc": "2026-10-04T10:12:00.000Z",
+    "export_utc": "2026-10-04T10:13:40.002Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/table-cell-width-negative-v6-v1-attempt1-setup.png",
+      "captures/v7/evidence/table-cell-width-negative-v6-v1-attempt1-export.png",
+      "captures/v7/evidence/table-cell-width-negative-v6-v1-attempt1-logs.txt",
+      "captures/v7/evidence/table-cell-width-negative-v6-v1-attempt1-logs-v1.json",
+      "captures/v7/evidence/table-cell-width-negative-v6-v1-attempt1-logs.png",
+      "captures/v7/evidence/table-cell-width-negative-v6-v1-attempt1-visual.png",
+      "captures/v7/evidence/table-cell-width-negative-v6-v1-attempt1-data-window-v1.png",
+      "captures/v7/evidence/table-cell-width-negative-v6-v1-attempt1-data-window-v1.json",
+      "captures/v7/evidence/table-cell-width-negative-v6-v1-attempt1-data-window-v1.txt",
+      "captures/v7/evidence/table-cell-width-negative-v6-v1-attempt1-table-phase-step0-v1.json",
+      "captures/v7/evidence/table-cell-width-negative-v6-v1-attempt1-table-phase-step0-v1.png",
+      "captures/v7/evidence/table-cell-width-negative-v6-v1-attempt1-table-phase-step1-v1.json",
+      "captures/v7/evidence/table-cell-width-negative-v6-v1-attempt1-table-phase-step1-v1.png",
+      "captures/v7/evidence/table-cell-width-negative-v6-v1-attempt1-table-phase-step2-v1.json",
+      "captures/v7/evidence/table-cell-width-negative-v6-v1-attempt1-table-phase-step2-v1.png",
+      "captures/v7/evidence/table-cell-width-negative-v6-v1-attempt1-table-phase-step3-v1.json",
+      "captures/v7/evidence/table-cell-width-negative-v6-v1-attempt1-table-phase-step3-v1.png",
+      "captures/v7/evidence/table-cell-width-negative-v6-v1-attempt1-table-phase-step4-v1.json",
+      "captures/v7/evidence/table-cell-width-negative-v6-v1-attempt1-table-phase-step4-v1.png",
+      "captures/v7/evidence/table-cell-width-negative-v6-v1-attempt1-table-phase-step5-v1.json",
+      "captures/v7/evidence/table-cell-width-negative-v6-v1-attempt1-table-phase-step5-v1.png",
+      "captures/v7/evidence/table-cell-width-negative-v6-v1-attempt1-table-phase-step6-v1.json",
+      "captures/v7/evidence/table-cell-width-negative-v6-v1-attempt1-table-phase-step6-v1.png",
+      "captures/v7/evidence/table-cell-width-negative-v6-v1-attempt1-table-phase-step7-v1.json",
+      "captures/v7/evidence/table-cell-width-negative-v6-v1-attempt1-table-phase-step7-v1.png",
+      "captures/v7/evidence/table-cell-width-negative-v6-v1-attempt1-table-phase-step8-v1.json",
+      "captures/v7/evidence/table-cell-width-negative-v6-v1-attempt1-table-phase-step8-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T10:13:30.649Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790803560,
+            83727.82,
+            83752.01,
+            83727.81,
+            83752,
+            2.76889
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791108720,
+            85245.9,
+            85245.91,
+            85223.49,
+            85223.49,
+            8.31357
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 table-cell-width-negative-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790803560,
+                -1
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791108720,
+                0
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T10:13:31.817Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790803560,
+            83727.82,
+            83752.01,
+            83727.81,
+            83752,
+            2.76889
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791108720,
+            85245.9,
+            85245.91,
+            85223.49,
+            85223.49,
+            8.31357
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 table-cell-width-negative-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24787,
+            "first": {
+              "index": -1022243,
+              "value": [
+                1788134400,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791108720,
+                0
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T10:13:32.782Z",
+        "bars": 24787,
+        "end": true,
+        "first": {
+          "index": -24487,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791108720,
+            85245.9,
+            85245.91,
+            85223.49,
+            85223.49,
+            8.33338
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 table-cell-width-negative-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24787,
+            "first": {
+              "index": -24487,
+              "value": [
+                1788134400,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791108720,
+                0
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   10:12",
+    "historical_compare_before_unix_seconds": 1791108720,
+    "pine_logs": {
+      "paths": [
+        "evidence/table-cell-width-negative-v6-v1-attempt1-logs.txt",
+        "evidence/table-cell-width-negative-v6-v1-attempt1-logs-v1.json",
+        "evidence/table-cell-width-negative-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "e5b4a2a564b47cd85562822ff3cf0939f9d1e1b03368fb0fa7feb792f866856f",
+    "csv_bytes": 1149411,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "DIMENSION"
+    ],
+    "declared_to_native_header_mapping": {
+      "DIMENSION": "DIMENSION"
+    },
+    "csv_rows": 24787,
+    "historical_rows": 24786,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791108720,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791108720",
+    "first_historical_values": {
+      "DIMENSION": "0"
+    },
+    "last_historical_values": {
+      "DIMENSION": "0"
+    },
+    "data_window_witness": "captures/v7/evidence/table-cell-width-negative-v6-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "script": "table-cell-height-negative-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "c03cccd3986bdce1c63b1a8b5837798004ddb449d7e55d986e17425c1100fde1",
+    "indicator_title": "V7 table-cell-height-negative-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/table-cell-height-negative-v6-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T182210.532.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 table-cell-height-negative-v6-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24491,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24792,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T10:21:58.994Z",
+    "live_candle_open_utc": "2026-10-04T10:22:00.000Z",
+    "export_utc": "2026-10-04T10:22:11.122Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/table-cell-height-negative-v6-v1-attempt1-setup.png",
+      "captures/v7/evidence/table-cell-height-negative-v6-v1-attempt1-export.png",
+      "captures/v7/evidence/table-cell-height-negative-v6-v1-attempt1-logs.txt",
+      "captures/v7/evidence/table-cell-height-negative-v6-v1-attempt1-logs-v1.json",
+      "captures/v7/evidence/table-cell-height-negative-v6-v1-attempt1-logs.png",
+      "captures/v7/evidence/table-cell-height-negative-v6-v1-attempt1-visual.png",
+      "captures/v7/evidence/table-cell-height-negative-v6-v1-attempt1-data-window-v1.png",
+      "captures/v7/evidence/table-cell-height-negative-v6-v1-attempt1-data-window-v1.json",
+      "captures/v7/evidence/table-cell-height-negative-v6-v1-attempt1-data-window-v1.txt",
+      "captures/v7/evidence/table-cell-height-negative-v6-v1-attempt1-table-phase-step0-v1.json",
+      "captures/v7/evidence/table-cell-height-negative-v6-v1-attempt1-table-phase-step0-v1.png",
+      "captures/v7/evidence/table-cell-height-negative-v6-v1-attempt1-table-phase-step1-v1.json",
+      "captures/v7/evidence/table-cell-height-negative-v6-v1-attempt1-table-phase-step1-v1.png",
+      "captures/v7/evidence/table-cell-height-negative-v6-v1-attempt1-table-phase-step2-v1.json",
+      "captures/v7/evidence/table-cell-height-negative-v6-v1-attempt1-table-phase-step2-v1.png",
+      "captures/v7/evidence/table-cell-height-negative-v6-v1-attempt1-table-phase-step3-v1.json",
+      "captures/v7/evidence/table-cell-height-negative-v6-v1-attempt1-table-phase-step3-v1.png",
+      "captures/v7/evidence/table-cell-height-negative-v6-v1-attempt1-table-phase-step4-v1.json",
+      "captures/v7/evidence/table-cell-height-negative-v6-v1-attempt1-table-phase-step4-v1.png",
+      "captures/v7/evidence/table-cell-height-negative-v6-v1-attempt1-table-phase-step5-v1.json",
+      "captures/v7/evidence/table-cell-height-negative-v6-v1-attempt1-table-phase-step5-v1.png",
+      "captures/v7/evidence/table-cell-height-negative-v6-v1-attempt1-table-phase-step6-v1.json",
+      "captures/v7/evidence/table-cell-height-negative-v6-v1-attempt1-table-phase-step6-v1.png",
+      "captures/v7/evidence/table-cell-height-negative-v6-v1-attempt1-table-phase-step7-v1.json",
+      "captures/v7/evidence/table-cell-height-negative-v6-v1-attempt1-table-phase-step7-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T10:22:00.017Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790804040,
+            83768.01,
+            83798.89,
+            83768,
+            83798.89,
+            4.22242
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791109200,
+            85390,
+            85391.89,
+            85360,
+            85378,
+            7.68564
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 table-cell-height-negative-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790804040,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791109200,
+                0
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T10:22:01.273Z",
+        "bars": 24791,
+        "end": true,
+        "first": {
+          "index": -24491,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791109200,
+            85390,
+            85391.89,
+            85360,
+            85378.01,
+            7.75132
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 table-cell-height-negative-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24791,
+            "first": {
+              "index": -24491,
+              "value": [
+                1788134400,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791109200,
+                0
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   10:22",
+    "historical_compare_before_unix_seconds": 1791109320,
+    "pine_logs": {
+      "paths": [
+        "evidence/table-cell-height-negative-v6-v1-attempt1-logs.txt",
+        "evidence/table-cell-height-negative-v6-v1-attempt1-logs-v1.json",
+        "evidence/table-cell-height-negative-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "8e762dd739e23e077c32bcc86ef70f0c4c951cac0b2b37a6e7c2659edea927b2",
+    "csv_bytes": 1149638,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "DIMENSION"
+    ],
+    "declared_to_native_header_mapping": {
+      "DIMENSION": "DIMENSION"
+    },
+    "csv_rows": 24792,
+    "historical_rows": 24791,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791109320,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791109320",
+    "first_historical_values": {
+      "DIMENSION": "0"
+    },
+    "last_historical_values": {
+      "DIMENSION": "0"
+    },
+    "data_window_witness": "captures/v7/evidence/table-cell-height-negative-v6-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "script": "table-cell-width-missing-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "ce10d80ffd224f4ecac12892a350dd5813b1f604697abeb921c8f25a8add26be",
+    "indicator_title": "V7 table-cell-width-missing-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/table-cell-width-missing-v6-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T182340.420.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 table-cell-width-missing-v6-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24492,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24792,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T10:23:29.764Z",
+    "live_candle_open_utc": "2026-10-04T10:22:00.000Z",
+    "export_utc": "2026-10-04T10:23:40.840Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/table-cell-width-missing-v6-v1-attempt1-setup.png",
+      "captures/v7/evidence/table-cell-width-missing-v6-v1-attempt1-export.png",
+      "captures/v7/evidence/table-cell-width-missing-v6-v1-attempt1-logs.txt",
+      "captures/v7/evidence/table-cell-width-missing-v6-v1-attempt1-logs-v1.json",
+      "captures/v7/evidence/table-cell-width-missing-v6-v1-attempt1-logs.png",
+      "captures/v7/evidence/table-cell-width-missing-v6-v1-attempt1-visual.png",
+      "captures/v7/evidence/table-cell-width-missing-v6-v1-attempt1-data-window-v1.png",
+      "captures/v7/evidence/table-cell-width-missing-v6-v1-attempt1-data-window-v1.json",
+      "captures/v7/evidence/table-cell-width-missing-v6-v1-attempt1-data-window-v1.txt",
+      "captures/v7/evidence/table-cell-width-missing-v6-v1-attempt1-table-phase-step0-v1.json",
+      "captures/v7/evidence/table-cell-width-missing-v6-v1-attempt1-table-phase-step0-v1.png",
+      "captures/v7/evidence/table-cell-width-missing-v6-v1-attempt1-table-phase-step1-v1.json",
+      "captures/v7/evidence/table-cell-width-missing-v6-v1-attempt1-table-phase-step1-v1.png",
+      "captures/v7/evidence/table-cell-width-missing-v6-v1-attempt1-table-phase-step2-v1.json",
+      "captures/v7/evidence/table-cell-width-missing-v6-v1-attempt1-table-phase-step2-v1.png",
+      "captures/v7/evidence/table-cell-width-missing-v6-v1-attempt1-table-phase-step3-v1.json",
+      "captures/v7/evidence/table-cell-width-missing-v6-v1-attempt1-table-phase-step3-v1.png",
+      "captures/v7/evidence/table-cell-width-missing-v6-v1-attempt1-table-phase-step4-v1.json",
+      "captures/v7/evidence/table-cell-width-missing-v6-v1-attempt1-table-phase-step4-v1.png",
+      "captures/v7/evidence/table-cell-width-missing-v6-v1-attempt1-table-phase-step5-v1.json",
+      "captures/v7/evidence/table-cell-width-missing-v6-v1-attempt1-table-phase-step5-v1.png",
+      "captures/v7/evidence/table-cell-width-missing-v6-v1-attempt1-table-phase-step6-v1.json",
+      "captures/v7/evidence/table-cell-width-missing-v6-v1-attempt1-table-phase-step6-v1.png",
+      "captures/v7/evidence/table-cell-width-missing-v6-v1-attempt1-table-phase-step7-v1.json",
+      "captures/v7/evidence/table-cell-width-missing-v6-v1-attempt1-table-phase-step7-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T10:23:30.946Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790804160,
+            83798.88,
+            83816.05,
+            83788,
+            83788,
+            6.90763
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791109320,
+            85378,
+            85405.69,
+            85378,
+            85388,
+            10.71086
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 table-cell-width-missing-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2507,
+            "first": {
+              "index": -1000281,
+              "value": [
+                1790765640,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791109320,
+                0
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T10:23:32.188Z",
+        "bars": 24792,
+        "end": true,
+        "first": {
+          "index": -24492,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791109320,
+            85378,
+            85405.69,
+            85378,
+            85388,
+            10.71778
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 table-cell-width-missing-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 21693,
+            "first": {
+              "index": -24492,
+              "value": [
+                1788134400,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791109320,
+                0
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   10:22",
+    "historical_compare_before_unix_seconds": 1791109320,
+    "pine_logs": {
+      "paths": [
+        "evidence/table-cell-width-missing-v6-v1-attempt1-logs.txt",
+        "evidence/table-cell-width-missing-v6-v1-attempt1-logs-v1.json",
+        "evidence/table-cell-width-missing-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "e88a9735780e2d269892a6ae075450c51ed2e6159e3e227ff2f6efa71a499c17",
+    "csv_bytes": 1143446,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "DIMENSION"
+    ],
+    "declared_to_native_header_mapping": {
+      "DIMENSION": "DIMENSION"
+    },
+    "csv_rows": 24792,
+    "historical_rows": 24791,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791109320,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791109320",
+    "first_historical_values": {
+      "DIMENSION": "0"
+    },
+    "last_historical_values": {
+      "DIMENSION": "0"
+    },
+    "data_window_witness": "captures/v7/evidence/table-cell-width-missing-v6-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "script": "table-cell-height-missing-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "4ce1af5decc0333814501df90e986108b830c5d2bc21f71ea723338de3cc2c1b",
+    "indicator_title": "V7 table-cell-height-missing-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/table-cell-height-missing-v6-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T182542.505.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 table-cell-height-missing-v6-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24493,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24793,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T10:25:32.494Z",
+    "live_candle_open_utc": "2026-10-04T10:24:00.000Z",
+    "export_utc": "2026-10-04T10:25:42.678Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/table-cell-height-missing-v6-v1-attempt1-setup.png",
+      "captures/v7/evidence/table-cell-height-missing-v6-v1-attempt1-export.png",
+      "captures/v7/evidence/table-cell-height-missing-v6-v1-attempt1-logs.txt",
+      "captures/v7/evidence/table-cell-height-missing-v6-v1-attempt1-logs-v1.json",
+      "captures/v7/evidence/table-cell-height-missing-v6-v1-attempt1-logs.png",
+      "captures/v7/evidence/table-cell-height-missing-v6-v1-attempt1-visual.png",
+      "captures/v7/evidence/table-cell-height-missing-v6-v1-attempt1-data-window-v1.png",
+      "captures/v7/evidence/table-cell-height-missing-v6-v1-attempt1-data-window-v1.json",
+      "captures/v7/evidence/table-cell-height-missing-v6-v1-attempt1-data-window-v1.txt",
+      "captures/v7/evidence/table-cell-height-missing-v6-v1-attempt1-table-phase-step0-v1.json",
+      "captures/v7/evidence/table-cell-height-missing-v6-v1-attempt1-table-phase-step0-v1.png",
+      "captures/v7/evidence/table-cell-height-missing-v6-v1-attempt1-table-phase-step1-v1.json",
+      "captures/v7/evidence/table-cell-height-missing-v6-v1-attempt1-table-phase-step1-v1.png",
+      "captures/v7/evidence/table-cell-height-missing-v6-v1-attempt1-table-phase-step2-v1.json",
+      "captures/v7/evidence/table-cell-height-missing-v6-v1-attempt1-table-phase-step2-v1.png",
+      "captures/v7/evidence/table-cell-height-missing-v6-v1-attempt1-table-phase-step3-v1.json",
+      "captures/v7/evidence/table-cell-height-missing-v6-v1-attempt1-table-phase-step3-v1.png",
+      "captures/v7/evidence/table-cell-height-missing-v6-v1-attempt1-table-phase-step4-v1.json",
+      "captures/v7/evidence/table-cell-height-missing-v6-v1-attempt1-table-phase-step4-v1.png",
+      "captures/v7/evidence/table-cell-height-missing-v6-v1-attempt1-table-phase-step5-v1.json",
+      "captures/v7/evidence/table-cell-height-missing-v6-v1-attempt1-table-phase-step5-v1.png",
+      "captures/v7/evidence/table-cell-height-missing-v6-v1-attempt1-table-phase-step6-v1.json",
+      "captures/v7/evidence/table-cell-height-missing-v6-v1-attempt1-table-phase-step6-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T10:25:33.392Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790804280,
+            83788.01,
+            83790.01,
+            83759.74,
+            83759.74,
+            8.74363
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791109440,
+            85375.09,
+            85388.01,
+            85375.08,
+            85388.01,
+            2.12364
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 table-cell-height-missing-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2507,
+            "first": {
+              "index": -1000281,
+              "value": [
+                1790765760,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791109440,
+                0
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T10:25:34.696Z",
+        "bars": 24793,
+        "end": true,
+        "first": {
+          "index": -24493,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791109440,
+            85375.09,
+            85395.98,
+            85375.08,
+            85395.98,
+            3.43806
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 table-cell-height-missing-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 21694,
+            "first": {
+              "index": -24493,
+              "value": [
+                1788134400,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791109440,
+                0
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   10:24",
+    "historical_compare_before_unix_seconds": 1791109440,
+    "pine_logs": {
+      "paths": [
+        "evidence/table-cell-height-missing-v6-v1-attempt1-logs.txt",
+        "evidence/table-cell-height-missing-v6-v1-attempt1-logs-v1.json",
+        "evidence/table-cell-height-missing-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "c5b2295d9708e838476f23ff4493d478455073a5e61906859f7267240e7400bb",
+    "csv_bytes": 1143492,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "DIMENSION"
+    ],
+    "declared_to_native_header_mapping": {
+      "DIMENSION": "DIMENSION"
+    },
+    "csv_rows": 24793,
+    "historical_rows": 24792,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791109440,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791109440",
+    "first_historical_values": {
+      "DIMENSION": "0"
+    },
+    "last_historical_values": {
+      "DIMENSION": "0"
+    },
+    "data_window_witness": "captures/v7/evidence/table-cell-height-missing-v6-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "script": "table-cell-width-overflow-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "c1a5ddb0a2d192c43d306a6de0d249e5a0ab4ba08008c9ac1efca6c63b9e6725",
+    "indicator_title": "V7 table-cell-width-overflow-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/table-cell-width-overflow-v6-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T182653.186.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 table-cell-width-overflow-v6-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24494,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24794,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T10:26:42.565Z",
+    "live_candle_open_utc": "2026-10-04T10:26:00.000Z",
+    "export_utc": "2026-10-04T10:26:53.583Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/table-cell-width-overflow-v6-v1-attempt1-setup.png",
+      "captures/v7/evidence/table-cell-width-overflow-v6-v1-attempt1-export.png",
+      "captures/v7/evidence/table-cell-width-overflow-v6-v1-attempt1-logs.txt",
+      "captures/v7/evidence/table-cell-width-overflow-v6-v1-attempt1-logs-v1.json",
+      "captures/v7/evidence/table-cell-width-overflow-v6-v1-attempt1-logs.png",
+      "captures/v7/evidence/table-cell-width-overflow-v6-v1-attempt1-visual.png",
+      "captures/v7/evidence/table-cell-width-overflow-v6-v1-attempt1-data-window-v1.png",
+      "captures/v7/evidence/table-cell-width-overflow-v6-v1-attempt1-data-window-v1.json",
+      "captures/v7/evidence/table-cell-width-overflow-v6-v1-attempt1-data-window-v1.txt",
+      "captures/v7/evidence/table-cell-width-overflow-v6-v1-attempt1-table-phase-step0-v1.json",
+      "captures/v7/evidence/table-cell-width-overflow-v6-v1-attempt1-table-phase-step0-v1.png",
+      "captures/v7/evidence/table-cell-width-overflow-v6-v1-attempt1-table-phase-step1-v1.json",
+      "captures/v7/evidence/table-cell-width-overflow-v6-v1-attempt1-table-phase-step1-v1.png",
+      "captures/v7/evidence/table-cell-width-overflow-v6-v1-attempt1-table-phase-step2-v1.json",
+      "captures/v7/evidence/table-cell-width-overflow-v6-v1-attempt1-table-phase-step2-v1.png",
+      "captures/v7/evidence/table-cell-width-overflow-v6-v1-attempt1-table-phase-step3-v1.json",
+      "captures/v7/evidence/table-cell-width-overflow-v6-v1-attempt1-table-phase-step3-v1.png",
+      "captures/v7/evidence/table-cell-width-overflow-v6-v1-attempt1-table-phase-step4-v1.json",
+      "captures/v7/evidence/table-cell-width-overflow-v6-v1-attempt1-table-phase-step4-v1.png",
+      "captures/v7/evidence/table-cell-width-overflow-v6-v1-attempt1-table-phase-step5-v1.json",
+      "captures/v7/evidence/table-cell-width-overflow-v6-v1-attempt1-table-phase-step5-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T10:26:43.495Z",
+        "bars": 2556,
+        "end": false,
+        "first": {
+          "index": -2256,
+          "value": [
+            1790802960,
+            83744,
+            83786,
+            83734.87,
+            83785.99,
+            13.94377
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791109560,
+            85395.99,
+            85396,
+            85385.62,
+            85389.9,
+            1.97511
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 table-cell-width-overflow-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2519,
+            "first": {
+              "index": -1000282,
+              "value": [
+                1790764320,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791109560,
+                0
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T10:26:44.836Z",
+        "bars": 24794,
+        "end": true,
+        "first": {
+          "index": -24494,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791109560,
+            85395.99,
+            85396,
+            85385.62,
+            85389.7,
+            8.2247
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 table-cell-width-overflow-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 21695,
+            "first": {
+              "index": -24494,
+              "value": [
+                1788134400,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791109560,
+                0
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   10:26",
+    "historical_compare_before_unix_seconds": 1791109560,
+    "pine_logs": {
+      "paths": [
+        "evidence/table-cell-width-overflow-v6-v1-attempt1-logs.txt",
+        "evidence/table-cell-width-overflow-v6-v1-attempt1-logs-v1.json",
+        "evidence/table-cell-width-overflow-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "d2d9659b9e150ad4c3fcbb9460cdfb98205e3dc3a715ee1e9bdcd0d02a83339a",
+    "csv_bytes": 1143535,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "DIMENSION"
+    ],
+    "declared_to_native_header_mapping": {
+      "DIMENSION": "DIMENSION"
+    },
+    "csv_rows": 24794,
+    "historical_rows": 24793,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791109560,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791109560",
+    "first_historical_values": {
+      "DIMENSION": "0"
+    },
+    "last_historical_values": {
+      "DIMENSION": "0"
+    },
+    "data_window_witness": "captures/v7/evidence/table-cell-width-overflow-v6-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "script": "table-cell-height-overflow-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "7505e75615b02905e5f330c47ff282c4bd86c0ed83aba8785e4599f567ce0be7",
+    "indicator_title": "V7 table-cell-height-overflow-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/table-cell-height-overflow-v6-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T182801.103.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 table-cell-height-overflow-v6-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24494,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24795,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T10:27:51.909Z",
+    "live_candle_open_utc": "2026-10-04T10:26:00.000Z",
+    "export_utc": "2026-10-04T10:28:01.425Z",
+    "live_boundary_confirmed_unchanged": false,
+    "evidence_files": [
+      "captures/v7/evidence/table-cell-height-overflow-v6-v1-attempt1-setup.png",
+      "captures/v7/evidence/table-cell-height-overflow-v6-v1-attempt1-export.png",
+      "captures/v7/evidence/table-cell-height-overflow-v6-v1-attempt1-logs.txt",
+      "captures/v7/evidence/table-cell-height-overflow-v6-v1-attempt1-logs-v1.json",
+      "captures/v7/evidence/table-cell-height-overflow-v6-v1-attempt1-logs.png",
+      "captures/v7/evidence/table-cell-height-overflow-v6-v1-attempt1-visual.png",
+      "captures/v7/evidence/table-cell-height-overflow-v6-v1-attempt1-data-window-v1.png",
+      "captures/v7/evidence/table-cell-height-overflow-v6-v1-attempt1-data-window-v1.json",
+      "captures/v7/evidence/table-cell-height-overflow-v6-v1-attempt1-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T10:27:52.670Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790804400,
+            83759.74,
+            83759.75,
+            83744,
+            83748.5,
+            5.56963
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791109560,
+            85395.99,
+            85406,
+            85385.62,
+            85405.99,
+            19.72866
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 table-cell-height-overflow-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2507,
+            "first": {
+              "index": -1000281,
+              "value": [
+                1790765880,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791109560,
+                0
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T10:27:53.913Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790804400,
+            83759.74,
+            83759.75,
+            83744,
+            83748.5,
+            5.56963
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791109560,
+            85395.99,
+            85406,
+            85385.62,
+            85405.99,
+            19.72866
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 table-cell-height-overflow-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 21695,
+            "first": {
+              "index": -1019469,
+              "value": [
+                1788134400,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791109560,
+                0
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T10:27:54.802Z",
+        "bars": 24794,
+        "end": true,
+        "first": {
+          "index": -24494,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791109560,
+            85395.99,
+            85406,
+            85385.62,
+            85405.98,
+            19.74208
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 table-cell-height-overflow-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 21695,
+            "first": {
+              "index": -24494,
+              "value": [
+                1788134400,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791109560,
+                0
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   10:26",
+    "historical_compare_before_unix_seconds": 1791109560,
+    "pine_logs": {
+      "paths": [
+        "evidence/table-cell-height-overflow-v6-v1-attempt1-logs.txt",
+        "evidence/table-cell-height-overflow-v6-v1-attempt1-logs-v1.json",
+        "evidence/table-cell-height-overflow-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "04003e02039a24a18e53bbc76e23c8407fad9e9b810806361f2dd5210f5f6ccb",
+    "csv_bytes": 1143538,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "DIMENSION"
+    ],
+    "declared_to_native_header_mapping": {
+      "DIMENSION": "DIMENSION"
+    },
+    "csv_rows": 24794,
+    "historical_rows": 24793,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791109560,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791109560",
+    "first_historical_values": {
+      "DIMENSION": "0"
+    },
+    "last_historical_values": {
+      "DIMENSION": "0"
+    },
+    "data_window_witness": "captures/v7/evidence/table-cell-height-overflow-v6-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "script": "table-cell-height-overflow-v6-v1.pine",
+    "attempt": 2,
+    "source_sha256": "7505e75615b02905e5f330c47ff282c4bd86c0ed83aba8785e4599f567ce0be7",
+    "indicator_title": "V7 table-cell-height-overflow-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/table-cell-height-overflow-v6-v1-attempt2.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T182836.561.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 table-cell-height-overflow-v6-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24495,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24795,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T10:28:26.578Z",
+    "live_candle_open_utc": "2026-10-04T10:28:00.000Z",
+    "export_utc": "2026-10-04T10:28:36.842Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/table-cell-height-overflow-v6-v1-attempt2-setup.png",
+      "captures/v7/evidence/table-cell-height-overflow-v6-v1-attempt2-export.png",
+      "captures/v7/evidence/table-cell-height-overflow-v6-v1-attempt2-logs.txt",
+      "captures/v7/evidence/table-cell-height-overflow-v6-v1-attempt2-logs-v1.json",
+      "captures/v7/evidence/table-cell-height-overflow-v6-v1-attempt2-logs.png",
+      "captures/v7/evidence/table-cell-height-overflow-v6-v1-attempt2-visual.png",
+      "captures/v7/evidence/table-cell-height-overflow-v6-v1-attempt2-data-window-v1.png",
+      "captures/v7/evidence/table-cell-height-overflow-v6-v1-attempt2-data-window-v1.json",
+      "captures/v7/evidence/table-cell-height-overflow-v6-v1-attempt2-data-window-v1.txt",
+      "captures/v7/evidence/table-cell-height-overflow-v6-v1-attempt2-table-phase-step0-v1.json",
+      "captures/v7/evidence/table-cell-height-overflow-v6-v1-attempt2-table-phase-step0-v1.png",
+      "captures/v7/evidence/table-cell-height-overflow-v6-v1-attempt2-table-phase-step1-v1.json",
+      "captures/v7/evidence/table-cell-height-overflow-v6-v1-attempt2-table-phase-step1-v1.png",
+      "captures/v7/evidence/table-cell-height-overflow-v6-v1-attempt2-table-phase-step2-v1.json",
+      "captures/v7/evidence/table-cell-height-overflow-v6-v1-attempt2-table-phase-step2-v1.png",
+      "captures/v7/evidence/table-cell-height-overflow-v6-v1-attempt2-table-phase-step3-v1.json",
+      "captures/v7/evidence/table-cell-height-overflow-v6-v1-attempt2-table-phase-step3-v1.png",
+      "captures/v7/evidence/table-cell-height-overflow-v6-v1-attempt2-table-phase-step4-v1.json",
+      "captures/v7/evidence/table-cell-height-overflow-v6-v1-attempt2-table-phase-step4-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T10:28:27.609Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790804520,
+            83748.51,
+            83756.89,
+            83740.45,
+            83740.45,
+            2.89956
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791109680,
+            85408,
+            85414.51,
+            85408,
+            85414.5,
+            0.7423
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 table-cell-height-overflow-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2507,
+            "first": {
+              "index": -1000281,
+              "value": [
+                1790766000,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791109680,
+                0
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T10:28:28.709Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790804520,
+            83748.51,
+            83756.89,
+            83740.45,
+            83740.45,
+            2.89956
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791109680,
+            85408,
+            85414.51,
+            85408,
+            85414.5,
+            0.77255
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 table-cell-height-overflow-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 21696,
+            "first": {
+              "index": -1019470,
+              "value": [
+                1788134400,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791109680,
+                0
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T10:28:29.592Z",
+        "bars": 24795,
+        "end": true,
+        "first": {
+          "index": -24495,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791109680,
+            85408,
+            85417.12,
+            85408,
+            85417.12,
+            1.40992
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 table-cell-height-overflow-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 21696,
+            "first": {
+              "index": -24495,
+              "value": [
+                1788134400,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791109680,
+                0
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   10:28",
+    "historical_compare_before_unix_seconds": 1791109680,
+    "pine_logs": {
+      "paths": [
+        "evidence/table-cell-height-overflow-v6-v1-attempt2-logs.txt",
+        "evidence/table-cell-height-overflow-v6-v1-attempt2-logs-v1.json",
+        "evidence/table-cell-height-overflow-v6-v1-attempt2-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "1675dd9992d7d32ecf142dba7637193db43e2aadac51622718a856a6d41a90de",
+    "csv_bytes": 1143581,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "DIMENSION"
+    ],
+    "declared_to_native_header_mapping": {
+      "DIMENSION": "DIMENSION"
+    },
+    "csv_rows": 24795,
+    "historical_rows": 24794,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791109680,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791109680",
+    "first_historical_values": {
+      "DIMENSION": "0"
+    },
+    "last_historical_values": {
+      "DIMENSION": "0"
+    },
+    "data_window_witness": "captures/v7/evidence/table-cell-height-overflow-v6-v1-attempt2-data-window-v1.json"
   }
 ]
