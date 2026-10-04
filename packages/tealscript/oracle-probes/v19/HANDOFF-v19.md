@@ -1,0 +1,14 @@
+# TradingView v19 provider/context capture handoff v1
+
+FROZEN: four indicator companions plus four exact paired original indicators. Canonical manifest: bundle-manifest-v3.json. All companions compile locally; native phases/values are UNSPECIFIED.
+
+1. Run `sha256sum -c SHA256SUMS`. Preserve all source bytes/versions/indentation. Remove previous indicators and capture each source separately.
+2. Read per-probe steps before capture. Pair the unchanged original with its companion under the SAME resolved chart symbol, type, timeframe, session, adjustment, timezone, currencies, mintick, entitlement, inputs, observed origin and cutoff. If original hidden context is unavailable, record that gap and make a new matched pair; never relabel it the old attempt.
+3. Record compile/runtime phase and complete first diagnostic/code/text/line/bar with screenshots. Guarded companions observe inputs only; they do not replace an original error such as rows(na).
+4. Export every numeric column in full precision with blanks/duplicate headers. Preserve raw chart OHLCV/time/end/index, execution-origin and availability observations, settings screenshots, capture time and strict live cutoff.
+5. Pivot: export paired direct feeds2/60/240/D/W through cutoff including weekly warmup. Companion CSV has61plots; requested full OHLCV/end/index/origin/last-index tuples for both gaps modes are in Pine Logs. Verify complete bounded log chunks. Exported first bar is not necessarily the original execution origin.
+6. Financial: use the original resolved equity, reporting currency and rvolLen. Capture nine exact provider fields in gaps_off and gaps_on plus NA masks, FX daily and chart-symbol daily volume/prior-SMA inputs. Direct FX/D raw history and original table/plots are mandatory for full reconstruction. Financial series are effective-time observations, not invented release dates; revisions require a contemporaneous matched pair.
+7. Footprints: preserve availability including original bar3, complete ordered volume rows/price bounds/buy/sell/total/delta/imbalance flags and POC/VAH/VAL/close-selected rows. CSV aggregates cannot reconstruct rows. Log bounds default0..31; obtain sequential bounded chunks, verify every ORDERED index against ROW_COUNT, and retain changing provider timestamps. Truncated logs leave omitted bars held. Record ticks/value-area/imbalance and original alert/settings observations; companions send no alerts.
+8. Return raw evidence in v19/captures/v19/ and write v19/captures/v19/RESPONSE-v19.md with hashes, matched pair IDs, phase, raw CSV/log/feed/settings paths and context gaps.
+
+No synthetic provider fixture, expected request close, inferred currency or guessed old developing tick supplies native authority. Derived footprint counters only cross-check observed inputs; original behavior is measured separately. Partial matched histories support only their bounded span. Late arrivals go to open v20.

@@ -1,0 +1,1220 @@
+// This source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © LivingDraculaOG
+
+//@version=5
+indicator('Pivot Candles', overlay=true, max_lines_count=500, max_labels_count=500, max_boxes_count=500)
+
+
+////////////////////////////////////////////////////////////////////}
+////# Variables
+////////////////////////////////////////////////////////////////////{
+redCandle  = close < open
+greenCandle =  close > open
+
+option_pivot1 = 'All'
+option_pivot2 = 'New only'
+option_pivot3 = 'None'
+option_pivot_label1 = 'Levels'
+option_pivot_label2 = 'Levels & Price'
+option_pivot_label3 = 'Price'
+
+t_PP = 'PP'
+t_R5 = 'R⁵'
+t_R4 = 'R⁴'
+t_R3 = 'R³'
+t_R2 = 'R²'
+t_R1 = 'R¹'
+t_S1 = 'S¹'
+t_S2 = 'S²'
+t_S3 = 'S³'
+t_S4 = 'S⁴'
+t_S5 = 'S⁵'
+t_BC = 'BC'
+t_TC = 'TC'
+
+c_none                  = color.new(color.black, 100)
+i_pivots_line_transp    = 30
+i_pivots_line_thickness = 1
+i_pivots_zone_transp    = 96
+
+patternLabelPosLow      = low - ta.atr(30) * 0.6
+patternLabelPosHigh     = high + ta.atr(30) * 0.6
+
+
+////////////////////////////////////////////////////////////////////}
+////# Inputs
+////////////////////////////////////////////////////////////////////{
+
+_group_Risk              = "Suitability and Risk Management"
+// User Inputs
+int   startYearInput            = input.int(1990, "Starting Year for Analysis", minval=1900, group = _group_Risk)
+// User-defined inputs
+float capitalInput              = input.float(2000, "($)", minval=0, group = _group_Risk, inline="capital environment")
+string fedStanceInput           = input.string("neutral", "Fed Stance", options=["neutral", "dovish", "hawkish"], group = _group_Risk, inline="capital environment", tooltip = "What amount of cash is unsettled in the account, is the fed lowering rates, keeping them the same, ect.")
+
+float riskToleranceInput        = input.float(0.25, "Risk (0-1)", minval=0, maxval=1, group = _group_Risk,  inline="risk", tooltip="Set your risk tolerance level between 0 and 1. A higher value indicates a greater willingness to take risks. For example, if investing in bonds, you might set this higher due to their lower risk profile. Conversely, for more volatile assets like stocks, you may want to set it lower based on your individual risk preference.")
+float maxDrawdownInput          = input.float(10.0, "Max Drawdown (%)", minval=0, group = _group_Risk, inline="risk", tooltip="Set the maximum allowable drawdown as a percentage. This value can help manage risk by limiting potential losses. For instance, if your maximum recorded drawdown is 15%, setting this to 10% can help smooth out risk for the quarter, allowing for more controlled trading decisions.")
+
+float marginRateInput           = input.float(0.8, "Rate (0-1)", minval=0.01, maxval=1, group = _group_Risk, inline="margin", tooltip="This sets the margin rate for trading.")
+float maintenanceRateInput      = input.float(0.25, "Maintenance (0-1)", minval=0, maxval=1, group = _group_Risk, inline="margin", tooltip="This sets the margin rate for trading and sets the maintenance margin required to keep a position open.")
+
+////////////////////////////////////////////////////////////////////}
+////# Inputs
+////////////////////////////////////////////////////////////////////{
+_group_ADX              = "ADX Prediction"
+// Core Parameters
+predictionLength        = input.int(15, "Prediction Length", 5, 100, group = _group_ADX, inline="core")
+lookbackPeriod          = input.int(30, "Lookback Period", 5, 200, group = _group_ADX, inline="core")
+smoothFactorLRC         = input.int(2, "Smoothing Factor (LRC)", 1, 10, group = _group_ADX, inline="core")
+smoothFactorPred        = input.int(2, "Smoothing Factor (Pred)", 1, 10, group = _group_ADX, inline="core")
+
+// Enhanced Prediction Settings
+squareSize              = input.float(0.5, "Square Size (%)", 0.1, 2.0, step=0.1, group = _group_ADX, inline="enhanced")
+minConfidence           = input.float(70, "Minimum Confidence %", 1, 100, group = _group_ADX, inline="enhanced")
+volatilityMultiplier    = input.float(2.0, "Volatility Multiplier", 0.1, 5.0, step=0.1, group = _group_ADX, inline="enhanced")
+
+// Multiple Timeframe Settings
+timeframe1              = input.timeframe("240", "Higher Timeframe 1", group = _group_ADX, inline="timeframe")
+timeframe2              = input.timeframe("60", "Higher Timeframe 2", group = _group_ADX, inline="timeframe")
+
+// ADX Parameters
+adxLength               = input.int(14, "ADX Length", 1, 50, group = _group_ADX, inline="ADX")
+diLength                = input.int(14, "DI Length", 1, 50, group = _group_ADX,  inline="ADX")
+
+
+////////////////////////////////////////////////////////////////////}
+////# Bollinger Bands
+////////////////////////////////////////////////////////////////////{
+_group_shortBands       = "Short Term"
+_group_longBands        = "Long Term"
+
+// First Bollinger Band setup
+displayBB1              = input.bool(false, title="Display BB Set 1", inline = "display", group=_group_shortBands)
+displayMA1              = input.bool(true, title="Display MA Set 1", inline = "display", group=_group_shortBands, tooltip="Bollinger Bands are a volatility indicator that consists of a middle band (moving average) and two outer bands (standard deviations). Mean reversion trading is based on the idea that prices will revert to their mean over time. Traders often buy when the price is below the lower band, anticipating a bounce back to the mean, and sell when the price is above the upper band, expecting a pullback to the mean. This setup is for short-term analysis.")
+timeframebb1              = input.timeframe("", title = "Timeframe Set 1", inline = "settings", group=_group_shortBands)
+maType1                 = input.string("SMA", title = "MA Type Set 1", options = ["DEMA", "EMA", "HMA", "LSMA", "RMA", "SMA", "SWMA", "TEMA", "TMA", "VWMA", "WMA"], inline = "settings", group=_group_shortBands)
+dataSource1             = input.source(close, title = "Data Source Set 1", inline = "settings", group=_group_shortBands)
+maPeriod1               = input.int(20, title = "MA Period Set 1", minval = 2, inline = "settings", group=_group_shortBands)
+stdDevMultiplier1       = input.float(2.0, title = "StdDev Multiplier Set 1", minval = 1, inline = "settings", group=_group_shortBands)
+offsetValue1            = input.int(0, title = "Offset Set 1", inline = "settings", group=_group_shortBands)
+
+// Second Bollinger Band setup
+displayBB2              = input.bool(false, title="Display BB Set 2", inline = "display", group = _group_longBands)
+displayMA2              = input.bool(true, title="Display MA Set 2", inline = "display", group = _group_longBands, tooltip="Bollinger Bands are a volatility indicator that consists of a middle band (moving average) and two outer bands (standard deviations). Mean reversion trading is based on the idea that prices will revert to their mean over time. Traders often buy when the price is below the lower band, anticipating a bounce back to the mean, and sell when the price is above the upper band, expecting a pullback to the mean. This setup is for long-term analysis.")
+timeframebb2              = input.timeframe("W", title = "Timeframe Set 2",inline = "settings", group = _group_longBands)
+maType2                 = input.string("HMA", title = "MA Type Set 2", options = ["DEMA", "EMA", "HMA", "LSMA", "RMA", "SMA", "SWMA", "TEMA", "TMA", "VWMA", "WMA"],inline = "settings", group = _group_longBands)
+dataSource2             = input.source(close, title = "Data Source Set 2",inline = "settings", group = _group_longBands)
+maPeriod2               = input.int(52, title = "MA Period Set 2", minval = 2,inline = "settings", group = _group_longBands)
+stdDevMultiplier2       = input.float(2.0, title = "StdDev Multiplier Set 2", minval = 1,inline = "settings", group = _group_longBands)
+offsetValue2            = input.int(0, title = "Offset Set 2",inline = "settings", group = _group_longBands)
+
+////////////////////////////////////////////////////////////////////}
+////# SUPPORT & RESISTENCE with Breakout
+////////////////////////////////////////////////////////////////////{
+
+_group_SR               = "Pivot Strikes Support and Resistance"
+
+usePivotTimeframe       = input.string('D', 'Pivots timeframe', group=_group_SR, inline="pivots", options=['60', '120', '240', '360', '720', 'D', 'W', 'M', '6M', '12M'])
+usePivotType            = input.string('Woodie', 'Type',        group=_group_SR, inline="pivots", options=['Traditional', 'Fibonacci', 'Woodie', 'Classic', 'DM', 'Camarilla', 'Expected Pivot Points'], tooltip="Technical analysts use pivot points to identify potential support and resistance levels. They may set buy stop orders above resistance levels and sell stop limit orders below support levels to capitalize on price movements. Some options traders use these to determine strikes for spreads.")
+
+i_pivots_line_style     = line.style_dotted               //input.string(line.style_dotted, 'Line style ', options=[line.style_solid, line.style_dotted, line.style_dashed])
+showPivots              = input.bool(false, 'Show', group=_group_SR, inline="0")
+showPreviousPivots      = true // = input.bool(true, 'Show',               group="pivots", inline="0")
+showPreviousPivots2     = input.bool(false, 'history',           group=_group_SR, inline="0")
+
+i_pivots_label_show     = input.bool(true, 'Labels', group= _group_SR, inline="label")
+i_pivots_label          = input.string(option_pivot_label2, '', options=[option_pivot_label1, option_pivot_label2, option_pivot_label3], group= _group_SR, inline='label')
+i_pivots_label_position = input.string('Right', '', options=['Right', 'Left'], group=_group_SR, inline="label")
+i_pivots_show_zone      = input.bool(true, 'BG', group=_group_SR, inline='label')
+
+i_show_resistance       = input.bool(false, 'Resistance',  inline='03', group=_group_SR)
+R1color                 = input.color(defval=color.new(#9698a1, 0), title='R1', inline='03', group=_group_SR)
+R2color                 = input.color(defval=color.new(#9698a1, 50), title='R2', inline='03', group=_group_SR)
+R3color                 = input.color(defval=color.new(#9698a1, 26), title='R3', inline='03', group=_group_SR)
+R4color                 = input.color(defval=color.new(#7cff01, 0), title='R4', inline='03', group=_group_SR, tooltip = 'These candles will change colors if the close is greater than R1, R2, R3, R4. You may change each color as needed.')
+
+i_show_support          = input.bool(false, 'Support',    group=_group_SR, inline='04')
+S1color                 = input.color(defval=color.new(#ff0303, 0), title='S1', inline='04', group=_group_SR)
+S2color                 = input.color(defval=color.new(#b50505, 50), title='S2', inline='04', group=_group_SR)
+S3color                 = input.color(defval=color.new(#880505, 30), title='S3', inline='04', group=_group_SR)
+S4color                 = input.color(defval=color.new(#000000, 0), title='S4', inline='04', group=_group_SR, tooltip = 'These candles will change colors if the close is less than S1, S2, S3, S4. You may change each color as needed.')
+
+////////////////////////////////////////////////////////////////////}
+////# Table
+// Spread Calculator
+////////////////////////////////////////////////////////////////////{
+_group_Spreads      = "Spread Calculator"
+useRound            = input(true, title = "Round?",inline = "00", group=_group_Spreads)
+hideTable           = input.bool(defval=false, title='Show Calculator', inline='00', group=_group_Spreads, tooltip='Use this calculator to quickly estimate buying and selling share prices relative to support/resistance pivots and statistical deviations. This tool can assist in trend-following or mean reversion strategies, allowing you to customize your approach based on your trading preferences.')
+
+string  i_tableYpos      = input.string("top",      "↕",             inline = "02", group = _group_Spreads, options = ["top", "middle", "bottom"])
+string  i_tableXpos      = input.string("right",    "↔",                inline = "02", group = _group_Spreads, options = ["left", "center", "right"], tooltip = "Position on the chart.")
+
+int     i_tableRowHeight = 0
+int     i_tableColWidth  = 0
+
+color   row_col                  = color.blue
+color   col_col                  = color.blue
+color   poscol                   = color.green
+color   neutralcolor             = color.gray
+color   negcol                   = color.red
+
+////////////////////////////////////////////////////////////////////}
+////# Weekly Data
+////////////////////////////////////////////////////////////////////{
+_group_Weekly                   = "Weekly Data"
+// Options to display the results
+bool  showTableInput            = input.bool(false, "Weekly Statistics & Position", group=_group_Weekly, inline ="tineframes", tooltip="This table displays weekly statistics related to your trading performance, including average returns, position sizes, and drawdowns. It helps you analyze data so you can create a trading strategy's that is effective over time. Use this information to make informed decisions about your trading approach and risk management.")
+string  i_PivotTableYpos        = input.string("bottom",      "↕",      inline = "01", group = _group_Weekly, options = ["top", "middle", "bottom"])
+string  i_PivotTableXpos        = input.string("right",    "↔",         inline = "01", group = _group_Weekly, options = ["left", "center", "right"], tooltip = "Position on the chart.")
+string  i_textSize              = input.string("Auto", "TXT", options = ["Auto", "Tiny", "Small", "Normal", "Large", "Huge"], inline = "01", group = _group_Weekly)
+
+// computed value of selected text size
+string  textSize                = i_textSize == "Auto" ? size.auto : i_textSize == "Tiny" ? size.tiny : i_textSize == "Small" ? size.small : i_textSize == "Normal" ? size.normal : i_textSize == "Large" ? size.large : size.huge
+
+// Options to filter returns by specific quarters
+bool q1Input                    = input.bool(false, "Q1", group=_group_Weekly, inline="Quarter")
+bool q2Input                    = input.bool(false, "Q2", group=_group_Weekly, inline="Quarter")
+bool q3Input                    = input.bool(false, "Q3", group=_group_Weekly, inline="Quarter")
+bool q4Input                    = input.bool(true,  "Q4", group=_group_Weekly, inline="Quarter", tooltip="Limit to individual quarters to accurately analyze trading performance. Note that triple witching weeks are highlighted in yellow, and the current week is always blue.")
+
+table_data ="Data Columns"
+// User inputs for showing/hiding table columns
+bool showPosSizeInput       = input.bool(true, "Show Position Size",          group = table_data, tooltip = "Toggle to show/hide Position Size column. This represents the size of the position taken in each trade, which can indicate the level of confidence or risk associated with the trade.")
+bool showKellyRatioInput    = input.bool(false, "Show Kelly Ratio",           group = table_data, tooltip = "Toggle to show/hide Kelly Ratio column. This ratio helps determine the optimal size of a series of bets to maximize logarithmic wealth.")
+bool showAdjKellyFracInput  = input.bool(false, "Show Adjusted Kelly Frac",   group = table_data, tooltip = "Toggle to show/hide Adjusted Kelly Fraction column. This is a modified version of the Kelly Ratio that accounts for risk aversion, providing a more conservative approach to position sizing.")
+
+
+bool showAvgInput         = input.bool(true, "Show Averages",                 group = table_data, tooltip = "Toggle to show/hide Averages column. This displays the average return for each week, providing insight into the overall performance trend.")
+bool showPosInput         = input.bool(true, "Show Percent Positive",         group = table_data, tooltip = "Toggle to show/hide Percent Positive column. This indicates the percentage of trades that were profitable, which is crucial for evaluating trading strategies.")
+bool showMaxDDInput       = input.bool(true, "Show Max Drawdown",             group = table_data, tooltip = "Toggle to show/hide Max Drawdown column. This shows the maximum observed loss from a peak to a trough, helping to understand the risk of significant losses.")
+
+bool showSharpeInput      = input.bool(false, "Show Sharpe Ratio",            group = table_data, tooltip = "Toggle to show/hide Sharpe Ratio column. This ratio measures risk-adjusted return, helping to evaluate the performance of an investment compared to its risk.")
+bool showSortinoInput     = input.bool(false, "Show Sortino Ratio",           group = table_data, tooltip = "Toggle to show/hide Sortino Ratio column. This is a variation of the Sharpe Ratio that only considers downside risk, providing a more accurate measure of risk-adjusted return.")
+bool showStDevInput       = input.bool(false, "Show Standard Deviation",      group = table_data, tooltip = "Toggle to show/hide Standard Deviation column. This measures the volatility of returns, indicating how much the returns deviate from the average.")
+
+bool showVaRInput         = input.bool(false, "Show Value at Risk (VaR)",     group = table_data, tooltip = "Toggle to show/hide Value at Risk column. VaR estimates the potential loss in value of a portfolio over a defined period for a given confidence interval, expressed as a percentage. It indicates the maximum expected loss under normal market conditions over a specified time frame, helping to assess the risk of significant losses without quantifying the exact dollar amount of that loss.")
+bool showCVaRInput        = input.bool(false, "Show Conditional VaR (CVaR)",  group = table_data, tooltip = "Toggle to show/hide Conditional VaR column. CVaR provides an average of losses that occur beyond the VaR threshold, giving insight into tail risk.")
+bool showTailRatioInput    = input.bool(false, "Show Tail Ratio",             group = table_data, tooltip = "Toggle to show/hide Tail Ratio column. This ratio assesses the risk of extreme losses compared to extreme gains, providing insight into the distribution of returns.")
+
+bool showEVInput          = input.bool(false, "Show Expected Value (EV)",      group = table_data, tooltip = "Toggle to show/hide Expected Value column. The Expected Value is a measure of the average outcome of a trade, helping to assess the potential profitability over time. A positive Expected Value indicates that the trade is expected to be profitable on average, while a negative Expected Value suggests that the trade is likely to result in a loss over time.")
+bool showNextPricesInput   = input.bool(false, "Show Expected Prices",        group = table_data, tooltip = "Toggle to show/hide Next Min and Max Expected Price columns. The Min and Max Expected Prices are calculated based on the current price, expected value (EV), and standard deviation (SD) of returns. These values can help traders set potential price targets or stop-loss levels for the upcoming week.")
+
+
+////////////////////////////////////////////////////////////////////}
+////# Function Definitions 
+////////////////////////////////////////////////////////////////////{
+// This function calculates the Kelly Ratio, which is a formula used to determine the optimal size of a series of bets.
+// @param returns        An array of floats representing the returns from bets.
+// @returns              The calculated Kelly Ratio, which indicates the optimal bet size based on winning and losing probabilities.
+calculateKellyRatio(float[] returns) =>
+    float winCount = 0.0
+    float lossCount = 0.0
+    float totalWinReturn = 0.0
+    float totalLossReturn = 0.0
+    int n = array.size(returns)
+    for i = 0 to n - 1
+        float ret = array.get(returns, i)
+        if ret > 0
+            winCount += 1
+            totalWinReturn += ret
+        else if ret < 0
+            lossCount += 1
+            totalLossReturn += math.abs(ret)
+    float winProb = (winCount + lossCount) > 0 ? winCount / (winCount + lossCount) : 0.0
+    float lossProb = 1 - winProb
+    float avgWinReturn = winCount > 0 ? totalWinReturn / winCount : 0.0
+    float avgLossReturn = lossCount > 0 ? totalLossReturn / lossCount : 0.0
+    float kellyRatio = 0.0
+    if avgLossReturn != 0 and avgWinReturn != 0
+        float odds = avgWinReturn / avgLossReturn
+        if odds != 0
+            kellyRatio := winProb - (lossProb / odds)
+    kellyRatio
+
+// Function to calculate adjusted Kelly Fraction based on Kelly Ratio, risk tolerance, and Fed stance
+calculateAdjustedKellyFraction(float kellyRatio, float riskTolerance, string fedStance) =>
+    // Adjust Kelly Fraction based on risk tolerance
+    float adjustedKellyFraction = kellyRatio * riskTolerance
+    // Adjust based on Fed stance
+    float kellyAdjustment = fedStance == "dovish" ? 0.1 : fedStance == "hawkish" ? -0.1 : 0.0
+    adjustedKellyFraction := adjustedKellyFraction + kellyAdjustment
+    // Ensure Kelly fraction is within bounds [-1, 1]
+    adjustedKellyFraction := math.max(math.min(adjustedKellyFraction, 1), -1)
+    adjustedKellyFraction
+
+// Custom function to sum over an array
+sumArray(float[] arr) =>
+    float total = 0.0
+    for i = 0 to array.size(arr) - 1
+        total += array.get(arr, i)
+    total
+
+// This function calculates the standard deviation of an array of returns.
+// Standard deviation measures the amount of variation or dispersion of a set of values.
+// @param returns        An array of floats representing the returns.
+// @returns              The standard deviation of the returns, or 0 if insufficient data.
+calculateStdDev(float[] returns) =>
+    int count = array.size(returns)
+    if count > 1
+        float avg = sumArray(returns) / count
+        float sumSqDiffs = 0.0
+        for i = 0 to count - 1
+            float val = array.get(returns, i)
+            float diff = val - avg
+            sumSqDiffs += diff * diff
+        float variance = sumSqDiffs / (count - 1)
+        math.sqrt(variance)
+    else
+        0.0
+
+
+// This function calculates the maximum drawdown from an array of returns.
+// Maximum drawdown is the largest drop from a peak to a trough in the value of an investment.
+// @param returns        An array of floats representing the returns.
+// @returns              The maximum drawdown as a percentage.
+calculateMaxDrawdown(float[] returns) =>
+    float peak = 1.0  // Start with initial equity of 1.0 (or 100%)
+    float maxDD = 0.0
+    float cumulativeReturn = 1.0
+    for i = 0 to array.size(returns) - 1
+        cumulativeReturn := cumulativeReturn * (1 + array.get(returns, i) / 100)  // Convert percent to decimal
+        if cumulativeReturn > peak
+            peak := cumulativeReturn  // Update peak if current value exceeds it
+        float drawdown = (peak - cumulativeReturn) / peak  // Calculate drawdown
+        if drawdown > maxDD
+            maxDD := drawdown  // Update maximum drawdown if current drawdown is greater
+    maxDD * 100  // Return as percentage
+
+// This function calculates the Expected Value (EV) of a bet based on average win return, win probability, and average loss return.
+// Expected Value is a measure of the average outcome of a bet if it were repeated many times.
+// @param avgWinReturn   The average return from winning bets.
+// @param winProb        The probability of winning a bet.
+// @param avgLossReturn  The average return from losing bets.
+// @returns              The calculated Expected Value of the bet.
+calculateEV(float avgWinReturn, float winProb, float avgLossReturn) =>
+    (winProb * avgWinReturn) + ((1 - winProb) * (-avgLossReturn))  // Calculate EV
+
+// This function calculates the Tail Ratio, which is a measure of the risk of extreme losses in a distribution of returns.
+// It sorts the returns and finds the 95th and 5th percentiles, returning the ratio of the 95th percentile to the absolute value of the 5th percentile.
+// @param returns        An array of floats representing the returns.
+// @returns              The Tail Ratio, or na if the 5th percentile is zero to avoid division by zero.
+calculateTailRatio(float[] returns) =>
+    array.sort(returns)  // Sort the returns array
+    int n = array.size(returns)
+    float tail95 = array.get(returns, int(n * 0.95) - 1)  // 95th percentile
+    float tail5 = array.get(returns, int(n * 0.05))  // 5th percentile
+    tail5 != 0 ? tail95 / math.abs(tail5) : na  // Avoid division by zero
+
+// This function calculates the Sharpe Ratio, which is a measure of risk-adjusted return.
+// It compares the average return of an investment to its standard deviation, adjusted for a risk-free rate.
+// @param avgReturn      The average return of the investment.
+// @param riskFreeRate   The risk-free rate of return.
+// @param stdDev         The standard deviation of the investment's returns.
+// @returns              The calculated Sharpe Ratio, or na if standard deviation is zero.
+calculateSharpeRatio(float avgReturn, float riskFreeRate, float stdDev) =>
+    stdDev != 0 ? (avgReturn - riskFreeRate) / stdDev : na  // Calculate Sharpe Ratio
+
+// This function calculates the Downside Deviation, which measures the risk of negative returns.
+// It computes the average return and then calculates the standard deviation of returns that fall below this average.
+// @param returns        An array of floats representing the returns.
+// @returns              The standard deviation of the downside returns, or 0 if no downside returns exist.
+calculateDownsideDeviation(float[] returns) =>
+    float downsideSum = 0.0
+    int downsideCount = 0
+    float avgReturn = sumArray(returns) / array.size(returns)  // Calculate average return
+    for i = 0 to array.size(returns) - 1
+        if array.get(returns, i) < avgReturn  // Check if return is below average
+            downsideSum += math.pow(avgReturn - array.get(returns, i), 2)  // Sum squared deviations
+            downsideCount += 1  // Count number of downside returns
+    downsideCount > 0 ? math.sqrt(downsideSum / downsideCount) : 0.0  // Return standard deviation of downside returns
+
+// This function calculates the Sortino Ratio, which is a variation of the Sharpe Ratio that only considers downside risk.
+// It compares the average return to the downside deviation.
+// @param avgReturn          The average return of the investment.
+// @param downsideDeviation   The standard deviation of the downside returns.
+// @returns                  The calculated Sortino Ratio, or na if downside deviation is zero.
+calculateSortinoRatio(float avgReturn, float downsideDeviation) =>
+    downsideDeviation != 0 ? avgReturn / downsideDeviation : na  // Calculate Sortino Ratio
+
+// This function calculates the Value at Risk (VaR), which estimates the potential loss in value of an asset over a defined period for a given confidence interval.
+// It sorts the returns and finds the return at the specified confidence level.
+// @param returns          An array of floats representing the returns.
+// @param confidenceLevel  A float representing the confidence level (e.g., 0.95 for 95% confidence).
+// @returns                The Value at Risk at the specified confidence level.
+calculateVaR(float[] returns, float confidenceLevel) =>
+    array.sort(returns)  // Sort the returns
+    int index = int(array.size(returns) * (1 - confidenceLevel))  // Calculate index for VaR
+    array.get(returns, index)  // Return the VaR value
+
+// This function calculates the Conditional Value at Risk (CVaR), which provides the expected loss given that a loss is beyond the VaR threshold.
+// It averages the returns that are less than or equal to the VaR value.
+// @param returns        An array of floats representing the returns.
+// @param varValue       The Value at Risk threshold.
+// @returns              The average Conditional Value at Risk, or na if no returns are below the threshold.
+calculateCVaR(float[] returns, float varValue) =>
+    float cvarSum = 0.0
+    int count = 0
+    for i = 0 to array.size(returns) - 1
+        if array.get(returns, i) <= varValue  // Check if return is less than or equal to VaR
+            cvarSum += array.get(returns, i)  // Sum the returns
+            count += 1  // Count the number of returns
+    count > 0 ? cvarSum / count : na  // Return average CVaR or na if no returns
+
+// This function calculates the expected price range based on Expected Value (EV) and standard deviation.
+// @param currentPrice     The current price of the asset.
+// @param ev               The expected value (in percentage terms).
+// @param stdDev           The standard deviation (in percentage terms).
+// @param confidenceLevel  The confidence level for the price range (e.g., 1.96 for 95% confidence).
+// @returns               A tuple containing the minimum and maximum expected prices.
+calculateExpectedPriceRange(float currentPrice, float ev, float stdDev, float confidenceLevel) =>
+    float expectedPriceChange = currentPrice * (1 + ev / 100)  // Convert EV to decimal
+    float minPrice = expectedPriceChange - (confidenceLevel * stdDev / 100 * currentPrice)
+    float maxPrice = expectedPriceChange + (confidenceLevel * stdDev / 100 * currentPrice)
+    [minPrice, maxPrice]
+
+
+// @function Calculates the pivot point and returns its value.
+// @param _type Specifies the type of pivot point.
+// @param _open The open price
+// @param _high The high price
+// @param _low The low price
+// @param _clsoe The close price
+// @returns Returns the value of the calculated pivot point as a tuple.
+pivots (_type, _open, _high, _low, _close) =>
+    PP = 0.0
+    R1 = 0.0, R2 = 0.0, R3 = 0.0, R4 = 0.0, R5 = 0.0
+    S1 = 0.0, S2 = 0.0, S3 = 0.0, S4 = 0.0, S5 = 0.0
+    
+    if _type == 'Traditional'
+        PP := (_high + _low + _close) / 3
+        R1 := PP + PP - _low
+        S1 := PP - (_high - PP)
+        R2 := PP + _high - _low
+        S2 := PP - (_high - _low)
+        R3 := _high + 2 * (PP - _low)
+        S3 := _low - 2 * (_high - PP)
+    
+        true
+
+    else if _type == 'Fibonacci'
+        PP := (_high + _low + _close) / 3
+        R1 := PP + (_high - _low) * 0.382
+        S1 := PP - (_high - _low) * 0.382
+        R2 := PP + (_high - _low) * 0.618
+        S2 := PP - (_high - _low) * 0.618
+        R3 := PP + (_high - _low) * 1.000
+        S3 := PP - (_high - _low) * 1.000
+        R4 := PP + (_high - _low) * 1.272
+        S4 := PP - (_high - _low) * 1.272
+        R5 := PP + (_high - _low) * 1.618
+        S5 := PP - (_high - _low) * 1.618
+        
+        true
+    
+    else if _type == 'Woodie'
+        PP := (_high + _low + 2 * _open) / 4
+        R1 := PP + PP - _low
+        S1 := PP - (_high - PP)
+        R2 := PP + _high - _low
+        S2 := PP - (_high - _low)
+        R3 := _high + 2 * (PP - _low)
+        S3 := _low - 2 * (_high - PP)
+        R4 := R3 + _high - _low
+        S4 := S3 - (_high - _low)
+    
+        true
+
+    else if _type == 'Classic'
+        PP := (_high + _low + _close) / 3
+        pivot_range = _high - _low
+        R1 := PP * 2 - _low
+        S1 := PP * 2 - _high
+        R2 := PP + 1 * pivot_range
+        S2 := PP - 1 * pivot_range
+        R3 := PP + 2 * pivot_range
+        S3 := PP - 2 * pivot_range
+        R4 := PP + 3 * pivot_range
+        S4 := PP - 3 * pivot_range
+        
+        true
+    
+    else if _type == 'DM'
+        pivotX_Demark_X = _high + _low * 2 + _close
+
+        if _close == _open
+            pivotX_Demark_X := _high + _low + _close * 2
+        if _close > _open
+            pivotX_Demark_X := _high * 2 + _low + _close
+
+        PP := pivotX_Demark_X / 4
+        R1 := pivotX_Demark_X / 2 - _low
+        S1 := pivotX_Demark_X / 2 - _high
+    
+    else if _type == 'Camarilla'
+        PP := (_high + _low + _close) / 3
+        pivot_range = _high - _low
+        R1 := _close + pivot_range * 1.1 / 12.0
+        S1 := _close - pivot_range * 1.1 / 12.0
+        R2 := _close + pivot_range * 1.1 / 6.0
+        S2 := _close - pivot_range * 1.1 / 6.0
+        R3 := _close + pivot_range * 1.1 / 4.0
+        S3 := _close - pivot_range * 1.1 / 4.0
+        R4 := _close + pivot_range * 1.1 / 2.0
+        S4 := _close - pivot_range * 1.1 / 2.0
+
+        true
+
+    else if _type == 'Expected Pivot Points'
+        PP := (_high + _low + _close) / 3
+        R1 := PP * 2 - _low
+        S1 := PP * 2 - _high
+        R2 := PP + (R1 - S1)
+        S2 := PP - (R1 - S1)
+        
+        true
+
+    [PP, R1, S1, R2, S2, R3, S3, R4, S4, R5, S5]
+    
+// @function Calculate the Central Pivot Range
+// @param _high The high price
+// @param _low The low price
+// @param _clsoe The close price
+// @returns Returns the values as a tuple.
+f_cpr (_high, _low, _close) =>
+    PP = (_high + _low + _close) / 3
+    BC = (_high + _low) / 2
+    TC = PP - BC + PP
+    CPR = math.abs(TC - BC)
+
+    [BC, TC, CPR]
+
+// @function Calculate the HTF values
+// @param _htf Resolution
+// @returns Returns the values as a tuple.
+f_htf_ohlc (_htf) =>
+    var htf_o  = 0., var htf_h  = 0., var htf_l  = 0.,     htf_c  = close  
+    var htf_ox = 0., var htf_hx = 0., var htf_lx = 0., var htf_cx = 0.
+
+    if ta.change(time(_htf))
+        htf_ox := htf_o, htf_o := open
+        htf_hx := htf_h, htf_h := high
+        htf_lx := htf_l, htf_l := low
+        htf_cx := htf_c[1]
+    else
+        htf_h  := math.max(high, htf_h)
+        htf_l  := math.min(low , htf_l)
+
+    [htf_ox, htf_hx, htf_lx, htf_cx, htf_o, htf_h, htf_l, htf_c]
+
+
+// @function Calculates the pivot point and returns its value.
+// @param _type Specifies the type of pivot point.
+// @param _open The open price
+// @param _high The high price
+// @param _low The low price
+// @param _clsoe The close price
+// @returns Returns the value of the calculated pivot point as a tuple.
+// pivots (simple string _type, float _open, float _high, float _low, float _close) => 
+//     f_pivots(_type, _open, _high, _low, _close)
+
+// @function Calculate the Central Pivot Range
+// @param _high The high price
+// @param _low The low price
+// @param _clsoe The close price
+// @returns Returns the values as a tuple.
+cpr (float _high, float _low, float _close) => f_cpr(_high, _low, _close)
+
+// @function Calculate the HTF values
+// @param _htf Resolution
+// @returns Returns the values as a tuple.
+htf_ohlc (simple string _htf) => f_htf_ohlc(_htf)
+
+f_render_pivots_label (_show, _x, _y, _text, _color, _style, _xloc, _show_history) =>
+    var label my_label = na
+    
+    if _show
+        v_price = str.format('{0,number,#.###}', _y)
+        v_text = ''
+
+        if i_pivots_label == option_pivot_label1
+            v_text := _text
+        else if i_pivots_label == option_pivot_label2
+            v_text := _text + ' (' + v_price + ')'
+        else if i_pivots_label == option_pivot_label3
+            v_text := v_price
+
+        my_label := label.new(_x, _y, v_text, textcolor=_color, color=c_none, style=_style, size=size.normal, xloc=_xloc)
+
+        if not _show_history
+            label.delete(my_label[1])
+
+f_render_pivots_box (_show, _x1, _y1, _x2, _y2, _color, _xloc, _show_history, _should_delete) =>
+    var box my_box = na
+    if _show
+        my_box := box.new(_x1, _y1, _x2, _y2, bgcolor=color.new(_color, i_pivots_zone_transp), border_color=c_none, xloc=_xloc)
+        if (not _show_history) or _should_delete
+            box.delete(my_box[1])
+
+f_render_pivots_line (_show, _x1, _y, _x2, _width, _color, _style, _xloc, _show_history, _should_delete) =>
+    var line my_line = na
+    if _show and _y > 0
+        my_line := line.new(_x1, _y, _x2, _y, width=_width, color=color.new(_color, i_pivots_line_transp), style=_style, xloc=_xloc)
+        if (not _show_history) or _should_delete
+            line.delete(my_line[1])
+    my_line
+
+
+f_render_pivots (_show, _show_history, _xloc, _update=false, _x1=0, _x2=0, _should_delete=false) =>
+    if _show
+        time_x1  = 0
+        time_x2  = 0
+        offset = 0
+
+        if _xloc == xloc.bar_time
+            time_x11  = ta.valuewhen(ta.change(time(usePivotTimeframe)), time, 1)
+            time_x1  := ta.valuewhen(ta.change(time(usePivotTimeframe)), time, 0)
+            offset   := math.round(ta.change(time))
+            time_x2  := (2 * time_x1 - time_x11) - offset
+        else
+            time_x1  := _x1
+            time_x2  := _x2
+    
+        [O1, H1, L1, C1, O0, H0, L0, C0] = htf_ohlc(usePivotTimeframe)
+
+        O = _update ? O0 : O1 
+        H = _update ? H0 : H1 
+        L = _update ? L0 : L1 
+        C = _update ? C0 : C1 
+
+        [PP, R1, S1, R2, S2, R3, S3, R4, S4, R5, S5] = pivots(usePivotType, O, H, L, C)
+        [BC, TC, CPR] = cpr(H, L, C)
+
+
+        if ta.change(time(usePivotTimeframe)) or _update
+            // Lines
+            
+            f_render_pivots_line(true, time_x1, R1, time_x2, i_pivots_line_thickness, color.red, i_pivots_line_style, _xloc, _show_history, _should_delete)
+            f_render_pivots_line(true, time_x1, R2, time_x2, i_pivots_line_thickness, color.red, i_pivots_line_style, _xloc, _show_history, _should_delete)
+            f_render_pivots_line(true, time_x1, R3, time_x2, i_pivots_line_thickness, color.red, i_pivots_line_style, _xloc, _show_history, _should_delete)
+            f_render_pivots_line(true, time_x1, R4, time_x2, i_pivots_line_thickness, color.red, i_pivots_line_style, _xloc, _show_history, _should_delete)
+            f_render_pivots_line(true, time_x1, R5, time_x2, i_pivots_line_thickness, color.red, i_pivots_line_style, _xloc, _show_history, _should_delete)
+            
+            f_render_pivots_line(true, time_x1, PP, time_x2, 3, color.green, line.style_dotted, _xloc, _show_history, _should_delete)
+            
+            f_render_pivots_line(true, time_x1, S1, time_x2, i_pivots_line_thickness, color.blue, i_pivots_line_style, _xloc, _show_history, _should_delete)
+            f_render_pivots_line(true, time_x1, S2, time_x2, i_pivots_line_thickness, color.blue, i_pivots_line_style, _xloc, _show_history, _should_delete)
+            f_render_pivots_line(true, time_x1, S3, time_x2, i_pivots_line_thickness, color.blue, i_pivots_line_style, _xloc, _show_history, _should_delete)
+            f_render_pivots_line(true, time_x1, S4, time_x2, i_pivots_line_thickness, color.blue, i_pivots_line_style, _xloc, _show_history, _should_delete)
+            f_render_pivots_line(true, time_x1, S5, time_x2, i_pivots_line_thickness, color.blue, i_pivots_line_style, _xloc, _show_history, _should_delete)
+            
+            // Boxes
+            if i_pivots_show_zone
+                f_render_pivots_box(true, time_x1, R1, time_x2, R2, color.red, _xloc, _show_history, _should_delete)
+                f_render_pivots_box(true, time_x1, R3, time_x2, R4, color.red, _xloc, _show_history, _should_delete)
+                f_render_pivots_box(true, time_x1, S1, time_x2, S2, color.blue, _xloc, _show_history, _should_delete)
+                f_render_pivots_box(true, time_x1, S3, time_x2, S4, color.blue, _xloc, _show_history, _should_delete)
+    
+            // Labels
+            if i_pivots_label_show
+                label_x     = i_pivots_label_position == 'Left' ? time_x1 : time_x2
+                label_style = i_pivots_label_position == 'Left' ? label.style_label_right : label.style_label_left
+                f_render_pivots_label(true, label_x, PP, t_PP, color.new(color.green, 20), label_style, _xloc, _show_history)
+                
+                f_render_pivots_label(true, label_x, R5, t_R5, color.new(color.red, 30), label_style, _xloc, _show_history)
+                f_render_pivots_label(true, label_x, R4, t_R4, color.new(color.red, 30), label_style, _xloc, _show_history)
+                f_render_pivots_label(true, label_x, R3, t_R3, color.new(color.red, 30), label_style, _xloc, _show_history)
+                f_render_pivots_label(true, label_x, R2, t_R2, color.new(color.red, 30), label_style, _xloc, _show_history)
+                f_render_pivots_label(true, label_x, R1, t_R1, color.new(color.red, 30), label_style, _xloc, _show_history)
+                
+                f_render_pivots_label(true, label_x, S1, t_S1, color.new(color.blue, 30), label_style, _xloc, _show_history)
+                f_render_pivots_label(true, label_x, S2, t_S2, color.new(color.blue, 30), label_style, _xloc, _show_history)
+                f_render_pivots_label(true, label_x, S3, t_S3, color.new(color.blue, 30), label_style, _xloc, _show_history)
+                f_render_pivots_label(true, label_x, S4, t_S4, color.new(color.blue, 30), label_style, _xloc, _show_history)
+                f_render_pivots_label(true, label_x, S5, t_S5, color.new(color.blue, 30), label_style, _xloc, _show_history)
+        ///
+
+
+////////////////////////////////////////////////////////////////////}
+////# ATX
+////////////////////////////////////////////////////////////////////{
+// Core Calculations
+price = close
+lrc = ta.linreg(price, lookbackPeriod, 0)
+prev_lrc = ta.linreg(price, lookbackPeriod, 1)
+slope = lrc - prev_lrc
+volatility = ta.atr(lookbackPeriod)
+
+// Multiple Timeframe Analysis
+htf1_close = request.security(syminfo.tickerid, timeframe1, close)
+htf2_close = request.security(syminfo.tickerid, timeframe2, close)
+htf1_trend = ta.ema(htf1_close, 20)
+htf2_trend = ta.ema(htf2_close, 20)
+
+// Dynamic Volatility Adjustment
+dynamicVol = ta.stdev(price, lookbackPeriod) * volatilityMultiplier
+marketCondition = ta.rsi(close, 14)
+volAdjustment = marketCondition > 70 or marketCondition < 30 ? dynamicVol * 1.5 : dynamicVol
+
+// Function to get ADX for different timeframes
+get_adx(tf) =>
+    [_, _, adx] = ta.dmi(diLength, adxLength)
+    adx
+
+// ADX Calculations with Multi-timeframe
+[adxValue, plusDI, minusDI] = ta.dmi(diLength, adxLength)
+adx = adxValue
+
+// Fixed MTF calculations
+htf1_adx = request.security(syminfo.tickerid, timeframe1, get_adx(timeframe1))
+htf2_adx = request.security(syminfo.tickerid, timeframe2, get_adx(timeframe2))
+
+// Enhanced Trend Strength with ADX Threshold
+trendStrength = math.avg(adx, htf1_adx, htf2_adx)
+strongTrend = adx > 25 and htf1_adx > 25 and htf2_adx > 25
+trendAlignment = (htf1_trend > htf1_close and htf2_trend > htf2_close) ? 1.2 : (htf1_trend < htf1_close and htf2_trend < htf2_close) ? 0.8 : 1.0
+
+// Enhanced Confidence Score - Revised for Strong Trends
+volumeScore = ta.sma(volume > ta.sma(volume, lookbackPeriod) ? 1 : 0, 5) * 100
+priceVolatility = ta.stdev(price, lookbackPeriod)
+normalizedVolatility = priceVolatility / price * 100
+
+// ADX-based confidence boost
+adxConfidence = adx > 25 ? 100 : math.min(100, adx * 2)
+mtfConfidence = math.avg(adxConfidence, htf1_adx > 25 ? 100 : htf1_adx * 2, htf2_adx > 25 ? 100 : htf2_adx * 2)
+
+// Trend alignment boost
+alignmentBoost = trendAlignment > 1.0 ? 20 : trendAlignment < 1.0 ? -20 : 0
+
+// Final confidence calculation
+baseConfidenceScore = math.min(100, math.max(0, mtfConfidence + alignmentBoost + (volumeScore * 0.2)))
+
+// Smoothed Predictions with Multi-timeframe Input
+smoothedLRC = ta.wma(lrc, smoothFactorLRC)
+predictedValue = lrc + (slope * predictionLength * trendAlignment)
+smoothedPredicted = ta.wma(predictedValue, smoothFactorPred)
+
+// Brown Shaded Projection Area
+projectionUpper = smoothedPredicted + ta.stdev(price, lookbackPeriod) * 0.1
+projectionLower = smoothedPredicted - ta.stdev(price, lookbackPeriod) * 0.1
+
+////////////////////////////////////////////////////////////////////}
+////# Visualization of ADX Prediction
+////////////////////////////////////////////////////////////////////{
+// Create projection lines and fill
+line.new(bar_index, projectionUpper, bar_index + predictionLength, projectionUpper, color=color.new(color.orange, 70), width=1, style=line.style_dashed)
+line.new(bar_index, projectionLower, bar_index + predictionLength, projectionLower, color=color.new(color.orange, 70), width=1, style=line.style_dashed)
+fill_color_projection = color.new(color.orange, 85)
+fill(plot(projectionUpper, color=na, title=""), plot(projectionLower, color=na, title=""), color=fill_color_projection)
+
+// Plot Square Prediction Area
+var box predictionBox = na
+var label currentLabel = na
+
+// Clear previous drawings
+if barstate.islast
+    box.delete(predictionBox)
+    if not na(currentLabel)
+        label.delete(currentLabel)
+
+// Create new prediction box
+if barstate.islast and baseConfidenceScore >= minConfidence
+    squareHeight = smoothedPredicted * squareSize / 100
+    squareLeft = bar_index + predictionLength - 2
+    squareRight = bar_index + predictionLength + 2
+    squareTop = smoothedPredicted + squareHeight/2
+    squareBottom = smoothedPredicted - squareHeight/2
+    predictionBox := box.new(left=squareLeft, top=squareTop, right=squareRight, bottom=squareBottom, border_color=color.rgb(128, 128, 128, 80), bgcolor=color.rgb(128, 128, 128, 20), border_width=1)
+
+// Enhanced Trend Line
+trendColor = slope > 0 ? color.green : color.red
+plot(smoothedLRC, "Trend", color=trendColor, linewidth=2)
+
+// Plot Future Prediction Line
+var line projLine = na
+if barstate.islast and baseConfidenceScore >= minConfidence
+    line.delete(projLine)
+    projLine := line.new(x1=bar_index, y1=smoothedLRC, x2=bar_index + predictionLength, y2=smoothedPredicted, color=color.white, width=2, style=line.style_dashed)
+
+// Create new label
+if barstate.islast
+    currentLabel := label.new(bar_index, high, text="Pred: " + str.tostring(smoothedPredicted, "#.##") + "\nConf: " + str.tostring(baseConfidenceScore, "#.0") + "%\nADX: " + str.tostring(adx, "#.0") + "\nVol: " + str.tostring(volAdjustment, "#.##"), yloc=yloc.abovebar, style=label.style_label_down, textcolor=color.white, color=color.rgb(0, 0, 255, 90))
+
+
+
+////////////////////////////////////////////////////////////////////}
+////# Processing of Weekly Probabilities and Position Sizing
+////////////////////////////////////////////////////////////////////{
+
+// Initialize variables
+var float[] weekReturnSums      = array.new_float(52, 0.0)
+var int[] weekReturnCounts      = array.new_int(52, 0)
+var int[] weekPositiveCounts    = array.new_int(52, 0)
+var float[] weekReturnSquares   = array.new_float(52, 0.0)
+var float[] allWeekReturns      = array.new_float()
+var int[] allWeekNums           = array.new_int()
+
+// Get weekly data using request.security
+[weeklyClose, weeklyTime]       = request.security(syminfo.tickerid, 'W', [close, time])
+
+// Detect new week
+isNewWeek = ta.change(weeklyTime)
+
+if isNewWeek
+    int weekNum = weekofyear(weeklyTime[1])  // Previous week number
+    int yearNum = year(weeklyTime[1])
+    if yearNum >= startYearInput
+        float prevWeeklyClose = weeklyClose[1]
+        float currWeeklyClose = weeklyClose
+        float ret = (currWeeklyClose - prevWeeklyClose) / prevWeeklyClose * 100
+
+        // Update the arrays
+        int idx = weekNum - 1  // index in arrays
+        if idx >= 0 and idx < 52
+            // Sum of returns
+            sum = array.get(weekReturnSums, idx) + ret
+            array.set(weekReturnSums, idx, sum)
+            // Count of returns
+            count = array.get(weekReturnCounts, idx) + 1
+            array.set(weekReturnCounts, idx, count)
+            // Sum of squared returns
+            sumSq = array.get(weekReturnSquares, idx) + ret * ret
+            array.set(weekReturnSquares, idx, sumSq)
+            // Positive counts
+            posCount = array.get(weekPositiveCounts, idx)
+            if ret > 0
+                posCount += 1
+            array.set(weekPositiveCounts, idx, posCount)
+            // Store all returns and week numbers
+            array.push(allWeekReturns, ret)
+            array.push(allWeekNums, weekNum)
+
+////////////////////////////////////////////////////////////////////}
+////# Table
+////////////////////////////////////////////////////////////////////{
+
+if showTableInput and barstate.islast
+    // Prepare data for the table
+    var int[] selectedWeekNumbers = array.new_int()
+    var float[] avgReturnsArray = array.new_float()
+    var float[] stdDevArray = array.new_float()
+    var float[] posPercentsArray = array.new_float()
+    var float[] kellyRatiosArray = array.new_float()
+    var float[] adjustedKellyFractionsArray = array.new_float()
+    var float[] positionSizesArray = array.new_float()
+    var float[] maxDrawdownsArray = array.new_float()
+    var float[] evArray = array.new_float()
+    var float[] tailRatiosArray = array.new_float()
+    var float[] sharpeRatiosArray = array.new_float()
+    var float[] sortinoRatiosArray = array.new_float()
+    var float[] varArray = array.new_float()
+    var float[] cvarArray = array.new_float()
+    var float[] minExpectedPricesArray = array.new_float()
+    var float[] maxExpectedPricesArray = array.new_float()
+    var float[] nextMinExpectedPricesArray = array.new_float()  // New array for next week's min expected prices
+    var float[] nextMaxExpectedPricesArray = array.new_float()  // New array for next week's max expected prices
+
+    // Loop through each week of the year
+    for idx = 0 to 51
+        int weekNum = idx + 1
+        // Check if the week number is in the specified quarters
+        bool isInQuarter = (weekNum >= 1 and weekNum <= 13 and q1Input) or 
+                           (weekNum >= 14 and weekNum <= 26 and q2Input) or 
+                           (weekNum >= 27 and weekNum <= 39 and q3Input) or 
+                           (weekNum >= 40 and weekNum <= 52 and q4Input)
+        if isInQuarter
+            int count = array.get(weekReturnCounts, idx)
+            if count > 0
+                // Store week number
+                array.push(selectedWeekNumbers, weekNum)
+                
+                // Calculate average return
+                float sum = array.get(weekReturnSums, idx)
+                float avgRet = sum / count
+                array.push(avgReturnsArray, avgRet)
+                
+                // Calculate standard deviation
+                float sumSq = array.get(weekReturnSquares, idx)
+                float variance = (sumSq - (sum * sum) / count) / (count - 1)
+                float stdDev = variance > 0 ? math.sqrt(variance) : 0.0
+                array.push(stdDevArray, stdDev)
+                
+                // Calculate positive percentage
+                int posCount = array.get(weekPositiveCounts, idx)
+                float posPercent = count > 0 ? (posCount / count) * 100 : 0.0
+                array.push(posPercentsArray, posPercent)
+                
+                // Extract returns for this week
+                float[] returnsArray = array.new_float()
+                for i = 0 to array.size(allWeekReturns) - 1
+                    if array.get(allWeekNums, i) == weekNum
+                        array.push(returnsArray, array.get(allWeekReturns, i))
+                
+                // Calculate Kelly Ratio
+                float kellyRatio = calculateKellyRatio(returnsArray)
+                array.push(kellyRatiosArray, kellyRatio)
+                
+                // Calculate Adjusted Kelly Fraction
+                float adjustedKellyFraction = calculateAdjustedKellyFraction(kellyRatio, riskToleranceInput, fedStanceInput)
+                array.push(adjustedKellyFractionsArray, adjustedKellyFraction)
+                
+                // Calculate position size based on leverage
+                float leverageFactor = marginRateInput > 0 ? 1 / marginRateInput : 1.0
+                float maxPositionSize = capitalInput * leverageFactor
+                float positionSize = maxPositionSize * adjustedKellyFraction
+                positionSize := math.min(positionSize, maxPositionSize)  // Ensure position size does not exceed max
+                
+                // Calculate Max Drawdown
+                float maxDD = calculateMaxDrawdown(returnsArray)
+                // Adjust position size if max drawdown exceeds maxDrawdownInput
+                if maxDD > maxDrawdownInput and maxDD != 0
+                    positionSize := positionSize * (maxDrawdownInput / maxDD)
+                array.push(positionSizesArray, positionSize)
+                array.push(maxDrawdownsArray, maxDD)
+
+                // Calculate additional metrics
+                float negReturn = (count - posCount) > 0 ? (sum - (avgRet * posCount)) / (count - posCount) : 0.0
+                float ev = calculateEV(avgRet, posCount / 100, negReturn)
+                array.push(evArray, ev)
+                float tailRatio = calculateTailRatio(returnsArray)
+                array.push(tailRatiosArray, tailRatio)
+                float sharpeRatio = calculateSharpeRatio(avgRet, 0.01, stdDev)  // Assuming a risk-free rate of 1%
+                array.push(sharpeRatiosArray, sharpeRatio)
+                float downsideDeviation = calculateDownsideDeviation(returnsArray)
+                float sortinoRatio = calculateSortinoRatio(avgRet, downsideDeviation)
+                array.push(sortinoRatiosArray, sortinoRatio)
+                float VAR = calculateVaR(returnsArray, 0.95)  // 95% confidence level
+                array.push(varArray, VAR)
+                float cvar = calculateCVaR(returnsArray, VAR)
+                array.push(cvarArray, cvar)
+
+                // Calculate expected price range
+                float currentPrice = weeklyClose
+                
+                [minExpectedPrice,  maxExpectedPrice] = calculateExpectedPriceRange(currentPrice, ev, stdDev, 1.96)  // 95% confidence level
+                array.push(minExpectedPricesArray, minExpectedPrice)
+                array.push(maxExpectedPricesArray, maxExpectedPrice)
+
+                // Calculate expected price range for next week
+                float nextWeekCurrentPrice = currentPrice  // Assuming the current price is used for next week as well
+                [nextMinExpectedPrice, nextMaxExpectedPrice] = calculateExpectedPriceRange(nextWeekCurrentPrice, ev, stdDev, 1.96)  // 95% confidence level
+                array.push(nextMinExpectedPricesArray, nextMinExpectedPrice)
+                array.push(nextMaxExpectedPricesArray, nextMaxExpectedPrice)
+
+    // Limit the number of rows to fit within the table size limit
+    int maxRows = 49  // 49 data rows + 1 header row = 50 total rows
+    int totalRows = array.size(selectedWeekNumbers)
+    int numRows = math.min(totalRows, maxRows)
+    int startIndex = 0  // Display from the first selected week
+
+    // Create table
+    var table returnsTable = table.new(i_PivotTableYpos + "_" + i_PivotTableXpos, 18, numRows + 1, border_width=1)  // Updated column count to 18
+    // Set table headers
+    table.cell(returnsTable, 0, 0, "Week", bgcolor=color.gray, text_color=color.white, text_size = textSize)
+    if showPosSizeInput
+        table.cell(returnsTable, 1, 0, "Position Size ($)", bgcolor=color.gray, text_color=color.white, text_size = textSize)
+    if showPosInput
+        table.cell(returnsTable, 2, 0, "Pos %", bgcolor=color.gray, text_color=color.white, text_size = textSize)
+    if showMaxDDInput
+        table.cell(returnsTable, 3, 0, "Max Drawdown (%)", bgcolor=color.gray, text_color=color.white, text_size = textSize)
+    if showEVInput
+        table.cell(returnsTable, 4, 0, "EV", bgcolor=color.gray, text_color=color.white, text_size = textSize)
+    if showAvgInput
+        table.cell(returnsTable, 5, 0, "Avg Return (%)", bgcolor=color.gray, text_color=color.white, text_size = textSize)
+    if showStDevInput
+        table.cell(returnsTable, 6, 0, "Volatility (%)", bgcolor=color.gray, text_color=color.white, text_size = textSize)
+    if showKellyRatioInput
+        table.cell(returnsTable, 7, 0, "Kelly Ratio", bgcolor=color.gray, text_color=color.white, text_size = textSize)
+    if showAdjKellyFracInput
+        table.cell(returnsTable, 8, 0, "Adj Kelly Frac", bgcolor=color.gray, text_color=color.white, text_size = textSize)
+    if showTailRatioInput
+        table.cell(returnsTable, 9, 0, "Tail Ratio", bgcolor=color.gray, text_color=color.white, text_size = textSize)
+    if showSharpeInput
+        table.cell(returnsTable, 10, 0, "Sharpe Ratio", bgcolor=color.gray, text_color=color.white, text_size = textSize)
+    if showSortinoInput
+        table.cell(returnsTable, 11, 0, "Sortino Ratio", bgcolor=color.gray, text_color=color.white, text_size = textSize)
+    if showVaRInput
+        table.cell(returnsTable, 12, 0, "VaR", bgcolor=color.gray, text_color=color.white, text_size = textSize)
+    if showCVaRInput
+        table.cell(returnsTable, 13, 0, "CVaR", bgcolor=color.gray, text_color=color.white, text_size = textSize)
+    
+    // New headers for next week's expected prices
+    if showNextPricesInput
+        table.cell(returnsTable, 14, 0, "Next Min Expected Price", bgcolor=color.gray, text_color=color.white, text_size = textSize)
+        table.cell(returnsTable, 15, 0, "Next Max Expected Price", bgcolor=color.gray, text_color=color.white, text_size = textSize)
+
+    // Populate table
+    for idx = startIndex to numRows - 1
+        int row = idx + 1  // Adjust row index for the table
+        int weekNum = array.get(selectedWeekNumbers, idx)
+        float avgRet = array.get(avgReturnsArray, idx)
+        float stdDev = array.get(stdDevArray, idx)
+        float posPercent = array.get(posPercentsArray, idx)
+        float kellyRatio = array.get(kellyRatiosArray, idx)
+        float adjustedKellyFraction = array.get(adjustedKellyFractionsArray, idx)
+        float posSize = array.get(positionSizesArray, idx)
+        float maxDD = array.get(maxDrawdownsArray, idx)
+        float ev = array.get(evArray, idx)
+        float tailRatio = array.get(tailRatiosArray, idx)
+        float sharpeRatio = array.get(sharpeRatiosArray, idx)
+        float sortinoRatio = array.get(sortinoRatiosArray, idx)
+        float VAR = array.get(varArray, idx)
+        float cvar = array.get(cvarArray, idx)
+        float minExpectedPrice = array.get(minExpectedPricesArray, idx)
+        float maxExpectedPrice = array.get(maxExpectedPricesArray, idx)
+        float nextMinExpectedPrice = array.get(nextMinExpectedPricesArray, idx)  // Next week's min expected price
+        float nextMaxExpectedPrice = array.get(nextMaxExpectedPricesArray, idx)  // Next week's max expected price
+
+        // Week Number
+        // Triple witching weeks are [11, 24, 37, 50]
+        // Check if it is the current week
+        color weekColor = (weekNum == 11 or weekNum == 24 or weekNum == 37 or weekNum == 50) ? color.yellow : na
+        bool isCurrentWeek = (weekNum == weekofyear(time))
+        weekColor := isCurrentWeek ? color.blue : weekColor  // Set weekColor to blue if it's the current week
+        color textColor = isCurrentWeek ? (weekColor == color.yellow ? color.black : color.white) : (weekColor != na ? weekColor : color.gray)
+        table.cell(returnsTable, 0, row, str.tostring(weekNum), bgcolor=weekColor, text_color=textColor, text_size = textSize)
+        // Position Size ($)
+        if showPosSizeInput
+            table.cell(returnsTable, 1, row, str.format("{0,number,#.##}", posSize), bgcolor=(posSize > 0 ? color.green : posSize < 0 ? color.red : na), text_size = textSize)
+        // Pos %
+        if showPosInput
+            table.cell(returnsTable, 2, row, str.format("{0,number,#.##}", posPercent), bgcolor=(posPercent > 50 ? color.green : posPercent < 50 ? color.red : na), text_size = textSize)
+        // Max Drawdown (%)
+        if showMaxDDInput
+            table.cell(returnsTable, 3, row, str.format("{0,number,#.##}", maxDD), bgcolor=(maxDD > 10 ? color.red : color.green), text_size = textSize)
+        // EV
+        if showEVInput
+            table.cell(returnsTable, 4, row, str.format("{0,number,#.##}", ev), bgcolor=(ev > 0 ? color.green : ev < 0 ? color.red : na), text_size = textSize)
+        // Avg Return (%)
+        if showAvgInput
+            table.cell(returnsTable, 5, row, str.format("{0,number,#.##}", avgRet), bgcolor=(avgRet > 0 ? color.green : avgRet < 0 ? color.red : na), text_size = textSize)
+        // Volatility (%)
+        if showStDevInput
+            table.cell(returnsTable, 6, row, str.format("{0,number,#.##}", stdDev), bgcolor=(stdDev > 0 ? color.blue : stdDev < 0 ? color.red : na), text_size = textSize)
+        // Kelly Ratio
+        if showKellyRatioInput
+            table.cell(returnsTable, 7, row, str.format("{0,number,#.####}", kellyRatio), bgcolor=(kellyRatio > 0 ? color.green : kellyRatio < 0 ? color.red : na), text_size = textSize)
+        // Adj Kelly Frac
+        if showAdjKellyFracInput
+            table.cell(returnsTable, 8, row, str.format("{0,number,#.####}", adjustedKellyFraction), bgcolor=(adjustedKellyFraction > 0 ? color.green : adjustedKellyFraction < 0 ? color.red : na), text_size = textSize)
+        // Tail Ratio
+        if showTailRatioInput
+            table.cell(returnsTable, 9, row, str.format("{0,number,#.##}", tailRatio), bgcolor=(tailRatio > 1 ? color.green : tailRatio < 1 ? color.red : na), text_size = textSize)
+        // Sharpe Ratio
+        if showSharpeInput
+            table.cell(returnsTable, 10, row, str.format("{0,number,#.##}", sharpeRatio), bgcolor=(sharpeRatio > 1 ? color.green : sharpeRatio < 1 ? color.red : na), text_size = textSize)
+        // Sortino Ratio
+        if showSortinoInput
+            table.cell(returnsTable, 11, row, str.format("{0,number,#.##}", sortinoRatio), bgcolor=(sortinoRatio > 1 ? color.green : sortinoRatio < 1 ? color.red : na), text_size = textSize)
+        // VaR
+        if showVaRInput
+            table.cell(returnsTable, 12, row, str.format("{0,number,#.##}", VAR), bgcolor=(VAR < 0 ? color.red : color.green), text_size = textSize)
+        // CVaR
+        if showCVaRInput
+            table.cell(returnsTable, 13, row, str.format("{0,number,#.##}", cvar), bgcolor=(cvar < 0 ? color.red : color.green), text_size = textSize)
+        
+        //  Expected Prices
+        if showNextPricesInput
+            table.cell(returnsTable, 14, row, str.format("{0,number,#.##}", nextMinExpectedPrice), bgcolor=(nextMinExpectedPrice < 0 ? color.red : color.green), text_size = textSize)
+            table.cell(returnsTable, 15, row, str.format("{0,number,#.##}", nextMaxExpectedPrice), bgcolor=(nextMaxExpectedPrice < 0 ? color.red : color.green), text_size = textSize)
+
+
+////////////////////////////////////////////////////////////////////}
+////# Credit Spread Calculations
+////////////////////////////////////////////////////////////////////{
+
+f_render_pivots(showPreviousPivots, showPreviousPivots2, xloc.bar_time, false, 0, 0, false)
+
+htf_o = request.security(syminfo.tickerid, usePivotTimeframe, open  )
+htf_h = request.security(syminfo.tickerid, usePivotTimeframe, high  )
+htf_l = request.security(syminfo.tickerid, usePivotTimeframe, low   )
+htf_c = request.security(syminfo.tickerid, usePivotTimeframe, close )
+
+// Expose Pivot Variables
+[PP, R1, S1, R2, S2, R3, S3, R4, S4, R5, S5] = pivots(usePivotType, htf_o[1], htf_h[1], htf_l[1], htf_c[1])
+
+plot( showPivots == true ? R4 : na, "R4", color = R4color, linewidth = 2)
+plot( showPivots == true ? R3 : na, "R3", color = R3color)
+plot( showPivots == true ? R2 : na, "R2", color = R2color)
+plot( showPivots == true ? R1 : na, "R1", color = R1color)
+plot( showPivots == true ? PP : na, "PP", color = color.new(#37c205, 26), linewidth = 3)
+plot( showPivots == true ? S1 : na, "S1", color = S1color)
+plot( showPivots == true ? S2 : na, "S2", color = S2color)
+plot( showPivots == true ? S3 : na, "S3", color = S3color)
+plot( showPivots == true ? S4 : na, "S4", color = S4color, linewidth = 2)
+
+// Bullish 
+ResistenceCondition1 = close >= R1 and close <= R2
+ResistenceCondition2 = close >= R2 and close <= R3
+ResistenceCondition3 = close >= R3 and close <= R4
+ResistenceCondition4 = close >= R4
+
+barcolor(i_show_resistance and greenCandle and ResistenceCondition1? R1color : na)
+barcolor(i_show_resistance and greenCandle and ResistenceCondition2? R2color : na)
+barcolor(i_show_resistance and greenCandle and ResistenceCondition3? R3color : na)
+barcolor(i_show_resistance and greenCandle and ResistenceCondition4? R4color : na)
+
+// Bearish
+supportCondition1 = close <= S1 and close >= S2
+supportCondition2 = close <= S2 and close >= S3
+supportCondition3 = close <= S3 and close >= S4
+supportCondition4 = close <= S4
+barcolor(i_show_support and redCandle and supportCondition1 ? S1color : na)
+barcolor(i_show_support and redCandle and supportCondition2 ? S2color : na)
+barcolor(i_show_support and redCandle and supportCondition3 ? S3color : na)
+barcolor(i_show_support and redCandle and supportCondition4 ? S4color : na)
+
+
+
+////////////////////////////////////////////////////////////////////}
+////# Plot Bands
+////////////////////////////////////////////////////////////////////{
+
+
+// Function to calculate various types of moving averages
+calculateMA(type, src, len) =>
+    if type == "DEMA"
+        2 * ta.ema(src, len) - ta.ema(ta.ema(src, len), len)
+    else if type == "EMA"
+        ta.ema(src, len)
+    else if type == "HMA"
+        ta.wma(2 * ta.wma(src, len / 2) - ta.wma(src, len), math.round(math.sqrt(len)))
+    else if type == "LSMA"
+        3 * ta.wma(src, len) - 2 * ta.sma(src, len)
+    else if type == "RMA"
+        ta.rma(src, len)
+    else if type == "SMA"
+        ta.sma(src, len)
+    else if type == "SWMA"
+        ta.swma(src)
+    else if type == "TEMA"
+        3 * ta.ema(src, len) - 3 * ta.ema(ta.ema(src, len), len) + ta.ema(ta.ema(ta.ema(src, len), len), len)
+    else if type == "TMA"
+        ta.swma(ta.wma(src, len))
+    else if type == "VWMA"
+        ta.vwma(src, len)
+    else if type == "WMA"
+        ta.wma(src, len)
+
+// Calculate moving averages for both setups
+movingAvg1 = request.security(syminfo.tickerid, timeframebb1, calculateMA(maType1, dataSource1, maPeriod1))
+movingAvg2 = request.security(syminfo.tickerid, timeframebb2, calculateMA(maType2, dataSource2, maPeriod2))
+
+// Calculate Bollinger Bands for both setups
+upperBand1 = movingAvg1 + request.security(syminfo.tickerid, timeframebb1, ta.stdev(dataSource1, maPeriod1)) * stdDevMultiplier1
+upperBand2 = movingAvg2 + request.security(syminfo.tickerid, timeframebb2, ta.stdev(dataSource2, maPeriod2)) * stdDevMultiplier2
+lowerBand1 = movingAvg1 - request.security(syminfo.tickerid, timeframebb1, ta.stdev(dataSource1, maPeriod1)) * stdDevMultiplier1
+lowerBand2 = movingAvg2 - request.security(syminfo.tickerid, timeframebb2, ta.stdev(dataSource2, maPeriod2)) * stdDevMultiplier2
+
+// Calculate predicted moving averages for future periods
+predictedMA11 = request.security(syminfo.tickerid, timeframebb1, (calculateMA(maType1, dataSource1, maPeriod1 - 1) * (maPeriod1 - 1) + dataSource1 * 1) / maPeriod1)
+predictedMA12 = request.security(syminfo.tickerid, timeframebb1, (calculateMA(maType1, dataSource1, maPeriod1 - 2) * (maPeriod1 - 2) + dataSource1 * 2) / maPeriod1)
+predictedMA13 = request.security(syminfo.tickerid, timeframebb1, (calculateMA(maType1, dataSource1, maPeriod1 - 3) * (maPeriod1 - 3) + dataSource1 * 3) / maPeriod1)
+
+predictedMA21 = request.security(syminfo.tickerid, timeframebb2, (calculateMA(maType2, dataSource2, maPeriod2 - 1) * (maPeriod2 - 1) + dataSource2 * 1) / maPeriod2)
+predictedMA22 = request.security(syminfo.tickerid, timeframebb2, (calculateMA(maType2, dataSource2, maPeriod2 - 2) * (maPeriod2 - 2) + dataSource2 * 2) / maPeriod2)
+predictedMA23 = request.security(syminfo.tickerid, timeframebb2, (calculateMA(maType2, dataSource2, maPeriod2 - 3) * (maPeriod2 - 3) + dataSource2 * 3) / maPeriod2)
+
+// Calculate predicted Bollinger Bands for future periods
+predictedUpperBand11 = predictedMA11 + request.security(syminfo.tickerid, timeframebb1, ta.stdev(dataSource1, maPeriod1)) * stdDevMultiplier1
+predictedUpperBand12 = predictedMA12 + request.security(syminfo.tickerid, timeframebb1, ta.stdev(dataSource1, maPeriod1)) * stdDevMultiplier1
+predictedUpperBand13 = predictedMA13 + request.security(syminfo.tickerid, timeframebb1, ta.stdev(dataSource1, maPeriod1)) * stdDevMultiplier1
+predictedLowerBand11 = predictedMA11 - request.security(syminfo.tickerid, timeframebb1, ta.stdev(dataSource1, maPeriod1)) * stdDevMultiplier1
+predictedLowerBand12 = predictedMA12 - request.security(syminfo.tickerid, timeframebb1, ta.stdev(dataSource1, maPeriod1)) * stdDevMultiplier1
+predictedLowerBand13 = predictedMA13 - request.security(syminfo.tickerid, timeframebb1, ta.stdev(dataSource1, maPeriod1)) * stdDevMultiplier1
+
+predictedUpperBand21 = predictedMA21 + request.security(syminfo.tickerid, timeframebb2, ta.stdev(dataSource2, maPeriod2)) * stdDevMultiplier2
+predictedUpperBand22 = predictedMA22 + request.security(syminfo.tickerid, timeframebb2, ta.stdev(dataSource2, maPeriod2)) * stdDevMultiplier2
+predictedUpperBand23 = predictedMA23 + request.security(syminfo.tickerid, timeframebb2, ta.stdev(dataSource2, maPeriod2)) * stdDevMultiplier2
+predictedLowerBand21 = predictedMA21 - request.security(syminfo.tickerid, timeframebb2, ta.stdev(dataSource2, maPeriod2)) * stdDevMultiplier2
+predictedLowerBand22 = predictedMA22 - request.security(syminfo.tickerid, timeframebb2, ta.stdev(dataSource2, maPeriod2)) * stdDevMultiplier2
+predictedLowerBand23 = predictedMA23 - request.security(syminfo.tickerid, timeframebb2, ta.stdev(dataSource2, maPeriod2)) * stdDevMultiplier2
+
+// Define colors for Bollinger Bands
+colorUpperBand1 = color.red
+colorLowerBand1 = color.blue
+colorUpperBand2 = color.yellow
+colorLowerBand2 = color.green
+
+// Plot and fill Bollinger Bands for the first setup
+plot(displayBB1 and displayMA1 ? movingAvg1 : na, title = "MA Set 1", color = color.gray, offset = offsetValue1)
+upperBandPlot1 = plot(displayBB1 ? upperBand1 : na, title = "Upper Band Set 1", color = colorUpperBand1, offset = offsetValue1)
+lowerBandPlot1 = plot(displayBB1 ? lowerBand1 : na, title = "Lower Band Set 1", color = colorLowerBand1, offset = offsetValue1)
+fill(upperBandPlot1, lowerBandPlot1, title = "BB Fill Set 1", color = color.new(colorUpperBand1, 95))
+
+// Plot predicted Bollinger Bands for the first setup
+plot(displayBB1 and displayMA1 ? predictedMA11 : na, title = "Predicted MA Set 1 (1)", color = color.gray, style = plot.style_circles, offset = offsetValue1 + 1, show_last = 1)
+plot(displayBB1 and displayMA1 ? predictedMA12 : na, title = "Predicted MA Set 1 (2)", color = color.gray, style = plot.style_circles, offset = offsetValue1 + 2, show_last = 1)
+plot(displayBB1 and displayMA1 ? predictedMA13 : na, title = "Predicted MA Set 1 (3)", color = color.gray, style = plot.style_circles, offset = offsetValue1 + 3, show_last = 1)
+plot(displayBB1 ? predictedUpperBand11 : na, title = "Predicted Upper Band Set 1 (1)", color = colorUpperBand1, style = plot.style_circles, offset = offsetValue1 + 1, show_last = 1)
+plot(displayBB1 ? predictedUpperBand12 : na, title = "Predicted Upper Band Set 1 (2)", color = colorUpperBand1, style = plot.style_circles, offset = offsetValue1 + 2, show_last = 1)
+plot(displayBB1 ? predictedUpperBand13 : na, title = "Predicted Upper Band Set 1 (3)", color = colorUpperBand1, style = plot.style_circles, offset = offsetValue1 + 3, show_last = 1)
+plot(displayBB1 ? predictedLowerBand11 : na, title = "Predicted Lower Band Set 1 (1)", color = colorLowerBand1, style = plot.style_circles, offset = offsetValue1 + 1, show_last = 1)
+plot(displayBB1 ? predictedLowerBand12 : na, title = "Predicted Lower Band Set 1 (2)", color = colorLowerBand1, style = plot.style_circles, offset = offsetValue1 + 2, show_last = 1)
+plot(displayBB1 ? predictedLowerBand13 : na, title = "Predicted Lower Band Set 1 (3)", color = colorLowerBand1, style = plot.style_circles, offset = offsetValue1 + 3, show_last = 1)
+
+// Plot and fill Bollinger Bands for the second setup
+plot(displayBB2 and displayMA2 ? movingAvg2 : na, title = "MA Set 2", color = color.gray, offset = offsetValue2)
+upperBandPlot2 = plot(displayBB2 ? upperBand2 : na, title = "Upper Band Set 2", color = colorUpperBand2, offset = offsetValue2)
+lowerBandPlot2 = plot(displayBB2 ? lowerBand2 : na, title = "Lower Band Set 2", color = colorLowerBand2, offset = offsetValue2)
+fill(upperBandPlot2, lowerBandPlot2, title = "BB Fill Set 2", color = color.new(colorUpperBand2, 95))
+
+// Plot predicted Bollinger Bands for the second setup
+plot(displayBB2 and displayMA2 ? predictedMA21 : na, title = "Predicted MA Set 2 (1)", color = color.gray, style = plot.style_circles, offset = offsetValue2 + 1, show_last = 1)
+plot(displayBB2 and displayMA2 ? predictedMA22 : na, title = "Predicted MA Set 2 (2)", color = color.gray, style = plot.style_circles, offset = offsetValue2 + 2, show_last = 1)
+plot(displayBB2 and displayMA2 ? predictedMA23 : na, title = "Predicted MA Set 2 (3)", color = color.gray, style = plot.style_circles, offset = offsetValue2 + 3, show_last = 1)
+plot(displayBB2 ? predictedUpperBand21 : na, title = "Predicted Upper Band Set 2 (1)", color = colorUpperBand2, style = plot.style_circles, offset = offsetValue2 + 1, show_last = 1)
+plot(displayBB2 ? predictedUpperBand22 : na, title = "Predicted Upper Band Set 2 (2)", color = colorUpperBand2, style = plot.style_circles, offset = offsetValue2 + 2, show_last = 1)
+plot(displayBB2 ? predictedUpperBand23 : na, title = "Predicted Upper Band Set 2 (3)", color = colorUpperBand2, style = plot.style_circles, offset = offsetValue2 + 3, show_last = 1)
+plot(displayBB2 ? predictedLowerBand21 : na, title = "Predicted Lower Band Set 2 (1)", color = colorLowerBand2, style = plot.style_circles, offset = offsetValue2 + 1, show_last = 1)
+plot(displayBB2 ? predictedLowerBand22 : na, title = "Predicted Lower Band Set 2 (2)", color = colorLowerBand2, style = plot.style_circles, offset = offsetValue2 + 2, show_last = 1)
+plot(displayBB2 ? predictedLowerBand23 : na, title = "Predicted Lower Band Set 2 (3)", color = colorLowerBand2, style = plot.style_circles, offset = offsetValue2 + 3, show_last = 1)
+
+////////////////////////////////////////////////////////////////////}
+////# Spread Table
+////////////////////////////////////////////////////////////////////{
+customBuyOption     = input.string('R1', 'Long↕', options=['S1', 'S2', 'S3', 'S4', 'Pivot', 'R1', 'R2', 'R3', 'R4', 'MA1', 'Upper Band 1', 'Lower Band 1', 'MA2', 'Upper Band 2', 'Lower Band 2'], group=_group_Spreads, inline="long")
+customLongExit      = input.string('R3', 'Exit↕', options=['S1', 'S2', 'S3', 'S4', 'Pivot', 'R1', 'R2', 'R3', 'R4', 'MA1', 'Upper Band 1', 'Lower Band 1', 'MA2', 'Upper Band 2', 'Lower Band 2'], group=_group_Spreads, inline="long")
+// Bearish
+customSellOption    = input.string('S1', 'Short↕', options=['S1', 'S2', 'S3', 'S4', 'Pivot', 'R1', 'R2', 'R3', 'R4', 'MA1', 'Upper Band 1', 'Lower Band 1', 'MA2', 'Upper Band 2', 'Lower Band 2'], group=_group_Spreads, inline="short")
+customSellExit      = input.string('S3', 'Exit ↕', options=['S1', 'S2', 'S3', 'S4', 'Pivot', 'R1', 'R2', 'R3', 'R4', 'MA1', 'Upper Band 1', 'Lower Band 1', 'MA2', 'Upper Band 2', 'Lower Band 2'], group=_group_Spreads, inline="short")
+
+customQuantity      = input.float(100.0, title='Quantity', inline='03', group=_group_Spreads)
+customFEE           = input.float(0.001, title='Exchange Fee', inline='03', group=_group_Spreads)
+
+printProfit(_buy, _sell) =>  //{
+    _fee = customFEE  //0.001
+    netBuy = _buy - _buy * _fee
+    netSell = _sell - _sell * _fee
+    netProfit = netSell - netBuy
+    customQuantity > 0 ? str.tostring(netProfit * customQuantity) : str.tostring(netProfit * customQuantity)
+//}  
+
+__roundPrice(value) =>  str.tostring(useRound ? math.floor(value) : value) // requried utility
+
+//////////////////////////////////////////////////////////////////////////
+///
+___customBuy        = customBuyOption   == 'R1' ? R1 : customBuyOption == 'R2' ? R2 : customBuyOption == 'R3' ? R3 : customBuyOption   == 'R4' ? R4 : customBuyOption == 'Pivot' ? PP : customBuyOption == 'S1' ? S1 : customBuyOption == 'S2' ? S2 : customBuyOption == 'S3' ? S3 : customBuyOption   == 'S4' ? 1 : customBuyOption == 'MA1' ? movingAvg1 : customBuyOption == 'Upper Band 1' ? upperBand1 : customBuyOption == 'Lower Band 1' ? lowerBand1 : customBuyOption == 'MA2' ? movingAvg2 : customBuyOption == 'Upper Band 2' ? upperBand2 : customBuyOption == 'Lower Band 2' ? lowerBand2 : na
+___customLongExit   = customLongExit    == 'R1' ? R1 : customLongExit == 'R2' ? R2 : customLongExit == 'R3' ? R3 : customLongExit   == 'R4' ? R4 : customLongExit == 'Pivot' ? PP : customLongExit == 'S1' ? S1 : customLongExit == 'S2' ? S2 : customLongExit == 'S3' ? S3 : customLongExit   == 'S4' ? 1 : customLongExit == 'MA1' ? movingAvg1 : customLongExit == 'Upper Band 1' ? upperBand1 : customLongExit == 'Lower Band 1' ? lowerBand1 : customLongExit == 'MA2' ? movingAvg2 : customLongExit == 'Upper Band 2' ? upperBand2 : customLongExit == 'Lower Band 2' ? lowerBand2 : na
+___customSell       = customSellOption  == 'R1' ? R1 : customSellOption == 'R2' ? R2 : customSellOption == 'R3' ? R3 : customSellOption   == 'R4' ? R4 : customSellOption == 'Pivot' ? PP : customSellOption == 'S1' ? S1 : customSellOption == 'S2' ? S2 : customSellOption == 'S3' ? S3 : customSellOption   == 'S4' ? 1 : customSellOption == 'MA1' ? movingAvg1 : customSellOption == 'Upper Band 1' ? upperBand1 : customSellOption == 'Lower Band 1' ? lowerBand1 : customSellOption == 'MA2' ? movingAvg2 : customSellOption == 'Upper Band 2' ? upperBand2 : customSellOption == 'Lower Band 2' ? lowerBand2 : na
+___customSellExit   = customSellExit    == 'R1' ? R1 : customSellExit == 'R2' ? R2 : customSellExit == 'R3' ? R3 : customSellExit   == 'R4' ? R4 : customSellExit == 'Pivot' ? PP : customSellExit == 'S1' ? S1 : customSellExit == 'S2' ? S2 : customSellExit == 'S3' ? S3 : customSellExit   == 'S4' ? 1 : customSellExit == 'MA1' ? movingAvg1 : customSellExit == 'Upper Band 1' ? upperBand1 : customSellExit == 'Lower Band 1' ? lowerBand1 : customSellExit == 'MA2' ? movingAvg2 : customSellExit == 'Upper Band 2' ? upperBand2 : customSellExit == 'Lower Band 2' ? lowerBand2 : na
+
+//{ Trading Zone 
+var table anan = table.new(i_tableYpos + "_" + i_tableXpos, 10, 10, border_width = 3) 
+
+if barstate.islast and hideTable
+    table.cell(anan, 1, 0, "Entry #", text_color = col_col, bgcolor = color.new(col_col, 80), text_size = textSize)
+    table.cell(anan, 2, 0, "Exit #", text_color = col_col, bgcolor = color.new(col_col, 80), text_size = textSize)
+    table.cell(anan, 3, 0, "Profit", text_color = col_col, bgcolor = color.new(col_col, 80), text_size = textSize)
+
+if barstate.islast and hideTable
+    table.cell(anan, 0, 2,  "Bull Spread", text_color = row_col, bgcolor = color.new(poscol, 80), text_size = textSize)
+    table.cell(anan, 1, 2, str.tostring( useRound ? math.floor(___customBuy)      :___customBuy), text_color = color.new(negcol, 50), bgcolor = color.new(poscol, 80), text_size = textSize)
+    table.cell(anan, 2, 2, str.tostring( useRound ? math.floor(___customLongExit) :___customLongExit), text_color = color.new(negcol, 50), bgcolor = color.new(poscol, 80), text_size = textSize)
+    table.cell(anan, 3, 2, printProfit(___customBuy,___customLongExit), text_color = color.new(poscol, 50), bgcolor = color.new(poscol, 80), text_size = textSize)
+
+if barstate.islast and hideTable
+    table.cell(anan, 0, 4,  "Bear Spread", text_color = row_col, bgcolor = color.new(negcol, 80),  text_size = textSize)
+    table.cell(anan, 1, 4,  str.tostring(useRound ? math.floor(___customSell)     : ___customSell  ), text_color = color.new(negcol, 50), bgcolor = color.new(negcol, 80), text_size = textSize)
+    table.cell(anan, 2, 4,  str.tostring(useRound ? math.floor(___customSellExit) : ___customSellExit  ), text_color = color.new(negcol, 50), bgcolor = color.new(negcol, 80), text_size = textSize)
+    table.cell(anan, 3, 4,  printProfit(___customSell,___customSellExit), text_color = color.new(poscol, 50), bgcolor = color.new(poscol, 80), text_size = textSize)
