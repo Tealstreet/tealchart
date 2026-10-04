@@ -1,0 +1,182 @@
+{
+  "artifact": "Native Style controls v1",
+  "utc": "2026-10-04T17:58:42.432Z",
+  "title": "V11 Style constant control",
+  "source_status": {
+    "type": 2
+  },
+  "interval": "2",
+  "timezone": "Etc/UTC",
+  "replay": false,
+  "native_styles": {
+    "plot_0": {
+      "color": "rgba(41,98,255,0.75)",
+      "display": 4294967295,
+      "linestyle": 0,
+      "linewidth": 1,
+      "plottype": 0,
+      "trackPrice": false,
+      "title": "plot_0"
+    }
+  },
+  "coded_styles": {
+    "plot_0": {
+      "color": "rgba(41,98,255,0.75)",
+      "display": 4294967295,
+      "linestyle": 0,
+      "linewidth": 1,
+      "plottype": 0,
+      "trackPrice": false
+    }
+  },
+  "global_settings": true,
+  "visible_range": {
+    "_firstBar": 264,
+    "_lastBar": 302
+  },
+  "bar_spacing": 24.46153846153846,
+  "background": "rgba(15, 15, 15, 1)",
+  "dialog_text": "V11 Style constant control\nClose menu\nStyleVisibility\nPRICE\nOUTPUT VALUES\nPrecision\nDefault\nLabels on price scale\nValues in status line\nDefaults\nCancel\nOk",
+  "controls": [
+    {
+      "tag": "BUTTON",
+      "role": null,
+      "name": null,
+      "aria": null,
+      "text": "Close menu",
+      "value": "",
+      "aria_checked": null,
+      "disabled": false,
+      "class_name": "navButton-hbSJVxkQ medium-hbSJVxkQ quietPrimary-hbSJVxkQ lightGray-hbSJVxkQ preservePaddings-hbSJVxkQ close-QAvUMTL6"
+    },
+    {
+      "tag": "BUTTON",
+      "role": "tab",
+      "name": null,
+      "aria": null,
+      "text": "Style",
+      "value": "",
+      "aria_checked": null,
+      "disabled": false,
+      "class_name": "underline-tab-GAhOQ4ll size-small-GAhOQ4ll selected-GAhOQ4ll"
+    },
+    {
+      "tag": "BUTTON",
+      "role": "tab",
+      "name": null,
+      "aria": null,
+      "text": "Visibility",
+      "value": "",
+      "aria_checked": null,
+      "disabled": false,
+      "class_name": "underline-tab-GAhOQ4ll size-small-GAhOQ4ll"
+    },
+    {
+      "tag": "INPUT",
+      "role": null,
+      "name": null,
+      "aria": null,
+      "text": "",
+      "value": "",
+      "checked": true,
+      "aria_checked": "true",
+      "disabled": false,
+      "class_name": "primary-sW87pQzK input-sW87pQzK"
+    },
+    {
+      "tag": "BUTTON",
+      "role": null,
+      "name": null,
+      "aria": null,
+      "text": "",
+      "value": "",
+      "aria_checked": null,
+      "disabled": false,
+      "class_name": "button-GudBEStR accessible-GudBEStR"
+    },
+    {
+      "tag": "DIV",
+      "role": null,
+      "name": "color-with-thickness-select",
+      "aria": null,
+      "text": "",
+      "aria_checked": null,
+      "class_name": "colorPickerWrap-Ah_R6QP5 intent-default-Ah_R6QP5 border-thin-Ah_R6QP5 size-medium-Ah_R6QP5"
+    },
+    {
+      "tag": "INPUT",
+      "role": null,
+      "name": null,
+      "aria": null,
+      "text": "",
+      "value": "",
+      "checked": true,
+      "aria_checked": "true",
+      "disabled": false,
+      "class_name": "primary-sW87pQzK input-sW87pQzK"
+    },
+    {
+      "tag": "INPUT",
+      "role": null,
+      "name": null,
+      "aria": null,
+      "text": "",
+      "value": "",
+      "checked": true,
+      "aria_checked": "true",
+      "disabled": false,
+      "class_name": "primary-sW87pQzK input-sW87pQzK"
+    },
+    {
+      "tag": "BUTTON",
+      "role": null,
+      "name": null,
+      "aria": null,
+      "text": "Defaults",
+      "value": "",
+      "aria_checked": null,
+      "disabled": false,
+      "class_name": "container-N84XScGn container-small-N84XScGn intent-default-N84XScGn border-thin-N84XScGn size-small-N84XScGn adjust-position-N84XScGn first-row-N84XScGn first-col-N84XScGn button-thGO1RZb defaultsButtonText-eh36DZHN"
+    },
+    {
+      "tag": "BUTTON",
+      "role": null,
+      "name": null,
+      "aria": null,
+      "text": "Cancel",
+      "value": "",
+      "aria_checked": null,
+      "disabled": false,
+      "class_name": "button-mLEhCrVw small-mLEhCrVw black-mLEhCrVw secondary-mLEhCrVw apply-overflow-tooltip apply-overflow-tooltip--check-children-recursively apply-overflow-tooltip--allow-text apply-common-tooltip"
+    },
+    {
+      "tag": "BUTTON",
+      "role": null,
+      "name": "submit-button",
+      "aria": null,
+      "text": "Ok",
+      "value": "",
+      "aria_checked": null,
+      "disabled": false,
+      "class_name": "button-mLEhCrVw small-mLEhCrVw black-mLEhCrVw primary-mLEhCrVw apply-overflow-tooltip apply-overflow-tooltip--check-children-recursively apply-overflow-tooltip--allow-text apply-common-tooltip"
+    }
+  ],
+  "color_controls": [
+    {
+      "name": "color-with-thickness-select",
+      "class_name": "colorPickerWrap-Ah_R6QP5 intent-default-Ah_R6QP5 border-thin-Ah_R6QP5 size-medium-Ah_R6QP5",
+      "swatches": [
+        {
+          "style": "background-color: rgba(41, 98, 255, 0.75);",
+          "background": "rgba(41, 98, 255, 0.75)"
+        },
+        {
+          "style": "width: 30px; height: 1px; background-color: rgba(41, 98, 255, 0.75);",
+          "background": "rgba(41, 98, 255, 0.75)"
+        }
+      ]
+    }
+  ],
+  "ui_snapshot": "## Latest page snapshot\nuid=9048_0 RootWebArea \"BTCUSDT 85,330.00 ▲ +0.68% basic\" url=\"https://www.tradingview.com/chart/xlvYwHdH/?symbol=BINANCE%3ABTCUSDT&interval=2\"\n  uid=9048_1 button \"Logged in as sours-lat Active layout: basic\" haspopup=\"menu\"\n  uid=9048_2 StaticText \"11\"\n  uid=9048_3 button \"BTCUSDT\" description=\"Symbol search\"\n  uid=9048_4 button \"Switch data type\"\n  uid=9048_5 button \"Compare symbols\" haspopup=\"dialog\"\n  uid=9048_6 radio \"3 minutes\"\n  uid=9048_7 radio \"5 minutes\"\n  uid=9048_8 radio \"15 minutes\"\n  uid=9048_9 radio \"30 minutes\"\n  uid=9048_10 radio \"45 minutes\"\n  uid=9048_11 radio \"1 hour\"\n  uid=9048_12 radio \"2 hours\"\n  uid=9048_13 radio \"3 hours\"\n  uid=9048_14 radio \"4 hours\"\n  uid=9048_15 radio \"8 hours\"\n  uid=9048_16 radio \"10 hours\"\n  uid=9048_17 radio \"12 hours\"\n  uid=9048_18 radio \"1 day\"\n  uid=9048_19 radio \"3 days\"\n  uid=9048_20 radio \"10 days\"\n  uid=9048_21 radio \"1 week\"\n  uid=9048_22 radio \"1 month\"\n  uid=9048_23 radio \"2 minutes\" checked\n  uid=9048_24 button \"Chart interval\" haspopup=\"menu\"\n  uid=9048_25 radio \"Candles\" checked\n  uid=9048_26 radio \"Line\"\n  uid=9048_27 radio \"High-low\"\n  uid=9048_28 button \"Bar's style\" haspopup=\"menu\"\n  uid=9048_29 button \"Indicators, metrics, and strategies\"\n  uid=9048_30 button \"Favorite indicators\" haspopup=\"menu\"\n  uid=9048_31 button \"Indicator templates\" haspopup=\"menu\"\n  uid=9048_32 button \"Create alert\"\n  uid=9048_33 button \"Bar replay\"\n  uid=9048_34 button disableable disabled\n  uid=9048_35 button disableable disabled\n  uid=9048_36 button \"Layout setup\" haspopup=\"menu\"\n  uid=9048_37 button \"All changes saved\" disableable disabled\n  uid=9048_38 button \"Manage layouts\" haspopup=\"menu\"\n  uid=9048_39 button \"Quick search\"\n  uid=9048_40 button \"Settings\"\n  uid=9048_41 button \"Fullscreen mode\"\n  uid=9048_42 button \"Take a snapshot\" haspopup=\"menu\"\n  uid=9048_43 button \"Share your idea with the trade community\" haspopup=\"menu\"\n  uid=9048_44 button \"Trade\"\n  uid=9048_45 button \"Cross\"\n  uid=9048_46 button \"Cursors\" pressed\n  uid=9048_47 button \"Trendline\"\n  uid=9048_48 button \"Trend tools\"\n  uid=9048_49 button \"Fib retracement\"\n  uid=9048_50 button \"Gann and Fibonacci tools\"\n  uid=9048_51 button \"XABCD pattern\"\n  uid=9048_52 button \"Patterns\"\n  uid=9048_53 button \"Long position\"\n  uid=9048_54 button \"Forecasting and measurement tools\"\n  uid=9048_55 button \"Brush\"\n  uid=9048_56 button \"Geometric shapes\"\n  uid=9048_57 button \"Text\"\n  uid=9048_58 button \"Annotation tools\"\n  uid=9048_59 button \"Icon\"\n  uid=9048_60 button \"Icons\"\n  uid=9048_61 button \"Measure\"\n  uid=9048_62 button \"Zoom in\"\n  uid=9048_63 button \"Magnet mode snaps drawings placed near price bars to the closest OHLC value\" pressed\n  uid=9048_64 button \"Magnets\" pressed\n  uid=9048_65 button \"Keep drawing\"\n  uid=9048_66 button \"Lock drawings and indicators\"\n  uid=9048_67 button \"Lock options\"\n  uid=9048_68 button \"Hide all drawings, indicators, positions, and orders\"\n  uid=9048_69 button \"Hide options\"\n  uid=9048_70 button \"New drawings will not be synced\"\n  uid=9048_71 button \"Sync drawings options\"\n  uid=9048_72 button \"Remove objects\"\n  uid=9048_73 button \"Remove options\"\n  uid=9048_74 button \"Show Favorite Drawing Tools Toolbar\"\n  uid=9048_75 region \"Chart #1\"\n    uid=9048_76 StaticText \"B\"\n    uid=9048_77 button \"Change symbol\"\n    uid=9048_78 StaticText \"·\"\n    uid=9048_79 button \"Change interval\"\n    uid=9048_78 StaticText \"·\"\n    uid=9048_80 StaticText \"Binance\"\n    uid=9048_81 button \"Unflag symbol\"\n    uid=9048_82 button \"More\" description=\"More\"\n    uid=9048_83 button \"Market open\"\n    uid=9048_84 StaticText \"O\"\n    uid=9048_85 StaticText \"85,342.52\"\n    uid=9048_86 StaticText \"H\"\n    uid=9048_87 StaticText \"85,342.53\"\n    uid=9048_88 StaticText \"L\"\n    uid=9048_89 StaticText \"85,319.52\"\n    uid=9048_90 StaticText \"C\"\n    uid=9048_91 StaticText \"85,319.52\"\n    uid=9048_92 StaticText \"−23.00 (−0.03%)\"\n    uid=9048_93 StaticText \"85,319.52\"\n    uid=9048_94 StaticText \"SELL\"\n    uid=9048_95 StaticText \"0.01\"\n    uid=9048_96 StaticText \"85,319.53\"\n    uid=9048_97 StaticText \"BUY\"\n    uid=9048_98 Canvas \"Chart for BINANCE:BTCUSDT, 2 minutes\"\n    uid=9048_99 StaticText \"V11 Style constant control\"\n    uid=9048_100 button \"Hide\" description=\"Hide\"\n    uid=9048_101 button \"Settings\" description=\"Settings\"\n    uid=9048_102 button \"Remove\" description=\"Remove\"\n    uid=9048_103 button \"More\" description=\"More\"\n    uid=9048_104 StaticText \"85,319.52\"\n  uid=9048_105 button \"1 day in 1 minute intervals\"\n  uid=9048_106 button \"5 days in 5 minutes intervals\"\n  uid=9048_107 button \"1 month in 30 minutes intervals\"\n  uid=9048_108 button \"3 months in 1 hour intervals\"\n  uid=9048_109 button \"6 months in 2 hours intervals\"\n  uid=9048_110 button \"Year to day in 1 day intervals\"\n  uid=9048_111 button \"1 year in 1 day intervals\"\n  uid=9048_112 button \"5 years in 1 week intervals\"\n  uid=9048_113 button \"All data in 1 month intervals\"\n  uid=9048_114 button \"Go to\"\n  uid=9048_115 button \"Timezone\"\n  uid=9048_116 button \"Watchlist, details, and news\"\n  uid=9048_117 button \"Alerts\"\n  uid=9048_118 button \"Object tree and data window\" pressed\n  uid=9048_119 button \"AI Copilot\"\n  uid=9048_120 button \"Screeners\"\n  uid=9048_121 button \"Pine\"\n  uid=9048_122 button \"Calendars\"\n  uid=9048_123 button \"Community\"\n  uid=9048_124 button \"Notifications\"\n  uid=9048_125 button \"Chats\"\n  uid=9048_126 button \"Products\" haspopup=\"menu\"\n  uid=9048_127 button \"Help Center\"\n  uid=9054_0 tab \"Object tree\" selectable\n  uid=9054_1 tab \"Data window\" selectable selected\n  uid=9054_2 generic disableable disabled\n    uid=9054_3 StaticText \"Date\"\n    uid=9054_4 StaticText \"Sun 04 Oct '26\"\n    uid=9054_5 StaticText \"Time\"\n    uid=9054_6 StaticText \"17:56\"\n  uid=9054_7 row \"BTCUSDT · 2 · Binance Open 85,342.52 High 85,342.53 Low 85,319.52 Close 85,319.52 Change −23.00 (−0.03%) Vol 3.14 Last day change +576.44 (+0.68%)\"\n    uid=9054_8 StaticText \"BTCUSDT · 2 · Binance\"\n    uid=9054_9 button \"Hide data\"\n    uid=9054_10 StaticText \"Open\"\n    uid=9054_11 StaticText \"85,342.52\"\n    uid=9054_12 StaticText \"High\"\n    uid=9054_13 StaticText \"85,342.53\"\n    uid=9054_14 StaticText \"Low\"\n    uid=9054_15 StaticText \"85,319.52\"\n    uid=9054_16 StaticText \"Close\"\n    uid=9054_17 StaticText \"85,319.52\"\n    uid=9054_18 StaticText \"Change\"\n    uid=9054_19 StaticText \"−23.00 (−0.03%)\"\n    uid=9054_20 StaticText \"Vol\"\n    uid=9054_21 StaticText \"3.14\"\n    uid=9054_22 StaticText \"Last day change\"\n    uid=9054_23 StaticText \"+576.44 (+0.68%)\"\n  uid=9054_24 row \"V11 Style constant control PRICE 85,319.52\"\n    uid=9054_25 StaticText \"V11 Style constant control\"\n    uid=9054_26 button \"Hide data\"\n    uid=9054_27 StaticText \"PRICE\"\n    uid=9054_28 StaticText \"85,319.52\"\n  uid=9048_128 generic \"Trading panel\"\n    uid=9048_129 generic\n  uid=9048_130 generic live=\"polite\" relevant=\"additions\"\n  uid=9048_131 generic live=\"polite\" relevant=\"additions\"\n  uid=9048_132 generic live=\"assertive\" relevant=\"additions\"\n  uid=9048_133 generic live=\"assertive\" relevant=\"additions\"\n  uid=9048_134 generic live=\"polite\" relevant=\"additions text\"\n  uid=9048_135 log live=\"polite\" relevant=\"additions text\"\n  uid=9048_136 log live=\"polite\" relevant=\"additions text\"\n  uid=9048_137 log live=\"polite\" relevant=\"additions text\"\n  uid=9048_138 log live=\"polite\" relevant=\"additions text\"\n  uid=9048_139 log live=\"polite\" relevant=\"additions text\"\n  uid=9048_140 log live=\"polite\" relevant=\"additions text\"\n  uid=9048_141 log live=\"polite\" relevant=\"additions text\"\n  uid=9048_142 log live=\"polite\" relevant=\"additions text\"\n  uid=9048_143 log live=\"polite\" relevant=\"additions text\"\n  uid=9048_144 log live=\"polite\" relevant=\"additions text\"\n  uid=9048_145 log live=\"polite\" relevant=\"additions text\"\n  uid=9048_146 log live=\"polite\" relevant=\"additions text\"\n  uid=9048_147 log live=\"polite\" relevant=\"additions text\"\n  uid=9048_148 log live=\"polite\" relevant=\"additions text\"\n  uid=9048_149 log live=\"polite\" relevant=\"additions text\"\n  uid=9048_150 log live=\"polite\" relevant=\"additions text\"\n  uid=9048_151 log live=\"polite\" relevant=\"additions text\"\n  uid=9048_152 log live=\"polite\" relevant=\"additions text\"\n  uid=9048_153 log live=\"polite\" relevant=\"additions text\"\n  uid=9048_154 log live=\"polite\" relevant=\"additions text\"\n  uid=9048_155 log live=\"polite\" relevant=\"additions text\"\n  uid=9056_0 generic\n    uid=9056_1 StaticText \"V11 Style constant control\"\n    uid=9056_2 button \"Close menu\"\n    uid=9056_3 tab \"Style\" focusable focused selectable selected\n    uid=9056_4 tab \"Visibility\" selectable\n    uid=9056_5 checkbox \"PRICE\" checked\n    uid=9056_6 StaticText \"PRICE\"\n    uid=9056_7 button\n    uid=9056_8 button expandable haspopup=\"listbox\"\n    uid=9056_9 StaticText \"OUTPUT VALUES\"\n    uid=9056_10 StaticText \"Precision\"\n    uid=9056_11 button \"Default\" expandable haspopup=\"listbox\"\n    uid=9056_12 checkbox \"Labels on price scale\" checked\n    uid=9056_13 StaticText \"Labels on price scale\"\n    uid=9056_14 checkbox \"Values in status line\" checked\n    uid=9056_15 StaticText \"Values in status line\"\n    uid=9056_16 button \"Defaults\" expandable haspopup=\"menu\"\n    uid=9056_17 button \"Cancel\"\n    uid=9056_18 button \"Ok\"\n",
+  "reload_observation": "Same chart properties and saved viewport spacing reloaded; native host history300 vs full baseline. Collector full-history wait failed; no native runtime failure."
+}

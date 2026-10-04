@@ -3493,5 +3493,5420 @@
     },
     "declared_unexported_columns": [],
     "data_window_witness": "captures/v13/evidence/context-sabres-origin-v5-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T17:55:14.303Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "arm",
+        "bitness": "64",
+        "brands": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156"
+          }
+        ],
+        "fullVersionList": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8.0.0.0"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156.0.8075.0"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156.0.8075.0"
+          }
+        ],
+        "mobile": false,
+        "platform": "macOS",
+        "platformVersion": "27.2.0"
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v13 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "host-style-constant-control-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "f083262590be5ee06ce79a7c69aa7b19123c9fbea073c41cc97c21ffa71ac03f",
+    "indicator_title": "V11 Style constant control",
+    "status": "RUNS",
+    "csv_file": "captures/v13/host-style-constant-control-v6-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-05T015513.700.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "minmove": 1,
+      "pricescale": 100,
+      "pointvalue": 1,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V11 Style constant control",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24718,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 25018,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T17:55:05.851Z",
+    "live_candle_open_utc": "2026-10-04T17:54:00.000Z",
+    "export_utc": "2026-10-04T17:55:13.941Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v13/evidence/host-style-constant-control-v6-v1-attempt1-setup.png",
+      "captures/v13/evidence/host-style-constant-control-v6-v1-attempt1-export.png",
+      "captures/v13/evidence/host-style-constant-control-v6-v1-attempt1-logs.txt",
+      "captures/v13/evidence/host-style-constant-control-v6-v1-attempt1-logs-v1.json",
+      "captures/v13/evidence/host-style-constant-control-v6-v1-attempt1-logs.png",
+      "captures/v13/evidence/host-style-constant-control-v6-v1-attempt1-visual.png",
+      "captures/v13/evidence/host-style-constant-control-v6-v1-attempt1-data-window-v1.png",
+      "captures/v13/evidence/host-style-constant-control-v6-v1-attempt1-data-window-v1.json",
+      "captures/v13/evidence/host-style-constant-control-v6-v1-attempt1-data-window-v1.txt",
+      "captures/v13/evidence/host-style-constant-control-v6-v1-attempt1-authority-object-geometry-v1.json",
+      "captures/v13/evidence/host-style-constant-control-v6-v1-attempt1-authority-object-geometry-v1.png",
+      "captures/v13/evidence/host-style-constant-control-v6-v1-attempt1-constant-style-controls-v1.json",
+      "captures/v13/evidence/host-style-constant-control-v6-v1-attempt1-constant-style-controls-v1.png",
+      "captures/v13/evidence/host-style-constant-control-v6-v1-attempt1-constant-native-color-editor-v1.json",
+      "captures/v13/evidence/host-style-constant-control-v6-v1-attempt1-constant-native-color-editor-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T17:55:06.641Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790831280,
+            84170.98,
+            84175.65,
+            84160.01,
+            84175.65,
+            6.54866
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791136440,
+            85340.04,
+            85340.04,
+            85330.01,
+            85334,
+            4.49259
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 Style constant control",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790831280,
+                84175.65
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791136440,
+                85334
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T17:55:07.668Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790831280,
+            84170.98,
+            84175.65,
+            84160.01,
+            84175.65,
+            6.54866
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791136440,
+            85340.04,
+            85340.04,
+            85330.01,
+            85334.01,
+            4.49259
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 Style constant control",
+            "status": {
+              "type": 2
+            },
+            "size": 25018,
+            "first": {
+              "index": -1022474,
+              "value": [
+                1788134400,
+                77674.04
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791136440,
+                85334.01
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T17:55:08.431Z",
+        "bars": 25018,
+        "end": true,
+        "first": {
+          "index": -24718,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791136440,
+            85340.04,
+            85340.04,
+            85330.01,
+            85334.01,
+            4.49431
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 Style constant control",
+            "status": {
+              "type": 2
+            },
+            "size": 25018,
+            "first": {
+              "index": -24718,
+              "value": [
+                1788134400,
+                77674.04
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791136440,
+                85334.01
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   17:54",
+    "historical_compare_before_unix_seconds": 1791136440,
+    "pine_logs": {
+      "paths": [
+        "evidence/host-style-constant-control-v6-v1-attempt1-logs.txt",
+        "evidence/host-style-constant-control-v6-v1-attempt1-logs-v1.json",
+        "evidence/host-style-constant-control-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "all_exported_column_occurrences": [
+      {
+        "title": "time",
+        "occurrence": 1,
+        "position": 0
+      },
+      {
+        "title": "open",
+        "occurrence": 1,
+        "position": 1
+      },
+      {
+        "title": "high",
+        "occurrence": 1,
+        "position": 2
+      },
+      {
+        "title": "low",
+        "occurrence": 1,
+        "position": 3
+      },
+      {
+        "title": "close",
+        "occurrence": 1,
+        "position": 4
+      },
+      {
+        "title": "PRICE",
+        "occurrence": 1,
+        "position": 5
+      }
+    ],
+    "declared_to_native_column_occurrences": [
+      {
+        "declared_title": "PRICE",
+        "native_title": "PRICE",
+        "occurrence": 1,
+        "position": 5
+      }
+    ],
+    "named_value_map_scope": "Legacy title maps show the first occurrence only; original positional cells and occurrence tables retain every duplicate without renaming.",
+    "csv_sha256": "36190ae1422e3dc68ca5bb5a4b6f3d79fdcb3aed785be76ea0c1e89bc6148570",
+    "csv_bytes": 1317476,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "PRICE"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "PRICE": 5
+    },
+    "first_historical_cells": [
+      "1788134400",
+      "77682",
+      "77682.01",
+      "77572",
+      "77674.04",
+      "77674.04"
+    ],
+    "last_historical_cells": [
+      "1791136320",
+      "85386.01",
+      "85386.01",
+      "85338.87",
+      "85340.04",
+      "85340.04"
+    ],
+    "declared_to_native_header_mapping": {
+      "PRICE": "PRICE"
+    },
+    "csv_rows": 25018,
+    "historical_rows": 25017,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791136440,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791136440",
+    "first_historical_values": {
+      "PRICE": "77674.04"
+    },
+    "last_historical_values": {
+      "PRICE": "85340.04"
+    },
+    "declared_unexported_columns": [],
+    "data_window_witness": "captures/v13/evidence/host-style-constant-control-v6-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T17:58:35.664Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "arm",
+        "bitness": "64",
+        "brands": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156"
+          }
+        ],
+        "fullVersionList": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8.0.0.0"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156.0.8075.0"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156.0.8075.0"
+          }
+        ],
+        "mobile": false,
+        "platform": "macOS",
+        "platformVersion": "27.2.0"
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v13 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "host-style-constant-control-v6-v1.pine",
+    "attempt": 2,
+    "source_sha256": "f083262590be5ee06ce79a7c69aa7b19123c9fbea073c41cc97c21ffa71ac03f",
+    "indicator_title": "V11 Style constant control",
+    "status": "RUNS-PARTIAL-HISTORY",
+    "csv_file": "captures/v13/host-style-constant-control-v6-v1-attempt2.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-05T015835.033.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "minmove": 1,
+      "pricescale": 100,
+      "pointvalue": 1,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V11 Style constant control",
+      "dataset_start_utc": "2026-10-04T07:58:00.000Z",
+      "first_chart_bar": {
+        "index": 0,
+        "value": [
+          1791100680,
+          85054.26,
+          85112.65,
+          85054.26,
+          85106,
+          14.54156
+        ]
+      },
+      "chart_bars": 301,
+      "subscription": "pro_premium",
+      "native_end_of_data": false,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": "2026-10-04T17:58:00.000Z",
+    "export_utc": "2026-10-04T17:58:35.303Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v13/evidence/host-style-constant-control-v6-v1-attempt2-setup.png",
+      "captures/v13/evidence/host-style-constant-control-v6-v1-attempt2-export.png",
+      "captures/v13/evidence/host-style-constant-control-v6-v1-attempt2-logs.txt",
+      "captures/v13/evidence/host-style-constant-control-v6-v1-attempt2-logs-v1.json",
+      "captures/v13/evidence/host-style-constant-control-v6-v1-attempt2-logs.png",
+      "captures/v13/evidence/host-style-constant-control-v6-v1-attempt2-visual.png",
+      "captures/v13/evidence/host-style-constant-control-v6-v1-attempt2-data-window-v1.png",
+      "captures/v13/evidence/host-style-constant-control-v6-v1-attempt2-data-window-v1.json",
+      "captures/v13/evidence/host-style-constant-control-v6-v1-attempt2-data-window-v1.txt",
+      "captures/v13/evidence/host-style-constant-control-v6-v1-attempt2-constant-style-after-reload-v1.json",
+      "captures/v13/evidence/host-style-constant-control-v6-v1-attempt2-constant-style-after-reload-v1.png"
+    ],
+    "notes": "Exact frozen source unchanged. This equity-context capture is retained with actual history below the frozen minimum; not a full-history parity receipt. Source default inputs unchanged. Native provider identity, interval, session, cutoff and visuals recorded; request-series companions remain separate.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T17:56:43.409Z",
+        "bars": 300,
+        "end": false,
+        "first": {
+          "index": 0,
+          "value": [
+            1791100680,
+            85054.26,
+            85112.65,
+            85054.26,
+            85106,
+            14.54156
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791136560,
+            85342.52,
+            85342.53,
+            85342.52,
+            85342.53,
+            0.29836
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 Style constant control",
+            "status": {
+              "type": 2
+            },
+            "size": 400,
+            "first": {
+              "index": -1000100,
+              "value": [
+                1791088680,
+                84812.01
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791136560,
+                85342.53
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T17:56:44.106Z",
+        "bars": 300,
+        "end": false,
+        "first": {
+          "index": 0,
+          "value": [
+            1791100680,
+            85054.26,
+            85112.65,
+            85054.26,
+            85106,
+            14.54156
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791136560,
+            85342.52,
+            85342.53,
+            85342.52,
+            85342.53,
+            0.29836
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 Style constant control",
+            "status": {
+              "type": 2
+            },
+            "size": 400,
+            "first": {
+              "index": -1000100,
+              "value": [
+                1791088680,
+                84812.01
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791136560,
+                85342.53
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T17:56:44.768Z",
+        "bars": 300,
+        "end": false,
+        "first": {
+          "index": 0,
+          "value": [
+            1791100680,
+            85054.26,
+            85112.65,
+            85054.26,
+            85106,
+            14.54156
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791136560,
+            85342.52,
+            85342.53,
+            85342.52,
+            85342.52,
+            0.29836
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 Style constant control",
+            "status": {
+              "type": 2
+            },
+            "size": 400,
+            "first": {
+              "index": -1000100,
+              "value": [
+                1791088680,
+                84812.01
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791136560,
+                85342.52
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T17:56:45.428Z",
+        "bars": 300,
+        "end": false,
+        "first": {
+          "index": 0,
+          "value": [
+            1791100680,
+            85054.26,
+            85112.65,
+            85054.26,
+            85106,
+            14.54156
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791136560,
+            85342.52,
+            85342.53,
+            85342.52,
+            85342.52,
+            0.29836
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 Style constant control",
+            "status": {
+              "type": 2
+            },
+            "size": 400,
+            "first": {
+              "index": -1000100,
+              "value": [
+                1791088680,
+                84812.01
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791136560,
+                85342.52
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T17:56:46.164Z",
+        "bars": 300,
+        "end": false,
+        "first": {
+          "index": 0,
+          "value": [
+            1791100680,
+            85054.26,
+            85112.65,
+            85054.26,
+            85106,
+            14.54156
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791136560,
+            85342.52,
+            85342.53,
+            85342.52,
+            85342.53,
+            0.30323
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 Style constant control",
+            "status": {
+              "type": 2
+            },
+            "size": 400,
+            "first": {
+              "index": -1000100,
+              "value": [
+                1791088680,
+                84812.01
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791136560,
+                85342.53
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T17:56:46.966Z",
+        "bars": 300,
+        "end": false,
+        "first": {
+          "index": 0,
+          "value": [
+            1791100680,
+            85054.26,
+            85112.65,
+            85054.26,
+            85106,
+            14.54156
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791136560,
+            85342.52,
+            85342.53,
+            85342.52,
+            85342.52,
+            0.34049
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 Style constant control",
+            "status": {
+              "type": 2
+            },
+            "size": 400,
+            "first": {
+              "index": -1000100,
+              "value": [
+                1791088680,
+                84812.01
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791136560,
+                85342.52
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T17:56:47.636Z",
+        "bars": 300,
+        "end": false,
+        "first": {
+          "index": 0,
+          "value": [
+            1791100680,
+            85054.26,
+            85112.65,
+            85054.26,
+            85106,
+            14.54156
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791136560,
+            85342.52,
+            85342.53,
+            85342.52,
+            85342.52,
+            0.34049
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 Style constant control",
+            "status": {
+              "type": 2
+            },
+            "size": 400,
+            "first": {
+              "index": -1000100,
+              "value": [
+                1791088680,
+                84812.01
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791136560,
+                85342.52
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T17:56:48.383Z",
+        "bars": 300,
+        "end": false,
+        "first": {
+          "index": 0,
+          "value": [
+            1791100680,
+            85054.26,
+            85112.65,
+            85054.26,
+            85106,
+            14.54156
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791136560,
+            85342.52,
+            85342.53,
+            85342.52,
+            85342.52,
+            0.34066
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 Style constant control",
+            "status": {
+              "type": 2
+            },
+            "size": 400,
+            "first": {
+              "index": -1000100,
+              "value": [
+                1791088680,
+                84812.01
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791136560,
+                85342.52
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T17:56:49.052Z",
+        "bars": 300,
+        "end": false,
+        "first": {
+          "index": 0,
+          "value": [
+            1791100680,
+            85054.26,
+            85112.65,
+            85054.26,
+            85106,
+            14.54156
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791136560,
+            85342.52,
+            85342.53,
+            85342.52,
+            85342.53,
+            0.34066
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 Style constant control",
+            "status": {
+              "type": 2
+            },
+            "size": 400,
+            "first": {
+              "index": -1000100,
+              "value": [
+                1791088680,
+                84812.01
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791136560,
+                85342.53
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T17:56:49.721Z",
+        "bars": 300,
+        "end": false,
+        "first": {
+          "index": 0,
+          "value": [
+            1791100680,
+            85054.26,
+            85112.65,
+            85054.26,
+            85106,
+            14.54156
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791136560,
+            85342.52,
+            85342.53,
+            85342.52,
+            85342.52,
+            0.37103
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 Style constant control",
+            "status": {
+              "type": 2
+            },
+            "size": 400,
+            "first": {
+              "index": -1000100,
+              "value": [
+                1791088680,
+                84812.01
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791136560,
+                85342.52
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T17:56:50.386Z",
+        "bars": 300,
+        "end": false,
+        "first": {
+          "index": 0,
+          "value": [
+            1791100680,
+            85054.26,
+            85112.65,
+            85054.26,
+            85106,
+            14.54156
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791136560,
+            85342.52,
+            85342.53,
+            85342.52,
+            85342.52,
+            0.37103
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 Style constant control",
+            "status": {
+              "type": 2
+            },
+            "size": 400,
+            "first": {
+              "index": -1000100,
+              "value": [
+                1791088680,
+                84812.01
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791136560,
+                85342.52
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T17:56:51.053Z",
+        "bars": 300,
+        "end": false,
+        "first": {
+          "index": 0,
+          "value": [
+            1791100680,
+            85054.26,
+            85112.65,
+            85054.26,
+            85106,
+            14.54156
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791136560,
+            85342.52,
+            85342.53,
+            85342.52,
+            85342.52,
+            0.37331
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 Style constant control",
+            "status": {
+              "type": 2
+            },
+            "size": 400,
+            "first": {
+              "index": -1000100,
+              "value": [
+                1791088680,
+                84812.01
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791136560,
+                85342.52
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T17:56:51.717Z",
+        "bars": 300,
+        "end": false,
+        "first": {
+          "index": 0,
+          "value": [
+            1791100680,
+            85054.26,
+            85112.65,
+            85054.26,
+            85106,
+            14.54156
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791136560,
+            85342.52,
+            85342.53,
+            85342.52,
+            85342.52,
+            0.37331
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 Style constant control",
+            "status": {
+              "type": 2
+            },
+            "size": 400,
+            "first": {
+              "index": -1000100,
+              "value": [
+                1791088680,
+                84812.01
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791136560,
+                85342.52
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T17:56:52.386Z",
+        "bars": 300,
+        "end": false,
+        "first": {
+          "index": 0,
+          "value": [
+            1791100680,
+            85054.26,
+            85112.65,
+            85054.26,
+            85106,
+            14.54156
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791136560,
+            85342.52,
+            85342.53,
+            85342.52,
+            85342.52,
+            0.37331
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 Style constant control",
+            "status": {
+              "type": 2
+            },
+            "size": 400,
+            "first": {
+              "index": -1000100,
+              "value": [
+                1791088680,
+                84812.01
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791136560,
+                85342.52
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T17:56:53.045Z",
+        "bars": 300,
+        "end": false,
+        "first": {
+          "index": 0,
+          "value": [
+            1791100680,
+            85054.26,
+            85112.65,
+            85054.26,
+            85106,
+            14.54156
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791136560,
+            85342.52,
+            85342.53,
+            85342.52,
+            85342.52,
+            0.37331
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 Style constant control",
+            "status": {
+              "type": 2
+            },
+            "size": 400,
+            "first": {
+              "index": -1000100,
+              "value": [
+                1791088680,
+                84812.01
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791136560,
+                85342.52
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T17:56:53.703Z",
+        "bars": 300,
+        "end": false,
+        "first": {
+          "index": 0,
+          "value": [
+            1791100680,
+            85054.26,
+            85112.65,
+            85054.26,
+            85106,
+            14.54156
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791136560,
+            85342.52,
+            85342.53,
+            85342.52,
+            85342.52,
+            0.37331
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 Style constant control",
+            "status": {
+              "type": 2
+            },
+            "size": 400,
+            "first": {
+              "index": -1000100,
+              "value": [
+                1791088680,
+                84812.01
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791136560,
+                85342.52
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T17:56:54.371Z",
+        "bars": 300,
+        "end": false,
+        "first": {
+          "index": 0,
+          "value": [
+            1791100680,
+            85054.26,
+            85112.65,
+            85054.26,
+            85106,
+            14.54156
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791136560,
+            85342.52,
+            85342.53,
+            85342.52,
+            85342.52,
+            0.37331
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 Style constant control",
+            "status": {
+              "type": 2
+            },
+            "size": 400,
+            "first": {
+              "index": -1000100,
+              "value": [
+                1791088680,
+                84812.01
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791136560,
+                85342.52
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T17:56:55.027Z",
+        "bars": 300,
+        "end": false,
+        "first": {
+          "index": 0,
+          "value": [
+            1791100680,
+            85054.26,
+            85112.65,
+            85054.26,
+            85106,
+            14.54156
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791136560,
+            85342.52,
+            85342.53,
+            85342.52,
+            85342.52,
+            0.38531
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 Style constant control",
+            "status": {
+              "type": 2
+            },
+            "size": 400,
+            "first": {
+              "index": -1000100,
+              "value": [
+                1791088680,
+                84812.01
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791136560,
+                85342.52
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T17:56:55.702Z",
+        "bars": 300,
+        "end": false,
+        "first": {
+          "index": 0,
+          "value": [
+            1791100680,
+            85054.26,
+            85112.65,
+            85054.26,
+            85106,
+            14.54156
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791136560,
+            85342.52,
+            85342.53,
+            85342.52,
+            85342.52,
+            0.38993
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 Style constant control",
+            "status": {
+              "type": 2
+            },
+            "size": 400,
+            "first": {
+              "index": -1000100,
+              "value": [
+                1791088680,
+                84812.01
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791136560,
+                85342.52
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T17:56:56.371Z",
+        "bars": 300,
+        "end": false,
+        "first": {
+          "index": 0,
+          "value": [
+            1791100680,
+            85054.26,
+            85112.65,
+            85054.26,
+            85106,
+            14.54156
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791136560,
+            85342.52,
+            85342.53,
+            85342.52,
+            85342.52,
+            0.38993
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 Style constant control",
+            "status": {
+              "type": 2
+            },
+            "size": 400,
+            "first": {
+              "index": -1000100,
+              "value": [
+                1791088680,
+                84812.01
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791136560,
+                85342.52
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T17:56:57.044Z",
+        "bars": 300,
+        "end": false,
+        "first": {
+          "index": 0,
+          "value": [
+            1791100680,
+            85054.26,
+            85112.65,
+            85054.26,
+            85106,
+            14.54156
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791136560,
+            85342.52,
+            85342.53,
+            85342.52,
+            85342.52,
+            0.39251
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 Style constant control",
+            "status": {
+              "type": 2
+            },
+            "size": 400,
+            "first": {
+              "index": -1000100,
+              "value": [
+                1791088680,
+                84812.01
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791136560,
+                85342.52
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T17:56:57.705Z",
+        "bars": 300,
+        "end": false,
+        "first": {
+          "index": 0,
+          "value": [
+            1791100680,
+            85054.26,
+            85112.65,
+            85054.26,
+            85106,
+            14.54156
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791136560,
+            85342.52,
+            85342.53,
+            85342.52,
+            85342.52,
+            0.39794
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 Style constant control",
+            "status": {
+              "type": 2
+            },
+            "size": 400,
+            "first": {
+              "index": -1000100,
+              "value": [
+                1791088680,
+                84812.01
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791136560,
+                85342.52
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T17:56:58.401Z",
+        "bars": 300,
+        "end": false,
+        "first": {
+          "index": 0,
+          "value": [
+            1791100680,
+            85054.26,
+            85112.65,
+            85054.26,
+            85106,
+            14.54156
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791136560,
+            85342.52,
+            85342.53,
+            85342.52,
+            85342.52,
+            0.39794
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 Style constant control",
+            "status": {
+              "type": 2
+            },
+            "size": 400,
+            "first": {
+              "index": -1000100,
+              "value": [
+                1791088680,
+                84812.01
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791136560,
+                85342.52
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T17:56:59.088Z",
+        "bars": 300,
+        "end": false,
+        "first": {
+          "index": 0,
+          "value": [
+            1791100680,
+            85054.26,
+            85112.65,
+            85054.26,
+            85106,
+            14.54156
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791136560,
+            85342.52,
+            85342.53,
+            85342.52,
+            85342.53,
+            0.40619
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 Style constant control",
+            "status": {
+              "type": 2
+            },
+            "size": 400,
+            "first": {
+              "index": -1000100,
+              "value": [
+                1791088680,
+                84812.01
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791136560,
+                85342.53
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T17:56:59.763Z",
+        "bars": 300,
+        "end": false,
+        "first": {
+          "index": 0,
+          "value": [
+            1791100680,
+            85054.26,
+            85112.65,
+            85054.26,
+            85106,
+            14.54156
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791136560,
+            85342.52,
+            85342.53,
+            85342.52,
+            85342.53,
+            0.40791
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 Style constant control",
+            "status": {
+              "type": 2
+            },
+            "size": 400,
+            "first": {
+              "index": -1000100,
+              "value": [
+                1791088680,
+                84812.01
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791136560,
+                85342.53
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T17:57:00.427Z",
+        "bars": 300,
+        "end": false,
+        "first": {
+          "index": 0,
+          "value": [
+            1791100680,
+            85054.26,
+            85112.65,
+            85054.26,
+            85106,
+            14.54156
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791136560,
+            85342.52,
+            85342.53,
+            85342.52,
+            85342.53,
+            0.40791
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 Style constant control",
+            "status": {
+              "type": 2
+            },
+            "size": 400,
+            "first": {
+              "index": -1000100,
+              "value": [
+                1791088680,
+                84812.01
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791136560,
+                85342.53
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T17:57:01.083Z",
+        "bars": 300,
+        "end": false,
+        "first": {
+          "index": 0,
+          "value": [
+            1791100680,
+            85054.26,
+            85112.65,
+            85054.26,
+            85106,
+            14.54156
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791136560,
+            85342.52,
+            85342.53,
+            85342.52,
+            85342.52,
+            0.40791
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 Style constant control",
+            "status": {
+              "type": 2
+            },
+            "size": 400,
+            "first": {
+              "index": -1000100,
+              "value": [
+                1791088680,
+                84812.01
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791136560,
+                85342.52
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T17:57:01.739Z",
+        "bars": 300,
+        "end": false,
+        "first": {
+          "index": 0,
+          "value": [
+            1791100680,
+            85054.26,
+            85112.65,
+            85054.26,
+            85106,
+            14.54156
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791136560,
+            85342.52,
+            85342.53,
+            85342.52,
+            85342.53,
+            0.41122
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 Style constant control",
+            "status": {
+              "type": 2
+            },
+            "size": 400,
+            "first": {
+              "index": -1000100,
+              "value": [
+                1791088680,
+                84812.01
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791136560,
+                85342.53
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T17:57:02.402Z",
+        "bars": 300,
+        "end": false,
+        "first": {
+          "index": 0,
+          "value": [
+            1791100680,
+            85054.26,
+            85112.65,
+            85054.26,
+            85106,
+            14.54156
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791136560,
+            85342.52,
+            85342.53,
+            85342.52,
+            85342.53,
+            0.41122
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 Style constant control",
+            "status": {
+              "type": 2
+            },
+            "size": 400,
+            "first": {
+              "index": -1000100,
+              "value": [
+                1791088680,
+                84812.01
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791136560,
+                85342.53
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T17:57:03.066Z",
+        "bars": 300,
+        "end": false,
+        "first": {
+          "index": 0,
+          "value": [
+            1791100680,
+            85054.26,
+            85112.65,
+            85054.26,
+            85106,
+            14.54156
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791136560,
+            85342.52,
+            85342.53,
+            85342.52,
+            85342.52,
+            0.41183
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 Style constant control",
+            "status": {
+              "type": 2
+            },
+            "size": 400,
+            "first": {
+              "index": -1000100,
+              "value": [
+                1791088680,
+                84812.01
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791136560,
+                85342.52
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T17:57:03.721Z",
+        "bars": 300,
+        "end": false,
+        "first": {
+          "index": 0,
+          "value": [
+            1791100680,
+            85054.26,
+            85112.65,
+            85054.26,
+            85106,
+            14.54156
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791136560,
+            85342.52,
+            85342.53,
+            85342.52,
+            85342.52,
+            0.41183
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 Style constant control",
+            "status": {
+              "type": 2
+            },
+            "size": 400,
+            "first": {
+              "index": -1000100,
+              "value": [
+                1791088680,
+                84812.01
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791136560,
+                85342.52
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T17:57:04.388Z",
+        "bars": 300,
+        "end": false,
+        "first": {
+          "index": 0,
+          "value": [
+            1791100680,
+            85054.26,
+            85112.65,
+            85054.26,
+            85106,
+            14.54156
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791136560,
+            85342.52,
+            85342.53,
+            85342.52,
+            85342.52,
+            0.41947
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 Style constant control",
+            "status": {
+              "type": 2
+            },
+            "size": 400,
+            "first": {
+              "index": -1000100,
+              "value": [
+                1791088680,
+                84812.01
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791136560,
+                85342.52
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T17:57:05.052Z",
+        "bars": 300,
+        "end": false,
+        "first": {
+          "index": 0,
+          "value": [
+            1791100680,
+            85054.26,
+            85112.65,
+            85054.26,
+            85106,
+            14.54156
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791136560,
+            85342.52,
+            85342.53,
+            85342.52,
+            85342.52,
+            0.41947
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 Style constant control",
+            "status": {
+              "type": 2
+            },
+            "size": 400,
+            "first": {
+              "index": -1000100,
+              "value": [
+                1791088680,
+                84812.01
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791136560,
+                85342.52
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T17:57:05.715Z",
+        "bars": 300,
+        "end": false,
+        "first": {
+          "index": 0,
+          "value": [
+            1791100680,
+            85054.26,
+            85112.65,
+            85054.26,
+            85106,
+            14.54156
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791136560,
+            85342.52,
+            85342.53,
+            85342.52,
+            85342.52,
+            0.41947
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 Style constant control",
+            "status": {
+              "type": 2
+            },
+            "size": 400,
+            "first": {
+              "index": -1000100,
+              "value": [
+                1791088680,
+                84812.01
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791136560,
+                85342.52
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T17:57:06.375Z",
+        "bars": 300,
+        "end": false,
+        "first": {
+          "index": 0,
+          "value": [
+            1791100680,
+            85054.26,
+            85112.65,
+            85054.26,
+            85106,
+            14.54156
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791136560,
+            85342.52,
+            85342.53,
+            85342.52,
+            85342.52,
+            0.41947
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 Style constant control",
+            "status": {
+              "type": 2
+            },
+            "size": 400,
+            "first": {
+              "index": -1000100,
+              "value": [
+                1791088680,
+                84812.01
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791136560,
+                85342.52
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T17:57:07.121Z",
+        "bars": 300,
+        "end": false,
+        "first": {
+          "index": 0,
+          "value": [
+            1791100680,
+            85054.26,
+            85112.65,
+            85054.26,
+            85106,
+            14.54156
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791136560,
+            85342.52,
+            85342.53,
+            85342.52,
+            85342.52,
+            0.41947
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 Style constant control",
+            "status": {
+              "type": 2
+            },
+            "size": 400,
+            "first": {
+              "index": -1000100,
+              "value": [
+                1791088680,
+                84812.01
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791136560,
+                85342.52
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T17:57:07.784Z",
+        "bars": 300,
+        "end": false,
+        "first": {
+          "index": 0,
+          "value": [
+            1791100680,
+            85054.26,
+            85112.65,
+            85054.26,
+            85106,
+            14.54156
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791136560,
+            85342.52,
+            85342.53,
+            85342.52,
+            85342.53,
+            0.42066
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 Style constant control",
+            "status": {
+              "type": 2
+            },
+            "size": 400,
+            "first": {
+              "index": -1000100,
+              "value": [
+                1791088680,
+                84812.01
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791136560,
+                85342.53
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T17:57:08.456Z",
+        "bars": 300,
+        "end": false,
+        "first": {
+          "index": 0,
+          "value": [
+            1791100680,
+            85054.26,
+            85112.65,
+            85054.26,
+            85106,
+            14.54156
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791136560,
+            85342.52,
+            85342.53,
+            85342.52,
+            85342.53,
+            0.42066
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 Style constant control",
+            "status": {
+              "type": 2
+            },
+            "size": 400,
+            "first": {
+              "index": -1000100,
+              "value": [
+                1791088680,
+                84812.01
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791136560,
+                85342.53
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T17:57:09.117Z",
+        "bars": 300,
+        "end": false,
+        "first": {
+          "index": 0,
+          "value": [
+            1791100680,
+            85054.26,
+            85112.65,
+            85054.26,
+            85106,
+            14.54156
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791136560,
+            85342.52,
+            85342.53,
+            85342.52,
+            85342.52,
+            0.42238
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 Style constant control",
+            "status": {
+              "type": 2
+            },
+            "size": 400,
+            "first": {
+              "index": -1000100,
+              "value": [
+                1791088680,
+                84812.01
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791136560,
+                85342.52
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T17:57:09.909Z",
+        "bars": 300,
+        "end": false,
+        "first": {
+          "index": 0,
+          "value": [
+            1791100680,
+            85054.26,
+            85112.65,
+            85054.26,
+            85106,
+            14.54156
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791136560,
+            85342.52,
+            85342.53,
+            85342.52,
+            85342.53,
+            0.4241
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 Style constant control",
+            "status": {
+              "type": 2
+            },
+            "size": 400,
+            "first": {
+              "index": -1000100,
+              "value": [
+                1791088680,
+                84812.01
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791136560,
+                85342.53
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "required_historical_rows": 600,
+    "capture_context": "Supported equity with separately recorded native interval; limited history receipt",
+    "live_tooltip": "Sun 04 Oct '26   17:58",
+    "historical_compare_before_unix_seconds": 1791136680,
+    "pine_logs": {
+      "paths": [
+        "evidence/host-style-constant-control-v6-v1-attempt2-logs.txt",
+        "evidence/host-style-constant-control-v6-v1-attempt2-logs-v1.json",
+        "evidence/host-style-constant-control-v6-v1-attempt2-logs.png"
+      ],
+      "entries": 0
+    },
+    "all_exported_column_occurrences": [
+      {
+        "title": "time",
+        "occurrence": 1,
+        "position": 0
+      },
+      {
+        "title": "open",
+        "occurrence": 1,
+        "position": 1
+      },
+      {
+        "title": "high",
+        "occurrence": 1,
+        "position": 2
+      },
+      {
+        "title": "low",
+        "occurrence": 1,
+        "position": 3
+      },
+      {
+        "title": "close",
+        "occurrence": 1,
+        "position": 4
+      },
+      {
+        "title": "PRICE",
+        "occurrence": 1,
+        "position": 5
+      }
+    ],
+    "declared_to_native_column_occurrences": [
+      {
+        "declared_title": "PRICE",
+        "native_title": "PRICE",
+        "occurrence": 1,
+        "position": 5
+      }
+    ],
+    "named_value_map_scope": "Legacy title maps show the first occurrence only; original positional cells and occurrence tables retain every duplicate without renaming.",
+    "csv_sha256": "b60ef9e93fb5cd6a4d9615b2530e5dd41841228f041b222b9227bd0737daefab",
+    "csv_bytes": 16087,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "PRICE"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "PRICE": 5
+    },
+    "first_historical_cells": [
+      "1791100680",
+      "85054.26",
+      "85112.65",
+      "85054.26",
+      "85106",
+      "85106"
+    ],
+    "last_historical_cells": [
+      "1791136560",
+      "85342.52",
+      "85342.53",
+      "85319.52",
+      "85319.52",
+      "85319.52"
+    ],
+    "declared_to_native_header_mapping": {
+      "PRICE": "PRICE"
+    },
+    "csv_rows": 301,
+    "historical_rows": 300,
+    "first_csv_timestamp_seconds": 1791100680,
+    "last_csv_timestamp_seconds": 1791136680,
+    "first_csv_time_raw": "1791100680",
+    "last_csv_time_raw": "1791136680",
+    "first_historical_values": {
+      "PRICE": "85106"
+    },
+    "last_historical_values": {
+      "PRICE": "85319.52"
+    },
+    "declared_unexported_columns": [],
+    "data_window_witness": "captures/v13/evidence/host-style-constant-control-v6-v1-attempt2-data-window-v1.json",
+    "reload_first_observed_utc": "2026-10-04T17:56:43.409Z",
+    "reset_time_limit": "Exact native load completion UTC was not retained after collector history wait failed; first post-reload observation is recorded separately, not relabelled as reset time."
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T18:00:14.019Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "arm",
+        "bitness": "64",
+        "brands": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156"
+          }
+        ],
+        "fullVersionList": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8.0.0.0"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156.0.8075.0"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156.0.8075.0"
+          }
+        ],
+        "mobile": false,
+        "platform": "macOS",
+        "platformVersion": "27.2.0"
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v13 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "host-style-dynamic-new-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "f2eea18c335a0885e548e264f06a8a082e03c91d37533bbf388dbd5bd1fd20da",
+    "indicator_title": "V11 Style dynamic color new",
+    "status": "RUNS",
+    "csv_file": "captures/v13/host-style-dynamic-new-v6-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-05T020013.228.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "minmove": 1,
+      "pricescale": 100,
+      "pointvalue": 1,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V11 Style dynamic color new",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24721,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 25021,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T18:00:05.415Z",
+    "live_candle_open_utc": "2026-10-04T18:00:00.000Z",
+    "export_utc": "2026-10-04T18:00:13.586Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v13/evidence/host-style-dynamic-new-v6-v1-attempt1-setup.png",
+      "captures/v13/evidence/host-style-dynamic-new-v6-v1-attempt1-export.png",
+      "captures/v13/evidence/host-style-dynamic-new-v6-v1-attempt1-logs.txt",
+      "captures/v13/evidence/host-style-dynamic-new-v6-v1-attempt1-logs-v1.json",
+      "captures/v13/evidence/host-style-dynamic-new-v6-v1-attempt1-logs.png",
+      "captures/v13/evidence/host-style-dynamic-new-v6-v1-attempt1-visual.png",
+      "captures/v13/evidence/host-style-dynamic-new-v6-v1-attempt1-data-window-v1.png",
+      "captures/v13/evidence/host-style-dynamic-new-v6-v1-attempt1-data-window-v1.json",
+      "captures/v13/evidence/host-style-dynamic-new-v6-v1-attempt1-data-window-v1.txt",
+      "captures/v13/evidence/host-style-dynamic-new-v6-v1-attempt1-authority-object-geometry-v1.json",
+      "captures/v13/evidence/host-style-dynamic-new-v6-v1-attempt1-authority-object-geometry-v1.png",
+      "captures/v13/evidence/host-style-dynamic-new-v6-v1-attempt1-dynamic-style-controls-v1.json",
+      "captures/v13/evidence/host-style-dynamic-new-v6-v1-attempt1-dynamic-style-controls-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T18:00:06.366Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790831640,
+            84232,
+            84276.43,
+            84224,
+            84270.01,
+            11.85684
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791136800,
+            85319.54,
+            85319.54,
+            85319.53,
+            85319.53,
+            2.082
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 Style dynamic color new",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790831640,
+                84270.01,
+                1006592553
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791136800,
+                85319.53,
+                1728012841
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T18:00:07.436Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790831640,
+            84232,
+            84276.43,
+            84224,
+            84270.01,
+            11.85684
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791136800,
+            85319.54,
+            85319.54,
+            85319.53,
+            85319.53,
+            2.082
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 Style dynamic color new",
+            "status": {
+              "type": 2
+            },
+            "size": 25021,
+            "first": {
+              "index": -1022477,
+              "value": [
+                1788134400,
+                77674.04,
+                4294926889
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791136800,
+                85319.53,
+                1728012841
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T18:00:08.170Z",
+        "bars": 25021,
+        "end": true,
+        "first": {
+          "index": -24721,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791136800,
+            85319.54,
+            85319.54,
+            85319.52,
+            85319.52,
+            2.082
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 Style dynamic color new",
+            "status": {
+              "type": 2
+            },
+            "size": 25021,
+            "first": {
+              "index": -24721,
+              "value": [
+                1788134400,
+                77674.04,
+                4294926889
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791136800,
+                85319.52,
+                1728012841
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   18:00",
+    "historical_compare_before_unix_seconds": 1791136800,
+    "pine_logs": {
+      "paths": [
+        "evidence/host-style-dynamic-new-v6-v1-attempt1-logs.txt",
+        "evidence/host-style-dynamic-new-v6-v1-attempt1-logs-v1.json",
+        "evidence/host-style-dynamic-new-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "all_exported_column_occurrences": [
+      {
+        "title": "time",
+        "occurrence": 1,
+        "position": 0
+      },
+      {
+        "title": "open",
+        "occurrence": 1,
+        "position": 1
+      },
+      {
+        "title": "high",
+        "occurrence": 1,
+        "position": 2
+      },
+      {
+        "title": "low",
+        "occurrence": 1,
+        "position": 3
+      },
+      {
+        "title": "close",
+        "occurrence": 1,
+        "position": 4
+      },
+      {
+        "title": "PRICE",
+        "occurrence": 1,
+        "position": 5
+      }
+    ],
+    "declared_to_native_column_occurrences": [
+      {
+        "declared_title": "PRICE",
+        "native_title": "PRICE",
+        "occurrence": 1,
+        "position": 5
+      }
+    ],
+    "named_value_map_scope": "Legacy title maps show the first occurrence only; original positional cells and occurrence tables retain every duplicate without renaming.",
+    "csv_sha256": "d261e8a37f3e551fd1ff36ba714737a1ab4f384b16db9b90bea4993bcdf68699",
+    "csv_bytes": 1317650,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "PRICE"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "PRICE": 5
+    },
+    "first_historical_cells": [
+      "1788134400",
+      "77682",
+      "77682.01",
+      "77572",
+      "77674.04",
+      "77674.04"
+    ],
+    "last_historical_cells": [
+      "1791136680",
+      "85319.52",
+      "85330.01",
+      "85319.52",
+      "85319.53",
+      "85319.53"
+    ],
+    "declared_to_native_header_mapping": {
+      "PRICE": "PRICE"
+    },
+    "csv_rows": 25021,
+    "historical_rows": 25020,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791136800,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791136800",
+    "first_historical_values": {
+      "PRICE": "77674.04"
+    },
+    "last_historical_values": {
+      "PRICE": "85319.53"
+    },
+    "declared_unexported_columns": [],
+    "data_window_witness": "captures/v13/evidence/host-style-dynamic-new-v6-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T18:00:47.620Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "arm",
+        "bitness": "64",
+        "brands": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156"
+          }
+        ],
+        "fullVersionList": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8.0.0.0"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156.0.8075.0"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156.0.8075.0"
+          }
+        ],
+        "mobile": false,
+        "platform": "macOS",
+        "platformVersion": "27.2.0"
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v13 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "host-style-gradient-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "a77ab2a4c68797c38d695ff0eae77410613e209b1d81230c72abc0e612b45824",
+    "indicator_title": "V11 Style gradient result",
+    "status": "RUNS",
+    "csv_file": "captures/v13/host-style-gradient-v6-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-05T020047.063.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "minmove": 1,
+      "pricescale": 100,
+      "pointvalue": 1,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V11 Style gradient result",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24721,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 25021,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T18:00:39.299Z",
+    "live_candle_open_utc": "2026-10-04T18:00:00.000Z",
+    "export_utc": "2026-10-04T18:00:47.253Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v13/evidence/host-style-gradient-v6-v1-attempt1-setup.png",
+      "captures/v13/evidence/host-style-gradient-v6-v1-attempt1-export.png",
+      "captures/v13/evidence/host-style-gradient-v6-v1-attempt1-logs.txt",
+      "captures/v13/evidence/host-style-gradient-v6-v1-attempt1-logs-v1.json",
+      "captures/v13/evidence/host-style-gradient-v6-v1-attempt1-logs.png",
+      "captures/v13/evidence/host-style-gradient-v6-v1-attempt1-visual.png",
+      "captures/v13/evidence/host-style-gradient-v6-v1-attempt1-data-window-v1.png",
+      "captures/v13/evidence/host-style-gradient-v6-v1-attempt1-data-window-v1.json",
+      "captures/v13/evidence/host-style-gradient-v6-v1-attempt1-data-window-v1.txt",
+      "captures/v13/evidence/host-style-gradient-v6-v1-attempt1-authority-object-geometry-v1.json",
+      "captures/v13/evidence/host-style-gradient-v6-v1-attempt1-authority-object-geometry-v1.png",
+      "captures/v13/evidence/host-style-gradient-v6-v1-attempt1-gradient-style-controls-v1.json",
+      "captures/v13/evidence/host-style-gradient-v6-v1-attempt1-gradient-style-controls-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T18:00:40.116Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790831640,
+            84232,
+            84276.43,
+            84224,
+            84270.01,
+            11.85684
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791136800,
+            85319.54,
+            85327.96,
+            85319.52,
+            85327.96,
+            2.79569
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 Style gradient result",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790831640,
+                84270.01,
+                4288826509
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791136800,
+                85327.96,
+                4288826509
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T18:00:41.192Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790831640,
+            84232,
+            84276.43,
+            84224,
+            84270.01,
+            11.85684
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791136800,
+            85319.54,
+            85327.96,
+            85319.52,
+            85327.96,
+            2.79569
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 Style gradient result",
+            "status": {
+              "type": 2
+            },
+            "size": 25021,
+            "first": {
+              "index": -1022477,
+              "value": [
+                1788134400,
+                77674.04,
+                4288826509
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791136800,
+                85327.96,
+                4288826509
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T18:00:41.988Z",
+        "bars": 25021,
+        "end": true,
+        "first": {
+          "index": -24721,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791136800,
+            85319.54,
+            85327.96,
+            85319.52,
+            85327.95,
+            2.80546
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 Style gradient result",
+            "status": {
+              "type": 2
+            },
+            "size": 25021,
+            "first": {
+              "index": -24721,
+              "value": [
+                1788134400,
+                77674.04,
+                4288826509
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791136800,
+                85327.95,
+                4288826509
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   18:00",
+    "historical_compare_before_unix_seconds": 1791136800,
+    "pine_logs": {
+      "paths": [
+        "evidence/host-style-gradient-v6-v1-attempt1-logs.txt",
+        "evidence/host-style-gradient-v6-v1-attempt1-logs-v1.json",
+        "evidence/host-style-gradient-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "all_exported_column_occurrences": [
+      {
+        "title": "time",
+        "occurrence": 1,
+        "position": 0
+      },
+      {
+        "title": "open",
+        "occurrence": 1,
+        "position": 1
+      },
+      {
+        "title": "high",
+        "occurrence": 1,
+        "position": 2
+      },
+      {
+        "title": "low",
+        "occurrence": 1,
+        "position": 3
+      },
+      {
+        "title": "close",
+        "occurrence": 1,
+        "position": 4
+      },
+      {
+        "title": "PRICE",
+        "occurrence": 1,
+        "position": 5
+      }
+    ],
+    "declared_to_native_column_occurrences": [
+      {
+        "declared_title": "PRICE",
+        "native_title": "PRICE",
+        "occurrence": 1,
+        "position": 5
+      }
+    ],
+    "named_value_map_scope": "Legacy title maps show the first occurrence only; original positional cells and occurrence tables retain every duplicate without renaming.",
+    "csv_sha256": "2dbdf7490ed0d1fe7063749532f562877bb7fb88255d8a034f0b149ad6f4d148",
+    "csv_bytes": 1317650,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "PRICE"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "PRICE": 5
+    },
+    "first_historical_cells": [
+      "1788134400",
+      "77682",
+      "77682.01",
+      "77572",
+      "77674.04",
+      "77674.04"
+    ],
+    "last_historical_cells": [
+      "1791136680",
+      "85319.52",
+      "85330.01",
+      "85319.52",
+      "85319.53",
+      "85319.53"
+    ],
+    "declared_to_native_header_mapping": {
+      "PRICE": "PRICE"
+    },
+    "csv_rows": 25021,
+    "historical_rows": 25020,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791136800,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791136800",
+    "first_historical_values": {
+      "PRICE": "77674.04"
+    },
+    "last_historical_values": {
+      "PRICE": "85319.53"
+    },
+    "declared_unexported_columns": [],
+    "data_window_witness": "captures/v13/evidence/host-style-gradient-v6-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T18:01:56.512Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "arm",
+        "bitness": "64",
+        "brands": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156"
+          }
+        ],
+        "fullVersionList": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8.0.0.0"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156.0.8075.0"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156.0.8075.0"
+          }
+        ],
+        "mobile": false,
+        "platform": "macOS",
+        "platformVersion": "27.2.0"
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v13 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "host-style-constant-control-v6-v1.pine",
+    "attempt": 3,
+    "source_sha256": "f083262590be5ee06ce79a7c69aa7b19123c9fbea073c41cc97c21ffa71ac03f",
+    "indicator_title": "V11 Style constant control",
+    "status": "RUNS",
+    "csv_file": "captures/v13/host-style-constant-control-v6-v1-attempt3.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-05T020155.745.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "minmove": 1,
+      "pricescale": 100,
+      "pointvalue": 1,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V11 Style constant control",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24721,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 25021,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T18:01:47.764Z",
+    "live_candle_open_utc": "2026-10-04T18:00:00.000Z",
+    "export_utc": "2026-10-04T18:01:56.141Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v13/evidence/host-style-constant-control-v6-v1-attempt3-setup.png",
+      "captures/v13/evidence/host-style-constant-control-v6-v1-attempt3-export.png",
+      "captures/v13/evidence/host-style-constant-control-v6-v1-attempt3-logs.txt",
+      "captures/v13/evidence/host-style-constant-control-v6-v1-attempt3-logs-v1.json",
+      "captures/v13/evidence/host-style-constant-control-v6-v1-attempt3-logs.png",
+      "captures/v13/evidence/host-style-constant-control-v6-v1-attempt3-visual.png",
+      "captures/v13/evidence/host-style-constant-control-v6-v1-attempt3-data-window-v1.png",
+      "captures/v13/evidence/host-style-constant-control-v6-v1-attempt3-data-window-v1.json",
+      "captures/v13/evidence/host-style-constant-control-v6-v1-attempt3-data-window-v1.txt",
+      "captures/v13/evidence/host-style-constant-control-v6-v1-attempt3-authority-object-geometry-v1.json",
+      "captures/v13/evidence/host-style-constant-control-v6-v1-attempt3-authority-object-geometry-v1.png",
+      "captures/v13/evidence/host-style-constant-control-v6-v1-attempt3-constant-control-after-gradient-v1.json",
+      "captures/v13/evidence/host-style-constant-control-v6-v1-attempt3-constant-control-after-gradient-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T18:01:48.569Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790831640,
+            84232,
+            84276.43,
+            84224,
+            84270.01,
+            11.85684
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791136800,
+            85319.54,
+            85327.96,
+            85319.52,
+            85319.52,
+            4.62102
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 Style constant control",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790831640,
+                84270.01
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791136800,
+                85319.52
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T18:01:49.645Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790831640,
+            84232,
+            84276.43,
+            84224,
+            84270.01,
+            11.85684
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791136800,
+            85319.54,
+            85327.96,
+            85319.52,
+            85319.53,
+            4.62102
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 Style constant control",
+            "status": {
+              "type": 2
+            },
+            "size": 25021,
+            "first": {
+              "index": -1022477,
+              "value": [
+                1788134400,
+                77674.04
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791136800,
+                85319.53
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T18:01:50.371Z",
+        "bars": 25021,
+        "end": true,
+        "first": {
+          "index": -24721,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791136800,
+            85319.54,
+            85327.96,
+            85319.52,
+            85319.53,
+            4.62118
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 Style constant control",
+            "status": {
+              "type": 2
+            },
+            "size": 25021,
+            "first": {
+              "index": -24721,
+              "value": [
+                1788134400,
+                77674.04
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791136800,
+                85319.53
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   18:00",
+    "historical_compare_before_unix_seconds": 1791136800,
+    "pine_logs": {
+      "paths": [
+        "evidence/host-style-constant-control-v6-v1-attempt3-logs.txt",
+        "evidence/host-style-constant-control-v6-v1-attempt3-logs-v1.json",
+        "evidence/host-style-constant-control-v6-v1-attempt3-logs.png"
+      ],
+      "entries": 0
+    },
+    "all_exported_column_occurrences": [
+      {
+        "title": "time",
+        "occurrence": 1,
+        "position": 0
+      },
+      {
+        "title": "open",
+        "occurrence": 1,
+        "position": 1
+      },
+      {
+        "title": "high",
+        "occurrence": 1,
+        "position": 2
+      },
+      {
+        "title": "low",
+        "occurrence": 1,
+        "position": 3
+      },
+      {
+        "title": "close",
+        "occurrence": 1,
+        "position": 4
+      },
+      {
+        "title": "PRICE",
+        "occurrence": 1,
+        "position": 5
+      }
+    ],
+    "declared_to_native_column_occurrences": [
+      {
+        "declared_title": "PRICE",
+        "native_title": "PRICE",
+        "occurrence": 1,
+        "position": 5
+      }
+    ],
+    "named_value_map_scope": "Legacy title maps show the first occurrence only; original positional cells and occurrence tables retain every duplicate without renaming.",
+    "csv_sha256": "41131dbe5c225dc85e82c994b3bfbfb793cc54c0c671bfd83be595312623a9a9",
+    "csv_bytes": 1317650,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "PRICE"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "PRICE": 5
+    },
+    "first_historical_cells": [
+      "1788134400",
+      "77682",
+      "77682.01",
+      "77572",
+      "77674.04",
+      "77674.04"
+    ],
+    "last_historical_cells": [
+      "1791136680",
+      "85319.52",
+      "85330.01",
+      "85319.52",
+      "85319.53",
+      "85319.53"
+    ],
+    "declared_to_native_header_mapping": {
+      "PRICE": "PRICE"
+    },
+    "csv_rows": 25021,
+    "historical_rows": 25020,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791136800,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791136800",
+    "first_historical_values": {
+      "PRICE": "77674.04"
+    },
+    "last_historical_values": {
+      "PRICE": "85319.53"
+    },
+    "declared_unexported_columns": [],
+    "data_window_witness": "captures/v13/evidence/host-style-constant-control-v6-v1-attempt3-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T18:02:30.508Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "arm",
+        "bitness": "64",
+        "brands": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156"
+          }
+        ],
+        "fullVersionList": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8.0.0.0"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156.0.8075.0"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156.0.8075.0"
+          }
+        ],
+        "mobile": false,
+        "platform": "macOS",
+        "platformVersion": "27.2.0"
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v13 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "host-display-window-reset-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "3b6457180b338d08e364e48b60c57f91b95ca71fb397e04cc6df9228307dd28c",
+    "indicator_title": "V11 Data Window coded display",
+    "status": "RUNS",
+    "csv_file": "captures/v13/host-display-window-reset-v6-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-05T020229.666.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "minmove": 1,
+      "pricescale": 100,
+      "pointvalue": 1,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V11 Data Window coded display",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24722,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 25022,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T18:02:21.919Z",
+    "live_candle_open_utc": "2026-10-04T18:02:00.000Z",
+    "export_utc": "2026-10-04T18:02:30.029Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v13/evidence/host-display-window-reset-v6-v1-attempt1-setup.png",
+      "captures/v13/evidence/host-display-window-reset-v6-v1-attempt1-export.png",
+      "captures/v13/evidence/host-display-window-reset-v6-v1-attempt1-logs.txt",
+      "captures/v13/evidence/host-display-window-reset-v6-v1-attempt1-logs-v1.json",
+      "captures/v13/evidence/host-display-window-reset-v6-v1-attempt1-logs.png",
+      "captures/v13/evidence/host-display-window-reset-v6-v1-attempt1-visual.png",
+      "captures/v13/evidence/host-display-window-reset-v6-v1-attempt1-data-window-v1.png",
+      "captures/v13/evidence/host-display-window-reset-v6-v1-attempt1-data-window-v1.json",
+      "captures/v13/evidence/host-display-window-reset-v6-v1-attempt1-data-window-v1.txt",
+      "captures/v13/evidence/host-display-window-reset-v6-v1-attempt1-authority-object-geometry-v1.json",
+      "captures/v13/evidence/host-display-window-reset-v6-v1-attempt1-authority-object-geometry-v1.png",
+      "captures/v13/evidence/host-display-window-reset-v6-v1-attempt1-window-coded-initial-style-v1.json",
+      "captures/v13/evidence/host-display-window-reset-v6-v1-attempt1-window-coded-initial-style-v1.png",
+      "captures/v13/evidence/host-display-window-reset-v6-v1-attempt1-window-coded-initial-destinations-v1.json",
+      "captures/v13/evidence/host-display-window-reset-v6-v1-attempt1-window-coded-initial-destinations-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T18:02:22.767Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790831760,
+            84270.01,
+            84270.01,
+            84254,
+            84262.01,
+            6.56587
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791136920,
+            85319.52,
+            85319.53,
+            85319.52,
+            85319.52,
+            0.36765
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 Data Window coded display",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790831760,
+                84262.01
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791136920,
+                85319.52
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T18:02:23.871Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790831760,
+            84270.01,
+            84270.01,
+            84254,
+            84262.01,
+            6.56587
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791136920,
+            85319.52,
+            85319.53,
+            85319.52,
+            85319.52,
+            0.3957
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 Data Window coded display",
+            "status": {
+              "type": 2
+            },
+            "size": 25022,
+            "first": {
+              "index": -1022478,
+              "value": [
+                1788134400,
+                77674.04
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791136920,
+                85319.52
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T18:02:24.588Z",
+        "bars": 25022,
+        "end": true,
+        "first": {
+          "index": -24722,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791136920,
+            85319.52,
+            85319.53,
+            85319.52,
+            85319.52,
+            0.3957
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 Data Window coded display",
+            "status": {
+              "type": 2
+            },
+            "size": 25022,
+            "first": {
+              "index": -24722,
+              "value": [
+                1788134400,
+                77674.04
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791136920,
+                85319.52
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   18:02",
+    "historical_compare_before_unix_seconds": 1791136920,
+    "pine_logs": {
+      "paths": [
+        "evidence/host-display-window-reset-v6-v1-attempt1-logs.txt",
+        "evidence/host-display-window-reset-v6-v1-attempt1-logs-v1.json",
+        "evidence/host-display-window-reset-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "all_exported_column_occurrences": [
+      {
+        "title": "time",
+        "occurrence": 1,
+        "position": 0
+      },
+      {
+        "title": "open",
+        "occurrence": 1,
+        "position": 1
+      },
+      {
+        "title": "high",
+        "occurrence": 1,
+        "position": 2
+      },
+      {
+        "title": "low",
+        "occurrence": 1,
+        "position": 3
+      },
+      {
+        "title": "close",
+        "occurrence": 1,
+        "position": 4
+      },
+      {
+        "title": "WINDOW_ONLY",
+        "occurrence": 1,
+        "position": 5
+      }
+    ],
+    "declared_to_native_column_occurrences": [
+      {
+        "declared_title": "WINDOW_ONLY",
+        "native_title": "WINDOW_ONLY",
+        "occurrence": 1,
+        "position": 5
+      }
+    ],
+    "named_value_map_scope": "Legacy title maps show the first occurrence only; original positional cells and occurrence tables retain every duplicate without renaming.",
+    "csv_sha256": "099058d67ae7399e92a61521ef9390c7e52b7451c0bd2956e4976228434b6372",
+    "csv_bytes": 1317712,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "WINDOW_ONLY"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "WINDOW_ONLY": 5
+    },
+    "first_historical_cells": [
+      "1788134400",
+      "77682",
+      "77682.01",
+      "77572",
+      "77674.04",
+      "77674.04"
+    ],
+    "last_historical_cells": [
+      "1791136800",
+      "85319.54",
+      "85327.96",
+      "85319.52",
+      "85319.52",
+      "85319.52"
+    ],
+    "declared_to_native_header_mapping": {
+      "WINDOW_ONLY": "WINDOW_ONLY"
+    },
+    "csv_rows": 25022,
+    "historical_rows": 25021,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791136920,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791136920",
+    "first_historical_values": {
+      "WINDOW_ONLY": "77674.04"
+    },
+    "last_historical_values": {
+      "WINDOW_ONLY": "85319.52"
+    },
+    "declared_unexported_columns": [],
+    "data_window_witness": "captures/v13/evidence/host-display-window-reset-v6-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T18:06:15.246Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "arm",
+        "bitness": "64",
+        "brands": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156"
+          }
+        ],
+        "fullVersionList": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8.0.0.0"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156.0.8075.0"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156.0.8075.0"
+          }
+        ],
+        "mobile": false,
+        "platform": "macOS",
+        "platformVersion": "27.2.0"
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v13 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "host-display-window-reset-v6-v1.pine",
+    "attempt": 2,
+    "source_sha256": "3b6457180b338d08e364e48b60c57f91b95ca71fb397e04cc6df9228307dd28c",
+    "indicator_title": "V11 Data Window coded display",
+    "status": "UNKNOWN",
+    "csv_file": "captures/v13/host-display-window-reset-v6-v1-attempt2.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-05T020614.462.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "minmove": 1,
+      "pricescale": 100,
+      "pointvalue": 1,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V11 Data Window coded display",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24722,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 25024,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T18:02:21.919Z",
+    "live_candle_open_utc": "2026-10-04T18:06:00.000Z",
+    "export_utc": "2026-10-04T18:06:14.896Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v13/evidence/host-display-window-reset-v6-v1-attempt2-setup.png",
+      "captures/v13/evidence/host-display-window-reset-v6-v1-attempt2-export.png",
+      "captures/v13/evidence/host-display-window-reset-v6-v1-attempt2-logs.txt",
+      "captures/v13/evidence/host-display-window-reset-v6-v1-attempt2-logs-v1.json",
+      "captures/v13/evidence/host-display-window-reset-v6-v1-attempt2-logs.png",
+      "captures/v13/evidence/host-display-window-reset-v6-v1-attempt2-visual.png",
+      "captures/v13/evidence/host-display-window-reset-v6-v1-attempt2-data-window-v1.png",
+      "captures/v13/evidence/host-display-window-reset-v6-v1-attempt2-data-window-v1.json",
+      "captures/v13/evidence/host-display-window-reset-v6-v1-attempt2-data-window-v1.txt",
+      "captures/v13/evidence/host-display-window-reset-v6-v1-attempt2-window-unchecked-applied-destinations-v1.json",
+      "captures/v13/evidence/host-display-window-reset-v6-v1-attempt2-window-unchecked-applied-destinations-v1.png",
+      "captures/v13/evidence/host-display-window-reset-v6-v1-attempt2-window-unchecked-style-v1.json",
+      "captures/v13/evidence/host-display-window-reset-v6-v1-attempt2-window-unchecked-style-v1.png"
+    ],
+    "notes": "Native unchecked/apply action on WINDOW_ONLY; coded display.data_window baseline retained separately. CSV native omission of disabled plot is preserved. Frozen source unchanged; action states are distinct attempts. Native CSV omitted these declared plot titles under the recorded native display state: WINDOW_ONLY. No cells filled or source repaired.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T18:02:22.767Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790831760,
+            84270.01,
+            84270.01,
+            84254,
+            84262.01,
+            6.56587
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791136920,
+            85319.52,
+            85319.53,
+            85319.52,
+            85319.52,
+            0.36765
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 Data Window coded display",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790831760,
+                84262.01
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791136920,
+                85319.52
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T18:02:23.871Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790831760,
+            84270.01,
+            84270.01,
+            84254,
+            84262.01,
+            6.56587
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791136920,
+            85319.52,
+            85319.53,
+            85319.52,
+            85319.52,
+            0.3957
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 Data Window coded display",
+            "status": {
+              "type": 2
+            },
+            "size": 25022,
+            "first": {
+              "index": -1022478,
+              "value": [
+                1788134400,
+                77674.04
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791136920,
+                85319.52
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T18:02:24.588Z",
+        "bars": 25022,
+        "end": true,
+        "first": {
+          "index": -24722,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791136920,
+            85319.52,
+            85319.53,
+            85319.52,
+            85319.52,
+            0.3957
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 Data Window coded display",
+            "status": {
+              "type": 2
+            },
+            "size": 25022,
+            "first": {
+              "index": -24722,
+              "value": [
+                1788134400,
+                77674.04
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791136920,
+                85319.52
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "native_ui_action_state": "Inactive status0 following native Style unchecked/apply; no Pine refusal diagnostic or running plot values observed.",
+    "live_tooltip": "Sun 04 Oct '26   18:06",
+    "historical_compare_before_unix_seconds": 1791137160,
+    "pine_logs": {
+      "paths": [
+        "evidence/host-display-window-reset-v6-v1-attempt2-logs.txt",
+        "evidence/host-display-window-reset-v6-v1-attempt2-logs-v1.json",
+        "evidence/host-display-window-reset-v6-v1-attempt2-logs.png"
+      ],
+      "entries": 0
+    },
+    "all_exported_column_occurrences": [
+      {
+        "title": "time",
+        "occurrence": 1,
+        "position": 0
+      },
+      {
+        "title": "open",
+        "occurrence": 1,
+        "position": 1
+      },
+      {
+        "title": "high",
+        "occurrence": 1,
+        "position": 2
+      },
+      {
+        "title": "low",
+        "occurrence": 1,
+        "position": 3
+      },
+      {
+        "title": "close",
+        "occurrence": 1,
+        "position": 4
+      }
+    ],
+    "declared_to_native_column_occurrences": [],
+    "named_value_map_scope": "Legacy title maps show the first occurrence only; original positional cells and occurrence tables retain every duplicate without renaming.",
+    "csv_sha256": "258f5d439e2ad36a4997f6e46267fcfeaac84a860d8f31dca9ad3c4d220dedba",
+    "csv_bytes": 1107371,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {},
+    "first_historical_cells": [
+      "1788134400",
+      "77682",
+      "77682.01",
+      "77572",
+      "77674.04"
+    ],
+    "last_historical_cells": [
+      "1791137040",
+      "85332.89",
+      "85340.04",
+      "85330.15",
+      "85340.03"
+    ],
+    "declared_to_native_header_mapping": {},
+    "csv_rows": 25024,
+    "historical_rows": 25023,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791137160,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791137160",
+    "first_historical_values": {},
+    "last_historical_values": {},
+    "declared_unexported_columns": [
+      "WINDOW_ONLY"
+    ],
+    "data_window_witness": "captures/v13/evidence/host-display-window-reset-v6-v1-attempt2-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T18:07:00.900Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "arm",
+        "bitness": "64",
+        "brands": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156"
+          }
+        ],
+        "fullVersionList": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8.0.0.0"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156.0.8075.0"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156.0.8075.0"
+          }
+        ],
+        "mobile": false,
+        "platform": "macOS",
+        "platformVersion": "27.2.0"
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v13 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "host-display-window-reset-v6-v1.pine",
+    "attempt": 3,
+    "source_sha256": "3b6457180b338d08e364e48b60c57f91b95ca71fb397e04cc6df9228307dd28c",
+    "indicator_title": "V11 Data Window coded display",
+    "status": "RUNS",
+    "csv_file": "captures/v13/host-display-window-reset-v6-v1-attempt3.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-05T020700.136.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "minmove": 1,
+      "pricescale": 100,
+      "pointvalue": 1,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V11 Data Window coded display",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24722,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 25024,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T18:02:21.919Z",
+    "live_candle_open_utc": "2026-10-04T18:06:00.000Z",
+    "export_utc": "2026-10-04T18:07:00.489Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v13/evidence/host-display-window-reset-v6-v1-attempt3-setup.png",
+      "captures/v13/evidence/host-display-window-reset-v6-v1-attempt3-export.png",
+      "captures/v13/evidence/host-display-window-reset-v6-v1-attempt3-logs.txt",
+      "captures/v13/evidence/host-display-window-reset-v6-v1-attempt3-logs-v1.json",
+      "captures/v13/evidence/host-display-window-reset-v6-v1-attempt3-logs.png",
+      "captures/v13/evidence/host-display-window-reset-v6-v1-attempt3-visual.png",
+      "captures/v13/evidence/host-display-window-reset-v6-v1-attempt3-data-window-v1.png",
+      "captures/v13/evidence/host-display-window-reset-v6-v1-attempt3-data-window-v1.json",
+      "captures/v13/evidence/host-display-window-reset-v6-v1-attempt3-data-window-v1.txt",
+      "captures/v13/evidence/host-display-window-reset-v6-v1-attempt3-window-rechecked-applied-destinations-v1.json",
+      "captures/v13/evidence/host-display-window-reset-v6-v1-attempt3-window-rechecked-applied-destinations-v1.png",
+      "captures/v13/evidence/host-display-window-reset-v6-v1-attempt3-window-rechecked-style-v1.json",
+      "captures/v13/evidence/host-display-window-reset-v6-v1-attempt3-window-rechecked-style-v1.png",
+      "captures/v13/evidence/host-display-window-reset-v6-v1-attempt3-window-reset-dialog-before-apply-v1.json",
+      "captures/v13/evidence/host-display-window-reset-v6-v1-attempt3-window-reset-dialog-before-apply-v1.png"
+    ],
+    "notes": "Native rechecked/apply action; separate coded and unchecked actions retained. Frozen source unchanged.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T18:02:22.767Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790831760,
+            84270.01,
+            84270.01,
+            84254,
+            84262.01,
+            6.56587
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791136920,
+            85319.52,
+            85319.53,
+            85319.52,
+            85319.52,
+            0.36765
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 Data Window coded display",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790831760,
+                84262.01
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791136920,
+                85319.52
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T18:02:23.871Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790831760,
+            84270.01,
+            84270.01,
+            84254,
+            84262.01,
+            6.56587
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791136920,
+            85319.52,
+            85319.53,
+            85319.52,
+            85319.52,
+            0.3957
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 Data Window coded display",
+            "status": {
+              "type": 2
+            },
+            "size": 25022,
+            "first": {
+              "index": -1022478,
+              "value": [
+                1788134400,
+                77674.04
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791136920,
+                85319.52
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T18:02:24.588Z",
+        "bars": 25022,
+        "end": true,
+        "first": {
+          "index": -24722,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791136920,
+            85319.52,
+            85319.53,
+            85319.52,
+            85319.52,
+            0.3957
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 Data Window coded display",
+            "status": {
+              "type": 2
+            },
+            "size": 25022,
+            "first": {
+              "index": -24722,
+              "value": [
+                1788134400,
+                77674.04
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791136920,
+                85319.52
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   18:06",
+    "historical_compare_before_unix_seconds": 1791137160,
+    "pine_logs": {
+      "paths": [
+        "evidence/host-display-window-reset-v6-v1-attempt3-logs.txt",
+        "evidence/host-display-window-reset-v6-v1-attempt3-logs-v1.json",
+        "evidence/host-display-window-reset-v6-v1-attempt3-logs.png"
+      ],
+      "entries": 0
+    },
+    "all_exported_column_occurrences": [
+      {
+        "title": "time",
+        "occurrence": 1,
+        "position": 0
+      },
+      {
+        "title": "open",
+        "occurrence": 1,
+        "position": 1
+      },
+      {
+        "title": "high",
+        "occurrence": 1,
+        "position": 2
+      },
+      {
+        "title": "low",
+        "occurrence": 1,
+        "position": 3
+      },
+      {
+        "title": "close",
+        "occurrence": 1,
+        "position": 4
+      },
+      {
+        "title": "WINDOW_ONLY",
+        "occurrence": 1,
+        "position": 5
+      }
+    ],
+    "declared_to_native_column_occurrences": [
+      {
+        "declared_title": "WINDOW_ONLY",
+        "native_title": "WINDOW_ONLY",
+        "occurrence": 1,
+        "position": 5
+      }
+    ],
+    "named_value_map_scope": "Legacy title maps show the first occurrence only; original positional cells and occurrence tables retain every duplicate without renaming.",
+    "csv_sha256": "1911a8221d70b061988ca533368f0f77b0e20477e1776276b01a342e0395826f",
+    "csv_bytes": 1317823,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "WINDOW_ONLY"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "WINDOW_ONLY": 5
+    },
+    "first_historical_cells": [
+      "1788134400",
+      "77682",
+      "77682.01",
+      "77572",
+      "77674.04",
+      "77674.04"
+    ],
+    "last_historical_cells": [
+      "1791137040",
+      "85332.89",
+      "85340.04",
+      "85330.15",
+      "85340.03",
+      "85340.03"
+    ],
+    "declared_to_native_header_mapping": {
+      "WINDOW_ONLY": "WINDOW_ONLY"
+    },
+    "csv_rows": 25024,
+    "historical_rows": 25023,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791137160,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791137160",
+    "first_historical_values": {
+      "WINDOW_ONLY": "77674.04"
+    },
+    "last_historical_values": {
+      "WINDOW_ONLY": "85340.03"
+    },
+    "declared_unexported_columns": [],
+    "data_window_witness": "captures/v13/evidence/host-display-window-reset-v6-v1-attempt3-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T18:07:21.046Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "arm",
+        "bitness": "64",
+        "brands": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156"
+          }
+        ],
+        "fullVersionList": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8.0.0.0"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156.0.8075.0"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156.0.8075.0"
+          }
+        ],
+        "mobile": false,
+        "platform": "macOS",
+        "platformVersion": "27.2.0"
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v13 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "host-display-window-reset-v6-v1.pine",
+    "attempt": 4,
+    "source_sha256": "3b6457180b338d08e364e48b60c57f91b95ca71fb397e04cc6df9228307dd28c",
+    "indicator_title": "V11 Data Window coded display",
+    "status": "RUNS",
+    "csv_file": "captures/v13/host-display-window-reset-v6-v1-attempt4.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-05T020720.367.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "minmove": 1,
+      "pricescale": 100,
+      "pointvalue": 1,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V11 Data Window coded display",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24722,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 25024,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T18:02:21.919Z",
+    "live_candle_open_utc": "2026-10-04T18:06:00.000Z",
+    "export_utc": "2026-10-04T18:07:20.673Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v13/evidence/host-display-window-reset-v6-v1-attempt4-setup.png",
+      "captures/v13/evidence/host-display-window-reset-v6-v1-attempt4-export.png",
+      "captures/v13/evidence/host-display-window-reset-v6-v1-attempt4-logs.txt",
+      "captures/v13/evidence/host-display-window-reset-v6-v1-attempt4-logs-v1.json",
+      "captures/v13/evidence/host-display-window-reset-v6-v1-attempt4-logs.png",
+      "captures/v13/evidence/host-display-window-reset-v6-v1-attempt4-visual.png",
+      "captures/v13/evidence/host-display-window-reset-v6-v1-attempt4-data-window-v1.png",
+      "captures/v13/evidence/host-display-window-reset-v6-v1-attempt4-data-window-v1.json",
+      "captures/v13/evidence/host-display-window-reset-v6-v1-attempt4-data-window-v1.txt",
+      "captures/v13/evidence/host-display-window-reset-v6-v1-attempt4-window-defaults-reset-destinations-v1.json",
+      "captures/v13/evidence/host-display-window-reset-v6-v1-attempt4-window-defaults-reset-destinations-v1.png",
+      "captures/v13/evidence/host-display-window-reset-v6-v1-attempt4-window-defaults-reset-style-v1.json",
+      "captures/v13/evidence/host-display-window-reset-v6-v1-attempt4-window-defaults-reset-style-v1.png"
+    ],
+    "notes": "Native Defaults Reset settings applied; authored display.data_window state observed separately. Frozen source unchanged.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T18:02:22.767Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790831760,
+            84270.01,
+            84270.01,
+            84254,
+            84262.01,
+            6.56587
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791136920,
+            85319.52,
+            85319.53,
+            85319.52,
+            85319.52,
+            0.36765
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 Data Window coded display",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790831760,
+                84262.01
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791136920,
+                85319.52
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T18:02:23.871Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790831760,
+            84270.01,
+            84270.01,
+            84254,
+            84262.01,
+            6.56587
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791136920,
+            85319.52,
+            85319.53,
+            85319.52,
+            85319.52,
+            0.3957
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 Data Window coded display",
+            "status": {
+              "type": 2
+            },
+            "size": 25022,
+            "first": {
+              "index": -1022478,
+              "value": [
+                1788134400,
+                77674.04
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791136920,
+                85319.52
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T18:02:24.588Z",
+        "bars": 25022,
+        "end": true,
+        "first": {
+          "index": -24722,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791136920,
+            85319.52,
+            85319.53,
+            85319.52,
+            85319.52,
+            0.3957
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 Data Window coded display",
+            "status": {
+              "type": 2
+            },
+            "size": 25022,
+            "first": {
+              "index": -24722,
+              "value": [
+                1788134400,
+                77674.04
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791136920,
+                85319.52
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   18:06",
+    "historical_compare_before_unix_seconds": 1791137160,
+    "pine_logs": {
+      "paths": [
+        "evidence/host-display-window-reset-v6-v1-attempt4-logs.txt",
+        "evidence/host-display-window-reset-v6-v1-attempt4-logs-v1.json",
+        "evidence/host-display-window-reset-v6-v1-attempt4-logs.png"
+      ],
+      "entries": 0
+    },
+    "all_exported_column_occurrences": [
+      {
+        "title": "time",
+        "occurrence": 1,
+        "position": 0
+      },
+      {
+        "title": "open",
+        "occurrence": 1,
+        "position": 1
+      },
+      {
+        "title": "high",
+        "occurrence": 1,
+        "position": 2
+      },
+      {
+        "title": "low",
+        "occurrence": 1,
+        "position": 3
+      },
+      {
+        "title": "close",
+        "occurrence": 1,
+        "position": 4
+      },
+      {
+        "title": "WINDOW_ONLY",
+        "occurrence": 1,
+        "position": 5
+      }
+    ],
+    "declared_to_native_column_occurrences": [
+      {
+        "declared_title": "WINDOW_ONLY",
+        "native_title": "WINDOW_ONLY",
+        "occurrence": 1,
+        "position": 5
+      }
+    ],
+    "named_value_map_scope": "Legacy title maps show the first occurrence only; original positional cells and occurrence tables retain every duplicate without renaming.",
+    "csv_sha256": "cc81b9f2bba792634e38fe6c7ad829ad5a0a72d963749bae27c189c0751b6f39",
+    "csv_bytes": 1317823,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "WINDOW_ONLY"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "WINDOW_ONLY": 5
+    },
+    "first_historical_cells": [
+      "1788134400",
+      "77682",
+      "77682.01",
+      "77572",
+      "77674.04",
+      "77674.04"
+    ],
+    "last_historical_cells": [
+      "1791137040",
+      "85332.89",
+      "85340.04",
+      "85330.15",
+      "85340.03",
+      "85340.03"
+    ],
+    "declared_to_native_header_mapping": {
+      "WINDOW_ONLY": "WINDOW_ONLY"
+    },
+    "csv_rows": 25024,
+    "historical_rows": 25023,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791137160,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791137160",
+    "first_historical_values": {
+      "WINDOW_ONLY": "77674.04"
+    },
+    "last_historical_values": {
+      "WINDOW_ONLY": "85340.03"
+    },
+    "declared_unexported_columns": [],
+    "data_window_witness": "captures/v13/evidence/host-display-window-reset-v6-v1-attempt4-data-window-v1.json"
   }
 ]

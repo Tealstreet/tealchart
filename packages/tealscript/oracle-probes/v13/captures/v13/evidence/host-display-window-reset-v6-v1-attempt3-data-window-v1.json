@@ -1,0 +1,29 @@
+{
+  "index": 300,
+  "bar": [
+    1791137040,
+    85332.89,
+    85340.04,
+    85330.15,
+    85340.03,
+    2.58142
+  ],
+  "source_row": [
+    1791137040,
+    85340.03
+  ],
+  "browser_utc": "2026-10-04T18:07:04.687Z",
+  "title": "V11 Data Window coded display",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   18:04",
+  "visible_range": {
+    "_firstBar": 265,
+    "_lastBar": 303
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}

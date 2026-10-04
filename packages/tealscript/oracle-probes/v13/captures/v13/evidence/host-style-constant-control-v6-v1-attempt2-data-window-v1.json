@@ -1,0 +1,29 @@
+{
+  "index": 299,
+  "bar": [
+    1791136560,
+    85342.52,
+    85342.53,
+    85319.52,
+    85319.52,
+    3.14463
+  ],
+  "source_row": [
+    1791136560,
+    85319.52
+  ],
+  "browser_utc": "2026-10-04T17:58:40.233Z",
+  "title": "V11 Style constant control",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   17:56",
+  "visible_range": {
+    "_firstBar": 264,
+    "_lastBar": 302
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}

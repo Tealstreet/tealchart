@@ -1,0 +1,30 @@
+{
+  "index": 298,
+  "bar": [
+    1791136680,
+    85319.52,
+    85330.01,
+    85319.52,
+    85319.53,
+    8.21617
+  ],
+  "source_row": [
+    1791136680,
+    85319.53,
+    1778344489
+  ],
+  "browser_utc": "2026-10-04T18:00:18.740Z",
+  "title": "V11 Style dynamic color new",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   17:58",
+  "visible_range": {
+    "_firstBar": 263,
+    "_lastBar": 301
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}

@@ -1,0 +1,167 @@
+{
+  "artifact": "Style automatic controls context v1",
+  "observations": [
+    {
+      "source": "host-style-constant-control-v6-v1.pine",
+      "source_sha256": "f083262590be5ee06ce79a7c69aa7b19123c9fbea073c41cc97c21ffa71ac03f",
+      "attempt": 1,
+      "status": "RUNS",
+      "evidence": "captures/v13/evidence/host-style-constant-control-v6-v1-attempt1-constant-style-controls-v1.json",
+      "utc": "2026-10-04T17:56:08.286Z",
+      "color_controls": [
+        {
+          "name": "color-with-thickness-select",
+          "class_name": "colorPickerWrap-Ah_R6QP5 intent-default-Ah_R6QP5 border-thin-Ah_R6QP5 size-medium-Ah_R6QP5",
+          "swatches": [
+            {
+              "style": "background-color: rgba(41, 98, 255, 0.75);",
+              "background": "rgba(41, 98, 255, 0.75)"
+            },
+            {
+              "style": "width: 30px; height: 1px; background-color: rgba(41, 98, 255, 0.75);",
+              "background": "rgba(41, 98, 255, 0.75)"
+            }
+          ]
+        }
+      ],
+      "native_styles": {
+        "plot_0": {
+          "color": "rgba(41,98,255,0.75)",
+          "display": 4294967295,
+          "linestyle": 0,
+          "linewidth": 1,
+          "plottype": 0,
+          "trackPrice": false,
+          "title": "plot_0"
+        }
+      },
+      "dialog_text": "V11 Style constant control\nClose menu\nStyleVisibility\nPRICE\nOUTPUT VALUES\nPrecision\nDefault\nLabels on price scale\nValues in status line\nDefaults\nCancel\nOk",
+      "reload_observation": null
+    },
+    {
+      "source": "host-style-constant-control-v6-v1.pine",
+      "source_sha256": "f083262590be5ee06ce79a7c69aa7b19123c9fbea073c41cc97c21ffa71ac03f",
+      "attempt": 2,
+      "status": "RUNS-PARTIAL-HISTORY",
+      "evidence": "captures/v13/evidence/host-style-constant-control-v6-v1-attempt2-constant-style-after-reload-v1.json",
+      "utc": "2026-10-04T17:58:42.432Z",
+      "color_controls": [
+        {
+          "name": "color-with-thickness-select",
+          "class_name": "colorPickerWrap-Ah_R6QP5 intent-default-Ah_R6QP5 border-thin-Ah_R6QP5 size-medium-Ah_R6QP5",
+          "swatches": [
+            {
+              "style": "background-color: rgba(41, 98, 255, 0.75);",
+              "background": "rgba(41, 98, 255, 0.75)"
+            },
+            {
+              "style": "width: 30px; height: 1px; background-color: rgba(41, 98, 255, 0.75);",
+              "background": "rgba(41, 98, 255, 0.75)"
+            }
+          ]
+        }
+      ],
+      "native_styles": {
+        "plot_0": {
+          "color": "rgba(41,98,255,0.75)",
+          "display": 4294967295,
+          "linestyle": 0,
+          "linewidth": 1,
+          "plottype": 0,
+          "trackPrice": false,
+          "title": "plot_0"
+        }
+      },
+      "dialog_text": "V11 Style constant control\nClose menu\nStyleVisibility\nPRICE\nOUTPUT VALUES\nPrecision\nDefault\nLabels on price scale\nValues in status line\nDefaults\nCancel\nOk",
+      "reload_observation": "Same chart properties and saved viewport spacing reloaded; native host history300 vs full baseline. Collector full-history wait failed; no native runtime failure."
+    },
+    {
+      "source": "host-style-dynamic-new-v6-v1.pine",
+      "source_sha256": "f2eea18c335a0885e548e264f06a8a082e03c91d37533bbf388dbd5bd1fd20da",
+      "attempt": 1,
+      "status": "RUNS",
+      "evidence": "captures/v13/evidence/host-style-dynamic-new-v6-v1-attempt1-dynamic-style-controls-v1.json",
+      "utc": "2026-10-04T18:00:24.157Z",
+      "color_controls": [],
+      "native_styles": {
+        "plot_0": {
+          "color": "#2962ff",
+          "display": 4294967295,
+          "linestyle": 0,
+          "linewidth": 1,
+          "plottype": 0,
+          "trackPrice": false,
+          "title": "plot_0"
+        }
+      },
+      "dialog_text": "V11 Style dynamic color new\nClose menu\nStyleVisibility\nPRICE\nOUTPUT VALUES\nPrecision\nDefault\nLabels on price scale\nValues in status line\nDefaults\nCancel\nOk",
+      "reload_observation": null
+    },
+    {
+      "source": "host-style-gradient-v6-v1.pine",
+      "source_sha256": "a77ab2a4c68797c38d695ff0eae77410613e209b1d81230c72abc0e612b45824",
+      "attempt": 1,
+      "status": "RUNS",
+      "evidence": "captures/v13/evidence/host-style-gradient-v6-v1-attempt1-gradient-style-controls-v1.json",
+      "utc": "2026-10-04T18:00:57.853Z",
+      "color_controls": [],
+      "native_styles": {
+        "plot_0": {
+          "color": "#2962ff",
+          "display": 4294967295,
+          "linestyle": 0,
+          "linewidth": 1,
+          "plottype": 0,
+          "trackPrice": false,
+          "title": "plot_0"
+        }
+      },
+      "dialog_text": "V11 Style gradient result\nClose menu\nStyleVisibility\nPRICE\nOUTPUT VALUES\nPrecision\nDefault\nLabels on price scale\nValues in status line\nDefaults\nCancel\nOk",
+      "reload_observation": null
+    },
+    {
+      "source": "host-style-constant-control-v6-v1.pine",
+      "source_sha256": "f083262590be5ee06ce79a7c69aa7b19123c9fbea073c41cc97c21ffa71ac03f",
+      "attempt": 3,
+      "status": "RUNS",
+      "evidence": "captures/v13/evidence/host-style-constant-control-v6-v1-attempt3-constant-control-after-gradient-v1.json",
+      "utc": "2026-10-04T18:02:06.295Z",
+      "color_controls": [
+        {
+          "name": "color-with-thickness-select",
+          "class_name": "colorPickerWrap-Ah_R6QP5 intent-default-Ah_R6QP5 border-thin-Ah_R6QP5 size-medium-Ah_R6QP5",
+          "swatches": [
+            {
+              "style": "background-color: rgba(41, 98, 255, 0.75);",
+              "background": "rgba(41, 98, 255, 0.75)"
+            },
+            {
+              "style": "width: 30px; height: 1px; background-color: rgba(41, 98, 255, 0.75);",
+              "background": "rgba(41, 98, 255, 0.75)"
+            }
+          ]
+        }
+      ],
+      "native_styles": {
+        "plot_0": {
+          "color": "rgba(41,98,255,0.75)",
+          "display": 4294967295,
+          "linestyle": 0,
+          "linewidth": 1,
+          "plottype": 0,
+          "trackPrice": false,
+          "title": "plot_0"
+        }
+      },
+      "dialog_text": "V11 Style constant control\nClose menu\nStyleVisibility\nPRICE\nOUTPUT VALUES\nPrecision\nDefault\nLabels on price scale\nValues in status line\nDefaults\nCancel\nOk",
+      "reload_observation": null
+    }
+  ],
+  "limits": [
+    "Isolated constant, dynamic transparency and constant-argument gradient source/Style dialog receipts retained. No automatic picker behavior inferred from numeric color or qualifiers.",
+    "Constant source full history attempts1/3 expose picker; same-setting reload attempt2 is partial native host history300 with picker still present.",
+    "Dynamic and gradient captured Style dialogs expose no color controls.",
+    "Reload exact completion UTC unobserved after collector full-history wait; first observed post-reload UTC is recorded separately.",
+    "No implementation or general automatic UI policy closure."
+  ]
+}
