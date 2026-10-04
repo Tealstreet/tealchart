@@ -1,0 +1,6 @@
+//@version=6
+indicator("Line eviction observation", max_lines_count=3)
+line.new(bar_index, close, bar_index + 1, close)
+plot(array.size(line.all), "VISIBLE_COUNT")
+oldest = array.size(line.all) > 0 ? line.get_x1(array.get(line.all, 0)) : na
+plot(oldest, "OLDEST_INDEX")

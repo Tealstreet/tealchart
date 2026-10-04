@@ -1,0 +1,12 @@
+//@version=5
+indicator("Packet004 v5 first predecessor v1")
+type Level
+    float value
+levels = array.new<Level>()
+array.push(levels, Level.new(23.0))
+float previousValue = na
+for i = 0 to array.size(levels) - 1
+    current = array.get(levels, i)
+    previous = array.get(levels, i - 1)
+    previousValue := previous.value
+plot(previousValue, "previous_value")

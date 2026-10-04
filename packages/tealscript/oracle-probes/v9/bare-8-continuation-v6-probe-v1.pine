@@ -1,0 +1,5 @@
+//@version=6
+indicator("V9 bare 8 continuation")
+value = open + high +
+        low + close
+plot(value, "OUTCOME")

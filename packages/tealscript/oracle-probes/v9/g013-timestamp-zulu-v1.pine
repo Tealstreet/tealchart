@@ -1,0 +1,3 @@
+//@version=6
+indicator("Timestamp zulu v1")
+plot(timestamp("2026-01-01T00:00:00Z"), title="Timestamp")

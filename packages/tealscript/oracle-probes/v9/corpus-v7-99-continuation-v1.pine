@@ -1,0 +1,40 @@
+//@version=6
+indicator("V9 corpus v7 99 continuation")
+secret = input.string("oracle")
+catalyst_score = 1.0
+confidence = 1.0
+catalyst_window_active = "inactive"
+event_risk_score = 0.0
+pead_score = 0.0
+sue_dir = 0
+bars_to_earn = 1
+bars_to_div = 1
+golden_cross = false
+death_cross = false
+donch_break_up = false
+donch_break_down = false
+make_payload(sig, kind) =>
+    '{"secret":"' + secret +
+    '","symbol":"' + syminfo.ticker +
+    '","pillar":"catalyst' +
+    '","score":'      + str.tostring(catalyst_score, "#.####") +
+    ',"confidence":'  + str.tostring(confidence,     "#.####") +
+    ',"signal":"'     + sig +
+    '","price":'      + str.tostring(close,          "#.####") +
+    ',"timeframe":"'  + timeframe.period +
+    '","timestamp":'  + str.tostring(time) +
+    ',"details":{' +
+        '"kind":"'                       + kind +
+        '","catalyst_window_active":"'   + catalyst_window_active +
+        '","event_risk_score":'          + str.tostring(event_risk_score, "#.###") +
+        ',"pead_score":'                 + str.tostring(pead_score,       "#.###") +
+        ',"sue_dir":'                    + str.tostring(sue_dir) +
+        ',"bars_to_earnings":'           + (na(bars_to_earn) ? "null" : str.tostring(bars_to_earn)) +
+        ',"bars_to_dividend":'           + (na(bars_to_div)  ? "null" : str.tostring(bars_to_div)) +
+        ',"golden_cross":'               + (golden_cross     ? "true" : "false") +
+        ',"death_cross":'                + (death_cross      ? "true" : "false") +
+        ',"donch_break_up":'             + (donch_break_up   ? "true" : "false") +
+        ',"donch_break_down":'           + (donch_break_down ? "true" : "false") +
+    "}}"
+outputValue = make_payload("CONTROL", "EVENT")
+plot(str.length(outputValue), "OUTCOME")

@@ -1,0 +1,5 @@
+//@version=6
+indicator("Bool simple numeric return")
+simple int source = timeframe.multiplier
+const bool converted = bool(source)
+plot(converted ? 1 : 0)

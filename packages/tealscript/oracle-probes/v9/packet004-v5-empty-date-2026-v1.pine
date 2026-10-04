@@ -1,0 +1,18 @@
+//@version=5
+indicator("Packet004 empty date 2026 v1")
+int startDate = timestamp("01 Jan 2000 00:00:00 GMT+10")
+int stopDate = timestamp("31 Dec 2025 23:45:00 GMT+10")
+int evaluationTime = timestamp("31 Aug 2026 00:00:00 GMT+0")
+bool window = evaluationTime >= startDate and evaluationTime <= stopDate
+feature1 = array.new_float()
+feature2 = array.new_float()
+if window
+    array.push(feature1, 2.0)
+    array.push(feature2, 5.0)
+int size = array.size(feature1)
+float observed = na
+for i = 0 to size - 1
+    observed := array.get(feature1, i) + array.get(feature2, i)
+plot(window ? 1 : 0, "training_window")
+plot(size, "training_size")
+plot(observed, "read_sum")
