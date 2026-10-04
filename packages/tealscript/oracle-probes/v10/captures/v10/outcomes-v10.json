@@ -1,0 +1,1260 @@
+[
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T14:40:04.224Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v10 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "input-generic-computed-source-v5-v1.pine",
+    "attempt": 1,
+    "source_sha256": "acf96853695ed7f29f4bd473a258e9dfea7e1e3c0ffb69b0a10cf534196aee23",
+    "indicator_title": "INPUT-GENERIC-COMPUTED-SOURCE-V5",
+    "status": "COMPILE-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": "Arguments of input function must be of constant type, or 'source' builtin variables.",
+      "line": 3,
+      "column": 10,
+      "first_bar_index": null,
+      "first_bar_time_utc": null,
+      "native": {
+        "error": "Arguments of input function must be of constant type, or 'source' builtin variables.",
+        "editorError": {
+          "end": {
+            "column": 40,
+            "line": 3
+          },
+          "message": "Arguments of input function must be of constant type, or 'source' builtin variables.",
+          "start": {
+            "column": 10,
+            "line": 3
+          },
+          "id": "USER;643ed0e623ee4548bc23a6f67c233b44"
+        },
+        "title": "Compilation error",
+        "compiler_markers": [
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///f59185b8-ea46-43e2-b674-b062384f72ee.pine?placement%3Ddialog",
+              "path": "/f59185b8-ea46-43e2-b674-b062384f72ee.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "code": "PINE_VERSION_OUTDATED",
+            "severity": 4,
+            "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+            "startLineNumber": 1,
+            "startColumn": 3,
+            "endLineNumber": 1,
+            "endColumn": 12
+          }
+        ],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,264.76\nH\n85,264.76\nL\n85,252.28\nC\n85,252.29\n\u221212.47 (\u22120.01%)\n85,139.09\nSELL\n0.01\n85,139.10\nBUY\nUSDT\ninput-generic-computed-source-v5-v1.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n14:40:05 UTC\n99+\nPine Editor\ninput-generic-computed-source-v5-v1.pine\nPublish script\n1\n2\n3\n4\n5\n6\n//@version=5\nindicator(\"INPUT-GENERIC-COMPUTED-SOURCE-V5\")\nselected=input(close*2,\"ComputedSource\")\nplot(close,\"OUTCOME\")\nplot(bar_index,\"BAR_INDEX\")\n1 of 1 problem\nVersion 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.(PINE_VERSION_OUTDATED)\n1 \u2219 Today, 22:40\nLine 1, Col 3\nPine Script\u00ae v5\nCompilation error\n\nArguments of input function must be of constant type, or 'source' builtin variables.\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+        "context_substituted_message": "Arguments of input function must be of constant type, or 'source' builtin variables."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "input-generic-computed-source-v5-v1.pine",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24618,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24921,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v10/evidence/input-generic-computed-source-v5-v1-attempt1-error.png",
+      "captures/v10/evidence/input-generic-computed-source-v5-v1-attempt1-error.txt",
+      "captures/v10/evidence/input-generic-computed-source-v5-v1-attempt1-logs.txt",
+      "captures/v10/evidence/input-generic-computed-source-v5-v1-attempt1-logs-v1.json",
+      "captures/v10/evidence/input-generic-computed-source-v5-v1-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": null,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///f59185b8-ea46-43e2-b674-b062384f72ee.pine?placement%3Ddialog",
+          "path": "/f59185b8-ea46-43e2-b674-b062384f72ee.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "error_observed_utc": "2026-10-04T14:40:07.850Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/input-generic-computed-source-v5-v1-attempt1-logs.txt",
+        "evidence/input-generic-computed-source-v5-v1-attempt1-logs-v1.json",
+        "evidence/input-generic-computed-source-v5-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T14:40:16.925Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v10 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "input-generic-source-metadata-v5-v1.pine",
+    "attempt": 1,
+    "source_sha256": "43e3b883d20d2aac3170536afd3b661268ac95c52faca5f2153f7c4767e609c4",
+    "indicator_title": "INPUT-GENERIC-SOURCE-POSITIONAL-V5",
+    "status": "COMPILE-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": "Too many arguments passed into the `input()` function call. Passed 8 arguments but expected 6.",
+      "line": 3,
+      "column": 10,
+      "first_bar_index": null,
+      "first_bar_time_utc": null,
+      "native": {
+        "error": "Too many arguments passed into the `input()` function call. Passed 8 arguments but expected 6.",
+        "editorError": {
+          "end": {
+            "column": 77,
+            "line": 3
+          },
+          "message": "Too many arguments passed into the `input()` function call. Passed 8 arguments but expected 6.",
+          "start": {
+            "column": 10,
+            "line": 3
+          },
+          "id": "USER;46676d948c6d4b48ad3d4a3e48483771"
+        },
+        "title": "Compilation error",
+        "compiler_markers": [
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///d32759a9-8a25-454d-a787-8b8b1f21b6f0.pine?placement%3Ddialog",
+              "path": "/d32759a9-8a25-454d-a787-8b8b1f21b6f0.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "code": "PINE_VERSION_OUTDATED",
+            "severity": 4,
+            "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+            "startLineNumber": 1,
+            "startColumn": 3,
+            "endLineNumber": 1,
+            "endColumn": 12
+          },
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///d32759a9-8a25-454d-a787-8b8b1f21b6f0.pine?placement%3Ddialog",
+              "path": "/d32759a9-8a25-454d-a787-8b8b1f21b6f0.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "severity": 8,
+            "message": "Too many arguments passed into the `input()` function call. Passed 8 arguments but expected 6.",
+            "startLineNumber": 3,
+            "startColumn": 10,
+            "endLineNumber": 3,
+            "endColumn": 78
+          }
+        ],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,139.10\nH\n85,139.10\nL\n85,127.19\nC\n85,127.20\n\u221211.89 (\u22120.01%)\n85,127.19\nSELL\n0.01\n85,127.20\nBUY\nUSDT\ninput-generic-source-metadata-v5-v1.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n14:40:18 UTC\n99+\nPine Editor\ninput-generic-source-metadata-v5-v1.pine\nPublish script\n1\n2\n3\n4\n5\n//@version=5\nindicator(\"INPUT-GENERIC-SOURCE-POSITIONAL-V5\")\nselected=input(close,\"SourceTitle\",\"SLOT3\",\"SLOT4\",\"SLOT5\",display.none,true)\nplot(close,\"OUTCOME\")\n1 of 2 problems\nToo many arguments passed into the `input()` function call. Passed 8 arguments but expected 6.\n1 \u2219 Today, 22:40\nLine 3, Col 10\nPine Script\u00ae v5\nCompilation error\n\nToo many arguments passed into the `input()` function call. Passed 8 arguments but expected 6.\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+        "context_substituted_message": "Too many arguments passed into the `input()` function call. Passed 8 arguments but expected 6."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "input-generic-source-metadata-v5-v1.pine",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24618,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24921,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v10/evidence/input-generic-source-metadata-v5-v1-attempt1-error.png",
+      "captures/v10/evidence/input-generic-source-metadata-v5-v1-attempt1-error.txt",
+      "captures/v10/evidence/input-generic-source-metadata-v5-v1-attempt1-logs.txt",
+      "captures/v10/evidence/input-generic-source-metadata-v5-v1-attempt1-logs-v1.json",
+      "captures/v10/evidence/input-generic-source-metadata-v5-v1-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": null,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///d32759a9-8a25-454d-a787-8b8b1f21b6f0.pine?placement%3Ddialog",
+          "path": "/d32759a9-8a25-454d-a787-8b8b1f21b6f0.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      },
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///d32759a9-8a25-454d-a787-8b8b1f21b6f0.pine?placement%3Ddialog",
+          "path": "/d32759a9-8a25-454d-a787-8b8b1f21b6f0.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "severity": 8,
+        "message": "Too many arguments passed into the `input()` function call. Passed 8 arguments but expected 6.",
+        "startLineNumber": 3,
+        "startColumn": 10,
+        "endLineNumber": 3,
+        "endColumn": 78
+      }
+    ],
+    "error_observed_utc": "2026-10-04T14:40:20.521Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/input-generic-source-metadata-v5-v1-attempt1-logs.txt",
+        "evidence/input-generic-source-metadata-v5-v1-attempt1-logs-v1.json",
+        "evidence/input-generic-source-metadata-v5-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T14:40:42.435Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v10 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "input-generic-bare-volume-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "76040577a1a98568306699adf575323cd9511743bbf1adb9ac7fef0d40e847d3",
+    "indicator_title": "INPUT-GENERIC-BARE-VOLUME-V6",
+    "status": "RUNS",
+    "csv_file": "captures/v10/input-generic-bare-volume-v6-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T224041.630.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [
+        {
+          "id": "in_0",
+          "name": "Volume",
+          "value": "volume",
+          "default": "volume"
+        }
+      ],
+      "observed_indicator_title": "INPUT-GENERIC-BARE-VOLUME-V6",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24621,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24921,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T14:40:34.202Z",
+    "live_candle_open_utc": "2026-10-04T14:40:00.000Z",
+    "export_utc": "2026-10-04T14:40:42.002Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v10/evidence/input-generic-bare-volume-v6-v1-attempt1-setup.png",
+      "captures/v10/evidence/input-generic-bare-volume-v6-v1-attempt1-export.png",
+      "captures/v10/evidence/input-generic-bare-volume-v6-v1-attempt1-logs.txt",
+      "captures/v10/evidence/input-generic-bare-volume-v6-v1-attempt1-logs-v1.json",
+      "captures/v10/evidence/input-generic-bare-volume-v6-v1-attempt1-logs.png",
+      "captures/v10/evidence/input-generic-bare-volume-v6-v1-attempt1-inputs.png",
+      "captures/v10/evidence/input-generic-bare-volume-v6-v1-attempt1-visual.png",
+      "captures/v10/evidence/input-generic-bare-volume-v6-v1-attempt1-data-window-v1.png",
+      "captures/v10/evidence/input-generic-bare-volume-v6-v1-attempt1-data-window-v1.json",
+      "captures/v10/evidence/input-generic-bare-volume-v6-v1-attempt1-data-window-v1.txt",
+      "captures/v10/evidence/input-generic-bare-volume-v6-v1-attempt1-authority-object-geometry-v1.json",
+      "captures/v10/evidence/input-generic-bare-volume-v6-v1-attempt1-authority-object-geometry-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T14:40:35.069Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790819640,
+            83540.1,
+            83556.9,
+            83524.36,
+            83556.82,
+            6.13961
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791124800,
+            85139.1,
+            85139.1,
+            85127.17,
+            85127.18,
+            10.52881
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "INPUT-GENERIC-BARE-VOLUME-V6",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790819640,
+                83556.82
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791124800,
+                85127.18
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T14:40:36.325Z",
+        "bars": 24921,
+        "end": true,
+        "first": {
+          "index": -24621,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791124800,
+            85139.1,
+            85139.1,
+            85127.17,
+            85127.18,
+            10.53752
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "INPUT-GENERIC-BARE-VOLUME-V6",
+            "status": {
+              "type": 2
+            },
+            "size": 24921,
+            "first": {
+              "index": -24621,
+              "value": [
+                1788134400,
+                77674.04
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791124800,
+                85127.18
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   14:40",
+    "historical_compare_before_unix_seconds": 1791124800,
+    "pine_logs": {
+      "paths": [
+        "evidence/input-generic-bare-volume-v6-v1-attempt1-logs.txt",
+        "evidence/input-generic-bare-volume-v6-v1-attempt1-logs-v1.json",
+        "evidence/input-generic-bare-volume-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "d60470fa5dde3607dafe286b4b3405a1f1fbe6729238ba9e5a6eb860baabe162",
+    "csv_bytes": 1312340,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "OUTCOME"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "OUTCOME": 5
+    },
+    "first_historical_cells": [
+      "1788134400",
+      "77682",
+      "77682.01",
+      "77572",
+      "77674.04",
+      "77674.04"
+    ],
+    "last_historical_cells": [
+      "1791124680",
+      "85151.18",
+      "85151.18",
+      "85139.09",
+      "85139.09",
+      "85139.09"
+    ],
+    "declared_to_native_header_mapping": {
+      "OUTCOME": "OUTCOME"
+    },
+    "csv_rows": 24921,
+    "historical_rows": 24920,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791124800,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791124800",
+    "first_historical_values": {
+      "OUTCOME": "77674.04"
+    },
+    "last_historical_values": {
+      "OUTCOME": "85139.09"
+    },
+    "data_window_witness": "captures/v10/evidence/input-generic-bare-volume-v6-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T14:41:42.475Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v10 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "tuple-udf-64-plus63-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "0bdcb58b48f9604aca0c597ea7992096b194deda63ceffa776dbcde39c3f530e",
+    "indicator_title": "UDF tuple127 control",
+    "status": "RUNS",
+    "csv_file": "captures/v10/tuple-udf-64-plus63-v6-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T224141.837.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "UDF tuple127 control",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24621,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24921,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T14:41:33.581Z",
+    "live_candle_open_utc": "2026-10-04T14:40:00.000Z",
+    "export_utc": "2026-10-04T14:41:42.080Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v10/evidence/tuple-udf-64-plus63-v6-v1-attempt1-setup.png",
+      "captures/v10/evidence/tuple-udf-64-plus63-v6-v1-attempt1-export.png",
+      "captures/v10/evidence/tuple-udf-64-plus63-v6-v1-attempt1-logs.txt",
+      "captures/v10/evidence/tuple-udf-64-plus63-v6-v1-attempt1-logs-v1.json",
+      "captures/v10/evidence/tuple-udf-64-plus63-v6-v1-attempt1-logs.png",
+      "captures/v10/evidence/tuple-udf-64-plus63-v6-v1-attempt1-visual.png",
+      "captures/v10/evidence/tuple-udf-64-plus63-v6-v1-attempt1-data-window-v1.png",
+      "captures/v10/evidence/tuple-udf-64-plus63-v6-v1-attempt1-data-window-v1.json",
+      "captures/v10/evidence/tuple-udf-64-plus63-v6-v1-attempt1-data-window-v1.txt",
+      "captures/v10/evidence/tuple-udf-64-plus63-v6-v1-attempt1-authority-object-geometry-v1.json",
+      "captures/v10/evidence/tuple-udf-64-plus63-v6-v1-attempt1-authority-object-geometry-v1.png",
+      "captures/v10/tuple-request-context-v1.json",
+      "captures/v10/evidence/tuple-request-context-companion-1-attempt1-receipt-v1.json",
+      "captures/v10/evidence/tuple-request-context-companion-2-attempt1-receipt-v1.json",
+      "captures/v10/tuple-request-context-companion-1-attempt1.csv",
+      "captures/v10/tuple-request-context-companion-2-attempt1.csv",
+      "captures/v10/evidence/tuple-request-context-companion-1-attempt1-setup-v1.png",
+      "captures/v10/evidence/tuple-request-context-companion-1-attempt1-export-v1.png",
+      "captures/v10/evidence/tuple-request-context-companion-2-attempt1-setup-v1.png",
+      "captures/v10/evidence/tuple-request-context-companion-2-attempt1-export-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T14:41:34.412Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790819640,
+            83540.1,
+            83556.9,
+            83524.36,
+            83556.82,
+            6.13961
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791124800,
+            85139.1,
+            85139.1,
+            85126.87,
+            85126.87,
+            14.60616
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "UDF tuple127 control",
+            "status": {
+              "type": 1,
+              "startTime": 1791124893642
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T14:41:35.686Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790819640,
+            83540.1,
+            83556.9,
+            83524.36,
+            83556.82,
+            6.13961
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791124800,
+            85139.1,
+            85139.1,
+            85126.87,
+            85126.88,
+            14.61323
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "UDF tuple127 control",
+            "status": {
+              "type": 2
+            },
+            "size": 24921,
+            "first": {
+              "index": -1022377,
+              "value": [
+                1788134400,
+                4973154.560000001,
+                4895417.520000001
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791124800,
+                5450136.319999995,
+                5364946.439999995
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T14:41:36.516Z",
+        "bars": 24921,
+        "end": true,
+        "first": {
+          "index": -24621,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791124800,
+            85139.1,
+            85139.1,
+            85126.87,
+            85126.88,
+            14.62671
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "UDF tuple127 control",
+            "status": {
+              "type": 2
+            },
+            "size": 24921,
+            "first": {
+              "index": -24621,
+              "value": [
+                1788134400,
+                4973154.560000001,
+                4895417.520000001
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791124800,
+                5450136.319999995,
+                5364946.439999995
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   14:40",
+    "historical_compare_before_unix_seconds": 1791124800,
+    "pine_logs": {
+      "paths": [
+        "evidence/tuple-udf-64-plus63-v6-v1-attempt1-logs.txt",
+        "evidence/tuple-udf-64-plus63-v6-v1-attempt1-logs-v1.json",
+        "evidence/tuple-udf-64-plus63-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "573d5a836617a29c2ff288e45f2561f04d60079372e08a40fcefb57050702d12",
+    "csv_bytes": 1896176,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "a sum",
+      "b sum"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "a sum": 5,
+      "b sum": 6
+    },
+    "first_historical_cells": [
+      "1788134400",
+      "77682",
+      "77682.01",
+      "77572",
+      "77674.04",
+      "4973154.560000001",
+      "4895417.520000001"
+    ],
+    "last_historical_cells": [
+      "1791124680",
+      "85151.18",
+      "85151.18",
+      "85139.09",
+      "85139.09",
+      "5450917.759999995",
+      "5365715.669999995"
+    ],
+    "declared_to_native_header_mapping": {
+      "a sum": "a sum",
+      "b sum": "b sum"
+    },
+    "csv_rows": 24921,
+    "historical_rows": 24920,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791124800,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791124800",
+    "first_historical_values": {
+      "a sum": "4973154.560000001",
+      "b sum": "4895417.520000001"
+    },
+    "last_historical_values": {
+      "a sum": "5450917.759999995",
+      "b sum": "5365715.669999995"
+    },
+    "data_window_witness": "captures/v10/evidence/tuple-udf-64-plus63-v6-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T14:42:16.333Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v10 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "tuple-udf-64-plus64-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "7d0f86049693210a22628f71ee8a248c4287d982fb16499c2334306778eb74ea",
+    "indicator_title": "UDF tuple128 discriminator",
+    "status": "RUNS",
+    "csv_file": "captures/v10/tuple-udf-64-plus64-v6-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T224215.385.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "UDF tuple128 discriminator",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24622,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24922,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T14:42:07.998Z",
+    "live_candle_open_utc": "2026-10-04T14:42:00.000Z",
+    "export_utc": "2026-10-04T14:42:15.870Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v10/evidence/tuple-udf-64-plus64-v6-v1-attempt1-setup.png",
+      "captures/v10/evidence/tuple-udf-64-plus64-v6-v1-attempt1-export.png",
+      "captures/v10/evidence/tuple-udf-64-plus64-v6-v1-attempt1-logs.txt",
+      "captures/v10/evidence/tuple-udf-64-plus64-v6-v1-attempt1-logs-v1.json",
+      "captures/v10/evidence/tuple-udf-64-plus64-v6-v1-attempt1-logs.png",
+      "captures/v10/evidence/tuple-udf-64-plus64-v6-v1-attempt1-visual.png",
+      "captures/v10/evidence/tuple-udf-64-plus64-v6-v1-attempt1-data-window-v1.png",
+      "captures/v10/evidence/tuple-udf-64-plus64-v6-v1-attempt1-data-window-v1.json",
+      "captures/v10/evidence/tuple-udf-64-plus64-v6-v1-attempt1-data-window-v1.txt",
+      "captures/v10/evidence/tuple-udf-64-plus64-v6-v1-attempt1-authority-object-geometry-v1.json",
+      "captures/v10/evidence/tuple-udf-64-plus64-v6-v1-attempt1-authority-object-geometry-v1.png",
+      "captures/v10/tuple-request-context-v1.json",
+      "captures/v10/evidence/tuple-request-context-companion-1-attempt1-receipt-v1.json",
+      "captures/v10/evidence/tuple-request-context-companion-2-attempt1-receipt-v1.json",
+      "captures/v10/tuple-request-context-companion-1-attempt1.csv",
+      "captures/v10/tuple-request-context-companion-2-attempt1.csv",
+      "captures/v10/evidence/tuple-request-context-companion-1-attempt1-setup-v1.png",
+      "captures/v10/evidence/tuple-request-context-companion-1-attempt1-export-v1.png",
+      "captures/v10/evidence/tuple-request-context-companion-2-attempt1-setup-v1.png",
+      "captures/v10/evidence/tuple-request-context-companion-2-attempt1-export-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T14:42:08.870Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790819760,
+            83556.82,
+            83566.87,
+            83530,
+            83530,
+            5.68935
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791124920,
+            85126.87,
+            85126.88,
+            85126.86,
+            85126.86,
+            2.71503
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "UDF tuple128 discriminator",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790819760,
+                5347936,
+                5347936
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791124920,
+                5450135.040000003,
+                5450135.040000003
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T14:42:10.182Z",
+        "bars": 24922,
+        "end": true,
+        "first": {
+          "index": -24622,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791124920,
+            85126.87,
+            85126.88,
+            85126.86,
+            85126.87,
+            2.71503
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "UDF tuple128 discriminator",
+            "status": {
+              "type": 2
+            },
+            "size": 24922,
+            "first": {
+              "index": -24622,
+              "value": [
+                1788134400,
+                4973154.560000001,
+                4973154.560000001
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791124920,
+                5450135.680000005,
+                5450135.680000005
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   14:42",
+    "historical_compare_before_unix_seconds": 1791124920,
+    "pine_logs": {
+      "paths": [
+        "evidence/tuple-udf-64-plus64-v6-v1-attempt1-logs.txt",
+        "evidence/tuple-udf-64-plus64-v6-v1-attempt1-logs-v1.json",
+        "evidence/tuple-udf-64-plus64-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "bdeb7c994a5acc3a0aa11538abab268763c33c54a5f8462adff601fbfaa07298",
+    "csv_bytes": 1892436,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "a sum",
+      "b sum"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "a sum": 5,
+      "b sum": 6
+    },
+    "first_historical_cells": [
+      "1788134400",
+      "77682",
+      "77682.01",
+      "77572",
+      "77674.04",
+      "4973154.560000001",
+      "4973154.560000001"
+    ],
+    "last_historical_cells": [
+      "1791124800",
+      "85139.1",
+      "85139.1",
+      "85126.87",
+      "85126.87",
+      "5450135.680000005",
+      "5450135.680000005"
+    ],
+    "declared_to_native_header_mapping": {
+      "a sum": "a sum",
+      "b sum": "b sum"
+    },
+    "csv_rows": 24922,
+    "historical_rows": 24921,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791124920,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791124920",
+    "first_historical_values": {
+      "a sum": "4973154.560000001",
+      "b sum": "4973154.560000001"
+    },
+    "last_historical_values": {
+      "a sum": "5450135.680000005",
+      "b sum": "5450135.680000005"
+    },
+    "data_window_witness": "captures/v10/evidence/tuple-udf-64-plus64-v6-v1-attempt1-data-window-v1.json"
+  }
+]

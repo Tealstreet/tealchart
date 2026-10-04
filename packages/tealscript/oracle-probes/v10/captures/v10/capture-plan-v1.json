@@ -1,0 +1,184 @@
+{
+  "artifact": "v10 capture plan v1",
+  "batch_start_utc": "2026-10-04T14:39:31.301261+00:00",
+  "frozen_source_commit": "03d5367aef",
+  "manifest": "bundle-manifest-v8.json",
+  "manifest_sha256": "643e6d620838fa21df616f255b715c5d209b5d7bd278afbf81f2b44edb8c71b8",
+  "scripts": [
+    {
+      "script": "input-generic-computed-source-v5-v1.pine",
+      "sha256": "acf96853695ed7f29f4bd473a258e9dfea7e1e3c0ffb69b0a10cf534196aee23",
+      "title": "INPUT-GENERIC-COMPUTED-SOURCE-V5",
+      "shorttitle": null,
+      "columns": [
+        "OUTCOME",
+        "BAR_INDEX"
+      ],
+      "minimumHistoryBars": 10,
+      "instructions": "instructions/input-generic-computed-source-v5-v1.md",
+      "pineVersion": 5,
+      "captureKind": "OUTCOME-AND-NUMERIC-CSV"
+    },
+    {
+      "script": "input-generic-source-metadata-v5-v1.pine",
+      "sha256": "43e3b883d20d2aac3170536afd3b661268ac95c52faca5f2153f7c4767e609c4",
+      "title": "INPUT-GENERIC-SOURCE-POSITIONAL-V5",
+      "shorttitle": null,
+      "columns": [
+        "OUTCOME"
+      ],
+      "minimumHistoryBars": 10,
+      "instructions": "instructions/input-generic-source-metadata-v5-v1.md",
+      "pineVersion": 5,
+      "captureKind": "OUTCOME-AND-NUMERIC-CSV"
+    },
+    {
+      "script": "input-generic-bare-volume-v6-v1.pine",
+      "sha256": "76040577a1a98568306699adf575323cd9511743bbf1adb9ac7fef0d40e847d3",
+      "title": "INPUT-GENERIC-BARE-VOLUME-V6",
+      "shorttitle": null,
+      "columns": [
+        "OUTCOME"
+      ],
+      "minimumHistoryBars": 10,
+      "instructions": "instructions/input-generic-bare-volume-v6-v1.md",
+      "pineVersion": 6,
+      "captureKind": "OUTCOME-AND-NUMERIC-CSV"
+    },
+    {
+      "script": "tuple-udf-64-plus63-v6-v1.pine",
+      "sha256": "0bdcb58b48f9604aca0c597ea7992096b194deda63ceffa776dbcde39c3f530e",
+      "title": "UDF tuple127 control",
+      "shorttitle": null,
+      "columns": [
+        "a sum",
+        "b sum"
+      ],
+      "minimumHistoryBars": 4,
+      "instructions": "instructions/tuple-udf-64-plus63-v6-v1.md",
+      "pineVersion": 6,
+      "captureKind": "OUTCOME-AND-NUMERIC-CSV"
+    },
+    {
+      "script": "tuple-udf-64-plus64-v6-v1.pine",
+      "sha256": "7d0f86049693210a22628f71ee8a248c4287d982fb16499c2334306778eb74ea",
+      "title": "UDF tuple128 discriminator",
+      "shorttitle": null,
+      "columns": [
+        "a sum",
+        "b sum"
+      ],
+      "minimumHistoryBars": 4,
+      "instructions": "instructions/tuple-udf-64-plus64-v6-v1.md",
+      "pineVersion": 6,
+      "captureKind": "OUTCOME-AND-NUMERIC-CSV"
+    },
+    {
+      "script": "plot-magnitude-cutoff-signed-v6-v1.pine",
+      "sha256": "864e406f04f713e7ecaa790d3090188b81239cb5c75abba13b1e76170d72d3b7",
+      "title": "Plot magnitude cutoff signed v1",
+      "shorttitle": null,
+      "columns": [
+        "Raw signed magnitude",
+        "Magnitude scaled by 1e99",
+        "Source is NA",
+        "Magnitude case index",
+        "Input bar index"
+      ],
+      "minimumHistoryBars": 156,
+      "instructions": "instructions/plot-magnitude-cutoff-signed-v6-v1.md",
+      "pineVersion": 6,
+      "captureKind": "SCREENSHOT-AND-OUTCOME-AND-NUMERIC-CSV"
+    },
+    {
+      "script": "nvi-formula-holes-magnitude-v6-v1.pine",
+      "sha256": "13ef354f125e70dc1e96565fcb9aa973d0c3e5136e499420bb55c9d2276faee2",
+      "title": "Synthetic NVI holes and plot magnitude v1",
+      "shorttitle": null,
+      "columns": [
+        "nvi_na_synthetic_doc",
+        "nvi_na_synthetic_legacy",
+        "NVI doc scaled by 1e99",
+        "NVI legacy scaled by 1e99",
+        "NVI doc source is NA",
+        "NVI legacy source is NA",
+        "Input synthetic price",
+        "Input synthetic volume",
+        "Input cycle phase",
+        "Input bar index"
+      ],
+      "minimumHistoryBars": 24000,
+      "instructions": "instructions/nvi-formula-holes-magnitude-v6-v1.md",
+      "pineVersion": 6,
+      "captureKind": "SCREENSHOT-AND-OUTCOME-AND-NUMERIC-CSV"
+    },
+    {
+      "script": "corpus-framework-exact-v5-v1.pine",
+      "sha256": "02b9dcd04cd5ea2990297dd7d216f00f294ed2fa7c745489a58a0bd8492c82ce",
+      "title": "Unit Testing Framework",
+      "shorttitle": null,
+      "columns": [],
+      "minimumHistoryBars": 64,
+      "instructions": "instructions/corpus-framework-exact-v5-v1.md",
+      "pineVersion": 5,
+      "captureKind": "SCREENSHOT-AND-OUTCOME"
+    },
+    {
+      "script": "sort-v56-815-exact-v5-v1.pine",
+      "sha256": "a8193da177a20a6d127b90a9cae826152ca53f601c69bbdcbbe2608b6b553263",
+      "title": "Unsupported array sort_indices bool namespace",
+      "shorttitle": null,
+      "columns": [],
+      "minimumHistoryBars": 10,
+      "instructions": "instructions/sort-v56-815-exact-v5-v1.md",
+      "pineVersion": 5,
+      "captureKind": "COMPILE-OUTCOME-AND-PINE-LOGS"
+    },
+    {
+      "script": "sort-v56-977-exact-v5-v1.pine",
+      "sha256": "08ba449094ca10e33c5a6060132cc4c0e670c99c65786353a2ff17b64fbf97cf",
+      "title": "Unsupported array sort box",
+      "shorttitle": null,
+      "columns": [],
+      "minimumHistoryBars": 10,
+      "instructions": "instructions/sort-v56-977-exact-v5-v1.md",
+      "pineVersion": 5,
+      "captureKind": "COMPILE-OUTCOME-AND-PINE-LOGS"
+    },
+    {
+      "script": "sort-v56-1676-exact-v5-v1.pine",
+      "sha256": "691a3257f554680771afa786fb1d95c870ff49c1a2ffc6deba9a53acc7e85922",
+      "title": "Unsupported array sort polyline namespace",
+      "shorttitle": null,
+      "columns": [],
+      "minimumHistoryBars": 10,
+      "instructions": "instructions/sort-v56-1676-exact-v5-v1.md",
+      "pineVersion": 5,
+      "captureKind": "COMPILE-OUTCOME-AND-PINE-LOGS"
+    },
+    {
+      "script": "documented49-corpus-v7-258-exact-v6-v1.pine",
+      "sha256": "d36a0afcb55f15a1e94a3eeeedfcd917409506d3862be0d9cc7e42cd68fc43f1",
+      "title": "basics/const_namespaces",
+      "shorttitle": null,
+      "columns": [],
+      "minimumHistoryBars": 10,
+      "instructions": "instructions/documented49-corpus-v7-258-exact-v6-v1.md",
+      "pineVersion": 6,
+      "captureKind": "COMPILE-OUTCOME-AND-PINE-LOGS"
+    },
+    {
+      "script": "ledger-909-max-bars-back-10001-v6-v1.pine",
+      "sha256": "fa1228c3f06d67b1eb5e0eb29f50d896467bff3d5c0b884ab2a53d958d03c1de",
+      "title": "Ledger 909 max_bars_back 10001",
+      "shorttitle": null,
+      "columns": [
+        "Close control"
+      ],
+      "minimumHistoryBars": 10,
+      "instructions": "instructions/ledger-909-max-bars-back-10001-v6-v1.md",
+      "pineVersion": 6,
+      "captureKind": "RUNTIME-OUTCOME-OR-COMPILE-REFUSAL"
+    }
+  ]
+}
