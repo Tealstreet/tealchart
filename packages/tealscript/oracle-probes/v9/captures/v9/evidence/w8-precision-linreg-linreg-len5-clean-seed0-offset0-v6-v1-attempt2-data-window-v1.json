@@ -1,0 +1,55 @@
+{
+  "index": 298,
+  "bar": [
+    1791030120,
+    84860,
+    84882.42,
+    84844.98,
+    84882.42,
+    23.30657
+  ],
+  "source_row": [
+    1791030120,
+    84860,
+    84882.42,
+    84844.98,
+    84882.42,
+    23.30657,
+    158,
+    84882.42,
+    84882.42,
+    84892.65399999995,
+    0,
+    0,
+    null,
+    null,
+    0,
+    null,
+    null,
+    0,
+    null,
+    null,
+    0,
+    null,
+    null,
+    0,
+    null,
+    null,
+    1791030120000,
+    24131
+  ],
+  "browser_utc": "2026-10-04T13:50:37.463Z",
+  "title": "Oracle warmup-seed-ma v2 (59 columns)",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sat 03 Oct '26   12:22",
+  "visible_range": {
+    "_firstBar": 263,
+    "_lastBar": 301
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}

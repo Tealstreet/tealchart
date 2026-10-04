@@ -1,0 +1,230 @@
+{
+  "artifact": "Archived seed context v1",
+  "selection": {
+    "browser_utc": "2026-10-04T13:49:01.825Z",
+    "clicked_native_index": -461,
+    "host": [
+      1791030360,
+      84894,
+      84916,
+      84862.97,
+      84862.98,
+      15.29674
+    ],
+    "clicked_coordinates": {
+      "x": 659.5,
+      "y": 192
+    },
+    "target": "CANVAS"
+  },
+  "ready": {
+    "browser_utc": "2026-10-04T13:49:45.298Z",
+    "bars": 24133,
+    "end": true,
+    "first": {
+      "index": -23833,
+      "value": [
+        1788134400,
+        77682,
+        77682.01,
+        77572,
+        77674.04,
+        51.86295
+      ]
+    },
+    "last": {
+      "index": 299,
+      "value": [
+        1791030240,
+        84882.41,
+        84921.66,
+        84860.91,
+        84894,
+        31.10794
+      ]
+    },
+    "timezone": "Etc/UTC",
+    "studies": [
+      {
+        "name": "Oracle warmup-seed-ma v2 (59 columns)",
+        "status": {
+          "type": 2
+        },
+        "size": 24133,
+        "first": {
+          "index": -23833,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295,
+            -23973,
+            null,
+            null,
+            null,
+            1,
+            0,
+            null,
+            null,
+            0,
+            null,
+            null,
+            0,
+            null,
+            null,
+            0,
+            null,
+            null,
+            0,
+            null,
+            null,
+            1788134400000,
+            0
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791030240,
+            84882.41,
+            84921.66,
+            84860.91,
+            84894,
+            31.10794,
+            159,
+            84894,
+            84894,
+            84894,
+            0,
+            0,
+            null,
+            null,
+            0,
+            null,
+            null,
+            0,
+            null,
+            null,
+            0,
+            null,
+            null,
+            0,
+            null,
+            null,
+            1791030240000,
+            24132
+          ]
+        }
+      }
+    ]
+  },
+  "actual": {
+    "browser_utc": "2026-10-04T13:50:10.936Z",
+    "bars": 24133,
+    "end": true,
+    "first": {
+      "index": -23833,
+      "value": [
+        1788134400,
+        77682,
+        77682.01,
+        77572,
+        77674.04,
+        51.86295
+      ]
+    },
+    "last": {
+      "index": 299,
+      "value": [
+        1791030240,
+        84882.41,
+        84921.66,
+        84860.91,
+        84894,
+        31.10794
+      ]
+    },
+    "timezone": "Etc/UTC",
+    "studies": [
+      {
+        "name": "Oracle warmup-seed-ma v2 (59 columns)",
+        "status": {
+          "type": 2
+        },
+        "size": 24133,
+        "first": {
+          "index": -23833,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295,
+            -23973,
+            null,
+            null,
+            null,
+            1,
+            0,
+            null,
+            null,
+            0,
+            null,
+            null,
+            0,
+            null,
+            null,
+            0,
+            null,
+            null,
+            0,
+            null,
+            null,
+            1788134400000,
+            0
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791030240,
+            84882.41,
+            84921.66,
+            84860.91,
+            84894,
+            31.10794,
+            159,
+            84894,
+            84894,
+            84894,
+            0,
+            0,
+            null,
+            null,
+            0,
+            null,
+            null,
+            0,
+            null,
+            null,
+            0,
+            null,
+            null,
+            0,
+            null,
+            null,
+            1791030240000,
+            24132
+          ]
+        }
+      }
+    ]
+  },
+  "archived_last_bar_index": 24132,
+  "archived_seed_anchor": 23973,
+  "archived_cutoff_unix_seconds": 1791030240,
+  "limits": "Actual native replay cutoff restores source last_bar_index seed. Original archive last row was realtime and changed when it closed; conservatively exclude that cutoff row. Compare complete echoed input/phase rows before interpreting equality/residual; no source edits or local engine replay."
+}
