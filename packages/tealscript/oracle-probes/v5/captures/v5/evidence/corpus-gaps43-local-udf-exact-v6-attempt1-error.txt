@@ -1,0 +1,54 @@
+Mismatched input 'end of line without line continuation' expecting ')'
+{
+  "error": "Mismatched input 'end of line without line continuation' expecting ')'",
+  "editorError": {
+    "end": {
+      "column": 41,
+      "line": 141
+    },
+    "message": "Mismatched input 'end of line without line continuation' expecting ')'",
+    "start": {
+      "column": 38,
+      "line": 141
+    },
+    "id": "USER;577f2783756e41b6aee5e92135fc4976"
+  },
+  "title": "Compilation error",
+  "compiler_markers": [
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///5e4bcf71-4bf3-41b7-bb0a-48da0d296054.pine?placement%3Ddialog",
+        "path": "/5e4bcf71-4bf3-41b7-bb0a-48da0d296054.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "code": "PINE_VERSION_OUTDATED",
+      "severity": 4,
+      "message": "Version 5 of Pine Script® is outdated. We recommend using the current version, which is 6.",
+      "startLineNumber": 1,
+      "startColumn": 3,
+      "endLineNumber": 1,
+      "endColumn": 12
+    },
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///5e4bcf71-4bf3-41b7-bb0a-48da0d296054.pine?placement%3Ddialog",
+        "path": "/5e4bcf71-4bf3-41b7-bb0a-48da0d296054.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "severity": 8,
+      "message": "Mismatched input 'end of line without line continuation' expecting ')'",
+      "startLineNumber": 141,
+      "startColumn": 38,
+      "endLineNumber": 141,
+      "endColumn": 42
+    }
+  ],
+  "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,821.59\nH\n84,821.59\nL\n84,821.58\nC\n84,821.59\n0.00 (0.00%)\n84,821.58\nSELL\n0.01\n84,821.59\nBUY\ncorpus-gaps43-local-udf-exact-v6.pine\nUSDT\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n03:24:43 UTC\n99+\nPine Editor\ncorpus-gaps43-local-udf-exact-v6.pine\nPublish script\n132\n133\n134\n135\n136\n137\n138\n139\n140\n141\n142\n143\n144\n145\n146\n147\n148\n149\n150\n151\n152\n153\n154\n155\n156\n157\n158\n159\n160\n161\n162\n163\n164\n165\n166\n167\n168\n169\n170\n171\nfloat zMacd  = _zscore(macdHist,  lookback)\nfloat zBb    = _zscore(bbPos,     lookback)\nfloat zAtr   = _zscore(atrVal,    lookback)\nfloat zStoch = _zscore(stochKVal, lookback)\nfloat zObv   = _zscore(obvDelta,  lookback)\nfloat zAdx   = _zscore(adxVal,    lookback)\nfloat zVwap  = _zscore(vwapDev,   lookback)\n// Instantiate FeatureVector UDT\nFeatureVector fv = FeatureVector.new(\n    rsi_z  = zRsi,\n    macd_z = zMacd,\n    bb_z   = zBb,\n    atr_z  = zAtr,\n    stoch_z= zStoch,\n    obv_z  = zObv,\n    adx_z  = zAdx,\n    vwap_z = zVwap\n)\n// ─────────────────────────────────────────────────────────────────────────────\n// LAYER 3 — WEIGHTED COMPOSITE SCORE\n// ─────────────────────────────────────────────────────────────────────────────\nfloat wSum = wRsi + wMacd + wBb + wAtr + wStoch + wObv + wAdx + wVwap + 1e-9\nfloat rawScore =\n    (wRsi   * fv.rsi_z\n   + wMacd  * fv.macd_z\n   + wBb    * fv.bb_z\n   + wAtr   * fv.atr_z\n   + wStoch * fv.stoch_z\n   + wObv   * fv.obv_z\n   + wAdx   * fv.adx_z\n   + wVwap  * fv.vwap_z) / wSum\n// ─────────────────────────────────────────────────────────────────────────────\n// LAYER 4 — KALMAN SMOOTHER  (scalar 1-D state-space)\n// ─────────────────────────────────────────────────────────────────────────────\nvar float kState = rawScore\n1 of 2 problems\nMismatched input 'end of line without line continuation' expecting ')'\n1 ∙ Today, 11:24\nLine 141, Col 38\nPine Script® v5\nCompilation error\n\nMismatched input 'end of line without line continuation' expecting ')'\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+  "context_substituted_message": "Mismatched input 'end of line without line continuation' expecting ')'"
+}

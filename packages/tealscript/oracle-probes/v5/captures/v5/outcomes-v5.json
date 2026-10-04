@@ -6191,5 +6191,1781 @@
       "PREVIOUS_LOW": "84456.02"
     },
     "session_witness": "captures/v5/evidence/continuous-session-configuration-v1.json"
+  },
+  {
+    "script": "corpus-gaps43-duplicate-method-distinct-control-v5.pine",
+    "attempt": 1,
+    "source_sha256": "6a04067473aa5f1f9786f16138d1ec0b65e53574aa7f86b8237d162215d72b0c",
+    "indicator_title": "Corpus distinct method signature control",
+    "status": "RUNS",
+    "csv_file": "captures/v5/corpus-gaps43-duplicate-method-distinct-control-v5-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T112414.512.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "Corpus distinct method signature control",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24283,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24583,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T03:24:04.420Z",
+    "live_candle_open_utc": "2026-10-04T03:24:00.000Z",
+    "export_utc": "2026-10-04T03:24:14.899Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v5/evidence/corpus-gaps43-duplicate-method-distinct-control-v5-attempt1-setup.png",
+      "captures/v5/evidence/corpus-gaps43-duplicate-method-distinct-control-v5-attempt1-export.png",
+      "captures/v5/evidence/corpus-gaps43-duplicate-method-distinct-control-v5-attempt1-logs.txt",
+      "captures/v5/evidence/corpus-gaps43-duplicate-method-distinct-control-v5-attempt1-logs-v1.json",
+      "captures/v5/evidence/corpus-gaps43-duplicate-method-distinct-control-v5-attempt1-logs.png",
+      "captures/v5/evidence/corpus-gaps43-duplicate-method-distinct-control-v5-attempt1-visual.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///7386cf81-eeb9-47d8-ae7d-d7c7161757f5.pine?placement%3Ddialog",
+          "path": "/7386cf81-eeb9-47d8-ae7d-d7c7161757f5.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "live_tooltip": "Sun 04 Oct '26   03:24",
+    "historical_compare_before_unix_seconds": 1791084240,
+    "pine_logs": {
+      "paths": [
+        "evidence/corpus-gaps43-duplicate-method-distinct-control-v5-attempt1-logs.txt",
+        "evidence/corpus-gaps43-duplicate-method-distinct-control-v5-attempt1-logs-v1.json",
+        "evidence/corpus-gaps43-duplicate-method-distinct-control-v5-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "3678c8138dfc9370081a4aa8e3b7381e1143e1d253c8be4cbc3d4b99770d8905",
+    "csv_bytes": 1500947,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "ONE",
+      "TWO"
+    ],
+    "declared_to_native_header_mapping": {
+      "ONE": "ONE",
+      "TWO": "TWO"
+    },
+    "csv_rows": 24583,
+    "historical_rows": 24582,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791084240,
+    "first_historical_values": {
+      "ONE": "77674.04",
+      "TWO": "77675.04"
+    },
+    "last_historical_values": {
+      "ONE": "84821.59",
+      "TWO": "84822.59"
+    }
+  },
+  {
+    "script": "corpus-gaps43-duplicate-method-exact-v5.pine",
+    "attempt": 1,
+    "source_sha256": "7ba22e4d2286acb6d0c7a51ca15c0b0c94d0549f4c9977634bcfc31e48c04937",
+    "indicator_title": "Unsupported duplicate user method",
+    "status": "COMPILE-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": "The 'shift' function has overloads with the same parameters. The type of parameters must be different in overloaded versions of functions.",
+      "line": 7,
+      "column": 13,
+      "first_bar_index": null,
+      "first_bar_time_utc": null,
+      "native": {
+        "error": "The 'shift' function has overloads with the same parameters. The type of parameters must be different in overloaded versions of functions.",
+        "editorError": {
+          "end": {
+            "column": 21,
+            "line": 7
+          },
+          "message": "The 'shift' function has overloads with the same parameters. The type of parameters must be different in overloaded versions of functions.",
+          "start": {
+            "column": 13,
+            "line": 7
+          },
+          "id": "USER;93882cbf5be14f7097ef1cafd4222712"
+        },
+        "title": "Compilation error",
+        "compiler_markers": [
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///3ff52f53-2696-44ed-9674-09dbe5f144d0.pine?placement%3Ddialog",
+              "path": "/3ff52f53-2696-44ed-9674-09dbe5f144d0.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "code": "PINE_VERSION_OUTDATED",
+            "severity": 4,
+            "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+            "startLineNumber": 1,
+            "startColumn": 3,
+            "endLineNumber": 1,
+            "endColumn": 12
+          },
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///3ff52f53-2696-44ed-9674-09dbe5f144d0.pine?placement%3Ddialog",
+              "path": "/3ff52f53-2696-44ed-9674-09dbe5f144d0.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "severity": 8,
+            "message": "The 'shift' function has overloads with the same parameters. The type of parameters must be different in overloaded versions of functions.",
+            "startLineNumber": 7,
+            "startColumn": 13,
+            "endLineNumber": 7,
+            "endColumn": 22
+          }
+        ],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,821.59\nH\n84,821.59\nL\n84,821.58\nC\n84,821.59\n0.00 (0.00%)\n84,821.58\nSELL\n0.01\n84,821.59\nBUY\nUSDT\ncorpus-gaps43-duplicate-method-exact-v5.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n03:24:31 UTC\n99+\nPine Editor\ncorpus-gaps43-duplicate-method-exact-v5.pine\nPublish script\n1\n2\n3\n4\n5\n6\n7\n8\n9\n//@version=5\nindicator(\"Unsupported\u00a0duplicate\u00a0user\u00a0method\")\ntype\u00a0Point\n\u00a0\u00a0\u00a0\u00a0float\u00a0x\nmethod\u00a0shift(Point\u00a0p)\u00a0=>\u00a0p.x\nmethod\u00a0shift(Point\u00a0p)\u00a0=>\u00a0p.x\u00a0+\u00a01\nplot(close)\n1 of 2 problems\nThe 'shift' function has overloads with the same parameters. The type of parameters must be different in overloaded versions of functions.\n1 \u2219 Today, 11:24\nLine 7, Col 13\nPine Script\u00ae v5\nCompilation error\n\nThe 'shift' function has overloads with the same parameters. The type of parameters must be different in overloaded versions of functions.\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+        "context_substituted_message": "The 'shift' function has overloads with the same parameters. The type of parameters must be different in overloaded versions of functions."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "corpus-gaps43-duplicate-method-exact-v5.pine",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24283,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24583,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v5/evidence/corpus-gaps43-duplicate-method-exact-v5-attempt1-error.png",
+      "captures/v5/evidence/corpus-gaps43-duplicate-method-exact-v5-attempt1-error.txt",
+      "captures/v5/evidence/corpus-gaps43-duplicate-method-exact-v5-attempt1-logs.txt",
+      "captures/v5/evidence/corpus-gaps43-duplicate-method-exact-v5-attempt1-logs-v1.json",
+      "captures/v5/evidence/corpus-gaps43-duplicate-method-exact-v5-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///3ff52f53-2696-44ed-9674-09dbe5f144d0.pine?placement%3Ddialog",
+          "path": "/3ff52f53-2696-44ed-9674-09dbe5f144d0.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      },
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///3ff52f53-2696-44ed-9674-09dbe5f144d0.pine?placement%3Ddialog",
+          "path": "/3ff52f53-2696-44ed-9674-09dbe5f144d0.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "severity": 8,
+        "message": "The 'shift' function has overloads with the same parameters. The type of parameters must be different in overloaded versions of functions.",
+        "startLineNumber": 7,
+        "startColumn": 13,
+        "endLineNumber": 7,
+        "endColumn": 22
+      }
+    ],
+    "error_observed_utc": "2026-10-04T03:24:33.396Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/corpus-gaps43-duplicate-method-exact-v5-attempt1-logs.txt",
+        "evidence/corpus-gaps43-duplicate-method-exact-v5-attempt1-logs-v1.json",
+        "evidence/corpus-gaps43-duplicate-method-exact-v5-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "script": "corpus-gaps43-local-udf-exact-v6.pine",
+    "attempt": 1,
+    "source_sha256": "e8015eb9373e922265ecc5079f1d7c247c6ef799f4f89b94198b828269c74396",
+    "indicator_title": "Neural Network ML Indicator \u2014 Extended",
+    "status": "COMPILE-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": "Mismatched input 'end of line without line continuation' expecting ')'",
+      "line": 141,
+      "column": 38,
+      "first_bar_index": null,
+      "first_bar_time_utc": null,
+      "native": {
+        "error": "Mismatched input 'end of line without line continuation' expecting ')'",
+        "editorError": {
+          "end": {
+            "column": 41,
+            "line": 141
+          },
+          "message": "Mismatched input 'end of line without line continuation' expecting ')'",
+          "start": {
+            "column": 38,
+            "line": 141
+          },
+          "id": "USER;577f2783756e41b6aee5e92135fc4976"
+        },
+        "title": "Compilation error",
+        "compiler_markers": [
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///5e4bcf71-4bf3-41b7-bb0a-48da0d296054.pine?placement%3Ddialog",
+              "path": "/5e4bcf71-4bf3-41b7-bb0a-48da0d296054.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "code": "PINE_VERSION_OUTDATED",
+            "severity": 4,
+            "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+            "startLineNumber": 1,
+            "startColumn": 3,
+            "endLineNumber": 1,
+            "endColumn": 12
+          },
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///5e4bcf71-4bf3-41b7-bb0a-48da0d296054.pine?placement%3Ddialog",
+              "path": "/5e4bcf71-4bf3-41b7-bb0a-48da0d296054.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "severity": 8,
+            "message": "Mismatched input 'end of line without line continuation' expecting ')'",
+            "startLineNumber": 141,
+            "startColumn": 38,
+            "endLineNumber": 141,
+            "endColumn": 42
+          }
+        ],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,821.59\nH\n84,821.59\nL\n84,821.58\nC\n84,821.59\n0.00 (0.00%)\n84,821.58\nSELL\n0.01\n84,821.59\nBUY\ncorpus-gaps43-local-udf-exact-v6.pine\nUSDT\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n03:24:43 UTC\n99+\nPine Editor\ncorpus-gaps43-local-udf-exact-v6.pine\nPublish script\n132\n133\n134\n135\n136\n137\n138\n139\n140\n141\n142\n143\n144\n145\n146\n147\n148\n149\n150\n151\n152\n153\n154\n155\n156\n157\n158\n159\n160\n161\n162\n163\n164\n165\n166\n167\n168\n169\n170\n171\nfloat\u00a0zMacd\u00a0\u00a0=\u00a0_zscore(macdHist,\u00a0\u00a0lookback)\nfloat\u00a0zBb\u00a0\u00a0\u00a0\u00a0=\u00a0_zscore(bbPos,\u00a0\u00a0\u00a0\u00a0\u00a0lookback)\nfloat\u00a0zAtr\u00a0\u00a0\u00a0=\u00a0_zscore(atrVal,\u00a0\u00a0\u00a0\u00a0lookback)\nfloat\u00a0zStoch\u00a0=\u00a0_zscore(stochKVal,\u00a0lookback)\nfloat\u00a0zObv\u00a0\u00a0\u00a0=\u00a0_zscore(obvDelta,\u00a0\u00a0lookback)\nfloat\u00a0zAdx\u00a0\u00a0\u00a0=\u00a0_zscore(adxVal,\u00a0\u00a0\u00a0\u00a0lookback)\nfloat\u00a0zVwap\u00a0\u00a0=\u00a0_zscore(vwapDev,\u00a0\u00a0\u00a0lookback)\n//\u00a0Instantiate\u00a0FeatureVector\u00a0UDT\nFeatureVector\u00a0fv\u00a0=\u00a0FeatureVector.new(\n\u00a0\u00a0\u00a0\u00a0rsi_z\u00a0\u00a0=\u00a0zRsi,\n\u00a0\u00a0\u00a0\u00a0macd_z\u00a0=\u00a0zMacd,\n\u00a0\u00a0\u00a0\u00a0bb_z\u00a0\u00a0\u00a0=\u00a0zBb,\n\u00a0\u00a0\u00a0\u00a0atr_z\u00a0\u00a0=\u00a0zAtr,\n\u00a0\u00a0\u00a0\u00a0stoch_z=\u00a0zStoch,\n\u00a0\u00a0\u00a0\u00a0obv_z\u00a0\u00a0=\u00a0zObv,\n\u00a0\u00a0\u00a0\u00a0adx_z\u00a0\u00a0=\u00a0zAdx,\n\u00a0\u00a0\u00a0\u00a0vwap_z\u00a0=\u00a0zVwap\n)\n//\u00a0\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n//\u00a0LAYER\u00a03\u00a0\u2014\u00a0WEIGHTED\u00a0COMPOSITE\u00a0SCORE\n//\u00a0\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nfloat\u00a0wSum\u00a0=\u00a0wRsi\u00a0+\u00a0wMacd\u00a0+\u00a0wBb\u00a0+\u00a0wAtr\u00a0+\u00a0wStoch\u00a0+\u00a0wObv\u00a0+\u00a0wAdx\u00a0+\u00a0wVwap\u00a0+\u00a01e-9\nfloat\u00a0rawScore\u00a0=\n\u00a0\u00a0\u00a0\u00a0(wRsi\u00a0\u00a0\u00a0*\u00a0fv.rsi_z\n\u00a0\u00a0\u00a0+\u00a0wMacd\u00a0\u00a0*\u00a0fv.macd_z\n\u00a0\u00a0\u00a0+\u00a0wBb\u00a0\u00a0\u00a0\u00a0*\u00a0fv.bb_z\n\u00a0\u00a0\u00a0+\u00a0wAtr\u00a0\u00a0\u00a0*\u00a0fv.atr_z\n\u00a0\u00a0\u00a0+\u00a0wStoch\u00a0*\u00a0fv.stoch_z\n\u00a0\u00a0\u00a0+\u00a0wObv\u00a0\u00a0\u00a0*\u00a0fv.obv_z\n\u00a0\u00a0\u00a0+\u00a0wAdx\u00a0\u00a0\u00a0*\u00a0fv.adx_z\n\u00a0\u00a0\u00a0+\u00a0wVwap\u00a0\u00a0*\u00a0fv.vwap_z)\u00a0/\u00a0wSum\n//\u00a0\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n//\u00a0LAYER\u00a04\u00a0\u2014\u00a0KALMAN\u00a0SMOOTHER\u00a0\u00a0(scalar\u00a01-D\u00a0state-space)\n//\u00a0\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nvar\u00a0float\u00a0kState\u00a0=\u00a0rawScore\n1 of 2 problems\nMismatched input 'end of line without line continuation' expecting ')'\n1 \u2219 Today, 11:24\nLine 141, Col 38\nPine Script\u00ae v5\nCompilation error\n\nMismatched input 'end of line without line continuation' expecting ')'\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+        "context_substituted_message": "Mismatched input 'end of line without line continuation' expecting ')'"
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "corpus-gaps43-local-udf-exact-v6.pine",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24283,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24583,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v5/evidence/corpus-gaps43-local-udf-exact-v6-attempt1-error.png",
+      "captures/v5/evidence/corpus-gaps43-local-udf-exact-v6-attempt1-error.txt",
+      "captures/v5/evidence/corpus-gaps43-local-udf-exact-v6-attempt1-logs.txt",
+      "captures/v5/evidence/corpus-gaps43-local-udf-exact-v6-attempt1-logs-v1.json",
+      "captures/v5/evidence/corpus-gaps43-local-udf-exact-v6-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///5e4bcf71-4bf3-41b7-bb0a-48da0d296054.pine?placement%3Ddialog",
+          "path": "/5e4bcf71-4bf3-41b7-bb0a-48da0d296054.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      },
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///5e4bcf71-4bf3-41b7-bb0a-48da0d296054.pine?placement%3Ddialog",
+          "path": "/5e4bcf71-4bf3-41b7-bb0a-48da0d296054.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "severity": 8,
+        "message": "Mismatched input 'end of line without line continuation' expecting ')'",
+        "startLineNumber": 141,
+        "startColumn": 38,
+        "endLineNumber": 141,
+        "endColumn": 42
+      }
+    ],
+    "error_observed_utc": "2026-10-04T03:24:45.709Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/corpus-gaps43-local-udf-exact-v6-attempt1-logs.txt",
+        "evidence/corpus-gaps43-local-udf-exact-v6-attempt1-logs-v1.json",
+        "evidence/corpus-gaps43-local-udf-exact-v6-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "script": "corpus-gaps43-local-udf-global-control-v6.pine",
+    "attempt": 1,
+    "source_sha256": "2a1404c55f83e97183785cec82c15b91c6248f24237f279444f05f5da6a91c97",
+    "indicator_title": "Corpus global UDF scope control",
+    "status": "RUNS",
+    "csv_file": "captures/v5/corpus-gaps43-local-udf-global-control-v6-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T112506.054.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "Corpus global UDF scope control",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24283,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24583,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T03:24:59.643Z",
+    "live_candle_open_utc": "2026-10-04T03:24:00.000Z",
+    "export_utc": "2026-10-04T03:25:06.293Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v5/evidence/corpus-gaps43-local-udf-global-control-v6-attempt1-setup.png",
+      "captures/v5/evidence/corpus-gaps43-local-udf-global-control-v6-attempt1-export.png",
+      "captures/v5/evidence/corpus-gaps43-local-udf-global-control-v6-attempt1-logs.txt",
+      "captures/v5/evidence/corpus-gaps43-local-udf-global-control-v6-attempt1-logs-v1.json",
+      "captures/v5/evidence/corpus-gaps43-local-udf-global-control-v6-attempt1-logs.png",
+      "captures/v5/evidence/corpus-gaps43-local-udf-global-control-v6-attempt1-visual.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   03:24",
+    "historical_compare_before_unix_seconds": 1791084240,
+    "pine_logs": {
+      "paths": [
+        "evidence/corpus-gaps43-local-udf-global-control-v6-attempt1-logs.txt",
+        "evidence/corpus-gaps43-local-udf-global-control-v6-attempt1-logs-v1.json",
+        "evidence/corpus-gaps43-local-udf-global-control-v6-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "0e329151bf5cd8d4692e781f496e8e12c82cd5e4824fc2e66220fef7a8ffbacd",
+    "csv_bytes": 1294260,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "CONTROL"
+    ],
+    "declared_to_native_header_mapping": {
+      "CONTROL": "CONTROL"
+    },
+    "csv_rows": 24583,
+    "historical_rows": 24582,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791084240,
+    "first_historical_values": {
+      "CONTROL": "77674.04"
+    },
+    "last_historical_values": {
+      "CONTROL": "84821.59"
+    }
+  },
+  {
+    "script": "corpus-gaps43-local-udf-minimal-v6.pine",
+    "attempt": 1,
+    "source_sha256": "4ffd885ebdbb49e348e042dc9d7b28d658890e9841b3149be3164e043f0e2233",
+    "indicator_title": "Corpus local UDF scope discriminator",
+    "status": "COMPILE-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": "CE10156",
+      "text": "Syntax error at input \"=>\"",
+      "line": 4,
+      "column": 24,
+      "first_bar_index": null,
+      "first_bar_time_utc": null,
+      "native": {
+        "error": "Syntax error at input {value}",
+        "editorError": {
+          "code": "CE10156",
+          "ctx": {
+            "value": "\"=>\""
+          },
+          "end": {
+            "column": 24,
+            "line": 4
+          },
+          "message": "Syntax error at input {value}",
+          "start": {
+            "column": 24,
+            "line": 4
+          },
+          "id": "USER;ddf851639fa14fcfb195cdfc886f6cbf"
+        },
+        "title": "Compilation error",
+        "compiler_markers": [
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///6f90f4a9-8176-4375-bb25-d5f611c14003.pine?placement%3Ddialog",
+              "path": "/6f90f4a9-8176-4375-bb25-d5f611c14003.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "code": "CE10156",
+            "severity": 8,
+            "message": "Syntax error at input \"=>\"",
+            "startLineNumber": 4,
+            "startColumn": 24,
+            "endLineNumber": 4,
+            "endColumn": 25
+          }
+        ],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,821.59\nH\n84,825.48\nL\n84,821.58\nC\n84,825.48\n+3.89 (+0.00%)\n84,825.47\nSELL\n0.01\n84,825.48\nBUY\nUSDT\ncorpus-gaps43-local-udf-minimal-v6.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n03:25:19 UTC\n99+\nPine Editor\ncorpus-gaps43-local-udf-minimal-v6.pine\nPublish script\n1\n2\n3\n4\n5\n6\n7\n//@version=6\nindicator(\"Corpus\u00a0local\u00a0UDF\u00a0scope\u00a0discriminator\")\nif\u00a0barstate.islast\n\u00a0\u00a0\u00a0\u00a0_cell(r,\u00a0lbl,\u00a0val)\u00a0=>\u00a0val\n\u00a0\u00a0\u00a0\u00a0value\u00a0=\u00a0_cell(4,\u00a0\"z\u00a0RSI\",\u00a0close)\nplot(close,\u00a0\"CONTROL\",\u00a0display=display.data_window)\n1 of 1 problem\nSyntax error at input \"=>\"(CE10156)\n1 \u2219 Today, 11:25\nLine 4, Col 24\nPine Script\u00ae v6\nCompilation error: CE10156\n\nSyntax error at input \"=>\"\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+        "context_substituted_message": "Syntax error at input \"=>\""
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "corpus-gaps43-local-udf-minimal-v6.pine",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24283,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24583,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v5/evidence/corpus-gaps43-local-udf-minimal-v6-attempt1-error.png",
+      "captures/v5/evidence/corpus-gaps43-local-udf-minimal-v6-attempt1-error.txt",
+      "captures/v5/evidence/corpus-gaps43-local-udf-minimal-v6-attempt1-logs.txt",
+      "captures/v5/evidence/corpus-gaps43-local-udf-minimal-v6-attempt1-logs-v1.json",
+      "captures/v5/evidence/corpus-gaps43-local-udf-minimal-v6-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///6f90f4a9-8176-4375-bb25-d5f611c14003.pine?placement%3Ddialog",
+          "path": "/6f90f4a9-8176-4375-bb25-d5f611c14003.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "CE10156",
+        "severity": 8,
+        "message": "Syntax error at input \"=>\"",
+        "startLineNumber": 4,
+        "startColumn": 24,
+        "endLineNumber": 4,
+        "endColumn": 25
+      }
+    ],
+    "error_observed_utc": "2026-10-04T03:25:21.835Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/corpus-gaps43-local-udf-minimal-v6-attempt1-logs.txt",
+        "evidence/corpus-gaps43-local-udf-minimal-v6-attempt1-logs-v1.json",
+        "evidence/corpus-gaps43-local-udf-minimal-v6-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "script": "corpus-length-atr-series-float-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "9d42991c109fb386fb0347a73a80319d6d0bdfde61c2126d79f29c49ab5c53b5",
+    "indicator_title": "V5-CORPUS-ATR-SERIES-FLOAT-V1",
+    "status": "COMPILE-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": "CE10123",
+      "text": "Cannot call \"ta.atr\" with argument \"length\"=\"length\". An argument of \"series float\" type was used but a \"simple int\"  is expected.",
+      "line": 6,
+      "column": 13,
+      "first_bar_index": null,
+      "first_bar_time_utc": null,
+      "native": {
+        "error": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+        "editorError": {
+          "code": "CE10123",
+          "ctx": {
+            "argDisplayName": "length",
+            "argUserFriendlyRepresentation": "length",
+            "argumentType": "series float",
+            "currentTypeDocStr": "simple int",
+            "funId": "ta.atr",
+            "typePostfix": ""
+          },
+          "end": {
+            "column": 18,
+            "line": 6
+          },
+          "message": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+          "start": {
+            "column": 13,
+            "line": 6
+          },
+          "id": "USER;7fb42b0448074f399150e058091a9f57"
+        },
+        "title": "Compilation error",
+        "compiler_markers": [
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///bff5de4b-22f3-4f20-9d2e-768edc82295f.pine?placement%3Ddialog",
+              "path": "/bff5de4b-22f3-4f20-9d2e-768edc82295f.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "code": "CE10123",
+            "severity": 8,
+            "message": "Cannot call \"ta.atr\" with argument \"length\"=\"length\". An argument of \"series float\" type was used but a \"simple int\"  is expected.",
+            "startLineNumber": 6,
+            "startColumn": 13,
+            "endLineNumber": 6,
+            "endColumn": 19
+          }
+        ],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,821.59\nH\n84,825.48\nL\n84,821.58\nC\n84,825.48\n+3.89 (+0.00%)\n84,825.47\nSELL\n0.01\n84,825.48\nBUY\nUSDT\ncorpus-length-atr-series-float-v6-v1.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n03:25:34 UTC\n99+\nPine Editor\ncorpus-length-atr-series-float-v6-v1.pine\nPublish script\n1\n2\n3\n4\n5\n6\n7\n//@version=6\nindicator(\"V5-CORPUS-ATR-SERIES-FLOAT-V1\")\nlength\u00a0=\u00a014.0\nif\u00a0close\u00a0>\u00a0open\n\u00a0\u00a0\u00a0\u00a0length\u00a0:=\u00a010.0\nplot(ta.atr(length),\u00a0\"OUTCOME\")\n1 of 1 problem\nCannot call \"ta.atr\" with argument \"length\"=\"length\". An argument of \"series float\" type was used but a \"simple int\" is expected.(CE10123)\n1 \u2219 Today, 11:25\nLine 6, Col 13\nPine Script\u00ae v6\nCompilation error: CE10123\n\nCannot call \"ta.atr\" with argument \"length\"=\"length\". An argument of \"series float\" type was used but a \"simple int\" is expected.\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+        "context_substituted_message": "Cannot call \"ta.atr\" with argument \"length\"=\"length\". An argument of \"series float\" type was used but a \"simple int\"  is expected."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "corpus-length-atr-series-float-v6-v1.pine",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24283,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24583,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v5/evidence/corpus-length-atr-series-float-v6-v1-attempt1-error.png",
+      "captures/v5/evidence/corpus-length-atr-series-float-v6-v1-attempt1-error.txt",
+      "captures/v5/evidence/corpus-length-atr-series-float-v6-v1-attempt1-logs.txt",
+      "captures/v5/evidence/corpus-length-atr-series-float-v6-v1-attempt1-logs-v1.json",
+      "captures/v5/evidence/corpus-length-atr-series-float-v6-v1-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///bff5de4b-22f3-4f20-9d2e-768edc82295f.pine?placement%3Ddialog",
+          "path": "/bff5de4b-22f3-4f20-9d2e-768edc82295f.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "CE10123",
+        "severity": 8,
+        "message": "Cannot call \"ta.atr\" with argument \"length\"=\"length\". An argument of \"series float\" type was used but a \"simple int\"  is expected.",
+        "startLineNumber": 6,
+        "startColumn": 13,
+        "endLineNumber": 6,
+        "endColumn": 19
+      }
+    ],
+    "error_observed_utc": "2026-10-04T03:25:37.144Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/corpus-length-atr-series-float-v6-v1-attempt1-logs.txt",
+        "evidence/corpus-length-atr-series-float-v6-v1-attempt1-logs-v1.json",
+        "evidence/corpus-length-atr-series-float-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "script": "corpus-length-atr-series-int-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "774cff0a875f5602f584a5fe59326628bb75149c294c0f284a329a6aa51c829d",
+    "indicator_title": "V5-CORPUS-ATR-SERIES-INT-V1",
+    "status": "COMPILE-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": "CE10123",
+      "text": "Cannot call \"ta.atr\" with argument \"length\"=\"length\". An argument of \"series int\" type was used but a \"simple int\"  is expected.",
+      "line": 6,
+      "column": 13,
+      "first_bar_index": null,
+      "first_bar_time_utc": null,
+      "native": {
+        "error": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+        "editorError": {
+          "code": "CE10123",
+          "ctx": {
+            "argDisplayName": "length",
+            "argUserFriendlyRepresentation": "length",
+            "argumentType": "series int",
+            "currentTypeDocStr": "simple int",
+            "funId": "ta.atr",
+            "typePostfix": ""
+          },
+          "end": {
+            "column": 18,
+            "line": 6
+          },
+          "message": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+          "start": {
+            "column": 13,
+            "line": 6
+          },
+          "id": "USER;d8d87fb939e048ed8349196601a2c7ee"
+        },
+        "title": "Compilation error",
+        "compiler_markers": [
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///dd9b22bc-b12d-42e7-893c-330d6a085280.pine?placement%3Ddialog",
+              "path": "/dd9b22bc-b12d-42e7-893c-330d6a085280.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "code": "CE10123",
+            "severity": 8,
+            "message": "Cannot call \"ta.atr\" with argument \"length\"=\"length\". An argument of \"series int\" type was used but a \"simple int\"  is expected.",
+            "startLineNumber": 6,
+            "startColumn": 13,
+            "endLineNumber": 6,
+            "endColumn": 19
+          }
+        ],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,821.59\nH\n84,825.48\nL\n84,821.58\nC\n84,825.47\n+3.88 (+0.00%)\n84,825.47\nSELL\n0.01\n84,825.48\nBUY\nUSDT\ncorpus-length-atr-series-int-v6-v1.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n03:25:57 UTC\n99+\nPine Editor\ncorpus-length-atr-series-int-v6-v1.pine\nPublish script\n1\n2\n3\n4\n5\n6\n7\n//@version=6\nindicator(\"V5-CORPUS-ATR-SERIES-INT-V1\")\nlength\u00a0=\u00a014\nif\u00a0close\u00a0>\u00a0open\n\u00a0\u00a0\u00a0\u00a0length\u00a0:=\u00a010\nplot(ta.atr(length),\u00a0\"OUTCOME\")\n1 of 1 problem\nCannot call \"ta.atr\" with argument \"length\"=\"length\". An argument of \"series int\" type was used but a \"simple int\" is expected.(CE10123)\n1 \u2219 Today, 11:25\nLine 6, Col 13\nPine Script\u00ae v6\nCompilation error: CE10123\n\nCannot call \"ta.atr\" with argument \"length\"=\"length\". An argument of \"series int\" type was used but a \"simple int\" is expected.\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+        "context_substituted_message": "Cannot call \"ta.atr\" with argument \"length\"=\"length\". An argument of \"series int\" type was used but a \"simple int\"  is expected."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "corpus-length-atr-series-int-v6-v1.pine",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24283,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24583,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v5/evidence/corpus-length-atr-series-int-v6-v1-attempt1-error.png",
+      "captures/v5/evidence/corpus-length-atr-series-int-v6-v1-attempt1-error.txt",
+      "captures/v5/evidence/corpus-length-atr-series-int-v6-v1-attempt1-logs.txt",
+      "captures/v5/evidence/corpus-length-atr-series-int-v6-v1-attempt1-logs-v1.json",
+      "captures/v5/evidence/corpus-length-atr-series-int-v6-v1-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///dd9b22bc-b12d-42e7-893c-330d6a085280.pine?placement%3Ddialog",
+          "path": "/dd9b22bc-b12d-42e7-893c-330d6a085280.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "CE10123",
+        "severity": 8,
+        "message": "Cannot call \"ta.atr\" with argument \"length\"=\"length\". An argument of \"series int\" type was used but a \"simple int\"  is expected.",
+        "startLineNumber": 6,
+        "startColumn": 13,
+        "endLineNumber": 6,
+        "endColumn": 19
+      }
+    ],
+    "error_observed_utc": "2026-10-04T03:25:59.268Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/corpus-length-atr-series-int-v6-v1-attempt1-logs.txt",
+        "evidence/corpus-length-atr-series-int-v6-v1-attempt1-logs-v1.json",
+        "evidence/corpus-length-atr-series-int-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "script": "corpus-length-sma-simple-float-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "d22e6f126e8128e2b5f274588e395dceaab3cf7e5e4616940a6effc79ab253ab",
+    "indicator_title": "V5-CORPUS-SMA-SIMPLE-FLOAT-V1",
+    "status": "RUNS",
+    "csv_file": "captures/v5/corpus-length-sma-simple-float-v6-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T112621.360.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [
+        {
+          "id": "in_0",
+          "name": "Numerator",
+          "value": 6,
+          "default": 6
+        }
+      ],
+      "observed_indicator_title": "V5-CORPUS-SMA-SIMPLE-FLOAT-V1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24284,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24584,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T03:26:12.545Z",
+    "live_candle_open_utc": "2026-10-04T03:26:00.000Z",
+    "export_utc": "2026-10-04T03:26:21.766Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v5/evidence/corpus-length-sma-simple-float-v6-v1-attempt1-setup.png",
+      "captures/v5/evidence/corpus-length-sma-simple-float-v6-v1-attempt1-export.png",
+      "captures/v5/evidence/corpus-length-sma-simple-float-v6-v1-attempt1-logs.txt",
+      "captures/v5/evidence/corpus-length-sma-simple-float-v6-v1-attempt1-logs-v1.json",
+      "captures/v5/evidence/corpus-length-sma-simple-float-v6-v1-attempt1-logs.png",
+      "captures/v5/evidence/corpus-length-sma-simple-float-v6-v1-attempt1-inputs.png",
+      "captures/v5/evidence/corpus-length-sma-simple-float-v6-v1-attempt1-visual.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   03:26",
+    "historical_compare_before_unix_seconds": 1791084360,
+    "pine_logs": {
+      "paths": [
+        "evidence/corpus-length-sma-simple-float-v6-v1-attempt1-logs.txt",
+        "evidence/corpus-length-sma-simple-float-v6-v1-attempt1-logs-v1.json",
+        "evidence/corpus-length-sma-simple-float-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "fd734f74b88adebd62d53ea52d922fba50b02a1d5b8cbc4011b639e0007a45c7",
+    "csv_bytes": 1525028,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "OUTCOME"
+    ],
+    "declared_to_native_header_mapping": {
+      "OUTCOME": "OUTCOME"
+    },
+    "csv_rows": 24584,
+    "historical_rows": 24583,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791084360,
+    "first_historical_values": {
+      "OUTCOME": ""
+    },
+    "last_historical_values": {
+      "OUTCOME": "84819.0233333335"
+    }
+  },
+  {
+    "script": "corpus-matrix-remove_col-missing-index-v1.pine",
+    "attempt": 1,
+    "source_sha256": "2a8b8faa130c55771ed1908ba7a7dea68638bde86b50ee264e281b687bbd8100",
+    "indicator_title": "Corpus matrix remove_col missing index v1",
+    "status": "RUNS",
+    "csv_file": "captures/v5/corpus-matrix-remove_col-missing-index-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T112707.407.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "Corpus matrix remove_col missing index v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24284,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24584,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T03:26:59.015Z",
+    "live_candle_open_utc": "2026-10-04T03:26:00.000Z",
+    "export_utc": "2026-10-04T03:27:07.784Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v5/evidence/corpus-matrix-remove_col-missing-index-v1-attempt1-setup.png",
+      "captures/v5/evidence/corpus-matrix-remove_col-missing-index-v1-attempt1-export.png",
+      "captures/v5/evidence/corpus-matrix-remove_col-missing-index-v1-attempt1-logs.txt",
+      "captures/v5/evidence/corpus-matrix-remove_col-missing-index-v1-attempt1-logs-v1.json",
+      "captures/v5/evidence/corpus-matrix-remove_col-missing-index-v1-attempt1-logs.png",
+      "captures/v5/evidence/corpus-matrix-remove_col-missing-index-v1-attempt1-visual.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   03:26",
+    "historical_compare_before_unix_seconds": 1791084360,
+    "pine_logs": {
+      "paths": [
+        "evidence/corpus-matrix-remove_col-missing-index-v1-attempt1-logs.txt",
+        "evidence/corpus-matrix-remove_col-missing-index-v1-attempt1-logs-v1.json",
+        "evidence/corpus-matrix-remove_col-missing-index-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "8dbfe18a647194bce305cd88a3858d1ecf3c0b75951d0b8d6732a4acbdecf7bd",
+    "csv_bytes": 1343504,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "columns_after",
+      "close_control"
+    ],
+    "declared_to_native_header_mapping": {
+      "columns_after": "columns_after",
+      "close_control": "close_control"
+    },
+    "csv_rows": 24584,
+    "historical_rows": 24583,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791084360,
+    "first_historical_values": {
+      "columns_after": "0",
+      "close_control": "77674.04"
+    },
+    "last_historical_values": {
+      "columns_after": "0",
+      "close_control": "84825.48"
+    }
+  },
+  {
+    "script": "corpus-matrix-swap_columns-missing-index-v1.pine",
+    "attempt": 1,
+    "source_sha256": "0c35b64206521a4f6bbeced7dea44c81dd259b1acbc8f6f2be3af39e0ddde773",
+    "indicator_title": "Corpus matrix swap_columns missing index v1",
+    "status": "RUNS",
+    "csv_file": "captures/v5/corpus-matrix-swap_columns-missing-index-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T112734.749.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "Corpus matrix swap_columns missing index v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24284,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24584,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T03:27:27.134Z",
+    "live_candle_open_utc": "2026-10-04T03:26:00.000Z",
+    "export_utc": "2026-10-04T03:27:35.123Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v5/evidence/corpus-matrix-swap_columns-missing-index-v1-attempt1-setup.png",
+      "captures/v5/evidence/corpus-matrix-swap_columns-missing-index-v1-attempt1-export.png",
+      "captures/v5/evidence/corpus-matrix-swap_columns-missing-index-v1-attempt1-logs.txt",
+      "captures/v5/evidence/corpus-matrix-swap_columns-missing-index-v1-attempt1-logs-v1.json",
+      "captures/v5/evidence/corpus-matrix-swap_columns-missing-index-v1-attempt1-logs.png",
+      "captures/v5/evidence/corpus-matrix-swap_columns-missing-index-v1-attempt1-visual.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   03:26",
+    "historical_compare_before_unix_seconds": 1791084360,
+    "pine_logs": {
+      "paths": [
+        "evidence/corpus-matrix-swap_columns-missing-index-v1-attempt1-logs.txt",
+        "evidence/corpus-matrix-swap_columns-missing-index-v1-attempt1-logs-v1.json",
+        "evidence/corpus-matrix-swap_columns-missing-index-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "2917d89ed21b75a0b5ff07aadb355e0632bd02b489a6f28a611107eda989b52d",
+    "csv_bytes": 1343504,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "columns_after",
+      "close_control"
+    ],
+    "declared_to_native_header_mapping": {
+      "columns_after": "columns_after",
+      "close_control": "close_control"
+    },
+    "csv_rows": 24584,
+    "historical_rows": 24583,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791084360,
+    "first_historical_values": {
+      "columns_after": "1",
+      "close_control": "77674.04"
+    },
+    "last_historical_values": {
+      "columns_after": "1",
+      "close_control": "84825.48"
+    }
+  },
+  {
+    "script": "corpus-table-text-wrap-control-v5-v1.pine",
+    "attempt": 1,
+    "source_sha256": "7cb75b06da98169599e0e9712165430b4d33d796ef43f56f59b1a97110ec2982",
+    "indicator_title": "corpus-table-text-wrap-control-v5-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v5/corpus-table-text-wrap-control-v5-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T112802.527.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "corpus-table-text-wrap-control-v5-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24284,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24585,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T03:27:55.193Z",
+    "live_candle_open_utc": "2026-10-04T03:26:00.000Z",
+    "export_utc": "2026-10-04T03:28:02.996Z",
+    "live_boundary_confirmed_unchanged": false,
+    "evidence_files": [
+      "captures/v5/evidence/corpus-table-text-wrap-control-v5-v1-attempt1-setup.png",
+      "captures/v5/evidence/corpus-table-text-wrap-control-v5-v1-attempt1-export.png",
+      "captures/v5/evidence/corpus-table-text-wrap-control-v5-v1-attempt1-logs.txt",
+      "captures/v5/evidence/corpus-table-text-wrap-control-v5-v1-attempt1-logs-v1.json",
+      "captures/v5/evidence/corpus-table-text-wrap-control-v5-v1-attempt1-logs.png",
+      "captures/v5/evidence/corpus-table-text-wrap-control-v5-v1-attempt1-visual.png",
+      "captures/v5/evidence/corpus-table-text-wrap-control-v5-v1-attempt1-table-view-v1.json",
+      "captures/v5/evidence/corpus-table-text-wrap-control-v5-v1-attempt1-table-view-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///a04ef234-e0d3-4cf9-b4f5-dabf81292e86.pine?placement%3Ddialog",
+          "path": "/a04ef234-e0d3-4cf9-b4f5-dabf81292e86.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "live_tooltip": "Sun 04 Oct '26   03:26",
+    "historical_compare_before_unix_seconds": 1791084360,
+    "pine_logs": {
+      "paths": [
+        "evidence/corpus-table-text-wrap-control-v5-v1-attempt1-logs.txt",
+        "evidence/corpus-table-text-wrap-control-v5-v1-attempt1-logs-v1.json",
+        "evidence/corpus-table-text-wrap-control-v5-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "6c65a24a616024dd0038273ce89b65e84dae738df83af100c4173e808c8f6720",
+    "csv_bytes": 1294369,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "Plot"
+    ],
+    "declared_to_native_header_mapping": {
+      "close": "close"
+    },
+    "csv_rows": 24585,
+    "historical_rows": 24583,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791084480,
+    "first_historical_values": {
+      "close": "77674.04"
+    },
+    "last_historical_values": {
+      "close": "84825.48"
+    }
+  },
+  {
+    "script": "corpus-table-text-wrap-control-v5-v1.pine",
+    "attempt": 2,
+    "source_sha256": "7cb75b06da98169599e0e9712165430b4d33d796ef43f56f59b1a97110ec2982",
+    "indicator_title": "corpus-table-text-wrap-control-v5-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v5/corpus-table-text-wrap-control-v5-v1-attempt2.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T112828.221.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "corpus-table-text-wrap-control-v5-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24285,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24585,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T03:28:21.264Z",
+    "live_candle_open_utc": "2026-10-04T03:28:00.000Z",
+    "export_utc": "2026-10-04T03:28:28.598Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v5/evidence/corpus-table-text-wrap-control-v5-v1-attempt2-setup.png",
+      "captures/v5/evidence/corpus-table-text-wrap-control-v5-v1-attempt2-export.png",
+      "captures/v5/evidence/corpus-table-text-wrap-control-v5-v1-attempt2-logs.txt",
+      "captures/v5/evidence/corpus-table-text-wrap-control-v5-v1-attempt2-logs-v1.json",
+      "captures/v5/evidence/corpus-table-text-wrap-control-v5-v1-attempt2-logs.png",
+      "captures/v5/evidence/corpus-table-text-wrap-control-v5-v1-attempt2-visual.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///5aa2829e-52de-406e-bd39-3155a844494b.pine?placement%3Ddialog",
+          "path": "/5aa2829e-52de-406e-bd39-3155a844494b.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "live_tooltip": "Sun 04 Oct '26   03:28",
+    "historical_compare_before_unix_seconds": 1791084480,
+    "pine_logs": {
+      "paths": [
+        "evidence/corpus-table-text-wrap-control-v5-v1-attempt2-logs.txt",
+        "evidence/corpus-table-text-wrap-control-v5-v1-attempt2-logs-v1.json",
+        "evidence/corpus-table-text-wrap-control-v5-v1-attempt2-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "86a779f0292d0b3b22a26851bf731828eb01390dec3163003d7c67fe38344c6a",
+    "csv_bytes": 1294369,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "Plot"
+    ],
+    "declared_to_native_header_mapping": {
+      "close": "close"
+    },
+    "csv_rows": 24585,
+    "historical_rows": 24584,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791084480,
+    "first_historical_values": {
+      "close": "77674.04"
+    },
+    "last_historical_values": {
+      "close": "84819.47"
+    }
+  },
+  {
+    "script": "corpus-table-text-wrap-control-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "66f2aab2638df7fead47ff1ffa40253f70fa607c21dfd53651e03b0c31b71090",
+    "indicator_title": "corpus-table-text-wrap-control-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v5/corpus-table-text-wrap-control-v6-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T112859.354.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "corpus-table-text-wrap-control-v6-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24285,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24585,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T03:28:52.366Z",
+    "live_candle_open_utc": "2026-10-04T03:28:00.000Z",
+    "export_utc": "2026-10-04T03:28:59.602Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v5/evidence/corpus-table-text-wrap-control-v6-v1-attempt1-setup.png",
+      "captures/v5/evidence/corpus-table-text-wrap-control-v6-v1-attempt1-export.png",
+      "captures/v5/evidence/corpus-table-text-wrap-control-v6-v1-attempt1-logs.txt",
+      "captures/v5/evidence/corpus-table-text-wrap-control-v6-v1-attempt1-logs-v1.json",
+      "captures/v5/evidence/corpus-table-text-wrap-control-v6-v1-attempt1-logs.png",
+      "captures/v5/evidence/corpus-table-text-wrap-control-v6-v1-attempt1-visual.png",
+      "captures/v5/evidence/corpus-table-text-wrap-control-v6-v1-attempt1-table-view-v1.json",
+      "captures/v5/evidence/corpus-table-text-wrap-control-v6-v1-attempt1-table-view-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   03:28",
+    "historical_compare_before_unix_seconds": 1791084480,
+    "pine_logs": {
+      "paths": [
+        "evidence/corpus-table-text-wrap-control-v6-v1-attempt1-logs.txt",
+        "evidence/corpus-table-text-wrap-control-v6-v1-attempt1-logs-v1.json",
+        "evidence/corpus-table-text-wrap-control-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "86a779f0292d0b3b22a26851bf731828eb01390dec3163003d7c67fe38344c6a",
+    "csv_bytes": 1294369,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "Plot"
+    ],
+    "declared_to_native_header_mapping": {
+      "close": "close"
+    },
+    "csv_rows": 24585,
+    "historical_rows": 24584,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791084480,
+    "first_historical_values": {
+      "close": "77674.04"
+    },
+    "last_historical_values": {
+      "close": "84819.47"
+    }
+  },
+  {
+    "script": "corpus-table-text-wrap-v5-v1.pine",
+    "attempt": 1,
+    "source_sha256": "5bb44856f338a56bff85df1df5b4d9c1994fbde0028c4c42af5c8b61b78cd0b6",
+    "indicator_title": "corpus-table-text-wrap-v5-v1",
+    "status": "COMPILE-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": "Could not find function or function reference 'table.cell_set_text_wrap'",
+      "line": 6,
+      "column": 5,
+      "first_bar_index": null,
+      "first_bar_time_utc": null,
+      "native": {
+        "error": "Could not find function or function reference 'table.cell_set_text_wrap'",
+        "editorError": {
+          "end": {
+            "column": 28,
+            "line": 6
+          },
+          "message": "Could not find function or function reference 'table.cell_set_text_wrap'",
+          "start": {
+            "column": 5,
+            "line": 6
+          },
+          "id": "USER;8530d95e01b147eb911beb2e509fc314"
+        },
+        "title": "Compilation error",
+        "compiler_markers": [
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///fda200fc-e2a7-428e-af2f-9beae3135766.pine?placement%3Ddialog",
+              "path": "/fda200fc-e2a7-428e-af2f-9beae3135766.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "code": "PINE_VERSION_OUTDATED",
+            "severity": 4,
+            "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+            "startLineNumber": 1,
+            "startColumn": 3,
+            "endLineNumber": 1,
+            "endColumn": 12
+          },
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///fda200fc-e2a7-428e-af2f-9beae3135766.pine?placement%3Ddialog",
+              "path": "/fda200fc-e2a7-428e-af2f-9beae3135766.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "severity": 8,
+            "message": "Could not find function or function reference 'table.cell_set_text_wrap'",
+            "startLineNumber": 6,
+            "startColumn": 5,
+            "endLineNumber": 6,
+            "endColumn": 29
+          }
+        ],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,819.48\nH\n84,819.48\nL\n84,796.41\nC\n84,796.42\n\u221223.05 (\u22120.03%)\n84,796.41\nSELL\n0.01\n84,796.42\nBUY\nUSDT\ncorpus-table-text-wrap-v5-v1.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n03:29:17 UTC\n99+\nPine Editor\ncorpus-table-text-wrap-v5-v1.pine\nPublish script\n1\n2\n3\n4\n5\n6\n7\n8\n//@version=5\nindicator(\"corpus-table-text-wrap-v5-v1\")\nvar\u00a0t\u00a0=\u00a0table.new(position.top_left,\u00a01,\u00a01)\nif\u00a0barstate.islast\n\u00a0\u00a0\u00a0\u00a0table.cell(t,\u00a00,\u00a00,\u00a0\"text\")\n\u00a0\u00a0\u00a0\u00a0table.cell_set_text_wrap(t,\u00a00,\u00a00,\u00a0text.wrap_auto)\nplot(close)\n1 of 2 problems\nCould not find function or function reference 'table.cell_set_text_wrap'\n1 \u2219 Today, 11:29\nLine 6, Col 5\nPine Script\u00ae v5\nCompilation error\n\nCould not find function or function reference 'table.cell_set_text_wrap'\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+        "context_substituted_message": "Could not find function or function reference 'table.cell_set_text_wrap'"
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "corpus-table-text-wrap-v5-v1.pine",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24285,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24585,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v5/evidence/corpus-table-text-wrap-v5-v1-attempt1-error.png",
+      "captures/v5/evidence/corpus-table-text-wrap-v5-v1-attempt1-error.txt",
+      "captures/v5/evidence/corpus-table-text-wrap-v5-v1-attempt1-logs.txt",
+      "captures/v5/evidence/corpus-table-text-wrap-v5-v1-attempt1-logs-v1.json",
+      "captures/v5/evidence/corpus-table-text-wrap-v5-v1-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///fda200fc-e2a7-428e-af2f-9beae3135766.pine?placement%3Ddialog",
+          "path": "/fda200fc-e2a7-428e-af2f-9beae3135766.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      },
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///fda200fc-e2a7-428e-af2f-9beae3135766.pine?placement%3Ddialog",
+          "path": "/fda200fc-e2a7-428e-af2f-9beae3135766.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "severity": 8,
+        "message": "Could not find function or function reference 'table.cell_set_text_wrap'",
+        "startLineNumber": 6,
+        "startColumn": 5,
+        "endLineNumber": 6,
+        "endColumn": 29
+      }
+    ],
+    "error_observed_utc": "2026-10-04T03:29:19.338Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/corpus-table-text-wrap-v5-v1-attempt1-logs.txt",
+        "evidence/corpus-table-text-wrap-v5-v1-attempt1-logs-v1.json",
+        "evidence/corpus-table-text-wrap-v5-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "script": "corpus-table-text-wrap-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "50713ee238ad762544abda07edd1110f30e02815a77e4c441930380486ddcbe5",
+    "indicator_title": "corpus-table-text-wrap-v6-v1",
+    "status": "COMPILE-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": "CE10271",
+      "text": "Could not find function or function reference 'table.cell_set_text_wrap'",
+      "line": 6,
+      "column": 5,
+      "first_bar_index": null,
+      "first_bar_time_utc": null,
+      "native": {
+        "error": "Could not find {kind} '{fullName}'",
+        "editorError": {
+          "code": "CE10271",
+          "ctx": {
+            "fullName": "table.cell_set_text_wrap",
+            "kind": "function or function reference"
+          },
+          "end": {
+            "column": 28,
+            "line": 6
+          },
+          "message": "Could not find {kind} '{fullName}'",
+          "start": {
+            "column": 5,
+            "line": 6
+          },
+          "id": "USER;1f7811e94e8b4d6487756fd74971a162"
+        },
+        "title": "Compilation error",
+        "compiler_markers": [
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///701398b0-eb02-485e-aa88-7323d527b067.pine?placement%3Ddialog",
+              "path": "/701398b0-eb02-485e-aa88-7323d527b067.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "code": "CE10271",
+            "severity": 8,
+            "message": "Could not find function or function reference 'table.cell_set_text_wrap'",
+            "startLineNumber": 6,
+            "startColumn": 5,
+            "endLineNumber": 6,
+            "endColumn": 29
+          }
+        ],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,819.48\nH\n84,819.48\nL\n84,796.41\nC\n84,796.41\n\u221223.06 (\u22120.03%)\n84,796.41\nSELL\n0.01\n84,796.42\nBUY\nUSDT\ncorpus-table-text-wrap-v6-v1.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n03:29:30 UTC\n99+\nPine Editor\ncorpus-table-text-wrap-v6-v1.pine\nPublish script\n1\n2\n3\n4\n5\n6\n7\n8\n//@version=6\nindicator(\"corpus-table-text-wrap-v6-v1\")\nvar\u00a0t\u00a0=\u00a0table.new(position.top_left,\u00a01,\u00a01)\nif\u00a0barstate.islast\n\u00a0\u00a0\u00a0\u00a0table.cell(t,\u00a00,\u00a00,\u00a0\"text\")\n\u00a0\u00a0\u00a0\u00a0table.cell_set_text_wrap(t,\u00a00,\u00a00,\u00a0text.wrap_auto)\nplot(close)\n1 of 1 problem\nCould not find function or function reference 'table.cell_set_text_wrap'(CE10271)\n1 \u2219 Today, 11:29\nLine 6, Col 5\nPine Script\u00ae v6\nCompilation error: CE10271\n\nCould not find function or function reference 'table.cell_set_text_wrap'\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+        "context_substituted_message": "Could not find function or function reference 'table.cell_set_text_wrap'"
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "corpus-table-text-wrap-v6-v1.pine",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24285,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24585,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v5/evidence/corpus-table-text-wrap-v6-v1-attempt1-error.png",
+      "captures/v5/evidence/corpus-table-text-wrap-v6-v1-attempt1-error.txt",
+      "captures/v5/evidence/corpus-table-text-wrap-v6-v1-attempt1-logs.txt",
+      "captures/v5/evidence/corpus-table-text-wrap-v6-v1-attempt1-logs-v1.json",
+      "captures/v5/evidence/corpus-table-text-wrap-v6-v1-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///701398b0-eb02-485e-aa88-7323d527b067.pine?placement%3Ddialog",
+          "path": "/701398b0-eb02-485e-aa88-7323d527b067.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "CE10271",
+        "severity": 8,
+        "message": "Could not find function or function reference 'table.cell_set_text_wrap'",
+        "startLineNumber": 6,
+        "startColumn": 5,
+        "endLineNumber": 6,
+        "endColumn": 29
+      }
+    ],
+    "error_observed_utc": "2026-10-04T03:29:32.733Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/corpus-table-text-wrap-v6-v1-attempt1-logs.txt",
+        "evidence/corpus-table-text-wrap-v6-v1-attempt1-logs-v1.json",
+        "evidence/corpus-table-text-wrap-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
   }
 ]

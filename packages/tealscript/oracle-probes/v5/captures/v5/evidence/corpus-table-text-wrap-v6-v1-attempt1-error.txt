@@ -1,0 +1,43 @@
+Could not find function or function reference 'table.cell_set_text_wrap'
+{
+  "error": "Could not find {kind} '{fullName}'",
+  "editorError": {
+    "code": "CE10271",
+    "ctx": {
+      "fullName": "table.cell_set_text_wrap",
+      "kind": "function or function reference"
+    },
+    "end": {
+      "column": 28,
+      "line": 6
+    },
+    "message": "Could not find {kind} '{fullName}'",
+    "start": {
+      "column": 5,
+      "line": 6
+    },
+    "id": "USER;1f7811e94e8b4d6487756fd74971a162"
+  },
+  "title": "Compilation error",
+  "compiler_markers": [
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///701398b0-eb02-485e-aa88-7323d527b067.pine?placement%3Ddialog",
+        "path": "/701398b0-eb02-485e-aa88-7323d527b067.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "code": "CE10271",
+      "severity": 8,
+      "message": "Could not find function or function reference 'table.cell_set_text_wrap'",
+      "startLineNumber": 6,
+      "startColumn": 5,
+      "endLineNumber": 6,
+      "endColumn": 29
+    }
+  ],
+  "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,819.48\nH\n84,819.48\nL\n84,796.41\nC\n84,796.41\n−23.06 (−0.03%)\n84,796.41\nSELL\n0.01\n84,796.42\nBUY\nUSDT\ncorpus-table-text-wrap-v6-v1.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n03:29:30 UTC\n99+\nPine Editor\ncorpus-table-text-wrap-v6-v1.pine\nPublish script\n1\n2\n3\n4\n5\n6\n7\n8\n//@version=6\nindicator(\"corpus-table-text-wrap-v6-v1\")\nvar t = table.new(position.top_left, 1, 1)\nif barstate.islast\n    table.cell(t, 0, 0, \"text\")\n    table.cell_set_text_wrap(t, 0, 0, text.wrap_auto)\nplot(close)\n1 of 1 problem\nCould not find function or function reference 'table.cell_set_text_wrap'(CE10271)\n1 ∙ Today, 11:29\nLine 6, Col 5\nPine Script® v6\nCompilation error: CE10271\n\nCould not find function or function reference 'table.cell_set_text_wrap'\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+  "context_substituted_message": "Could not find function or function reference 'table.cell_set_text_wrap'"
+}
