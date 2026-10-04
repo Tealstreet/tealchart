@@ -1,0 +1,29 @@
+{
+  "index": 299,
+  "bar": [
+    1791104400,
+    85106.48,
+    85106.48,
+    85106.47,
+    85106.47,
+    1.82244
+  ],
+  "source_row": [
+    1791104400,
+    0.4636476090008061
+  ],
+  "browser_utc": "2026-10-04T09:02:09.503Z",
+  "title": "V7 legacy-atan-v4-v1",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   09:00",
+  "visible_range": {
+    "_firstBar": 264,
+    "_lastBar": 302
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}
