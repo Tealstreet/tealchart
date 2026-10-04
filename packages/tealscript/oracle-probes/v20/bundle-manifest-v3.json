@@ -1,0 +1,1532 @@
+{
+  "schemaVersion": 1,
+  "bundle": "v20",
+  "version": 3,
+  "status": "FROZEN",
+  "frozen": true,
+  "owner": "codex-9tqhik",
+  "scripts": [
+    {
+      "probe": "silent-s1-line-new-width-151-v20-v1.pine",
+      "path": "silent-s1-line-new-width-151-v20-v1.pine",
+      "sourceSha256": "1b48e24a022e65e4620c066f2cb16ad7614902f6416dc4da01d389776a0028bb",
+      "owner": "codex-9tqhik",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "csv+data-window+first-diagnostic+screenshot",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "auditFamily": "S1",
+      "rowIds": [
+        "S1"
+      ],
+      "question": "Does line.new accept width 151, refuse (capture exact phase/text/location/bar), or render it differently? Red target at y4/box3..5; blue width1; green width100. Numeric CALL_COMPLETED=1 and OBJECT_COUNT=3 indicate all calls survived.",
+      "minimumHistory": 32,
+      "columns": [
+        "CHART_INDEX",
+        "CHART_TIME_MS",
+        "REQUESTED_WIDTH",
+        "CALL_COMPLETED",
+        "OBJECT_COUNT",
+        "PANE_TOP",
+        "PANE_BOTTOM"
+      ],
+      "instructions": "instructions/silent-s1-line-new-width-151-v20-v1.md",
+      "provenance": "/home/sam/cs/docs/tealscript-parity-archive/ledger/silent-truncation-audit-vmp8l6-v1/REPORT-v1.md",
+      "provenanceSha256": "44bb4feec53af2c3a1e0fa9c19ec178eee6b9602d7b2588961f75e7ad05fa953",
+      "limitations": "REQUESTED_WIDTH is the unmodified argument, not an effective-width getter. CREATED/CALL_COMPLETED exposes survival only; capture the full rendering to distinguish accepted width from normalization. A refusal phase/text is an equally valid native outcome.",
+      "instructionSha256": "d373319b579b1b8bdb2ccc1d45d83ca99efe296bb63b0ff0c4d245a1fdf0808a",
+      "authorPreflightReceipt": "/home/sam/cs/docs/tealscript-parity-archive/probe-bundle-v20-j-v1/LOCAL-PREFLIGHT-v2.json",
+      "authorPreflightReceiptSha256": "247e7e469eaba57d63a60f0079c33dbb0c8fa417506d3c3f02282054546266b9",
+      "localPreflight": {
+        "head": "1328d1c788ffbec44348fa2039457112f76d6a96",
+        "phase": "COMPILED",
+        "diagnostics": [],
+        "nativeAuthority": false
+      }
+    },
+    {
+      "probe": "silent-s1-line-set-width-151-v20-v1.pine",
+      "path": "silent-s1-line-set-width-151-v20-v1.pine",
+      "sourceSha256": "fb1f386854bfc8df1b48ba6b88a803914077b526c4e2f3226171ce530db10903",
+      "owner": "codex-9tqhik",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "csv+data-window+first-diagnostic+screenshot",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "auditFamily": "S1",
+      "rowIds": [
+        "S1"
+      ],
+      "question": "Does line.set accept width 151, refuse (capture exact phase/text/location/bar), or render it differently? Red target at y4/box3..5; blue width1; green width100. Numeric CALL_COMPLETED=1 and OBJECT_COUNT=3 indicate all calls survived.",
+      "minimumHistory": 32,
+      "columns": [
+        "CHART_INDEX",
+        "CHART_TIME_MS",
+        "REQUESTED_WIDTH",
+        "CALL_COMPLETED",
+        "OBJECT_COUNT",
+        "PANE_TOP",
+        "PANE_BOTTOM"
+      ],
+      "instructions": "instructions/silent-s1-line-set-width-151-v20-v1.md",
+      "provenance": "/home/sam/cs/docs/tealscript-parity-archive/ledger/silent-truncation-audit-vmp8l6-v1/REPORT-v1.md",
+      "provenanceSha256": "44bb4feec53af2c3a1e0fa9c19ec178eee6b9602d7b2588961f75e7ad05fa953",
+      "limitations": "REQUESTED_WIDTH is the unmodified argument, not an effective-width getter. CREATED/CALL_COMPLETED exposes survival only; capture the full rendering to distinguish accepted width from normalization. A refusal phase/text is an equally valid native outcome.",
+      "instructionSha256": "3eecc285c2e4c6a15801de9541232eef6c6ca730e64194185064d421bc1c2646",
+      "authorPreflightReceipt": "/home/sam/cs/docs/tealscript-parity-archive/probe-bundle-v20-j-v1/LOCAL-PREFLIGHT-v2.json",
+      "authorPreflightReceiptSha256": "247e7e469eaba57d63a60f0079c33dbb0c8fa417506d3c3f02282054546266b9",
+      "localPreflight": {
+        "head": "1328d1c788ffbec44348fa2039457112f76d6a96",
+        "phase": "COMPILED",
+        "diagnostics": [],
+        "nativeAuthority": false
+      }
+    },
+    {
+      "probe": "silent-s1-line-new-width-0-v20-v1.pine",
+      "path": "silent-s1-line-new-width-0-v20-v1.pine",
+      "sourceSha256": "a17903688738ee2e3f6d085a621f825e580776426e11aa08dbbcdfde4208da66",
+      "owner": "codex-9tqhik",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "csv+data-window+first-diagnostic+screenshot",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "auditFamily": "S1",
+      "rowIds": [
+        "S1"
+      ],
+      "question": "Does line.new accept width 0, refuse (capture exact phase/text/location/bar), or render it differently? Red target at y4/box3..5; blue width1; green width100. Numeric CALL_COMPLETED=1 and OBJECT_COUNT=3 indicate all calls survived.",
+      "minimumHistory": 32,
+      "columns": [
+        "CHART_INDEX",
+        "CHART_TIME_MS",
+        "REQUESTED_WIDTH",
+        "CALL_COMPLETED",
+        "OBJECT_COUNT",
+        "PANE_TOP",
+        "PANE_BOTTOM"
+      ],
+      "instructions": "instructions/silent-s1-line-new-width-0-v20-v1.md",
+      "provenance": "/home/sam/cs/docs/tealscript-parity-archive/ledger/silent-truncation-audit-vmp8l6-v1/REPORT-v1.md",
+      "provenanceSha256": "44bb4feec53af2c3a1e0fa9c19ec178eee6b9602d7b2588961f75e7ad05fa953",
+      "limitations": "REQUESTED_WIDTH is the unmodified argument, not an effective-width getter. CREATED/CALL_COMPLETED exposes survival only; capture the full rendering to distinguish accepted width from normalization. A refusal phase/text is an equally valid native outcome.",
+      "instructionSha256": "38d6e9241b2df36b331ebeb7a305e2e8c9f0838f33ce42dba02641e435d2a189",
+      "authorPreflightReceipt": "/home/sam/cs/docs/tealscript-parity-archive/probe-bundle-v20-j-v1/LOCAL-PREFLIGHT-v2.json",
+      "authorPreflightReceiptSha256": "247e7e469eaba57d63a60f0079c33dbb0c8fa417506d3c3f02282054546266b9",
+      "localPreflight": {
+        "head": "1328d1c788ffbec44348fa2039457112f76d6a96",
+        "phase": "COMPILED",
+        "diagnostics": [],
+        "nativeAuthority": false
+      }
+    },
+    {
+      "probe": "silent-s1-line-set-width-0-v20-v1.pine",
+      "path": "silent-s1-line-set-width-0-v20-v1.pine",
+      "sourceSha256": "88cef0c76a4881413eb5822ed3e8473005fcc2dfb130ebd54ba4ce1f0114859e",
+      "owner": "codex-9tqhik",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "csv+data-window+first-diagnostic+screenshot",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "auditFamily": "S1",
+      "rowIds": [
+        "S1"
+      ],
+      "question": "Does line.set accept width 0, refuse (capture exact phase/text/location/bar), or render it differently? Red target at y4/box3..5; blue width1; green width100. Numeric CALL_COMPLETED=1 and OBJECT_COUNT=3 indicate all calls survived.",
+      "minimumHistory": 32,
+      "columns": [
+        "CHART_INDEX",
+        "CHART_TIME_MS",
+        "REQUESTED_WIDTH",
+        "CALL_COMPLETED",
+        "OBJECT_COUNT",
+        "PANE_TOP",
+        "PANE_BOTTOM"
+      ],
+      "instructions": "instructions/silent-s1-line-set-width-0-v20-v1.md",
+      "provenance": "/home/sam/cs/docs/tealscript-parity-archive/ledger/silent-truncation-audit-vmp8l6-v1/REPORT-v1.md",
+      "provenanceSha256": "44bb4feec53af2c3a1e0fa9c19ec178eee6b9602d7b2588961f75e7ad05fa953",
+      "limitations": "REQUESTED_WIDTH is the unmodified argument, not an effective-width getter. CREATED/CALL_COMPLETED exposes survival only; capture the full rendering to distinguish accepted width from normalization. A refusal phase/text is an equally valid native outcome.",
+      "instructionSha256": "54e089828f6b85b304871a6e068a675a77bfdeb11868284b55e5b1b315b89691",
+      "authorPreflightReceipt": "/home/sam/cs/docs/tealscript-parity-archive/probe-bundle-v20-j-v1/LOCAL-PREFLIGHT-v2.json",
+      "authorPreflightReceiptSha256": "247e7e469eaba57d63a60f0079c33dbb0c8fa417506d3c3f02282054546266b9",
+      "localPreflight": {
+        "head": "1328d1c788ffbec44348fa2039457112f76d6a96",
+        "phase": "COMPILED",
+        "diagnostics": [],
+        "nativeAuthority": false
+      }
+    },
+    {
+      "probe": "silent-s1-box-new-width-151-v20-v1.pine",
+      "path": "silent-s1-box-new-width-151-v20-v1.pine",
+      "sourceSha256": "89433b2af3446dba3a7cfb51bbe01c976648dd6ded43b70fafb2eee1d84b4640",
+      "owner": "codex-9tqhik",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "csv+data-window+first-diagnostic+screenshot",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "auditFamily": "S1",
+      "rowIds": [
+        "S1"
+      ],
+      "question": "Does box.new accept width 151, refuse (capture exact phase/text/location/bar), or render it differently? Red target at y4/box3..5; blue width1; green width100. Numeric CALL_COMPLETED=1 and OBJECT_COUNT=3 indicate all calls survived.",
+      "minimumHistory": 32,
+      "columns": [
+        "CHART_INDEX",
+        "CHART_TIME_MS",
+        "REQUESTED_WIDTH",
+        "CALL_COMPLETED",
+        "OBJECT_COUNT",
+        "PANE_TOP",
+        "PANE_BOTTOM"
+      ],
+      "instructions": "instructions/silent-s1-box-new-width-151-v20-v1.md",
+      "provenance": "/home/sam/cs/docs/tealscript-parity-archive/ledger/silent-truncation-audit-vmp8l6-v1/REPORT-v1.md",
+      "provenanceSha256": "44bb4feec53af2c3a1e0fa9c19ec178eee6b9602d7b2588961f75e7ad05fa953",
+      "limitations": "REQUESTED_WIDTH is the unmodified argument, not an effective-width getter. CREATED/CALL_COMPLETED exposes survival only; capture the full rendering to distinguish accepted width from normalization. A refusal phase/text is an equally valid native outcome.",
+      "instructionSha256": "b15fe1a38c0df34f130d2e0f1236783f3147b877559aa3322f3d31f4217f0174",
+      "authorPreflightReceipt": "/home/sam/cs/docs/tealscript-parity-archive/probe-bundle-v20-j-v1/LOCAL-PREFLIGHT-v2.json",
+      "authorPreflightReceiptSha256": "247e7e469eaba57d63a60f0079c33dbb0c8fa417506d3c3f02282054546266b9",
+      "localPreflight": {
+        "head": "1328d1c788ffbec44348fa2039457112f76d6a96",
+        "phase": "COMPILED",
+        "diagnostics": [],
+        "nativeAuthority": false
+      }
+    },
+    {
+      "probe": "silent-s1-box-set-width-151-v20-v1.pine",
+      "path": "silent-s1-box-set-width-151-v20-v1.pine",
+      "sourceSha256": "f8562ca2762d45c9a46d84b0a965a8500a3ca7ef2bb01d225e02917bde8c3609",
+      "owner": "codex-9tqhik",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "csv+data-window+first-diagnostic+screenshot",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "auditFamily": "S1",
+      "rowIds": [
+        "S1"
+      ],
+      "question": "Does box.set accept width 151, refuse (capture exact phase/text/location/bar), or render it differently? Red target at y4/box3..5; blue width1; green width100. Numeric CALL_COMPLETED=1 and OBJECT_COUNT=3 indicate all calls survived.",
+      "minimumHistory": 32,
+      "columns": [
+        "CHART_INDEX",
+        "CHART_TIME_MS",
+        "REQUESTED_WIDTH",
+        "CALL_COMPLETED",
+        "OBJECT_COUNT",
+        "PANE_TOP",
+        "PANE_BOTTOM"
+      ],
+      "instructions": "instructions/silent-s1-box-set-width-151-v20-v1.md",
+      "provenance": "/home/sam/cs/docs/tealscript-parity-archive/ledger/silent-truncation-audit-vmp8l6-v1/REPORT-v1.md",
+      "provenanceSha256": "44bb4feec53af2c3a1e0fa9c19ec178eee6b9602d7b2588961f75e7ad05fa953",
+      "limitations": "REQUESTED_WIDTH is the unmodified argument, not an effective-width getter. CREATED/CALL_COMPLETED exposes survival only; capture the full rendering to distinguish accepted width from normalization. A refusal phase/text is an equally valid native outcome.",
+      "instructionSha256": "79622a7a8f719eaa47eb7321bb81ec8115a3b4817602102d69c23a2f698686c4",
+      "authorPreflightReceipt": "/home/sam/cs/docs/tealscript-parity-archive/probe-bundle-v20-j-v1/LOCAL-PREFLIGHT-v2.json",
+      "authorPreflightReceiptSha256": "247e7e469eaba57d63a60f0079c33dbb0c8fa417506d3c3f02282054546266b9",
+      "localPreflight": {
+        "head": "1328d1c788ffbec44348fa2039457112f76d6a96",
+        "phase": "COMPILED",
+        "diagnostics": [],
+        "nativeAuthority": false
+      }
+    },
+    {
+      "probe": "silent-s1-box-new-width-0-v20-v1.pine",
+      "path": "silent-s1-box-new-width-0-v20-v1.pine",
+      "sourceSha256": "5d150aa329b1d93fc4803670748c0feea0a984ccf5baec4b46cf2f93df356e48",
+      "owner": "codex-9tqhik",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "csv+data-window+first-diagnostic+screenshot",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "auditFamily": "S1",
+      "rowIds": [
+        "S1"
+      ],
+      "question": "Does box.new accept width 0, refuse (capture exact phase/text/location/bar), or render it differently? Red target at y4/box3..5; blue width1; green width100. Numeric CALL_COMPLETED=1 and OBJECT_COUNT=3 indicate all calls survived.",
+      "minimumHistory": 32,
+      "columns": [
+        "CHART_INDEX",
+        "CHART_TIME_MS",
+        "REQUESTED_WIDTH",
+        "CALL_COMPLETED",
+        "OBJECT_COUNT",
+        "PANE_TOP",
+        "PANE_BOTTOM"
+      ],
+      "instructions": "instructions/silent-s1-box-new-width-0-v20-v1.md",
+      "provenance": "/home/sam/cs/docs/tealscript-parity-archive/ledger/silent-truncation-audit-vmp8l6-v1/REPORT-v1.md",
+      "provenanceSha256": "44bb4feec53af2c3a1e0fa9c19ec178eee6b9602d7b2588961f75e7ad05fa953",
+      "limitations": "REQUESTED_WIDTH is the unmodified argument, not an effective-width getter. CREATED/CALL_COMPLETED exposes survival only; capture the full rendering to distinguish accepted width from normalization. A refusal phase/text is an equally valid native outcome.",
+      "instructionSha256": "316063eada7e7880072de7e89fc54f3ad7aa8c3a331805457f75981002dde511",
+      "authorPreflightReceipt": "/home/sam/cs/docs/tealscript-parity-archive/probe-bundle-v20-j-v1/LOCAL-PREFLIGHT-v2.json",
+      "authorPreflightReceiptSha256": "247e7e469eaba57d63a60f0079c33dbb0c8fa417506d3c3f02282054546266b9",
+      "localPreflight": {
+        "head": "1328d1c788ffbec44348fa2039457112f76d6a96",
+        "phase": "COMPILED",
+        "diagnostics": [],
+        "nativeAuthority": false
+      }
+    },
+    {
+      "probe": "silent-s1-box-set-width-0-v20-v1.pine",
+      "path": "silent-s1-box-set-width-0-v20-v1.pine",
+      "sourceSha256": "b2c9c0d88b7b5dcb30944984811a73cffd50fe058ea99df4526b6cb573b7ee81",
+      "owner": "codex-9tqhik",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "csv+data-window+first-diagnostic+screenshot",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "auditFamily": "S1",
+      "rowIds": [
+        "S1"
+      ],
+      "question": "Does box.set accept width 0, refuse (capture exact phase/text/location/bar), or render it differently? Red target at y4/box3..5; blue width1; green width100. Numeric CALL_COMPLETED=1 and OBJECT_COUNT=3 indicate all calls survived.",
+      "minimumHistory": 32,
+      "columns": [
+        "CHART_INDEX",
+        "CHART_TIME_MS",
+        "REQUESTED_WIDTH",
+        "CALL_COMPLETED",
+        "OBJECT_COUNT",
+        "PANE_TOP",
+        "PANE_BOTTOM"
+      ],
+      "instructions": "instructions/silent-s1-box-set-width-0-v20-v1.md",
+      "provenance": "/home/sam/cs/docs/tealscript-parity-archive/ledger/silent-truncation-audit-vmp8l6-v1/REPORT-v1.md",
+      "provenanceSha256": "44bb4feec53af2c3a1e0fa9c19ec178eee6b9602d7b2588961f75e7ad05fa953",
+      "limitations": "REQUESTED_WIDTH is the unmodified argument, not an effective-width getter. CREATED/CALL_COMPLETED exposes survival only; capture the full rendering to distinguish accepted width from normalization. A refusal phase/text is an equally valid native outcome.",
+      "instructionSha256": "c5518d77285cffcfb3634563105fc5e9c80ca489ff06e8cf261bb6879f14f12d",
+      "authorPreflightReceipt": "/home/sam/cs/docs/tealscript-parity-archive/probe-bundle-v20-j-v1/LOCAL-PREFLIGHT-v2.json",
+      "authorPreflightReceiptSha256": "247e7e469eaba57d63a60f0079c33dbb0c8fa417506d3c3f02282054546266b9",
+      "localPreflight": {
+        "head": "1328d1c788ffbec44348fa2039457112f76d6a96",
+        "phase": "COMPILED",
+        "diagnostics": [],
+        "nativeAuthority": false
+      }
+    },
+    {
+      "probe": "silent-s1-polyline-new-width-151-v20-v1.pine",
+      "path": "silent-s1-polyline-new-width-151-v20-v1.pine",
+      "sourceSha256": "279b35f026d58b8f028c06d3de05cc69f90b696b49b4567e80c8e94c80be9ed9",
+      "owner": "codex-9tqhik",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "csv+data-window+first-diagnostic+screenshot",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "auditFamily": "S1",
+      "rowIds": [
+        "S1"
+      ],
+      "question": "Does polyline.new accept width 151, refuse (capture exact phase/text/location/bar), or render it differently? Red target at y4/box3..5; blue width1; green width100. Numeric CALL_COMPLETED=1 and OBJECT_COUNT=3 indicate all calls survived.",
+      "minimumHistory": 32,
+      "columns": [
+        "CHART_INDEX",
+        "CHART_TIME_MS",
+        "REQUESTED_WIDTH",
+        "CALL_COMPLETED",
+        "OBJECT_COUNT",
+        "PANE_TOP",
+        "PANE_BOTTOM"
+      ],
+      "instructions": "instructions/silent-s1-polyline-new-width-151-v20-v1.md",
+      "provenance": "/home/sam/cs/docs/tealscript-parity-archive/ledger/silent-truncation-audit-vmp8l6-v1/REPORT-v1.md",
+      "provenanceSha256": "44bb4feec53af2c3a1e0fa9c19ec178eee6b9602d7b2588961f75e7ad05fa953",
+      "limitations": "REQUESTED_WIDTH is the unmodified argument, not an effective-width getter. CREATED/CALL_COMPLETED exposes survival only; capture the full rendering to distinguish accepted width from normalization. A refusal phase/text is an equally valid native outcome.",
+      "instructionSha256": "faa60428c9e5d2ca641e22a427b41b914026a654b7a9624a3db12af4a87c46c2",
+      "authorPreflightReceipt": "/home/sam/cs/docs/tealscript-parity-archive/probe-bundle-v20-j-v1/LOCAL-PREFLIGHT-v2.json",
+      "authorPreflightReceiptSha256": "247e7e469eaba57d63a60f0079c33dbb0c8fa417506d3c3f02282054546266b9",
+      "localPreflight": {
+        "head": "1328d1c788ffbec44348fa2039457112f76d6a96",
+        "phase": "COMPILED",
+        "diagnostics": [],
+        "nativeAuthority": false
+      }
+    },
+    {
+      "probe": "silent-s1-polyline-new-width-0-v20-v1.pine",
+      "path": "silent-s1-polyline-new-width-0-v20-v1.pine",
+      "sourceSha256": "211a2014f3a3f1b409fa2547b16845a4461a849abee35638f910ce185719f608",
+      "owner": "codex-9tqhik",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "csv+data-window+first-diagnostic+screenshot",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "auditFamily": "S1",
+      "rowIds": [
+        "S1"
+      ],
+      "question": "Does polyline.new accept width 0, refuse (capture exact phase/text/location/bar), or render it differently? Red target at y4/box3..5; blue width1; green width100. Numeric CALL_COMPLETED=1 and OBJECT_COUNT=3 indicate all calls survived.",
+      "minimumHistory": 32,
+      "columns": [
+        "CHART_INDEX",
+        "CHART_TIME_MS",
+        "REQUESTED_WIDTH",
+        "CALL_COMPLETED",
+        "OBJECT_COUNT",
+        "PANE_TOP",
+        "PANE_BOTTOM"
+      ],
+      "instructions": "instructions/silent-s1-polyline-new-width-0-v20-v1.md",
+      "provenance": "/home/sam/cs/docs/tealscript-parity-archive/ledger/silent-truncation-audit-vmp8l6-v1/REPORT-v1.md",
+      "provenanceSha256": "44bb4feec53af2c3a1e0fa9c19ec178eee6b9602d7b2588961f75e7ad05fa953",
+      "limitations": "REQUESTED_WIDTH is the unmodified argument, not an effective-width getter. CREATED/CALL_COMPLETED exposes survival only; capture the full rendering to distinguish accepted width from normalization. A refusal phase/text is an equally valid native outcome.",
+      "instructionSha256": "2d5e41dac1eb887efaec29a2cb33af6f7de649f233e332efb24654cae4cd29bb",
+      "authorPreflightReceipt": "/home/sam/cs/docs/tealscript-parity-archive/probe-bundle-v20-j-v1/LOCAL-PREFLIGHT-v2.json",
+      "authorPreflightReceiptSha256": "247e7e469eaba57d63a60f0079c33dbb0c8fa417506d3c3f02282054546266b9",
+      "localPreflight": {
+        "head": "1328d1c788ffbec44348fa2039457112f76d6a96",
+        "phase": "COMPILED",
+        "diagnostics": [],
+        "nativeAuthority": false
+      }
+    },
+    {
+      "probe": "silent-s2-table-border-width-151-v20-v2.pine",
+      "path": "silent-s2-table-border-width-151-v20-v2.pine",
+      "sourceSha256": "a6d51d5288bbf7eb76e46f1aeae98aff14ca1e0a3acc20c2c6d9f8931b0a01b2",
+      "owner": "codex-9tqhik",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "csv+data-window+first-diagnostic+screenshot",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "auditFamily": "S2",
+      "rowIds": [
+        "S2"
+      ],
+      "question": "Does table.new accept border_width=151? Export completion and capture first diagnostic or full table screenshot, including red internal border and blue outer frame. Compare top-left WIDTH1 and bottom-left WIDTH100 reference tables with target top-right, using identical viewport/device scaling.",
+      "minimumHistory": 32,
+      "columns": [
+        "CHART_INDEX",
+        "CHART_TIME_MS",
+        "REQUESTED_WIDTH",
+        "CALL_COMPLETED"
+      ],
+      "instructions": "instructions/silent-s2-table-border-width-151-v20-v2.md",
+      "provenance": "/home/sam/cs/docs/tealscript-parity-archive/ledger/silent-truncation-audit-vmp8l6-v1/REPORT-v1.md",
+      "provenanceSha256": "44bb4feec53af2c3a1e0fa9c19ec178eee6b9602d7b2588961f75e7ad05fa953",
+      "limitations": "REQUESTED_WIDTH is the unmodified argument, not an effective-width getter. CREATED/CALL_COMPLETED exposes survival only; capture the full rendering to distinguish accepted width from normalization. A refusal phase/text is an equally valid native outcome.",
+      "instructionSha256": "ddc3409bd5d00906b11006bd4ec8abaf919e8d47304c4aaeaa53ad9fdc591f5a",
+      "authorPreflightReceipt": "/home/sam/cs/docs/tealscript-parity-archive/probe-bundle-v20-j-v1/LOCAL-PREFLIGHT-v2.json",
+      "authorPreflightReceiptSha256": "247e7e469eaba57d63a60f0079c33dbb0c8fa417506d3c3f02282054546266b9",
+      "localPreflight": {
+        "head": "1328d1c788ffbec44348fa2039457112f76d6a96",
+        "phase": "COMPILED",
+        "diagnostics": [],
+        "nativeAuthority": false
+      }
+    },
+    {
+      "probe": "silent-s2-table-border-width--1-v20-v2.pine",
+      "path": "silent-s2-table-border-width--1-v20-v2.pine",
+      "sourceSha256": "e3c19531b76f9c0a61a753ed3e316b24d46ee392f3351454df529578b094c2e7",
+      "owner": "codex-9tqhik",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "csv+data-window+first-diagnostic+screenshot",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "auditFamily": "S2",
+      "rowIds": [
+        "S2"
+      ],
+      "question": "Does table.new accept border_width=-1? Export completion and capture first diagnostic or full table screenshot, including red internal border and blue outer frame. Compare top-left WIDTH1 and bottom-left WIDTH100 reference tables with target top-right, using identical viewport/device scaling.",
+      "minimumHistory": 32,
+      "columns": [
+        "CHART_INDEX",
+        "CHART_TIME_MS",
+        "REQUESTED_WIDTH",
+        "CALL_COMPLETED"
+      ],
+      "instructions": "instructions/silent-s2-table-border-width--1-v20-v2.md",
+      "provenance": "/home/sam/cs/docs/tealscript-parity-archive/ledger/silent-truncation-audit-vmp8l6-v1/REPORT-v1.md",
+      "provenanceSha256": "44bb4feec53af2c3a1e0fa9c19ec178eee6b9602d7b2588961f75e7ad05fa953",
+      "limitations": "REQUESTED_WIDTH is the unmodified argument, not an effective-width getter. CREATED/CALL_COMPLETED exposes survival only; capture the full rendering to distinguish accepted width from normalization. A refusal phase/text is an equally valid native outcome.",
+      "instructionSha256": "12a86e28d1004376c948aba0ba10a7e4027690fe9774257d5487d82adf436517",
+      "authorPreflightReceipt": "/home/sam/cs/docs/tealscript-parity-archive/probe-bundle-v20-j-v1/LOCAL-PREFLIGHT-v2.json",
+      "authorPreflightReceiptSha256": "247e7e469eaba57d63a60f0079c33dbb0c8fa417506d3c3f02282054546266b9",
+      "localPreflight": {
+        "head": "1328d1c788ffbec44348fa2039457112f76d6a96",
+        "phase": "COMPILED",
+        "diagnostics": [],
+        "nativeAuthority": false
+      }
+    },
+    {
+      "probe": "silent-s2-table-frame-width-151-v20-v2.pine",
+      "path": "silent-s2-table-frame-width-151-v20-v2.pine",
+      "sourceSha256": "dd2f17766f69ba315d3fe891c13f7ebe2dd80375494393f9a8aa176e74134514",
+      "owner": "codex-9tqhik",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "csv+data-window+first-diagnostic+screenshot",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "auditFamily": "S2",
+      "rowIds": [
+        "S2"
+      ],
+      "question": "Does table.new accept frame_width=151? Export completion and capture first diagnostic or full table screenshot, including red internal border and blue outer frame. Compare top-left WIDTH1 and bottom-left WIDTH100 reference tables with target top-right, using identical viewport/device scaling.",
+      "minimumHistory": 32,
+      "columns": [
+        "CHART_INDEX",
+        "CHART_TIME_MS",
+        "REQUESTED_WIDTH",
+        "CALL_COMPLETED"
+      ],
+      "instructions": "instructions/silent-s2-table-frame-width-151-v20-v2.md",
+      "provenance": "/home/sam/cs/docs/tealscript-parity-archive/ledger/silent-truncation-audit-vmp8l6-v1/REPORT-v1.md",
+      "provenanceSha256": "44bb4feec53af2c3a1e0fa9c19ec178eee6b9602d7b2588961f75e7ad05fa953",
+      "limitations": "REQUESTED_WIDTH is the unmodified argument, not an effective-width getter. CREATED/CALL_COMPLETED exposes survival only; capture the full rendering to distinguish accepted width from normalization. A refusal phase/text is an equally valid native outcome.",
+      "instructionSha256": "da74d929304b6231bbfb98601d094b2f378aff53ff105e3ef45cbaaab7977be3",
+      "authorPreflightReceipt": "/home/sam/cs/docs/tealscript-parity-archive/probe-bundle-v20-j-v1/LOCAL-PREFLIGHT-v2.json",
+      "authorPreflightReceiptSha256": "247e7e469eaba57d63a60f0079c33dbb0c8fa417506d3c3f02282054546266b9",
+      "localPreflight": {
+        "head": "1328d1c788ffbec44348fa2039457112f76d6a96",
+        "phase": "COMPILED",
+        "diagnostics": [],
+        "nativeAuthority": false
+      }
+    },
+    {
+      "probe": "silent-s2-table-frame-width--1-v20-v2.pine",
+      "path": "silent-s2-table-frame-width--1-v20-v2.pine",
+      "sourceSha256": "a45438b9cbef8902480648cad8a9202a612f0400df6b0f6be589bb8732ae242e",
+      "owner": "codex-9tqhik",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "csv+data-window+first-diagnostic+screenshot",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "auditFamily": "S2",
+      "rowIds": [
+        "S2"
+      ],
+      "question": "Does table.new accept frame_width=-1? Export completion and capture first diagnostic or full table screenshot, including red internal border and blue outer frame. Compare top-left WIDTH1 and bottom-left WIDTH100 reference tables with target top-right, using identical viewport/device scaling.",
+      "minimumHistory": 32,
+      "columns": [
+        "CHART_INDEX",
+        "CHART_TIME_MS",
+        "REQUESTED_WIDTH",
+        "CALL_COMPLETED"
+      ],
+      "instructions": "instructions/silent-s2-table-frame-width--1-v20-v2.md",
+      "provenance": "/home/sam/cs/docs/tealscript-parity-archive/ledger/silent-truncation-audit-vmp8l6-v1/REPORT-v1.md",
+      "provenanceSha256": "44bb4feec53af2c3a1e0fa9c19ec178eee6b9602d7b2588961f75e7ad05fa953",
+      "limitations": "REQUESTED_WIDTH is the unmodified argument, not an effective-width getter. CREATED/CALL_COMPLETED exposes survival only; capture the full rendering to distinguish accepted width from normalization. A refusal phase/text is an equally valid native outcome.",
+      "instructionSha256": "971ba1aac6ee35d9cb4c04f22b2b4c240faf4acf3de31ab631a02a1c7f00a8e0",
+      "authorPreflightReceipt": "/home/sam/cs/docs/tealscript-parity-archive/probe-bundle-v20-j-v1/LOCAL-PREFLIGHT-v2.json",
+      "authorPreflightReceiptSha256": "247e7e469eaba57d63a60f0079c33dbb0c8fa417506d3c3f02282054546266b9",
+      "localPreflight": {
+        "head": "1328d1c788ffbec44348fa2039457112f76d6a96",
+        "phase": "COMPILED",
+        "diagnostics": [],
+        "nativeAuthority": false
+      }
+    },
+    {
+      "probe": "silent-s3-max-lines-501-v20-v1.pine",
+      "path": "silent-s3-max-lines-501-v20-v1.pine",
+      "sourceSha256": "e4b87bc9e20903264fa5672925a063354b931c123c0276ad6883d4cea7fc6548",
+      "owner": "codex-9tqhik",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "csv+data-window+first-diagnostic+screenshot",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "auditFamily": "S3",
+      "rowIds": [
+        "S3"
+      ],
+      "question": "Compile phase for literal max_lines_count=501; if accepted, what is line.all size after501 creations? 500 is the separate valid-limit control. Capture first diagnostic including any declaration refusal.",
+      "minimumHistory": 32,
+      "columns": [
+        "CHART_INDEX",
+        "CHART_TIME_MS",
+        "DECLARED_MAX_LINES",
+        "CALL_COMPLETED",
+        "LINE_ALL_SIZE"
+      ],
+      "instructions": "instructions/silent-s3-max-lines-501-v20-v1.md",
+      "provenance": "/home/sam/cs/docs/tealscript-parity-archive/ledger/silent-truncation-audit-vmp8l6-v1/REPORT-v1.md",
+      "provenanceSha256": "44bb4feec53af2c3a1e0fa9c19ec178eee6b9602d7b2588961f75e7ad05fa953",
+      "limitations": "",
+      "instructionSha256": "bab0605c87d60a673dc74dfd7d16ae38d6d171850c7b07cef3cba8c7ff3fcdbd",
+      "authorPreflightReceipt": "/home/sam/cs/docs/tealscript-parity-archive/probe-bundle-v20-j-v1/LOCAL-PREFLIGHT-v2.json",
+      "authorPreflightReceiptSha256": "247e7e469eaba57d63a60f0079c33dbb0c8fa417506d3c3f02282054546266b9",
+      "localPreflight": {
+        "head": "1328d1c788ffbec44348fa2039457112f76d6a96",
+        "phase": "SEMANTIC-REFUSAL",
+        "diagnostics": [
+          {
+            "code": "type-mismatch",
+            "message": "indicator max_lines_count must be a non-negative integer no greater than 500",
+            "severity": "error",
+            "line": 2,
+            "column": 75
+          }
+        ],
+        "nativeAuthority": false
+      }
+    },
+    {
+      "probe": "silent-s3-max-lines-0-v20-v1.pine",
+      "path": "silent-s3-max-lines-0-v20-v1.pine",
+      "sourceSha256": "bd4ccc9b82e2a896277e8109a9fd4393e654f3376c69d9bc5287ad8bf86f43d2",
+      "owner": "codex-9tqhik",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "csv+data-window+first-diagnostic+screenshot",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "auditFamily": "S3",
+      "rowIds": [
+        "S3"
+      ],
+      "question": "Compile phase for literal max_lines_count=0; if accepted, what is line.all size after501 creations? 500 is the separate valid-limit control. Capture first diagnostic including any declaration refusal.",
+      "minimumHistory": 32,
+      "columns": [
+        "CHART_INDEX",
+        "CHART_TIME_MS",
+        "DECLARED_MAX_LINES",
+        "CALL_COMPLETED",
+        "LINE_ALL_SIZE"
+      ],
+      "instructions": "instructions/silent-s3-max-lines-0-v20-v1.md",
+      "provenance": "/home/sam/cs/docs/tealscript-parity-archive/ledger/silent-truncation-audit-vmp8l6-v1/REPORT-v1.md",
+      "provenanceSha256": "44bb4feec53af2c3a1e0fa9c19ec178eee6b9602d7b2588961f75e7ad05fa953",
+      "limitations": "",
+      "instructionSha256": "db2743d18a49579afafccc39356d10a122c5aad617d235c0d81ed6236152c419",
+      "authorPreflightReceipt": "/home/sam/cs/docs/tealscript-parity-archive/probe-bundle-v20-j-v1/LOCAL-PREFLIGHT-v2.json",
+      "authorPreflightReceiptSha256": "247e7e469eaba57d63a60f0079c33dbb0c8fa417506d3c3f02282054546266b9",
+      "localPreflight": {
+        "head": "1328d1c788ffbec44348fa2039457112f76d6a96",
+        "phase": "COMPILED",
+        "diagnostics": [],
+        "nativeAuthority": false
+      }
+    },
+    {
+      "probe": "silent-s3-max-lines-500-v20-v1.pine",
+      "path": "silent-s3-max-lines-500-v20-v1.pine",
+      "sourceSha256": "3d9fe86e8a23e1b29917240f1ec22b108bede5da44c11051071607e6c944e300",
+      "owner": "codex-9tqhik",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "csv+data-window+first-diagnostic+screenshot",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "auditFamily": "S3",
+      "rowIds": [
+        "S3"
+      ],
+      "question": "Compile phase for literal max_lines_count=500; if accepted, what is line.all size after501 creations? 500 is the separate valid-limit control. Capture first diagnostic including any declaration refusal.",
+      "minimumHistory": 32,
+      "columns": [
+        "CHART_INDEX",
+        "CHART_TIME_MS",
+        "DECLARED_MAX_LINES",
+        "CALL_COMPLETED",
+        "LINE_ALL_SIZE"
+      ],
+      "instructions": "instructions/silent-s3-max-lines-500-v20-v1.md",
+      "provenance": "/home/sam/cs/docs/tealscript-parity-archive/ledger/silent-truncation-audit-vmp8l6-v1/REPORT-v1.md",
+      "provenanceSha256": "44bb4feec53af2c3a1e0fa9c19ec178eee6b9602d7b2588961f75e7ad05fa953",
+      "limitations": "",
+      "instructionSha256": "d93958557a7c250d55275bb1b1af1c8a6c7c5b8ae4f95f843d910396a6f7d3f0",
+      "authorPreflightReceipt": "/home/sam/cs/docs/tealscript-parity-archive/probe-bundle-v20-j-v1/LOCAL-PREFLIGHT-v2.json",
+      "authorPreflightReceiptSha256": "247e7e469eaba57d63a60f0079c33dbb0c8fa417506d3c3f02282054546266b9",
+      "localPreflight": {
+        "head": "1328d1c788ffbec44348fa2039457112f76d6a96",
+        "phase": "COMPILED",
+        "diagnostics": [],
+        "nativeAuthority": false
+      }
+    },
+    {
+      "probe": "silent-s4-time-offset-5001-v20-v1.pine",
+      "path": "silent-s4-time-offset-5001-v20-v1.pine",
+      "sourceSha256": "230df04438a5faaf8f8391e3d78e48f44c8c8b1b20517311558b8c6de60f03d8",
+      "owner": "codex-9tqhik",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "csv+data-window+first-diagnostic+screenshot",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "auditFamily": "S4",
+      "rowIds": [
+        "S4"
+      ],
+      "question": "On a continuous BTCUSDT1-minute chart with at least6000 execution bars, does time(\"1\",bars_back=5001) return a timestamp, NA, or refusal? Preserve every raw chart timestamp and execution index;5000/-500 are independent boundary controls.",
+      "minimumHistory": 6000,
+      "columns": [
+        "CHART_INDEX",
+        "CHART_TIME_MS",
+        "REQUESTED_BARS_BACK",
+        "TIME_RESULT_MS",
+        "RESULT_NA",
+        "RESULT_MINUS_CHART_MS"
+      ],
+      "instructions": "instructions/silent-s4-time-offset-5001-v20-v1.md",
+      "provenance": "/home/sam/cs/docs/tealscript-parity-archive/ledger/silent-truncation-audit-vmp8l6-v1/REPORT-v1.md",
+      "provenanceSha256": "44bb4feec53af2c3a1e0fa9c19ec178eee6b9602d7b2588961f75e7ad05fa953",
+      "limitations": "Positive5001 cannot be settled from a short warmup-only capture. Require plotted CHART_INDEX>=5002; no general-series history rule is assumed for this function.",
+      "instructionSha256": "91e78cf9aedd5ce3646a114ef40b65e8a979ef35818aa4c52e57ac5f720b6587",
+      "authorPreflightReceipt": "/home/sam/cs/docs/tealscript-parity-archive/probe-bundle-v20-j-v1/LOCAL-PREFLIGHT-v2.json",
+      "authorPreflightReceiptSha256": "247e7e469eaba57d63a60f0079c33dbb0c8fa417506d3c3f02282054546266b9",
+      "localPreflight": {
+        "head": "1328d1c788ffbec44348fa2039457112f76d6a96",
+        "phase": "SEMANTIC-REFUSAL",
+        "diagnostics": [
+          {
+            "code": "type-mismatch",
+            "message": "time bars_back must be an integer between -500 and 5000",
+            "severity": "error",
+            "line": 3,
+            "column": 34
+          }
+        ],
+        "nativeAuthority": false
+      }
+    },
+    {
+      "probe": "silent-s4-time-offset--501-v20-v1.pine",
+      "path": "silent-s4-time-offset--501-v20-v1.pine",
+      "sourceSha256": "b636d4afe508d79b91669c2c847b6d3953b2e52e8179465a662b4ce4ea443284",
+      "owner": "codex-9tqhik",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "csv+data-window+first-diagnostic+screenshot",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "auditFamily": "S4",
+      "rowIds": [
+        "S4"
+      ],
+      "question": "On a continuous BTCUSDT1-minute chart with at least6000 execution bars, does time(\"1\",bars_back=-501) return a timestamp, NA, or refusal? Preserve every raw chart timestamp and execution index;5000/-500 are independent boundary controls.",
+      "minimumHistory": 6000,
+      "columns": [
+        "CHART_INDEX",
+        "CHART_TIME_MS",
+        "REQUESTED_BARS_BACK",
+        "TIME_RESULT_MS",
+        "RESULT_NA",
+        "RESULT_MINUS_CHART_MS"
+      ],
+      "instructions": "instructions/silent-s4-time-offset--501-v20-v1.md",
+      "provenance": "/home/sam/cs/docs/tealscript-parity-archive/ledger/silent-truncation-audit-vmp8l6-v1/REPORT-v1.md",
+      "provenanceSha256": "44bb4feec53af2c3a1e0fa9c19ec178eee6b9602d7b2588961f75e7ad05fa953",
+      "limitations": "Positive5001 cannot be settled from a short warmup-only capture. Require plotted CHART_INDEX>=5002; no general-series history rule is assumed for this function.",
+      "instructionSha256": "86b7aff8b4259f3fdbbd07c8efa1c3db747396b996ab3a1fa503f5a86e232fcf",
+      "authorPreflightReceipt": "/home/sam/cs/docs/tealscript-parity-archive/probe-bundle-v20-j-v1/LOCAL-PREFLIGHT-v2.json",
+      "authorPreflightReceiptSha256": "247e7e469eaba57d63a60f0079c33dbb0c8fa417506d3c3f02282054546266b9",
+      "localPreflight": {
+        "head": "1328d1c788ffbec44348fa2039457112f76d6a96",
+        "phase": "SEMANTIC-REFUSAL",
+        "diagnostics": [
+          {
+            "code": "type-mismatch",
+            "message": "time bars_back must be an integer between -500 and 5000",
+            "severity": "error",
+            "line": 3,
+            "column": 34
+          }
+        ],
+        "nativeAuthority": false
+      }
+    },
+    {
+      "probe": "silent-s4-time-offset-5000-v20-v1.pine",
+      "path": "silent-s4-time-offset-5000-v20-v1.pine",
+      "sourceSha256": "976939a258be50abaf335616369e006540eadda889c04a62ded1d49efe6911de",
+      "owner": "codex-9tqhik",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "csv+data-window+first-diagnostic+screenshot",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "auditFamily": "S4",
+      "rowIds": [
+        "S4"
+      ],
+      "question": "On a continuous BTCUSDT1-minute chart with at least6000 execution bars, does time(\"1\",bars_back=5000) return a timestamp, NA, or refusal? Preserve every raw chart timestamp and execution index;5000/-500 are independent boundary controls.",
+      "minimumHistory": 6000,
+      "columns": [
+        "CHART_INDEX",
+        "CHART_TIME_MS",
+        "REQUESTED_BARS_BACK",
+        "TIME_RESULT_MS",
+        "RESULT_NA",
+        "RESULT_MINUS_CHART_MS"
+      ],
+      "instructions": "instructions/silent-s4-time-offset-5000-v20-v1.md",
+      "provenance": "/home/sam/cs/docs/tealscript-parity-archive/ledger/silent-truncation-audit-vmp8l6-v1/REPORT-v1.md",
+      "provenanceSha256": "44bb4feec53af2c3a1e0fa9c19ec178eee6b9602d7b2588961f75e7ad05fa953",
+      "limitations": "Positive5001 cannot be settled from a short warmup-only capture. Require plotted CHART_INDEX>=5002; no general-series history rule is assumed for this function.",
+      "instructionSha256": "aee9f2870eea2b5b5ab44cdfae528ac4c7e4dba1d2edc871e7ae379c133c80a2",
+      "authorPreflightReceipt": "/home/sam/cs/docs/tealscript-parity-archive/probe-bundle-v20-j-v1/LOCAL-PREFLIGHT-v2.json",
+      "authorPreflightReceiptSha256": "247e7e469eaba57d63a60f0079c33dbb0c8fa417506d3c3f02282054546266b9",
+      "localPreflight": {
+        "head": "1328d1c788ffbec44348fa2039457112f76d6a96",
+        "phase": "COMPILED",
+        "diagnostics": [],
+        "nativeAuthority": false
+      }
+    },
+    {
+      "probe": "silent-s4-time-offset--500-v20-v1.pine",
+      "path": "silent-s4-time-offset--500-v20-v1.pine",
+      "sourceSha256": "ec20585aa9cc2bea1a6ae749d8ffeb348b31bf4182a750281e07baef9aafe05f",
+      "owner": "codex-9tqhik",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "csv+data-window+first-diagnostic+screenshot",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "auditFamily": "S4",
+      "rowIds": [
+        "S4"
+      ],
+      "question": "On a continuous BTCUSDT1-minute chart with at least6000 execution bars, does time(\"1\",bars_back=-500) return a timestamp, NA, or refusal? Preserve every raw chart timestamp and execution index;5000/-500 are independent boundary controls.",
+      "minimumHistory": 6000,
+      "columns": [
+        "CHART_INDEX",
+        "CHART_TIME_MS",
+        "REQUESTED_BARS_BACK",
+        "TIME_RESULT_MS",
+        "RESULT_NA",
+        "RESULT_MINUS_CHART_MS"
+      ],
+      "instructions": "instructions/silent-s4-time-offset--500-v20-v1.md",
+      "provenance": "/home/sam/cs/docs/tealscript-parity-archive/ledger/silent-truncation-audit-vmp8l6-v1/REPORT-v1.md",
+      "provenanceSha256": "44bb4feec53af2c3a1e0fa9c19ec178eee6b9602d7b2588961f75e7ad05fa953",
+      "limitations": "Positive5001 cannot be settled from a short warmup-only capture. Require plotted CHART_INDEX>=5002; no general-series history rule is assumed for this function.",
+      "instructionSha256": "69ab3751cce5ce9843c799029a42becb79a2c4ca003de6665c37e67978dc7cef",
+      "authorPreflightReceipt": "/home/sam/cs/docs/tealscript-parity-archive/probe-bundle-v20-j-v1/LOCAL-PREFLIGHT-v2.json",
+      "authorPreflightReceiptSha256": "247e7e469eaba57d63a60f0079c33dbb0c8fa417506d3c3f02282054546266b9",
+      "localPreflight": {
+        "head": "1328d1c788ffbec44348fa2039457112f76d6a96",
+        "phase": "COMPILED",
+        "diagnostics": [],
+        "nativeAuthority": false
+      }
+    },
+    {
+      "probe": "silent-s5-pivothigh-strengths--1-0-v20-v1.pine",
+      "path": "silent-s5-pivothigh-strengths--1-0-v20-v1.pine",
+      "sourceSha256": "0b01684a98ea1482c4e3c1a96d03de490d833781ac29db7aa8ad1c6e6a9b83a6",
+      "owner": "codex-9tqhik",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "csv+data-window+first-diagnostic+screenshot",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "auditFamily": "S5",
+      "rowIds": [
+        "S5"
+      ],
+      "question": "Does negative strength (-1,0) refuse, normalize, or yield different values? Compare separate(0,0) control under the same synthetic source and execution index.",
+      "minimumHistory": 32,
+      "columns": [
+        "CHART_INDEX",
+        "CHART_TIME_MS",
+        "SOURCE",
+        "LEFT_STRENGTH",
+        "RIGHT_STRENGTH",
+        "PIVOT_HIGH",
+        "RESULT_NA"
+      ],
+      "instructions": "instructions/silent-s5-pivothigh-strengths--1-0-v20-v1.md",
+      "provenance": "/home/sam/cs/docs/tealscript-parity-archive/ledger/silent-truncation-audit-vmp8l6-v1/REPORT-v1.md",
+      "provenanceSha256": "44bb4feec53af2c3a1e0fa9c19ec178eee6b9602d7b2588961f75e7ad05fa953",
+      "limitations": "",
+      "instructionSha256": "de3cc4c90f18eaf2522441998339dfc5b197fc7dc73e16a1e51fd02e670d14d4",
+      "authorPreflightReceipt": "/home/sam/cs/docs/tealscript-parity-archive/probe-bundle-v20-j-v1/LOCAL-PREFLIGHT-v2.json",
+      "authorPreflightReceiptSha256": "247e7e469eaba57d63a60f0079c33dbb0c8fa417506d3c3f02282054546266b9",
+      "localPreflight": {
+        "head": "1328d1c788ffbec44348fa2039457112f76d6a96",
+        "phase": "COMPILED",
+        "diagnostics": [],
+        "nativeAuthority": false
+      }
+    },
+    {
+      "probe": "silent-s5-pivothigh-strengths-0--1-v20-v1.pine",
+      "path": "silent-s5-pivothigh-strengths-0--1-v20-v1.pine",
+      "sourceSha256": "243872f3eb6240300cc2d58222d2d3b8eecd78d30124616332e3416214582f56",
+      "owner": "codex-9tqhik",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "csv+data-window+first-diagnostic+screenshot",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "auditFamily": "S5",
+      "rowIds": [
+        "S5"
+      ],
+      "question": "Does negative strength (0,-1) refuse, normalize, or yield different values? Compare separate(0,0) control under the same synthetic source and execution index.",
+      "minimumHistory": 32,
+      "columns": [
+        "CHART_INDEX",
+        "CHART_TIME_MS",
+        "SOURCE",
+        "LEFT_STRENGTH",
+        "RIGHT_STRENGTH",
+        "PIVOT_HIGH",
+        "RESULT_NA"
+      ],
+      "instructions": "instructions/silent-s5-pivothigh-strengths-0--1-v20-v1.md",
+      "provenance": "/home/sam/cs/docs/tealscript-parity-archive/ledger/silent-truncation-audit-vmp8l6-v1/REPORT-v1.md",
+      "provenanceSha256": "44bb4feec53af2c3a1e0fa9c19ec178eee6b9602d7b2588961f75e7ad05fa953",
+      "limitations": "",
+      "instructionSha256": "24cbc647996213c60aa07e3680bbf682b4ca8103a58a97de5c28c3505402c6e5",
+      "authorPreflightReceipt": "/home/sam/cs/docs/tealscript-parity-archive/probe-bundle-v20-j-v1/LOCAL-PREFLIGHT-v2.json",
+      "authorPreflightReceiptSha256": "247e7e469eaba57d63a60f0079c33dbb0c8fa417506d3c3f02282054546266b9",
+      "localPreflight": {
+        "head": "1328d1c788ffbec44348fa2039457112f76d6a96",
+        "phase": "COMPILED",
+        "diagnostics": [],
+        "nativeAuthority": false
+      }
+    },
+    {
+      "probe": "silent-s5-pivothigh-strengths-0-0-v20-v1.pine",
+      "path": "silent-s5-pivothigh-strengths-0-0-v20-v1.pine",
+      "sourceSha256": "18566ae9aa0f7d9f833f122a242605a6436de9969984ea018887ba6e4dd7272c",
+      "owner": "codex-9tqhik",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "csv+data-window+first-diagnostic+screenshot",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "auditFamily": "S5",
+      "rowIds": [
+        "S5"
+      ],
+      "question": "Does negative strength (0,0) refuse, normalize, or yield different values? Compare separate(0,0) control under the same synthetic source and execution index.",
+      "minimumHistory": 32,
+      "columns": [
+        "CHART_INDEX",
+        "CHART_TIME_MS",
+        "SOURCE",
+        "LEFT_STRENGTH",
+        "RIGHT_STRENGTH",
+        "PIVOT_HIGH",
+        "RESULT_NA"
+      ],
+      "instructions": "instructions/silent-s5-pivothigh-strengths-0-0-v20-v1.md",
+      "provenance": "/home/sam/cs/docs/tealscript-parity-archive/ledger/silent-truncation-audit-vmp8l6-v1/REPORT-v1.md",
+      "provenanceSha256": "44bb4feec53af2c3a1e0fa9c19ec178eee6b9602d7b2588961f75e7ad05fa953",
+      "limitations": "",
+      "instructionSha256": "b9c6306b0669e6da89362495d64d4bc87f11ee67eb27eb28a2c956f829748cad",
+      "authorPreflightReceipt": "/home/sam/cs/docs/tealscript-parity-archive/probe-bundle-v20-j-v1/LOCAL-PREFLIGHT-v2.json",
+      "authorPreflightReceiptSha256": "247e7e469eaba57d63a60f0079c33dbb0c8fa417506d3c3f02282054546266b9",
+      "localPreflight": {
+        "head": "1328d1c788ffbec44348fa2039457112f76d6a96",
+        "phase": "COMPILED",
+        "diagnostics": [],
+        "nativeAuthority": false
+      }
+    },
+    {
+      "probe": "silent-s6-tiny-eigenvalues-v20-v1.pine",
+      "path": "silent-s6-tiny-eigenvalues-v20-v1.pine",
+      "sourceSha256": "49fbaefd1f52e677dc14c3a697b9f89fc94c0b2efc6dbc872c3a15a9d510013a",
+      "owner": "codex-9tqhik",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "csv+data-window+first-diagnostic+screenshot",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "auditFamily": "S6",
+      "rowIds": [
+        "S6"
+      ],
+      "question": "What values/ordering/NA does native return for diag(1e-12,2e-12)? Raw and1e12-scaled outputs distinguish tiny values from zero; precision16 preserves readable results.",
+      "minimumHistory": 32,
+      "columns": [
+        "CHART_INDEX",
+        "CHART_TIME_MS",
+        "EIGEN_0",
+        "EIGEN_0_SCALED_1E12",
+        "EIGEN_0_NA",
+        "EIGEN_1",
+        "EIGEN_1_SCALED_1E12",
+        "EIGEN_1_NA"
+      ],
+      "instructions": "instructions/silent-s6-tiny-eigenvalues-v20-v1.md",
+      "provenance": "/home/sam/cs/docs/tealscript-parity-archive/ledger/silent-truncation-audit-vmp8l6-v1/REPORT-v1.md",
+      "provenanceSha256": "44bb4feec53af2c3a1e0fa9c19ec178eee6b9602d7b2588961f75e7ad05fa953",
+      "limitations": "",
+      "instructionSha256": "08f84373c73ae9c48900fb56c497663854aeea4d944eb03a78237ad2073d7d4f",
+      "authorPreflightReceipt": "/home/sam/cs/docs/tealscript-parity-archive/probe-bundle-v20-j-v1/LOCAL-PREFLIGHT-v2.json",
+      "authorPreflightReceiptSha256": "247e7e469eaba57d63a60f0079c33dbb0c8fa417506d3c3f02282054546266b9",
+      "localPreflight": {
+        "head": "1328d1c788ffbec44348fa2039457112f76d6a96",
+        "phase": "COMPILED",
+        "diagnostics": [],
+        "nativeAuthority": false
+      }
+    },
+    {
+      "probe": "silent-s7-merge-reversed-v20-v1.pine",
+      "path": "silent-s7-merge-reversed-v20-v1.pine",
+      "sourceSha256": "775194789cde5d51f6ea093394a3f0f5b9f05440803c72b69d681d062fec234d",
+      "owner": "codex-9tqhik",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "csv+data-window+first-diagnostic+screenshot",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "auditFamily": "S7",
+      "rowIds": [
+        "S7"
+      ],
+      "question": "Native table.merge_cells corners(1, 1, 0, 0): does it refuse or complete? If complete, capture which original cell text/color survives and merged geometry in full screenshot.",
+      "minimumHistory": 32,
+      "columns": [
+        "CHART_INDEX",
+        "CHART_TIME_MS",
+        "MERGE_COMPLETED"
+      ],
+      "instructions": "instructions/silent-s7-merge-reversed-v20-v1.md",
+      "provenance": "/home/sam/cs/docs/tealscript-parity-archive/ledger/silent-truncation-audit-vmp8l6-v1/REPORT-v1.md",
+      "provenanceSha256": "44bb4feec53af2c3a1e0fa9c19ec178eee6b9602d7b2588961f75e7ad05fa953",
+      "limitations": "MERGE_COMPLETED measures survival, not range coordinates. Pine exposes no merged-range getter; screenshot of A/B/C/D identity is mandatory for normalization/source-cell attribution.",
+      "instructionSha256": "3a2ae82a76b0241f4eed002dfc7bf94c3e4c0a4533e78fcee914432e1947a4bb",
+      "authorPreflightReceipt": "/home/sam/cs/docs/tealscript-parity-archive/probe-bundle-v20-j-v1/LOCAL-PREFLIGHT-v2.json",
+      "authorPreflightReceiptSha256": "247e7e469eaba57d63a60f0079c33dbb0c8fa417506d3c3f02282054546266b9",
+      "localPreflight": {
+        "head": "1328d1c788ffbec44348fa2039457112f76d6a96",
+        "phase": "COMPILED",
+        "diagnostics": [],
+        "nativeAuthority": false
+      }
+    },
+    {
+      "probe": "silent-s7-merge-ordered-control-v20-v1.pine",
+      "path": "silent-s7-merge-ordered-control-v20-v1.pine",
+      "sourceSha256": "cde6a5711eebd345a9323e65cad096d0304adf3684c6c193ea85d6f1c1a63ce2",
+      "owner": "codex-9tqhik",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "csv+data-window+first-diagnostic+screenshot",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "auditFamily": "S7",
+      "rowIds": [
+        "S7"
+      ],
+      "question": "Native table.merge_cells corners(0, 0, 1, 1): does it refuse or complete? If complete, capture which original cell text/color survives and merged geometry in full screenshot.",
+      "minimumHistory": 32,
+      "columns": [
+        "CHART_INDEX",
+        "CHART_TIME_MS",
+        "MERGE_COMPLETED"
+      ],
+      "instructions": "instructions/silent-s7-merge-ordered-control-v20-v1.md",
+      "provenance": "/home/sam/cs/docs/tealscript-parity-archive/ledger/silent-truncation-audit-vmp8l6-v1/REPORT-v1.md",
+      "provenanceSha256": "44bb4feec53af2c3a1e0fa9c19ec178eee6b9602d7b2588961f75e7ad05fa953",
+      "limitations": "MERGE_COMPLETED measures survival, not range coordinates. Pine exposes no merged-range getter; screenshot of A/B/C/D identity is mandatory for normalization/source-cell attribution.",
+      "instructionSha256": "fec9f0619263fc2f8cb65f7ba12d2f4efa06186761185815f0aa9c32e8d7d2d3",
+      "authorPreflightReceipt": "/home/sam/cs/docs/tealscript-parity-archive/probe-bundle-v20-j-v1/LOCAL-PREFLIGHT-v2.json",
+      "authorPreflightReceiptSha256": "247e7e469eaba57d63a60f0079c33dbb0c8fa417506d3c3f02282054546266b9",
+      "localPreflight": {
+        "head": "1328d1c788ffbec44348fa2039457112f76d6a96",
+        "phase": "COMPILED",
+        "diagnostics": [],
+        "nativeAuthority": false
+      }
+    },
+    {
+      "probe": "silent-p1-eigen-complex-v20-v1.pine",
+      "path": "silent-p1-eigen-complex-v20-v1.pine",
+      "sourceSha256": "87a7d3c167783e244685a46b19a6ab7a948d99ecb8b45e702f07de46adea066d",
+      "owner": "codex-9tqhik",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "csv+data-window+first-diagnostic+screenshot",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "auditFamily": "P1",
+      "rowIds": [
+        "P1"
+      ],
+      "question": "For rotation block[[0,-1],[1,0]] plus diagonal1, does native eigenvalues refuse, return missing placeholders, or finite values? Capture all3values/NA and exact first diagnostic.",
+      "minimumHistory": 32,
+      "columns": [
+        "CHART_INDEX",
+        "CHART_TIME_MS",
+        "EIGEN_0",
+        "EIGEN_0_NA",
+        "EIGEN_1",
+        "EIGEN_1_NA",
+        "EIGEN_2",
+        "EIGEN_2_NA"
+      ],
+      "instructions": "instructions/silent-p1-eigen-complex-v20-v1.md",
+      "provenance": "/home/sam/cs/docs/tealscript-parity-archive/ledger/silent-truncation-audit-vmp8l6-v1/REPORT-v1.md",
+      "provenanceSha256": "44bb4feec53af2c3a1e0fa9c19ec178eee6b9602d7b2588961f75e7ad05fa953",
+      "limitations": "This matrix has complex roots; it is not a real-spectrum nonconvergence witness.",
+      "instructionSha256": "829dab546420aa387e351e990e9ecddbe2ec7bf053af7d6b0cb4db097e16e2ad",
+      "authorPreflightReceipt": "/home/sam/cs/docs/tealscript-parity-archive/probe-bundle-v20-j-v1/LOCAL-PREFLIGHT-v2.json",
+      "authorPreflightReceiptSha256": "247e7e469eaba57d63a60f0079c33dbb0c8fa417506d3c3f02282054546266b9",
+      "localPreflight": {
+        "head": "1328d1c788ffbec44348fa2039457112f76d6a96",
+        "phase": "COMPILED",
+        "diagnostics": [],
+        "nativeAuthority": false
+      }
+    },
+    {
+      "probe": "silent-p1-eigen-real-convergence-stress-v20-v1.pine",
+      "path": "silent-p1-eigen-real-convergence-stress-v20-v1.pine",
+      "sourceSha256": "9c3a70364b2e1bf2af850ebfbcfaf20dd38fb3dd492026af59cd8fe1a8d7ad23",
+      "owner": "codex-9tqhik",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "csv+data-window+first-diagnostic+screenshot",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "auditFamily": "P1",
+      "rowIds": [
+        "P1"
+      ],
+      "question": "Capture symmetric tridiagonal real-spectrum stress at inputs(n,scale)=(16,1),(32,1),(32,1e-12),(32,1e12). Record refusal, missing count, all eigenvalues from Pine Logs and displayed aggregates.",
+      "minimumHistory": 32,
+      "columns": [
+        "CHART_INDEX",
+        "CHART_TIME_MS",
+        "MATRIX_DIMENSION",
+        "MATRIX_SCALE",
+        "EIGEN_COUNT",
+        "EIGEN_NA_COUNT",
+        "EIGEN_SUM",
+        "FIRST_EIGEN",
+        "LAST_EIGEN"
+      ],
+      "instructions": "instructions/silent-p1-eigen-real-convergence-stress-v20-v1.md",
+      "provenance": "/home/sam/cs/docs/tealscript-parity-archive/ledger/silent-truncation-audit-vmp8l6-v1/REPORT-v1.md",
+      "provenanceSha256": "44bb4feec53af2c3a1e0fa9c19ec178eee6b9602d7b2588961f75e7ad05fa953",
+      "limitations": "No actual real-spectrum nonconvergence counterexample exists in the audit; this is finite-spectrum stress coverage, not a claim that any sample reaches native/internal iteration limits. Successful runs cannot certify arbitrary convergence.",
+      "instructionSha256": "e7230b47964a39cf709a2581c6a1e1e09aad989ffa43e0cfec2a4a69406dbf61",
+      "authorPreflightReceipt": "/home/sam/cs/docs/tealscript-parity-archive/probe-bundle-v20-j-v1/LOCAL-PREFLIGHT-v2.json",
+      "authorPreflightReceiptSha256": "247e7e469eaba57d63a60f0079c33dbb0c8fa417506d3c3f02282054546266b9",
+      "localPreflight": {
+        "head": "1328d1c788ffbec44348fa2039457112f76d6a96",
+        "phase": "COMPILED",
+        "diagnostics": [],
+        "nativeAuthority": false
+      }
+    },
+    {
+      "probe": "silent-p2-percentile-101-constant-v20-v1.pine",
+      "path": "silent-p2-percentile-101-constant-v20-v1.pine",
+      "sourceSha256": "08d1a102fc65164676a43e0c2781c5be5f72214753f5e611fb1dbd793e996aea",
+      "owner": "codex-9tqhik",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "csv+data-window+first-diagnostic+screenshot",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "auditFamily": "P2",
+      "rowIds": [
+        "P2"
+      ],
+      "question": "For [1,2], percentage101 (constant) does native refuse, clamp, or return another result? Dynamic case has valid50 prefix bars0..2 then101 at3; record exact first refusal bar/phase/text and prefix CSV.",
+      "minimumHistory": 32,
+      "columns": [
+        "CHART_INDEX",
+        "CHART_TIME_MS",
+        "REQUESTED_PERCENTAGE",
+        "PERCENTILE_RESULT",
+        "RESULT_NA"
+      ],
+      "instructions": "instructions/silent-p2-percentile-101-constant-v20-v1.md",
+      "provenance": "/home/sam/cs/docs/tealscript-parity-archive/ledger/silent-truncation-audit-vmp8l6-v1/REPORT-v1.md",
+      "provenanceSha256": "44bb4feec53af2c3a1e0fa9c19ec178eee6b9602d7b2588961f75e7ad05fa953",
+      "limitations": "",
+      "instructionSha256": "41da8485c9af686452ed0d08b7aa4a177634d261550842d74bc93c04c817a650",
+      "authorPreflightReceipt": "/home/sam/cs/docs/tealscript-parity-archive/probe-bundle-v20-j-v1/LOCAL-PREFLIGHT-v2.json",
+      "authorPreflightReceiptSha256": "247e7e469eaba57d63a60f0079c33dbb0c8fa417506d3c3f02282054546266b9",
+      "localPreflight": {
+        "head": "1328d1c788ffbec44348fa2039457112f76d6a96",
+        "phase": "COMPILED",
+        "diagnostics": [],
+        "nativeAuthority": false
+      }
+    },
+    {
+      "probe": "silent-p2-percentile-101-dynamic-v20-v1.pine",
+      "path": "silent-p2-percentile-101-dynamic-v20-v1.pine",
+      "sourceSha256": "5125edbb26d5b5605142a5cfc7e8dcd6e68142ec1ec98e9bbfebefb0a53c5875",
+      "owner": "codex-9tqhik",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "csv+data-window+first-diagnostic+screenshot",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "auditFamily": "P2",
+      "rowIds": [
+        "P2"
+      ],
+      "question": "For [1,2], percentage101 (dynamic) does native refuse, clamp, or return another result? Dynamic case has valid50 prefix bars0..2 then101 at3; record exact first refusal bar/phase/text and prefix CSV.",
+      "minimumHistory": 32,
+      "columns": [
+        "CHART_INDEX",
+        "CHART_TIME_MS",
+        "REQUESTED_PERCENTAGE",
+        "PERCENTILE_RESULT",
+        "RESULT_NA"
+      ],
+      "instructions": "instructions/silent-p2-percentile-101-dynamic-v20-v1.md",
+      "provenance": "/home/sam/cs/docs/tealscript-parity-archive/ledger/silent-truncation-audit-vmp8l6-v1/REPORT-v1.md",
+      "provenanceSha256": "44bb4feec53af2c3a1e0fa9c19ec178eee6b9602d7b2588961f75e7ad05fa953",
+      "limitations": "",
+      "instructionSha256": "4b1e1c471ece19d6da0270b73768f640d20903c585582ec5f10f7eab4bede97c",
+      "authorPreflightReceipt": "/home/sam/cs/docs/tealscript-parity-archive/probe-bundle-v20-j-v1/LOCAL-PREFLIGHT-v2.json",
+      "authorPreflightReceiptSha256": "247e7e469eaba57d63a60f0079c33dbb0c8fa417506d3c3f02282054546266b9",
+      "localPreflight": {
+        "head": "1328d1c788ffbec44348fa2039457112f76d6a96",
+        "phase": "COMPILED",
+        "diagnostics": [],
+        "nativeAuthority": false
+      }
+    },
+    {
+      "probe": "silent-p3-table-creation-only-v20-v1.pine",
+      "path": "silent-p3-table-creation-only-v20-v1.pine",
+      "sourceSha256": "93476768dc17671431a8be2233848de1e020867b4e6d5d6649ea107dc30411f0",
+      "owner": "codex-9tqhik",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "csv+data-window+first-diagnostic+screenshot",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "auditFamily": "P3",
+      "rowIds": [
+        "P3"
+      ],
+      "question": "Does table.new(columns=0,rows=1) itself refuse? No cell is accessed, isolating constructor admission.",
+      "minimumHistory": 32,
+      "columns": [
+        "CHART_INDEX",
+        "CHART_TIME_MS",
+        "REQUESTED_COLUMNS",
+        "CALL_COMPLETED"
+      ],
+      "instructions": "instructions/silent-p3-table-creation-only-v20-v1.md",
+      "provenance": "/home/sam/cs/docs/tealscript-parity-archive/ledger/silent-truncation-audit-vmp8l6-v1/REPORT-v1.md",
+      "provenanceSha256": "44bb4feec53af2c3a1e0fa9c19ec178eee6b9602d7b2588961f75e7ad05fa953",
+      "limitations": "A zero-column constructor followed by a cell bounds error differs from constructor refusal or fallback1. Capture both probes independently.",
+      "instructionSha256": "83feedaea974789b364d133099722981b3e867ae12260dc7181288135e02f0fa",
+      "authorPreflightReceipt": "/home/sam/cs/docs/tealscript-parity-archive/probe-bundle-v20-j-v1/LOCAL-PREFLIGHT-v2.json",
+      "authorPreflightReceiptSha256": "247e7e469eaba57d63a60f0079c33dbb0c8fa417506d3c3f02282054546266b9",
+      "localPreflight": {
+        "head": "1328d1c788ffbec44348fa2039457112f76d6a96",
+        "phase": "COMPILED",
+        "diagnostics": [],
+        "nativeAuthority": false
+      }
+    },
+    {
+      "probe": "silent-p3-table-cell-zero-v20-v1.pine",
+      "path": "silent-p3-table-cell-zero-v20-v1.pine",
+      "sourceSha256": "a437bb71f4d16bb2046e39f4f09e77c646c0e8beefe043452ae0388380b62cce",
+      "owner": "codex-9tqhik",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "csv+data-window+first-diagnostic+screenshot",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "auditFamily": "P3",
+      "rowIds": [
+        "P3"
+      ],
+      "question": "Does table.new(columns=0,rows=1) itself refuse? Does subsequent cell(0,0) survive? Compare separate one-column control.",
+      "minimumHistory": 32,
+      "columns": [
+        "CHART_INDEX",
+        "CHART_TIME_MS",
+        "REQUESTED_COLUMNS",
+        "CALL_COMPLETED"
+      ],
+      "instructions": "instructions/silent-p3-table-cell-zero-v20-v1.md",
+      "provenance": "/home/sam/cs/docs/tealscript-parity-archive/ledger/silent-truncation-audit-vmp8l6-v1/REPORT-v1.md",
+      "provenanceSha256": "44bb4feec53af2c3a1e0fa9c19ec178eee6b9602d7b2588961f75e7ad05fa953",
+      "limitations": "A zero-column constructor followed by a cell bounds error differs from constructor refusal or fallback1. Capture both probes independently.",
+      "instructionSha256": "6d295d025808ec26a8ae7b922a8461243afadaccb8c002c9c20c9c6ee9de3d6b",
+      "authorPreflightReceipt": "/home/sam/cs/docs/tealscript-parity-archive/probe-bundle-v20-j-v1/LOCAL-PREFLIGHT-v2.json",
+      "authorPreflightReceiptSha256": "247e7e469eaba57d63a60f0079c33dbb0c8fa417506d3c3f02282054546266b9",
+      "localPreflight": {
+        "head": "1328d1c788ffbec44348fa2039457112f76d6a96",
+        "phase": "COMPILED",
+        "diagnostics": [],
+        "nativeAuthority": false
+      }
+    },
+    {
+      "probe": "silent-p3-table-one-column-control-v20-v1.pine",
+      "path": "silent-p3-table-one-column-control-v20-v1.pine",
+      "sourceSha256": "0634ac18ee0e973284f0df28a0d60d72d64a244e931a69c97f08a47433a599f1",
+      "owner": "codex-9tqhik",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "csv+data-window+first-diagnostic+screenshot",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "auditFamily": "P3",
+      "rowIds": [
+        "P3"
+      ],
+      "question": "Does table.new(columns=1,rows=1) itself refuse? Does subsequent cell(0,0) survive? Compare separate one-column control.",
+      "minimumHistory": 32,
+      "columns": [
+        "CHART_INDEX",
+        "CHART_TIME_MS",
+        "REQUESTED_COLUMNS",
+        "CALL_COMPLETED"
+      ],
+      "instructions": "instructions/silent-p3-table-one-column-control-v20-v1.md",
+      "provenance": "/home/sam/cs/docs/tealscript-parity-archive/ledger/silent-truncation-audit-vmp8l6-v1/REPORT-v1.md",
+      "provenanceSha256": "44bb4feec53af2c3a1e0fa9c19ec178eee6b9602d7b2588961f75e7ad05fa953",
+      "limitations": "A zero-column constructor followed by a cell bounds error differs from constructor refusal or fallback1. Capture both probes independently.",
+      "instructionSha256": "a8b20ae6d6e73a8745acb85e2fa47c9d7d220c66042f10f426364a8c5c8319e8",
+      "authorPreflightReceipt": "/home/sam/cs/docs/tealscript-parity-archive/probe-bundle-v20-j-v1/LOCAL-PREFLIGHT-v2.json",
+      "authorPreflightReceiptSha256": "247e7e469eaba57d63a60f0079c33dbb0c8fa417506d3c3f02282054546266b9",
+      "localPreflight": {
+        "head": "1328d1c788ffbec44348fa2039457112f76d6a96",
+        "phase": "COMPILED",
+        "diagnostics": [],
+        "nativeAuthority": false
+      }
+    },
+    {
+      "probe": "silent-s4-time-offset-5001-dynamic-v20-v1.pine",
+      "path": "silent-s4-time-offset-5001-dynamic-v20-v1.pine",
+      "sourceSha256": "c645f961eb231c5468a87c7235c7fc509b9f14b2876faef52f7c0c7e4351073c",
+      "owner": "codex-9tqhik",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "csv+data-window+first-diagnostic+screenshot",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "auditFamily": "S4",
+      "rowIds": [
+        "S4"
+      ],
+      "question": "Dynamic time(\"1\",bars_back=offset), offset0 before bar5002, then5001. Capture exact first runtime refusal or raw time/NA results after transition. Positive5001 has available prior timestamps by its first target bar5002; future-501 starts at3.",
+      "minimumHistory": 6000,
+      "columns": [
+        "CHART_INDEX",
+        "CHART_TIME_MS",
+        "REQUESTED_BARS_BACK",
+        "TIME_RESULT_MS",
+        "RESULT_NA",
+        "RESULT_MINUS_CHART_MS"
+      ],
+      "instructions": "instructions/silent-s4-time-offset-5001-dynamic-v20-v1.md",
+      "provenance": "/home/sam/cs/docs/tealscript-parity-archive/ledger/silent-truncation-audit-vmp8l6-v1/REPORT-v1.md",
+      "provenanceSha256": "44bb4feec53af2c3a1e0fa9c19ec178eee6b9602d7b2588961f75e7ad05fa953",
+      "limitations": "Positive5001 cannot be settled from a short warmup-only capture. Require plotted CHART_INDEX>=5002; no general-series history rule is assumed for this function.",
+      "instructionSha256": "632e2386f63708b37737b55a6e04c270b35f50fa2fb7c98eeee1d4f4af97e82b",
+      "authorPreflightReceipt": "/home/sam/cs/docs/tealscript-parity-archive/probe-bundle-v20-j-v1/LOCAL-PREFLIGHT-v2.json",
+      "authorPreflightReceiptSha256": "247e7e469eaba57d63a60f0079c33dbb0c8fa417506d3c3f02282054546266b9",
+      "localPreflight": {
+        "head": "1328d1c788ffbec44348fa2039457112f76d6a96",
+        "phase": "COMPILED",
+        "diagnostics": [],
+        "nativeAuthority": false
+      }
+    },
+    {
+      "probe": "silent-s4-time-offset--501-dynamic-v20-v1.pine",
+      "path": "silent-s4-time-offset--501-dynamic-v20-v1.pine",
+      "sourceSha256": "96c023344234935fa35ff27eabe2eab3e2a1ac4007440d2423ad52170615b4ad",
+      "owner": "codex-9tqhik",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "csv+data-window+first-diagnostic+screenshot",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "auditFamily": "S4",
+      "rowIds": [
+        "S4"
+      ],
+      "question": "Dynamic time(\"1\",bars_back=offset), offset0 before bar3, then-501. Capture exact first runtime refusal or raw time/NA results after transition. Positive5001 has available prior timestamps by its first target bar5002; future-501 starts at3.",
+      "minimumHistory": 6000,
+      "columns": [
+        "CHART_INDEX",
+        "CHART_TIME_MS",
+        "REQUESTED_BARS_BACK",
+        "TIME_RESULT_MS",
+        "RESULT_NA",
+        "RESULT_MINUS_CHART_MS"
+      ],
+      "instructions": "instructions/silent-s4-time-offset--501-dynamic-v20-v1.md",
+      "provenance": "/home/sam/cs/docs/tealscript-parity-archive/ledger/silent-truncation-audit-vmp8l6-v1/REPORT-v1.md",
+      "provenanceSha256": "44bb4feec53af2c3a1e0fa9c19ec178eee6b9602d7b2588961f75e7ad05fa953",
+      "limitations": "Positive5001 cannot be settled from a short warmup-only capture. Require plotted CHART_INDEX>=5002; no general-series history rule is assumed for this function.",
+      "instructionSha256": "0eec7a99da2afdf7f483c60115d3c53a9ebf4b1ac6b59ee2dc8a71474f2faad0",
+      "authorPreflightReceipt": "/home/sam/cs/docs/tealscript-parity-archive/probe-bundle-v20-j-v1/LOCAL-PREFLIGHT-v2.json",
+      "authorPreflightReceiptSha256": "247e7e469eaba57d63a60f0079c33dbb0c8fa417506d3c3f02282054546266b9",
+      "localPreflight": {
+        "head": "1328d1c788ffbec44348fa2039457112f76d6a96",
+        "phase": "COMPILED",
+        "diagnostics": [],
+        "nativeAuthority": false
+      }
+    }
+  ],
+  "scriptCount": 36,
+  "auditFamilies": [
+    "P1",
+    "P2",
+    "P3",
+    "S1",
+    "S2",
+    "S3",
+    "S4",
+    "S5",
+    "S6",
+    "S7"
+  ],
+  "responsePath": "v20/captures/v20/RESPONSE-v20.md",
+  "reuseReferences": [],
+  "auditReport": "/home/sam/cs/docs/tealscript-parity-archive/ledger/silent-truncation-audit-vmp8l6-v1/REPORT-v1.md",
+  "auditReportSha256": "44bb4feec53af2c3a1e0fa9c19ec178eee6b9602d7b2588961f75e7ad05fa953",
+  "preflight": {
+    "scripts": 36,
+    "compiled": 33,
+    "deliberateLiteralRefusals": 3,
+    "receipt": "/home/sam/cs/docs/tealscript-parity-archive/probe-bundle-v20-j-v1/LOCAL-PREFLIGHT-v2.json",
+    "receiptSha256": "247e7e469eaba57d63a60f0079c33dbb0c8fa417506d3c3f02282054546266b9",
+    "head": "1328d1c788ffbec44348fa2039457112f76d6a96",
+    "productionEdited": false,
+    "nativeAuthority": false
+  }
+}

@@ -1,0 +1,30 @@
+//@version=6
+indicator("silent-p1-eigen-real-convergence-stress-v20-v1", precision=16)
+int n = input.int(16, "Matrix dimension", minval=2, maxval=32)
+float scale = input.float(1.0, "Matrix scale")
+var matrix<float> m = matrix.new<float>(n, n, 0.0)
+if barstate.isfirst
+    for i = 0 to n - 1
+        matrix.set(m, i, i, scale * (math.abs(2 * i - n + 1) + 1.0))
+        if i < n - 1
+            matrix.set(m, i, i + 1, scale)
+            matrix.set(m, i + 1, i, scale)
+array<float> eigen = matrix.eigenvalues(m)
+int missing = 0
+float total = 0.0
+for i = 0 to array.size(eigen) - 1
+    float value = array.get(eigen, i)
+    if na(value)
+        missing += 1
+    total += value
+plot(bar_index, title="CHART_INDEX", display=display.data_window)
+plot(time, title="CHART_TIME_MS", display=display.data_window)
+plot(n, title="MATRIX_DIMENSION", display=display.data_window)
+plot(scale, title="MATRIX_SCALE", display=display.data_window)
+plot(array.size(eigen), title="EIGEN_COUNT", display=display.data_window)
+plot(missing, title="EIGEN_NA_COUNT", display=display.data_window)
+plot(total, title="EIGEN_SUM")
+plot(array.get(eigen, 0), title="FIRST_EIGEN")
+plot(array.get(eigen, n - 1), title="LAST_EIGEN")
+if barstate.islastconfirmedhistory
+    log.info("EIGEN_VALUES={0}", str.tostring(eigen))

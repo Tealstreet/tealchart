@@ -1,0 +1,15 @@
+//@version=6
+indicator("silent-s1-line-new-width-151-v20-v1", precision=16)
+var int completed = 0
+if barstate.islastconfirmedhistory
+    line id = line.new(bar_index - 8, 4.0, bar_index, 4.0, width=151, color=color.red)
+    line.new(bar_index - 8, 2.0, bar_index, 2.0, width=1, color=color.blue)
+    line.new(bar_index - 8, 0.0, bar_index, 0.0, width=100, color=color.green)
+    completed := 1
+plot(bar_index, title="CHART_INDEX", display=display.data_window)
+plot(time, title="CHART_TIME_MS", display=display.data_window)
+plot(151, title="REQUESTED_WIDTH", display=display.data_window)
+plot(completed, title="CALL_COMPLETED", display=display.data_window)
+plot(array.size(line.all), title="OBJECT_COUNT", display=display.data_window)
+plot(6.0, title="PANE_TOP", color=color.new(color.gray, 100))
+plot(-1.0, title="PANE_BOTTOM", color=color.new(color.gray, 100))

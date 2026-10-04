@@ -1,0 +1,11 @@
+//@version=6
+indicator("silent-s5-pivothigh-strengths-0-0-v20-v1", precision=16)
+float source = 100.0 + bar_index % 7
+float result = ta.pivothigh(source, 0, 0)
+plot(bar_index, title="CHART_INDEX", display=display.data_window)
+plot(time, title="CHART_TIME_MS", display=display.data_window)
+plot(source, title="SOURCE")
+plot(0, title="LEFT_STRENGTH", display=display.data_window)
+plot(0, title="RIGHT_STRENGTH", display=display.data_window)
+plot(result, title="PIVOT_HIGH")
+plot(na(result) ? 1 : 0, title="RESULT_NA", display=display.data_window)

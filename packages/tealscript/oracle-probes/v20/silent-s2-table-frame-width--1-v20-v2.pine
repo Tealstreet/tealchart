@@ -1,0 +1,24 @@
+//@version=6
+indicator("silent-s2-table-frame-width--1-v20-v2", precision=16)
+var table id = table.new(position.top_right, 2, 2, frame_width=-1, border_color=color.red, frame_color=color.blue)
+var table reference1 = table.new(position.top_left, 2, 2, frame_width=1, border_color=color.red, frame_color=color.blue)
+var table reference100 = table.new(position.bottom_left, 2, 2, frame_width=100, border_color=color.red, frame_color=color.blue)
+var int completed = 0
+if barstate.islastconfirmedhistory
+    table.cell(id, 0, 0, "A: frame_width -1", bgcolor=color.yellow)
+    table.cell(id, 1, 0, "B")
+    table.cell(id, 0, 1, "C")
+    table.cell(id, 1, 1, "D")
+    table.cell(reference1, 0, 0, "REFERENCE WIDTH 1")
+    table.cell(reference1, 1, 0, "B")
+    table.cell(reference1, 0, 1, "C")
+    table.cell(reference1, 1, 1, "D")
+    table.cell(reference100, 0, 0, "REFERENCE WIDTH 100")
+    table.cell(reference100, 1, 0, "B")
+    table.cell(reference100, 0, 1, "C")
+    table.cell(reference100, 1, 1, "D")
+    completed := 1
+plot(bar_index, title="CHART_INDEX", display=display.data_window)
+plot(time, title="CHART_TIME_MS", display=display.data_window)
+plot(-1, title="REQUESTED_WIDTH", display=display.data_window)
+plot(completed, title="CALL_COMPLETED", display=display.data_window)

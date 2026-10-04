@@ -1,0 +1,12 @@
+//@version=6
+indicator("silent-s3-max-lines-501-v20-v1", precision=16, max_lines_count=501)
+var int completed = 0
+if barstate.islastconfirmedhistory
+    for i = 0 to 500
+        line.new(bar_index - 1, float(i), bar_index, float(i))
+    completed := 1
+plot(bar_index, title="CHART_INDEX", display=display.data_window)
+plot(time, title="CHART_TIME_MS", display=display.data_window)
+plot(501, title="DECLARED_MAX_LINES", display=display.data_window)
+plot(completed, title="CALL_COMPLETED", display=display.data_window)
+plot(array.size(line.all), title="LINE_ALL_SIZE", display=display.data_window)
