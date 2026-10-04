@@ -1,4 +1,0 @@
-//@version=5
-indicator("Full-width comment prefix")
-    　　// Comment after full-width spaces
-plot(1)

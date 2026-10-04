@@ -18542,5 +18542,2785 @@
       "MFI_SOURCE_HOLE": "92.74186856592397"
     },
     "data_window_witness": "captures/v7/evidence/ta-vwap-mfi-source-holes-v6-v1-attempt2-data-window-v1.json"
+  },
+  {
+    "script": "implicit-sar-actual-chart-gaps-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "4bd8ce8ace1a6ae36c05daab44596f270deb3db1000d522c630229a799467883",
+    "indicator_title": "V7 implicit-sar-actual-chart-gaps-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/implicit-sar-actual-chart-gaps-v6-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T141253.582.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 implicit-sar-actual-chart-gaps-v6-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24367,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24667,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T06:12:45.226Z",
+    "live_candle_open_utc": "2026-10-04T06:12:00.000Z",
+    "export_utc": "2026-10-04T06:12:54.053Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/implicit-sar-actual-chart-gaps-v6-v1-attempt1-setup.png",
+      "captures/v7/evidence/implicit-sar-actual-chart-gaps-v6-v1-attempt1-export.png",
+      "captures/v7/evidence/implicit-sar-actual-chart-gaps-v6-v1-attempt1-logs.txt",
+      "captures/v7/evidence/implicit-sar-actual-chart-gaps-v6-v1-attempt1-logs-v1.json",
+      "captures/v7/evidence/implicit-sar-actual-chart-gaps-v6-v1-attempt1-logs.png",
+      "captures/v7/evidence/implicit-sar-actual-chart-gaps-v6-v1-attempt1-visual.png",
+      "captures/v7/evidence/implicit-sar-actual-chart-gaps-v6-v1-attempt1-data-window-v1.png",
+      "captures/v7/evidence/implicit-sar-actual-chart-gaps-v6-v1-attempt1-data-window-v1.json",
+      "captures/v7/evidence/implicit-sar-actual-chart-gaps-v6-v1-attempt1-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T06:12:46.186Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790789160,
+            84090.01,
+            84128.01,
+            84016,
+            84128.01,
+            25.25505
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791094320,
+            84922.49,
+            84922.49,
+            84922.48,
+            84922.49,
+            2.11765
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 implicit-sar-actual-chart-gaps-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790789160,
+                84090.01,
+                84128.01,
+                84016,
+                84128.01,
+                25.25505,
+                0,
+                0,
+                84346.17484473181
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791094320,
+                84922.49,
+                84922.49,
+                84922.48,
+                84922.49,
+                2.11765,
+                0,
+                0,
+                84908.43
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T06:12:47.224Z",
+        "bars": 24667,
+        "end": true,
+        "first": {
+          "index": -24367,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791094320,
+            84922.49,
+            84922.49,
+            84922.48,
+            84922.48,
+            2.11802
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 implicit-sar-actual-chart-gaps-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24667,
+            "first": {
+              "index": -24367,
+              "value": [
+                1788134400,
+                77682,
+                77682.01,
+                77572,
+                77674.04,
+                51.86295,
+                0,
+                0,
+                null
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791094320,
+                84922.49,
+                84922.49,
+                84922.48,
+                84922.48,
+                2.11802,
+                0,
+                0,
+                84908.43
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   06:12",
+    "historical_compare_before_unix_seconds": 1791094320,
+    "pine_logs": {
+      "paths": [
+        "evidence/implicit-sar-actual-chart-gaps-v6-v1-attempt1-logs.txt",
+        "evidence/implicit-sar-actual-chart-gaps-v6-v1-attempt1-logs-v1.json",
+        "evidence/implicit-sar-actual-chart-gaps-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "47f669d3dccd6bf06fd30795257bf7ec662d465dadcfc5066ac8e2b0ed428823",
+    "csv_bytes": 2601146,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "ACTUAL_OPEN",
+      "ACTUAL_HIGH",
+      "ACTUAL_LOW",
+      "ACTUAL_CLOSE",
+      "ACTUAL_VOLUME",
+      "OHLC_MISSING",
+      "VOLUME_MISSING",
+      "TARGET"
+    ],
+    "declared_to_native_header_mapping": {
+      "ACTUAL_OPEN": "ACTUAL_OPEN",
+      "ACTUAL_HIGH": "ACTUAL_HIGH",
+      "ACTUAL_LOW": "ACTUAL_LOW",
+      "ACTUAL_CLOSE": "ACTUAL_CLOSE",
+      "ACTUAL_VOLUME": "ACTUAL_VOLUME",
+      "OHLC_MISSING": "OHLC_MISSING",
+      "VOLUME_MISSING": "VOLUME_MISSING",
+      "TARGET": "TARGET"
+    },
+    "csv_rows": 24667,
+    "historical_rows": 24666,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791094320,
+    "first_historical_values": {
+      "ACTUAL_OPEN": "77682",
+      "ACTUAL_HIGH": "77682.01",
+      "ACTUAL_LOW": "77572",
+      "ACTUAL_CLOSE": "77674.04",
+      "ACTUAL_VOLUME": "51.86295",
+      "OHLC_MISSING": "0",
+      "VOLUME_MISSING": "0",
+      "TARGET": ""
+    },
+    "last_historical_values": {
+      "ACTUAL_OPEN": "84922.48",
+      "ACTUAL_HIGH": "84922.49",
+      "ACTUAL_LOW": "84922.48",
+      "ACTUAL_CLOSE": "84922.48",
+      "ACTUAL_VOLUME": "2.55244",
+      "OHLC_MISSING": "0",
+      "VOLUME_MISSING": "0",
+      "TARGET": "84922.6920623319"
+    },
+    "data_window_witness": "captures/v7/evidence/implicit-sar-actual-chart-gaps-v6-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "script": "implicit-pivot-levels-actual-chart-gaps-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "d673ed320cc07bd9957774987ba8c2b4cc3ee8d9a75527054e0d307a034274fd",
+    "indicator_title": "V7 implicit-pivot-levels-actual-chart-gaps-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/implicit-pivot-levels-actual-chart-gaps-v6-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T141327.792.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 implicit-pivot-levels-actual-chart-gaps-v6-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24367,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24667,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T06:13:19.663Z",
+    "live_candle_open_utc": "2026-10-04T06:12:00.000Z",
+    "export_utc": "2026-10-04T06:13:28.294Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/implicit-pivot-levels-actual-chart-gaps-v6-v1-attempt1-setup.png",
+      "captures/v7/evidence/implicit-pivot-levels-actual-chart-gaps-v6-v1-attempt1-export.png",
+      "captures/v7/evidence/implicit-pivot-levels-actual-chart-gaps-v6-v1-attempt1-logs.txt",
+      "captures/v7/evidence/implicit-pivot-levels-actual-chart-gaps-v6-v1-attempt1-logs-v1.json",
+      "captures/v7/evidence/implicit-pivot-levels-actual-chart-gaps-v6-v1-attempt1-logs.png",
+      "captures/v7/evidence/implicit-pivot-levels-actual-chart-gaps-v6-v1-attempt1-visual.png",
+      "captures/v7/evidence/implicit-pivot-levels-actual-chart-gaps-v6-v1-attempt1-data-window-v1.png",
+      "captures/v7/evidence/implicit-pivot-levels-actual-chart-gaps-v6-v1-attempt1-data-window-v1.json",
+      "captures/v7/evidence/implicit-pivot-levels-actual-chart-gaps-v6-v1-attempt1-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T06:13:20.626Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790789160,
+            84090.01,
+            84128.01,
+            84016,
+            84128.01,
+            25.25505
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791094320,
+            84922.49,
+            84922.49,
+            84922.48,
+            84922.49,
+            4.44448
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 implicit-pivot-levels-actual-chart-gaps-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790789160,
+                84090.01,
+                84128.01,
+                84016,
+                84128.01,
+                25.25505,
+                0,
+                0,
+                84341.78666666667
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791094320,
+                84922.49,
+                84922.49,
+                84922.48,
+                84922.49,
+                4.44448,
+                0,
+                0,
+                84889.08333333333
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T06:13:22.340Z",
+        "bars": 24667,
+        "end": true,
+        "first": {
+          "index": -24367,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791094320,
+            84922.49,
+            84922.49,
+            84922.48,
+            84922.49,
+            4.45288
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 implicit-pivot-levels-actual-chart-gaps-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24667,
+            "first": {
+              "index": -24367,
+              "value": [
+                1788134400,
+                77682,
+                77682.01,
+                77572,
+                77674.04,
+                51.86295,
+                0,
+                0,
+                null
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791094320,
+                84922.49,
+                84922.49,
+                84922.48,
+                84922.49,
+                4.45288,
+                0,
+                0,
+                84889.08333333333
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   06:12",
+    "historical_compare_before_unix_seconds": 1791094320,
+    "pine_logs": {
+      "paths": [
+        "evidence/implicit-pivot-levels-actual-chart-gaps-v6-v1-attempt1-logs.txt",
+        "evidence/implicit-pivot-levels-actual-chart-gaps-v6-v1-attempt1-logs-v1.json",
+        "evidence/implicit-pivot-levels-actual-chart-gaps-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "2f5f8ee265715a39d4313eaae2a162fc4363b66eb5a481261eaf4709c9b530aa",
+    "csv_bytes": 2609007,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "ACTUAL_OPEN",
+      "ACTUAL_HIGH",
+      "ACTUAL_LOW",
+      "ACTUAL_CLOSE",
+      "ACTUAL_VOLUME",
+      "OHLC_MISSING",
+      "VOLUME_MISSING",
+      "TARGET"
+    ],
+    "declared_to_native_header_mapping": {
+      "ACTUAL_OPEN": "ACTUAL_OPEN",
+      "ACTUAL_HIGH": "ACTUAL_HIGH",
+      "ACTUAL_LOW": "ACTUAL_LOW",
+      "ACTUAL_CLOSE": "ACTUAL_CLOSE",
+      "ACTUAL_VOLUME": "ACTUAL_VOLUME",
+      "OHLC_MISSING": "OHLC_MISSING",
+      "VOLUME_MISSING": "VOLUME_MISSING",
+      "TARGET": "TARGET"
+    },
+    "csv_rows": 24667,
+    "historical_rows": 24666,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791094320,
+    "first_historical_values": {
+      "ACTUAL_OPEN": "77682",
+      "ACTUAL_HIGH": "77682.01",
+      "ACTUAL_LOW": "77572",
+      "ACTUAL_CLOSE": "77674.04",
+      "ACTUAL_VOLUME": "51.86295",
+      "OHLC_MISSING": "0",
+      "VOLUME_MISSING": "0",
+      "TARGET": ""
+    },
+    "last_historical_values": {
+      "ACTUAL_OPEN": "84922.48",
+      "ACTUAL_HIGH": "84922.49",
+      "ACTUAL_LOW": "84922.48",
+      "ACTUAL_CLOSE": "84922.48",
+      "ACTUAL_VOLUME": "2.55244",
+      "OHLC_MISSING": "0",
+      "VOLUME_MISSING": "0",
+      "TARGET": "84889.08333333333"
+    },
+    "data_window_witness": "captures/v7/evidence/implicit-pivot-levels-actual-chart-gaps-v6-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "script": "implicit-obv-pvt-wad-actual-chart-gaps-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "31b68029b8d4d6bd74f34afacb7822593b43bda7fd28af88f90e8ec6e1cedca5",
+    "indicator_title": "V7 implicit-obv-pvt-wad-actual-chart-gaps-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/implicit-obv-pvt-wad-actual-chart-gaps-v6-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T141357.872.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 implicit-obv-pvt-wad-actual-chart-gaps-v6-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24367,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24667,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T06:13:51.088Z",
+    "live_candle_open_utc": "2026-10-04T06:12:00.000Z",
+    "export_utc": "2026-10-04T06:13:58.080Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/implicit-obv-pvt-wad-actual-chart-gaps-v6-v1-attempt1-setup.png",
+      "captures/v7/evidence/implicit-obv-pvt-wad-actual-chart-gaps-v6-v1-attempt1-export.png",
+      "captures/v7/evidence/implicit-obv-pvt-wad-actual-chart-gaps-v6-v1-attempt1-logs.txt",
+      "captures/v7/evidence/implicit-obv-pvt-wad-actual-chart-gaps-v6-v1-attempt1-logs-v1.json",
+      "captures/v7/evidence/implicit-obv-pvt-wad-actual-chart-gaps-v6-v1-attempt1-logs.png",
+      "captures/v7/evidence/implicit-obv-pvt-wad-actual-chart-gaps-v6-v1-attempt1-visual.png",
+      "captures/v7/evidence/implicit-obv-pvt-wad-actual-chart-gaps-v6-v1-attempt1-data-window-v1.png",
+      "captures/v7/evidence/implicit-obv-pvt-wad-actual-chart-gaps-v6-v1-attempt1-data-window-v1.json",
+      "captures/v7/evidence/implicit-obv-pvt-wad-actual-chart-gaps-v6-v1-attempt1-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T06:13:52.131Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790789160,
+            84090.01,
+            84128.01,
+            84016,
+            84128.01,
+            25.25505
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791094320,
+            84922.49,
+            84922.49,
+            84922.48,
+            84922.49,
+            5.14166
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 implicit-obv-pvt-wad-actual-chart-gaps-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790789160,
+                84090.01,
+                84128.01,
+                84016,
+                84128.01,
+                25.25505,
+                0,
+                0,
+                1485.4387299999812,
+                -0.8993719169551725,
+                9355.64999999787
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791094320,
+                84922.49,
+                84922.49,
+                84922.48,
+                84922.49,
+                5.14166,
+                0,
+                0,
+                3235.6236999999724,
+                1.0203180363582554,
+                10304.2599999979
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T06:13:53.194Z",
+        "bars": 24667,
+        "end": true,
+        "first": {
+          "index": -24367,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791094320,
+            84922.49,
+            84922.49,
+            84922.48,
+            84922.49,
+            5.14699
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 implicit-obv-pvt-wad-actual-chart-gaps-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24667,
+            "first": {
+              "index": -24367,
+              "value": [
+                1788134400,
+                77682,
+                77682.01,
+                77572,
+                77674.04,
+                51.86295,
+                0,
+                0,
+                null,
+                null,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791094320,
+                84922.49,
+                84922.49,
+                84922.48,
+                84922.49,
+                5.14699,
+                0,
+                0,
+                3235.6290299999728,
+                1.0203180369858864,
+                10304.2599999979
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   06:12",
+    "historical_compare_before_unix_seconds": 1791094320,
+    "pine_logs": {
+      "paths": [
+        "evidence/implicit-obv-pvt-wad-actual-chart-gaps-v6-v1-attempt1-logs.txt",
+        "evidence/implicit-obv-pvt-wad-actual-chart-gaps-v6-v1-attempt1-logs-v1.json",
+        "evidence/implicit-obv-pvt-wad-actual-chart-gaps-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "48ee8451075ed18884a0473e55fc7ac7f39b97949a6465fd5794335957daadae",
+    "csv_bytes": 3621472,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "ACTUAL_OPEN",
+      "ACTUAL_HIGH",
+      "ACTUAL_LOW",
+      "ACTUAL_CLOSE",
+      "ACTUAL_VOLUME",
+      "OHLC_MISSING",
+      "VOLUME_MISSING",
+      "OBV",
+      "PVT",
+      "WAD"
+    ],
+    "declared_to_native_header_mapping": {
+      "ACTUAL_OPEN": "ACTUAL_OPEN",
+      "ACTUAL_HIGH": "ACTUAL_HIGH",
+      "ACTUAL_LOW": "ACTUAL_LOW",
+      "ACTUAL_CLOSE": "ACTUAL_CLOSE",
+      "ACTUAL_VOLUME": "ACTUAL_VOLUME",
+      "OHLC_MISSING": "OHLC_MISSING",
+      "VOLUME_MISSING": "VOLUME_MISSING",
+      "OBV": "OBV",
+      "PVT": "PVT",
+      "WAD": "WAD"
+    },
+    "csv_rows": 24667,
+    "historical_rows": 24666,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791094320,
+    "first_historical_values": {
+      "ACTUAL_OPEN": "77682",
+      "ACTUAL_HIGH": "77682.01",
+      "ACTUAL_LOW": "77572",
+      "ACTUAL_CLOSE": "77674.04",
+      "ACTUAL_VOLUME": "51.86295",
+      "OHLC_MISSING": "0",
+      "VOLUME_MISSING": "0",
+      "OBV": "",
+      "PVT": "",
+      "WAD": "0"
+    },
+    "last_historical_values": {
+      "ACTUAL_OPEN": "84922.48",
+      "ACTUAL_HIGH": "84922.49",
+      "ACTUAL_LOW": "84922.48",
+      "ACTUAL_CLOSE": "84922.48",
+      "ACTUAL_VOLUME": "2.55244",
+      "OHLC_MISSING": "0",
+      "VOLUME_MISSING": "0",
+      "OBV": "3230.4820399999726",
+      "PVT": "1.0203174309049048",
+      "WAD": "10304.24999999789"
+    },
+    "data_window_witness": "captures/v7/evidence/implicit-obv-pvt-wad-actual-chart-gaps-v6-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "script": "implicit-vwap-variable-actual-chart-gaps-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "89959c4765ae32af544116a4c241beca14188924a7a570f2b07edcf01c26f855",
+    "indicator_title": "V7 implicit-vwap-variable-actual-chart-gaps-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/implicit-vwap-variable-actual-chart-gaps-v6-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T141426.178.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 implicit-vwap-variable-actual-chart-gaps-v6-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24368,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24668,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T06:14:18.015Z",
+    "live_candle_open_utc": "2026-10-04T06:14:00.000Z",
+    "export_utc": "2026-10-04T06:14:26.478Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/implicit-vwap-variable-actual-chart-gaps-v6-v1-attempt1-setup.png",
+      "captures/v7/evidence/implicit-vwap-variable-actual-chart-gaps-v6-v1-attempt1-export.png",
+      "captures/v7/evidence/implicit-vwap-variable-actual-chart-gaps-v6-v1-attempt1-logs.txt",
+      "captures/v7/evidence/implicit-vwap-variable-actual-chart-gaps-v6-v1-attempt1-logs-v1.json",
+      "captures/v7/evidence/implicit-vwap-variable-actual-chart-gaps-v6-v1-attempt1-logs.png",
+      "captures/v7/evidence/implicit-vwap-variable-actual-chart-gaps-v6-v1-attempt1-visual.png",
+      "captures/v7/evidence/implicit-vwap-variable-actual-chart-gaps-v6-v1-attempt1-data-window-v1.png",
+      "captures/v7/evidence/implicit-vwap-variable-actual-chart-gaps-v6-v1-attempt1-data-window-v1.json",
+      "captures/v7/evidence/implicit-vwap-variable-actual-chart-gaps-v6-v1-attempt1-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T06:14:18.872Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790789280,
+            84128.01,
+            84217.37,
+            84114,
+            84217.37,
+            16.62896
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791094440,
+            84922.48,
+            84922.49,
+            84916,
+            84916.01,
+            3.24261
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 implicit-vwap-variable-actual-chart-gaps-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790789280,
+                84128.01,
+                84217.37,
+                84114,
+                84217.37,
+                16.62896,
+                0,
+                0,
+                84146.07685322371
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791094440,
+                84922.48,
+                84922.49,
+                84916,
+                84916.01,
+                3.24261,
+                0,
+                0,
+                84820.8298604216
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T06:14:19.848Z",
+        "bars": 24668,
+        "end": true,
+        "first": {
+          "index": -24368,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791094440,
+            84922.48,
+            84922.49,
+            84916,
+            84916.01,
+            3.24735
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 implicit-vwap-variable-actual-chart-gaps-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24668,
+            "first": {
+              "index": -24368,
+              "value": [
+                1788134400,
+                77682,
+                77682.01,
+                77572,
+                77674.04,
+                51.86295,
+                0,
+                0,
+                77642.68333333333
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791094440,
+                84922.48,
+                84922.49,
+                84916,
+                84916.01,
+                3.24735,
+                0,
+                0,
+                84820.8301871997
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   06:14",
+    "historical_compare_before_unix_seconds": 1791094440,
+    "pine_logs": {
+      "paths": [
+        "evidence/implicit-vwap-variable-actual-chart-gaps-v6-v1-attempt1-logs.txt",
+        "evidence/implicit-vwap-variable-actual-chart-gaps-v6-v1-attempt1-logs-v1.json",
+        "evidence/implicit-vwap-variable-actual-chart-gaps-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "6ba519d3e0bc49c0d728cab2ec01e4c7b35b65642b0113c64d128f55dac4538b",
+    "csv_bytes": 2660591,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "ACTUAL_OPEN",
+      "ACTUAL_HIGH",
+      "ACTUAL_LOW",
+      "ACTUAL_CLOSE",
+      "ACTUAL_VOLUME",
+      "OHLC_MISSING",
+      "VOLUME_MISSING",
+      "VWAP"
+    ],
+    "declared_to_native_header_mapping": {
+      "ACTUAL_OPEN": "ACTUAL_OPEN",
+      "ACTUAL_HIGH": "ACTUAL_HIGH",
+      "ACTUAL_LOW": "ACTUAL_LOW",
+      "ACTUAL_CLOSE": "ACTUAL_CLOSE",
+      "ACTUAL_VOLUME": "ACTUAL_VOLUME",
+      "OHLC_MISSING": "OHLC_MISSING",
+      "VOLUME_MISSING": "VOLUME_MISSING",
+      "VWAP": "VWAP"
+    },
+    "csv_rows": 24668,
+    "historical_rows": 24667,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791094440,
+    "first_historical_values": {
+      "ACTUAL_OPEN": "77682",
+      "ACTUAL_HIGH": "77682.01",
+      "ACTUAL_LOW": "77572",
+      "ACTUAL_CLOSE": "77674.04",
+      "ACTUAL_VOLUME": "51.86295",
+      "OHLC_MISSING": "0",
+      "VOLUME_MISSING": "0",
+      "VWAP": "77642.68333333333"
+    },
+    "last_historical_values": {
+      "ACTUAL_OPEN": "84922.49",
+      "ACTUAL_HIGH": "84922.49",
+      "ACTUAL_LOW": "84922.48",
+      "ACTUAL_CLOSE": "84922.48",
+      "ACTUAL_VOLUME": "5.16366",
+      "OHLC_MISSING": "0",
+      "VOLUME_MISSING": "0",
+      "VWAP": "84820.60579782845"
+    },
+    "data_window_witness": "captures/v7/evidence/implicit-vwap-variable-actual-chart-gaps-v6-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "script": "implicit-dmi-actual-chart-gaps-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "e1a7606814e3323d606918c05df2d5e3786bcf36e94e4d5140bc20b0c13e4466",
+    "indicator_title": "V7 implicit-dmi-actual-chart-gaps-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/implicit-dmi-actual-chart-gaps-v6-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T141512.125.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 implicit-dmi-actual-chart-gaps-v6-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24368,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24668,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T06:15:03.819Z",
+    "live_candle_open_utc": "2026-10-04T06:14:00.000Z",
+    "export_utc": "2026-10-04T06:15:12.313Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/implicit-dmi-actual-chart-gaps-v6-v1-attempt1-setup.png",
+      "captures/v7/evidence/implicit-dmi-actual-chart-gaps-v6-v1-attempt1-export.png",
+      "captures/v7/evidence/implicit-dmi-actual-chart-gaps-v6-v1-attempt1-logs.txt",
+      "captures/v7/evidence/implicit-dmi-actual-chart-gaps-v6-v1-attempt1-logs-v1.json",
+      "captures/v7/evidence/implicit-dmi-actual-chart-gaps-v6-v1-attempt1-logs.png",
+      "captures/v7/evidence/implicit-dmi-actual-chart-gaps-v6-v1-attempt1-visual.png",
+      "captures/v7/evidence/implicit-dmi-actual-chart-gaps-v6-v1-attempt1-data-window-v1.png",
+      "captures/v7/evidence/implicit-dmi-actual-chart-gaps-v6-v1-attempt1-data-window-v1.json",
+      "captures/v7/evidence/implicit-dmi-actual-chart-gaps-v6-v1-attempt1-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T06:15:04.862Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790789280,
+            84128.01,
+            84217.37,
+            84114,
+            84217.37,
+            16.62896
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791094440,
+            84922.48,
+            84922.6,
+            84916,
+            84922.6,
+            14.87477
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 implicit-dmi-actual-chart-gaps-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790789280,
+                84128.01,
+                84217.37,
+                84114,
+                84217.37,
+                16.62896,
+                0,
+                0,
+                30.89309247601788,
+                29.128674143280964,
+                32.52454130643991
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791094440,
+                84922.48,
+                84922.6,
+                84916,
+                84922.6,
+                14.87477,
+                0,
+                0,
+                27.938064322957615,
+                56.04932027211774,
+                74.37427104967922
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T06:15:06.276Z",
+        "bars": 24668,
+        "end": true,
+        "first": {
+          "index": -24368,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791094440,
+            84922.48,
+            84922.6,
+            84916,
+            84922.59,
+            14.9168
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 implicit-dmi-actual-chart-gaps-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24668,
+            "first": {
+              "index": -24368,
+              "value": [
+                1788134400,
+                77682,
+                77682.01,
+                77572,
+                77674.04,
+                51.86295,
+                0,
+                0,
+                null,
+                null,
+                null
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791094440,
+                84922.48,
+                84922.6,
+                84916,
+                84922.59,
+                14.9168,
+                0,
+                0,
+                27.938064322957615,
+                56.04932027211774,
+                74.37427104967922
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   06:14",
+    "historical_compare_before_unix_seconds": 1791094440,
+    "pine_logs": {
+      "paths": [
+        "evidence/implicit-dmi-actual-chart-gaps-v6-v1-attempt1-logs.txt",
+        "evidence/implicit-dmi-actual-chart-gaps-v6-v1-attempt1-logs-v1.json",
+        "evidence/implicit-dmi-actual-chart-gaps-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "31b1e766de508a625938606cbede5a8650031688051acba20cbff89e6324df10",
+    "csv_bytes": 3578033,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "ACTUAL_OPEN",
+      "ACTUAL_HIGH",
+      "ACTUAL_LOW",
+      "ACTUAL_CLOSE",
+      "ACTUAL_VOLUME",
+      "OHLC_MISSING",
+      "VOLUME_MISSING",
+      "PLUS",
+      "MINUS",
+      "ADX"
+    ],
+    "declared_to_native_header_mapping": {
+      "ACTUAL_OPEN": "ACTUAL_OPEN",
+      "ACTUAL_HIGH": "ACTUAL_HIGH",
+      "ACTUAL_LOW": "ACTUAL_LOW",
+      "ACTUAL_CLOSE": "ACTUAL_CLOSE",
+      "ACTUAL_VOLUME": "ACTUAL_VOLUME",
+      "OHLC_MISSING": "OHLC_MISSING",
+      "VOLUME_MISSING": "VOLUME_MISSING",
+      "PLUS": "PLUS",
+      "MINUS": "MINUS",
+      "ADX": "ADX"
+    },
+    "csv_rows": 24668,
+    "historical_rows": 24667,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791094440,
+    "first_historical_values": {
+      "ACTUAL_OPEN": "77682",
+      "ACTUAL_HIGH": "77682.01",
+      "ACTUAL_LOW": "77572",
+      "ACTUAL_CLOSE": "77674.04",
+      "ACTUAL_VOLUME": "51.86295",
+      "OHLC_MISSING": "0",
+      "VOLUME_MISSING": "0",
+      "PLUS": "",
+      "MINUS": "",
+      "ADX": ""
+    },
+    "last_historical_values": {
+      "ACTUAL_OPEN": "84922.49",
+      "ACTUAL_HIGH": "84922.49",
+      "ACTUAL_LOW": "84922.48",
+      "ACTUAL_CLOSE": "84922.48",
+      "ACTUAL_VOLUME": "5.16366",
+      "OHLC_MISSING": "0",
+      "VOLUME_MISSING": "0",
+      "PLUS": "63.088973390597474",
+      "MINUS": "3.039362757122276",
+      "ADX": "88.00875884914497"
+    },
+    "data_window_witness": "captures/v7/evidence/implicit-dmi-actual-chart-gaps-v6-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "script": "implicit-mfi-actual-chart-gaps-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "544a113923e36749e13a92afae56e17adcd9b04a571dd324c3143f3d21ed2c69",
+    "indicator_title": "V7 implicit-mfi-actual-chart-gaps-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/implicit-mfi-actual-chart-gaps-v6-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T141546.404.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 implicit-mfi-actual-chart-gaps-v6-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24368,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24668,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T06:15:38.520Z",
+    "live_candle_open_utc": "2026-10-04T06:14:00.000Z",
+    "export_utc": "2026-10-04T06:15:46.795Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/implicit-mfi-actual-chart-gaps-v6-v1-attempt1-setup.png",
+      "captures/v7/evidence/implicit-mfi-actual-chart-gaps-v6-v1-attempt1-export.png",
+      "captures/v7/evidence/implicit-mfi-actual-chart-gaps-v6-v1-attempt1-logs.txt",
+      "captures/v7/evidence/implicit-mfi-actual-chart-gaps-v6-v1-attempt1-logs-v1.json",
+      "captures/v7/evidence/implicit-mfi-actual-chart-gaps-v6-v1-attempt1-logs.png",
+      "captures/v7/evidence/implicit-mfi-actual-chart-gaps-v6-v1-attempt1-visual.png",
+      "captures/v7/evidence/implicit-mfi-actual-chart-gaps-v6-v1-attempt1-data-window-v1.png",
+      "captures/v7/evidence/implicit-mfi-actual-chart-gaps-v6-v1-attempt1-data-window-v1.json",
+      "captures/v7/evidence/implicit-mfi-actual-chart-gaps-v6-v1-attempt1-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T06:15:39.333Z",
+        "bars": 2556,
+        "end": false,
+        "first": {
+          "index": -2256,
+          "value": [
+            1790787840,
+            84334.01,
+            84353.9,
+            84283.57,
+            84316.46,
+            26.47668
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791094440,
+            84922.48,
+            84922.6,
+            84916,
+            84922.6,
+            15.32869
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 implicit-mfi-actual-chart-gaps-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2556,
+            "first": {
+              "index": -2256,
+              "value": [
+                1790787840,
+                84334.01,
+                84353.9,
+                84283.57,
+                84316.46,
+                26.47668,
+                0,
+                0,
+                24.846961625873774
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791094440,
+                84922.48,
+                84922.6,
+                84916,
+                84922.6,
+                15.328690000000002,
+                0,
+                0,
+                0
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T06:15:40.400Z",
+        "bars": 24668,
+        "end": true,
+        "first": {
+          "index": -24368,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791094440,
+            84922.48,
+            84922.6,
+            84916,
+            84922.59,
+            15.37497
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 implicit-mfi-actual-chart-gaps-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24668,
+            "first": {
+              "index": -24368,
+              "value": [
+                1788134400,
+                77682,
+                77682.01,
+                77572,
+                77674.04,
+                51.86295,
+                0,
+                0,
+                null
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791094440,
+                84922.48,
+                84922.6,
+                84916,
+                84922.59,
+                15.37497,
+                0,
+                0,
+                0
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   06:14",
+    "historical_compare_before_unix_seconds": 1791094440,
+    "pine_logs": {
+      "paths": [
+        "evidence/implicit-mfi-actual-chart-gaps-v6-v1-attempt1-logs.txt",
+        "evidence/implicit-mfi-actual-chart-gaps-v6-v1-attempt1-logs-v1.json",
+        "evidence/implicit-mfi-actual-chart-gaps-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "aac9d7c5fde8cfda0f07e62fb261d9527cbdfe116c42d05bb04eb52242fc631e",
+    "csv_bytes": 2641092,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "ACTUAL_OPEN",
+      "ACTUAL_HIGH",
+      "ACTUAL_LOW",
+      "ACTUAL_CLOSE",
+      "ACTUAL_VOLUME",
+      "OHLC_MISSING",
+      "VOLUME_MISSING",
+      "MFI"
+    ],
+    "declared_to_native_header_mapping": {
+      "ACTUAL_OPEN": "ACTUAL_OPEN",
+      "ACTUAL_HIGH": "ACTUAL_HIGH",
+      "ACTUAL_LOW": "ACTUAL_LOW",
+      "ACTUAL_CLOSE": "ACTUAL_CLOSE",
+      "ACTUAL_VOLUME": "ACTUAL_VOLUME",
+      "OHLC_MISSING": "OHLC_MISSING",
+      "VOLUME_MISSING": "VOLUME_MISSING",
+      "MFI": "MFI"
+    },
+    "csv_rows": 24668,
+    "historical_rows": 24667,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791094440,
+    "first_historical_values": {
+      "ACTUAL_OPEN": "77682",
+      "ACTUAL_HIGH": "77682.01",
+      "ACTUAL_LOW": "77572",
+      "ACTUAL_CLOSE": "77674.04",
+      "ACTUAL_VOLUME": "51.86295",
+      "OHLC_MISSING": "0",
+      "VOLUME_MISSING": "0",
+      "MFI": ""
+    },
+    "last_historical_values": {
+      "ACTUAL_OPEN": "84922.49",
+      "ACTUAL_HIGH": "84922.49",
+      "ACTUAL_LOW": "84922.48",
+      "ACTUAL_CLOSE": "84922.48",
+      "ACTUAL_VOLUME": "5.16366",
+      "OHLC_MISSING": "0",
+      "VOLUME_MISSING": "0",
+      "MFI": "100.00000000000016"
+    },
+    "data_window_witness": "captures/v7/evidence/implicit-mfi-actual-chart-gaps-v6-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "script": "implicit-sar-actual-chart-gaps-v6-v1.pine",
+    "attempt": 2,
+    "source_sha256": "4bd8ce8ace1a6ae36c05daab44596f270deb3db1000d522c630229a799467883",
+    "indicator_title": "V7 implicit-sar-actual-chart-gaps-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/implicit-sar-actual-chart-gaps-v6-v1-attempt2.csv",
+    "original_download_filename": "TVC_DXY, 2 (1).csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "TVC:DXY",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.001,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 implicit-sar-actual-chart-gaps-v6-v1",
+      "dataset_start_utc": "2026-08-23T22:00:00.000Z",
+      "first_chart_bar": {
+        "index": -19815,
+        "value": [
+          1787522400,
+          98.856,
+          98.887,
+          98.846,
+          98.882
+        ]
+      },
+      "chart_bars": 20115,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "America/New_York",
+      "exchange_session": "1900-1900:3456|1700F-1900:2",
+      "currency": "USD",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T06:16:38.404Z",
+    "live_candle_open_utc": "2026-10-02T20:58:00.000Z",
+    "export_utc": "2026-10-04T06:16:46.483Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/implicit-sar-actual-chart-gaps-v6-v1-attempt2-setup.png",
+      "captures/v7/evidence/implicit-sar-actual-chart-gaps-v6-v1-attempt2-export.png",
+      "captures/v7/evidence/implicit-sar-actual-chart-gaps-v6-v1-attempt2-logs.txt",
+      "captures/v7/evidence/implicit-sar-actual-chart-gaps-v6-v1-attempt2-logs-v1.json",
+      "captures/v7/evidence/implicit-sar-actual-chart-gaps-v6-v1-attempt2-logs.png",
+      "captures/v7/evidence/implicit-sar-actual-chart-gaps-v6-v1-attempt2-visual.png",
+      "captures/v7/evidence/implicit-sar-actual-chart-gaps-v6-v1-attempt2-data-window-v1.png",
+      "captures/v7/evidence/implicit-sar-actual-chart-gaps-v6-v1-attempt2-data-window-v1.json",
+      "captures/v7/evidence/implicit-sar-actual-chart-gaps-v6-v1-attempt2-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T06:16:39.280Z",
+        "bars": 2556,
+        "end": false,
+        "first": {
+          "index": -2256,
+          "value": [
+            1790650800,
+            101.211,
+            101.214,
+            101.207,
+            101.209
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1790974680,
+            101.939,
+            101.942,
+            101.923,
+            101.923
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 implicit-sar-actual-chart-gaps-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2556,
+            "first": {
+              "index": -2256,
+              "value": [
+                1790650800,
+                101.211,
+                101.214,
+                101.207,
+                101.209,
+                null,
+                0,
+                1,
+                101.18441591808
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1790974680,
+                101.939,
+                101.942,
+                101.923,
+                101.923,
+                null,
+                0,
+                1,
+                101.92265471514894
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Fri 02 Oct '26   20:58",
+    "historical_compare_before_unix_seconds": 1790974680,
+    "pine_logs": {
+      "paths": [
+        "evidence/implicit-sar-actual-chart-gaps-v6-v1-attempt2-logs.txt",
+        "evidence/implicit-sar-actual-chart-gaps-v6-v1-attempt2-logs-v1.json",
+        "evidence/implicit-sar-actual-chart-gaps-v6-v1-attempt2-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "8bed66f5a6619376c6b08a7ffb95f00fe984ebfb43b0d494212cb763e54ddc04",
+    "csv_bytes": 1794435,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "ACTUAL_OPEN",
+      "ACTUAL_HIGH",
+      "ACTUAL_LOW",
+      "ACTUAL_CLOSE",
+      "ACTUAL_VOLUME",
+      "OHLC_MISSING",
+      "VOLUME_MISSING",
+      "TARGET"
+    ],
+    "declared_to_native_header_mapping": {
+      "ACTUAL_OPEN": "ACTUAL_OPEN",
+      "ACTUAL_HIGH": "ACTUAL_HIGH",
+      "ACTUAL_LOW": "ACTUAL_LOW",
+      "ACTUAL_CLOSE": "ACTUAL_CLOSE",
+      "ACTUAL_VOLUME": "ACTUAL_VOLUME",
+      "OHLC_MISSING": "OHLC_MISSING",
+      "VOLUME_MISSING": "VOLUME_MISSING",
+      "TARGET": "TARGET"
+    },
+    "csv_rows": 20115,
+    "historical_rows": 20114,
+    "first_csv_timestamp_seconds": 1787522400,
+    "last_csv_timestamp_seconds": 1790974680,
+    "first_historical_values": {
+      "ACTUAL_OPEN": "98.856",
+      "ACTUAL_HIGH": "98.887",
+      "ACTUAL_LOW": "98.846",
+      "ACTUAL_CLOSE": "98.882",
+      "ACTUAL_VOLUME": "",
+      "OHLC_MISSING": "0",
+      "VOLUME_MISSING": "1",
+      "TARGET": ""
+    },
+    "last_historical_values": {
+      "ACTUAL_OPEN": "101.944",
+      "ACTUAL_HIGH": "101.945",
+      "ACTUAL_LOW": "101.936",
+      "ACTUAL_CLOSE": "101.938",
+      "ACTUAL_VOLUME": "",
+      "OHLC_MISSING": "0",
+      "VOLUME_MISSING": "1",
+      "TARGET": "101.91919853994197"
+    },
+    "data_window_witness": "captures/v7/evidence/implicit-sar-actual-chart-gaps-v6-v1-attempt2-data-window-v1.json"
+  },
+  {
+    "script": "implicit-pivot-levels-actual-chart-gaps-v6-v1.pine",
+    "attempt": 2,
+    "source_sha256": "d673ed320cc07bd9957774987ba8c2b4cc3ee8d9a75527054e0d307a034274fd",
+    "indicator_title": "V7 implicit-pivot-levels-actual-chart-gaps-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/implicit-pivot-levels-actual-chart-gaps-v6-v1-attempt2.csv",
+    "original_download_filename": "TVC_DXY, 2 (2).csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "TVC:DXY",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.001,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 implicit-pivot-levels-actual-chart-gaps-v6-v1",
+      "dataset_start_utc": "2026-08-23T22:00:00.000Z",
+      "first_chart_bar": {
+        "index": -19815,
+        "value": [
+          1787522400,
+          98.856,
+          98.887,
+          98.846,
+          98.882
+        ]
+      },
+      "chart_bars": 20115,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "America/New_York",
+      "exchange_session": "1900-1900:3456|1700F-1900:2",
+      "currency": "USD",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T06:17:10.932Z",
+    "live_candle_open_utc": "2026-10-02T20:58:00.000Z",
+    "export_utc": "2026-10-04T06:17:18.672Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/implicit-pivot-levels-actual-chart-gaps-v6-v1-attempt2-setup.png",
+      "captures/v7/evidence/implicit-pivot-levels-actual-chart-gaps-v6-v1-attempt2-export.png",
+      "captures/v7/evidence/implicit-pivot-levels-actual-chart-gaps-v6-v1-attempt2-logs.txt",
+      "captures/v7/evidence/implicit-pivot-levels-actual-chart-gaps-v6-v1-attempt2-logs-v1.json",
+      "captures/v7/evidence/implicit-pivot-levels-actual-chart-gaps-v6-v1-attempt2-logs.png",
+      "captures/v7/evidence/implicit-pivot-levels-actual-chart-gaps-v6-v1-attempt2-visual.png",
+      "captures/v7/evidence/implicit-pivot-levels-actual-chart-gaps-v6-v1-attempt2-data-window-v1.png",
+      "captures/v7/evidence/implicit-pivot-levels-actual-chart-gaps-v6-v1-attempt2-data-window-v1.json",
+      "captures/v7/evidence/implicit-pivot-levels-actual-chart-gaps-v6-v1-attempt2-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T06:17:12.261Z",
+        "bars": 2540,
+        "end": false,
+        "first": {
+          "index": -2240,
+          "value": [
+            1790652720,
+            101.228,
+            101.238,
+            101.228,
+            101.236
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1790974680,
+            101.939,
+            101.942,
+            101.923,
+            101.923
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 implicit-pivot-levels-actual-chart-gaps-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2540,
+            "first": {
+              "index": -2240,
+              "value": [
+                1790652720,
+                101.228,
+                101.238,
+                101.228,
+                101.236,
+                null,
+                0,
+                1,
+                101.209
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1790974680,
+                101.939,
+                101.942,
+                101.923,
+                101.923,
+                null,
+                0,
+                1,
+                101.928
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Fri 02 Oct '26   20:58",
+    "historical_compare_before_unix_seconds": 1790974680,
+    "pine_logs": {
+      "paths": [
+        "evidence/implicit-pivot-levels-actual-chart-gaps-v6-v1-attempt2-logs.txt",
+        "evidence/implicit-pivot-levels-actual-chart-gaps-v6-v1-attempt2-logs-v1.json",
+        "evidence/implicit-pivot-levels-actual-chart-gaps-v6-v1-attempt2-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "c7244eff01381460fdd46e38a155140faa8d409a18e9b6ab743f0538d3318b12",
+    "csv_bytes": 1819125,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "ACTUAL_OPEN",
+      "ACTUAL_HIGH",
+      "ACTUAL_LOW",
+      "ACTUAL_CLOSE",
+      "ACTUAL_VOLUME",
+      "OHLC_MISSING",
+      "VOLUME_MISSING",
+      "TARGET"
+    ],
+    "declared_to_native_header_mapping": {
+      "ACTUAL_OPEN": "ACTUAL_OPEN",
+      "ACTUAL_HIGH": "ACTUAL_HIGH",
+      "ACTUAL_LOW": "ACTUAL_LOW",
+      "ACTUAL_CLOSE": "ACTUAL_CLOSE",
+      "ACTUAL_VOLUME": "ACTUAL_VOLUME",
+      "OHLC_MISSING": "OHLC_MISSING",
+      "VOLUME_MISSING": "VOLUME_MISSING",
+      "TARGET": "TARGET"
+    },
+    "csv_rows": 20115,
+    "historical_rows": 20114,
+    "first_csv_timestamp_seconds": 1787522400,
+    "last_csv_timestamp_seconds": 1790974680,
+    "first_historical_values": {
+      "ACTUAL_OPEN": "98.856",
+      "ACTUAL_HIGH": "98.887",
+      "ACTUAL_LOW": "98.846",
+      "ACTUAL_CLOSE": "98.882",
+      "ACTUAL_VOLUME": "",
+      "OHLC_MISSING": "0",
+      "VOLUME_MISSING": "1",
+      "TARGET": ""
+    },
+    "last_historical_values": {
+      "ACTUAL_OPEN": "101.944",
+      "ACTUAL_HIGH": "101.945",
+      "ACTUAL_LOW": "101.936",
+      "ACTUAL_CLOSE": "101.938",
+      "ACTUAL_VOLUME": "",
+      "OHLC_MISSING": "0",
+      "VOLUME_MISSING": "1",
+      "TARGET": "101.928"
+    },
+    "data_window_witness": "captures/v7/evidence/implicit-pivot-levels-actual-chart-gaps-v6-v1-attempt2-data-window-v1.json"
+  },
+  {
+    "script": "implicit-obv-pvt-wad-actual-chart-gaps-v6-v1.pine",
+    "attempt": 2,
+    "source_sha256": "31b68029b8d4d6bd74f34afacb7822593b43bda7fd28af88f90e8ec6e1cedca5",
+    "indicator_title": "V7 implicit-obv-pvt-wad-actual-chart-gaps-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/implicit-obv-pvt-wad-actual-chart-gaps-v6-v1-attempt2.csv",
+    "original_download_filename": "TVC_DXY, 2 (3).csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "TVC:DXY",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.001,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 implicit-obv-pvt-wad-actual-chart-gaps-v6-v1",
+      "dataset_start_utc": "2026-08-23T22:00:00.000Z",
+      "first_chart_bar": {
+        "index": -19815,
+        "value": [
+          1787522400,
+          98.856,
+          98.887,
+          98.846,
+          98.882
+        ]
+      },
+      "chart_bars": 20115,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "America/New_York",
+      "exchange_session": "1900-1900:3456|1700F-1900:2",
+      "currency": "USD",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T06:17:43.034Z",
+    "live_candle_open_utc": "2026-10-02T20:58:00.000Z",
+    "export_utc": "2026-10-04T06:17:50.725Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/implicit-obv-pvt-wad-actual-chart-gaps-v6-v1-attempt2-setup.png",
+      "captures/v7/evidence/implicit-obv-pvt-wad-actual-chart-gaps-v6-v1-attempt2-export.png",
+      "captures/v7/evidence/implicit-obv-pvt-wad-actual-chart-gaps-v6-v1-attempt2-logs.txt",
+      "captures/v7/evidence/implicit-obv-pvt-wad-actual-chart-gaps-v6-v1-attempt2-logs-v1.json",
+      "captures/v7/evidence/implicit-obv-pvt-wad-actual-chart-gaps-v6-v1-attempt2-logs.png",
+      "captures/v7/evidence/implicit-obv-pvt-wad-actual-chart-gaps-v6-v1-attempt2-visual.png",
+      "captures/v7/evidence/implicit-obv-pvt-wad-actual-chart-gaps-v6-v1-attempt2-data-window-v1.png",
+      "captures/v7/evidence/implicit-obv-pvt-wad-actual-chart-gaps-v6-v1-attempt2-data-window-v1.json",
+      "captures/v7/evidence/implicit-obv-pvt-wad-actual-chart-gaps-v6-v1-attempt2-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T06:17:44.082Z",
+        "bars": 2556,
+        "end": false,
+        "first": {
+          "index": -2256,
+          "value": [
+            1790650800,
+            101.211,
+            101.214,
+            101.207,
+            101.209
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1790974680,
+            101.939,
+            101.942,
+            101.923,
+            101.923
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 implicit-obv-pvt-wad-actual-chart-gaps-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2556,
+            "first": {
+              "index": -2256,
+              "value": [
+                1790650800,
+                101.211,
+                101.214,
+                101.207,
+                101.209,
+                null,
+                0,
+                1,
+                null,
+                null,
+                -3.1179999999991566
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1790974680,
+                101.939,
+                101.942,
+                101.923,
+                101.923,
+                null,
+                0,
+                1,
+                null,
+                null,
+                -2.6489999999991483
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Fri 02 Oct '26   20:58",
+    "historical_compare_before_unix_seconds": 1790974680,
+    "pine_logs": {
+      "paths": [
+        "evidence/implicit-obv-pvt-wad-actual-chart-gaps-v6-v1-attempt2-logs.txt",
+        "evidence/implicit-obv-pvt-wad-actual-chart-gaps-v6-v1-attempt2-logs-v1.json",
+        "evidence/implicit-obv-pvt-wad-actual-chart-gaps-v6-v1-attempt2-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "dd73c5b26e133f5addb7f53c11b85bde273eee158636830e9cc4df179cf3ed7f",
+    "csv_bytes": 1931186,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "ACTUAL_OPEN",
+      "ACTUAL_HIGH",
+      "ACTUAL_LOW",
+      "ACTUAL_CLOSE",
+      "ACTUAL_VOLUME",
+      "OHLC_MISSING",
+      "VOLUME_MISSING",
+      "OBV",
+      "PVT",
+      "WAD"
+    ],
+    "declared_to_native_header_mapping": {
+      "ACTUAL_OPEN": "ACTUAL_OPEN",
+      "ACTUAL_HIGH": "ACTUAL_HIGH",
+      "ACTUAL_LOW": "ACTUAL_LOW",
+      "ACTUAL_CLOSE": "ACTUAL_CLOSE",
+      "ACTUAL_VOLUME": "ACTUAL_VOLUME",
+      "OHLC_MISSING": "OHLC_MISSING",
+      "VOLUME_MISSING": "VOLUME_MISSING",
+      "OBV": "OBV",
+      "PVT": "PVT",
+      "WAD": "WAD"
+    },
+    "csv_rows": 20115,
+    "historical_rows": 20114,
+    "first_csv_timestamp_seconds": 1787522400,
+    "last_csv_timestamp_seconds": 1790974680,
+    "first_historical_values": {
+      "ACTUAL_OPEN": "98.856",
+      "ACTUAL_HIGH": "98.887",
+      "ACTUAL_LOW": "98.846",
+      "ACTUAL_CLOSE": "98.882",
+      "ACTUAL_VOLUME": "",
+      "OHLC_MISSING": "0",
+      "VOLUME_MISSING": "1",
+      "OBV": "",
+      "PVT": "",
+      "WAD": "0"
+    },
+    "last_historical_values": {
+      "ACTUAL_OPEN": "101.944",
+      "ACTUAL_HIGH": "101.945",
+      "ACTUAL_LOW": "101.936",
+      "ACTUAL_CLOSE": "101.938",
+      "ACTUAL_VOLUME": "",
+      "OHLC_MISSING": "0",
+      "VOLUME_MISSING": "1",
+      "OBV": "",
+      "PVT": "",
+      "WAD": "-2.629999999999157"
+    },
+    "data_window_witness": "captures/v7/evidence/implicit-obv-pvt-wad-actual-chart-gaps-v6-v1-attempt2-data-window-v1.json"
+  },
+  {
+    "script": "implicit-vwap-variable-actual-chart-gaps-v6-v1.pine",
+    "attempt": 2,
+    "source_sha256": "89959c4765ae32af544116a4c241beca14188924a7a570f2b07edcf01c26f855",
+    "indicator_title": "V7 implicit-vwap-variable-actual-chart-gaps-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/implicit-vwap-variable-actual-chart-gaps-v6-v1-attempt2.csv",
+    "original_download_filename": "TVC_DXY, 2 (4).csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "TVC:DXY",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.001,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 implicit-vwap-variable-actual-chart-gaps-v6-v1",
+      "dataset_start_utc": "2026-08-23T22:00:00.000Z",
+      "first_chart_bar": {
+        "index": -19815,
+        "value": [
+          1787522400,
+          98.856,
+          98.887,
+          98.846,
+          98.882
+        ]
+      },
+      "chart_bars": 20115,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "America/New_York",
+      "exchange_session": "1900-1900:3456|1700F-1900:2",
+      "currency": "USD",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T06:18:28.112Z",
+    "live_candle_open_utc": "2026-10-02T20:58:00.000Z",
+    "export_utc": "2026-10-04T06:18:35.621Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/implicit-vwap-variable-actual-chart-gaps-v6-v1-attempt2-setup.png",
+      "captures/v7/evidence/implicit-vwap-variable-actual-chart-gaps-v6-v1-attempt2-export.png",
+      "captures/v7/evidence/implicit-vwap-variable-actual-chart-gaps-v6-v1-attempt2-logs.txt",
+      "captures/v7/evidence/implicit-vwap-variable-actual-chart-gaps-v6-v1-attempt2-logs-v1.json",
+      "captures/v7/evidence/implicit-vwap-variable-actual-chart-gaps-v6-v1-attempt2-logs.png",
+      "captures/v7/evidence/implicit-vwap-variable-actual-chart-gaps-v6-v1-attempt2-visual.png",
+      "captures/v7/evidence/implicit-vwap-variable-actual-chart-gaps-v6-v1-attempt2-data-window-v1.png",
+      "captures/v7/evidence/implicit-vwap-variable-actual-chart-gaps-v6-v1-attempt2-data-window-v1.json",
+      "captures/v7/evidence/implicit-vwap-variable-actual-chart-gaps-v6-v1-attempt2-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T06:18:29.209Z",
+        "bars": 2556,
+        "end": false,
+        "first": {
+          "index": -2256,
+          "value": [
+            1790650800,
+            101.211,
+            101.214,
+            101.207,
+            101.209
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1790974680,
+            101.939,
+            101.942,
+            101.923,
+            101.923
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 implicit-vwap-variable-actual-chart-gaps-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2556,
+            "first": {
+              "index": -2256,
+              "value": [
+                1790650800,
+                101.211,
+                101.214,
+                101.207,
+                101.209,
+                null,
+                0,
+                1,
+                null
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1790974680,
+                101.939,
+                101.942,
+                101.923,
+                101.923,
+                null,
+                0,
+                1,
+                null
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Fri 02 Oct '26   20:58",
+    "historical_compare_before_unix_seconds": 1790974680,
+    "pine_logs": {
+      "paths": [
+        "evidence/implicit-vwap-variable-actual-chart-gaps-v6-v1-attempt2-logs.txt",
+        "evidence/implicit-vwap-variable-actual-chart-gaps-v6-v1-attempt2-logs-v1.json",
+        "evidence/implicit-vwap-variable-actual-chart-gaps-v6-v1-attempt2-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "b82990aae8f617a8fa7cb6f9d432d04eb9e23f0572f9362f4897c4daeae22f8a",
+    "csv_bytes": 1514238,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "ACTUAL_OPEN",
+      "ACTUAL_HIGH",
+      "ACTUAL_LOW",
+      "ACTUAL_CLOSE",
+      "ACTUAL_VOLUME",
+      "OHLC_MISSING",
+      "VOLUME_MISSING",
+      "VWAP"
+    ],
+    "declared_to_native_header_mapping": {
+      "ACTUAL_OPEN": "ACTUAL_OPEN",
+      "ACTUAL_HIGH": "ACTUAL_HIGH",
+      "ACTUAL_LOW": "ACTUAL_LOW",
+      "ACTUAL_CLOSE": "ACTUAL_CLOSE",
+      "ACTUAL_VOLUME": "ACTUAL_VOLUME",
+      "OHLC_MISSING": "OHLC_MISSING",
+      "VOLUME_MISSING": "VOLUME_MISSING",
+      "VWAP": "VWAP"
+    },
+    "csv_rows": 20115,
+    "historical_rows": 20114,
+    "first_csv_timestamp_seconds": 1787522400,
+    "last_csv_timestamp_seconds": 1790974680,
+    "first_historical_values": {
+      "ACTUAL_OPEN": "98.856",
+      "ACTUAL_HIGH": "98.887",
+      "ACTUAL_LOW": "98.846",
+      "ACTUAL_CLOSE": "98.882",
+      "ACTUAL_VOLUME": "",
+      "OHLC_MISSING": "0",
+      "VOLUME_MISSING": "1",
+      "VWAP": ""
+    },
+    "last_historical_values": {
+      "ACTUAL_OPEN": "101.944",
+      "ACTUAL_HIGH": "101.945",
+      "ACTUAL_LOW": "101.936",
+      "ACTUAL_CLOSE": "101.938",
+      "ACTUAL_VOLUME": "",
+      "OHLC_MISSING": "0",
+      "VOLUME_MISSING": "1",
+      "VWAP": ""
+    },
+    "data_window_witness": "captures/v7/evidence/implicit-vwap-variable-actual-chart-gaps-v6-v1-attempt2-data-window-v1.json"
+  },
+  {
+    "script": "implicit-dmi-actual-chart-gaps-v6-v1.pine",
+    "attempt": 2,
+    "source_sha256": "e1a7606814e3323d606918c05df2d5e3786bcf36e94e4d5140bc20b0c13e4466",
+    "indicator_title": "V7 implicit-dmi-actual-chart-gaps-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/implicit-dmi-actual-chart-gaps-v6-v1-attempt2.csv",
+    "original_download_filename": "TVC_DXY, 2 (5).csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "TVC:DXY",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.001,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 implicit-dmi-actual-chart-gaps-v6-v1",
+      "dataset_start_utc": "2026-08-23T22:00:00.000Z",
+      "first_chart_bar": {
+        "index": -19815,
+        "value": [
+          1787522400,
+          98.856,
+          98.887,
+          98.846,
+          98.882
+        ]
+      },
+      "chart_bars": 20115,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "America/New_York",
+      "exchange_session": "1900-1900:3456|1700F-1900:2",
+      "currency": "USD",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T06:19:00.663Z",
+    "live_candle_open_utc": "2026-10-02T20:58:00.000Z",
+    "export_utc": "2026-10-04T06:19:08.166Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/implicit-dmi-actual-chart-gaps-v6-v1-attempt2-setup.png",
+      "captures/v7/evidence/implicit-dmi-actual-chart-gaps-v6-v1-attempt2-export.png",
+      "captures/v7/evidence/implicit-dmi-actual-chart-gaps-v6-v1-attempt2-logs.txt",
+      "captures/v7/evidence/implicit-dmi-actual-chart-gaps-v6-v1-attempt2-logs-v1.json",
+      "captures/v7/evidence/implicit-dmi-actual-chart-gaps-v6-v1-attempt2-logs.png",
+      "captures/v7/evidence/implicit-dmi-actual-chart-gaps-v6-v1-attempt2-visual.png",
+      "captures/v7/evidence/implicit-dmi-actual-chart-gaps-v6-v1-attempt2-data-window-v1.png",
+      "captures/v7/evidence/implicit-dmi-actual-chart-gaps-v6-v1-attempt2-data-window-v1.json",
+      "captures/v7/evidence/implicit-dmi-actual-chart-gaps-v6-v1-attempt2-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T06:19:01.676Z",
+        "bars": 2556,
+        "end": false,
+        "first": {
+          "index": -2256,
+          "value": [
+            1790650800,
+            101.211,
+            101.214,
+            101.207,
+            101.209
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1790974680,
+            101.939,
+            101.942,
+            101.923,
+            101.923
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 implicit-dmi-actual-chart-gaps-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2556,
+            "first": {
+              "index": -2256,
+              "value": [
+                1790650800,
+                101.211,
+                101.214,
+                101.207,
+                101.209,
+                null,
+                0,
+                1,
+                16.06513853393395,
+                21.73632414630913,
+                29.735813555798334
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1790974680,
+                101.939,
+                101.942,
+                101.923,
+                101.923,
+                null,
+                0,
+                1,
+                15.428927496434387,
+                38.9445869076167,
+                56.29772023649057
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Fri 02 Oct '26   20:58",
+    "historical_compare_before_unix_seconds": 1790974680,
+    "pine_logs": {
+      "paths": [
+        "evidence/implicit-dmi-actual-chart-gaps-v6-v1-attempt2-logs.txt",
+        "evidence/implicit-dmi-actual-chart-gaps-v6-v1-attempt2-logs-v1.json",
+        "evidence/implicit-dmi-actual-chart-gaps-v6-v1-attempt2-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "69dda3566fdb6ca25633dbd767016eda48a449cd753114f080ca325e18e23475",
+    "csv_bytes": 2603805,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "ACTUAL_OPEN",
+      "ACTUAL_HIGH",
+      "ACTUAL_LOW",
+      "ACTUAL_CLOSE",
+      "ACTUAL_VOLUME",
+      "OHLC_MISSING",
+      "VOLUME_MISSING",
+      "PLUS",
+      "MINUS",
+      "ADX"
+    ],
+    "declared_to_native_header_mapping": {
+      "ACTUAL_OPEN": "ACTUAL_OPEN",
+      "ACTUAL_HIGH": "ACTUAL_HIGH",
+      "ACTUAL_LOW": "ACTUAL_LOW",
+      "ACTUAL_CLOSE": "ACTUAL_CLOSE",
+      "ACTUAL_VOLUME": "ACTUAL_VOLUME",
+      "OHLC_MISSING": "OHLC_MISSING",
+      "VOLUME_MISSING": "VOLUME_MISSING",
+      "PLUS": "PLUS",
+      "MINUS": "MINUS",
+      "ADX": "ADX"
+    },
+    "csv_rows": 20115,
+    "historical_rows": 20114,
+    "first_csv_timestamp_seconds": 1787522400,
+    "last_csv_timestamp_seconds": 1790974680,
+    "first_historical_values": {
+      "ACTUAL_OPEN": "98.856",
+      "ACTUAL_HIGH": "98.887",
+      "ACTUAL_LOW": "98.846",
+      "ACTUAL_CLOSE": "98.882",
+      "ACTUAL_VOLUME": "",
+      "OHLC_MISSING": "0",
+      "VOLUME_MISSING": "1",
+      "PLUS": "",
+      "MINUS": "",
+      "ADX": ""
+    },
+    "last_historical_values": {
+      "ACTUAL_OPEN": "101.944",
+      "ACTUAL_HIGH": "101.945",
+      "ACTUAL_LOW": "101.936",
+      "ACTUAL_CLOSE": "101.938",
+      "ACTUAL_VOLUME": "",
+      "OHLC_MISSING": "0",
+      "VOLUME_MISSING": "1",
+      "PLUS": "27.894313908185943",
+      "MINUS": "15.129870337875257",
+      "ADX": "60.64750320743744"
+    },
+    "data_window_witness": "captures/v7/evidence/implicit-dmi-actual-chart-gaps-v6-v1-attempt2-data-window-v1.json"
+  },
+  {
+    "script": "implicit-mfi-actual-chart-gaps-v6-v1.pine",
+    "attempt": 2,
+    "source_sha256": "544a113923e36749e13a92afae56e17adcd9b04a571dd324c3143f3d21ed2c69",
+    "indicator_title": "V7 implicit-mfi-actual-chart-gaps-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/implicit-mfi-actual-chart-gaps-v6-v1-attempt2.csv",
+    "original_download_filename": "TVC_DXY, 2 (6).csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "TVC:DXY",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.001,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 implicit-mfi-actual-chart-gaps-v6-v1",
+      "dataset_start_utc": "2026-08-23T22:00:00.000Z",
+      "first_chart_bar": {
+        "index": -19815,
+        "value": [
+          1787522400,
+          98.856,
+          98.887,
+          98.846,
+          98.882
+        ]
+      },
+      "chart_bars": 20115,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "America/New_York",
+      "exchange_session": "1900-1900:3456|1700F-1900:2",
+      "currency": "USD",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T06:19:33.283Z",
+    "live_candle_open_utc": "2026-10-02T20:58:00.000Z",
+    "export_utc": "2026-10-04T06:19:40.812Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/implicit-mfi-actual-chart-gaps-v6-v1-attempt2-setup.png",
+      "captures/v7/evidence/implicit-mfi-actual-chart-gaps-v6-v1-attempt2-export.png",
+      "captures/v7/evidence/implicit-mfi-actual-chart-gaps-v6-v1-attempt2-logs.txt",
+      "captures/v7/evidence/implicit-mfi-actual-chart-gaps-v6-v1-attempt2-logs-v1.json",
+      "captures/v7/evidence/implicit-mfi-actual-chart-gaps-v6-v1-attempt2-logs.png",
+      "captures/v7/evidence/implicit-mfi-actual-chart-gaps-v6-v1-attempt2-visual.png",
+      "captures/v7/evidence/implicit-mfi-actual-chart-gaps-v6-v1-attempt2-data-window-v1.png",
+      "captures/v7/evidence/implicit-mfi-actual-chart-gaps-v6-v1-attempt2-data-window-v1.json",
+      "captures/v7/evidence/implicit-mfi-actual-chart-gaps-v6-v1-attempt2-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T06:19:34.093Z",
+        "bars": 2556,
+        "end": false,
+        "first": {
+          "index": -2256,
+          "value": [
+            1790650800,
+            101.211,
+            101.214,
+            101.207,
+            101.209
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1790974680,
+            101.939,
+            101.942,
+            101.923,
+            101.923
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 implicit-mfi-actual-chart-gaps-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2556,
+            "first": {
+              "index": -2256,
+              "value": [
+                1790650800,
+                101.211,
+                101.214,
+                101.207,
+                101.209,
+                null,
+                0,
+                1,
+                null
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1790974680,
+                101.939,
+                101.942,
+                101.923,
+                101.923,
+                null,
+                0,
+                1,
+                null
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Fri 02 Oct '26   20:58",
+    "historical_compare_before_unix_seconds": 1790974680,
+    "pine_logs": {
+      "paths": [
+        "evidence/implicit-mfi-actual-chart-gaps-v6-v1-attempt2-logs.txt",
+        "evidence/implicit-mfi-actual-chart-gaps-v6-v1-attempt2-logs-v1.json",
+        "evidence/implicit-mfi-actual-chart-gaps-v6-v1-attempt2-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "7875dbb61a3bf8b92b5a7fb50af55034d894c4936ad5d3079622849bdf52499c",
+    "csv_bytes": 1514237,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "ACTUAL_OPEN",
+      "ACTUAL_HIGH",
+      "ACTUAL_LOW",
+      "ACTUAL_CLOSE",
+      "ACTUAL_VOLUME",
+      "OHLC_MISSING",
+      "VOLUME_MISSING",
+      "MFI"
+    ],
+    "declared_to_native_header_mapping": {
+      "ACTUAL_OPEN": "ACTUAL_OPEN",
+      "ACTUAL_HIGH": "ACTUAL_HIGH",
+      "ACTUAL_LOW": "ACTUAL_LOW",
+      "ACTUAL_CLOSE": "ACTUAL_CLOSE",
+      "ACTUAL_VOLUME": "ACTUAL_VOLUME",
+      "OHLC_MISSING": "OHLC_MISSING",
+      "VOLUME_MISSING": "VOLUME_MISSING",
+      "MFI": "MFI"
+    },
+    "csv_rows": 20115,
+    "historical_rows": 20114,
+    "first_csv_timestamp_seconds": 1787522400,
+    "last_csv_timestamp_seconds": 1790974680,
+    "first_historical_values": {
+      "ACTUAL_OPEN": "98.856",
+      "ACTUAL_HIGH": "98.887",
+      "ACTUAL_LOW": "98.846",
+      "ACTUAL_CLOSE": "98.882",
+      "ACTUAL_VOLUME": "",
+      "OHLC_MISSING": "0",
+      "VOLUME_MISSING": "1",
+      "MFI": ""
+    },
+    "last_historical_values": {
+      "ACTUAL_OPEN": "101.944",
+      "ACTUAL_HIGH": "101.945",
+      "ACTUAL_LOW": "101.936",
+      "ACTUAL_CLOSE": "101.938",
+      "ACTUAL_VOLUME": "",
+      "OHLC_MISSING": "0",
+      "VOLUME_MISSING": "1",
+      "MFI": ""
+    },
+    "data_window_witness": "captures/v7/evidence/implicit-mfi-actual-chart-gaps-v6-v1-attempt2-data-window-v1.json"
   }
 ]

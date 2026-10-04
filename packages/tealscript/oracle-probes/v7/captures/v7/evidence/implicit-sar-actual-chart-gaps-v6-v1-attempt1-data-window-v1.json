@@ -1,0 +1,36 @@
+{
+  "index": 298,
+  "bar": [
+    1791094200,
+    84922.48,
+    84922.49,
+    84922.48,
+    84922.48,
+    2.55244
+  ],
+  "source_row": [
+    1791094200,
+    84922.48,
+    84922.49,
+    84922.48,
+    84922.48,
+    2.55244,
+    0,
+    0,
+    84922.6920623319
+  ],
+  "browser_utc": "2026-10-04T06:13:00.259Z",
+  "title": "V7 implicit-sar-actual-chart-gaps-v6-v1",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   06:10",
+  "visible_range": {
+    "_firstBar": 263,
+    "_lastBar": 301
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}

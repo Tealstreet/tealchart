@@ -1,3 +1,0 @@
-//@version=6
-indicator("W8 timeframe string-control v1")
-plot(timeframe.from_seconds(1) == "1S" ? 1 : 0, "RESULT")

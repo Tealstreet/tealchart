@@ -1,6 +1,0 @@
-//@version=6
-indicator("Label eviction observation", max_labels_count=3)
-label.new(bar_index, close)
-plot(array.size(label.all), "VISIBLE_COUNT")
-oldest = array.size(label.all) > 0 ? label.get_x(array.get(label.all, 0)) : na
-plot(oldest, "OLDEST_INDEX")

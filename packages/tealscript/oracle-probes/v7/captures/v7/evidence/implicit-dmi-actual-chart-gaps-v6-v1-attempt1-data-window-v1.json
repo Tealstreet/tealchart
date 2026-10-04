@@ -1,0 +1,38 @@
+{
+  "index": 298,
+  "bar": [
+    1791094320,
+    84922.49,
+    84922.49,
+    84922.48,
+    84922.48,
+    5.16366
+  ],
+  "source_row": [
+    1791094320,
+    84922.49,
+    84922.49,
+    84922.48,
+    84922.48,
+    5.16366,
+    0,
+    0,
+    63.088973390597474,
+    3.039362757122276,
+    88.00875884914497
+  ],
+  "browser_utc": "2026-10-04T06:15:18.026Z",
+  "title": "V7 implicit-dmi-actual-chart-gaps-v6-v1",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   06:12",
+  "visible_range": {
+    "_firstBar": 263,
+    "_lastBar": 301
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}
