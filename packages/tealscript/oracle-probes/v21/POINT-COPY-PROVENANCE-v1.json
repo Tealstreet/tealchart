@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "job": 9,
+  "rank": 1926,
+  "authorityAudit": "/home/sam/cs/docs/tealscript-parity-archive/ledger/top20-drawing-w8-v1/job9-v1/AUTHORITY-AUDIT-v1.json",
+  "polylineCoordinateGetterAssumed": false,
+  "controls": [
+    "line.new documented point coordinate copy",
+    "box.new documented point coordinate copy"
+  ],
+  "polylineQuestion": [
+    "post-creation chart.point mutation",
+    "post-creation nontrivial ordinal1/2 exchange"
+  ],
+  "nativeStatus": "UNOBSERVED"
+}

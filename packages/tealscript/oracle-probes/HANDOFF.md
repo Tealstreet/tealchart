@@ -45,6 +45,10 @@
 >
 > **Then round v20.** After v19, do [`v20/HANDOFF-v20.md`](v20/HANDOFF-v20.md) — 36 silent-truncation probes (S1–S7,
 > P1–P3), one at a time; steps in `v20/instructions/`. Reply at `v20/captures/v20/RESPONSE-v20.md`.
+>
+> **Then round v21.** After v20, do [`v21/HANDOFF-v21-v2.md`](v21/HANDOFF-v21-v2.md) — 20 request-context, polyline
+> point-copy and drawing-retention probes plus 3 paired originals; steps in `v21/instructions/`. Reply at
+> `v21/captures/v21/RESPONSE-v21.md`.
 
 Agent exchange: [capture response v1](RESPONSE-v1.md). The next reply belongs in
 `RESPONSE-v2.md` beside this handoff; commit responses so both machines can read them.

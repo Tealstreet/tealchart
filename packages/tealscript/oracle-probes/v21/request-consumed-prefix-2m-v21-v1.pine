@@ -1,0 +1,87 @@
+//@version=6
+indicator("Request consumed 1m arrays on 2m companion v21 v1", precision=16)
+if timeframe.period != "2"
+    runtime.error("Use standard 2-minute candles")
+var int chartOrigin = time
+logStart = input.int(0, "Log first chart Pine index", minval=0)
+logEnd = input.int(255, "Log last chart Pine index", minval=0)
+firstRequestedTime() =>
+    var int origin = time
+    origin
+lowerPack() =>
+    float sma7 = ta.sma(close, 7)
+    int phase29 = int(time / 60000) % 29
+    float utcHole29 = phase29 == 5 or phase29 == 6 ? na : close
+    float warm47 = int(time / 60000) % 47 < 7 ? na : sma7
+    float indexHole97Two = bar_index % 97 == 40 or bar_index % 97 == 41 ? na : close
+    float indexHole97Three = bar_index % 97 == 40 or bar_index % 97 == 41 or bar_index % 97 == 42 ? na : close
+    [float(time), float(time_close), float(bar_index), float(firstRequestedTime()), open, high, low, close, volume, utcHole29, warm47, sma7, indexHole97Two, indexHole97Three]
+edge(array<float> values, bool last) =>
+    array.size(values) > 0 ? array.get(values, last ? array.size(values) - 1 : 0) : na
+finiteCount(array<float> values) =>
+    int count = 0
+    if array.size(values) > 0
+        for i = 0 to array.size(values) - 1
+            if not na(array.get(values, i))
+                count += 1
+    count
+num(float value) =>
+    na(value) ? "null" : str.tostring(value, "0.################")
+[LTF_TIME_MS, LTF_END_MS, LTF_INDEX, LTF_FIRST_EXECUTION_MS, LTF_OPEN, LTF_HIGH, LTF_LOW, LTF_CLOSE, LTF_VOLUME, LTF_HOLE_UTC29, LTF_WARM_UTC47_SMA7, LTF_SMA7_RAW, LTF_HOLE_INDEX97_TWO, LTF_HOLE_INDEX97_THREE] = request.security_lower_tf(syminfo.tickerid, "1", lowerPack())
+int intrabarCount = array.size(LTF_TIME_MS)
+plot(time, "CHART_TIME_MS", display=display.data_window)
+plot(time_close, "CHART_END_MS", display=display.data_window)
+plot(bar_index, "CHART_INDEX", display=display.data_window)
+plot(last_bar_index, "CHART_LAST_INDEX", display=display.data_window)
+plot(chartOrigin, "CHART_FIRST_EXECUTION_MS", display=display.data_window)
+plot(open, "CHART_OPEN", display=display.data_window)
+plot(high, "CHART_HIGH", display=display.data_window)
+plot(low, "CHART_LOW", display=display.data_window)
+plot(close, "CHART_CLOSE", display=display.data_window)
+plot(volume, "CHART_VOLUME", display=display.data_window)
+plot(barstate.isrealtime ? 1 : 0, "CHART_REALTIME", display=display.data_window)
+plot(barstate.isconfirmed ? 1 : 0, "CHART_CONFIRMED", display=display.data_window)
+plot(timenow, "EXECUTION_NOW_MS", display=display.data_window)
+plot(barstate.islastconfirmedhistory ? 1 : 0, "CHART_LAST_CONFIRMED_HISTORY", display=display.data_window)
+plot(intrabarCount, "LTF_COUNT", display=display.data_window)
+plot(intrabarCount <= 2 ? 1 : 0, "LTF_EDGE_EXPORT_COMPLETE", display=display.data_window)
+plot(finiteCount(LTF_CLOSE), "LTF_CLEAN_NON_NA_COUNT", display=display.data_window)
+plot(finiteCount(LTF_HOLE_UTC29), "LTF_HOLE_NON_NA_COUNT", display=display.data_window)
+plot(finiteCount(LTF_WARM_UTC47_SMA7), "LTF_WARM_NON_NA_COUNT", display=display.data_window)
+plot(logStart, "LOG_FIRST_INDEX", display=display.data_window)
+plot(logEnd, "LOG_LAST_INDEX", display=display.data_window)
+plot(edge(LTF_TIME_MS, false), "LTF_FIRST_TIME_MS", display=display.data_window)
+plot(edge(LTF_TIME_MS, true), "LTF_LAST_TIME_MS", display=display.data_window)
+plot(edge(LTF_END_MS, false), "LTF_FIRST_END_MS", display=display.data_window)
+plot(edge(LTF_END_MS, true), "LTF_LAST_END_MS", display=display.data_window)
+plot(edge(LTF_INDEX, false), "LTF_FIRST_INDEX", display=display.data_window)
+plot(edge(LTF_INDEX, true), "LTF_LAST_INDEX", display=display.data_window)
+plot(edge(LTF_FIRST_EXECUTION_MS, false), "LTF_FIRST_FIRST_EXECUTION_MS", display=display.data_window)
+plot(edge(LTF_FIRST_EXECUTION_MS, true), "LTF_LAST_FIRST_EXECUTION_MS", display=display.data_window)
+plot(edge(LTF_OPEN, false), "LTF_FIRST_OPEN", display=display.data_window)
+plot(edge(LTF_OPEN, true), "LTF_LAST_OPEN", display=display.data_window)
+plot(edge(LTF_HIGH, false), "LTF_FIRST_HIGH", display=display.data_window)
+plot(edge(LTF_HIGH, true), "LTF_LAST_HIGH", display=display.data_window)
+plot(edge(LTF_LOW, false), "LTF_FIRST_LOW", display=display.data_window)
+plot(edge(LTF_LOW, true), "LTF_LAST_LOW", display=display.data_window)
+plot(edge(LTF_CLOSE, false), "LTF_FIRST_CLOSE", display=display.data_window)
+plot(edge(LTF_CLOSE, true), "LTF_LAST_CLOSE", display=display.data_window)
+plot(edge(LTF_VOLUME, false), "LTF_FIRST_VOLUME", display=display.data_window)
+plot(edge(LTF_VOLUME, true), "LTF_LAST_VOLUME", display=display.data_window)
+plot(edge(LTF_HOLE_UTC29, false), "LTF_FIRST_HOLE_UTC29", display=display.data_window)
+plot(edge(LTF_HOLE_UTC29, true), "LTF_LAST_HOLE_UTC29", display=display.data_window)
+plot(edge(LTF_WARM_UTC47_SMA7, false), "LTF_FIRST_WARM_UTC47_SMA7", display=display.data_window)
+plot(edge(LTF_WARM_UTC47_SMA7, true), "LTF_LAST_WARM_UTC47_SMA7", display=display.data_window)
+plot(edge(LTF_SMA7_RAW, false), "LTF_FIRST_SMA7_RAW", display=display.data_window)
+plot(edge(LTF_SMA7_RAW, true), "LTF_LAST_SMA7_RAW", display=display.data_window)
+plot(edge(LTF_HOLE_INDEX97_TWO, false), "LTF_FIRST_HOLE_INDEX97_TWO", display=display.data_window)
+plot(edge(LTF_HOLE_INDEX97_TWO, true), "LTF_LAST_HOLE_INDEX97_TWO", display=display.data_window)
+plot(edge(LTF_HOLE_INDEX97_THREE, false), "LTF_FIRST_HOLE_INDEX97_THREE", display=display.data_window)
+plot(edge(LTF_HOLE_INDEX97_THREE, true), "LTF_LAST_HOLE_INDEX97_THREE", display=display.data_window)
+if bar_index >= logStart and bar_index <= logEnd and barstate.isconfirmed
+    log.info("LTF_BAR chartTime=" + str.tostring(time) + " chartIndex=" + str.tostring(bar_index) + " count=" + str.tostring(intrabarCount) + " origin=" + str.tostring(chartOrigin))
+    if intrabarCount > 0
+        for i = 0 to intrabarCount - 1
+            log.info("LTF_ROW chartTime=" + str.tostring(time) + " ordinal=" + str.tostring(i) + " TIME_MS=" + num(array.get(LTF_TIME_MS, i)) + " END_MS=" + num(array.get(LTF_END_MS, i)) + " INDEX=" + num(array.get(LTF_INDEX, i)) + " FIRST_EXECUTION_MS=" + num(array.get(LTF_FIRST_EXECUTION_MS, i)) + " OPEN=" + num(array.get(LTF_OPEN, i)) + " HIGH=" + num(array.get(LTF_HIGH, i)) + " LOW=" + num(array.get(LTF_LOW, i)) + " CLOSE=" + num(array.get(LTF_CLOSE, i)) + " VOLUME=" + num(array.get(LTF_VOLUME, i)) + " HOLE_UTC29=" + num(array.get(LTF_HOLE_UTC29, i)) + " WARM_UTC47_SMA7=" + num(array.get(LTF_WARM_UTC47_SMA7, i)) + " SMA7_RAW=" + num(array.get(LTF_SMA7_RAW, i)) + " HOLE_INDEX97_TWO=" + num(array.get(LTF_HOLE_INDEX97_TWO, i)) + " HOLE_INDEX97_THREE=" + num(array.get(LTF_HOLE_INDEX97_THREE, i)))
+if barstate.islastconfirmedhistory
+    log.info("CONTEXT ticker=" + syminfo.tickerid + " tf=" + timeframe.period + " timezone=" + syminfo.timezone + " session=" + syminfo.session + " currency=" + syminfo.currency + " mintick=" + str.tostring(syminfo.mintick) + " origin=" + str.tostring(chartOrigin) + " now=" + str.tostring(timenow))
