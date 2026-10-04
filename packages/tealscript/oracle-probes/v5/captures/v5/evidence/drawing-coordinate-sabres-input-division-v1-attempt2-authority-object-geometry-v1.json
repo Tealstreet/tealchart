@@ -1,0 +1,269 @@
+{
+  "artifact": "Native authority object geometry v1",
+  "browser_utc": "2026-10-04T17:53:03.368Z",
+  "title": "Sabres point v1",
+  "source_status": {
+    "type": 2
+  },
+  "host_last": {
+    "index": 299,
+    "value": [
+      1791136320,
+      85386.01,
+      85386.01,
+      85372.01,
+      85372.02,
+      1.8776
+    ]
+  },
+  "timezone": "Etc/UTC",
+  "replay": false,
+  "source_last": {
+    "index": 299,
+    "value": [
+      1791136320,
+      85372.02
+    ]
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  },
+  "zoom": {
+    "range": {
+      "_firstBar": 279,
+      "_lastBar": 307
+    },
+    "spacing": 43.275862068965516,
+    "right_offset": 8
+  },
+  "panes": [
+    {
+      "width": 1255,
+      "height": 526.5,
+      "scale_range": {
+        "_minValue": 85317.84,
+        "_maxValue": 85454.01
+      },
+      "scale_mode": {
+        "autoScale": true,
+        "lockScale": false,
+        "percentage": false,
+        "indexedTo100": false,
+        "log": false
+      }
+    },
+    {
+      "width": 1255,
+      "height": 263.5,
+      "scale_range": {
+        "_minValue": 85317.84,
+        "_maxValue": 85438.67
+      },
+      "scale_mode": {
+        "autoScale": true,
+        "lockScale": false,
+        "percentage": false,
+        "indexedTo100": false,
+        "log": false
+      }
+    }
+  ],
+  "labels": [],
+  "lines": [],
+  "boxes": [],
+  "tables": [],
+  "cells": [],
+  "graphic_index_map": [],
+  "chart_properties": {
+    "timezone": "Etc/UTC",
+    "priceScaleSelectionStrategyName": "auto",
+    "inactivityGaps": false,
+    "paneProperties": {
+      "backgroundType": "solid",
+      "vertGridProperties": {
+        "style": 0,
+        "visible": true,
+        "color": "rgba(242, 242, 242, 0.06)"
+      },
+      "horzGridProperties": {
+        "style": 0,
+        "visible": true,
+        "color": "rgba(242, 242, 242, 0.06)"
+      },
+      "crossHairProperties": {
+        "style": 2,
+        "transparency": 0,
+        "width": 1,
+        "color": "#9C9C9C"
+      },
+      "topMargin": 10,
+      "bottomMargin": 8,
+      "axisProperties": {
+        "autoScale": true,
+        "autoScaleDisabled": false,
+        "lockScale": false,
+        "percentage": false,
+        "percentageDisabled": false,
+        "indexedTo100": false,
+        "log": false,
+        "logDisabled": false,
+        "alignLabels": true,
+        "isInverted": false
+      },
+      "legendProperties": {
+        "showStudyArguments": true,
+        "showStudyTitles": true,
+        "showStudyValues": true,
+        "showSeriesTitle": true,
+        "showSeriesOHLC": true,
+        "showLegend": true,
+        "showLastDayChange": false,
+        "showBarChange": true,
+        "showVolume": false,
+        "showBackground": true,
+        "showPriceSource": true,
+        "backgroundTransparency": 50,
+        "showLogo": true,
+        "showTradingButtons": true,
+        "showTradingButtonsMobile": true,
+        "showSeriesLegendCloseOnMobile": true,
+        "barChangeUpColor": "#089981",
+        "barChangeDownColor": "#F23645",
+        "useBarChangeCustomColors": false
+      },
+      "separatorColor": "#2E2E2E",
+      "background": "rgba(15, 15, 15, 1)",
+      "backgroundGradientStartColor": "#1F1F1F",
+      "backgroundGradientEndColor": "#0F0F0F"
+    },
+    "scalesProperties": {
+      "fontSize": 12,
+      "scaleSeriesOnly": false,
+      "showSeriesLastValue": true,
+      "seriesLastValueMode": 1,
+      "showSeriesPrevCloseValue": false,
+      "showStudyLastValue": true,
+      "showSymbolLabels": false,
+      "showStudyPlotLabels": false,
+      "showBidAskLabels": false,
+      "showPrePostMarketPriceLabel": true,
+      "showFundamentalNameLabel": false,
+      "showFundamentalLastValue": true,
+      "barSpacing": 6,
+      "axisHighlightColor": "rgba(41, 98, 255, 0.25)",
+      "axisHoverHighlightColor": "",
+      "axisLineToolLabelBackgroundColorCommon": "#2962FF",
+      "axisLineToolLabelBackgroundColorActive": "#143EB2",
+      "showPriceScaleCrosshairLabel": true,
+      "showTimeScaleCrosshairLabel": true,
+      "crosshairLabelBgColorLight": "#0F0F0F",
+      "crosshairLabelBgColorDark": "#3D3D3D",
+      "saveLeftEdge": false,
+      "textColor": "#B8B8B8",
+      "lineColor": "rgba(242, 242, 242, 0)",
+      "backgroundColor": "#ffffff"
+    },
+    "chartEventsSourceProperties": {
+      "visible": true,
+      "futureOnly": true,
+      "breaks": {
+        "color": "#555555",
+        "visible": false,
+        "style": 2,
+        "width": 1
+      }
+    },
+    "tradingProperties": {
+      "showPositions": true,
+      "positionAndBracketsPL": true,
+      "positionPL": {
+        "visibility": true,
+        "display": 0
+      },
+      "bracketsPL": {
+        "visibility": true,
+        "display": 0
+      },
+      "showOrders": true,
+      "showProjectMarketOrder": true,
+      "showExecutions": true,
+      "showExecutionsLabels": false,
+      "showReverse": true,
+      "extendLeft": true,
+      "lineLength": 5,
+      "horizontalAlignment": 2,
+      "lineWidth": 1,
+      "lineStyle": 0
+    },
+    "volumePaneSize": "large"
+  },
+  "body_font": "",
+  "font_status": "loaded",
+  "limits": "Unchanged exact source admission and rendered object geometry only. Native renderer IDs/indices are not Pine IDs/indices. Materialized coordinates and raw index map retained without substituting documented integer signatures or rounding expectations. Future anchors have no invented UTC when host bar absent.",
+  "environment": {
+    "browser_utc": "2026-10-04T17:53:03.730Z",
+    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+    "platform": "MacIntel",
+    "user_agent_data": {
+      "architecture": "arm",
+      "bitness": "64",
+      "brands": [
+        {
+          "brand": "Not:A-Brand",
+          "version": "8"
+        },
+        {
+          "brand": "Chromium",
+          "version": "156"
+        },
+        {
+          "brand": "Google Chrome",
+          "version": "156"
+        }
+      ],
+      "fullVersionList": [
+        {
+          "brand": "Not:A-Brand",
+          "version": "8.0.0.0"
+        },
+        {
+          "brand": "Chromium",
+          "version": "156.0.8075.0"
+        },
+        {
+          "brand": "Google Chrome",
+          "version": "156.0.8075.0"
+        }
+      ],
+      "mobile": false,
+      "platform": "macOS",
+      "platformVersion": "27.2.0"
+    },
+    "device_pixel_ratio": 2,
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "visual_viewport_scale": 1
+    },
+    "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v5 batch; visualViewport scale recorded independently.",
+    "tradingview_build": null,
+    "tradingview_script_urls": [
+      "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+      "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+      "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+      "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+      "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+      "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+      "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+      "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+      "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+      "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+      "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+      "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+    ],
+    "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+  },
+  "ui_snapshot": "## Latest page snapshot\nuid=9001_0 RootWebArea \"BTCUSDT 85,372.01 ▲ +0.73% basic\" url=\"https://www.tradingview.com/chart/xlvYwHdH/?symbol=BINANCE%3ABTCUSDT&interval=2\"\n  uid=9001_1 button \"Logged in as sours-lat Active layout: basic\" haspopup=\"menu\"\n  uid=9001_2 StaticText \"11\"\n  uid=9001_3 button \"BTCUSDT\" description=\"Symbol search\"\n  uid=9001_4 button \"Switch data type\"\n  uid=9001_5 button \"Compare symbols\" haspopup=\"dialog\"\n  uid=9001_6 radio \"3 minutes\"\n  uid=9001_7 radio \"5 minutes\"\n  uid=9001_8 radio \"15 minutes\"\n  uid=9001_9 radio \"30 minutes\"\n  uid=9001_10 radio \"45 minutes\"\n  uid=9001_11 radio \"1 hour\"\n  uid=9001_12 radio \"2 hours\"\n  uid=9001_13 radio \"3 hours\"\n  uid=9001_14 radio \"4 hours\"\n  uid=9001_15 radio \"8 hours\"\n  uid=9001_16 radio \"10 hours\"\n  uid=9001_17 radio \"12 hours\"\n  uid=9001_18 radio \"1 day\"\n  uid=9001_19 radio \"3 days\"\n  uid=9001_20 radio \"10 days\"\n  uid=9001_21 radio \"1 week\"\n  uid=9001_22 radio \"1 month\"\n  uid=9001_23 radio \"2 minutes\" checked\n  uid=9001_24 button \"Chart interval\" haspopup=\"menu\"\n  uid=9001_25 radio \"Candles\" checked\n  uid=9001_26 radio \"Line\"\n  uid=9001_27 radio \"High-low\"\n  uid=9001_28 button \"Bar's style\" haspopup=\"menu\"\n  uid=9001_29 button \"Indicators, metrics, and strategies\"\n  uid=9001_30 button \"Favorite indicators\" haspopup=\"menu\"\n  uid=9001_31 button \"Indicator templates\" haspopup=\"menu\"\n  uid=9001_32 button \"Create alert\"\n  uid=9001_33 button \"Bar replay\"\n  uid=9001_34 button disableable disabled\n  uid=9001_35 button disableable disabled\n  uid=9001_36 button \"Layout setup\" haspopup=\"menu\"\n  uid=9001_37 button \"All changes saved\" disableable disabled\n  uid=9001_38 button \"Manage layouts\" haspopup=\"menu\"\n  uid=9001_39 button \"Quick search\"\n  uid=9001_40 button \"Settings\"\n  uid=9001_41 button \"Fullscreen mode\"\n  uid=9001_42 button \"Take a snapshot\" haspopup=\"menu\"\n  uid=9001_43 button \"Share your idea with the trade community\" haspopup=\"menu\"\n  uid=9001_44 button \"Trade\"\n  uid=9001_45 button \"Cross\"\n  uid=9001_46 button \"Cursors\" pressed\n  uid=9001_47 button \"Trendline\"\n  uid=9001_48 button \"Trend tools\"\n  uid=9001_49 button \"Fib retracement\"\n  uid=9001_50 button \"Gann and Fibonacci tools\"\n  uid=9001_51 button \"XABCD pattern\"\n  uid=9001_52 button \"Patterns\"\n  uid=9001_53 button \"Long position\"\n  uid=9001_54 button \"Forecasting and measurement tools\"\n  uid=9001_55 button \"Brush\"\n  uid=9001_56 button \"Geometric shapes\"\n  uid=9001_57 button \"Text\"\n  uid=9001_58 button \"Annotation tools\"\n  uid=9001_59 button \"Icon\"\n  uid=9001_60 button \"Icons\"\n  uid=9001_61 button \"Measure\"\n  uid=9001_62 button \"Zoom in\"\n  uid=9001_63 button \"Magnet mode snaps drawings placed near price bars to the closest OHLC value\" pressed\n  uid=9001_64 button \"Magnets\" pressed\n  uid=9001_65 button \"Keep drawing\"\n  uid=9001_66 button \"Lock drawings and indicators\"\n  uid=9001_67 button \"Lock options\"\n  uid=9001_68 button \"Hide all drawings, indicators, positions, and orders\"\n  uid=9001_69 button \"Hide options\"\n  uid=9001_70 button \"New drawings will not be synced\"\n  uid=9001_71 button \"Sync drawings options\"\n  uid=9001_72 button \"Remove objects\"\n  uid=9001_73 button \"Remove options\"\n  uid=9001_74 button \"Show Favorite Drawing Tools Toolbar\"\n  uid=9001_75 region \"Chart #1\"\n    uid=9001_76 StaticText \"B\"\n    uid=9001_77 button \"Change symbol\"\n    uid=9001_78 StaticText \"·\"\n    uid=9001_79 button \"Change interval\"\n    uid=9001_78 StaticText \"·\"\n    uid=9001_80 StaticText \"Binance\"\n    uid=9001_81 button \"Unflag symbol\"\n    uid=9001_82 button \"More\" description=\"More\"\n    uid=9001_83 button \"Market open\"\n    uid=9001_84 StaticText \"O\"\n    uid=9001_85 StaticText \"85,332.66\"\n    uid=9001_86 StaticText \"H\"\n    uid=9001_87 StaticText \"85,332.67\"\n    uid=9001_88 StaticText \"L\"\n    uid=9001_89 StaticText \"85,317.84\"\n    uid=9001_90 StaticText \"C\"\n    uid=9001_91 StaticText \"85,317.85\"\n    uid=9001_92 StaticText \"−14.82 (−0.02%)\"\n    uid=9001_93 StaticText \"85,372.01\"\n    uid=9001_94 StaticText \"SELL\"\n    uid=9001_95 StaticText \"0.01\"\n    uid=9001_96 StaticText \"85,372.02\"\n    uid=9001_97 StaticText \"BUY\"\n    uid=9001_98 Canvas \"Chart for BINANCE:BTCUSDT, 2 minutes\"\n    uid=9001_99 StaticText \"Sabres point v1\"\n    uid=9001_100 StaticText \"50\"\n    uid=9001_101 button \"Hide\" description=\"Hide\"\n    uid=9001_102 button \"Settings\" description=\"Settings\"\n    uid=9001_103 button \"Remove\" description=\"Remove\"\n    uid=9001_104 button \"More\" description=\"More\"\n    uid=9001_105 StaticText \"85,317.85\"\n  uid=9001_106 button \"1 day in 1 minute intervals\"\n  uid=9001_107 button \"5 days in 5 minutes intervals\"\n  uid=9001_108 button \"1 month in 30 minutes intervals\"\n  uid=9001_109 button \"3 months in 1 hour intervals\"\n  uid=9001_110 button \"6 months in 2 hours intervals\"\n  uid=9001_111 button \"Year to day in 1 day intervals\"\n  uid=9001_112 button \"1 year in 1 day intervals\"\n  uid=9001_113 button \"5 years in 1 week intervals\"\n  uid=9001_114 button \"All data in 1 month intervals\"\n  uid=9001_115 button \"Go to\"\n  uid=9001_116 button \"Timezone\"\n  uid=9001_117 button \"Watchlist, details, and news\"\n  uid=9001_118 button \"Alerts\"\n  uid=9001_119 button \"Object tree and data window\"\n  uid=9001_120 button \"AI Copilot\"\n  uid=9001_121 button \"Screeners\"\n  uid=9001_122 button \"Pine\"\n  uid=9001_123 button \"Calendars\"\n  uid=9001_124 button \"Community\"\n  uid=9001_125 button \"Notifications\"\n  uid=9001_126 button \"Chats\"\n  uid=9001_127 button \"Products\" haspopup=\"menu\"\n  uid=9001_128 button \"Help Center\"\n  uid=9001_129 generic \"Trading panel\"\n    uid=9001_130 generic\n  uid=9001_131 generic live=\"polite\" relevant=\"additions\"\n  uid=9001_132 generic live=\"polite\" relevant=\"additions\"\n  uid=9001_133 generic live=\"assertive\" relevant=\"additions\"\n  uid=9001_134 generic live=\"assertive\" relevant=\"additions\"\n  uid=9001_135 generic live=\"polite\" relevant=\"additions text\"\n  uid=9001_136 log live=\"polite\" relevant=\"additions text\"\n  uid=9001_137 log live=\"polite\" relevant=\"additions text\"\n  uid=9001_138 log live=\"polite\" relevant=\"additions text\"\n  uid=9001_139 log live=\"polite\" relevant=\"additions text\"\n  uid=9001_140 log live=\"polite\" relevant=\"additions text\"\n  uid=9001_141 log live=\"polite\" relevant=\"additions text\"\n  uid=9001_142 log live=\"polite\" relevant=\"additions text\"\n  uid=9001_143 log live=\"polite\" relevant=\"additions text\"\n  uid=9001_144 log live=\"polite\" relevant=\"additions text\"\n  uid=9001_145 log live=\"polite\" relevant=\"additions text\"\n  uid=9001_146 log live=\"polite\" relevant=\"additions text\"\n  uid=9001_147 log live=\"polite\" relevant=\"additions text\"\n  uid=9001_148 log live=\"polite\" relevant=\"additions text\"\n  uid=9001_149 log live=\"polite\" relevant=\"additions text\"\n  uid=9001_150 log live=\"polite\" relevant=\"additions text\"\n  uid=9001_151 log live=\"polite\" relevant=\"additions text\"\n  uid=9001_152 log live=\"polite\" relevant=\"additions text\"\n  uid=9001_153 log live=\"polite\" relevant=\"additions text\"\n  uid=9001_154 log live=\"polite\" relevant=\"additions text\"\n  uid=9001_155 log live=\"polite\" relevant=\"additions text\"\n  uid=9001_156 log live=\"polite\" relevant=\"additions text\"\n"
+}

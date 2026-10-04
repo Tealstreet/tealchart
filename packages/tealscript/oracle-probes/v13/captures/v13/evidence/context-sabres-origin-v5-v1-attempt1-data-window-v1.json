@@ -1,0 +1,33 @@
+{
+  "index": 298,
+  "bar": [
+    1791136080,
+    85438.67,
+    85438.67,
+    85391.46,
+    85391.47,
+    8.81532
+  ],
+  "source_row": [
+    1791136080,
+    85391.47,
+    25014,
+    1791136080000,
+    1788134400000,
+    50
+  ],
+  "browser_utc": "2026-10-04T17:51:32.700Z",
+  "title": "V13 Sabres execution origin v1",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   17:48",
+  "visible_range": {
+    "_firstBar": 263,
+    "_lastBar": 301
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}

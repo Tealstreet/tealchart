@@ -24327,5 +24327,406 @@
     "last_historical_values": {
       "READINESS_CLOSE": "84812.01"
     }
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T17:52:53.157Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "arm",
+        "bitness": "64",
+        "brands": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156"
+          }
+        ],
+        "fullVersionList": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8.0.0.0"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156.0.8075.0"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156.0.8075.0"
+          }
+        ],
+        "mobile": false,
+        "platform": "macOS",
+        "platformVersion": "27.2.0"
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v5 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "drawing-coordinate-sabres-input-division-v1.pine",
+    "attempt": 2,
+    "source_sha256": "4cfcf8d804c92e16ca4b385f5dd684dafa761a2aeecaa217115da4181d831808",
+    "indicator_title": "Sabres point v1",
+    "status": "RUNS",
+    "csv_file": "captures/v5/drawing-coordinate-sabres-input-division-v1-attempt2.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-05T015252.336.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "minmove": 1,
+      "pricescale": 100,
+      "pointvalue": 1,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [
+        {
+          "id": "in_0",
+          "name": "length",
+          "value": 50,
+          "default": 50
+        }
+      ],
+      "observed_indicator_title": "Sabres point v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24717,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 25017,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T17:52:44.784Z",
+    "live_candle_open_utc": "2026-10-04T17:52:00.000Z",
+    "export_utc": "2026-10-04T17:52:52.802Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v5/evidence/drawing-coordinate-sabres-input-division-v1-attempt2-setup.png",
+      "captures/v5/evidence/drawing-coordinate-sabres-input-division-v1-attempt2-export.png",
+      "captures/v5/evidence/drawing-coordinate-sabres-input-division-v1-attempt2-logs.txt",
+      "captures/v5/evidence/drawing-coordinate-sabres-input-division-v1-attempt2-logs-v1.json",
+      "captures/v5/evidence/drawing-coordinate-sabres-input-division-v1-attempt2-logs.png",
+      "captures/v5/evidence/drawing-coordinate-sabres-input-division-v1-attempt2-inputs.png",
+      "captures/v5/evidence/drawing-coordinate-sabres-input-division-v1-attempt2-visual.png",
+      "captures/v5/evidence/drawing-coordinate-sabres-input-division-v1-attempt2-data-window-v1.png",
+      "captures/v5/evidence/drawing-coordinate-sabres-input-division-v1-attempt2-data-window-v1.json",
+      "captures/v5/evidence/drawing-coordinate-sabres-input-division-v1-attempt2-data-window-v1.txt",
+      "captures/v5/evidence/drawing-coordinate-sabres-input-division-v1-attempt2-authority-object-geometry-v1.json",
+      "captures/v5/evidence/drawing-coordinate-sabres-input-division-v1-attempt2-authority-object-geometry-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T17:52:45.639Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790831160,
+            84198.02,
+            84239,
+            84170.98,
+            84170.98,
+            19.52951
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791136320,
+            85386.01,
+            85386.01,
+            85372.01,
+            85372.01,
+            1.65152
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Sabres point v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790831160,
+                84170.98
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791136320,
+                85372.01
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T17:52:46.605Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790831160,
+            84198.02,
+            84239,
+            84170.98,
+            84170.98,
+            19.52951
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791136320,
+            85386.01,
+            85386.01,
+            85372.01,
+            85372.01,
+            1.65152
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Sabres point v1",
+            "status": {
+              "type": 2
+            },
+            "size": 25017,
+            "first": {
+              "index": -1022473,
+              "value": [
+                1788134400,
+                77674.04
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791136320,
+                85372.01
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T17:52:47.279Z",
+        "bars": 25017,
+        "end": true,
+        "first": {
+          "index": -24717,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791136320,
+            85386.01,
+            85386.01,
+            85372.01,
+            85372.02,
+            1.65331
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Sabres point v1",
+            "status": {
+              "type": 2
+            },
+            "size": 25017,
+            "first": {
+              "index": -24717,
+              "value": [
+                1788134400,
+                77674.04
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791136320,
+                85372.02
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///d9ad9167-443c-48a4-a1fe-4ec2ca78a85a.pine?placement%3Ddialog",
+          "path": "/d9ad9167-443c-48a4-a1fe-4ec2ca78a85a.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "live_tooltip": "Sun 04 Oct '26   17:52",
+    "historical_compare_before_unix_seconds": 1791136320,
+    "pine_logs": {
+      "paths": [
+        "evidence/drawing-coordinate-sabres-input-division-v1-attempt2-logs.txt",
+        "evidence/drawing-coordinate-sabres-input-division-v1-attempt2-logs-v1.json",
+        "evidence/drawing-coordinate-sabres-input-division-v1-attempt2-logs.png"
+      ],
+      "entries": 0
+    },
+    "all_exported_column_occurrences": [
+      {
+        "title": "time",
+        "occurrence": 1,
+        "position": 0
+      },
+      {
+        "title": "open",
+        "occurrence": 1,
+        "position": 1
+      },
+      {
+        "title": "high",
+        "occurrence": 1,
+        "position": 2
+      },
+      {
+        "title": "low",
+        "occurrence": 1,
+        "position": 3
+      },
+      {
+        "title": "close",
+        "occurrence": 1,
+        "position": 4
+      },
+      {
+        "title": "Plot",
+        "occurrence": 1,
+        "position": 5
+      }
+    ],
+    "declared_to_native_column_occurrences": [],
+    "named_value_map_scope": "Legacy title maps show the first occurrence only; original positional cells and occurrence tables retain every duplicate without renaming.",
+    "csv_sha256": "838496f32a25002cf6b515b3d321d64d3bb6c327ce96d04136db4b50918ec0e4",
+    "csv_bytes": 1317425,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "Plot"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {},
+    "first_historical_cells": [
+      "1788134400",
+      "77682",
+      "77682.01",
+      "77572",
+      "77674.04",
+      "77674.04"
+    ],
+    "last_historical_cells": [
+      "1791136200",
+      "85391.47",
+      "85391.47",
+      "85386",
+      "85386.01",
+      "85386.01"
+    ],
+    "declared_to_native_header_mapping": {},
+    "csv_rows": 25017,
+    "historical_rows": 25016,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791136320,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791136320",
+    "first_historical_values": {},
+    "last_historical_values": {},
+    "declared_unexported_columns": [],
+    "data_window_witness": "captures/v5/evidence/drawing-coordinate-sabres-input-division-v1-attempt2-data-window-v1.json"
   }
 ]

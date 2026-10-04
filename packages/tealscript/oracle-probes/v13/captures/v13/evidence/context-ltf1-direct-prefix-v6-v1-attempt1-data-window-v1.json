@@ -1,0 +1,39 @@
+{
+  "index": 298,
+  "bar": [
+    1791135960,
+    85438.15,
+    85454.01,
+    85438.15,
+    85438.61,
+    3.91138
+  ],
+  "source_row": [
+    1791135960,
+    85438.15,
+    85454.01,
+    85438.15,
+    85438.61,
+    3.91138,
+    1791135960000,
+    1791136020000,
+    29866,
+    1789344000000,
+    85382.76714285677,
+    1791136038503
+  ],
+  "browser_utc": "2026-10-04T17:47:31.729Z",
+  "title": "V13 independent minute prefix v1",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   17:46",
+  "visible_range": {
+    "_firstBar": 263,
+    "_lastBar": 301
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}

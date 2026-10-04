@@ -1,0 +1,99 @@
+{
+  "artifact": "Single hole percentile startup context v1",
+  "source": "linear-percentile-single-hole-len3-p50-v1.pine",
+  "source_sha256": "3ab123bce4e7def9dd4f842b5df37f2102a9c69f1a7f0c443dd8e31385e73010",
+  "attempt": 1,
+  "csv": "captures/v13/linear-percentile-single-hole-len3-p50-v1-attempt1.csv",
+  "headers": [
+    "time",
+    "open",
+    "high",
+    "low",
+    "close",
+    "INPUT_BAR_INDEX",
+    "SOURCE",
+    "PERCENTILE",
+    "RESULT_NA"
+  ],
+  "first_seven_rows": [
+    [
+      "1788134400",
+      "77682",
+      "77682.01",
+      "77572",
+      "77674.04",
+      "0",
+      "10",
+      "",
+      "1"
+    ],
+    [
+      "1788134520",
+      "77674.5",
+      "77780.34",
+      "77646",
+      "77758.24",
+      "1",
+      "11",
+      "",
+      "1"
+    ],
+    [
+      "1788134640",
+      "77758.24",
+      "77827.99",
+      "77724",
+      "77740.01",
+      "2",
+      "12",
+      "11",
+      "0"
+    ],
+    [
+      "1788134760",
+      "77740.01",
+      "77751.37",
+      "77490",
+      "77508.86",
+      "3",
+      "",
+      "",
+      "1"
+    ],
+    [
+      "1788134880",
+      "77508.86",
+      "77525.28",
+      "77436.4",
+      "77437.58",
+      "4",
+      "13",
+      "",
+      "1"
+    ],
+    [
+      "1788135000",
+      "77437.57",
+      "77636",
+      "77436.41",
+      "77636",
+      "5",
+      "13",
+      "13",
+      "0"
+    ],
+    [
+      "1788135120",
+      "77635.99",
+      "77726",
+      "77576",
+      "77725.99",
+      "6",
+      "14",
+      "13",
+      "0"
+    ]
+  ],
+  "literal_INDEX0": "0",
+  "limits": "Exact len3 percentage50 single-hole frozen source; no inferred other lengths/percentages or engine output."
+}
