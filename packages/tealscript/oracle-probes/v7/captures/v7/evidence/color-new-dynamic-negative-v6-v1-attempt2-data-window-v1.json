@@ -1,0 +1,35 @@
+{
+  "index": 298,
+  "bar": [
+    1791094800,
+    84930,
+    84971.99,
+    84930,
+    84971.99,
+    12.27031
+  ],
+  "source_row": [
+    1791094800,
+    50,
+    242,
+    54,
+    69,
+    50,
+    1,
+    2152019698
+  ],
+  "browser_utc": "2026-10-04T06:22:47.656Z",
+  "title": "V7 color-new-dynamic-negative-v6-v1",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   06:20",
+  "visible_range": {
+    "_firstBar": 263,
+    "_lastBar": 301
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}

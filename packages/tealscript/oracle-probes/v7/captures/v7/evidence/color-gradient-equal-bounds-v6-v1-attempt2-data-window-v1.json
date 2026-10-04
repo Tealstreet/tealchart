@@ -1,0 +1,35 @@
+{
+  "index": 299,
+  "bar": [
+    1791095400,
+    84947.62,
+    84947.62,
+    84919.74,
+    84931.99,
+    8.11579
+  ],
+  "source_row": [
+    1791095400,
+    null,
+    0,
+    0,
+    0,
+    100,
+    1,
+    0
+  ],
+  "browser_utc": "2026-10-04T06:32:05.445Z",
+  "title": "V7 color-gradient-equal-bounds-v6-v1",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   06:30",
+  "visible_range": {
+    "_firstBar": 264,
+    "_lastBar": 302
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}
