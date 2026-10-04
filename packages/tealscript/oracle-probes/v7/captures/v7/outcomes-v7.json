@@ -57080,5 +57080,3569 @@
       "CONTROL": "1"
     },
     "data_window_witness": "captures/v7/evidence/plotshape-zero-offset-v5-control-v1-attempt2-data-window-v1.json"
+  },
+  {
+    "script": "negative-remainder-v5-v1.pine",
+    "attempt": 1,
+    "source_sha256": "ae7be977ca4e9b2aa8c55fbe97ab4b5cbcb5a810e594a73a8928bef3b7f20a5d",
+    "indicator_title": "V7 negative-remainder-v5-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/negative-remainder-v5-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T163132.004.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 negative-remainder-v5-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24436,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24736,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T08:31:24.523Z",
+    "live_candle_open_utc": "2026-10-04T08:30:00.000Z",
+    "export_utc": "2026-10-04T08:31:32.406Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/negative-remainder-v5-v1-attempt1-setup.png",
+      "captures/v7/evidence/negative-remainder-v5-v1-attempt1-export.png",
+      "captures/v7/evidence/negative-remainder-v5-v1-attempt1-logs.txt",
+      "captures/v7/evidence/negative-remainder-v5-v1-attempt1-logs-v1.json",
+      "captures/v7/evidence/negative-remainder-v5-v1-attempt1-logs.png",
+      "captures/v7/evidence/negative-remainder-v5-v1-attempt1-visual.png",
+      "captures/v7/evidence/negative-remainder-v5-v1-attempt1-data-window-v1.png",
+      "captures/v7/evidence/negative-remainder-v5-v1-attempt1-data-window-v1.json",
+      "captures/v7/evidence/negative-remainder-v5-v1-attempt1-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T08:31:25.400Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790797440,
+            83824.01,
+            83825.85,
+            83816.94,
+            83816.95,
+            2.18203
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791102600,
+            85137.99,
+            85148.64,
+            85082,
+            85082,
+            13.43554
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 negative-remainder-v5-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790797440,
+                -2,
+                2,
+                -2,
+                -2
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791102600,
+                -2,
+                2,
+                -2,
+                -2
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T08:31:26.406Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790797440,
+            83824.01,
+            83825.85,
+            83816.94,
+            83816.95,
+            2.18203
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791102600,
+            85137.99,
+            85148.64,
+            85082,
+            85082,
+            13.43554
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 negative-remainder-v5-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24736,
+            "first": {
+              "index": -1022192,
+              "value": [
+                1788134400,
+                -2,
+                2,
+                -2,
+                -2
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791102600,
+                -2,
+                2,
+                -2,
+                -2
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T08:31:27.274Z",
+        "bars": 24736,
+        "end": true,
+        "first": {
+          "index": -24436,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791102600,
+            85137.99,
+            85148.64,
+            85082,
+            85082.01,
+            13.43954
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 negative-remainder-v5-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24736,
+            "first": {
+              "index": -24436,
+              "value": [
+                1788134400,
+                -2,
+                2,
+                -2,
+                -2
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791102600,
+                -2,
+                2,
+                -2,
+                -2
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///0767e780-23b5-4f0e-b1c9-a38ee8930ceb.pine?placement%3Ddialog",
+          "path": "/0767e780-23b5-4f0e-b1c9-a38ee8930ceb.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "live_tooltip": "Sun 04 Oct '26   08:30",
+    "historical_compare_before_unix_seconds": 1791102600,
+    "pine_logs": {
+      "paths": [
+        "evidence/negative-remainder-v5-v1-attempt1-logs.txt",
+        "evidence/negative-remainder-v5-v1-attempt1-logs-v1.json",
+        "evidence/negative-remainder-v5-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "a98ea9ab3f49a86ea4e029c103ef9a553802ab43ae5294ef09687d5218508183",
+    "csv_bytes": 1366567,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "NEGATIVE_DIVIDEND",
+      "NEGATIVE_DIVISOR",
+      "BOTH_NEGATIVE",
+      "COMPOUND"
+    ],
+    "declared_to_native_header_mapping": {
+      "NEGATIVE_DIVIDEND": "NEGATIVE_DIVIDEND",
+      "NEGATIVE_DIVISOR": "NEGATIVE_DIVISOR",
+      "BOTH_NEGATIVE": "BOTH_NEGATIVE",
+      "COMPOUND": "COMPOUND"
+    },
+    "csv_rows": 24736,
+    "historical_rows": 24735,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791102600,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791102600",
+    "first_historical_values": {
+      "NEGATIVE_DIVIDEND": "-2",
+      "NEGATIVE_DIVISOR": "2",
+      "BOTH_NEGATIVE": "-2",
+      "COMPOUND": "-2"
+    },
+    "last_historical_values": {
+      "NEGATIVE_DIVIDEND": "-2",
+      "NEGATIVE_DIVISOR": "2",
+      "BOTH_NEGATIVE": "-2",
+      "COMPOUND": "-2"
+    },
+    "data_window_witness": "captures/v7/evidence/negative-remainder-v5-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "script": "negative-remainder-v5-v1.pine",
+    "attempt": 2,
+    "source_sha256": "ae7be977ca4e9b2aa8c55fbe97ab4b5cbcb5a810e594a73a8928bef3b7f20a5d",
+    "indicator_title": "V7 negative-remainder-v5-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/negative-remainder-v5-v1-attempt2.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T163200.233.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 negative-remainder-v5-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24436,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24736,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T08:31:53.996Z",
+    "live_candle_open_utc": "2026-10-04T08:30:00.000Z",
+    "export_utc": "2026-10-04T08:32:00.686Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/negative-remainder-v5-v1-attempt2-setup.png",
+      "captures/v7/evidence/negative-remainder-v5-v1-attempt2-export.png",
+      "captures/v7/evidence/negative-remainder-v5-v1-attempt2-logs.txt",
+      "captures/v7/evidence/negative-remainder-v5-v1-attempt2-logs-v1.json",
+      "captures/v7/evidence/negative-remainder-v5-v1-attempt2-logs.png",
+      "captures/v7/evidence/negative-remainder-v5-v1-attempt2-visual.png",
+      "captures/v7/evidence/negative-remainder-v5-v1-attempt2-data-window-v1.png",
+      "captures/v7/evidence/negative-remainder-v5-v1-attempt2-data-window-v1.json",
+      "captures/v7/evidence/negative-remainder-v5-v1-attempt2-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": "2026-10-04T08:31:39.964Z",
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T08:31:54.773Z",
+        "bars": 300,
+        "end": false,
+        "first": {
+          "index": 0,
+          "value": [
+            1791066720,
+            84784,
+            84784.01,
+            84783.98,
+            84783.98,
+            4.31753
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791102600,
+            85137.99,
+            85148.64,
+            85066,
+            85066,
+            15.8838
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 negative-remainder-v5-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24736,
+            "first": {
+              "index": -1024436,
+              "value": [
+                1788134400,
+                -2,
+                2,
+                -2,
+                -2
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791102600,
+                -2,
+                2,
+                -2,
+                -2
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T08:31:55.457Z",
+        "bars": 24736,
+        "end": true,
+        "first": {
+          "index": -24436,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791102600,
+            85137.99,
+            85148.64,
+            85066,
+            85066,
+            15.8838
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 negative-remainder-v5-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24736,
+            "first": {
+              "index": -24436,
+              "value": [
+                1788134400,
+                -2,
+                2,
+                -2,
+                -2
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791102600,
+                -2,
+                2,
+                -2,
+                -2
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///2c7459c6-cdcd-4b5c-8327-7241e374678c.pine?placement%3Ddialog",
+          "path": "/2c7459c6-cdcd-4b5c-8327-7241e374678c.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "live_tooltip": "Sun 04 Oct '26   08:30",
+    "historical_compare_before_unix_seconds": 1791102600,
+    "pine_logs": {
+      "paths": [
+        "evidence/negative-remainder-v5-v1-attempt2-logs.txt",
+        "evidence/negative-remainder-v5-v1-attempt2-logs-v1.json",
+        "evidence/negative-remainder-v5-v1-attempt2-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "3ab9678e65a9e8ff7af943109965768fc1ce472bac60de3ac2073a513d4b8b66",
+    "csv_bytes": 1366567,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "NEGATIVE_DIVIDEND",
+      "NEGATIVE_DIVISOR",
+      "BOTH_NEGATIVE",
+      "COMPOUND"
+    ],
+    "declared_to_native_header_mapping": {
+      "NEGATIVE_DIVIDEND": "NEGATIVE_DIVIDEND",
+      "NEGATIVE_DIVISOR": "NEGATIVE_DIVISOR",
+      "BOTH_NEGATIVE": "BOTH_NEGATIVE",
+      "COMPOUND": "COMPOUND"
+    },
+    "csv_rows": 24736,
+    "historical_rows": 24735,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791102600,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791102600",
+    "first_historical_values": {
+      "NEGATIVE_DIVIDEND": "-2",
+      "NEGATIVE_DIVISOR": "2",
+      "BOTH_NEGATIVE": "-2",
+      "COMPOUND": "-2"
+    },
+    "last_historical_values": {
+      "NEGATIVE_DIVIDEND": "-2",
+      "NEGATIVE_DIVISOR": "2",
+      "BOTH_NEGATIVE": "-2",
+      "COMPOUND": "-2"
+    },
+    "data_window_witness": "captures/v7/evidence/negative-remainder-v5-v1-attempt2-data-window-v1.json"
+  },
+  {
+    "script": "negative-remainder-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "0a6034ab75d2518c879781da7eab5ff60c6bab45215d4affec8404521e84fb40",
+    "indicator_title": "V7 negative-remainder-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/negative-remainder-v6-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T163227.699.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 negative-remainder-v6-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24437,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24737,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T08:32:20.111Z",
+    "live_candle_open_utc": "2026-10-04T08:32:00.000Z",
+    "export_utc": "2026-10-04T08:32:28.142Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/negative-remainder-v6-v1-attempt1-setup.png",
+      "captures/v7/evidence/negative-remainder-v6-v1-attempt1-export.png",
+      "captures/v7/evidence/negative-remainder-v6-v1-attempt1-logs.txt",
+      "captures/v7/evidence/negative-remainder-v6-v1-attempt1-logs-v1.json",
+      "captures/v7/evidence/negative-remainder-v6-v1-attempt1-logs.png",
+      "captures/v7/evidence/negative-remainder-v6-v1-attempt1-visual.png",
+      "captures/v7/evidence/negative-remainder-v6-v1-attempt1-data-window-v1.png",
+      "captures/v7/evidence/negative-remainder-v6-v1-attempt1-data-window-v1.json",
+      "captures/v7/evidence/negative-remainder-v6-v1-attempt1-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T08:32:21.061Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790797560,
+            83816.94,
+            83834.23,
+            83721.62,
+            83721.63,
+            33.03081
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791102720,
+            85064,
+            85064.01,
+            85064,
+            85064.01,
+            0.47643
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 negative-remainder-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790797560,
+                -2,
+                2,
+                -2,
+                -2
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791102720,
+                -2,
+                2,
+                -2,
+                -2
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T08:32:22.121Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790797560,
+            83816.94,
+            83834.23,
+            83721.62,
+            83721.63,
+            33.03081
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791102720,
+            85064,
+            85066.01,
+            85064,
+            85066,
+            1.54036
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 negative-remainder-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24737,
+            "first": {
+              "index": -1022193,
+              "value": [
+                1788134400,
+                -2,
+                2,
+                -2,
+                -2
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791102720,
+                -2,
+                2,
+                -2,
+                -2
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T08:32:22.816Z",
+        "bars": 24737,
+        "end": true,
+        "first": {
+          "index": -24437,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791102720,
+            85064,
+            85066.01,
+            85064,
+            85066.01,
+            1.56537
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 negative-remainder-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24737,
+            "first": {
+              "index": -24437,
+              "value": [
+                1788134400,
+                -2,
+                2,
+                -2,
+                -2
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791102720,
+                -2,
+                2,
+                -2,
+                -2
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   08:32",
+    "historical_compare_before_unix_seconds": 1791102720,
+    "pine_logs": {
+      "paths": [
+        "evidence/negative-remainder-v6-v1-attempt1-logs.txt",
+        "evidence/negative-remainder-v6-v1-attempt1-logs-v1.json",
+        "evidence/negative-remainder-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "77297332edb4b881545b1d6c21f5ea38dddaea9dbec9dd7ac1fe8bb7a4927d4f",
+    "csv_bytes": 1366613,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "NEGATIVE_DIVIDEND",
+      "NEGATIVE_DIVISOR",
+      "BOTH_NEGATIVE",
+      "COMPOUND"
+    ],
+    "declared_to_native_header_mapping": {
+      "NEGATIVE_DIVIDEND": "NEGATIVE_DIVIDEND",
+      "NEGATIVE_DIVISOR": "NEGATIVE_DIVISOR",
+      "BOTH_NEGATIVE": "BOTH_NEGATIVE",
+      "COMPOUND": "COMPOUND"
+    },
+    "csv_rows": 24737,
+    "historical_rows": 24736,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791102720,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791102720",
+    "first_historical_values": {
+      "NEGATIVE_DIVIDEND": "-2",
+      "NEGATIVE_DIVISOR": "2",
+      "BOTH_NEGATIVE": "-2",
+      "COMPOUND": "-2"
+    },
+    "last_historical_values": {
+      "NEGATIVE_DIVIDEND": "-2",
+      "NEGATIVE_DIVISOR": "2",
+      "BOTH_NEGATIVE": "-2",
+      "COMPOUND": "-2"
+    },
+    "data_window_witness": "captures/v7/evidence/negative-remainder-v6-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "script": "negative-remainder-v6-v1.pine",
+    "attempt": 2,
+    "source_sha256": "0a6034ab75d2518c879781da7eab5ff60c6bab45215d4affec8404521e84fb40",
+    "indicator_title": "V7 negative-remainder-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/negative-remainder-v6-v1-attempt2.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T163257.577.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 negative-remainder-v6-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24437,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24737,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T08:32:50.785Z",
+    "live_candle_open_utc": "2026-10-04T08:32:00.000Z",
+    "export_utc": "2026-10-04T08:32:57.979Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/negative-remainder-v6-v1-attempt2-setup.png",
+      "captures/v7/evidence/negative-remainder-v6-v1-attempt2-export.png",
+      "captures/v7/evidence/negative-remainder-v6-v1-attempt2-logs.txt",
+      "captures/v7/evidence/negative-remainder-v6-v1-attempt2-logs-v1.json",
+      "captures/v7/evidence/negative-remainder-v6-v1-attempt2-logs.png",
+      "captures/v7/evidence/negative-remainder-v6-v1-attempt2-visual.png",
+      "captures/v7/evidence/negative-remainder-v6-v1-attempt2-data-window-v1.png",
+      "captures/v7/evidence/negative-remainder-v6-v1-attempt2-data-window-v1.json",
+      "captures/v7/evidence/negative-remainder-v6-v1-attempt2-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": "2026-10-04T08:32:36.098Z",
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T08:32:51.768Z",
+        "bars": 300,
+        "end": false,
+        "first": {
+          "index": 0,
+          "value": [
+            1791066840,
+            84783.98,
+            84786.01,
+            84783.98,
+            84786,
+            3.51915
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791102720,
+            85064,
+            85085.77,
+            85064,
+            85085.77,
+            2.61373
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 negative-remainder-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24737,
+            "first": {
+              "index": -1024437,
+              "value": [
+                1788134400,
+                -2,
+                2,
+                -2,
+                -2
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791102720,
+                -2,
+                2,
+                -2,
+                -2
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T08:32:52.766Z",
+        "bars": 24737,
+        "end": true,
+        "first": {
+          "index": -24437,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791102720,
+            85064,
+            85085.77,
+            85064,
+            85085.76,
+            2.62854
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 negative-remainder-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24737,
+            "first": {
+              "index": -24437,
+              "value": [
+                1788134400,
+                -2,
+                2,
+                -2,
+                -2
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791102720,
+                -2,
+                2,
+                -2,
+                -2
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   08:32",
+    "historical_compare_before_unix_seconds": 1791102720,
+    "pine_logs": {
+      "paths": [
+        "evidence/negative-remainder-v6-v1-attempt2-logs.txt",
+        "evidence/negative-remainder-v6-v1-attempt2-logs-v1.json",
+        "evidence/negative-remainder-v6-v1-attempt2-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "334d37f23a495eed3ebf390035cb86e9cef94748b4c87b7fee81cf035ced162e",
+    "csv_bytes": 1366619,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "NEGATIVE_DIVIDEND",
+      "NEGATIVE_DIVISOR",
+      "BOTH_NEGATIVE",
+      "COMPOUND"
+    ],
+    "declared_to_native_header_mapping": {
+      "NEGATIVE_DIVIDEND": "NEGATIVE_DIVIDEND",
+      "NEGATIVE_DIVISOR": "NEGATIVE_DIVISOR",
+      "BOTH_NEGATIVE": "BOTH_NEGATIVE",
+      "COMPOUND": "COMPOUND"
+    },
+    "csv_rows": 24737,
+    "historical_rows": 24736,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791102720,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791102720",
+    "first_historical_values": {
+      "NEGATIVE_DIVIDEND": "-2",
+      "NEGATIVE_DIVISOR": "2",
+      "BOTH_NEGATIVE": "-2",
+      "COMPOUND": "-2"
+    },
+    "last_historical_values": {
+      "NEGATIVE_DIVIDEND": "-2",
+      "NEGATIVE_DIVISOR": "2",
+      "BOTH_NEGATIVE": "-2",
+      "COMPOUND": "-2"
+    },
+    "data_window_witness": "captures/v7/evidence/negative-remainder-v6-v1-attempt2-data-window-v1.json"
+  },
+  {
+    "script": "ta-bbw-tsi-hole-zero-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "4bfa501e4df36aaffa1ccb4f04efc6c0cd7b51fcef09332791cadd91f20a20d2",
+    "indicator_title": "V7 ta-bbw-tsi-hole-zero-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/ta-bbw-tsi-hole-zero-v6-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T163326.924.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 ta-bbw-tsi-hole-zero-v6-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24437,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24737,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T08:33:19.153Z",
+    "live_candle_open_utc": "2026-10-04T08:32:00.000Z",
+    "export_utc": "2026-10-04T08:33:27.310Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/ta-bbw-tsi-hole-zero-v6-v1-attempt1-setup.png",
+      "captures/v7/evidence/ta-bbw-tsi-hole-zero-v6-v1-attempt1-export.png",
+      "captures/v7/evidence/ta-bbw-tsi-hole-zero-v6-v1-attempt1-logs.txt",
+      "captures/v7/evidence/ta-bbw-tsi-hole-zero-v6-v1-attempt1-logs-v1.json",
+      "captures/v7/evidence/ta-bbw-tsi-hole-zero-v6-v1-attempt1-logs.png",
+      "captures/v7/evidence/ta-bbw-tsi-hole-zero-v6-v1-attempt1-visual.png",
+      "captures/v7/evidence/ta-bbw-tsi-hole-zero-v6-v1-attempt1-data-window-v1.png",
+      "captures/v7/evidence/ta-bbw-tsi-hole-zero-v6-v1-attempt1-data-window-v1.json",
+      "captures/v7/evidence/ta-bbw-tsi-hole-zero-v6-v1-attempt1-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T08:33:20.109Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790797560,
+            83816.94,
+            83834.23,
+            83721.62,
+            83721.63,
+            33.03081
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791102720,
+            85064,
+            85090.01,
+            85064,
+            85090.01,
+            6.67793
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-bbw-tsi-hole-zero-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790797560,
+                null,
+                11,
+                19.030365765955658,
+                null,
+                null,
+                null
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791102720,
+                null,
+                10,
+                19.030365765955658,
+                null,
+                null,
+                null
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T08:33:21.112Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790797560,
+            83816.94,
+            83834.23,
+            83721.62,
+            83721.63,
+            33.03081
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791102720,
+            85064,
+            85090.01,
+            85064,
+            85090.01,
+            6.67793
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-bbw-tsi-hole-zero-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24737,
+            "first": {
+              "index": -1022193,
+              "value": [
+                1788134400,
+                null,
+                10,
+                null,
+                null,
+                null,
+                null
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791102720,
+                null,
+                10,
+                19.030365765955658,
+                null,
+                null,
+                null
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T08:33:22.038Z",
+        "bars": 24737,
+        "end": true,
+        "first": {
+          "index": -24437,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791102720,
+            85064,
+            85090.01,
+            85064,
+            85090.01,
+            6.70853
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-bbw-tsi-hole-zero-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24737,
+            "first": {
+              "index": -24437,
+              "value": [
+                1788134400,
+                null,
+                10,
+                null,
+                null,
+                null,
+                null
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791102720,
+                null,
+                10,
+                19.030365765955658,
+                null,
+                null,
+                null
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   08:32",
+    "historical_compare_before_unix_seconds": 1791102720,
+    "pine_logs": {
+      "paths": [
+        "evidence/ta-bbw-tsi-hole-zero-v6-v1-attempt1-logs.txt",
+        "evidence/ta-bbw-tsi-hole-zero-v6-v1-attempt1-logs-v1.json",
+        "evidence/ta-bbw-tsi-hole-zero-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "09fff7f874c374ab36bd8d58fe914d2952cc2a6b16bb1ead0893516053fa1e1a",
+    "csv_bytes": 1774663,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "SOURCE",
+      "CLEAN",
+      "BBW_HOLES",
+      "BBW_ZERO",
+      "TSI_HOLES",
+      "TSI_CONSTANT"
+    ],
+    "declared_to_native_header_mapping": {
+      "SOURCE": "SOURCE",
+      "CLEAN": "CLEAN",
+      "BBW_HOLES": "BBW_HOLES",
+      "BBW_ZERO": "BBW_ZERO",
+      "TSI_HOLES": "TSI_HOLES",
+      "TSI_CONSTANT": "TSI_CONSTANT"
+    },
+    "csv_rows": 24737,
+    "historical_rows": 24736,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791102720,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791102720",
+    "first_historical_values": {
+      "SOURCE": "",
+      "CLEAN": "10",
+      "BBW_HOLES": "",
+      "BBW_ZERO": "",
+      "TSI_HOLES": "",
+      "TSI_CONSTANT": ""
+    },
+    "last_historical_values": {
+      "SOURCE": "25",
+      "CLEAN": "25",
+      "BBW_HOLES": "19.030365765955658",
+      "BBW_ZERO": "",
+      "TSI_HOLES": "1",
+      "TSI_CONSTANT": ""
+    },
+    "data_window_witness": "captures/v7/evidence/ta-bbw-tsi-hole-zero-v6-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "script": "ta-bbw-tsi-hole-zero-v6-v1.pine",
+    "attempt": 2,
+    "source_sha256": "4bfa501e4df36aaffa1ccb4f04efc6c0cd7b51fcef09332791cadd91f20a20d2",
+    "indicator_title": "V7 ta-bbw-tsi-hole-zero-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/ta-bbw-tsi-hole-zero-v6-v1-attempt2.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T163355.103.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 ta-bbw-tsi-hole-zero-v6-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24437,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24737,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T08:33:49.048Z",
+    "live_candle_open_utc": "2026-10-04T08:32:00.000Z",
+    "export_utc": "2026-10-04T08:33:55.517Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/ta-bbw-tsi-hole-zero-v6-v1-attempt2-setup.png",
+      "captures/v7/evidence/ta-bbw-tsi-hole-zero-v6-v1-attempt2-export.png",
+      "captures/v7/evidence/ta-bbw-tsi-hole-zero-v6-v1-attempt2-logs.txt",
+      "captures/v7/evidence/ta-bbw-tsi-hole-zero-v6-v1-attempt2-logs-v1.json",
+      "captures/v7/evidence/ta-bbw-tsi-hole-zero-v6-v1-attempt2-logs.png",
+      "captures/v7/evidence/ta-bbw-tsi-hole-zero-v6-v1-attempt2-visual.png",
+      "captures/v7/evidence/ta-bbw-tsi-hole-zero-v6-v1-attempt2-data-window-v1.png",
+      "captures/v7/evidence/ta-bbw-tsi-hole-zero-v6-v1-attempt2-data-window-v1.json",
+      "captures/v7/evidence/ta-bbw-tsi-hole-zero-v6-v1-attempt2-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": "2026-10-04T08:33:34.717Z",
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T08:33:49.861Z",
+        "bars": 300,
+        "end": false,
+        "first": {
+          "index": 0,
+          "value": [
+            1791066840,
+            84783.98,
+            84786.01,
+            84783.98,
+            84786,
+            3.51915
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791102720,
+            85064,
+            85090.01,
+            85060.65,
+            85068,
+            18.13793
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-bbw-tsi-hole-zero-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24737,
+            "first": {
+              "index": -1024437,
+              "value": [
+                1788134400,
+                null,
+                10,
+                null,
+                null,
+                null,
+                null
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791102720,
+                null,
+                10,
+                19.030365765955658,
+                null,
+                null,
+                null
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T08:33:50.527Z",
+        "bars": 24737,
+        "end": true,
+        "first": {
+          "index": -24437,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791102720,
+            85064,
+            85090.01,
+            85060.65,
+            85067.99,
+            18.14473
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-bbw-tsi-hole-zero-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24737,
+            "first": {
+              "index": -24437,
+              "value": [
+                1788134400,
+                null,
+                10,
+                null,
+                null,
+                null,
+                null
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791102720,
+                null,
+                10,
+                19.030365765955658,
+                null,
+                null,
+                null
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   08:32",
+    "historical_compare_before_unix_seconds": 1791102720,
+    "pine_logs": {
+      "paths": [
+        "evidence/ta-bbw-tsi-hole-zero-v6-v1-attempt2-logs.txt",
+        "evidence/ta-bbw-tsi-hole-zero-v6-v1-attempt2-logs-v1.json",
+        "evidence/ta-bbw-tsi-hole-zero-v6-v1-attempt2-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "739b5cdf5cd5de27181e432ffefe2053cd03c2b9273fe043b18ce493870b9a99",
+    "csv_bytes": 1774663,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "SOURCE",
+      "CLEAN",
+      "BBW_HOLES",
+      "BBW_ZERO",
+      "TSI_HOLES",
+      "TSI_CONSTANT"
+    ],
+    "declared_to_native_header_mapping": {
+      "SOURCE": "SOURCE",
+      "CLEAN": "CLEAN",
+      "BBW_HOLES": "BBW_HOLES",
+      "BBW_ZERO": "BBW_ZERO",
+      "TSI_HOLES": "TSI_HOLES",
+      "TSI_CONSTANT": "TSI_CONSTANT"
+    },
+    "csv_rows": 24737,
+    "historical_rows": 24736,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791102720,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791102720",
+    "first_historical_values": {
+      "SOURCE": "",
+      "CLEAN": "10",
+      "BBW_HOLES": "",
+      "BBW_ZERO": "",
+      "TSI_HOLES": "",
+      "TSI_CONSTANT": ""
+    },
+    "last_historical_values": {
+      "SOURCE": "25",
+      "CLEAN": "25",
+      "BBW_HOLES": "19.030365765955658",
+      "BBW_ZERO": "",
+      "TSI_HOLES": "1",
+      "TSI_CONSTANT": ""
+    },
+    "data_window_witness": "captures/v7/evidence/ta-bbw-tsi-hole-zero-v6-v1-attempt2-data-window-v1.json"
+  },
+  {
+    "script": "ta-wpr-actual-ohlc-gaps-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "b804a3e586e9797ae6cb3d99954dfc9af8db8cdce556e71bff952a9810176c02",
+    "indicator_title": "V7 ta-wpr-actual-ohlc-gaps-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/ta-wpr-actual-ohlc-gaps-v6-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T163423.353.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 ta-wpr-actual-ohlc-gaps-v6-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24438,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24738,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T08:34:15.812Z",
+    "live_candle_open_utc": "2026-10-04T08:34:00.000Z",
+    "export_utc": "2026-10-04T08:34:23.533Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/ta-wpr-actual-ohlc-gaps-v6-v1-attempt1-setup.png",
+      "captures/v7/evidence/ta-wpr-actual-ohlc-gaps-v6-v1-attempt1-export.png",
+      "captures/v7/evidence/ta-wpr-actual-ohlc-gaps-v6-v1-attempt1-logs.txt",
+      "captures/v7/evidence/ta-wpr-actual-ohlc-gaps-v6-v1-attempt1-logs-v1.json",
+      "captures/v7/evidence/ta-wpr-actual-ohlc-gaps-v6-v1-attempt1-logs.png",
+      "captures/v7/evidence/ta-wpr-actual-ohlc-gaps-v6-v1-attempt1-visual.png",
+      "captures/v7/evidence/ta-wpr-actual-ohlc-gaps-v6-v1-attempt1-data-window-v1.png",
+      "captures/v7/evidence/ta-wpr-actual-ohlc-gaps-v6-v1-attempt1-data-window-v1.json",
+      "captures/v7/evidence/ta-wpr-actual-ohlc-gaps-v6-v1-attempt1-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T08:34:16.789Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790797680,
+            83721.62,
+            83784.41,
+            83686,
+            83699.99,
+            30.82296
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791102840,
+            85068,
+            85068,
+            85067.99,
+            85067.99,
+            0.38721
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-wpr-actual-ohlc-gaps-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790797680,
+                83721.62,
+                83784.41,
+                83686,
+                83699.99,
+                30.82296,
+                0,
+                0,
+                -92.41734417343889
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791102840,
+                85068,
+                85068,
+                85067.99,
+                85067.99,
+                0.38721,
+                0,
+                0,
+                -94.57060433463205
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T08:34:17.926Z",
+        "bars": 24738,
+        "end": true,
+        "first": {
+          "index": -24438,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791102840,
+            85068,
+            85068,
+            85067.99,
+            85067.99,
+            0.41857
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-wpr-actual-ohlc-gaps-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24738,
+            "first": {
+              "index": -24438,
+              "value": [
+                1788134400,
+                77682,
+                77682.01,
+                77572,
+                77674.04,
+                51.86295,
+                0,
+                0,
+                null
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791102840,
+                85068,
+                85068,
+                85067.99,
+                85067.99,
+                0.41857,
+                0,
+                0,
+                -94.57060433463205
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   08:34",
+    "historical_compare_before_unix_seconds": 1791102840,
+    "pine_logs": {
+      "paths": [
+        "evidence/ta-wpr-actual-ohlc-gaps-v6-v1-attempt1-logs.txt",
+        "evidence/ta-wpr-actual-ohlc-gaps-v6-v1-attempt1-logs-v1.json",
+        "evidence/ta-wpr-actual-ohlc-gaps-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "77539e4ebb18c36bf78e5908da68b4d14e3b49c2bc3672b9e5765765e0833eaf",
+    "csv_bytes": 2658586,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "ACTUAL_OPEN",
+      "ACTUAL_HIGH",
+      "ACTUAL_LOW",
+      "ACTUAL_CLOSE",
+      "ACTUAL_VOLUME",
+      "OHLC_MISSING",
+      "VOLUME_MISSING",
+      "WPR"
+    ],
+    "declared_to_native_header_mapping": {
+      "ACTUAL_OPEN": "ACTUAL_OPEN",
+      "ACTUAL_HIGH": "ACTUAL_HIGH",
+      "ACTUAL_LOW": "ACTUAL_LOW",
+      "ACTUAL_CLOSE": "ACTUAL_CLOSE",
+      "ACTUAL_VOLUME": "ACTUAL_VOLUME",
+      "OHLC_MISSING": "OHLC_MISSING",
+      "VOLUME_MISSING": "VOLUME_MISSING",
+      "WPR": "WPR"
+    },
+    "csv_rows": 24738,
+    "historical_rows": 24737,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791102840,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791102840",
+    "first_historical_values": {
+      "ACTUAL_OPEN": "77682",
+      "ACTUAL_HIGH": "77682.01",
+      "ACTUAL_LOW": "77572",
+      "ACTUAL_CLOSE": "77674.04",
+      "ACTUAL_VOLUME": "51.86295",
+      "OHLC_MISSING": "0",
+      "VOLUME_MISSING": "0",
+      "WPR": ""
+    },
+    "last_historical_values": {
+      "ACTUAL_OPEN": "85064",
+      "ACTUAL_HIGH": "85090.01",
+      "ACTUAL_LOW": "85060.65",
+      "ACTUAL_CLOSE": "85067.99",
+      "ACTUAL_VOLUME": "18.34457",
+      "OHLC_MISSING": "0",
+      "VOLUME_MISSING": "0",
+      "WPR": "-94.57060433463205"
+    },
+    "data_window_witness": "captures/v7/evidence/ta-wpr-actual-ohlc-gaps-v6-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "script": "array-min-allna-empty-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "cc2905b0d8def89ac031e060de93db39284dd6ef3763fa0fa50291c513da8ac4",
+    "indicator_title": "V7 array-min-allna-empty-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/array-min-allna-empty-v6-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T163451.701.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 array-min-allna-empty-v6-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24438,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24738,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T08:34:42.993Z",
+    "live_candle_open_utc": "2026-10-04T08:34:00.000Z",
+    "export_utc": "2026-10-04T08:34:52.063Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/array-min-allna-empty-v6-v1-attempt1-setup.png",
+      "captures/v7/evidence/array-min-allna-empty-v6-v1-attempt1-export.png",
+      "captures/v7/evidence/array-min-allna-empty-v6-v1-attempt1-logs.txt",
+      "captures/v7/evidence/array-min-allna-empty-v6-v1-attempt1-logs-v1.json",
+      "captures/v7/evidence/array-min-allna-empty-v6-v1-attempt1-logs.png",
+      "captures/v7/evidence/array-min-allna-empty-v6-v1-attempt1-visual.png",
+      "captures/v7/evidence/array-min-allna-empty-v6-v1-attempt1-data-window-v1.png",
+      "captures/v7/evidence/array-min-allna-empty-v6-v1-attempt1-data-window-v1.json",
+      "captures/v7/evidence/array-min-allna-empty-v6-v1-attempt1-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T08:34:43.894Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790797680,
+            83721.62,
+            83784.41,
+            83686,
+            83699.99,
+            30.82296
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791102840,
+            85068,
+            85085.02,
+            85067.99,
+            85085.02,
+            2.06939
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 array-min-allna-empty-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T08:34:45.005Z",
+        "bars": 24738,
+        "end": true,
+        "first": {
+          "index": -24438,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791102840,
+            85068,
+            85085.02,
+            85067.99,
+            85085.01,
+            2.07775
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 array-min-allna-empty-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T08:34:45.681Z",
+        "bars": 24738,
+        "end": true,
+        "first": {
+          "index": -24438,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791102840,
+            85068,
+            85085.02,
+            85067.99,
+            85085.01,
+            2.07775
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 array-min-allna-empty-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T08:34:46.377Z",
+        "bars": 24738,
+        "end": true,
+        "first": {
+          "index": -24438,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791102840,
+            85068,
+            85085.02,
+            85067.99,
+            85085.02,
+            2.09886
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 array-min-allna-empty-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T08:34:47.048Z",
+        "bars": 24738,
+        "end": true,
+        "first": {
+          "index": -24438,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791102840,
+            85068,
+            85085.02,
+            85067.99,
+            85085.02,
+            2.12658
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 array-min-allna-empty-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   08:34",
+    "historical_compare_before_unix_seconds": 1791102840,
+    "pine_logs": {
+      "paths": [
+        "evidence/array-min-allna-empty-v6-v1-attempt1-logs.txt",
+        "evidence/array-min-allna-empty-v6-v1-attempt1-logs-v1.json",
+        "evidence/array-min-allna-empty-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "06867a8545865691e1e9bb5a048d7076ed3c6c7d030dc55c0dd4655b460333e8",
+    "csv_bytes": 1143990,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "ALL_NA",
+      "EMPTY"
+    ],
+    "declared_to_native_header_mapping": {
+      "ALL_NA": "ALL_NA",
+      "EMPTY": "EMPTY"
+    },
+    "csv_rows": 24738,
+    "historical_rows": 24737,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791102840,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791102840",
+    "first_historical_values": {
+      "ALL_NA": "",
+      "EMPTY": ""
+    },
+    "last_historical_values": {
+      "ALL_NA": "",
+      "EMPTY": ""
+    },
+    "data_window_witness": "captures/v7/evidence/array-min-allna-empty-v6-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "script": "array-min-allna-empty-v6-v1.pine",
+    "attempt": 2,
+    "source_sha256": "cc2905b0d8def89ac031e060de93db39284dd6ef3763fa0fa50291c513da8ac4",
+    "indicator_title": "V7 array-min-allna-empty-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/array-min-allna-empty-v6-v1-attempt2.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T163523.834.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 array-min-allna-empty-v6-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24438,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24738,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T08:35:14.118Z",
+    "live_candle_open_utc": "2026-10-04T08:34:00.000Z",
+    "export_utc": "2026-10-04T08:35:24.204Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/array-min-allna-empty-v6-v1-attempt2-setup.png",
+      "captures/v7/evidence/array-min-allna-empty-v6-v1-attempt2-export.png",
+      "captures/v7/evidence/array-min-allna-empty-v6-v1-attempt2-logs.txt",
+      "captures/v7/evidence/array-min-allna-empty-v6-v1-attempt2-logs-v1.json",
+      "captures/v7/evidence/array-min-allna-empty-v6-v1-attempt2-logs.png",
+      "captures/v7/evidence/array-min-allna-empty-v6-v1-attempt2-visual.png",
+      "captures/v7/evidence/array-min-allna-empty-v6-v1-attempt2-data-window-v1.png",
+      "captures/v7/evidence/array-min-allna-empty-v6-v1-attempt2-data-window-v1.json",
+      "captures/v7/evidence/array-min-allna-empty-v6-v1-attempt2-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": "2026-10-04T08:34:59.871Z",
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T08:35:15.369Z",
+        "bars": 24738,
+        "end": true,
+        "first": {
+          "index": -24438,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791102840,
+            85068,
+            85085.02,
+            85067.99,
+            85068,
+            7.98252
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 array-min-allna-empty-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T08:35:16.297Z",
+        "bars": 24738,
+        "end": true,
+        "first": {
+          "index": -24438,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791102840,
+            85068,
+            85085.02,
+            85067.99,
+            85068,
+            7.98252
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 array-min-allna-empty-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T08:35:17.327Z",
+        "bars": 24738,
+        "end": true,
+        "first": {
+          "index": -24438,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791102840,
+            85068,
+            85085.02,
+            85067.99,
+            85068,
+            7.99565
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 array-min-allna-empty-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T08:35:18.060Z",
+        "bars": 24738,
+        "end": true,
+        "first": {
+          "index": -24438,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791102840,
+            85068,
+            85085.02,
+            85067.99,
+            85068,
+            8.05126
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 array-min-allna-empty-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T08:35:18.806Z",
+        "bars": 24738,
+        "end": true,
+        "first": {
+          "index": -24438,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791102840,
+            85068,
+            85085.02,
+            85067.99,
+            85068,
+            8.0514
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 array-min-allna-empty-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   08:34",
+    "historical_compare_before_unix_seconds": 1791102840,
+    "pine_logs": {
+      "paths": [
+        "evidence/array-min-allna-empty-v6-v1-attempt2-logs.txt",
+        "evidence/array-min-allna-empty-v6-v1-attempt2-logs-v1.json",
+        "evidence/array-min-allna-empty-v6-v1-attempt2-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "0c30cd74648fc9e97b0953a98b33f63302faa26cdce8720ece325e20c4417d0b",
+    "csv_bytes": 1143990,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "ALL_NA",
+      "EMPTY"
+    ],
+    "declared_to_native_header_mapping": {
+      "ALL_NA": "ALL_NA",
+      "EMPTY": "EMPTY"
+    },
+    "csv_rows": 24738,
+    "historical_rows": 24737,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791102840,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791102840",
+    "first_historical_values": {
+      "ALL_NA": "",
+      "EMPTY": ""
+    },
+    "last_historical_values": {
+      "ALL_NA": "",
+      "EMPTY": ""
+    },
+    "data_window_witness": "captures/v7/evidence/array-min-allna-empty-v6-v1-attempt2-data-window-v1.json"
+  },
+  {
+    "script": "array-standardize-allna-empty-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "367993cccdba57cd179c177e3da9cf40bcacf65f15e7d384e412bd5c79b33c14",
+    "indicator_title": "V7 array-standardize-allna-empty-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/array-standardize-allna-empty-v6-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T163551.496.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 array-standardize-allna-empty-v6-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24438,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24738,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T08:35:43.667Z",
+    "live_candle_open_utc": "2026-10-04T08:34:00.000Z",
+    "export_utc": "2026-10-04T08:35:51.884Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/array-standardize-allna-empty-v6-v1-attempt1-setup.png",
+      "captures/v7/evidence/array-standardize-allna-empty-v6-v1-attempt1-export.png",
+      "captures/v7/evidence/array-standardize-allna-empty-v6-v1-attempt1-logs.txt",
+      "captures/v7/evidence/array-standardize-allna-empty-v6-v1-attempt1-logs-v1.json",
+      "captures/v7/evidence/array-standardize-allna-empty-v6-v1-attempt1-logs.png",
+      "captures/v7/evidence/array-standardize-allna-empty-v6-v1-attempt1-visual.png",
+      "captures/v7/evidence/array-standardize-allna-empty-v6-v1-attempt1-data-window-v1.png",
+      "captures/v7/evidence/array-standardize-allna-empty-v6-v1-attempt1-data-window-v1.json",
+      "captures/v7/evidence/array-standardize-allna-empty-v6-v1-attempt1-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T08:35:44.595Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790797680,
+            83721.62,
+            83784.41,
+            83686,
+            83699.99,
+            30.82296
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791102840,
+            85068,
+            85085.02,
+            85066,
+            85066,
+            8.89837
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 array-standardize-allna-empty-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790797680,
+                3,
+                null,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791102840,
+                3,
+                null,
+                0
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T08:35:45.768Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790797680,
+            83721.62,
+            83784.41,
+            83686,
+            83699.99,
+            30.82296
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791102840,
+            85068,
+            85085.02,
+            85066,
+            85066.01,
+            8.92665
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 array-standardize-allna-empty-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24738,
+            "first": {
+              "index": -1022194,
+              "value": [
+                1788134400,
+                3,
+                null,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791102840,
+                3,
+                null,
+                0
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T08:35:46.661Z",
+        "bars": 24738,
+        "end": true,
+        "first": {
+          "index": -24438,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791102840,
+            85068,
+            85085.02,
+            85066,
+            85066.01,
+            8.93096
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 array-standardize-allna-empty-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24738,
+            "first": {
+              "index": -24438,
+              "value": [
+                1788134400,
+                3,
+                null,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791102840,
+                3,
+                null,
+                0
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   08:34",
+    "historical_compare_before_unix_seconds": 1791102840,
+    "pine_logs": {
+      "paths": [
+        "evidence/array-standardize-allna-empty-v6-v1-attempt1-logs.txt",
+        "evidence/array-standardize-allna-empty-v6-v1-attempt1-logs-v1.json",
+        "evidence/array-standardize-allna-empty-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "3c1d7a14982714feedf30b8a0a244ded5053cf7cf7d36fcca1804908f2949e01",
+    "csv_bytes": 1218227,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "ALL_NA_SIZE",
+      "ALL_NA_FIRST",
+      "EMPTY_SIZE"
+    ],
+    "declared_to_native_header_mapping": {
+      "ALL_NA_SIZE": "ALL_NA_SIZE",
+      "ALL_NA_FIRST": "ALL_NA_FIRST",
+      "EMPTY_SIZE": "EMPTY_SIZE"
+    },
+    "csv_rows": 24738,
+    "historical_rows": 24737,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791102840,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791102840",
+    "first_historical_values": {
+      "ALL_NA_SIZE": "3",
+      "ALL_NA_FIRST": "",
+      "EMPTY_SIZE": "0"
+    },
+    "last_historical_values": {
+      "ALL_NA_SIZE": "3",
+      "ALL_NA_FIRST": "",
+      "EMPTY_SIZE": "0"
+    },
+    "data_window_witness": "captures/v7/evidence/array-standardize-allna-empty-v6-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "script": "array-standardize-allna-empty-v6-v1.pine",
+    "attempt": 2,
+    "source_sha256": "367993cccdba57cd179c177e3da9cf40bcacf65f15e7d384e412bd5c79b33c14",
+    "indicator_title": "V7 array-standardize-allna-empty-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/array-standardize-allna-empty-v6-v1-attempt2.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T163620.991.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 array-standardize-allna-empty-v6-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24439,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24739,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T08:36:14.196Z",
+    "live_candle_open_utc": "2026-10-04T08:36:00.000Z",
+    "export_utc": "2026-10-04T08:36:21.193Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/array-standardize-allna-empty-v6-v1-attempt2-setup.png",
+      "captures/v7/evidence/array-standardize-allna-empty-v6-v1-attempt2-export.png",
+      "captures/v7/evidence/array-standardize-allna-empty-v6-v1-attempt2-logs.txt",
+      "captures/v7/evidence/array-standardize-allna-empty-v6-v1-attempt2-logs-v1.json",
+      "captures/v7/evidence/array-standardize-allna-empty-v6-v1-attempt2-logs.png",
+      "captures/v7/evidence/array-standardize-allna-empty-v6-v1-attempt2-visual.png",
+      "captures/v7/evidence/array-standardize-allna-empty-v6-v1-attempt2-data-window-v1.png",
+      "captures/v7/evidence/array-standardize-allna-empty-v6-v1-attempt2-data-window-v1.json",
+      "captures/v7/evidence/array-standardize-allna-empty-v6-v1-attempt2-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": "2026-10-04T08:35:59.593Z",
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T08:36:15.218Z",
+        "bars": 300,
+        "end": false,
+        "first": {
+          "index": 0,
+          "value": [
+            1791067080,
+            84790,
+            84792.01,
+            84790,
+            84792.01,
+            1.48122
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791102960,
+            85059.03,
+            85059.03,
+            85059.02,
+            85059.02,
+            0.20178
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 array-standardize-allna-empty-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24739,
+            "first": {
+              "index": -1024439,
+              "value": [
+                1788134400,
+                3,
+                null,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791102960,
+                3,
+                null,
+                0
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T08:36:16.249Z",
+        "bars": 24739,
+        "end": true,
+        "first": {
+          "index": -24439,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791102960,
+            85059.03,
+            85059.03,
+            85059.02,
+            85059.03,
+            0.21373
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 array-standardize-allna-empty-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24739,
+            "first": {
+              "index": -24439,
+              "value": [
+                1788134400,
+                3,
+                null,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791102960,
+                3,
+                null,
+                0
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   08:36",
+    "historical_compare_before_unix_seconds": 1791102960,
+    "pine_logs": {
+      "paths": [
+        "evidence/array-standardize-allna-empty-v6-v1-attempt2-logs.txt",
+        "evidence/array-standardize-allna-empty-v6-v1-attempt2-logs-v1.json",
+        "evidence/array-standardize-allna-empty-v6-v1-attempt2-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "f28f73657761219610796855989bf8f3571855bb0c02172b5ab82be0d479c777",
+    "csv_bytes": 1218279,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "ALL_NA_SIZE",
+      "ALL_NA_FIRST",
+      "EMPTY_SIZE"
+    ],
+    "declared_to_native_header_mapping": {
+      "ALL_NA_SIZE": "ALL_NA_SIZE",
+      "ALL_NA_FIRST": "ALL_NA_FIRST",
+      "EMPTY_SIZE": "EMPTY_SIZE"
+    },
+    "csv_rows": 24739,
+    "historical_rows": 24738,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791102960,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791102960",
+    "first_historical_values": {
+      "ALL_NA_SIZE": "3",
+      "ALL_NA_FIRST": "",
+      "EMPTY_SIZE": "0"
+    },
+    "last_historical_values": {
+      "ALL_NA_SIZE": "3",
+      "ALL_NA_FIRST": "",
+      "EMPTY_SIZE": "0"
+    },
+    "data_window_witness": "captures/v7/evidence/array-standardize-allna-empty-v6-v1-attempt2-data-window-v1.json"
+  },
+  {
+    "script": "matrix-stochastic-row-column-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "3c0177e4781256573a79dc67253fe12b7ebb429b6838a444baf88641d7ec356c",
+    "indicator_title": "V7 matrix-stochastic-row-column-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/matrix-stochastic-row-column-v6-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T163648.250.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 matrix-stochastic-row-column-v6-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24439,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24739,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T08:36:41.015Z",
+    "live_candle_open_utc": "2026-10-04T08:36:00.000Z",
+    "export_utc": "2026-10-04T08:36:48.618Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/matrix-stochastic-row-column-v6-v1-attempt1-setup.png",
+      "captures/v7/evidence/matrix-stochastic-row-column-v6-v1-attempt1-export.png",
+      "captures/v7/evidence/matrix-stochastic-row-column-v6-v1-attempt1-logs.txt",
+      "captures/v7/evidence/matrix-stochastic-row-column-v6-v1-attempt1-logs-v1.json",
+      "captures/v7/evidence/matrix-stochastic-row-column-v6-v1-attempt1-logs.png",
+      "captures/v7/evidence/matrix-stochastic-row-column-v6-v1-attempt1-visual.png",
+      "captures/v7/evidence/matrix-stochastic-row-column-v6-v1-attempt1-data-window-v1.png",
+      "captures/v7/evidence/matrix-stochastic-row-column-v6-v1-attempt1-data-window-v1.json",
+      "captures/v7/evidence/matrix-stochastic-row-column-v6-v1-attempt1-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T08:36:41.702Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790797800,
+            83699.99,
+            83718.01,
+            83541.32,
+            83552.29,
+            41.16179
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791102960,
+            85059.03,
+            85065.07,
+            85059.02,
+            85065.07,
+            0.93309
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 matrix-stochastic-row-column-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790797800,
+                1,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791102960,
+                1,
+                0
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T08:36:42.691Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790797800,
+            83699.99,
+            83718.01,
+            83541.32,
+            83552.29,
+            41.16179
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791102960,
+            85059.03,
+            85065.07,
+            85059.02,
+            85065.06,
+            0.9399
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 matrix-stochastic-row-column-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24739,
+            "first": {
+              "index": -1022195,
+              "value": [
+                1788134400,
+                1,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791102960,
+                1,
+                0
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T08:36:43.543Z",
+        "bars": 24739,
+        "end": true,
+        "first": {
+          "index": -24439,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791102960,
+            85059.03,
+            85065.07,
+            85059.02,
+            85065.06,
+            0.99569
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 matrix-stochastic-row-column-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24739,
+            "first": {
+              "index": -24439,
+              "value": [
+                1788134400,
+                1,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791102960,
+                1,
+                0
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   08:36",
+    "historical_compare_before_unix_seconds": 1791102960,
+    "pine_logs": {
+      "paths": [
+        "evidence/matrix-stochastic-row-column-v6-v1-attempt1-logs.txt",
+        "evidence/matrix-stochastic-row-column-v6-v1-attempt1-logs-v1.json",
+        "evidence/matrix-stochastic-row-column-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "e3b1403107247a325840c1293b0aa62135959b139ec6398fc0e29d573d6a69e9",
+    "csv_bytes": 1193525,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "ROW_ONLY",
+      "COLUMN_ONLY"
+    ],
+    "declared_to_native_header_mapping": {
+      "ROW_ONLY": "ROW_ONLY",
+      "COLUMN_ONLY": "COLUMN_ONLY"
+    },
+    "csv_rows": 24739,
+    "historical_rows": 24738,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791102960,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791102960",
+    "first_historical_values": {
+      "ROW_ONLY": "1",
+      "COLUMN_ONLY": "0"
+    },
+    "last_historical_values": {
+      "ROW_ONLY": "1",
+      "COLUMN_ONLY": "0"
+    },
+    "data_window_witness": "captures/v7/evidence/matrix-stochastic-row-column-v6-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "script": "matrix-stochastic-row-column-v6-v1.pine",
+    "attempt": 2,
+    "source_sha256": "3c0177e4781256573a79dc67253fe12b7ebb429b6838a444baf88641d7ec356c",
+    "indicator_title": "V7 matrix-stochastic-row-column-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/matrix-stochastic-row-column-v6-v1-attempt2.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T163717.287.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 matrix-stochastic-row-column-v6-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24439,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24739,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T08:37:10.411Z",
+    "live_candle_open_utc": "2026-10-04T08:36:00.000Z",
+    "export_utc": "2026-10-04T08:37:17.676Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/matrix-stochastic-row-column-v6-v1-attempt2-setup.png",
+      "captures/v7/evidence/matrix-stochastic-row-column-v6-v1-attempt2-export.png",
+      "captures/v7/evidence/matrix-stochastic-row-column-v6-v1-attempt2-logs.txt",
+      "captures/v7/evidence/matrix-stochastic-row-column-v6-v1-attempt2-logs-v1.json",
+      "captures/v7/evidence/matrix-stochastic-row-column-v6-v1-attempt2-logs.png",
+      "captures/v7/evidence/matrix-stochastic-row-column-v6-v1-attempt2-visual.png",
+      "captures/v7/evidence/matrix-stochastic-row-column-v6-v1-attempt2-data-window-v1.png",
+      "captures/v7/evidence/matrix-stochastic-row-column-v6-v1-attempt2-data-window-v1.json",
+      "captures/v7/evidence/matrix-stochastic-row-column-v6-v1-attempt2-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": "2026-10-04T08:36:56.347Z",
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T08:37:11.305Z",
+        "bars": 300,
+        "end": false,
+        "first": {
+          "index": 0,
+          "value": [
+            1791067080,
+            84790,
+            84792.01,
+            84790,
+            84792.01,
+            1.48122
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791102960,
+            85059.03,
+            85065.07,
+            85054.2,
+            85054.2,
+            2.88451
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 matrix-stochastic-row-column-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24739,
+            "first": {
+              "index": -1024439,
+              "value": [
+                1788134400,
+                1,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791102960,
+                1,
+                0
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T08:37:11.980Z",
+        "bars": 24739,
+        "end": true,
+        "first": {
+          "index": -24439,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791102960,
+            85059.03,
+            85065.07,
+            85054.2,
+            85054.2,
+            2.89761
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 matrix-stochastic-row-column-v6-v1",
+            "status": {
+              "type": 1,
+              "startTime": 1791103031938
+            },
+            "size": 24739,
+            "first": {
+              "index": -24439,
+              "value": [
+                1788134400,
+                1,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791102960,
+                1,
+                0
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T08:37:12.773Z",
+        "bars": 24739,
+        "end": true,
+        "first": {
+          "index": -24439,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791102960,
+            85059.03,
+            85065.07,
+            85054.2,
+            85054.2,
+            2.94433
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 matrix-stochastic-row-column-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24739,
+            "first": {
+              "index": -24439,
+              "value": [
+                1788134400,
+                1,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791102960,
+                1,
+                0
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   08:36",
+    "historical_compare_before_unix_seconds": 1791102960,
+    "pine_logs": {
+      "paths": [
+        "evidence/matrix-stochastic-row-column-v6-v1-attempt2-logs.txt",
+        "evidence/matrix-stochastic-row-column-v6-v1-attempt2-logs-v1.json",
+        "evidence/matrix-stochastic-row-column-v6-v1-attempt2-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "80d3994826f790de89ef166ef947fe93dab3d8ec637d607db345902327531f2f",
+    "csv_bytes": 1193524,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "ROW_ONLY",
+      "COLUMN_ONLY"
+    ],
+    "declared_to_native_header_mapping": {
+      "ROW_ONLY": "ROW_ONLY",
+      "COLUMN_ONLY": "COLUMN_ONLY"
+    },
+    "csv_rows": 24739,
+    "historical_rows": 24738,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791102960,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791102960",
+    "first_historical_values": {
+      "ROW_ONLY": "1",
+      "COLUMN_ONLY": "0"
+    },
+    "last_historical_values": {
+      "ROW_ONLY": "1",
+      "COLUMN_ONLY": "0"
+    },
+    "data_window_witness": "captures/v7/evidence/matrix-stochastic-row-column-v6-v1-attempt2-data-window-v1.json"
   }
 ]

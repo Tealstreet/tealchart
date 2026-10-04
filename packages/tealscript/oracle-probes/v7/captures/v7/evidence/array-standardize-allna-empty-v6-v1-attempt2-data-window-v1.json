@@ -1,0 +1,31 @@
+{
+  "index": 298,
+  "bar": [
+    1791102840,
+    85068,
+    85085.02,
+    85059.02,
+    85059.03,
+    9.71335
+  ],
+  "source_row": [
+    1791102840,
+    3,
+    null,
+    0
+  ],
+  "browser_utc": "2026-10-04T08:36:25.880Z",
+  "title": "V7 array-standardize-allna-empty-v6-v1",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   08:34",
+  "visible_range": {
+    "_firstBar": 263,
+    "_lastBar": 301
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}
