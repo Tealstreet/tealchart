@@ -1,0 +1,34 @@
+{
+  "index": 298,
+  "bar": [
+    1791139080,
+    85318.01,
+    85318.01,
+    85318,
+    85318,
+    4.91052
+  ],
+  "source_row": [
+    1791139080,
+    1791139080000,
+    85318.01,
+    85318,
+    85318,
+    0,
+    85314.19412911999
+  ],
+  "browser_utc": "2026-10-04T18:40:20.363Z",
+  "title": "V13 SAR actual missing extrema v1",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   18:38",
+  "visible_range": {
+    "_firstBar": 263,
+    "_lastBar": 301
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}

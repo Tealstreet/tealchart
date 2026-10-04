@@ -1,0 +1,35 @@
+{
+  "index": 298,
+  "bar": [
+    1791139320,
+    85327.45,
+    85333.72,
+    85327.44,
+    85333.72,
+    1.85629
+  ],
+  "source_row": [
+    1791139320,
+    1,
+    1,
+    1791138900000,
+    1791139200000,
+    7999,
+    1791139320000,
+    20001
+  ],
+  "browser_utc": "2026-10-04T18:44:32.402Z",
+  "title": "V13 security confirmed context BK v1",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   18:42",
+  "visible_range": {
+    "_firstBar": 263,
+    "_lastBar": 301
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}

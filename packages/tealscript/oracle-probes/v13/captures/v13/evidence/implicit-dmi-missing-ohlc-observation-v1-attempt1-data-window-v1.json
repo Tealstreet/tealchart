@@ -1,0 +1,36 @@
+{
+  "index": 298,
+  "bar": [
+    1791138960,
+    85325.74,
+    85325.74,
+    85318,
+    85318,
+    8.63319
+  ],
+  "source_row": [
+    1791138960,
+    1791138960000,
+    85325.74,
+    85318,
+    85318,
+    0,
+    31.360561531779698,
+    16.588526915595427,
+    54.47896132439535
+  ],
+  "browser_utc": "2026-10-04T18:39:50.345Z",
+  "title": "V13 DMI actual missing OHLC v1",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   18:36",
+  "visible_range": {
+    "_firstBar": 263,
+    "_lastBar": 301
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}

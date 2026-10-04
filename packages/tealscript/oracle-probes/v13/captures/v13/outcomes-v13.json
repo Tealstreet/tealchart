@@ -15189,5 +15189,5629 @@
     },
     "declared_unexported_columns": [],
     "data_window_witness": "captures/v13/evidence/analyst-target-unavailable-context-v13-v1-attempt3-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T18:39:13.909Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "arm",
+        "bitness": "64",
+        "brands": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156"
+          }
+        ],
+        "fullVersionList": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8.0.0.0"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156.0.8075.0"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156.0.8075.0"
+          }
+        ],
+        "mobile": false,
+        "platform": "macOS",
+        "platformVersion": "27.2.0"
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v13 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "v5-negative-const-int-division-v1.pine",
+    "attempt": 1,
+    "source_sha256": "a3b7b345a071447d7b225defb9c3b54d3abb4435f0fa6acafd6ca31998bf5e52",
+    "indicator_title": "V13 negative const int division v1",
+    "status": "RUNS",
+    "csv_file": "captures/v13/v5-negative-const-int-division-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-05T023913.132.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "minmove": 1,
+      "pricescale": 100,
+      "pointvalue": 1,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V13 negative const int division v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24740,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 25040,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T18:39:05.108Z",
+    "live_candle_open_utc": "2026-10-04T18:38:00.000Z",
+    "export_utc": "2026-10-04T18:39:13.519Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v13/evidence/v5-negative-const-int-division-v1-attempt1-setup.png",
+      "captures/v13/evidence/v5-negative-const-int-division-v1-attempt1-export.png",
+      "captures/v13/evidence/v5-negative-const-int-division-v1-attempt1-logs.txt",
+      "captures/v13/evidence/v5-negative-const-int-division-v1-attempt1-logs-v1.json",
+      "captures/v13/evidence/v5-negative-const-int-division-v1-attempt1-logs.png",
+      "captures/v13/evidence/v5-negative-const-int-division-v1-attempt1-visual.png",
+      "captures/v13/evidence/v5-negative-const-int-division-v1-attempt1-data-window-v1.png",
+      "captures/v13/evidence/v5-negative-const-int-division-v1-attempt1-data-window-v1.json",
+      "captures/v13/evidence/v5-negative-const-int-division-v1-attempt1-data-window-v1.txt",
+      "captures/v13/evidence/v5-negative-const-int-division-v1-attempt1-authority-object-geometry-v1.json",
+      "captures/v13/evidence/v5-negative-const-int-division-v1-attempt1-authority-object-geometry-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T18:39:05.949Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790833920,
+            84323.03,
+            84333.33,
+            84320.36,
+            84333.32,
+            6.67688
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791139080,
+            85318.01,
+            85318.01,
+            85318,
+            85318,
+            1.16743
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V13 negative const int division v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790833920,
+                -2,
+                -2,
+                -2.5,
+                -2
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791139080,
+                -2,
+                -2,
+                -2.5,
+                -2
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T18:39:06.937Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790833920,
+            84323.03,
+            84333.33,
+            84320.36,
+            84333.32,
+            6.67688
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791139080,
+            85318.01,
+            85318.01,
+            85318,
+            85318,
+            1.16743
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V13 negative const int division v1",
+            "status": {
+              "type": 2
+            },
+            "size": 20000,
+            "first": {
+              "index": -1017456,
+              "value": [
+                1788739200,
+                -2,
+                -2,
+                -2.5,
+                -2
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791139080,
+                -2,
+                -2,
+                -2.5,
+                -2
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T18:39:08.223Z",
+        "bars": 25040,
+        "end": true,
+        "first": {
+          "index": -24740,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791139080,
+            85318.01,
+            85318.01,
+            85318,
+            85318.01,
+            1.1726
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V13 negative const int division v1",
+            "status": {
+              "type": 2
+            },
+            "size": 20000,
+            "first": {
+              "index": -19700,
+              "value": [
+                1788739200,
+                -2,
+                -2,
+                -2.5,
+                -2
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791139080,
+                -2,
+                -2,
+                -2.5,
+                -2
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///3e09332e-66cf-4fcd-bad5-1e333c273e08.pine?placement%3Ddialog",
+          "path": "/3e09332e-66cf-4fcd-bad5-1e333c273e08.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      },
+      {
+        "resource": {
+          "$mid": 1,
+          "fsPath": "/3e09332e-66cf-4fcd-bad5-1e333c273e08.pine",
+          "external": "file:///3e09332e-66cf-4fcd-bad5-1e333c273e08.pine?placement%3Ddialog",
+          "path": "/3e09332e-66cf-4fcd-bad5-1e333c273e08.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "owner",
+        "severity": 4,
+        "message": "The division of two `const int` values yields a rounded down `int` value. If you require a `float` result, cast one of the values to `float`: `float(int1) / int2`.",
+        "startLineNumber": 4,
+        "startColumn": 6,
+        "endLineNumber": 4,
+        "endColumn": 18
+      },
+      {
+        "resource": {
+          "$mid": 1,
+          "fsPath": "/3e09332e-66cf-4fcd-bad5-1e333c273e08.pine",
+          "external": "file:///3e09332e-66cf-4fcd-bad5-1e333c273e08.pine?placement%3Ddialog",
+          "path": "/3e09332e-66cf-4fcd-bad5-1e333c273e08.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "owner",
+        "severity": 4,
+        "message": "The division of two `const int` values yields a rounded down `int` value. If you require a `float` result, cast one of the values to `float`: `float(int1) / int2`.",
+        "startLineNumber": 5,
+        "startColumn": 6,
+        "endLineNumber": 5,
+        "endColumn": 11
+      }
+    ],
+    "live_tooltip": "Sun 04 Oct '26   18:38",
+    "historical_compare_before_unix_seconds": 1791139080,
+    "pine_logs": {
+      "paths": [
+        "evidence/v5-negative-const-int-division-v1-attempt1-logs.txt",
+        "evidence/v5-negative-const-int-division-v1-attempt1-logs-v1.json",
+        "evidence/v5-negative-const-int-division-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "all_exported_column_occurrences": [
+      {
+        "title": "time",
+        "occurrence": 1,
+        "position": 0
+      },
+      {
+        "title": "open",
+        "occurrence": 1,
+        "position": 1
+      },
+      {
+        "title": "high",
+        "occurrence": 1,
+        "position": 2
+      },
+      {
+        "title": "low",
+        "occurrence": 1,
+        "position": 3
+      },
+      {
+        "title": "close",
+        "occurrence": 1,
+        "position": 4
+      },
+      {
+        "title": "CONST_NEGATIVE",
+        "occurrence": 1,
+        "position": 5
+      },
+      {
+        "title": "LITERAL_NEGATIVE",
+        "occurrence": 1,
+        "position": 6
+      },
+      {
+        "title": "FLOAT_CONTROL",
+        "occurrence": 1,
+        "position": 7
+      },
+      {
+        "title": "EXPLICIT_CAST_CONTROL",
+        "occurrence": 1,
+        "position": 8
+      }
+    ],
+    "declared_to_native_column_occurrences": [
+      {
+        "declared_title": "CONST_NEGATIVE",
+        "native_title": "CONST_NEGATIVE",
+        "occurrence": 1,
+        "position": 5
+      },
+      {
+        "declared_title": "LITERAL_NEGATIVE",
+        "native_title": "LITERAL_NEGATIVE",
+        "occurrence": 1,
+        "position": 6
+      },
+      {
+        "declared_title": "FLOAT_CONTROL",
+        "native_title": "FLOAT_CONTROL",
+        "occurrence": 1,
+        "position": 7
+      },
+      {
+        "declared_title": "EXPLICIT_CAST_CONTROL",
+        "native_title": "EXPLICIT_CAST_CONTROL",
+        "occurrence": 1,
+        "position": 8
+      }
+    ],
+    "named_value_map_scope": "Legacy title maps show the first occurrence only; original positional cells and occurrence tables retain every duplicate without renaming.",
+    "csv_sha256": "73a259e304e5f396e3f4da13f6cda4352df760988de50ec60e35a5c4f4677b08",
+    "csv_bytes": 1408329,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "CONST_NEGATIVE",
+      "LITERAL_NEGATIVE",
+      "FLOAT_CONTROL",
+      "EXPLICIT_CAST_CONTROL"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "CONST_NEGATIVE": 5,
+      "LITERAL_NEGATIVE": 6,
+      "FLOAT_CONTROL": 7,
+      "EXPLICIT_CAST_CONTROL": 8
+    },
+    "first_historical_cells": [
+      "1788134400",
+      "77682",
+      "77682.01",
+      "77572",
+      "77674.04",
+      "",
+      "",
+      "",
+      ""
+    ],
+    "last_historical_cells": [
+      "1791138960",
+      "85325.74",
+      "85325.74",
+      "85318",
+      "85318",
+      "-2",
+      "-2",
+      "-2.5",
+      "-2"
+    ],
+    "declared_to_native_header_mapping": {
+      "CONST_NEGATIVE": "CONST_NEGATIVE",
+      "LITERAL_NEGATIVE": "LITERAL_NEGATIVE",
+      "FLOAT_CONTROL": "FLOAT_CONTROL",
+      "EXPLICIT_CAST_CONTROL": "EXPLICIT_CAST_CONTROL"
+    },
+    "csv_rows": 25040,
+    "historical_rows": 25039,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791139080,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791139080",
+    "first_historical_values": {
+      "CONST_NEGATIVE": "",
+      "LITERAL_NEGATIVE": "",
+      "FLOAT_CONTROL": "",
+      "EXPLICIT_CAST_CONTROL": ""
+    },
+    "last_historical_values": {
+      "CONST_NEGATIVE": "-2",
+      "LITERAL_NEGATIVE": "-2",
+      "FLOAT_CONTROL": "-2.5",
+      "EXPLICIT_CAST_CONTROL": "-2"
+    },
+    "declared_unexported_columns": [],
+    "data_window_witness": "captures/v13/evidence/v5-negative-const-int-division-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T18:39:46.008Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "arm",
+        "bitness": "64",
+        "brands": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156"
+          }
+        ],
+        "fullVersionList": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8.0.0.0"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156.0.8075.0"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156.0.8075.0"
+          }
+        ],
+        "mobile": false,
+        "platform": "macOS",
+        "platformVersion": "27.2.0"
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v13 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "implicit-dmi-missing-ohlc-observation-v1.pine",
+    "attempt": 1,
+    "source_sha256": "7afcc23a6a29dc6ea5d9376fc5597ed28b7a21bb2653c76e8343e3e98cee1630",
+    "indicator_title": "V13 DMI actual missing OHLC v1",
+    "status": "RUNS",
+    "csv_file": "captures/v13/implicit-dmi-missing-ohlc-observation-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-05T023945.206.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "minmove": 1,
+      "pricescale": 100,
+      "pointvalue": 1,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V13 DMI actual missing OHLC v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24740,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 25040,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T18:39:38.128Z",
+    "live_candle_open_utc": "2026-10-04T18:38:00.000Z",
+    "export_utc": "2026-10-04T18:39:45.585Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v13/evidence/implicit-dmi-missing-ohlc-observation-v1-attempt1-setup.png",
+      "captures/v13/evidence/implicit-dmi-missing-ohlc-observation-v1-attempt1-export.png",
+      "captures/v13/evidence/implicit-dmi-missing-ohlc-observation-v1-attempt1-logs.txt",
+      "captures/v13/evidence/implicit-dmi-missing-ohlc-observation-v1-attempt1-logs-v1.json",
+      "captures/v13/evidence/implicit-dmi-missing-ohlc-observation-v1-attempt1-logs.png",
+      "captures/v13/evidence/implicit-dmi-missing-ohlc-observation-v1-attempt1-visual.png",
+      "captures/v13/evidence/implicit-dmi-missing-ohlc-observation-v1-attempt1-data-window-v1.png",
+      "captures/v13/evidence/implicit-dmi-missing-ohlc-observation-v1-attempt1-data-window-v1.json",
+      "captures/v13/evidence/implicit-dmi-missing-ohlc-observation-v1-attempt1-data-window-v1.txt",
+      "captures/v13/evidence/implicit-dmi-missing-ohlc-observation-v1-attempt1-authority-object-geometry-v1.json",
+      "captures/v13/evidence/implicit-dmi-missing-ohlc-observation-v1-attempt1-authority-object-geometry-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T18:39:38.946Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790833920,
+            84323.03,
+            84333.33,
+            84320.36,
+            84333.32,
+            6.67688
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791139080,
+            85318.01,
+            85318.01,
+            85318,
+            85318.01,
+            4.84388
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V13 DMI actual missing OHLC v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790833920,
+                1790833920000,
+                84333.33,
+                84320.36,
+                84333.32,
+                0,
+                73.32960852610589,
+                14.406547484879683,
+                59.052574349509136
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791139080,
+                1791139080000,
+                85318.01,
+                85318,
+                85318.01,
+                0,
+                31.34517061656541,
+                16.580385715348452,
+                46.58855707689973
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T18:39:39.957Z",
+        "bars": 25040,
+        "end": true,
+        "first": {
+          "index": -24740,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791139080,
+            85318.01,
+            85318.01,
+            85318,
+            85318,
+            4.85605
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V13 DMI actual missing OHLC v1",
+            "status": {
+              "type": 2
+            },
+            "size": 20000,
+            "first": {
+              "index": -19700,
+              "value": [
+                1788739200,
+                1788739200000,
+                80356,
+                80230.29,
+                80293.23,
+                0,
+                null,
+                null,
+                null
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791139080,
+                1791139080000,
+                85318.01,
+                85318,
+                85318,
+                0,
+                31.34517061656541,
+                16.580385715348452,
+                46.58855707689973
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   18:38",
+    "historical_compare_before_unix_seconds": 1791139080,
+    "pine_logs": {
+      "paths": [
+        "evidence/implicit-dmi-missing-ohlc-observation-v1-attempt1-logs.txt",
+        "evidence/implicit-dmi-missing-ohlc-observation-v1-attempt1-logs-v1.json",
+        "evidence/implicit-dmi-missing-ohlc-observation-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "all_exported_column_occurrences": [
+      {
+        "title": "time",
+        "occurrence": 1,
+        "position": 0
+      },
+      {
+        "title": "open",
+        "occurrence": 1,
+        "position": 1
+      },
+      {
+        "title": "high",
+        "occurrence": 1,
+        "position": 2
+      },
+      {
+        "title": "low",
+        "occurrence": 1,
+        "position": 3
+      },
+      {
+        "title": "close",
+        "occurrence": 1,
+        "position": 4
+      },
+      {
+        "title": "INPUT_TIME",
+        "occurrence": 1,
+        "position": 5
+      },
+      {
+        "title": "ACTUAL_HIGH",
+        "occurrence": 1,
+        "position": 6
+      },
+      {
+        "title": "ACTUAL_LOW",
+        "occurrence": 1,
+        "position": 7
+      },
+      {
+        "title": "ACTUAL_CLOSE",
+        "occurrence": 1,
+        "position": 8
+      },
+      {
+        "title": "OHLC_MISSING",
+        "occurrence": 1,
+        "position": 9
+      },
+      {
+        "title": "PLUS",
+        "occurrence": 1,
+        "position": 10
+      },
+      {
+        "title": "MINUS",
+        "occurrence": 1,
+        "position": 11
+      },
+      {
+        "title": "ADX",
+        "occurrence": 1,
+        "position": 12
+      }
+    ],
+    "declared_to_native_column_occurrences": [
+      {
+        "declared_title": "INPUT_TIME",
+        "native_title": "INPUT_TIME",
+        "occurrence": 1,
+        "position": 5
+      },
+      {
+        "declared_title": "ACTUAL_HIGH",
+        "native_title": "ACTUAL_HIGH",
+        "occurrence": 1,
+        "position": 6
+      },
+      {
+        "declared_title": "ACTUAL_LOW",
+        "native_title": "ACTUAL_LOW",
+        "occurrence": 1,
+        "position": 7
+      },
+      {
+        "declared_title": "ACTUAL_CLOSE",
+        "native_title": "ACTUAL_CLOSE",
+        "occurrence": 1,
+        "position": 8
+      },
+      {
+        "declared_title": "OHLC_MISSING",
+        "native_title": "OHLC_MISSING",
+        "occurrence": 1,
+        "position": 9
+      },
+      {
+        "declared_title": "PLUS",
+        "native_title": "PLUS",
+        "occurrence": 1,
+        "position": 10
+      },
+      {
+        "declared_title": "MINUS",
+        "native_title": "MINUS",
+        "occurrence": 1,
+        "position": 11
+      },
+      {
+        "declared_title": "ADX",
+        "native_title": "ADX",
+        "occurrence": 1,
+        "position": 12
+      }
+    ],
+    "named_value_map_scope": "Legacy title maps show the first occurrence only; original positional cells and occurrence tables retain every duplicate without renaming.",
+    "csv_sha256": "d46229afa32b1969a88779e71fc71aa7dc250b428eba34699d9ba4e3ec7e2363",
+    "csv_bytes": 3066259,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "INPUT_TIME",
+      "ACTUAL_HIGH",
+      "ACTUAL_LOW",
+      "ACTUAL_CLOSE",
+      "OHLC_MISSING",
+      "PLUS",
+      "MINUS",
+      "ADX"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "INPUT_TIME": 5,
+      "ACTUAL_HIGH": 6,
+      "ACTUAL_LOW": 7,
+      "ACTUAL_CLOSE": 8,
+      "OHLC_MISSING": 9,
+      "PLUS": 10,
+      "MINUS": 11,
+      "ADX": 12
+    },
+    "first_historical_cells": [
+      "1788134400",
+      "77682",
+      "77682.01",
+      "77572",
+      "77674.04",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""
+    ],
+    "last_historical_cells": [
+      "1791138960",
+      "85325.74",
+      "85325.74",
+      "85318",
+      "85318",
+      "1791138960000",
+      "85325.74",
+      "85318",
+      "85318",
+      "0",
+      "31.360561531779698",
+      "16.588526915595427",
+      "54.47896132439535"
+    ],
+    "declared_to_native_header_mapping": {
+      "INPUT_TIME": "INPUT_TIME",
+      "ACTUAL_HIGH": "ACTUAL_HIGH",
+      "ACTUAL_LOW": "ACTUAL_LOW",
+      "ACTUAL_CLOSE": "ACTUAL_CLOSE",
+      "OHLC_MISSING": "OHLC_MISSING",
+      "PLUS": "PLUS",
+      "MINUS": "MINUS",
+      "ADX": "ADX"
+    },
+    "csv_rows": 25040,
+    "historical_rows": 25039,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791139080,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791139080",
+    "first_historical_values": {
+      "INPUT_TIME": "",
+      "ACTUAL_HIGH": "",
+      "ACTUAL_LOW": "",
+      "ACTUAL_CLOSE": "",
+      "OHLC_MISSING": "",
+      "PLUS": "",
+      "MINUS": "",
+      "ADX": ""
+    },
+    "last_historical_values": {
+      "INPUT_TIME": "1791138960000",
+      "ACTUAL_HIGH": "85325.74",
+      "ACTUAL_LOW": "85318",
+      "ACTUAL_CLOSE": "85318",
+      "OHLC_MISSING": "0",
+      "PLUS": "31.360561531779698",
+      "MINUS": "16.588526915595427",
+      "ADX": "54.47896132439535"
+    },
+    "declared_unexported_columns": [],
+    "data_window_witness": "captures/v13/evidence/implicit-dmi-missing-ohlc-observation-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T18:40:15.683Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "arm",
+        "bitness": "64",
+        "brands": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156"
+          }
+        ],
+        "fullVersionList": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8.0.0.0"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156.0.8075.0"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156.0.8075.0"
+          }
+        ],
+        "mobile": false,
+        "platform": "macOS",
+        "platformVersion": "27.2.0"
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v13 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "implicit-sar-missing-extrema-observation-v1.pine",
+    "attempt": 1,
+    "source_sha256": "e6e7cbcdbafa98032b43dd927cf7100a42008eb058ad7259ebf287433ada42bc",
+    "indicator_title": "V13 SAR actual missing extrema v1",
+    "status": "RUNS",
+    "csv_file": "captures/v13/implicit-sar-missing-extrema-observation-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-05T024014.971.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "minmove": 1,
+      "pricescale": 100,
+      "pointvalue": 1,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V13 SAR actual missing extrema v1",
+      "dataset_start_utc": "2026-09-07T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -19701,
+        "value": [
+          1788739200,
+          80341.83,
+          80356,
+          80230.29,
+          80293.23,
+          37.66955
+        ]
+      },
+      "chart_bars": 20001,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T18:40:07.964Z",
+    "live_candle_open_utc": "2026-10-04T18:40:00.000Z",
+    "export_utc": "2026-10-04T18:40:15.213Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v13/evidence/implicit-sar-missing-extrema-observation-v1-attempt1-setup.png",
+      "captures/v13/evidence/implicit-sar-missing-extrema-observation-v1-attempt1-export.png",
+      "captures/v13/evidence/implicit-sar-missing-extrema-observation-v1-attempt1-logs.txt",
+      "captures/v13/evidence/implicit-sar-missing-extrema-observation-v1-attempt1-logs-v1.json",
+      "captures/v13/evidence/implicit-sar-missing-extrema-observation-v1-attempt1-logs.png",
+      "captures/v13/evidence/implicit-sar-missing-extrema-observation-v1-attempt1-visual.png",
+      "captures/v13/evidence/implicit-sar-missing-extrema-observation-v1-attempt1-data-window-v1.png",
+      "captures/v13/evidence/implicit-sar-missing-extrema-observation-v1-attempt1-data-window-v1.json",
+      "captures/v13/evidence/implicit-sar-missing-extrema-observation-v1-attempt1-data-window-v1.txt",
+      "captures/v13/evidence/implicit-sar-missing-extrema-observation-v1-attempt1-authority-object-geometry-v1.json",
+      "captures/v13/evidence/implicit-sar-missing-extrema-observation-v1-attempt1-authority-object-geometry-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T18:40:08.803Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790834040,
+            84333.33,
+            84368,
+            84316,
+            84316.01,
+            11.27216
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791139200,
+            85318.01,
+            85318.01,
+            85318,
+            85318.01,
+            0.01211
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V13 SAR actual missing extrema v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790834040,
+                1790834040000,
+                84368,
+                84316,
+                84316.01,
+                0,
+                84215.221968
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791139200,
+                1791139200000,
+                85318.01,
+                85318,
+                85318.01,
+                0,
+                85314.8932465376
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T18:40:09.794Z",
+        "bars": 20001,
+        "end": true,
+        "first": {
+          "index": -19701,
+          "value": [
+            1788739200,
+            80341.83,
+            80356,
+            80230.29,
+            80293.23,
+            37.66955
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791139200,
+            85318.01,
+            85318.01,
+            85318,
+            85318,
+            0.0189
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V13 SAR actual missing extrema v1",
+            "status": {
+              "type": 2
+            },
+            "size": 20001,
+            "first": {
+              "index": -19701,
+              "value": [
+                1788739200,
+                1788739200000,
+                80356,
+                80230.29,
+                80293.23,
+                0,
+                null
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791139200,
+                1791139200000,
+                85318.01,
+                85318,
+                85318,
+                0,
+                85314.8932465376
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   18:40",
+    "historical_compare_before_unix_seconds": 1791139200,
+    "pine_logs": {
+      "paths": [
+        "evidence/implicit-sar-missing-extrema-observation-v1-attempt1-logs.txt",
+        "evidence/implicit-sar-missing-extrema-observation-v1-attempt1-logs-v1.json",
+        "evidence/implicit-sar-missing-extrema-observation-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "all_exported_column_occurrences": [
+      {
+        "title": "time",
+        "occurrence": 1,
+        "position": 0
+      },
+      {
+        "title": "open",
+        "occurrence": 1,
+        "position": 1
+      },
+      {
+        "title": "high",
+        "occurrence": 1,
+        "position": 2
+      },
+      {
+        "title": "low",
+        "occurrence": 1,
+        "position": 3
+      },
+      {
+        "title": "close",
+        "occurrence": 1,
+        "position": 4
+      },
+      {
+        "title": "INPUT_TIME",
+        "occurrence": 1,
+        "position": 5
+      },
+      {
+        "title": "ACTUAL_HIGH",
+        "occurrence": 1,
+        "position": 6
+      },
+      {
+        "title": "ACTUAL_LOW",
+        "occurrence": 1,
+        "position": 7
+      },
+      {
+        "title": "ACTUAL_CLOSE",
+        "occurrence": 1,
+        "position": 8
+      },
+      {
+        "title": "OHLC_MISSING",
+        "occurrence": 1,
+        "position": 9
+      },
+      {
+        "title": "TARGET",
+        "occurrence": 1,
+        "position": 10
+      }
+    ],
+    "declared_to_native_column_occurrences": [
+      {
+        "declared_title": "INPUT_TIME",
+        "native_title": "INPUT_TIME",
+        "occurrence": 1,
+        "position": 5
+      },
+      {
+        "declared_title": "ACTUAL_HIGH",
+        "native_title": "ACTUAL_HIGH",
+        "occurrence": 1,
+        "position": 6
+      },
+      {
+        "declared_title": "ACTUAL_LOW",
+        "native_title": "ACTUAL_LOW",
+        "occurrence": 1,
+        "position": 7
+      },
+      {
+        "declared_title": "ACTUAL_CLOSE",
+        "native_title": "ACTUAL_CLOSE",
+        "occurrence": 1,
+        "position": 8
+      },
+      {
+        "declared_title": "OHLC_MISSING",
+        "native_title": "OHLC_MISSING",
+        "occurrence": 1,
+        "position": 9
+      },
+      {
+        "declared_title": "TARGET",
+        "native_title": "TARGET",
+        "occurrence": 1,
+        "position": 10
+      }
+    ],
+    "named_value_map_scope": "Legacy title maps show the first occurrence only; original positional cells and occurrence tables retain every duplicate without renaming.",
+    "csv_sha256": "3c232d76ab9b1ac29cc5dec17b94e64127f5751aa2df611cf6a66af877a0478f",
+    "csv_bytes": 2016951,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "INPUT_TIME",
+      "ACTUAL_HIGH",
+      "ACTUAL_LOW",
+      "ACTUAL_CLOSE",
+      "OHLC_MISSING",
+      "TARGET"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "INPUT_TIME": 5,
+      "ACTUAL_HIGH": 6,
+      "ACTUAL_LOW": 7,
+      "ACTUAL_CLOSE": 8,
+      "OHLC_MISSING": 9,
+      "TARGET": 10
+    },
+    "first_historical_cells": [
+      "1788739200",
+      "80341.83",
+      "80356",
+      "80230.29",
+      "80293.23",
+      "1788739200000",
+      "80356",
+      "80230.29",
+      "80293.23",
+      "0",
+      ""
+    ],
+    "last_historical_cells": [
+      "1791139080",
+      "85318.01",
+      "85318.01",
+      "85318",
+      "85318",
+      "1791139080000",
+      "85318.01",
+      "85318",
+      "85318",
+      "0",
+      "85314.19412911999"
+    ],
+    "declared_to_native_header_mapping": {
+      "INPUT_TIME": "INPUT_TIME",
+      "ACTUAL_HIGH": "ACTUAL_HIGH",
+      "ACTUAL_LOW": "ACTUAL_LOW",
+      "ACTUAL_CLOSE": "ACTUAL_CLOSE",
+      "OHLC_MISSING": "OHLC_MISSING",
+      "TARGET": "TARGET"
+    },
+    "csv_rows": 20001,
+    "historical_rows": 20000,
+    "first_csv_timestamp_seconds": 1788739200,
+    "last_csv_timestamp_seconds": 1791139200,
+    "first_csv_time_raw": "1788739200",
+    "last_csv_time_raw": "1791139200",
+    "first_historical_values": {
+      "INPUT_TIME": "1788739200000",
+      "ACTUAL_HIGH": "80356",
+      "ACTUAL_LOW": "80230.29",
+      "ACTUAL_CLOSE": "80293.23",
+      "OHLC_MISSING": "0",
+      "TARGET": ""
+    },
+    "last_historical_values": {
+      "INPUT_TIME": "1791139080000",
+      "ACTUAL_HIGH": "85318.01",
+      "ACTUAL_LOW": "85318",
+      "ACTUAL_CLOSE": "85318",
+      "OHLC_MISSING": "0",
+      "TARGET": "85314.19412911999"
+    },
+    "declared_unexported_columns": [],
+    "data_window_witness": "captures/v13/evidence/implicit-sar-missing-extrema-observation-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T18:42:20.591Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "arm",
+        "bitness": "64",
+        "brands": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156"
+          }
+        ],
+        "fullVersionList": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8.0.0.0"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156.0.8075.0"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156.0.8075.0"
+          }
+        ],
+        "mobile": false,
+        "platform": "macOS",
+        "platformVersion": "27.2.0"
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v13 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "corpus-752-scanner-loop-limit-v1.pine",
+    "attempt": 1,
+    "source_sha256": "71c25778f2a82d080f483d58fa98643e78546825007cfb111c056df96e3040cc",
+    "indicator_title": "Momentum Setup - RSI Directional Momentum Scanner",
+    "status": "RUNTIME-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": "Invalid symbol: NSE:ZOMATO",
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null,
+      "native": {
+        "ctx": {
+          "symbol": "NSE:ZOMATO"
+        },
+        "error": "Invalid symbol: {symbol}",
+        "title": "Runtime error",
+        "showReportItButton": false,
+        "studyAccessBlocked": false,
+        "compiler_markers": [],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,327.45\nH\n85,327.45\nL\n85,327.44\nC\n85,327.45\n+0.01 (+0.00%)\n85,327.44\nSELL\n0.01\n85,327.45\nBUY\nUSDT\nRSIDMScan\nContinuous Break\n12\nbottom_left\nsmall\n14\nclose\n14\n0.5\n5\n5\n60\n5\n2\n500,000\n0\n14\n1\n70\n2\n20\n90\n5\n9\n15\n10\n15\n25\n10\n2,024\nbottom_right\nnormal\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n18:42:22 UTC\n99+\nRuntime error\nRuntime error\n\nInvalid symbol: NSE:ZOMATO",
+        "context_substituted_message": "Invalid symbol: NSE:ZOMATO"
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "minmove": 1,
+      "pricescale": 100,
+      "pointvalue": 1,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [
+        {
+          "id": "in_0",
+          "name": "Scanning Method",
+          "value": "Continuous Break",
+          "default": "Continuous Break"
+        },
+        {
+          "id": "in_1",
+          "name": "Paste Symbols",
+          "value": "NSE:ABCAPITAL,NSE:ABFRL,NSE:ASHOKLEY,NSE:BANDHANBNK,NSE:BANKBARODA,NSE:BANKINDIA,NSE:BEL,NSE:BHEL,NSE:BIOCON,NSE:BPCL,NSE:CESC,NSE:DELHIVERY,NSE:FEDERALBNK,NSE:GAIL,NSE:HINDCOPPER,NSE:HUDCO,NSE:IEX,NSE:IGL,NSE:IIFL,NSE:INDUSTOWER,NSE:IOC,NSE:IREDA,NSE:IRFC,NSE:JIOFIN,NSE:LTF,NSE:MANAPPURAM,NSE:MOTHERSON,NSE:M_MFIN,NSE:NATIONALUM,NSE:NCC,NSE:NYKAA,NSE:ONGC,NSE:PETRONET,NSE:POONAWALLA,NSE:POWERGRID,NSE:RBLBANK,NSE:SAIL,NSE:TATASTEEL,NSE:UNIONBANK,NSE:ZOMATO",
+          "default": "NSE:ABCAPITAL,NSE:ABFRL,NSE:ASHOKLEY,NSE:BANDHANBNK,NSE:BANKBARODA,NSE:BANKINDIA,NSE:BEL,NSE:BHEL,NSE:BIOCON,NSE:BPCL,NSE:CESC,NSE:DELHIVERY,NSE:FEDERALBNK,NSE:GAIL,NSE:HINDCOPPER,NSE:HUDCO,NSE:IEX,NSE:IGL,NSE:IIFL,NSE:INDUSTOWER,NSE:IOC,NSE:IREDA,NSE:IRFC,NSE:JIOFIN,NSE:LTF,NSE:MANAPPURAM,NSE:MOTHERSON,NSE:M_MFIN,NSE:NATIONALUM,NSE:NCC,NSE:NYKAA,NSE:ONGC,NSE:PETRONET,NSE:POONAWALLA,NSE:POWERGRID,NSE:RBLBANK,NSE:SAIL,NSE:TATASTEEL,NSE:UNIONBANK,NSE:ZOMATO"
+        },
+        {
+          "id": "in_2",
+          "name": "Display Table",
+          "value": true,
+          "default": true
+        },
+        {
+          "id": "in_3",
+          "name": "Long Signals",
+          "value": true,
+          "default": true
+        },
+        {
+          "id": "in_4",
+          "name": "Short Signals",
+          "value": true,
+          "default": true
+        },
+        {
+          "id": "in_5",
+          "name": "Display Rows",
+          "value": 12,
+          "default": 12
+        },
+        {
+          "id": "in_6",
+          "name": "Table Position",
+          "value": "bottom_left",
+          "default": "bottom_left"
+        },
+        {
+          "id": "in_7",
+          "name": "Table Size",
+          "value": "small",
+          "default": "small"
+        },
+        {
+          "id": "in_8",
+          "name": "RSI Length",
+          "value": 14,
+          "default": 14
+        },
+        {
+          "id": "in_9",
+          "name": "RSI Source",
+          "value": "close",
+          "default": "close"
+        },
+        {
+          "id": "in_10",
+          "name": "SMA Length",
+          "value": 14,
+          "default": 14
+        },
+        {
+          "id": "in_11",
+          "name": "Fib Value",
+          "value": 0.5,
+          "default": 0.5
+        },
+        {
+          "id": "in_12",
+          "name": "Display Bullish Divergence",
+          "value": true,
+          "default": true
+        },
+        {
+          "id": "in_13",
+          "name": "Display Bearish Divergence",
+          "value": true,
+          "default": true
+        },
+        {
+          "id": "in_14",
+          "name": "Display Hidden Bullish Divergence",
+          "value": true,
+          "default": true
+        },
+        {
+          "id": "in_15",
+          "name": "Display Hidden Bearish Divergence",
+          "value": true,
+          "default": true
+        },
+        {
+          "id": "in_16",
+          "name": "Pivot Lookback Right",
+          "value": 5,
+          "default": 5
+        },
+        {
+          "id": "in_17",
+          "name": "Pivot Lookback Left",
+          "value": 5,
+          "default": 5
+        },
+        {
+          "id": "in_18",
+          "name": "Max of Lookback Range",
+          "value": 60,
+          "default": 60
+        },
+        {
+          "id": "in_19",
+          "name": "Min of Lookback Range",
+          "value": 5,
+          "default": 5
+        },
+        {
+          "id": "in_20",
+          "name": "Apply % Change Filter",
+          "value": false,
+          "default": false
+        },
+        {
+          "id": "in_21",
+          "name": "% Change Above/Below +/-",
+          "value": 2,
+          "default": 2
+        },
+        {
+          "id": "in_22",
+          "name": "Apply Volume Filter",
+          "value": false,
+          "default": false
+        },
+        {
+          "id": "in_23",
+          "name": "Volume Above",
+          "value": 500000,
+          "default": 500000
+        },
+        {
+          "id": "in_24",
+          "name": "Apply Volume % Change Filter",
+          "value": false,
+          "default": false
+        },
+        {
+          "id": "in_25",
+          "name": "Volume % Change Above",
+          "value": 0,
+          "default": 0
+        },
+        {
+          "id": "in_26",
+          "name": "Apply ATR Filter",
+          "value": false,
+          "default": false
+        },
+        {
+          "id": "in_27",
+          "name": "ATR Length",
+          "value": 14,
+          "default": 14
+        },
+        {
+          "id": "in_28",
+          "name": "ATR Multiplier",
+          "value": 1,
+          "default": 1
+        },
+        {
+          "id": "in_29",
+          "name": "Apply Body % Filter",
+          "value": false,
+          "default": false
+        },
+        {
+          "id": "in_30",
+          "name": "Body % Above",
+          "value": 70,
+          "default": 70
+        },
+        {
+          "id": "in_31",
+          "name": "Apply Body Size Filter",
+          "value": false,
+          "default": false
+        },
+        {
+          "id": "in_32",
+          "name": "Body Size Multiplier (x)",
+          "value": 2,
+          "default": 2
+        },
+        {
+          "id": "in_33",
+          "name": "Apply Volume Filter",
+          "value": false,
+          "default": false
+        },
+        {
+          "id": "in_34",
+          "name": "Volume SMA Length",
+          "value": 20,
+          "default": 20
+        },
+        {
+          "id": "in_35",
+          "name": "Apply Relative Volume Filter",
+          "value": false,
+          "default": false
+        },
+        {
+          "id": "in_36",
+          "name": "Relative Volume Length",
+          "value": 90,
+          "default": 90
+        },
+        {
+          "id": "in_37",
+          "name": "Rel Vol SMA Multiplier",
+          "value": 5,
+          "default": 5
+        },
+        {
+          "id": "in_38",
+          "name": "Apply Time Filter",
+          "value": false,
+          "default": false
+        },
+        {
+          "id": "in_39",
+          "name": "Time From",
+          "value": 9,
+          "default": 9
+        },
+        {
+          "id": "in_40",
+          "name": ":",
+          "value": 15,
+          "default": 15
+        },
+        {
+          "id": "in_41",
+          "name": "Time To\u2003",
+          "value": 10,
+          "default": 10
+        },
+        {
+          "id": "in_42",
+          "name": ":",
+          "value": 15,
+          "default": 15
+        },
+        {
+          "id": "in_43",
+          "name": "Apply Date Filter",
+          "value": false,
+          "default": false
+        },
+        {
+          "id": "in_44",
+          "name": "Day",
+          "value": 25,
+          "default": 25
+        },
+        {
+          "id": "in_45",
+          "name": "Month",
+          "value": 10,
+          "default": 10
+        },
+        {
+          "id": "in_46",
+          "name": "Year",
+          "value": 2024,
+          "default": 2024
+        },
+        {
+          "id": "in_47",
+          "name": "Display",
+          "value": true,
+          "default": true
+        },
+        {
+          "id": "in_48",
+          "name": "Position",
+          "value": "bottom_right",
+          "default": "bottom_right"
+        },
+        {
+          "id": "in_49",
+          "name": "Size",
+          "value": "normal",
+          "default": "normal"
+        }
+      ],
+      "observed_indicator_title": "Momentum Setup - RSI Directional Momentum Scanner",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24741,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 25042,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v13/evidence/corpus-752-scanner-loop-limit-v1-attempt1-error.png",
+      "captures/v13/evidence/corpus-752-scanner-loop-limit-v1-attempt1-error.txt",
+      "captures/v13/evidence/corpus-752-scanner-loop-limit-v1-attempt1-logs.txt",
+      "captures/v13/evidence/corpus-752-scanner-loop-limit-v1-attempt1-logs-v1.json",
+      "captures/v13/evidence/corpus-752-scanner-loop-limit-v1-attempt1-logs.png",
+      "captures/v13/evidence/corpus-752-scanner-loop-limit-v1-attempt1-source-and-defaults-v1.json",
+      "captures/v13/evidence/corpus-752-scanner-loop-limit-v1-attempt1-source-and-defaults-v1.png",
+      "captures/v13/evidence/corpus-752-scanner-loop-limit-v1-attempt1-inputs.png"
+    ],
+    "notes": "Unchanged complete scanner with original defaults; native Invalid symbol NSE:ZOMATO intervenes. Full history reset was applied but collector wait ended while status type1; later native read confirmed Runtime error. Reset UTC unobserved, timeline retained. Not a loop-limit outcome.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T18:41:29.976Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790834040,
+            84333.33,
+            84368,
+            84316,
+            84316.01,
+            11.27216
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791139200,
+            85318.01,
+            85327.45,
+            85318,
+            85327.45,
+            2.98026
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Momentum Setup - RSI Directional Momentum Scanner",
+            "status": {
+              "type": 1,
+              "startTime": 1791139289172
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T18:41:31.009Z",
+        "bars": 25041,
+        "end": true,
+        "first": {
+          "index": -24741,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791139200,
+            85318.01,
+            85327.45,
+            85318,
+            85327.45,
+            2.98223
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Momentum Setup - RSI Directional Momentum Scanner",
+            "status": {
+              "type": 1,
+              "startTime": 1791139289172
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T18:41:31.769Z",
+        "bars": 25041,
+        "end": true,
+        "first": {
+          "index": -24741,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791139200,
+            85318.01,
+            85327.45,
+            85318,
+            85327.45,
+            2.98223
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Momentum Setup - RSI Directional Momentum Scanner",
+            "status": {
+              "type": 1,
+              "startTime": 1791139289172
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T18:41:32.455Z",
+        "bars": 25041,
+        "end": true,
+        "first": {
+          "index": -24741,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791139200,
+            85318.01,
+            85327.45,
+            85318,
+            85327.45,
+            2.98223
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Momentum Setup - RSI Directional Momentum Scanner",
+            "status": {
+              "type": 1,
+              "startTime": 1791139289172
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T18:41:33.142Z",
+        "bars": 25041,
+        "end": true,
+        "first": {
+          "index": -24741,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791139200,
+            85318.01,
+            85327.45,
+            85318,
+            85327.45,
+            2.98526
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Momentum Setup - RSI Directional Momentum Scanner",
+            "status": {
+              "type": 1,
+              "startTime": 1791139289172
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T18:41:33.821Z",
+        "bars": 25041,
+        "end": true,
+        "first": {
+          "index": -24741,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791139200,
+            85318.01,
+            85327.45,
+            85318,
+            85327.44,
+            2.98705
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Momentum Setup - RSI Directional Momentum Scanner",
+            "status": {
+              "type": 1,
+              "startTime": 1791139289172
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T18:41:34.518Z",
+        "bars": 25041,
+        "end": true,
+        "first": {
+          "index": -24741,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791139200,
+            85318.01,
+            85327.45,
+            85318,
+            85327.44,
+            3.13496
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Momentum Setup - RSI Directional Momentum Scanner",
+            "status": {
+              "type": 1,
+              "startTime": 1791139289172
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T18:41:35.274Z",
+        "bars": 25041,
+        "end": true,
+        "first": {
+          "index": -24741,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791139200,
+            85318.01,
+            85327.45,
+            85318,
+            85327.44,
+            3.13496
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Momentum Setup - RSI Directional Momentum Scanner",
+            "status": {
+              "type": 1,
+              "startTime": 1791139289172
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T18:41:35.954Z",
+        "bars": 25041,
+        "end": true,
+        "first": {
+          "index": -24741,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791139200,
+            85318.01,
+            85327.45,
+            85318,
+            85327.44,
+            3.14112
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Momentum Setup - RSI Directional Momentum Scanner",
+            "status": {
+              "type": 1,
+              "startTime": 1791139289172
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T18:41:36.617Z",
+        "bars": 25041,
+        "end": true,
+        "first": {
+          "index": -24741,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791139200,
+            85318.01,
+            85327.45,
+            85318,
+            85327.44,
+            3.14369
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Momentum Setup - RSI Directional Momentum Scanner",
+            "status": {
+              "type": 1,
+              "startTime": 1791139289172
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T18:41:37.300Z",
+        "bars": 25041,
+        "end": true,
+        "first": {
+          "index": -24741,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791139200,
+            85318.01,
+            85327.45,
+            85318,
+            85327.44,
+            3.14369
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Momentum Setup - RSI Directional Momentum Scanner",
+            "status": {
+              "type": 1,
+              "startTime": 1791139289172
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T18:41:37.980Z",
+        "bars": 25041,
+        "end": true,
+        "first": {
+          "index": -24741,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791139200,
+            85318.01,
+            85327.45,
+            85318,
+            85327.45,
+            3.14694
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Momentum Setup - RSI Directional Momentum Scanner",
+            "status": {
+              "type": 1,
+              "startTime": 1791139289172
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T18:41:38.751Z",
+        "bars": 25041,
+        "end": true,
+        "first": {
+          "index": -24741,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791139200,
+            85318.01,
+            85327.45,
+            85318,
+            85327.44,
+            3.15069
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Momentum Setup - RSI Directional Momentum Scanner",
+            "status": {
+              "type": 1,
+              "startTime": 1791139289172
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T18:41:39.439Z",
+        "bars": 25041,
+        "end": true,
+        "first": {
+          "index": -24741,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791139200,
+            85318.01,
+            85327.45,
+            85318,
+            85327.44,
+            3.15069
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Momentum Setup - RSI Directional Momentum Scanner",
+            "status": {
+              "type": 1,
+              "startTime": 1791139289172
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T18:41:40.124Z",
+        "bars": 25041,
+        "end": true,
+        "first": {
+          "index": -24741,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791139200,
+            85318.01,
+            85327.45,
+            85318,
+            85327.45,
+            3.15258
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Momentum Setup - RSI Directional Momentum Scanner",
+            "status": {
+              "type": 1,
+              "startTime": 1791139289172
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T18:41:40.800Z",
+        "bars": 25041,
+        "end": true,
+        "first": {
+          "index": -24741,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791139200,
+            85318.01,
+            85327.45,
+            85318,
+            85327.44,
+            3.66913
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Momentum Setup - RSI Directional Momentum Scanner",
+            "status": {
+              "type": 1,
+              "startTime": 1791139289172
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T18:41:41.485Z",
+        "bars": 25041,
+        "end": true,
+        "first": {
+          "index": -24741,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791139200,
+            85318.01,
+            85327.45,
+            85318,
+            85327.44,
+            3.66913
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Momentum Setup - RSI Directional Momentum Scanner",
+            "status": {
+              "type": 1,
+              "startTime": 1791139289172
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T18:41:42.261Z",
+        "bars": 25041,
+        "end": true,
+        "first": {
+          "index": -24741,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791139200,
+            85318.01,
+            85327.45,
+            85318,
+            85327.44,
+            3.67075
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Momentum Setup - RSI Directional Momentum Scanner",
+            "status": {
+              "type": 1,
+              "startTime": 1791139289172
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T18:41:42.959Z",
+        "bars": 25041,
+        "end": true,
+        "first": {
+          "index": -24741,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791139200,
+            85318.01,
+            85327.45,
+            85318,
+            85327.45,
+            3.67447
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Momentum Setup - RSI Directional Momentum Scanner",
+            "status": {
+              "type": 1,
+              "startTime": 1791139289172
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T18:41:43.621Z",
+        "bars": 25041,
+        "end": true,
+        "first": {
+          "index": -24741,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791139200,
+            85318.01,
+            85327.45,
+            85318,
+            85327.45,
+            3.67634
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Momentum Setup - RSI Directional Momentum Scanner",
+            "status": {
+              "type": 1,
+              "startTime": 1791139289172
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T18:41:44.310Z",
+        "bars": 25041,
+        "end": true,
+        "first": {
+          "index": -24741,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791139200,
+            85318.01,
+            85327.45,
+            85318,
+            85327.45,
+            3.67634
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Momentum Setup - RSI Directional Momentum Scanner",
+            "status": {
+              "type": 1,
+              "startTime": 1791139289172
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T18:41:45.003Z",
+        "bars": 25041,
+        "end": true,
+        "first": {
+          "index": -24741,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791139200,
+            85318.01,
+            85327.45,
+            85318,
+            85327.44,
+            3.67909
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Momentum Setup - RSI Directional Momentum Scanner",
+            "status": {
+              "type": 1,
+              "startTime": 1791139289172
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T18:41:45.751Z",
+        "bars": 25041,
+        "end": true,
+        "first": {
+          "index": -24741,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791139200,
+            85318.01,
+            85327.45,
+            85318,
+            85327.44,
+            3.67909
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Momentum Setup - RSI Directional Momentum Scanner",
+            "status": {
+              "type": 1,
+              "startTime": 1791139289172
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T18:41:46.440Z",
+        "bars": 25041,
+        "end": true,
+        "first": {
+          "index": -24741,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791139200,
+            85318.01,
+            85327.45,
+            85318,
+            85327.44,
+            3.67909
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Momentum Setup - RSI Directional Momentum Scanner",
+            "status": {
+              "type": 1,
+              "startTime": 1791139289172
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T18:41:47.144Z",
+        "bars": 25041,
+        "end": true,
+        "first": {
+          "index": -24741,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791139200,
+            85318.01,
+            85327.45,
+            85318,
+            85327.44,
+            3.6836
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Momentum Setup - RSI Directional Momentum Scanner",
+            "status": {
+              "type": 1,
+              "startTime": 1791139289172
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T18:41:47.802Z",
+        "bars": 25041,
+        "end": true,
+        "first": {
+          "index": -24741,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791139200,
+            85318.01,
+            85327.45,
+            85318,
+            85327.44,
+            3.68746
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Momentum Setup - RSI Directional Momentum Scanner",
+            "status": {
+              "type": 1,
+              "startTime": 1791139289172
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T18:41:48.509Z",
+        "bars": 25041,
+        "end": true,
+        "first": {
+          "index": -24741,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791139200,
+            85318.01,
+            85327.45,
+            85318,
+            85327.44,
+            3.68746
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Momentum Setup - RSI Directional Momentum Scanner",
+            "status": {
+              "type": 1,
+              "startTime": 1791139289172
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T18:41:49.291Z",
+        "bars": 25041,
+        "end": true,
+        "first": {
+          "index": -24741,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791139200,
+            85318.01,
+            85327.45,
+            85318,
+            85327.44,
+            3.68746
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Momentum Setup - RSI Directional Momentum Scanner",
+            "status": {
+              "type": 1,
+              "startTime": 1791139289172
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T18:41:49.956Z",
+        "bars": 25041,
+        "end": true,
+        "first": {
+          "index": -24741,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791139200,
+            85318.01,
+            85327.45,
+            85318,
+            85327.45,
+            3.69907
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Momentum Setup - RSI Directional Momentum Scanner",
+            "status": {
+              "type": 1,
+              "startTime": 1791139289172
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T18:41:50.633Z",
+        "bars": 25041,
+        "end": true,
+        "first": {
+          "index": -24741,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791139200,
+            85318.01,
+            85327.45,
+            85318,
+            85327.44,
+            3.70083
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Momentum Setup - RSI Directional Momentum Scanner",
+            "status": {
+              "type": 1,
+              "startTime": 1791139289172
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T18:41:51.315Z",
+        "bars": 25041,
+        "end": true,
+        "first": {
+          "index": -24741,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791139200,
+            85318.01,
+            85327.45,
+            85318,
+            85327.44,
+            3.70083
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Momentum Setup - RSI Directional Momentum Scanner",
+            "status": {
+              "type": 1,
+              "startTime": 1791139289172
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T18:41:52.006Z",
+        "bars": 25041,
+        "end": true,
+        "first": {
+          "index": -24741,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791139200,
+            85318.01,
+            85327.45,
+            85318,
+            85327.44,
+            3.70433
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Momentum Setup - RSI Directional Momentum Scanner",
+            "status": {
+              "type": 1,
+              "startTime": 1791139289172
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T18:41:52.755Z",
+        "bars": 25041,
+        "end": true,
+        "first": {
+          "index": -24741,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791139200,
+            85318.01,
+            85327.45,
+            85318,
+            85327.44,
+            3.70433
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Momentum Setup - RSI Directional Momentum Scanner",
+            "status": {
+              "type": 1,
+              "startTime": 1791139289172
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T18:41:53.451Z",
+        "bars": 25041,
+        "end": true,
+        "first": {
+          "index": -24741,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791139200,
+            85318.01,
+            85327.45,
+            85318,
+            85327.44,
+            3.70433
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Momentum Setup - RSI Directional Momentum Scanner",
+            "status": {
+              "type": 1,
+              "startTime": 1791139289172
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T18:41:54.276Z",
+        "bars": 25041,
+        "end": true,
+        "first": {
+          "index": -24741,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791139200,
+            85318.01,
+            85327.45,
+            85318,
+            85327.44,
+            3.70804
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Momentum Setup - RSI Directional Momentum Scanner",
+            "status": {
+              "type": 1,
+              "startTime": 1791139289172
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T18:41:54.952Z",
+        "bars": 25041,
+        "end": true,
+        "first": {
+          "index": -24741,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791139200,
+            85318.01,
+            85327.45,
+            85318,
+            85327.45,
+            3.71725
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Momentum Setup - RSI Directional Momentum Scanner",
+            "status": {
+              "type": 1,
+              "startTime": 1791139289172
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T18:41:55.648Z",
+        "bars": 25041,
+        "end": true,
+        "first": {
+          "index": -24741,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791139200,
+            85318.01,
+            85327.45,
+            85318,
+            85327.45,
+            3.71738
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Momentum Setup - RSI Directional Momentum Scanner",
+            "status": {
+              "type": 1,
+              "startTime": 1791139289172
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T18:41:56.324Z",
+        "bars": 25041,
+        "end": true,
+        "first": {
+          "index": -24741,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791139200,
+            85318.01,
+            85327.45,
+            85318,
+            85327.45,
+            3.71738
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Momentum Setup - RSI Directional Momentum Scanner",
+            "status": {
+              "type": 1,
+              "startTime": 1791139289172
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T18:41:57.026Z",
+        "bars": 25041,
+        "end": true,
+        "first": {
+          "index": -24741,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791139200,
+            85318.01,
+            85327.45,
+            85318,
+            85327.45,
+            3.71738
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Momentum Setup - RSI Directional Momentum Scanner",
+            "status": {
+              "type": 1,
+              "startTime": 1791139289172
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T18:41:57.762Z",
+        "bars": 25041,
+        "end": true,
+        "first": {
+          "index": -24741,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791139200,
+            85318.01,
+            85327.45,
+            85318,
+            85327.45,
+            3.7226
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Momentum Setup - RSI Directional Momentum Scanner",
+            "status": {
+              "type": 1,
+              "startTime": 1791139289172
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///7b1d3849-eadb-4eac-9f1f-1d95db0c4327.pine?placement%3Ddialog",
+          "path": "/7b1d3849-eadb-4eac-9f1f-1d95db0c4327.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "CW10002",
+        "severity": 4,
+        "message": "The \"ta.atr()\" call inside the conditional expression might not execute on every bar, which can cause inconsistent calculations because the function depends on historical results. For consistency, assign the call's result to a global variable and use that variable in the expression instead.",
+        "startLineNumber": 203,
+        "startColumn": 49,
+        "endLineNumber": 203,
+        "endColumn": 69
+      },
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///7b1d3849-eadb-4eac-9f1f-1d95db0c4327.pine?placement%3Ddialog",
+          "path": "/7b1d3849-eadb-4eac-9f1f-1d95db0c4327.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "CW10002",
+        "severity": 4,
+        "message": "The \"ta.sma()\" call inside the conditional expression might not execute on every bar, which can cause inconsistent calculations because the function depends on historical results. For consistency, assign the call's result to a global variable and use that variable in the expression instead.",
+        "startLineNumber": 210,
+        "startColumn": 49,
+        "endLineNumber": 210,
+        "endColumn": 81
+      },
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///7b1d3849-eadb-4eac-9f1f-1d95db0c4327.pine?placement%3Ddialog",
+          "path": "/7b1d3849-eadb-4eac-9f1f-1d95db0c4327.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "CW10002",
+        "severity": 4,
+        "message": "The \"_inRange()\" call inside the conditional expression might not execute on every bar, which can cause inconsistent calculations because the function depends on historical results. For consistency, assign the call's result to a global variable and use that variable in the expression instead.",
+        "startLineNumber": 272,
+        "startColumn": 55,
+        "endLineNumber": 272,
+        "endColumn": 75
+      },
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///7b1d3849-eadb-4eac-9f1f-1d95db0c4327.pine?placement%3Ddialog",
+          "path": "/7b1d3849-eadb-4eac-9f1f-1d95db0c4327.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "CW10002",
+        "severity": 4,
+        "message": "The \"_inRange()\" call inside the conditional expression might not execute on every bar, which can cause inconsistent calculations because the function depends on historical results. For consistency, assign the call's result to a global variable and use that variable in the expression instead.",
+        "startLineNumber": 277,
+        "startColumn": 55,
+        "endLineNumber": 277,
+        "endColumn": 75
+      },
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///7b1d3849-eadb-4eac-9f1f-1d95db0c4327.pine?placement%3Ddialog",
+          "path": "/7b1d3849-eadb-4eac-9f1f-1d95db0c4327.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "CW10002",
+        "severity": 4,
+        "message": "The \"_inRange()\" call inside the conditional expression might not execute on every bar, which can cause inconsistent calculations because the function depends on historical results. For consistency, assign the call's result to a global variable and use that variable in the expression instead.",
+        "startLineNumber": 282,
+        "startColumn": 55,
+        "endLineNumber": 282,
+        "endColumn": 75
+      },
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///7b1d3849-eadb-4eac-9f1f-1d95db0c4327.pine?placement%3Ddialog",
+          "path": "/7b1d3849-eadb-4eac-9f1f-1d95db0c4327.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "CW10002",
+        "severity": 4,
+        "message": "The \"_inRange()\" call inside the conditional expression might not execute on every bar, which can cause inconsistent calculations because the function depends on historical results. For consistency, assign the call's result to a global variable and use that variable in the expression instead.",
+        "startLineNumber": 287,
+        "startColumn": 55,
+        "endLineNumber": 287,
+        "endColumn": 75
+      },
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///7b1d3849-eadb-4eac-9f1f-1d95db0c4327.pine?placement%3Ddialog",
+          "path": "/7b1d3849-eadb-4eac-9f1f-1d95db0c4327.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "CW10002",
+        "severity": 4,
+        "message": "The \"ta.crossover()\" call inside the conditional expression might not execute on every bar, which can cause inconsistent calculations because the function depends on historical results. For consistency, assign the call's result to a global variable and use that variable in the expression instead.",
+        "startLineNumber": 465,
+        "startColumn": 93,
+        "endLineNumber": 465,
+        "endColumn": 126
+      },
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///7b1d3849-eadb-4eac-9f1f-1d95db0c4327.pine?placement%3Ddialog",
+          "path": "/7b1d3849-eadb-4eac-9f1f-1d95db0c4327.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "CW10002",
+        "severity": 4,
+        "message": "The \"ta.crossunder()\" call inside the conditional expression might not execute on every bar, which can cause inconsistent calculations because the function depends on historical results. For consistency, assign the call's result to a global variable and use that variable in the expression instead.",
+        "startLineNumber": 472,
+        "startColumn": 89,
+        "endLineNumber": 472,
+        "endColumn": 121
+      }
+    ],
+    "error_observed_utc": "2026-10-04T18:42:24.205Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/corpus-752-scanner-loop-limit-v1-attempt1-logs.txt",
+        "evidence/corpus-752-scanner-loop-limit-v1-attempt1-logs-v1.json",
+        "evidence/corpus-752-scanner-loop-limit-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T18:42:52.798Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "arm",
+        "bitness": "64",
+        "brands": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156"
+          }
+        ],
+        "fullVersionList": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8.0.0.0"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156.0.8075.0"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156.0.8075.0"
+          }
+        ],
+        "mobile": false,
+        "platform": "macOS",
+        "platformVersion": "27.2.0"
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v13 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "history-overflow-offset-bk-v13-v1.pine",
+    "attempt": 1,
+    "source_sha256": "dd130bb8b1e0e8cc9273e1e58ae2afad11ad7459ecd6ddce17b7453308ecfd1c",
+    "indicator_title": "V13 history overflow offset BK v1",
+    "status": "RUNTIME-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": "RE10008",
+      "text": "Error on bar 0: The script attempts to reference historical data that is too far from the current bar (2147483647 bars back). The history-referencing length for the expression must be a value between 0 and 10000.",
+      "line": 5,
+      "column": null,
+      "first_bar_index": 0,
+      "first_bar_time_utc": null,
+      "native": {
+        "ctx": {
+          "invalidBarsBack": 2147483647,
+          "code": "RE10008",
+          "bar_index": 0,
+          "maxBarsBack": 10000
+        },
+        "error": "Error on bar {bar_index}: The script attempts to reference historical data that is too far from the current bar ({invalidBarsBack} bars back). The history-referencing length for the expression must be a value between 0 and {maxBarsBack}.",
+        "stack_trace": [
+          {
+            "n": "#main",
+            "p": 5
+          }
+        ],
+        "title": "Runtime error",
+        "showReportItButton": false,
+        "studyAccessBlocked": false,
+        "compiler_markers": [],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,327.45\nH\n85,331.76\nL\n85,327.44\nC\n85,331.75\n+4.31 (+0.01%)\n85,331.75\nSELL\n0.01\n85,331.76\nBUY\nUSDT\nV13 history overflow offset BK v1\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n18:42:54 UTC\n99+\nRuntime error: RE10008\nRuntime error: RE10008\nError on bar 0: The script attempts to reference historical data that is too far from the current bar (2147483647 bars back). The history-referencing length for the expression must be a value between 0 and 10000.\nat #main():5\nOpen in editor",
+        "context_substituted_message": "Error on bar 0: The script attempts to reference historical data that is too far from the current bar (2147483647 bars back). The history-referencing length for the expression must be a value between 0 and 10000."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "minmove": 1,
+      "pricescale": 100,
+      "pointvalue": 1,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V13 history overflow offset BK v1",
+      "dataset_start_utc": "2026-09-07T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -19702,
+        "value": [
+          1788739200,
+          80341.83,
+          80356,
+          80230.29,
+          80293.23,
+          37.66955
+        ]
+      },
+      "chart_bars": 20002,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T18:42:50.678Z",
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v13/evidence/history-overflow-offset-bk-v13-v1-attempt1-error.png",
+      "captures/v13/evidence/history-overflow-offset-bk-v13-v1-attempt1-error.txt",
+      "captures/v13/evidence/history-overflow-offset-bk-v13-v1-attempt1-logs.txt",
+      "captures/v13/evidence/history-overflow-offset-bk-v13-v1-attempt1-logs-v1.json",
+      "captures/v13/evidence/history-overflow-offset-bk-v13-v1-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T18:42:51.367Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790834160,
+            84316.01,
+            84316.01,
+            84280.55,
+            84282,
+            6.39854
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791139320,
+            85327.45,
+            85331.76,
+            85327.44,
+            85331.76,
+            0.75923
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V13 history overflow offset BK v1",
+            "status": {
+              "type": 3,
+              "errorDescription": {
+                "ctx": {
+                  "invalidBarsBack": 2147483647,
+                  "code": "RE10008",
+                  "bar_index": 0,
+                  "maxBarsBack": 10000
+                },
+                "error": "Error on bar {bar_index}: The script attempts to reference historical data that is too far from the current bar ({invalidBarsBack} bars back). The history-referencing length for the expression must be a value between 0 and {maxBarsBack}.",
+                "stack_trace": [
+                  {
+                    "n": "#main",
+                    "p": 5
+                  }
+                ],
+                "title": "Runtime error",
+                "showReportItButton": false,
+                "studyAccessBlocked": false
+              }
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T18:42:52.367Z",
+        "bars": 20002,
+        "end": true,
+        "first": {
+          "index": -19702,
+          "value": [
+            1788739200,
+            80341.83,
+            80356,
+            80230.29,
+            80293.23,
+            37.66955
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791139320,
+            85327.45,
+            85331.76,
+            85327.44,
+            85331.76,
+            0.75923
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V13 history overflow offset BK v1",
+            "status": {
+              "type": 3,
+              "errorDescription": {
+                "ctx": {
+                  "invalidBarsBack": 2147483647,
+                  "code": "RE10008",
+                  "bar_index": 0,
+                  "maxBarsBack": 10000
+                },
+                "error": "Error on bar {bar_index}: The script attempts to reference historical data that is too far from the current bar ({invalidBarsBack} bars back). The history-referencing length for the expression must be a value between 0 and {maxBarsBack}.",
+                "stack_trace": [
+                  {
+                    "n": "#main",
+                    "p": 5
+                  }
+                ],
+                "title": "Runtime error",
+                "showReportItButton": false,
+                "studyAccessBlocked": false
+              }
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "error_observed_utc": "2026-10-04T18:42:56.454Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/history-overflow-offset-bk-v13-v1-attempt1-logs.txt",
+        "evidence/history-overflow-offset-bk-v13-v1-attempt1-logs-v1.json",
+        "evidence/history-overflow-offset-bk-v13-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T18:43:13.639Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "arm",
+        "bitness": "64",
+        "brands": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156"
+          }
+        ],
+        "fullVersionList": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8.0.0.0"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156.0.8075.0"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156.0.8075.0"
+          }
+        ],
+        "mobile": false,
+        "platform": "macOS",
+        "platformVersion": "27.2.0"
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v13 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "history-inference-realtime-jump-bk-v13-v1.pine",
+    "attempt": 1,
+    "source_sha256": "28694a720ceeddf21a39f4606d3bc2c970eb3f4c2b119ded91431c85c3556c53",
+    "indicator_title": "V13 history inference realtime jump BK v1",
+    "status": "RUNTIME-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": "Error on bar 20001: The requested historical offset (151) is beyond the historical buffer's limit (101).",
+      "line": 4,
+      "column": null,
+      "first_bar_index": 20001,
+      "first_bar_time_utc": null,
+      "native": {
+        "ctx": {
+          "num1": 151,
+          "bar_index": 20001,
+          "num2": 101
+        },
+        "error": "Error on bar {bar_index}: The requested historical offset ({num1}) is beyond the historical buffer's limit ({num2}).",
+        "solution_id": "43000587849",
+        "stack_trace": [
+          {
+            "n": "#main",
+            "p": 4
+          }
+        ],
+        "title": "Runtime error",
+        "showReportItButton": false,
+        "studyAccessBlocked": false,
+        "compiler_markers": [],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,327.45\nH\n85,333.72\nL\n85,327.44\nC\n85,333.72\n+6.28 (+0.01%)\n85,333.71\nSELL\n0.01\n85,333.72\nBUY\nUSDT\nV13 history inference realtime jump BK v1\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n18:43:15 UTC\n99+\nRuntime error\nRuntime error\nError on bar 20001: The requested historical offset (151) is beyond the historical buffer's limit (101).\nat #main():4\nOpen in editor",
+        "context_substituted_message": "Error on bar 20001: The requested historical offset (151) is beyond the historical buffer's limit (101)."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "minmove": 1,
+      "pricescale": 100,
+      "pointvalue": 1,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V13 history inference realtime jump BK v1",
+      "dataset_start_utc": "2026-09-07T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -19702,
+        "value": [
+          1788739200,
+          80341.83,
+          80356,
+          80230.29,
+          80293.23,
+          37.66955
+        ]
+      },
+      "chart_bars": 20002,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T18:43:11.293Z",
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v13/evidence/history-inference-realtime-jump-bk-v13-v1-attempt1-error.png",
+      "captures/v13/evidence/history-inference-realtime-jump-bk-v13-v1-attempt1-error.txt",
+      "captures/v13/evidence/history-inference-realtime-jump-bk-v13-v1-attempt1-logs.txt",
+      "captures/v13/evidence/history-inference-realtime-jump-bk-v13-v1-attempt1-logs-v1.json",
+      "captures/v13/evidence/history-inference-realtime-jump-bk-v13-v1-attempt1-logs.png",
+      "captures/v13/evidence/history-inference-realtime-jump-bk-v13-v1-attempt1-historical-and-live-error-v1.json",
+      "captures/v13/evidence/history-inference-realtime-jump-bk-v13-v1-attempt1-historical-and-live-error-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T18:43:12.311Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790834160,
+            84316.01,
+            84316.01,
+            84280.55,
+            84282,
+            6.39854
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791139320,
+            85327.45,
+            85333.72,
+            85327.44,
+            85333.71,
+            1.298
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V13 history inference realtime jump BK v1",
+            "status": {
+              "type": 3,
+              "errorDescription": {
+                "ctx": {
+                  "num1": 151,
+                  "bar_index": 20001,
+                  "num2": 101
+                },
+                "error": "Error on bar {bar_index}: The requested historical offset ({num1}) is beyond the historical buffer's limit ({num2}).",
+                "solution_id": "43000587849",
+                "stack_trace": [
+                  {
+                    "n": "#main",
+                    "p": 4
+                  }
+                ],
+                "title": "Runtime error",
+                "showReportItButton": false,
+                "studyAccessBlocked": false
+              }
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T18:43:13.314Z",
+        "bars": 20002,
+        "end": true,
+        "first": {
+          "index": -19702,
+          "value": [
+            1788739200,
+            80341.83,
+            80356,
+            80230.29,
+            80293.23,
+            37.66955
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791139320,
+            85327.45,
+            85333.72,
+            85327.44,
+            85333.72,
+            1.30857
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V13 history inference realtime jump BK v1",
+            "status": {
+              "type": 3,
+              "errorDescription": {
+                "ctx": {
+                  "num1": 151,
+                  "bar_index": 20001,
+                  "num2": 101
+                },
+                "error": "Error on bar {bar_index}: The requested historical offset ({num1}) is beyond the historical buffer's limit ({num2}).",
+                "solution_id": "43000587849",
+                "stack_trace": [
+                  {
+                    "n": "#main",
+                    "p": 4
+                  }
+                ],
+                "title": "Runtime error",
+                "showReportItButton": false,
+                "studyAccessBlocked": false
+              }
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "error_observed_utc": "2026-10-04T18:43:17.257Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/history-inference-realtime-jump-bk-v13-v1-attempt1-logs.txt",
+        "evidence/history-inference-realtime-jump-bk-v13-v1-attempt1-logs-v1.json",
+        "evidence/history-inference-realtime-jump-bk-v13-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T18:44:27.812Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "arm",
+        "bitness": "64",
+        "brands": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156"
+          }
+        ],
+        "fullVersionList": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8.0.0.0"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156.0.8075.0"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156.0.8075.0"
+          }
+        ],
+        "mobile": false,
+        "platform": "macOS",
+        "platformVersion": "27.2.0"
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v13 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "security-confirmed-context-bk-v13-v1.pine",
+    "attempt": 1,
+    "source_sha256": "6e859ecab7def97b6ae64a74cd0c2c1a283b9a481ab0c459acf409e2c9cff665",
+    "indicator_title": "V13 security confirmed context BK v1",
+    "status": "RUNS",
+    "csv_file": "captures/v13/security-confirmed-context-bk-v13-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-05T024427.231.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "minmove": 1,
+      "pricescale": 100,
+      "pointvalue": 1,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V13 security confirmed context BK v1",
+      "dataset_start_utc": "2026-09-07T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -19703,
+        "value": [
+          1788739200,
+          80341.83,
+          80356,
+          80230.29,
+          80293.23,
+          37.66955
+        ]
+      },
+      "chart_bars": 20003,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T18:44:19.994Z",
+    "live_candle_open_utc": "2026-10-04T18:44:00.000Z",
+    "export_utc": "2026-10-04T18:44:27.431Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v13/evidence/security-confirmed-context-bk-v13-v1-attempt1-setup.png",
+      "captures/v13/evidence/security-confirmed-context-bk-v13-v1-attempt1-export.png",
+      "captures/v13/evidence/security-confirmed-context-bk-v13-v1-attempt1-logs.txt",
+      "captures/v13/evidence/security-confirmed-context-bk-v13-v1-attempt1-logs-v1.json",
+      "captures/v13/evidence/security-confirmed-context-bk-v13-v1-attempt1-logs.png",
+      "captures/v13/evidence/security-confirmed-context-bk-v13-v1-attempt1-visual.png",
+      "captures/v13/evidence/security-confirmed-context-bk-v13-v1-attempt1-data-window-v1.png",
+      "captures/v13/evidence/security-confirmed-context-bk-v13-v1-attempt1-data-window-v1.json",
+      "captures/v13/evidence/security-confirmed-context-bk-v13-v1-attempt1-data-window-v1.txt",
+      "captures/v13/evidence/security-confirmed-context-bk-v13-v1-attempt1-authority-object-geometry-v1.json",
+      "captures/v13/evidence/security-confirmed-context-bk-v13-v1-attempt1-authority-object-geometry-v1.png",
+      "captures/v13/evidence/security-confirmed-context-bk-v13-v1-attempt1-five-minute-after-0-v1.json",
+      "captures/v13/evidence/security-confirmed-context-bk-v13-v1-attempt1-five-minute-after-0-v1.png",
+      "captures/v13/evidence/security-confirmed-context-bk-v13-v1-attempt1-five-minute-after-6-v1.json",
+      "captures/v13/evidence/security-confirmed-context-bk-v13-v1-attempt1-five-minute-after-6-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T18:44:20.888Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790834280,
+            84282,
+            84291.49,
+            84264.63,
+            84291.48,
+            6.97978
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791139440,
+            85333.71,
+            85342.24,
+            85333.71,
+            85342.23,
+            0.46899
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V13 security confirmed context BK v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790834280,
+                1,
+                1,
+                1790834100000,
+                1790834400000,
+                6983,
+                1790834280000,
+                17459
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791139440,
+                0,
+                0,
+                1791139200000,
+                1791139500000,
+                8000,
+                1791139440000,
+                20002
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T18:44:22.058Z",
+        "bars": 20003,
+        "end": true,
+        "first": {
+          "index": -19703,
+          "value": [
+            1788739200,
+            80341.83,
+            80356,
+            80230.29,
+            80293.23,
+            37.66955
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791139440,
+            85333.71,
+            85342.24,
+            85333.71,
+            85342.24,
+            0.47328
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V13 security confirmed context BK v1",
+            "status": {
+              "type": 2
+            },
+            "size": 20003,
+            "first": {
+              "index": -19703,
+              "value": [
+                1788739200,
+                1,
+                null,
+                null,
+                null,
+                null,
+                1788739200000,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791139440,
+                0,
+                0,
+                1791139200000,
+                1791139500000,
+                8000,
+                1791139440000,
+                20002
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   18:44",
+    "historical_compare_before_unix_seconds": 1791139440,
+    "pine_logs": {
+      "paths": [
+        "evidence/security-confirmed-context-bk-v13-v1-attempt1-logs.txt",
+        "evidence/security-confirmed-context-bk-v13-v1-attempt1-logs-v1.json",
+        "evidence/security-confirmed-context-bk-v13-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "all_exported_column_occurrences": [
+      {
+        "title": "time",
+        "occurrence": 1,
+        "position": 0
+      },
+      {
+        "title": "open",
+        "occurrence": 1,
+        "position": 1
+      },
+      {
+        "title": "high",
+        "occurrence": 1,
+        "position": 2
+      },
+      {
+        "title": "low",
+        "occurrence": 1,
+        "position": 3
+      },
+      {
+        "title": "close",
+        "occurrence": 1,
+        "position": 4
+      },
+      {
+        "title": "CHART_CONFIRMED",
+        "occurrence": 1,
+        "position": 5
+      },
+      {
+        "title": "REQUESTED_CONFIRMED",
+        "occurrence": 1,
+        "position": 6
+      },
+      {
+        "title": "REQUESTED_TIME",
+        "occurrence": 1,
+        "position": 7
+      },
+      {
+        "title": "REQUESTED_CLOSE_TIME",
+        "occurrence": 1,
+        "position": 8
+      },
+      {
+        "title": "REQUESTED_INDEX",
+        "occurrence": 1,
+        "position": 9
+      },
+      {
+        "title": "CHART_TIME",
+        "occurrence": 1,
+        "position": 10
+      },
+      {
+        "title": "BAR_INDEX",
+        "occurrence": 1,
+        "position": 11
+      }
+    ],
+    "declared_to_native_column_occurrences": [
+      {
+        "declared_title": "CHART_CONFIRMED",
+        "native_title": "CHART_CONFIRMED",
+        "occurrence": 1,
+        "position": 5
+      },
+      {
+        "declared_title": "REQUESTED_CONFIRMED",
+        "native_title": "REQUESTED_CONFIRMED",
+        "occurrence": 1,
+        "position": 6
+      },
+      {
+        "declared_title": "REQUESTED_TIME",
+        "native_title": "REQUESTED_TIME",
+        "occurrence": 1,
+        "position": 7
+      },
+      {
+        "declared_title": "REQUESTED_CLOSE_TIME",
+        "native_title": "REQUESTED_CLOSE_TIME",
+        "occurrence": 1,
+        "position": 8
+      },
+      {
+        "declared_title": "REQUESTED_INDEX",
+        "native_title": "REQUESTED_INDEX",
+        "occurrence": 1,
+        "position": 9
+      },
+      {
+        "declared_title": "CHART_TIME",
+        "native_title": "CHART_TIME",
+        "occurrence": 1,
+        "position": 10
+      },
+      {
+        "declared_title": "BAR_INDEX",
+        "native_title": "BAR_INDEX",
+        "occurrence": 1,
+        "position": 11
+      }
+    ],
+    "named_value_map_scope": "Legacy title maps show the first occurrence only; original positional cells and occurrence tables retain every duplicate without renaming.",
+    "csv_sha256": "73e8f57ea4968dd1ed1feabd38c92cf6320450b7e5da437bd1c97a4e32eb8b72",
+    "csv_bytes": 2013869,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "CHART_CONFIRMED",
+      "REQUESTED_CONFIRMED",
+      "REQUESTED_TIME",
+      "REQUESTED_CLOSE_TIME",
+      "REQUESTED_INDEX",
+      "CHART_TIME",
+      "BAR_INDEX"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "CHART_CONFIRMED": 5,
+      "REQUESTED_CONFIRMED": 6,
+      "REQUESTED_TIME": 7,
+      "REQUESTED_CLOSE_TIME": 8,
+      "REQUESTED_INDEX": 9,
+      "CHART_TIME": 10,
+      "BAR_INDEX": 11
+    },
+    "first_historical_cells": [
+      "1788739200",
+      "80341.83",
+      "80356",
+      "80230.29",
+      "80293.23",
+      "1",
+      "",
+      "",
+      "",
+      "",
+      "1788739200000",
+      "0"
+    ],
+    "last_historical_cells": [
+      "1791139320",
+      "85327.45",
+      "85333.72",
+      "85327.44",
+      "85333.72",
+      "1",
+      "1",
+      "1791138900000",
+      "1791139200000",
+      "7999",
+      "1791139320000",
+      "20001"
+    ],
+    "declared_to_native_header_mapping": {
+      "CHART_CONFIRMED": "CHART_CONFIRMED",
+      "REQUESTED_CONFIRMED": "REQUESTED_CONFIRMED",
+      "REQUESTED_TIME": "REQUESTED_TIME",
+      "REQUESTED_CLOSE_TIME": "REQUESTED_CLOSE_TIME",
+      "REQUESTED_INDEX": "REQUESTED_INDEX",
+      "CHART_TIME": "CHART_TIME",
+      "BAR_INDEX": "BAR_INDEX"
+    },
+    "csv_rows": 20003,
+    "historical_rows": 20002,
+    "first_csv_timestamp_seconds": 1788739200,
+    "last_csv_timestamp_seconds": 1791139440,
+    "first_csv_time_raw": "1788739200",
+    "last_csv_time_raw": "1791139440",
+    "first_historical_values": {
+      "CHART_CONFIRMED": "1",
+      "REQUESTED_CONFIRMED": "",
+      "REQUESTED_TIME": "",
+      "REQUESTED_CLOSE_TIME": "",
+      "REQUESTED_INDEX": "",
+      "CHART_TIME": "1788739200000",
+      "BAR_INDEX": "0"
+    },
+    "last_historical_values": {
+      "CHART_CONFIRMED": "1",
+      "REQUESTED_CONFIRMED": "1",
+      "REQUESTED_TIME": "1791138900000",
+      "REQUESTED_CLOSE_TIME": "1791139200000",
+      "REQUESTED_INDEX": "7999",
+      "CHART_TIME": "1791139320000",
+      "BAR_INDEX": "20001"
+    },
+    "declared_unexported_columns": [],
+    "data_window_witness": "captures/v13/evidence/security-confirmed-context-bk-v13-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T18:45:58.392Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "arm",
+        "bitness": "64",
+        "brands": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156"
+          }
+        ],
+        "fullVersionList": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8.0.0.0"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156.0.8075.0"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156.0.8075.0"
+          }
+        ],
+        "mobile": false,
+        "platform": "macOS",
+        "platformVersion": "27.2.0"
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v13 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "security-confirmed-context-bk-v13-v1.pine",
+    "attempt": 2,
+    "source_sha256": "6e859ecab7def97b6ae64a74cd0c2c1a283b9a481ab0c459acf409e2c9cff665",
+    "indicator_title": "V13 security confirmed context BK v1",
+    "status": "RUNS",
+    "csv_file": "captures/v13/security-confirmed-context-bk-v13-v1-attempt2.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-05T024557.800.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "minmove": 1,
+      "pricescale": 100,
+      "pointvalue": 1,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V13 security confirmed context BK v1",
+      "dataset_start_utc": "2026-09-07T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -19703,
+        "value": [
+          1788739200,
+          80341.83,
+          80356,
+          80230.29,
+          80293.23,
+          37.66955
+        ]
+      },
+      "chart_bars": 20003,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T18:44:19.994Z",
+    "live_candle_open_utc": "2026-10-04T18:44:00.000Z",
+    "export_utc": "2026-10-04T18:45:58.040Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v13/evidence/security-confirmed-context-bk-v13-v1-attempt2-setup.png",
+      "captures/v13/evidence/security-confirmed-context-bk-v13-v1-attempt2-export.png",
+      "captures/v13/evidence/security-confirmed-context-bk-v13-v1-attempt2-logs.txt",
+      "captures/v13/evidence/security-confirmed-context-bk-v13-v1-attempt2-logs-v1.json",
+      "captures/v13/evidence/security-confirmed-context-bk-v13-v1-attempt2-logs.png",
+      "captures/v13/evidence/security-confirmed-context-bk-v13-v1-attempt2-visual.png",
+      "captures/v13/evidence/security-confirmed-context-bk-v13-v1-attempt2-data-window-v1.png",
+      "captures/v13/evidence/security-confirmed-context-bk-v13-v1-attempt2-data-window-v1.json",
+      "captures/v13/evidence/security-confirmed-context-bk-v13-v1-attempt2-data-window-v1.txt",
+      "captures/v13/evidence/security-confirmed-context-bk-v13-v1-attempt2-five-minute-observations-v1.json",
+      "captures/v13/evidence/security-confirmed-context-bk-v13-v1-attempt2-five-minute-observations-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T18:44:20.888Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790834280,
+            84282,
+            84291.49,
+            84264.63,
+            84291.48,
+            6.97978
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791139440,
+            85333.71,
+            85342.24,
+            85333.71,
+            85342.23,
+            0.46899
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V13 security confirmed context BK v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790834280,
+                1,
+                1,
+                1790834100000,
+                1790834400000,
+                6983,
+                1790834280000,
+                17459
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791139440,
+                0,
+                0,
+                1791139200000,
+                1791139500000,
+                8000,
+                1791139440000,
+                20002
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T18:44:22.058Z",
+        "bars": 20003,
+        "end": true,
+        "first": {
+          "index": -19703,
+          "value": [
+            1788739200,
+            80341.83,
+            80356,
+            80230.29,
+            80293.23,
+            37.66955
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791139440,
+            85333.71,
+            85342.24,
+            85333.71,
+            85342.24,
+            0.47328
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V13 security confirmed context BK v1",
+            "status": {
+              "type": 2
+            },
+            "size": 20003,
+            "first": {
+              "index": -19703,
+              "value": [
+                1788739200,
+                1,
+                null,
+                null,
+                null,
+                null,
+                1788739200000,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791139440,
+                0,
+                0,
+                1791139200000,
+                1791139500000,
+                8000,
+                1791139440000,
+                20002
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   18:44",
+    "historical_compare_before_unix_seconds": 1791139440,
+    "pine_logs": {
+      "paths": [
+        "evidence/security-confirmed-context-bk-v13-v1-attempt2-logs.txt",
+        "evidence/security-confirmed-context-bk-v13-v1-attempt2-logs-v1.json",
+        "evidence/security-confirmed-context-bk-v13-v1-attempt2-logs.png"
+      ],
+      "entries": 0
+    },
+    "all_exported_column_occurrences": [
+      {
+        "title": "time",
+        "occurrence": 1,
+        "position": 0
+      },
+      {
+        "title": "open",
+        "occurrence": 1,
+        "position": 1
+      },
+      {
+        "title": "high",
+        "occurrence": 1,
+        "position": 2
+      },
+      {
+        "title": "low",
+        "occurrence": 1,
+        "position": 3
+      },
+      {
+        "title": "close",
+        "occurrence": 1,
+        "position": 4
+      },
+      {
+        "title": "CHART_CONFIRMED",
+        "occurrence": 1,
+        "position": 5
+      },
+      {
+        "title": "REQUESTED_CONFIRMED",
+        "occurrence": 1,
+        "position": 6
+      },
+      {
+        "title": "REQUESTED_TIME",
+        "occurrence": 1,
+        "position": 7
+      },
+      {
+        "title": "REQUESTED_CLOSE_TIME",
+        "occurrence": 1,
+        "position": 8
+      },
+      {
+        "title": "REQUESTED_INDEX",
+        "occurrence": 1,
+        "position": 9
+      },
+      {
+        "title": "CHART_TIME",
+        "occurrence": 1,
+        "position": 10
+      },
+      {
+        "title": "BAR_INDEX",
+        "occurrence": 1,
+        "position": 11
+      }
+    ],
+    "declared_to_native_column_occurrences": [
+      {
+        "declared_title": "CHART_CONFIRMED",
+        "native_title": "CHART_CONFIRMED",
+        "occurrence": 1,
+        "position": 5
+      },
+      {
+        "declared_title": "REQUESTED_CONFIRMED",
+        "native_title": "REQUESTED_CONFIRMED",
+        "occurrence": 1,
+        "position": 6
+      },
+      {
+        "declared_title": "REQUESTED_TIME",
+        "native_title": "REQUESTED_TIME",
+        "occurrence": 1,
+        "position": 7
+      },
+      {
+        "declared_title": "REQUESTED_CLOSE_TIME",
+        "native_title": "REQUESTED_CLOSE_TIME",
+        "occurrence": 1,
+        "position": 8
+      },
+      {
+        "declared_title": "REQUESTED_INDEX",
+        "native_title": "REQUESTED_INDEX",
+        "occurrence": 1,
+        "position": 9
+      },
+      {
+        "declared_title": "CHART_TIME",
+        "native_title": "CHART_TIME",
+        "occurrence": 1,
+        "position": 10
+      },
+      {
+        "declared_title": "BAR_INDEX",
+        "native_title": "BAR_INDEX",
+        "occurrence": 1,
+        "position": 11
+      }
+    ],
+    "named_value_map_scope": "Legacy title maps show the first occurrence only; original positional cells and occurrence tables retain every duplicate without renaming.",
+    "csv_sha256": "8b6ce3f3c97898c1a29f3f2dc8bb88729bb9b2b8b405a3a8ef514d57f8b2b9a8",
+    "csv_bytes": 2013869,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "CHART_CONFIRMED",
+      "REQUESTED_CONFIRMED",
+      "REQUESTED_TIME",
+      "REQUESTED_CLOSE_TIME",
+      "REQUESTED_INDEX",
+      "CHART_TIME",
+      "BAR_INDEX"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "CHART_CONFIRMED": 5,
+      "REQUESTED_CONFIRMED": 6,
+      "REQUESTED_TIME": 7,
+      "REQUESTED_CLOSE_TIME": 8,
+      "REQUESTED_INDEX": 9,
+      "CHART_TIME": 10,
+      "BAR_INDEX": 11
+    },
+    "first_historical_cells": [
+      "1788739200",
+      "80341.83",
+      "80356",
+      "80230.29",
+      "80293.23",
+      "1",
+      "",
+      "",
+      "",
+      "",
+      "1788739200000",
+      "0"
+    ],
+    "last_historical_cells": [
+      "1791139320",
+      "85327.45",
+      "85333.72",
+      "85327.44",
+      "85333.72",
+      "1",
+      "1",
+      "1791138900000",
+      "1791139200000",
+      "7999",
+      "1791139320000",
+      "20001"
+    ],
+    "declared_to_native_header_mapping": {
+      "CHART_CONFIRMED": "CHART_CONFIRMED",
+      "REQUESTED_CONFIRMED": "REQUESTED_CONFIRMED",
+      "REQUESTED_TIME": "REQUESTED_TIME",
+      "REQUESTED_CLOSE_TIME": "REQUESTED_CLOSE_TIME",
+      "REQUESTED_INDEX": "REQUESTED_INDEX",
+      "CHART_TIME": "CHART_TIME",
+      "BAR_INDEX": "BAR_INDEX"
+    },
+    "csv_rows": 20003,
+    "historical_rows": 20002,
+    "first_csv_timestamp_seconds": 1788739200,
+    "last_csv_timestamp_seconds": 1791139440,
+    "first_csv_time_raw": "1788739200",
+    "last_csv_time_raw": "1791139440",
+    "first_historical_values": {
+      "CHART_CONFIRMED": "1",
+      "REQUESTED_CONFIRMED": "",
+      "REQUESTED_TIME": "",
+      "REQUESTED_CLOSE_TIME": "",
+      "REQUESTED_INDEX": "",
+      "CHART_TIME": "1788739200000",
+      "BAR_INDEX": "0"
+    },
+    "last_historical_values": {
+      "CHART_CONFIRMED": "1",
+      "REQUESTED_CONFIRMED": "1",
+      "REQUESTED_TIME": "1791138900000",
+      "REQUESTED_CLOSE_TIME": "1791139200000",
+      "REQUESTED_INDEX": "7999",
+      "CHART_TIME": "1791139320000",
+      "BAR_INDEX": "20001"
+    },
+    "declared_unexported_columns": [],
+    "data_window_witness": "captures/v13/evidence/security-confirmed-context-bk-v13-v1-attempt2-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T18:46:23.035Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "arm",
+        "bitness": "64",
+        "brands": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156"
+          }
+        ],
+        "fullVersionList": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8.0.0.0"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156.0.8075.0"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156.0.8075.0"
+          }
+        ],
+        "mobile": false,
+        "platform": "macOS",
+        "platformVersion": "27.2.0"
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v13 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "security-confirmed-context-bk-v13-v1.pine",
+    "attempt": 3,
+    "source_sha256": "6e859ecab7def97b6ae64a74cd0c2c1a283b9a481ab0c459acf409e2c9cff665",
+    "indicator_title": "V13 security confirmed context BK v1",
+    "status": "RUNS",
+    "csv_file": "captures/v13/security-confirmed-context-bk-v13-v1-attempt3.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-05T024622.235.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "minmove": 1,
+      "pricescale": 100,
+      "pointvalue": 1,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V13 security confirmed context BK v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24744,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 25044,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T18:46:15.006Z",
+    "live_candle_open_utc": "2026-10-04T18:46:00.000Z",
+    "export_utc": "2026-10-04T18:46:22.632Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v13/evidence/security-confirmed-context-bk-v13-v1-attempt3-setup.png",
+      "captures/v13/evidence/security-confirmed-context-bk-v13-v1-attempt3-export.png",
+      "captures/v13/evidence/security-confirmed-context-bk-v13-v1-attempt3-logs.txt",
+      "captures/v13/evidence/security-confirmed-context-bk-v13-v1-attempt3-logs-v1.json",
+      "captures/v13/evidence/security-confirmed-context-bk-v13-v1-attempt3-logs.png",
+      "captures/v13/evidence/security-confirmed-context-bk-v13-v1-attempt3-visual.png",
+      "captures/v13/evidence/security-confirmed-context-bk-v13-v1-attempt3-data-window-v1.png",
+      "captures/v13/evidence/security-confirmed-context-bk-v13-v1-attempt3-data-window-v1.json",
+      "captures/v13/evidence/security-confirmed-context-bk-v13-v1-attempt3-data-window-v1.txt",
+      "captures/v13/evidence/security-confirmed-context-bk-v13-v1-attempt3-authority-object-geometry-v1.json",
+      "captures/v13/evidence/security-confirmed-context-bk-v13-v1-attempt3-authority-object-geometry-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T18:46:15.906Z",
+        "bars": 1942,
+        "end": false,
+        "first": {
+          "index": -1642,
+          "value": [
+            1790906640,
+            84928.78,
+            85045.45,
+            84928.77,
+            85023.07,
+            30.98383
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791139560,
+            85342.24,
+            85342.24,
+            85342.23,
+            85342.24,
+            0.0317
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V13 security confirmed context BK v1",
+            "status": {
+              "type": 2
+            },
+            "size": 1942,
+            "first": {
+              "index": -1642,
+              "value": [
+                1790906640,
+                1,
+                1,
+                1790906400000,
+                1790906700000,
+                7224,
+                1790906640000,
+                18062
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791139560,
+                0,
+                0,
+                1791139500000,
+                1791139800000,
+                8001,
+                1791139560000,
+                20003
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T18:46:16.964Z",
+        "bars": 25044,
+        "end": true,
+        "first": {
+          "index": -24744,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791139560,
+            85342.24,
+            85342.24,
+            85342.23,
+            85342.24,
+            0.0417
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V13 security confirmed context BK v1",
+            "status": {
+              "type": 2
+            },
+            "size": 20004,
+            "first": {
+              "index": -19704,
+              "value": [
+                1788739200,
+                1,
+                null,
+                null,
+                null,
+                null,
+                1788739200000,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791139560,
+                0,
+                0,
+                1791139500000,
+                1791139800000,
+                8001,
+                1791139560000,
+                20003
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   18:46",
+    "historical_compare_before_unix_seconds": 1791139560,
+    "pine_logs": {
+      "paths": [
+        "evidence/security-confirmed-context-bk-v13-v1-attempt3-logs.txt",
+        "evidence/security-confirmed-context-bk-v13-v1-attempt3-logs-v1.json",
+        "evidence/security-confirmed-context-bk-v13-v1-attempt3-logs.png"
+      ],
+      "entries": 0
+    },
+    "all_exported_column_occurrences": [
+      {
+        "title": "time",
+        "occurrence": 1,
+        "position": 0
+      },
+      {
+        "title": "open",
+        "occurrence": 1,
+        "position": 1
+      },
+      {
+        "title": "high",
+        "occurrence": 1,
+        "position": 2
+      },
+      {
+        "title": "low",
+        "occurrence": 1,
+        "position": 3
+      },
+      {
+        "title": "close",
+        "occurrence": 1,
+        "position": 4
+      },
+      {
+        "title": "CHART_CONFIRMED",
+        "occurrence": 1,
+        "position": 5
+      },
+      {
+        "title": "REQUESTED_CONFIRMED",
+        "occurrence": 1,
+        "position": 6
+      },
+      {
+        "title": "REQUESTED_TIME",
+        "occurrence": 1,
+        "position": 7
+      },
+      {
+        "title": "REQUESTED_CLOSE_TIME",
+        "occurrence": 1,
+        "position": 8
+      },
+      {
+        "title": "REQUESTED_INDEX",
+        "occurrence": 1,
+        "position": 9
+      },
+      {
+        "title": "CHART_TIME",
+        "occurrence": 1,
+        "position": 10
+      },
+      {
+        "title": "BAR_INDEX",
+        "occurrence": 1,
+        "position": 11
+      }
+    ],
+    "declared_to_native_column_occurrences": [
+      {
+        "declared_title": "CHART_CONFIRMED",
+        "native_title": "CHART_CONFIRMED",
+        "occurrence": 1,
+        "position": 5
+      },
+      {
+        "declared_title": "REQUESTED_CONFIRMED",
+        "native_title": "REQUESTED_CONFIRMED",
+        "occurrence": 1,
+        "position": 6
+      },
+      {
+        "declared_title": "REQUESTED_TIME",
+        "native_title": "REQUESTED_TIME",
+        "occurrence": 1,
+        "position": 7
+      },
+      {
+        "declared_title": "REQUESTED_CLOSE_TIME",
+        "native_title": "REQUESTED_CLOSE_TIME",
+        "occurrence": 1,
+        "position": 8
+      },
+      {
+        "declared_title": "REQUESTED_INDEX",
+        "native_title": "REQUESTED_INDEX",
+        "occurrence": 1,
+        "position": 9
+      },
+      {
+        "declared_title": "CHART_TIME",
+        "native_title": "CHART_TIME",
+        "occurrence": 1,
+        "position": 10
+      },
+      {
+        "declared_title": "BAR_INDEX",
+        "native_title": "BAR_INDEX",
+        "occurrence": 1,
+        "position": 11
+      }
+    ],
+    "named_value_map_scope": "Legacy title maps show the first occurrence only; original positional cells and occurrence tables retain every duplicate without renaming.",
+    "csv_sha256": "626e2a619d3b54e7a32ac610eac739d758f9da6645794a3802a25e387ecd0845",
+    "csv_bytes": 2269956,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "CHART_CONFIRMED",
+      "REQUESTED_CONFIRMED",
+      "REQUESTED_TIME",
+      "REQUESTED_CLOSE_TIME",
+      "REQUESTED_INDEX",
+      "CHART_TIME",
+      "BAR_INDEX"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "CHART_CONFIRMED": 5,
+      "REQUESTED_CONFIRMED": 6,
+      "REQUESTED_TIME": 7,
+      "REQUESTED_CLOSE_TIME": 8,
+      "REQUESTED_INDEX": 9,
+      "CHART_TIME": 10,
+      "BAR_INDEX": 11
+    },
+    "first_historical_cells": [
+      "1788134400",
+      "77682",
+      "77682.01",
+      "77572",
+      "77674.04",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""
+    ],
+    "last_historical_cells": [
+      "1791139440",
+      "85333.71",
+      "85342.24",
+      "85333.71",
+      "85342.23",
+      "1",
+      "1",
+      "1791139200000",
+      "1791139500000",
+      "8000",
+      "1791139440000",
+      "20002"
+    ],
+    "declared_to_native_header_mapping": {
+      "CHART_CONFIRMED": "CHART_CONFIRMED",
+      "REQUESTED_CONFIRMED": "REQUESTED_CONFIRMED",
+      "REQUESTED_TIME": "REQUESTED_TIME",
+      "REQUESTED_CLOSE_TIME": "REQUESTED_CLOSE_TIME",
+      "REQUESTED_INDEX": "REQUESTED_INDEX",
+      "CHART_TIME": "CHART_TIME",
+      "BAR_INDEX": "BAR_INDEX"
+    },
+    "csv_rows": 25044,
+    "historical_rows": 25043,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791139560,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791139560",
+    "first_historical_values": {
+      "CHART_CONFIRMED": "",
+      "REQUESTED_CONFIRMED": "",
+      "REQUESTED_TIME": "",
+      "REQUESTED_CLOSE_TIME": "",
+      "REQUESTED_INDEX": "",
+      "CHART_TIME": "",
+      "BAR_INDEX": ""
+    },
+    "last_historical_values": {
+      "CHART_CONFIRMED": "1",
+      "REQUESTED_CONFIRMED": "1",
+      "REQUESTED_TIME": "1791139200000",
+      "REQUESTED_CLOSE_TIME": "1791139500000",
+      "REQUESTED_INDEX": "8000",
+      "CHART_TIME": "1791139440000",
+      "BAR_INDEX": "20002"
+    },
+    "declared_unexported_columns": [],
+    "data_window_witness": "captures/v13/evidence/security-confirmed-context-bk-v13-v1-attempt3-data-window-v1.json"
   }
 ]

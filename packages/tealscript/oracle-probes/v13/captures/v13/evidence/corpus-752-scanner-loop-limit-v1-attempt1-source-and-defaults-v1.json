@@ -1,0 +1,61 @@
+{
+  "editor_identity": {
+    "exact": false,
+    "normalized_line_endings_only": true
+  },
+  "inputs_screenshot": "captures/v13/evidence/corpus-752-scanner-loop-limit-v1-attempt1-inputs.png",
+  "full_original_frozen_source": true,
+  "script_unchanged": true,
+  "native_status": {
+    "browser_utc": "2026-10-04T18:42:20.272Z",
+    "bars": 25042,
+    "end": true,
+    "first": {
+      "index": -24741,
+      "value": [
+        1788134400,
+        77682,
+        77682.01,
+        77572,
+        77674.04,
+        51.86295
+      ]
+    },
+    "last": {
+      "index": 300,
+      "value": [
+        1791139320,
+        85327.45,
+        85327.45,
+        85327.44,
+        85327.45,
+        0.11674
+      ]
+    },
+    "timezone": "Etc/UTC",
+    "studies": [
+      {
+        "name": "Momentum Setup - RSI Directional Momentum Scanner",
+        "status": {
+          "type": 3,
+          "errorDescription": {
+            "ctx": {
+              "symbol": "NSE:ZOMATO"
+            },
+            "error": "Invalid symbol: {symbol}",
+            "title": "Runtime error",
+            "showReportItButton": false,
+            "studyAccessBlocked": false,
+            "compiler_markers": [],
+            "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,327.45\nH\n85,327.45\nL\n85,327.44\nC\n85,327.45\n+0.01 (+0.00%)\n85,327.44\nSELL\n0.01\n85,327.45\nBUY\nUSDT\nRSIDMScan\nContinuous Break\n12\nbottom_left\nsmall\n14\nclose\n14\n0.5\n5\n5\n60\n5\n2\n500,000\n0\n14\n1\n70\n2\n20\n90\n5\n9\n15\n10\n15\n25\n10\n2,024\nbottom_right\nnormal\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n18:42:22 UTC\n99+\nRuntime error\nRuntime error\n\nInvalid symbol: NSE:ZOMATO",
+            "context_substituted_message": "Invalid symbol: NSE:ZOMATO"
+          }
+        },
+        "size": 0,
+        "first": null,
+        "last": null
+      }
+    ]
+  },
+  "collector_outcome": "History/execution wait expired while pending; independent native state and rendered Runtime error agree on NSE:ZOMATO refusal."
+}

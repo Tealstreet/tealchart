@@ -1,0 +1,66 @@
+{
+  "sample": {
+    "browser_utc": "2026-10-04T18:45:17.642Z",
+    "bars": 20003,
+    "end": true,
+    "first": {
+      "index": -19703,
+      "value": [
+        1788739200,
+        80341.83,
+        80356,
+        80230.29,
+        80293.23,
+        37.66955
+      ]
+    },
+    "last": {
+      "index": 299,
+      "value": [
+        1791139440,
+        85333.71,
+        85342.24,
+        85333.71,
+        85342.23,
+        1.01421
+      ]
+    },
+    "timezone": "Etc/UTC",
+    "studies": [
+      {
+        "name": "V13 security confirmed context BK v1",
+        "status": {
+          "type": 2
+        },
+        "size": 20003,
+        "first": {
+          "index": -19703,
+          "value": [
+            1788739200,
+            1,
+            null,
+            null,
+            null,
+            null,
+            1788739200000,
+            0
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791139440,
+            0,
+            0,
+            1791139500000,
+            1791139800000,
+            8001,
+            1791139440000,
+            20002
+          ]
+        }
+      }
+    ]
+  },
+  "phase": "After 18:45UTC requested5m boundary; before sample is independently captured original attempt1 CSV and authority witness, not a reconstructed tick."
+}
