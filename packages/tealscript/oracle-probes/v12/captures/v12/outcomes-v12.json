@@ -12233,5 +12233,3026 @@
       ],
       "entries": 0
     }
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T17:39:10.045Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "arm",
+        "bitness": "64",
+        "brands": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156"
+          }
+        ],
+        "fullVersionList": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8.0.0.0"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156.0.8075.0"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156.0.8075.0"
+          }
+        ],
+        "mobile": false,
+        "platform": "macOS",
+        "platformVersion": "27.2.0"
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v12 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "matrix-pinv-cutoff-zero-v1.pine",
+    "attempt": 1,
+    "source_sha256": "abb55cdbcef097fe692374804d42e697d86132311712b2926023bab62070a952",
+    "indicator_title": "matrix-pinv-cutoff-zero-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v12/matrix-pinv-cutoff-zero-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-05T013909.197.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "matrix-pinv-cutoff-zero-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24710,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 25010,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T17:39:01.555Z",
+    "live_candle_open_utc": "2026-10-04T17:38:00.000Z",
+    "export_utc": "2026-10-04T17:39:09.691Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v12/evidence/matrix-pinv-cutoff-zero-v1-attempt1-setup.png",
+      "captures/v12/evidence/matrix-pinv-cutoff-zero-v1-attempt1-export.png",
+      "captures/v12/evidence/matrix-pinv-cutoff-zero-v1-attempt1-logs.txt",
+      "captures/v12/evidence/matrix-pinv-cutoff-zero-v1-attempt1-logs-v1.json",
+      "captures/v12/evidence/matrix-pinv-cutoff-zero-v1-attempt1-logs.png",
+      "captures/v12/evidence/matrix-pinv-cutoff-zero-v1-attempt1-visual.png",
+      "captures/v12/evidence/matrix-pinv-cutoff-zero-v1-attempt1-data-window-v1.png",
+      "captures/v12/evidence/matrix-pinv-cutoff-zero-v1-attempt1-data-window-v1.json",
+      "captures/v12/evidence/matrix-pinv-cutoff-zero-v1-attempt1-data-window-v1.txt",
+      "captures/v12/evidence/matrix-pinv-cutoff-zero-v1-attempt1-authority-object-geometry-v1.json",
+      "captures/v12/evidence/matrix-pinv-cutoff-zero-v1-attempt1-authority-object-geometry-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T17:39:02.347Z",
+        "bars": 2556,
+        "end": false,
+        "first": {
+          "index": -2256,
+          "value": [
+            1790828880,
+            83843.99,
+            83867.96,
+            83840,
+            83860.01,
+            12.49957
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791135480,
+            85367.06,
+            85367.07,
+            85348,
+            85348,
+            2.7517
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "matrix-pinv-cutoff-zero-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2556,
+            "first": {
+              "index": -2256,
+              "value": [
+                1790828880,
+                1,
+                0,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791135480,
+                1,
+                0,
+                0
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T17:39:03.375Z",
+        "bars": 2556,
+        "end": false,
+        "first": {
+          "index": -2256,
+          "value": [
+            1790828880,
+            83843.99,
+            83867.96,
+            83840,
+            83860.01,
+            12.49957
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791135480,
+            85367.06,
+            85367.07,
+            85348,
+            85348,
+            2.75192
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "matrix-pinv-cutoff-zero-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 25010,
+            "first": {
+              "index": -1022454,
+              "value": [
+                1788134400,
+                1,
+                0,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791135480,
+                1,
+                0,
+                0
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T17:39:04.054Z",
+        "bars": 25010,
+        "end": true,
+        "first": {
+          "index": -24710,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791135480,
+            85367.06,
+            85367.07,
+            85348,
+            85348,
+            2.75385
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "matrix-pinv-cutoff-zero-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 25010,
+            "first": {
+              "index": -24710,
+              "value": [
+                1788134400,
+                1,
+                0,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791135480,
+                1,
+                0,
+                0
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   17:38",
+    "historical_compare_before_unix_seconds": 1791135480,
+    "pine_logs": {
+      "paths": [
+        "evidence/matrix-pinv-cutoff-zero-v1-attempt1-logs.txt",
+        "evidence/matrix-pinv-cutoff-zero-v1-attempt1-logs-v1.json",
+        "evidence/matrix-pinv-cutoff-zero-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "all_exported_column_occurrences": [
+      {
+        "title": "time",
+        "occurrence": 1,
+        "position": 0
+      },
+      {
+        "title": "open",
+        "occurrence": 1,
+        "position": 1
+      },
+      {
+        "title": "high",
+        "occurrence": 1,
+        "position": 2
+      },
+      {
+        "title": "low",
+        "occurrence": 1,
+        "position": 3
+      },
+      {
+        "title": "close",
+        "occurrence": 1,
+        "position": 4
+      },
+      {
+        "title": "pinv00",
+        "occurrence": 1,
+        "position": 5
+      },
+      {
+        "title": "pinv11",
+        "occurrence": 1,
+        "position": 6
+      },
+      {
+        "title": "source11",
+        "occurrence": 1,
+        "position": 7
+      }
+    ],
+    "declared_to_native_column_occurrences": [
+      {
+        "declared_title": "pinv00",
+        "native_title": "pinv00",
+        "occurrence": 1,
+        "position": 5
+      },
+      {
+        "declared_title": "pinv11",
+        "native_title": "pinv11",
+        "occurrence": 1,
+        "position": 6
+      },
+      {
+        "declared_title": "source11",
+        "native_title": "source11",
+        "occurrence": 1,
+        "position": 7
+      }
+    ],
+    "named_value_map_scope": "Legacy title maps show the first occurrence only; original positional cells and occurrence tables retain every duplicate without renaming.",
+    "csv_sha256": "c9fceedbe3eeb4171a4e896d372b1584101717966371b88d4fcbeb963ae02a96",
+    "csv_bytes": 1256806,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "pinv00",
+      "pinv11",
+      "source11"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "pinv00": 5,
+      "pinv11": 6,
+      "source11": 7
+    },
+    "first_historical_cells": [
+      "1788134400",
+      "77682",
+      "77682.01",
+      "77572",
+      "77674.04",
+      "1",
+      "0",
+      "0"
+    ],
+    "last_historical_cells": [
+      "1791135360",
+      "85372",
+      "85372.01",
+      "85367.06",
+      "85367.06",
+      "1",
+      "0",
+      "0"
+    ],
+    "declared_to_native_header_mapping": {
+      "pinv00": "pinv00",
+      "pinv11": "pinv11",
+      "source11": "source11"
+    },
+    "csv_rows": 25010,
+    "historical_rows": 25009,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791135480,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791135480",
+    "first_historical_values": {
+      "pinv00": "1",
+      "pinv11": "0",
+      "source11": "0"
+    },
+    "last_historical_values": {
+      "pinv00": "1",
+      "pinv11": "0",
+      "source11": "0"
+    },
+    "declared_unexported_columns": [],
+    "data_window_witness": "captures/v12/evidence/matrix-pinv-cutoff-zero-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T17:39:40.306Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "arm",
+        "bitness": "64",
+        "brands": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156"
+          }
+        ],
+        "fullVersionList": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8.0.0.0"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156.0.8075.0"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156.0.8075.0"
+          }
+        ],
+        "mobile": false,
+        "platform": "macOS",
+        "platformVersion": "27.2.0"
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v12 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "matrix-pinv-cutoff-small8-v1.pine",
+    "attempt": 1,
+    "source_sha256": "6b8d76d0f67dee2fd37cbb340e1fbb4414e932c0ee2e61b8fb1a9ac57cfda964",
+    "indicator_title": "matrix-pinv-cutoff-small8-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v12/matrix-pinv-cutoff-small8-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-05T013939.529.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "matrix-pinv-cutoff-small8-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24710,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 25010,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T17:39:31.986Z",
+    "live_candle_open_utc": "2026-10-04T17:38:00.000Z",
+    "export_utc": "2026-10-04T17:39:39.949Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v12/evidence/matrix-pinv-cutoff-small8-v1-attempt1-setup.png",
+      "captures/v12/evidence/matrix-pinv-cutoff-small8-v1-attempt1-export.png",
+      "captures/v12/evidence/matrix-pinv-cutoff-small8-v1-attempt1-logs.txt",
+      "captures/v12/evidence/matrix-pinv-cutoff-small8-v1-attempt1-logs-v1.json",
+      "captures/v12/evidence/matrix-pinv-cutoff-small8-v1-attempt1-logs.png",
+      "captures/v12/evidence/matrix-pinv-cutoff-small8-v1-attempt1-visual.png",
+      "captures/v12/evidence/matrix-pinv-cutoff-small8-v1-attempt1-data-window-v1.png",
+      "captures/v12/evidence/matrix-pinv-cutoff-small8-v1-attempt1-data-window-v1.json",
+      "captures/v12/evidence/matrix-pinv-cutoff-small8-v1-attempt1-data-window-v1.txt",
+      "captures/v12/evidence/matrix-pinv-cutoff-small8-v1-attempt1-authority-object-geometry-v1.json",
+      "captures/v12/evidence/matrix-pinv-cutoff-small8-v1-attempt1-authority-object-geometry-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T17:39:32.845Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790830320,
+            84168,
+            84207.53,
+            84100,
+            84100,
+            24.11835
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791135480,
+            85367.06,
+            85367.07,
+            85346.02,
+            85346.02,
+            2.87869
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "matrix-pinv-cutoff-small8-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790830320,
+                1,
+                100000000,
+                1e-08
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791135480,
+                1,
+                100000000,
+                1e-08
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T17:39:33.816Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790830320,
+            84168,
+            84207.53,
+            84100,
+            84100,
+            24.11835
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791135480,
+            85367.06,
+            85367.07,
+            85346.02,
+            85346.02,
+            2.87869
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "matrix-pinv-cutoff-small8-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 25010,
+            "first": {
+              "index": -1022466,
+              "value": [
+                1788134400,
+                1,
+                100000000,
+                1e-08
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791135480,
+                1,
+                100000000,
+                1e-08
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T17:39:34.494Z",
+        "bars": 25010,
+        "end": true,
+        "first": {
+          "index": -24710,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791135480,
+            85367.06,
+            85367.07,
+            85346.02,
+            85346.02,
+            2.87869
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "matrix-pinv-cutoff-small8-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 25010,
+            "first": {
+              "index": -24710,
+              "value": [
+                1788134400,
+                1,
+                100000000,
+                1e-08
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791135480,
+                1,
+                100000000,
+                1e-08
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   17:38",
+    "historical_compare_before_unix_seconds": 1791135480,
+    "pine_logs": {
+      "paths": [
+        "evidence/matrix-pinv-cutoff-small8-v1-attempt1-logs.txt",
+        "evidence/matrix-pinv-cutoff-small8-v1-attempt1-logs-v1.json",
+        "evidence/matrix-pinv-cutoff-small8-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "all_exported_column_occurrences": [
+      {
+        "title": "time",
+        "occurrence": 1,
+        "position": 0
+      },
+      {
+        "title": "open",
+        "occurrence": 1,
+        "position": 1
+      },
+      {
+        "title": "high",
+        "occurrence": 1,
+        "position": 2
+      },
+      {
+        "title": "low",
+        "occurrence": 1,
+        "position": 3
+      },
+      {
+        "title": "close",
+        "occurrence": 1,
+        "position": 4
+      },
+      {
+        "title": "pinv00",
+        "occurrence": 1,
+        "position": 5
+      },
+      {
+        "title": "pinv11",
+        "occurrence": 1,
+        "position": 6
+      },
+      {
+        "title": "source11",
+        "occurrence": 1,
+        "position": 7
+      }
+    ],
+    "declared_to_native_column_occurrences": [
+      {
+        "declared_title": "pinv00",
+        "native_title": "pinv00",
+        "occurrence": 1,
+        "position": 5
+      },
+      {
+        "declared_title": "pinv11",
+        "native_title": "pinv11",
+        "occurrence": 1,
+        "position": 6
+      },
+      {
+        "declared_title": "source11",
+        "native_title": "source11",
+        "occurrence": 1,
+        "position": 7
+      }
+    ],
+    "named_value_map_scope": "Legacy title maps show the first occurrence only; original positional cells and occurrence tables retain every duplicate without renaming.",
+    "csv_sha256": "f50ae86368fc672b1f0e73687c665fe54eb0509bdae80e6e3e42153587adb95b",
+    "csv_bytes": 1531922,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "pinv00",
+      "pinv11",
+      "source11"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "pinv00": 5,
+      "pinv11": 6,
+      "source11": 7
+    },
+    "first_historical_cells": [
+      "1788134400",
+      "77682",
+      "77682.01",
+      "77572",
+      "77674.04",
+      "1",
+      "100000000",
+      "1e-8"
+    ],
+    "last_historical_cells": [
+      "1791135360",
+      "85372",
+      "85372.01",
+      "85367.06",
+      "85367.06",
+      "1",
+      "100000000",
+      "1e-8"
+    ],
+    "declared_to_native_header_mapping": {
+      "pinv00": "pinv00",
+      "pinv11": "pinv11",
+      "source11": "source11"
+    },
+    "csv_rows": 25010,
+    "historical_rows": 25009,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791135480,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791135480",
+    "first_historical_values": {
+      "pinv00": "1",
+      "pinv11": "100000000",
+      "source11": "1e-8"
+    },
+    "last_historical_values": {
+      "pinv00": "1",
+      "pinv11": "100000000",
+      "source11": "1e-8"
+    },
+    "declared_unexported_columns": [],
+    "data_window_witness": "captures/v12/evidence/matrix-pinv-cutoff-small8-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T17:40:14.420Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "arm",
+        "bitness": "64",
+        "brands": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156"
+          }
+        ],
+        "fullVersionList": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8.0.0.0"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156.0.8075.0"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156.0.8075.0"
+          }
+        ],
+        "mobile": false,
+        "platform": "macOS",
+        "platformVersion": "27.2.0"
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v12 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "matrix-pinv-cutoff-small12-v1.pine",
+    "attempt": 1,
+    "source_sha256": "6e42dc1fde7c2ef0e160b2657b924639ed441d5019d3fd1032c20bf1d31c883f",
+    "indicator_title": "matrix-pinv-cutoff-small12-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v12/matrix-pinv-cutoff-small12-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-05T014013.662.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "matrix-pinv-cutoff-small12-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24711,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 25011,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T17:40:05.725Z",
+    "live_candle_open_utc": "2026-10-04T17:40:00.000Z",
+    "export_utc": "2026-10-04T17:40:14.051Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v12/evidence/matrix-pinv-cutoff-small12-v1-attempt1-setup.png",
+      "captures/v12/evidence/matrix-pinv-cutoff-small12-v1-attempt1-export.png",
+      "captures/v12/evidence/matrix-pinv-cutoff-small12-v1-attempt1-logs.txt",
+      "captures/v12/evidence/matrix-pinv-cutoff-small12-v1-attempt1-logs-v1.json",
+      "captures/v12/evidence/matrix-pinv-cutoff-small12-v1-attempt1-logs.png",
+      "captures/v12/evidence/matrix-pinv-cutoff-small12-v1-attempt1-visual.png",
+      "captures/v12/evidence/matrix-pinv-cutoff-small12-v1-attempt1-data-window-v1.png",
+      "captures/v12/evidence/matrix-pinv-cutoff-small12-v1-attempt1-data-window-v1.json",
+      "captures/v12/evidence/matrix-pinv-cutoff-small12-v1-attempt1-data-window-v1.txt",
+      "captures/v12/evidence/matrix-pinv-cutoff-small12-v1-attempt1-authority-object-geometry-v1.json",
+      "captures/v12/evidence/matrix-pinv-cutoff-small12-v1-attempt1-authority-object-geometry-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T17:40:06.542Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790830440,
+            84100,
+            84124.01,
+            84046.01,
+            84048.03,
+            24.78136
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791135600,
+            85341.16,
+            85341.17,
+            85341.16,
+            85341.16,
+            0.01734
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "matrix-pinv-cutoff-small12-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790830440,
+                1,
+                1000000000000,
+                1e-12
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791135600,
+                1,
+                1000000000000,
+                1e-12
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T17:40:07.576Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790830440,
+            84100,
+            84124.01,
+            84046.01,
+            84048.03,
+            24.78136
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791135600,
+            85341.16,
+            85341.17,
+            85341.16,
+            85341.16,
+            0.01734
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "matrix-pinv-cutoff-small12-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 25011,
+            "first": {
+              "index": -1022467,
+              "value": [
+                1788134400,
+                1,
+                1000000000000,
+                1e-12
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791135600,
+                1,
+                1000000000000,
+                1e-12
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T17:40:08.413Z",
+        "bars": 25011,
+        "end": true,
+        "first": {
+          "index": -24711,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791135600,
+            85341.16,
+            85341.17,
+            85341.16,
+            85341.17,
+            0.0181
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "matrix-pinv-cutoff-small12-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 25011,
+            "first": {
+              "index": -24711,
+              "value": [
+                1788134400,
+                1,
+                1000000000000,
+                1e-12
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791135600,
+                1,
+                1000000000000,
+                1e-12
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   17:40",
+    "historical_compare_before_unix_seconds": 1791135600,
+    "pine_logs": {
+      "paths": [
+        "evidence/matrix-pinv-cutoff-small12-v1-attempt1-logs.txt",
+        "evidence/matrix-pinv-cutoff-small12-v1-attempt1-logs-v1.json",
+        "evidence/matrix-pinv-cutoff-small12-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "all_exported_column_occurrences": [
+      {
+        "title": "time",
+        "occurrence": 1,
+        "position": 0
+      },
+      {
+        "title": "open",
+        "occurrence": 1,
+        "position": 1
+      },
+      {
+        "title": "high",
+        "occurrence": 1,
+        "position": 2
+      },
+      {
+        "title": "low",
+        "occurrence": 1,
+        "position": 3
+      },
+      {
+        "title": "close",
+        "occurrence": 1,
+        "position": 4
+      },
+      {
+        "title": "pinv00",
+        "occurrence": 1,
+        "position": 5
+      },
+      {
+        "title": "pinv11",
+        "occurrence": 1,
+        "position": 6
+      },
+      {
+        "title": "source11",
+        "occurrence": 1,
+        "position": 7
+      }
+    ],
+    "declared_to_native_column_occurrences": [
+      {
+        "declared_title": "pinv00",
+        "native_title": "pinv00",
+        "occurrence": 1,
+        "position": 5
+      },
+      {
+        "declared_title": "pinv11",
+        "native_title": "pinv11",
+        "occurrence": 1,
+        "position": 6
+      },
+      {
+        "declared_title": "source11",
+        "native_title": "source11",
+        "occurrence": 1,
+        "position": 7
+      }
+    ],
+    "named_value_map_scope": "Legacy title maps show the first occurrence only; original positional cells and occurrence tables retain every duplicate without renaming.",
+    "csv_sha256": "dd3eceee15ee169542d752b4f6f56e1dd2610ceee05c3d73fe5953ecdfed7f9d",
+    "csv_bytes": 1657041,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "pinv00",
+      "pinv11",
+      "source11"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "pinv00": 5,
+      "pinv11": 6,
+      "source11": 7
+    },
+    "first_historical_cells": [
+      "1788134400",
+      "77682",
+      "77682.01",
+      "77572",
+      "77674.04",
+      "1",
+      "1000000000000",
+      "1e-12"
+    ],
+    "last_historical_cells": [
+      "1791135480",
+      "85367.06",
+      "85367.07",
+      "85341.16",
+      "85341.17",
+      "1",
+      "1000000000000",
+      "1e-12"
+    ],
+    "declared_to_native_header_mapping": {
+      "pinv00": "pinv00",
+      "pinv11": "pinv11",
+      "source11": "source11"
+    },
+    "csv_rows": 25011,
+    "historical_rows": 25010,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791135600,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791135600",
+    "first_historical_values": {
+      "pinv00": "1",
+      "pinv11": "1000000000000",
+      "source11": "1e-12"
+    },
+    "last_historical_values": {
+      "pinv00": "1",
+      "pinv11": "1000000000000",
+      "source11": "1e-12"
+    },
+    "declared_unexported_columns": [],
+    "data_window_witness": "captures/v12/evidence/matrix-pinv-cutoff-small12-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T17:40:46.016Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "arm",
+        "bitness": "64",
+        "brands": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156"
+          }
+        ],
+        "fullVersionList": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8.0.0.0"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156.0.8075.0"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156.0.8075.0"
+          }
+        ],
+        "mobile": false,
+        "platform": "macOS",
+        "platformVersion": "27.2.0"
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v12 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "matrix-pinv-cutoff-small16-v1.pine",
+    "attempt": 1,
+    "source_sha256": "aa7e41eff80dc03a9e8e1f7edf84553caf984dc7e71717e0f670117664b3711a",
+    "indicator_title": "matrix-pinv-cutoff-small16-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v12/matrix-pinv-cutoff-small16-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-05T014045.457.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "matrix-pinv-cutoff-small16-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24711,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 25011,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T17:40:37.700Z",
+    "live_candle_open_utc": "2026-10-04T17:40:00.000Z",
+    "export_utc": "2026-10-04T17:40:45.664Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v12/evidence/matrix-pinv-cutoff-small16-v1-attempt1-setup.png",
+      "captures/v12/evidence/matrix-pinv-cutoff-small16-v1-attempt1-export.png",
+      "captures/v12/evidence/matrix-pinv-cutoff-small16-v1-attempt1-logs.txt",
+      "captures/v12/evidence/matrix-pinv-cutoff-small16-v1-attempt1-logs-v1.json",
+      "captures/v12/evidence/matrix-pinv-cutoff-small16-v1-attempt1-logs.png",
+      "captures/v12/evidence/matrix-pinv-cutoff-small16-v1-attempt1-visual.png",
+      "captures/v12/evidence/matrix-pinv-cutoff-small16-v1-attempt1-data-window-v1.png",
+      "captures/v12/evidence/matrix-pinv-cutoff-small16-v1-attempt1-data-window-v1.json",
+      "captures/v12/evidence/matrix-pinv-cutoff-small16-v1-attempt1-data-window-v1.txt",
+      "captures/v12/evidence/matrix-pinv-cutoff-small16-v1-attempt1-authority-object-geometry-v1.json",
+      "captures/v12/evidence/matrix-pinv-cutoff-small16-v1-attempt1-authority-object-geometry-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T17:40:38.683Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790830440,
+            84100,
+            84124.01,
+            84046.01,
+            84048.03,
+            24.78136
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791135600,
+            85341.16,
+            85341.17,
+            85341.16,
+            85341.16,
+            0.37175
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "matrix-pinv-cutoff-small16-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790830440,
+                1,
+                0,
+                1e-16
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791135600,
+                1,
+                0,
+                1e-16
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T17:40:39.663Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790830440,
+            84100,
+            84124.01,
+            84046.01,
+            84048.03,
+            24.78136
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791135600,
+            85341.16,
+            85341.17,
+            85341.16,
+            85341.16,
+            0.37175
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "matrix-pinv-cutoff-small16-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 25011,
+            "first": {
+              "index": -1022467,
+              "value": [
+                1788134400,
+                1,
+                0,
+                1e-16
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791135600,
+                1,
+                0,
+                1e-16
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T17:40:40.345Z",
+        "bars": 25011,
+        "end": true,
+        "first": {
+          "index": -24711,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791135600,
+            85341.16,
+            85341.17,
+            85341.16,
+            85341.16,
+            0.37198
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "matrix-pinv-cutoff-small16-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 25011,
+            "first": {
+              "index": -24711,
+              "value": [
+                1788134400,
+                1,
+                0,
+                1e-16
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791135600,
+                1,
+                0,
+                1e-16
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   17:40",
+    "historical_compare_before_unix_seconds": 1791135600,
+    "pine_logs": {
+      "paths": [
+        "evidence/matrix-pinv-cutoff-small16-v1-attempt1-logs.txt",
+        "evidence/matrix-pinv-cutoff-small16-v1-attempt1-logs-v1.json",
+        "evidence/matrix-pinv-cutoff-small16-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "all_exported_column_occurrences": [
+      {
+        "title": "time",
+        "occurrence": 1,
+        "position": 0
+      },
+      {
+        "title": "open",
+        "occurrence": 1,
+        "position": 1
+      },
+      {
+        "title": "high",
+        "occurrence": 1,
+        "position": 2
+      },
+      {
+        "title": "low",
+        "occurrence": 1,
+        "position": 3
+      },
+      {
+        "title": "close",
+        "occurrence": 1,
+        "position": 4
+      },
+      {
+        "title": "pinv00",
+        "occurrence": 1,
+        "position": 5
+      },
+      {
+        "title": "pinv11",
+        "occurrence": 1,
+        "position": 6
+      },
+      {
+        "title": "source11",
+        "occurrence": 1,
+        "position": 7
+      }
+    ],
+    "declared_to_native_column_occurrences": [
+      {
+        "declared_title": "pinv00",
+        "native_title": "pinv00",
+        "occurrence": 1,
+        "position": 5
+      },
+      {
+        "declared_title": "pinv11",
+        "native_title": "pinv11",
+        "occurrence": 1,
+        "position": 6
+      },
+      {
+        "declared_title": "source11",
+        "native_title": "source11",
+        "occurrence": 1,
+        "position": 7
+      }
+    ],
+    "named_value_map_scope": "Legacy title maps show the first occurrence only; original positional cells and occurrence tables retain every duplicate without renaming.",
+    "csv_sha256": "3bee6c957657958308c20654c35b09d9738d5db3b3e4d0de6ec48388993884d9",
+    "csv_bytes": 1356909,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "pinv00",
+      "pinv11",
+      "source11"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "pinv00": 5,
+      "pinv11": 6,
+      "source11": 7
+    },
+    "first_historical_cells": [
+      "1788134400",
+      "77682",
+      "77682.01",
+      "77572",
+      "77674.04",
+      "1",
+      "0",
+      "1e-16"
+    ],
+    "last_historical_cells": [
+      "1791135480",
+      "85367.06",
+      "85367.07",
+      "85341.16",
+      "85341.17",
+      "1",
+      "0",
+      "1e-16"
+    ],
+    "declared_to_native_header_mapping": {
+      "pinv00": "pinv00",
+      "pinv11": "pinv11",
+      "source11": "source11"
+    },
+    "csv_rows": 25011,
+    "historical_rows": 25010,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791135600,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791135600",
+    "first_historical_values": {
+      "pinv00": "1",
+      "pinv11": "0",
+      "source11": "1e-16"
+    },
+    "last_historical_values": {
+      "pinv00": "1",
+      "pinv11": "0",
+      "source11": "1e-16"
+    },
+    "declared_unexported_columns": [],
+    "data_window_witness": "captures/v12/evidence/matrix-pinv-cutoff-small16-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T17:41:29.567Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "arm",
+        "bitness": "64",
+        "brands": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156"
+          }
+        ],
+        "fullVersionList": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8.0.0.0"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156.0.8075.0"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156.0.8075.0"
+          }
+        ],
+        "mobile": false,
+        "platform": "macOS",
+        "platformVersion": "27.2.0"
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v12 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "matrix-eigen-nonsymmetric-reference2-v1.pine",
+    "attempt": 1,
+    "source_sha256": "eb4e307d2bb88e512a80c2bfa4843de31020df2987a0cbebc880022085e36ff7",
+    "indicator_title": "matrix-eigen-nonsymmetric-reference2-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v12/matrix-eigen-nonsymmetric-reference2-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-05T014128.978.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "matrix-eigen-nonsymmetric-reference2-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24711,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 25011,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T17:41:21.262Z",
+    "live_candle_open_utc": "2026-10-04T17:40:00.000Z",
+    "export_utc": "2026-10-04T17:41:29.221Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v12/evidence/matrix-eigen-nonsymmetric-reference2-v1-attempt1-setup.png",
+      "captures/v12/evidence/matrix-eigen-nonsymmetric-reference2-v1-attempt1-export.png",
+      "captures/v12/evidence/matrix-eigen-nonsymmetric-reference2-v1-attempt1-logs.txt",
+      "captures/v12/evidence/matrix-eigen-nonsymmetric-reference2-v1-attempt1-logs-v1.json",
+      "captures/v12/evidence/matrix-eigen-nonsymmetric-reference2-v1-attempt1-logs.png",
+      "captures/v12/evidence/matrix-eigen-nonsymmetric-reference2-v1-attempt1-visual.png",
+      "captures/v12/evidence/matrix-eigen-nonsymmetric-reference2-v1-attempt1-data-window-v1.png",
+      "captures/v12/evidence/matrix-eigen-nonsymmetric-reference2-v1-attempt1-data-window-v1.json",
+      "captures/v12/evidence/matrix-eigen-nonsymmetric-reference2-v1-attempt1-data-window-v1.txt",
+      "captures/v12/evidence/matrix-eigen-nonsymmetric-reference2-v1-attempt1-authority-object-geometry-v1.json",
+      "captures/v12/evidence/matrix-eigen-nonsymmetric-reference2-v1-attempt1-authority-object-geometry-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T17:41:22.175Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790830440,
+            84100,
+            84124.01,
+            84046.01,
+            84048.03,
+            24.78136
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791135600,
+            85341.16,
+            85341.17,
+            85341.16,
+            85341.16,
+            0.5646
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "matrix-eigen-nonsymmetric-reference2-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790830440,
+                -0.7445626465380285,
+                10.744562646538029
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791135600,
+                -0.7445626465380285,
+                10.744562646538029
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T17:41:23.156Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790830440,
+            84100,
+            84124.01,
+            84046.01,
+            84048.03,
+            24.78136
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791135600,
+            85341.16,
+            85341.17,
+            85341.16,
+            85341.17,
+            0.56879
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "matrix-eigen-nonsymmetric-reference2-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 25011,
+            "first": {
+              "index": -1022467,
+              "value": [
+                1788134400,
+                -0.7445626465380285,
+                10.744562646538029
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791135600,
+                -0.7445626465380285,
+                10.744562646538029
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T17:41:23.856Z",
+        "bars": 25011,
+        "end": true,
+        "first": {
+          "index": -24711,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791135600,
+            85341.16,
+            85341.17,
+            85341.16,
+            85341.16,
+            0.57499
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "matrix-eigen-nonsymmetric-reference2-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 25011,
+            "first": {
+              "index": -24711,
+              "value": [
+                1788134400,
+                -0.7445626465380285,
+                10.744562646538029
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791135600,
+                -0.7445626465380285,
+                10.744562646538029
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   17:40",
+    "historical_compare_before_unix_seconds": 1791135600,
+    "pine_logs": {
+      "paths": [
+        "evidence/matrix-eigen-nonsymmetric-reference2-v1-attempt1-logs.txt",
+        "evidence/matrix-eigen-nonsymmetric-reference2-v1-attempt1-logs-v1.json",
+        "evidence/matrix-eigen-nonsymmetric-reference2-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "all_exported_column_occurrences": [
+      {
+        "title": "time",
+        "occurrence": 1,
+        "position": 0
+      },
+      {
+        "title": "open",
+        "occurrence": 1,
+        "position": 1
+      },
+      {
+        "title": "high",
+        "occurrence": 1,
+        "position": 2
+      },
+      {
+        "title": "low",
+        "occurrence": 1,
+        "position": 3
+      },
+      {
+        "title": "close",
+        "occurrence": 1,
+        "position": 4
+      },
+      {
+        "title": "eigen0",
+        "occurrence": 1,
+        "position": 5
+      },
+      {
+        "title": "eigen1",
+        "occurrence": 1,
+        "position": 6
+      }
+    ],
+    "declared_to_native_column_occurrences": [
+      {
+        "declared_title": "eigen0",
+        "native_title": "eigen0",
+        "occurrence": 1,
+        "position": 5
+      },
+      {
+        "declared_title": "eigen1",
+        "native_title": "eigen1",
+        "occurrence": 1,
+        "position": 6
+      }
+    ],
+    "named_value_map_scope": "Legacy title maps show the first occurrence only; original positional cells and occurrence tables retain every duplicate without renaming.",
+    "csv_sha256": "84b23fe038d54dfcf0c1b850993509d6a979182349b480e473e512db24c09466",
+    "csv_bytes": 2082219,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "eigen0",
+      "eigen1"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "eigen0": 5,
+      "eigen1": 6
+    },
+    "first_historical_cells": [
+      "1788134400",
+      "77682",
+      "77682.01",
+      "77572",
+      "77674.04",
+      "-0.7445626465380285",
+      "10.744562646538029"
+    ],
+    "last_historical_cells": [
+      "1791135480",
+      "85367.06",
+      "85367.07",
+      "85341.16",
+      "85341.17",
+      "-0.7445626465380285",
+      "10.744562646538029"
+    ],
+    "declared_to_native_header_mapping": {
+      "eigen0": "eigen0",
+      "eigen1": "eigen1"
+    },
+    "csv_rows": 25011,
+    "historical_rows": 25010,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791135600,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791135600",
+    "first_historical_values": {
+      "eigen0": "-0.7445626465380285",
+      "eigen1": "10.744562646538029"
+    },
+    "last_historical_values": {
+      "eigen0": "-0.7445626465380285",
+      "eigen1": "10.744562646538029"
+    },
+    "declared_unexported_columns": [],
+    "data_window_witness": "captures/v12/evidence/matrix-eigen-nonsymmetric-reference2-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T17:42:00.269Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "arm",
+        "bitness": "64",
+        "brands": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156"
+          }
+        ],
+        "fullVersionList": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8.0.0.0"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156.0.8075.0"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156.0.8075.0"
+          }
+        ],
+        "mobile": false,
+        "platform": "macOS",
+        "platformVersion": "27.2.0"
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v12 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "matrix-eigen-nonsymmetric-triangular3-v1.pine",
+    "attempt": 1,
+    "source_sha256": "b9239d8d89a027b9d61af1c7701edd496872cd7bbb6282b91c0f71eeed6972b9",
+    "indicator_title": "matrix-eigen-nonsymmetric-triangular3-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v12/matrix-eigen-nonsymmetric-triangular3-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-05T014159.712.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "matrix-eigen-nonsymmetric-triangular3-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24711,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 25011,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T17:41:52.278Z",
+    "live_candle_open_utc": "2026-10-04T17:40:00.000Z",
+    "export_utc": "2026-10-04T17:41:59.910Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v12/evidence/matrix-eigen-nonsymmetric-triangular3-v1-attempt1-setup.png",
+      "captures/v12/evidence/matrix-eigen-nonsymmetric-triangular3-v1-attempt1-export.png",
+      "captures/v12/evidence/matrix-eigen-nonsymmetric-triangular3-v1-attempt1-logs.txt",
+      "captures/v12/evidence/matrix-eigen-nonsymmetric-triangular3-v1-attempt1-logs-v1.json",
+      "captures/v12/evidence/matrix-eigen-nonsymmetric-triangular3-v1-attempt1-logs.png",
+      "captures/v12/evidence/matrix-eigen-nonsymmetric-triangular3-v1-attempt1-visual.png",
+      "captures/v12/evidence/matrix-eigen-nonsymmetric-triangular3-v1-attempt1-data-window-v1.png",
+      "captures/v12/evidence/matrix-eigen-nonsymmetric-triangular3-v1-attempt1-data-window-v1.json",
+      "captures/v12/evidence/matrix-eigen-nonsymmetric-triangular3-v1-attempt1-data-window-v1.txt",
+      "captures/v12/evidence/matrix-eigen-nonsymmetric-triangular3-v1-attempt1-authority-object-geometry-v1.json",
+      "captures/v12/evidence/matrix-eigen-nonsymmetric-triangular3-v1-attempt1-authority-object-geometry-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T17:41:52.945Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790830440,
+            84100,
+            84124.01,
+            84046.01,
+            84048.03,
+            24.78136
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791135600,
+            85341.16,
+            85341.17,
+            85341.16,
+            85341.16,
+            0.74387
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "matrix-eigen-nonsymmetric-triangular3-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790830440,
+                1,
+                3,
+                5
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791135600,
+                1,
+                3,
+                5
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T17:41:53.997Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790830440,
+            84100,
+            84124.01,
+            84046.01,
+            84048.03,
+            24.78136
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791135600,
+            85341.16,
+            85341.17,
+            85341.16,
+            85341.16,
+            0.74387
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "matrix-eigen-nonsymmetric-triangular3-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 25011,
+            "first": {
+              "index": -1022467,
+              "value": [
+                1788134400,
+                1,
+                3,
+                5
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791135600,
+                1,
+                3,
+                5
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T17:41:54.692Z",
+        "bars": 25011,
+        "end": true,
+        "first": {
+          "index": -24711,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791135600,
+            85341.16,
+            85341.17,
+            85341.16,
+            85341.16,
+            0.75218
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "matrix-eigen-nonsymmetric-triangular3-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 25011,
+            "first": {
+              "index": -24711,
+              "value": [
+                1788134400,
+                1,
+                3,
+                5
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791135600,
+                1,
+                3,
+                5
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   17:40",
+    "historical_compare_before_unix_seconds": 1791135600,
+    "pine_logs": {
+      "paths": [
+        "evidence/matrix-eigen-nonsymmetric-triangular3-v1-attempt1-logs.txt",
+        "evidence/matrix-eigen-nonsymmetric-triangular3-v1-attempt1-logs-v1.json",
+        "evidence/matrix-eigen-nonsymmetric-triangular3-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "all_exported_column_occurrences": [
+      {
+        "title": "time",
+        "occurrence": 1,
+        "position": 0
+      },
+      {
+        "title": "open",
+        "occurrence": 1,
+        "position": 1
+      },
+      {
+        "title": "high",
+        "occurrence": 1,
+        "position": 2
+      },
+      {
+        "title": "low",
+        "occurrence": 1,
+        "position": 3
+      },
+      {
+        "title": "close",
+        "occurrence": 1,
+        "position": 4
+      },
+      {
+        "title": "eigen0",
+        "occurrence": 1,
+        "position": 5
+      },
+      {
+        "title": "eigen1",
+        "occurrence": 1,
+        "position": 6
+      },
+      {
+        "title": "eigen2",
+        "occurrence": 1,
+        "position": 7
+      }
+    ],
+    "declared_to_native_column_occurrences": [
+      {
+        "declared_title": "eigen0",
+        "native_title": "eigen0",
+        "occurrence": 1,
+        "position": 5
+      },
+      {
+        "declared_title": "eigen1",
+        "native_title": "eigen1",
+        "occurrence": 1,
+        "position": 6
+      },
+      {
+        "declared_title": "eigen2",
+        "native_title": "eigen2",
+        "occurrence": 1,
+        "position": 7
+      }
+    ],
+    "named_value_map_scope": "Legacy title maps show the first occurrence only; original positional cells and occurrence tables retain every duplicate without renaming.",
+    "csv_sha256": "3a9f09e8e932960ddcf70c70495deedd462c796b4c2c9137ca8e02c4f501f700",
+    "csv_bytes": 1256863,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "eigen0",
+      "eigen1",
+      "eigen2"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "eigen0": 5,
+      "eigen1": 6,
+      "eigen2": 7
+    },
+    "first_historical_cells": [
+      "1788134400",
+      "77682",
+      "77682.01",
+      "77572",
+      "77674.04",
+      "1",
+      "3",
+      "5"
+    ],
+    "last_historical_cells": [
+      "1791135480",
+      "85367.06",
+      "85367.07",
+      "85341.16",
+      "85341.17",
+      "1",
+      "3",
+      "5"
+    ],
+    "declared_to_native_header_mapping": {
+      "eigen0": "eigen0",
+      "eigen1": "eigen1",
+      "eigen2": "eigen2"
+    },
+    "csv_rows": 25011,
+    "historical_rows": 25010,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791135600,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791135600",
+    "first_historical_values": {
+      "eigen0": "1",
+      "eigen1": "3",
+      "eigen2": "5"
+    },
+    "last_historical_values": {
+      "eigen0": "1",
+      "eigen1": "3",
+      "eigen2": "5"
+    },
+    "declared_unexported_columns": [],
+    "data_window_witness": "captures/v12/evidence/matrix-eigen-nonsymmetric-triangular3-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T17:42:31.221Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "arm",
+        "bitness": "64",
+        "brands": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156"
+          }
+        ],
+        "fullVersionList": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8.0.0.0"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156.0.8075.0"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156.0.8075.0"
+          }
+        ],
+        "mobile": false,
+        "platform": "macOS",
+        "platformVersion": "27.2.0"
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v12 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "matrix-eigen-nonsymmetric-defective3-v1.pine",
+    "attempt": 1,
+    "source_sha256": "76fa2adcb7ca99a389e775895af69e1c0536b7a0f1c4b1651d3c601a939ad97d",
+    "indicator_title": "matrix-eigen-nonsymmetric-defective3-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v12/matrix-eigen-nonsymmetric-defective3-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-05T014230.413.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "matrix-eigen-nonsymmetric-defective3-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24712,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 25012,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T17:42:22.946Z",
+    "live_candle_open_utc": "2026-10-04T17:42:00.000Z",
+    "export_utc": "2026-10-04T17:42:30.811Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v12/evidence/matrix-eigen-nonsymmetric-defective3-v1-attempt1-setup.png",
+      "captures/v12/evidence/matrix-eigen-nonsymmetric-defective3-v1-attempt1-export.png",
+      "captures/v12/evidence/matrix-eigen-nonsymmetric-defective3-v1-attempt1-logs.txt",
+      "captures/v12/evidence/matrix-eigen-nonsymmetric-defective3-v1-attempt1-logs-v1.json",
+      "captures/v12/evidence/matrix-eigen-nonsymmetric-defective3-v1-attempt1-logs.png",
+      "captures/v12/evidence/matrix-eigen-nonsymmetric-defective3-v1-attempt1-visual.png",
+      "captures/v12/evidence/matrix-eigen-nonsymmetric-defective3-v1-attempt1-data-window-v1.png",
+      "captures/v12/evidence/matrix-eigen-nonsymmetric-defective3-v1-attempt1-data-window-v1.json",
+      "captures/v12/evidence/matrix-eigen-nonsymmetric-defective3-v1-attempt1-data-window-v1.txt",
+      "captures/v12/evidence/matrix-eigen-nonsymmetric-defective3-v1-attempt1-authority-object-geometry-v1.json",
+      "captures/v12/evidence/matrix-eigen-nonsymmetric-defective3-v1-attempt1-authority-object-geometry-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T17:42:23.820Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790830560,
+            84048.02,
+            84054.01,
+            83993.35,
+            84010.93,
+            22.40173
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791135720,
+            85341.17,
+            85341.17,
+            85341.16,
+            85341.17,
+            0.07875
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "matrix-eigen-nonsymmetric-defective3-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790830560,
+                1,
+                1,
+                1
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791135720,
+                1,
+                1,
+                1
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T17:42:24.816Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790830560,
+            84048.02,
+            84054.01,
+            83993.35,
+            84010.93,
+            22.40173
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791135720,
+            85341.17,
+            85341.17,
+            85341.16,
+            85341.17,
+            0.07875
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "matrix-eigen-nonsymmetric-defective3-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 25012,
+            "first": {
+              "index": -1022468,
+              "value": [
+                1788134400,
+                1,
+                1,
+                1
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791135720,
+                1,
+                1,
+                1
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T17:42:25.495Z",
+        "bars": 25012,
+        "end": true,
+        "first": {
+          "index": -24712,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791135720,
+            85341.17,
+            85341.17,
+            85341.16,
+            85341.16,
+            0.08215
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "matrix-eigen-nonsymmetric-defective3-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 25012,
+            "first": {
+              "index": -24712,
+              "value": [
+                1788134400,
+                1,
+                1,
+                1
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791135720,
+                1,
+                1,
+                1
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   17:42",
+    "historical_compare_before_unix_seconds": 1791135720,
+    "pine_logs": {
+      "paths": [
+        "evidence/matrix-eigen-nonsymmetric-defective3-v1-attempt1-logs.txt",
+        "evidence/matrix-eigen-nonsymmetric-defective3-v1-attempt1-logs-v1.json",
+        "evidence/matrix-eigen-nonsymmetric-defective3-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "all_exported_column_occurrences": [
+      {
+        "title": "time",
+        "occurrence": 1,
+        "position": 0
+      },
+      {
+        "title": "open",
+        "occurrence": 1,
+        "position": 1
+      },
+      {
+        "title": "high",
+        "occurrence": 1,
+        "position": 2
+      },
+      {
+        "title": "low",
+        "occurrence": 1,
+        "position": 3
+      },
+      {
+        "title": "close",
+        "occurrence": 1,
+        "position": 4
+      },
+      {
+        "title": "eigen0",
+        "occurrence": 1,
+        "position": 5
+      },
+      {
+        "title": "eigen1",
+        "occurrence": 1,
+        "position": 6
+      },
+      {
+        "title": "eigen2",
+        "occurrence": 1,
+        "position": 7
+      }
+    ],
+    "declared_to_native_column_occurrences": [
+      {
+        "declared_title": "eigen0",
+        "native_title": "eigen0",
+        "occurrence": 1,
+        "position": 5
+      },
+      {
+        "declared_title": "eigen1",
+        "native_title": "eigen1",
+        "occurrence": 1,
+        "position": 6
+      },
+      {
+        "declared_title": "eigen2",
+        "native_title": "eigen2",
+        "occurrence": 1,
+        "position": 7
+      }
+    ],
+    "named_value_map_scope": "Legacy title maps show the first occurrence only; original positional cells and occurrence tables retain every duplicate without renaming.",
+    "csv_sha256": "116cd3c2cc797d73ae4e000cb088de580018bdc541036201e93edb84a6868c13",
+    "csv_bytes": 1256916,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "eigen0",
+      "eigen1",
+      "eigen2"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "eigen0": 5,
+      "eigen1": 6,
+      "eigen2": 7
+    },
+    "first_historical_cells": [
+      "1788134400",
+      "77682",
+      "77682.01",
+      "77572",
+      "77674.04",
+      "1",
+      "1",
+      "1"
+    ],
+    "last_historical_cells": [
+      "1791135600",
+      "85341.16",
+      "85341.17",
+      "85341.16",
+      "85341.17",
+      "1",
+      "1",
+      "1"
+    ],
+    "declared_to_native_header_mapping": {
+      "eigen0": "eigen0",
+      "eigen1": "eigen1",
+      "eigen2": "eigen2"
+    },
+    "csv_rows": 25012,
+    "historical_rows": 25011,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791135720,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791135720",
+    "first_historical_values": {
+      "eigen0": "1",
+      "eigen1": "1",
+      "eigen2": "1"
+    },
+    "last_historical_values": {
+      "eigen0": "1",
+      "eigen1": "1",
+      "eigen2": "1"
+    },
+    "declared_unexported_columns": [],
+    "data_window_witness": "captures/v12/evidence/matrix-eigen-nonsymmetric-defective3-v1-attempt1-data-window-v1.json"
   }
 ]

@@ -1,0 +1,31 @@
+{
+  "index": 298,
+  "bar": [
+    1791135360,
+    85372,
+    85372.01,
+    85367.06,
+    85367.06,
+    4.49742
+  ],
+  "source_row": [
+    1791135360,
+    1,
+    0,
+    0
+  ],
+  "browser_utc": "2026-10-04T17:39:14.651Z",
+  "title": "matrix-pinv-cutoff-zero-v1",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   17:36",
+  "visible_range": {
+    "_firstBar": 263,
+    "_lastBar": 301
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}
