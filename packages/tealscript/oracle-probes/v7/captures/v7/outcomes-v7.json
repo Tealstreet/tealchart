@@ -3449,5 +3449,121 @@
       "TARGET": "1"
     },
     "data_window_witness": "captures/v7/evidence/plotchar-zero-offset-v5-control-v1-attempt2-data-window-v1.json"
+  },
+  {
+    "script": "barcolor-series-offset-v3-v1.pine",
+    "attempt": 1,
+    "source_sha256": "a225028c7da441ad54e696c6f569492f8d512000c8e7451e40b75c3f2d0e7102",
+    "indicator_title": "V7 barcolor-series-offset-v3-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/barcolor-series-offset-v3-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T132643.854.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 barcolor-series-offset-v3-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24344,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24644,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T05:26:31.298Z",
+    "live_candle_open_utc": "2026-10-04T05:26:00.000Z",
+    "export_utc": "2026-10-04T05:26:44.321Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/barcolor-series-offset-v3-v1-attempt1-setup.png",
+      "captures/v7/evidence/barcolor-series-offset-v3-v1-attempt1-export.png",
+      "captures/v7/evidence/barcolor-series-offset-v3-v1-attempt1-logs.txt",
+      "captures/v7/evidence/barcolor-series-offset-v3-v1-attempt1-logs-v1.json",
+      "captures/v7/evidence/barcolor-series-offset-v3-v1-attempt1-logs.png",
+      "captures/v7/evidence/barcolor-series-offset-v3-v1-attempt1-visual.png",
+      "captures/v7/evidence/barcolor-series-offset-v3-v1-attempt1-data-window-v1.png",
+      "captures/v7/evidence/barcolor-series-offset-v3-v1-attempt1-data-window-v1.json",
+      "captures/v7/evidence/barcolor-series-offset-v3-v1-attempt1-data-window-v1.txt",
+      "captures/v7/evidence/barcolor-series-offset-v3-v1-attempt1-offset-source-v1.json",
+      "captures/v7/evidence/barcolor-series-offset-v3-v1-attempt1-offset-source-v1.png",
+      "captures/v7/evidence/barcolor-series-offset-v3-v1-attempt1-offset-destination-v1.json",
+      "captures/v7/evidence/barcolor-series-offset-v3-v1-attempt1-offset-destination-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///d98ce0f1-bf41-44ad-a25b-5e5cd61a5734.pine?placement%3Ddialog",
+          "path": "/d98ce0f1-bf41-44ad-a25b-5e5cd61a5734.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 3 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "live_tooltip": "Sun 04 Oct '26   05:26",
+    "historical_compare_before_unix_seconds": 1791091560,
+    "pine_logs": {
+      "paths": [
+        "evidence/barcolor-series-offset-v3-v1-attempt1-logs.txt",
+        "evidence/barcolor-series-offset-v3-v1-attempt1-logs-v1.json",
+        "evidence/barcolor-series-offset-v3-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "1ad73d0aa96aa4637cc90bd99e1151a992780be7859285e80a5904d3883d6662",
+    "csv_bytes": 1090311,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "declared_to_native_header_mapping": {},
+    "csv_rows": 24644,
+    "historical_rows": 24643,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791091560,
+    "first_historical_values": {},
+    "last_historical_values": {},
+    "data_window_witness": "captures/v7/evidence/barcolor-series-offset-v3-v1-attempt1-data-window-v1.json"
   }
 ]
