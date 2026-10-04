@@ -1,0 +1,3 @@
+//@version=6
+indicator("V23 explicit hline type keyword")
+hline value = hline(1, "Level")

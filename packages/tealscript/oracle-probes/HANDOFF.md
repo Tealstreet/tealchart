@@ -49,6 +49,14 @@
 > **Then round v21.** After v20, do [`v21/HANDOFF-v21-v2.md`](v21/HANDOFF-v21-v2.md) — 20 request-context, polyline
 > point-copy and drawing-retention probes plus 3 paired originals; steps in `v21/instructions/`. Reply at
 > `v21/captures/v21/RESPONSE-v21.md`.
+>
+> **Then round v22.** After v21, do [`v22/HANDOFF-v22-v1.md`](v22/HANDOFF-v22-v1.md) — 1 probe: zone-less
+> `timestamp()` inside `request.security` on a non-UTC symbol. Reply at `v22/captures/v22/RESPONSE-v22.md`.
+
+> **Then round v23.** After v22, do [`v23/HANDOFF-v23-v1.md`](v23/HANDOFF-v23-v1.md) — 4 probes: explicit
+> `plot`/`hline` type keywords (expected compile refusal; capture the exact error text) plus an
+> inferred-ID control, and requested `barstate.isconfirmed` timing (needs live intrabar
+> observation on 2m with a 10m request, plus pre/post-reload CSV). Reply at `v23/captures/v23/RESPONSE-v23.md`.
 
 Agent exchange: [capture response v1](RESPONSE-v1.md). The next reply belongs in
 `RESPONSE-v2.md` beside this handoff; commit responses so both machines can read them.

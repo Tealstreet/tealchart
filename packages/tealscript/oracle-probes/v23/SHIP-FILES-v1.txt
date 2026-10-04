@@ -1,0 +1,13 @@
+HANDOFF-v23-v1.md
+SHA256SUMS
+SHIP-FILES-v1.txt
+bundle-manifest-v2.json
+hline-type-keyword-v23-v1.pine
+instructions/hline-type-keyword-v23-v1.md
+instructions/plot-hline-inferred-control-v23-v1.md
+instructions/plot-type-keyword-v23-v1.md
+instructions/requested-confirmation-timing-v23-v1.md
+plot-hline-inferred-control-v23-v1.pine
+plot-type-keyword-v23-v1.pine
+requested-confirmation-timing-v23-v1.pine
+requested-confirmation-timing-v23-v1.pine.columns.json
