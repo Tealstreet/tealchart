@@ -1,0 +1,30 @@
+{
+  "index": 298,
+  "bar": [
+    1791110280,
+    85293.43,
+    85320.01,
+    85293.42,
+    85310.79,
+    13.01256
+  ],
+  "source_row": [
+    1791110280,
+    4,
+    100
+  ],
+  "browser_utc": "2026-10-04T10:41:19.434Z",
+  "title": "V7 ta-percentrank-clean-ties-warmup-v6-v1",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   10:38",
+  "visible_range": {
+    "_firstBar": 263,
+    "_lastBar": 301
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}

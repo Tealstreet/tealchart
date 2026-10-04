@@ -86981,5 +86981,1112 @@
       "DIMENSION": "0"
     },
     "data_window_witness": "captures/v7/evidence/table-cell-height-overflow-v6-v1-attempt2-data-window-v1.json"
+  },
+  {
+    "script": "label-arrow-outline-metrics-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "65b4276bf7d3d3db9ae5c81babc6c5364c2bade39343f3878317c64d02e27f54",
+    "indicator_title": "V7 label-arrow-outline-metrics-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/label-arrow-outline-metrics-v6-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T183136.083.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 label-arrow-outline-metrics-v6-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24496,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24796,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T10:31:26.416Z",
+    "live_candle_open_utc": "2026-10-04T10:30:00.000Z",
+    "export_utc": "2026-10-04T10:31:36.533Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/label-arrow-outline-metrics-v6-v1-attempt1-setup.png",
+      "captures/v7/evidence/label-arrow-outline-metrics-v6-v1-attempt1-export.png",
+      "captures/v7/evidence/label-arrow-outline-metrics-v6-v1-attempt1-logs.txt",
+      "captures/v7/evidence/label-arrow-outline-metrics-v6-v1-attempt1-logs-v1.json",
+      "captures/v7/evidence/label-arrow-outline-metrics-v6-v1-attempt1-logs.png",
+      "captures/v7/evidence/label-arrow-outline-metrics-v6-v1-attempt1-visual.png",
+      "captures/v7/evidence/label-arrow-outline-metrics-v6-v1-attempt1-data-window-v1.png",
+      "captures/v7/evidence/label-arrow-outline-metrics-v6-v1-attempt1-data-window-v1.json",
+      "captures/v7/evidence/label-arrow-outline-metrics-v6-v1-attempt1-data-window-v1.txt",
+      "captures/v7/evidence/label-arrow-outline-metrics-v6-v1-attempt1-glyph-geometry-v1.json",
+      "captures/v7/evidence/label-arrow-outline-metrics-v6-v1-attempt1-glyph-geometry-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T10:31:27.383Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790804640,
+            83740.46,
+            83740.46,
+            83707.76,
+            83717.37,
+            9.15031
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791109800,
+            85375.07,
+            85392.01,
+            85375.07,
+            85392.01,
+            9.78222
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 label-arrow-outline-metrics-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790804640,
+                1
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791109800,
+                1
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T10:31:28.927Z",
+        "bars": 24796,
+        "end": true,
+        "first": {
+          "index": -24496,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791109800,
+            85375.07,
+            85392.01,
+            85375.07,
+            85392.01,
+            9.89192
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 label-arrow-outline-metrics-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24796,
+            "first": {
+              "index": -24496,
+              "value": [
+                1788134400,
+                1
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791109800,
+                1
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   10:30",
+    "historical_compare_before_unix_seconds": 1791109800,
+    "pine_logs": {
+      "paths": [
+        "evidence/label-arrow-outline-metrics-v6-v1-attempt1-logs.txt",
+        "evidence/label-arrow-outline-metrics-v6-v1-attempt1-logs-v1.json",
+        "evidence/label-arrow-outline-metrics-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "332fcca0f41eaff46d65fcb1643cd3ed9a165272d51a8d063a45853e64196b16",
+    "csv_bytes": 1146725,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "SCALE"
+    ],
+    "declared_to_native_header_mapping": {
+      "SCALE": "SCALE"
+    },
+    "csv_rows": 24796,
+    "historical_rows": 24795,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791109800,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791109800",
+    "first_historical_values": {
+      "SCALE": "1"
+    },
+    "last_historical_values": {
+      "SCALE": "1"
+    },
+    "data_window_witness": "captures/v7/evidence/label-arrow-outline-metrics-v6-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "script": "label-viewport-clamp-eight-styles-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "b259c8bfc9aa3eee61547d129a0ec5b6a988517ad6e272808e295fce7ad9599d",
+    "indicator_title": "V7 label-viewport-clamp-eight-styles-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/label-viewport-clamp-eight-styles-v6-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T183315.479.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 label-viewport-clamp-eight-styles-v6-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24497,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24797,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T10:32:56.840Z",
+    "live_candle_open_utc": "2026-10-04T10:32:00.000Z",
+    "export_utc": "2026-10-04T10:33:15.886Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-setup.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-export.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-logs.txt",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-logs-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-logs.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-visual.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-data-window-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-data-window-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-data-window-v1.txt",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label0-left-before-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label0-left-before-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label0-left-at-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label0-left-at-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label0-left-after-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label0-left-after-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label0-right-before-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label0-right-before-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label0-right-at-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label0-right-at-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label0-right-after-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label0-right-after-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label0-top-before-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label0-top-before-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label0-top-at-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label0-top-at-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label0-top-after-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label0-top-after-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label0-bottom-before-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label0-bottom-before-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label0-bottom-at-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label0-bottom-at-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label0-bottom-after-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label0-bottom-after-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label1-left-before-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label1-left-before-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label1-left-at-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label1-left-at-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label1-left-after-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label1-left-after-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label1-right-before-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label1-right-before-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label1-right-at-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label1-right-at-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label1-right-after-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label1-right-after-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label1-top-before-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label1-top-before-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label1-top-at-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label1-top-at-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label1-top-after-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label1-top-after-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label1-bottom-before-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label1-bottom-before-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label1-bottom-at-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label1-bottom-at-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label1-bottom-after-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label1-bottom-after-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label2-left-before-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label2-left-before-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label2-left-at-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label2-left-at-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label2-left-after-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label2-left-after-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label2-right-before-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label2-right-before-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label2-right-at-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label2-right-at-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label2-right-after-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label2-right-after-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label2-top-before-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label2-top-before-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label2-top-at-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label2-top-at-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label2-top-after-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label2-top-after-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label2-bottom-before-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label2-bottom-before-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label2-bottom-at-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label2-bottom-at-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label2-bottom-after-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label2-bottom-after-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label3-left-before-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label3-left-before-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label3-left-at-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label3-left-at-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label3-left-after-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label3-left-after-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label3-right-before-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label3-right-before-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label3-right-at-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label3-right-at-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label3-right-after-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label3-right-after-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label3-top-before-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label3-top-before-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label3-top-at-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label3-top-at-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label3-top-after-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label3-top-after-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label3-bottom-before-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label3-bottom-before-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label3-bottom-at-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label3-bottom-at-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label3-bottom-after-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label3-bottom-after-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label4-left-before-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label4-left-before-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label4-left-at-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label4-left-at-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label4-left-after-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label4-left-after-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label4-right-before-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label4-right-before-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label4-right-at-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label4-right-at-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label4-right-after-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label4-right-after-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label4-top-before-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label4-top-before-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label4-top-at-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label4-top-at-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label4-top-after-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label4-top-after-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label4-bottom-before-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label4-bottom-before-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label4-bottom-at-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label4-bottom-at-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label4-bottom-after-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label4-bottom-after-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label5-left-before-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label5-left-before-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label5-left-at-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label5-left-at-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label5-left-after-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label5-left-after-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label5-right-before-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label5-right-before-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label5-right-at-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label5-right-at-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label5-right-after-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label5-right-after-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label5-top-before-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label5-top-before-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label5-top-at-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label5-top-at-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label5-top-after-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label5-top-after-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label5-bottom-before-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label5-bottom-before-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label5-bottom-at-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label5-bottom-at-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label5-bottom-after-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label5-bottom-after-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label6-left-before-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label6-left-before-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label6-left-at-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label6-left-at-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label6-left-after-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label6-left-after-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label6-right-before-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label6-right-before-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label6-right-at-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label6-right-at-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label6-right-after-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label6-right-after-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label6-top-before-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label6-top-before-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label6-top-at-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label6-top-at-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label6-top-after-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label6-top-after-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label6-bottom-before-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label6-bottom-before-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label6-bottom-at-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label6-bottom-at-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label6-bottom-after-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label6-bottom-after-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label7-left-before-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label7-left-before-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label7-left-at-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label7-left-at-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label7-left-after-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label7-left-after-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label7-right-before-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label7-right-before-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label7-right-at-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label7-right-at-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label7-right-after-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label7-right-after-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label7-top-before-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label7-top-before-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label7-top-at-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label7-top-at-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label7-top-after-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label7-top-after-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label7-bottom-before-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label7-bottom-before-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label7-bottom-at-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label7-bottom-at-v1.png",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label7-bottom-after-v1.json",
+      "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-label7-bottom-after-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T10:32:58.311Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790804760,
+            83717.38,
+            83749.37,
+            83717.37,
+            83749.36,
+            2.27593
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791109920,
+            85404.75,
+            85404.76,
+            85356,
+            85356,
+            4.87619
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 label-viewport-clamp-eight-styles-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790804760,
+                0,
+                7
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791109920,
+                0,
+                7
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T10:32:59.507Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790804760,
+            83717.38,
+            83749.37,
+            83717.37,
+            83749.36,
+            2.27593
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791109920,
+            85404.75,
+            85404.76,
+            85356,
+            85356,
+            4.87764
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 label-viewport-clamp-eight-styles-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24797,
+            "first": {
+              "index": -1022253,
+              "value": [
+                1788134400,
+                0,
+                7
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791109920,
+                0,
+                7
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T10:33:00.595Z",
+        "bars": 24797,
+        "end": true,
+        "first": {
+          "index": -24497,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791109920,
+            85404.75,
+            85404.76,
+            85356,
+            85356,
+            4.98594
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 label-viewport-clamp-eight-styles-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24797,
+            "first": {
+              "index": -24497,
+              "value": [
+                1788134400,
+                0,
+                7
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791109920,
+                0,
+                7
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   10:32",
+    "historical_compare_before_unix_seconds": 1791109920,
+    "pine_logs": {
+      "paths": [
+        "evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-logs.txt",
+        "evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-logs-v1.json",
+        "evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "f77cb4ab68fa51a7cc65c5fcbf736224a3768ab80306cd545bc2905b42e43a14",
+    "csv_bytes": 1196368,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "LOW",
+      "HIGH"
+    ],
+    "declared_to_native_header_mapping": {
+      "LOW": "LOW",
+      "HIGH": "HIGH"
+    },
+    "csv_rows": 24797,
+    "historical_rows": 24796,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791109920,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791109920",
+    "first_historical_values": {
+      "LOW": "0",
+      "HIGH": "7"
+    },
+    "last_historical_values": {
+      "LOW": "0",
+      "HIGH": "7"
+    },
+    "data_window_witness": "captures/v7/evidence/label-viewport-clamp-eight-styles-v6-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "script": "ta-percentrank-clean-ties-warmup-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "8f87f0c2fdd0c8f33c523baded6cf1635613d80896e14bb974c56e73d64ae0c6",
+    "indicator_title": "V7 ta-percentrank-clean-ties-warmup-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/ta-percentrank-clean-ties-warmup-v6-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T184109.933.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 ta-percentrank-clean-ties-warmup-v6-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24501,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24801,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T10:40:54.334Z",
+    "live_candle_open_utc": "2026-10-04T10:40:00.000Z",
+    "export_utc": "2026-10-04T10:41:10.390Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/ta-percentrank-clean-ties-warmup-v6-v1-attempt1-setup.png",
+      "captures/v7/evidence/ta-percentrank-clean-ties-warmup-v6-v1-attempt1-export.png",
+      "captures/v7/evidence/ta-percentrank-clean-ties-warmup-v6-v1-attempt1-logs.txt",
+      "captures/v7/evidence/ta-percentrank-clean-ties-warmup-v6-v1-attempt1-logs-v1.json",
+      "captures/v7/evidence/ta-percentrank-clean-ties-warmup-v6-v1-attempt1-logs.png",
+      "captures/v7/evidence/ta-percentrank-clean-ties-warmup-v6-v1-attempt1-visual.png",
+      "captures/v7/evidence/ta-percentrank-clean-ties-warmup-v6-v1-attempt1-data-window-v1.png",
+      "captures/v7/evidence/ta-percentrank-clean-ties-warmup-v6-v1-attempt1-data-window-v1.json",
+      "captures/v7/evidence/ta-percentrank-clean-ties-warmup-v6-v1-attempt1-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T10:40:55.226Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790805240,
+            83738.01,
+            83750.01,
+            83738,
+            83749.6,
+            4.34131
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791110400,
+            85310.79,
+            85310.8,
+            85306,
+            85306,
+            2.75099
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-percentrank-clean-ties-warmup-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790805240,
+                1,
+                25
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791110400,
+                1,
+                0
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T10:40:56.609Z",
+        "bars": 24801,
+        "end": true,
+        "first": {
+          "index": -24501,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791110400,
+            85310.79,
+            85310.8,
+            85306,
+            85306.01,
+            2.75154
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-percentrank-clean-ties-warmup-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24801,
+            "first": {
+              "index": -24501,
+              "value": [
+                1788134400,
+                1,
+                null
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791110400,
+                1,
+                0
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   10:40",
+    "historical_compare_before_unix_seconds": 1791110400,
+    "pine_logs": {
+      "paths": [
+        "evidence/ta-percentrank-clean-ties-warmup-v6-v1-attempt1-logs.txt",
+        "evidence/ta-percentrank-clean-ties-warmup-v6-v1-attempt1-logs-v1.json",
+        "evidence/ta-percentrank-clean-ties-warmup-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "bcc21397bf6ccd1ea05f092b5e114175569b89fa7bbbaa637b66ee982dc88fe9",
+    "csv_bytes": 1230651,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "SOURCE",
+      "TARGET"
+    ],
+    "declared_to_native_header_mapping": {
+      "SOURCE": "SOURCE",
+      "TARGET": "TARGET"
+    },
+    "csv_rows": 24801,
+    "historical_rows": 24800,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791110400,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791110400",
+    "first_historical_values": {
+      "SOURCE": "1",
+      "TARGET": ""
+    },
+    "last_historical_values": {
+      "SOURCE": "4",
+      "TARGET": "100"
+    },
+    "data_window_witness": "captures/v7/evidence/ta-percentrank-clean-ties-warmup-v6-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "script": "ta-percentrank-clean-ties-warmup-v6-v1.pine",
+    "attempt": 2,
+    "source_sha256": "8f87f0c2fdd0c8f33c523baded6cf1635613d80896e14bb974c56e73d64ae0c6",
+    "indicator_title": "V7 ta-percentrank-clean-ties-warmup-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/ta-percentrank-clean-ties-warmup-v6-v1-attempt2.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T184158.985.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 ta-percentrank-clean-ties-warmup-v6-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24501,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24801,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T10:41:46.849Z",
+    "live_candle_open_utc": "2026-10-04T10:40:00.000Z",
+    "export_utc": "2026-10-04T10:41:58.973Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/ta-percentrank-clean-ties-warmup-v6-v1-attempt2-setup.png",
+      "captures/v7/evidence/ta-percentrank-clean-ties-warmup-v6-v1-attempt2-export.png",
+      "captures/v7/evidence/ta-percentrank-clean-ties-warmup-v6-v1-attempt2-logs.txt",
+      "captures/v7/evidence/ta-percentrank-clean-ties-warmup-v6-v1-attempt2-logs-v1.json",
+      "captures/v7/evidence/ta-percentrank-clean-ties-warmup-v6-v1-attempt2-logs.png",
+      "captures/v7/evidence/ta-percentrank-clean-ties-warmup-v6-v1-attempt2-visual.png",
+      "captures/v7/evidence/ta-percentrank-clean-ties-warmup-v6-v1-attempt2-data-window-v1.png",
+      "captures/v7/evidence/ta-percentrank-clean-ties-warmup-v6-v1-attempt2-data-window-v1.json",
+      "captures/v7/evidence/ta-percentrank-clean-ties-warmup-v6-v1-attempt2-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": "2026-10-04T10:41:25.686Z",
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T10:41:47.816Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790805240,
+            83738.01,
+            83750.01,
+            83738,
+            83749.6,
+            4.34131
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791110400,
+            85310.79,
+            85343.04,
+            85302.16,
+            85343.04,
+            13.91287
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-percentrank-clean-ties-warmup-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790805240,
+                1,
+                25
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791110400,
+                1,
+                0
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T10:41:49.175Z",
+        "bars": 24801,
+        "end": true,
+        "first": {
+          "index": -24501,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791110400,
+            85310.79,
+            85343.04,
+            85302.16,
+            85343.04,
+            13.91403
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-percentrank-clean-ties-warmup-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24801,
+            "first": {
+              "index": -24501,
+              "value": [
+                1788134400,
+                1,
+                null
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791110400,
+                1,
+                0
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   10:40",
+    "historical_compare_before_unix_seconds": 1791110400,
+    "pine_logs": {
+      "paths": [
+        "evidence/ta-percentrank-clean-ties-warmup-v6-v1-attempt2-logs.txt",
+        "evidence/ta-percentrank-clean-ties-warmup-v6-v1-attempt2-logs-v1.json",
+        "evidence/ta-percentrank-clean-ties-warmup-v6-v1-attempt2-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "7b12d0cade9ab3b4aa38b65267a2d2eac9383e3cde29003a6c7935466e4beabb",
+    "csv_bytes": 1230652,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "SOURCE",
+      "TARGET"
+    ],
+    "declared_to_native_header_mapping": {
+      "SOURCE": "SOURCE",
+      "TARGET": "TARGET"
+    },
+    "csv_rows": 24801,
+    "historical_rows": 24800,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791110400,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791110400",
+    "first_historical_values": {
+      "SOURCE": "1",
+      "TARGET": ""
+    },
+    "last_historical_values": {
+      "SOURCE": "4",
+      "TARGET": "100"
+    },
+    "data_window_witness": "captures/v7/evidence/ta-percentrank-clean-ties-warmup-v6-v1-attempt2-data-window-v1.json"
   }
 ]
