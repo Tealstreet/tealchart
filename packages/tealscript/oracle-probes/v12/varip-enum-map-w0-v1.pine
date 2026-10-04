@@ -1,0 +1,6 @@
+//@version=6
+indicator("varip enum map eligibility")
+enum State
+    member
+varip map<int, State> values = map.new<int, State>()
+plot(map.size(values), "OUTCOME")

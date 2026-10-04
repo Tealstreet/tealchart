@@ -1,0 +1,6 @@
+//@version=6
+indicator("varip enum matrix eligibility")
+enum State
+    member
+varip matrix<State> values = matrix.new<State>()
+plot(matrix.rows(values), "OUTCOME")

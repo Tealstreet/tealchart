@@ -1,0 +1,3 @@
+//@version=5
+indicator("rename-authority-atan-number-v5-probe-v1")
+plot(math.atan(number=0.5),"result")

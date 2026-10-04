@@ -1,0 +1,3 @@
+//@version=5
+indicator("rename-authority-acos-angle-v5-probe-v1")
+plot(math.acos(angle=0.5),"result")

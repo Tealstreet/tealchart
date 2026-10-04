@@ -1,0 +1,10 @@
+//@version=6
+indicator("Static model coordinate set-x v1", overlay=true)
+invLabelPos = input.string("Center", options=["Left", "Center", "Right"])
+f_invLabelX(int x1, int x2) =>
+    invLabelPos == "Left" ? x1 : invLabelPos == "Center" ? (x1 + x2) / 2 : x2
+id = label.new(time, close, xloc=xloc.bar_time)
+label.set_x(id, f_invLabelX(time[1], time))
+plot(label.get_x(id), "LABEL_X")
+plot(f_invLabelX(time[1], time), "EXPRESSION")
+plot(time, "INPUT_TIME")
