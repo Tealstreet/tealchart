@@ -1,0 +1,33 @@
+{
+  "index": 298,
+  "bar": [
+    1791128400,
+    85299.99,
+    85326.01,
+    85299.99,
+    85326.01,
+    2.58176
+  ],
+  "source_row": [
+    1791128400,
+    24950,
+    5,
+    -3,
+    2,
+    2
+  ],
+  "browser_utc": "2026-10-04T15:42:57.683Z",
+  "title": "V11 modulo-assignment-sign-matrix-v1",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   15:40",
+  "visible_range": {
+    "_firstBar": 263,
+    "_lastBar": 301
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}

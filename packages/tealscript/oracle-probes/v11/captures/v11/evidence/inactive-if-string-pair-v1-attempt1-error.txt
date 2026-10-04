@@ -1,0 +1,42 @@
+"text" cannot be used as a variable or function name.
+{
+  "error": "\"{keyword}\" cannot be used as a variable or function name.",
+  "editorError": {
+    "code": "CE10150",
+    "ctx": {
+      "keyword": "text"
+    },
+    "end": {
+      "column": 4,
+      "line": 3
+    },
+    "message": "\"{keyword}\" cannot be used as a variable or function name.",
+    "start": {
+      "column": 1,
+      "line": 3
+    },
+    "id": "USER;e940768b63d94857948e3b433cac7c1a"
+  },
+  "title": "Compilation error",
+  "compiler_markers": [
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///72a4d8a6-2e0b-4cd0-a65e-813df13116e9.pine?placement%3Ddialog",
+        "path": "/72a4d8a6-2e0b-4cd0-a65e-813df13116e9.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "code": "CE10150",
+      "severity": 8,
+      "message": "\"text\" cannot be used as a variable or function name.",
+      "startLineNumber": 3,
+      "startColumn": 1,
+      "endLineNumber": 3,
+      "endColumn": 5
+    }
+  ],
+  "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,293.83\nH\n85,330.00\nL\n85,280.00\nC\n85,329.99\n+36.16 (+0.04%)\n85,332.54\nSELL\n0.01\n85,332.55\nBUY\nUSDT\ninactive-if-string-pair-v1.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n15:42:19 UTC\n99+\nPine Editor\ninactive-if-string-pair-v1.pine\nPublish script\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n//@version=6\nindicator(\"V11 inactive-if-string-pair-v1\", max_bars_back=256)\ntext = if bar_index % 2 == 0\n    \"SET\"\nplot(float(bar_index), \"BAR_INDEX\")\nplot(na(text) ? 1 : 0, \"STRING_IS_NA\")\nplot(str.length(text), \"STRING_LENGTH\")\nif bar_index < 8\n    log.info(\"BAR=\" + str.tostring(bar_index) + \" TEXT=[\" + text + \"] NA=\" + str.tostring(na(text)))\n1 of 1 problem\n\"text\" cannot be used as a variable or function name.(CE10150)\n1 ∙ Today, 23:42\nLine 3, Col 1\nPine Script® v6\nCompilation error: CE10150\n\n\"text\" cannot be used as a variable or function name.\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+  "context_substituted_message": "\"text\" cannot be used as a variable or function name."
+}

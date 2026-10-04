@@ -6270,5 +6270,3093 @@
       "CROSS_STATE": "1"
     },
     "data_window_witness": "captures/v11/evidence/legacy-cross-hole-matrix-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T15:41:54.001Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v11 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "default-string-text-pair-v1.pine",
+    "attempt": 1,
+    "source_sha256": "d5edf390dd59de188f6ac1e27fe159ed7ed97fec191a4d6a81abc3df15cbb29e",
+    "indicator_title": "V11 default-string-text-pair-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v11/default-string-text-pair-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T234153.424.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V11 default-string-text-pair-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24651,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24951,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T15:41:45.280Z",
+    "live_candle_open_utc": "2026-10-04T15:40:00.000Z",
+    "export_utc": "2026-10-04T15:41:53.642Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v11/evidence/default-string-text-pair-v1-attempt1-setup.png",
+      "captures/v11/evidence/default-string-text-pair-v1-attempt1-export.png",
+      "captures/v11/evidence/default-string-text-pair-v1-attempt1-logs.txt",
+      "captures/v11/evidence/default-string-text-pair-v1-attempt1-logs-v1.json",
+      "captures/v11/evidence/default-string-text-pair-v1-attempt1-logs.png",
+      "captures/v11/evidence/default-string-text-pair-v1-attempt1-visual.png",
+      "captures/v11/evidence/default-string-text-pair-v1-attempt1-data-window-v1.png",
+      "captures/v11/evidence/default-string-text-pair-v1-attempt1-data-window-v1.json",
+      "captures/v11/evidence/default-string-text-pair-v1-attempt1-data-window-v1.txt",
+      "captures/v11/evidence/default-string-text-pair-v1-attempt1-authority-object-geometry-v1.json",
+      "captures/v11/evidence/default-string-text-pair-v1-attempt1-authority-object-geometry-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T15:41:46.037Z",
+        "bars": 1942,
+        "end": false,
+        "first": {
+          "index": -1642,
+          "value": [
+            1790895480,
+            84736,
+            84749.74,
+            84736,
+            84749.73,
+            4.89325
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791128400,
+            85299.99,
+            85324.01,
+            85299.99,
+            85324,
+            2.41682
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 default-string-text-pair-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 1942,
+            "first": {
+              "index": -1642,
+              "value": [
+                1790895480,
+                10,
+                12
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791128400,
+                10,
+                12
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T15:41:47.191Z",
+        "bars": 1942,
+        "end": false,
+        "first": {
+          "index": -1642,
+          "value": [
+            1790895480,
+            84736,
+            84749.74,
+            84736,
+            84749.73,
+            4.89325
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791128400,
+            85299.99,
+            85324.01,
+            85299.99,
+            85324.01,
+            2.42996
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 default-string-text-pair-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24951,
+            "first": {
+              "index": -1023009,
+              "value": [
+                1788134400,
+                10,
+                12
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791128400,
+                10,
+                12
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T15:41:47.880Z",
+        "bars": 24951,
+        "end": true,
+        "first": {
+          "index": -24651,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791128400,
+            85299.99,
+            85324.01,
+            85299.99,
+            85324,
+            2.43752
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 default-string-text-pair-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24951,
+            "first": {
+              "index": -24651,
+              "value": [
+                1788134400,
+                10,
+                12
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791128400,
+                10,
+                12
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///bda5ec02-828e-46cc-b707-d3341a39d5ab.pine?placement%3Ddialog",
+          "path": "/bda5ec02-828e-46cc-b707-d3341a39d5ab.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "CW10011",
+        "severity": 4,
+        "message": "Shadowing built-in variable \"second\"",
+        "startLineNumber": 5,
+        "startColumn": 5,
+        "endLineNumber": 5,
+        "endColumn": 37
+      }
+    ],
+    "live_tooltip": "Sun 04 Oct '26   15:40",
+    "historical_compare_before_unix_seconds": 1791128400,
+    "pine_logs": {
+      "paths": [
+        "evidence/default-string-text-pair-v1-attempt1-logs.txt",
+        "evidence/default-string-text-pair-v1-attempt1-logs-v1.json",
+        "evidence/default-string-text-pair-v1-attempt1-logs.png"
+      ],
+      "entries": 1,
+      "last_message_time_ms": 1791128280000,
+      "last_bar_time_ms": 1791128280000
+    },
+    "csv_sha256": "529588a3e795b0d49d5ccd083ebdf01451b6b53505a3b224e783e9b0fa186e6d",
+    "csv_bytes": 1253829,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "FIRST_LENGTH",
+      "SECOND_LENGTH"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "FIRST_LENGTH": 5,
+      "SECOND_LENGTH": 6
+    },
+    "first_historical_cells": [
+      "1788134400",
+      "77682",
+      "77682.01",
+      "77572",
+      "77674.04",
+      "10",
+      "12"
+    ],
+    "last_historical_cells": [
+      "1791128280",
+      "85286.56",
+      "85300",
+      "85286.55",
+      "85299.99",
+      "10",
+      "12"
+    ],
+    "declared_to_native_header_mapping": {
+      "FIRST_LENGTH": "FIRST_LENGTH",
+      "SECOND_LENGTH": "SECOND_LENGTH"
+    },
+    "csv_rows": 24951,
+    "historical_rows": 24950,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791128400,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791128400",
+    "first_historical_values": {
+      "FIRST_LENGTH": "10",
+      "SECOND_LENGTH": "12"
+    },
+    "last_historical_values": {
+      "FIRST_LENGTH": "10",
+      "SECOND_LENGTH": "12"
+    },
+    "data_window_witness": "captures/v11/evidence/default-string-text-pair-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T15:42:17.102Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v11 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "inactive-if-string-pair-v1.pine",
+    "attempt": 1,
+    "source_sha256": "fe1e5e3fac02f1a802d754865e3b6c6f99bdbc922b9b770c61ef697cfdb85991",
+    "indicator_title": "V11 inactive-if-string-pair-v1",
+    "status": "COMPILE-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": "CE10150",
+      "text": "\"text\" cannot be used as a variable or function name.",
+      "line": 3,
+      "column": 1,
+      "first_bar_index": null,
+      "first_bar_time_utc": null,
+      "native": {
+        "error": "\"{keyword}\" cannot be used as a variable or function name.",
+        "editorError": {
+          "code": "CE10150",
+          "ctx": {
+            "keyword": "text"
+          },
+          "end": {
+            "column": 4,
+            "line": 3
+          },
+          "message": "\"{keyword}\" cannot be used as a variable or function name.",
+          "start": {
+            "column": 1,
+            "line": 3
+          },
+          "id": "USER;e940768b63d94857948e3b433cac7c1a"
+        },
+        "title": "Compilation error",
+        "compiler_markers": [
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///72a4d8a6-2e0b-4cd0-a65e-813df13116e9.pine?placement%3Ddialog",
+              "path": "/72a4d8a6-2e0b-4cd0-a65e-813df13116e9.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "code": "CE10150",
+            "severity": 8,
+            "message": "\"text\" cannot be used as a variable or function name.",
+            "startLineNumber": 3,
+            "startColumn": 1,
+            "endLineNumber": 3,
+            "endColumn": 5
+          }
+        ],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,293.83\nH\n85,330.00\nL\n85,280.00\nC\n85,329.99\n+36.16 (+0.04%)\n85,332.54\nSELL\n0.01\n85,332.55\nBUY\nUSDT\ninactive-if-string-pair-v1.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n15:42:19 UTC\n99+\nPine Editor\ninactive-if-string-pair-v1.pine\nPublish script\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n//@version=6\nindicator(\"V11\u00a0inactive-if-string-pair-v1\",\u00a0max_bars_back=256)\ntext\u00a0=\u00a0if\u00a0bar_index\u00a0%\u00a02\u00a0==\u00a00\n\u00a0\u00a0\u00a0\u00a0\"SET\"\nplot(float(bar_index),\u00a0\"BAR_INDEX\")\nplot(na(text)\u00a0?\u00a01\u00a0:\u00a00,\u00a0\"STRING_IS_NA\")\nplot(str.length(text),\u00a0\"STRING_LENGTH\")\nif\u00a0bar_index\u00a0<\u00a08\n\u00a0\u00a0\u00a0\u00a0log.info(\"BAR=\"\u00a0+\u00a0str.tostring(bar_index)\u00a0+\u00a0\"\u00a0TEXT=[\"\u00a0+\u00a0text\u00a0+\u00a0\"]\u00a0NA=\"\u00a0+\u00a0str.tostring(na(text)))\n1 of 1 problem\n\"text\" cannot be used as a variable or function name.(CE10150)\n1 \u2219 Today, 23:42\nLine 3, Col 1\nPine Script\u00ae v6\nCompilation error: CE10150\n\n\"text\" cannot be used as a variable or function name.\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+        "context_substituted_message": "\"text\" cannot be used as a variable or function name."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "inactive-if-string-pair-v1.pine",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24651,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24952,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v11/evidence/inactive-if-string-pair-v1-attempt1-error.png",
+      "captures/v11/evidence/inactive-if-string-pair-v1-attempt1-error.txt",
+      "captures/v11/evidence/inactive-if-string-pair-v1-attempt1-logs.txt",
+      "captures/v11/evidence/inactive-if-string-pair-v1-attempt1-logs-v1.json",
+      "captures/v11/evidence/inactive-if-string-pair-v1-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": null,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///72a4d8a6-2e0b-4cd0-a65e-813df13116e9.pine?placement%3Ddialog",
+          "path": "/72a4d8a6-2e0b-4cd0-a65e-813df13116e9.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "CE10150",
+        "severity": 8,
+        "message": "\"text\" cannot be used as a variable or function name.",
+        "startLineNumber": 3,
+        "startColumn": 1,
+        "endLineNumber": 3,
+        "endColumn": 5
+      }
+    ],
+    "error_observed_utc": "2026-10-04T15:42:22.631Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/inactive-if-string-pair-v1-attempt1-logs.txt",
+        "evidence/inactive-if-string-pair-v1-attempt1-logs-v1.json",
+        "evidence/inactive-if-string-pair-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T15:42:52.430Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v11 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "modulo-assignment-sign-matrix-v1.pine",
+    "attempt": 1,
+    "source_sha256": "2e6b353c8f1f1569361279928fb9de106dadf5070ee67b55e64b8908a52545ca",
+    "indicator_title": "V11 modulo-assignment-sign-matrix-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v11/modulo-assignment-sign-matrix-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T234250.804.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V11 modulo-assignment-sign-matrix-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24652,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24952,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T15:42:39.940Z",
+    "live_candle_open_utc": "2026-10-04T15:42:00.000Z",
+    "export_utc": "2026-10-04T15:42:51.412Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v11/evidence/modulo-assignment-sign-matrix-v1-attempt1-setup.png",
+      "captures/v11/evidence/modulo-assignment-sign-matrix-v1-attempt1-export.png",
+      "captures/v11/evidence/modulo-assignment-sign-matrix-v1-attempt1-logs.txt",
+      "captures/v11/evidence/modulo-assignment-sign-matrix-v1-attempt1-logs-v1.json",
+      "captures/v11/evidence/modulo-assignment-sign-matrix-v1-attempt1-logs.png",
+      "captures/v11/evidence/modulo-assignment-sign-matrix-v1-attempt1-visual.png",
+      "captures/v11/evidence/modulo-assignment-sign-matrix-v1-attempt1-data-window-v1.png",
+      "captures/v11/evidence/modulo-assignment-sign-matrix-v1-attempt1-data-window-v1.json",
+      "captures/v11/evidence/modulo-assignment-sign-matrix-v1-attempt1-data-window-v1.txt",
+      "captures/v11/evidence/modulo-assignment-sign-matrix-v1-attempt1-authority-object-geometry-v1.json",
+      "captures/v11/evidence/modulo-assignment-sign-matrix-v1-attempt1-authority-object-geometry-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T15:42:41.015Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790823360,
+            83486,
+            83522.01,
+            83486,
+            83522,
+            6.52944
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791128520,
+            85326.01,
+            85349.19,
+            85326,
+            85349.18,
+            4.26391
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 modulo-assignment-sign-matrix-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790823360,
+                22408,
+                -5,
+                3,
+                -2,
+                -2
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791128520,
+                24951,
+                5,
+                -3,
+                2,
+                2
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T15:42:42.383Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790823360,
+            83486,
+            83522.01,
+            83486,
+            83522,
+            6.52944
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791128520,
+            85326.01,
+            85349.19,
+            85326,
+            85349.19,
+            4.26954
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 modulo-assignment-sign-matrix-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24952,
+            "first": {
+              "index": -1022408,
+              "value": [
+                1788134400,
+                0,
+                -5,
+                3,
+                -2,
+                -2
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791128520,
+                24951,
+                5,
+                -3,
+                2,
+                2
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T15:42:43.175Z",
+        "bars": 24952,
+        "end": true,
+        "first": {
+          "index": -24652,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791128520,
+            85326.01,
+            85349.19,
+            85326,
+            85349.19,
+            4.27212
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 modulo-assignment-sign-matrix-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24952,
+            "first": {
+              "index": -24652,
+              "value": [
+                1788134400,
+                0,
+                -5,
+                3,
+                -2,
+                -2
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791128520,
+                24951,
+                5,
+                -3,
+                2,
+                2
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   15:42",
+    "historical_compare_before_unix_seconds": 1791128520,
+    "pine_logs": {
+      "paths": [
+        "evidence/modulo-assignment-sign-matrix-v1-attempt1-logs.txt",
+        "evidence/modulo-assignment-sign-matrix-v1-attempt1-logs-v1.json",
+        "evidence/modulo-assignment-sign-matrix-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "d5b45a6f640b3464358d11c573fd333fce4dab8df5e5937cf4bfd340d272edd6",
+    "csv_bytes": 1473583,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "BAR_INDEX",
+      "A",
+      "B",
+      "MODULO",
+      "MODULO_ASSIGN"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "BAR_INDEX": 5,
+      "A": 6,
+      "B": 7,
+      "MODULO": 8,
+      "MODULO_ASSIGN": 9
+    },
+    "first_historical_cells": [
+      "1788134400",
+      "77682",
+      "77682.01",
+      "77572",
+      "77674.04",
+      "0",
+      "-5",
+      "3",
+      "-2",
+      "-2"
+    ],
+    "last_historical_cells": [
+      "1791128400",
+      "85299.99",
+      "85326.01",
+      "85299.99",
+      "85326.01",
+      "24950",
+      "5",
+      "-3",
+      "2",
+      "2"
+    ],
+    "declared_to_native_header_mapping": {
+      "BAR_INDEX": "BAR_INDEX",
+      "A": "A",
+      "B": "B",
+      "MODULO": "MODULO",
+      "MODULO_ASSIGN": "MODULO_ASSIGN"
+    },
+    "csv_rows": 24952,
+    "historical_rows": 24951,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791128520,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791128520",
+    "first_historical_values": {
+      "BAR_INDEX": "0",
+      "A": "-5",
+      "B": "3",
+      "MODULO": "-2",
+      "MODULO_ASSIGN": "-2"
+    },
+    "last_historical_values": {
+      "BAR_INDEX": "24950",
+      "A": "5",
+      "B": "-3",
+      "MODULO": "2",
+      "MODULO_ASSIGN": "2"
+    },
+    "data_window_witness": "captures/v11/evidence/modulo-assignment-sign-matrix-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T15:43:18.049Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v11 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "numeric-array-every-float-method-v1.pine",
+    "attempt": 1,
+    "source_sha256": "0b667c5c01e0e4fdf54051be332a11c83d2651e9d8375a0ec9ad1d617e3fe9f9",
+    "indicator_title": "V11 numeric-array-every-float-method-v1",
+    "status": "COMPILE-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": "CE10123",
+      "text": "Cannot call \"array.every\" with argument \"id\"=\"items\". An argument of \"array<float>\" type was used but a \"array<bool>\"  is expected.",
+      "line": 4,
+      "column": 6,
+      "first_bar_index": null,
+      "first_bar_time_utc": null,
+      "native": {
+        "error": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+        "editorError": {
+          "code": "CE10123",
+          "ctx": {
+            "argDisplayName": "id",
+            "argUserFriendlyRepresentation": "items",
+            "argumentType": "array<float>",
+            "currentTypeDocStr": "array<bool>",
+            "funId": "array.every",
+            "typePostfix": ""
+          },
+          "end": {
+            "column": 10,
+            "line": 4
+          },
+          "message": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+          "start": {
+            "column": 6,
+            "line": 4
+          },
+          "id": "USER;decd56d8fdcb4a8795f8aaf4cc28a01f"
+        },
+        "title": "Compilation error",
+        "compiler_markers": [
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///9ec32b94-9399-4bf9-b1bc-859a4f25e5da.pine?placement%3Ddialog",
+              "path": "/9ec32b94-9399-4bf9-b1bc-859a4f25e5da.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "code": "CE10123",
+            "severity": 8,
+            "message": "Cannot call \"array.every\" with argument \"id\"=\"items\". An argument of \"array<float>\" type was used but a \"array<bool>\"  is expected.",
+            "startLineNumber": 4,
+            "startColumn": 6,
+            "endLineNumber": 4,
+            "endColumn": 11
+          }
+        ],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,293.83\nH\n85,330.00\nL\n85,280.00\nC\n85,329.99\n+36.16 (+0.04%)\n85,349.18\nSELL\n0.01\n85,349.19\nBUY\nUSDT\nnumeric-array-every-float-method-v1.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n15:43:20 UTC\n99+\nPine Editor\nnumeric-array-every-float-method-v1.pine\nPublish script\n1\n2\n3\n4\n5\n//@version=6\nindicator(\"V11\u00a0numeric-array-every-float-method-v1\",\u00a0max_bars_back=256)\narray<float>\u00a0items\u00a0=\u00a0array.from(0.0,\u00a0na,\u00a02.0)\nplot(items.every()\u00a0?\u00a01\u00a0:\u00a00,\u00a0\"RESULT\")\n1 of 1 problem\nCannot call \"array.every\" with argument \"id\"=\"items\". An argument of \"array<float>\" type was used but a \"array<bool>\" is expected.(CE10123)\n1 \u2219 Today, 23:43\nLine 4, Col 6\nPine Script\u00ae v6\nCompilation error: CE10123\n\nCannot call \"array.every\" with argument \"id\"=\"items\". An argument of \"array<float>\" type was used but a \"array<bool>\" is expected.\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+        "context_substituted_message": "Cannot call \"array.every\" with argument \"id\"=\"items\". An argument of \"array<float>\" type was used but a \"array<bool>\"  is expected."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "numeric-array-every-float-method-v1.pine",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24652,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24952,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v11/evidence/numeric-array-every-float-method-v1-attempt1-error.png",
+      "captures/v11/evidence/numeric-array-every-float-method-v1-attempt1-error.txt",
+      "captures/v11/evidence/numeric-array-every-float-method-v1-attempt1-logs.txt",
+      "captures/v11/evidence/numeric-array-every-float-method-v1-attempt1-logs-v1.json",
+      "captures/v11/evidence/numeric-array-every-float-method-v1-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": null,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///9ec32b94-9399-4bf9-b1bc-859a4f25e5da.pine?placement%3Ddialog",
+          "path": "/9ec32b94-9399-4bf9-b1bc-859a4f25e5da.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "CE10123",
+        "severity": 8,
+        "message": "Cannot call \"array.every\" with argument \"id\"=\"items\". An argument of \"array<float>\" type was used but a \"array<bool>\"  is expected.",
+        "startLineNumber": 4,
+        "startColumn": 6,
+        "endLineNumber": 4,
+        "endColumn": 11
+      }
+    ],
+    "error_observed_utc": "2026-10-04T15:43:24.142Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/numeric-array-every-float-method-v1-attempt1-logs.txt",
+        "evidence/numeric-array-every-float-method-v1-attempt1-logs-v1.json",
+        "evidence/numeric-array-every-float-method-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T15:43:34.647Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v11 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "numeric-array-every-float-namespace-v1.pine",
+    "attempt": 1,
+    "source_sha256": "8b9196658175656b964c5e2835f89f2b705bc1e90e47b4efa4c15f230692ac9b",
+    "indicator_title": "V11 numeric-array-every-float-namespace-v1",
+    "status": "COMPILE-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": "CE10123",
+      "text": "Cannot call \"array.every\" with argument \"id\"=\"items\". An argument of \"array<float>\" type was used but a \"array<bool>\"  is expected.",
+      "line": 4,
+      "column": 18,
+      "first_bar_index": null,
+      "first_bar_time_utc": null,
+      "native": {
+        "error": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+        "editorError": {
+          "code": "CE10123",
+          "ctx": {
+            "argDisplayName": "id",
+            "argUserFriendlyRepresentation": "items",
+            "argumentType": "array<float>",
+            "currentTypeDocStr": "array<bool>",
+            "funId": "array.every",
+            "typePostfix": ""
+          },
+          "end": {
+            "column": 22,
+            "line": 4
+          },
+          "message": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+          "start": {
+            "column": 18,
+            "line": 4
+          },
+          "id": "USER;9a1ec096ec5348a58c8a427c4f8878fc"
+        },
+        "title": "Compilation error",
+        "compiler_markers": [
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///d3a62a2d-ce41-4b68-9c20-be38e28c4461.pine?placement%3Ddialog",
+              "path": "/d3a62a2d-ce41-4b68-9c20-be38e28c4461.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "code": "CE10123",
+            "severity": 8,
+            "message": "Cannot call \"array.every\" with argument \"id\"=\"items\". An argument of \"array<float>\" type was used but a \"array<bool>\"  is expected.",
+            "startLineNumber": 4,
+            "startColumn": 18,
+            "endLineNumber": 4,
+            "endColumn": 23
+          }
+        ],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,326.01\nH\n85,349.19\nL\n85,326.00\nC\n85,342.78\n+16.77 (+0.02%)\n85,342.77\nSELL\n0.01\n85,342.78\nBUY\nUSDT\nnumeric-array-every-float-namespace-v1.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n15:43:36 UTC\n99+\nPine Editor\nnumeric-array-every-float-namespace-v1.pine\nPublish script\n1\n2\n3\n4\n5\n//@version=6\nindicator(\"V11\u00a0numeric-array-every-float-namespace-v1\",\u00a0max_bars_back=256)\narray<float>\u00a0items\u00a0=\u00a0array.from(0.0,\u00a0na,\u00a02.0)\nplot(array.every(items)\u00a0?\u00a01\u00a0:\u00a00,\u00a0\"RESULT\")\n1 of 1 problem\nCannot call \"array.every\" with argument \"id\"=\"items\". An argument of \"array<float>\" type was used but a \"array<bool>\" is expected.(CE10123)\n1 \u2219 Today, 23:43\nLine 4, Col 18\nPine Script\u00ae v6\nCompilation error: CE10123\n\nCannot call \"array.every\" with argument \"id\"=\"items\". An argument of \"array<float>\" type was used but a \"array<bool>\" is expected.\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+        "context_substituted_message": "Cannot call \"array.every\" with argument \"id\"=\"items\". An argument of \"array<float>\" type was used but a \"array<bool>\"  is expected."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "numeric-array-every-float-namespace-v1.pine",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24652,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24952,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v11/evidence/numeric-array-every-float-namespace-v1-attempt1-error.png",
+      "captures/v11/evidence/numeric-array-every-float-namespace-v1-attempt1-error.txt",
+      "captures/v11/evidence/numeric-array-every-float-namespace-v1-attempt1-logs.txt",
+      "captures/v11/evidence/numeric-array-every-float-namespace-v1-attempt1-logs-v1.json",
+      "captures/v11/evidence/numeric-array-every-float-namespace-v1-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": null,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///d3a62a2d-ce41-4b68-9c20-be38e28c4461.pine?placement%3Ddialog",
+          "path": "/d3a62a2d-ce41-4b68-9c20-be38e28c4461.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "CE10123",
+        "severity": 8,
+        "message": "Cannot call \"array.every\" with argument \"id\"=\"items\". An argument of \"array<float>\" type was used but a \"array<bool>\"  is expected.",
+        "startLineNumber": 4,
+        "startColumn": 18,
+        "endLineNumber": 4,
+        "endColumn": 23
+      }
+    ],
+    "error_observed_utc": "2026-10-04T15:43:40.188Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/numeric-array-every-float-namespace-v1-attempt1-logs.txt",
+        "evidence/numeric-array-every-float-namespace-v1-attempt1-logs-v1.json",
+        "evidence/numeric-array-every-float-namespace-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T15:43:49.890Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v11 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "numeric-array-every-int-method-v1.pine",
+    "attempt": 1,
+    "source_sha256": "a04566b29f2eea9dd1e8feebc8fe3ac4f71b6fad44dfe2790425178227f2c7c6",
+    "indicator_title": "V11 numeric-array-every-int-method-v1",
+    "status": "COMPILE-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": "CE10123",
+      "text": "Cannot call \"array.every\" with argument \"id\"=\"items\". An argument of \"array<int>\" type was used but a \"array<bool>\"  is expected.",
+      "line": 4,
+      "column": 6,
+      "first_bar_index": null,
+      "first_bar_time_utc": null,
+      "native": {
+        "error": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+        "editorError": {
+          "code": "CE10123",
+          "ctx": {
+            "argDisplayName": "id",
+            "argUserFriendlyRepresentation": "items",
+            "argumentType": "array<int>",
+            "currentTypeDocStr": "array<bool>",
+            "funId": "array.every",
+            "typePostfix": ""
+          },
+          "end": {
+            "column": 10,
+            "line": 4
+          },
+          "message": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+          "start": {
+            "column": 6,
+            "line": 4
+          },
+          "id": "USER;069806036ed84a7f9092da4f280e9e08"
+        },
+        "title": "Compilation error",
+        "compiler_markers": [
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///5cf810fe-0a29-4682-a7de-1b8b1c00dc86.pine?placement%3Ddialog",
+              "path": "/5cf810fe-0a29-4682-a7de-1b8b1c00dc86.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "code": "CE10123",
+            "severity": 8,
+            "message": "Cannot call \"array.every\" with argument \"id\"=\"items\". An argument of \"array<int>\" type was used but a \"array<bool>\"  is expected.",
+            "startLineNumber": 4,
+            "startColumn": 6,
+            "endLineNumber": 4,
+            "endColumn": 11
+          }
+        ],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,326.01\nH\n85,349.19\nL\n85,326.00\nC\n85,342.78\n+16.77 (+0.02%)\n85,342.77\nSELL\n0.01\n85,342.78\nBUY\nUSDT\nnumeric-array-every-int-method-v1.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n15:43:51 UTC\n99+\nPine Editor\nnumeric-array-every-int-method-v1.pine\nPublish script\n1\n2\n3\n4\n5\n//@version=6\nindicator(\"V11\u00a0numeric-array-every-int-method-v1\",\u00a0max_bars_back=256)\narray<int>\u00a0items\u00a0=\u00a0array.from(0,\u00a0na,\u00a02)\nplot(items.every()\u00a0?\u00a01\u00a0:\u00a00,\u00a0\"RESULT\")\n1 of 1 problem\nCannot call \"array.every\" with argument \"id\"=\"items\". An argument of \"array<int>\" type was used but a \"array<bool>\" is expected.(CE10123)\n1 \u2219 Today, 23:43\nLine 4, Col 6\nPine Script\u00ae v6\nCompilation error: CE10123\n\nCannot call \"array.every\" with argument \"id\"=\"items\". An argument of \"array<int>\" type was used but a \"array<bool>\" is expected.\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+        "context_substituted_message": "Cannot call \"array.every\" with argument \"id\"=\"items\". An argument of \"array<int>\" type was used but a \"array<bool>\"  is expected."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "numeric-array-every-int-method-v1.pine",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24652,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24952,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v11/evidence/numeric-array-every-int-method-v1-attempt1-error.png",
+      "captures/v11/evidence/numeric-array-every-int-method-v1-attempt1-error.txt",
+      "captures/v11/evidence/numeric-array-every-int-method-v1-attempt1-logs.txt",
+      "captures/v11/evidence/numeric-array-every-int-method-v1-attempt1-logs-v1.json",
+      "captures/v11/evidence/numeric-array-every-int-method-v1-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": null,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///5cf810fe-0a29-4682-a7de-1b8b1c00dc86.pine?placement%3Ddialog",
+          "path": "/5cf810fe-0a29-4682-a7de-1b8b1c00dc86.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "CE10123",
+        "severity": 8,
+        "message": "Cannot call \"array.every\" with argument \"id\"=\"items\". An argument of \"array<int>\" type was used but a \"array<bool>\"  is expected.",
+        "startLineNumber": 4,
+        "startColumn": 6,
+        "endLineNumber": 4,
+        "endColumn": 11
+      }
+    ],
+    "error_observed_utc": "2026-10-04T15:43:55.367Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/numeric-array-every-int-method-v1-attempt1-logs.txt",
+        "evidence/numeric-array-every-int-method-v1-attempt1-logs-v1.json",
+        "evidence/numeric-array-every-int-method-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T15:44:06.748Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v11 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "numeric-array-every-int-namespace-v1.pine",
+    "attempt": 1,
+    "source_sha256": "5b2b003a21c85e4f47baa423d5800403e01061f9d6a7667c72584dba70186061",
+    "indicator_title": "V11 numeric-array-every-int-namespace-v1",
+    "status": "COMPILE-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": "CE10123",
+      "text": "Cannot call \"array.every\" with argument \"id\"=\"items\". An argument of \"array<int>\" type was used but a \"array<bool>\"  is expected.",
+      "line": 4,
+      "column": 18,
+      "first_bar_index": null,
+      "first_bar_time_utc": null,
+      "native": {
+        "error": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+        "editorError": {
+          "code": "CE10123",
+          "ctx": {
+            "argDisplayName": "id",
+            "argUserFriendlyRepresentation": "items",
+            "argumentType": "array<int>",
+            "currentTypeDocStr": "array<bool>",
+            "funId": "array.every",
+            "typePostfix": ""
+          },
+          "end": {
+            "column": 22,
+            "line": 4
+          },
+          "message": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+          "start": {
+            "column": 18,
+            "line": 4
+          },
+          "id": "USER;adc896b7886f4962bd0bab9b69f5762f"
+        },
+        "title": "Compilation error",
+        "compiler_markers": [
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///2c2d9359-05f7-4910-aeae-a2ff5769d851.pine?placement%3Ddialog",
+              "path": "/2c2d9359-05f7-4910-aeae-a2ff5769d851.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "code": "CE10123",
+            "severity": 8,
+            "message": "Cannot call \"array.every\" with argument \"id\"=\"items\". An argument of \"array<int>\" type was used but a \"array<bool>\"  is expected.",
+            "startLineNumber": 4,
+            "startColumn": 18,
+            "endLineNumber": 4,
+            "endColumn": 23
+          }
+        ],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,342.78\nH\n85,342.78\nL\n85,342.77\nC\n85,342.77\n0.00 (0.00%)\n85,342.77\nSELL\n0.01\n85,342.78\nBUY\nUSDT\nnumeric-array-every-int-namespace-v1.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n15:44:08 UTC\n99+\nPine Editor\nnumeric-array-every-int-namespace-v1.pine\nPublish script\n1\n2\n3\n4\n5\n//@version=6\nindicator(\"V11\u00a0numeric-array-every-int-namespace-v1\",\u00a0max_bars_back=256)\narray<int>\u00a0items\u00a0=\u00a0array.from(0,\u00a0na,\u00a02)\nplot(array.every(items)\u00a0?\u00a01\u00a0:\u00a00,\u00a0\"RESULT\")\n1 of 1 problem\nCannot call \"array.every\" with argument \"id\"=\"items\". An argument of \"array<int>\" type was used but a \"array<bool>\" is expected.(CE10123)\n1 \u2219 Today, 23:44\nLine 4, Col 18\nPine Script\u00ae v6\nCompilation error: CE10123\n\nCannot call \"array.every\" with argument \"id\"=\"items\". An argument of \"array<int>\" type was used but a \"array<bool>\" is expected.\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+        "context_substituted_message": "Cannot call \"array.every\" with argument \"id\"=\"items\". An argument of \"array<int>\" type was used but a \"array<bool>\"  is expected."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "numeric-array-every-int-namespace-v1.pine",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24652,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24953,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v11/evidence/numeric-array-every-int-namespace-v1-attempt1-error.png",
+      "captures/v11/evidence/numeric-array-every-int-namespace-v1-attempt1-error.txt",
+      "captures/v11/evidence/numeric-array-every-int-namespace-v1-attempt1-logs.txt",
+      "captures/v11/evidence/numeric-array-every-int-namespace-v1-attempt1-logs-v1.json",
+      "captures/v11/evidence/numeric-array-every-int-namespace-v1-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": null,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///2c2d9359-05f7-4910-aeae-a2ff5769d851.pine?placement%3Ddialog",
+          "path": "/2c2d9359-05f7-4910-aeae-a2ff5769d851.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "CE10123",
+        "severity": 8,
+        "message": "Cannot call \"array.every\" with argument \"id\"=\"items\". An argument of \"array<int>\" type was used but a \"array<bool>\"  is expected.",
+        "startLineNumber": 4,
+        "startColumn": 18,
+        "endLineNumber": 4,
+        "endColumn": 23
+      }
+    ],
+    "error_observed_utc": "2026-10-04T15:44:12.132Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/numeric-array-every-int-namespace-v1-attempt1-logs.txt",
+        "evidence/numeric-array-every-int-namespace-v1-attempt1-logs-v1.json",
+        "evidence/numeric-array-every-int-namespace-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T15:44:22.410Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v11 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "numeric-array-some-float-method-v1.pine",
+    "attempt": 1,
+    "source_sha256": "0686a8120285e47b57c677229cb7af5102414caefd22658745811bec16c75dd0",
+    "indicator_title": "V11 numeric-array-some-float-method-v1",
+    "status": "COMPILE-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": "CE10123",
+      "text": "Cannot call \"array.some\" with argument \"id\"=\"items\". An argument of \"array<float>\" type was used but a \"array<bool>\"  is expected.",
+      "line": 4,
+      "column": 6,
+      "first_bar_index": null,
+      "first_bar_time_utc": null,
+      "native": {
+        "error": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+        "editorError": {
+          "code": "CE10123",
+          "ctx": {
+            "argDisplayName": "id",
+            "argUserFriendlyRepresentation": "items",
+            "argumentType": "array<float>",
+            "currentTypeDocStr": "array<bool>",
+            "funId": "array.some",
+            "typePostfix": ""
+          },
+          "end": {
+            "column": 10,
+            "line": 4
+          },
+          "message": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+          "start": {
+            "column": 6,
+            "line": 4
+          },
+          "id": "USER;5c19bbe6b8be4d67af6fa17e52ff8d9f"
+        },
+        "title": "Compilation error",
+        "compiler_markers": [
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///e504408c-b115-45f2-8a8b-040c40650657.pine?placement%3Ddialog",
+              "path": "/e504408c-b115-45f2-8a8b-040c40650657.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "code": "CE10123",
+            "severity": 8,
+            "message": "Cannot call \"array.some\" with argument \"id\"=\"items\". An argument of \"array<float>\" type was used but a \"array<bool>\"  is expected.",
+            "startLineNumber": 4,
+            "startColumn": 6,
+            "endLineNumber": 4,
+            "endColumn": 11
+          }
+        ],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,342.78\nH\n85,342.78\nL\n85,342.77\nC\n85,342.77\n0.00 (0.00%)\n85,342.77\nSELL\n0.01\n85,342.78\nBUY\nUSDT\nnumeric-array-some-float-method-v1.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n15:44:24 UTC\n99+\nPine Editor\nnumeric-array-some-float-method-v1.pine\nPublish script\n1\n2\n3\n4\n5\n//@version=6\nindicator(\"V11\u00a0numeric-array-some-float-method-v1\",\u00a0max_bars_back=256)\narray<float>\u00a0items\u00a0=\u00a0array.from(0.0,\u00a0na,\u00a02.0)\nplot(items.some()\u00a0?\u00a01\u00a0:\u00a00,\u00a0\"RESULT\")\n1 of 1 problem\nCannot call \"array.some\" with argument \"id\"=\"items\". An argument of \"array<float>\" type was used but a \"array<bool>\" is expected.(CE10123)\n1 \u2219 Today, 23:44\nLine 4, Col 6\nPine Script\u00ae v6\nCompilation error: CE10123\n\nCannot call \"array.some\" with argument \"id\"=\"items\". An argument of \"array<float>\" type was used but a \"array<bool>\" is expected.\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+        "context_substituted_message": "Cannot call \"array.some\" with argument \"id\"=\"items\". An argument of \"array<float>\" type was used but a \"array<bool>\"  is expected."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "numeric-array-some-float-method-v1.pine",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24652,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24953,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v11/evidence/numeric-array-some-float-method-v1-attempt1-error.png",
+      "captures/v11/evidence/numeric-array-some-float-method-v1-attempt1-error.txt",
+      "captures/v11/evidence/numeric-array-some-float-method-v1-attempt1-logs.txt",
+      "captures/v11/evidence/numeric-array-some-float-method-v1-attempt1-logs-v1.json",
+      "captures/v11/evidence/numeric-array-some-float-method-v1-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": null,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///e504408c-b115-45f2-8a8b-040c40650657.pine?placement%3Ddialog",
+          "path": "/e504408c-b115-45f2-8a8b-040c40650657.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "CE10123",
+        "severity": 8,
+        "message": "Cannot call \"array.some\" with argument \"id\"=\"items\". An argument of \"array<float>\" type was used but a \"array<bool>\"  is expected.",
+        "startLineNumber": 4,
+        "startColumn": 6,
+        "endLineNumber": 4,
+        "endColumn": 11
+      }
+    ],
+    "error_observed_utc": "2026-10-04T15:44:29.191Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/numeric-array-some-float-method-v1-attempt1-logs.txt",
+        "evidence/numeric-array-some-float-method-v1-attempt1-logs-v1.json",
+        "evidence/numeric-array-some-float-method-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T15:44:39.421Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v11 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "numeric-array-some-float-namespace-v1.pine",
+    "attempt": 1,
+    "source_sha256": "017d2d98b8acb3ba1f41e86127eba0cbf2a4148b94ecd236cb55bccfa1b09d27",
+    "indicator_title": "V11 numeric-array-some-float-namespace-v1",
+    "status": "COMPILE-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": "CE10123",
+      "text": "Cannot call \"array.some\" with argument \"id\"=\"items\". An argument of \"array<float>\" type was used but a \"array<bool>\"  is expected.",
+      "line": 4,
+      "column": 17,
+      "first_bar_index": null,
+      "first_bar_time_utc": null,
+      "native": {
+        "error": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+        "editorError": {
+          "code": "CE10123",
+          "ctx": {
+            "argDisplayName": "id",
+            "argUserFriendlyRepresentation": "items",
+            "argumentType": "array<float>",
+            "currentTypeDocStr": "array<bool>",
+            "funId": "array.some",
+            "typePostfix": ""
+          },
+          "end": {
+            "column": 21,
+            "line": 4
+          },
+          "message": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+          "start": {
+            "column": 17,
+            "line": 4
+          },
+          "id": "USER;4780d041d04e43e58b0af199f0cc9be6"
+        },
+        "title": "Compilation error",
+        "compiler_markers": [
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///f58ceaf9-57c7-4336-87a8-a7c84b6d5606.pine?placement%3Ddialog",
+              "path": "/f58ceaf9-57c7-4336-87a8-a7c84b6d5606.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "code": "CE10123",
+            "severity": 8,
+            "message": "Cannot call \"array.some\" with argument \"id\"=\"items\". An argument of \"array<float>\" type was used but a \"array<bool>\"  is expected.",
+            "startLineNumber": 4,
+            "startColumn": 17,
+            "endLineNumber": 4,
+            "endColumn": 22
+          }
+        ],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,342.78\nH\n85,342.78\nL\n85,342.77\nC\n85,342.77\n0.00 (0.00%)\n85,342.77\nSELL\n0.01\n85,342.78\nBUY\nUSDT\nnumeric-array-some-float-namespace-v1.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n15:44:42 UTC\n99+\nPine Editor\nnumeric-array-some-float-namespace-v1.pine\nPublish script\n1\n2\n3\n4\n5\n//@version=6\nindicator(\"V11\u00a0numeric-array-some-float-namespace-v1\",\u00a0max_bars_back=256)\narray<float>\u00a0items\u00a0=\u00a0array.from(0.0,\u00a0na,\u00a02.0)\nplot(array.some(items)\u00a0?\u00a01\u00a0:\u00a00,\u00a0\"RESULT\")\n1 of 1 problem\nCannot call \"array.some\" with argument \"id\"=\"items\". An argument of \"array<float>\" type was used but a \"array<bool>\" is expected.(CE10123)\n1 \u2219 Today, 23:44\nLine 4, Col 17\nPine Script\u00ae v6\nCompilation error: CE10123\n\nCannot call \"array.some\" with argument \"id\"=\"items\". An argument of \"array<float>\" type was used but a \"array<bool>\" is expected.\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+        "context_substituted_message": "Cannot call \"array.some\" with argument \"id\"=\"items\". An argument of \"array<float>\" type was used but a \"array<bool>\"  is expected."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "numeric-array-some-float-namespace-v1.pine",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24652,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24953,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v11/evidence/numeric-array-some-float-namespace-v1-attempt1-error.png",
+      "captures/v11/evidence/numeric-array-some-float-namespace-v1-attempt1-error.txt",
+      "captures/v11/evidence/numeric-array-some-float-namespace-v1-attempt1-logs.txt",
+      "captures/v11/evidence/numeric-array-some-float-namespace-v1-attempt1-logs-v1.json",
+      "captures/v11/evidence/numeric-array-some-float-namespace-v1-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": null,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///f58ceaf9-57c7-4336-87a8-a7c84b6d5606.pine?placement%3Ddialog",
+          "path": "/f58ceaf9-57c7-4336-87a8-a7c84b6d5606.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "CE10123",
+        "severity": 8,
+        "message": "Cannot call \"array.some\" with argument \"id\"=\"items\". An argument of \"array<float>\" type was used but a \"array<bool>\"  is expected.",
+        "startLineNumber": 4,
+        "startColumn": 17,
+        "endLineNumber": 4,
+        "endColumn": 22
+      }
+    ],
+    "error_observed_utc": "2026-10-04T15:44:45.257Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/numeric-array-some-float-namespace-v1-attempt1-logs.txt",
+        "evidence/numeric-array-some-float-namespace-v1-attempt1-logs-v1.json",
+        "evidence/numeric-array-some-float-namespace-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T15:44:57.362Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v11 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "numeric-array-some-int-method-v1.pine",
+    "attempt": 1,
+    "source_sha256": "0d49144827ee4d2670f19a0bbe52ccf62a1c3d3bfcd66c62ae76b2ccd15c9c25",
+    "indicator_title": "V11 numeric-array-some-int-method-v1",
+    "status": "COMPILE-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": "CE10123",
+      "text": "Cannot call \"array.some\" with argument \"id\"=\"items\". An argument of \"array<int>\" type was used but a \"array<bool>\"  is expected.",
+      "line": 4,
+      "column": 6,
+      "first_bar_index": null,
+      "first_bar_time_utc": null,
+      "native": {
+        "error": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+        "editorError": {
+          "code": "CE10123",
+          "ctx": {
+            "argDisplayName": "id",
+            "argUserFriendlyRepresentation": "items",
+            "argumentType": "array<int>",
+            "currentTypeDocStr": "array<bool>",
+            "funId": "array.some",
+            "typePostfix": ""
+          },
+          "end": {
+            "column": 10,
+            "line": 4
+          },
+          "message": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+          "start": {
+            "column": 6,
+            "line": 4
+          },
+          "id": "USER;98d9ec6f83974007ab9950d5210b4a7c"
+        },
+        "title": "Compilation error",
+        "compiler_markers": [
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///e07c6433-4509-4a65-911a-d192e38ced9e.pine?placement%3Ddialog",
+              "path": "/e07c6433-4509-4a65-911a-d192e38ced9e.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "code": "CE10123",
+            "severity": 8,
+            "message": "Cannot call \"array.some\" with argument \"id\"=\"items\". An argument of \"array<int>\" type was used but a \"array<bool>\"  is expected.",
+            "startLineNumber": 4,
+            "startColumn": 6,
+            "endLineNumber": 4,
+            "endColumn": 11
+          }
+        ],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,342.78\nH\n85,342.78\nL\n85,342.77\nC\n85,342.78\n+0.01 (+0.00%)\n85,342.77\nSELL\n0.01\n85,342.78\nBUY\nUSDT\nnumeric-array-some-int-method-v1.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n15:44:59 UTC\n99+\nPine Editor\nnumeric-array-some-int-method-v1.pine\nPublish script\n1\n2\n3\n4\n5\n//@version=6\nindicator(\"V11\u00a0numeric-array-some-int-method-v1\",\u00a0max_bars_back=256)\narray<int>\u00a0items\u00a0=\u00a0array.from(0,\u00a0na,\u00a02)\nplot(items.some()\u00a0?\u00a01\u00a0:\u00a00,\u00a0\"RESULT\")\n1 of 1 problem\nCannot call \"array.some\" with argument \"id\"=\"items\". An argument of \"array<int>\" type was used but a \"array<bool>\" is expected.(CE10123)\n1 \u2219 Today, 23:44\nLine 4, Col 6\nPine Script\u00ae v6\nCompilation error: CE10123\n\nCannot call \"array.some\" with argument \"id\"=\"items\". An argument of \"array<int>\" type was used but a \"array<bool>\" is expected.\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+        "context_substituted_message": "Cannot call \"array.some\" with argument \"id\"=\"items\". An argument of \"array<int>\" type was used but a \"array<bool>\"  is expected."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "numeric-array-some-int-method-v1.pine",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24652,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24953,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v11/evidence/numeric-array-some-int-method-v1-attempt1-error.png",
+      "captures/v11/evidence/numeric-array-some-int-method-v1-attempt1-error.txt",
+      "captures/v11/evidence/numeric-array-some-int-method-v1-attempt1-logs.txt",
+      "captures/v11/evidence/numeric-array-some-int-method-v1-attempt1-logs-v1.json",
+      "captures/v11/evidence/numeric-array-some-int-method-v1-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": null,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///e07c6433-4509-4a65-911a-d192e38ced9e.pine?placement%3Ddialog",
+          "path": "/e07c6433-4509-4a65-911a-d192e38ced9e.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "CE10123",
+        "severity": 8,
+        "message": "Cannot call \"array.some\" with argument \"id\"=\"items\". An argument of \"array<int>\" type was used but a \"array<bool>\"  is expected.",
+        "startLineNumber": 4,
+        "startColumn": 6,
+        "endLineNumber": 4,
+        "endColumn": 11
+      }
+    ],
+    "error_observed_utc": "2026-10-04T15:45:02.960Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/numeric-array-some-int-method-v1-attempt1-logs.txt",
+        "evidence/numeric-array-some-int-method-v1-attempt1-logs-v1.json",
+        "evidence/numeric-array-some-int-method-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T15:45:12.999Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v11 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "numeric-array-some-int-namespace-v1.pine",
+    "attempt": 1,
+    "source_sha256": "e88abec471de121ed94f72342304bcc998ad00652819ee6da1f1b1d208d88199",
+    "indicator_title": "V11 numeric-array-some-int-namespace-v1",
+    "status": "COMPILE-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": "CE10123",
+      "text": "Cannot call \"array.some\" with argument \"id\"=\"items\". An argument of \"array<int>\" type was used but a \"array<bool>\"  is expected.",
+      "line": 4,
+      "column": 17,
+      "first_bar_index": null,
+      "first_bar_time_utc": null,
+      "native": {
+        "error": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+        "editorError": {
+          "code": "CE10123",
+          "ctx": {
+            "argDisplayName": "id",
+            "argUserFriendlyRepresentation": "items",
+            "argumentType": "array<int>",
+            "currentTypeDocStr": "array<bool>",
+            "funId": "array.some",
+            "typePostfix": ""
+          },
+          "end": {
+            "column": 21,
+            "line": 4
+          },
+          "message": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+          "start": {
+            "column": 17,
+            "line": 4
+          },
+          "id": "USER;3c8f4685311041c08ae91c26f68fe08a"
+        },
+        "title": "Compilation error",
+        "compiler_markers": [
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///68686b97-8863-4331-927b-530b59ce1ba7.pine?placement%3Ddialog",
+              "path": "/68686b97-8863-4331-927b-530b59ce1ba7.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "code": "CE10123",
+            "severity": 8,
+            "message": "Cannot call \"array.some\" with argument \"id\"=\"items\". An argument of \"array<int>\" type was used but a \"array<bool>\"  is expected.",
+            "startLineNumber": 4,
+            "startColumn": 17,
+            "endLineNumber": 4,
+            "endColumn": 22
+          }
+        ],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,342.78\nH\n85,342.78\nL\n85,342.77\nC\n85,342.77\n0.00 (0.00%)\n85,342.77\nSELL\n0.01\n85,342.78\nBUY\nUSDT\nnumeric-array-some-int-namespace-v1.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n15:45:15 UTC\n99+\nPine Editor\nnumeric-array-some-int-namespace-v1.pine\nPublish script\n1\n2\n3\n4\n5\n//@version=6\nindicator(\"V11\u00a0numeric-array-some-int-namespace-v1\",\u00a0max_bars_back=256)\narray<int>\u00a0items\u00a0=\u00a0array.from(0,\u00a0na,\u00a02)\nplot(array.some(items)\u00a0?\u00a01\u00a0:\u00a00,\u00a0\"RESULT\")\n1 of 1 problem\nCannot call \"array.some\" with argument \"id\"=\"items\". An argument of \"array<int>\" type was used but a \"array<bool>\" is expected.(CE10123)\n1 \u2219 Today, 23:45\nLine 4, Col 17\nPine Script\u00ae v6\nCompilation error: CE10123\n\nCannot call \"array.some\" with argument \"id\"=\"items\". An argument of \"array<int>\" type was used but a \"array<bool>\" is expected.\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+        "context_substituted_message": "Cannot call \"array.some\" with argument \"id\"=\"items\". An argument of \"array<int>\" type was used but a \"array<bool>\"  is expected."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "numeric-array-some-int-namespace-v1.pine",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24652,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24953,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v11/evidence/numeric-array-some-int-namespace-v1-attempt1-error.png",
+      "captures/v11/evidence/numeric-array-some-int-namespace-v1-attempt1-error.txt",
+      "captures/v11/evidence/numeric-array-some-int-namespace-v1-attempt1-logs.txt",
+      "captures/v11/evidence/numeric-array-some-int-namespace-v1-attempt1-logs-v1.json",
+      "captures/v11/evidence/numeric-array-some-int-namespace-v1-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": null,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///68686b97-8863-4331-927b-530b59ce1ba7.pine?placement%3Ddialog",
+          "path": "/68686b97-8863-4331-927b-530b59ce1ba7.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "CE10123",
+        "severity": 8,
+        "message": "Cannot call \"array.some\" with argument \"id\"=\"items\". An argument of \"array<int>\" type was used but a \"array<bool>\"  is expected.",
+        "startLineNumber": 4,
+        "startColumn": 17,
+        "endLineNumber": 4,
+        "endColumn": 22
+      }
+    ],
+    "error_observed_utc": "2026-10-04T15:45:17.904Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/numeric-array-some-int-namespace-v1-attempt1-logs.txt",
+        "evidence/numeric-array-some-int-namespace-v1-attempt1-logs-v1.json",
+        "evidence/numeric-array-some-int-namespace-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T15:45:47.103Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v11 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "sparse-udf-history-pair-v1.pine",
+    "attempt": 1,
+    "source_sha256": "9d068c73947aefa5ec1e271574bad113bf6be3de776ba77c62685783fae2af8e",
+    "indicator_title": "V11 sparse-udf-history-pair-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v11/sparse-udf-history-pair-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T234546.253.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V11 sparse-udf-history-pair-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24653,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24953,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T15:45:33.805Z",
+    "live_candle_open_utc": "2026-10-04T15:44:00.000Z",
+    "export_utc": "2026-10-04T15:45:46.516Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v11/evidence/sparse-udf-history-pair-v1-attempt1-setup.png",
+      "captures/v11/evidence/sparse-udf-history-pair-v1-attempt1-export.png",
+      "captures/v11/evidence/sparse-udf-history-pair-v1-attempt1-logs.txt",
+      "captures/v11/evidence/sparse-udf-history-pair-v1-attempt1-logs-v1.json",
+      "captures/v11/evidence/sparse-udf-history-pair-v1-attempt1-logs.png",
+      "captures/v11/evidence/sparse-udf-history-pair-v1-attempt1-visual.png",
+      "captures/v11/evidence/sparse-udf-history-pair-v1-attempt1-data-window-v1.png",
+      "captures/v11/evidence/sparse-udf-history-pair-v1-attempt1-data-window-v1.json",
+      "captures/v11/evidence/sparse-udf-history-pair-v1-attempt1-data-window-v1.txt",
+      "captures/v11/evidence/sparse-udf-history-pair-v1-attempt1-authority-object-geometry-v1.json",
+      "captures/v11/evidence/sparse-udf-history-pair-v1-attempt1-authority-object-geometry-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T15:45:34.699Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790823480,
+            83522.01,
+            83522.01,
+            83490.78,
+            83490.78,
+            12.87109
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791128640,
+            85342.78,
+            85342.78,
+            85342.77,
+            85342.77,
+            1.82062
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 sparse-udf-history-pair-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790823480,
+                22409,
+                null,
+                null,
+                null,
+                null
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791128640,
+                24952,
+                null,
+                null,
+                null,
+                null
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T15:45:35.813Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790823480,
+            83522.01,
+            83522.01,
+            83490.78,
+            83490.78,
+            12.87109
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791128640,
+            85342.78,
+            85342.78,
+            85342.77,
+            85342.77,
+            1.82407
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 sparse-udf-history-pair-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24953,
+            "first": {
+              "index": -1022409,
+              "value": [
+                1788134400,
+                0,
+                0,
+                null,
+                null,
+                null
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791128640,
+                24952,
+                null,
+                null,
+                null,
+                null
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T15:45:36.842Z",
+        "bars": 24953,
+        "end": true,
+        "first": {
+          "index": -24653,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791128640,
+            85342.78,
+            85342.78,
+            85342.77,
+            85342.77,
+            1.91256
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 sparse-udf-history-pair-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24953,
+            "first": {
+              "index": -24653,
+              "value": [
+                1788134400,
+                0,
+                0,
+                null,
+                null,
+                null
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791128640,
+                24952,
+                null,
+                null,
+                null,
+                null
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///f34b31de-933a-4ac7-9749-ac0ddade4956.pine?placement%3Ddialog",
+          "path": "/f34b31de-933a-4ac7-9749-ac0ddade4956.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": {
+          "value": "CW10003",
+          "target": {
+            "$mid": 1,
+            "path": "/pine-script-docs/errors/CW10003",
+            "scheme": "https",
+            "authority": "www.tradingview.com"
+          }
+        },
+        "severity": 4,
+        "message": "The function \"sample\" should be called on each calculation for consistency. It is recommended to extract the call from this scope",
+        "startLineNumber": 10,
+        "startColumn": 20,
+        "endLineNumber": 10,
+        "endColumn": 44
+      }
+    ],
+    "live_tooltip": "Sun 04 Oct '26   15:44",
+    "historical_compare_before_unix_seconds": 1791128640,
+    "pine_logs": {
+      "paths": [
+        "evidence/sparse-udf-history-pair-v1-attempt1-logs.txt",
+        "evidence/sparse-udf-history-pair-v1-attempt1-logs-v1.json",
+        "evidence/sparse-udf-history-pair-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "81dbd875c92a3a289eb7faf99af80ee96ed0ad6726c01da692105ae7d1aaaf6f",
+    "csv_bytes": 1494167,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "BAR_INDEX",
+      "CURRENT",
+      "PRIOR1",
+      "PRIOR2",
+      "PRIOR3"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "BAR_INDEX": 5,
+      "CURRENT": 6,
+      "PRIOR1": 7,
+      "PRIOR2": 8,
+      "PRIOR3": 9
+    },
+    "first_historical_cells": [
+      "1788134400",
+      "77682",
+      "77682.01",
+      "77572",
+      "77674.04",
+      "0",
+      "0",
+      "",
+      "",
+      ""
+    ],
+    "last_historical_cells": [
+      "1791128520",
+      "85326.01",
+      "85349.19",
+      "85326",
+      "85342.77",
+      "24951",
+      "24951",
+      "24948",
+      "24948",
+      "24948"
+    ],
+    "declared_to_native_header_mapping": {
+      "BAR_INDEX": "BAR_INDEX",
+      "CURRENT": "CURRENT",
+      "PRIOR1": "PRIOR1",
+      "PRIOR2": "PRIOR2",
+      "PRIOR3": "PRIOR3"
+    },
+    "csv_rows": 24953,
+    "historical_rows": 24952,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791128640,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791128640",
+    "first_historical_values": {
+      "BAR_INDEX": "0",
+      "CURRENT": "0",
+      "PRIOR1": "",
+      "PRIOR2": "",
+      "PRIOR3": ""
+    },
+    "last_historical_values": {
+      "BAR_INDEX": "24951",
+      "CURRENT": "24951",
+      "PRIOR1": "24948",
+      "PRIOR2": "24948",
+      "PRIOR3": "24948"
+    },
+    "data_window_witness": "captures/v11/evidence/sparse-udf-history-pair-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T15:46:32.940Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v11 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "tagged-udt-equal-key-sort-v1.pine",
+    "attempt": 1,
+    "source_sha256": "3f53206b2f33c3d948394588f4dc11808871116e4e767a3184ac5b6fe332c47c",
+    "indicator_title": "V11 tagged-udt-equal-key-sort-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v11/tagged-udt-equal-key-sort-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T234632.156.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V11 tagged-udt-equal-key-sort-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24654,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24954,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T15:46:20.229Z",
+    "live_candle_open_utc": "2026-10-04T15:46:00.000Z",
+    "export_utc": "2026-10-04T15:46:32.542Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v11/evidence/tagged-udt-equal-key-sort-v1-attempt1-setup.png",
+      "captures/v11/evidence/tagged-udt-equal-key-sort-v1-attempt1-export.png",
+      "captures/v11/evidence/tagged-udt-equal-key-sort-v1-attempt1-logs.txt",
+      "captures/v11/evidence/tagged-udt-equal-key-sort-v1-attempt1-logs-v1.json",
+      "captures/v11/evidence/tagged-udt-equal-key-sort-v1-attempt1-logs.png",
+      "captures/v11/evidence/tagged-udt-equal-key-sort-v1-attempt1-visual.png",
+      "captures/v11/evidence/tagged-udt-equal-key-sort-v1-attempt1-data-window-v1.png",
+      "captures/v11/evidence/tagged-udt-equal-key-sort-v1-attempt1-data-window-v1.json",
+      "captures/v11/evidence/tagged-udt-equal-key-sort-v1-attempt1-data-window-v1.txt",
+      "captures/v11/evidence/tagged-udt-equal-key-sort-v1-attempt1-authority-object-geometry-v1.json",
+      "captures/v11/evidence/tagged-udt-equal-key-sort-v1-attempt1-authority-object-geometry-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T15:46:21.341Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790823600,
+            83490.78,
+            83529.1,
+            83484,
+            83520.39,
+            25.87332
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791128760,
+            85342.77,
+            85342.78,
+            85342.77,
+            85342.78,
+            2.02049
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 tagged-udt-equal-key-sort-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790823600,
+                20,
+                50,
+                10,
+                30,
+                40
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791128760,
+                20,
+                50,
+                10,
+                30,
+                40
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T15:46:22.376Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790823600,
+            83490.78,
+            83529.1,
+            83484,
+            83520.39,
+            25.87332
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791128760,
+            85342.77,
+            85342.78,
+            85342.77,
+            85342.77,
+            2.02059
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 tagged-udt-equal-key-sort-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24954,
+            "first": {
+              "index": -1022410,
+              "value": [
+                1788134400,
+                20,
+                50,
+                10,
+                30,
+                40
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791128760,
+                20,
+                50,
+                10,
+                30,
+                40
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T15:46:23.336Z",
+        "bars": 24954,
+        "end": true,
+        "first": {
+          "index": -24654,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791128760,
+            85342.77,
+            85342.78,
+            85342.77,
+            85342.77,
+            2.02082
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 tagged-udt-equal-key-sort-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24954,
+            "first": {
+              "index": -24654,
+              "value": [
+                1788134400,
+                20,
+                50,
+                10,
+                30,
+                40
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791128760,
+                20,
+                50,
+                10,
+                30,
+                40
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///fc4a428d-342c-40c5-b178-4d84328e4537.pine?placement%3Ddialog",
+          "path": "/fc4a428d-342c-40c5-b178-4d84328e4537.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "CW10011",
+        "severity": 4,
+        "message": "Shadowing built-in variable \"second\"",
+        "startLineNumber": 9,
+        "startColumn": 1,
+        "endLineNumber": 9,
+        "endColumn": 29
+      }
+    ],
+    "live_tooltip": "Sun 04 Oct '26   15:46",
+    "historical_compare_before_unix_seconds": 1791128760,
+    "pine_logs": {
+      "paths": [
+        "evidence/tagged-udt-equal-key-sort-v1-attempt1-logs.txt",
+        "evidence/tagged-udt-equal-key-sort-v1-attempt1-logs-v1.json",
+        "evidence/tagged-udt-equal-key-sort-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "ff7e3c9ed48bd9ca314bd06dd4391bc71f88297ca73e28bd2730c15e001c3914",
+    "csv_bytes": 1478569,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "TAG0",
+      "TAG1",
+      "TAG2",
+      "TAG3",
+      "TAG4"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "TAG0": 5,
+      "TAG1": 6,
+      "TAG2": 7,
+      "TAG3": 8,
+      "TAG4": 9
+    },
+    "first_historical_cells": [
+      "1788134400",
+      "77682",
+      "77682.01",
+      "77572",
+      "77674.04",
+      "20",
+      "50",
+      "10",
+      "30",
+      "40"
+    ],
+    "last_historical_cells": [
+      "1791128640",
+      "85342.78",
+      "85342.78",
+      "85342.77",
+      "85342.78",
+      "20",
+      "50",
+      "10",
+      "30",
+      "40"
+    ],
+    "declared_to_native_header_mapping": {
+      "TAG0": "TAG0",
+      "TAG1": "TAG1",
+      "TAG2": "TAG2",
+      "TAG3": "TAG3",
+      "TAG4": "TAG4"
+    },
+    "csv_rows": 24954,
+    "historical_rows": 24953,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791128760,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791128760",
+    "first_historical_values": {
+      "TAG0": "20",
+      "TAG1": "50",
+      "TAG2": "10",
+      "TAG3": "30",
+      "TAG4": "40"
+    },
+    "last_historical_values": {
+      "TAG0": "20",
+      "TAG1": "50",
+      "TAG2": "10",
+      "TAG3": "30",
+      "TAG4": "40"
+    },
+    "data_window_witness": "captures/v11/evidence/tagged-udt-equal-key-sort-v1-attempt1-data-window-v1.json"
   }
 ]
