@@ -625,6 +625,9 @@ independently.
 colors and projected CSS coordinates. `TealchartRenderer.layoutExternalAxisLabels`
 reuses the existing bounded label collision pass and updates supplied OEMS bounds
 in place before `PriceLineManager.update`, so presentation and hit tests agree.
+Anonymous OEMS bounds retain the collision cache's positional fallback; never
+fabricate a shared empty ID, which aliases distinct tags on cache hits and makes
+unchanged order stacks jump between cached and fresh passes.
 `computeExternalIndicatorAxisLabels` reuses existing Tealscript tag eligibility,
 formatting, grow-only measured width, font and plot-color border with the host's
 value converter; these tags join the same pass. `renderExternalIndicatorAxisGuides`

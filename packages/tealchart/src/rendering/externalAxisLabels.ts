@@ -85,7 +85,9 @@ export function layoutExternalAxisLabels(
       .filter((obstacle) => obstacle.axisId === axis.id)
       .map(({ bound }) => ({
         ...bound,
-        id: `external-obstacle:${axis.id}:${bound.id ?? ''}`,
+        // Anonymous bounds use the collision cache's positional fallback.
+        // Giving them all an empty ID aliases distinct OEMS tags on cache hits.
+        id: bound.id ? `external-obstacle:${axis.id}:${bound.id}` : undefined,
         height: bound.height + 2,
         source: bound,
       }));
