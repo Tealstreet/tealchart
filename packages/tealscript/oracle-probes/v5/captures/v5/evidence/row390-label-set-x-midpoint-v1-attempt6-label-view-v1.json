@@ -1,0 +1,36 @@
+{
+  "browser_utc": "2026-10-04T04:10:09.232Z",
+  "source": "row390-label-set-x-midpoint-v1",
+  "native_last_bar": {
+    "index": 300,
+    "value": [
+      1791087000,
+      84823.68,
+      84823.68,
+      84823.67,
+      84823.68,
+      0.11663
+    ]
+  },
+  "plots": [
+    {
+      "id": "plot_0",
+      "type": "line"
+    }
+  ],
+  "styles": {
+    "plot_0": {
+      "color": "#2962FF",
+      "display": 4294967295,
+      "linestyle": 0,
+      "linewidth": 1,
+      "plottype": 0,
+      "trackPrice": false,
+      "title": "plot_0"
+    }
+  },
+  "visible_range": {
+    "_firstBar": 255,
+    "_lastBar": 305
+  }
+}

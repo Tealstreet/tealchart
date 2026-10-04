@@ -1,0 +1,39 @@
+{
+  "artifact": "Native accdist host coverage v1",
+  "historical_counts": [
+    {
+      "attempt": 1,
+      "ticker": "BINANCE:BTCUSDT",
+      "historical_rows": 24606,
+      "native_condition_counts": {
+        "VOLUME_MISSING": 0,
+        "PRICE_MISSING": 0,
+        "FLAT_RANGE": 0,
+        "ACCDIST_MISSING": 0
+      }
+    },
+    {
+      "attempt": 2,
+      "ticker": "SP_DLY:SPX",
+      "historical_rows": 2555,
+      "native_condition_counts": {
+        "VOLUME_MISSING": 0,
+        "PRICE_MISSING": 0,
+        "FLAT_RANGE": 25,
+        "ACCDIST_MISSING": 0
+      }
+    },
+    {
+      "attempt": 3,
+      "ticker": "TVC:DXY",
+      "historical_rows": 2555,
+      "native_condition_counts": {
+        "VOLUME_MISSING": 2555,
+        "PRICE_MISSING": 0,
+        "FLAT_RANGE": 3,
+        "ACCDIST_MISSING": 2555
+      }
+    }
+  ],
+  "no_recovery_claim": true
+}

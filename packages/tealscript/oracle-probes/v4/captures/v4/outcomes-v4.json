@@ -4315,7 +4315,7 @@
     "original_download_filename": null,
     "partial_csv_file": null,
     "diagnostic": {
-      "code": null,
+      "code": "RE10001",
       "text": "Error on bar 0: Invalid value of the 'length' argument (-1) in the ''change'' function. It must be > 0.",
       "line": 3,
       "column": null,
@@ -4422,7 +4422,7 @@
     "original_download_filename": null,
     "partial_csv_file": null,
     "diagnostic": {
-      "code": null,
+      "code": "RE10001",
       "text": "Error on bar 0: Invalid value of the 'length' argument (0) in the ''change'' function. It must be > 0.",
       "line": 3,
       "column": null,
@@ -4638,7 +4638,7 @@
     "original_download_filename": null,
     "partial_csv_file": null,
     "diagnostic": {
-      "code": null,
+      "code": "RE10090",
       "text": "Error on bar 0: In the 'matrix.pow()' function. The 'power' argument must be positive.",
       "line": 3,
       "column": null,
@@ -5050,7 +5050,7 @@
     "original_download_filename": null,
     "partial_csv_file": null,
     "diagnostic": {
-      "code": null,
+      "code": "RE10007",
       "text": "Error on bar 0: Invalid number of bars back specified in the history-referencing operator. It accepts a value between 0 and 10000.",
       "line": 4,
       "column": null,
@@ -11638,7 +11638,7 @@
     "original_download_filename": null,
     "partial_csv_file": null,
     "diagnostic": {
-      "code": null,
+      "code": "RE10002",
       "text": "Error on bar 40: Invalid value of the 'percentage' argument (101) in the 'array.percentile_nearest_rank' function. It must be in the range [0..100].",
       "line": 5,
       "column": null,
@@ -11728,7 +11728,7 @@
     "original_download_filename": null,
     "partial_csv_file": null,
     "diagnostic": {
-      "code": null,
+      "code": "RE10002",
       "text": "Error on bar 40: Invalid value of the 'percentage' argument (-1) in the 'array.percentile_nearest_rank' function. It must be in the range [0..100].",
       "line": 5,
       "column": null,
@@ -12016,7 +12016,7 @@
     "original_download_filename": null,
     "partial_csv_file": null,
     "diagnostic": {
-      "code": null,
+      "code": "RE10002",
       "text": "Error on bar 40: Invalid value of the 'percentage' argument (101) in the 'array.percentile_nearest_rank' function. It must be in the range [0..100].",
       "line": 5,
       "column": null,
@@ -12106,7 +12106,7 @@
     "original_download_filename": null,
     "partial_csv_file": null,
     "diagnostic": {
-      "code": null,
+      "code": "RE10002",
       "text": "Error on bar 40: Invalid value of the 'percentage' argument (-1) in the 'array.percentile_nearest_rank' function. It must be in the range [0..100].",
       "line": 5,
       "column": null,
