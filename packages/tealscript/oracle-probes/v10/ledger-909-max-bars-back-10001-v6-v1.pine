@@ -1,0 +1,4 @@
+//@version=6
+indicator("Ledger 909 max_bars_back 10001")
+max_bars_back(close, 10001)
+plot(close, "Close control")

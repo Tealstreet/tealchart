@@ -17,6 +17,8 @@
 > `v8/instructions/` (`SHA256SUMS` pins every source). Reply at `v8/captures/v8/RESPONSE-v8.md`.
 > **Then round v9.** After v8, do [`v9/HANDOFF-v9.md`](v9/HANDOFF-v9.md) — 95 scripts; per-script steps in
 > `v9/instructions/` (`SHA256SUMS` pins every source). Reply at `v9/captures/v9/RESPONSE-v9.md`.
+> **Then round v10.** After v9, do [`v10/HANDOFF-v10.md`](v10/HANDOFF-v10.md) — 13 scripts; per-script steps in
+> `v10/instructions/` (`SHA256SUMS` pins every source). Reply at `v10/captures/v10/RESPONSE-v10.md`.
 
 Agent exchange: [capture response v1](RESPONSE-v1.md). The next reply belongs in
 `RESPONSE-v2.md` beside this handoff; commit responses so both machines can read them.

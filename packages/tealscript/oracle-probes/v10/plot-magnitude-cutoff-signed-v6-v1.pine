@@ -1,0 +1,35 @@
+//@version=6
+indicator("Plot magnitude cutoff signed v1", precision=8)
+int sampleIndex = bar_index % 26
+float signedMagnitude = switch sampleIndex
+    0 => 9.26e99
+    1 => -9.26e99
+    2 => 9.269999e99
+    3 => -9.269999e99
+    4 => 9.27e99
+    5 => -9.27e99
+    6 => 9.270001e99
+    7 => -9.270001e99
+    8 => 9.28e99
+    9 => -9.28e99
+    10 => 9.5e99
+    11 => -9.5e99
+    12 => 9.9e99
+    13 => -9.9e99
+    14 => 9.99e99
+    15 => -9.99e99
+    16 => 9.999e99
+    17 => -9.999e99
+    18 => 9.999999e99
+    19 => -9.999999e99
+    20 => 1.0e100
+    21 => -1.0e100
+    22 => 1.000001e100
+    23 => -1.000001e100
+    24 => 0.0
+    => na
+plot(signedMagnitude, title="Raw signed magnitude", style=plot.style_circles, linewidth=3)
+plot(signedMagnitude / 1e99, title="Magnitude scaled by 1e99", display=display.data_window)
+plot(na(signedMagnitude) ? 1 : 0, title="Source is NA", display=display.data_window)
+plot(sampleIndex, title="Magnitude case index", display=display.data_window)
+plot(bar_index, title="Input bar index", display=display.data_window)

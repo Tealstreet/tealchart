@@ -1,0 +1,5 @@
+//@version=5
+indicator("Unsupported array sort polyline namespace")
+values = array.new_polyline(0)
+array.sort(values)
+plot(close)
