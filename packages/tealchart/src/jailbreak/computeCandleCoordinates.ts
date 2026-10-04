@@ -20,6 +20,7 @@ export function computeCandleCoordinates(
   priceToY: (price: number) => number,
   timeToX: (time: number) => number,
   minCandleWidth = 1.5,
+  nativeBarSpacingPx?: number,
 ): CandleCoordinates[] {
   if (bars.length === 0) return [];
 
@@ -31,7 +32,7 @@ export function computeCandleCoordinates(
   }
 
   const pixelsPerMs = chartWidth / viewportTimeRange;
-  const slotWidth = barInterval * pixelsPerMs;
+  const slotWidth = nativeBarSpacingPx ?? barInterval * pixelsPerMs;
   const spacingRatio = 0.2; // 20% spacing, 80% candle — matches TealchartRenderer
   const candleWidth = Math.max(minCandleWidth, slotWidth * (1 - spacingRatio));
   const halfCandle = candleWidth / 2;

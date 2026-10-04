@@ -171,3 +171,19 @@ describe('TealchartApi line removal coalescing', () => {
     }
   });
 });
+
+describe('study input execution ownership', () => {
+  it('notifies the host with merged inputs and ignores removed study handles', async () => {
+    const api = new TealchartApi('BTCUSDT', '15');
+    const notify = vi.fn();
+    api.setOnStudyInputsChange(notify);
+    const study = await api.createStudy('SMA', true, false, { length: 20, source: 'close' });
+    study!.setInputs({ length: 5 });
+    expect(notify).toHaveBeenCalledWith(study!.getId(), { length: 5, source: 'close' });
+    expect(study!.getInputs()).toEqual({ length: 5, source: 'close' });
+    study!.remove();
+    study!.setInputs({ length: 30 });
+    expect(notify).toHaveBeenCalledTimes(1);
+    api.dispose();
+  });
+});

@@ -44,6 +44,12 @@ export interface PriceLineManagerOptions {
    * and shared with the render pass, so a tag never narrows again.
    */
   growPriceAxisTagWidth?: (bound: PriceLineLabelBounds, text: string) => number;
+  /** Optional hosted input ownership gate; ordinary hosts retain existing behavior. */
+  acceptPointerEvent?: (
+    event: Event | undefined,
+    node: Konva.Node,
+    phase: 'down' | 'start' | 'move' | 'end',
+  ) => boolean;
   /** Callback when order is moved via drag (final) */
   onOrderMove?: (orderId: string, newPrice: number) => void;
   /** Callback while order is being dragged */
@@ -317,6 +323,7 @@ export class PriceLineManager {
     originalY: number;
     originalX?: number;
     originalGroupY?: number;
+    originalNodeY?: number;
     originalAbsoluteY?: number;
     originalPointerX?: number;
     originalPointerY?: number;
@@ -541,12 +548,52 @@ export class PriceLineManager {
     return this.activeDrag !== null;
   }
 
+  /** Cancel a transient gesture when its chart binding or presentation disappears. Never commits an action. */
+  cancelDrag(): void {
+    if (!this.activeDrag) return;
+    const activeDrag = this.activeDrag;
+    this.dragCancelled = true;
+    activeDrag.node.stopDrag();
+    if (activeDrag.type === 'order') {
+      if (activeDrag.group) {
+        activeDrag.group.y(activeDrag.originalGroupY ?? 0);
+        activeDrag.group.setAttr('lineY', activeDrag.originalY);
+      }
+      activeDrag.node.y(activeDrag.originalNodeY ?? activeDrag.originalY - TOUCH_TARGET_HEIGHT / 2);
+    } else {
+      if (activeDrag.originalX !== undefined) {
+        activeDrag.node.x(activeDrag.originalX);
+      }
+      activeDrag.node.y(activeDrag.originalY);
+    }
+    activeDrag.onCancel?.();
+    this.activeDrag = null;
+    this.layer.batchDraw();
+    this.options.onCursorChange?.('crosshair');
+  }
+
   getDragType(): 'order' | 'tpsl' | null {
     return this.activeDrag?.type ?? null;
   }
 
   getDragLineId(): string | null {
     return this.activeDrag?.lineId ?? null;
+  }
+
+  /** Current painted tag occupancy, including a translated in-flight order.
+   * External hosts can de-overlap other labels without moving drag hit targets. */
+  getRenderedPriceAxisLabelBounds(): PriceLineLabelBounds[] {
+    const bounds: PriceLineLabelBounds[] = [];
+    for (const group of this.cachedLineGroups.values()) {
+      const bound = group.getAttr('boundData') as PriceLineLabelBounds | undefined;
+      const refs = group.getAttr('contentRefs') as CachedLineContentRefs | undefined;
+      const rect = refs?.priceAxisRect;
+      if (!bound || !rect || !rect.isVisible()) continue;
+      const center = rect.getAbsolutePosition().y + rect.height() / 2;
+      if (!Number.isFinite(center)) continue;
+      bounds.push({ ...bound, originalY: center, adjustedY: center, height: rect.height(), fixed: true });
+    }
+    return bounds;
   }
 
   setFontFamily(fontFamily?: string): void {
@@ -1138,16 +1185,18 @@ export class PriceLineManager {
       // pending window meant a confirmation that never matched - a host that
       // retires the adapter on an amend, a venue that echoes a different shape -
       // left the line un-draggable until the action timed out.
-      dragRect.on('mousedown touchstart', () => {
+      dragRect.on('mousedown touchstart', (e) => {
+        if (this.options.acceptPointerEvent && !this.options.acceptPointerEvent(e.evt, dragRect, 'down')) return;
         const currentBound = this.getCurrentBound(group, bound);
         if (currentBound.actionState?.isAwaitingCallback) return;
         this.selectLine(currentBound.lineId);
         if (!this.activeDrag) {
-          dragRect.startDrag();
+          dragRect.startDrag(e);
         }
       });
 
-      dragRect.on('dragstart', () => {
+      dragRect.on('dragstart', (e) => {
+        if (this.options.acceptPointerEvent && !this.options.acceptPointerEvent(e.evt, dragRect, 'start')) return;
         const currentBound = this.getCurrentBound(group, bound);
         if (currentBound.actionState?.isAwaitingCallback) {
           this.dragCancelled = true;
@@ -1156,13 +1205,16 @@ export class PriceLineManager {
         }
         dragStartY = dragRect.y();
         const startPointer = this.getStagePointerPosition(dragRect);
+        // Cached groups move during scale/pan updates without rebuilding these
+        // listeners. The creation-time lineY is no longer their projected Y.
         this.activeDrag = {
           node: dragRect,
           group,
           type: 'order',
           lineId: currentBound.lineId,
-          originalY: lineY,
+          originalY: group.getAttr('lineY') ?? this.options.priceToY(currentBound.price),
           originalGroupY: group.y(),
+          originalNodeY: dragStartY,
           originalAbsoluteY: dragRect.getAbsolutePosition().y + TOUCH_TARGET_HEIGHT / 2,
           originalPointerY: startPointer?.y,
           originalPrice: currentBound.price,
@@ -1173,7 +1225,8 @@ export class PriceLineManager {
         this.options.onCursorChange?.('grabbing');
       });
 
-      dragRect.on('dragmove', () => {
+      dragRect.on('dragmove', (e) => {
+        if (this.options.acceptPointerEvent && !this.options.acceptPointerEvent(e.evt, dragRect, 'move')) return;
         // Constrain to vertical only
         dragRect.x(dragRectX);
         const activeDrag = this.activeDrag;
@@ -1196,7 +1249,8 @@ export class PriceLineManager {
         this.layer.batchDraw();
       });
 
-      dragRect.on('dragend', () => {
+      dragRect.on('dragend', (e) => {
+        if (this.options.acceptPointerEvent && !this.options.acceptPointerEvent(e.evt, dragRect, 'end')) return;
         const activeDrag = this.activeDrag;
         if (!activeDrag || activeDrag.type !== 'order' || activeDrag.node !== dragRect || !activeDrag.group) {
           dragRect.y(dragStartY);
@@ -1212,7 +1266,7 @@ export class PriceLineManager {
 
         dragRect.y(dragStartY);
 
-        if (!this.dragCancelled && Math.abs(finalY - lineY) > 1) {
+        if (!this.dragCancelled && Math.abs(finalY - activeDrag.originalY) > 1) {
           // Dragging translates the whole group for smooth motion. The next
           // data-driven update must rebuild against the final price geometry
           // instead of reusing that temporary group transform.
@@ -1383,16 +1437,18 @@ export class PriceLineManager {
           const originalY = lineY - LABEL_HEIGHT / 2;
           const startCenterX = originalX + buttonWidth / 2;
 
-          hitRect.on('mousedown touchstart', () => {
+          hitRect.on('mousedown touchstart', (e) => {
+            if (this.options.acceptPointerEvent && !this.options.acceptPointerEvent(e.evt, hitRect, 'down')) return;
             const currentBound = this.getCurrentBound(group, bound);
             if (currentBound.actionState?.isAwaitingCallback) return;
             this.selectLine(currentBound.lineId);
             if (!this.activeDrag) {
-              hitRect.startDrag();
+              hitRect.startDrag(e);
             }
           });
 
-          hitRect.on('dragstart', () => {
+          hitRect.on('dragstart', (e) => {
+            if (this.options.acceptPointerEvent && !this.options.acceptPointerEvent(e.evt, hitRect, 'start')) return;
             const currentBound = this.getCurrentBound(group, bound);
             if (currentBound.actionState?.isAwaitingCallback) {
               this.dragCancelled = true;
@@ -1423,7 +1479,8 @@ export class PriceLineManager {
             this.options.onCursorChange?.('grabbing');
           });
 
-          hitRect.on('dragmove', () => {
+          hitRect.on('dragmove', (e) => {
+            if (this.options.acceptPointerEvent && !this.options.acceptPointerEvent(e.evt, hitRect, 'move')) return;
             const activeDrag = this.activeDrag;
             if (!activeDrag || activeDrag.type !== 'tpsl' || activeDrag.node !== hitRect) return;
 
@@ -1458,7 +1515,8 @@ export class PriceLineManager {
             }
           });
 
-          hitRect.on('dragend', () => {
+          hitRect.on('dragend', (e) => {
+            if (this.options.acceptPointerEvent && !this.options.acceptPointerEvent(e.evt, hitRect, 'end')) return;
             const activeDrag = this.activeDrag;
             if (!activeDrag || activeDrag.type !== 'tpsl' || activeDrag.node !== hitRect) {
               hitRect.x(originalX);
@@ -1534,6 +1592,7 @@ export class PriceLineManager {
           hitRect.setAttr('tealchartCursor', 'pointer');
 
           hitRect.on('mousedown touchstart', (e) => {
+            if (this.options.acceptPointerEvent && !this.options.acceptPointerEvent(e.evt, hitRect, 'down')) return;
             e.cancelBubble = true;
             const currentBound = this.getCurrentBound(group, bound);
             this.selectLine(currentBound.lineId);
@@ -1567,6 +1626,7 @@ export class PriceLineManager {
           hitRect.setAttr('tealchartCursor', 'pointer');
 
           hitRect.on('mousedown touchstart', (e) => {
+            if (this.options.acceptPointerEvent && !this.options.acceptPointerEvent(e.evt, hitRect, 'down')) return;
             e.cancelBubble = true;
             const currentBound = this.getCurrentBound(group, bound);
             this.selectLine(currentBound.lineId);
@@ -1717,27 +1777,7 @@ export class PriceLineManager {
   // ============================================================================
 
   private handleKeyDown = (e: KeyboardEvent): void => {
-    if (e.key === 'Escape' && this.activeDrag) {
-      const activeDrag = this.activeDrag;
-      this.dragCancelled = true;
-      activeDrag.node.stopDrag();
-      if (activeDrag.type === 'order') {
-        if (activeDrag.group) {
-          activeDrag.group.y(activeDrag.originalGroupY ?? 0);
-          activeDrag.group.setAttr('lineY', activeDrag.originalY);
-        }
-        activeDrag.node.y(activeDrag.originalY - TOUCH_TARGET_HEIGHT / 2);
-      } else {
-        if (activeDrag.originalX !== undefined) {
-          activeDrag.node.x(activeDrag.originalX);
-        }
-        activeDrag.node.y(activeDrag.originalY);
-      }
-      activeDrag.onCancel?.();
-      this.activeDrag = null;
-      this.layer.batchDraw();
-      this.options.onCursorChange?.('crosshair');
-    }
+    if (e.key === 'Escape') this.cancelDrag();
   };
 
   private setupKeyboardHandler(): void {

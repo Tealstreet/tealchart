@@ -11,6 +11,15 @@ describe('ContextMenu', () => {
     document.body.innerHTML = '';
   });
 
+  it('opens left of its anchor using the measured width and still clamps to the viewport', () => {
+    vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue({ width: 260, height: 200 } as DOMRect);
+    const menu = showContextMenu({ x: 700, y: 20, openDirection: 'left', items: [{ text: 'Menu', position: 'top', click: vi.fn() }] });
+    expect(menu.getElement().style.left).toBe('440px');
+    menu.close();
+    const narrow = showContextMenu({ x: 100, y: 20, openDirection: 'left', items: [{ text: 'Menu', position: 'top', click: vi.fn() }] });
+    expect(narrow.getElement().style.left).toBe('10px');
+  });
+
   it('keeps menu clicks from falling through to chart handlers', () => {
     const onChartClick = vi.fn();
     const onItemClick = vi.fn();

@@ -30,6 +30,12 @@ export interface LayoutSelectorCallbacks {
   onDelete: (id: string | number) => void;
   /** Rename a layout */
   onRename: (id: string | number, newName: string) => void;
+  /** Hosts such as Electron provide their existing naming dialog. Browser callers retain prompt. */
+  requestName?: (kind: 'save' | 'rename', layout?: LayoutMetadata) => Promise<string | null>;
+  /** Hosts provide their existing confirmation dialog. Browser callers retain confirm. */
+  confirmDelete?: (layout: LayoutMetadata) => Promise<boolean>;
+  /** Called by the original modal's close button, overlay and Escape handling. */
+  onClose?: () => void;
 }
 
 // ============================================================================
@@ -161,6 +167,7 @@ class LayoutModal extends Modal {
       width: 320,
       maxHeight: 'min(80vh, calc(100% - 40px))',
       position: 'absolute',
+      onClose: callbacks.onClose,
     });
     this.callbacks = callbacks;
   }
@@ -225,6 +232,12 @@ class LayoutModal extends Modal {
     actionsContainer.appendChild(
       this.createActionItem('Save As...', () => {
         this.close();
+        if (this.callbacks.requestName) {
+          void this.callbacks.requestName('save').then((name) => {
+            if (this.isMounted() && name?.trim()) this.callbacks.onSaveAs(name.trim());
+          });
+          return;
+        }
         const name = prompt('Layout name:');
         if (name && name.trim()) {
           this.callbacks.onSaveAs(name.trim());
@@ -260,6 +273,14 @@ class LayoutModal extends Modal {
     renameBtn.textContent = '\u270E';
     renameBtn.addEventListener('click', (e) => {
       e.stopPropagation();
+      if (this.callbacks.requestName) {
+        this.close();
+        void this.callbacks.requestName('rename', layout).then((name) => {
+          if (this.isMounted() && name?.trim() && name.trim() !== layout.name)
+            this.callbacks.onRename(layout.id, name.trim());
+        });
+        return;
+      }
       const newName = prompt('Rename layout:', layout.name);
       if (newName && newName.trim() && newName.trim() !== layout.name) {
         this.callbacks.onRename(layout.id, newName.trim());
@@ -283,6 +304,13 @@ class LayoutModal extends Modal {
     deleteBtn.textContent = '\u2715';
     deleteBtn.addEventListener('click', (e) => {
       e.stopPropagation();
+      if (this.callbacks.confirmDelete) {
+        this.close();
+        void this.callbacks.confirmDelete(layout).then((confirmed) => {
+          if (this.isMounted() && confirmed) this.callbacks.onDelete(layout.id);
+        });
+        return;
+      }
       if (confirm(`Delete layout "${layout.name}"?`)) {
         this.callbacks.onDelete(layout.id);
         this.close();
@@ -393,6 +421,16 @@ export class LayoutSelector {
 
   getElement(): HTMLButtonElement {
     return this.buttonEl;
+  }
+
+  /** Native/header hosts can open the same chart-contained modal without a duplicate button. */
+  open(): void {
+    this.modal.open();
+    this.modal.getContentElement().parentElement?.querySelector<HTMLButtonElement>('button')?.focus();
+  }
+
+  close(): void {
+    this.modal.close();
   }
 
   setCurrentLayout(layoutId: string | number | null, layoutName: string | null): void {

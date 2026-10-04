@@ -22,6 +22,8 @@ export interface ContextMenuOptions {
   x: number;
   /** Y position (screen coordinates) */
   y: number;
+  /** Side of the anchor on which the menu opens; defaults to right. */
+  openDirection?: 'left' | 'right';
   /** Callback when menu is closed */
   onClose?: () => void;
   /** Chart render options used to theme the menu (it portals to document.body). */
@@ -212,8 +214,9 @@ export class ContextMenu {
   // ============================================================================
 
   private positionMenu(): void {
+    const width = this.el.getBoundingClientRect().width || this.el.offsetWidth || 160;
     positionFixedFloatingElement(this.el, {
-      desiredLeft: this.options.x,
+      desiredLeft: this.options.x - (this.options.openDirection === 'left' ? width : 0),
       desiredTop: this.options.y,
       fallbackWidth: 160,
       margin: 10,

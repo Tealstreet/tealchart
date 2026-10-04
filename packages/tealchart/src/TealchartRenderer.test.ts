@@ -1500,6 +1500,13 @@ describe('TealchartRenderer coordinate transforms', () => {
       (renderer as any).drawCandlesInPane(bars, viewport, pane, [hiddenTint, lastBarTint]);
 
       expect(candleBodyColors).toEqual(['#aaaaaa', '#00ff00']);
+      // The hosted style bridge must report exactly the native renderer's
+      // chosen overrides, without coloring hidden or show_last-clipped bars.
+      expect(renderer.getExternalBarColors([hiddenTint, lastBarTint], bars.length)).toEqual([
+        { index: 1, color: '#00ff00' },
+      ]);
+      expect(renderer.getExternalBarColors([lastBarTint, { ...lastBarTint, color: ['#123456', '#123456'] }], 2))
+        .toEqual([{ index: 1, color: '#123456' }]);
     });
   });
 
@@ -4829,5 +4836,134 @@ describe('value axis label layout', () => {
       expect(label.y - (label.height ?? 0) / 2).toBeGreaterThanOrEqual(pane.top);
       expect(label.y + (label.height ?? 0) / 2).toBeLessThanOrEqual(pane.bottom);
     }
+  });
+});
+
+describe('external host trading-line projection', () => {
+  const layout: UnifiedPaneLayout = {
+    panes: [{ id: 'main', type: 'main', heightRatio: 1, yMin: 10, yMax: 200, fixedRange: false }],
+    timeAxisHeight: TIME_AXIS_HEIGHT,
+  };
+  const viewport: Viewport = { startTime: 0, endTime: 1, priceMin: 10, priceMax: 200 };
+  const lines: PriceLine[] = [
+    { id: 'one', price: 100, color: '#00ff00', lineStyle: 'solid', label: { primaryText: '100' } },
+    { id: 'two', price: 101, color: '#ff0000', lineStyle: 'solid', label: { primaryText: '101' } },
+  ];
+
+  it('retains identical measurement and collision behavior with an equivalent external projection', () => {
+    const renderer = new TealchartRenderer(createMockCtx(), { width: 800, height: 600 });
+    const panes = renderer.computePanesLayout(layout, 600);
+    const main = panes[0]!;
+    const direct = renderer.computePriceLineLabelBoundsWithLayout(lines, viewport, layout);
+    const external = renderer.computeExternalPriceLineLabelBounds(lines, {
+      panes,
+      mainPaneTop: renderer.getOptions().margins.top,
+      priceToY: (price) => main.top + (1 - (price - main.yMin) / (main.yMax - main.yMin)) * main.height,
+    });
+    expect(external).toHaveLength(direct.length);
+    for (let index = 0; index < direct.length; index += 1) {
+      const { originalY, adjustedY, ...content } = external[index]!;
+      const { originalY: directY, adjustedY: directAdjustedY, ...directContent } = direct[index]!;
+      expect(content).toEqual(directContent);
+      expect(originalY).toBeCloseTo(directY, 10);
+      expect(adjustedY).toBeCloseTo(directAdjustedY, 10);
+    }
+  });
+
+  it('uses the actual nonlinear projection and clips lines by projected coordinates', () => {
+    const renderer = new TealchartRenderer(createMockCtx(), { width: 800, height: 600 });
+    const panes = renderer.computePanesLayout(layout, 600);
+    const main = panes[0]!;
+    const project = (price: number) => main.bottom - (Math.log(price / 10) / Math.log(20)) * main.height;
+    const inverse = (y: number) => 10 * Math.exp(((main.bottom - y) / main.height) * Math.log(20));
+    const bounds = renderer.computeExternalPriceLineLabelBounds(
+      [...lines, { ...lines[0]!, id: 'offscreen', price: 500 }],
+      { panes, priceToY: project },
+    );
+    expect(bounds.map((bound) => bound.lineId).sort()).toEqual(['one', 'two']);
+    for (const bound of bounds) {
+      expect(bound.originalY).toBeCloseTo(project(bound.price));
+      expect(inverse(bound.originalY)).toBeCloseTo(bound.price);
+    }
+  });
+
+  it('draws each canvas-owned horizontal primitive once at its projected price without drawing Konva-owned lines', () => {
+    const ctx = createMockCtx();
+    ctx.moveTo = vi.fn();
+    ctx.stroke = vi.fn();
+    const renderer = new TealchartRenderer(ctx, { width: 800, height: 600 });
+    const panes = renderer.computePanesLayout(layout, 600);
+    const projection = { panes, priceToY: () => 123 };
+    const bounds = renderer.computeExternalPriceLineLabelBounds(
+      [
+        { ...lines[0]!, renderLineOnCanvas: true },
+        { ...lines[1]!, id: 'konva', type: 'order' },
+      ],
+      projection,
+    );
+    renderer.renderExternalCanvasPriceLines(bounds, projection);
+    expect(ctx.stroke).toHaveBeenCalledOnce();
+    expect(ctx.moveTo).toHaveBeenCalledWith(renderer.getOptions().margins.left, 123);
+  });
+});
+
+describe('external Tealscript overlay render passes', () => {
+  const epoch = 1_800_000_000_000;
+  const bars: Bar[] = [0, 60_000, 3 * 86_400_000].map((offset, index) => ({
+    time: epoch + offset, open: 20, high: 80, low: 10, close: 40, volume: 100,
+  }));
+  const pane: ComputedPane = {
+    id: 'main', type: 'main', top: 0, bottom: 200, height: 200, heightRatio: 1,
+    yMin: 10, yMax: 100, fixedRange: false,
+  };
+  const viewport: Viewport = { startTime: bars[0]!.time, endTime: bars[2]!.time, priceMin: 10, priceMax: 100 };
+  const nativeY = (value: number) => 180 - Math.log(value) * 20;
+  const indexToX = (index: number) => 40 + index * 40;
+  const projection = {
+    panes: [pane], valueToY: nativeY, barIndexToX: indexToX, barSpacingPx: 40,
+    timeToX: (time: number) => indexToX(bars.findIndex(bar => bar.time === time)),
+  };
+
+  it('uses native index spacing and nonlinear price projection for plots, drawing lines, and execution markers', () => {
+    const ctx = createMockCtx();
+    ctx.moveTo = vi.fn(); ctx.lineTo = vi.fn();
+    const renderer = new TealchartRenderer(ctx, { width: 800, height: 200 });
+    renderer.renderExternalOverlayContent({ bars, viewport, projection,
+      plots: [{ id: 'plot', type: 'plot', title: 'Line', values: [20, 40, 80], color: '#00ff00' }],
+      drawings: [{ id: 'drawing', type: 'line', barIndex: 2, x1: 0, y1: 20, x2: 2, y2: 80,
+        xloc: 'bar_index', extend: 'none', color: '#ffffff', style: 'solid', width: 1 }],
+      executionLines: [{ id: 'fill', time: bars[2]!.time, price: 80, text: '', direction: 'buy',
+        arrowColor: '#00ff00', arrowHeight: 10, arrowSpacing: 0, markerShape: 'caret', tooltip: '',
+        textColor: '#ffffff', font: '11px Arial' }],
+    });
+    expect(ctx.moveTo).toHaveBeenCalledWith(40, nativeY(20));
+    expect(ctx.lineTo).toHaveBeenCalledWith(120, nativeY(80));
+    expect(ctx.moveTo).toHaveBeenCalledWith(120, nativeY(80) - 3.1);
+    expect(renderer.valueToY(20, pane)).toBeCloseTo((100 - 20) / 90 * 200);
+  });
+
+  it('keeps shifted plots in native index space beyond irregular calendar timestamps', () => {
+    const ctx = createMockCtx(); ctx.moveTo = vi.fn(); ctx.lineTo = vi.fn();
+    const renderer = new TealchartRenderer(ctx, { width: 800, height: 200 });
+    renderer.renderExternalOverlayContent({ bars, viewport, projection,
+      plots: [{ id: 'offset', type: 'plot', title: 'Shifted', offset: 2, values: [20, 40, 80], color: '#00ff00' }],
+    });
+    expect(ctx.moveTo).toHaveBeenCalledWith(120, nativeY(20));
+    expect(ctx.lineTo).toHaveBeenCalledWith(200, nativeY(80));
+  });
+
+  it('uses native bar spacing for histogram columns and restores projection after an error', () => {
+    const ctx = createMockCtx(); ctx.fillRect = vi.fn();
+    const renderer = new TealchartRenderer(ctx, { width: 800, height: 200 });
+    renderer.renderExternalOverlayContent({ bars, viewport, projection,
+      plots: [{ id: 'columns', type: 'plot', title: 'Columns', style: 'columns', histbase: 10,
+        values: [20, null, null], color: '#00ff00' }],
+    });
+    expect(ctx.fillRect).toHaveBeenCalledWith(28, nativeY(20), 24, nativeY(10) - nativeY(20));
+    expect(() => renderer.renderExternalOverlayContent({ bars, viewport,
+      projection: { ...projection, valueToY: () => { throw new Error('native model replaced'); } },
+      plots: [{ id: 'error', type: 'plot', title: 'Error', values: [20], color: '#ffffff' }],
+    })).toThrow('native model replaced');
+    expect(renderer.valueToY(20, pane)).toBeCloseTo((100 - 20) / 90 * 200);
   });
 });

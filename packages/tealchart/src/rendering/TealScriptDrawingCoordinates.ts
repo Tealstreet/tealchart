@@ -21,6 +21,8 @@ export interface DrawingRect {
 export interface DrawingCoordinateResolvers {
   timeToX(time: number, viewport: Viewport, chartWidth: number): number;
   valueToY(value: number, pane: ComputedPane): number;
+  /** External hosts can project bar indices directly across session gaps and future slots. */
+  barIndexToX?(index: number): number;
 }
 
 export function barIndexToTime(index: number, bars: readonly Bar[]): number | null {
@@ -82,9 +84,10 @@ export function resolveLineDrawingPoint(
   const time = xloc === 'bar_time' ? xValue : barIndexToTime(xValue, bars);
   if (time === null) return null;
 
-  const x = resolvers.timeToX(time, viewport, chartWidth);
+  const x = xloc !== 'bar_time' && resolvers.barIndexToX
+    ? resolvers.barIndexToX(xValue) : resolvers.timeToX(time, viewport, chartWidth);
   const y = resolvers.valueToY(yValue, pane);
-  return { x, y };
+  return Number.isFinite(x) && Number.isFinite(y) ? { x, y } : null;
 }
 
 export function resolveLineDrawingSegment(
@@ -156,13 +159,17 @@ export function resolveBoxDrawingRect(
   const rightTime = box.xloc === 'bar_time' ? box.right : barIndexToTime(box.right, bars);
   if (leftTime === null || rightTime === null) return null;
 
-  let leftX = resolvers.timeToX(leftTime, viewport, chartWidth);
-  let rightX = resolvers.timeToX(rightTime, viewport, chartWidth);
+  let leftX = box.xloc !== 'bar_time' && resolvers.barIndexToX
+    ? resolvers.barIndexToX(box.left) : resolvers.timeToX(leftTime, viewport, chartWidth);
+  let rightX = box.xloc !== 'bar_time' && resolvers.barIndexToX
+    ? resolvers.barIndexToX(box.right) : resolvers.timeToX(rightTime, viewport, chartWidth);
+  if (!Number.isFinite(leftX) || !Number.isFinite(rightX)) return null;
   if (box.extend === 'left' || box.extend === 'both') leftX = minX;
   if (box.extend === 'right' || box.extend === 'both') rightX = maxX;
 
   const topY = resolvers.valueToY(box.top, pane);
   const bottomY = resolvers.valueToY(box.bottom, pane);
+  if (!Number.isFinite(topY) || !Number.isFinite(bottomY)) return null;
   const x = Math.min(leftX, rightX);
   const y = Math.min(topY, bottomY);
   return {
@@ -197,11 +204,13 @@ export function resolveLabelDrawingPosition(
   }
 
   const bar = anchorIndex >= 0 && anchorIndex < bars.length ? bars[anchorIndex] : undefined;
-  if (time === undefined || time < viewport.startTime || time > viewport.endTime) {
+  if (time === undefined || (!resolvers.barIndexToX || label.xloc === 'bar_time') && (time < viewport.startTime || time > viewport.endTime)) {
     return null;
   }
 
-  const x = resolvers.timeToX(time, viewport, chartWidth);
+  const x = label.xloc !== 'bar_time' && resolvers.barIndexToX
+    ? resolvers.barIndexToX(anchorIndex) : resolvers.timeToX(time, viewport, chartWidth);
+  if (!Number.isFinite(x) || (resolvers.barIndexToX && (x < 0 || x > chartWidth))) return null;
   let y: number;
 
   if (label.yloc === 'abovebar') {
@@ -216,5 +225,5 @@ export function resolveLabelDrawingPosition(
     y = resolvers.valueToY(clampedY, pane);
   }
 
-  return { x, y };
+  return Number.isFinite(y) ? { x, y } : null;
 }

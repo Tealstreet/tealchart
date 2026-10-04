@@ -2,8 +2,15 @@ import type { DrawingOutput, PlotLineStyle, PlotOutput, PlotStyle } from '@teals
 import type { JailbreakIndicatorManager } from './jailbreak/JailbreakIndicatorManager';
 import type { TimeAxisMarker } from './rendering/axisMarkers';
 import type { CanvasContext } from './rendering/CanvasContext';
+import type {
+  ExternalAxisDescriptor,
+  ExternalAxisLabel,
+  ExternalAxisLabelLayout,
+  ExternalAxisObstacle,
+} from './rendering/externalAxisLabels';
 import type { IndicatorOutputAxisLabelSource } from './rendering/indicatorOutputAxisLabels';
 import type { PaneOffset } from './rendering/PaneManager';
+import type { PriceLineLayoutProjection } from './rendering/priceLineLayout';
 import type { DrawingCoordinateResolvers } from './rendering/TealScriptDrawingCoordinates';
 import type { TealScriptDrawingPartition } from './rendering/TealScriptDrawingPartition';
 import type { LabelBounds } from './utils/labelCollision';
@@ -21,11 +28,13 @@ import {
   generatePriceMarkers as generateAxisPriceMarkers,
   generateTimeMarkers as generateAxisTimeMarkers,
 } from './rendering/axisMarkers';
+import { layoutExternalAxisLabels, renderExternalAxisLabels } from './rendering/externalAxisLabels';
 import {
   formatIndicatorOutputAxisValue,
   getIndicatorOutputAxisLabelSources,
   resolveIndicatorOutputSourceTime,
 } from './rendering/indicatorOutputAxisLabels';
+import { computeProjectedPriceLineLabelBounds } from './rendering/priceLineLayout';
 import { routeTealScriptDrawings } from './rendering/TealScriptDrawingPaneRouting';
 import { partitionTealScriptDrawings } from './rendering/TealScriptDrawingPartition';
 import { TealScriptDrawingRenderer } from './rendering/TealScriptDrawingRenderer';
@@ -127,6 +136,28 @@ export interface TealchartRenderPassInput {
 }
 
 export type TealchartRenderFrameInput = Omit<TealchartRenderPassInput, 'passes'>;
+
+/** Native host projection in CSS pixels. Indices are relative to the supplied bar array. */
+export interface ExternalOverlayProjection {
+  panes: readonly ComputedPane[];
+  timeToX: (timeMs: number) => number;
+  barIndexToX: (index: number) => number;
+  valueToY: (value: number, pane: ComputedPane) => number;
+  barSpacingPx: number;
+}
+
+export interface ExternalOverlayRenderInput {
+  /** Axes for Tealchart-owned study panes; the native main axis stays host-owned. */
+  ownedPaneAxes?: boolean;
+  bars: Bar[];
+  viewport: Viewport;
+  projection: ExternalOverlayProjection;
+  plots?: PlotOutput[];
+  drawings?: DrawingOutput[];
+  executionLines?: ExecutionLineRenderData[];
+  indicatorPaneInfo?: Record<string, IndicatorPaneInfo>;
+  plotStyleOverrides?: Map<string, PlotStyleOverride>;
+}
 
 export interface TealchartPreparedRenderFrame extends TealchartRenderFrameInput {
   computedPanes: ComputedPane[];
@@ -250,7 +281,10 @@ export interface PriceAxisTagWidthCacheKeySource {
   targetPaneId?: string;
 }
 
-function getWebPriceLineAxisTagFont(line: PriceLine | PriceLineLabelBounds | PriceAxisTagWidthCacheKeySource, fontFamily: string): string {
+function getWebPriceLineAxisTagFont(
+  line: PriceLine | PriceLineLabelBounds | PriceAxisTagWidthCacheKeySource,
+  fontFamily: string,
+): string {
   const domain = resolvePriceLineAxisTagDomain(line);
   return `${WEB_PRICE_AXIS_TAG_SIZING[domain].fontSize}px ${fontFamily}`;
 }
@@ -262,7 +296,9 @@ function getWebPriceLineAxisTagHeight(line: PriceLine | PriceLineLabelBounds, ha
   );
 }
 
-function getWebPriceLineAxisTagPaddingX(line: PriceLine | PriceLineLabelBounds | PriceAxisTagWidthCacheKeySource): number {
+function getWebPriceLineAxisTagPaddingX(
+  line: PriceLine | PriceLineLabelBounds | PriceAxisTagWidthCacheKeySource,
+): number {
   return WEB_PRICE_AXIS_TAG_SIZING[resolvePriceLineAxisTagDomain(line)].paddingX;
 }
 
@@ -321,6 +357,8 @@ export class TealchartRenderer {
   private valueAxisCommonLabelWidth = 0;
   private valueAxisPaneLabelWidths = new Map<string, number>();
 
+  private externalProjection?: ExternalOverlayProjection;
+
   constructor(ctx: CanvasContext, options: Partial<RenderOptions> = {}, margins: Partial<ChartMargins> = {}) {
     this.ctx = ctx;
     this.options = { ...DEFAULT_RENDER_OPTIONS, ...options };
@@ -376,6 +414,7 @@ export class TealchartRenderer {
     return {
       timeToX: (time, viewport, chartWidth) => this.timeToX(time, viewport, chartWidth),
       valueToY: (value, pane) => this.valueToY(value, pane),
+      ...(this.externalProjection ? { barIndexToX: this.externalProjection.barIndexToX } : {}),
     };
   }
 
@@ -667,7 +706,7 @@ export class TealchartRenderer {
 
     // Convert time interval to pixel width
     const pixelsPerMs = chartWidth / viewportTimeRange;
-    const slotWidth = barInterval * pixelsPerMs;
+    const slotWidth = this.externalProjection?.barSpacingPx ?? barInterval * pixelsPerMs;
     const spacingRatio = 0.2; // 20% spacing, 80% candle
     const candleWidth = Math.max(options.minCandleWidth, slotWidth * (1 - spacingRatio));
 
@@ -733,7 +772,7 @@ export class TealchartRenderer {
     }
 
     const pixelsPerMs = chartWidth / viewportTimeRange;
-    const slotWidth = barInterval * pixelsPerMs;
+    const slotWidth = this.externalProjection?.barSpacingPx ?? barInterval * pixelsPerMs;
     const spacingRatio = 0.2; // 20% spacing, 80% bar
     const barWidth = Math.max(options.minCandleWidth, slotWidth * (1 - spacingRatio));
 
@@ -2180,7 +2219,7 @@ export class TealchartRenderer {
       if (!this.shouldRenderPlotBar(plot, bars, i)) continue;
 
       // Skip bars outside viewport
-      if (plotTime < viewport.startTime || plotTime > viewport.endTime) {
+      if (this.isPlotOutsideViewport(plot, bars, i, viewport, plotTime)) {
         continue;
       }
 
@@ -2204,7 +2243,7 @@ export class TealchartRenderer {
         continue;
       }
 
-      const x = this.timeToX(plotTime, viewport, chartWidth);
+      const x = this.getPlotX(plot, bars, i, viewport, chartWidth, plotTime);
       const y = this.priceToY(value, viewport, priceHeight);
 
       // Handle per-bar color if available
@@ -2278,7 +2317,7 @@ export class TealchartRenderer {
       const plotTime = this.getPlotTime(plot, bars, i);
 
       if (!this.shouldRenderPlotBar(plot, bars, i)) continue;
-      if (plotTime < viewport.startTime || plotTime > viewport.endTime) continue;
+      if (this.isPlotOutsideViewport(plot, bars, i, viewport, plotTime)) continue;
       if (value === null || value === undefined || isNaN(value)) continue;
 
       const markerColor =
@@ -2288,7 +2327,12 @@ export class TealchartRenderer {
       ctx.fillStyle = markerColor as string;
       ctx.strokeStyle = markerColor as string;
       ctx.lineWidth = markerLinewidth;
-      this.drawShape(this.timeToX(plotTime, viewport, chartWidth), valueToY(value), 'diamond', markerSize);
+      this.drawShape(
+        this.getPlotX(plot, bars, i, viewport, chartWidth, plotTime),
+        valueToY(value),
+        'diamond',
+        markerSize,
+      );
     }
   }
 
@@ -2312,7 +2356,7 @@ export class TealchartRenderer {
       barInterval = bars[1].time - bars[0].time;
     }
     const pixelsPerMs = chartWidth / viewportTimeRange;
-    const slotWidth = barInterval * pixelsPerMs;
+    const slotWidth = this.externalProjection?.barSpacingPx ?? barInterval * pixelsPerMs;
     const barWidth =
       style === 'columns' ? Math.max(1, slotWidth * 0.6) : Math.max(1, Math.min(slotWidth, linewidth * 3));
 
@@ -2324,7 +2368,7 @@ export class TealchartRenderer {
 
       if (!this.shouldRenderPlotBar(plot, bars, i)) continue;
 
-      if (plotTime < viewport.startTime || plotTime > viewport.endTime) {
+      if (this.isPlotOutsideViewport(plot, bars, i, viewport, plotTime)) {
         continue;
       }
 
@@ -2332,7 +2376,7 @@ export class TealchartRenderer {
         continue;
       }
 
-      const x = this.timeToX(plotTime, viewport, chartWidth);
+      const x = this.getPlotX(plot, bars, i, viewport, chartWidth, plotTime);
       const y = this.priceToY(value, viewport, priceHeight);
 
       const barColor = this.getVisiblePlotColorAt(color, i, baseColor);
@@ -2379,7 +2423,7 @@ export class TealchartRenderer {
 
       if (!this.shouldRenderPlotBar(plot, bars, i)) continue;
 
-      if (plotTime < viewport.startTime || plotTime > viewport.endTime) {
+      if (this.isPlotOutsideViewport(plot, bars, i, viewport, plotTime)) {
         continue;
       }
 
@@ -2387,7 +2431,7 @@ export class TealchartRenderer {
         continue;
       }
 
-      const x = this.timeToX(plotTime, viewport, chartWidth);
+      const x = this.getPlotX(plot, bars, i, viewport, chartWidth, plotTime);
       const y = valueToY(value);
       const markerColor = this.getVisiblePlotColorAt(color, i, baseColor);
       if (markerColor === null) continue;
@@ -2441,7 +2485,7 @@ export class TealchartRenderer {
       const value = values[i];
       const plotTime = this.getPlotTime(plot, bars, i);
 
-      if (!this.shouldRenderPlotBar(plot, bars, i) || plotTime < viewport.startTime || plotTime > viewport.endTime) {
+      if (!this.shouldRenderPlotBar(plot, bars, i) || this.isPlotOutsideViewport(plot, bars, i, viewport, plotTime)) {
         continue;
       }
 
@@ -2454,7 +2498,7 @@ export class TealchartRenderer {
         continue;
       }
 
-      const x = this.timeToX(plotTime, viewport, chartWidth);
+      const x = this.getPlotX(plot, bars, i, viewport, chartWidth, plotTime);
       const y = valueToY(value);
 
       const barColor = this.getVisiblePlotColorAt(color, i, baseColor);
@@ -2512,7 +2556,11 @@ export class TealchartRenderer {
     return color || fallback;
   }
 
-  private getPerBarColor(color: string | (string | null)[] | undefined, barIndex: number, fallback: string): string | null {
+  private getPerBarColor(
+    color: string | (string | null)[] | undefined,
+    barIndex: number,
+    fallback: string,
+  ): string | null {
     if (Array.isArray(color)) {
       return color[barIndex] ?? null;
     }
@@ -2535,6 +2583,7 @@ export class TealchartRenderer {
   }
 
   private getSlotWidth(bars: Bar[], viewport: Viewport, chartWidth: number): number {
+    if (this.externalProjection) return this.externalProjection.barSpacingPx;
     const viewportTimeRange = viewport.endTime - viewport.startTime;
     const fallbackWidth = Math.max(this.options.minCandleWidth, 1);
     if (viewportTimeRange <= 0 || chartWidth <= 0) {
@@ -2556,6 +2605,31 @@ export class TealchartRenderer {
     return bar.time + offset * (bars[1].time - bars[0].time);
   }
 
+  private getPlotX(
+    plot: Pick<PlotOutput, 'offset'>,
+    _bars: Bar[],
+    index: number,
+    viewport: Viewport,
+    chartWidth: number,
+    plotTime: number,
+  ): number {
+    return this.externalProjection
+      ? this.externalProjection.barIndexToX(index + (plot.offset ?? 0))
+      : this.timeToX(plotTime, viewport, chartWidth);
+  }
+
+  private isPlotOutsideViewport(
+    plot: Pick<PlotOutput, 'offset'>,
+    _bars: Bar[],
+    index: number,
+    viewport: Viewport,
+    plotTime: number,
+  ): boolean {
+    if (!this.externalProjection) return plotTime < viewport.startTime || plotTime > viewport.endTime;
+    const x = this.externalProjection.barIndexToX(index + (plot.offset ?? 0));
+    return !Number.isFinite(x) || x < this.margins.left || x > this.options.width - this.margins.right;
+  }
+
   private getPlotHistbase(plot: Pick<PlotOutput, 'histbase'>): number {
     return Number.isFinite(plot.histbase) ? plot.histbase! : 0;
   }
@@ -2574,7 +2648,7 @@ export class TealchartRenderer {
       const value = plot.values[i];
       if (!this.shouldRenderPlotBar(plot, bars, i)) continue;
       const plotTime = this.getPlotTime(plot, bars, i);
-      if (plotTime < viewport.startTime || plotTime > viewport.endTime) continue;
+      if (this.isPlotOutsideViewport(plot, bars, i, viewport, plotTime)) continue;
       if (typeof value === 'number' && Number.isFinite(value)) {
         return { index: i, value };
       }
@@ -2804,7 +2878,7 @@ export class TealchartRenderer {
 
       if (!this.shouldRenderPlotBar(plot, bars, i)) continue;
 
-      if (plotTime < viewport.startTime || plotTime > viewport.endTime) {
+      if (this.isPlotOutsideViewport(plot, bars, i, viewport, plotTime)) {
         continue;
       }
 
@@ -2816,7 +2890,7 @@ export class TealchartRenderer {
         continue;
       }
 
-      const x = this.timeToX(plotTime, viewport, chartWidth);
+      const x = this.getPlotX(plot, bars, i, viewport, chartWidth, plotTime);
       const y = valueToY(value);
 
       if (!started) {
@@ -2858,7 +2932,7 @@ export class TealchartRenderer {
 
       if (!this.shouldRenderPlotBar(plot, bars, i)) continue;
 
-      if (plotTime < viewport.startTime || plotTime > viewport.endTime) {
+      if (this.isPlotOutsideViewport(plot, bars, i, viewport, plotTime)) {
         prevX = null;
         prevY = null;
         continue;
@@ -2872,7 +2946,7 @@ export class TealchartRenderer {
         continue;
       }
 
-      const x = this.timeToX(plotTime, viewport, chartWidth);
+      const x = this.getPlotX(plot, bars, i, viewport, chartWidth, plotTime);
       const y = valueToY(value);
       const barColor = this.getVisiblePlotColorAt(colors, i, baseColor);
       if (barColor === null) {
@@ -3055,7 +3129,7 @@ export class TealchartRenderer {
       barInterval = bars[1].time - bars[0].time;
     }
     const pixelsPerMs = chartWidth / viewportTimeRange;
-    const slotWidth = barInterval * pixelsPerMs;
+    const slotWidth = this.externalProjection?.barSpacingPx ?? barInterval * pixelsPerMs;
 
     for (let i = 0; i < bars.length && i < values.length; i++) {
       const bar = bars[i];
@@ -3131,7 +3205,7 @@ export class TealchartRenderer {
 
       if (!this.shouldRenderPlotBar(plot, bars, i)) continue;
 
-      if (plotTime < viewport.startTime || plotTime > viewport.endTime) {
+      if (this.isPlotOutsideViewport(plot, bars, i, viewport, plotTime)) {
         continue;
       }
 
@@ -3149,7 +3223,7 @@ export class TealchartRenderer {
           ? this.getPlotArrowMarkerSize(plot, Math.abs(value as number), arrowMaxMagnitude, baseMarkerSize)
           : baseMarkerSize;
 
-      const x = this.timeToX(plotTime, viewport, chartWidth);
+      const x = this.getPlotX(plot, bars, i, viewport, chartWidth, plotTime);
       const effectiveLocation = plot.type === 'plotarrow' ? (value > 0 ? 'belowbar' : 'abovebar') : location;
 
       // Determine Y position based on location
@@ -3232,7 +3306,7 @@ export class TealchartRenderer {
     for (let i = 0; i < bars.length && i < plot.values.length; i++) {
       if (!this.shouldRenderPlotBar(plot, bars, i)) continue;
       const plotTime = this.getPlotTime(plot, bars, i);
-      if (plotTime < viewport.startTime || plotTime > viewport.endTime) continue;
+      if (this.isPlotOutsideViewport(plot, bars, i, viewport, plotTime)) continue;
       if (this.getVisiblePlotColorAt(plot.color, i, baseColor) === null) continue;
 
       const value = plot.values[i];
@@ -3609,110 +3683,186 @@ export class TealchartRenderer {
     // and applied via ChartCore.setPaneYRanges() / getUnifiedLayout() before rendering.
     // The panes already have correct yMin/yMax values set.
 
-    // Calculate bounds using pane coordinate system
-    const bounds: PriceLineLabelBounds[] = priceLines.map((line) => {
-      const labelFont = getWebPriceLineAxisTagFont(line, this.font);
-      // Find the target pane (default to main if not specified)
-      const targetPaneId = line.targetPaneId || 'main';
-      const targetPane = computedPanes.find((p) => p.id === targetPaneId) || mainPane;
-
-      // Use valueToY with the correct pane
-      const originalY = this.valueToY(line.price, targetPane);
-      // Check for secondary text or countdown (countdown renders as secondary text)
-      const hasSecondaryText = line.label.secondaryText || line.countdownToTime;
-      const width = this.measureGrowOnlyPriceLineAxisLabelWidth(line, labelFont);
-      const height = getWebPriceLineAxisTagHeight(line, hasSecondaryText);
-
-      return {
-        lineId: line.id,
-        price: line.price,
-        originalY,
-        adjustedY: originalY,
-        width,
-        height,
-        color: line.color,
-        label: line.label,
-        lineStyle: line.lineStyle,
-        type: line.type,
-        chartLabel: line.chartLabel,
-        lineLength: line.lineLength,
-        lineLengthUnit: line.lineLengthUnit,
-        extendLeft: line.extendLeft,
-        lineWidth: line.lineWidth,
-        floatingLabel: line.floatingLabel,
-        priority: line.priority,
-        fixed: line.id === 'last-trade',
-        renderLineOnCanvas: line.renderLineOnCanvas,
-        countdownToTime: line.countdownToTime,
-        draggable: line.draggable,
-        actionState: line.actionState,
-        targetPaneId: line.targetPaneId,
-        // Trading object identity for OEMS callbacks
-        orderId: line.orderId,
-        positionId: line.positionId,
-        partialEnabled: line.partialEnabled,
-        positionData: line.positionData,
-        // Adapter callbacks carried through for direct invocation
-        callbacks: line.callbacks,
-      };
+    return this.computeExternalPriceLineLabelBounds(priceLines, {
+      panes: computedPanes,
+      priceToY: (price, pane) => this.valueToY(price, pane),
+      mainPaneTop: this.margins.top,
     });
+  }
 
-    // Separate floating labels (they don't participate in collision detection)
-    const floatingBounds = bounds.filter((b) => b.floatingLabel);
-    const staticBounds = bounds.filter((b) => !b.floatingLabel);
-
-    // Resolve collisions within each target pane. A global resolve followed by
-    // per-label pane clamps can collapse labels onto pane edges.
-    const staticBoundsByPane = new Map<string, PriceLineLabelBounds[]>();
-    for (const bound of staticBounds) {
-      const targetPaneId = bound.targetPaneId || 'main';
-      const paneBounds = staticBoundsByPane.get(targetPaneId) ?? [];
-      paneBounds.push(bound);
-      staticBoundsByPane.set(targetPaneId, paneBounds);
+  /** Render existing overlay passes against native coordinates, without candles, grids or chart chrome.
+   * Behind-candle outputs and candle recoloring require a separate host draw-order capability.
+   * Caller owns canvas DPR transform; every projection coordinate here is in CSS pixels. */
+  renderExternalOverlayContent(input: ExternalOverlayRenderInput): void {
+    if (!Number.isFinite(input.projection.barSpacingPx) || input.projection.barSpacingPx <= 0) {
+      throw new Error('External overlay projection requires a positive native bar spacing');
     }
-    for (const [targetPaneId, paneBounds] of staticBoundsByPane) {
-      const targetPane = computedPanes.find((p) => p.id === targetPaneId) || mainPane;
-      const paneTop = targetPane.type === 'main' ? this.margins.top : targetPane.top;
-      resolveLabelCollisionsWithinBounds(paneBounds, paneTop, targetPane.bottom);
-    }
-
-    // Sort by Y for rendering order
-    staticBounds.sort((a, b) => a.adjustedY - b.adjustedY);
-
-    const allBounds = [...staticBounds, ...floatingBounds];
-
-    // Floating labels bypass collision, so keep only those inside their target pane here.
-    const visibleTop = this.margins.top;
-    for (const bound of floatingBounds) {
-      const targetPaneId = bound.targetPaneId || 'main';
-      const targetPane = computedPanes.find((p) => p.id === targetPaneId) || mainPane;
-
-      const labelTop = bound.adjustedY - bound.height / 2;
-      const labelBottom = bound.adjustedY + bound.height / 2;
-
-      // For main pane, respect top bar safe zone
-      const paneTop = targetPane.type === 'main' ? visibleTop : targetPane.top;
-
-      if (labelTop < paneTop) {
-        bound.adjustedY = paneTop + bound.height / 2;
+    const previous = this.externalProjection;
+    this.externalProjection = input.projection;
+    const passes = new Set<TealchartRenderPass>([
+      'main-price-overlay-content',
+      'main-overlay-content',
+      'indicator-price-content',
+      'indicator-content',
+    ]);
+    if (input.ownedPaneAxes) passes.add('indicator-axis');
+    const indicatorPaneInfo =
+      input.indicatorPaneInfo ??
+      Object.fromEntries((input.plots ?? []).map((plot) => [plot.scriptId ?? 'unknown', { overlay: true }]));
+    const routedDrawings = routeTealScriptDrawings(input.drawings ?? [], input.projection.panes);
+    try {
+      for (const pane of input.projection.panes) {
+        if (pane.height <= 0) continue;
+        this.ctx.save();
+        try {
+          this.ctx.beginPath();
+          this.ctx.rect(0, pane.top, this.options.width, pane.height);
+          this.ctx.clip();
+          this.renderPaneUnified(
+            pane,
+            input.bars,
+            input.viewport,
+            undefined,
+            input.executionLines,
+            input.plots,
+            indicatorPaneInfo,
+            undefined,
+            input.plotStyleOverrides,
+            pane.type === 'main' ? routedDrawings.main : routedDrawings.byPaneId.get(pane.id),
+            passes,
+          );
+        } finally {
+          this.ctx.restore();
+        }
       }
-      if (labelBottom > targetPane.bottom) {
-        bound.adjustedY = targetPane.bottom - bound.height / 2;
-      }
+    } finally {
+      this.externalProjection = previous;
     }
+  }
 
-    // Filter to visible area within each line's target pane
-    return allBounds.filter((b) => {
-      const targetPaneId = b.targetPaneId || 'main';
-      const targetPane = computedPanes.find((p) => p.id === targetPaneId) || mainPane;
-      return b.originalY >= targetPane.top && b.originalY <= targetPane.bottom;
+  /** Existing Tealscript output tag eligibility/formatting with a native host projection.
+   * These tags join native value tags and OEMS in one collision pass. */
+  computeExternalIndicatorAxisLabels(
+    input: Pick<ExternalOverlayRenderInput, 'bars' | 'plots' | 'indicatorPaneInfo' | 'projection'>,
+    axisByPane: ReadonlyMap<string, string>,
+  ): ExternalAxisLabel[] {
+    if (this.options.showIndicatorOutputAxisLabels === false) return [];
+    const sources = getIndicatorOutputAxisLabelSources({
+      panes: input.projection.panes,
+      plots: input.plots,
+      indicatorPaneInfo: input.indicatorPaneInfo,
+      totalBarCount: input.bars.length,
     });
+    return sources.flatMap((source) => {
+      const pane = input.projection.panes.find((candidate) => candidate.id === source.paneId);
+      const axisId = axisByPane.get(source.paneId);
+      if (!pane || !axisId) return [];
+      const valueY = input.projection.valueToY(source.value, pane);
+      if (!Number.isFinite(valueY) || valueY < pane.top || valueY > pane.bottom) return [];
+      const text = formatIndicatorOutputAxisValue(
+        source.value,
+        pane.yMax - pane.yMin,
+        source.precision,
+        source.format,
+        {
+          paneType: pane.type,
+          pricePrecision: this.options.pricePrecision,
+        },
+      );
+      const font = `11px ${this.font}`;
+      const measuredWidth = Math.max(
+        INDICATOR_OUTPUT_AXIS_TAG_MIN_WIDTH,
+        getCachedTextWidth(this.ctx, text, font) + WEB_PRICE_AXIS_TAG_SIZING.indicatorOutput.paddingX * 2,
+      );
+      return [
+        {
+          id: source.id,
+          axisId,
+          valueY,
+          textLines: [text],
+          color: source.color,
+          borderColor: source.color,
+          font,
+          fontSize: 11,
+          width: Math.ceil(this.indicatorOutputAxisTagWidthCache.resolve(source.id, measuredWidth)),
+          backgroundColor: withPriceAxisTagBackgroundAlpha(this.options.backgroundColor),
+          height: INDICATOR_OUTPUT_AXIS_TAG_HEIGHT,
+        },
+      ];
+    });
+  }
+
+  /** The original output guide style with exact host bar-index anchors. */
+  renderExternalIndicatorAxisGuides(
+    input: Pick<ExternalOverlayRenderInput, 'bars' | 'plots' | 'indicatorPaneInfo' | 'projection'>,
+    labels: readonly ExternalAxisLabel[],
+  ): void {
+    if (!labels.length) return;
+    const owned = new Map(labels.map((label) => [label.id, label]));
+    const sources = getIndicatorOutputAxisLabelSources({
+      panes: input.projection.panes,
+      plots: input.plots,
+      indicatorPaneInfo: input.indicatorPaneInfo,
+      totalBarCount: input.bars.length,
+    });
+    for (const source of sources) {
+      const label = owned.get(source.id);
+      const pane = input.projection.panes.find((candidate) => candidate.id === source.paneId);
+      if (!label || !pane) continue;
+      const offset = Number.isFinite(source.plotOffset ?? NaN) ? source.plotOffset! : 0;
+      const sourceX = input.projection.barIndexToX(source.sourceIndex + offset);
+      this.drawIndicatorOutputAxisGuide(pane, {
+        sourceX,
+        labelX: this.options.width - this.margins.right,
+        valueY: label.valueY,
+        color: label.color,
+        borderColor: label.borderColor,
+      });
+    }
+  }
+
+  /** Host-native value tags share the existing axis collision engine with OEMS tags.
+   * Host supplies exact native coordinates and formatting; scale ticks stay native. */
+  layoutExternalAxisLabels(
+    axes: readonly ExternalAxisDescriptor[],
+    labels: readonly ExternalAxisLabel[],
+    obstacles: readonly ExternalAxisObstacle[] = [],
+  ): ExternalAxisLabelLayout[] {
+    return layoutExternalAxisLabels(axes, labels, obstacles);
+  }
+
+  renderExternalAxisLabels(labels: readonly ExternalAxisLabelLayout[]): void {
+    renderExternalAxisLabels(this.ctx, labels);
+  }
+
+  /** Use the same bounds and collision pass against an external chart's actual projection. */
+  computeExternalPriceLineLabelBounds(
+    priceLines: PriceLine[],
+    projection: PriceLineLayoutProjection,
+  ): PriceLineLabelBounds[] {
+    return computeProjectedPriceLineLabelBounds(priceLines, projection, {
+      font: (line) => getWebPriceLineAxisTagFont(line, this.font),
+      width: (line, font) => this.measureGrowOnlyPriceLineAxisLabelWidth(line, font),
+      height: (line, secondaryText) => getWebPriceLineAxisTagHeight(line, secondaryText),
+    });
+  }
+
+  /** Transparent pass for the horizontal primitives the Konva manager deliberately leaves to canvas. */
+  renderExternalCanvasPriceLines(bounds: PriceLineLabelBounds[], projection: PriceLineLayoutProjection): void {
+    const mainPane = projection.panes.find((pane) => pane.type === 'main');
+    if (!mainPane) return;
+    for (const bound of bounds) {
+      if (!bound.renderLineOnCanvas || bound.type === 'order' || bound.type === 'position') continue;
+      const pane = projection.panes.find((candidate) => candidate.id === (bound.targetPaneId ?? 'main')) ?? mainPane;
+      this.drawSimplePriceLineInPane(bound, pane, 'content', bound.originalY);
+    }
   }
 
   /**
    * Convert time to X coordinate
    */
   private timeToX(time: number, viewport: Viewport, chartWidth: number): number {
+    if (this.externalProjection) return this.externalProjection.timeToX(time);
     const { margins } = this;
     const ratio = (time - viewport.startTime) / (viewport.endTime - viewport.startTime);
     return margins.left + ratio * chartWidth;
@@ -3835,6 +3985,7 @@ export class TealchartRenderer {
    * This is the unified coordinate transform for all pane types
    */
   valueToY(value: number, pane: ComputedPane): number {
+    if (this.externalProjection) return this.externalProjection.valueToY(value, pane);
     const range = pane.yMax - pane.yMin;
     if (range === 0) return pane.top + pane.height / 2;
 
@@ -4033,39 +4184,41 @@ export class TealchartRenderer {
       ctx.clip();
     }
 
-    if (pane.type === 'main') {
-      this.renderMainPaneContent(
-        pane,
-        bars,
-        viewport,
-        priceLines,
-        executionLines,
-        plots,
-        indicatorPaneInfo,
-        labelBounds,
-        plotStyleOverrides,
-        drawings,
-        passes,
-        passOptions,
-        valueAxisLabelLayout,
-      );
-    } else {
-      this.renderIndicatorPaneContent(
-        pane,
-        bars,
-        viewport,
-        plots,
-        indicatorPaneInfo,
-        labelBounds,
-        plotStyleOverrides,
-        drawings,
-        passes,
-        passOptions,
-        valueAxisLabelLayout,
-      );
+    try {
+      if (pane.type === 'main') {
+        this.renderMainPaneContent(
+          pane,
+          bars,
+          viewport,
+          priceLines,
+          executionLines,
+          plots,
+          indicatorPaneInfo,
+          labelBounds,
+          plotStyleOverrides,
+          drawings,
+          passes,
+          passOptions,
+          valueAxisLabelLayout,
+        );
+      } else {
+        this.renderIndicatorPaneContent(
+          pane,
+          bars,
+          viewport,
+          plots,
+          indicatorPaneInfo,
+          labelBounds,
+          plotStyleOverrides,
+          drawings,
+          passes,
+          passOptions,
+          valueAxisLabelLayout,
+        );
+      }
+    } finally {
+      ctx.restore();
     }
-
-    ctx.restore();
   }
 
   /**
@@ -4266,8 +4419,7 @@ export class TealchartRenderer {
         continue;
       }
 
-      const ratio = (timeMs - viewport.startTime) / (viewport.endTime - viewport.startTime);
-      const x = margins.left + ratio * chartWidth;
+      const x = this.timeToX(timeMs, viewport, chartWidth);
       const anchorY = this.valueToY(execution.price, pane);
       const isBuy = execution.direction === 'buy';
       const arrowHeight = Math.max(8, execution.arrowHeight || 20);
@@ -4645,7 +4797,10 @@ export class TealchartRenderer {
     }
   }
 
-  private drawIndicatorOutputAxisGuide(pane: ComputedPane, label: ValueAxisLabelRenderData): void {
+  private drawIndicatorOutputAxisGuide(
+    pane: ComputedPane,
+    label: Pick<ValueAxisLabelRenderData, 'sourceX' | 'labelX' | 'valueY' | 'color' | 'borderColor'>,
+  ): void {
     const { ctx, margins } = this;
     const endX = label.labelX;
     const sourceX = Number.isFinite(label.sourceX ?? NaN) ? label.sourceX! : undefined;
@@ -5046,6 +5201,16 @@ export class TealchartRenderer {
     return override;
   }
 
+  /** Native hosts use the same barcolor visibility/precedence rules to style their candles. */
+  getExternalBarColors(plots: PlotOutput[] | undefined, barCount: number): Array<{ index: number; color: string }> {
+    const colors: Array<{ index: number; color: string }> = [];
+    for (let index = 0; index < barCount; index++) {
+      const color = this.resolveBarColorOverride(plots, index, barCount);
+      if (color) colors.push({ index, color });
+    }
+    return colors;
+  }
+
   private drawCandlesInPane(
     bars: Bar[],
     viewport: Viewport,
@@ -5066,7 +5231,7 @@ export class TealchartRenderer {
     }
 
     const pixelsPerMs = chartWidth / viewportTimeRange;
-    const slotWidth = barInterval * pixelsPerMs;
+    const slotWidth = this.externalProjection?.barSpacingPx ?? barInterval * pixelsPerMs;
     const spacingRatio = 0.2;
     const candleWidth = Math.max(options.minCandleWidth, slotWidth * (1 - spacingRatio));
     const overscanTime = Math.max(0, timeContentOverscanPx) / pixelsPerMs;
@@ -5125,7 +5290,7 @@ export class TealchartRenderer {
     }
 
     const pixelsPerMs = chartWidth / viewportTimeRange;
-    const slotWidth = barInterval * pixelsPerMs;
+    const slotWidth = this.externalProjection?.barSpacingPx ?? barInterval * pixelsPerMs;
     const spacingRatio = 0.2;
     const barWidth = Math.max(options.minCandleWidth, slotWidth * (1 - spacingRatio));
     const overscanTime = Math.max(0, timeContentOverscanPx) / pixelsPerMs;
@@ -5307,7 +5472,7 @@ export class TealchartRenderer {
 
       if (!this.shouldRenderPlotBar(plot, bars, i)) continue;
 
-      if (plotTime < viewport.startTime || plotTime > viewport.endTime) continue;
+      if (this.isPlotOutsideViewport(plot, bars, i, viewport, plotTime)) continue;
 
       if (value === null || value === undefined || isNaN(value)) {
         if (this.plotStyleBreaksOnNa(style) && isDrawing) {
@@ -5328,7 +5493,7 @@ export class TealchartRenderer {
         continue;
       }
 
-      const x = this.timeToX(plotTime, viewport, chartWidth);
+      const x = this.getPlotX(plot, bars, i, viewport, chartWidth, plotTime);
       const y = this.valueToY(value, pane);
 
       // Handle per-bar colors (only if no override is set)
@@ -5417,7 +5582,7 @@ export class TealchartRenderer {
     }
 
     const pixelsPerMs = chartWidth / viewportTimeRange;
-    const slotWidth = barInterval * pixelsPerMs;
+    const slotWidth = this.externalProjection?.barSpacingPx ?? barInterval * pixelsPerMs;
     const barWidth =
       style === 'columns' ? Math.max(1, slotWidth * 0.6) : Math.max(1, Math.min(slotWidth, linewidth * 3));
 
@@ -5429,10 +5594,10 @@ export class TealchartRenderer {
 
       if (!this.shouldRenderPlotBar(plot, bars, i)) continue;
 
-      if (plotTime < viewport.startTime || plotTime > viewport.endTime) continue;
+      if (this.isPlotOutsideViewport(plot, bars, i, viewport, plotTime)) continue;
       if (value === null || value === undefined || isNaN(value)) continue;
 
-      const x = this.timeToX(plotTime, viewport, chartWidth);
+      const x = this.getPlotX(plot, bars, i, viewport, chartWidth, plotTime);
       const y = this.valueToY(value, pane);
 
       // Get color - prefer override, then per-bar color, then base color
@@ -5550,7 +5715,7 @@ export class TealchartRenderer {
       const lineType = bound.type || 'price';
 
       if (lineType === 'price') {
-        this.drawSimplePriceLineInPane(bound, viewport, pane, part);
+        this.drawSimplePriceLineInPane(bound, pane, part);
       } else if (lineType === 'order' || lineType === 'position') {
         // Order/position labels and controls are handled by PriceLineManager via Konva.
         // ChartCore filters these bounds out of the main canvas render path, so this is
@@ -5567,15 +5732,15 @@ export class TealchartRenderer {
    */
   private drawSimplePriceLineInPane(
     bound: PriceLineLabelBounds,
-    viewport: Viewport,
     pane: ComputedPane,
     part: PriceLineRenderPart = 'all',
+    projectedY?: number,
   ): void {
     const { ctx, options, margins } = this;
     const drawContent = part !== 'labels';
     const drawLabels = part !== 'content';
 
-    const lineY = Math.max(pane.top, Math.min(pane.bottom, this.valueToY(bound.price, pane)));
+    const lineY = Math.max(pane.top, Math.min(pane.bottom, projectedY ?? this.valueToY(bound.price, pane)));
     const color = bound.color;
     const labelCenterY = Math.max(pane.top, Math.min(pane.bottom, bound.adjustedY));
 
@@ -6032,7 +6197,7 @@ export class TealchartRenderer {
 
       if (!this.shouldRenderPlotBar(plot, bars, i)) continue;
 
-      if (plotTime < viewport.startTime || plotTime > viewport.endTime) {
+      if (this.isPlotOutsideViewport(plot, bars, i, viewport, plotTime)) {
         continue;
       }
 
@@ -6055,7 +6220,7 @@ export class TealchartRenderer {
         continue;
       }
 
-      const x = this.timeToX(plotTime, viewport, chartWidth);
+      const x = this.getPlotX(plot, bars, i, viewport, chartWidth, plotTime);
       const y = this.valueToPaneY(value, paneOffset);
 
       if (Array.isArray(color)) {
@@ -6124,7 +6289,7 @@ export class TealchartRenderer {
       barInterval = bars[1].time - bars[0].time;
     }
     const pixelsPerMs = chartWidth / viewportTimeRange;
-    const slotWidth = barInterval * pixelsPerMs;
+    const slotWidth = this.externalProjection?.barSpacingPx ?? barInterval * pixelsPerMs;
     const barWidth =
       style === 'columns' ? Math.max(1, slotWidth * 0.6) : Math.max(1, Math.min(slotWidth, linewidth * 3));
 
@@ -6136,7 +6301,7 @@ export class TealchartRenderer {
 
       if (!this.shouldRenderPlotBar(plot, bars, i)) continue;
 
-      if (plotTime < viewport.startTime || plotTime > viewport.endTime) {
+      if (this.isPlotOutsideViewport(plot, bars, i, viewport, plotTime)) {
         continue;
       }
 
@@ -6144,7 +6309,7 @@ export class TealchartRenderer {
         continue;
       }
 
-      const x = this.timeToX(plotTime, viewport, chartWidth);
+      const x = this.getPlotX(plot, bars, i, viewport, chartWidth, plotTime);
       const y = this.valueToPaneY(value, paneOffset);
 
       const barColor = this.getVisiblePlotColorAt(color, i, baseColor);

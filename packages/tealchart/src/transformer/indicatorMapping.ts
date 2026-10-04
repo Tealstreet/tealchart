@@ -7,6 +7,8 @@
 
 import type { IndicatorMapping, IndicatorMappingRegistry } from './types';
 
+import { BUILTIN_INDICATORS } from '../indicators/builtinIndicators';
+
 // ============================================================================
 // Indicator Mapping Registry
 // ============================================================================
@@ -563,9 +565,19 @@ export function findMappingByTvStudyId(tvStudyId: string): IndicatorMapping | un
     .sort(byPriority)[0];
   if (exact) return exact;
 
-  return mappings
-    .filter((mapping) => tvStudyId.startsWith(mapping.tvStudyId.split('@')[0]))
-    .sort(byPriority)[0];
+  // Hosted widgets save official display names instead of licensed STD IDs.
+  // Never reinterpret a private/Pine script merely because its name matches.
+  const officialName = tvStudyId.match(/^(.+)@tv-(?:basic|pro)studies(?:-\d+)?$/)?.[1];
+  if (officialName) {
+    const officialId = mappings
+      .filter((mapping) => [mapping.tvStudyId, ...(mapping.tvAltIds ?? [])].some((id) => id === `STD;${officialName}`))
+      .sort(byPriority)[0];
+    if (officialId) return officialId;
+    const builtin = BUILTIN_INDICATORS.find((indicator) => indicator.name === officialName);
+    if (builtin && INDICATOR_MAPPINGS[builtin.id]) return INDICATOR_MAPPINGS[builtin.id];
+  }
+
+  return mappings.filter((mapping) => tvStudyId.startsWith(mapping.tvStudyId.split('@')[0])).sort(byPriority)[0];
 }
 
 /**

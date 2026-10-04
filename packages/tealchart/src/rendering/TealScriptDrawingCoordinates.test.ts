@@ -256,3 +256,27 @@ describe('TealScript drawing coordinates', () => {
     expect(below).toEqual({ x: 50, y: 106 });
   });
 });
+
+describe('external native drawing index projection', () => {
+  const native = {
+    ...resolvers,
+    timeToX: () => { throw new Error('bar_index must not interpolate timestamps'); },
+    barIndexToX: (index: number) => 10 + index * 15,
+  };
+
+  it('projects future line, box, and label slots directly in native index space', () => {
+    const line = resolveLineDrawingSegment(makeLine({ x2: 5 }), bars, viewport, pane, 100, 0, 100, native);
+    expect(line).toEqual({ start: { x: 10, y: 110 }, end: { x: 85, y: 10 } });
+    const box = resolveBoxDrawingRect(makeBox({ right: 5 }), bars, viewport, pane, 100, 0, 100, native);
+    expect(box).toMatchObject({ x: 10, width: 75 });
+    const label = resolveLabelDrawingPosition(makeLabel({ x: 5 }), bars, viewport, pane, 100, native);
+    expect(label).toEqual({ x: 85, y: 40 });
+  });
+
+  it('omits drawing geometry when the native index slot is unavailable', () => {
+    const unavailable = { ...native, barIndexToX: () => NaN };
+    expect(resolveLineDrawingSegment(makeLine(), bars, viewport, pane, 100, 0, 100, unavailable)).toBeNull();
+    expect(resolveBoxDrawingRect(makeBox(), bars, viewport, pane, 100, 0, 100, unavailable)).toBeNull();
+    expect(resolveLabelDrawingPosition(makeLabel(), bars, viewport, pane, 100, unavailable)).toBeNull();
+  });
+});

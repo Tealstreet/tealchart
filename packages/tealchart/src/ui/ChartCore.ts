@@ -28,8 +28,7 @@ import type {
   CrosshairState as EventCrosshairState,
   PaneDividerInfo,
 } from '../interaction/EventManager';
-import type { OemsActionKind } from '../interaction/oemsActionManager';
-import type { OemsTradingLineState } from '../interaction/oemsLineState';
+import type { BracketDragPreviewState } from '../rendering/bracketDragPreview';
 import type { CanvasContext } from '../rendering/CanvasContext';
 import type { DirtyFlags } from '../rendering/RenderScheduler';
 import type { PlotStyleOverride } from '../state/chartState';
@@ -55,29 +54,15 @@ import {
 } from '../drawings';
 import { snapPriceToTick, snapTimeToInterval } from '../interaction/crosshairSnap';
 import { EventManager } from '../interaction/EventManager';
-import { OemsActionManager } from '../interaction/oemsActionManager';
-import {
-  applyOemsOrderActionState,
-  applyOemsPositionActionState,
-  confirmOemsOrderLineSnapshots,
-  confirmOemsPositionLineSnapshots,
-  getOemsOrderLineState,
-  getOemsOrderObjectId,
-  getOemsPositionLineState,
-  getOemsPositionObjectId,
-} from '../interaction/oemsLineState';
-import {
-  PARTIAL_BRACKET_MARKER_INTERVAL,
-  PARTIAL_BRACKET_PERCENTS,
-  PARTIAL_BRACKET_ZONE_HALF_WIDTH,
-  resolvePartialBracketMarkers,
-} from '../interaction/partialBrackets';
+import { getOemsOrderObjectId, getOemsPositionObjectId } from '../interaction/oemsLineState';
+import { OemsTradingRuntime } from '../interaction/OemsTradingRuntime';
 import { PriceLineManager } from '../interaction/PriceLineManager';
 import { computePaneGeometry, computeTradingLineLabelMinX, WEB_CHART_CHROME_METRICS } from '../layout/chartGeometry';
+import { drawBracketDragPreview } from '../rendering/bracketDragPreview';
+import { drawJailbreakTooltipGroups } from '../rendering/jailbreakTooltips';
 import { DIRTY } from '../rendering/RenderScheduler';
 import { WebCanvasContext } from '../rendering/WebCanvasContext';
 import { getDecimalPlacesFromPrecision } from '../state/chartState';
-import { resolveWebPriceAxisLaneTagLayout } from '../utils/priceAxisTagSizing';
 import { TealchartRenderer } from '../TealchartRenderer';
 import {
   Awaitable,
@@ -92,7 +77,6 @@ import {
   OemsActionResult,
   OrderLineRenderData,
   PaneLayout,
-  PositionData,
   PositionLineRenderData,
   PRICE_AXIS_RIGHT_PADDING,
   PriceLine,
@@ -104,9 +88,10 @@ import {
   Viewport,
 } from '../types';
 import { dedupeBarsByTime } from '../utils/dedupeBars';
+import { resolveWebPriceAxisLaneTagLayout } from '../utils/priceAxisTagSizing';
 import { safeNum, safeToFixed } from '../utils/safeNumber';
 import { tradingLineToBracketLines } from '../utils/tradeLineBrackets';
-import { resolveOrderTradeLineLabel, resolvePositionTradeLineLabel } from '../utils/tradeLineLabel';
+import { orderLineToPriceLine, positionLineToPriceLine } from '../utils/tradingPriceLines';
 import { applyAutoScale, intervalToMs } from '../viewport/viewScale';
 import { applyChromeThemeVars } from './chromeTheme';
 import { button, div, icons } from './dom';
@@ -321,92 +306,6 @@ function resolveNegativeTradingColor(renderOptions?: Partial<RenderOptions> | nu
   return renderOptions?.downColor ?? DEFAULT_SELL_CANDLE_COLOR;
 }
 
-function orderLineToPriceLine(
-  order: OrderLineRenderData,
-  formatPrice: (price: number) => string,
-  positiveColor: string,
-): PriceLine {
-  const lineStyleMap: Record<number, 'solid' | 'dashed' | 'dotted'> = {
-    0: 'solid',
-    1: 'dotted',
-    2: 'dashed',
-    3: 'dashed',
-    4: 'dashed',
-  };
-  const chartLabel = resolveOrderTradeLineLabel(order, positiveColor);
-
-  return {
-    id: order.id,
-    price: order.price,
-    lineStyle: lineStyleMap[order.lineStyle] || 'dashed',
-    color: order.lineColor,
-    type: 'order',
-    lineLength: order.lineLength,
-    lineLengthUnit: order.lineLengthUnit,
-    extendLeft: order.extendLeft,
-    lineWidth: order.lineWidth,
-    priority: 50,
-    draggable: order.editable,
-    label: {
-      primaryText: formatPrice(order.price),
-      backgroundColor: order.bodyBackgroundColor,
-      textColor: order.bodyTextColor,
-    },
-    chartLabel,
-    orderId: order.orderId,
-    partialEnabled: order.partialEnabled,
-    brackets: order.brackets,
-    actionState: order.actionState,
-    callbacks: order.callbacks,
-  };
-}
-
-/**
- * Convert PositionLineRenderData to PriceLine
- */
-function positionLineToPriceLine(
-  position: PositionLineRenderData,
-  formatPrice: (price: number) => string,
-  positiveColor: string,
-  negativeColor: string,
-): PriceLine {
-  const lineStyleMap: Record<number, 'solid' | 'dashed' | 'dotted'> = {
-    0: 'solid',
-    1: 'dotted',
-    2: 'dashed',
-    3: 'dashed',
-    4: 'dashed',
-  };
-
-  const chartLabel = resolvePositionTradeLineLabel(position, positiveColor, negativeColor);
-
-  return {
-    id: position.id,
-    price: position.price,
-    lineStyle: lineStyleMap[position.lineStyle] || 'solid',
-    color: position.lineColor,
-    type: 'position',
-    lineLength: position.lineLength,
-    lineLengthUnit: position.lineLengthUnit,
-    extendLeft: position.extendLeft,
-    lineWidth: position.lineWidth,
-    priority: 75,
-    draggable: false,
-    label: {
-      primaryText: formatPrice(position.price),
-      backgroundColor: position.bodyBackgroundColor,
-      textColor: position.bodyTextColor,
-    },
-    chartLabel,
-    positionId: position.positionId,
-    partialEnabled: position.partialEnabled,
-    positionData: position.positionData ?? undefined,
-    brackets: position.brackets,
-    actionState: position.actionState,
-    callbacks: position.callbacks,
-  };
-}
-
 interface CrosshairPlusButtonBounds {
   hitBottom: number;
   hitLeft: number;
@@ -470,10 +369,12 @@ export class ChartCore {
   } | null = null;
   private viewport: Viewport | null = null;
   private priceLines: PriceLine[] = [];
-  private rawOrderLines: OrderLineRenderData[] = [];
-  private orderLines: OrderLineRenderData[] = [];
-  private rawPositionLines: PositionLineRenderData[] = [];
-  private positionLines: PositionLineRenderData[] = [];
+  private get orderLines(): OrderLineRenderData[] {
+    return this.tradingRuntime.getOrderLines();
+  }
+  private get positionLines(): PositionLineRenderData[] {
+    return this.tradingRuntime.getPositionLines();
+  }
   private executionLines: ExecutionLineRenderData[] = [];
   private plots: PlotOutput[] = [];
   private drawings: DrawingOutput[] = [];
@@ -486,7 +387,10 @@ export class ChartCore {
   private plotStyleOverrides: Map<string, PlotStyleOverride> = new Map();
 
   // State
-  private readonly oemsActions: OemsActionManager<OemsTradingLineState>;
+  private readonly tradingRuntime: OemsTradingRuntime;
+  private get oemsActions() {
+    return this.tradingRuntime.oemsActions;
+  }
   // Keeps a dragged line on the chart while its row is out of the feed, and
   // retires the hold when a matching row returns under any id. See the
   // optimistic-holding section of this package's CLAUDE.md.
@@ -503,18 +407,7 @@ export class ChartCore {
   private requestedCursor = 'crosshair';
 
   // Bracket drag preview state (TP/SL drag visualization on crosshair canvas)
-  private _bracketDragState: {
-    type: 'tp' | 'sl';
-    positionId: string;
-    price: number;
-    entryPrice: number;
-    partialPercent: number;
-    partialEnabled: boolean;
-    dragStartX: number;
-    dragCurrentX: number;
-    positionData: PositionData;
-    color: string;
-  } | null = null;
+  private _bracketDragState: BracketDragPreviewState | null = null;
 
   // Collision offset cache — keyed by geometry (IDs + prices + viewport).
   // Stores only the de-overlap offset per line, NOT label content.
@@ -563,13 +456,13 @@ export class ChartCore {
     this.options = options;
     this.container = options.container;
     this.margins = { ...DEFAULT_MARGINS, ...options.margins };
-    this.oemsActions = new OemsActionManager<OemsTradingLineState>({
-      // Read live: the tick changes with the symbol, and the manager outlives it.
+    this.tradingRuntime = new OemsTradingRuntime({
       priceTolerance: () => this.options.renderOptions?.pricePrecision ?? 0,
-      onChange: () => {
-        this.reapplyOemsActionState();
-        this.scheduleRender();
-      },
+      onChange: () => this.scheduleRender(),
+      onOrderMove: (id, price) => this.options.onOrderMove?.(id, price),
+      onOrderCancel: (id) => this.options.onOrderCancel?.(id),
+      onPositionClose: (id) => this.options.onPositionClose?.(id),
+      onPositionReverse: (id) => this.options.onPositionReverse?.(id),
     });
 
     // Create chart container
@@ -928,11 +821,7 @@ export class ChartCore {
    */
   setOrderLines(lines: OrderLineRenderData[]): void {
     if (this.eventManager.getIsDragging() || this.priceLineManager?.isDragging()) return;
-    if (lines === this.rawOrderLines && this.oemsActions.getActions().length === 0) return;
-
-    this.rawOrderLines = lines;
-    this.confirmOrderLineSnapshots(lines);
-    this.orderLines = lines.map((line) => applyOemsOrderActionState(line, this.oemsActions));
+    this.tradingRuntime.setOrderLines(lines);
     // No scheduleRender — paint() is called by the widget after pushing state
   }
 
@@ -943,49 +832,15 @@ export class ChartCore {
    */
   setPositionLines(lines: PositionLineRenderData[]): void {
     if (this.eventManager.getIsDragging() || this.priceLineManager?.isDragging()) return;
-    if (lines === this.rawPositionLines && this.oemsActions.getActions().length === 0) return;
-
-    this.rawPositionLines = lines;
-    this.confirmPositionLineSnapshots(lines);
-    this.positionLines = lines.map((line) => applyOemsPositionActionState(line, this.oemsActions));
+    this.tradingRuntime.setPositionLines(lines);
     // No scheduleRender — paint() is called by the widget after pushing state
-  }
-
-  private reapplyOemsActionState(): void {
-    this.orderLines = this.rawOrderLines.map((line) => applyOemsOrderActionState(line, this.oemsActions));
-    this.positionLines = this.rawPositionLines.map((line) => applyOemsPositionActionState(line, this.oemsActions));
   }
 
   private getOrderObjectId(line: OrderLineRenderData): string {
     return getOemsOrderObjectId(line);
   }
-
   private getPositionObjectId(line: PositionLineRenderData): string {
     return getOemsPositionObjectId(line);
-  }
-
-  private getOrderLineState(line: OrderLineRenderData): OemsTradingLineState {
-    return getOemsOrderLineState(line);
-  }
-
-  private getPositionLineState(line: PositionLineRenderData): OemsTradingLineState {
-    return getOemsPositionLineState(line);
-  }
-
-  private confirmOrderLineSnapshots(lines: OrderLineRenderData[]): void {
-    confirmOemsOrderLineSnapshots(this.oemsActions, lines);
-  }
-
-  private confirmPositionLineSnapshots(lines: PositionLineRenderData[]): void {
-    confirmOemsPositionLineSnapshots(this.oemsActions, lines);
-  }
-
-  private applyOrderActionState(line: OrderLineRenderData): OrderLineRenderData {
-    return applyOemsOrderActionState(line, this.oemsActions);
-  }
-
-  private applyPositionActionState(line: PositionLineRenderData): PositionLineRenderData {
-    return applyOemsPositionActionState(line, this.oemsActions);
   }
 
   /**
@@ -1227,160 +1082,32 @@ export class ChartCore {
     return hit !== null && !hit.drawing.locked;
   }
 
-  private handleOrderMove(orderId: string, newPrice: number): void {
-    // Raw, never the action-applied array: an action's optimistic state must
-    // describe what the venue is expected to report back. Reading a line that
-    // already carries an unsettled action folds that action's guess into the
-    // new one, and `confirmState` compares every field it was given - so the
-    // replacement could never confirm either.
-    const order = this.rawOrderLines.find((line) => this.getOrderObjectId(line) === orderId);
-    const originalState = order ? this.getOrderLineState(order) : { price: newPrice, visible: true };
-    const result = this.oemsActions.startAction({
-      objectType: 'order',
-      objectId: orderId,
-      kind: 'orderMove',
-      originalState,
-      optimisticState: {
-        ...originalState,
-        price: newPrice,
-      },
-      callback: () => this.options.onOrderMove?.(orderId, newPrice),
-    });
-    if (result.completedSynchronously) this.scheduleRender();
+  private handleOrderMove(id: string, price: number): void {
+    this.tradingRuntime.handleOrderMove(id, price);
   }
-
-  private handleOrderCancel(orderId: string): void {
-    const order = this.rawOrderLines.find((line) => this.getOrderObjectId(line) === orderId);
-    const originalState = order ? this.getOrderLineState(order) : { visible: true };
-    const result = this.oemsActions.startAction({
-      objectType: 'order',
-      objectId: orderId,
-      kind: 'orderCancel',
-      originalState,
-      optimisticState: originalState,
-      confirmsRemoved: true,
-      callback: () => this.options.onOrderCancel?.(orderId),
-    });
-    if (result.completedSynchronously) this.scheduleRender();
+  private handleOrderCancel(id: string): void {
+    this.tradingRuntime.handleOrderCancel(id);
   }
-
-  private handlePositionClose(positionId: string): void {
-    const position = this.rawPositionLines.find((line) => this.getPositionObjectId(line) === positionId);
-    const originalState = position ? this.getPositionLineState(position) : { visible: true };
-    const result = this.oemsActions.startAction({
-      objectType: 'position',
-      objectId: positionId,
-      kind: 'positionClose',
-      originalState,
-      optimisticState: originalState,
-      confirmsRemoved: true,
-      callback: () => this.options.onPositionClose?.(positionId),
-    });
-    if (result.completedSynchronously) this.scheduleRender();
+  private handlePositionClose(id: string): void {
+    this.tradingRuntime.handlePositionClose(id);
   }
-
-  private handlePositionReverse(positionId: string): void {
-    const position = this.rawPositionLines.find((line) => this.getPositionObjectId(line) === positionId);
-    const originalState = position ? this.getPositionLineState(position) : { visible: true };
-    const result = this.oemsActions.startAction({
-      objectType: 'position',
-      objectId: positionId,
-      kind: 'positionReverse',
-      originalState,
-      optimisticState: originalState,
-      confirmsRemoved: true,
-      callback: () => this.options.onPositionReverse?.(positionId),
-    });
-    if (result.completedSynchronously) this.scheduleRender();
+  private handlePositionReverse(id: string): void {
+    this.tradingRuntime.handlePositionReverse(id);
   }
-
   private handleBracketMoveEnd(
-    bracketType: 'tp' | 'sl',
+    type: 'tp' | 'sl',
     bound: PriceLineLabelBounds,
     price: number,
     partialPercent?: number,
   ): void {
-    const object = this.getBoundTradingObject(bound);
-    if (!object) return;
-
-    const originalState = object.state;
-    const existingBracketPrice = bracketType === 'tp' ? originalState.takeProfit : originalState.stopLoss;
-    const optimisticState: OemsTradingLineState = {
-      ...originalState,
-      ...(bracketType === 'tp' ? { takeProfit: price } : { stopLoss: price }),
-    };
-    const kind = this.getBracketMoveActionKind(object.objectType, bracketType);
-    const callback =
-      bracketType === 'tp'
-        ? () => bound.callbacks?.onTPMoveEnd?.(price, partialPercent)
-        : () => bound.callbacks?.onSLMoveEnd?.(price, partialPercent);
-
-    const result = this.oemsActions.startAction({
-      objectType: object.objectType,
-      objectId: object.objectId,
-      kind,
-      originalState,
-      optimisticState,
-      settleOnCallback: typeof existingBracketPrice !== 'number',
-      callback,
-    });
-    if (result.completedSynchronously) this.scheduleRender();
+    this.tradingRuntime.handleBracketMoveEnd(type, bound, price, partialPercent);
+  }
+  private handleBracketClick(type: 'tp' | 'sl', bound: PriceLineLabelBounds): void {
+    this.tradingRuntime.handleBracketClick(type, bound);
   }
 
-  private handleBracketClick(bracketType: 'tp' | 'sl', bound: PriceLineLabelBounds): void {
-    const object = this.getBoundTradingObject(bound);
-    if (!object) return;
-
-    const kind: OemsActionKind = bracketType === 'tp' ? 'tpClick' : 'slClick';
-    const callback = bracketType === 'tp' ? () => bound.callbacks?.onTPClick?.() : () => bound.callbacks?.onSLClick?.();
-    const result = this.oemsActions.startAction({
-      objectType: object.objectType,
-      objectId: object.objectId,
-      kind,
-      originalState: object.state,
-      optimisticState: object.state,
-      callback,
-    });
-    if (result.completedSynchronously) this.scheduleRender();
-  }
-
-  private getBoundTradingObject(bound: PriceLineLabelBounds): {
-    objectType: 'order' | 'position';
-    objectId: string;
-    state: OemsTradingLineState;
-  } | null {
-    if (bound.type === 'order') {
-      // `lineId` IS the identity - it is the adapter's id, which is what the
-      // OEMS layer keys on. Preferring `bound.orderId` started actions under the
-      // venue's id and looked them up under the adapter's, so nothing on this
-      // line ever rendered as pending. See CLAUDE.md "Line identity (OEMS)".
-      const objectId = bound.lineId;
-      const line = this.rawOrderLines.find((candidate) => this.getOrderObjectId(candidate) === objectId);
-      return {
-        objectType: 'order',
-        objectId,
-        state: line ? this.getOrderLineState(line) : { price: bound.price, visible: true },
-      };
-    }
-
-    if (bound.type === 'position') {
-      const objectId = bound.lineId;
-      const line = this.rawPositionLines.find((candidate) => this.getPositionObjectId(candidate) === objectId);
-      return {
-        objectType: 'position',
-        objectId,
-        state: line ? this.getPositionLineState(line) : { price: bound.price, visible: true },
-      };
-    }
-
-    return null;
-  }
-
-  private getBracketMoveActionKind(objectType: 'order' | 'position', bracketType: 'tp' | 'sl'): OemsActionKind {
-    if (objectType === 'order') {
-      return bracketType === 'tp' ? 'orderTpMove' : 'orderSlMove';
-    }
-    return bracketType === 'tp' ? 'positionTpMove' : 'positionSlMove';
+  private getBoundTradingObject(bound: PriceLineLabelBounds) {
+    return this.tradingRuntime.getBoundTradingObject(bound);
   }
 
   /**
@@ -1524,7 +1251,7 @@ export class ChartCore {
     this.chartContainer.removeEventListener('click', this.plusButtonClickHandler);
     this.closeContextMenu();
     this.eventManager.dispose();
-    this.oemsActions.dispose();
+    this.tradingRuntime.dispose();
     this.priceLineManager?.dispose();
     this.stage?.destroy();
     if (!preserveDom) {
@@ -2744,121 +2471,15 @@ export class ChartCore {
       symbol,
     });
 
-    if (tooltipGroups.length === 0) return;
-
-    // Separate tooltip groups by position
-    const leftGroups: typeof tooltipGroups = [];
-    const hoverGroups: typeof tooltipGroups = [];
-    for (const group of tooltipGroups) {
-      // Check the position of the first tooltip in the group
-      const pos = group[0]?.position ?? 'left';
-      if (pos === 'hover') {
-        hoverGroups.push(group);
-      } else {
-        // both 'left' and 'right' go to left for now (matching TV behavior)
-        leftGroups.push(group);
-      }
-    }
-
-    const bgColor = this.options.renderOptions?.backgroundColor || '#131722';
-    const textColor = this.options.renderOptions?.crosshairColor || '#888888';
-
-    if (leftGroups.length > 0) {
-      this._drawTooltipGroups(ctx, leftGroups, cursorX, cursorY, width, bgColor, textColor, 'left');
-    }
-    if (hoverGroups.length > 0) {
-      this._drawTooltipGroups(ctx, hoverGroups, cursorX, cursorY, width, bgColor, textColor, 'hover');
-    }
-  }
-
-  /**
-   * Render tooltip groups as a canvas text box.
-   */
-  private _drawTooltipGroups(
-    ctx: CanvasRenderingContext2D,
-    groups: import('../jailbreak/types').CrossHairTooltip[][],
-    cursorX: number,
-    cursorY: number,
-    chartWidth: number,
-    bgColor: string,
-    defaultTextColor: string,
-    alignment: 'left' | 'hover',
-  ): void {
-    const flat = groups.flat();
-    if (flat.length === 0) return;
-
-    const fontSize = 12;
-    const font = this.renderer.getFont();
-    ctx.font = `${fontSize}px ${font}`;
-
-    // Measure max text width
-    let maxTextWidth = 0;
-    for (const t of flat) {
-      const w = ctx.measureText(t.text).width;
-      if (w > maxTextWidth) maxTextWidth = w;
-    }
-
-    const textHeight = 15;
-    const padding = 5;
-    const groupPadding = 0.2;
-
-    // Calculate total height including group separators
-    const totalRows = flat.length + (groups.length - 1) * groupPadding * 2;
-    const tooltipHeight = textHeight * totalRows + padding;
-    const tooltipWidth = maxTextWidth + padding * 2;
-
-    // Position the tooltip
-    let rectX: number;
-    if (alignment === 'left') {
-      rectX = 20;
-    } else {
-      // hover: position near cursor, flip side if too close to edge
-      const fitsRight = cursorX + 15 + tooltipWidth < chartWidth - this.margins.right;
-      rectX = fitsRight ? cursorX + 15 : cursorX - tooltipWidth - 15;
-    }
-    const rectY = cursorY - tooltipHeight / 2;
-
-    // Draw background
-    ctx.fillStyle = bgColor;
-    ctx.globalAlpha = 0.85;
-    ctx.beginPath();
-    ctx.roundRect(rectX, rectY, tooltipWidth, tooltipHeight, 3);
-    ctx.fill();
-    ctx.globalAlpha = 1.0;
-
-    // Draw border
-    ctx.strokeStyle = defaultTextColor;
-    ctx.globalAlpha = 0.3;
-    ctx.lineWidth = 0.5;
-    ctx.strokeRect(rectX, rectY, tooltipWidth, tooltipHeight);
-    ctx.globalAlpha = 1.0;
-
-    // Draw text rows
-    ctx.textAlign = 'left';
-    ctx.textBaseline = 'top';
-
-    let rowOffset = 0;
-    for (let gi = 0; gi < groups.length; gi++) {
-      const group = groups[gi];
-      for (const tooltip of group) {
-        ctx.fillStyle = tooltip.color || defaultTextColor;
-        ctx.fillText(tooltip.text, rectX + padding, rectY + rowOffset * textHeight + padding / 1.2);
-        rowOffset++;
-      }
-
-      // Draw separator line between groups (not after last)
-      if (gi < groups.length - 1) {
-        rowOffset += groupPadding;
-        ctx.beginPath();
-        ctx.strokeStyle = defaultTextColor;
-        ctx.globalAlpha = 0.3;
-        ctx.moveTo(rectX, rectY + rowOffset * textHeight + padding / 2);
-        ctx.lineTo(rectX + tooltipWidth, rectY + rowOffset * textHeight + padding / 2);
-        ctx.stroke();
-        ctx.globalAlpha = 1.0;
-        rowOffset += groupPadding;
-      }
-    }
+    drawJailbreakTooltipGroups(ctx, tooltipGroups, {
+      cursorX,
+      cursorY,
+      chartWidth: width,
+      rightMargin: this.margins.right,
+      font: this.renderer.getFont(),
+      backgroundColor: this.options.renderOptions?.backgroundColor,
+      textColor: this.options.renderOptions?.crosshairColor,
+    });
   }
 
   /**
@@ -2930,282 +2551,13 @@ export class ChartCore {
   private _drawBracketPreview(ctx: CanvasRenderingContext2D): void {
     const state = this._bracketDragState;
     if (!state || !this.viewport) return;
-
-    const chartWidth = this.options.width - this.margins.right;
-    const color = state.color;
-    const bracketType = state.type === 'tp' ? 'TP' : 'SL';
-    const isPartialMode = state.partialEnabled;
-
-    // Convert prices to Y coordinates
-    const layout = this.getUnifiedLayout();
-    const bracketY = this.renderer.publicPriceToYWithLayout(state.price, this.viewport, layout);
-    const entryY = this.renderer.publicPriceToYWithLayout(state.entryPrice, this.viewport, layout);
-
-    // Compute PnL inline (only when notional > 0, i.e. for positions)
-    const pd = state.positionData;
-    const hasPnl = pd.notional > 0;
-    const priceDiff = pd.isLong ? state.price - state.entryPrice : state.entryPrice - state.price;
-    const pnl = hasPnl ? ((priceDiff * pd.notional) / state.entryPrice) * (state.partialPercent / 100) : 0;
-    const percentDistance = ((state.price - state.entryPrice) / state.entryPrice) * 100;
-
-    // Format values
-    const pnlText = hasPnl ? (pnl >= 0 ? '+' : '-') + '$' + safeToFixed(Math.abs(pnl), 2) : '';
-    const pctSign = percentDistance >= 0 ? '+' : '';
-    const percentText = pctSign + safeToFixed(percentDistance, 2) + '%';
-
-    // Build type label
-    const typeLabel =
-      isPartialMode && state.partialPercent < 100 ? state.partialPercent + '% Partial ' + bracketType : bracketType;
-
-    ctx.save();
-
-    // ========= Zone visualization =========
-    const centerX = state.dragStartX;
-    // The zone follows the arm being dragged, like the marker ladder above it.
-    // A two-sided zone under a one-sided ladder reads as a bug.
-    const armEdge =
-      state.dragCurrentX < centerX
-        ? Math.max(0, centerX - PARTIAL_BRACKET_ZONE_HALF_WIDTH)
-        : Math.min(chartWidth, centerX + PARTIAL_BRACKET_ZONE_HALF_WIDTH);
-    const leftEdge = Math.min(centerX, armEdge);
-    const rightEdge = Math.max(centerX, armEdge);
-
-    const top = Math.min(entryY, bracketY);
-    const bottom = Math.max(entryY, bracketY);
-    const height = bottom - top;
-    const isDraggingUp = bracketY < entryY;
-
-    const bgColor = '#1e222d';
-    const borderColor = '#363a45';
-
-    if (isPartialMode && height > 0) {
-      // Fill rectangle with low opacity
-      ctx.fillStyle = color;
-      ctx.globalAlpha = 0.08;
-      ctx.fillRect(leftEdge, top, rightEdge - leftEdge, height);
-
-      // Dashed rectangle border
-      ctx.strokeStyle = color;
-      ctx.lineWidth = 1;
-      ctx.setLineDash([4, 4]);
-      ctx.globalAlpha = 0.6;
-      ctx.strokeRect(leftEdge, top, rightEdge - leftEdge, height);
-
-      // V-shape diagonal lines from center to corners
-      ctx.beginPath();
-      if (isDraggingUp) {
-        ctx.moveTo(leftEdge, top);
-        ctx.lineTo(centerX, bottom);
-        ctx.lineTo(rightEdge, top);
-      } else {
-        ctx.moveTo(leftEdge, bottom);
-        ctx.lineTo(centerX, top);
-        ctx.lineTo(rightEdge, bottom);
-      }
-      ctx.stroke();
-
-      // Boundary lines sit under their own markers, on the dragged arm only.
-      ctx.globalAlpha = 0.3;
-      const boundaryDirection = state.dragCurrentX < centerX ? -1 : 1;
-      for (let index = 1; index < PARTIAL_BRACKET_PERCENTS.length; index += 1) {
-        const boundaryX = centerX + boundaryDirection * index * PARTIAL_BRACKET_MARKER_INTERVAL;
-        ctx.beginPath();
-        ctx.moveTo(boundaryX, top);
-        ctx.lineTo(boundaryX, bottom);
-        ctx.stroke();
-      }
-
-      ctx.globalAlpha = 1.0;
-      ctx.setLineDash([]);
-
-      // Partial % labels
-      ctx.font = `10px ${this.renderer.getFont()}`;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      const padding = 3;
-      const boxHeight = 14;
-      const labelBoxY = isDraggingUp ? top - 4 - boxHeight : bottom + 4;
-      const labelTextY = labelBoxY + boxHeight / 2;
-
-      // Same ladder native draws: one arm, dimmed rather than overlapping, and
-      // shifted as a piece to stay inside the zone. Canvas measures per string
-      // while native approximates from one character, so the shared resolver
-      // takes a character width - '%' and the digits are close enough at this
-      // size, and the box is padded either way.
-      const characterWidth = ctx.measureText('0').width;
-      const markers = resolvePartialBracketMarkers({
-        dragStartX: centerX,
-        currentX: state.dragCurrentX,
-        zoneLeft: leftEdge,
-        zoneRight: rightEdge,
-        characterWidth,
-        paddingX: padding,
-        minGap: 8,
-      });
-
-      for (const marker of markers) {
-        const boxX = marker.centerX - marker.width / 2;
-        const isHighlighted = marker.isActive;
-
-        ctx.globalAlpha = marker.opacity;
-        if (isHighlighted) {
-          ctx.fillStyle = color;
-          ctx.globalAlpha = 0.3 * marker.opacity;
-          ctx.fillRect(boxX, labelBoxY, marker.width, boxHeight);
-          ctx.globalAlpha = marker.opacity;
-        }
-
-        ctx.fillStyle = bgColor;
-        ctx.fillRect(boxX, labelBoxY, marker.width, boxHeight);
-        ctx.strokeStyle = isHighlighted ? color : borderColor;
-        ctx.lineWidth = 1;
-        ctx.strokeRect(boxX, labelBoxY, marker.width, boxHeight);
-        ctx.fillStyle = isHighlighted ? color : '#787b86';
-        ctx.fillText(marker.text, marker.centerX, labelTextY);
-        ctx.globalAlpha = 1.0;
-      }
-    }
-
-    // ========= Horizontal dashed line =========
-    ctx.lineWidth = 1;
-    ctx.setLineDash([4, 4]);
-    ctx.strokeStyle = color;
-    ctx.globalAlpha = 1.0;
-    const roundedBracketY = Math.round(bracketY);
-    const lineStartX = !isPartialMode ? state.dragStartX : 0;
-    ctx.beginPath();
-    ctx.moveTo(lineStartX, roundedBracketY);
-    ctx.lineTo(chartWidth, roundedBracketY);
-    ctx.stroke();
-
-    this._drawBracketPreviewPriceAxisLabel(ctx, state.price, roundedBracketY, color);
-
-    // ========= Main label (PnL | type | %) =========
-    const labelParts = [pnlText, typeLabel, percentText].filter(Boolean);
-
-    // Position label
-    const cornerY = isPartialMode
-      ? isDraggingUp
-        ? top + 20
-        : bottom - 20
-      : isDraggingUp
-        ? bracketY - 14
-        : bracketY + 14;
-
-    let cornerX: number;
-    if (isPartialMode) {
-      // The ladder was written out a second time here; it comes from the same
-      // resolver as the markers now, so the pill cannot point somewhere no
-      // marker sits.
-      const activeMarker = resolvePartialBracketMarkers({
-        dragStartX: centerX,
-        currentX: state.dragCurrentX,
-        zoneLeft: Math.max(0, centerX - PARTIAL_BRACKET_ZONE_HALF_WIDTH),
-        zoneRight: Math.min(chartWidth, centerX + PARTIAL_BRACKET_ZONE_HALF_WIDTH),
-        characterWidth: 0,
-        paddingX: 0,
-        minGap: 0,
-      }).find((marker) => marker.isActive);
-      cornerX = activeMarker ? activeMarker.centerX : centerX;
-    } else {
-      cornerX = state.dragStartX;
-    }
-
-    ctx.font = `11px ${this.renderer.getFont()}`;
-    ctx.textBaseline = 'middle';
-    ctx.textAlign = 'center';
-    ctx.setLineDash([]);
-
-    const sectionPadding = 10;
-    const dividerWidth = 1;
-    let totalWidth = 0;
-    const sectionWidths = labelParts.map((part) => {
-      const w = ctx.measureText(part).width + sectionPadding * 2;
-      totalWidth += w;
-      return w;
+    drawBracketDragPreview(ctx, state, {
+      chartWidth: this.options.width - this.margins.right,
+      font: this.renderer.getFont(),
+      priceToY: (price) => this.renderer.publicPriceToYWithLayout(price, this.viewport!, this.getUnifiedLayout()),
+      drawPriceAxisLabel: (context, price, y, color) =>
+        this._drawBracketPreviewPriceAxisLabel(context, price, y, color),
     });
-    totalWidth += (labelParts.length - 1) * dividerWidth;
-
-    const labelBoxHeight = 20;
-    const labelBoxX = cornerX - totalWidth / 2;
-    const mainLabelBoxY = cornerY - labelBoxHeight / 2;
-
-    // Label background
-    ctx.fillStyle = bgColor;
-    ctx.fillRect(labelBoxX, mainLabelBoxY, totalWidth, labelBoxHeight);
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 1;
-    ctx.strokeRect(labelBoxX, mainLabelBoxY, totalWidth, labelBoxHeight);
-
-    // Draw each section with dividers
-    let xOffset = labelBoxX;
-    for (let i = 0; i < labelParts.length; i++) {
-      const sectionWidth = sectionWidths[i];
-
-      if (i > 0) {
-        ctx.strokeStyle = color;
-        ctx.globalAlpha = 0.4;
-        ctx.beginPath();
-        ctx.moveTo(xOffset, mainLabelBoxY + 3);
-        ctx.lineTo(xOffset, mainLabelBoxY + labelBoxHeight - 3);
-        ctx.stroke();
-        ctx.globalAlpha = 1.0;
-        xOffset += dividerWidth;
-      }
-
-      ctx.fillStyle = color;
-      ctx.fillText(labelParts[i], xOffset + sectionWidth / 2, cornerY);
-      xOffset += sectionWidth;
-    }
-
-    // ========= Vertical line and price offset labels =========
-    if (state.entryPrice && state.price && height > 0) {
-      const vertLineX = !isPartialMode ? state.dragStartX : rightEdge;
-      ctx.strokeStyle = color;
-      ctx.lineWidth = 1;
-      ctx.setLineDash([4, 4]);
-      ctx.globalAlpha = 0.6;
-      ctx.beginPath();
-      ctx.moveTo(vertLineX, top);
-      ctx.lineTo(vertLineX, bottom);
-      ctx.stroke();
-      ctx.globalAlpha = 1.0;
-      ctx.setLineDash([]);
-
-      ctx.textBaseline = 'middle';
-      ctx.textAlign = 'left';
-      ctx.font = `10px ${this.renderer.getFont()}`;
-      const rightLabelX = vertLineX + 6;
-
-      const priceRange = state.price - state.entryPrice;
-      const rightLabels = [
-        { percent: 10, yRatio: 0.1 },
-        { percent: 25, yRatio: 0.25 },
-        { percent: 50, yRatio: 0.5 },
-        { percent: 75, yRatio: 0.75 },
-        { percent: 100, yRatio: 1.0 },
-      ];
-
-      for (const label of rightLabels) {
-        let labelYPos = isDraggingUp ? bottom - height * label.yRatio : top + height * label.yRatio;
-
-        if (label.percent === 100) {
-          labelYPos += isDraggingUp ? 8 : -8;
-        }
-
-        const priceAtLevel = state.entryPrice + priceRange * label.yRatio;
-        const percentOffset = ((priceAtLevel - state.entryPrice) / state.entryPrice) * 100;
-        const sign = percentOffset >= 0 ? '' : '-';
-        const text = sign + safeToFixed(Math.abs(percentOffset), 1) + '%';
-
-        ctx.fillStyle = color;
-        ctx.globalAlpha = 0.7;
-        ctx.fillText(text, rightLabelX, labelYPos);
-      }
-      ctx.globalAlpha = 1.0;
-    }
-
-    ctx.restore();
   }
 
   private _drawBracketPreviewPriceAxisLabel(

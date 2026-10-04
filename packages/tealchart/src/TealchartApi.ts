@@ -103,6 +103,7 @@ interface StudyCreateOptions {
   checkLimit?: boolean;
   priceScale?: string;
   displayName?: string;
+  disableSave?: boolean;
 }
 
 export interface StudyCreateRequest {
@@ -535,6 +536,7 @@ export class TealchartApi {
   private _onStudyCreate?: StudyCreateCallback;
   private _onStudyRemove?: (studyId: string) => void;
   private _onStudyVisibilityChange?: StudyVisibilityCallback;
+  private _onStudyInputsChange?: (studyId: string, inputs: Record<string, unknown>) => void;
 
   // Callback for when symbol/interval changes need to propagate to widget
   private _onSymbolChange?: (symbol: string) => void;
@@ -2013,6 +2015,7 @@ export class TealchartApi {
     // Arrow keeps `this` on the instance; the returned object's method shorthand
     // would otherwise rebind it, which is why this used to alias `this`.
     const notifyStudyRemoved = () => this._onStudyRemove?.(studyId);
+    const notifyInputsChanged = (inputs: Record<string, unknown>) => this._onStudyInputsChange?.(studyId, inputs);
 
     return {
       applyOverrides(overrides: Record<string, unknown>): void {
@@ -2034,7 +2037,7 @@ export class TealchartApi {
         const study = studies.get(studyId);
         if (study) {
           study.inputs = { ...study.inputs, ...inputs };
-          // TODO: Trigger script re-execution with new inputs
+          notifyInputsChanged(study.inputs);
         }
       },
 
@@ -2071,6 +2074,11 @@ export class TealchartApi {
    */
   setOnStudyVisibilityChange(callback: StudyVisibilityCallback): void {
     this._onStudyVisibilityChange = callback;
+  }
+
+  /** @internal Hosts execute input changes through their existing script manager. */
+  setOnStudyInputsChange(callback: (studyId: string, inputs: Record<string, unknown>) => void): void {
+    this._onStudyInputsChange = callback;
   }
 
   /**

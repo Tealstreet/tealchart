@@ -204,9 +204,8 @@ describe('PriceLineManager TP/SL dragging', () => {
     manager.update([makeOrderBound(100)]);
 
     const lineGroup = (manager as unknown as PriceLineManagerProbe).cachedLineGroups.get('order-1');
-    const dashedLines = lineGroup?.find(
-      (node: Konva.Node) => node instanceof Konva.Line && node.dash().length > 0,
-    ) as Konva.Line[] | undefined;
+    const dashedLines = lineGroup?.find((node: Konva.Node) => node instanceof Konva.Line && node.dash().length > 0) as
+      Konva.Line[] | undefined;
 
     expect(dashedLines?.length).toBeGreaterThan(0);
     for (const line of dashedLines ?? []) {
@@ -452,6 +451,34 @@ describe('PriceLineManager order dragging', () => {
     stage.destroy();
   }
 
+  it('cancels a drag before binding invalidation without committing and permits fresh lines to render', () => {
+    const onOrderMove = vi.fn();
+    withManager(
+      (manager) => {
+        manager.update([draggableOrderBound(undefined)]);
+        const staleHandle = dragHandle(manager);
+        staleHandle.fire('dragstart');
+        staleHandle.y(staleHandle.y() + 24);
+        staleHandle.fire('dragmove');
+        expect(manager.isDragging()).toBe(true);
+
+        manager.cancelDrag();
+        manager.update([]);
+        staleHandle.fire('dragend');
+        expect(onOrderMove).not.toHaveBeenCalled();
+        expect(manager.isDragging()).toBe(false);
+        manager.cancelDrag();
+
+        manager.update([{ ...draggableOrderBound(undefined), price: 120, originalY: 120, adjustedY: 120 }]);
+        expect((manager as unknown as PriceLineManagerProbe).cachedLineGroups.get('order-1')).toBeDefined();
+        dragHandle(manager).fire('dragstart');
+        expect(manager.isDragging()).toBe(true);
+        manager.cancelDrag();
+      },
+      { onOrderMove },
+    );
+  });
+
   // The bug this covers: an amend the venue never echoed back in the shape the
   // action expected left the line pending, and pending refused every later drag
   // until the action timed out thirty seconds on.
@@ -520,6 +547,70 @@ describe('PriceLineManager order dragging', () => {
     );
   });
 
+  it.each([0.25, 2, 5])('starts order dragging at the current cached projection after axis scale %s', (scale) => {
+    let factor = 1;
+    const onOrderMove = vi.fn();
+    const onOrderMoving = vi.fn();
+    withManager(
+      (manager) => {
+        manager.update([draggableOrderBound(undefined)]);
+        const first = (manager as unknown as PriceLineManagerProbe).cachedLineGroups.get('order-1');
+        factor = scale;
+        manager.update([{ ...draggableOrderBound(undefined), originalY: 100 * scale, adjustedY: 100 * scale }]);
+        expect((manager as unknown as PriceLineManagerProbe).cachedLineGroups.get('order-1')).toBe(first);
+        const handle = dragHandle(manager);
+        handle.fire('dragstart');
+        handle.y(handle.y() + 20);
+        handle.fire('dragmove');
+        expect(onOrderMoving).toHaveBeenLastCalledWith('order-1', 100 + 20 / scale);
+        expect(manager.getRenderedPriceAxisLabelBounds()[0]).toEqual(expect.objectContaining({
+          originalY: 100 * scale + 20, adjustedY: 100 * scale + 20, fixed: true,
+        }));
+        handle.fire('dragend');
+        expect(onOrderMove).toHaveBeenLastCalledWith('order-1', 100 + 20 / scale);
+      },
+      { priceToY: (price) => price * factor, yToPrice: (y) => y / factor, onOrderMove, onOrderMoving },
+    );
+  });
+
+  it('cancels a rescaled order drag without moving its cached handle or submitting an action', () => {
+    let factor = 1;
+    const onOrderMove = vi.fn();
+    withManager(
+      (manager) => {
+        manager.update([draggableOrderBound(undefined)]);
+        factor = 2;
+        manager.update([{ ...draggableOrderBound(undefined), originalY: 200, adjustedY: 200 }]);
+        const handle = dragHandle(manager);
+        const originalY = handle.getAbsolutePosition().y;
+        handle.fire('dragstart');
+        handle.y(handle.y() + 20);
+        handle.fire('dragmove');
+        manager.cancelDrag();
+        expect(handle.getAbsolutePosition().y).toBe(originalY);
+        expect(onOrderMove).not.toHaveBeenCalled();
+      },
+      { priceToY: (price) => price * factor, yToPrice: (y) => y / factor, onOrderMove },
+    );
+  });
+
+  it('does not submit an unchanged order drag after the cached line was rescaled', () => {
+    let factor = 1;
+    const onOrderMove = vi.fn();
+    withManager(
+      (manager) => {
+        manager.update([draggableOrderBound(undefined)]);
+        factor = 2;
+        manager.update([{ ...draggableOrderBound(undefined), originalY: 200, adjustedY: 200 }]);
+        const handle = dragHandle(manager);
+        handle.fire('dragstart');
+        handle.fire('dragend');
+        expect(onOrderMove).not.toHaveBeenCalled();
+      },
+      { priceToY: (price) => price * factor, yToPrice: (y) => y / factor, onOrderMove },
+    );
+  });
+
   // Nothing may rebuild the layer while a line is being dragged, so the tag
   // would otherwise sit at the price the drag started from until it was dropped.
   it('writes the dragged price into its own axis tag, and never lets the tag narrow', () => {
@@ -538,8 +629,7 @@ describe('PriceLineManager order dragging', () => {
 
         const group = (manager as unknown as PriceLineManagerProbe).cachedLineGroups.get('order-1');
         const refs = group?.getAttr('contentRefs') as
-          | { priceAxisRect?: Konva.Rect; priceAxisPrimaryText?: Konva.Text }
-          | undefined;
+          { priceAxisRect?: Konva.Rect; priceAxisPrimaryText?: Konva.Text } | undefined;
         const handle = dragHandle(manager);
         const stage = handle.getStage();
         const getPointerPosition = vi.spyOn(stage!, 'getPointerPosition');

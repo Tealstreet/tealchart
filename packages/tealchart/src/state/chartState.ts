@@ -50,6 +50,8 @@ export interface IndicatorInstance {
   sourceId?: string;
   /** Source hash/version marker captured when the indicator was added. */
   sourceHash?: string;
+  /** Editor-created source with no catalog row; retained in shared layout metadata. */
+  inlineTealscript?: { code: string; overlay: boolean };
   /** User-configured input values */
   inputs: Record<string, unknown>;
   /** Style overrides for plots */

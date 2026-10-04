@@ -4,11 +4,24 @@ Canvas-based OHLCV charting library with a TradingView-compatible widget API.
 
 ## Architecture
 
+`PriceLineManager` accepts an optional host pointer-event predicate before
+financial down/drag handlers mutate state. Hosted frames require the original
+trusted DOM event; omitted predicates retain ordinary Tealchart behavior.
+Programmatic drag cancellation restores geometry without submitting callbacks.
+
 **Hybrid rendering model:**
 
 - **Canvas 2D API**: Candlesticks, volume, grid, time/price axes, crosshair (high-frequency updates)
 - **Konva.js**: Interactive trading geometry on web — order/position lines with draggable labels and controls
 - **DOM / React Native overlays**: Menus, buttons, chrome controls, and toolbars that do not require per-frame chart projection
+
+`ui/LayoutSelector` is the shared saved-layout list and action modal. Hosts can
+open/close it through a native header without adding a second menu. Optional
+`requestName`, `confirmDelete` and `onClose` callbacks connect Electron's
+existing app-origin dialogs; omitted callbacks keep browser prompt/confirm.
+Hosted calls mount the original modal in the chart root and use its existing
+Escape, overlay and close-button behavior. Pending hosted naming results are
+retired when that selector is unmounted.
 
 **Overlay UI rule:** Use real DOM nodes on web and real React Native nodes on mobile for controls, menus, buttons, popovers, context menus, floating action buttons, and toolbars whenever their size/value is not a high-frequency function of chart data. Canvas/Skia should own plot primitives and chart-derived labels that must stay inside the draw pass: candles, volume, grid, axes, crosshair, price/time labels, and projected drawing or trading geometry. The left drawing tool rail, reset-view affordance, context menus, price-axis plus menus, and similar chrome belong in overlay UI, not canvas/Skia.
 
@@ -141,6 +154,11 @@ entries cover label price-coordinate clamping, area fill alpha normalization,
 plotarrow height flooring/reordering, table explicit width/height invalid-input
 normalization, and `plotshape`/`plotchar` `textcolor=na` fallback. Do not turn
 these into behavior fixes or quiet assumptions without a TradingView trace.
+
+Order drag handlers read the cached group's current projected line Y when a
+gesture starts. Scale/pan updates translate cached groups without rebuilding
+listeners, so their creation-time Y must never seed a new drag. Cancellation
+restores the saved node-local Y; a zero-distance drag never submits an amend.
 
 ## Directory Structure
 
@@ -516,6 +534,21 @@ Order and position trading-line labels derive their body, quantity, price-label,
 
 The `transformer/README.md` documents the TradingView layout schema in detail.
 
+Official hosted study identifiers (`SMA@tv-basicstudies-278`, or exact builtin
+display names in `tv-basicstudies`/`tv-prostudies`) use the same existing indicator
+mapping registry as licensed `STD;` layouts. Private/Pine namespaces and approximate
+display names are preserved as unsupported sources, never guessed from a name.
+The `hosted` entry exports the existing transformer and state types so desktop
+adapters can preserve the same saved-chart schema without another storage format.
+
+Editor-created sources without a catalog row carry optional
+`IndicatorInstance.inlineTealscript` (`code`, `overlay`) in the existing
+`_tealstreetOriginalIndicators` metadata. Hosted saved layouts preserve that
+descriptor through save, import and resave, and feed it back to the existing
+runtime resolver. Stable builtin/catalog studies keep their identifiers; no
+schema migration or native executable source is added. Current parent study
+state owns removal and replacement of inline source metadata.
+
 ## Commands
 
 ```bash
@@ -551,6 +584,69 @@ Platform-specific rendering:
 - **Mobile**: `SkiaTealchart.tsx` (passive Skia canvas) plus pure native frame/projection helpers
 
 When adding features like TP/SL drag preview, crosshair improvements, or new line types — implement for both platforms.
+
+## External chart hosts
+
+`@tealstreet/tealchart/hosted` is the narrow web entry for hosts that supply their
+own candles, data, and viewport. It exports the real `TealchartApi` and snapshot
+reader, `OemsTradingRuntime`, `PriceLineManager`, shared trading-line assembly,
+projected label layout, existing bracket preview draw pass, and canvas adapter.
+It does not construct a Tealchart widget or datafeed. External hosts call
+`PriceLineManager.cancelDrag()` before clearing a binding, disabling gestures,
+or disposing presentation. This reuses Escape cancellation and never commits a
+stale drag into the next binding; destroying rendered groups alone leaves the
+manager's active-drag ownership latched.
+
+`interaction/OemsTradingRuntime.ts` owns the web OEMS action manager and the raw
+versus action-applied line snapshots extracted from `ChartCore`. Both normal
+`ChartCore` and external hosts use it. Keep action transitions in the existing
+`OemsActionManager`/`oemsLineState`; external presentation must not create a
+second pending-action or reconciliation manager. The runtime receives registered
+adapter callbacks from its owner. Frame transports keep those functions in the
+parent and resolve gestures by the stable adapter ID.
+
+`rendering/priceLineLayout.ts` is the shared measurement/collision/clipping pass.
+`TealchartRenderer.computeExternalPriceLineLabelBounds` supplies existing
+measurement and grow-only tag widths against a host's actual projection.
+Projection coordinates and pane bounds use CSS pixels in the overlay container;
+logarithmic/percentage scales must use the host conversion, not a fabricated
+linear viewport. `renderExternalCanvasPriceLines` draws only primitives marked
+`renderLineOnCanvas`, once, while `PriceLineManager` owns their tags and the other
+interactive lines. `rendering/bracketDragPreview.ts` retains the existing draw
+pass and inline PnL behavior with injected projection and price-axis rendering.
+Registered custom PnL calculators remain callbacks in `TealchartApi`, not
+serializable render snapshot fields. `tealscript/timeframeInfo.ts` preserves the
+existing widget resolution-to-runtime flags; Hosted and normal widgets both use
+`createTealscriptTimeframeInfo` rather than deriving daily/weekly/monthly flags
+independently.
+
+`rendering/externalAxisLabels.ts` lets hosts provide native boxed value tags
+(last trade, studies, drawings and crosshair) with their original formatting,
+colors and projected CSS coordinates. `TealchartRenderer.layoutExternalAxisLabels`
+reuses the existing bounded label collision pass and updates supplied OEMS bounds
+in place before `PriceLineManager.update`, so presentation and hit tests agree.
+`computeExternalIndicatorAxisLabels` reuses existing Tealscript tag eligibility,
+formatting, grow-only measured width, font and plot-color border with the host's
+value converter; these tags join the same pass. `renderExternalIndicatorAxisGuides`
+reuses the normal guide style with exact host bar-index anchors, including plot
+offsets. Floating crosshair tags bypass collisions. Ordinary tags sit below
+interactive trading geometry; last trade and crosshair use separate foreground
+layers, with last trade above trading tags and crosshair above last trade.
+`renderExternalAxisLabels` draws only those tags. Native numeric scale ticks stay
+host-owned; hosts release native label suppression on clear, model replacement
+or canvas failure and apply DPR once to each owned canvas.
+
+`TealchartRenderer.renderExternalOverlayContent` reuses existing main/indicator
+plot, drawing, and execution render passes without candles, grids, backgrounds,
+or axis chrome. Its projection is scoped to that call and restored even on
+failure. Hosts supply real pane bounds, visible-time bounds, native millisecond
+`timeToX`, array-relative `barIndexToX`, price/value projection, and positive CSS
+pixel bar spacing. Plot offsets and `bar_index` drawings use native index space,
+including future slots, rather than time interpolation across market-session
+gaps. Callers own the canvas DPR transform. This above-candle pass does not make
+behind-candle output or candle recoloring available; hosts must gate those until
+they have native draw-order capabilities.
+
 
 ## Line identity (OEMS)
 
@@ -971,3 +1067,32 @@ must be passed into `_createExecutionLineAdapter`, not set afterwards.
 offset `arrowSpacing` px beside the bar, `caret` the squat triangle planted ON
 the price that icon shapes draw. Defaults to `arrow`, so existing execution
 shapes are unchanged.
+
+Hosted study adapters keep managed study IDs in the existing `TealchartApi`: hosts wire
+`setOnStudyInputsChange` to their existing `TealscriptManager` owner so `IStudyApi.setInputs`
+merges values and re-executes that same worker. Removed handles cannot trigger input callbacks.
+The hosted entry exports the existing indicator picker and settings modal for app-origin controls.
+
+`renderExternalOverlayContent` projects the existing plot, drawing and execution renderers
+through host-provided time/index/price callbacks. Native bar indices are relative to the supplied
+bars; explicit irregular-time projection replaces viewport interpolation. The scoped projection
+is restored in `finally`, so later normal Tealchart renders keep their own viewport coordinates.
+The host supplies pane dimensions and native bar spacing; this pass does not draw OHLCV.
+
+`hosted/canvasCommands.ts` records and replays a bounded Canvas2D primitive allowlist for existing
+jailbreak indicators that must retain app-origin data/account access. Text metrics come from a
+real app canvas. Gradient handles and captured image pixels are explicit resources; the complete
+batch is validated before any draw operation. Replayers own DPR/clip placement and accept only
+finite commands for the current native projection revision. Business indicator classes remain
+with the app's original `JailbreakIndicatorManager` and factories.
+
+External hosts and ChartCore share `rendering/jailbreakTooltips.ts` for the
+original grouped hover/left tooltip placement and styling. Tooltip bar callbacks
+consume seconds, as do existing jailbreak drawing factories; internal renderer
+and host geometry retain milliseconds. The hosted recorder omits repeated current
+property assignments with save/restore semantics while retaining its bounded
+100,000-command limit.
+
+ContextMenu accepts `openDirection: 'left'` to place the measured menu width
+left of its anchor, still clamped to the viewport. Existing callers keep the
+default rightward opening; Hosted uses left at its right-axis plus button.

@@ -7,7 +7,10 @@
 export { TealchartWidget, createTealchartWidget } from './TealchartWidget';
 
 // Per-chart API
-export { TealchartApi } from './TealchartApi';
+export { TealchartApi, getTealchartApiLineRenderSnapshot } from './TealchartApi';
+export type { TealchartApiLineRenderSnapshot } from './TealchartApi';
+export { OemsTradingRuntime } from './interaction/OemsTradingRuntime';
+export type { OemsTradingRuntimeOptions } from './interaction/OemsTradingRuntime';
 
 export {
   DEFAULT_BUY_CANDLE_COLOR,
