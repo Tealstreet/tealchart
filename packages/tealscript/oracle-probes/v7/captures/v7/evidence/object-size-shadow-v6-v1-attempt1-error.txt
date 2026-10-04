@@ -1,0 +1,59 @@
+Invalid object name: size. Namespaces of built-ins cannot be used.
+{
+  "error": "Invalid object name: {name}. Namespaces of built-ins cannot be used.",
+  "editorError": {
+    "code": "CE10093",
+    "ctx": {
+      "name": "size"
+    },
+    "end": {
+      "column": 4,
+      "line": 5
+    },
+    "message": "Invalid object name: {name}. Namespaces of built-ins cannot be used.",
+    "start": {
+      "column": 1,
+      "line": 5
+    },
+    "id": "USER;0353b9bf396548a186775515333b4252"
+  },
+  "title": "Compilation error",
+  "compiler_markers": [
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///8c58a193-ac8e-4d15-af5f-3b4926fd40a9.pine?placement%3Ddialog",
+        "path": "/8c58a193-ac8e-4d15-af5f-3b4926fd40a9.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "code": "CE10093",
+      "severity": 8,
+      "message": "Invalid object name: size. Namespaces of built-ins cannot be used.",
+      "startLineNumber": 5,
+      "startColumn": 1,
+      "endLineNumber": 5,
+      "endColumn": 5
+    },
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///8c58a193-ac8e-4d15-af5f-3b4926fd40a9.pine?placement%3Ddialog",
+        "path": "/8c58a193-ac8e-4d15-af5f-3b4926fd40a9.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "code": "CW10011",
+      "severity": 4,
+      "message": "Shadowing built-in variable \"size.normal\"",
+      "startLineNumber": 5,
+      "startColumn": 1,
+      "endLineNumber": 5,
+      "endColumn": 23
+    }
+  ],
+  "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\nC\n85,201.53\n+29.52 (+0.03%)\n85,212.57\nSELL\n0.01\n85,212.58\nBUY\nUSDT\nobject-size-shadow-v6-v1.pine\nDate Range\n09:25:56 UTC\n99+\nObject tree\nData window\nDate\nSun 04 Oct '26\nTime\n09:22\nBTCUSDT · 2 · Binance\nOpen\n85,172.00\nHigh\n85,201.53\nLow\n85,172.00\nClose\n85,201.53\nChange\n+29.52 (+0.03%)\nVol\n8.26\nLast day change\n+459.02 (+0.54%)\nobject-size-shadow-v6-v1.pine\nPlot\n∅\nPine Editor\nobject-size-shadow-v6-v1.pine\nPublish script\n1\n2\n3\n4\n5\n6\n7\n8\n//@version=6\nindicator(\"V7 object-size-shadow-v6-v1\")\ntype Font\n    float normal = 3.0\nFont size = Font.new()\nfloat value = size.normal\nplot(value,\"FIELD\")\n2 of 2 problems\nShadowing built-in variable \"size.normal\"(CW10011)\n1 ∙ Today, 17:25\nLine 5, Col 1\nPine Script® v6\nCompilation error: CE10093\n\nInvalid object name: size. Namespaces of built-ins cannot be used.\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+  "context_substituted_message": "Invalid object name: size. Namespaces of built-ins cannot be used."
+}
