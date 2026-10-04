@@ -1,0 +1,57 @@
+{
+  "artifact": "Native history capture instrument v1",
+  "observed_truncated_first_plot_row": {
+    "native_index": -2244,
+    "time": 1790782800,
+    "BAR_INDEX": 22070
+  },
+  "native_request": "timeScale.requestMoreHistoryPoints(30000)",
+  "restored": {
+    "bars": 24616,
+    "end": true,
+    "first": {
+      "index": -24314,
+      "value": [
+        1788134400,
+        77682,
+        77682.01,
+        77572,
+        77674.04,
+        51.86295
+      ]
+    },
+    "last": {
+      "index": 301,
+      "value": [
+        1791088200,
+        84812,
+        84812.01,
+        84812,
+        84812.01,
+        0.19766
+      ]
+    },
+    "timezone": "Etc/UTC",
+    "studies": [
+      {
+        "name": "trace-plotarrow-height-negative-max-v6",
+        "status": {
+          "type": 2
+        },
+        "size": 24616,
+        "first": {
+          "index": -24314,
+          "value": [
+            1788134400,
+            1,
+            0,
+            1,
+            0,
+            5,
+            -5
+          ]
+        }
+      }
+    ]
+  }
+}

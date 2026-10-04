@@ -1,0 +1,2441 @@
+{
+  "requested_pine_range": [
+    0,
+    80
+  ],
+  "native_range": [
+    -24322,
+    -24242
+  ],
+  "crosshair_native_index": -24319,
+  "crosshair_source_row": [
+    1788134760,
+    0,
+    3,
+    0,
+    0,
+    10,
+    80
+  ],
+  "crosshair_host_bar": [
+    1788134760,
+    77740.01,
+    77751.37,
+    77490,
+    77508.86,
+    94.421
+  ],
+  "browser_utc": "2026-10-04T04:42:32.187Z",
+  "title": "trace-plotarrow-normalization-domain-v6",
+  "ticker": "BINANCE:BTCUSDT",
+  "interval": "2",
+  "utc": "Etc/UTC",
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  },
+  "canvas": {
+    "width": 2510,
+    "height": 1582,
+    "rect": {
+      "x": 56,
+      "y": 42,
+      "width": 1255,
+      "height": 791,
+      "top": 42,
+      "right": 1311,
+      "bottom": 833,
+      "left": 56
+    }
+  },
+  "visible_range": {
+    "_firstBar": -24322,
+    "_lastBar": -24242
+  },
+  "price_scale": {
+    "mode": {
+      "autoScale": true,
+      "lockScale": false,
+      "percentage": false,
+      "indexedTo100": false,
+      "log": false
+    },
+    "range": {
+      "_minValue": 77436.4,
+      "_maxValue": 78185.89
+    }
+  },
+  "crosshair_label": "Mon 31 Aug '26   00:06",
+  "effective_native_offset": 0,
+  "latest_source_row": {
+    "index": 299,
+    "value": [
+      1791088920,
+      0,
+      24621,
+      0,
+      0,
+      10,
+      80
+    ]
+  },
+  "height_conversion_native_method": "_updateItemsHeights(e){const t=this._study.properties().childs().styles.childs();let s=Math.abs((0,h.ensureDefined)(t[this._plotName].childs().minHeight?.value()??this._plotStyleInfo.minHeight)),i=Math.abs((0,h.ensureDefined)(t[this._plotName].childs().maxHeight?.value()??this._plotStyleInfo.maxHeight));if(s>i){const e=s;s=i,i=e}const r=this._items,n=e.visibleItemsRange?.startItemIndex??0,a=(e.visibleItemsRange?.endItemIndex??r.length)-1;let o=0;for(let e=n;e<=a;e++){const t=r[e],s=Math.abs(t.origHeight);s>o&&(o=s)}const l=(i-s)/o;for(let e=n;e<=a;e++){const t=r[e],i=Math.abs(t.origHeight);t.height=i*l+s}}",
+  "styles": {
+    "plot_0": {
+      "isHidden": false,
+      "maxHeight": 80,
+      "minHeight": 10,
+      "title": "Arrows"
+    },
+    "plot_1": {
+      "histogramBase": 0,
+      "isHidden": false,
+      "joinPoints": false,
+      "title": "BAR_INDEX"
+    },
+    "plot_2": {
+      "histogramBase": 0,
+      "isHidden": false,
+      "joinPoints": false,
+      "title": "SOURCE"
+    },
+    "plot_3": {
+      "histogramBase": 0,
+      "isHidden": false,
+      "joinPoints": false,
+      "title": "OFFSET"
+    },
+    "plot_4": {
+      "histogramBase": 0,
+      "isHidden": false,
+      "joinPoints": false,
+      "title": "MINHEIGHT"
+    },
+    "plot_5": {
+      "histogramBase": 0,
+      "isHidden": false,
+      "joinPoints": false,
+      "title": "MAXHEIGHT"
+    }
+  },
+  "renderer_items": [
+    {
+      "center": 7.746913580246883,
+      "origHeight": null,
+      "timePointIndex": -24322,
+      "isUp": true,
+      "height": null,
+      "price": null,
+      "left": 0,
+      "right": 15.493827160493765,
+      "y": null,
+      "native_bar": [
+        1788134400,
+        77682,
+        77682.01,
+        77572,
+        77674.04,
+        51.86295
+      ],
+      "source_plot_row": [
+        1788134400,
+        0,
+        0,
+        0,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "center": 23.240740740740648,
+      "origHeight": null,
+      "timePointIndex": -24321,
+      "isUp": true,
+      "height": null,
+      "price": null,
+      "left": 15.493827160493765,
+      "right": 30.98765432098753,
+      "y": null,
+      "native_bar": [
+        1788134520,
+        77674.5,
+        77780.34,
+        77646,
+        77758.24,
+        33.50717
+      ],
+      "source_plot_row": [
+        1788134520,
+        0,
+        1,
+        0,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "center": 38.73456790123464,
+      "origHeight": null,
+      "timePointIndex": -24320,
+      "isUp": true,
+      "height": null,
+      "price": null,
+      "left": 30.98765432098753,
+      "right": 46.481481481481524,
+      "y": null,
+      "native_bar": [
+        1788134640,
+        77758.24,
+        77827.99,
+        77724,
+        77740.01,
+        33.1126
+      ],
+      "source_plot_row": [
+        1788134640,
+        0,
+        2,
+        0,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "center": 54.228395061728406,
+      "origHeight": null,
+      "timePointIndex": -24319,
+      "isUp": true,
+      "height": null,
+      "price": null,
+      "left": 46.481481481481524,
+      "right": 61.97530864197529,
+      "y": null,
+      "native_bar": [
+        1788134760,
+        77740.01,
+        77751.37,
+        77490,
+        77508.86,
+        94.421
+      ],
+      "source_plot_row": [
+        1788134760,
+        0,
+        3,
+        0,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "center": 69.72222222222217,
+      "origHeight": null,
+      "timePointIndex": -24318,
+      "isUp": true,
+      "height": null,
+      "price": null,
+      "left": 61.97530864197529,
+      "right": 77.46913580246905,
+      "y": null,
+      "native_bar": [
+        1788134880,
+        77508.86,
+        77525.28,
+        77436.4,
+        77437.58,
+        30.43664
+      ],
+      "source_plot_row": [
+        1788134880,
+        0,
+        4,
+        0,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "center": 85.21604938271594,
+      "origHeight": null,
+      "timePointIndex": -24317,
+      "isUp": true,
+      "height": null,
+      "price": null,
+      "left": 77.46913580246905,
+      "right": 92.96296296296282,
+      "y": null,
+      "native_bar": [
+        1788135000,
+        77437.57,
+        77636,
+        77436.41,
+        77636,
+        31.56641
+      ],
+      "source_plot_row": [
+        1788135000,
+        0,
+        5,
+        0,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "center": 100.70987654320993,
+      "origHeight": null,
+      "timePointIndex": -24316,
+      "isUp": true,
+      "height": null,
+      "price": null,
+      "left": 92.96296296296282,
+      "right": 108.45679012345681,
+      "y": null,
+      "native_bar": [
+        1788135120,
+        77635.99,
+        77726,
+        77576,
+        77725.99,
+        32.61091
+      ],
+      "source_plot_row": [
+        1788135120,
+        0,
+        6,
+        0,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "center": 116.2037037037037,
+      "origHeight": null,
+      "timePointIndex": -24315,
+      "isUp": true,
+      "height": null,
+      "price": null,
+      "left": 108.45679012345681,
+      "right": 123.95061728395058,
+      "y": null,
+      "native_bar": [
+        1788135240,
+        77726,
+        77797.91,
+        77720.88,
+        77797.91,
+        19.17203
+      ],
+      "source_plot_row": [
+        1788135240,
+        0,
+        7,
+        0,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "left": 123.95061728395058,
+      "center": 131.69753086419746,
+      "right": 139.44444444444434,
+      "y": 426.36547625718526,
+      "height": 27.5,
+      "timePointIndex": -24314,
+      "price": 77784,
+      "origHeight": 1,
+      "isUp": true,
+      "style": {
+        "color": "rgba(0, 230, 118, 1)",
+        "borderColor": "#2962FF"
+      },
+      "native_bar": [
+        1788135360,
+        77797.99,
+        77896,
+        77784,
+        77864.01,
+        38.48407
+      ],
+      "source_plot_row": [
+        1788135360,
+        1,
+        8,
+        1,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "left": 139.44444444444434,
+      "center": 147.19135802469123,
+      "right": 154.93827160493834,
+      "y": 343.41370905548865,
+      "height": 27.5,
+      "timePointIndex": -24313,
+      "price": 77880,
+      "origHeight": -1,
+      "isUp": false,
+      "style": {
+        "color": "rgba(242, 54, 69, 1)",
+        "borderColor": "#2962FF"
+      },
+      "native_bar": [
+        1788135480,
+        77864.01,
+        77880,
+        77861,
+        77867.51,
+        7.87193
+      ],
+      "source_plot_row": [
+        1788135480,
+        -1,
+        9,
+        -1,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "center": 162.68518518518522,
+      "origHeight": null,
+      "timePointIndex": -24312,
+      "isUp": true,
+      "height": null,
+      "price": null,
+      "left": 154.93827160493834,
+      "right": 170.4320987654321,
+      "y": null,
+      "native_bar": [
+        1788135600,
+        77867.5,
+        77951.87,
+        77862,
+        77924,
+        18.21319
+      ],
+      "source_plot_row": [
+        1788135600,
+        0,
+        10,
+        0,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "left": 170.4320987654321,
+      "center": 178.17901234567898,
+      "right": 185.92592592592587,
+      "y": 310.5786345381505,
+      "height": 80,
+      "timePointIndex": -24311,
+      "price": 77918,
+      "origHeight": 4,
+      "isUp": true,
+      "style": {
+        "color": "rgba(0, 230, 118, 1)",
+        "borderColor": "#2962FF"
+      },
+      "native_bar": [
+        1788135720,
+        77924,
+        77962.93,
+        77918,
+        77962.93,
+        17.74209
+      ],
+      "source_plot_row": [
+        1788135720,
+        4,
+        11,
+        4,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "left": 185.92592592592587,
+      "center": 193.67283950617275,
+      "right": 201.41975308641963,
+      "y": 264.3762283686211,
+      "height": 80,
+      "timePointIndex": -24310,
+      "price": 77971.47,
+      "origHeight": -4,
+      "isUp": false,
+      "style": {
+        "color": "rgba(242, 54, 69, 1)",
+        "borderColor": "#2962FF"
+      },
+      "native_bar": [
+        1788135840,
+        77962.92,
+        77971.47,
+        77948,
+        77971.01,
+        13.49977
+      ],
+      "source_plot_row": [
+        1788135840,
+        -4,
+        12,
+        -4,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "center": 209.16666666666674,
+      "origHeight": null,
+      "timePointIndex": -24309,
+      "isUp": true,
+      "height": null,
+      "price": null,
+      "left": 201.41975308641963,
+      "right": 216.91358024691363,
+      "y": null,
+      "native_bar": [
+        1788135960,
+        77971,
+        77971.01,
+        77894,
+        77908.34,
+        22.65162
+      ],
+      "source_plot_row": [
+        1788135960,
+        0,
+        13,
+        0,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "center": 224.6604938271605,
+      "origHeight": null,
+      "timePointIndex": -24308,
+      "isUp": true,
+      "height": null,
+      "price": null,
+      "left": 216.91358024691363,
+      "right": 232.4074074074074,
+      "y": null,
+      "native_bar": [
+        1788136080,
+        77908.34,
+        77923.62,
+        77888,
+        77901.33,
+        18.59185
+      ],
+      "source_plot_row": [
+        1788136080,
+        0,
+        14,
+        0,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "center": 240.15432098765427,
+      "origHeight": null,
+      "timePointIndex": -24307,
+      "isUp": true,
+      "height": null,
+      "price": null,
+      "left": 232.4074074074074,
+      "right": 247.90123456790116,
+      "y": null,
+      "native_bar": [
+        1788136200,
+        77901.34,
+        77949.99,
+        77892,
+        77949.99,
+        19.87269
+      ],
+      "source_plot_row": [
+        1788136200,
+        0,
+        15,
+        0,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "center": 255.64814814814815,
+      "origHeight": null,
+      "timePointIndex": -24306,
+      "isUp": true,
+      "height": null,
+      "price": null,
+      "left": 247.90123456790116,
+      "right": 263.39506172839504,
+      "y": null,
+      "native_bar": [
+        1788136320,
+        77950,
+        77958,
+        77932,
+        77942,
+        9.08727
+      ],
+      "source_plot_row": [
+        1788136320,
+        0,
+        16,
+        0,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "center": 271.1419753086419,
+      "origHeight": null,
+      "timePointIndex": -24305,
+      "isUp": true,
+      "height": null,
+      "price": null,
+      "left": 263.39506172839504,
+      "right": 278.8888888888889,
+      "y": null,
+      "native_bar": [
+        1788136440,
+        77942,
+        78155.29,
+        77938,
+        78076.74,
+        68.69563
+      ],
+      "source_plot_row": [
+        1788136440,
+        0,
+        17,
+        0,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "center": 286.6358024691358,
+      "origHeight": null,
+      "timePointIndex": -24304,
+      "isUp": true,
+      "height": null,
+      "price": null,
+      "left": 278.8888888888889,
+      "right": 294.3827160493827,
+      "y": null,
+      "native_bar": [
+        1788136560,
+        78076.75,
+        78185.89,
+        78039.34,
+        78050,
+        27.08586
+      ],
+      "source_plot_row": [
+        1788136560,
+        0,
+        18,
+        0,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "center": 302.12962962962956,
+      "origHeight": null,
+      "timePointIndex": -24303,
+      "isUp": true,
+      "height": null,
+      "price": null,
+      "left": 294.3827160493827,
+      "right": 309.87654320987656,
+      "y": null,
+      "native_bar": [
+        1788136680,
+        78050.01,
+        78056,
+        77998,
+        78012.48,
+        13.25446
+      ],
+      "source_plot_row": [
+        1788136680,
+        0,
+        19,
+        0,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "center": 317.62345679012344,
+      "origHeight": null,
+      "timePointIndex": -24302,
+      "isUp": true,
+      "height": null,
+      "price": null,
+      "left": 309.87654320987656,
+      "right": 325.3703703703703,
+      "y": null,
+      "native_bar": [
+        1788136800,
+        78013.42,
+        78052,
+        78006,
+        78052,
+        7.50885
+      ],
+      "source_plot_row": [
+        1788136800,
+        0,
+        20,
+        0,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "center": 333.1172839506172,
+      "origHeight": null,
+      "timePointIndex": -24301,
+      "isUp": true,
+      "height": null,
+      "price": null,
+      "left": 325.3703703703703,
+      "right": 340.8641975308642,
+      "y": null,
+      "native_bar": [
+        1788136920,
+        78052,
+        78070,
+        78040,
+        78043.26,
+        9.44819
+      ],
+      "source_plot_row": [
+        1788136920,
+        0,
+        21,
+        0,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "center": 348.6111111111111,
+      "origHeight": null,
+      "timePointIndex": -24300,
+      "isUp": true,
+      "height": null,
+      "price": null,
+      "left": 340.8641975308642,
+      "right": 356.35802469135797,
+      "y": null,
+      "native_bar": [
+        1788137040,
+        78043.26,
+        78043.26,
+        77994,
+        77996.04,
+        6.92695
+      ],
+      "source_plot_row": [
+        1788137040,
+        0,
+        22,
+        0,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "center": 364.10493827160496,
+      "origHeight": null,
+      "timePointIndex": -24299,
+      "isUp": true,
+      "height": null,
+      "price": null,
+      "left": 356.35802469135797,
+      "right": 371.85185185185185,
+      "y": null,
+      "native_bar": [
+        1788137160,
+        77996.05,
+        78011.54,
+        77949.99,
+        77950,
+        17.91486
+      ],
+      "source_plot_row": [
+        1788137160,
+        0,
+        23,
+        0,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "center": 379.59876543209873,
+      "origHeight": null,
+      "timePointIndex": -24298,
+      "isUp": true,
+      "height": null,
+      "price": null,
+      "left": 371.85185185185185,
+      "right": 387.3456790123456,
+      "y": null,
+      "native_bar": [
+        1788137280,
+        77949.99,
+        77985.43,
+        77947.93,
+        77978,
+        15.95419
+      ],
+      "source_plot_row": [
+        1788137280,
+        0,
+        24,
+        0,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "center": 395.0925925925926,
+      "origHeight": null,
+      "timePointIndex": -24297,
+      "isUp": true,
+      "height": null,
+      "price": null,
+      "left": 387.3456790123456,
+      "right": 402.8395061728395,
+      "y": null,
+      "native_bar": [
+        1788137400,
+        77978,
+        78031.75,
+        77978,
+        77979.5,
+        16.54114
+      ],
+      "source_plot_row": [
+        1788137400,
+        0,
+        25,
+        0,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "center": 410.5864197530864,
+      "origHeight": null,
+      "timePointIndex": -24296,
+      "isUp": true,
+      "height": null,
+      "price": null,
+      "left": 402.8395061728395,
+      "right": 418.33333333333326,
+      "y": null,
+      "native_bar": [
+        1788137520,
+        77979.51,
+        78018,
+        77976,
+        78010.01,
+        8.90264
+      ],
+      "source_plot_row": [
+        1788137520,
+        0,
+        26,
+        0,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "center": 426.08024691358025,
+      "origHeight": null,
+      "timePointIndex": -24295,
+      "isUp": true,
+      "height": null,
+      "price": null,
+      "left": 418.33333333333326,
+      "right": 433.82716049382714,
+      "y": null,
+      "native_bar": [
+        1788137640,
+        78010.01,
+        78034.01,
+        77995.11,
+        77996.36,
+        9.57833
+      ],
+      "source_plot_row": [
+        1788137640,
+        0,
+        27,
+        0,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "center": 441.574074074074,
+      "origHeight": null,
+      "timePointIndex": -24294,
+      "isUp": true,
+      "height": null,
+      "price": null,
+      "left": 433.82716049382714,
+      "right": 449.320987654321,
+      "y": null,
+      "native_bar": [
+        1788137760,
+        77996.37,
+        77996.37,
+        77948,
+        77948,
+        6.00362
+      ],
+      "source_plot_row": [
+        1788137760,
+        0,
+        28,
+        0,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "center": 457.0679012345679,
+      "origHeight": null,
+      "timePointIndex": -24293,
+      "isUp": true,
+      "height": null,
+      "price": null,
+      "left": 449.320987654321,
+      "right": 464.8148148148148,
+      "y": null,
+      "native_bar": [
+        1788137880,
+        77948,
+        77948,
+        77922,
+        77937.04,
+        10.91488
+      ],
+      "source_plot_row": [
+        1788137880,
+        0,
+        29,
+        0,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "center": 472.56172839506166,
+      "origHeight": null,
+      "timePointIndex": -24292,
+      "isUp": true,
+      "height": null,
+      "price": null,
+      "left": 464.8148148148148,
+      "right": 480.30864197530866,
+      "y": null,
+      "native_bar": [
+        1788138000,
+        77937.03,
+        77993.03,
+        77905.4,
+        77984,
+        27.36198
+      ],
+      "source_plot_row": [
+        1788138000,
+        0,
+        30,
+        0,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "center": 488.05555555555554,
+      "origHeight": null,
+      "timePointIndex": -24291,
+      "isUp": true,
+      "height": null,
+      "price": null,
+      "left": 480.30864197530866,
+      "right": 495.8024691358024,
+      "y": null,
+      "native_bar": [
+        1788138120,
+        77984,
+        77993.03,
+        77862,
+        77870.5,
+        27.84652
+      ],
+      "source_plot_row": [
+        1788138120,
+        0,
+        31,
+        0,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "center": 503.5493827160493,
+      "origHeight": null,
+      "timePointIndex": -24290,
+      "isUp": true,
+      "height": null,
+      "price": null,
+      "left": 495.8024691358024,
+      "right": 511.2962962962963,
+      "y": null,
+      "native_bar": [
+        1788138240,
+        77870.51,
+        77870.51,
+        77740,
+        77766.95,
+        32.48556
+      ],
+      "source_plot_row": [
+        1788138240,
+        0,
+        32,
+        0,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "center": 519.0432098765432,
+      "origHeight": null,
+      "timePointIndex": -24289,
+      "isUp": true,
+      "height": null,
+      "price": null,
+      "left": 511.2962962962963,
+      "right": 526.7901234567901,
+      "y": null,
+      "native_bar": [
+        1788138360,
+        77766.94,
+        77766.95,
+        77682,
+        77694.78,
+        25.89741
+      ],
+      "source_plot_row": [
+        1788138360,
+        0,
+        33,
+        0,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "center": 534.5370370370371,
+      "origHeight": null,
+      "timePointIndex": -24288,
+      "isUp": true,
+      "height": null,
+      "price": null,
+      "left": 526.7901234567901,
+      "right": 542.283950617284,
+      "y": null,
+      "native_bar": [
+        1788138480,
+        77694.78,
+        77694.78,
+        77642,
+        77646.57,
+        44.73852
+      ],
+      "source_plot_row": [
+        1788138480,
+        0,
+        34,
+        0,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "center": 550.0308641975308,
+      "origHeight": null,
+      "timePointIndex": -24287,
+      "isUp": true,
+      "height": null,
+      "price": null,
+      "left": 542.283950617284,
+      "right": 557.7777777777777,
+      "y": null,
+      "native_bar": [
+        1788138600,
+        77646.57,
+        77706,
+        77621.11,
+        77634.76,
+        19.17798
+      ],
+      "source_plot_row": [
+        1788138600,
+        0,
+        35,
+        0,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "center": 565.5246913580247,
+      "origHeight": null,
+      "timePointIndex": -24286,
+      "isUp": true,
+      "height": null,
+      "price": null,
+      "left": 557.7777777777777,
+      "right": 573.2716049382716,
+      "y": null,
+      "native_bar": [
+        1788138720,
+        77634.75,
+        77634.76,
+        77565.08,
+        77607.96,
+        53.15068
+      ],
+      "source_plot_row": [
+        1788138720,
+        0,
+        36,
+        0,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "center": 581.0185185185185,
+      "origHeight": null,
+      "timePointIndex": -24285,
+      "isUp": true,
+      "height": null,
+      "price": null,
+      "left": 573.2716049382716,
+      "right": 588.7654320987654,
+      "y": null,
+      "native_bar": [
+        1788138840,
+        77607.96,
+        77672,
+        77578,
+        77609.05,
+        24.08442
+      ],
+      "source_plot_row": [
+        1788138840,
+        0,
+        37,
+        0,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "center": 596.5123456790124,
+      "origHeight": null,
+      "timePointIndex": -24284,
+      "isUp": true,
+      "height": null,
+      "price": null,
+      "left": 588.7654320987654,
+      "right": 604.2592592592592,
+      "y": null,
+      "native_bar": [
+        1788138960,
+        77609.05,
+        77651.47,
+        77600,
+        77614.39,
+        9.33289
+      ],
+      "source_plot_row": [
+        1788138960,
+        0,
+        38,
+        0,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "center": 612.0061728395061,
+      "origHeight": null,
+      "timePointIndex": -24283,
+      "isUp": true,
+      "height": null,
+      "price": null,
+      "left": 604.2592592592592,
+      "right": 619.7530864197531,
+      "y": null,
+      "native_bar": [
+        1788139080,
+        77614.38,
+        77780,
+        77609.25,
+        77778.45,
+        20.25209
+      ],
+      "source_plot_row": [
+        1788139080,
+        0,
+        39,
+        0,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "left": 619.7530864197531,
+      "center": 627.5,
+      "right": 635.2469135802469,
+      "y": 492.0356252918617,
+      "height": 27.5,
+      "timePointIndex": -24282,
+      "price": 77708,
+      "origHeight": 1,
+      "isUp": true,
+      "style": {
+        "color": "rgba(0, 230, 118, 1)",
+        "borderColor": "#2962FF"
+      },
+      "native_bar": [
+        1788139200,
+        77778.45,
+        77828,
+        77708,
+        77743.47,
+        16.4889
+      ],
+      "source_plot_row": [
+        1788139200,
+        1,
+        40,
+        1,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "left": 635.2469135802469,
+      "center": 642.9938271604938,
+      "right": 650.7407407407408,
+      "y": 377.96830458044997,
+      "height": 27.5,
+      "timePointIndex": -24281,
+      "price": 77840.01,
+      "origHeight": -1,
+      "isUp": false,
+      "style": {
+        "color": "rgba(242, 54, 69, 1)",
+        "borderColor": "#2962FF"
+      },
+      "native_bar": [
+        1788139320,
+        77743.47,
+        77840.01,
+        77733.55,
+        77796.01,
+        9.27885
+      ],
+      "source_plot_row": [
+        1788139320,
+        -1,
+        41,
+        -1,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "center": 658.4876543209876,
+      "origHeight": null,
+      "timePointIndex": -24280,
+      "isUp": true,
+      "height": null,
+      "price": null,
+      "left": 650.7407407407408,
+      "right": 666.2345679012345,
+      "y": null,
+      "native_bar": [
+        1788139440,
+        77796,
+        77851.41,
+        77764,
+        77819.73,
+        9.32605
+      ],
+      "source_plot_row": [
+        1788139440,
+        0,
+        42,
+        0,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "left": 666.2345679012345,
+      "center": 673.9814814814814,
+      "right": 681.7283950617284,
+      "y": 448.6328412653942,
+      "height": 80,
+      "timePointIndex": -24279,
+      "price": 77758.23,
+      "origHeight": 4,
+      "isUp": true,
+      "style": {
+        "color": "rgba(0, 230, 118, 1)",
+        "borderColor": "#2962FF"
+      },
+      "native_bar": [
+        1788139560,
+        77819.74,
+        77847.18,
+        77758.23,
+        77797.99,
+        13.40909
+      ],
+      "source_plot_row": [
+        1788139560,
+        4,
+        43,
+        4,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "left": 681.7283950617284,
+      "center": 689.4753086419753,
+      "right": 697.2222222222222,
+      "y": 388.65698541674783,
+      "height": 80,
+      "timePointIndex": -24278,
+      "price": 77827.64,
+      "origHeight": -4,
+      "isUp": false,
+      "style": {
+        "color": "rgba(242, 54, 69, 1)",
+        "borderColor": "#2962FF"
+      },
+      "native_bar": [
+        1788139680,
+        77798,
+        77827.64,
+        77766.73,
+        77775.26,
+        5.66211
+      ],
+      "source_plot_row": [
+        1788139680,
+        -4,
+        44,
+        -4,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "center": 704.9691358024692,
+      "origHeight": null,
+      "timePointIndex": -24277,
+      "isUp": true,
+      "height": null,
+      "price": null,
+      "left": 697.2222222222222,
+      "right": 712.716049382716,
+      "y": null,
+      "native_bar": [
+        1788139800,
+        77775.27,
+        77808,
+        77742.36,
+        77742.36,
+        14.79681
+      ],
+      "source_plot_row": [
+        1788139800,
+        0,
+        45,
+        0,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "center": 720.4629629629629,
+      "origHeight": null,
+      "timePointIndex": -24276,
+      "isUp": true,
+      "height": null,
+      "price": null,
+      "left": 712.716049382716,
+      "right": 728.2098765432098,
+      "y": null,
+      "native_bar": [
+        1788139920,
+        77742.36,
+        77782,
+        77704,
+        77730,
+        16.36244
+      ],
+      "source_plot_row": [
+        1788139920,
+        0,
+        46,
+        0,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "center": 735.9567901234568,
+      "origHeight": null,
+      "timePointIndex": -24275,
+      "isUp": true,
+      "height": null,
+      "price": null,
+      "left": 728.2098765432098,
+      "right": 743.7037037037037,
+      "y": null,
+      "native_bar": [
+        1788140040,
+        77730,
+        77735.06,
+        77654,
+        77706,
+        23.05625
+      ],
+      "source_plot_row": [
+        1788140040,
+        0,
+        47,
+        0,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "center": 751.4506172839506,
+      "origHeight": null,
+      "timePointIndex": -24274,
+      "isUp": true,
+      "height": null,
+      "price": null,
+      "left": 743.7037037037037,
+      "right": 759.1975308641975,
+      "y": null,
+      "native_bar": [
+        1788140160,
+        77705.99,
+        77806,
+        77705.99,
+        77806,
+        21.17539
+      ],
+      "source_plot_row": [
+        1788140160,
+        0,
+        48,
+        0,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "center": 766.9444444444445,
+      "origHeight": null,
+      "timePointIndex": -24273,
+      "isUp": true,
+      "height": null,
+      "price": null,
+      "left": 759.1975308641975,
+      "right": 774.6913580246913,
+      "y": null,
+      "native_bar": [
+        1788140280,
+        77806,
+        77953.99,
+        77722,
+        77855.49,
+        31.15774
+      ],
+      "source_plot_row": [
+        1788140280,
+        0,
+        49,
+        0,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "center": 782.4382716049383,
+      "origHeight": null,
+      "timePointIndex": -24272,
+      "isUp": true,
+      "height": null,
+      "price": null,
+      "left": 774.6913580246913,
+      "right": 790.1851851851852,
+      "y": null,
+      "native_bar": [
+        1788140400,
+        77855.49,
+        77890,
+        77814,
+        77815.25,
+        14.48633
+      ],
+      "source_plot_row": [
+        1788140400,
+        0,
+        50,
+        0,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "center": 797.9320987654321,
+      "origHeight": null,
+      "timePointIndex": -24271,
+      "isUp": true,
+      "height": null,
+      "price": null,
+      "left": 790.1851851851852,
+      "right": 805.679012345679,
+      "y": null,
+      "native_bar": [
+        1788140520,
+        77815.26,
+        77819.01,
+        77748.26,
+        77774,
+        9.16494
+      ],
+      "source_plot_row": [
+        1788140520,
+        0,
+        51,
+        0,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "center": 813.4259259259259,
+      "origHeight": null,
+      "timePointIndex": -24270,
+      "isUp": true,
+      "height": null,
+      "price": null,
+      "left": 805.679012345679,
+      "right": 821.1728395061727,
+      "y": null,
+      "native_bar": [
+        1788140640,
+        77774,
+        77843.99,
+        77722,
+        77843.99,
+        19.57804
+      ],
+      "source_plot_row": [
+        1788140640,
+        0,
+        52,
+        0,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "center": 828.9197530864197,
+      "origHeight": null,
+      "timePointIndex": -24269,
+      "isUp": true,
+      "height": null,
+      "price": null,
+      "left": 821.1728395061727,
+      "right": 836.6666666666666,
+      "y": null,
+      "native_bar": [
+        1788140760,
+        77844,
+        77854,
+        77746,
+        77748.01,
+        7.26511
+      ],
+      "source_plot_row": [
+        1788140760,
+        0,
+        53,
+        0,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "center": 844.4135802469136,
+      "origHeight": null,
+      "timePointIndex": -24268,
+      "isUp": true,
+      "height": null,
+      "price": null,
+      "left": 836.6666666666666,
+      "right": 852.1604938271605,
+      "y": null,
+      "native_bar": [
+        1788140880,
+        77748.01,
+        77772,
+        77726,
+        77772,
+        6.87587
+      ],
+      "source_plot_row": [
+        1788140880,
+        0,
+        54,
+        0,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "center": 859.9074074074074,
+      "origHeight": null,
+      "timePointIndex": -24267,
+      "isUp": true,
+      "height": null,
+      "price": null,
+      "left": 852.1604938271605,
+      "right": 867.6543209876543,
+      "y": null,
+      "native_bar": [
+        1788141000,
+        77772,
+        77775.55,
+        77748,
+        77748.01,
+        10.16398
+      ],
+      "source_plot_row": [
+        1788141000,
+        0,
+        55,
+        0,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "center": 875.4012345679012,
+      "origHeight": null,
+      "timePointIndex": -24266,
+      "isUp": true,
+      "height": null,
+      "price": null,
+      "left": 867.6543209876543,
+      "right": 883.1481481481482,
+      "y": null,
+      "native_bar": [
+        1788141120,
+        77748,
+        77806.3,
+        77710.2,
+        77714.03,
+        17.56694
+      ],
+      "source_plot_row": [
+        1788141120,
+        0,
+        56,
+        0,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "center": 890.895061728395,
+      "origHeight": null,
+      "timePointIndex": -24265,
+      "isUp": true,
+      "height": null,
+      "price": null,
+      "left": 883.1481481481482,
+      "right": 898.641975308642,
+      "y": null,
+      "native_bar": [
+        1788141240,
+        77714.02,
+        77734,
+        77680,
+        77727.91,
+        9.98622
+      ],
+      "source_plot_row": [
+        1788141240,
+        0,
+        57,
+        0,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "center": 906.3888888888889,
+      "origHeight": null,
+      "timePointIndex": -24264,
+      "isUp": true,
+      "height": null,
+      "price": null,
+      "left": 898.641975308642,
+      "right": 914.1358024691358,
+      "y": null,
+      "native_bar": [
+        1788141360,
+        77727.9,
+        77750,
+        77680,
+        77684.01,
+        7.95561
+      ],
+      "source_plot_row": [
+        1788141360,
+        0,
+        58,
+        0,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "center": 921.8827160493827,
+      "origHeight": null,
+      "timePointIndex": -24263,
+      "isUp": true,
+      "height": null,
+      "price": null,
+      "left": 914.1358024691358,
+      "right": 929.6296296296296,
+      "y": null,
+      "native_bar": [
+        1788141480,
+        77684.01,
+        77687.68,
+        77622,
+        77640.94,
+        19.17586
+      ],
+      "source_plot_row": [
+        1788141480,
+        0,
+        59,
+        0,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "center": 937.3765432098766,
+      "origHeight": null,
+      "timePointIndex": -24262,
+      "isUp": true,
+      "height": null,
+      "price": null,
+      "left": 929.6296296296296,
+      "right": 945.1234567901234,
+      "y": null,
+      "native_bar": [
+        1788141600,
+        77640.93,
+        77640.94,
+        77580,
+        77597.24,
+        26.64963
+      ],
+      "source_plot_row": [
+        1788141600,
+        0,
+        60,
+        0,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "center": 952.8703703703704,
+      "origHeight": null,
+      "timePointIndex": -24261,
+      "isUp": true,
+      "height": null,
+      "price": null,
+      "left": 945.1234567901234,
+      "right": 960.6172839506173,
+      "y": null,
+      "native_bar": [
+        1788141720,
+        77597.25,
+        77622,
+        77526.01,
+        77610.01,
+        36.80087
+      ],
+      "source_plot_row": [
+        1788141720,
+        0,
+        61,
+        0,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "center": 968.3641975308642,
+      "origHeight": null,
+      "timePointIndex": -24260,
+      "isUp": true,
+      "height": null,
+      "price": null,
+      "left": 960.6172839506173,
+      "right": 976.1111111111111,
+      "y": null,
+      "native_bar": [
+        1788141840,
+        77610.01,
+        77708,
+        77595.35,
+        77708,
+        21.09094
+      ],
+      "source_plot_row": [
+        1788141840,
+        0,
+        62,
+        0,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "center": 983.858024691358,
+      "origHeight": null,
+      "timePointIndex": -24259,
+      "isUp": true,
+      "height": null,
+      "price": null,
+      "left": 976.1111111111111,
+      "right": 991.6049382716049,
+      "y": null,
+      "native_bar": [
+        1788141960,
+        77708,
+        77770,
+        77708,
+        77740.15,
+        18.39348
+      ],
+      "source_plot_row": [
+        1788141960,
+        0,
+        63,
+        0,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "center": 999.3518518518518,
+      "origHeight": null,
+      "timePointIndex": -24258,
+      "isUp": true,
+      "height": null,
+      "price": null,
+      "left": 991.6049382716049,
+      "right": 1007.0987654320987,
+      "y": null,
+      "native_bar": [
+        1788142080,
+        77740.15,
+        77740.15,
+        77680,
+        77734,
+        14.01729
+      ],
+      "source_plot_row": [
+        1788142080,
+        0,
+        64,
+        0,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "center": 1014.8456790123457,
+      "origHeight": null,
+      "timePointIndex": -24257,
+      "isUp": true,
+      "height": null,
+      "price": null,
+      "left": 1007.0987654320987,
+      "right": 1022.5925925925926,
+      "y": null,
+      "native_bar": [
+        1788142200,
+        77734,
+        77828,
+        77734,
+        77827.99,
+        11.45945
+      ],
+      "source_plot_row": [
+        1788142200,
+        0,
+        65,
+        0,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "center": 1030.3395061728395,
+      "origHeight": null,
+      "timePointIndex": -24256,
+      "isUp": true,
+      "height": null,
+      "price": null,
+      "left": 1022.5925925925926,
+      "right": 1038.0864197530864,
+      "y": null,
+      "native_bar": [
+        1788142320,
+        77827.99,
+        77993.99,
+        77816,
+        77980,
+        13.48402
+      ],
+      "source_plot_row": [
+        1788142320,
+        0,
+        66,
+        0,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "center": 1045.8333333333333,
+      "origHeight": null,
+      "timePointIndex": -24255,
+      "isUp": true,
+      "height": null,
+      "price": null,
+      "left": 1038.0864197530864,
+      "right": 1053.5802469135801,
+      "y": null,
+      "native_bar": [
+        1788142440,
+        77980.01,
+        78000,
+        77892,
+        77919.49,
+        17.14302
+      ],
+      "source_plot_row": [
+        1788142440,
+        0,
+        67,
+        0,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "center": 1061.3271604938273,
+      "origHeight": null,
+      "timePointIndex": -24254,
+      "isUp": true,
+      "height": null,
+      "price": null,
+      "left": 1053.5802469135801,
+      "right": 1069.0740740740741,
+      "y": null,
+      "native_bar": [
+        1788142560,
+        77919.49,
+        77954,
+        77884,
+        77890,
+        23.74136
+      ],
+      "source_plot_row": [
+        1788142560,
+        0,
+        68,
+        0,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "center": 1076.820987654321,
+      "origHeight": null,
+      "timePointIndex": -24253,
+      "isUp": true,
+      "height": null,
+      "price": null,
+      "left": 1069.0740740740741,
+      "right": 1084.567901234568,
+      "y": null,
+      "native_bar": [
+        1788142680,
+        77890.01,
+        77901.32,
+        77840.7,
+        77856,
+        26.24347
+      ],
+      "source_plot_row": [
+        1788142680,
+        0,
+        69,
+        0,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "center": 1092.3148148148148,
+      "origHeight": null,
+      "timePointIndex": -24252,
+      "isUp": true,
+      "height": null,
+      "price": null,
+      "left": 1084.567901234568,
+      "right": 1100.0617283950617,
+      "y": null,
+      "native_bar": [
+        1788142800,
+        77856,
+        77886,
+        77832,
+        77842,
+        32.83598
+      ],
+      "source_plot_row": [
+        1788142800,
+        0,
+        70,
+        0,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "center": 1107.8086419753085,
+      "origHeight": null,
+      "timePointIndex": -24251,
+      "isUp": true,
+      "height": null,
+      "price": null,
+      "left": 1100.0617283950617,
+      "right": 1115.5555555555557,
+      "y": null,
+      "native_bar": [
+        1788142920,
+        77842,
+        77878,
+        77824,
+        77851.12,
+        58.55621
+      ],
+      "source_plot_row": [
+        1788142920,
+        0,
+        71,
+        0,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "left": 1115.5555555555557,
+      "center": 1123.3024691358025,
+      "right": 1131.0493827160494,
+      "y": 391.80223992314507,
+      "height": 27.5,
+      "timePointIndex": -24250,
+      "price": 77824,
+      "origHeight": 1,
+      "isUp": true,
+      "style": {
+        "color": "rgba(0, 230, 118, 1)",
+        "borderColor": "#2962FF"
+      },
+      "native_bar": [
+        1788143040,
+        77851.13,
+        77877.49,
+        77824,
+        77842,
+        21.67593
+      ],
+      "source_plot_row": [
+        1788143040,
+        1,
+        72,
+        1,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "left": 1131.0493827160494,
+      "center": 1138.7962962962963,
+      "right": 1146.5432098765432,
+      "y": 342.2644814473804,
+      "height": 27.5,
+      "timePointIndex": -24249,
+      "price": 77881.33,
+      "origHeight": -1,
+      "isUp": false,
+      "style": {
+        "color": "rgba(242, 54, 69, 1)",
+        "borderColor": "#2962FF"
+      },
+      "native_bar": [
+        1788143160,
+        77842,
+        77881.33,
+        77838,
+        77881.32,
+        19.6419
+      ],
+      "source_plot_row": [
+        1788143160,
+        -1,
+        73,
+        -1,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "center": 1154.29012345679,
+      "origHeight": null,
+      "timePointIndex": -24248,
+      "isUp": true,
+      "height": null,
+      "price": null,
+      "left": 1146.5432098765432,
+      "right": 1162.037037037037,
+      "y": null,
+      "native_bar": [
+        1788143280,
+        77881.33,
+        77881.33,
+        77872.67,
+        77875.05,
+        1.53424
+      ],
+      "source_plot_row": [
+        1788143280,
+        0,
+        74,
+        0,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "left": 1162.037037037037,
+      "center": 1169.783950617284,
+      "right": 1177.530864197531,
+      "y": 360.9199882586755,
+      "height": 80,
+      "timePointIndex": -24247,
+      "price": 77859.74,
+      "origHeight": 4,
+      "isUp": true,
+      "style": {
+        "color": "rgba(0, 230, 118, 1)",
+        "borderColor": "#2962FF"
+      },
+      "native_bar": [
+        1788143400,
+        77875.05,
+        77931.78,
+        77859.74,
+        77884,
+        18.69697
+      ],
+      "source_plot_row": [
+        1788143400,
+        4,
+        75,
+        4,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "left": 1177.530864197531,
+      "center": 1185.2777777777778,
+      "right": 1193.0246913580247,
+      "y": 324.4039290717666,
+      "height": 80,
+      "timePointIndex": -24246,
+      "price": 77902,
+      "origHeight": -4,
+      "isUp": false,
+      "style": {
+        "color": "rgba(242, 54, 69, 1)",
+        "borderColor": "#2962FF"
+      },
+      "native_bar": [
+        1788143520,
+        77884.01,
+        77902,
+        77864.95,
+        77864.95,
+        23.61272
+      ],
+      "source_plot_row": [
+        1788143520,
+        -4,
+        76,
+        -4,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "center": 1200.7716049382716,
+      "origHeight": null,
+      "timePointIndex": -24245,
+      "isUp": true,
+      "height": null,
+      "price": null,
+      "left": 1193.0246913580247,
+      "right": 1208.5185185185185,
+      "y": null,
+      "native_bar": [
+        1788143640,
+        77864.95,
+        77864.96,
+        77782,
+        77782,
+        12.20846
+      ],
+      "source_plot_row": [
+        1788143640,
+        0,
+        77,
+        0,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "center": 1216.2654320987654,
+      "origHeight": null,
+      "timePointIndex": -24244,
+      "isUp": true,
+      "height": null,
+      "price": null,
+      "left": 1208.5185185185185,
+      "right": 1224.0123456790122,
+      "y": null,
+      "native_bar": [
+        1788143760,
+        77782,
+        77811.19,
+        77754,
+        77771.03,
+        9.65721
+      ],
+      "source_plot_row": [
+        1788143760,
+        0,
+        78,
+        0,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "center": 1231.7592592592594,
+      "origHeight": null,
+      "timePointIndex": -24243,
+      "isUp": true,
+      "height": null,
+      "price": null,
+      "left": 1224.0123456790122,
+      "right": 1239.5061728395062,
+      "y": null,
+      "native_bar": [
+        1788143880,
+        77771.02,
+        77788,
+        77744.59,
+        77766.03,
+        5.97522
+      ],
+      "source_plot_row": [
+        1788143880,
+        0,
+        79,
+        0,
+        0,
+        10,
+        80
+      ]
+    },
+    {
+      "center": 1247.2530864197531,
+      "origHeight": null,
+      "timePointIndex": -24242,
+      "isUp": true,
+      "height": null,
+      "price": null,
+      "left": 1239.5061728395062,
+      "right": 1255,
+      "y": null,
+      "native_bar": [
+        1788144000,
+        77766.03,
+        77766.05,
+        77726.1,
+        77729.24,
+        7.51575
+      ],
+      "source_plot_row": [
+        1788144000,
+        0,
+        80,
+        0,
+        0,
+        10,
+        80
+      ]
+    }
+  ],
+  "coordinate_units": "CSS pixels local to chart pane; renderer item height is native rendered arrow height, not inferred from CSV or screenshot resizing."
+}

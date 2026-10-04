@@ -1,0 +1,241 @@
+{
+  "browser_utc": "2026-10-04T04:47:57.499Z",
+  "title": "Polyline point mutation outcome",
+  "timezone": "Etc/UTC",
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  },
+  "visible_range": {
+    "_firstBar": 291,
+    "_lastBar": 300
+  },
+  "price_range": {
+    "_minValue": 84810.01,
+    "_maxValue": 84825.01
+  },
+  "indexes": [
+    293,
+    298
+  ],
+  "polylines": [
+    [
+      "polylines",
+      [
+        {
+          "key": false,
+          "raw": [
+            [
+              1,
+              {
+                "id": 1,
+                "points": [
+                  {
+                    "x": 0,
+                    "y": 84812.01
+                  },
+                  {
+                    "x": 1,
+                    "y": 84813.01
+                  }
+                ],
+                "w": 5,
+                "crv": false,
+                "cls": false,
+                "c": 0,
+                "fc": null,
+                "st": "sol"
+              }
+            ],
+            [
+              2,
+              {
+                "id": 2,
+                "points": [
+                  {
+                    "x": 0,
+                    "y": 84812.01
+                  },
+                  {
+                    "x": 1,
+                    "y": 84813.01
+                  }
+                ],
+                "w": 1,
+                "crv": false,
+                "cls": false,
+                "c": 1,
+                "fc": null,
+                "st": "sol"
+              }
+            ],
+            [
+              3,
+              {
+                "id": 3,
+                "points": [
+                  {
+                    "x": 0,
+                    "y": 84822.01
+                  },
+                  {
+                    "x": 1,
+                    "y": 84823.01
+                  }
+                ],
+                "w": 1,
+                "crv": false,
+                "cls": false,
+                "c": 2,
+                "fc": null,
+                "st": "sol"
+              }
+            ]
+          ],
+          "materialized": [
+            {
+              "id": 1,
+              "points": [
+                {
+                  "x": 293,
+                  "y": 84812.01
+                },
+                {
+                  "x": 298,
+                  "y": 84813.01
+                }
+              ],
+              "width": 5,
+              "curved": false,
+              "closed": false,
+              "color": 0,
+              "fillColor": null,
+              "style": "sol",
+              "host_bars": [
+                [
+                  1791088440,
+                  84812.01,
+                  84812.01,
+                  84812,
+                  84812,
+                  4.8316
+                ],
+                [
+                  1791089040,
+                  84812.01,
+                  84812.01,
+                  84812,
+                  84812.01,
+                  1.22569
+                ]
+              ]
+            },
+            {
+              "id": 2,
+              "points": [
+                {
+                  "x": 293,
+                  "y": 84812.01
+                },
+                {
+                  "x": 298,
+                  "y": 84813.01
+                }
+              ],
+              "width": 1,
+              "curved": false,
+              "closed": false,
+              "color": 1,
+              "fillColor": null,
+              "style": "sol",
+              "host_bars": [
+                [
+                  1791088440,
+                  84812.01,
+                  84812.01,
+                  84812,
+                  84812,
+                  4.8316
+                ],
+                [
+                  1791089040,
+                  84812.01,
+                  84812.01,
+                  84812,
+                  84812.01,
+                  1.22569
+                ]
+              ]
+            },
+            {
+              "id": 3,
+              "points": [
+                {
+                  "x": 293,
+                  "y": 84822.01
+                },
+                {
+                  "x": 298,
+                  "y": 84823.01
+                }
+              ],
+              "width": 1,
+              "curved": false,
+              "closed": false,
+              "color": 2,
+              "fillColor": null,
+              "style": "sol",
+              "host_bars": [
+                [
+                  1791088440,
+                  84812.01,
+                  84812.01,
+                  84812,
+                  84812,
+                  4.8316
+                ],
+                [
+                  1791089040,
+                  84812.01,
+                  84812.01,
+                  84812,
+                  84812.01,
+                  1.22569
+                ]
+              ]
+            }
+          ]
+        }
+      ]
+    ]
+  ],
+  "palettes": {
+    "palette_common": {
+      "colors": {
+        "0": {
+          "name": "Color 0"
+        },
+        "1": {
+          "name": "Color 1"
+        },
+        "2": {
+          "name": "Color 2"
+        }
+      },
+      "valToIndex": {
+        "0": 0,
+        "1": 1,
+        "2": 2
+      }
+    }
+  },
+  "native_styles": {
+    "dwgpolylines": {
+      "polylines": {
+        "visible": true
+      }
+    }
+  },
+  "observation": "Red width5 and green width1 share native coordinates; blue is 10 price units higher. The thin green line is drawn along the red line; their overlap is retained in screenshot."
+}

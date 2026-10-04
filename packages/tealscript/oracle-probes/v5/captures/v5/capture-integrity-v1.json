@@ -1,0 +1,707 @@
+{
+  "artifact": "v5 capture integrity v1",
+  "sources": 130,
+  "attempts": 169,
+  "selected_status_counts": {
+    "COMPILE-ERROR": 28,
+    "RUNS": 99,
+    "RUNTIME-ERROR": 3
+  },
+  "csv_sha256_paths_headers_minimum_history": "verified for every recorded CSV and selected successful source",
+  "frozen_sha256_sums": "all entries verified",
+  "index_observations": [
+    {
+      "script": "collection-ranked01-from-single-control-v1.pine",
+      "required_first_index": null,
+      "index_column": null,
+      "first_plotted_index": null,
+      "observable": false
+    },
+    {
+      "script": "collection-ranked22-mode-outcomes-v1.pine",
+      "required_first_index": null,
+      "index_column": null,
+      "first_plotted_index": null,
+      "observable": false
+    },
+    {
+      "script": "collection11-symmetric-eigenvectors-integer-pinv-v1.pine",
+      "required_first_index": null,
+      "index_column": null,
+      "first_plotted_index": null,
+      "observable": false
+    },
+    {
+      "script": "compound-additive-grouping-v1.pine",
+      "required_first_index": 0,
+      "index_column": "input_bar_index",
+      "first_plotted_index": "0",
+      "observable": true
+    },
+    {
+      "script": "compound-operator-association-pine-v5-v1.pine",
+      "required_first_index": 0,
+      "index_column": "input_bar_index",
+      "first_plotted_index": "0",
+      "observable": true
+    },
+    {
+      "script": "compound-operator-association-pine-v6-v1.pine",
+      "required_first_index": 0,
+      "index_column": "input_bar_index",
+      "first_plotted_index": "0",
+      "observable": true
+    },
+    {
+      "script": "corpus-array-get-division-v5-v1.pine",
+      "required_first_index": null,
+      "index_column": null,
+      "first_plotted_index": null,
+      "observable": false
+    },
+    {
+      "script": "corpus-array-get-division-v6-v1.pine",
+      "required_first_index": null,
+      "index_column": null,
+      "first_plotted_index": null,
+      "observable": false
+    },
+    {
+      "script": "corpus-array-get-integer-controls-v6-v1.pine",
+      "required_first_index": null,
+      "index_column": null,
+      "first_plotted_index": null,
+      "observable": false
+    },
+    {
+      "script": "corpus-array-get-loop-int-controls-v5-v1.pine",
+      "required_first_index": null,
+      "index_column": null,
+      "first_plotted_index": null,
+      "observable": false
+    },
+    {
+      "script": "corpus-array-get-loop-var-division-v5-v1.pine",
+      "required_first_index": null,
+      "index_column": null,
+      "first_plotted_index": null,
+      "observable": false
+    },
+    {
+      "script": "corpus-array-get-size-division-v6-v1.pine",
+      "required_first_index": null,
+      "index_column": null,
+      "first_plotted_index": null,
+      "observable": false
+    },
+    {
+      "script": "corpus-array-get-size-series-controls-v6-v1.pine",
+      "required_first_index": null,
+      "index_column": null,
+      "first_plotted_index": null,
+      "observable": false
+    },
+    {
+      "script": "corpus-array-median-float-control-v1.pine",
+      "required_first_index": null,
+      "index_column": null,
+      "first_plotted_index": null,
+      "observable": false
+    },
+    {
+      "script": "corpus-array-median-integer-v1.pine",
+      "required_first_index": null,
+      "index_column": null,
+      "first_plotted_index": null,
+      "observable": false
+    },
+    {
+      "script": "corpus-array-standardize-float-control-v1.pine",
+      "required_first_index": null,
+      "index_column": null,
+      "first_plotted_index": null,
+      "observable": false
+    },
+    {
+      "script": "corpus-array-standardize-int-inferred-v1.pine",
+      "required_first_index": null,
+      "index_column": null,
+      "first_plotted_index": null,
+      "observable": false
+    },
+    {
+      "script": "corpus-array-standardize-int-typed-v1.pine",
+      "required_first_index": null,
+      "index_column": null,
+      "first_plotted_index": null,
+      "observable": false
+    },
+    {
+      "script": "corpus-array-standardize-mixed-na-v1.pine",
+      "required_first_index": null,
+      "index_column": null,
+      "first_plotted_index": null,
+      "observable": false
+    },
+    {
+      "script": "corpus-color-new-linewidth-control-v6-v1.pine",
+      "required_first_index": null,
+      "index_column": null,
+      "first_plotted_index": null,
+      "observable": false
+    },
+    {
+      "script": "corpus-compile-third-v5-comma-imports-v1.pine",
+      "required_first_index": null,
+      "index_column": null,
+      "first_plotted_index": null,
+      "observable": false
+    },
+    {
+      "script": "corpus-compile-third-v5-fill-modern-title-control-v1.pine",
+      "required_first_index": null,
+      "index_column": null,
+      "first_plotted_index": null,
+      "observable": false
+    },
+    {
+      "script": "corpus-compile-third-v5-fill-named-title-transp-control-v1.pine",
+      "required_first_index": null,
+      "index_column": null,
+      "first_plotted_index": null,
+      "observable": false
+    },
+    {
+      "script": "corpus-compile-third-v5-fill-positional-title-named-transp-v1.pine",
+      "required_first_index": null,
+      "index_column": null,
+      "first_plotted_index": null,
+      "observable": false
+    },
+    {
+      "script": "corpus-compile-third-v5-fullwidth-comment-layout-v1.pine",
+      "required_first_index": null,
+      "index_column": null,
+      "first_plotted_index": null,
+      "observable": false
+    },
+    {
+      "script": "corpus-compile-third-v5-polyline-typed-na-control-v1.pine",
+      "required_first_index": null,
+      "index_column": null,
+      "first_plotted_index": null,
+      "observable": false
+    },
+    {
+      "script": "corpus-compile-third-v5-separate-import-controls-v1.pine",
+      "required_first_index": null,
+      "index_column": null,
+      "first_plotted_index": null,
+      "observable": false
+    },
+    {
+      "script": "corpus-compile-third-v6-leading-comma-declaration-v1.pine",
+      "required_first_index": null,
+      "index_column": null,
+      "first_plotted_index": null,
+      "observable": false
+    },
+    {
+      "script": "corpus-compile-third-v6-name-binding-controls-v1.pine",
+      "required_first_index": null,
+      "index_column": null,
+      "first_plotted_index": null,
+      "observable": false
+    },
+    {
+      "script": "corpus-compile-v5-series-int-division-v1.pine",
+      "required_first_index": null,
+      "index_column": null,
+      "first_plotted_index": null,
+      "observable": false
+    },
+    {
+      "script": "corpus-compile-v5-simple-int-division-v1.pine",
+      "required_first_index": null,
+      "index_column": null,
+      "first_plotted_index": null,
+      "observable": false
+    },
+    {
+      "script": "corpus-continuous-session-boundaries-v5-v1.pine",
+      "required_first_index": 0,
+      "index_column": "INDEX",
+      "first_plotted_index": "0",
+      "observable": true
+    },
+    {
+      "script": "corpus-continuous-session-boundaries-v6-v1.pine",
+      "required_first_index": 0,
+      "index_column": "INDEX",
+      "first_plotted_index": "0",
+      "observable": true
+    },
+    {
+      "script": "corpus-gaps43-duplicate-method-distinct-control-v5.pine",
+      "required_first_index": null,
+      "index_column": null,
+      "first_plotted_index": null,
+      "observable": false
+    },
+    {
+      "script": "corpus-gaps43-local-udf-global-control-v6.pine",
+      "required_first_index": null,
+      "index_column": null,
+      "first_plotted_index": null,
+      "observable": false
+    },
+    {
+      "script": "corpus-length-sma-simple-float-v6-v1.pine",
+      "required_first_index": null,
+      "index_column": null,
+      "first_plotted_index": null,
+      "observable": false
+    },
+    {
+      "script": "corpus-matrix-remove_col-missing-index-v1.pine",
+      "required_first_index": null,
+      "index_column": null,
+      "first_plotted_index": null,
+      "observable": false
+    },
+    {
+      "script": "corpus-matrix-swap_columns-missing-index-v1.pine",
+      "required_first_index": null,
+      "index_column": null,
+      "first_plotted_index": null,
+      "observable": false
+    },
+    {
+      "script": "corpus-table-text-wrap-control-v5-v1.pine",
+      "required_first_index": null,
+      "index_column": null,
+      "first_plotted_index": null,
+      "observable": false
+    },
+    {
+      "script": "corpus-table-text-wrap-control-v6-v1.pine",
+      "required_first_index": null,
+      "index_column": null,
+      "first_plotted_index": null,
+      "observable": false
+    },
+    {
+      "script": "corpus5-v5-extrema-warmup1000-v1.pine",
+      "required_first_index": null,
+      "index_column": "BAR_INDEX",
+      "first_plotted_index": "0",
+      "observable": true
+    },
+    {
+      "script": "corpus5-v6-exp-price-overflow-v1.pine",
+      "required_first_index": null,
+      "index_column": null,
+      "first_plotted_index": null,
+      "observable": false
+    },
+    {
+      "script": "currency-constant-literal-values-v1.pine",
+      "required_first_index": null,
+      "index_column": null,
+      "first_plotted_index": null,
+      "observable": false
+    },
+    {
+      "script": "drawing-coordinate-backquant-float-x-v1.pine",
+      "required_first_index": null,
+      "index_column": null,
+      "first_plotted_index": null,
+      "observable": false
+    },
+    {
+      "script": "drawing-coordinate-point-index-active-v5-length50-v1.pine",
+      "required_first_index": null,
+      "index_column": null,
+      "first_plotted_index": null,
+      "observable": false
+    },
+    {
+      "script": "drawing-coordinate-point-index-active-v5-length51-v1.pine",
+      "required_first_index": null,
+      "index_column": null,
+      "first_plotted_index": null,
+      "observable": false
+    },
+    {
+      "script": "drawing-coordinate-profile-float-right-v1.pine",
+      "required_first_index": null,
+      "index_column": null,
+      "first_plotted_index": null,
+      "observable": false
+    },
+    {
+      "script": "drawing-coordinate-sabres-input-division-v1.pine",
+      "required_first_index": null,
+      "index_column": null,
+      "first_plotted_index": null,
+      "observable": false
+    },
+    {
+      "script": "drawing-default-blue-v5-v2.pine",
+      "required_first_index": null,
+      "index_column": null,
+      "first_plotted_index": null,
+      "observable": false
+    },
+    {
+      "script": "drawing-default-blue-v6-v2.pine",
+      "required_first_index": null,
+      "index_column": null,
+      "first_plotted_index": null,
+      "observable": false
+    },
+    {
+      "script": "drawing-future-index-first-local-v1.pine",
+      "required_first_index": null,
+      "index_column": "BAR_INDEX",
+      "first_plotted_index": "0",
+      "observable": true
+    },
+    {
+      "script": "drawing-method-distinct-v5-control-v1.pine",
+      "required_first_index": null,
+      "index_column": null,
+      "first_plotted_index": null,
+      "observable": false
+    },
+    {
+      "script": "float-equality-nonzero-discriminator-v3.pine",
+      "required_first_index": 0,
+      "index_column": "input_bar_index",
+      "first_plotted_index": "0",
+      "observable": true
+    },
+    {
+      "script": "fractional-int-division-const-control-v1.pine",
+      "required_first_index": null,
+      "index_column": null,
+      "first_plotted_index": null,
+      "observable": false
+    },
+    {
+      "script": "fractional-int-division-explicit-cast-control-v1.pine",
+      "required_first_index": null,
+      "index_column": null,
+      "first_plotted_index": null,
+      "observable": false
+    },
+    {
+      "script": "fractional-int-division-input-control-v1.pine",
+      "required_first_index": null,
+      "index_column": null,
+      "first_plotted_index": null,
+      "observable": false
+    },
+    {
+      "script": "fractional-int-division-series-negative-v1.pine",
+      "required_first_index": null,
+      "index_column": null,
+      "first_plotted_index": null,
+      "observable": false
+    },
+    {
+      "script": "fractional-int-division-series-positive-v1.pine",
+      "required_first_index": null,
+      "index_column": null,
+      "first_plotted_index": null,
+      "observable": false
+    },
+    {
+      "script": "fractional-int-division-simple-negative-v1.pine",
+      "required_first_index": null,
+      "index_column": null,
+      "first_plotted_index": null,
+      "observable": false
+    },
+    {
+      "script": "fractional-int-division-simple-positive-v1.pine",
+      "required_first_index": null,
+      "index_column": null,
+      "first_plotted_index": null,
+      "observable": false
+    },
+    {
+      "script": "ledger47-zero-div-v5-compound-zero-v1.pine",
+      "required_first_index": null,
+      "index_column": null,
+      "first_plotted_index": null,
+      "observable": false
+    },
+    {
+      "script": "ledger47-zero-div-v5-dynamic-negative-zero-v1.pine",
+      "required_first_index": null,
+      "index_column": null,
+      "first_plotted_index": null,
+      "observable": false
+    },
+    {
+      "script": "ledger47-zero-div-v5-dynamic-positive-zero-v1.pine",
+      "required_first_index": null,
+      "index_column": null,
+      "first_plotted_index": null,
+      "observable": false
+    },
+    {
+      "script": "ledger47-zero-div-v5-finite-control-v1.pine",
+      "required_first_index": null,
+      "index_column": null,
+      "first_plotted_index": null,
+      "observable": false
+    },
+    {
+      "script": "ledger47-zero-div-v5-missing-numerator-control-v1.pine",
+      "required_first_index": null,
+      "index_column": null,
+      "first_plotted_index": null,
+      "observable": false
+    },
+    {
+      "script": "ledger47-zero-div-v5-udf-zero-v1.pine",
+      "required_first_index": null,
+      "index_column": null,
+      "first_plotted_index": null,
+      "observable": false
+    },
+    {
+      "script": "percentile-hole-linear_interpolation-len14-p25-v1.pine",
+      "required_first_index": 0,
+      "index_column": "input_bar_index",
+      "first_plotted_index": "0",
+      "observable": true
+    },
+    {
+      "script": "percentile-hole-linear_interpolation-len14-p75-v1.pine",
+      "required_first_index": 0,
+      "index_column": "input_bar_index",
+      "first_plotted_index": "0",
+      "observable": true
+    },
+    {
+      "script": "percentile-hole-linear_interpolation-len4-p75-v1.pine",
+      "required_first_index": 0,
+      "index_column": "input_bar_index",
+      "first_plotted_index": "0",
+      "observable": true
+    },
+    {
+      "script": "percentile-hole-nearest_rank-len14-p25-v1.pine",
+      "required_first_index": 0,
+      "index_column": "input_bar_index",
+      "first_plotted_index": "0",
+      "observable": true
+    },
+    {
+      "script": "percentile-hole-nearest_rank-len14-p75-v1.pine",
+      "required_first_index": 0,
+      "index_column": "input_bar_index",
+      "first_plotted_index": "0",
+      "observable": true
+    },
+    {
+      "script": "percentile-rank-readout-v1.pine",
+      "required_first_index": 0,
+      "index_column": "input_bar_index",
+      "first_plotted_index": "0",
+      "observable": true
+    },
+    {
+      "script": "rci-missing-sign-discriminator-v1.pine",
+      "required_first_index": 0,
+      "index_column": "input_bar_index",
+      "first_plotted_index": "0",
+      "observable": true
+    },
+    {
+      "script": "row1654-explicit-int-control-v1.pine",
+      "required_first_index": null,
+      "index_column": null,
+      "first_plotted_index": null,
+      "observable": false
+    },
+    {
+      "script": "row1654-label-timeframe-division-v1.pine",
+      "required_first_index": null,
+      "index_column": null,
+      "first_plotted_index": null,
+      "observable": false
+    },
+    {
+      "script": "row1654-line-timeframe-division-v1.pine",
+      "required_first_index": null,
+      "index_column": null,
+      "first_plotted_index": null,
+      "observable": false
+    },
+    {
+      "script": "row1654-lowest-timeframe-division-v1.pine",
+      "required_first_index": null,
+      "index_column": null,
+      "first_plotted_index": null,
+      "observable": false
+    },
+    {
+      "script": "row1654-original-v1.pine",
+      "required_first_index": null,
+      "index_column": null,
+      "first_plotted_index": null,
+      "observable": false
+    },
+    {
+      "script": "row390-explicit-int-control-v1.pine",
+      "required_first_index": null,
+      "index_column": null,
+      "first_plotted_index": null,
+      "observable": false
+    },
+    {
+      "script": "row390-label-new-midpoint-v1.pine",
+      "required_first_index": null,
+      "index_column": null,
+      "first_plotted_index": null,
+      "observable": false
+    },
+    {
+      "script": "row390-label-set-x-midpoint-v1.pine",
+      "required_first_index": null,
+      "index_column": null,
+      "first_plotted_index": null,
+      "observable": false
+    },
+    {
+      "script": "row390-original-v1.pine",
+      "required_first_index": null,
+      "index_column": null,
+      "first_plotted_index": null,
+      "observable": false
+    },
+    {
+      "script": "supertrend-factor-alone-first3-v1.pine",
+      "required_first_index": 0,
+      "index_column": "input_bar_index",
+      "first_plotted_index": "0",
+      "observable": true
+    },
+    {
+      "script": "supertrend-factor-alone-v1.pine",
+      "required_first_index": 0,
+      "index_column": "input_bar_index",
+      "first_plotted_index": "0",
+      "observable": true
+    },
+    {
+      "script": "supertrend-factor-paired-fixed2-v1.pine",
+      "required_first_index": 0,
+      "index_column": "input_bar_index",
+      "first_plotted_index": "0",
+      "observable": true
+    },
+    {
+      "script": "trace-accdist-host-missing-v1.pine",
+      "required_first_index": 0,
+      "index_column": null,
+      "first_plotted_index": null,
+      "observable": false
+    },
+    {
+      "script": "trace-corporate-eps-revenue-exdate-v1.pine",
+      "required_first_index": 0,
+      "index_column": null,
+      "first_plotted_index": null,
+      "observable": false
+    },
+    {
+      "script": "trace-matrix-predicate-epsilon-v1.pine",
+      "required_first_index": 0,
+      "index_column": null,
+      "first_plotted_index": null,
+      "observable": false
+    },
+    {
+      "script": "trace-max-all-na-seed-v1.pine",
+      "required_first_index": 0,
+      "index_column": null,
+      "first_plotted_index": null,
+      "observable": false
+    },
+    {
+      "script": "trace-plotarrow-height-negative-max-v6.pine",
+      "required_first_index": null,
+      "index_column": "BAR_INDEX",
+      "first_plotted_index": "0",
+      "observable": true
+    },
+    {
+      "script": "trace-plotarrow-height-negative-min-v6.pine",
+      "required_first_index": null,
+      "index_column": "BAR_INDEX",
+      "first_plotted_index": "0",
+      "observable": true
+    },
+    {
+      "script": "trace-plotarrow-height-reversed-v6.pine",
+      "required_first_index": null,
+      "index_column": "BAR_INDEX",
+      "first_plotted_index": "0",
+      "observable": true
+    },
+    {
+      "script": "trace-plotarrow-height-valid-control-v6.pine",
+      "required_first_index": null,
+      "index_column": "BAR_INDEX",
+      "first_plotted_index": "0",
+      "observable": true
+    },
+    {
+      "script": "trace-plotarrow-normalization-domain-v6.pine",
+      "required_first_index": null,
+      "index_column": "BAR_INDEX",
+      "first_plotted_index": "0",
+      "observable": true
+    },
+    {
+      "script": "trace-plotarrow-offset-v4-series.pine",
+      "required_first_index": null,
+      "index_column": "BAR_INDEX",
+      "first_plotted_index": "0",
+      "observable": true
+    },
+    {
+      "script": "trace-plotarrow-offset-v4-zero-control.pine",
+      "required_first_index": null,
+      "index_column": "BAR_INDEX",
+      "first_plotted_index": "0",
+      "observable": true
+    },
+    {
+      "script": "trace-plotarrow-offset-v5-series.pine",
+      "required_first_index": null,
+      "index_column": "BAR_INDEX",
+      "first_plotted_index": "0",
+      "observable": true
+    },
+    {
+      "script": "trace-plotarrow-offset-v5-zero-control.pine",
+      "required_first_index": null,
+      "index_column": "BAR_INDEX",
+      "first_plotted_index": "0",
+      "observable": true
+    },
+    {
+      "script": "trace-polyline-point-array-mutation-v1.pine",
+      "required_first_index": null,
+      "index_column": null,
+      "first_plotted_index": null,
+      "observable": false
+    }
+  ]
+}
