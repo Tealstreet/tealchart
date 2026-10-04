@@ -1,0 +1,7 @@
+//@version=6
+indicator("Drawing GC box quota 1 v2", max_boxes_count=1)
+box.new(bar_index, 2.0, bar_index + 1, 1.0)
+int count = array.size(box.all)
+int oldest = count > 0 ? box.get_left(array.get(box.all, 0)) : na
+plot(count, "VISIBLE_COUNT")
+plot(oldest, "OLDEST_INDEX")

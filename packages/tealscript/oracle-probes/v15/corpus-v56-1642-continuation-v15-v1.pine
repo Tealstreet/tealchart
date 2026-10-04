@@ -1,0 +1,534 @@
+//@version=5
+indicator("LOCAL_AI_ENGINE A/D Context v20.8", overlay=false, max_labels_count=500, max_lines_count=500)
+
+// ============================================================================
+// v20.8
+// - AUTO-TF: indicator auto-detects chart timeframe via timeframe.multiplier
+//   Manual override via "Override TF Profile" — можно выбрать любой профиль
+//   независимо от реального ТФ (например, применить 1h-настройки на 15m)
+// - FIXED: исторические дивергенции теперь видны — убрано требование
+//   follow-through для истории (паттерн уже случился, результат известен)
+//   Опция "Hist: require confirmation" позволяет включить фильтр обратно
+// - FIXED: live follow-through смягчён — достаточно одного из условий:
+//   (a) close > high[1] OR (b) закрытие выше открытия с телом > 20%
+// - FIXED: исторический cooldown теперь обновляется только при реальном сигнале
+// - FIXED: hConfirmed loop переписан — проверяем N баров после пивота корректно
+// ============================================================================
+
+// ========================= INPUTS ==========================================
+
+grpFlow = "Flow"
+flowMode = input.string("Williams AD", "Flow Mode", options=["Chaikin AD","Williams AD"], group=grpFlow)
+cmfLen   = input.int(20, "CMF Length",        minval=1, group=grpFlow)
+emaLen   = input.int(21, "A/D Smoothing EMA", minval=1, group=grpFlow)
+atrLen   = input.int(14, "ATR Length",        minval=1, group=grpFlow)
+
+grpTF = "Timeframe Profile"
+// Auto-detect: включён по умолчанию. При выключении — выбирай любой профиль
+autoTF        = input.bool(true, "Auto-detect TF (from chart)", group=grpTF,
+                    tooltip="ON = профиль подбирается автоматически по ТФ графика.\nOFF = используй ручной выбор ниже.")
+manualProfile = input.string("1h", "Override Profile (when Auto OFF)",
+                    options=["1m","3m","5m","15m","30m","1h","2h","4h","6h","12h","1d","1w"],
+                    group=grpTF,
+                    tooltip="Выбери любой профиль независимо от ТФ графика.\nАктивен только при выключенном Auto-detect.")
+
+grpDiv = "Divergence"
+pivotLeftBase  = input.int(6,    "Pivot Left",          minval=2, group=grpDiv)
+pivotRightBase = input.int(6,    "Pivot Right",         minval=2, group=grpDiv)
+minPricePct    = input.float(0.08,"Min Price Move %",   minval=0, step=0.01, group=grpDiv)
+minFlowPct     = input.float(0.15,"Min Flow Move %",    minval=0, step=0.01, group=grpDiv)
+minAtrMult     = input.float(0.5, "Min Swing ATR mult", minval=0, step=0.1,  group=grpDiv)
+cooldown       = input.int(12,   "Cooldown Bars",       minval=1, group=grpDiv)
+reqConfirm     = input.bool(false,"Require follow-through (live)",  group=grpDiv,
+                    tooltip="OFF = метка появляется сразу при обнаружении паттерна.\nON = ждём подтверждающей свечи.")
+confirmBars    = input.int(6,    "Max confirm wait (bars)", minval=1, maxval=30, group=grpDiv)
+
+grpHist = "History"
+showHist       = input.bool(true,                    "Show Historical Divergences", group=grpHist)
+histDate       = input.time(timestamp("2024-01-01"), "History Start Date",          group=grpHist)
+histReqConf    = input.bool(false, "Hist: require follow-through confirmation",     group=grpHist,
+                    tooltip="OFF = показываем все дивергенции по паттерну.\nON = только те, за которыми был импульс.")
+histStyle      = input.string("Circles","History Label Style",
+                    options=["Circles","Triangles","Text"],                         group=grpHist)
+showHistRaw    = input.bool(true, "Hist: show unconfirmed (dim)",                  group=grpHist)
+
+grpRegime = "Regime"
+regimeLB   = input.int(8,    "Regime Lookback",   minval=2, group=grpRegime)
+slopePctMin = input.float(0.15,"Min EMA Slope %", minval=0, step=0.01, group=grpRegime)
+rangePctMin = input.float(0.20,"Min EMA Range %", minval=0, step=0.01, group=grpRegime)
+regimeConf  = input.int(3,   "Regime Confirm Bars", minval=1, group=grpRegime)
+
+grpBias = "Bias Weights"
+wFlow      = input.float(1.0,"Weight: Flow Slope", minval=0, step=0.1, group=grpBias)
+wCmf       = input.float(1.5,"Weight: CMF Score",  minval=0, step=0.1, group=grpBias)
+wRegime    = input.float(1.0,"Weight: Regime",     minval=0, step=0.1, group=grpBias)
+biasThresh = input.float(2.0,"Bias Threshold",     minval=0.5, step=0.1, group=grpBias)
+
+grpVis = "Visual"
+showBias  = input.bool(true,  "Show Bias Background", group=grpVis)
+showCMF   = input.bool(true,  "Show CMF",             group=grpVis)
+showLive  = input.bool(true,  "Show Live Div Labels",  group=grpVis)
+showTable = input.bool(true,  "Show Info Table",       group=grpVis)
+showNorm  = input.bool(true,  "Show flow_z / flow_pct",group=grpVis)
+
+// ========================= AUTO TF PROFILE =================================
+// Автоопределение: читаем реальный ТФ графика через timeframe.multiplier
+// Группировка: 1-3m → "5m" профиль (самый агрессивный),
+//              4-15m → "15m", 16-90m → "1h", 91-360m → "4h", >360m → "1d"
+_tfMul = timeframe.in_seconds() / 60  // минуты текущего ТФ
+
+autoProfile =
+     _tfMul <= 3   ? "5m"  :
+     _tfMul <= 15  ? "15m" :
+     _tfMul <= 90  ? "1h"  :
+     _tfMul <= 360 ? "4h"  : "1d"
+
+profile = autoTF ? autoProfile : manualProfile
+
+// Pivot lengths по профилю
+_pivL =
+     profile == "1m"  or profile == "3m"  or profile == "5m"  ? math.max(pivotLeftBase, 4)  :
+     profile == "15m" or profile == "30m"                      ? math.max(pivotLeftBase, 6)  :
+     profile == "1h"  or profile == "2h"                       ? math.max(pivotLeftBase, 8)  :
+     profile == "4h"  or profile == "6h"  or profile == "12h"  ? math.max(pivotLeftBase, 10) :
+                                                                  math.max(pivotLeftBase, 12)
+
+_pivR =
+     profile == "1m"  or profile == "3m"  or profile == "5m"  ? math.max(pivotRightBase, 4)  :
+     profile == "15m" or profile == "30m"                      ? math.max(pivotRightBase, 6)  :
+     profile == "1h"  or profile == "2h"                       ? math.max(pivotRightBase, 8)  :
+     profile == "4h"  or profile == "6h"  or profile == "12h"  ? math.max(pivotRightBase, 10) :
+                                                                  math.max(pivotRightBase, 12)
+
+// Масштаб порогов
+_priceMult =
+     profile == "1m"  or profile == "3m"  ? 0.5 :
+     profile == "5m"                       ? 0.7 :
+     profile == "15m" or profile == "30m"  ? 0.9 :
+     profile == "1h"  or profile == "2h"   ? 1.2 :
+     profile == "4h"  or profile == "6h"   ? 1.5 :
+     profile == "12h"                      ? 1.8 : 2.0
+
+_flowMult = _priceMult  // симметрично
+_atrMult  = _priceMult * 0.8
+
+_cooldown =
+     profile == "1m"  or profile == "3m"  ? cooldown :
+     profile == "5m"                       ? cooldown + 2 :
+     profile == "15m" or profile == "30m"  ? cooldown + 4 :
+     profile == "1h"  or profile == "2h"   ? cooldown + 8 :
+     profile == "4h"  or profile == "6h"   ? cooldown + 15 :
+                                             cooldown + 20
+
+_confirmBars =
+     profile == "1m"  or profile == "3m"  ? confirmBars + 6 :
+     profile == "5m"                       ? confirmBars + 4 :
+     profile == "15m" or profile == "30m"  ? confirmBars + 2 :
+                                             confirmBars
+
+_cmfStrong =
+     profile == "1m"  or profile == "3m"  or profile == "5m"  ? 0.02 :
+     profile == "15m" or profile == "30m"                      ? 0.04 :
+     profile == "1h"  or profile == "2h"                       ? 0.05 :
+     profile == "4h"  or profile == "6h"  or profile == "12h"  ? 0.06 : 0.07
+
+_cmfWeak =
+     profile == "1m"  or profile == "3m"  or profile == "5m"  ? 0.006 :
+     profile == "15m" or profile == "30m"                      ? 0.012 :
+     profile == "1h"  or profile == "2h"                       ? 0.02  :
+     profile == "4h"  or profile == "6h"  or profile == "12h"  ? 0.025 : 0.03
+
+_brLen =
+     profile == "1m"  or profile == "3m"  or profile == "5m"  ? 3 :
+     profile == "15m" or profile == "30m"                      ? 4 :
+     profile == "1h"  or profile == "2h"                       ? 5 :
+     profile == "4h"  or profile == "6h"  or profile == "12h"  ? 6 : 8
+
+_minFlowAbsFrac =
+     profile == "1m"  or profile == "3m"  ? 0.004 :
+     profile == "5m"                       ? 0.006 :
+     profile == "15m" or profile == "30m"  ? 0.012 :
+     profile == "1h"  or profile == "2h"   ? 0.025 :
+     profile == "4h"  or profile == "6h"   ? 0.035 : 0.05
+
+// Итоговые пороги
+profPricePct  = minPricePct  * _priceMult
+profFlowPct   = minFlowPct   * _flowMult
+profAtrMult   = minAtrMult   * _atrMult
+
+// ========================= FLOW CORE =======================================
+eps      = 1e-9
+bRange   = math.max(high - low, syminfo.mintick)
+mfm      = ((close - low) - (high - close)) / bRange
+mfv      = mfm * volume
+rawFlow  = ta.cum(mfv)
+smoothed = ta.ema(rawFlow, emaLen)
+slope    = smoothed - smoothed[1]
+
+// CMF
+cumMFV  = ta.cum(mfv)
+cumVol  = ta.cum(volume)
+sMFV    = na(cumMFV[cmfLen]) ? cumMFV : cumMFV - cumMFV[cmfLen]
+sVol    = na(cumVol[cmfLen]) ? cumVol : cumVol - cumVol[cmfLen]
+cmf     = (not na(sMFV) and not na(sVol) and sVol != 0) ? sMFV / sVol : 0.0
+atr     = ta.atr(atrLen)
+
+// Normalizer
+fScale   = ta.ema(math.abs(rawFlow), math.max(5, regimeLB))
+flowNorm = smoothed / math.max(fScale, eps)
+fMean    = ta.sma(smoothed, cmfLen)
+fStd     = ta.stdev(smoothed, cmfLen)
+flow_z   = fStd > syminfo.mintick ? (smoothed - fMean) / fStd : 0.0
+fHi      = ta.highest(smoothed, cmfLen)
+fLo      = ta.lowest(smoothed, cmfLen)
+flow_pct = (fHi - fLo) > syminfo.mintick ? (smoothed - fLo) / (fHi - fLo) : 0.5
+fnStd    = ta.stdev(flowNorm, cmfLen)
+minFAbs  = math.max(fnStd * _minFlowAbsFrac, 1e-10)
+
+// ========================= REGIME ==========================================
+lagFlow  = smoothed[regimeLB]
+denom    = math.max(math.abs(lagFlow), ta.sma(math.abs(smoothed), regimeLB), syminfo.mintick)
+slopePct = (smoothed - lagFlow) / denom * 100
+rangePct = math.abs(fHi - fLo) / math.max(math.abs(smoothed), syminfo.mintick) * 100
+
+var int bullCnt = 0
+var int bearCnt = 0
+bullCnt := smoothed > smoothed[1] ? bullCnt + 1 : 0
+bearCnt := smoothed < smoothed[1] ? bearCnt + 1 : 0
+
+bullReg = bullCnt >= regimeConf and slopePct > slopePctMin and rangePct > rangePctMin and smoothed > lagFlow
+bearReg = bearCnt >= regimeConf and slopePct < -slopePctMin and rangePct > rangePctMin and smoothed < lagFlow
+
+regime =
+     bullReg ? "bull" :
+     bearReg ? "bear" :
+     math.abs(slopePct) < slopePctMin ? "flat" : "transition"
+
+if regime == "flat"
+    regime := slope < 0 and cmf < -_cmfWeak ? "bear" : slope > 0 and cmf > _cmfWeak ? "bull" : "flat"
+
+// ========================= BIAS ============================================
+fScore = slope > 0 ? 1.0 : slope < 0 ? -1.0 : 0.0
+cScore = cmf > _cmfStrong ? 1.5 : cmf > _cmfWeak ? 0.5 : cmf < -_cmfStrong ? -1.5 : cmf < -_cmfWeak ? -0.5 : 0.0
+rScore = bullReg ? 1.0 : bearReg ? -1.0 : 0.0
+bScore = fScore * wFlow + cScore * wCmf + rScore * wRegime
+
+bias = bScore >= biasThresh ? "bullish" : bScore <= -biasThresh ? "bearish" : "neutral"
+
+// Confirmation
+bullBrk = close >= ta.highest(high, _brLen)
+bearBrk = close <= ta.lowest(low,  _brLen)
+bullCS  = bias == "bullish" and cmf > _cmfStrong and slope > 0 and bullBrk
+bearCS  = bias == "bearish" and cmf < -_cmfStrong and slope < 0 and bearBrk
+bullCW  = bias == "bullish" and cmf > _cmfWeak and slope > 0
+bearCW  = bias == "bearish" and cmf < -_cmfWeak and slope < 0
+conf    = bullCS ? "strong_bull" : bearCS ? "strong_bear" : bullCW or bearCW ? "weak" : "none"
+
+// ========================= HELPER: draw div label ==========================
+// style: "bull_live" / "bear_live" / "bull_pend" / "bear_pend"
+//        "hist_bull" / "hist_bear" / "hist_bull_raw" / "hist_bear_raw"
+f_labelDiv(barIdx, yVal, lStyle) =>
+    _isBull = str.contains(lStyle, "bull")
+    _isHist = str.contains(lStyle, "hist")
+    _isRaw  = str.contains(lStyle, "raw")
+    _isPend = str.contains(lStyle, "pend")
+
+    _baseCol  = _isBull ? color.green : color.red
+    _alpha    = _isRaw ? 70 : _isHist ? 25 : 0
+    _col      = color.new(_baseCol, _alpha)
+    _txtCol   = _isRaw ? color.new(color.white, 30) : color.white
+
+    // Выбор стиля маркера
+    _histUp   = histStyle == "Circles" ? label.style_circle :
+                histStyle == "Triangles" ? label.style_triangleup : label.style_label_up
+    _histDn   = histStyle == "Circles" ? label.style_circle :
+                histStyle == "Triangles" ? label.style_triangledown : label.style_label_down
+
+    _styleUp  = _isHist ? _histUp   : _isPend ? label.style_label_up   : label.style_label_up
+    _styleDn  = _isHist ? _histDn   : _isPend ? label.style_label_down  : label.style_label_down
+    _style    = _isBull ? _styleUp  : _styleDn
+
+    _sz = _isRaw ? size.tiny : _isHist ? size.small : size.normal
+
+    _txt = _isHist and histStyle != "Text" ? "" :
+           lStyle == "bull_live" ? "BUY DIV"   :
+           lStyle == "bear_live" ? "SELL DIV"  :
+           lStyle == "bull_pend" ? "BUY DIV v" :
+           lStyle == "bear_pend" ? "SELL DIV v":
+           lStyle == "hist_bull" ? "B"          :
+           lStyle == "hist_bear" ? "S"          :
+           lStyle == "hist_bull_raw" ? "b?"     : "s?"
+
+    label.new(barIdx, yVal, _txt, style=_style, color=_col, textcolor=_txtCol, size=_sz)
+
+// ========================= LIVE DIVERGENCE =================================
+pl = ta.pivotlow(low,  _pivL, _pivR)
+ph = ta.pivothigh(high,_pivL, _pivR)
+
+var float pPriceLo = na,  var float pFlowLo  = na,  var int pBullBar  = na
+var float pPriceHi = na,  var float pFlowHi  = na,  var int pBearBar  = na
+var int   pendBullBar = na, var float pendBullY = na, var bool pendBull = false
+var int   pendBearBar = na, var float pendBearY = na, var bool pendBear = false
+
+bullDiv = false
+bearDiv = false
+
+// --- Bull div (lower price low + higher flow low) ---
+if not na(pl)
+    cBar  = bar_index - _pivR
+    cPLow = low[_pivR]
+    cFLow = flowNorm[_pivR]
+    cSm   = smoothed[_pivR]
+
+    if not na(pPriceLo) and not na(pFlowLo)
+        pdiff   = math.abs(cPLow - pPriceLo)
+        priceOk = pdiff / math.max(pPriceLo, eps) >= profPricePct
+        ffrac   = math.abs(cFLow - pFlowLo) / math.max(math.abs(pFlowLo), eps)
+        fabs    = math.abs(cFLow - pFlowLo)
+        flowOk  = (ffrac >= profFlowPct) and (fabs >= minFAbs)
+        atrOk   = pdiff >= atr[_pivR] * profAtrMult
+        raw     = (cPLow < pPriceLo) and (cFLow > pFlowLo) and priceOk and flowOk and atrOk
+        cdOk    = na(pBullBar) or (cBar - pBullBar >= _cooldown)
+
+        if raw and cdOk
+            if not reqConfirm
+                bullDiv  := true
+                pBullBar := cBar
+                if showLive
+                    f_labelDiv(cBar, cSm, "bull_live")
+            else
+                pendBull    := true
+                pendBullBar := cBar
+                pendBullY   := cSm
+
+    pPriceLo := cPLow
+    pFlowLo  := cFLow
+
+// --- Bear div (higher price high + lower flow high) ---
+if not na(ph)
+    cBar  = bar_index - _pivR
+    cPHi  = high[_pivR]
+    cFHi  = flowNorm[_pivR]
+    cSm   = smoothed[_pivR]
+
+    if not na(pPriceHi) and not na(pFlowHi)
+        pdiff   = math.abs(cPHi - pPriceHi)
+        priceOk = pdiff / math.max(pPriceHi, eps) >= profPricePct
+        ffrac   = math.abs(cFHi - pFlowHi) / math.max(math.abs(pFlowHi), eps)
+        fabs    = math.abs(cFHi - pFlowHi)
+        flowOk  = (ffrac >= profFlowPct) and (fabs >= minFAbs)
+        atrOk   = pdiff >= atr[_pivR] * profAtrMult
+        raw     = (cPHi > pPriceHi) and (cFHi < pFlowHi) and priceOk and flowOk and atrOk
+        cdOk    = na(pBearBar) or (cBar - pBearBar >= _cooldown)
+
+        if raw and cdOk
+            if not reqConfirm
+                bearDiv  := true
+                pBearBar := cBar
+                if showLive
+                    f_labelDiv(cBar, cSm, "bear_live")
+            else
+                pendBear    := true
+                pendBearBar := cBar
+                pendBearY   := cSm
+
+    pPriceHi := cPHi
+    pFlowHi  := cFHi
+
+// --- Pending confirmation ---
+// Смягчённый follow-through: достаточно одного из условий:
+//   (a) close выше high предыдущей свечи
+//   (b) бычья свеча с телом > 20% от диапазона
+bBody  = math.abs(close - open)
+bRng   = math.max(high - low, syminfo.mintick)
+bullFT = (close > high[1]) or (close > open and bBody / bRng >= 0.2)
+bearFT = (close < low[1])  or (close < open and bBody / bRng >= 0.2)
+
+if pendBull and not na(pendBullBar)
+    age = bar_index - pendBullBar
+    if age > 0 and age <= _confirmBars and bullFT
+        bullDiv  := true
+        pBullBar := pendBullBar
+        if showLive
+            f_labelDiv(pendBullBar, pendBullY, "bull_pend")
+        pendBull := false, pendBullBar := na, pendBullY := na
+    else if age > _confirmBars
+        if showLive
+            label.new(pendBullBar, pendBullY, "bull?",
+                 style=label.style_label_up, color=color.new(color.green, 65),
+                 textcolor=color.white, size=size.small)
+        pendBull := false, pendBullBar := na, pendBullY := na
+
+if pendBear and not na(pendBearBar)
+    age = bar_index - pendBearBar
+    if age > 0 and age <= _confirmBars and bearFT
+        bearDiv  := true
+        pBearBar := pendBearBar
+        if showLive
+            f_labelDiv(pendBearBar, pendBearY, "bear_pend")
+        pendBear := false, pendBearBar := na, pendBearY := na
+    else if age > _confirmBars
+        if showLive
+            label.new(pendBearBar, pendBearY, "bear?",
+                 style=label.style_label_down, color=color.new(color.red, 65),
+                 textcolor=color.white, size=size.small)
+        pendBear := false, pendBearBar := na, pendBearY := na
+
+divState = bullDiv ? "bullish" : bearDiv ? "bearish" : "none"
+
+// ========================= HISTORICAL DIVERGENCE ===========================
+// Независимые переменные (h* prefix) — не влияют на live
+// Follow-through для истории: смотрим вперёд — бары уже случились,
+// поэтому проверяем close[pivotRight-1..pivotRight-N] vs open/high/low
+// При histReqConf=false показываем все паттерны без фильтра
+
+var float hPLo = na, var float hFLo = na, var int hBullBar = na
+var float hPHi = na, var float hFHi = na, var int hBearBar = na
+
+inHist = showHist and (time >= histDate)
+
+// Проверка исторического follow-through: ищем импульсный бар среди следующих после пивота
+// pivotRight-й бар = пивот, pivotRight-1, pivotRight-2... = будущие относительно пивота
+f_histConfirmed(isBull) =>
+    confirmed = false
+    maxLook   = math.min(_confirmBars, _pivR - 1)
+    for i = 1 to maxLook
+        idx = _pivR - i  // смещение от текущего бара (эти бары уже есть)
+        if idx >= 0
+            _bBody = math.abs(close[idx] - open[idx])
+            _bRng  = math.max(high[idx] - low[idx], syminfo.mintick)
+            _ft    = isBull ?
+                     ((close[idx] > high[idx + 1]) or (close[idx] > open[idx] and _bBody / _bRng >= 0.2)) :
+                     ((close[idx] < low[idx + 1])  or (close[idx] < open[idx] and _bBody / _bRng >= 0.2))
+            if _ft
+                confirmed := true
+    confirmed
+
+// Исторические bull div
+if not na(pl) and inHist
+    hCBar  = bar_index - _pivR
+    hCPLow = low[_pivR]
+    hCFLow = flowNorm[_pivR]
+    hCSm   = smoothed[_pivR]
+
+    if not na(hPLo) and not na(hFLo)
+        pdiff   = math.abs(hCPLow - hPLo)
+        priceOk = pdiff / math.max(hPLo, eps) >= profPricePct
+        ffrac   = math.abs(hCFLow - hFLo) / math.max(math.abs(hFLo), eps)
+        fabs    = math.abs(hCFLow - hFLo)
+        flowOk  = (ffrac >= profFlowPct) and (fabs >= minFAbs)
+        atrOk   = pdiff >= atr[_pivR] * profAtrMult
+        raw     = (hCPLow < hPLo) and (hCFLow > hFLo) and priceOk and flowOk and atrOk
+        cdOk    = na(hBullBar) or (hCBar - hBullBar >= _cooldown)
+
+        if raw and cdOk
+            isConf = not histReqConf or f_histConfirmed(true)
+            if isConf
+                hBullBar := hCBar
+                f_labelDiv(hCBar, hCSm, "hist_bull")
+            else if showHistRaw
+                f_labelDiv(hCBar, hCSm, "hist_bull_raw")
+
+    hPLo := hCPLow
+    hFLo := hCFLow
+
+// Исторические bear div
+if not na(ph) and inHist
+    hCBar  = bar_index - _pivR
+    hCPHi  = high[_pivR]
+    hCFHi  = flowNorm[_pivR]
+    hCSm   = smoothed[_pivR]
+
+    if not na(hPHi) and not na(hFHi)
+        pdiff   = math.abs(hCPHi - hPHi)
+        priceOk = pdiff / math.max(hPHi, eps) >= profPricePct
+        ffrac   = math.abs(hCFHi - hFHi) / math.max(math.abs(hFHi), eps)
+        fabs    = math.abs(hCFHi - hFHi)
+        flowOk  = (ffrac >= profFlowPct) and (fabs >= minFAbs)
+        atrOk   = pdiff >= atr[_pivR] * profAtrMult
+        raw     = (hCPHi > hPHi) and (hCFHi < hFHi) and priceOk and flowOk and atrOk
+        cdOk    = na(hBearBar) or (hCBar - hBearBar >= _cooldown)
+
+        if raw and cdOk
+            isConf = not histReqConf or f_histConfirmed(false)
+            if isConf
+                hBearBar := hCBar
+                f_labelDiv(hCBar, hCSm, "hist_bear")
+            else if showHistRaw
+                f_labelDiv(hCBar, hCSm, "hist_bear_raw")
+
+    hPHi := hCPHi
+    hFHi := hCFHi
+
+// ========================= QUALITY =========================================
+qs  = 0
+qs += bias == "bullish" or bias == "bearish" ? 1 : 0
+qs += conf == "strong_bull" or conf == "strong_bear" ? 2 : conf == "weak" ? 1 : 0
+qs += divState != "none" ? 1 : 0
+qs += regime == "bull" or regime == "bear" ? 1 : 0
+qual = qs >= 5 ? "high" : qs >= 3 ? "medium" : "low"
+
+// ========================= COMMENT =========================================
+ct  = (bias == "bearish" and slope > 0) or (bias == "bullish" and slope < 0)
+pnd = pendBull or pendBear
+adComment =
+     pnd ? "div candidate — await follow-through" :
+     ct  ? "countertrend flow vs bias" :
+     divState == "bullish" ? "bullish divergence" :
+     divState == "bearish" ? "bearish divergence" :
+     conf == "strong_bull" ? "bullish vol confirm" :
+     conf == "strong_bear" ? "bearish vol confirm" :
+     bias == "bullish" ? "bullish vol pressure" :
+     bias == "bearish" ? "bearish vol pressure" : "neutral"
+
+// ========================= PLOTS ===========================================
+hline(0, "Zero", color=color.new(color.gray, 80))
+plot(rawFlow,  "Raw Flow",  color=color.new(color.teal,   0), linewidth=1)
+plot(smoothed, "Smoothed",  color=color.new(color.orange, 0), linewidth=2)
+plot(showCMF  ? cmf     : na, "CMF",      color=color.new(color.blue,   0), linewidth=2)
+plot(showNorm ? flow_z  : na, "flow_z",   color=color.new(color.purple, 0), linewidth=1)
+plot(showNorm ? flow_pct: na, "flow_pct", color=color.new(color.yellow, 0), linewidth=1)
+
+bgcolor(showBias ?
+     (bias == "bullish" ? color.new(color.green, 90) :
+      bias == "bearish" ? color.new(color.red,   90) :
+      color.new(color.gray, 95)) : na)
+
+// ========================= TABLE ===========================================
+var table t = table.new(position.top_right, 2, 15, border_width=1)
+
+if barstate.islast and showTable
+    bg0 = color.new(color.black, 80)
+    fg0 = color.new(color.gray, 0)
+
+    _tfLabel = "TF: " + (autoTF ? timeframe.period + " (auto)" : manualProfile + " (manual)")
+    table.cell(t, 0,  0, "profile",    text_color=fg0, bgcolor=bg0, text_size=size.small)
+    table.cell(t, 1,  0, _tfLabel,     text_color=color.white, bgcolor=color.new(color.navy,50), text_size=size.small)
+    table.cell(t, 0,  1, "bias",       text_color=fg0, bgcolor=bg0, text_size=size.small)
+    table.cell(t, 1,  1, bias,         text_color=color.white, bgcolor=bias=="bullish"?color.new(color.green,40):bias=="bearish"?color.new(color.red,40):color.new(color.gray,70), text_size=size.small)
+    table.cell(t, 0,  2, "confirm",    text_color=fg0, bgcolor=bg0, text_size=size.small)
+    table.cell(t, 1,  2, conf,         text_color=color.white, bgcolor=conf=="strong_bull"?color.new(color.green,55):conf=="strong_bear"?color.new(color.red,55):color.new(color.gray,75), text_size=size.small)
+    table.cell(t, 0,  3, "divergence", text_color=fg0, bgcolor=bg0, text_size=size.small)
+    table.cell(t, 1,  3, divState,     text_color=color.white, bgcolor=divState=="bullish"?color.new(color.green,45):divState=="bearish"?color.new(color.red,45):color.new(color.black,70), text_size=size.small)
+    table.cell(t, 0,  4, "regime",     text_color=fg0, bgcolor=bg0, text_size=size.small)
+    table.cell(t, 1,  4, regime,       text_color=color.white, bgcolor=regime=="bull"?color.new(color.green,35):regime=="bear"?color.new(color.red,35):color.new(color.gray,60), text_size=size.small)
+    table.cell(t, 0,  5, "quality",    text_color=fg0, bgcolor=bg0, text_size=size.small)
+    table.cell(t, 1,  5, qual,         text_color=color.white, bgcolor=qual=="high"?color.new(color.green,30):qual=="medium"?color.new(color.orange,40):color.new(color.gray,70), text_size=size.small)
+    table.cell(t, 0,  6, "cmf",        text_color=fg0, bgcolor=bg0, text_size=size.small)
+    table.cell(t, 1,  6, str.tostring(cmf, "#.####"), text_color=color.white, bgcolor=color.new(color.blue,65), text_size=size.small)
+    table.cell(t, 0,  7, "slope",      text_color=fg0, bgcolor=bg0, text_size=size.small)
+    table.cell(t, 1,  7, str.tostring(slope, format.mintick), text_color=color.white, bgcolor=color.new(color.purple,70), text_size=size.small)
+    table.cell(t, 0,  8, "raw_flow",   text_color=fg0, bgcolor=bg0, text_size=size.small)
+    table.cell(t, 1,  8, str.tostring(rawFlow, format.mintick), text_color=color.white, bgcolor=color.new(color.black,70), text_size=size.small)
+    table.cell(t, 0,  9, "smoothed",   text_color=fg0, bgcolor=bg0, text_size=size.small)
+    table.cell(t, 1,  9, str.tostring(smoothed, format.mintick), text_color=color.white, bgcolor=color.new(color.black,70), text_size=size.small)
+    table.cell(t, 0, 10, "flow_z",     text_color=fg0, bgcolor=bg0, text_size=size.small)
+    table.cell(t, 1, 10, str.tostring(flow_z, "#.##"), text_color=color.white, bgcolor=color.new(color.purple,55), text_size=size.small)
+    table.cell(t, 0, 11, "flow_pct",   text_color=fg0, bgcolor=bg0, text_size=size.small)
+    table.cell(t, 1, 11, str.tostring(flow_pct*100,"#.#")+"%", text_color=color.white, bgcolor=color.new(color.purple,55), text_size=size.small)
+    table.cell(t, 0, 12, "pivot L/R",  text_color=fg0, bgcolor=bg0, text_size=size.small)
+    table.cell(t, 1, 12, str.tostring(_pivL) + " / " + str.tostring(_pivR), text_color=color.white, bgcolor=color.new(color.black,70), text_size=size.small)
+    table.cell(t, 0, 13, "cooldown",   text_color=fg0, bgcolor=bg0, text_size=size.small)
+    table.cell(t, 1, 13, str.tostring(_cooldown), text_color=color.white, bgcolor=color.new(color.black,70), text_size=size.small)
+    table.cell(t, 0, 14, "comment",    text_color=fg0, bgcolor=bg0, text_size=size.small)
+    table.cell(t, 1, 14, adComment,    text_color=color.white, bgcolor=color.new(color.black,70), text_size=size.small)

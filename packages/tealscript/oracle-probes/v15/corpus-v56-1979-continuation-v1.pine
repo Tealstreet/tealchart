@@ -1,0 +1,10 @@
+//@version=6
+indicator("V14 corpus 1979 continuation")
+signal_type = input.string("BULL")
+var color observed = na
+if barstate.islast
+    sig_color = signal_type == "BULL" ? color.green :
+                signal_type == "BEAR" ? color.red : color.gray
+    observed := sig_color
+bgcolor(observed)
+plot(1, "OUTCOME")

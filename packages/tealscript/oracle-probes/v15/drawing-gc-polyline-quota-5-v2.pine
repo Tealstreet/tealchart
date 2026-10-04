@@ -1,0 +1,8 @@
+//@version=6
+indicator("Drawing GC polyline quota 5 v2", max_polylines_count=5)
+var array<polyline> created = array.new<polyline>()
+array.push(created, polyline.new(array.from(chart.point.from_index(bar_index, 1.0), chart.point.from_index(bar_index + 1, 2.0))))
+int count = array.size(polyline.all)
+int oldest = count > 0 ? array.indexof(created, array.get(polyline.all, 0)) : na
+plot(count, "VISIBLE_COUNT")
+plot(oldest, "OLDEST_INDEX")

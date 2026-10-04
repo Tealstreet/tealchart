@@ -1,0 +1,11 @@
+//@version=3
+study("V13 bgcolor offset v3 zero-control", overlay=false)
+phase = n % 32
+source_code = phase == 8 ? 1 : phase == 9 ? 2 : phase == 11 ? 3 : phase == 12 ? 4 : 0
+series_offset = phase < 10 ? 2 : phase < 12 ? -1 : -3
+tint = source_code == 1 ? red : source_code == 2 ? blue : source_code == 3 ? lime : source_code == 4 ? orange : na
+bgcolor(tint, offset=0, transp=0)
+plot(n, "BAR_INDEX", transp=100)
+plot(phase, "PHASE", transp=100)
+plot(source_code, "SOURCE_CODE", transp=100)
+plot(series_offset, "SERIES_OFFSET", transp=100)

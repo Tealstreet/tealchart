@@ -1,0 +1,228 @@
+//@version=5
+indicator("CTA Context (Zones + SMAs + VIX)", overlay=true)
+
+// ==========================================
+// CTA CONTEXT INDICATOR
+// Purpose: Always-on visual context showing:
+// - CTA Regime Zones (background color)
+// - Key SMAs (20/50/120/200)
+// - VIX Divergence Warning
+// - Distance to key levels
+// ==========================================
+
+// ==========================================
+// 1. INPUT SETTINGS
+// ==========================================
+
+// --- CTA SMA Settings ---
+grp_sma = "CTA SMAs"
+show_sma20 = input.bool(true, "SMA 20 (Fast)", group=grp_sma, inline="s20")
+col_sma20 = input.color(#2196F3, "", group=grp_sma, inline="s20")
+wid_sma20 = input.int(2, "Width", minval=1, maxval=5, group=grp_sma, inline="s20")
+
+show_sma50 = input.bool(true, "SMA 50 (Core)", group=grp_sma, inline="s50")
+col_sma50 = input.color(#FF9800, "", group=grp_sma, inline="s50")
+wid_sma50 = input.int(2, "Width", minval=1, maxval=5, group=grp_sma, inline="s50")
+
+show_sma120 = input.bool(true, "SMA 120 (Structural)", group=grp_sma, inline="s120")
+col_sma120 = input.color(#F44336, "", group=grp_sma, inline="s120")
+wid_sma120 = input.int(2, "Width", minval=1, maxval=5, group=grp_sma, inline="s120")
+
+show_sma200 = input.bool(true, "SMA 200 (Long-term)", group=grp_sma, inline="s200")
+col_sma200 = input.color(#795548, "", group=grp_sma, inline="s200")
+wid_sma200 = input.int(1, "Width", minval=1, maxval=5, group=grp_sma, inline="s200")
+
+// --- Zone Visualization ---
+grp_zone = "CTA Zone Display"
+show_zone_bg = input.bool(true, "Show Zone Background", group=grp_zone)
+show_zone_label = input.bool(true, "Show Zone Label", group=grp_zone)
+zone_transparency = input.int(92, "Background Transparency", minval=80, maxval=98, group=grp_zone)
+col_max_long = input.color(color.green, "Max Long", group=grp_zone, inline="zc1")
+col_delever = input.color(color.yellow, "De-Lever", group=grp_zone, inline="zc1")
+col_waterfall = input.color(color.orange, "Waterfall", group=grp_zone, inline="zc2")
+col_capitulation = input.color(color.red, "Capitulation", group=grp_zone, inline="zc2")
+
+// --- VIX Divergence Warning ---
+grp_vix = "VIX Divergence Warning"
+show_vix_warning = input.bool(true, "Enable VIX Warning", group=grp_vix)
+vix_symbol = input.symbol("VIX", "VIX Symbol", group=grp_vix)
+vix_lookback = input.int(5, "Lookback Bars", minval=2, maxval=20, group=grp_vix)
+
+// --- Labels ---
+grp_lbl = "Labels"
+show_labels = input.bool(true, "Show SMA Labels", group=grp_lbl)
+lbl_offset = input.int(5, "Label Offset", minval=1, maxval=20, group=grp_lbl)
+
+// --- Info Table ---
+grp_table = "Info Table"
+show_table = input.bool(true, "Show Info Table", group=grp_table)
+table_pos_str = input.string("top_right", "Position", options=["top_right", "top_left", "bottom_right", "bottom_left"], group=grp_table)
+
+// ==========================================
+// 2. CALCULATIONS
+// ==========================================
+
+// --- SMAs ---
+sma20 = ta.sma(close, 20)
+sma50 = ta.sma(close, 50)
+sma120 = ta.sma(close, 120)
+sma200 = ta.sma(close, 200)
+
+// --- CTA Zones ---
+zone_max_long = close > sma20 and close > sma50 and close > sma120
+zone_delever = close < sma20 and close >= sma50
+zone_waterfall = close < sma50 and sma20 >= sma120
+zone_capitulation = sma20 < sma120
+
+// --- VIX Data ---
+vix_close = request.security(vix_symbol, timeframe.period, close)
+vix_rising = vix_close > vix_close[vix_lookback]
+price_rising = close > close[vix_lookback]
+vix_divergence = show_vix_warning and vix_rising and price_rising
+
+// --- Zone Color ---
+zone_color = show_zone_bg ? 
+    (zone_max_long ? color.new(col_max_long, zone_transparency) : 
+     zone_delever ? color.new(col_delever, zone_transparency) : 
+     zone_waterfall ? color.new(col_waterfall, zone_transparency) : 
+     zone_capitulation ? color.new(col_capitulation, zone_transparency) : na) : na
+
+// --- Zone Text ---
+zone_text = zone_max_long ? "MAX LONG" : 
+            zone_delever ? "DE-LEVER" : 
+            zone_waterfall ? "WATERFALL" : 
+            zone_capitulation ? "CAPITULATION" : "NEUTRAL"
+
+zone_label_color = zone_max_long ? col_max_long : 
+                   zone_delever ? col_delever : 
+                   zone_waterfall ? col_waterfall : 
+                   zone_capitulation ? col_capitulation : color.gray
+
+// ==========================================
+// 3. PLOTTING
+// ==========================================
+
+// --- SMAs ---
+plot(show_sma20 ? sma20 : na, "SMA 20", col_sma20, wid_sma20)
+plot(show_sma50 ? sma50 : na, "SMA 50", col_sma50, wid_sma50)
+plot(show_sma120 ? sma120 : na, "SMA 120", col_sma120, wid_sma120)
+plot(show_sma200 ? sma200 : na, "SMA 200", col_sma200, wid_sma200)
+
+// --- Zone Background ---
+bgcolor(zone_color, title="CTA Zone")
+
+// --- VIX Divergence Warning ---
+bgcolor(vix_divergence ? color.new(color.purple, 85) : na, title="VIX Divergence Warning")
+plotshape(vix_divergence and not vix_divergence[1], 
+          style=shape.xcross, location=location.abovebar,
+          color=color.purple, size=size.small, text="VIX!")
+
+// ==========================================
+// 4. LABELS
+// ==========================================
+
+// SMA Labels
+var label lbl_sma20 = label.new(na, na, style=label.style_label_left, textcolor=color.white, size=size.small)
+var label lbl_sma50 = label.new(na, na, style=label.style_label_left, textcolor=color.white, size=size.small)
+var label lbl_sma120 = label.new(na, na, style=label.style_label_left, textcolor=color.white, size=size.small)
+var label lbl_sma200 = label.new(na, na, style=label.style_label_left, textcolor=color.white, size=size.small)
+
+if barstate.islast and show_labels
+    if show_sma20
+        label.set_xy(lbl_sma20, bar_index + lbl_offset, sma20)
+        label.set_text(lbl_sma20, "20")
+        label.set_color(lbl_sma20, col_sma20)
+    if show_sma50
+        label.set_xy(lbl_sma50, bar_index + lbl_offset, sma50)
+        label.set_text(lbl_sma50, "50")
+        label.set_color(lbl_sma50, col_sma50)
+    if show_sma120
+        label.set_xy(lbl_sma120, bar_index + lbl_offset, sma120)
+        label.set_text(lbl_sma120, "120")
+        label.set_color(lbl_sma120, col_sma120)
+    if show_sma200
+        label.set_xy(lbl_sma200, bar_index + lbl_offset, sma200)
+        label.set_text(lbl_sma200, "200")
+        label.set_color(lbl_sma200, col_sma200)
+
+// Zone Label
+var label zone_label = label.new(na, na, style=label.style_label_lower_left, textcolor=color.white, size=size.normal)
+if barstate.islast and show_zone_label
+    label.set_xy(zone_label, bar_index + 2, high * 1.002)
+    label.set_text(zone_label, zone_text + (vix_divergence ? " ⚠️VIX" : ""))
+    label.set_color(zone_label, zone_label_color)
+
+// ==========================================
+// 5. INFO TABLE
+// ==========================================
+
+table_pos = switch table_pos_str
+    "top_right" => position.top_right
+    "top_left" => position.top_left
+    "bottom_right" => position.bottom_right
+    "bottom_left" => position.bottom_left
+    => position.top_right
+
+var table info_tbl = table.new(table_pos, 3, 10, border_width=1)
+
+if barstate.islast and show_table
+    // Header
+    table.cell(info_tbl, 0, 0, "Level", bgcolor=color.gray, text_color=color.white)
+    table.cell(info_tbl, 1, 0, "Price", bgcolor=color.gray, text_color=color.white)
+    table.cell(info_tbl, 2, 0, "Dist %", bgcolor=color.gray, text_color=color.white)
+    
+    // Zone Row
+    table.cell(info_tbl, 0, 1, "ZONE", bgcolor=zone_label_color, text_color=color.white)
+    table.cell(info_tbl, 1, 1, zone_text, bgcolor=color.new(zone_label_color, 70), text_color=color.white)
+    vix_status = vix_divergence ? "⚠️ FAKE?" : "OK"
+    table.cell(info_tbl, 2, 1, vix_status, bgcolor=vix_divergence ? color.new(color.purple, 50) : color.new(color.gray, 80), text_color=color.white)
+    
+    // SMA Rows
+    dist_20 = (close - sma20) / sma20 * 100
+    dist_50 = (close - sma50) / sma50 * 100
+    dist_120 = (close - sma120) / sma120 * 100
+    dist_200 = (close - sma200) / sma200 * 100
+    
+    table.cell(info_tbl, 0, 2, "SMA 20", bgcolor=col_sma20, text_color=color.white)
+    table.cell(info_tbl, 1, 2, str.tostring(sma20, format.mintick), bgcolor=color.new(color.gray, 90), text_color=chart.fg_color)
+    table.cell(info_tbl, 2, 2, str.tostring(dist_20, "+#.1;-#.1") + "%", bgcolor=dist_20 > 0 ? color.new(color.green, 80) : color.new(color.red, 80), text_color=chart.fg_color)
+    
+    table.cell(info_tbl, 0, 3, "SMA 50", bgcolor=col_sma50, text_color=color.white)
+    table.cell(info_tbl, 1, 3, str.tostring(sma50, format.mintick), bgcolor=color.new(color.gray, 90), text_color=chart.fg_color)
+    table.cell(info_tbl, 2, 3, str.tostring(dist_50, "+#.1;-#.1") + "%", bgcolor=dist_50 > 0 ? color.new(color.green, 80) : color.new(color.red, 80), text_color=chart.fg_color)
+    
+    table.cell(info_tbl, 0, 4, "SMA 120", bgcolor=col_sma120, text_color=color.white)
+    table.cell(info_tbl, 1, 4, str.tostring(sma120, format.mintick), bgcolor=color.new(color.gray, 90), text_color=chart.fg_color)
+    table.cell(info_tbl, 2, 4, str.tostring(dist_120, "+#.1;-#.1") + "%", bgcolor=dist_120 > 0 ? color.new(color.green, 80) : color.new(color.red, 80), text_color=chart.fg_color)
+    
+    table.cell(info_tbl, 0, 5, "SMA 200", bgcolor=col_sma200, text_color=color.white)
+    table.cell(info_tbl, 1, 5, str.tostring(sma200, format.mintick), bgcolor=color.new(color.gray, 90), text_color=chart.fg_color)
+    table.cell(info_tbl, 2, 5, str.tostring(dist_200, "+#.1;-#.1") + "%", bgcolor=dist_200 > 0 ? color.new(color.green, 80) : color.new(color.red, 80), text_color=chart.fg_color)
+    
+    // VIX Row
+    table.cell(info_tbl, 0, 6, "VIX", bgcolor=color.purple, text_color=color.white)
+    table.cell(info_tbl, 1, 6, str.tostring(vix_close, "#.1"), bgcolor=color.new(color.gray, 90), text_color=chart.fg_color)
+    vix_chg = (vix_close - vix_close[vix_lookback]) / vix_close[vix_lookback] * 100
+    table.cell(info_tbl, 2, 6, str.tostring(vix_chg, "+#.1;-#.1") + "%", bgcolor=vix_chg > 0 ? color.new(color.red, 80) : color.new(color.green, 80), text_color=chart.fg_color)
+
+else if not show_table
+    table.clear(info_tbl, 0, 0, 2, 9)
+
+// ==========================================
+// 6. ALERTS
+// ==========================================
+
+// Zone Transitions
+alertcondition(zone_max_long and not zone_max_long[1], "Entered Max Long Zone", "CTA: Entered MAX LONG zone")
+alertcondition(zone_delever and not zone_delever[1], "Entered De-Lever Zone", "CTA: Entered DE-LEVERAGING zone")
+alertcondition(zone_waterfall and not zone_waterfall[1], "Entered Waterfall Zone", "CTA: Entered WATERFALL zone - bearish")
+alertcondition(zone_capitulation and not zone_capitulation[1], "Capitulation Triggered", "CTA: CAPITULATION - 20 SMA below 120")
+
+// VIX Warning
+alertcondition(vix_divergence and not vix_divergence[1], "VIX Divergence Warning", "⚠️ VIX rising with price - potential fake rally!")
+
+// Key Level Crosses
+alertcondition(ta.crossover(close, sma50), "Price Above 50 SMA", "Price crossed ABOVE 50 SMA")
+alertcondition(ta.crossunder(close, sma50), "Price Below 50 SMA", "Price crossed BELOW 50 SMA")
+alertcondition(ta.crossover(close, sma120), "Price Above 120 SMA", "Price crossed ABOVE 120 SMA")
+alertcondition(ta.crossunder(close, sma120), "Price Below 120 SMA", "Price crossed BELOW 120 SMA")
