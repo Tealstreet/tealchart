@@ -49,6 +49,9 @@
 > **Then round v21.** After v20, do [`v21/HANDOFF-v21-v2.md`](v21/HANDOFF-v21-v2.md) — 20 request-context, polyline
 > point-copy and drawing-retention probes plus 3 paired originals; steps in `v21/instructions/`. Reply at
 > `v21/captures/v21/RESPONSE-v21.md`.
+>
+> **Then round v22.** After v21, do [`v22/HANDOFF-v22-v1.md`](v22/HANDOFF-v22-v1.md) — 1 probe: zone-less
+> `timestamp()` inside `request.security` on a non-UTC symbol. Reply at `v22/captures/v22/RESPONSE-v22.md`.
 
 Agent exchange: [capture response v1](RESPONSE-v1.md). The next reply belongs in
 `RESPONSE-v2.md` beside this handoff; commit responses so both machines can read them.

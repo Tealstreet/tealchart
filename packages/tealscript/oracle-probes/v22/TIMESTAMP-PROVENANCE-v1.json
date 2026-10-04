@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "sourceSha256": "437eb7152ea43abb724a0a721d1fa2e63cc0fa7ce118883f2659a25ba194a482",
+  "unchangedStagedSource": true,
+  "semanticAtom": "7ff14e2d4dd9231409cb35479372d263d7a72e6a",
+  "authorityCredit": "DOCUMENTED-AUTHORITY-ONLY",
+  "nativeStatus": "UNOBSERVED",
+  "authority": [
+    "https://www.tradingview.com/pine-script-docs/concepts/time/#timestamp",
+    "https://www.tradingview.com/pine-script-docs/concepts/time/#time-zones",
+    "https://www.tradingview.com/pine-script-docs/concepts/other-timeframes-and-data/#common-characteristics"
+  ],
+  "localCompileReceipt": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v22-outcomes/REQUESTED-TIMESTAMP-LOCAL-PREFLIGHT-v1.json"
+}

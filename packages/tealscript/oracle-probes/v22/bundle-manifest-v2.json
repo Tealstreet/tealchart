@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "bundle": "v22",
+  "scripts": [
+    {
+      "probe": "request-timestamp-exchange-zone-v22-v1.pine",
+      "path": "request-timestamp-exchange-zone-v22-v1.pine",
+      "owner": "codex-p4250m",
+      "sourceSha256": "437eb7152ea43abb724a0a721d1fa2e63cc0fa7ce118883f2659a25ba194a482",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "raw-csv+context+snapshot",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "columns": [
+        "CHART_TIME_MS",
+        "CHART_IMPLICIT_LITERAL",
+        "REQUEST_TIME_MS",
+        "REQUEST_IMPLICIT_LITERAL",
+        "REQUEST_EXPLICIT_EXCHANGE_LITERAL",
+        "REQUEST_EXPLICIT_UTC_LITERAL",
+        "REQUEST_IMPLICIT_SERIES_MIDNIGHT",
+        "REQUEST_EXPLICIT_EXCHANGE_SERIES_MIDNIGHT",
+        "REQUEST_DATESTRING_UTC",
+        "REQUEST_ZONE_IS_NEWYORK"
+      ],
+      "question": "On a BINANCE:BTCUSDT 2m chart requesting NASDAQ:MSFT at chart timeframe, does numeric timestamp with omitted zone equal explicit requested syminfo.timezone, for fixed components and series calendar components? Does dateString remain UTC? Export all columns and requested dataset/context metadata; retain compile/runtime diagnostics.",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC"
+      },
+      "requestedContext": {
+        "symbol": "NASDAQ:MSFT",
+        "timeframe": "chart timeframe",
+        "exchangeTimezone": "Record actual syminfo.timezone attestation"
+      },
+      "instructions": [
+        "Keep exact source; use BINANCE:BTCUSDT 2m chart with overlapping NASDAQ:MSFT history.",
+        "Save raw CSV, all compile/runtime outcome text and screenshots. Do not substitute symbol or timezone silently.",
+        "Capture requested MSFT time/OHLC companion/provider metadata where available; mark any missing rows as missing context.",
+        "Do not force expected values or mask disagreement; compare implicit and explicit columns at identical aligned rows."
+      ],
+      "rootClaim": "ledger/requested-timestamp-zone-p4250m-v1/ROOT-CLAIM-v1.json",
+      "instructionsPath": "instructions/request-timestamp-exchange-zone-v22-v1.md",
+      "instructionsSha256": "2d2bcc8a1f550f11b4549570e357c83a5cbd62b67a6af57733e866fff526cc2a",
+      "localReadiness": {
+        "sourceSha256": "437eb7152ea43abb724a0a721d1fa2e63cc0fa7ce118883f2659a25ba194a482",
+        "parseSemanticCompile": "PASS",
+        "receipt": "oracle-probes/v22-outcomes/REQUESTED-TIMESTAMP-LOCAL-PREFLIGHT-v1.json",
+        "nativeVerdict": "UNOBSERVED"
+      }
+    }
+  ],
+  "version": 2,
+  "status": "FROZEN",
+  "frozen": true
+}
