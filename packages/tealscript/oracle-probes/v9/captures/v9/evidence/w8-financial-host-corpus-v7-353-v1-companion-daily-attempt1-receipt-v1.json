@@ -1,0 +1,1225 @@
+{
+  "artifact": "Financial native chart companion v1",
+  "parent_source": "w8-financial-host-corpus-v7-353-v1.pine",
+  "parent_source_sha256": "2319f696d5fd5847e482944c116f692ecae8b1af81c8bab44ca11136baadf05b",
+  "parent_attempt": 3,
+  "setup": {
+    "browser_utc": "2026-10-04T13:24:10.835Z",
+    "symbol": {
+      "exchange_traded_night_name": "BOATS",
+      "exchange_traded_night": "BOATS",
+      "night_symbol": "BOATS_LS:AAPL",
+      "source2": {
+        "country": "US",
+        "description": "Cboe One",
+        "exchange-type": "exchange",
+        "id": "BATS",
+        "name": "Cboe One",
+        "url": "https://markets.cboe.com/us/equities/overview/"
+      },
+      "currency_code": "USD",
+      "source_id": "BATS",
+      "session_holidays": "20000117,20000221,20000421,20000529,20000704,20000904,20001123,20001225,20010101,20010115,20010219,20010413,20010528,20010704,20010903,20011122,20011225,20020101,20020121,20020218,20020329,20020527,20020704,20020902,20021128,20021225,20030101,20030120,20030217,20030418,20030526,20030704,20030901,20031127,20031225,20040101,20040119,20040216,20040409,20040531,20040611,20040705,20040906,20041125,20041224,20050117,20050221,20050325,20050530,20050704,20050905,20051124,20051226,20060102,20060116,20060220,20060414,20060529,20060704,20060904,20061123,20061225,20070101,20070102,20070115,20070219,20070406,20070528,20070704,20070903,20071122,20071225,20080101,20080121,20080218,20080321,20080526,20080704,20080901,20081127,20081225,20090101,20090119,20090216,20090410,20090525,20090703,20090907,20091126,20091225,20100101,20100118,20100215,20100402,20100531,20100705,20100906,20101125,20101224,20110117,20110221,20110422,20110530,20110704,20110905,20111124,20111226,20120102,20120116,20120220,20120406,20120528,20120704,20120903,20121122,20121225,20130101,20130121,20130218,20130329,20130527,20130704,20130902,20131128,20131225,20140101,20140120,20140217,20140418,20140526,20140704,20140901,20141127,20141225,20150101,20150119,20150216,20150403,20150525,20150703,20150907,20151126,20151225,20160101,20160118,20160215,20160325,20160530,20160704,20160905,20161124,20161226,20170102,20170116,20170220,20170414,20170529,20170704,20170904,20171123,20171225,20180101,20180115,20180219,20180330,20180528,20180704,20180903,20181122,20181225,20190101,20190121,20190218,20190419,20190527,20190704,20190902,20191128,20191225,20200101,20200120,20200217,20200410,20200525,20200703,20200907,20201126,20201225,20210101,20210118,20210215,20210402,20210531,20210705,20210906,20211125,20211224,20220117,20220221,20220415,20220530,20220620,20220704,20220905,20221124,20221226,20230102,20230116,20230220,20230407,20230529,20230619,20230704,20230904,20231123,20231225,20240101,20240115,20240219,20240329,20240527,20240619,20240704,20240902,20241128,20241225,20250101,20250120,20250217,20250418,20250526,20250619,20250704,20250901,20251127,20251225,20260101,20260119,20260216,20260403,20260525,20260619,20260703,20260907,20261126,20261225,20270101,20270118,20270215,20270326,20270531,20270618,20270705,20270906,20271125,20271224",
+      "subsession_id": "regular",
+      "provider_id": "ice",
+      "currency_id": "USD",
+      "country": "US",
+      "pro_perm": "nasdaq",
+      "measure": "price",
+      "allowed_adjustment": "any",
+      "short_description": "Apple Inc.",
+      "variable_tick_size": "0.0001 1 0.01",
+      "cusip": "037833100",
+      "isin": "US0378331005",
+      "language": "en",
+      "local_description": "Apple Inc.",
+      "name": "AAPL",
+      "full_name": "BATS:AAPL",
+      "pro_name": "NASDAQ:AAPL",
+      "base_name": [
+        "NASDAQ:AAPL"
+      ],
+      "description": "Apple Inc.",
+      "exchange": "Cboe One",
+      "pricescale": 100,
+      "pointvalue": 1,
+      "minmov": 1,
+      "session": "0930-1600",
+      "session_display": "0930-1600",
+      "subsessions": [
+        {
+          "description": "Night",
+          "id": "night",
+          "private": true,
+          "session": "2000-0400",
+          "session-display": "2000-0400"
+        },
+        {
+          "description": "24h",
+          "id": "24h",
+          "private": false,
+          "session": "2000-2000",
+          "session-display": "2000-2000"
+        },
+        {
+          "description": "Premarket",
+          "id": "premarket",
+          "private": true,
+          "session": "0400-0930",
+          "session-display": "0400-0930"
+        },
+        {
+          "description": "Regular Trading Hours",
+          "id": "regular",
+          "private": false,
+          "session": "0930-1600",
+          "session-correction": "0930-1300:20190703,20191129,20191224,20211126,20221125,20230703,20231124,20240703,20241129,20241224,20250703,20251128,20251224,20261127,20261224,20271126,20271223;dayoff:20250109",
+          "session-display": "0930-1600"
+        },
+        {
+          "description": "Postmarket",
+          "id": "postmarket",
+          "private": true,
+          "session": "1600-2000",
+          "session-correction": "1300-1700:20190703,20191129,20191224,20211126,20221125,20230703,20231124,20240703,20241129,20241224,20250703,20251128,20251224,20261127,20261224,20271126,20271223;dayoff:20250109",
+          "session-display": "1600-2000"
+        },
+        {
+          "description": "Extended Trading Hours",
+          "id": "extended",
+          "private": false,
+          "session": "0400-2000",
+          "session-correction": "0400-1700:20190703,20191129,20191224,20211126,20221125,20230703,20231124,20240703,20241129,20241224,20250703,20251128,20251224,20261127,20261224,20271126,20271223;dayoff:20250109",
+          "session-display": "0400-2000"
+        }
+      ],
+      "type": "stock",
+      "typespecs": [
+        "common"
+      ],
+      "has_intraday": true,
+      "fractional": false,
+      "listed_exchange": "NASDAQ",
+      "legs": [
+        "BATS:AAPL"
+      ],
+      "is_tradable": true,
+      "minmove2": 0,
+      "timezone": "America/New_York",
+      "aliases": [],
+      "alternatives": [
+        "BATS_DLY:AAPL"
+      ],
+      "is_replayable": true,
+      "has_adjustment": true,
+      "has_extended_hours": true,
+      "bar_source": "trade",
+      "bar_transform": "none",
+      "bar_fillgaps": false,
+      "visible_plots_set": "ohlcv",
+      "is-tickbars-available": true,
+      "exchange_listed_name": "NASDAQ",
+      "isin-displayed": "US0378331005",
+      "figi": {
+        "country-composite": "BBG000B9XRY4",
+        "exchange-level": "BBG000B9XRY4"
+      },
+      "corrections": "0930-1300:20190703,20191129,20191224,20211126,20221125,20230703,20231124,20240703,20241129,20241224,20250703,20251128,20251224,20261127,20261224,20271126,20271223;dayoff:20250109"
+    },
+    "interval": "1D",
+    "style": 1,
+    "timezone": "Etc/UTC",
+    "replay": false,
+    "bars": 11538,
+    "first": {
+      "index": -11238,
+      "value": [
+        345479400,
+        0.128348,
+        0.128348,
+        0.128348,
+        0.128348,
+        469034068
+      ]
+    },
+    "last": {
+      "index": 299,
+      "value": [
+        1790947800,
+        333.26,
+        334.54,
+        330.61,
+        333.69,
+        33278552
+      ]
+    },
+    "end": true,
+    "studies": [
+      {
+        "id": "XZs03l",
+        "name": "All: Valuation Ratios + Vol",
+        "meta_id": "Script$USER;64eb9fe01ecd4728859be8cb120fa590@tv-scripting",
+        "inputs": [
+          {
+            "id": "in_0",
+            "name": "Growth Lookback (Years)",
+            "value": 5
+          },
+          {
+            "id": "in_1",
+            "name": "Include Revenue Growth in Score",
+            "value": false
+          },
+          {
+            "id": "in_2",
+            "name": "Net Cash Required for Top Score",
+            "value": false
+          },
+          {
+            "id": "in_3",
+            "name": "Growth Basis for Verdict & Score",
+            "value": "Auto (longest available)"
+          },
+          {
+            "id": "in_4",
+            "name": "Debt/EBITDA \u00b7 Healthy up to",
+            "value": 2
+          },
+          {
+            "id": "in_5",
+            "name": "Debt/EBITDA \u00b7 Moderate up to",
+            "value": 4
+          },
+          {
+            "id": "in_6",
+            "name": "EV/EBITDA \u00b7 Cheap up to",
+            "value": 10
+          },
+          {
+            "id": "in_7",
+            "name": "EV/EBITDA \u00b7 Fair up to",
+            "value": 15
+          },
+          {
+            "id": "in_8",
+            "name": "FCF Yield % \u00b7 Cash Cow from",
+            "value": 8
+          },
+          {
+            "id": "in_9",
+            "name": "FCF Yield % \u00b7 Strong from",
+            "value": 6
+          },
+          {
+            "id": "in_10",
+            "name": "FCF Yield % \u00b7 Decent from",
+            "value": 3
+          },
+          {
+            "id": "in_11",
+            "name": "Revenue CAGR % \u00b7 High from",
+            "value": 15
+          },
+          {
+            "id": "in_12",
+            "name": "Revenue CAGR % \u00b7 Steady from",
+            "value": 5
+          },
+          {
+            "id": "in_13",
+            "name": "Volume Average Length (Days)",
+            "value": 20
+          },
+          {
+            "id": "in_14",
+            "name": "ANOMALIE Threshold (x)",
+            "value": 2
+          },
+          {
+            "id": "in_15",
+            "name": "ACTIF Level (\u00d7 threshold)",
+            "value": 0.6
+          },
+          {
+            "id": "in_16",
+            "name": "NORMAL Level (\u00d7 threshold)",
+            "value": 0.4
+          },
+          {
+            "id": "in_17",
+            "name": "Alerts Only on Daily/Weekly Charts",
+            "value": true
+          },
+          {
+            "id": "in_18",
+            "name": "Table Position",
+            "value": "Bottom Right"
+          },
+          {
+            "id": "in_19",
+            "name": "Text Size",
+            "value": "normal"
+          },
+          {
+            "id": "in_20",
+            "name": "Theme",
+            "value": "Dark"
+          },
+          {
+            "id": "in_21",
+            "name": "Show Title Band",
+            "value": true
+          },
+          {
+            "id": "in_22",
+            "name": "Show 2Y / NY History Columns",
+            "value": true
+          },
+          {
+            "id": "in_23",
+            "name": "Show Score Meter (\u25b0\u25b1)",
+            "value": true
+          },
+          {
+            "id": "in_24",
+            "name": "Show D_RVol Row",
+            "value": true
+          },
+          {
+            "id": "in_25",
+            "name": "Show Revenue Growth Row",
+            "value": true
+          },
+          {
+            "id": "in_26",
+            "name": "Show Score Footer in Table",
+            "value": true
+          },
+          {
+            "id": "in_27",
+            "name": "Show Floating Score Box",
+            "value": true
+          },
+          {
+            "id": "in_28",
+            "name": "Floating Score Box Position",
+            "value": "Top Right"
+          },
+          {
+            "id": "in_29",
+            "name": "Frame Color",
+            "value": "rgba(143,162,200,1)"
+          },
+          {
+            "id": "in_30",
+            "name": "Header Accent",
+            "value": "rgba(44,69,119,1)"
+          },
+          {
+            "id": "in_31",
+            "name": "Table Transparency",
+            "value": 0
+          },
+          {
+            "id": "in_32",
+            "name": "Current-Figure Basis",
+            "value": "TTM + latest quarter"
+          },
+          {
+            "id": "in_33",
+            "name": "Financials Currency (blank = same as chart)",
+            "value": ""
+          },
+          {
+            "id": "in_34",
+            "name": "Minimum Metrics Required for a Verdict",
+            "value": 2
+          },
+          {
+            "id": "in_35",
+            "name": "Fiscal-Year Settle (bars)",
+            "value": 2
+          }
+        ],
+        "plots": [
+          {
+            "id": "plot_0",
+            "type": "alertcondition"
+          },
+          {
+            "id": "plot_1",
+            "type": "shapes"
+          }
+        ],
+        "styles": {
+          "plot_0": {
+            "text": "Daily volume explosion on {{ticker}} \u2014 D_RVol above threshold.",
+            "title": "Volume Explosion"
+          },
+          "plot_1": {
+            "isHidden": false,
+            "size": "small",
+            "text": "VOL",
+            "title": "Explosion Volume"
+          }
+        },
+        "status": {
+          "type": 2
+        },
+        "first": {
+          "index": -11238,
+          "value": [
+            345479400,
+            0,
+            0
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1790947800,
+            0,
+            0
+          ]
+        }
+      },
+      {
+        "id": "x6EiTo",
+        "name": "Volume",
+        "meta_id": "Volume@tv-basicstudies",
+        "inputs": [
+          {
+            "id": "length",
+            "name": "MA Length",
+            "value": 20
+          },
+          {
+            "id": "col_prev_close",
+            "name": "Color based on previous close",
+            "value": false
+          }
+        ],
+        "plots": [
+          {
+            "id": "vol",
+            "type": "line"
+          },
+          {
+            "id": "vol_color",
+            "palette": "volumePalette",
+            "target": "vol",
+            "type": "colorer"
+          },
+          {
+            "id": "vol_ma",
+            "type": "line"
+          }
+        ],
+        "styles": {
+          "vol": {
+            "histogramBase": 0,
+            "title": "Volume"
+          },
+          "vol_ma": {
+            "histogramBase": 0,
+            "title": "Volume MA"
+          }
+        },
+        "status": {
+          "type": 2
+        },
+        "first": {
+          "index": -11238,
+          "value": [
+            345479400,
+            469034068,
+            0,
+            null
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1790947800,
+            33275562,
+            0,
+            42235713.4
+          ]
+        }
+      },
+      {
+        "id": "1mbLLF",
+        "name": "Net debt",
+        "meta_id": "Internal$STD;Fund_net_debt_fq@tv-scripting",
+        "inputs": [
+          {
+            "id": "in_0",
+            "name": "Symbol",
+            "value": ""
+          },
+          {
+            "id": "in_1",
+            "name": "Currency",
+            "value": "Default"
+          },
+          {
+            "id": "in_2",
+            "name": "Show Change",
+            "value": true
+          },
+          {
+            "id": "in_3",
+            "name": "",
+            "value": "Percentage"
+          },
+          {
+            "id": "in_4",
+            "name": "Show Date",
+            "value": true
+          }
+        ],
+        "plots": [
+          {
+            "id": "plot_0",
+            "type": "line"
+          }
+        ],
+        "styles": {
+          "plot_0": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "Net debt"
+          }
+        },
+        "status": {
+          "type": 2
+        },
+        "first": {
+          "index": -1650,
+          "value": [
+            1546266600,
+            28303000000
+          ]
+        },
+        "last": {
+          "index": 233,
+          "value": [
+            1782826200,
+            21945000000
+          ]
+        }
+      },
+      {
+        "id": "FsSJsd",
+        "name": "Net debt",
+        "meta_id": "Internal$STD;Fund_net_debt_fy@tv-scripting",
+        "inputs": [
+          {
+            "id": "in_0",
+            "name": "Symbol",
+            "value": ""
+          },
+          {
+            "id": "in_1",
+            "name": "Currency",
+            "value": "Default"
+          },
+          {
+            "id": "in_2",
+            "name": "Show Change",
+            "value": true
+          },
+          {
+            "id": "in_3",
+            "name": "",
+            "value": "Percentage"
+          },
+          {
+            "id": "in_4",
+            "name": "Show Date",
+            "value": true
+          }
+        ],
+        "plots": [
+          {
+            "id": "plot_0",
+            "type": "line"
+          }
+        ],
+        "styles": {
+          "plot_0": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "Net debt"
+          }
+        },
+        "status": {
+          "type": 2
+        },
+        "first": {
+          "index": -4483,
+          "value": [
+            1190986200,
+            -15386000000
+          ]
+        },
+        "last": {
+          "index": 46,
+          "value": [
+            1759239000,
+            57680000000
+          ]
+        }
+      },
+      {
+        "id": "nYyEMT",
+        "name": "EBITDA",
+        "meta_id": "Internal$STD;Fund_ebitda_fy@tv-scripting",
+        "inputs": [
+          {
+            "id": "in_0",
+            "name": "Symbol",
+            "value": ""
+          },
+          {
+            "id": "in_1",
+            "name": "Currency",
+            "value": "Default"
+          },
+          {
+            "id": "in_2",
+            "name": "Show Change",
+            "value": true
+          },
+          {
+            "id": "in_3",
+            "name": "",
+            "value": "Percentage"
+          },
+          {
+            "id": "in_4",
+            "name": "Show Date",
+            "value": true
+          }
+        ],
+        "plots": [
+          {
+            "id": "plot_0",
+            "type": "line"
+          }
+        ],
+        "styles": {
+          "plot_0": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "EBITDA"
+          }
+        },
+        "status": {
+          "type": 2
+        },
+        "first": {
+          "index": -4483,
+          "value": [
+            1190986200,
+            4693000000
+          ]
+        },
+        "last": {
+          "index": 46,
+          "value": [
+            1759239000,
+            144748000000
+          ]
+        }
+      },
+      {
+        "id": "IqP9HW",
+        "name": "EBITDA",
+        "meta_id": "Internal$STD;Fund_ebitda_ttm@tv-scripting",
+        "inputs": [
+          {
+            "id": "in_0",
+            "name": "Symbol",
+            "value": ""
+          },
+          {
+            "id": "in_1",
+            "name": "Currency",
+            "value": "Default"
+          },
+          {
+            "id": "in_2",
+            "name": "Show Change",
+            "value": true
+          },
+          {
+            "id": "in_3",
+            "name": "",
+            "value": "Percentage"
+          },
+          {
+            "id": "in_4",
+            "name": "Show Date",
+            "value": true
+          }
+        ],
+        "plots": [
+          {
+            "id": "plot_0",
+            "type": "line"
+          }
+        ],
+        "styles": {
+          "plot_0": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "EBITDA"
+          }
+        },
+        "status": {
+          "type": 2
+        },
+        "first": {
+          "index": -1650,
+          "value": [
+            1546266600,
+            79198000000
+          ]
+        },
+        "last": {
+          "index": 233,
+          "value": [
+            1782826200,
+            167959000000
+          ]
+        }
+      },
+      {
+        "id": "iIgsCw",
+        "name": "Free cash flow",
+        "meta_id": "Internal$STD;Fund_free_cash_flow_fy@tv-scripting",
+        "inputs": [
+          {
+            "id": "in_0",
+            "name": "Symbol",
+            "value": ""
+          },
+          {
+            "id": "in_1",
+            "name": "Currency",
+            "value": "Default"
+          },
+          {
+            "id": "in_2",
+            "name": "Show Change",
+            "value": true
+          },
+          {
+            "id": "in_3",
+            "name": "",
+            "value": "Percentage"
+          },
+          {
+            "id": "in_4",
+            "name": "Show Date",
+            "value": true
+          }
+        ],
+        "plots": [
+          {
+            "id": "plot_0",
+            "type": "line"
+          }
+        ],
+        "styles": {
+          "plot_0": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "Free cash flow"
+          }
+        },
+        "status": {
+          "type": 2
+        },
+        "first": {
+          "index": -4483,
+          "value": [
+            1190986200,
+            4735000000
+          ]
+        },
+        "last": {
+          "index": 46,
+          "value": [
+            1759239000,
+            98767000000
+          ]
+        }
+      },
+      {
+        "id": "JVkNDn",
+        "name": "Free cash flow",
+        "meta_id": "Internal$STD;Fund_free_cash_flow_ttm@tv-scripting",
+        "inputs": [
+          {
+            "id": "in_0",
+            "name": "Symbol",
+            "value": ""
+          },
+          {
+            "id": "in_1",
+            "name": "Currency",
+            "value": "Default"
+          },
+          {
+            "id": "in_2",
+            "name": "Show Change",
+            "value": true
+          },
+          {
+            "id": "in_3",
+            "name": "",
+            "value": "Percentage"
+          },
+          {
+            "id": "in_4",
+            "name": "Show Date",
+            "value": true
+          }
+        ],
+        "plots": [
+          {
+            "id": "plot_0",
+            "type": "line"
+          }
+        ],
+        "styles": {
+          "plot_0": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "Free cash flow"
+          }
+        },
+        "status": {
+          "type": 2
+        },
+        "first": {
+          "index": -1650,
+          "value": [
+            1546266600,
+            61973000000
+          ]
+        },
+        "last": {
+          "index": 233,
+          "value": [
+            1782826200,
+            136683000000
+          ]
+        }
+      },
+      {
+        "id": "NJ7qIP",
+        "name": "Total common shares outstanding",
+        "meta_id": "Internal$STD;Fund_total_shares_outstanding_fy@tv-scripting",
+        "inputs": [
+          {
+            "id": "in_0",
+            "name": "Symbol",
+            "value": ""
+          },
+          {
+            "id": "in_1",
+            "name": "Show Change",
+            "value": true
+          },
+          {
+            "id": "in_2",
+            "name": "",
+            "value": "Percentage"
+          },
+          {
+            "id": "in_3",
+            "name": "Show Date",
+            "value": true
+          }
+        ],
+        "plots": [
+          {
+            "id": "plot_0",
+            "type": "line"
+          }
+        ],
+        "styles": {
+          "plot_0": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "Total common shares outstanding"
+          }
+        },
+        "status": {
+          "type": 2
+        },
+        "first": {
+          "index": -4483,
+          "value": [
+            1190986200,
+            24425235641.211197
+          ]
+        },
+        "last": {
+          "index": 46,
+          "value": [
+            1759239000,
+            14773260000
+          ]
+        }
+      },
+      {
+        "id": "zLFMcm",
+        "name": "Total common shares outstanding",
+        "meta_id": "Internal$STD;Fund_total_shares_outstanding_fq@tv-scripting",
+        "inputs": [
+          {
+            "id": "in_0",
+            "name": "Symbol",
+            "value": ""
+          },
+          {
+            "id": "in_1",
+            "name": "Show Change",
+            "value": true
+          },
+          {
+            "id": "in_2",
+            "name": "",
+            "value": "Percentage"
+          },
+          {
+            "id": "in_3",
+            "name": "Show Date",
+            "value": true
+          }
+        ],
+        "plots": [
+          {
+            "id": "plot_0",
+            "type": "line"
+          }
+        ],
+        "styles": {
+          "plot_0": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "Total common shares outstanding"
+          }
+        },
+        "status": {
+          "type": 2
+        },
+        "first": {
+          "index": -1650,
+          "value": [
+            1546266600,
+            18919212000
+          ]
+        },
+        "last": {
+          "index": 233,
+          "value": [
+            1782826200,
+            14608963000
+          ]
+        }
+      },
+      {
+        "id": "djIpPC",
+        "name": "Total revenue",
+        "meta_id": "Internal$STD;Fund_total_revenue_fy@tv-scripting",
+        "inputs": [
+          {
+            "id": "in_0",
+            "name": "Symbol",
+            "value": ""
+          },
+          {
+            "id": "in_1",
+            "name": "Currency",
+            "value": "Default"
+          },
+          {
+            "id": "in_2",
+            "name": "Show Change",
+            "value": true
+          },
+          {
+            "id": "in_3",
+            "name": "",
+            "value": "Percentage"
+          },
+          {
+            "id": "in_4",
+            "name": "Show Date",
+            "value": true
+          }
+        ],
+        "plots": [
+          {
+            "id": "plot_0",
+            "type": "line"
+          }
+        ],
+        "styles": {
+          "plot_0": {
+            "histogramBase": 0,
+            "isHidden": false,
+            "joinPoints": false,
+            "title": "Total revenue"
+          }
+        },
+        "status": {
+          "type": 2
+        },
+        "first": {
+          "index": -4483,
+          "value": [
+            1190986200,
+            24006000000
+          ]
+        },
+        "last": {
+          "index": 46,
+          "value": [
+            1759239000,
+            416161000000
+          ]
+        }
+      }
+    ]
+  },
+  "native_environment": {
+    "browser_utc": "2026-10-04T13:24:14.695Z",
+    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+    "platform": "MacIntel",
+    "user_agent_data": {
+      "architecture": "",
+      "bitness": "",
+      "brands": [],
+      "fullVersionList": [],
+      "mobile": false,
+      "platform": "",
+      "platformVersion": ""
+    },
+    "device_pixel_ratio": 2,
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "visual_viewport_scale": 1
+    },
+    "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v9 batch; visualViewport scale recorded independently.",
+    "tradingview_build": null,
+    "tradingview_script_urls": [
+      "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+      "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+      "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+      "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+      "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+      "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+      "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+      "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+      "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+      "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+      "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+      "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+    ],
+    "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+  },
+  "capture_utc": "2026-10-04T13:24:14.948Z",
+  "observation": {
+    "time": 1790947800,
+    "index": 299,
+    "label": "Fri 02 Oct '26",
+    "observed": "2026-10-04T13:24:11.669Z"
+  },
+  "live_boundary_confirmed_unchanged": true,
+  "historical_compare_before_unix_seconds": 1790947800,
+  "limits": "Nine native TradingView Fundamentals indicators, with their actual Internal$STD field/period IDs, plus native Volume. Fundamentals indicators align reports to their own displayed fiscal timestamps; exact request.financial release/availability timestamps, internal request expression series and seed origin are UNEXPOSED. These companions must not be relabelled as the original source request output or a host-complete fixture. FX conversion not enabled by original blank currency input.",
+  "csv_file": "captures/v9/w8-financial-host-corpus-v7-353-v1-companion-daily-attempt1.csv",
+  "csv_sha256": "db27bce49770f5fd7d76c4c59b5a00bfa560b61beb498d4fa31c63e66b017f2c",
+  "original_download_filename": "BATS_AAPL, 1D (3).csv",
+  "csv_headers": [
+    "time",
+    "open",
+    "high",
+    "low",
+    "close",
+    "Volume",
+    "Explosion Volume",
+    "Net debt",
+    "Net debt",
+    "EBITDA",
+    "EBITDA",
+    "Free cash flow",
+    "Free cash flow",
+    "Total common shares outstanding",
+    "Total common shares outstanding",
+    "Total revenue"
+  ],
+  "csv_rows": 11538,
+  "historical_rows": 11537,
+  "column_observations": [
+    {
+      "position": 0,
+      "literal_header": "time",
+      "nonblank_rows": 11538,
+      "first_nonblank_cells": {
+        "time": "345479400",
+        "value": "345479400"
+      }
+    },
+    {
+      "position": 1,
+      "literal_header": "open",
+      "nonblank_rows": 11538,
+      "first_nonblank_cells": {
+        "time": "345479400",
+        "value": "0.128348"
+      }
+    },
+    {
+      "position": 2,
+      "literal_header": "high",
+      "nonblank_rows": 11538,
+      "first_nonblank_cells": {
+        "time": "345479400",
+        "value": "0.128348"
+      }
+    },
+    {
+      "position": 3,
+      "literal_header": "low",
+      "nonblank_rows": 11538,
+      "first_nonblank_cells": {
+        "time": "345479400",
+        "value": "0.128348"
+      }
+    },
+    {
+      "position": 4,
+      "literal_header": "close",
+      "nonblank_rows": 11538,
+      "first_nonblank_cells": {
+        "time": "345479400",
+        "value": "0.128348"
+      }
+    },
+    {
+      "position": 5,
+      "literal_header": "Volume",
+      "nonblank_rows": 11538,
+      "first_nonblank_cells": {
+        "time": "345479400",
+        "value": "469034068"
+      }
+    },
+    {
+      "position": 6,
+      "literal_header": "Explosion Volume",
+      "nonblank_rows": 11538,
+      "first_nonblank_cells": {
+        "time": "345479400",
+        "value": "0"
+      }
+    },
+    {
+      "position": 7,
+      "literal_header": "Net debt",
+      "nonblank_rows": 31,
+      "first_nonblank_cells": {
+        "time": "1546266600",
+        "value": "28303000000"
+      }
+    },
+    {
+      "position": 8,
+      "literal_header": "Net debt",
+      "nonblank_rows": 19,
+      "first_nonblank_cells": {
+        "time": "1190986200",
+        "value": "-15386000000"
+      }
+    },
+    {
+      "position": 9,
+      "literal_header": "EBITDA",
+      "nonblank_rows": 19,
+      "first_nonblank_cells": {
+        "time": "1190986200",
+        "value": "4693000000"
+      }
+    },
+    {
+      "position": 10,
+      "literal_header": "EBITDA",
+      "nonblank_rows": 31,
+      "first_nonblank_cells": {
+        "time": "1546266600",
+        "value": "79198000000"
+      }
+    },
+    {
+      "position": 11,
+      "literal_header": "Free cash flow",
+      "nonblank_rows": 19,
+      "first_nonblank_cells": {
+        "time": "1190986200",
+        "value": "4735000000"
+      }
+    },
+    {
+      "position": 12,
+      "literal_header": "Free cash flow",
+      "nonblank_rows": 31,
+      "first_nonblank_cells": {
+        "time": "1546266600",
+        "value": "61973000000"
+      }
+    },
+    {
+      "position": 13,
+      "literal_header": "Total common shares outstanding",
+      "nonblank_rows": 19,
+      "first_nonblank_cells": {
+        "time": "1190986200",
+        "value": "24425235641.211197"
+      }
+    },
+    {
+      "position": 14,
+      "literal_header": "Total common shares outstanding",
+      "nonblank_rows": 31,
+      "first_nonblank_cells": {
+        "time": "1546266600",
+        "value": "18919212000"
+      }
+    },
+    {
+      "position": 15,
+      "literal_header": "Total revenue",
+      "nonblank_rows": 19,
+      "first_nonblank_cells": {
+        "time": "1190986200",
+        "value": "24006000000"
+      }
+    }
+  ]
+}
