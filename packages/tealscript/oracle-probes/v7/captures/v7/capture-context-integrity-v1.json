@@ -1,0 +1,6 @@
+{
+  "artifact": "Context summary integrity v1",
+  "evidence_sha256": {
+    "captures/v7/evidence/nonstandard-history-ticks-context-summary-v1.json": "e21d99571a202ca8e2303a1eca24e16301984526b0c8e7c05b6fe8721293ce89"
+  }
+}

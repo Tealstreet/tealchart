@@ -1,0 +1,507 @@
+{
+  "artifact": "Standard and Renko history/ticks context summary v1",
+  "source": "nonstandard-history-ticks-v6-v1.pine",
+  "contexts": [
+    {
+      "attempt": 1,
+      "tag": "standard-before-reload",
+      "timeline": "captures/v7/evidence/nonstandard-history-ticks-v6-v1-attempt1-standard-before-reload-timeline-v1.json",
+      "sample_count": 12,
+      "first_utc": "2026-10-04T07:44:46.302Z",
+      "last_utc": "2026-10-04T07:45:02.589Z",
+      "distinct_source_last_rows": [
+        [
+          1791099840,
+          28,
+          84972,
+          84972,
+          0
+        ],
+        [
+          1791099840,
+          30,
+          84972.01,
+          84972,
+          0
+        ],
+        [
+          1791099840,
+          33,
+          84972.01,
+          84972,
+          0
+        ],
+        [
+          1791099840,
+          35,
+          84972.01,
+          84972,
+          0
+        ],
+        [
+          1791099840,
+          37,
+          84972.01,
+          84972,
+          0
+        ],
+        [
+          1791099840,
+          39,
+          84972.01,
+          84972,
+          0
+        ],
+        [
+          1791099840,
+          44,
+          84972.01,
+          84972,
+          0
+        ],
+        [
+          1791099840,
+          46,
+          84972,
+          84972,
+          0
+        ],
+        [
+          1791099840,
+          48,
+          84972,
+          84972,
+          0
+        ],
+        [
+          1791099840,
+          51,
+          84972.01,
+          84972,
+          0
+        ],
+        [
+          1791099840,
+          53,
+          84972,
+          84972,
+          0
+        ],
+        [
+          1791099840,
+          55,
+          84979.14,
+          84972,
+          0
+        ]
+      ],
+      "projection_axis_samples": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "attempt": 2,
+      "tag": "standard-after-reload",
+      "timeline": "captures/v7/evidence/nonstandard-history-ticks-v6-v1-attempt2-standard-after-reload-timeline-v1.json",
+      "sample_count": 12,
+      "first_utc": "2026-10-04T07:47:03.006Z",
+      "last_utc": "2026-10-04T07:47:19.221Z",
+      "distinct_source_last_rows": [
+        [
+          1791099960,
+          21,
+          85000,
+          84999.99,
+          0
+        ],
+        [
+          1791099960,
+          25,
+          84999.99,
+          84999.99,
+          0
+        ],
+        [
+          1791099960,
+          27,
+          84999.99,
+          84999.99,
+          0
+        ],
+        [
+          1791099960,
+          30,
+          85000,
+          84999.99,
+          0
+        ],
+        [
+          1791099960,
+          31,
+          84999.99,
+          84999.99,
+          0
+        ],
+        [
+          1791099960,
+          34,
+          85000,
+          84999.99,
+          0
+        ],
+        [
+          1791099960,
+          37,
+          85000,
+          84999.99,
+          0
+        ],
+        [
+          1791099960,
+          40,
+          85000,
+          84999.99,
+          0
+        ],
+        [
+          1791099960,
+          42,
+          84999.99,
+          84999.99,
+          0
+        ],
+        [
+          1791099960,
+          43,
+          85000,
+          84999.99,
+          0
+        ],
+        [
+          1791099960,
+          45,
+          84999.99,
+          84999.99,
+          0
+        ],
+        [
+          1791099960,
+          48,
+          84999.99,
+          84999.99,
+          0
+        ]
+      ],
+      "projection_axis_samples": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "attempt": 4,
+      "tag": "renko-before-reload",
+      "timeline": "captures/v7/evidence/nonstandard-history-ticks-v6-v1-attempt4-renko-before-reload-timeline-v1.json",
+      "sample_count": 12,
+      "first_utc": "2026-10-04T07:50:37.619Z",
+      "last_utc": "2026-10-04T07:50:53.894Z",
+      "distinct_source_last_rows": [
+        [
+          1791100080.001,
+          1,
+          85020,
+          85000,
+          1
+        ]
+      ],
+      "projection_axis_samples": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "attempt": 4,
+      "tag": "renko-projection-before-reload",
+      "timeline": "captures/v7/evidence/nonstandard-history-ticks-v6-v1-attempt4-renko-projection-before-reload-timeline-v1.json",
+      "sample_count": 12,
+      "first_utc": "2026-10-04T07:52:57.315Z",
+      "last_utc": "2026-10-04T07:57:30.921Z",
+      "distinct_source_last_rows": [
+        [
+          1791100080.001,
+          1,
+          85020,
+          85000,
+          1
+        ]
+      ],
+      "projection_axis_samples": [
+        {
+          "text": "85,031.08",
+          "visible": true,
+          "separatorVisible": true,
+          "borderVisible": false,
+          "ignoreAdditionalPaddingInner": false,
+          "secondLine": "",
+          "thirdLine": ""
+        },
+        {
+          "text": "85,025.04",
+          "visible": true,
+          "separatorVisible": true,
+          "borderVisible": false,
+          "ignoreAdditionalPaddingInner": false,
+          "secondLine": "",
+          "thirdLine": ""
+        },
+        {
+          "text": "85,025.05",
+          "visible": true,
+          "separatorVisible": true,
+          "borderVisible": false,
+          "ignoreAdditionalPaddingInner": false,
+          "secondLine": "",
+          "thirdLine": ""
+        },
+        {
+          "text": "85,025.05",
+          "visible": true,
+          "separatorVisible": true,
+          "borderVisible": false,
+          "ignoreAdditionalPaddingInner": false,
+          "secondLine": "",
+          "thirdLine": ""
+        },
+        {
+          "text": "85,025.05",
+          "visible": true,
+          "separatorVisible": true,
+          "borderVisible": false,
+          "ignoreAdditionalPaddingInner": false,
+          "secondLine": "",
+          "thirdLine": ""
+        },
+        {
+          "text": "85,025.13",
+          "visible": true,
+          "separatorVisible": true,
+          "borderVisible": false,
+          "ignoreAdditionalPaddingInner": false,
+          "secondLine": "",
+          "thirdLine": ""
+        },
+        {
+          "text": "85,027.23",
+          "visible": true,
+          "separatorVisible": true,
+          "borderVisible": false,
+          "ignoreAdditionalPaddingInner": false,
+          "secondLine": "",
+          "thirdLine": ""
+        },
+        {
+          "text": "85,029.96",
+          "visible": true,
+          "separatorVisible": true,
+          "borderVisible": false,
+          "ignoreAdditionalPaddingInner": false,
+          "secondLine": "",
+          "thirdLine": ""
+        },
+        {
+          "text": "85,030.01",
+          "visible": true,
+          "separatorVisible": true,
+          "borderVisible": false,
+          "ignoreAdditionalPaddingInner": false,
+          "secondLine": "",
+          "thirdLine": ""
+        },
+        {
+          "text": "85,030.00",
+          "visible": true,
+          "separatorVisible": true,
+          "borderVisible": false,
+          "ignoreAdditionalPaddingInner": false,
+          "secondLine": "",
+          "thirdLine": ""
+        },
+        {
+          "text": "85,030.00",
+          "visible": true,
+          "separatorVisible": true,
+          "borderVisible": false,
+          "ignoreAdditionalPaddingInner": false,
+          "secondLine": "",
+          "thirdLine": ""
+        },
+        {
+          "text": "85,035.53",
+          "visible": true,
+          "separatorVisible": true,
+          "borderVisible": false,
+          "ignoreAdditionalPaddingInner": false,
+          "secondLine": "",
+          "thirdLine": ""
+        }
+      ]
+    },
+    {
+      "attempt": 5,
+      "tag": "renko-after-reload",
+      "timeline": "captures/v7/evidence/nonstandard-history-ticks-v6-v1-attempt5-renko-after-reload-timeline-v1.json",
+      "sample_count": 12,
+      "first_utc": "2026-10-04T07:59:10.302Z",
+      "last_utc": "2026-10-04T07:59:28.360Z",
+      "distinct_source_last_rows": [
+        [
+          1791100320,
+          1,
+          85040,
+          85020,
+          1
+        ]
+      ],
+      "projection_axis_samples": [
+        {
+          "text": "85,099.99",
+          "visible": true,
+          "separatorVisible": true,
+          "borderVisible": false,
+          "ignoreAdditionalPaddingInner": false,
+          "secondLine": "",
+          "thirdLine": ""
+        },
+        {
+          "text": "85,100.00",
+          "visible": true,
+          "separatorVisible": true,
+          "borderVisible": false,
+          "ignoreAdditionalPaddingInner": false,
+          "secondLine": "",
+          "thirdLine": ""
+        },
+        {
+          "text": "85,099.99",
+          "visible": true,
+          "separatorVisible": true,
+          "borderVisible": false,
+          "ignoreAdditionalPaddingInner": false,
+          "secondLine": "",
+          "thirdLine": ""
+        },
+        {
+          "text": "85,099.99",
+          "visible": true,
+          "separatorVisible": true,
+          "borderVisible": false,
+          "ignoreAdditionalPaddingInner": false,
+          "secondLine": "",
+          "thirdLine": ""
+        },
+        {
+          "text": "85,100.00",
+          "visible": true,
+          "separatorVisible": true,
+          "borderVisible": false,
+          "ignoreAdditionalPaddingInner": false,
+          "secondLine": "",
+          "thirdLine": ""
+        },
+        {
+          "text": "85,100.00",
+          "visible": true,
+          "separatorVisible": true,
+          "borderVisible": false,
+          "ignoreAdditionalPaddingInner": false,
+          "secondLine": "",
+          "thirdLine": ""
+        },
+        {
+          "text": "85,100.00",
+          "visible": true,
+          "separatorVisible": true,
+          "borderVisible": false,
+          "ignoreAdditionalPaddingInner": false,
+          "secondLine": "",
+          "thirdLine": ""
+        },
+        {
+          "text": "85,099.99",
+          "visible": true,
+          "separatorVisible": true,
+          "borderVisible": false,
+          "ignoreAdditionalPaddingInner": false,
+          "secondLine": "",
+          "thirdLine": ""
+        },
+        {
+          "text": "85,099.99",
+          "visible": true,
+          "separatorVisible": true,
+          "borderVisible": false,
+          "ignoreAdditionalPaddingInner": false,
+          "secondLine": "",
+          "thirdLine": ""
+        },
+        {
+          "text": "85,099.99",
+          "visible": true,
+          "separatorVisible": true,
+          "borderVisible": false,
+          "ignoreAdditionalPaddingInner": false,
+          "secondLine": "",
+          "thirdLine": ""
+        },
+        {
+          "text": "85,099.99",
+          "visible": true,
+          "separatorVisible": true,
+          "borderVisible": false,
+          "ignoreAdditionalPaddingInner": false,
+          "secondLine": "",
+          "thirdLine": ""
+        },
+        {
+          "text": "85,099.99",
+          "visible": true,
+          "separatorVisible": true,
+          "borderVisible": false,
+          "ignoreAdditionalPaddingInner": false,
+          "secondLine": "",
+          "thirdLine": ""
+        }
+      ]
+    }
+  ]
+}
