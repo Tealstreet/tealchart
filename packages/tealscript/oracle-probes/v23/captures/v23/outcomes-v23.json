@@ -1,0 +1,2313 @@
+[
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T23:35:38.504Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "arm",
+        "bitness": "64",
+        "brands": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156"
+          }
+        ],
+        "fullVersionList": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8.0.0.0"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156.0.8075.0"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156.0.8075.0"
+          }
+        ],
+        "mobile": false,
+        "platform": "macOS",
+        "platformVersion": "27.2.0"
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v23 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "plot-type-keyword-v23-v1.pine",
+    "attempt": 1,
+    "source_sha256": "fc76f6ae16e94cf149d3aa1b7a61c000b6cb2bf07d6d9e82b655f0ec8d6839a0",
+    "indicator_title": "V23 explicit plot type keyword",
+    "status": "COMPILE-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": "CE10149",
+      "text": "\"plot\" is not a valid type keyword.",
+      "line": 3,
+      "column": 1,
+      "first_bar_index": null,
+      "first_bar_time_utc": null,
+      "native": {
+        "error": "\"{typeKeyword}\" is not a valid type keyword.",
+        "editorError": {
+          "code": "CE10149",
+          "ctx": {
+            "typeKeyword": "plot"
+          },
+          "end": {
+            "column": 4,
+            "line": 3
+          },
+          "message": "\"{typeKeyword}\" is not a valid type keyword.",
+          "start": {
+            "column": 1,
+            "line": 3
+          },
+          "id": "USER;95cf1a79006f4d029c8648f04e878c65"
+        },
+        "title": "Compilation error",
+        "native_context_scalar_types": [
+          {
+            "key": "typeKeyword",
+            "type": "string",
+            "nonfinite": false,
+            "native_string": "plot"
+          }
+        ],
+        "compiler_markers": [
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///537d0d1f-4e0d-4eb4-9af9-d13c06a6d9b2.pine?placement%3Ddialog",
+              "path": "/537d0d1f-4e0d-4eb4-9af9-d13c06a6d9b2.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "code": "CE10149",
+            "severity": 8,
+            "message": "\"plot\" is not a valid type keyword.",
+            "startLineNumber": 3,
+            "startColumn": 1,
+            "endLineNumber": 3,
+            "endColumn": 5
+          }
+        ],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n86,612.00\nH\n86,612.01\nL\n86,515.00\nC\n86,515.01\n\u221297.00 (\u22120.11%)\n86,515.00\nSELL\n0.01\n86,515.01\nBUY\nUSDT\nplot-type-keyword-v23-v1.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n23:35:40 UTC\n99+\nPine Editor\nplot-type-keyword-v23-v1.pine\nPublish script\n1\n2\n3\n4\n//@version=6\nindicator(\"V23\u00a0explicit\u00a0plot\u00a0type\u00a0keyword\")\nplot\u00a0value\u00a0=\u00a0plot(1,\u00a0\"Value\",\u00a0display=display.data_window)\n1 of 1 problem\n\"plot\" is not a valid type keyword.(CE10149)\n1 \u2219 Today, 07:35\nLine 3, Col 1\nPine Script\u00ae v6\nCompilation error: CE10149\n\n\"plot\" is not a valid type keyword.\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+        "context_substituted_message": "\"plot\" is not a valid type keyword."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "minmove": 1,
+      "pricescale": 100,
+      "pointvalue": 1,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "plot-type-keyword-v23-v1.pine",
+      "dataset_start_utc": "2026-10-04T13:36:00.000Z",
+      "first_chart_bar": {
+        "index": 0,
+        "value": [
+          1791120960,
+          85232.9,
+          85282.01,
+          85229.75,
+          85282.01,
+          6.29784
+        ]
+      },
+      "chart_bars": 300,
+      "subscription": "pro_premium",
+      "native_end_of_data": false,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v23/evidence/plot-type-keyword-v23-v1-attempt1-error.png",
+      "captures/v23/evidence/plot-type-keyword-v23-v1-attempt1-error.txt",
+      "captures/v23/evidence/plot-type-keyword-v23-v1-attempt1-logs.txt",
+      "captures/v23/evidence/plot-type-keyword-v23-v1-attempt1-logs-v1.json",
+      "captures/v23/evidence/plot-type-keyword-v23-v1-attempt1-logs.png"
+    ],
+    "notes": "Exact committed v23 source unchanged; manifest OPEN as received and individual source SHA pinned. Each type keyword and inferred control installed separately. Native diagnostics or third outcomes retained.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": null,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///537d0d1f-4e0d-4eb4-9af9-d13c06a6d9b2.pine?placement%3Ddialog",
+          "path": "/537d0d1f-4e0d-4eb4-9af9-d13c06a6d9b2.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "CE10149",
+        "severity": 8,
+        "message": "\"plot\" is not a valid type keyword.",
+        "startLineNumber": 3,
+        "startColumn": 1,
+        "endLineNumber": 3,
+        "endColumn": 5
+      }
+    ],
+    "error_observed_utc": "2026-10-04T23:35:43.129Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/plot-type-keyword-v23-v1-attempt1-logs.txt",
+        "evidence/plot-type-keyword-v23-v1-attempt1-logs-v1.json",
+        "evidence/plot-type-keyword-v23-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T23:35:53.404Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "arm",
+        "bitness": "64",
+        "brands": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156"
+          }
+        ],
+        "fullVersionList": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8.0.0.0"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156.0.8075.0"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156.0.8075.0"
+          }
+        ],
+        "mobile": false,
+        "platform": "macOS",
+        "platformVersion": "27.2.0"
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v23 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "hline-type-keyword-v23-v1.pine",
+    "attempt": 1,
+    "source_sha256": "e2439fc8872041437f7b38f5f7b2264641e9322f5899cfd41d04ad675c6a572f",
+    "indicator_title": "V23 explicit hline type keyword",
+    "status": "COMPILE-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": "CE10149",
+      "text": "\"hline\" is not a valid type keyword.",
+      "line": 3,
+      "column": 1,
+      "first_bar_index": null,
+      "first_bar_time_utc": null,
+      "native": {
+        "error": "\"{typeKeyword}\" is not a valid type keyword.",
+        "editorError": {
+          "code": "CE10149",
+          "ctx": {
+            "typeKeyword": "hline"
+          },
+          "end": {
+            "column": 5,
+            "line": 3
+          },
+          "message": "\"{typeKeyword}\" is not a valid type keyword.",
+          "start": {
+            "column": 1,
+            "line": 3
+          },
+          "id": "USER;0fe8b3cbe8db4225af69f4406efc5bd2"
+        },
+        "title": "Compilation error",
+        "native_context_scalar_types": [
+          {
+            "key": "typeKeyword",
+            "type": "string",
+            "nonfinite": false,
+            "native_string": "hline"
+          }
+        ],
+        "compiler_markers": [
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///8573ba54-fdfa-4a05-b581-c36d8b5e99b6.pine?placement%3Ddialog",
+              "path": "/8573ba54-fdfa-4a05-b581-c36d8b5e99b6.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "code": "CE10149",
+            "severity": 8,
+            "message": "\"hline\" is not a valid type keyword.",
+            "startLineNumber": 3,
+            "startColumn": 1,
+            "endLineNumber": 3,
+            "endColumn": 6
+          }
+        ],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n86,612.00\nH\n86,612.01\nL\n86,515.00\nC\n86,521.33\n\u221290.68 (\u22120.10%)\n86,521.32\nSELL\n0.01\n86,521.33\nBUY\nUSDT\nhline-type-keyword-v23-v1.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n23:35:55 UTC\n99+\nPine Editor\nhline-type-keyword-v23-v1.pine\nPublish script\n1\n2\n3\n4\n//@version=6\nindicator(\"V23\u00a0explicit\u00a0hline\u00a0type\u00a0keyword\")\nhline\u00a0value\u00a0=\u00a0hline(1,\u00a0\"Level\")\n1 of 1 problem\n\"hline\" is not a valid type keyword.(CE10149)\n1 \u2219 Today, 07:35\nLine 3, Col 1\nPine Script\u00ae v6\nCompilation error: CE10149\n\n\"hline\" is not a valid type keyword.\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+        "context_substituted_message": "\"hline\" is not a valid type keyword."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "minmove": 1,
+      "pricescale": 100,
+      "pointvalue": 1,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "hline-type-keyword-v23-v1.pine",
+      "dataset_start_utc": "2026-10-04T13:36:00.000Z",
+      "first_chart_bar": {
+        "index": 0,
+        "value": [
+          1791120960,
+          85232.9,
+          85282.01,
+          85229.75,
+          85282.01,
+          6.29784
+        ]
+      },
+      "chart_bars": 300,
+      "subscription": "pro_premium",
+      "native_end_of_data": false,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v23/evidence/hline-type-keyword-v23-v1-attempt1-error.png",
+      "captures/v23/evidence/hline-type-keyword-v23-v1-attempt1-error.txt",
+      "captures/v23/evidence/hline-type-keyword-v23-v1-attempt1-logs.txt",
+      "captures/v23/evidence/hline-type-keyword-v23-v1-attempt1-logs-v1.json",
+      "captures/v23/evidence/hline-type-keyword-v23-v1-attempt1-logs.png"
+    ],
+    "notes": "Exact committed v23 source unchanged; manifest OPEN as received and individual source SHA pinned. Each type keyword and inferred control installed separately. Native diagnostics or third outcomes retained.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": null,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///8573ba54-fdfa-4a05-b581-c36d8b5e99b6.pine?placement%3Ddialog",
+          "path": "/8573ba54-fdfa-4a05-b581-c36d8b5e99b6.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "CE10149",
+        "severity": 8,
+        "message": "\"hline\" is not a valid type keyword.",
+        "startLineNumber": 3,
+        "startColumn": 1,
+        "endLineNumber": 3,
+        "endColumn": 6
+      }
+    ],
+    "error_observed_utc": "2026-10-04T23:35:58.495Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/hline-type-keyword-v23-v1-attempt1-logs.txt",
+        "evidence/hline-type-keyword-v23-v1-attempt1-logs-v1.json",
+        "evidence/hline-type-keyword-v23-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T23:36:21.920Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "arm",
+        "bitness": "64",
+        "brands": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156"
+          }
+        ],
+        "fullVersionList": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8.0.0.0"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156.0.8075.0"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156.0.8075.0"
+          }
+        ],
+        "mobile": false,
+        "platform": "macOS",
+        "platformVersion": "27.2.0"
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v23 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "plot-hline-inferred-control-v23-v1.pine",
+    "attempt": 1,
+    "source_sha256": "59d00c3ad56963585610ea71664711799c8207f25c6c796eb20517a668c30fe3",
+    "indicator_title": "V23 inferred plot and hline control",
+    "status": "RUNS",
+    "csv_file": "captures/v23/plot-hline-inferred-control-v23-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-05T073621.047.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "minmove": 1,
+      "pricescale": 100,
+      "pointvalue": 1,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V23 inferred plot and hline control",
+      "dataset_start_utc": "2026-09-07T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -19849,
+        "value": [
+          1788739200,
+          80341.83,
+          80356,
+          80230.29,
+          80293.23,
+          37.66955
+        ]
+      },
+      "chart_bars": 20149,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T23:36:12.558Z",
+    "live_candle_open_utc": "2026-10-04T23:36:00.000Z",
+    "export_utc": "2026-10-04T23:36:21.301Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v23/evidence/plot-hline-inferred-control-v23-v1-attempt1-setup.png",
+      "captures/v23/evidence/plot-hline-inferred-control-v23-v1-attempt1-export.png",
+      "captures/v23/evidence/plot-hline-inferred-control-v23-v1-attempt1-logs.txt",
+      "captures/v23/evidence/plot-hline-inferred-control-v23-v1-attempt1-logs-v1.json",
+      "captures/v23/evidence/plot-hline-inferred-control-v23-v1-attempt1-logs.png",
+      "captures/v23/evidence/plot-hline-inferred-control-v23-v1-attempt1-visual.png",
+      "captures/v23/evidence/plot-hline-inferred-control-v23-v1-attempt1-data-window-v1.png",
+      "captures/v23/evidence/plot-hline-inferred-control-v23-v1-attempt1-data-window-v1.json",
+      "captures/v23/evidence/plot-hline-inferred-control-v23-v1-attempt1-data-window-v1.txt"
+    ],
+    "notes": "Exact committed v23 source unchanged; manifest OPEN as received and individual source SHA pinned. Each type keyword and inferred control installed separately. Native diagnostics or third outcomes retained.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T23:36:13.365Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790851800,
+            83964,
+            83974.55,
+            83944.67,
+            83948.71,
+            11.371
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791156960,
+            86521.32,
+            86531.37,
+            86445.38,
+            86468,
+            17.02471
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V23 inferred plot and hline control",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790851800,
+                1
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791156960,
+                1
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T23:36:14.448Z",
+        "bars": 20149,
+        "end": true,
+        "first": {
+          "index": -19849,
+          "value": [
+            1788739200,
+            80341.83,
+            80356,
+            80230.29,
+            80293.23,
+            37.66955
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791156960,
+            86521.32,
+            86531.37,
+            86445.38,
+            86476.01,
+            17.72105
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V23 inferred plot and hline control",
+            "status": {
+              "type": 2
+            },
+            "size": 20149,
+            "first": {
+              "index": -19849,
+              "value": [
+                1788739200,
+                1
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791156960,
+                1
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   23:36",
+    "historical_compare_before_unix_seconds": 1791156960,
+    "pine_logs": {
+      "paths": [
+        "evidence/plot-hline-inferred-control-v23-v1-attempt1-logs.txt",
+        "evidence/plot-hline-inferred-control-v23-v1-attempt1-logs-v1.json",
+        "evidence/plot-hline-inferred-control-v23-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "all_exported_column_occurrences": [
+      {
+        "title": "time",
+        "occurrence": 1,
+        "position": 0
+      },
+      {
+        "title": "open",
+        "occurrence": 1,
+        "position": 1
+      },
+      {
+        "title": "high",
+        "occurrence": 1,
+        "position": 2
+      },
+      {
+        "title": "low",
+        "occurrence": 1,
+        "position": 3
+      },
+      {
+        "title": "close",
+        "occurrence": 1,
+        "position": 4
+      },
+      {
+        "title": "CONTROL",
+        "occurrence": 1,
+        "position": 5
+      }
+    ],
+    "declared_to_native_column_occurrences": [
+      {
+        "declared_title": "CONTROL",
+        "native_title": "CONTROL",
+        "occurrence": 1,
+        "position": 5
+      }
+    ],
+    "named_value_map_scope": "Legacy title maps show the first occurrence only; original positional cells and occurrence tables retain every duplicate without renaming.",
+    "csv_sha256": "f24ae3376e89584b0b2d1835c54aac4c1a7e34f4220ef3dbf2b1d6f215c776cb",
+    "csv_bytes": 934335,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "CONTROL"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "CONTROL": 5
+    },
+    "first_historical_cells": [
+      "1788739200",
+      "80341.83",
+      "80356",
+      "80230.29",
+      "80293.23",
+      "1"
+    ],
+    "last_historical_cells": [
+      "1791156840",
+      "86612",
+      "86612.01",
+      "86515",
+      "86521.33",
+      "1"
+    ],
+    "declared_to_native_header_mapping": {
+      "CONTROL": "CONTROL"
+    },
+    "csv_rows": 20149,
+    "historical_rows": 20148,
+    "first_csv_timestamp_seconds": 1788739200,
+    "last_csv_timestamp_seconds": 1791156960,
+    "first_csv_time_raw": "1788739200",
+    "last_csv_time_raw": "1791156960",
+    "first_historical_values": {
+      "CONTROL": "1"
+    },
+    "last_historical_values": {
+      "CONTROL": "1"
+    },
+    "declared_unexported_columns": [],
+    "data_window_witness": "captures/v23/evidence/plot-hline-inferred-control-v23-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T23:40:51.172Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "arm",
+        "bitness": "64",
+        "brands": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156"
+          }
+        ],
+        "fullVersionList": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8.0.0.0"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156.0.8075.0"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156.0.8075.0"
+          }
+        ],
+        "mobile": false,
+        "platform": "macOS",
+        "platformVersion": "27.2.0"
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v23 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "requested-confirmation-timing-v23-v1.pine",
+    "attempt": 1,
+    "source_sha256": "9d29236961ade80dab2f9ca73458e70c7400a13f3a3810ee4e280140a0c637db",
+    "indicator_title": "Requested confirmation timing v23 v1",
+    "status": "RUNS",
+    "csv_file": "captures/v23/requested-confirmation-timing-v23-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-05T074050.282.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "minmove": 1,
+      "pricescale": 100,
+      "pointvalue": 1,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "Requested confirmation timing v23 v1",
+      "dataset_start_utc": "2026-09-07T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -19847,
+        "value": [
+          1788739200,
+          80341.83,
+          80356,
+          80230.29,
+          80293.23,
+          37.66955
+        ]
+      },
+      "chart_bars": 20151,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T23:33:48.287Z",
+    "live_candle_open_utc": "2026-10-04T23:40:00.000Z",
+    "export_utc": "2026-10-04T23:40:50.767Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v23/evidence/requested-confirmation-timing-v23-v1-attempt1-setup.png",
+      "captures/v23/evidence/requested-confirmation-timing-v23-v1-attempt1-export.png",
+      "captures/v23/evidence/requested-confirmation-timing-v23-v1-attempt1-logs.txt",
+      "captures/v23/evidence/requested-confirmation-timing-v23-v1-attempt1-logs-v1.json",
+      "captures/v23/evidence/requested-confirmation-timing-v23-v1-attempt1-logs.png",
+      "captures/v23/evidence/requested-confirmation-timing-v23-v1-attempt1-visual.png",
+      "captures/v23/evidence/requested-confirmation-timing-v23-v1-attempt1-data-window-v1.png",
+      "captures/v23/evidence/requested-confirmation-timing-v23-v1-attempt1-data-window-v1.json",
+      "captures/v23/evidence/requested-confirmation-timing-v23-v1-attempt1-data-window-v1.txt",
+      "captures/v23/evidence/requested-confirmation-timing-v23-v1-attempt1-closing-1791156960-v1.json",
+      "captures/v23/evidence/requested-confirmation-timing-v23-v1-attempt1-closing-1791156960-v1.png",
+      "captures/v23/evidence/requested-confirmation-timing-v23-v1-attempt1-closing-1791157080-v1.json",
+      "captures/v23/evidence/requested-confirmation-timing-v23-v1-attempt1-closing-1791157080-v1.png"
+    ],
+    "notes": "Original live execution export before reload, following actual opening/intermediate/closing observations of two2m bars including10mclose. Source unchanged; manifest OPEN retained and individual SHA pinned.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T23:33:49.205Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790851560,
+            83866.01,
+            83993.18,
+            83866,
+            83986.01,
+            10.53277
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791156720,
+            86644,
+            86657.51,
+            86594.99,
+            86622.01,
+            13.58953
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Requested confirmation timing v23 v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790851560,
+                17603,
+                1790851560000,
+                1790851680000,
+                1791156828515,
+                1,
+                1,
+                1,
+                0,
+                1,
+                1790851560000,
+                1790851680000,
+                1,
+                1,
+                0,
+                1,
+                1790850600000,
+                1790851200000,
+                1,
+                1,
+                0,
+                1
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791156720,
+                20146,
+                1791156720000,
+                1791156840000,
+                1791156828519,
+                1,
+                0,
+                1,
+                0,
+                1,
+                1791156720000,
+                1791156840000,
+                0,
+                1,
+                0,
+                1,
+                1791156000000,
+                1791156600000,
+                1,
+                1,
+                0,
+                1
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T23:33:50.298Z",
+        "bars": 20147,
+        "end": true,
+        "first": {
+          "index": -19847,
+          "value": [
+            1788739200,
+            80341.83,
+            80356,
+            80230.29,
+            80293.23,
+            37.66955
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791156720,
+            86644,
+            86657.51,
+            86594.99,
+            86622.01,
+            13.58953
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Requested confirmation timing v23 v1",
+            "status": {
+              "type": 2
+            },
+            "size": 20147,
+            "first": {
+              "index": -19847,
+              "value": [
+                1788739200,
+                0,
+                1788739200000,
+                1788739320000,
+                1791156828482,
+                1,
+                1,
+                1,
+                0,
+                1,
+                1788739200000,
+                1788739320000,
+                1,
+                1,
+                0,
+                1,
+                1788738600000,
+                1788739200000,
+                1,
+                1,
+                0,
+                1
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791156720,
+                20146,
+                1791156720000,
+                1791156840000,
+                1791156828519,
+                1,
+                0,
+                1,
+                0,
+                1,
+                1791156720000,
+                1791156840000,
+                0,
+                1,
+                0,
+                1,
+                1791156000000,
+                1791156600000,
+                1,
+                1,
+                0,
+                1
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   23:40",
+    "historical_compare_before_unix_seconds": 1791157200,
+    "pine_logs": {
+      "paths": [
+        "evidence/requested-confirmation-timing-v23-v1-attempt1-logs.txt",
+        "evidence/requested-confirmation-timing-v23-v1-attempt1-logs-v1.json",
+        "evidence/requested-confirmation-timing-v23-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "all_exported_column_occurrences": [
+      {
+        "title": "time",
+        "occurrence": 1,
+        "position": 0
+      },
+      {
+        "title": "open",
+        "occurrence": 1,
+        "position": 1
+      },
+      {
+        "title": "high",
+        "occurrence": 1,
+        "position": 2
+      },
+      {
+        "title": "low",
+        "occurrence": 1,
+        "position": 3
+      },
+      {
+        "title": "close",
+        "occurrence": 1,
+        "position": 4
+      },
+      {
+        "title": "CHART_INDEX",
+        "occurrence": 1,
+        "position": 5
+      },
+      {
+        "title": "CHART_TIME_MS",
+        "occurrence": 1,
+        "position": 6
+      },
+      {
+        "title": "CHART_CLOSE_TIME_MS",
+        "occurrence": 1,
+        "position": 7
+      },
+      {
+        "title": "CHART_TIMENOW_MS",
+        "occurrence": 1,
+        "position": 8
+      },
+      {
+        "title": "CHART_UPDATE_COUNT",
+        "occurrence": 1,
+        "position": 9
+      },
+      {
+        "title": "CHART_CONFIRMED",
+        "occurrence": 1,
+        "position": 10
+      },
+      {
+        "title": "CHART_HISTORY",
+        "occurrence": 1,
+        "position": 11
+      },
+      {
+        "title": "CHART_REALTIME",
+        "occurrence": 1,
+        "position": 12
+      },
+      {
+        "title": "CHART_NEW",
+        "occurrence": 1,
+        "position": 13
+      },
+      {
+        "title": "SAME_TIME_MS",
+        "occurrence": 1,
+        "position": 14
+      },
+      {
+        "title": "SAME_CLOSE_TIME_MS",
+        "occurrence": 1,
+        "position": 15
+      },
+      {
+        "title": "SAME_CONFIRMED",
+        "occurrence": 1,
+        "position": 16
+      },
+      {
+        "title": "SAME_HISTORY",
+        "occurrence": 1,
+        "position": 17
+      },
+      {
+        "title": "SAME_REALTIME",
+        "occurrence": 1,
+        "position": 18
+      },
+      {
+        "title": "SAME_NEW",
+        "occurrence": 1,
+        "position": 19
+      },
+      {
+        "title": "HTF_TIME_MS",
+        "occurrence": 1,
+        "position": 20
+      },
+      {
+        "title": "HTF_CLOSE_TIME_MS",
+        "occurrence": 1,
+        "position": 21
+      },
+      {
+        "title": "HTF_CONFIRMED",
+        "occurrence": 1,
+        "position": 22
+      },
+      {
+        "title": "HTF_HISTORY",
+        "occurrence": 1,
+        "position": 23
+      },
+      {
+        "title": "HTF_REALTIME",
+        "occurrence": 1,
+        "position": 24
+      },
+      {
+        "title": "HTF_NEW",
+        "occurrence": 1,
+        "position": 25
+      }
+    ],
+    "declared_to_native_column_occurrences": [
+      {
+        "declared_title": "CHART_INDEX",
+        "native_title": "CHART_INDEX",
+        "occurrence": 1,
+        "position": 5
+      },
+      {
+        "declared_title": "CHART_TIME_MS",
+        "native_title": "CHART_TIME_MS",
+        "occurrence": 1,
+        "position": 6
+      },
+      {
+        "declared_title": "CHART_CLOSE_TIME_MS",
+        "native_title": "CHART_CLOSE_TIME_MS",
+        "occurrence": 1,
+        "position": 7
+      },
+      {
+        "declared_title": "CHART_TIMENOW_MS",
+        "native_title": "CHART_TIMENOW_MS",
+        "occurrence": 1,
+        "position": 8
+      },
+      {
+        "declared_title": "CHART_UPDATE_COUNT",
+        "native_title": "CHART_UPDATE_COUNT",
+        "occurrence": 1,
+        "position": 9
+      },
+      {
+        "declared_title": "CHART_CONFIRMED",
+        "native_title": "CHART_CONFIRMED",
+        "occurrence": 1,
+        "position": 10
+      },
+      {
+        "declared_title": "CHART_HISTORY",
+        "native_title": "CHART_HISTORY",
+        "occurrence": 1,
+        "position": 11
+      },
+      {
+        "declared_title": "CHART_REALTIME",
+        "native_title": "CHART_REALTIME",
+        "occurrence": 1,
+        "position": 12
+      },
+      {
+        "declared_title": "CHART_NEW",
+        "native_title": "CHART_NEW",
+        "occurrence": 1,
+        "position": 13
+      },
+      {
+        "declared_title": "SAME_TIME_MS",
+        "native_title": "SAME_TIME_MS",
+        "occurrence": 1,
+        "position": 14
+      },
+      {
+        "declared_title": "SAME_CLOSE_TIME_MS",
+        "native_title": "SAME_CLOSE_TIME_MS",
+        "occurrence": 1,
+        "position": 15
+      },
+      {
+        "declared_title": "SAME_CONFIRMED",
+        "native_title": "SAME_CONFIRMED",
+        "occurrence": 1,
+        "position": 16
+      },
+      {
+        "declared_title": "SAME_HISTORY",
+        "native_title": "SAME_HISTORY",
+        "occurrence": 1,
+        "position": 17
+      },
+      {
+        "declared_title": "SAME_REALTIME",
+        "native_title": "SAME_REALTIME",
+        "occurrence": 1,
+        "position": 18
+      },
+      {
+        "declared_title": "SAME_NEW",
+        "native_title": "SAME_NEW",
+        "occurrence": 1,
+        "position": 19
+      },
+      {
+        "declared_title": "HTF_TIME_MS",
+        "native_title": "HTF_TIME_MS",
+        "occurrence": 1,
+        "position": 20
+      },
+      {
+        "declared_title": "HTF_CLOSE_TIME_MS",
+        "native_title": "HTF_CLOSE_TIME_MS",
+        "occurrence": 1,
+        "position": 21
+      },
+      {
+        "declared_title": "HTF_CONFIRMED",
+        "native_title": "HTF_CONFIRMED",
+        "occurrence": 1,
+        "position": 22
+      },
+      {
+        "declared_title": "HTF_HISTORY",
+        "native_title": "HTF_HISTORY",
+        "occurrence": 1,
+        "position": 23
+      },
+      {
+        "declared_title": "HTF_REALTIME",
+        "native_title": "HTF_REALTIME",
+        "occurrence": 1,
+        "position": 24
+      },
+      {
+        "declared_title": "HTF_NEW",
+        "native_title": "HTF_NEW",
+        "occurrence": 1,
+        "position": 25
+      }
+    ],
+    "named_value_map_scope": "Legacy title maps show the first occurrence only; original positional cells and occurrence tables retain every duplicate without renaming.",
+    "csv_sha256": "06bcd5ee78295d4518a14adf9c0eb83e72499ce0ef66c06da0460dc48ce5d233",
+    "csv_bytes": 3502937,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "CHART_INDEX",
+      "CHART_TIME_MS",
+      "CHART_CLOSE_TIME_MS",
+      "CHART_TIMENOW_MS",
+      "CHART_UPDATE_COUNT",
+      "CHART_CONFIRMED",
+      "CHART_HISTORY",
+      "CHART_REALTIME",
+      "CHART_NEW",
+      "SAME_TIME_MS",
+      "SAME_CLOSE_TIME_MS",
+      "SAME_CONFIRMED",
+      "SAME_HISTORY",
+      "SAME_REALTIME",
+      "SAME_NEW",
+      "HTF_TIME_MS",
+      "HTF_CLOSE_TIME_MS",
+      "HTF_CONFIRMED",
+      "HTF_HISTORY",
+      "HTF_REALTIME",
+      "HTF_NEW"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "CHART_INDEX": 5,
+      "CHART_TIME_MS": 6,
+      "CHART_CLOSE_TIME_MS": 7,
+      "CHART_TIMENOW_MS": 8,
+      "CHART_UPDATE_COUNT": 9,
+      "CHART_CONFIRMED": 10,
+      "CHART_HISTORY": 11,
+      "CHART_REALTIME": 12,
+      "CHART_NEW": 13,
+      "SAME_TIME_MS": 14,
+      "SAME_CLOSE_TIME_MS": 15,
+      "SAME_CONFIRMED": 16,
+      "SAME_HISTORY": 17,
+      "SAME_REALTIME": 18,
+      "SAME_NEW": 19,
+      "HTF_TIME_MS": 20,
+      "HTF_CLOSE_TIME_MS": 21,
+      "HTF_CONFIRMED": 22,
+      "HTF_HISTORY": 23,
+      "HTF_REALTIME": 24,
+      "HTF_NEW": 25
+    },
+    "first_historical_cells": [
+      "1788739200",
+      "80341.83",
+      "80356",
+      "80230.29",
+      "80293.23",
+      "0",
+      "1788739200000",
+      "1788739320000",
+      "1791156828482",
+      "1",
+      "1",
+      "1",
+      "0",
+      "1",
+      "1788739200000",
+      "1788739320000",
+      "1",
+      "1",
+      "0",
+      "1",
+      "1788738600000",
+      "1788739200000",
+      "1",
+      "1",
+      "0",
+      "1"
+    ],
+    "last_historical_cells": [
+      "1791157080",
+      "86506",
+      "86506",
+      "86432",
+      "86462",
+      "20149",
+      "1791157080000",
+      "1791157200000",
+      "1791157201460",
+      "351",
+      "1",
+      "0",
+      "1",
+      "0",
+      "1791157080000",
+      "1791157200000",
+      "1",
+      "0",
+      "1",
+      "0",
+      "1791156600000",
+      "1791157200000",
+      "1",
+      "0",
+      "1",
+      "0"
+    ],
+    "declared_to_native_header_mapping": {
+      "CHART_INDEX": "CHART_INDEX",
+      "CHART_TIME_MS": "CHART_TIME_MS",
+      "CHART_CLOSE_TIME_MS": "CHART_CLOSE_TIME_MS",
+      "CHART_TIMENOW_MS": "CHART_TIMENOW_MS",
+      "CHART_UPDATE_COUNT": "CHART_UPDATE_COUNT",
+      "CHART_CONFIRMED": "CHART_CONFIRMED",
+      "CHART_HISTORY": "CHART_HISTORY",
+      "CHART_REALTIME": "CHART_REALTIME",
+      "CHART_NEW": "CHART_NEW",
+      "SAME_TIME_MS": "SAME_TIME_MS",
+      "SAME_CLOSE_TIME_MS": "SAME_CLOSE_TIME_MS",
+      "SAME_CONFIRMED": "SAME_CONFIRMED",
+      "SAME_HISTORY": "SAME_HISTORY",
+      "SAME_REALTIME": "SAME_REALTIME",
+      "SAME_NEW": "SAME_NEW",
+      "HTF_TIME_MS": "HTF_TIME_MS",
+      "HTF_CLOSE_TIME_MS": "HTF_CLOSE_TIME_MS",
+      "HTF_CONFIRMED": "HTF_CONFIRMED",
+      "HTF_HISTORY": "HTF_HISTORY",
+      "HTF_REALTIME": "HTF_REALTIME",
+      "HTF_NEW": "HTF_NEW"
+    },
+    "csv_rows": 20151,
+    "historical_rows": 20150,
+    "first_csv_timestamp_seconds": 1788739200,
+    "last_csv_timestamp_seconds": 1791157200,
+    "first_csv_time_raw": "1788739200",
+    "last_csv_time_raw": "1791157200",
+    "first_historical_values": {
+      "CHART_INDEX": "0",
+      "CHART_TIME_MS": "1788739200000",
+      "CHART_CLOSE_TIME_MS": "1788739320000",
+      "CHART_TIMENOW_MS": "1791156828482",
+      "CHART_UPDATE_COUNT": "1",
+      "CHART_CONFIRMED": "1",
+      "CHART_HISTORY": "1",
+      "CHART_REALTIME": "0",
+      "CHART_NEW": "1",
+      "SAME_TIME_MS": "1788739200000",
+      "SAME_CLOSE_TIME_MS": "1788739320000",
+      "SAME_CONFIRMED": "1",
+      "SAME_HISTORY": "1",
+      "SAME_REALTIME": "0",
+      "SAME_NEW": "1",
+      "HTF_TIME_MS": "1788738600000",
+      "HTF_CLOSE_TIME_MS": "1788739200000",
+      "HTF_CONFIRMED": "1",
+      "HTF_HISTORY": "1",
+      "HTF_REALTIME": "0",
+      "HTF_NEW": "1"
+    },
+    "last_historical_values": {
+      "CHART_INDEX": "20149",
+      "CHART_TIME_MS": "1791157080000",
+      "CHART_CLOSE_TIME_MS": "1791157200000",
+      "CHART_TIMENOW_MS": "1791157201460",
+      "CHART_UPDATE_COUNT": "351",
+      "CHART_CONFIRMED": "1",
+      "CHART_HISTORY": "0",
+      "CHART_REALTIME": "1",
+      "CHART_NEW": "0",
+      "SAME_TIME_MS": "1791157080000",
+      "SAME_CLOSE_TIME_MS": "1791157200000",
+      "SAME_CONFIRMED": "1",
+      "SAME_HISTORY": "0",
+      "SAME_REALTIME": "1",
+      "SAME_NEW": "0",
+      "HTF_TIME_MS": "1791156600000",
+      "HTF_CLOSE_TIME_MS": "1791157200000",
+      "HTF_CONFIRMED": "1",
+      "HTF_HISTORY": "0",
+      "HTF_REALTIME": "1",
+      "HTF_NEW": "0"
+    },
+    "declared_unexported_columns": [],
+    "data_window_witness": "captures/v23/evidence/requested-confirmation-timing-v23-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T23:41:48.360Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "arm",
+        "bitness": "64",
+        "brands": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156"
+          }
+        ],
+        "fullVersionList": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8.0.0.0"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156.0.8075.0"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156.0.8075.0"
+          }
+        ],
+        "mobile": false,
+        "platform": "macOS",
+        "platformVersion": "27.2.0"
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v23 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "requested-confirmation-timing-v23-v1.pine",
+    "attempt": 2,
+    "source_sha256": "9d29236961ade80dab2f9ca73458e70c7400a13f3a3810ee4e280140a0c637db",
+    "indicator_title": "Requested confirmation timing v23 v1",
+    "status": "RUNS",
+    "csv_file": "captures/v23/requested-confirmation-timing-v23-v1-attempt2.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-05T074147.372.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "minmove": 1,
+      "pricescale": 100,
+      "pointvalue": 1,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "Requested confirmation timing v23 v1",
+      "dataset_start_utc": "2026-09-07T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -19851,
+        "value": [
+          1788739200,
+          80341.83,
+          80356,
+          80230.29,
+          80293.23,
+          37.66955
+        ]
+      },
+      "chart_bars": 20151,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T23:41:38.008Z",
+    "live_candle_open_utc": "2026-10-04T23:40:00.000Z",
+    "export_utc": "2026-10-04T23:41:47.810Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v23/evidence/requested-confirmation-timing-v23-v1-attempt2-setup.png",
+      "captures/v23/evidence/requested-confirmation-timing-v23-v1-attempt2-export.png",
+      "captures/v23/evidence/requested-confirmation-timing-v23-v1-attempt2-logs.txt",
+      "captures/v23/evidence/requested-confirmation-timing-v23-v1-attempt2-logs-v1.json",
+      "captures/v23/evidence/requested-confirmation-timing-v23-v1-attempt2-logs.png",
+      "captures/v23/evidence/requested-confirmation-timing-v23-v1-attempt2-visual.png",
+      "captures/v23/evidence/requested-confirmation-timing-v23-v1-attempt2-data-window-v1.png",
+      "captures/v23/evidence/requested-confirmation-timing-v23-v1-attempt2-data-window-v1.json",
+      "captures/v23/evidence/requested-confirmation-timing-v23-v1-attempt2-data-window-v1.txt"
+    ],
+    "notes": "Distinct actual native reload after live trace and before-reload export. Historical recomputation is separate from original live observations; unchanged source SHA pinned, v23 manifest OPEN retained.",
+    "independent_page_reload_utc": "2026-10-04T23:41:38.008Z",
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T23:41:38.820Z",
+        "bars": 1942,
+        "end": false,
+        "first": {
+          "index": -1642,
+          "value": [
+            1790924280,
+            85994.3,
+            86054.01,
+            85984.04,
+            85992.95,
+            30.20259
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791157200,
+            86462.01,
+            86511.47,
+            86462.01,
+            86489.99,
+            23.77515
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Requested confirmation timing v23 v1",
+            "status": {
+              "type": 2
+            },
+            "size": 1942,
+            "first": {
+              "index": -1642,
+              "value": [
+                1790924280,
+                18209,
+                1790924280000,
+                1790924400000,
+                1791157298307,
+                1,
+                1,
+                1,
+                0,
+                1,
+                1790924280000,
+                1790924400000,
+                1,
+                1,
+                0,
+                1,
+                1790923800000,
+                1790924400000,
+                1,
+                1,
+                0,
+                1
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791157200,
+                20150,
+                1791157200000,
+                1791157320000,
+                1791157298705,
+                2,
+                0,
+                1,
+                0,
+                0,
+                1791157200000,
+                1791157320000,
+                0,
+                1,
+                0,
+                1,
+                1791156600000,
+                1791157200000,
+                1,
+                1,
+                0,
+                1
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T23:41:40.137Z",
+        "bars": 20151,
+        "end": true,
+        "first": {
+          "index": -19851,
+          "value": [
+            1788739200,
+            80341.83,
+            80356,
+            80230.29,
+            80293.23,
+            37.66955
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791157200,
+            86462.01,
+            86511.47,
+            86462.01,
+            86490,
+            23.93329
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Requested confirmation timing v23 v1",
+            "status": {
+              "type": 2
+            },
+            "size": 20151,
+            "first": {
+              "index": -19851,
+              "value": [
+                1788739200,
+                0,
+                1788739200000,
+                1788739320000,
+                1791157298256,
+                1,
+                1,
+                1,
+                0,
+                1,
+                1788739200000,
+                1788739320000,
+                1,
+                1,
+                0,
+                1,
+                1788738600000,
+                1788739200000,
+                1,
+                1,
+                0,
+                1
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791157200,
+                20150,
+                1791157200000,
+                1791157320000,
+                1791157299911,
+                5,
+                0,
+                0,
+                1,
+                0,
+                1791157200000,
+                1791157320000,
+                0,
+                0,
+                1,
+                0,
+                1791157200000,
+                1791157800000,
+                0,
+                0,
+                1,
+                0
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   23:40",
+    "historical_compare_before_unix_seconds": 1791157200,
+    "pine_logs": {
+      "paths": [
+        "evidence/requested-confirmation-timing-v23-v1-attempt2-logs.txt",
+        "evidence/requested-confirmation-timing-v23-v1-attempt2-logs-v1.json",
+        "evidence/requested-confirmation-timing-v23-v1-attempt2-logs.png"
+      ],
+      "entries": 0
+    },
+    "all_exported_column_occurrences": [
+      {
+        "title": "time",
+        "occurrence": 1,
+        "position": 0
+      },
+      {
+        "title": "open",
+        "occurrence": 1,
+        "position": 1
+      },
+      {
+        "title": "high",
+        "occurrence": 1,
+        "position": 2
+      },
+      {
+        "title": "low",
+        "occurrence": 1,
+        "position": 3
+      },
+      {
+        "title": "close",
+        "occurrence": 1,
+        "position": 4
+      },
+      {
+        "title": "CHART_INDEX",
+        "occurrence": 1,
+        "position": 5
+      },
+      {
+        "title": "CHART_TIME_MS",
+        "occurrence": 1,
+        "position": 6
+      },
+      {
+        "title": "CHART_CLOSE_TIME_MS",
+        "occurrence": 1,
+        "position": 7
+      },
+      {
+        "title": "CHART_TIMENOW_MS",
+        "occurrence": 1,
+        "position": 8
+      },
+      {
+        "title": "CHART_UPDATE_COUNT",
+        "occurrence": 1,
+        "position": 9
+      },
+      {
+        "title": "CHART_CONFIRMED",
+        "occurrence": 1,
+        "position": 10
+      },
+      {
+        "title": "CHART_HISTORY",
+        "occurrence": 1,
+        "position": 11
+      },
+      {
+        "title": "CHART_REALTIME",
+        "occurrence": 1,
+        "position": 12
+      },
+      {
+        "title": "CHART_NEW",
+        "occurrence": 1,
+        "position": 13
+      },
+      {
+        "title": "SAME_TIME_MS",
+        "occurrence": 1,
+        "position": 14
+      },
+      {
+        "title": "SAME_CLOSE_TIME_MS",
+        "occurrence": 1,
+        "position": 15
+      },
+      {
+        "title": "SAME_CONFIRMED",
+        "occurrence": 1,
+        "position": 16
+      },
+      {
+        "title": "SAME_HISTORY",
+        "occurrence": 1,
+        "position": 17
+      },
+      {
+        "title": "SAME_REALTIME",
+        "occurrence": 1,
+        "position": 18
+      },
+      {
+        "title": "SAME_NEW",
+        "occurrence": 1,
+        "position": 19
+      },
+      {
+        "title": "HTF_TIME_MS",
+        "occurrence": 1,
+        "position": 20
+      },
+      {
+        "title": "HTF_CLOSE_TIME_MS",
+        "occurrence": 1,
+        "position": 21
+      },
+      {
+        "title": "HTF_CONFIRMED",
+        "occurrence": 1,
+        "position": 22
+      },
+      {
+        "title": "HTF_HISTORY",
+        "occurrence": 1,
+        "position": 23
+      },
+      {
+        "title": "HTF_REALTIME",
+        "occurrence": 1,
+        "position": 24
+      },
+      {
+        "title": "HTF_NEW",
+        "occurrence": 1,
+        "position": 25
+      }
+    ],
+    "declared_to_native_column_occurrences": [
+      {
+        "declared_title": "CHART_INDEX",
+        "native_title": "CHART_INDEX",
+        "occurrence": 1,
+        "position": 5
+      },
+      {
+        "declared_title": "CHART_TIME_MS",
+        "native_title": "CHART_TIME_MS",
+        "occurrence": 1,
+        "position": 6
+      },
+      {
+        "declared_title": "CHART_CLOSE_TIME_MS",
+        "native_title": "CHART_CLOSE_TIME_MS",
+        "occurrence": 1,
+        "position": 7
+      },
+      {
+        "declared_title": "CHART_TIMENOW_MS",
+        "native_title": "CHART_TIMENOW_MS",
+        "occurrence": 1,
+        "position": 8
+      },
+      {
+        "declared_title": "CHART_UPDATE_COUNT",
+        "native_title": "CHART_UPDATE_COUNT",
+        "occurrence": 1,
+        "position": 9
+      },
+      {
+        "declared_title": "CHART_CONFIRMED",
+        "native_title": "CHART_CONFIRMED",
+        "occurrence": 1,
+        "position": 10
+      },
+      {
+        "declared_title": "CHART_HISTORY",
+        "native_title": "CHART_HISTORY",
+        "occurrence": 1,
+        "position": 11
+      },
+      {
+        "declared_title": "CHART_REALTIME",
+        "native_title": "CHART_REALTIME",
+        "occurrence": 1,
+        "position": 12
+      },
+      {
+        "declared_title": "CHART_NEW",
+        "native_title": "CHART_NEW",
+        "occurrence": 1,
+        "position": 13
+      },
+      {
+        "declared_title": "SAME_TIME_MS",
+        "native_title": "SAME_TIME_MS",
+        "occurrence": 1,
+        "position": 14
+      },
+      {
+        "declared_title": "SAME_CLOSE_TIME_MS",
+        "native_title": "SAME_CLOSE_TIME_MS",
+        "occurrence": 1,
+        "position": 15
+      },
+      {
+        "declared_title": "SAME_CONFIRMED",
+        "native_title": "SAME_CONFIRMED",
+        "occurrence": 1,
+        "position": 16
+      },
+      {
+        "declared_title": "SAME_HISTORY",
+        "native_title": "SAME_HISTORY",
+        "occurrence": 1,
+        "position": 17
+      },
+      {
+        "declared_title": "SAME_REALTIME",
+        "native_title": "SAME_REALTIME",
+        "occurrence": 1,
+        "position": 18
+      },
+      {
+        "declared_title": "SAME_NEW",
+        "native_title": "SAME_NEW",
+        "occurrence": 1,
+        "position": 19
+      },
+      {
+        "declared_title": "HTF_TIME_MS",
+        "native_title": "HTF_TIME_MS",
+        "occurrence": 1,
+        "position": 20
+      },
+      {
+        "declared_title": "HTF_CLOSE_TIME_MS",
+        "native_title": "HTF_CLOSE_TIME_MS",
+        "occurrence": 1,
+        "position": 21
+      },
+      {
+        "declared_title": "HTF_CONFIRMED",
+        "native_title": "HTF_CONFIRMED",
+        "occurrence": 1,
+        "position": 22
+      },
+      {
+        "declared_title": "HTF_HISTORY",
+        "native_title": "HTF_HISTORY",
+        "occurrence": 1,
+        "position": 23
+      },
+      {
+        "declared_title": "HTF_REALTIME",
+        "native_title": "HTF_REALTIME",
+        "occurrence": 1,
+        "position": 24
+      },
+      {
+        "declared_title": "HTF_NEW",
+        "native_title": "HTF_NEW",
+        "occurrence": 1,
+        "position": 25
+      }
+    ],
+    "named_value_map_scope": "Legacy title maps show the first occurrence only; original positional cells and occurrence tables retain every duplicate without renaming.",
+    "csv_sha256": "9a2dd6bbd25386e908dee1886702e73d390853abdeb24ca8cfaa2d25292827ef",
+    "csv_bytes": 3502929,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "CHART_INDEX",
+      "CHART_TIME_MS",
+      "CHART_CLOSE_TIME_MS",
+      "CHART_TIMENOW_MS",
+      "CHART_UPDATE_COUNT",
+      "CHART_CONFIRMED",
+      "CHART_HISTORY",
+      "CHART_REALTIME",
+      "CHART_NEW",
+      "SAME_TIME_MS",
+      "SAME_CLOSE_TIME_MS",
+      "SAME_CONFIRMED",
+      "SAME_HISTORY",
+      "SAME_REALTIME",
+      "SAME_NEW",
+      "HTF_TIME_MS",
+      "HTF_CLOSE_TIME_MS",
+      "HTF_CONFIRMED",
+      "HTF_HISTORY",
+      "HTF_REALTIME",
+      "HTF_NEW"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "CHART_INDEX": 5,
+      "CHART_TIME_MS": 6,
+      "CHART_CLOSE_TIME_MS": 7,
+      "CHART_TIMENOW_MS": 8,
+      "CHART_UPDATE_COUNT": 9,
+      "CHART_CONFIRMED": 10,
+      "CHART_HISTORY": 11,
+      "CHART_REALTIME": 12,
+      "CHART_NEW": 13,
+      "SAME_TIME_MS": 14,
+      "SAME_CLOSE_TIME_MS": 15,
+      "SAME_CONFIRMED": 16,
+      "SAME_HISTORY": 17,
+      "SAME_REALTIME": 18,
+      "SAME_NEW": 19,
+      "HTF_TIME_MS": 20,
+      "HTF_CLOSE_TIME_MS": 21,
+      "HTF_CONFIRMED": 22,
+      "HTF_HISTORY": 23,
+      "HTF_REALTIME": 24,
+      "HTF_NEW": 25
+    },
+    "first_historical_cells": [
+      "1788739200",
+      "80341.83",
+      "80356",
+      "80230.29",
+      "80293.23",
+      "0",
+      "1788739200000",
+      "1788739320000",
+      "1791157298256",
+      "1",
+      "1",
+      "1",
+      "0",
+      "1",
+      "1788739200000",
+      "1788739320000",
+      "1",
+      "1",
+      "0",
+      "1",
+      "1788738600000",
+      "1788739200000",
+      "1",
+      "1",
+      "0",
+      "1"
+    ],
+    "last_historical_cells": [
+      "1791157080",
+      "86506",
+      "86506",
+      "86432",
+      "86462",
+      "20149",
+      "1791157080000",
+      "1791157200000",
+      "1791157298312",
+      "1",
+      "1",
+      "1",
+      "0",
+      "1",
+      "1791157080000",
+      "1791157200000",
+      "1",
+      "1",
+      "0",
+      "1",
+      "1791156600000",
+      "1791157200000",
+      "1",
+      "1",
+      "0",
+      "1"
+    ],
+    "declared_to_native_header_mapping": {
+      "CHART_INDEX": "CHART_INDEX",
+      "CHART_TIME_MS": "CHART_TIME_MS",
+      "CHART_CLOSE_TIME_MS": "CHART_CLOSE_TIME_MS",
+      "CHART_TIMENOW_MS": "CHART_TIMENOW_MS",
+      "CHART_UPDATE_COUNT": "CHART_UPDATE_COUNT",
+      "CHART_CONFIRMED": "CHART_CONFIRMED",
+      "CHART_HISTORY": "CHART_HISTORY",
+      "CHART_REALTIME": "CHART_REALTIME",
+      "CHART_NEW": "CHART_NEW",
+      "SAME_TIME_MS": "SAME_TIME_MS",
+      "SAME_CLOSE_TIME_MS": "SAME_CLOSE_TIME_MS",
+      "SAME_CONFIRMED": "SAME_CONFIRMED",
+      "SAME_HISTORY": "SAME_HISTORY",
+      "SAME_REALTIME": "SAME_REALTIME",
+      "SAME_NEW": "SAME_NEW",
+      "HTF_TIME_MS": "HTF_TIME_MS",
+      "HTF_CLOSE_TIME_MS": "HTF_CLOSE_TIME_MS",
+      "HTF_CONFIRMED": "HTF_CONFIRMED",
+      "HTF_HISTORY": "HTF_HISTORY",
+      "HTF_REALTIME": "HTF_REALTIME",
+      "HTF_NEW": "HTF_NEW"
+    },
+    "csv_rows": 20151,
+    "historical_rows": 20150,
+    "first_csv_timestamp_seconds": 1788739200,
+    "last_csv_timestamp_seconds": 1791157200,
+    "first_csv_time_raw": "1788739200",
+    "last_csv_time_raw": "1791157200",
+    "first_historical_values": {
+      "CHART_INDEX": "0",
+      "CHART_TIME_MS": "1788739200000",
+      "CHART_CLOSE_TIME_MS": "1788739320000",
+      "CHART_TIMENOW_MS": "1791157298256",
+      "CHART_UPDATE_COUNT": "1",
+      "CHART_CONFIRMED": "1",
+      "CHART_HISTORY": "1",
+      "CHART_REALTIME": "0",
+      "CHART_NEW": "1",
+      "SAME_TIME_MS": "1788739200000",
+      "SAME_CLOSE_TIME_MS": "1788739320000",
+      "SAME_CONFIRMED": "1",
+      "SAME_HISTORY": "1",
+      "SAME_REALTIME": "0",
+      "SAME_NEW": "1",
+      "HTF_TIME_MS": "1788738600000",
+      "HTF_CLOSE_TIME_MS": "1788739200000",
+      "HTF_CONFIRMED": "1",
+      "HTF_HISTORY": "1",
+      "HTF_REALTIME": "0",
+      "HTF_NEW": "1"
+    },
+    "last_historical_values": {
+      "CHART_INDEX": "20149",
+      "CHART_TIME_MS": "1791157080000",
+      "CHART_CLOSE_TIME_MS": "1791157200000",
+      "CHART_TIMENOW_MS": "1791157298312",
+      "CHART_UPDATE_COUNT": "1",
+      "CHART_CONFIRMED": "1",
+      "CHART_HISTORY": "1",
+      "CHART_REALTIME": "0",
+      "CHART_NEW": "1",
+      "SAME_TIME_MS": "1791157080000",
+      "SAME_CLOSE_TIME_MS": "1791157200000",
+      "SAME_CONFIRMED": "1",
+      "SAME_HISTORY": "1",
+      "SAME_REALTIME": "0",
+      "SAME_NEW": "1",
+      "HTF_TIME_MS": "1791156600000",
+      "HTF_CLOSE_TIME_MS": "1791157200000",
+      "HTF_CONFIRMED": "1",
+      "HTF_HISTORY": "1",
+      "HTF_REALTIME": "0",
+      "HTF_NEW": "1"
+    },
+    "declared_unexported_columns": [],
+    "data_window_witness": "captures/v23/evidence/requested-confirmation-timing-v23-v1-attempt2-data-window-v1.json"
+  }
+]

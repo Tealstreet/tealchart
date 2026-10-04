@@ -1,0 +1,31 @@
+{
+  "artifact": "Independent feed failed attempt v1",
+  "status": "HOLD",
+  "cause": "Native 1m boundary crossed between native-array snapshot and CSV export; collector assertion len(csv)-1 == len(native rows) failed.",
+  "csv_rows": 20118,
+  "native_rows": 20117,
+  "before_utc": "2026-10-04T23:16:59.146Z",
+  "after_utc": "2026-10-04T23:17:03.555Z",
+  "native_last": {
+    "index": 299,
+    "value": [
+      1791155760,
+      86586,
+      86598.01,
+      86572,
+      86598.01,
+      6.94693
+    ]
+  },
+  "csv_last": [
+    "1791155820",
+    "86598",
+    "86598",
+    "86598",
+    "86598"
+  ],
+  "live_boundary_unchanged": false,
+  "csv_sha256": "f800350d2f23cb4e78a98a725f4cb3700c36c0dd9be24fcd07f0f3abecfaf0fd",
+  "native_sha256": "b2e47e2667635d42cee6aba1f21071bf8d6ee69dc9114d8d27bd85ca725a3781",
+  "replacement": "native-BINANCE_BTCUSDT-1-raw-v1-attempt2-receipt-v1.json"
+}

@@ -1,0 +1,38 @@
+{
+  "index": 298,
+  "bar": [
+    1791156720,
+    86644,
+    86657.51,
+    86594.99,
+    86612.01,
+    13.95214
+  ],
+  "source_row": [
+    1791156720,
+    1791156720000,
+    1704164645000,
+    1790971080000,
+    1704182645000,
+    1704182645000,
+    1704164645000,
+    1790913600000,
+    1790913600000,
+    1704164645000,
+    1
+  ],
+  "browser_utc": "2026-10-04T23:35:14.715Z",
+  "title": "Requested timestamp exchange zone v22 v1",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   23:32",
+  "visible_range": {
+    "_firstBar": 263,
+    "_lastBar": 301
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}

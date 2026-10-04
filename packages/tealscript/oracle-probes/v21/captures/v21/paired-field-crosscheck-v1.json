@@ -1,0 +1,431 @@
+{
+  "artifact": "Paired literal field crosscheck v1",
+  "checks": [
+    {
+      "pair_id": "prefix-original-consumed-v1",
+      "phase": "prefix",
+      "companion": "Request consumed 1m arrays on 2m companion v21 v1",
+      "aliases": {
+        "ltf1_clean_count": "LTF_COUNT",
+        "ltf1_clean_non_na_count": "LTF_CLEAN_NON_NA_COUNT",
+        "ltf1_hole_non_na_count": "LTF_HOLE_NON_NA_COUNT",
+        "ltf1_warm_non_na_count": "LTF_WARM_NON_NA_COUNT",
+        "ltf1_clean_first": "LTF_FIRST_CLOSE",
+        "ltf1_clean_last": "LTF_LAST_CLOSE",
+        "ltf1_hole_first": "LTF_FIRST_HOLE_UTC29",
+        "ltf1_hole_last": "LTF_LAST_HOLE_UTC29",
+        "ltf1_warm_first": "LTF_FIRST_WARM_UTC47_SMA7",
+        "ltf1_warm_last": "LTF_LAST_WARM_UTC47_SMA7"
+      },
+      "rows": 20126,
+      "different_cells": 0,
+      "first_differences": [],
+      "origins": {
+        "CHART_FIRST_EXECUTION_MS": [
+          "1788739200000"
+        ],
+        "LTF_FIRST_FIRST_EXECUTION_MS": [
+          "1788739200000"
+        ]
+      },
+      "boundary_unchanged": true
+    },
+    {
+      "pair_id": "coverage-req-snapshot-6m-v1",
+      "phase": "completed-initial",
+      "companion": "Request native 6m snapshot on 2m companion v21 v1",
+      "aliases": {
+        "htf6_clean_gapsoff_lookaheadoff": "GOFF_LOFF_CLOSE",
+        "htf6_time_gapsoff_lookaheadoff": "GOFF_LOFF_TIME_MS",
+        "htf6_clean_gapsoff_lookaheadon": "GOFF_LON_CLOSE",
+        "htf6_time_gapsoff_lookaheadon": "GOFF_LON_TIME_MS",
+        "htf6_clean_gapson_lookaheadoff": "GON_LOFF_CLOSE",
+        "htf6_time_gapson_lookaheadoff": "GON_LOFF_TIME_MS",
+        "htf6_clean_gapson_lookaheadon": "GON_LON_CLOSE",
+        "htf6_time_gapson_lookaheadon": "GON_LON_TIME_MS",
+        "htf6_hole_gapsoff_lookaheadon": "GOFF_LON_HOLE_UTC11",
+        "htf6_sma4_warm_gapsoff_lookaheadon": "GOFF_LON_SMA4",
+        "htf6_rma4_warm_gapsoff_lookaheadon": "GOFF_LON_RMA4"
+      },
+      "rows": 20128,
+      "different_cells": 0,
+      "first_differences": [],
+      "origins": {
+        "CHART_FIRST_EXECUTION_MS": [
+          "1788739200000"
+        ],
+        "GOFF_LON_FIRST_EXECUTION_MS": [
+          "1788739200000"
+        ]
+      },
+      "boundary_unchanged": true
+    },
+    {
+      "pair_id": "coverage-request-snapshot-6m-v1",
+      "phase": "developing",
+      "companion": "Request native 6m snapshot on 2m companion v21 v1",
+      "aliases": {
+        "htf6_requested_index": "GOFF_LON_INDEX",
+        "htf6_requested_time": "GOFF_LON_TIME_MS",
+        "htf6_requested_end": "GOFF_LON_END_MS",
+        "htf6_requested_prev_close": "GOFF_LON_PREVIOUS_CLOSE",
+        "htf6_goff_lon_sum_close_len3_clean": "GOFF_LON_SUM3_CLOSE",
+        "htf6_goff_lon_sum_close_len3_hole": "GOFF_LON_SUM3_HOLE97_THREE",
+        "htf6_goff_lon_close_history2": "GOFF_LON_HISTORY2_CLOSE",
+        "htf6_goff_lon_dayofweek": "GOFF_LON_DAYOFWEEK",
+        "htf6_goff_lon_daily_open": "GOFF_LON_DAILY_OPEN_MS",
+        "htf6_goff_loff_close_clean": "GOFF_LOFF_CLOSE",
+        "htf6_goff_loff_close_hole97": "GOFF_LOFF_HOLE_INDEX97_THREE",
+        "htf6_goff_lon_close_clean": "GOFF_LON_CLOSE",
+        "htf6_goff_lon_close_hole97": "GOFF_LON_HOLE_INDEX97_THREE",
+        "htf6_gon_loff_close_clean": "GON_LOFF_CLOSE",
+        "htf6_gon_loff_close_hole97": "GON_LOFF_HOLE_INDEX97_THREE",
+        "htf6_gon_lon_close_clean": "GON_LON_CLOSE",
+        "htf6_gon_lon_close_hole97": "GON_LON_HOLE_INDEX97_THREE"
+      },
+      "rows": 20129,
+      "different_cells": 0,
+      "first_differences": [],
+      "origins": {
+        "CHART_FIRST_EXECUTION_MS": [
+          "1788739200000"
+        ],
+        "GOFF_LON_FIRST_EXECUTION_MS": [
+          "1788739200000"
+        ]
+      },
+      "boundary_unchanged": true
+    },
+    {
+      "pair_id": "coverage-req-snapshot-6m-v1",
+      "phase": "developing",
+      "companion": "Request native 6m snapshot on 2m companion v21 v1",
+      "aliases": {
+        "htf6_clean_gapsoff_lookaheadoff": "GOFF_LOFF_CLOSE",
+        "htf6_time_gapsoff_lookaheadoff": "GOFF_LOFF_TIME_MS",
+        "htf6_clean_gapsoff_lookaheadon": "GOFF_LON_CLOSE",
+        "htf6_time_gapsoff_lookaheadon": "GOFF_LON_TIME_MS",
+        "htf6_clean_gapson_lookaheadoff": "GON_LOFF_CLOSE",
+        "htf6_time_gapson_lookaheadoff": "GON_LOFF_TIME_MS",
+        "htf6_clean_gapson_lookaheadon": "GON_LON_CLOSE",
+        "htf6_time_gapson_lookaheadon": "GON_LON_TIME_MS",
+        "htf6_hole_gapsoff_lookaheadon": "GOFF_LON_HOLE_UTC11",
+        "htf6_sma4_warm_gapsoff_lookaheadon": "GOFF_LON_SMA4",
+        "htf6_rma4_warm_gapsoff_lookaheadon": "GOFF_LON_RMA4"
+      },
+      "rows": 20129,
+      "different_cells": 0,
+      "first_differences": [],
+      "origins": {
+        "CHART_FIRST_EXECUTION_MS": [
+          "1788739200000"
+        ],
+        "GOFF_LON_FIRST_EXECUTION_MS": [
+          "1788739200000"
+        ]
+      },
+      "boundary_unchanged": true
+    },
+    {
+      "pair_id": "htf-original-snapshot-6m-10m-v1",
+      "phase": "developing",
+      "companion": "Request native 6m snapshot on 2m companion v21 v1",
+      "aliases": {
+        "htf6_index_gapsoff_lookaheadon": "GOFF_LON_INDEX",
+        "htf6_time_gapsoff_lookaheadon": "GOFF_LON_TIME_MS"
+      },
+      "rows": 20131,
+      "different_cells": 0,
+      "first_differences": [],
+      "origins": {
+        "CHART_FIRST_EXECUTION_MS": [
+          "1788739200000"
+        ],
+        "GOFF_LON_FIRST_EXECUTION_MS": [
+          "1788739200000"
+        ]
+      },
+      "boundary_unchanged": false
+    },
+    {
+      "pair_id": "htf-original-snapshot-6m-10m-v1",
+      "phase": "developing",
+      "companion": "Request native 10m snapshot on 2m companion v21 v1",
+      "aliases": {
+        "htf10_index_gapsoff_lookaheadon": "GOFF_LON_INDEX",
+        "htf10_time_gapsoff_lookaheadon": "GOFF_LON_TIME_MS"
+      },
+      "rows": 20131,
+      "different_cells": 0,
+      "first_differences": [],
+      "origins": {
+        "CHART_FIRST_EXECUTION_MS": [
+          "1788739200000"
+        ],
+        "GOFF_LON_FIRST_EXECUTION_MS": [
+          "1788739200000"
+        ]
+      },
+      "boundary_unchanged": false
+    },
+    {
+      "pair_id": "htf-original-snapshot-6m-10m-v1",
+      "phase": "developing-retry",
+      "companion": "Request native 6m snapshot on 2m companion v21 v1",
+      "aliases": {
+        "htf6_index_gapsoff_lookaheadon": "GOFF_LON_INDEX",
+        "htf6_time_gapsoff_lookaheadon": "GOFF_LON_TIME_MS"
+      },
+      "rows": 20132,
+      "different_cells": 0,
+      "first_differences": [],
+      "origins": {
+        "CHART_FIRST_EXECUTION_MS": [
+          "1788739200000"
+        ],
+        "GOFF_LON_FIRST_EXECUTION_MS": [
+          "1788739200000"
+        ]
+      },
+      "boundary_unchanged": true
+    },
+    {
+      "pair_id": "htf-original-snapshot-6m-10m-v1",
+      "phase": "developing-retry",
+      "companion": "Request native 10m snapshot on 2m companion v21 v1",
+      "aliases": {
+        "htf10_index_gapsoff_lookaheadon": "GOFF_LON_INDEX",
+        "htf10_time_gapsoff_lookaheadon": "GOFF_LON_TIME_MS"
+      },
+      "rows": 20132,
+      "different_cells": 0,
+      "first_differences": [],
+      "origins": {
+        "CHART_FIRST_EXECUTION_MS": [
+          "1788739200000"
+        ],
+        "GOFF_LON_FIRST_EXECUTION_MS": [
+          "1788739200000"
+        ]
+      },
+      "boundary_unchanged": true
+    },
+    {
+      "pair_id": "coverage-req-snapshot-6m-v1",
+      "phase": "completed-reloaded",
+      "companion": "Request native 6m snapshot on 2m companion v21 v1",
+      "aliases": {
+        "htf6_clean_gapsoff_lookaheadoff": "GOFF_LOFF_CLOSE",
+        "htf6_time_gapsoff_lookaheadoff": "GOFF_LOFF_TIME_MS",
+        "htf6_clean_gapsoff_lookaheadon": "GOFF_LON_CLOSE",
+        "htf6_time_gapsoff_lookaheadon": "GOFF_LON_TIME_MS",
+        "htf6_clean_gapson_lookaheadoff": "GON_LOFF_CLOSE",
+        "htf6_time_gapson_lookaheadoff": "GON_LOFF_TIME_MS",
+        "htf6_clean_gapson_lookaheadon": "GON_LON_CLOSE",
+        "htf6_time_gapson_lookaheadon": "GON_LON_TIME_MS",
+        "htf6_hole_gapsoff_lookaheadon": "GOFF_LON_HOLE_UTC11",
+        "htf6_sma4_warm_gapsoff_lookaheadon": "GOFF_LON_SMA4",
+        "htf6_rma4_warm_gapsoff_lookaheadon": "GOFF_LON_RMA4"
+      },
+      "rows": 20133,
+      "different_cells": 0,
+      "first_differences": [],
+      "origins": {
+        "CHART_FIRST_EXECUTION_MS": [
+          "1788739200000"
+        ],
+        "GOFF_LON_FIRST_EXECUTION_MS": [
+          "1788739200000"
+        ]
+      },
+      "boundary_unchanged": true
+    },
+    {
+      "pair_id": "coverage-req-snapshot-6m-v1",
+      "phase": "completed-reload-control",
+      "companion": "Request native 6m snapshot on 2m companion v21 v1",
+      "aliases": {
+        "htf6_clean_gapsoff_lookaheadoff": "GOFF_LOFF_CLOSE",
+        "htf6_time_gapsoff_lookaheadoff": "GOFF_LOFF_TIME_MS",
+        "htf6_clean_gapsoff_lookaheadon": "GOFF_LON_CLOSE",
+        "htf6_time_gapsoff_lookaheadon": "GOFF_LON_TIME_MS",
+        "htf6_clean_gapson_lookaheadoff": "GON_LOFF_CLOSE",
+        "htf6_time_gapson_lookaheadoff": "GON_LOFF_TIME_MS",
+        "htf6_clean_gapson_lookaheadon": "GON_LON_CLOSE",
+        "htf6_time_gapson_lookaheadon": "GON_LON_TIME_MS",
+        "htf6_hole_gapsoff_lookaheadon": "GOFF_LON_HOLE_UTC11",
+        "htf6_sma4_warm_gapsoff_lookaheadon": "GOFF_LON_SMA4",
+        "htf6_rma4_warm_gapsoff_lookaheadon": "GOFF_LON_RMA4"
+      },
+      "rows": 20133,
+      "different_cells": 0,
+      "first_differences": [],
+      "origins": {
+        "CHART_FIRST_EXECUTION_MS": [
+          "1788739200000"
+        ],
+        "GOFF_LON_FIRST_EXECUTION_MS": [
+          "1788739200000"
+        ]
+      },
+      "boundary_unchanged": true
+    },
+    {
+      "pair_id": "coverage-request-snapshot-6m-v1",
+      "phase": "completed-reloaded",
+      "companion": "Request native 6m snapshot on 2m companion v21 v1",
+      "aliases": {
+        "htf6_requested_index": "GOFF_LON_INDEX",
+        "htf6_requested_time": "GOFF_LON_TIME_MS",
+        "htf6_requested_end": "GOFF_LON_END_MS",
+        "htf6_requested_prev_close": "GOFF_LON_PREVIOUS_CLOSE",
+        "htf6_goff_lon_sum_close_len3_clean": "GOFF_LON_SUM3_CLOSE",
+        "htf6_goff_lon_sum_close_len3_hole": "GOFF_LON_SUM3_HOLE97_THREE",
+        "htf6_goff_lon_close_history2": "GOFF_LON_HISTORY2_CLOSE",
+        "htf6_goff_lon_dayofweek": "GOFF_LON_DAYOFWEEK",
+        "htf6_goff_lon_daily_open": "GOFF_LON_DAILY_OPEN_MS",
+        "htf6_goff_loff_close_clean": "GOFF_LOFF_CLOSE",
+        "htf6_goff_loff_close_hole97": "GOFF_LOFF_HOLE_INDEX97_THREE",
+        "htf6_goff_lon_close_clean": "GOFF_LON_CLOSE",
+        "htf6_goff_lon_close_hole97": "GOFF_LON_HOLE_INDEX97_THREE",
+        "htf6_gon_loff_close_clean": "GON_LOFF_CLOSE",
+        "htf6_gon_loff_close_hole97": "GON_LOFF_HOLE_INDEX97_THREE",
+        "htf6_gon_lon_close_clean": "GON_LON_CLOSE",
+        "htf6_gon_lon_close_hole97": "GON_LON_HOLE_INDEX97_THREE"
+      },
+      "rows": 20133,
+      "different_cells": 0,
+      "first_differences": [],
+      "origins": {
+        "CHART_FIRST_EXECUTION_MS": [
+          "1788739200000"
+        ],
+        "GOFF_LON_FIRST_EXECUTION_MS": [
+          "1788739200000"
+        ]
+      },
+      "boundary_unchanged": true
+    },
+    {
+      "pair_id": "coverage-request-snapshot-6m-v1",
+      "phase": "completed-reload-control",
+      "companion": "Request native 6m snapshot on 2m companion v21 v1",
+      "aliases": {
+        "htf6_requested_index": "GOFF_LON_INDEX",
+        "htf6_requested_time": "GOFF_LON_TIME_MS",
+        "htf6_requested_end": "GOFF_LON_END_MS",
+        "htf6_requested_prev_close": "GOFF_LON_PREVIOUS_CLOSE",
+        "htf6_goff_lon_sum_close_len3_clean": "GOFF_LON_SUM3_CLOSE",
+        "htf6_goff_lon_sum_close_len3_hole": "GOFF_LON_SUM3_HOLE97_THREE",
+        "htf6_goff_lon_close_history2": "GOFF_LON_HISTORY2_CLOSE",
+        "htf6_goff_lon_dayofweek": "GOFF_LON_DAYOFWEEK",
+        "htf6_goff_lon_daily_open": "GOFF_LON_DAILY_OPEN_MS",
+        "htf6_goff_loff_close_clean": "GOFF_LOFF_CLOSE",
+        "htf6_goff_loff_close_hole97": "GOFF_LOFF_HOLE_INDEX97_THREE",
+        "htf6_goff_lon_close_clean": "GOFF_LON_CLOSE",
+        "htf6_goff_lon_close_hole97": "GOFF_LON_HOLE_INDEX97_THREE",
+        "htf6_gon_loff_close_clean": "GON_LOFF_CLOSE",
+        "htf6_gon_loff_close_hole97": "GON_LOFF_HOLE_INDEX97_THREE",
+        "htf6_gon_lon_close_clean": "GON_LON_CLOSE",
+        "htf6_gon_lon_close_hole97": "GON_LON_HOLE_INDEX97_THREE"
+      },
+      "rows": 20133,
+      "different_cells": 0,
+      "first_differences": [],
+      "origins": {
+        "CHART_FIRST_EXECUTION_MS": [
+          "1788739200000"
+        ],
+        "GOFF_LON_FIRST_EXECUTION_MS": [
+          "1788739200000"
+        ]
+      },
+      "boundary_unchanged": true
+    },
+    {
+      "pair_id": "htf-original-snapshot-6m-10m-v1",
+      "phase": "completed-reloaded",
+      "companion": "Request native 6m snapshot on 2m companion v21 v1",
+      "aliases": {
+        "htf6_index_gapsoff_lookaheadon": "GOFF_LON_INDEX",
+        "htf6_time_gapsoff_lookaheadon": "GOFF_LON_TIME_MS"
+      },
+      "rows": 20137,
+      "different_cells": 0,
+      "first_differences": [],
+      "origins": {
+        "CHART_FIRST_EXECUTION_MS": [
+          "1788739200000"
+        ],
+        "GOFF_LON_FIRST_EXECUTION_MS": [
+          "1788739200000"
+        ]
+      },
+      "boundary_unchanged": true
+    },
+    {
+      "pair_id": "htf-original-snapshot-6m-10m-v1",
+      "phase": "completed-reloaded",
+      "companion": "Request native 10m snapshot on 2m companion v21 v1",
+      "aliases": {
+        "htf10_index_gapsoff_lookaheadon": "GOFF_LON_INDEX",
+        "htf10_time_gapsoff_lookaheadon": "GOFF_LON_TIME_MS"
+      },
+      "rows": 20137,
+      "different_cells": 0,
+      "first_differences": [],
+      "origins": {
+        "CHART_FIRST_EXECUTION_MS": [
+          "1788739200000"
+        ],
+        "GOFF_LON_FIRST_EXECUTION_MS": [
+          "1788739200000"
+        ]
+      },
+      "boundary_unchanged": true
+    },
+    {
+      "pair_id": "htf-original-snapshot-6m-10m-v1",
+      "phase": "completed-reload-control",
+      "companion": "Request native 6m snapshot on 2m companion v21 v1",
+      "aliases": {
+        "htf6_index_gapsoff_lookaheadon": "GOFF_LON_INDEX",
+        "htf6_time_gapsoff_lookaheadon": "GOFF_LON_TIME_MS"
+      },
+      "rows": 20138,
+      "different_cells": 0,
+      "first_differences": [],
+      "origins": {
+        "CHART_FIRST_EXECUTION_MS": [
+          "1788739200000"
+        ],
+        "GOFF_LON_FIRST_EXECUTION_MS": [
+          "1788739200000"
+        ]
+      },
+      "boundary_unchanged": true
+    },
+    {
+      "pair_id": "htf-original-snapshot-6m-10m-v1",
+      "phase": "completed-reload-control",
+      "companion": "Request native 10m snapshot on 2m companion v21 v1",
+      "aliases": {
+        "htf10_index_gapsoff_lookaheadon": "GOFF_LON_INDEX",
+        "htf10_time_gapsoff_lookaheadon": "GOFF_LON_TIME_MS"
+      },
+      "rows": 20138,
+      "different_cells": 0,
+      "first_differences": [],
+      "origins": {
+        "CHART_FIRST_EXECUTION_MS": [
+          "1788739200000"
+        ],
+        "GOFF_LON_FIRST_EXECUTION_MS": [
+          "1788739200000"
+        ]
+      },
+      "boundary_unchanged": true
+    }
+  ],
+  "limit": "Only aliases with identical source expressions/request modes are compared. All raw differences preserved; no tolerance, origin substitution or engine result. Unexposed original requested origins remain unknown even when literal requested indices agree."
+}

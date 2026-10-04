@@ -1,0 +1,4676 @@
+{
+  "artifact": "Consumed 1m chronology and bounded log audit v2",
+  "original_csv": "captures/v21/request-consumed-prefix-2m-v21-v1-attempt1.csv",
+  "original_sha256": "0e8b664b2cdfa82c708ab0dfe77593558974d5db9f24e5e45147e6ae5e0d99c9",
+  "host_rows": 20126,
+  "counts": {
+    "2": 20125,
+    "1": 1
+  },
+  "child_rows": 40251,
+  "chronology": "consumed-1m-chronology-v1.csv",
+  "chronology_sha256": "406e7eb8c0f0b920bfc782b1974cbaa6eb9d2dfbd1ca5cf35da4bc83dbfe68eb",
+  "origin_ms": "1788739200000",
+  "logs": [
+    {
+      "file": "captures/v21/evidence/request-consumed-prefix-2m-v21-v1-attempt1-logs-v1.json",
+      "entries": 769,
+      "bars": 256,
+      "children": 512,
+      "first_pine_index": 0,
+      "last_pine_index": 255,
+      "complete_for_present_bounds": true,
+      "na_representation_differences": [
+        {
+          "key": [
+            1788739200000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788739200000,
+            0
+          ],
+          "field": "SMA7_RAW",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788739200000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788739200000,
+            1
+          ],
+          "field": "SMA7_RAW",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788739320000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788739320000,
+            0
+          ],
+          "field": "SMA7_RAW",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788739320000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788739320000,
+            1
+          ],
+          "field": "SMA7_RAW",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788739440000,
+            0
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788739440000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788739440000,
+            0
+          ],
+          "field": "SMA7_RAW",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788739440000,
+            1
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788739440000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788739440000,
+            1
+          ],
+          "field": "SMA7_RAW",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788740040000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788740160000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788740160000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788740280000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788740280000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788740400000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788740400000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788741120000,
+            1
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788741240000,
+            0
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788741600000,
+            0
+          ],
+          "field": "HOLE_INDEX97_TWO",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788741600000,
+            0
+          ],
+          "field": "HOLE_INDEX97_THREE",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788741600000,
+            1
+          ],
+          "field": "HOLE_INDEX97_TWO",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788741600000,
+            1
+          ],
+          "field": "HOLE_INDEX97_THREE",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788741720000,
+            0
+          ],
+          "field": "HOLE_INDEX97_THREE",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788742920000,
+            0
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788742920000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788742920000,
+            1
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788742920000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788743040000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788743040000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788743160000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788743160000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788743280000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788744600000,
+            1
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788744720000,
+            0
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788745680000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788745800000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788745800000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788745920000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788745920000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788746040000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788746040000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788746400000,
+            0
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788746400000,
+            1
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788747360000,
+            1
+          ],
+          "field": "HOLE_INDEX97_TWO",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788747360000,
+            1
+          ],
+          "field": "HOLE_INDEX97_THREE",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788747480000,
+            0
+          ],
+          "field": "HOLE_INDEX97_TWO",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788747480000,
+            0
+          ],
+          "field": "HOLE_INDEX97_THREE",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788747480000,
+            1
+          ],
+          "field": "HOLE_INDEX97_THREE",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788748080000,
+            1
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788748200000,
+            0
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788748560000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788748560000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788748680000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788748680000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788748800000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788748800000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788748920000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788749880000,
+            0
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788749880000,
+            1
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788751320000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788751440000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788751440000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788751560000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788751560000,
+            1
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788751560000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788751680000,
+            0
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788751680000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788751680000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788753240000,
+            0
+          ],
+          "field": "HOLE_INDEX97_TWO",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788753240000,
+            0
+          ],
+          "field": "HOLE_INDEX97_THREE",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788753240000,
+            1
+          ],
+          "field": "HOLE_INDEX97_TWO",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788753240000,
+            1
+          ],
+          "field": "HOLE_INDEX97_THREE",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788753360000,
+            0
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788753360000,
+            0
+          ],
+          "field": "HOLE_INDEX97_THREE",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788753360000,
+            1
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788754200000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788754200000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788754320000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788754320000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788754440000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788754440000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788754560000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788755040000,
+            1
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788755160000,
+            0
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788756840000,
+            0
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788756840000,
+            1
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788756960000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788757080000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788757080000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788757200000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788757200000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788757320000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788757320000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788758520000,
+            1
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788758640000,
+            0
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788759000000,
+            1
+          ],
+          "field": "HOLE_INDEX97_TWO",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788759000000,
+            1
+          ],
+          "field": "HOLE_INDEX97_THREE",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788759120000,
+            0
+          ],
+          "field": "HOLE_INDEX97_TWO",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788759120000,
+            0
+          ],
+          "field": "HOLE_INDEX97_THREE",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788759120000,
+            1
+          ],
+          "field": "HOLE_INDEX97_THREE",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788759840000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788759840000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788759960000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788759960000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788760080000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788760080000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788760200000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788760320000,
+            0
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788760320000,
+            1
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788762000000,
+            1
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788762120000,
+            0
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788762600000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788762720000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788762720000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788762840000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788762840000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788762960000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788762960000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788763800000,
+            0
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788763800000,
+            1
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788764880000,
+            0
+          ],
+          "field": "HOLE_INDEX97_TWO",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788764880000,
+            0
+          ],
+          "field": "HOLE_INDEX97_THREE",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788764880000,
+            1
+          ],
+          "field": "HOLE_INDEX97_TWO",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788764880000,
+            1
+          ],
+          "field": "HOLE_INDEX97_THREE",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788765000000,
+            0
+          ],
+          "field": "HOLE_INDEX97_THREE",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788765480000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788765480000,
+            1
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788765480000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788765600000,
+            0
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788765600000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788765600000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788765720000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788765720000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788765840000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788767280000,
+            0
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788767280000,
+            1
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788768240000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788768360000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788768360000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788768480000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788768480000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788768600000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788768600000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788768960000,
+            1
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1788769080000,
+            0
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        }
+      ],
+      "numeric_or_availability_differences": []
+    },
+    {
+      "file": "captures/v21/evidence/request-consumed-prefix-2m-v21-v1-chunk-19968-20124-v1-attempt1-logs-v1.json",
+      "entries": 472,
+      "bars": 157,
+      "children": 314,
+      "first_pine_index": 19968,
+      "last_pine_index": 20124,
+      "complete_for_present_bounds": true,
+      "na_representation_differences": [
+        {
+          "key": [
+            1791135360000,
+            1
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791135480000,
+            0
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791137040000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791137160000,
+            0
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791137160000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791137160000,
+            1
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791137160000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791137280000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791137280000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791137400000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791137400000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791138840000,
+            1
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791138960000,
+            0
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791139440000,
+            0
+          ],
+          "field": "HOLE_INDEX97_TWO",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791139440000,
+            0
+          ],
+          "field": "HOLE_INDEX97_THREE",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791139440000,
+            1
+          ],
+          "field": "HOLE_INDEX97_TWO",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791139440000,
+            1
+          ],
+          "field": "HOLE_INDEX97_THREE",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791139560000,
+            0
+          ],
+          "field": "HOLE_INDEX97_THREE",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791139920000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791139920000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791140040000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791140040000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791140160000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791140160000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791140280000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791140640000,
+            0
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791140640000,
+            1
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791142320000,
+            1
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791142440000,
+            0
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791142680000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791142800000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791142800000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791142920000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791142920000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791143040000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791143040000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791144120000,
+            0
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791144120000,
+            1
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791145200000,
+            1
+          ],
+          "field": "HOLE_INDEX97_TWO",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791145200000,
+            1
+          ],
+          "field": "HOLE_INDEX97_THREE",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791145320000,
+            0
+          ],
+          "field": "HOLE_INDEX97_TWO",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791145320000,
+            0
+          ],
+          "field": "HOLE_INDEX97_THREE",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791145320000,
+            1
+          ],
+          "field": "HOLE_INDEX97_THREE",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791145560000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791145560000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791145680000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791145680000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791145800000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791145800000,
+            1
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791145800000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791145920000,
+            0
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791145920000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791147600000,
+            0
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791147600000,
+            1
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791148320000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791148440000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791148440000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791148560000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791148560000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791148680000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791148680000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791149280000,
+            1
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791149400000,
+            0
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791151080000,
+            0
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791151080000,
+            0
+          ],
+          "field": "HOLE_INDEX97_TWO",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791151080000,
+            0
+          ],
+          "field": "HOLE_INDEX97_THREE",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791151080000,
+            1
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791151080000,
+            1
+          ],
+          "field": "HOLE_INDEX97_TWO",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791151080000,
+            1
+          ],
+          "field": "HOLE_INDEX97_THREE",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791151200000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791151200000,
+            0
+          ],
+          "field": "HOLE_INDEX97_THREE",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791151200000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791151320000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791151320000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791151440000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791151440000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791151560000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791152760000,
+            1
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791152880000,
+            0
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791153960000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791154080000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1791154080000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        }
+      ],
+      "numeric_or_availability_differences": []
+    },
+    {
+      "file": "captures/v21/evidence/request-consumed-prefix-2m-v21-v1-chunk-4864-5119-v1-attempt1-logs-v1.json",
+      "entries": 0,
+      "bars": 0,
+      "children": 0,
+      "first_pine_index": null,
+      "last_pine_index": null,
+      "complete_for_present_bounds": false,
+      "na_representation_differences": [],
+      "numeric_or_availability_differences": []
+    },
+    {
+      "file": "captures/v21/evidence/request-consumed-prefix-2m-v21-v1-chunk-4864-5119-v2-attempt1-logs-v1.json",
+      "entries": 769,
+      "bars": 256,
+      "children": 512,
+      "first_pine_index": 4864,
+      "last_pine_index": 5119,
+      "complete_for_present_bounds": true,
+      "na_representation_differences": [
+        {
+          "key": [
+            1789323600000,
+            0
+          ],
+          "field": "HOLE_INDEX97_TWO",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789323600000,
+            0
+          ],
+          "field": "HOLE_INDEX97_THREE",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789323600000,
+            1
+          ],
+          "field": "HOLE_INDEX97_TWO",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789323600000,
+            1
+          ],
+          "field": "HOLE_INDEX97_THREE",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789323720000,
+            0
+          ],
+          "field": "HOLE_INDEX97_THREE",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789323840000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789323840000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789323960000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789323960000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789324080000,
+            0
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789324080000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789324080000,
+            1
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789324080000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789324200000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789325760000,
+            1
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789325880000,
+            0
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789326600000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789326720000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789326720000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789326840000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789326840000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789326960000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789326960000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789327560000,
+            0
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789327560000,
+            1
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789329240000,
+            1
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789329360000,
+            0
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789329360000,
+            1
+          ],
+          "field": "HOLE_INDEX97_TWO",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789329360000,
+            1
+          ],
+          "field": "HOLE_INDEX97_THREE",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789329480000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789329480000,
+            0
+          ],
+          "field": "HOLE_INDEX97_TWO",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789329480000,
+            0
+          ],
+          "field": "HOLE_INDEX97_THREE",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789329480000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789329480000,
+            1
+          ],
+          "field": "HOLE_INDEX97_THREE",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789329600000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789329600000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789329720000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789329720000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789329840000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789331040000,
+            0
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789331040000,
+            1
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789332240000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789332360000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789332360000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789332480000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789332480000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789332600000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789332600000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789332720000,
+            1
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789332840000,
+            0
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789334520000,
+            0
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789334520000,
+            1
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789335120000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789335120000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789335240000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789335240000,
+            0
+          ],
+          "field": "HOLE_INDEX97_TWO",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789335240000,
+            0
+          ],
+          "field": "HOLE_INDEX97_THREE",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789335240000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789335240000,
+            1
+          ],
+          "field": "HOLE_INDEX97_TWO",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789335240000,
+            1
+          ],
+          "field": "HOLE_INDEX97_THREE",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789335360000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789335360000,
+            0
+          ],
+          "field": "HOLE_INDEX97_THREE",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789335360000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789335480000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789336200000,
+            1
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789336320000,
+            0
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789337880000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789338000000,
+            0
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789338000000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789338000000,
+            1
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789338000000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789338120000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789338120000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789338240000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789338240000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789339680000,
+            1
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789339800000,
+            0
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789340760000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789340760000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789340880000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789340880000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789341000000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789341000000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789341000000,
+            1
+          ],
+          "field": "HOLE_INDEX97_TWO",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789341000000,
+            1
+          ],
+          "field": "HOLE_INDEX97_THREE",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789341120000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789341120000,
+            0
+          ],
+          "field": "HOLE_INDEX97_TWO",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789341120000,
+            0
+          ],
+          "field": "HOLE_INDEX97_THREE",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789341120000,
+            1
+          ],
+          "field": "HOLE_INDEX97_THREE",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789341480000,
+            0
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789341480000,
+            1
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789343160000,
+            1
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789343280000,
+            0
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789343520000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789343640000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789343640000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789343760000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789343760000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789343880000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789343880000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789344960000,
+            0
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789344960000,
+            1
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789346400000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789346400000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789346520000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789346520000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789346640000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789346640000,
+            1
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789346640000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789346760000,
+            0
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789346760000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789346880000,
+            0
+          ],
+          "field": "HOLE_INDEX97_TWO",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789346880000,
+            0
+          ],
+          "field": "HOLE_INDEX97_THREE",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789346880000,
+            1
+          ],
+          "field": "HOLE_INDEX97_TWO",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789346880000,
+            1
+          ],
+          "field": "HOLE_INDEX97_THREE",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789347000000,
+            0
+          ],
+          "field": "HOLE_INDEX97_THREE",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789348440000,
+            0
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789348440000,
+            1
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789349160000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789349280000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789349280000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789349400000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789349400000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789349520000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789349520000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789350120000,
+            1
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789350240000,
+            0
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789351920000,
+            0
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789351920000,
+            1
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789352040000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789352040000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789352160000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789352160000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789352280000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789352280000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789352400000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789352640000,
+            1
+          ],
+          "field": "HOLE_INDEX97_TWO",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789352640000,
+            1
+          ],
+          "field": "HOLE_INDEX97_THREE",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789352760000,
+            0
+          ],
+          "field": "HOLE_INDEX97_TWO",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789352760000,
+            0
+          ],
+          "field": "HOLE_INDEX97_THREE",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789352760000,
+            1
+          ],
+          "field": "HOLE_INDEX97_THREE",
+          "csv": "",
+          "log": "null"
+        }
+      ],
+      "numeric_or_availability_differences": []
+    },
+    {
+      "file": "captures/v21/evidence/request-consumed-prefix-2m-v21-v1-chunk-9984-10239-v1-attempt1-logs-v1.json",
+      "entries": 769,
+      "bars": 256,
+      "children": 512,
+      "first_pine_index": 9984,
+      "last_pine_index": 10239,
+      "complete_for_present_bounds": true,
+      "na_representation_differences": [
+        {
+          "key": [
+            1789938240000,
+            1
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789938360000,
+            0
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789938600000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789938600000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789938720000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789938720000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789938840000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789938840000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789938960000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789940040000,
+            0
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789940040000,
+            1
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789940520000,
+            0
+          ],
+          "field": "HOLE_INDEX97_TWO",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789940520000,
+            0
+          ],
+          "field": "HOLE_INDEX97_THREE",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789940520000,
+            1
+          ],
+          "field": "HOLE_INDEX97_TWO",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789940520000,
+            1
+          ],
+          "field": "HOLE_INDEX97_THREE",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789940640000,
+            0
+          ],
+          "field": "HOLE_INDEX97_THREE",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789941360000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789941480000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789941480000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789941600000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789941600000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789941720000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789941720000,
+            1
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789941720000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789941840000,
+            0
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789943520000,
+            0
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789943520000,
+            1
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789944240000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789944240000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789944360000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789944360000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789944480000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789944480000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789944600000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789945200000,
+            1
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789945320000,
+            0
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789946280000,
+            1
+          ],
+          "field": "HOLE_INDEX97_TWO",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789946280000,
+            1
+          ],
+          "field": "HOLE_INDEX97_THREE",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789946400000,
+            0
+          ],
+          "field": "HOLE_INDEX97_TWO",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789946400000,
+            0
+          ],
+          "field": "HOLE_INDEX97_THREE",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789946400000,
+            1
+          ],
+          "field": "HOLE_INDEX97_THREE",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789947000000,
+            0
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789947000000,
+            1
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789947000000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789947120000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789947120000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789947240000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789947240000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789947360000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789947360000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789948680000,
+            1
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789948800000,
+            0
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789949880000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789949880000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789950000000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789950000000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789950120000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789950120000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789950240000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789950480000,
+            0
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789950480000,
+            1
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789952160000,
+            0
+          ],
+          "field": "HOLE_INDEX97_TWO",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789952160000,
+            0
+          ],
+          "field": "HOLE_INDEX97_THREE",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789952160000,
+            1
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789952160000,
+            1
+          ],
+          "field": "HOLE_INDEX97_TWO",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789952160000,
+            1
+          ],
+          "field": "HOLE_INDEX97_THREE",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789952280000,
+            0
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789952280000,
+            0
+          ],
+          "field": "HOLE_INDEX97_THREE",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789952640000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789952760000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789952760000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789952880000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789952880000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789953000000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789953000000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789953960000,
+            0
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789953960000,
+            1
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789955520000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789955520000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789955640000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789955640000,
+            1
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789955640000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789955760000,
+            0
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789955760000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789955760000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789955880000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789957440000,
+            0
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789957440000,
+            1
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789957920000,
+            1
+          ],
+          "field": "HOLE_INDEX97_TWO",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789957920000,
+            1
+          ],
+          "field": "HOLE_INDEX97_THREE",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789958040000,
+            0
+          ],
+          "field": "HOLE_INDEX97_TWO",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789958040000,
+            0
+          ],
+          "field": "HOLE_INDEX97_THREE",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789958040000,
+            1
+          ],
+          "field": "HOLE_INDEX97_THREE",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789958280000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789958400000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789958400000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789958520000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789958520000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789958640000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789958640000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789959120000,
+            1
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789959240000,
+            0
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789960920000,
+            0
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789960920000,
+            1
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789961160000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789961160000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789961280000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789961280000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789961400000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789961400000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789961520000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789962600000,
+            1
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789962720000,
+            0
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789963800000,
+            0
+          ],
+          "field": "HOLE_INDEX97_TWO",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789963800000,
+            0
+          ],
+          "field": "HOLE_INDEX97_THREE",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789963800000,
+            1
+          ],
+          "field": "HOLE_INDEX97_TWO",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789963800000,
+            1
+          ],
+          "field": "HOLE_INDEX97_THREE",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789963920000,
+            0
+          ],
+          "field": "HOLE_INDEX97_THREE",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789963920000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789964040000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789964040000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789964160000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789964160000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789964280000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789964280000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789964400000,
+            0
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789964400000,
+            1
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789966080000,
+            1
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789966200000,
+            0
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789966800000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789966800000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789966920000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789966920000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789967040000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789967040000,
+            1
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789967160000,
+            0
+          ],
+          "field": "WARM_UTC47_SMA7",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789967880000,
+            0
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        },
+        {
+          "key": [
+            1789967880000,
+            1
+          ],
+          "field": "HOLE_UTC29",
+          "csv": "",
+          "log": "null"
+        }
+      ],
+      "numeric_or_availability_differences": []
+    }
+  ],
+  "limit": "Derived chronology copies raw exported first/last tuple strings only; all observed count<=2 and edge completeness=1. For count1 the identical last edge is not duplicated. Empty native cells remain empty. Independent 1m chart starts later; its Pine origin cannot substitute consumed source origin.",
+  "representation_note": "Frozen source num() emits literal null for NA; original CSV emits blank cells. Raw strings remain distinct and preserved. v1 csv_differences included these representation differences; v2 separates them from numeric mismatches."
+}

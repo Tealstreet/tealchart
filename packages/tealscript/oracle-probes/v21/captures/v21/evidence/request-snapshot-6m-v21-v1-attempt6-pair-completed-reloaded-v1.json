@@ -1,0 +1,3949 @@
+{
+  "host_boundary_unchanged": true,
+  "artifact": "SAME chart paired export receipt v1",
+  "pair_id": "coverage-req-snapshot-6m-v1",
+  "phase": "completed-reloaded",
+  "combined_csv": "captures/v21/request-snapshot-6m-v21-v1-attempt6.csv",
+  "combined_csv_sha256": "506d91ed896b2653a6029629a0c78bdb0c31c6ea18d4537274ca18d5839b3cec",
+  "export_utc": "2026-10-04T23:04:20.522Z",
+  "before": {
+    "artifact": "Native SAME chart paired request snapshot v1",
+    "tag": "before-completed-reloaded",
+    "browser_utc": "2026-10-04T23:04:13.799Z",
+    "symbol": {
+      "source2": {
+        "country": "MT",
+        "description": "Binance",
+        "exchange-type": "exchange",
+        "id": "BINANCE",
+        "name": "Binance",
+        "url": "https://www.binance.com/en"
+      },
+      "currency_code": "USDT",
+      "source_id": "BINANCE",
+      "subsession_id": "regular",
+      "provider_id": "binance",
+      "base_currency_id": "XTVCBTC",
+      "base_currency": "BTC",
+      "currency_id": "XTVCUSDT",
+      "format": "price",
+      "formatter": "price",
+      "pro_perm": "",
+      "volume_type": "base",
+      "measure": "price",
+      "allowed_adjustment": "none",
+      "short_description": "Bitcoin / TetherUS",
+      "variable_tick_size": "",
+      "name": "BTCUSDT",
+      "full_name": "BINANCE:BTCUSDT",
+      "pro_name": "BINANCE:BTCUSDT",
+      "base_name": [
+        "BINANCE:BTCUSDT"
+      ],
+      "description": "Bitcoin / TetherUS",
+      "exchange": "Binance",
+      "pricescale": 100,
+      "pointvalue": 1,
+      "minmov": 1,
+      "session": "24x7",
+      "session_display": "24x7",
+      "subsessions": [
+        {
+          "description": "Regular Trading Hours",
+          "id": "regular",
+          "private": false,
+          "session": "24x7",
+          "session-display": "24x7"
+        }
+      ],
+      "type": "spot",
+      "typespecs": [
+        "crypto",
+        "defi"
+      ],
+      "has_intraday": true,
+      "fractional": false,
+      "listed_exchange": "BINANCE",
+      "legs": [
+        "BINANCE:BTCUSDT"
+      ],
+      "is_tradable": true,
+      "minmove2": 0,
+      "timezone": "Etc/UTC",
+      "aliases": [],
+      "alternatives": [],
+      "is_replayable": true,
+      "has_adjustment": false,
+      "has_extended_hours": false,
+      "bar_source": "trade",
+      "bar_transform": "none",
+      "bar_fillgaps": false,
+      "visible_plots_set": "ohlcv",
+      "is-tickbars-available": true,
+      "exchange_listed_name": "Binance"
+    },
+    "host_properties": {
+      "style": 1,
+      "esdShowDividends": true,
+      "esdShowSplits": true,
+      "esdShowEarnings": true,
+      "esdShowBreaks": false,
+      "showContinuousContractSwitches": true,
+      "showContinuousContractSwitchesBreaks": false,
+      "showFuturesContractExpiration": true,
+      "showLastNews": true,
+      "showCountdown": true,
+      "visible": true,
+      "showPriceLine": true,
+      "priceLineWidth": 1,
+      "showPrevClosePriceLine": false,
+      "prevClosePriceLineWidth": 1,
+      "minTick": "default",
+      "dividendsAdjustment": false,
+      "backAdjustment": false,
+      "settlementAsClose": true,
+      "sessionId": "regular",
+      "bidAsk": {
+        "visible": false,
+        "lineStyle": 1,
+        "lineWidth": 1,
+        "bidLineColor": "#2962FF",
+        "askLineColor": "#F7525F"
+      },
+      "prePostMarket": {
+        "visible": true,
+        "lineStyle": 1,
+        "lineWidth": 1,
+        "preMarketColor": "#FB8C00",
+        "postMarketColor": "#2962FF",
+        "overnightMarketColor": "#8e24aa"
+      },
+      "highLowAvgPrice": {
+        "highLowPriceLinesVisible": false,
+        "highLowPriceLabelsVisible": false,
+        "averageClosePriceLineVisible": false,
+        "averageClosePriceLabelVisible": false,
+        "highLowPriceLinesWidth": 1,
+        "averagePriceLineWidth": 1,
+        "highLowPriceLinesColor": "",
+        "averagePriceLineColor": ""
+      },
+      "statusViewStyle": {
+        "fontSize": 16,
+        "showExchange": true,
+        "showInterval": true,
+        "symbolTextSource": "description"
+      },
+      "lineStyle": {
+        "linestyle": 0,
+        "linewidth": 2,
+        "priceSource": "close",
+        "colorType": "gradient",
+        "color": "#2962FF",
+        "gradientStartColor": "#D500F9",
+        "gradientEndColor": "#00BCE5"
+      },
+      "lineWithMarkersStyle": {
+        "linestyle": 0,
+        "linewidth": 2,
+        "priceSource": "close",
+        "colorType": "gradient",
+        "color": "#2962FF",
+        "gradientStartColor": "#D500F9",
+        "gradientEndColor": "#00BCE5"
+      },
+      "steplineStyle": {
+        "linestyle": 0,
+        "linewidth": 2,
+        "priceSource": "close",
+        "colorType": "gradient",
+        "color": "#2962FF",
+        "gradientStartColor": "#D500F9",
+        "gradientEndColor": "#00BCE5"
+      },
+      "baselineStyle": {
+        "topLineWidth": 2,
+        "bottomLineWidth": 2,
+        "topLineStyle": 0,
+        "bottomLineStyle": 0,
+        "priceSource": "close",
+        "transparency": 50,
+        "baseLevelPercentage": 50,
+        "baselineColor": "#8C8C8C",
+        "topFillColor1": "rgba(8, 153, 129, 0.28)",
+        "topFillColor2": "rgba(8, 153, 129, 0.05)",
+        "bottomFillColor1": "rgba(242, 54, 69, 0.05)",
+        "bottomFillColor2": "rgba(242, 54, 69, 0.28)",
+        "topLineColor": "#089981",
+        "bottomLineColor": "#F23645"
+      },
+      "areaStyle": {
+        "linestyle": 0,
+        "linewidth": 2,
+        "priceSource": "close",
+        "transparency": 100,
+        "color1": "rgba(41, 98, 255, 0.28)",
+        "color2": "#2962FF",
+        "linecolor": "#2962FF"
+      },
+      "hlcAreaStyle": {
+        "highLineVisible": true,
+        "highLineStyle": 0,
+        "highLineWidth": 2,
+        "lowLineVisible": true,
+        "lowLineStyle": 0,
+        "lowLineWidth": 2,
+        "closeLineStyle": 0,
+        "closeLineWidth": 2,
+        "highLineColor": "#00bcd4",
+        "lowLineColor": "#e91e63",
+        "closeLineColor": "#2962FF",
+        "highCloseFillColor": "rgba(0, 188, 212, 0.25)",
+        "closeLowFillColor": "rgba(233, 30, 99, 0.25)"
+      },
+      "barStyle": {
+        "barColorsOnPrevClose": false,
+        "dontDrawOpen": false,
+        "thinBars": true,
+        "downColor": "#F23645",
+        "upColor": "#089981"
+      },
+      "hlcBarsStyle": {
+        "thinBars": true,
+        "color": "#2962FF"
+      },
+      "candleStyle": {
+        "drawWick": true,
+        "drawBorder": true,
+        "barColorsOnPrevClose": false,
+        "drawBody": true,
+        "borderColor": "#378658",
+        "upColor": "#089981",
+        "wickColor": "#737375",
+        "wickUpColor": "#089981",
+        "wickDownColor": "#F23645",
+        "downColor": "#F23645",
+        "borderUpColor": "#089981",
+        "borderDownColor": "#F23645"
+      },
+      "volCandlesStyle": {
+        "drawWick": true,
+        "drawBorder": true,
+        "barColorsOnPrevClose": false,
+        "drawBody": true,
+        "borderColor": "#378658",
+        "upColor": "#089981",
+        "wickColor": "#737375",
+        "wickUpColor": "#089981",
+        "wickDownColor": "#F23645",
+        "downColor": "#F23645",
+        "borderUpColor": "#089981",
+        "borderDownColor": "#F23645"
+      },
+      "hollowCandleStyle": {
+        "drawWick": true,
+        "drawBorder": true,
+        "drawBody": true,
+        "upColor": "#089981",
+        "downColor": "#F23645",
+        "borderColor": "#378658",
+        "borderUpColor": "#089981",
+        "borderDownColor": "#F23645",
+        "wickColor": "#737375",
+        "wickUpColor": "#089981",
+        "wickDownColor": "#F23645"
+      },
+      "haStyle": {
+        "drawWick": true,
+        "drawBorder": true,
+        "showRealLastPrice": false,
+        "barColorsOnPrevClose": false,
+        "inputs": {},
+        "inputInfo": {},
+        "drawBody": true,
+        "borderColor": "#378658",
+        "upColor": "#089981",
+        "wickColor": "#737375",
+        "wickUpColor": "#089981",
+        "wickDownColor": "#F23645",
+        "downColor": "#F23645",
+        "borderUpColor": "#089981",
+        "borderDownColor": "#F23645"
+      },
+      "hiloStyle": {
+        "showBorders": true,
+        "showLabels": true,
+        "drawBody": true,
+        "color": "#2962FF",
+        "borderColor": "#2962FF",
+        "labelColor": "#2962FF"
+      },
+      "columnStyle": {
+        "barColorsOnPrevClose": true,
+        "priceSource": "close",
+        "baselinePosition": "bottom",
+        "upColor": "rgba(8, 153, 129, 0.5)",
+        "downColor": "rgba(242, 54, 69, 0.5)"
+      },
+      "renkoStyle": {
+        "inputs": {
+          "source": "close",
+          "sources": "Close",
+          "boxSize": 3,
+          "style": "ATR",
+          "atrLength": 14,
+          "percentageLTP": 1,
+          "wicks": true
+        },
+        "inputInfo": {
+          "source": {
+            "name": "Source"
+          },
+          "sources": {
+            "name": "Source"
+          },
+          "boxSize": {
+            "name": "Box size"
+          },
+          "style": {
+            "name": "Style"
+          },
+          "atrLength": {
+            "name": "ATR length"
+          },
+          "percentageLTP": {
+            "name": "Percentage"
+          },
+          "wicks": {
+            "name": "Wicks"
+          }
+        },
+        "upColor": "#089981",
+        "downColor": "#F23645",
+        "borderUpColor": "#089981",
+        "borderDownColor": "#F23645",
+        "upColorProjection": "#336854",
+        "downColorProjection": "#7f323f",
+        "borderUpColorProjection": "#336854",
+        "borderDownColorProjection": "#7f323f",
+        "wickUpColor": "#089981",
+        "wickDownColor": "#F23645"
+      },
+      "pbStyle": {
+        "inputs": {
+          "lb": 3
+        },
+        "inputInfo": {
+          "lb": {
+            "name": "Number of line"
+          }
+        },
+        "upColor": "#089981",
+        "downColor": "#F23645",
+        "borderUpColor": "#089981",
+        "borderDownColor": "#F23645",
+        "upColorProjection": "#336854",
+        "downColorProjection": "#7f323f",
+        "borderUpColorProjection": "#336854",
+        "borderDownColorProjection": "#7f323f"
+      },
+      "kagiStyle": {
+        "inputs": {
+          "style": "ATR",
+          "atrLength": 14,
+          "percentageLTP": 1,
+          "reversalAmount": 1
+        },
+        "inputInfo": {
+          "style": {
+            "name": "Style"
+          },
+          "atrLength": {
+            "name": "ATR length"
+          },
+          "percentageLTP": {
+            "name": "Percentage"
+          },
+          "reversalAmount": {
+            "name": "Reversal amount"
+          }
+        },
+        "downColor": "#F23645",
+        "upColor": "#089981",
+        "upColorProjection": "#336854",
+        "downColorProjection": "#7f323f"
+      },
+      "pnfStyle": {
+        "inputs": {
+          "sources": "Close",
+          "reversalAmount": 3,
+          "boxSize": 1,
+          "style": "ATR",
+          "atrLength": 14,
+          "percentageLTP": 1,
+          "oneStepBackBuilding": false
+        },
+        "inputInfo": {
+          "sources": {
+            "name": "Source"
+          },
+          "boxSize": {
+            "name": "Box size"
+          },
+          "reversalAmount": {
+            "name": "Reversal amount"
+          },
+          "style": {
+            "name": "Style"
+          },
+          "atrLength": {
+            "name": "ATR length"
+          },
+          "percentageLTP": {
+            "name": "Percentage"
+          },
+          "oneStepBackBuilding": {
+            "name": "One step back building"
+          }
+        },
+        "downColor": "#F23645",
+        "upColor": "#089981",
+        "upColorProjection": "#336854",
+        "downColorProjection": "#7f323f"
+      },
+      "rangeStyle": {
+        "barStyle": 0,
+        "thinBars": true,
+        "inputs": {
+          "range": 10,
+          "phantomBars": false
+        },
+        "inputInfo": {
+          "range": {
+            "name": "Range"
+          },
+          "phantomBars": {
+            "name": "Phantom bars"
+          }
+        },
+        "upColor": "#089981",
+        "downColor": "#F23645",
+        "upColorProjection": "#336854",
+        "downColorProjection": "#7f323f",
+        "candlesUpColor": "#089981",
+        "candlesDownColor": "#F23645",
+        "candlesBorderUpColor": "#089981",
+        "candlesBorderDownColor": "#F23645",
+        "candlesWickUpColor": "#089981",
+        "candlesWickDownColor": "#F23645"
+      },
+      "tpoStyle": {
+        "color": "#2962FF",
+        "linestyle": 0,
+        "linewidth": 2,
+        "styles": {
+          "splitByBlocks": false,
+          "splitByBlocksMode": 0
+        },
+        "inputs": {
+          "period": "Day",
+          "periodsNum": 1,
+          "profilesSessions": "All",
+          "customSession": "0930-1600",
+          "customSession2": "",
+          "customSession3": "",
+          "customSession4": "",
+          "customSession5": "",
+          "rowSize": "Auto",
+          "ticksPerRow": 10,
+          "vaPercent": 70,
+          "blockSize": "30m",
+          "mergePoints": "[]",
+          "extendPoorHigh": false,
+          "extendPoorLow": false,
+          "extendPOC": false,
+          "extendTpoVah": false,
+          "extendTpoVal": false,
+          "extendVolumePoc": false,
+          "extendVolumeVah": false,
+          "extendVolumeVal": false,
+          "extendSingleprints": false
+        },
+        "tpo": {
+          "colors": {
+            "gradientColors": [
+              "#e91e63",
+              "#00c853",
+              "#00bcd4",
+              "#651FFF"
+            ]
+          },
+          "showBlocks": true,
+          "showLetters": true,
+          "nonVaOpacity": 30
+        },
+        "levels": {
+          "showPOC": true,
+          "pocColor": "#DBDBDB",
+          "showPoorHigh": false,
+          "poorHighColor": "#7C4DFF",
+          "showPoorLow": false,
+          "poorLowColor": "#7C4DFF",
+          "showSingleprints": false,
+          "singleprintsColor": "rgba(224, 64, 251, 0.15)",
+          "showVAH": true,
+          "vahColor": "#DBDBDB",
+          "showVAL": true,
+          "valColor": "#DBDBDB",
+          "showMidpoint": false,
+          "showOpenPrice": false,
+          "showClosePrice": false,
+          "initialBalanceRange": {
+            "levels": 2,
+            "visible": true
+          }
+        },
+        "volumeProfile": {
+          "visible": true,
+          "valuesColor": "#DBDBDB",
+          "showValues": true,
+          "vah": {
+            "visible": false,
+            "color": "#DBDBDB",
+            "linestyle": 2,
+            "linewidth": 2
+          },
+          "val": {
+            "visible": false,
+            "color": "#DBDBDB",
+            "linestyle": 2,
+            "linewidth": 2
+          },
+          "poc": {
+            "visible": false,
+            "color": "#DBDBDB",
+            "linestyle": 0,
+            "linewidth": 2
+          },
+          "volumeColor": "rgba(38, 198, 218, 0.5)",
+          "valueAreaColor": "rgba(38, 198, 218, 0.75)",
+          "placement": "left_to_right"
+        },
+        "summary": {
+          "visible": false,
+          "belowSeries": true,
+          "infoBlocks": {
+            "hlRange": {
+              "visible": false
+            },
+            "pocPrice": {
+              "visible": true
+            },
+            "rotationFactor": {
+              "visible": false
+            },
+            "totalVolume": {
+              "visible": false
+            },
+            "tpoCountAbovePoc": {
+              "visible": false
+            },
+            "tpoCountBelowPoc": {
+              "visible": false
+            },
+            "tpoCountTotal": {
+              "visible": false
+            },
+            "vaRange": {
+              "visible": false
+            },
+            "vahPrice": {
+              "visible": true
+            },
+            "valPrice": {
+              "visible": true
+            },
+            "initialBalanceHigh": {
+              "visible": true
+            },
+            "initialBalanceLow": {
+              "visible": true
+            },
+            "initialBalanceRange": {
+              "visible": true
+            }
+          }
+        },
+        "priceSource": "close"
+      },
+      "svpStyle": {
+        "inputs": {
+          "profilesSessions": "All",
+          "customSession": "0930-1600",
+          "customSessionTZ": "Exchange",
+          "volume": "Up/Down",
+          "vaVolume": 70,
+          "extendPocRight": false,
+          "extendVAHRight": false,
+          "extendVALRight": false,
+          "rowsLayout": "Number Of Rows",
+          "rows": 24
+        },
+        "volumeProfile": {
+          "visible": true,
+          "valuesColor": "#DBDBDB",
+          "showValues": false,
+          "volumeColorUp": "rgba(38, 198, 218, 0.5)",
+          "volumeColorDown": "rgba(236, 64, 122, 0.5)",
+          "valueAreaColorUp": "rgba(38, 198, 218, 0.75)",
+          "valueAreaColorDown": "rgba(236, 64, 122, 0.75)",
+          "histogramBoxColor": "rgba(38, 198, 218, 0.05)",
+          "placement": "left_to_right",
+          "percentWidth": 100
+        },
+        "vah": {
+          "visible": false,
+          "color": "#DBDBDB",
+          "linestyle": 2,
+          "linewidth": 2
+        },
+        "val": {
+          "visible": false,
+          "color": "#DBDBDB",
+          "linestyle": 2,
+          "linewidth": 2
+        },
+        "poc": {
+          "visible": true,
+          "color": "#DBDBDB",
+          "linestyle": 0,
+          "linewidth": 2
+        },
+        "developingPoc": {
+          "visible": false,
+          "color": "#DBDBDB",
+          "linestyle": 0,
+          "linewidth": 1
+        },
+        "developingVA": {
+          "visible": false,
+          "color": "#00bcd4",
+          "linestyle": 0,
+          "linewidth": 1
+        }
+      },
+      "volFootprintStyle": {
+        "drawWick": true,
+        "drawBorder": true,
+        "barColorsOnPrevClose": false,
+        "drawBody": true,
+        "upColor": "#089981",
+        "downColor": "#F23645",
+        "borderColor": "#378658",
+        "borderUpColor": "#089981",
+        "borderDownColor": "#F23645",
+        "wickColor": "#737375",
+        "wickUpColor": "#089981",
+        "wickDownColor": "#F23645",
+        "deltaAdjust": true,
+        "showSummary": true,
+        "summaryMode": 0,
+        "extendedSummary": {
+          "belowSeries": true,
+          "blockInfo": {
+            "volume": {
+              "visible": true
+            },
+            "volumePercentage": {
+              "visible": false
+            },
+            "buyVolume": {
+              "visible": false
+            },
+            "buyVolumePercentage": {
+              "visible": false
+            },
+            "sellVolume": {
+              "visible": false
+            },
+            "sellVolumePercentage": {
+              "visible": false
+            },
+            "delta": {
+              "visible": true
+            },
+            "deltaPercentage": {
+              "visible": false
+            },
+            "minDelta": {
+              "visible": false
+            },
+            "maxDelta": {
+              "visible": false
+            },
+            "sessionCVD": {
+              "visible": true
+            },
+            "pocPrice": {
+              "visible": true
+            },
+            "hlRange": {
+              "visible": false
+            }
+          },
+          "openInterestBlockInfo": {
+            "openInterest": {
+              "visible": false
+            }
+          },
+          "extendedOpenInterestBlockInfo": {
+            "openInterestHigh": {
+              "visible": false
+            },
+            "openInterestLow": {
+              "visible": false
+            }
+          }
+        },
+        "type": "Buy and sell",
+        "displayMode": 0,
+        "pointOfControl": true,
+        "bgColors": {
+          "adjBuyBgColors": [
+            "#082621",
+            "#004D40",
+            "#06806B",
+            "#22AB94"
+          ],
+          "adjSellBgColors": [
+            "#331F20",
+            "#991F29",
+            "#CC2F3C",
+            "#F7525F"
+          ],
+          "adjTotalBgColors": [
+            "#142E61",
+            "#143EB2",
+            "#1E53E5",
+            "#3179F5"
+          ],
+          "buyBgColor": "#004D40",
+          "sellBgColor": "#991F29",
+          "totalBgColor": "#143EB2",
+          "pocColor": "#DBDBDB"
+        },
+        "imbalanceHighlight": {
+          "buyColor": "#089981",
+          "sellColor": "#F23645",
+          "visible": true
+        },
+        "unfinishedAuction": {
+          "highColor": "#D500F9",
+          "lowColor": "#00e5ff"
+        },
+        "inputs": {
+          "rowSize": "Auto",
+          "atrLength": 14,
+          "imbalancePercent": 300,
+          "ticksPerRow": 100,
+          "showVA": true,
+          "vaPercent": 70,
+          "calcStackedImbalance": false,
+          "showUnfinishedAuction": false,
+          "stackedImbalanceCount": 3,
+          "ignore_zero_volume_for_imbalance_calc": false,
+          "minimal_imbalance_volume": 0
+        }
+      },
+      "baseLineColor": "#636363",
+      "prevClosePriceLineColor": "#555555",
+      "priceLineColor": "",
+      "timeframe": "",
+      "shortName": "BTCUSDT",
+      "currencyId": "XTVCUSDT",
+      "unitId": null,
+      "metricId": null,
+      "symbol": "BINANCE:BTCUSDT",
+      "interval": "2",
+      "showSessions": false,
+      "priceAxisProperties": {
+        "autoScale": true,
+        "autoScaleDisabled": false,
+        "lockScale": false,
+        "percentage": false,
+        "percentageDisabled": false,
+        "log": false,
+        "logDisabled": false,
+        "alignLabels": true,
+        "isInverted": false,
+        "indexedTo100": false
+      }
+    },
+    "timezone": "Etc/UTC",
+    "replay": false,
+    "native_end_of_data": true,
+    "host_first": {
+      "index": -19833,
+      "value": [
+        1788739200,
+        80341.83,
+        80356,
+        80230.29,
+        80293.23,
+        37.66955
+      ]
+    },
+    "host_last": {
+      "index": 299,
+      "value": [
+        1791155040,
+        86425.98,
+        86447.99,
+        86425.98,
+        86447.99,
+        1.41698
+      ]
+    },
+    "closed_host": [
+      1791154920,
+      86424.16,
+      86447.99,
+      86396,
+      86425.99,
+      27.9931
+    ],
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "dpr": 2
+    },
+    "pane_study_order": [
+      "Coverage req 1 v1",
+      "Request native 6m snapshot on 2m companion v21 v1"
+    ],
+    "studies": [
+      {
+        "title": "Coverage req 1 v1",
+        "status": {
+          "type": 2
+        },
+        "native_first": {
+          "index": -19833,
+          "value": [
+            1788739200,
+            80341.83,
+            80356,
+            80230.29,
+            80293.23,
+            37.66955,
+            1788739200000,
+            0,
+            2,
+            2,
+            80246,
+            80293.23,
+            160539.22999999998,
+            80269.61499999999,
+            2,
+            2,
+            80246,
+            80293.23,
+            160539.22999999998,
+            80269.61499999999,
+            2,
+            0,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            80426,
+            80426,
+            null,
+            null,
+            1788739200000,
+            null,
+            null,
+            null,
+            null,
+            null,
+            80426,
+            80426,
+            null,
+            null,
+            1788739200000,
+            1,
+            2,
+            2,
+            1,
+            80293.23,
+            80293.23,
+            null,
+            12,
+            12,
+            3,
+            1,
+            1,
+            1,
+            1,
+            1
+          ]
+        },
+        "native_last": {
+          "index": 299,
+          "value": [
+            1791155040,
+            86425.98,
+            86447.99,
+            86425.98,
+            86447.99,
+            1.41698,
+            1791155040000,
+            20132,
+            1,
+            1,
+            86447.99,
+            86447.99,
+            86447.99,
+            86447.99,
+            1,
+            1,
+            86447.99,
+            86447.99,
+            86447.99,
+            86447.99,
+            1,
+            1,
+            86425.60571428628,
+            86425.60571428628,
+            86425.60571428628,
+            86425.60571428628,
+            86447.99,
+            86447.99,
+            86419.00499999986,
+            86395.94093868832,
+            1791154800000,
+            86447.99,
+            86447.99,
+            86419.00499999986,
+            86395.94093868832,
+            1791154800000,
+            86447.99,
+            86447.99,
+            86419.00499999986,
+            86395.94093868832,
+            1791154800000,
+            null,
+            null,
+            null,
+            null,
+            null,
+            1,
+            2,
+            2,
+            1,
+            86447.99,
+            86447.99,
+            86447.99,
+            12,
+            12,
+            12,
+            20133,
+            20133,
+            20133,
+            20133,
+            1
+          ]
+        },
+        "closed_native": [
+          1791154920,
+          86424.16,
+          86447.99,
+          86396,
+          86425.99,
+          27.9931,
+          1791154920000,
+          20131,
+          2,
+          2,
+          86396.1,
+          86425.99,
+          172822.09000000003,
+          86411.04500000001,
+          2,
+          2,
+          86396.1,
+          86425.99,
+          172822.09000000003,
+          86411.04500000001,
+          2,
+          2,
+          86421.03857142913,
+          86419.03571428628,
+          172840.0742857154,
+          86420.0371428577,
+          86428.01,
+          86428.01,
+          86414.00999999986,
+          86378.59125158442,
+          1791154440000,
+          86447.98,
+          86447.98,
+          86419.00249999986,
+          86395.93843868832,
+          1791154800000,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          1,
+          2,
+          2,
+          1,
+          86425.99,
+          86425.99,
+          86425.99,
+          12,
+          12,
+          12,
+          20132,
+          20132,
+          20132,
+          20132,
+          1
+        ],
+        "plot_ids": [
+          {
+            "id": "plot_0",
+            "type": "line"
+          },
+          {
+            "id": "plot_1",
+            "type": "line"
+          },
+          {
+            "id": "plot_2",
+            "type": "line"
+          },
+          {
+            "id": "plot_3",
+            "type": "line"
+          },
+          {
+            "id": "plot_4",
+            "type": "line"
+          },
+          {
+            "id": "plot_5",
+            "type": "line"
+          },
+          {
+            "id": "plot_6",
+            "type": "line"
+          },
+          {
+            "id": "plot_7",
+            "type": "line"
+          },
+          {
+            "id": "plot_8",
+            "type": "line"
+          },
+          {
+            "id": "plot_9",
+            "type": "line"
+          },
+          {
+            "id": "plot_10",
+            "type": "line"
+          },
+          {
+            "id": "plot_11",
+            "type": "line"
+          },
+          {
+            "id": "plot_12",
+            "type": "line"
+          },
+          {
+            "id": "plot_13",
+            "type": "line"
+          },
+          {
+            "id": "plot_14",
+            "type": "line"
+          },
+          {
+            "id": "plot_15",
+            "type": "line"
+          },
+          {
+            "id": "plot_16",
+            "type": "line"
+          },
+          {
+            "id": "plot_17",
+            "type": "line"
+          },
+          {
+            "id": "plot_18",
+            "type": "line"
+          },
+          {
+            "id": "plot_19",
+            "type": "line"
+          },
+          {
+            "id": "plot_20",
+            "type": "line"
+          },
+          {
+            "id": "plot_21",
+            "type": "line"
+          },
+          {
+            "id": "plot_22",
+            "type": "line"
+          },
+          {
+            "id": "plot_23",
+            "type": "line"
+          },
+          {
+            "id": "plot_24",
+            "type": "line"
+          },
+          {
+            "id": "plot_25",
+            "type": "line"
+          },
+          {
+            "id": "plot_26",
+            "type": "line"
+          },
+          {
+            "id": "plot_27",
+            "type": "line"
+          },
+          {
+            "id": "plot_28",
+            "type": "line"
+          },
+          {
+            "id": "plot_29",
+            "type": "line"
+          },
+          {
+            "id": "plot_30",
+            "type": "line"
+          },
+          {
+            "id": "plot_31",
+            "type": "line"
+          },
+          {
+            "id": "plot_32",
+            "type": "line"
+          },
+          {
+            "id": "plot_33",
+            "type": "line"
+          },
+          {
+            "id": "plot_34",
+            "type": "line"
+          },
+          {
+            "id": "plot_35",
+            "type": "line"
+          },
+          {
+            "id": "plot_36",
+            "type": "line"
+          },
+          {
+            "id": "plot_37",
+            "type": "line"
+          },
+          {
+            "id": "plot_38",
+            "type": "line"
+          },
+          {
+            "id": "plot_39",
+            "type": "line"
+          },
+          {
+            "id": "plot_40",
+            "type": "line"
+          },
+          {
+            "id": "plot_41",
+            "type": "line"
+          },
+          {
+            "id": "plot_42",
+            "type": "line"
+          },
+          {
+            "id": "plot_43",
+            "type": "line"
+          },
+          {
+            "id": "plot_44",
+            "type": "line"
+          },
+          {
+            "id": "plot_45",
+            "type": "line"
+          },
+          {
+            "id": "plot_46",
+            "type": "line"
+          },
+          {
+            "id": "plot_47",
+            "type": "line"
+          },
+          {
+            "id": "plot_48",
+            "type": "line"
+          },
+          {
+            "id": "plot_49",
+            "type": "line"
+          },
+          {
+            "id": "plot_50",
+            "type": "line"
+          },
+          {
+            "id": "plot_51",
+            "type": "line"
+          },
+          {
+            "id": "plot_52",
+            "type": "line"
+          },
+          {
+            "id": "plot_53",
+            "type": "line"
+          },
+          {
+            "id": "plot_54",
+            "type": "line"
+          },
+          {
+            "id": "plot_55",
+            "type": "line"
+          },
+          {
+            "id": "plot_56",
+            "type": "line"
+          },
+          {
+            "id": "plot_57",
+            "type": "line"
+          },
+          {
+            "id": "plot_58",
+            "type": "line"
+          },
+          {
+            "id": "plot_59",
+            "type": "line"
+          }
+        ],
+        "plot_titles": [
+          "open",
+          "high",
+          "low",
+          "close",
+          "volume",
+          "time",
+          "bar_index",
+          "ltf1_clean_count",
+          "ltf1_clean_non_na_count",
+          "ltf1_clean_first",
+          "ltf1_clean_last",
+          "ltf1_clean_non_na_sum",
+          "ltf1_clean_non_na_mean",
+          "ltf1_hole_count",
+          "ltf1_hole_non_na_count",
+          "ltf1_hole_first",
+          "ltf1_hole_last",
+          "ltf1_hole_non_na_sum",
+          "ltf1_hole_non_na_mean",
+          "ltf1_warm_count",
+          "ltf1_warm_non_na_count",
+          "ltf1_warm_first",
+          "ltf1_warm_last",
+          "ltf1_warm_non_na_sum",
+          "ltf1_warm_non_na_mean",
+          "htf6_clean_gapsoff_lookaheadoff",
+          "htf6_hole_gapsoff_lookaheadoff",
+          "htf6_sma4_warm_gapsoff_lookaheadoff",
+          "htf6_rma4_warm_gapsoff_lookaheadoff",
+          "htf6_time_gapsoff_lookaheadoff",
+          "htf6_clean_gapsoff_lookaheadon",
+          "htf6_hole_gapsoff_lookaheadon",
+          "htf6_sma4_warm_gapsoff_lookaheadon",
+          "htf6_rma4_warm_gapsoff_lookaheadon",
+          "htf6_time_gapsoff_lookaheadon",
+          "htf6_clean_gapson_lookaheadoff",
+          "htf6_hole_gapson_lookaheadoff",
+          "htf6_sma4_warm_gapson_lookaheadoff",
+          "htf6_rma4_warm_gapson_lookaheadoff",
+          "htf6_time_gapson_lookaheadoff",
+          "htf6_clean_gapson_lookaheadon",
+          "htf6_hole_gapson_lookaheadon",
+          "htf6_sma4_warm_gapson_lookaheadon",
+          "htf6_rma4_warm_gapson_lookaheadon",
+          "htf6_time_gapson_lookaheadon",
+          "table_count_before_scratch",
+          "table_count_with_scratch",
+          "table_count_after_clear",
+          "table_count_after_delete",
+          "cell_clean_arg",
+          "cell_hole_arg",
+          "cell_warm_arg",
+          "cell_clean_text_length",
+          "cell_hole_text_length",
+          "cell_warm_text_length",
+          "cell_calls_reached",
+          "cell_text_setters_reached",
+          "cell_geometry_setters_reached",
+          "cell_appearance_setters_reached",
+          "merge_initialized"
+        ],
+        "inputs": []
+      },
+      {
+        "title": "Request native 6m snapshot on 2m companion v21 v1",
+        "status": {
+          "type": 2
+        },
+        "native_first": {
+          "index": -19833,
+          "value": [
+            1788739200,
+            1788739200000,
+            1788739320000,
+            0,
+            20132,
+            1788739200000,
+            80341.83,
+            80356,
+            80230.29,
+            80293.23,
+            37.66955,
+            0,
+            1,
+            1791155050246,
+            0,
+            1788739200000,
+            1788739560000,
+            0,
+            1788739200000,
+            6710,
+            80341.83,
+            80426,
+            80230.29,
+            80426,
+            106.57861,
+            null,
+            null,
+            2,
+            1788739200000,
+            null,
+            null,
+            80426,
+            80426,
+            80426,
+            null,
+            null,
+            1788739200000,
+            1788739560000,
+            0,
+            80341.83,
+            80426,
+            80230.29,
+            80426,
+            106.57861,
+            80426,
+            80426,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            6,
+            1,
+            0
+          ]
+        },
+        "native_last": {
+          "index": 299,
+          "value": [
+            1791155040,
+            1791155040000,
+            1791155160000,
+            20132,
+            20132,
+            1788739200000,
+            86425.98,
+            86447.99,
+            86425.98,
+            86447.99,
+            1.41698,
+            1,
+            0,
+            1791155053485,
+            0,
+            1791154800000,
+            1791155160000,
+            6710,
+            1788739200000,
+            6710,
+            86428.01,
+            86480,
+            86396,
+            86447.99,
+            60.01034,
+            86428.01,
+            86442.01,
+            1,
+            1791072000000,
+            259318.01000000053,
+            259318.0100000007,
+            86447.99,
+            86447.99,
+            86447.99,
+            86419.00499999986,
+            86395.94093868832,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            1791154800000,
+            86447.99,
+            86447.99,
+            86447.99,
+            1791154800000,
+            86447.99,
+            86447.99,
+            86447.99,
+            6,
+            0,
+            0
+          ]
+        },
+        "closed_native": [
+          1791154920,
+          1791154920000,
+          1791155040000,
+          20131,
+          20132,
+          1788739200000,
+          86424.16,
+          86447.99,
+          86396,
+          86425.99,
+          27.9931,
+          0,
+          1,
+          1791155050419,
+          1,
+          1791154800000,
+          1791155160000,
+          6710,
+          1788739200000,
+          6710,
+          86428.01,
+          86480,
+          86396,
+          86447.98,
+          60.00832999999999,
+          86428.01,
+          86442.01,
+          1,
+          1791072000000,
+          259318.00000000052,
+          259318.0000000007,
+          86447.98,
+          86447.98,
+          86447.98,
+          86419.00249999986,
+          86395.93843868832,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          1791154440000,
+          86428.01,
+          86428.01,
+          86428.01,
+          null,
+          null,
+          null,
+          null,
+          6,
+          0,
+          0
+        ],
+        "plot_ids": [
+          {
+            "id": "plot_0",
+            "type": "line"
+          },
+          {
+            "id": "plot_1",
+            "type": "line"
+          },
+          {
+            "id": "plot_2",
+            "type": "line"
+          },
+          {
+            "id": "plot_3",
+            "type": "line"
+          },
+          {
+            "id": "plot_4",
+            "type": "line"
+          },
+          {
+            "id": "plot_5",
+            "type": "line"
+          },
+          {
+            "id": "plot_6",
+            "type": "line"
+          },
+          {
+            "id": "plot_7",
+            "type": "line"
+          },
+          {
+            "id": "plot_8",
+            "type": "line"
+          },
+          {
+            "id": "plot_9",
+            "type": "line"
+          },
+          {
+            "id": "plot_10",
+            "type": "line"
+          },
+          {
+            "id": "plot_11",
+            "type": "line"
+          },
+          {
+            "id": "plot_12",
+            "type": "line"
+          },
+          {
+            "id": "plot_13",
+            "type": "line"
+          },
+          {
+            "id": "plot_14",
+            "type": "line"
+          },
+          {
+            "id": "plot_15",
+            "type": "line"
+          },
+          {
+            "id": "plot_16",
+            "type": "line"
+          },
+          {
+            "id": "plot_17",
+            "type": "line"
+          },
+          {
+            "id": "plot_18",
+            "type": "line"
+          },
+          {
+            "id": "plot_19",
+            "type": "line"
+          },
+          {
+            "id": "plot_20",
+            "type": "line"
+          },
+          {
+            "id": "plot_21",
+            "type": "line"
+          },
+          {
+            "id": "plot_22",
+            "type": "line"
+          },
+          {
+            "id": "plot_23",
+            "type": "line"
+          },
+          {
+            "id": "plot_24",
+            "type": "line"
+          },
+          {
+            "id": "plot_25",
+            "type": "line"
+          },
+          {
+            "id": "plot_26",
+            "type": "line"
+          },
+          {
+            "id": "plot_27",
+            "type": "line"
+          },
+          {
+            "id": "plot_28",
+            "type": "line"
+          },
+          {
+            "id": "plot_29",
+            "type": "line"
+          },
+          {
+            "id": "plot_30",
+            "type": "line"
+          },
+          {
+            "id": "plot_31",
+            "type": "line"
+          },
+          {
+            "id": "plot_32",
+            "type": "line"
+          },
+          {
+            "id": "plot_33",
+            "type": "line"
+          },
+          {
+            "id": "plot_34",
+            "type": "line"
+          },
+          {
+            "id": "plot_35",
+            "type": "line"
+          },
+          {
+            "id": "plot_36",
+            "type": "line"
+          },
+          {
+            "id": "plot_37",
+            "type": "line"
+          },
+          {
+            "id": "plot_38",
+            "type": "line"
+          },
+          {
+            "id": "plot_39",
+            "type": "line"
+          },
+          {
+            "id": "plot_40",
+            "type": "line"
+          },
+          {
+            "id": "plot_41",
+            "type": "line"
+          },
+          {
+            "id": "plot_42",
+            "type": "line"
+          },
+          {
+            "id": "plot_43",
+            "type": "line"
+          },
+          {
+            "id": "plot_44",
+            "type": "line"
+          },
+          {
+            "id": "plot_45",
+            "type": "line"
+          },
+          {
+            "id": "plot_46",
+            "type": "line"
+          },
+          {
+            "id": "plot_47",
+            "type": "line"
+          },
+          {
+            "id": "plot_48",
+            "type": "line"
+          },
+          {
+            "id": "plot_49",
+            "type": "line"
+          },
+          {
+            "id": "plot_50",
+            "type": "line"
+          },
+          {
+            "id": "plot_51",
+            "type": "line"
+          },
+          {
+            "id": "plot_52",
+            "type": "line"
+          },
+          {
+            "id": "plot_53",
+            "type": "line"
+          },
+          {
+            "id": "plot_54",
+            "type": "line"
+          },
+          {
+            "id": "plot_55",
+            "type": "line"
+          }
+        ],
+        "plot_titles": [
+          "CHART_TIME_MS",
+          "CHART_END_MS",
+          "CHART_INDEX",
+          "CHART_LAST_INDEX",
+          "CHART_FIRST_EXECUTION_MS",
+          "CHART_OPEN",
+          "CHART_HIGH",
+          "CHART_LOW",
+          "CHART_CLOSE",
+          "CHART_VOLUME",
+          "CHART_REALTIME",
+          "CHART_CONFIRMED",
+          "EXECUTION_NOW_MS",
+          "CHART_LAST_CONFIRMED_HISTORY",
+          "GOFF_LON_TIME_MS",
+          "GOFF_LON_END_MS",
+          "GOFF_LON_INDEX",
+          "GOFF_LON_FIRST_EXECUTION_MS",
+          "GOFF_LON_LAST_INDEX",
+          "GOFF_LON_OPEN",
+          "GOFF_LON_HIGH",
+          "GOFF_LON_LOW",
+          "GOFF_LON_CLOSE",
+          "GOFF_LON_VOLUME",
+          "GOFF_LON_PREVIOUS_CLOSE",
+          "GOFF_LON_HISTORY2_CLOSE",
+          "GOFF_LON_DAYOFWEEK",
+          "GOFF_LON_DAILY_OPEN_MS",
+          "GOFF_LON_SUM3_CLOSE",
+          "GOFF_LON_SUM3_HOLE97_THREE",
+          "GOFF_LON_HOLE_INDEX97_TWO",
+          "GOFF_LON_HOLE_INDEX97_THREE",
+          "GOFF_LON_HOLE_UTC11",
+          "GOFF_LON_SMA4",
+          "GOFF_LON_RMA4",
+          "GON_LON_TIME_MS",
+          "GON_LON_END_MS",
+          "GON_LON_INDEX",
+          "GON_LON_OPEN",
+          "GON_LON_HIGH",
+          "GON_LON_LOW",
+          "GON_LON_CLOSE",
+          "GON_LON_VOLUME",
+          "GON_LON_HOLE_INDEX97_TWO",
+          "GON_LON_HOLE_INDEX97_THREE",
+          "GOFF_LOFF_TIME_MS",
+          "GOFF_LOFF_CLOSE",
+          "GOFF_LOFF_HOLE_INDEX97_TWO",
+          "GOFF_LOFF_HOLE_INDEX97_THREE",
+          "GON_LOFF_TIME_MS",
+          "GON_LOFF_CLOSE",
+          "GON_LOFF_HOLE_INDEX97_TWO",
+          "GON_LOFF_HOLE_INDEX97_THREE",
+          "REQUEST_TIMEFRAME_MINUTES",
+          "REQUEST_BUCKET_COMPLETED_AT_EXECUTION",
+          "REQUEST_CLOSE_NA"
+        ],
+        "inputs": []
+      }
+    ],
+    "completed_target_native": {
+      "browser_utc": "2026-10-04T23:04:14.122Z",
+      "target_host_time": 1791154680,
+      "native_index": 296,
+      "host": [
+        1791154680,
+        86402,
+        86428.01,
+        86393.47,
+        86428.01,
+        8.955
+      ],
+      "current_host_last": {
+        "index": 299,
+        "value": [
+          1791155040,
+          86425.98,
+          86447.99,
+          86425.98,
+          86447.99,
+          1.41698
+        ]
+      },
+      "studies": [
+        {
+          "title": "Coverage req 1 v1",
+          "status": {
+            "type": 2
+          },
+          "row": [
+            1791154680,
+            86402,
+            86428.01,
+            86393.47,
+            86428.01,
+            8.955,
+            1791154680000,
+            20129,
+            2,
+            2,
+            86406.99,
+            86428.01,
+            172835,
+            86417.5,
+            2,
+            2,
+            86406.99,
+            86428.01,
+            172835,
+            86417.5,
+            2,
+            2,
+            86417.22714285771,
+            86424.16285714343,
+            172841.39000000112,
+            86420.69500000056,
+            86428.01,
+            86428.01,
+            86414.00999999986,
+            86378.59125158442,
+            1791154440000,
+            86428.01,
+            86428.01,
+            86414.00999999986,
+            86378.59125158442,
+            1791154440000,
+            86428.01,
+            86428.01,
+            86414.00999999986,
+            86378.59125158442,
+            1791154440000,
+            null,
+            null,
+            null,
+            null,
+            null,
+            1,
+            2,
+            2,
+            1,
+            86428.01,
+            86428.01,
+            86428.01,
+            12,
+            12,
+            12,
+            20130,
+            20130,
+            20130,
+            20130,
+            1
+          ]
+        },
+        {
+          "title": "Request native 6m snapshot on 2m companion v21 v1",
+          "status": {
+            "type": 2
+          },
+          "row": [
+            1791154680,
+            1791154680000,
+            1791154800000,
+            20129,
+            20132,
+            1788739200000,
+            86402,
+            86428.01,
+            86393.47,
+            86428.01,
+            8.955,
+            0,
+            1,
+            1791155050419,
+            0,
+            1791154440000,
+            1791154800000,
+            6709,
+            1788739200000,
+            6710,
+            86442,
+            86451.07,
+            86393.47,
+            86428.01,
+            32.26788,
+            86442.01,
+            86358.01,
+            1,
+            1791072000000,
+            259228.0300000005,
+            259228.03000000067,
+            86428.01,
+            86428.01,
+            86428.01,
+            86414.00999999986,
+            86378.59125158442,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            1791154440000,
+            86428.01,
+            86428.01,
+            86428.01,
+            1791154440000,
+            86428.01,
+            86428.01,
+            86428.01,
+            6,
+            1,
+            0
+          ]
+        }
+      ]
+    },
+    "sources": [
+      {
+        "script": "paired-originals/coverage-req-1-v1.pine",
+        "sha256": "8f481a6dfe7ba2f524606361e8abf1c49fe296891d1712b0a46e5af481705a63"
+      },
+      {
+        "script": "request-snapshot-6m-v21-v1.pine",
+        "sha256": "3d706a4c63e375b6d35a4e8e8aa0db1b141e8ddfc66ec36f5e7c90a485ecbf41"
+      }
+    ],
+    "pair_id": "coverage-req-snapshot-6m-v1"
+  },
+  "after": {
+    "artifact": "Native SAME chart paired request snapshot v1",
+    "tag": "after-completed-reloaded",
+    "browser_utc": "2026-10-04T23:04:27.066Z",
+    "symbol": {
+      "source2": {
+        "country": "MT",
+        "description": "Binance",
+        "exchange-type": "exchange",
+        "id": "BINANCE",
+        "name": "Binance",
+        "url": "https://www.binance.com/en"
+      },
+      "currency_code": "USDT",
+      "source_id": "BINANCE",
+      "subsession_id": "regular",
+      "provider_id": "binance",
+      "base_currency_id": "XTVCBTC",
+      "base_currency": "BTC",
+      "currency_id": "XTVCUSDT",
+      "format": "price",
+      "formatter": "price",
+      "pro_perm": "",
+      "volume_type": "base",
+      "measure": "price",
+      "allowed_adjustment": "none",
+      "short_description": "Bitcoin / TetherUS",
+      "variable_tick_size": "",
+      "name": "BTCUSDT",
+      "full_name": "BINANCE:BTCUSDT",
+      "pro_name": "BINANCE:BTCUSDT",
+      "base_name": [
+        "BINANCE:BTCUSDT"
+      ],
+      "description": "Bitcoin / TetherUS",
+      "exchange": "Binance",
+      "pricescale": 100,
+      "pointvalue": 1,
+      "minmov": 1,
+      "session": "24x7",
+      "session_display": "24x7",
+      "subsessions": [
+        {
+          "description": "Regular Trading Hours",
+          "id": "regular",
+          "private": false,
+          "session": "24x7",
+          "session-display": "24x7"
+        }
+      ],
+      "type": "spot",
+      "typespecs": [
+        "crypto",
+        "defi"
+      ],
+      "has_intraday": true,
+      "fractional": false,
+      "listed_exchange": "BINANCE",
+      "legs": [
+        "BINANCE:BTCUSDT"
+      ],
+      "is_tradable": true,
+      "minmove2": 0,
+      "timezone": "Etc/UTC",
+      "aliases": [],
+      "alternatives": [],
+      "is_replayable": true,
+      "has_adjustment": false,
+      "has_extended_hours": false,
+      "bar_source": "trade",
+      "bar_transform": "none",
+      "bar_fillgaps": false,
+      "visible_plots_set": "ohlcv",
+      "is-tickbars-available": true,
+      "exchange_listed_name": "Binance"
+    },
+    "host_properties": {
+      "style": 1,
+      "esdShowDividends": true,
+      "esdShowSplits": true,
+      "esdShowEarnings": true,
+      "esdShowBreaks": false,
+      "showContinuousContractSwitches": true,
+      "showContinuousContractSwitchesBreaks": false,
+      "showFuturesContractExpiration": true,
+      "showLastNews": true,
+      "showCountdown": true,
+      "visible": true,
+      "showPriceLine": true,
+      "priceLineWidth": 1,
+      "showPrevClosePriceLine": false,
+      "prevClosePriceLineWidth": 1,
+      "minTick": "default",
+      "dividendsAdjustment": false,
+      "backAdjustment": false,
+      "settlementAsClose": true,
+      "sessionId": "regular",
+      "bidAsk": {
+        "visible": false,
+        "lineStyle": 1,
+        "lineWidth": 1,
+        "bidLineColor": "#2962FF",
+        "askLineColor": "#F7525F"
+      },
+      "prePostMarket": {
+        "visible": true,
+        "lineStyle": 1,
+        "lineWidth": 1,
+        "preMarketColor": "#FB8C00",
+        "postMarketColor": "#2962FF",
+        "overnightMarketColor": "#8e24aa"
+      },
+      "highLowAvgPrice": {
+        "highLowPriceLinesVisible": false,
+        "highLowPriceLabelsVisible": false,
+        "averageClosePriceLineVisible": false,
+        "averageClosePriceLabelVisible": false,
+        "highLowPriceLinesWidth": 1,
+        "averagePriceLineWidth": 1,
+        "highLowPriceLinesColor": "",
+        "averagePriceLineColor": ""
+      },
+      "statusViewStyle": {
+        "fontSize": 16,
+        "showExchange": true,
+        "showInterval": true,
+        "symbolTextSource": "description"
+      },
+      "lineStyle": {
+        "linestyle": 0,
+        "linewidth": 2,
+        "priceSource": "close",
+        "colorType": "gradient",
+        "color": "#2962FF",
+        "gradientStartColor": "#D500F9",
+        "gradientEndColor": "#00BCE5"
+      },
+      "lineWithMarkersStyle": {
+        "linestyle": 0,
+        "linewidth": 2,
+        "priceSource": "close",
+        "colorType": "gradient",
+        "color": "#2962FF",
+        "gradientStartColor": "#D500F9",
+        "gradientEndColor": "#00BCE5"
+      },
+      "steplineStyle": {
+        "linestyle": 0,
+        "linewidth": 2,
+        "priceSource": "close",
+        "colorType": "gradient",
+        "color": "#2962FF",
+        "gradientStartColor": "#D500F9",
+        "gradientEndColor": "#00BCE5"
+      },
+      "baselineStyle": {
+        "topLineWidth": 2,
+        "bottomLineWidth": 2,
+        "topLineStyle": 0,
+        "bottomLineStyle": 0,
+        "priceSource": "close",
+        "transparency": 50,
+        "baseLevelPercentage": 50,
+        "baselineColor": "#8C8C8C",
+        "topFillColor1": "rgba(8, 153, 129, 0.28)",
+        "topFillColor2": "rgba(8, 153, 129, 0.05)",
+        "bottomFillColor1": "rgba(242, 54, 69, 0.05)",
+        "bottomFillColor2": "rgba(242, 54, 69, 0.28)",
+        "topLineColor": "#089981",
+        "bottomLineColor": "#F23645"
+      },
+      "areaStyle": {
+        "linestyle": 0,
+        "linewidth": 2,
+        "priceSource": "close",
+        "transparency": 100,
+        "color1": "rgba(41, 98, 255, 0.28)",
+        "color2": "#2962FF",
+        "linecolor": "#2962FF"
+      },
+      "hlcAreaStyle": {
+        "highLineVisible": true,
+        "highLineStyle": 0,
+        "highLineWidth": 2,
+        "lowLineVisible": true,
+        "lowLineStyle": 0,
+        "lowLineWidth": 2,
+        "closeLineStyle": 0,
+        "closeLineWidth": 2,
+        "highLineColor": "#00bcd4",
+        "lowLineColor": "#e91e63",
+        "closeLineColor": "#2962FF",
+        "highCloseFillColor": "rgba(0, 188, 212, 0.25)",
+        "closeLowFillColor": "rgba(233, 30, 99, 0.25)"
+      },
+      "barStyle": {
+        "barColorsOnPrevClose": false,
+        "dontDrawOpen": false,
+        "thinBars": true,
+        "downColor": "#F23645",
+        "upColor": "#089981"
+      },
+      "hlcBarsStyle": {
+        "thinBars": true,
+        "color": "#2962FF"
+      },
+      "candleStyle": {
+        "drawWick": true,
+        "drawBorder": true,
+        "barColorsOnPrevClose": false,
+        "drawBody": true,
+        "borderColor": "#378658",
+        "upColor": "#089981",
+        "wickColor": "#737375",
+        "wickUpColor": "#089981",
+        "wickDownColor": "#F23645",
+        "downColor": "#F23645",
+        "borderUpColor": "#089981",
+        "borderDownColor": "#F23645"
+      },
+      "volCandlesStyle": {
+        "drawWick": true,
+        "drawBorder": true,
+        "barColorsOnPrevClose": false,
+        "drawBody": true,
+        "borderColor": "#378658",
+        "upColor": "#089981",
+        "wickColor": "#737375",
+        "wickUpColor": "#089981",
+        "wickDownColor": "#F23645",
+        "downColor": "#F23645",
+        "borderUpColor": "#089981",
+        "borderDownColor": "#F23645"
+      },
+      "hollowCandleStyle": {
+        "drawWick": true,
+        "drawBorder": true,
+        "drawBody": true,
+        "upColor": "#089981",
+        "downColor": "#F23645",
+        "borderColor": "#378658",
+        "borderUpColor": "#089981",
+        "borderDownColor": "#F23645",
+        "wickColor": "#737375",
+        "wickUpColor": "#089981",
+        "wickDownColor": "#F23645"
+      },
+      "haStyle": {
+        "drawWick": true,
+        "drawBorder": true,
+        "showRealLastPrice": false,
+        "barColorsOnPrevClose": false,
+        "inputs": {},
+        "inputInfo": {},
+        "drawBody": true,
+        "borderColor": "#378658",
+        "upColor": "#089981",
+        "wickColor": "#737375",
+        "wickUpColor": "#089981",
+        "wickDownColor": "#F23645",
+        "downColor": "#F23645",
+        "borderUpColor": "#089981",
+        "borderDownColor": "#F23645"
+      },
+      "hiloStyle": {
+        "showBorders": true,
+        "showLabels": true,
+        "drawBody": true,
+        "color": "#2962FF",
+        "borderColor": "#2962FF",
+        "labelColor": "#2962FF"
+      },
+      "columnStyle": {
+        "barColorsOnPrevClose": true,
+        "priceSource": "close",
+        "baselinePosition": "bottom",
+        "upColor": "rgba(8, 153, 129, 0.5)",
+        "downColor": "rgba(242, 54, 69, 0.5)"
+      },
+      "renkoStyle": {
+        "inputs": {
+          "source": "close",
+          "sources": "Close",
+          "boxSize": 3,
+          "style": "ATR",
+          "atrLength": 14,
+          "percentageLTP": 1,
+          "wicks": true
+        },
+        "inputInfo": {
+          "source": {
+            "name": "Source"
+          },
+          "sources": {
+            "name": "Source"
+          },
+          "boxSize": {
+            "name": "Box size"
+          },
+          "style": {
+            "name": "Style"
+          },
+          "atrLength": {
+            "name": "ATR length"
+          },
+          "percentageLTP": {
+            "name": "Percentage"
+          },
+          "wicks": {
+            "name": "Wicks"
+          }
+        },
+        "upColor": "#089981",
+        "downColor": "#F23645",
+        "borderUpColor": "#089981",
+        "borderDownColor": "#F23645",
+        "upColorProjection": "#336854",
+        "downColorProjection": "#7f323f",
+        "borderUpColorProjection": "#336854",
+        "borderDownColorProjection": "#7f323f",
+        "wickUpColor": "#089981",
+        "wickDownColor": "#F23645"
+      },
+      "pbStyle": {
+        "inputs": {
+          "lb": 3
+        },
+        "inputInfo": {
+          "lb": {
+            "name": "Number of line"
+          }
+        },
+        "upColor": "#089981",
+        "downColor": "#F23645",
+        "borderUpColor": "#089981",
+        "borderDownColor": "#F23645",
+        "upColorProjection": "#336854",
+        "downColorProjection": "#7f323f",
+        "borderUpColorProjection": "#336854",
+        "borderDownColorProjection": "#7f323f"
+      },
+      "kagiStyle": {
+        "inputs": {
+          "style": "ATR",
+          "atrLength": 14,
+          "percentageLTP": 1,
+          "reversalAmount": 1
+        },
+        "inputInfo": {
+          "style": {
+            "name": "Style"
+          },
+          "atrLength": {
+            "name": "ATR length"
+          },
+          "percentageLTP": {
+            "name": "Percentage"
+          },
+          "reversalAmount": {
+            "name": "Reversal amount"
+          }
+        },
+        "downColor": "#F23645",
+        "upColor": "#089981",
+        "upColorProjection": "#336854",
+        "downColorProjection": "#7f323f"
+      },
+      "pnfStyle": {
+        "inputs": {
+          "sources": "Close",
+          "reversalAmount": 3,
+          "boxSize": 1,
+          "style": "ATR",
+          "atrLength": 14,
+          "percentageLTP": 1,
+          "oneStepBackBuilding": false
+        },
+        "inputInfo": {
+          "sources": {
+            "name": "Source"
+          },
+          "boxSize": {
+            "name": "Box size"
+          },
+          "reversalAmount": {
+            "name": "Reversal amount"
+          },
+          "style": {
+            "name": "Style"
+          },
+          "atrLength": {
+            "name": "ATR length"
+          },
+          "percentageLTP": {
+            "name": "Percentage"
+          },
+          "oneStepBackBuilding": {
+            "name": "One step back building"
+          }
+        },
+        "downColor": "#F23645",
+        "upColor": "#089981",
+        "upColorProjection": "#336854",
+        "downColorProjection": "#7f323f"
+      },
+      "rangeStyle": {
+        "barStyle": 0,
+        "thinBars": true,
+        "inputs": {
+          "range": 10,
+          "phantomBars": false
+        },
+        "inputInfo": {
+          "range": {
+            "name": "Range"
+          },
+          "phantomBars": {
+            "name": "Phantom bars"
+          }
+        },
+        "upColor": "#089981",
+        "downColor": "#F23645",
+        "upColorProjection": "#336854",
+        "downColorProjection": "#7f323f",
+        "candlesUpColor": "#089981",
+        "candlesDownColor": "#F23645",
+        "candlesBorderUpColor": "#089981",
+        "candlesBorderDownColor": "#F23645",
+        "candlesWickUpColor": "#089981",
+        "candlesWickDownColor": "#F23645"
+      },
+      "tpoStyle": {
+        "color": "#2962FF",
+        "linestyle": 0,
+        "linewidth": 2,
+        "styles": {
+          "splitByBlocks": false,
+          "splitByBlocksMode": 0
+        },
+        "inputs": {
+          "period": "Day",
+          "periodsNum": 1,
+          "profilesSessions": "All",
+          "customSession": "0930-1600",
+          "customSession2": "",
+          "customSession3": "",
+          "customSession4": "",
+          "customSession5": "",
+          "rowSize": "Auto",
+          "ticksPerRow": 10,
+          "vaPercent": 70,
+          "blockSize": "30m",
+          "mergePoints": "[]",
+          "extendPoorHigh": false,
+          "extendPoorLow": false,
+          "extendPOC": false,
+          "extendTpoVah": false,
+          "extendTpoVal": false,
+          "extendVolumePoc": false,
+          "extendVolumeVah": false,
+          "extendVolumeVal": false,
+          "extendSingleprints": false
+        },
+        "tpo": {
+          "colors": {
+            "gradientColors": [
+              "#e91e63",
+              "#00c853",
+              "#00bcd4",
+              "#651FFF"
+            ]
+          },
+          "showBlocks": true,
+          "showLetters": true,
+          "nonVaOpacity": 30
+        },
+        "levels": {
+          "showPOC": true,
+          "pocColor": "#DBDBDB",
+          "showPoorHigh": false,
+          "poorHighColor": "#7C4DFF",
+          "showPoorLow": false,
+          "poorLowColor": "#7C4DFF",
+          "showSingleprints": false,
+          "singleprintsColor": "rgba(224, 64, 251, 0.15)",
+          "showVAH": true,
+          "vahColor": "#DBDBDB",
+          "showVAL": true,
+          "valColor": "#DBDBDB",
+          "showMidpoint": false,
+          "showOpenPrice": false,
+          "showClosePrice": false,
+          "initialBalanceRange": {
+            "levels": 2,
+            "visible": true
+          }
+        },
+        "volumeProfile": {
+          "visible": true,
+          "valuesColor": "#DBDBDB",
+          "showValues": true,
+          "vah": {
+            "visible": false,
+            "color": "#DBDBDB",
+            "linestyle": 2,
+            "linewidth": 2
+          },
+          "val": {
+            "visible": false,
+            "color": "#DBDBDB",
+            "linestyle": 2,
+            "linewidth": 2
+          },
+          "poc": {
+            "visible": false,
+            "color": "#DBDBDB",
+            "linestyle": 0,
+            "linewidth": 2
+          },
+          "volumeColor": "rgba(38, 198, 218, 0.5)",
+          "valueAreaColor": "rgba(38, 198, 218, 0.75)",
+          "placement": "left_to_right"
+        },
+        "summary": {
+          "visible": false,
+          "belowSeries": true,
+          "infoBlocks": {
+            "hlRange": {
+              "visible": false
+            },
+            "pocPrice": {
+              "visible": true
+            },
+            "rotationFactor": {
+              "visible": false
+            },
+            "totalVolume": {
+              "visible": false
+            },
+            "tpoCountAbovePoc": {
+              "visible": false
+            },
+            "tpoCountBelowPoc": {
+              "visible": false
+            },
+            "tpoCountTotal": {
+              "visible": false
+            },
+            "vaRange": {
+              "visible": false
+            },
+            "vahPrice": {
+              "visible": true
+            },
+            "valPrice": {
+              "visible": true
+            },
+            "initialBalanceHigh": {
+              "visible": true
+            },
+            "initialBalanceLow": {
+              "visible": true
+            },
+            "initialBalanceRange": {
+              "visible": true
+            }
+          }
+        },
+        "priceSource": "close"
+      },
+      "svpStyle": {
+        "inputs": {
+          "profilesSessions": "All",
+          "customSession": "0930-1600",
+          "customSessionTZ": "Exchange",
+          "volume": "Up/Down",
+          "vaVolume": 70,
+          "extendPocRight": false,
+          "extendVAHRight": false,
+          "extendVALRight": false,
+          "rowsLayout": "Number Of Rows",
+          "rows": 24
+        },
+        "volumeProfile": {
+          "visible": true,
+          "valuesColor": "#DBDBDB",
+          "showValues": false,
+          "volumeColorUp": "rgba(38, 198, 218, 0.5)",
+          "volumeColorDown": "rgba(236, 64, 122, 0.5)",
+          "valueAreaColorUp": "rgba(38, 198, 218, 0.75)",
+          "valueAreaColorDown": "rgba(236, 64, 122, 0.75)",
+          "histogramBoxColor": "rgba(38, 198, 218, 0.05)",
+          "placement": "left_to_right",
+          "percentWidth": 100
+        },
+        "vah": {
+          "visible": false,
+          "color": "#DBDBDB",
+          "linestyle": 2,
+          "linewidth": 2
+        },
+        "val": {
+          "visible": false,
+          "color": "#DBDBDB",
+          "linestyle": 2,
+          "linewidth": 2
+        },
+        "poc": {
+          "visible": true,
+          "color": "#DBDBDB",
+          "linestyle": 0,
+          "linewidth": 2
+        },
+        "developingPoc": {
+          "visible": false,
+          "color": "#DBDBDB",
+          "linestyle": 0,
+          "linewidth": 1
+        },
+        "developingVA": {
+          "visible": false,
+          "color": "#00bcd4",
+          "linestyle": 0,
+          "linewidth": 1
+        }
+      },
+      "volFootprintStyle": {
+        "drawWick": true,
+        "drawBorder": true,
+        "barColorsOnPrevClose": false,
+        "drawBody": true,
+        "upColor": "#089981",
+        "downColor": "#F23645",
+        "borderColor": "#378658",
+        "borderUpColor": "#089981",
+        "borderDownColor": "#F23645",
+        "wickColor": "#737375",
+        "wickUpColor": "#089981",
+        "wickDownColor": "#F23645",
+        "deltaAdjust": true,
+        "showSummary": true,
+        "summaryMode": 0,
+        "extendedSummary": {
+          "belowSeries": true,
+          "blockInfo": {
+            "volume": {
+              "visible": true
+            },
+            "volumePercentage": {
+              "visible": false
+            },
+            "buyVolume": {
+              "visible": false
+            },
+            "buyVolumePercentage": {
+              "visible": false
+            },
+            "sellVolume": {
+              "visible": false
+            },
+            "sellVolumePercentage": {
+              "visible": false
+            },
+            "delta": {
+              "visible": true
+            },
+            "deltaPercentage": {
+              "visible": false
+            },
+            "minDelta": {
+              "visible": false
+            },
+            "maxDelta": {
+              "visible": false
+            },
+            "sessionCVD": {
+              "visible": true
+            },
+            "pocPrice": {
+              "visible": true
+            },
+            "hlRange": {
+              "visible": false
+            }
+          },
+          "openInterestBlockInfo": {
+            "openInterest": {
+              "visible": false
+            }
+          },
+          "extendedOpenInterestBlockInfo": {
+            "openInterestHigh": {
+              "visible": false
+            },
+            "openInterestLow": {
+              "visible": false
+            }
+          }
+        },
+        "type": "Buy and sell",
+        "displayMode": 0,
+        "pointOfControl": true,
+        "bgColors": {
+          "adjBuyBgColors": [
+            "#082621",
+            "#004D40",
+            "#06806B",
+            "#22AB94"
+          ],
+          "adjSellBgColors": [
+            "#331F20",
+            "#991F29",
+            "#CC2F3C",
+            "#F7525F"
+          ],
+          "adjTotalBgColors": [
+            "#142E61",
+            "#143EB2",
+            "#1E53E5",
+            "#3179F5"
+          ],
+          "buyBgColor": "#004D40",
+          "sellBgColor": "#991F29",
+          "totalBgColor": "#143EB2",
+          "pocColor": "#DBDBDB"
+        },
+        "imbalanceHighlight": {
+          "buyColor": "#089981",
+          "sellColor": "#F23645",
+          "visible": true
+        },
+        "unfinishedAuction": {
+          "highColor": "#D500F9",
+          "lowColor": "#00e5ff"
+        },
+        "inputs": {
+          "rowSize": "Auto",
+          "atrLength": 14,
+          "imbalancePercent": 300,
+          "ticksPerRow": 100,
+          "showVA": true,
+          "vaPercent": 70,
+          "calcStackedImbalance": false,
+          "showUnfinishedAuction": false,
+          "stackedImbalanceCount": 3,
+          "ignore_zero_volume_for_imbalance_calc": false,
+          "minimal_imbalance_volume": 0
+        }
+      },
+      "baseLineColor": "#636363",
+      "prevClosePriceLineColor": "#555555",
+      "priceLineColor": "",
+      "timeframe": "",
+      "shortName": "BTCUSDT",
+      "currencyId": "XTVCUSDT",
+      "unitId": null,
+      "metricId": null,
+      "symbol": "BINANCE:BTCUSDT",
+      "interval": "2",
+      "showSessions": false,
+      "priceAxisProperties": {
+        "autoScale": true,
+        "autoScaleDisabled": false,
+        "lockScale": false,
+        "percentage": false,
+        "percentageDisabled": false,
+        "log": false,
+        "logDisabled": false,
+        "alignLabels": true,
+        "isInverted": false,
+        "indexedTo100": false
+      }
+    },
+    "timezone": "Etc/UTC",
+    "replay": false,
+    "native_end_of_data": true,
+    "host_first": {
+      "index": -19833,
+      "value": [
+        1788739200,
+        80341.83,
+        80356,
+        80230.29,
+        80293.23,
+        37.66955
+      ]
+    },
+    "host_last": {
+      "index": 299,
+      "value": [
+        1791155040,
+        86425.98,
+        86447.99,
+        86425.98,
+        86447.98,
+        1.80438
+      ]
+    },
+    "closed_host": [
+      1791154920,
+      86424.16,
+      86447.99,
+      86396,
+      86425.99,
+      27.9931
+    ],
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "dpr": 2
+    },
+    "pane_study_order": [
+      "Coverage req 1 v1",
+      "Request native 6m snapshot on 2m companion v21 v1"
+    ],
+    "studies": [
+      {
+        "title": "Coverage req 1 v1",
+        "status": {
+          "type": 2
+        },
+        "native_first": {
+          "index": -19833,
+          "value": [
+            1788739200,
+            80341.83,
+            80356,
+            80230.29,
+            80293.23,
+            37.66955,
+            1788739200000,
+            0,
+            2,
+            2,
+            80246,
+            80293.23,
+            160539.22999999998,
+            80269.61499999999,
+            2,
+            2,
+            80246,
+            80293.23,
+            160539.22999999998,
+            80269.61499999999,
+            2,
+            0,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            80426,
+            80426,
+            null,
+            null,
+            1788739200000,
+            null,
+            null,
+            null,
+            null,
+            null,
+            80426,
+            80426,
+            null,
+            null,
+            1788739200000,
+            1,
+            2,
+            2,
+            1,
+            80293.23,
+            80293.23,
+            null,
+            12,
+            12,
+            3,
+            1,
+            1,
+            1,
+            1,
+            1
+          ]
+        },
+        "native_last": {
+          "index": 299,
+          "value": [
+            1791155040,
+            86425.98,
+            86447.99,
+            86425.98,
+            86447.98,
+            1.80438,
+            1791155040000,
+            20132,
+            1,
+            1,
+            86447.98,
+            86447.98,
+            86447.98,
+            86447.98,
+            1,
+            1,
+            86447.98,
+            86447.98,
+            86447.98,
+            86447.98,
+            1,
+            1,
+            86425.60428571484,
+            86425.60428571484,
+            86425.60428571484,
+            86425.60428571484,
+            86447.98,
+            86447.98,
+            86419.00249999986,
+            86395.93843868832,
+            1791154800000,
+            86447.98,
+            86447.98,
+            86419.00249999986,
+            86395.93843868832,
+            1791154800000,
+            86447.98,
+            86447.98,
+            86419.00249999986,
+            86395.93843868832,
+            1791154800000,
+            null,
+            null,
+            null,
+            null,
+            null,
+            1,
+            2,
+            2,
+            1,
+            86447.98,
+            86447.98,
+            86447.98,
+            12,
+            12,
+            12,
+            20133,
+            20133,
+            20133,
+            20133,
+            1
+          ]
+        },
+        "closed_native": [
+          1791154920,
+          86424.16,
+          86447.99,
+          86396,
+          86425.99,
+          27.9931,
+          1791154920000,
+          20131,
+          2,
+          2,
+          86396.1,
+          86425.99,
+          172822.09000000003,
+          86411.04500000001,
+          2,
+          2,
+          86396.1,
+          86425.99,
+          172822.09000000003,
+          86411.04500000001,
+          2,
+          2,
+          86421.03857142913,
+          86419.03571428628,
+          172840.0742857154,
+          86420.0371428577,
+          86428.01,
+          86428.01,
+          86414.00999999986,
+          86378.59125158442,
+          1791154440000,
+          86447.98,
+          86447.98,
+          86419.00249999986,
+          86395.93843868832,
+          1791154800000,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          1,
+          2,
+          2,
+          1,
+          86425.99,
+          86425.99,
+          86425.99,
+          12,
+          12,
+          12,
+          20132,
+          20132,
+          20132,
+          20132,
+          1
+        ],
+        "plot_ids": [
+          {
+            "id": "plot_0",
+            "type": "line"
+          },
+          {
+            "id": "plot_1",
+            "type": "line"
+          },
+          {
+            "id": "plot_2",
+            "type": "line"
+          },
+          {
+            "id": "plot_3",
+            "type": "line"
+          },
+          {
+            "id": "plot_4",
+            "type": "line"
+          },
+          {
+            "id": "plot_5",
+            "type": "line"
+          },
+          {
+            "id": "plot_6",
+            "type": "line"
+          },
+          {
+            "id": "plot_7",
+            "type": "line"
+          },
+          {
+            "id": "plot_8",
+            "type": "line"
+          },
+          {
+            "id": "plot_9",
+            "type": "line"
+          },
+          {
+            "id": "plot_10",
+            "type": "line"
+          },
+          {
+            "id": "plot_11",
+            "type": "line"
+          },
+          {
+            "id": "plot_12",
+            "type": "line"
+          },
+          {
+            "id": "plot_13",
+            "type": "line"
+          },
+          {
+            "id": "plot_14",
+            "type": "line"
+          },
+          {
+            "id": "plot_15",
+            "type": "line"
+          },
+          {
+            "id": "plot_16",
+            "type": "line"
+          },
+          {
+            "id": "plot_17",
+            "type": "line"
+          },
+          {
+            "id": "plot_18",
+            "type": "line"
+          },
+          {
+            "id": "plot_19",
+            "type": "line"
+          },
+          {
+            "id": "plot_20",
+            "type": "line"
+          },
+          {
+            "id": "plot_21",
+            "type": "line"
+          },
+          {
+            "id": "plot_22",
+            "type": "line"
+          },
+          {
+            "id": "plot_23",
+            "type": "line"
+          },
+          {
+            "id": "plot_24",
+            "type": "line"
+          },
+          {
+            "id": "plot_25",
+            "type": "line"
+          },
+          {
+            "id": "plot_26",
+            "type": "line"
+          },
+          {
+            "id": "plot_27",
+            "type": "line"
+          },
+          {
+            "id": "plot_28",
+            "type": "line"
+          },
+          {
+            "id": "plot_29",
+            "type": "line"
+          },
+          {
+            "id": "plot_30",
+            "type": "line"
+          },
+          {
+            "id": "plot_31",
+            "type": "line"
+          },
+          {
+            "id": "plot_32",
+            "type": "line"
+          },
+          {
+            "id": "plot_33",
+            "type": "line"
+          },
+          {
+            "id": "plot_34",
+            "type": "line"
+          },
+          {
+            "id": "plot_35",
+            "type": "line"
+          },
+          {
+            "id": "plot_36",
+            "type": "line"
+          },
+          {
+            "id": "plot_37",
+            "type": "line"
+          },
+          {
+            "id": "plot_38",
+            "type": "line"
+          },
+          {
+            "id": "plot_39",
+            "type": "line"
+          },
+          {
+            "id": "plot_40",
+            "type": "line"
+          },
+          {
+            "id": "plot_41",
+            "type": "line"
+          },
+          {
+            "id": "plot_42",
+            "type": "line"
+          },
+          {
+            "id": "plot_43",
+            "type": "line"
+          },
+          {
+            "id": "plot_44",
+            "type": "line"
+          },
+          {
+            "id": "plot_45",
+            "type": "line"
+          },
+          {
+            "id": "plot_46",
+            "type": "line"
+          },
+          {
+            "id": "plot_47",
+            "type": "line"
+          },
+          {
+            "id": "plot_48",
+            "type": "line"
+          },
+          {
+            "id": "plot_49",
+            "type": "line"
+          },
+          {
+            "id": "plot_50",
+            "type": "line"
+          },
+          {
+            "id": "plot_51",
+            "type": "line"
+          },
+          {
+            "id": "plot_52",
+            "type": "line"
+          },
+          {
+            "id": "plot_53",
+            "type": "line"
+          },
+          {
+            "id": "plot_54",
+            "type": "line"
+          },
+          {
+            "id": "plot_55",
+            "type": "line"
+          },
+          {
+            "id": "plot_56",
+            "type": "line"
+          },
+          {
+            "id": "plot_57",
+            "type": "line"
+          },
+          {
+            "id": "plot_58",
+            "type": "line"
+          },
+          {
+            "id": "plot_59",
+            "type": "line"
+          }
+        ],
+        "plot_titles": [
+          "open",
+          "high",
+          "low",
+          "close",
+          "volume",
+          "time",
+          "bar_index",
+          "ltf1_clean_count",
+          "ltf1_clean_non_na_count",
+          "ltf1_clean_first",
+          "ltf1_clean_last",
+          "ltf1_clean_non_na_sum",
+          "ltf1_clean_non_na_mean",
+          "ltf1_hole_count",
+          "ltf1_hole_non_na_count",
+          "ltf1_hole_first",
+          "ltf1_hole_last",
+          "ltf1_hole_non_na_sum",
+          "ltf1_hole_non_na_mean",
+          "ltf1_warm_count",
+          "ltf1_warm_non_na_count",
+          "ltf1_warm_first",
+          "ltf1_warm_last",
+          "ltf1_warm_non_na_sum",
+          "ltf1_warm_non_na_mean",
+          "htf6_clean_gapsoff_lookaheadoff",
+          "htf6_hole_gapsoff_lookaheadoff",
+          "htf6_sma4_warm_gapsoff_lookaheadoff",
+          "htf6_rma4_warm_gapsoff_lookaheadoff",
+          "htf6_time_gapsoff_lookaheadoff",
+          "htf6_clean_gapsoff_lookaheadon",
+          "htf6_hole_gapsoff_lookaheadon",
+          "htf6_sma4_warm_gapsoff_lookaheadon",
+          "htf6_rma4_warm_gapsoff_lookaheadon",
+          "htf6_time_gapsoff_lookaheadon",
+          "htf6_clean_gapson_lookaheadoff",
+          "htf6_hole_gapson_lookaheadoff",
+          "htf6_sma4_warm_gapson_lookaheadoff",
+          "htf6_rma4_warm_gapson_lookaheadoff",
+          "htf6_time_gapson_lookaheadoff",
+          "htf6_clean_gapson_lookaheadon",
+          "htf6_hole_gapson_lookaheadon",
+          "htf6_sma4_warm_gapson_lookaheadon",
+          "htf6_rma4_warm_gapson_lookaheadon",
+          "htf6_time_gapson_lookaheadon",
+          "table_count_before_scratch",
+          "table_count_with_scratch",
+          "table_count_after_clear",
+          "table_count_after_delete",
+          "cell_clean_arg",
+          "cell_hole_arg",
+          "cell_warm_arg",
+          "cell_clean_text_length",
+          "cell_hole_text_length",
+          "cell_warm_text_length",
+          "cell_calls_reached",
+          "cell_text_setters_reached",
+          "cell_geometry_setters_reached",
+          "cell_appearance_setters_reached",
+          "merge_initialized"
+        ],
+        "inputs": []
+      },
+      {
+        "title": "Request native 6m snapshot on 2m companion v21 v1",
+        "status": {
+          "type": 2
+        },
+        "native_first": {
+          "index": -19833,
+          "value": [
+            1788739200,
+            1788739200000,
+            1788739320000,
+            0,
+            20132,
+            1788739200000,
+            80341.83,
+            80356,
+            80230.29,
+            80293.23,
+            37.66955,
+            0,
+            1,
+            1791155050246,
+            0,
+            1788739200000,
+            1788739560000,
+            0,
+            1788739200000,
+            6710,
+            80341.83,
+            80426,
+            80230.29,
+            80426,
+            106.57861,
+            null,
+            null,
+            2,
+            1788739200000,
+            null,
+            null,
+            80426,
+            80426,
+            80426,
+            null,
+            null,
+            1788739200000,
+            1788739560000,
+            0,
+            80341.83,
+            80426,
+            80230.29,
+            80426,
+            106.57861,
+            80426,
+            80426,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            6,
+            1,
+            0
+          ]
+        },
+        "native_last": {
+          "index": 299,
+          "value": [
+            1791155040,
+            1791155040000,
+            1791155160000,
+            20132,
+            20132,
+            1788739200000,
+            86425.98,
+            86447.99,
+            86425.98,
+            86447.98,
+            1.80438,
+            1,
+            0,
+            1791155066695,
+            0,
+            1791154800000,
+            1791155160000,
+            6710,
+            1788739200000,
+            6710,
+            86428.01,
+            86480,
+            86396,
+            86447.98,
+            60.39774,
+            86428.01,
+            86442.01,
+            1,
+            1791072000000,
+            259318.00000000052,
+            259318.0000000007,
+            86447.98,
+            86447.98,
+            86447.98,
+            86419.00249999986,
+            86395.93843868832,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            1791154800000,
+            86447.98,
+            86447.98,
+            86447.98,
+            1791154800000,
+            86447.98,
+            86447.98,
+            86447.98,
+            6,
+            0,
+            0
+          ]
+        },
+        "closed_native": [
+          1791154920,
+          1791154920000,
+          1791155040000,
+          20131,
+          20132,
+          1788739200000,
+          86424.16,
+          86447.99,
+          86396,
+          86425.99,
+          27.9931,
+          0,
+          1,
+          1791155050419,
+          1,
+          1791154800000,
+          1791155160000,
+          6710,
+          1788739200000,
+          6710,
+          86428.01,
+          86480,
+          86396,
+          86447.98,
+          60.00832999999999,
+          86428.01,
+          86442.01,
+          1,
+          1791072000000,
+          259318.00000000052,
+          259318.0000000007,
+          86447.98,
+          86447.98,
+          86447.98,
+          86419.00249999986,
+          86395.93843868832,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          1791154440000,
+          86428.01,
+          86428.01,
+          86428.01,
+          null,
+          null,
+          null,
+          null,
+          6,
+          0,
+          0
+        ],
+        "plot_ids": [
+          {
+            "id": "plot_0",
+            "type": "line"
+          },
+          {
+            "id": "plot_1",
+            "type": "line"
+          },
+          {
+            "id": "plot_2",
+            "type": "line"
+          },
+          {
+            "id": "plot_3",
+            "type": "line"
+          },
+          {
+            "id": "plot_4",
+            "type": "line"
+          },
+          {
+            "id": "plot_5",
+            "type": "line"
+          },
+          {
+            "id": "plot_6",
+            "type": "line"
+          },
+          {
+            "id": "plot_7",
+            "type": "line"
+          },
+          {
+            "id": "plot_8",
+            "type": "line"
+          },
+          {
+            "id": "plot_9",
+            "type": "line"
+          },
+          {
+            "id": "plot_10",
+            "type": "line"
+          },
+          {
+            "id": "plot_11",
+            "type": "line"
+          },
+          {
+            "id": "plot_12",
+            "type": "line"
+          },
+          {
+            "id": "plot_13",
+            "type": "line"
+          },
+          {
+            "id": "plot_14",
+            "type": "line"
+          },
+          {
+            "id": "plot_15",
+            "type": "line"
+          },
+          {
+            "id": "plot_16",
+            "type": "line"
+          },
+          {
+            "id": "plot_17",
+            "type": "line"
+          },
+          {
+            "id": "plot_18",
+            "type": "line"
+          },
+          {
+            "id": "plot_19",
+            "type": "line"
+          },
+          {
+            "id": "plot_20",
+            "type": "line"
+          },
+          {
+            "id": "plot_21",
+            "type": "line"
+          },
+          {
+            "id": "plot_22",
+            "type": "line"
+          },
+          {
+            "id": "plot_23",
+            "type": "line"
+          },
+          {
+            "id": "plot_24",
+            "type": "line"
+          },
+          {
+            "id": "plot_25",
+            "type": "line"
+          },
+          {
+            "id": "plot_26",
+            "type": "line"
+          },
+          {
+            "id": "plot_27",
+            "type": "line"
+          },
+          {
+            "id": "plot_28",
+            "type": "line"
+          },
+          {
+            "id": "plot_29",
+            "type": "line"
+          },
+          {
+            "id": "plot_30",
+            "type": "line"
+          },
+          {
+            "id": "plot_31",
+            "type": "line"
+          },
+          {
+            "id": "plot_32",
+            "type": "line"
+          },
+          {
+            "id": "plot_33",
+            "type": "line"
+          },
+          {
+            "id": "plot_34",
+            "type": "line"
+          },
+          {
+            "id": "plot_35",
+            "type": "line"
+          },
+          {
+            "id": "plot_36",
+            "type": "line"
+          },
+          {
+            "id": "plot_37",
+            "type": "line"
+          },
+          {
+            "id": "plot_38",
+            "type": "line"
+          },
+          {
+            "id": "plot_39",
+            "type": "line"
+          },
+          {
+            "id": "plot_40",
+            "type": "line"
+          },
+          {
+            "id": "plot_41",
+            "type": "line"
+          },
+          {
+            "id": "plot_42",
+            "type": "line"
+          },
+          {
+            "id": "plot_43",
+            "type": "line"
+          },
+          {
+            "id": "plot_44",
+            "type": "line"
+          },
+          {
+            "id": "plot_45",
+            "type": "line"
+          },
+          {
+            "id": "plot_46",
+            "type": "line"
+          },
+          {
+            "id": "plot_47",
+            "type": "line"
+          },
+          {
+            "id": "plot_48",
+            "type": "line"
+          },
+          {
+            "id": "plot_49",
+            "type": "line"
+          },
+          {
+            "id": "plot_50",
+            "type": "line"
+          },
+          {
+            "id": "plot_51",
+            "type": "line"
+          },
+          {
+            "id": "plot_52",
+            "type": "line"
+          },
+          {
+            "id": "plot_53",
+            "type": "line"
+          },
+          {
+            "id": "plot_54",
+            "type": "line"
+          },
+          {
+            "id": "plot_55",
+            "type": "line"
+          }
+        ],
+        "plot_titles": [
+          "CHART_TIME_MS",
+          "CHART_END_MS",
+          "CHART_INDEX",
+          "CHART_LAST_INDEX",
+          "CHART_FIRST_EXECUTION_MS",
+          "CHART_OPEN",
+          "CHART_HIGH",
+          "CHART_LOW",
+          "CHART_CLOSE",
+          "CHART_VOLUME",
+          "CHART_REALTIME",
+          "CHART_CONFIRMED",
+          "EXECUTION_NOW_MS",
+          "CHART_LAST_CONFIRMED_HISTORY",
+          "GOFF_LON_TIME_MS",
+          "GOFF_LON_END_MS",
+          "GOFF_LON_INDEX",
+          "GOFF_LON_FIRST_EXECUTION_MS",
+          "GOFF_LON_LAST_INDEX",
+          "GOFF_LON_OPEN",
+          "GOFF_LON_HIGH",
+          "GOFF_LON_LOW",
+          "GOFF_LON_CLOSE",
+          "GOFF_LON_VOLUME",
+          "GOFF_LON_PREVIOUS_CLOSE",
+          "GOFF_LON_HISTORY2_CLOSE",
+          "GOFF_LON_DAYOFWEEK",
+          "GOFF_LON_DAILY_OPEN_MS",
+          "GOFF_LON_SUM3_CLOSE",
+          "GOFF_LON_SUM3_HOLE97_THREE",
+          "GOFF_LON_HOLE_INDEX97_TWO",
+          "GOFF_LON_HOLE_INDEX97_THREE",
+          "GOFF_LON_HOLE_UTC11",
+          "GOFF_LON_SMA4",
+          "GOFF_LON_RMA4",
+          "GON_LON_TIME_MS",
+          "GON_LON_END_MS",
+          "GON_LON_INDEX",
+          "GON_LON_OPEN",
+          "GON_LON_HIGH",
+          "GON_LON_LOW",
+          "GON_LON_CLOSE",
+          "GON_LON_VOLUME",
+          "GON_LON_HOLE_INDEX97_TWO",
+          "GON_LON_HOLE_INDEX97_THREE",
+          "GOFF_LOFF_TIME_MS",
+          "GOFF_LOFF_CLOSE",
+          "GOFF_LOFF_HOLE_INDEX97_TWO",
+          "GOFF_LOFF_HOLE_INDEX97_THREE",
+          "GON_LOFF_TIME_MS",
+          "GON_LOFF_CLOSE",
+          "GON_LOFF_HOLE_INDEX97_TWO",
+          "GON_LOFF_HOLE_INDEX97_THREE",
+          "REQUEST_TIMEFRAME_MINUTES",
+          "REQUEST_BUCKET_COMPLETED_AT_EXECUTION",
+          "REQUEST_CLOSE_NA"
+        ],
+        "inputs": []
+      }
+    ],
+    "completed_target_native": {
+      "browser_utc": "2026-10-04T23:04:27.380Z",
+      "target_host_time": 1791154680,
+      "native_index": 296,
+      "host": [
+        1791154680,
+        86402,
+        86428.01,
+        86393.47,
+        86428.01,
+        8.955
+      ],
+      "current_host_last": {
+        "index": 299,
+        "value": [
+          1791155040,
+          86425.98,
+          86447.99,
+          86425.98,
+          86447.98,
+          1.80438
+        ]
+      },
+      "studies": [
+        {
+          "title": "Coverage req 1 v1",
+          "status": {
+            "type": 2
+          },
+          "row": [
+            1791154680,
+            86402,
+            86428.01,
+            86393.47,
+            86428.01,
+            8.955,
+            1791154680000,
+            20129,
+            2,
+            2,
+            86406.99,
+            86428.01,
+            172835,
+            86417.5,
+            2,
+            2,
+            86406.99,
+            86428.01,
+            172835,
+            86417.5,
+            2,
+            2,
+            86417.22714285771,
+            86424.16285714343,
+            172841.39000000112,
+            86420.69500000056,
+            86428.01,
+            86428.01,
+            86414.00999999986,
+            86378.59125158442,
+            1791154440000,
+            86428.01,
+            86428.01,
+            86414.00999999986,
+            86378.59125158442,
+            1791154440000,
+            86428.01,
+            86428.01,
+            86414.00999999986,
+            86378.59125158442,
+            1791154440000,
+            null,
+            null,
+            null,
+            null,
+            null,
+            1,
+            2,
+            2,
+            1,
+            86428.01,
+            86428.01,
+            86428.01,
+            12,
+            12,
+            12,
+            20130,
+            20130,
+            20130,
+            20130,
+            1
+          ]
+        },
+        {
+          "title": "Request native 6m snapshot on 2m companion v21 v1",
+          "status": {
+            "type": 2
+          },
+          "row": [
+            1791154680,
+            1791154680000,
+            1791154800000,
+            20129,
+            20132,
+            1788739200000,
+            86402,
+            86428.01,
+            86393.47,
+            86428.01,
+            8.955,
+            0,
+            1,
+            1791155050419,
+            0,
+            1791154440000,
+            1791154800000,
+            6709,
+            1788739200000,
+            6710,
+            86442,
+            86451.07,
+            86393.47,
+            86428.01,
+            32.26788,
+            86442.01,
+            86358.01,
+            1,
+            1791072000000,
+            259228.0300000005,
+            259228.03000000067,
+            86428.01,
+            86428.01,
+            86428.01,
+            86414.00999999986,
+            86378.59125158442,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            1791154440000,
+            86428.01,
+            86428.01,
+            86428.01,
+            1791154440000,
+            86428.01,
+            86428.01,
+            86428.01,
+            6,
+            1,
+            0
+          ]
+        }
+      ]
+    },
+    "sources": [
+      {
+        "script": "paired-originals/coverage-req-1-v1.pine",
+        "sha256": "8f481a6dfe7ba2f524606361e8abf1c49fe296891d1712b0a46e5af481705a63"
+      },
+      {
+        "script": "request-snapshot-6m-v21-v1.pine",
+        "sha256": "3d706a4c63e375b6d35a4e8e8aa0db1b141e8ddfc66ec36f5e7c90a485ecbf41"
+      }
+    ],
+    "pair_id": "coverage-req-snapshot-6m-v1"
+  },
+  "limits": "One actual native download contains both original and companion outputs simultaneously, with positional duplicates unchanged. Source snapshots before/after allow input evolution to be assessed. A later completed capture has a separate pair/phase; no old tick is reconstructed.",
+  "completed_target_ui_snapshot": "## Latest page snapshot\nuid=14027_0 RootWebArea \"BTCUSDT 86,460.00 ▲ +2.01% basic\" url=\"https://www.tradingview.com/chart/xlvYwHdH/?symbol=BINANCE%3ABTCUSDT&interval=2\"\n  uid=14027_1 button \"Logged in as sours-lat Active layout: basic\" haspopup=\"menu\"\n  uid=14027_2 StaticText \"11\"\n  uid=14027_3 button \"BTCUSDT\" description=\"Symbol search\"\n  uid=14027_4 button \"Switch data type\"\n  uid=14027_5 button \"Compare symbols\" haspopup=\"dialog\"\n  uid=14027_6 radio \"3 minutes\"\n  uid=14027_7 radio \"5 minutes\"\n  uid=14027_8 radio \"15 minutes\"\n  uid=14027_9 radio \"30 minutes\"\n  uid=14027_10 radio \"45 minutes\"\n  uid=14027_11 radio \"1 hour\"\n  uid=14027_12 radio \"2 hours\"\n  uid=14027_13 radio \"3 hours\"\n  uid=14027_14 radio \"4 hours\"\n  uid=14027_15 radio \"8 hours\"\n  uid=14027_16 radio \"10 hours\"\n  uid=14027_17 radio \"12 hours\"\n  uid=14027_18 radio \"1 day\"\n  uid=14027_19 radio \"3 days\"\n  uid=14027_20 radio \"10 days\"\n  uid=14027_21 radio \"1 week\"\n  uid=14027_22 radio \"1 month\"\n  uid=14027_23 radio \"2 minutes\" checked\n  uid=14027_24 button \"Chart interval\" haspopup=\"menu\"\n  uid=14027_25 radio \"Candles\" checked\n  uid=14027_26 radio \"Line\"\n  uid=14027_27 radio \"High-low\"\n  uid=14027_28 button \"Bar's style\" haspopup=\"menu\"\n  uid=14027_29 button \"Indicators, metrics, and strategies\"\n  uid=14027_30 button \"Favorite indicators\" haspopup=\"menu\"\n  uid=14027_31 button \"Indicator templates\" haspopup=\"menu\"\n  uid=14027_32 button \"Create alert\"\n  uid=14027_33 button \"Bar replay\"\n  uid=14027_34 button disableable disabled\n  uid=14027_35 button disableable disabled\n  uid=14027_36 button \"Layout setup\" haspopup=\"menu\"\n  uid=14027_37 button \"All changes saved\" disableable disabled\n  uid=14027_38 button \"Manage layouts\" haspopup=\"menu\"\n  uid=14027_39 button \"Quick search\"\n  uid=14027_40 button \"Settings\"\n  uid=14027_41 button \"Fullscreen mode\"\n  uid=14027_42 button \"Take a snapshot\" haspopup=\"menu\"\n  uid=14027_43 button \"Share your idea with the trade community\" haspopup=\"menu\"\n  uid=14027_44 button \"Trade\"\n  uid=14027_45 button \"Cross\"\n  uid=14027_46 button \"Cursors\" pressed\n  uid=14027_47 button \"Trendline\"\n  uid=14027_48 button \"Trend tools\"\n  uid=14027_49 button \"Fib retracement\"\n  uid=14027_50 button \"Gann and Fibonacci tools\"\n  uid=14027_51 button \"XABCD pattern\"\n  uid=14027_52 button \"Patterns\"\n  uid=14027_53 button \"Long position\"\n  uid=14027_54 button \"Forecasting and measurement tools\"\n  uid=14027_55 button \"Brush\"\n  uid=14027_56 button \"Geometric shapes\"\n  uid=14027_57 button \"Text\"\n  uid=14027_58 button \"Annotation tools\"\n  uid=14027_59 button \"Icon\"\n  uid=14027_60 button \"Icons\"\n  uid=14027_61 button \"Measure\"\n  uid=14027_62 button \"Zoom in\"\n  uid=14027_63 button \"Magnet mode snaps drawings placed near price bars to the closest OHLC value\" pressed\n  uid=14027_64 button \"Magnets\" pressed\n  uid=14027_65 button \"Keep drawing\"\n  uid=14027_66 button \"Lock drawings and indicators\"\n  uid=14027_67 button \"Lock options\"\n  uid=14027_68 button \"Hide all drawings, indicators, positions, and orders\"\n  uid=14027_69 button \"Hide options\"\n  uid=14027_70 button \"New drawings will not be synced\"\n  uid=14027_71 button \"Sync drawings options\"\n  uid=14027_72 button \"Remove objects\"\n  uid=14027_73 button \"Remove options\"\n  uid=14027_74 button \"Show Favorite Drawing Tools Toolbar\"\n  uid=14027_75 region \"Chart #1\"\n    uid=14027_76 StaticText \"B\"\n    uid=14027_77 button \"Change symbol\"\n    uid=14027_78 StaticText \"·\"\n    uid=14027_79 button \"Change interval\"\n    uid=14027_78 StaticText \"·\"\n    uid=14027_80 StaticText \"Binance\"\n    uid=14027_81 button \"Unflag symbol\"\n    uid=14027_82 button \"More\" description=\"More\"\n    uid=14027_83 button \"Market open\"\n    uid=14027_84 StaticText \"O\"\n    uid=14027_85 StaticText \"86,402.00\"\n    uid=14027_86 StaticText \"H\"\n    uid=14027_87 StaticText \"86,428.01\"\n    uid=14027_88 StaticText \"L\"\n    uid=14027_89 StaticText \"86,393.47\"\n    uid=14027_90 StaticText \"C\"\n    uid=14027_91 StaticText \"86,428.01\"\n    uid=14027_92 StaticText \"+26.01 (+0.03%)\"\n    uid=14027_93 StaticText \"86,460.00\"\n    uid=14034_0 StaticText \"SELL\"\n    uid=14027_95 StaticText \"0.01\"\n    uid=14027_96 StaticText \"86,460.01\"\n    uid=14034_1 StaticText \"BUY\"\n    uid=14027_98 Canvas \"Chart for BINANCE:BTCUSDT, 2 minutes\"\n    uid=14027_99 StaticText \"Coverage req 1 v1\"\n    uid=14027_100 button \"Hide\" description=\"Hide\"\n    uid=14027_101 button \"Settings\" description=\"Settings\"\n    uid=14027_102 button \"Remove\" description=\"Remove\"\n    uid=14027_103 button \"More\" description=\"More\"\n    uid=14027_104 StaticText \"Request native 6m snapshot on 2m companion v21 v1\"\n    uid=14027_105 button \"Hide\" description=\"Hide\"\n    uid=14027_106 button \"Settings\" description=\"Settings\"\n    uid=14027_107 button \"Remove\" description=\"Remove\"\n    uid=14027_108 button \"More\" description=\"More\"\n  uid=14027_109 button \"1 day in 1 minute intervals\"\n  uid=14027_110 button \"5 days in 5 minutes intervals\"\n  uid=14027_111 button \"1 month in 30 minutes intervals\"\n  uid=14027_112 button \"3 months in 1 hour intervals\"\n  uid=14027_113 button \"6 months in 2 hours intervals\"\n  uid=14027_114 button \"Year to day in 1 day intervals\"\n  uid=14027_115 button \"1 year in 1 day intervals\"\n  uid=14027_116 button \"5 years in 1 week intervals\"\n  uid=14027_117 button \"All data in 1 month intervals\"\n  uid=14027_118 button \"Go to\"\n  uid=14027_119 button \"Timezone\"\n  uid=14027_120 button \"Watchlist, details, and news\"\n  uid=14027_121 button \"Alerts\"\n  uid=14027_122 button \"Object tree and data window\" pressed\n  uid=14027_123 button \"AI Copilot\"\n  uid=14027_124 button \"Screeners\"\n  uid=14027_125 button \"Pine\"\n  uid=14027_126 button \"Calendars\"\n  uid=14027_127 button \"Community\"\n  uid=14027_128 button \"Notifications\"\n  uid=14027_129 button \"Chats\"\n  uid=14027_130 button \"Products\" haspopup=\"menu\"\n  uid=14027_131 button \"Help Center\"\n  uid=14027_132 tab \"Object tree\" selectable\n  uid=14027_133 tab \"Data window\" selectable selected\n  uid=14027_134 generic disableable disabled\n    uid=14027_135 StaticText \"Date\"\n    uid=14027_136 StaticText \"Sun 04 Oct '26\"\n    uid=14027_137 StaticText \"Time\"\n    uid=14027_138 StaticText \"22:58\"\n  uid=14027_139 row \"BTCUSDT · 2 · Binance Open 86,402.00 High 86,428.01 Low 86,393.47 Close 86,428.01 Change +26.01 (+0.03%) Vol 8.96 Last day change +1,706.44 (+2.01%)\"\n    uid=14027_140 StaticText \"BTCUSDT · 2 · Binance\"\n    uid=14027_141 button \"Hide data\"\n    uid=14027_142 StaticText \"Open\"\n    uid=14027_143 StaticText \"86,402.00\"\n    uid=14027_144 StaticText \"High\"\n    uid=14027_145 StaticText \"86,428.01\"\n    uid=14027_146 StaticText \"Low\"\n    uid=14027_147 StaticText \"86,393.47\"\n    uid=14027_148 StaticText \"Close\"\n    uid=14027_149 StaticText \"86,428.01\"\n    uid=14027_150 StaticText \"Change\"\n    uid=14027_151 StaticText \"+26.01 (+0.03%)\"\n    uid=14027_152 StaticText \"Vol\"\n    uid=14027_153 StaticText \"8.96\"\n    uid=14027_154 StaticText \"Last day change\"\n    uid=14027_155 StaticText \"+1,706.44 (+2.01%)\"\n  uid=14027_156 row \"Coverage req 1 v1 open 86,402.0000000000 high 86,428.0100000000 low 86,393.4700000000 close 86,428.0100000000 volume 8.9550000000 time 1,791,154,680,000.0000000000 bar_index 20,129.0000000000 ltf1_clean_count 2.0000000000 ltf1_clean_non_na_count 2.0000000000 ltf1_clean_first 86,406.9900000000 ltf1_clean_last 86,428.0100000000 ltf1_clean_non_na_sum 172,835.0000000000 ltf1_clean_non_na_mean 86,417.5000000000 ltf1_hole_count 2.0000000000 ltf1_hole_non_na_count 2.0000000000 ltf1_hole_first 86,406.9900000000 ltf1_hole_last 86,428.0100000000 ltf1_hole_non_na_sum 172,835.0000000000 ltf1_hole_non_na_mean 86,417.5000000000\"\n    uid=14027_157 StaticText \"Coverage req 1 v1\"\n    uid=14027_158 button \"Hide data\"\n    uid=14027_159 StaticText \"open\"\n    uid=14027_160 StaticText \"86,402.0000000000\"\n    uid=14027_161 StaticText \"high\"\n    uid=14027_162 StaticText \"86,428.0100000000\"\n    uid=14027_163 StaticText \"low\"\n    uid=14027_164 StaticText \"86,393.4700000000\"\n    uid=14027_165 StaticText \"close\"\n    uid=14027_166 StaticText \"86,428.0100000000\"\n    uid=14027_167 StaticText \"volume\"\n    uid=14027_168 StaticText \"8.9550000000\"\n    uid=14027_169 StaticText \"time\"\n    uid=14027_170 StaticText \"1,791,154,680,000.0000000000\"\n    uid=14027_171 StaticText \"bar_index\"\n    uid=14027_172 StaticText \"20,129.0000000000\"\n    uid=14027_173 StaticText \"ltf1_clean_count\"\n    uid=14027_174 StaticText \"2.0000000000\"\n    uid=14027_175 StaticText \"ltf1_clean_non_na_count\"\n    uid=14027_176 StaticText \"2.0000000000\"\n    uid=14027_177 StaticText \"ltf1_clean_first\"\n    uid=14027_178 StaticText \"86,406.9900000000\"\n    uid=14027_179 StaticText \"ltf1_clean_last\"\n    uid=14027_180 StaticText \"86,428.0100000000\"\n    uid=14027_181 StaticText \"ltf1_clean_non_na_sum\"\n    uid=14027_182 StaticText \"172,835.0000000000\"\n    uid=14027_183 StaticText \"ltf1_clean_non_na_mean\"\n    uid=14027_184 StaticText \"86,417.5000000000\"\n    uid=14027_185 StaticText \"ltf1_hole_count\"\n    uid=14027_186 StaticText \"2.0000000000\"\n    uid=14027_187 StaticText \"ltf1_hole_non_na_count\"\n    uid=14027_188 StaticText \"2.0000000000\"\n    uid=14027_189 StaticText \"ltf1_hole_first\"\n    uid=14027_190 StaticText \"86,406.9900000000\"\n    uid=14027_191 StaticText \"ltf1_hole_last\"\n    uid=14027_192 StaticText \"86,428.0100000000\"\n    uid=14027_193 StaticText \"ltf1_hole_non_na_sum\"\n    uid=14027_194 StaticText \"172,835.0000000000\"\n    uid=14027_195 StaticText \"ltf1_hole_non_na_mean\"\n    uid=14027_196 StaticText \"86,417.5000000000\"\n    uid=14027_197 StaticText \"ltf1_warm_count\"\n    uid=14027_198 StaticText \"2.0000000000\"\n    uid=14027_199 StaticText \"ltf1_warm_non_na_count\"\n    uid=14027_200 StaticText \"2.0000000000\"\n    uid=14027_201 StaticText \"ltf1_warm_first\"\n    uid=14027_202 StaticText \"86,417.2271428577\"\n    uid=14027_203 StaticText \"ltf1_warm_last\"\n    uid=14027_204 StaticText \"86,424.1628571434\"\n    uid=14027_205 StaticText \"ltf1_warm_non_na_sum\"\n    uid=14027_206 StaticText \"172,841.3900000011\"\n    uid=14027_207 StaticText \"ltf1_warm_non_na_mean\"\n    uid=14027_208 StaticText \"86,420.6950000006\"\n    uid=14027_209 StaticText \"htf6_clean_gapsoff_lookaheadoff\"\n    uid=14027_210 StaticText \"86,428.0100000000\"\n    uid=14027_211 StaticText \"htf6_hole_gapsoff_lookaheadoff\"\n    uid=14027_212 StaticText \"86,428.0100000000\"\n    uid=14027_213 StaticText \"htf6_sma4_warm_gapsoff_lookaheadoff\"\n    uid=14027_214 StaticText \"86,414.0099999999\"\n    uid=14027_215 StaticText \"htf6_rma4_warm_gapsoff_lookaheadoff\"\n    uid=14027_216 StaticText \"86,378.5912515844\"\n    uid=14027_217 StaticText \"htf6_time_gapsoff_lookaheadoff\"\n    uid=14027_218 StaticText \"1,791,154,440,000.0000000000\"\n    uid=14027_219 StaticText \"htf6_clean_gapsoff_lookaheadon\"\n    uid=14027_220 StaticText \"86,428.0100000000\"\n    uid=14027_221 StaticText \"htf6_hole_gapsoff_lookaheadon\"\n    uid=14027_222 StaticText \"86,428.0100000000\"\n    uid=14027_223 StaticText \"htf6_sma4_warm_gapsoff_lookaheadon\"\n    uid=14027_224 StaticText \"86,414.0099999999\"\n    uid=14027_225 StaticText \"htf6_rma4_warm_gapsoff_lookaheadon\"\n    uid=14027_226 StaticText \"86,378.5912515844\"\n    uid=14027_227 StaticText \"htf6_time_gapsoff_lookaheadon\"\n    uid=14027_228 StaticText \"1,791,154,440,000.0000000000\"\n    uid=14027_229 StaticText \"htf6_clean_gapson_lookaheadoff\"\n    uid=14027_230 StaticText \"86,428.0100000000\"\n    uid=14027_231 StaticText \"htf6_hole_gapson_lookaheadoff\"\n    uid=14027_232 StaticText \"86,428.0100000000\"\n    uid=14027_233 StaticText \"htf6_sma4_warm_gapson_lookaheadoff\"\n    uid=14027_234 StaticText \"86,414.0099999999\"\n    uid=14027_235 StaticText \"htf6_rma4_warm_gapson_lookaheadoff\"\n    uid=14027_236 StaticText \"86,378.5912515844\"\n    uid=14027_237 StaticText \"htf6_time_gapson_lookaheadoff\"\n    uid=14027_238 StaticText \"1,791,154,440,000.0000000000\"\n    uid=14027_239 StaticText \"htf6_clean_gapson_lookaheadon\"\n    uid=14027_240 StaticText \"∅\"\n    uid=14027_241 StaticText \"htf6_hole_gapson_lookaheadon\"\n    uid=14027_242 StaticText \"∅\"\n    uid=14027_243 StaticText \"htf6_sma4_warm_gapson_lookaheadon\"\n    uid=14027_244 StaticText \"∅\"\n    uid=14027_245 StaticText \"htf6_rma4_warm_gapson_lookaheadon\"\n    uid=14027_246 StaticText \"∅\"\n    uid=14027_247 StaticText \"htf6_time_gapson_lookaheadon\"\n    uid=14027_248 StaticText \"∅\"\n    uid=14027_249 StaticText \"table_count_before_scratch\"\n    uid=14027_250 StaticText \"1.0000000000\"\n    uid=14027_251 StaticText \"table_count_with_scratch\"\n    uid=14027_252 StaticText \"2.0000000000\"\n    uid=14027_253 StaticText \"table_count_after_clear\"\n    uid=14027_254 StaticText \"2.0000000000\"\n    uid=14027_255 StaticText \"table_count_after_delete\"\n    uid=14027_256 StaticText \"1.0000000000\"\n    uid=14027_257 StaticText \"cell_clean_arg\"\n    uid=14027_258 StaticText \"86,428.0100000000\"\n    uid=14027_259 StaticText \"cell_hole_arg\"\n    uid=14027_260 StaticText \"86,428.0100000000\"\n    uid=14027_261 StaticText \"cell_warm_arg\"\n    uid=14027_262 StaticText \"86,428.0100000000\"\n    uid=14027_263 StaticText \"cell_clean_text_length\"\n    uid=14027_264 StaticText \"12.0000000000\"\n    uid=14027_265 StaticText \"cell_hole_text_length\"\n    uid=14027_266 StaticText \"12.0000000000\"\n    uid=14027_267 StaticText \"cell_warm_text_length\"\n    uid=14027_268 StaticText \"12.0000000000\"\n    uid=14027_269 StaticText \"cell_calls_reached\"\n    uid=14027_270 StaticText \"20,130.0000000000\"\n    uid=14027_271 StaticText \"cell_text_setters_reached\"\n    uid=14027_272 StaticText \"20,130.0000000000\"\n    uid=14027_273 StaticText \"cell_geometry_setters_reached\"\n    uid=14027_274 StaticText \"20,130.0000000000\"\n    uid=14027_275 StaticText \"cell_appearance_setters_reached\"\n    uid=14027_276 StaticText \"20,130.0000000000\"\n    uid=14027_277 StaticText \"merge_initialized\"\n    uid=14027_278 StaticText \"1.0000000000\"\n  uid=14027_279 row \"Request native 6m snapshot on 2m companion v21 v1 CHART_TIME_MS 1,791,154,680,000.0000000000000000 CHART_END_MS 1,791,154,800,000.0000000000000000 CHART_INDEX 20,129.0000000000000000 CHART_LAST_INDEX 20,132.0000000000000000 CHART_FIRST_EXECUTION_MS 1,788,739,200,000.0000000000000000 CHART_OPEN 86,402.0000000000000000 CHART_HIGH 86,428.0099999999983616 CHART_LOW 86,393.4700000000016384 CHART_CLOSE 86,428.0099999999983616 CHART_VOLUME 8.9550000000000000 CHART_REALTIME 0 CHART_CONFIRMED 1.0000000000000000 EXECUTION_NOW_MS 1,791,155,050,419.0000000000000000 CHART_LAST_CONFIRMED_HISTORY 0 GOFF_LON_TIME_MS 1,791,154,440,000.0000000000000000 GOFF_LON_END_MS 1,791,154,800,000.0000000000000000 GOFF_LON_INDEX 6,709.0000000000000000 GOFF_LON_FIRST_EXECUTION_MS 1,788,739,200,000.0000000000000000 GOFF_LON_LAST_INDEX 6,710.0000000000000000\"\n    uid=14027_280 StaticText \"Request native 6m snapshot on 2m companion v21 v1\"\n    uid=14027_281 button \"Hide data\"\n    uid=14027_282 StaticText \"CHART_TIME_MS\"\n    uid=14027_283 StaticText \"1,791,154,680,000.0000000000000000\"\n    uid=14027_284 StaticText \"CHART_END_MS\"\n    uid=14027_285 StaticText \"1,791,154,800,000.0000000000000000\"\n    uid=14027_286 StaticText \"CHART_INDEX\"\n    uid=14027_287 StaticText \"20,129.0000000000000000\"\n    uid=14027_288 StaticText \"CHART_LAST_INDEX\"\n    uid=14027_289 StaticText \"20,132.0000000000000000\"\n    uid=14027_290 StaticText \"CHART_FIRST_EXECUTION_MS\"\n    uid=14027_291 StaticText \"1,788,739,200,000.0000000000000000\"\n    uid=14027_292 StaticText \"CHART_OPEN\"\n    uid=14027_293 StaticText \"86,402.0000000000000000\"\n    uid=14027_294 StaticText \"CHART_HIGH\"\n    uid=14027_295 StaticText \"86,428.0099999999983616\"\n    uid=14027_296 StaticText \"CHART_LOW\"\n    uid=14027_297 StaticText \"86,393.4700000000016384\"\n    uid=14027_298 StaticText \"CHART_CLOSE\"\n    uid=14027_299 StaticText \"86,428.0099999999983616\"\n    uid=14027_300 StaticText \"CHART_VOLUME\"\n    uid=14027_301 StaticText \"8.9550000000000000\"\n    uid=14027_302 StaticText \"CHART_REALTIME\"\n    uid=14027_303 StaticText \"0\"\n    uid=14027_304 StaticText \"CHART_CONFIRMED\"\n    uid=14027_305 StaticText \"1.0000000000000000\"\n    uid=14027_306 StaticText \"EXECUTION_NOW_MS\"\n    uid=14027_307 StaticText \"1,791,155,050,419.0000000000000000\"\n    uid=14027_308 StaticText \"CHART_LAST_CONFIRMED_HISTORY\"\n    uid=14027_309 StaticText \"0\"\n    uid=14027_310 StaticText \"GOFF_LON_TIME_MS\"\n    uid=14027_311 StaticText \"1,791,154,440,000.0000000000000000\"\n    uid=14027_312 StaticText \"GOFF_LON_END_MS\"\n    uid=14027_313 StaticText \"1,791,154,800,000.0000000000000000\"\n    uid=14027_314 StaticText \"GOFF_LON_INDEX\"\n    uid=14027_315 StaticText \"6,709.0000000000000000\"\n    uid=14027_316 StaticText \"GOFF_LON_FIRST_EXECUTION_MS\"\n    uid=14027_317 StaticText \"1,788,739,200,000.0000000000000000\"\n    uid=14027_318 StaticText \"GOFF_LON_LAST_INDEX\"\n    uid=14027_319 StaticText \"6,710.0000000000000000\"\n    uid=14027_320 StaticText \"GOFF_LON_OPEN\"\n    uid=14027_321 StaticText \"86,442.0000000000000000\"\n    uid=14027_322 StaticText \"GOFF_LON_HIGH\"\n    uid=14027_323 StaticText \"86,451.0700000000016384\"\n    uid=14027_324 StaticText \"GOFF_LON_LOW\"\n    uid=14027_325 StaticText \"86,393.4700000000016384\"\n    uid=14027_326 StaticText \"GOFF_LON_CLOSE\"\n    uid=14027_327 StaticText \"86,428.0099999999983616\"\n    uid=14027_328 StaticText \"GOFF_LON_VOLUME\"\n    uid=14027_329 StaticText \"32.2678800000000000\"\n    uid=14027_330 StaticText \"GOFF_LON_PREVIOUS_CLOSE\"\n    uid=14027_331 StaticText \"86,442.0099999999983616\"\n    uid=14027_332 StaticText \"GOFF_LON_HISTORY2_CLOSE\"\n    uid=14027_333 StaticText \"86,358.0099999999983616\"\n    uid=14027_334 StaticText \"GOFF_LON_DAYOFWEEK\"\n    uid=14027_335 StaticText \"1.0000000000000000\"\n    uid=14027_336 StaticText \"GOFF_LON_DAILY_OPEN_MS\"\n    uid=14027_337 StaticText \"1,791,072,000,000.0000000000000000\"\n    uid=14027_338 StaticText \"GOFF_LON_SUM3_CLOSE\"\n    uid=14027_339 StaticText \"259,228.0300000004800512\"\n    uid=14027_340 StaticText \"GOFF_LON_SUM3_HOLE97_THREE\"\n    uid=14027_341 StaticText \"259,228.0300000006373376\"\n    uid=14027_342 StaticText \"GOFF_LON_HOLE_INDEX97_TWO\"\n    uid=14027_343 StaticText \"86,428.0099999999983616\"\n    uid=14027_344 StaticText \"GOFF_LON_HOLE_INDEX97_THREE\"\n    uid=14027_345 StaticText \"86,428.0099999999983616\"\n    uid=14027_346 StaticText \"GOFF_LON_HOLE_UTC11\"\n    uid=14027_347 StaticText \"86,428.0099999999983616\"\n    uid=14027_348 StaticText \"GOFF_LON_SMA4\"\n    uid=14027_349 StaticText \"86,414.0099999998672896\"\n    uid=14027_350 StaticText \"GOFF_LON_RMA4\"\n    uid=14027_351 StaticText \"86,378.5912515844243456\"\n    uid=14027_352 StaticText \"GON_LON_TIME_MS\"\n    uid=14027_353 StaticText \"∅\"\n    uid=14027_354 StaticText \"GON_LON_END_MS\"\n    uid=14027_355 StaticText \"∅\"\n    uid=14027_356 StaticText \"GON_LON_INDEX\"\n    uid=14027_357 StaticText \"∅\"\n    uid=14027_358 StaticText \"GON_LON_OPEN\"\n    uid=14027_359 StaticText \"∅\"\n    uid=14027_360 StaticText \"GON_LON_HIGH\"\n    uid=14027_361 StaticText \"∅\"\n    uid=14027_362 StaticText \"GON_LON_LOW\"\n    uid=14027_363 StaticText \"∅\"\n    uid=14027_364 StaticText \"GON_LON_CLOSE\"\n    uid=14027_365 StaticText \"∅\"\n    uid=14027_366 StaticText \"GON_LON_VOLUME\"\n    uid=14027_367 StaticText \"∅\"\n    uid=14027_368 StaticText \"GON_LON_HOLE_INDEX97_TWO\"\n    uid=14027_369 StaticText \"∅\"\n    uid=14027_370 StaticText \"GON_LON_HOLE_INDEX97_THREE\"\n    uid=14027_371 StaticText \"∅\"\n    uid=14027_372 StaticText \"GOFF_LOFF_TIME_MS\"\n    uid=14027_373 StaticText \"1,791,154,440,000.0000000000000000\"\n    uid=14027_374 StaticText \"GOFF_LOFF_CLOSE\"\n    uid=14027_375 StaticText \"86,428.0099999999983616\"\n    uid=14027_376 StaticText \"GOFF_LOFF_HOLE_INDEX97_TWO\"\n    uid=14027_377 StaticText \"86,428.0099999999983616\"\n    uid=14027_378 StaticText \"GOFF_LOFF_HOLE_INDEX97_THREE\"\n    uid=14027_379 StaticText \"86,428.0099999999983616\"\n    uid=14027_380 StaticText \"GON_LOFF_TIME_MS\"\n    uid=14027_381 StaticText \"1,791,154,440,000.0000000000000000\"\n    uid=14027_382 StaticText \"GON_LOFF_CLOSE\"\n    uid=14027_383 StaticText \"86,428.0099999999983616\"\n    uid=14027_384 StaticText \"GON_LOFF_HOLE_INDEX97_TWO\"\n    uid=14027_385 StaticText \"86,428.0099999999983616\"\n    uid=14027_386 StaticText \"GON_LOFF_HOLE_INDEX97_THREE\"\n    uid=14027_387 StaticText \"86,428.0099999999983616\"\n    uid=14027_388 StaticText \"REQUEST_TIMEFRAME_MINUTES\"\n    uid=14027_389 StaticText \"6.0000000000000000\"\n    uid=14027_390 StaticText \"REQUEST_BUCKET_COMPLETED_AT_EXECUTION\"\n    uid=14027_391 StaticText \"1.0000000000000000\"\n    uid=14027_392 StaticText \"REQUEST_CLOSE_NA\"\n    uid=14027_393 StaticText \"0\"\n  uid=14027_394 generic \"Trading panel\"\n    uid=14027_395 generic\n  uid=14027_396 generic live=\"polite\" relevant=\"additions\"\n  uid=14027_397 generic live=\"polite\" relevant=\"additions\"\n  uid=14027_398 generic live=\"assertive\" relevant=\"additions\"\n  uid=14027_399 generic live=\"assertive\" relevant=\"additions\"\n  uid=14031_0 StaticText \"Help Center\"\n  uid=14027_400 generic live=\"polite\" relevant=\"additions text\"\n  uid=14027_401 log live=\"polite\" relevant=\"additions text\"\n  uid=14027_402 log live=\"polite\" relevant=\"additions text\"\n  uid=14027_403 log live=\"polite\" relevant=\"additions text\"\n  uid=14027_404 log live=\"polite\" relevant=\"additions text\"\n  uid=14027_405 log live=\"polite\" relevant=\"additions text\"\n  uid=14027_406 log live=\"polite\" relevant=\"additions text\"\n  uid=14027_407 log live=\"polite\" relevant=\"additions text\"\n  uid=14027_408 log live=\"polite\" relevant=\"additions text\"\n  uid=14027_409 log live=\"polite\" relevant=\"additions text\"\n  uid=14027_410 log live=\"polite\" relevant=\"additions text\"\n  uid=14027_411 log live=\"polite\" relevant=\"additions text\"\n  uid=14027_412 log live=\"polite\" relevant=\"additions text\"\n  uid=14027_413 log live=\"polite\" relevant=\"additions text\"\n  uid=14027_414 log live=\"polite\" relevant=\"additions text\"\n  uid=14027_415 log live=\"polite\" relevant=\"additions text\"\n  uid=14027_416 log live=\"polite\" relevant=\"additions text\"\n  uid=14027_417 log live=\"polite\" relevant=\"additions text\"\n  uid=14027_418 log live=\"polite\" relevant=\"additions text\"\n  uid=14027_419 log live=\"polite\" relevant=\"additions text\"\n  uid=14027_420 log live=\"polite\" relevant=\"additions text\"\n  uid=14027_421 log live=\"polite\" relevant=\"additions text\"\n"
+}
