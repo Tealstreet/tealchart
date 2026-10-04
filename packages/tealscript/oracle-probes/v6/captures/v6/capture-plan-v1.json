@@ -1,0 +1,442 @@
+{
+  "artifact": "Native capture execution plan v1",
+  "source_master": "74f113d7a4",
+  "manifest": "bundle-manifest-v4.json",
+  "manifest_sha256": "45d1f73da82f2b0e571ed79a106ae882c8b7061250bb169bffe0c3200db06420",
+  "batch_start_utc": "2026-10-04T04:51:24.862850+00:00",
+  "scripts": [
+    {
+      "script": "mfi-private-zero-boundary-v1.pine",
+      "sha256": "8a3b2eef2595ac0d920ee374df9420fc03e41259ccf515304fb9b8f583322dc4",
+      "title": "MFI private zero boundary v1",
+      "columns": [
+        "input_time_ms",
+        "input_bar_index",
+        "input_close",
+        "input_volume",
+        "pow2_minus0_builtin",
+        "pow2_minus0_pine_reference",
+        "pow2_minus0_unscaled_sign_reference",
+        "pow2_minus0_guard_candidate",
+        "pow2_minus0_upper_restored",
+        "pow2_minus0_lower_restored",
+        "pow2_minus0_pine_up_flow_restored",
+        "pow2_minus0_pine_down_flow_restored",
+        "pow2_minus20_builtin",
+        "pow2_minus20_pine_reference",
+        "pow2_minus20_unscaled_sign_reference",
+        "pow2_minus20_guard_candidate",
+        "pow2_minus20_upper_restored",
+        "pow2_minus20_lower_restored",
+        "pow2_minus20_pine_up_flow_restored",
+        "pow2_minus20_pine_down_flow_restored",
+        "pow2_minus30_builtin",
+        "pow2_minus30_pine_reference",
+        "pow2_minus30_unscaled_sign_reference",
+        "pow2_minus30_guard_candidate",
+        "pow2_minus30_upper_restored",
+        "pow2_minus30_lower_restored",
+        "pow2_minus30_pine_up_flow_restored",
+        "pow2_minus30_pine_down_flow_restored",
+        "pow2_minus40_builtin",
+        "pow2_minus40_pine_reference",
+        "pow2_minus40_unscaled_sign_reference",
+        "pow2_minus40_guard_candidate",
+        "pow2_minus40_upper_restored",
+        "pow2_minus40_lower_restored",
+        "pow2_minus40_pine_up_flow_restored",
+        "pow2_minus40_pine_down_flow_restored",
+        "pow2_minus45_builtin",
+        "pow2_minus45_pine_reference",
+        "pow2_minus45_unscaled_sign_reference",
+        "pow2_minus45_guard_candidate",
+        "pow2_minus45_upper_restored",
+        "pow2_minus45_lower_restored",
+        "pow2_minus45_pine_up_flow_restored",
+        "pow2_minus45_pine_down_flow_restored",
+        "pow2_minus50_builtin",
+        "pow2_minus50_pine_reference",
+        "pow2_minus50_unscaled_sign_reference",
+        "pow2_minus50_guard_candidate",
+        "pow2_minus50_upper_restored",
+        "pow2_minus50_lower_restored",
+        "pow2_minus50_pine_up_flow_restored",
+        "pow2_minus50_pine_down_flow_restored",
+        "pow2_minus60_builtin",
+        "pow2_minus60_pine_reference",
+        "pow2_minus60_unscaled_sign_reference",
+        "pow2_minus60_guard_candidate",
+        "pow2_minus60_upper_restored",
+        "pow2_minus60_lower_restored",
+        "pow2_minus60_pine_up_flow_restored",
+        "pow2_minus60_pine_down_flow_restored"
+      ],
+      "minimumHistoryBars": 600,
+      "requiredFirstBarIndex": 0,
+      "indexColumn": "input_bar_index",
+      "supersededBy": null,
+      "captureKind": "numeric",
+      "record": [
+        "Export all60 columns at seven scales with raw signed values and empty cells.",
+        "Use the longest available history from script bar_index0; retain the same initial history as prior MFI captures when possible.",
+        "Inspect scaled-sign and unscaled-sign flow controls before attributing a result to a threshold."
+      ]
+    },
+    {
+      "script": "corpus-color-array-warmup-na-index-v5-v1.pine",
+      "sha256": "941479a5b41f7fc53db81226abc1e45245e8760ec409a0301a03f9aaa3751d6a",
+      "title": "Color array warmup na index v1",
+      "columns": [
+        "OUTCOME"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [
+        "Exact compiler diagnostic if refused",
+        "Runtime error/code/bar if admitted then fails",
+        "CSV including OUTCOME if accepted and executes",
+        "Keep both sources independent; a refusal must not suppress the finite control."
+      ]
+    },
+    {
+      "script": "corpus-color-array-finite-index-control-v5-v1.pine",
+      "sha256": "8ffc2d3db73ea904247b79deaffee14af5624bd19d434bcd0b6627d75e6ab35c",
+      "title": "Color array finite index control v1",
+      "columns": [
+        "OUTCOME"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [
+        "Exact compiler diagnostic if refused",
+        "Runtime error/code/bar if admitted then fails",
+        "CSV including OUTCOME if accepted and executes",
+        "Keep both sources independent; a refusal must not suppress the finite control."
+      ]
+    },
+    {
+      "script": "reserved-variable-range-v5-v6-round-v1.pine",
+      "sha256": "daec96e12ae61d5c20747837daa30f3df4a3debdc04e01216d2a869dbdb90029",
+      "title": "Reserved variable range v5",
+      "columns": [
+        "VALUE"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [
+        "Paste each unchanged source separately in TradingView. Record exact compile diagnostic/code/location or successful compile and VALUE output. Any chart/timeframe is sufficient for compiler acceptance. If admitted, export at least 3 confirmed bars with close and VALUE. Do not rename the identifier or edit the version."
+      ]
+    },
+    {
+      "script": "reserved-variable-text-v5-v6-round-v1.pine",
+      "sha256": "f9c91862b80a0ba1dd7bffefafd9a0d3b539ae7aab30f0d6854eac8d190d0ced",
+      "title": "Reserved variable text v5",
+      "columns": [
+        "VALUE"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [
+        "Paste each unchanged source separately in TradingView. Record exact compile diagnostic/code/location or successful compile and VALUE output. Any chart/timeframe is sufficient for compiler acceptance. If admitted, export at least 3 confirmed bars with close and VALUE. Do not rename the identifier or edit the version."
+      ]
+    },
+    {
+      "script": "reserved-variable-range-v6-v6-round-v1.pine",
+      "sha256": "1f3e9d5451d0c31b24f352bff58e168cc497c9f4fbf6e5a9206635615bac08be",
+      "title": "Reserved variable range v6",
+      "columns": [
+        "VALUE"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [
+        "Paste each unchanged source separately in TradingView. Record exact compile diagnostic/code/location or successful compile and VALUE output. Any chart/timeframe is sufficient for compiler acceptance. If admitted, export at least 3 confirmed bars with close and VALUE. Do not rename the identifier or edit the version."
+      ]
+    },
+    {
+      "script": "reserved-variable-text-v6-v6-round-v1.pine",
+      "sha256": "b540e38eaface58dc7c47cf807e0cc2f0df695d12d79c2e794ae033f2bb148ab",
+      "title": "Reserved variable text v6",
+      "columns": [
+        "VALUE"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [
+        "Paste each unchanged source separately in TradingView. Record exact compile diagnostic/code/location or successful compile and VALUE output. Any chart/timeframe is sufficient for compiler acceptance. If admitted, export at least 3 confirmed bars with close and VALUE. Do not rename the identifier or edit the version."
+      ]
+    },
+    {
+      "script": "mutable-ema-first-one-v5-v1.pine",
+      "sha256": "27209eafee7707329b362132295164ebe07a0cfc572983071725c941eff22596",
+      "title": "Mutable EMA first length one native",
+      "columns": [
+        "MUTABLE_ONE",
+        "FIXED_ONE",
+        "LIVE_LENGTH"
+      ],
+      "minimumHistoryBars": 128,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [
+        "Paste unchanged sources separately. Record exact compile/runtime diagnostics and phase/location, or export all plots plus native OHLC/time. Keep native lengths and startup rows; do not inject seeded values or treat engine-generated fixed controls as native truth. Length-one prior first-source seeding did not establish constructor freezing. Length-two and two written UDF calls distinguish freeze from fresh per-argument construction. Input-three is the separately valid fixed-length control."
+      ]
+    },
+    {
+      "script": "mutable-ema-first-two-v5-v1.pine",
+      "sha256": "2b6a798408522b6c15d993786017bf90f8572ae1e9c77c76b0e4151809f5dddc",
+      "title": "Mutable EMA first length two native",
+      "columns": [
+        "MUTABLE_TWO",
+        "FIXED_TWO",
+        "LIVE_LENGTH"
+      ],
+      "minimumHistoryBars": 128,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [
+        "Paste unchanged sources separately. Record exact compile/runtime diagnostics and phase/location, or export all plots plus native OHLC/time. Keep native lengths and startup rows; do not inject seeded values or treat engine-generated fixed controls as native truth. Length-one prior first-source seeding did not establish constructor freezing. Length-two and two written UDF calls distinguish freeze from fresh per-argument construction. Input-three is the separately valid fixed-length control."
+      ]
+    },
+    {
+      "script": "mutable-ema-udf-two-calls-v5-v1.pine",
+      "sha256": "0d9151129271433f9e29bc1e02762a4f6948fe0f9d20423e207b5248992615fc",
+      "title": "Mutable EMA separate UDF calls native",
+      "columns": [
+        "MUTABLE_UDF_TWO",
+        "FIXED_UDF_FOUR",
+        "FIXED_TWO",
+        "FIXED_FOUR"
+      ],
+      "minimumHistoryBars": 128,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [
+        "Paste unchanged sources separately. Record exact compile/runtime diagnostics and phase/location, or export all plots plus native OHLC/time. Keep native lengths and startup rows; do not inject seeded values or treat engine-generated fixed controls as native truth. Length-one prior first-source seeding did not establish constructor freezing. Length-two and two written UDF calls distinguish freeze from fresh per-argument construction. Input-three is the separately valid fixed-length control."
+      ]
+    },
+    {
+      "script": "fixed-ema-input-three-v5-control-v1.pine",
+      "sha256": "9034640287d9543e1d3ad5833a9646666eac2f69e6878a218ed2ff8ff56bdfa6",
+      "title": "Fixed EMA input native control",
+      "columns": [
+        "FIXED_INPUT_THREE",
+        "FIXED_LITERAL_THREE"
+      ],
+      "minimumHistoryBars": 128,
+      "requiredFirstBarIndex": null,
+      "indexColumn": null,
+      "supersededBy": null,
+      "captureKind": "outcome",
+      "record": [
+        "Paste unchanged sources separately. Record exact compile/runtime diagnostics and phase/location, or export all plots plus native OHLC/time. Keep native lengths and startup rows; do not inject seeded values or treat engine-generated fixed controls as native truth. Length-one prior first-source seeding did not establish constructor freezing. Length-two and two written UDF calls distinguish freeze from fresh per-argument construction. Input-three is the separately valid fixed-length control."
+      ]
+    },
+    {
+      "script": "supertrend-factor-alone-first3-v2.pine",
+      "sha256": "6c68c0b2c5d5aed235f7102b1fffe0525cea2da6410f270e4cc331fcbd63e3ca",
+      "title": "Supertrend factor alone-first3 v2",
+      "columns": [
+        "input_time_ms",
+        "input_bar_index",
+        "input_open",
+        "input_high",
+        "input_low",
+        "input_close",
+        "input_volume",
+        "input_factor",
+        "dynamic_line",
+        "dynamic_direction"
+      ],
+      "minimumHistoryBars": 256,
+      "requiredFirstBarIndex": 0,
+      "indexColumn": "input_bar_index",
+      "supersededBy": null,
+      "captureKind": "numeric",
+      "record": [
+        "Same symbol, timeframe, chart history and export for all three scripts",
+        "Historical dataset starts at plotted bar_index0; export at least256 historical rows",
+        "Reload each script before capture; preserve exact source and CSV SHA256",
+        "Plot factor and OHLCV inputs alongside line/direction; do not infer factor retention from paired call alone"
+      ]
+    },
+    {
+      "script": "supertrend-factor-alone-v2.pine",
+      "sha256": "9744da2fd144dbaab123dec19935a38b703014c28e9f4100f0a90c6dbf53311c",
+      "title": "Supertrend factor alone v2",
+      "columns": [
+        "input_time_ms",
+        "input_bar_index",
+        "input_open",
+        "input_high",
+        "input_low",
+        "input_close",
+        "input_volume",
+        "input_factor",
+        "dynamic_line",
+        "dynamic_direction"
+      ],
+      "minimumHistoryBars": 256,
+      "requiredFirstBarIndex": 0,
+      "indexColumn": "input_bar_index",
+      "supersededBy": null,
+      "captureKind": "numeric",
+      "record": [
+        "Same symbol, timeframe, chart history and export for all three scripts",
+        "Historical dataset starts at plotted bar_index0; export at least256 historical rows",
+        "Reload each script before capture; preserve exact source and CSV SHA256",
+        "Plot factor and OHLCV inputs alongside line/direction; do not infer factor retention from paired call alone"
+      ]
+    },
+    {
+      "script": "supertrend-factor-paired-fixed2-v2.pine",
+      "sha256": "73556b702f0b324d1d9ffee4387d1564a66ed61b1482b18a1983aa67406c9bab",
+      "title": "Supertrend factor paired-fixed2 v2",
+      "columns": [
+        "input_time_ms",
+        "input_bar_index",
+        "input_open",
+        "input_high",
+        "input_low",
+        "input_close",
+        "input_volume",
+        "input_factor",
+        "dynamic_line",
+        "dynamic_direction",
+        "fixed2_line",
+        "fixed2_direction"
+      ],
+      "minimumHistoryBars": 256,
+      "requiredFirstBarIndex": 0,
+      "indexColumn": "input_bar_index",
+      "supersededBy": null,
+      "captureKind": "numeric",
+      "record": [
+        "Same symbol, timeframe, chart history and export for all three scripts",
+        "Historical dataset starts at plotted bar_index0; export at least256 historical rows",
+        "Reload each script before capture; preserve exact source and CSV SHA256",
+        "Plot factor and OHLCV inputs alongside line/direction; do not infer factor retention from paired call alone"
+      ]
+    },
+    {
+      "script": "linear-hole-order-ascending-len4-v1.pine",
+      "sha256": "65dccfe743c0613071fc21f5ff4a6188d992942304aa16ca38e800d6ad59c4af",
+      "title": "Linear hole order ascending length4 v1",
+      "columns": [
+        "input_time_ms",
+        "input_bar_index",
+        "input_phase",
+        "input_clean",
+        "input_source",
+        "input_missing",
+        "linear_hole_p75"
+      ],
+      "minimumHistoryBars": 256,
+      "requiredFirstBarIndex": 0,
+      "indexColumn": "input_bar_index",
+      "supersededBy": null,
+      "captureKind": "numeric",
+      "record": [
+        "Standard chart BINANCE:BTCUSDT 2 minutes UTC",
+        "Reload every standalone script before capture; export all7plots from input_bar_index0 with at least256 confirmed historical rows",
+        "Keep blank NA cells, original CSV headers, timestamps, source/CSV hashes and setup evidence; exclude final live bar from historical comparisons"
+      ]
+    },
+    {
+      "script": "linear-hole-order-descending-len4-v1.pine",
+      "sha256": "488176ac17bd8a566d22fa7c5ac86b8846ae0d627dc3737c7faa7dd063d14829",
+      "title": "Linear hole order descending length4 v1",
+      "columns": [
+        "input_time_ms",
+        "input_bar_index",
+        "input_phase",
+        "input_clean",
+        "input_source",
+        "input_missing",
+        "linear_hole_p75"
+      ],
+      "minimumHistoryBars": 256,
+      "requiredFirstBarIndex": 0,
+      "indexColumn": "input_bar_index",
+      "supersededBy": null,
+      "captureKind": "numeric",
+      "record": [
+        "Standard chart BINANCE:BTCUSDT 2 minutes UTC",
+        "Reload every standalone script before capture; export all7plots from input_bar_index0 with at least256 confirmed historical rows",
+        "Keep blank NA cells, original CSV headers, timestamps, source/CSV hashes and setup evidence; exclude final live bar from historical comparisons"
+      ]
+    },
+    {
+      "script": "linear-hole-order-ascending-len14-v1.pine",
+      "sha256": "2e8a66aab073ca55b2d80037dd838cfb20de34377d6d0bfc0e03ee8a7ab0fc54",
+      "title": "Linear hole order ascending length14 v1",
+      "columns": [
+        "input_time_ms",
+        "input_bar_index",
+        "input_phase",
+        "input_clean",
+        "input_source",
+        "input_missing",
+        "linear_hole_p75"
+      ],
+      "minimumHistoryBars": 256,
+      "requiredFirstBarIndex": 0,
+      "indexColumn": "input_bar_index",
+      "supersededBy": null,
+      "captureKind": "numeric",
+      "record": [
+        "Standard chart BINANCE:BTCUSDT 2 minutes UTC",
+        "Reload every standalone script before capture; export all7plots from input_bar_index0 with at least256 confirmed historical rows",
+        "Keep blank NA cells, original CSV headers, timestamps, source/CSV hashes and setup evidence; exclude final live bar from historical comparisons"
+      ]
+    },
+    {
+      "script": "linear-hole-order-descending-len14-v1.pine",
+      "sha256": "c64cc95797229e7cbf395f9869e2b834ee2173e2ed35d000963cad3d8ae4a493",
+      "title": "Linear hole order descending length14 v1",
+      "columns": [
+        "input_time_ms",
+        "input_bar_index",
+        "input_phase",
+        "input_clean",
+        "input_source",
+        "input_missing",
+        "linear_hole_p75"
+      ],
+      "minimumHistoryBars": 256,
+      "requiredFirstBarIndex": 0,
+      "indexColumn": "input_bar_index",
+      "supersededBy": null,
+      "captureKind": "numeric",
+      "record": [
+        "Standard chart BINANCE:BTCUSDT 2 minutes UTC",
+        "Reload every standalone script before capture; export all7plots from input_bar_index0 with at least256 confirmed historical rows",
+        "Keep blank NA cells, original CSV headers, timestamps, source/CSV hashes and setup evidence; exclude final live bar from historical comparisons"
+      ]
+    }
+  ]
+}

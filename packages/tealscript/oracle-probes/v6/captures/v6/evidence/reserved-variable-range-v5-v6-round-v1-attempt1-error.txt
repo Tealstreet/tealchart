@@ -1,0 +1,54 @@
+'range' cannot be used as a variable or function name.
+{
+  "error": "'range' cannot be used as a variable or function name.",
+  "editorError": {
+    "end": {
+      "column": 11,
+      "line": 3
+    },
+    "message": "'range' cannot be used as a variable or function name.",
+    "start": {
+      "column": 7,
+      "line": 3
+    },
+    "id": "USER;1783760145fc4922871eaf124027e0ce"
+  },
+  "title": "Compilation error",
+  "compiler_markers": [
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///fc0632e9-8104-4086-ae1e-7aa4710322cc.pine?placement%3Ddialog",
+        "path": "/fc0632e9-8104-4086-ae1e-7aa4710322cc.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "code": "PINE_VERSION_OUTDATED",
+      "severity": 4,
+      "message": "Version 5 of Pine Script® is outdated. We recommend using the current version, which is 6.",
+      "startLineNumber": 1,
+      "startColumn": 3,
+      "endLineNumber": 1,
+      "endColumn": 12
+    },
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///fc0632e9-8104-4086-ae1e-7aa4710322cc.pine?placement%3Ddialog",
+        "path": "/fc0632e9-8104-4086-ae1e-7aa4710322cc.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "severity": 8,
+      "message": "'range' cannot be used as a variable or function name.",
+      "startLineNumber": 3,
+      "startColumn": 7,
+      "endLineNumber": 3,
+      "endColumn": 12
+    }
+  ],
+  "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,812.00\nH\n84,812.01\nL\n84,812.00\nC\n84,812.01\n0.00 (0.00%)\n84,812.00\nSELL\n0.01\n84,812.01\nBUY\nUSDT\nreserved-variable-range-v5-v6-round-v1.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n04:53:15 UTC\n99+\nPine Editor\nreserved-variable-range-v5-v6-round-v1.pine\nPublish script\n1\n2\n3\n4\n5\n//@version=5\nindicator(\"Reserved variable range v5\")\nfloat range = close\nplot(range, \"VALUE\")\n1 of 2 problems\n'range' cannot be used as a variable or function name.\n1 ∙ Today, 12:53\nLine 3, Col 7\nPine Script® v5\nCompilation error\n\n'range' cannot be used as a variable or function name.\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+  "context_substituted_message": "'range' cannot be used as a variable or function name."
+}
