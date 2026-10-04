@@ -1,0 +1,1 @@
+[2026-10-04T22:56:00.000Z]: CONTEXT ticker=BINANCE:BTCUSDT tf=2 timezone=Etc/UTC session=regular currency=USDT mintick=0.01 origin=1788739200000 now=1791154776645

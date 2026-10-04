@@ -1,0 +1,501 @@
+{
+  "artifact": "Independent feed and requested OHLCV audit v1",
+  "receipt_files": [
+    "native-BINANCE_BTCUSDT-1-raw-v1-attempt2-receipt-v1.json",
+    "native-BINANCE_BTCUSDT-10-raw-v1-attempt1-receipt-v1.json",
+    "native-BINANCE_BTCUSDT-2-raw-v1-attempt1-receipt-v1.json",
+    "native-BINANCE_BTCUSDT-6-raw-v1-attempt1-receipt-v1.json"
+  ],
+  "checks": [
+    {
+      "script": "request-snapshot-6m-v21-v1.pine",
+      "attempt": 1,
+      "paired_phase": "completed-initial",
+      "closed_requested_rows_compared": 20127,
+      "missing_direct_feed_rows": 0,
+      "different_cells": 3,
+      "first_differences": [
+        {
+          "host_time": "1791154080",
+          "requested_time": 1791154080,
+          "field": "VOLUME",
+          "companion": "54.741200000000006",
+          "native": 54.7412
+        },
+        {
+          "host_time": "1791154200",
+          "requested_time": 1791154080,
+          "field": "VOLUME",
+          "companion": "54.741200000000006",
+          "native": 54.7412
+        },
+        {
+          "host_time": "1791154320",
+          "requested_time": 1791154080,
+          "field": "VOLUME",
+          "companion": "54.741200000000006",
+          "native": 54.7412
+        }
+      ],
+      "scope": "All OHLCV fields at literal requested time, only requested end<=observed export cutoff. Developing historical snapshot OHLCV is not reconstructed from later feed."
+    },
+    {
+      "script": "request-snapshot-6m-v21-v1.pine",
+      "attempt": 2,
+      "paired_phase": "developing",
+      "closed_requested_rows_compared": 20127,
+      "missing_direct_feed_rows": 0,
+      "different_cells": 3,
+      "first_differences": [
+        {
+          "host_time": "1791154080",
+          "requested_time": 1791154080,
+          "field": "VOLUME",
+          "companion": "54.741200000000006",
+          "native": 54.7412
+        },
+        {
+          "host_time": "1791154200",
+          "requested_time": 1791154080,
+          "field": "VOLUME",
+          "companion": "54.741200000000006",
+          "native": 54.7412
+        },
+        {
+          "host_time": "1791154320",
+          "requested_time": 1791154080,
+          "field": "VOLUME",
+          "companion": "54.741200000000006",
+          "native": 54.7412
+        }
+      ],
+      "scope": "All OHLCV fields at literal requested time, only requested end<=observed export cutoff. Developing historical snapshot OHLCV is not reconstructed from later feed."
+    },
+    {
+      "script": "request-snapshot-6m-v21-v1.pine",
+      "attempt": 3,
+      "paired_phase": "developing",
+      "closed_requested_rows_compared": 20127,
+      "missing_direct_feed_rows": 0,
+      "different_cells": 3,
+      "first_differences": [
+        {
+          "host_time": "1791154080",
+          "requested_time": 1791154080,
+          "field": "VOLUME",
+          "companion": "54.741200000000006",
+          "native": 54.7412
+        },
+        {
+          "host_time": "1791154200",
+          "requested_time": 1791154080,
+          "field": "VOLUME",
+          "companion": "54.741200000000006",
+          "native": 54.7412
+        },
+        {
+          "host_time": "1791154320",
+          "requested_time": 1791154080,
+          "field": "VOLUME",
+          "companion": "54.741200000000006",
+          "native": 54.7412
+        }
+      ],
+      "scope": "All OHLCV fields at literal requested time, only requested end<=observed export cutoff. Developing historical snapshot OHLCV is not reconstructed from later feed."
+    },
+    {
+      "script": "request-snapshot-6m-v21-v1.pine",
+      "attempt": 4,
+      "paired_phase": "developing",
+      "closed_requested_rows_compared": 20127,
+      "missing_direct_feed_rows": 0,
+      "different_cells": 6,
+      "first_differences": [
+        {
+          "host_time": "1790938080",
+          "requested_time": 1790938080,
+          "field": "VOLUME",
+          "companion": "33.57039",
+          "native": 33.56835
+        },
+        {
+          "host_time": "1790938200",
+          "requested_time": 1790938080,
+          "field": "VOLUME",
+          "companion": "33.57039",
+          "native": 33.56835
+        },
+        {
+          "host_time": "1790938320",
+          "requested_time": 1790938080,
+          "field": "VOLUME",
+          "companion": "33.57039",
+          "native": 33.56835
+        },
+        {
+          "host_time": "1791154080",
+          "requested_time": 1791154080,
+          "field": "VOLUME",
+          "companion": "54.741200000000006",
+          "native": 54.7412
+        },
+        {
+          "host_time": "1791154200",
+          "requested_time": 1791154080,
+          "field": "VOLUME",
+          "companion": "54.741200000000006",
+          "native": 54.7412
+        },
+        {
+          "host_time": "1791154320",
+          "requested_time": 1791154080,
+          "field": "VOLUME",
+          "companion": "54.741200000000006",
+          "native": 54.7412
+        }
+      ],
+      "scope": "All OHLCV fields at literal requested time, only requested end<=observed export cutoff. Developing historical snapshot OHLCV is not reconstructed from later feed."
+    },
+    {
+      "script": "request-snapshot-10m-v21-v1.pine",
+      "attempt": 1,
+      "paired_phase": "developing",
+      "closed_requested_rows_compared": 20125,
+      "missing_direct_feed_rows": 0,
+      "different_cells": 10,
+      "first_differences": [
+        {
+          "host_time": "1790937600",
+          "requested_time": 1790937600,
+          "field": "VOLUME",
+          "companion": "83.75325",
+          "native": 83.75121
+        },
+        {
+          "host_time": "1790937720",
+          "requested_time": 1790937600,
+          "field": "VOLUME",
+          "companion": "83.75325",
+          "native": 83.75121
+        },
+        {
+          "host_time": "1790937840",
+          "requested_time": 1790937600,
+          "field": "VOLUME",
+          "companion": "83.75325",
+          "native": 83.75121
+        },
+        {
+          "host_time": "1790937960",
+          "requested_time": 1790937600,
+          "field": "VOLUME",
+          "companion": "83.75325",
+          "native": 83.75121
+        },
+        {
+          "host_time": "1790938080",
+          "requested_time": 1790937600,
+          "field": "VOLUME",
+          "companion": "83.75325",
+          "native": 83.75121
+        },
+        {
+          "host_time": "1791153600",
+          "requested_time": 1791153600,
+          "field": "VOLUME",
+          "companion": "85.94355999999999",
+          "native": 85.94356
+        },
+        {
+          "host_time": "1791153720",
+          "requested_time": 1791153600,
+          "field": "VOLUME",
+          "companion": "85.94355999999999",
+          "native": 85.94356
+        },
+        {
+          "host_time": "1791153840",
+          "requested_time": 1791153600,
+          "field": "VOLUME",
+          "companion": "85.94355999999999",
+          "native": 85.94356
+        },
+        {
+          "host_time": "1791153960",
+          "requested_time": 1791153600,
+          "field": "VOLUME",
+          "companion": "85.94355999999999",
+          "native": 85.94356
+        },
+        {
+          "host_time": "1791154080",
+          "requested_time": 1791153600,
+          "field": "VOLUME",
+          "companion": "85.94355999999999",
+          "native": 85.94356
+        }
+      ],
+      "scope": "All OHLCV fields at literal requested time, only requested end<=observed export cutoff. Developing historical snapshot OHLCV is not reconstructed from later feed."
+    },
+    {
+      "script": "request-snapshot-6m-v21-v1.pine",
+      "attempt": 5,
+      "paired_phase": "developing-retry",
+      "closed_requested_rows_compared": 20130,
+      "missing_direct_feed_rows": 0,
+      "different_cells": 3,
+      "first_differences": [
+        {
+          "host_time": "1790938080",
+          "requested_time": 1790938080,
+          "field": "VOLUME",
+          "companion": "33.57039",
+          "native": 33.56835
+        },
+        {
+          "host_time": "1790938200",
+          "requested_time": 1790938080,
+          "field": "VOLUME",
+          "companion": "33.57039",
+          "native": 33.56835
+        },
+        {
+          "host_time": "1790938320",
+          "requested_time": 1790938080,
+          "field": "VOLUME",
+          "companion": "33.57039",
+          "native": 33.56835
+        }
+      ],
+      "scope": "All OHLCV fields at literal requested time, only requested end<=observed export cutoff. Developing historical snapshot OHLCV is not reconstructed from later feed."
+    },
+    {
+      "script": "request-snapshot-10m-v21-v1.pine",
+      "attempt": 2,
+      "paired_phase": "developing-retry",
+      "closed_requested_rows_compared": 20130,
+      "missing_direct_feed_rows": 0,
+      "different_cells": 10,
+      "first_differences": [
+        {
+          "host_time": "1790937600",
+          "requested_time": 1790937600,
+          "field": "VOLUME",
+          "companion": "83.75325",
+          "native": 83.75121
+        },
+        {
+          "host_time": "1790937720",
+          "requested_time": 1790937600,
+          "field": "VOLUME",
+          "companion": "83.75325",
+          "native": 83.75121
+        },
+        {
+          "host_time": "1790937840",
+          "requested_time": 1790937600,
+          "field": "VOLUME",
+          "companion": "83.75325",
+          "native": 83.75121
+        },
+        {
+          "host_time": "1790937960",
+          "requested_time": 1790937600,
+          "field": "VOLUME",
+          "companion": "83.75325",
+          "native": 83.75121
+        },
+        {
+          "host_time": "1790938080",
+          "requested_time": 1790937600,
+          "field": "VOLUME",
+          "companion": "83.75325",
+          "native": 83.75121
+        },
+        {
+          "host_time": "1791154200",
+          "requested_time": 1791154200,
+          "field": "VOLUME",
+          "companion": "69.91731999999999",
+          "native": 69.91732
+        },
+        {
+          "host_time": "1791154320",
+          "requested_time": 1791154200,
+          "field": "VOLUME",
+          "companion": "69.91731999999999",
+          "native": 69.91732
+        },
+        {
+          "host_time": "1791154440",
+          "requested_time": 1791154200,
+          "field": "VOLUME",
+          "companion": "69.91731999999999",
+          "native": 69.91732
+        },
+        {
+          "host_time": "1791154560",
+          "requested_time": 1791154200,
+          "field": "VOLUME",
+          "companion": "69.91731999999999",
+          "native": 69.91732
+        },
+        {
+          "host_time": "1791154680",
+          "requested_time": 1791154200,
+          "field": "VOLUME",
+          "companion": "69.91731999999999",
+          "native": 69.91732
+        }
+      ],
+      "scope": "All OHLCV fields at literal requested time, only requested end<=observed export cutoff. Developing historical snapshot OHLCV is not reconstructed from later feed."
+    },
+    {
+      "script": "request-snapshot-6m-v21-v1.pine",
+      "attempt": 6,
+      "paired_phase": "completed-reloaded",
+      "closed_requested_rows_compared": 20130,
+      "missing_direct_feed_rows": 0,
+      "different_cells": 3,
+      "first_differences": [
+        {
+          "host_time": "1790938080",
+          "requested_time": 1790938080,
+          "field": "VOLUME",
+          "companion": "33.57039",
+          "native": 33.56835
+        },
+        {
+          "host_time": "1790938200",
+          "requested_time": 1790938080,
+          "field": "VOLUME",
+          "companion": "33.57039",
+          "native": 33.56835
+        },
+        {
+          "host_time": "1790938320",
+          "requested_time": 1790938080,
+          "field": "VOLUME",
+          "companion": "33.57039",
+          "native": 33.56835
+        }
+      ],
+      "scope": "All OHLCV fields at literal requested time, only requested end<=observed export cutoff. Developing historical snapshot OHLCV is not reconstructed from later feed."
+    },
+    {
+      "script": "request-snapshot-6m-v21-v1.pine",
+      "attempt": 7,
+      "paired_phase": "completed-reload-control",
+      "closed_requested_rows_compared": 20130,
+      "missing_direct_feed_rows": 0,
+      "different_cells": 0,
+      "first_differences": [],
+      "scope": "All OHLCV fields at literal requested time, only requested end<=observed export cutoff. Developing historical snapshot OHLCV is not reconstructed from later feed."
+    },
+    {
+      "script": "request-snapshot-6m-v21-v1.pine",
+      "attempt": 8,
+      "paired_phase": "completed-reloaded",
+      "closed_requested_rows_compared": 20130,
+      "missing_direct_feed_rows": 0,
+      "different_cells": 3,
+      "first_differences": [
+        {
+          "host_time": "1790938080",
+          "requested_time": 1790938080,
+          "field": "VOLUME",
+          "companion": "33.57039",
+          "native": 33.56835
+        },
+        {
+          "host_time": "1790938200",
+          "requested_time": 1790938080,
+          "field": "VOLUME",
+          "companion": "33.57039",
+          "native": 33.56835
+        },
+        {
+          "host_time": "1790938320",
+          "requested_time": 1790938080,
+          "field": "VOLUME",
+          "companion": "33.57039",
+          "native": 33.56835
+        }
+      ],
+      "scope": "All OHLCV fields at literal requested time, only requested end<=observed export cutoff. Developing historical snapshot OHLCV is not reconstructed from later feed."
+    },
+    {
+      "script": "request-snapshot-6m-v21-v1.pine",
+      "attempt": 9,
+      "paired_phase": "completed-reload-control",
+      "closed_requested_rows_compared": 20130,
+      "missing_direct_feed_rows": 0,
+      "different_cells": 3,
+      "first_differences": [
+        {
+          "host_time": "1790938080",
+          "requested_time": 1790938080,
+          "field": "VOLUME",
+          "companion": "33.57039",
+          "native": 33.56835
+        },
+        {
+          "host_time": "1790938200",
+          "requested_time": 1790938080,
+          "field": "VOLUME",
+          "companion": "33.57039",
+          "native": 33.56835
+        },
+        {
+          "host_time": "1790938320",
+          "requested_time": 1790938080,
+          "field": "VOLUME",
+          "companion": "33.57039",
+          "native": 33.56835
+        }
+      ],
+      "scope": "All OHLCV fields at literal requested time, only requested end<=observed export cutoff. Developing historical snapshot OHLCV is not reconstructed from later feed."
+    },
+    {
+      "script": "request-snapshot-6m-v21-v1.pine",
+      "attempt": 10,
+      "paired_phase": "completed-reloaded",
+      "closed_requested_rows_compared": 20136,
+      "missing_direct_feed_rows": 0,
+      "different_cells": 0,
+      "first_differences": [],
+      "scope": "All OHLCV fields at literal requested time, only requested end<=observed export cutoff. Developing historical snapshot OHLCV is not reconstructed from later feed."
+    },
+    {
+      "script": "request-snapshot-10m-v21-v1.pine",
+      "attempt": 3,
+      "paired_phase": "completed-reloaded",
+      "closed_requested_rows_compared": 20135,
+      "missing_direct_feed_rows": 0,
+      "different_cells": 0,
+      "first_differences": [],
+      "scope": "All OHLCV fields at literal requested time, only requested end<=observed export cutoff. Developing historical snapshot OHLCV is not reconstructed from later feed."
+    },
+    {
+      "script": "request-snapshot-6m-v21-v1.pine",
+      "attempt": 11,
+      "paired_phase": "completed-reload-control",
+      "closed_requested_rows_compared": 20136,
+      "missing_direct_feed_rows": 0,
+      "different_cells": 0,
+      "first_differences": [],
+      "scope": "All OHLCV fields at literal requested time, only requested end<=observed export cutoff. Developing historical snapshot OHLCV is not reconstructed from later feed."
+    },
+    {
+      "script": "request-snapshot-10m-v21-v1.pine",
+      "attempt": 4,
+      "paired_phase": "completed-reload-control",
+      "closed_requested_rows_compared": 20135,
+      "missing_direct_feed_rows": 0,
+      "different_cells": 0,
+      "first_differences": [],
+      "scope": "All OHLCV fields at literal requested time, only requested end<=observed export cutoff. Developing historical snapshot OHLCV is not reconstructed from later feed."
+    }
+  ],
+  "limit": "Direct native indices are not Pine indices. Every exact Decimal difference remains visible; no tolerance used. Later provider values cannot repair earlier developing snapshots. Failed attempt1 retained separately."
+}
