@@ -1,0 +1,29 @@
+{
+  "index": 299,
+  "bar": [
+    1791111000,
+    85330.72,
+    85344.81,
+    85330.71,
+    85334.69,
+    7.79807
+  ],
+  "source_row": [
+    1791111000,
+    -4.999999999999995
+  ],
+  "browser_utc": "2026-10-04T10:52:14.531Z",
+  "title": "V7 matrix-det-pivot-control-v6-v1",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   10:50",
+  "visible_range": {
+    "_firstBar": 264,
+    "_lastBar": 302
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}

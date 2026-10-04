@@ -1,0 +1,47 @@
+Cannot call "array.get" with argument "index"="index". An argument of "series float" type was used but a "series int"  is expected.
+{
+  "error": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+  "editorError": {
+    "code": "CE10123",
+    "ctx": {
+      "argDisplayName": "index",
+      "argUserFriendlyRepresentation": "index",
+      "argumentType": "series float",
+      "currentTypeDocStr": "series int",
+      "funId": "array.get",
+      "typePostfix": ""
+    },
+    "end": {
+      "column": 26,
+      "line": 7
+    },
+    "message": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+    "start": {
+      "column": 22,
+      "line": 7
+    },
+    "id": "USER;9f6c726bee174953ab7bba9feb958000"
+  },
+  "title": "Compilation error",
+  "compiler_markers": [
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///e3bd58eb-c241-4c02-b352-dc5f2c837189.pine?placement%3Ddialog",
+        "path": "/e3bd58eb-c241-4c02-b352-dc5f2c837189.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "code": "CE10123",
+      "severity": 8,
+      "message": "Cannot call \"array.get\" with argument \"index\"=\"index\". An argument of \"series float\" type was used but a \"series int\"  is expected.",
+      "startLineNumber": 7,
+      "startColumn": 22,
+      "endLineNumber": 7,
+      "endColumn": 27
+    }
+  ],
+  "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\nC\n85,334.69\n+3.97 (+0.00%)\n85,334.68\nSELL\n0.01\n85,334.69\nBUY\nUSDT\narray-float-index-floor-get-set-v6-v1.pine\nDate Range\n10:52:29 UTC\n99+\nObject tree\nData window\nDate\nSun 04 Oct '26\nTime\n10:50\nBTCUSDT · 2 · Binance\nOpen\n85,330.72\nHigh\n85,344.81\nLow\n85,330.71\nClose\n85,334.69\nChange\n+3.97 (+0.00%)\nVol\n7.8\nLast day change\n+581.12 (+0.69%)\narray-float-index-floor-get-set-v6-v1.pine\nPlot\n∅\nPine Editor\narray-float-index-floor-get-set-v6-v1.pine\nPublish script\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15\n16\n17\n18\n19\n20\n21\n22\n23\n24\n//@version=6\nindicator(\"V7 array-float-index-floor-get-set-v6-v1\")\nphase = bar_index % 8\nfloat index = phase == 0 ? 1.0 : phase == 1 ? 1.5 : phase == 2 ? 1.999 : phase == 3 ? -0.5 : phase == 4 ? 0.0 : phase == 5 ? 0.999 : phase == 6 ? -1.5 : 2.999\na = array.from(10,20,30,40)\nb = array.from(10,20,30,40)\ngetRaw = array.get(a,index)\narray.set(a,index,99)\nfloored = int(math.floor(index))\ngetFloor = array.get(b,floored)\narray.set(b,floored,99)\nplot(index,\"FLOAT_INDEX\")\nplot(floored,\"EXPLICIT_FLOOR\")\nplot(getRaw,\"GET_RAW\")\nplot(getFloor,\"GET_FLOOR_CONTROL\")\nplot(array.get(a,0),\"SET_RAW_0\")\nplot(array.get(a,1),\"SET_RAW_1\")\nplot(array.get(a,2),\"SET_RAW_2\")\nplot(array.get(a,3),\"SET_RAW_3\")\nplot(array.get(b,0),\"SET_FLOOR_0\")\nplot(array.get(b,1),\"SET_FLOOR_1\")\nplot(array.get(b,2),\"SET_FLOOR_2\")\nplot(array.get(b,3),\"SET_FLOOR_3\")\n1 of 1 problem\nCannot call \"array.get\" with argument \"index\"=\"index\". An argument of \"series float\" type was used but a \"series int\" is expected.(CE10123)\n1 ∙ Today, 18:52\nLine 7, Col 22\nPine Script® v6\nCompilation error: CE10123\n\nCannot call \"array.get\" with argument \"index\"=\"index\". An argument of \"series float\" type was used but a \"series int\" is expected.\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+  "context_substituted_message": "Cannot call \"array.get\" with argument \"index\"=\"index\". An argument of \"series float\" type was used but a \"series int\"  is expected."
+}
