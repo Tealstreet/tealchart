@@ -1,0 +1,4 @@
+//@version=6
+indicator("V6 ternary color-int")
+value = close > open ? color.red : 1
+plot(close, display=display.data_window)

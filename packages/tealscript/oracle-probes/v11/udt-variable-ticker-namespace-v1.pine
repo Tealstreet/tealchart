@@ -1,0 +1,10 @@
+//@version=6
+indicator("UDT namespace ticker discriminator v1")
+type Holder
+    string name
+    string detail
+method new(Holder this, string prefix, string symbol) => "method"
+ticker = Holder.new("custom", "detail")
+series string prefix = bar_index == 0 ? "NASDAQ" : "NYSE"
+simple string inferred = ticker.new(prefix, "AAPL")
+plot(inferred == "method" ? 1 : 0, title="method_result", display=display.data_window)

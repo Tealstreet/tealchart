@@ -1,0 +1,4 @@
+//@version=6
+indicator("V6 ternary int-string")
+value = close > open ? 1 : "one"
+plot(close, display=display.data_window)

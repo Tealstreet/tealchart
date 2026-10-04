@@ -1,0 +1,32 @@
+//@version=5
+indicator("V11 daily requested counter prefix", overlay=false, precision=12)
+if timeframe.period != "2"
+    runtime.error("Use BINANCE BTCUSDT standard 2-minute candles")
+f_counter(bool changed) =>
+    var count = 0
+    if changed
+        count += 1
+    count
+pack() =>
+    var int firstTime = time
+    changed = timeframe.change("1D")
+    pivots = ta.pivot_point_levels("Traditional", changed)
+    count = f_counter(changed)
+    var int firstCount = count
+    [pivots, count, open, high, low, close, volume, time, time_close, bar_index, firstTime, firstCount]
+[pivots, count, ro, rh, rl, rc, rv, rt, re, ri, rf, rfc] = request.security(syminfo.tickerid, "1D", pack(), lookahead=barmerge.lookahead_on)
+plot(count, "OUTCOME", display=display.data_window)
+plot(ro, "REQUEST_INPUT_open", display=display.data_window)
+plot(rh, "REQUEST_INPUT_high", display=display.data_window)
+plot(rl, "REQUEST_INPUT_low", display=display.data_window)
+plot(rc, "REQUEST_INPUT_close", display=display.data_window)
+plot(rv, "REQUEST_INPUT_volume", display=display.data_window)
+plot(rt, "REQUEST_INPUT_time", display=display.data_window)
+plot(re, "REQUEST_INPUT_time_close", display=display.data_window)
+plot(ri, "REQUEST_INPUT_index", display=display.data_window)
+plot(rf, "REQUEST_INPUT_first_time", display=display.data_window)
+plot(rfc, "REQUEST_INPUT_first_count", display=display.data_window)
+plot(time, "CHART_time", display=display.data_window)
+plot(time_close, "CHART_time_close", display=display.data_window)
+plot(bar_index, "CHART_bar_index", display=display.data_window)
+plot(timenow, "CHART_timenow", display=display.data_window)

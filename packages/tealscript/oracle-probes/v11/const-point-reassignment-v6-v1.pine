@@ -1,0 +1,5 @@
+//@version=6
+indicator("Const point ID replacement")
+const chart.point value = chart.point.from_index(bar_index, close)
+value := value
+plot(close, "OUTCOME")

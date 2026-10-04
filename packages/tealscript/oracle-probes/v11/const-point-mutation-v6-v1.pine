@@ -1,0 +1,6 @@
+//@version=6
+indicator("Const point content mutation")
+const chart.point value = chart.point.from_index(bar_index, close)
+value.price := close + 1
+plot(value.price, "MUTATED_PRICE")
+plot(close, "CLOSE_CONTROL")

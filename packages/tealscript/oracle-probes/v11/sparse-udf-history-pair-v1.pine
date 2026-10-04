@@ -1,0 +1,19 @@
+//@version=6
+indicator("V11 sparse-udf-history-pair-v1", max_bars_back=256)
+sample(float x) =>
+    [x, x[1], x[2], x[3]]
+float current = na
+float prior1 = na
+float prior2 = na
+float prior3 = na
+if bar_index % 3 == 0
+    [a, b, c, d] = sample(float(bar_index))
+    current := a
+    prior1 := b
+    prior2 := c
+    prior3 := d
+plot(float(bar_index), "BAR_INDEX")
+plot(current, "CURRENT")
+plot(prior1, "PRIOR1")
+plot(prior2, "PRIOR2")
+plot(prior3, "PRIOR3")

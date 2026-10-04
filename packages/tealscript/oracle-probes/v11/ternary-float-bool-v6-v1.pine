@@ -1,0 +1,4 @@
+//@version=6
+indicator("V6 ternary float-bool")
+value = close > open ? 1.5 : true
+plot(close, display=display.data_window)

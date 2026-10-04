@@ -1,0 +1,9 @@
+//@version=6
+indicator("V11 default-string-text-pair-v1", max_bars_back=256)
+if barstate.islastconfirmedhistory
+    first = str.tostring(78477.59079999999)
+    second = str.tostring(1.0 / 3.0)
+    log.info("FIRST=[" + first + "] SECOND=[" + second + "]")
+    label.new(bar_index, high, "FIRST=[" + first + "] SECOND=[" + second + "]")
+plot(str.length(str.tostring(78477.59079999999)), "FIRST_LENGTH")
+plot(str.length(str.tostring(1.0 / 3.0)), "SECOND_LENGTH")

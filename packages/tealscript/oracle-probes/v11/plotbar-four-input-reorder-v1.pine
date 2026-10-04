@@ -1,0 +1,13 @@
+//@version=6
+indicator("V11 plotbar-four-input-reorder-v1", max_bars_back=256)
+slot = bar_index % 4
+actualOpen = 10.0
+suppliedHigh = slot == 0 ? 8.0 : 12.0
+suppliedLow = slot == 1 ? 14.0 : 9.0
+actualClose = slot == 2 ? 20.0 : 11.0
+plotbar(actualOpen, suppliedHigh, suppliedLow, actualClose, "REORDER", color=color.orange)
+plot(float(bar_index), "BAR_INDEX")
+plot(actualOpen, "INPUT_OPEN")
+plot(suppliedHigh, "INPUT_HIGH")
+plot(suppliedLow, "INPUT_LOW")
+plot(actualClose, "INPUT_CLOSE")

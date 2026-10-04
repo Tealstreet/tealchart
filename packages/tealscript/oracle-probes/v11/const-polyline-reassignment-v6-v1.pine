@@ -1,0 +1,5 @@
+//@version=6
+indicator("Const polyline ID replacement")
+const polyline value = polyline.new(array.from(chart.point.from_index(0, close), chart.point.from_index(1, close)))
+value := value
+plot(close, "OUTCOME")

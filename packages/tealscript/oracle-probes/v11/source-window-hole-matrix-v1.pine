@@ -1,0 +1,22 @@
+//@version=6
+indicator("V11 source-window-hole-matrix-v1", max_bars_back=256)
+n = bar_index
+clean = float(10 + (n * 7 % 13))
+x = n < 3 or n % 11 == 7 or n % 11 == 8 ? na : clean
+peer = n < 2 or n % 13 == 5 ? na : float(30 - n * 3 % 17)
+plot(float(n), "BAR_INDEX")
+plot(clean, "CLEAN")
+plot(x, "SOURCE")
+plot(peer, "PEER")
+plot(ta.rsi(x, 4), "RSI4")
+plot(ta.cmo(x, 4), "CMO4")
+plot(ta.hma(x, 4), "HMA4")
+plot(ta.highestbars(x, 4), "HIGHESTBARS4")
+plot(ta.lowestbars(x, 4), "LOWESTBARS4")
+plot(ta.correlation(x, peer, 4), "CORRELATION4")
+plot(ta.rising(x, 4) ? 1 : 0, "RISING4")
+plot(ta.percentile_nearest_rank(x, 4, 50), "NEAREST4P50")
+plot(ta.pivotlow(x, 2, 2), "PIVOTLOW2")
+plot(ta.pivothigh(x, 2, 2), "PIVOTHIGH2")
+plot(ta.min(x), "MIN")
+plot(ta.rci(x, 4), "RCI4")

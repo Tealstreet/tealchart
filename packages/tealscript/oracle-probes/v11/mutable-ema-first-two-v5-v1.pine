@@ -1,0 +1,7 @@
+//@version=5
+indicator("Mutable EMA first length two native")
+var seriesLen = 1
+seriesLen += 1
+plot(ta.ema(close, seriesLen), "MUTABLE_TWO")
+plot(ta.ema(close, 2), "FIXED_TWO")
+plot(seriesLen, "LIVE_LENGTH")

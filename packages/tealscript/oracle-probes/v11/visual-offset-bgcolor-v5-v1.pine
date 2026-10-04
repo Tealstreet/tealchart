@@ -1,0 +1,10 @@
+//@version=5
+indicator("V11 isolated bgcolor offset v5", overlay=false, precision=6)
+phase = bar_index % 7
+shift = phase < 2 ? -2 : phase < 5 ? 1 : 3
+event = bar_index % 8 == 0
+plot(bar_index / 1000.0, title="SOURCE_INDEX_SCALED")
+plot(shift, title="SOURCE_SHIFT")
+plot(event ? bar_index / 1000.0 : na, title="EVENT_INDEX_SCALED")
+bgcolor(event ? color.blue : na, title="TARGET", offset=shift)
+
