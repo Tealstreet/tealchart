@@ -1,0 +1,2 @@
+# Probe sources are SHA256-pinned byte-for-byte; never normalize line endings.
+* -text
