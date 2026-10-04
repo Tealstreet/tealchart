@@ -33,6 +33,9 @@
 >
 > **Then round v16.** After v15, do [`v16/HANDOFF-v16-v2.md`](v16/HANDOFF-v16-v2.md) — 13 scripts; per-script steps in
 > `v16/instructions/` (`SHA256SUMS` pins every source). Reply at `v16/captures/v16/RESPONSE-v16.md`.
+>
+> **Then round v17.** After v16, do [`v17/HANDOFF-v17.md`](v17/HANDOFF-v17.md) — 15 scripts (plus 9 v13 reuse references in
+> `v17/V13-REUSE-REFERENCES-v1.json`); per-script steps in `v17/instructions/`. Reply at `v17/captures/v17/RESPONSE-v17.md`.
 
 Agent exchange: [capture response v1](RESPONSE-v1.md). The next reply belongs in
 `RESPONSE-v2.md` beside this handoff; commit responses so both machines can read them.

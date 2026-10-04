@@ -1,0 +1,343 @@
+{
+  "bundle": "v17",
+  "pasteAgain": false,
+  "references": [
+    {
+      "probe": "trace-drawing-count-501-v13-v1.pine",
+      "path": "probes/trace-drawing-count-501-v13-v1.pine",
+      "sourceSha256": "6108502c887215d5646b68eb8bb0fef1e0d011dd6ae994c01f77f02d4b69de3c",
+      "owner": "codex-vmp8l6",
+      "rowIds": [
+        "audit:S3"
+      ],
+      "family": "S3",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "minimumHistoryBars": 2,
+      "captureKind": "compile/runtime outcome + CSV",
+      "question": "Count501 is fixed. COMPILE-ERROR distinguishes declaration refusal from RUNS with OUTCOME500 (audit eviction) or501 (preserved count). Record exact runtime refusal separately. Never replace max_lines_count501 by500 to obtain admission. A RUNS count alone does not certify general quota policy.",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED",
+        "discriminator": "RUNS; line.all size500 after501 creations at audit6a86."
+      },
+      "columns": [
+        "INPUT_BAR_INDEX",
+        "OUTCOME"
+      ],
+      "instructions": "instructions/trace-drawing-count-501-v13-v1.md",
+      "instructionSha256": "e2f124c4e3f01b42ae1827f4bbb1125fec5a59b89ce03820144a6a85bd1eccb0",
+      "reuseReference": {
+        "bundle": "v13",
+        "source": "/home/sam/cs/tealstreet-next/packages/tealscript/oracle-probes/v13/trace-drawing-count-501-v13-v1.pine",
+        "sourceSha256": "6108502c887215d5646b68eb8bb0fef1e0d011dd6ae994c01f77f02d4b69de3c",
+        "reason": "Exact source already minimal; capture in v17 by reference rather than inventing duplicate source identity."
+      },
+      "pasteAgain": false,
+      "reusePolicy": "Use returned/shipped v13 evidence first; requested retry remains a reference, no new source identity",
+      "contributorIntake": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v17-outcomes/silent-truncation-vmp8l6-v1/INTAKE-v1.json"
+    },
+    {
+      "probe": "trace-time-offset-negative501-v13-v1.pine",
+      "path": "probes/trace-time-offset-negative501-v13-v1.pine",
+      "sourceSha256": "4f8abc03efaae4a1a8055b59effeea12a3c80b9e74f5aa0f0ce24d877d828546",
+      "owner": "codex-vmp8l6",
+      "rowIds": [
+        "audit:S4"
+      ],
+      "family": "S4",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "minimumHistoryBars": 100,
+      "captureKind": "compile/runtime outcome + CSV",
+      "question": "Use standard1-minute candles; preserve actual loaded history. For offset5001 load at least5003 bars and compare OUTCOME to DIRECT_HISTORY_CONTROL only on index>=5001. A finite direct control with blank OUTCOME distinguishes function suppression from missing history; equality distinguishes preserved history. For -501 record refusal, NA, or finite projection; no session/weekend inference from a non-time-based chart. The documented -500 horizon is a subfact, not a preselected invalid-input outcome.",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED",
+        "discriminator": "RUNS with OUTCOME na outside[-500,5000] at audit6a86."
+      },
+      "columns": [
+        "INPUT_BAR_INDEX",
+        "INPUT_TIME",
+        "OUTCOME"
+      ],
+      "instructions": "instructions/trace-time-offset-negative501-v13-v1.md",
+      "instructionSha256": "8f69575260d0b8cee539353f20dbcd406d1bb23777ae193dfde409f0af96a8c8",
+      "reuseReference": {
+        "bundle": "v13",
+        "source": "/home/sam/cs/tealstreet-next/packages/tealscript/oracle-probes/v13/trace-time-offset-negative501-v13-v1.pine",
+        "sourceSha256": "4f8abc03efaae4a1a8055b59effeea12a3c80b9e74f5aa0f0ce24d877d828546",
+        "reason": "Exact source already minimal; capture in v17 by reference rather than inventing duplicate source identity."
+      },
+      "pasteAgain": false,
+      "reusePolicy": "Use returned/shipped v13 evidence first; requested retry remains a reference, no new source identity",
+      "contributorIntake": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v17-outcomes/silent-truncation-vmp8l6-v1/INTAKE-v1.json"
+    },
+    {
+      "probe": "trace-time-offset-5001-v13-v1.pine",
+      "path": "probes/trace-time-offset-5001-v13-v1.pine",
+      "sourceSha256": "bb0646c2dcfb4142e86f73da82ac246f37aa64dd92f8d27c680c866587312909",
+      "owner": "codex-vmp8l6",
+      "rowIds": [
+        "audit:S4"
+      ],
+      "family": "S4",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "minimumHistoryBars": 5003,
+      "captureKind": "compile/runtime outcome + CSV",
+      "question": "Use standard1-minute candles; preserve actual loaded history. For offset5001 load at least5003 bars and compare OUTCOME to DIRECT_HISTORY_CONTROL only on index>=5001. A finite direct control with blank OUTCOME distinguishes function suppression from missing history; equality distinguishes preserved history. For -501 record refusal, NA, or finite projection; no session/weekend inference from a non-time-based chart. The documented -500 horizon is a subfact, not a preselected invalid-input outcome.",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED",
+        "discriminator": "RUNS with OUTCOME na outside[-500,5000] at audit6a86."
+      },
+      "columns": [
+        "INPUT_BAR_INDEX",
+        "INPUT_TIME",
+        "OUTCOME",
+        "DIRECT_HISTORY_CONTROL"
+      ],
+      "instructions": "instructions/trace-time-offset-5001-v13-v1.md",
+      "instructionSha256": "714313b85b91443e1a9e1442c11ebf000bfcb663c16dab685ae1ab7e25f3146e",
+      "reuseReference": {
+        "bundle": "v13",
+        "source": "/home/sam/cs/tealstreet-next/packages/tealscript/oracle-probes/v13/trace-time-offset-5001-v13-v1.pine",
+        "sourceSha256": "bb0646c2dcfb4142e86f73da82ac246f37aa64dd92f8d27c680c866587312909",
+        "reason": "Exact source already minimal; capture in v17 by reference rather than inventing duplicate source identity."
+      },
+      "pasteAgain": false,
+      "reusePolicy": "Use returned/shipped v13 evidence first; requested retry remains a reference, no new source identity",
+      "contributorIntake": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v17-outcomes/silent-truncation-vmp8l6-v1/INTAKE-v1.json"
+    },
+    {
+      "probe": "trace-pivot-pivothigh-negative1-v13-v1.pine",
+      "path": "probes/trace-pivot-pivothigh-negative1-v13-v1.pine",
+      "sourceSha256": "4716a69c970f15d86b117987f4786d7d083f8934f05b41ccccea86798ca1fa17",
+      "owner": "codex-vmp8l6",
+      "rowIds": [
+        "audit:S5"
+      ],
+      "family": "S5",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "minimumHistoryBars": 10,
+      "captureKind": "compile/runtime outcome + CSV",
+      "question": "At least10 historical bars. Compare OUTCOME with INPUT_SOURCE and ZERO_STRENGTH_CONTROL by exact row. The audit negative-left-to-zero rule makes OUTCOME equal zero-strength control. Preserve refusals and NA holes. These sources test negative LEFT strength only; do not generalize to negative RIGHT or every dynamic strength.",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED",
+        "discriminator": "RUNS; negative left strength normalized0 at audit6a86."
+      },
+      "columns": [
+        "INPUT_BAR_INDEX",
+        "INPUT_SOURCE",
+        "OUTCOME",
+        "ZERO_STRENGTH_CONTROL"
+      ],
+      "instructions": "instructions/trace-pivot-pivothigh-negative1-v13-v1.md",
+      "instructionSha256": "a19aec340abb1b2c88a5ecc937b42e4aa32ca3f3eb57615fab197cb4e504c410",
+      "reuseReference": {
+        "bundle": "v13",
+        "source": "/home/sam/cs/tealstreet-next/packages/tealscript/oracle-probes/v13/trace-pivot-pivothigh-negative1-v13-v1.pine",
+        "sourceSha256": "4716a69c970f15d86b117987f4786d7d083f8934f05b41ccccea86798ca1fa17",
+        "reason": "Exact source already minimal; capture in v17 by reference rather than inventing duplicate source identity."
+      },
+      "pasteAgain": false,
+      "reusePolicy": "Use returned/shipped v13 evidence first; requested retry remains a reference, no new source identity",
+      "contributorIntake": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v17-outcomes/silent-truncation-vmp8l6-v1/INTAKE-v1.json"
+    },
+    {
+      "probe": "trace-pivot-pivotlow-negative1-v13-v1.pine",
+      "path": "probes/trace-pivot-pivotlow-negative1-v13-v1.pine",
+      "sourceSha256": "fb70417390bc80611a3c26fd3a18f19077b5e3965f401c22adde1cfbc0902129",
+      "owner": "codex-vmp8l6",
+      "rowIds": [
+        "audit:S5"
+      ],
+      "family": "S5",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "minimumHistoryBars": 10,
+      "captureKind": "compile/runtime outcome + CSV",
+      "question": "At least10 historical bars. Compare OUTCOME with INPUT_SOURCE and ZERO_STRENGTH_CONTROL by exact row. The audit negative-left-to-zero rule makes OUTCOME equal zero-strength control. Preserve refusals and NA holes. These sources test negative LEFT strength only; do not generalize to negative RIGHT or every dynamic strength.",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED",
+        "discriminator": "RUNS; negative left strength normalized0 at audit6a86."
+      },
+      "columns": [
+        "INPUT_BAR_INDEX",
+        "INPUT_SOURCE",
+        "OUTCOME",
+        "ZERO_STRENGTH_CONTROL"
+      ],
+      "instructions": "instructions/trace-pivot-pivotlow-negative1-v13-v1.md",
+      "instructionSha256": "b73196fcf480de5accf9426bb4d2c1d47c486c70f0ed1219308512b2c6fc47dc",
+      "reuseReference": {
+        "bundle": "v13",
+        "source": "/home/sam/cs/tealstreet-next/packages/tealscript/oracle-probes/v13/trace-pivot-pivotlow-negative1-v13-v1.pine",
+        "sourceSha256": "fb70417390bc80611a3c26fd3a18f19077b5e3965f401c22adde1cfbc0902129",
+        "reason": "Exact source already minimal; capture in v17 by reference rather than inventing duplicate source identity."
+      },
+      "pasteAgain": false,
+      "reusePolicy": "Use returned/shipped v13 evidence first; requested retry remains a reference, no new source identity",
+      "contributorIntake": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v17-outcomes/silent-truncation-vmp8l6-v1/INTAKE-v1.json"
+    },
+    {
+      "probe": "trace-eigen-tiny-cleanup-v13-v1.pine",
+      "path": "probes/trace-eigen-tiny-cleanup-v13-v1.pine",
+      "sourceSha256": "25cd9a5db6e19c2996754ce108ee741c54f971a14231ac25d6b00b0285a444a4",
+      "owner": "codex-vmp8l6",
+      "rowIds": [
+        "audit:S6"
+      ],
+      "family": "S6",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "minimumHistoryBars": 8,
+      "captureKind": "compile/runtime outcome + CSV",
+      "question": "At least8 historical bars, covering all4 phases twice. Keep EIGEN0/1 and SCALED_EIGEN0/1; the in-Pine scale prevents export rounding from hiding tiny retained values. Compare eigenvalue multisets, retaining order separately. At epsilon1e-12 audit gives scaled[0,0], while preserved diagonals give scaled multiset[1,2]. At epsilon1e-10 audit cleanup is inclusive for1e-10 only. A control phase1e-9/1.0 bounds scale/order artifacts. This is eigenvalue output cleanup, not eigenvector or all numerical convergence certification.",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED",
+        "discriminator": "RUNS; abs<=1e-10 eigenvalues replaced0 at audit6a86."
+      },
+      "columns": [
+        "INPUT_BAR_INDEX",
+        "INPUT_EPSILON",
+        "EIGEN0",
+        "EIGEN1",
+        "SCALED_EIGEN0",
+        "SCALED_EIGEN1"
+      ],
+      "instructions": "instructions/trace-eigen-tiny-cleanup-v13-v1.md",
+      "instructionSha256": "a0a8f8f2fbb6a1920b15457e894b0994ef0d9468a51de7f070a4cc536b813ce8",
+      "reuseReference": {
+        "bundle": "v13",
+        "source": "/home/sam/cs/tealstreet-next/packages/tealscript/oracle-probes/v13/trace-eigen-tiny-cleanup-v13-v1.pine",
+        "sourceSha256": "25cd9a5db6e19c2996754ce108ee741c54f971a14231ac25d6b00b0285a444a4",
+        "reason": "Exact source already minimal; capture in v17 by reference rather than inventing duplicate source identity."
+      },
+      "pasteAgain": false,
+      "reusePolicy": "Use returned/shipped v13 evidence first; requested retry remains a reference, no new source identity",
+      "contributorIntake": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v17-outcomes/silent-truncation-vmp8l6-v1/INTAKE-v1.json"
+    },
+    {
+      "probe": "trace-merge-reversed-corners-v13-v1.pine",
+      "path": "probes/trace-merge-reversed-corners-v13-v1.pine",
+      "sourceSha256": "cc865950749413d86ed64d19aab07352aac9af92f2be83344e209e0b8b8c546b",
+      "owner": "codex-vmp8l6",
+      "rowIds": [
+        "audit:S7"
+      ],
+      "family": "S7",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "minimumHistoryBars": 2,
+      "captureKind": "compile/runtime outcome + CSV + screenshot",
+      "question": "Capture populated table and exact text/background. If admitted, native start-cell inheritance is documented: provided start(1,1) is START BOTTOM RIGHT/red. Audit corner reordering instead uses TOP LEFT/blue. OUTCOME1 proves reaching the call only; it does not expose merged corners or inherited text. Screenshot is mandatory. Refusal of reversed corners is distinct from either successful visual result.",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED",
+        "discriminator": "RUNS; reversed corners normalized and TOP LEFT/blue retained at audit6a86."
+      },
+      "columns": [
+        "INPUT_BAR_INDEX",
+        "OUTCOME"
+      ],
+      "instructions": "instructions/trace-merge-reversed-corners-v13-v1.md",
+      "instructionSha256": "30b61111e74e220bd6ea18dd2c6d0a338b14453e0a4e18be4974642e5209ea2b",
+      "reuseReference": {
+        "bundle": "v13",
+        "source": "/home/sam/cs/tealstreet-next/packages/tealscript/oracle-probes/v13/trace-merge-reversed-corners-v13-v1.pine",
+        "sourceSha256": "cc865950749413d86ed64d19aab07352aac9af92f2be83344e209e0b8b8c546b",
+        "reason": "Exact source already minimal; capture in v17 by reference rather than inventing duplicate source identity."
+      },
+      "pasteAgain": false,
+      "reusePolicy": "Use returned/shipped v13 evidence first; requested retry remains a reference, no new source identity",
+      "contributorIntake": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v17-outcomes/silent-truncation-vmp8l6-v1/INTAKE-v1.json"
+    },
+    {
+      "probe": "trace-array-linear-percentile101-v13-v1.pine",
+      "path": "probes/trace-array-linear-percentile101-v13-v1.pine",
+      "sourceSha256": "fdc07926b4aec4ecea32371c3341a449620af1ce6aed63cf5c5d31b68730245b",
+      "owner": "codex-vmp8l6",
+      "rowIds": [
+        "audit:P2"
+      ],
+      "family": "P2",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "minimumHistoryBars": 3,
+      "captureKind": "compile/runtime outcome + CSV",
+      "question": "Keep the series percentage unchanged: first bar100 is valid control, next bar101 is target. Capture first refusal bar/text and any already produced plots. On RUNS OUTCOME2 at101 supports endpoint clamping; a value above2, NA, or refusal is a different native route. Published0..100 eligibility does not specify the native invalid-input recovery.",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED",
+        "discriminator": "RUNS; dynamic101 clamped100, OUTCOME2 at audit6a86."
+      },
+      "columns": [
+        "INPUT_BAR_INDEX",
+        "INPUT_PERCENTAGE",
+        "OUTCOME"
+      ],
+      "instructions": "instructions/trace-array-linear-percentile101-v13-v1.md",
+      "instructionSha256": "9451aa3e97a8090f77b45437ae416067b2d4ea072707e9d92672783343c9e517",
+      "reuseReference": {
+        "bundle": "v13",
+        "source": "/home/sam/cs/tealstreet-next/packages/tealscript/oracle-probes/v13/trace-array-linear-percentile101-v13-v1.pine",
+        "sourceSha256": "fdc07926b4aec4ecea32371c3341a449620af1ce6aed63cf5c5d31b68730245b",
+        "reason": "Exact source already minimal; capture in v17 by reference rather than inventing duplicate source identity."
+      },
+      "pasteAgain": false,
+      "reusePolicy": "Use returned/shipped v13 evidence first; requested retry remains a reference, no new source identity",
+      "contributorIntake": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v17-outcomes/silent-truncation-vmp8l6-v1/INTAKE-v1.json"
+    },
+    {
+      "probe": "trace-table-zero-columns-v13-v1.pine",
+      "path": "probes/trace-table-zero-columns-v13-v1.pine",
+      "sourceSha256": "b6cc8bec9e5efab9bdbc8b0dc210ec1119bbb06186e56b12bbc63f2ea3102a5e",
+      "owner": "codex-vmp8l6",
+      "rowIds": [
+        "audit:P3"
+      ],
+      "family": "P3",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "minimumHistoryBars": 2,
+      "captureKind": "compile/runtime outcome + CSV + screenshot",
+      "question": "Distinguish refusal at table.new from refusal at table.cell, preserving exact line/bar. If RUNS capture COLUMN ZERO CELL visibly populated and OUTCOME1. This tests usable cell(0,0), unlike an earlier zero-column construction-only capture. Successful construction alone cannot prove fallback to one, and CSV cannot reveal table dimensions.",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED",
+        "discriminator": "RUNS; zero columns replaced1 and cell(0,0) usable at audit6a86."
+      },
+      "columns": [
+        "INPUT_BAR_INDEX",
+        "OUTCOME"
+      ],
+      "instructions": "instructions/trace-table-zero-columns-v13-v1.md",
+      "instructionSha256": "73e39aa9a9d4c3478e593772d6bb2510d527dc135bb67515d5b275aaaaec59c5",
+      "reuseReference": {
+        "bundle": "v13",
+        "source": "/home/sam/cs/tealstreet-next/packages/tealscript/oracle-probes/v13/trace-table-zero-columns-v13-v1.pine",
+        "sourceSha256": "b6cc8bec9e5efab9bdbc8b0dc210ec1119bbb06186e56b12bbc63f2ea3102a5e",
+        "reason": "Exact source already minimal; capture in v17 by reference rather than inventing duplicate source identity."
+      },
+      "pasteAgain": false,
+      "reusePolicy": "Use returned/shipped v13 evidence first; requested retry remains a reference, no new source identity",
+      "contributorIntake": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v17-outcomes/silent-truncation-vmp8l6-v1/INTAKE-v1.json"
+    }
+  ],
+  "policy": "Use exact-source returned v13 evidence first. Missing evidence can be requested by reference, never invented or scored as agreement."
+}

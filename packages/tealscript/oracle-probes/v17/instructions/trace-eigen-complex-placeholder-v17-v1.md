@@ -1,0 +1,7 @@
+# trace-eigen-complex-placeholder-v17-v1 capture instructions v1
+
+Use the exact SHA-pinned indicator unchanged on standard BINANCE:BTCUSDT time-based candles. Record COMPILE-ERROR, RUNTIME-ERROR, or RUNS separately. Preserve exact diagnostic text, source line/column, error bar, symbol, timeframe, loaded bar count and screenshot. A refusal is an outcome: do not edit the invalid argument or manufacture a CSV. On RUNS export every named plot as untouched CSV, preserving blanks and original decimal strings; exclude live rows from historical comparisons. Requested-input and reached-operation plots are sentinels, not getters for rendered properties. Native phase/values are UNOBSERVED; the audit engine outcome is a competing hypothesis, not expected native truth.
+
+At least3historicalbars. Record exact eigenvalues refusal or successful RESULT_SIZE and all three values/blanks. This matrix contains a rotation block with complex roots plus real root1. Audit produces size3/all NA; refusal, a shorter array or finite values is a distinct native route. Length guards prevent a short returned array from causing a secondary array.get error and obscuring the eigenvalues outcome. This does NOT probe the internal128-iteration ceiling or establish real-spectrum nonconvergence behavior; those remain TRACE-REQUIRED.
+
+Audit-engine discriminator: RUNS; eigenvalue size3/all NA placeholder at audit6a86. This is historical6a86 behavior; no current-engine replay or native result is claimed.

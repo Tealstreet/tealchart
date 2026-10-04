@@ -1,0 +1,12 @@
+//@version=6
+indicator("Table border width 151 trace v17 v1",overlay=false,precision=16)
+var control=table.new(position.top_left,1,2,frame_width=1,border_width=100,frame_color=color.red,border_color=color.red)
+var target=table.new(position.top_right,1,2,frame_width=1,border_width=151,frame_color=color.red,border_color=color.red)
+if barstate.islast
+    table.cell(control,0,0,"CONTROL border 100",width=35,height=30)
+    table.cell(control,0,1,"SECOND ROW",width=35,height=30)
+    table.cell(target,0,0,"TARGET border 151",width=35,height=30)
+    table.cell(target,0,1,"SECOND ROW",width=35,height=30)
+plot(bar_index,"INPUT_BAR_INDEX",display=display.data_window)
+plot(151,"REQUESTED_WIDTH",display=display.data_window)
+plot(barstate.islast?1:na,"CELL_WRITES_REACHED",display=display.data_window)

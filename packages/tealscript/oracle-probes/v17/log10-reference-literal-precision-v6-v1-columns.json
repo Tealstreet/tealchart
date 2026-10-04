@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "source": "log10-reference-literal-precision-v6-v1.pine",
+  "sourceSha256": "4905cbfd5045cc89069d044605a772680b622f5e9e3ec8720090a7ded0989578",
+  "columns": [
+    {
+      "position": 5,
+      "title": "REFERENCE_LITERAL"
+    },
+    {
+      "position": 6,
+      "title": "REFERENCE_SHORT"
+    },
+    {
+      "position": 7,
+      "title": "LOG10_VALUE"
+    },
+    {
+      "position": 8,
+      "title": "LOG10_RESIDUAL"
+    },
+    {
+      "position": 9,
+      "title": "LITERAL_MINUS_SHORT_X1E18"
+    },
+    {
+      "position": 10,
+      "title": "LITERAL_A"
+    },
+    {
+      "position": 11,
+      "title": "A_MINUS_SHORT_X1E18"
+    },
+    {
+      "position": 12,
+      "title": "LITERAL_B"
+    },
+    {
+      "position": 13,
+      "title": "B_X1E18"
+    },
+    {
+      "position": 14,
+      "title": "B_SCI_X1E18"
+    },
+    {
+      "position": 15,
+      "title": "LOG_REFERENCE_LITERAL"
+    },
+    {
+      "position": 16,
+      "title": "LOG_RESIDUAL"
+    },
+    {
+      "position": 17,
+      "title": "BAR_INDEX"
+    },
+    {
+      "position": 18,
+      "title": "TIME_MS"
+    }
+  ],
+  "nativeStatus": "UNOBSERVED"
+}

@@ -1,0 +1,5 @@
+//@version=6
+indicator("Self reference own declaration v1")
+float x = nz(x[1]) + 1
+plot(x)
+

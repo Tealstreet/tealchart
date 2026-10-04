@@ -1,0 +1,20 @@
+//@version=6
+indicator("Log10 reference literal precision v1", precision=16)
+argument = input.float(1.75, "Argument") + bar_index * 0.0
+reference = 0.24303804868629442
+short_reference = 0.2430380486862944
+value = math.log10(argument)
+plot(reference, "REFERENCE_LITERAL")
+plot(short_reference, "REFERENCE_SHORT")
+plot(value, "LOG10_VALUE")
+plot((value - reference) * 1e11, "LOG10_RESIDUAL")
+plot((reference - short_reference) * 1e18, "LITERAL_MINUS_SHORT_X1E18")
+plot(0.12345678901234567, "LITERAL_A")
+plot((0.12345678901234567 - 0.1234567890123456) * 1e18, "A_MINUS_SHORT_X1E18")
+plot(0.00000000000000017, "LITERAL_B")
+plot(0.00000000000000017 * 1e18, "B_X1E18")
+plot(1.7e-16 * 1e18, "B_SCI_X1E18")
+plot(1.0986122886681096, "LOG_REFERENCE_LITERAL")
+plot((math.log(3.0 + bar_index * 0.0) - 1.0986122886681096) * 1e11, "LOG_RESIDUAL")
+plot(bar_index, "BAR_INDEX")
+plot(time, "TIME_MS")

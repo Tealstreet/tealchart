@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "source": "roc-toradians-reference-literals-v6-v1.pine",
+  "sourceSha256": "812c72d1d0aae1ab3896171a19ed96c7db5e173216a939c95837851ba24f1847",
+  "columns": [
+    {
+      "position": 5,
+      "title": "ROC_LITERAL_MINUS_SHORT"
+    },
+    {
+      "position": 6,
+      "title": "ROC_LITERAL_MINUS_CONSTRUCTED"
+    },
+    {
+      "position": 7,
+      "title": "ROC_BUILTIN_MINUS_LITERAL"
+    },
+    {
+      "position": 8,
+      "title": "ROC_BUILTIN_MINUS_CONSTRUCTED"
+    },
+    {
+      "position": 9,
+      "title": "ROC_MULTIPLY_THEN_DIVIDE"
+    },
+    {
+      "position": 10,
+      "title": "ROC_DIVIDE_THEN_MULTIPLY"
+    },
+    {
+      "position": 11,
+      "title": "RADIANS_LITERAL_MINUS_SHORT"
+    },
+    {
+      "position": 12,
+      "title": "RADIANS_LITERAL_MINUS_CONSTRUCTED"
+    },
+    {
+      "position": 13,
+      "title": "RADIANS_BUILTIN_MINUS_LITERAL"
+    },
+    {
+      "position": 14,
+      "title": "RADIANS_BUILTIN_MINUS_CONSTRUCTED"
+    },
+    {
+      "position": 15,
+      "title": "RADIANS_MULTIPLY_THEN_DIVIDE"
+    },
+    {
+      "position": 16,
+      "title": "RADIANS_DIVIDE_CONSTANT_FIRST"
+    },
+    {
+      "position": 17,
+      "title": "ROC_SECOND_LITERAL_SHIFT"
+    },
+    {
+      "position": 18,
+      "title": "ROC_THIRD_LITERAL_SHIFT"
+    },
+    {
+      "position": 19,
+      "title": "RADIANS_HALF_LITERAL_SHIFT"
+    },
+    {
+      "position": 20,
+      "title": "TINY_DECIMAL_RUNTIME"
+    },
+    {
+      "position": 21,
+      "title": "TINY_SCI_RUNTIME"
+    },
+    {
+      "position": 22,
+      "title": "BAR_INDEX"
+    },
+    {
+      "position": 23,
+      "title": "TIME_MS"
+    }
+  ]
+}

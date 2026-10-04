@@ -1,0 +1,34 @@
+//@version=6
+indicator("ROC and radians reference literals v1", precision=16, max_bars_back=20)
+z = bar_index * 0.0
+r = 0.24659765961781024
+s = 0.2465976596178102
+constructed = s + z + 2.0 * math.pow(2.0 + z, -55.0)
+plot((r - s) * 1e18, "ROC_LITERAL_MINUS_SHORT")
+plot((r - constructed) * 1e18, "ROC_LITERAL_MINUS_CONSTRUCTED")
+source = bar_index % 15 == 14 ? 77949.99 : 77758.24
+roc = ta.roc(source, 14)
+plot(bar_index % 15 == 14 ? (roc - r) * 1e11 : na, "ROC_BUILTIN_MINUS_LITERAL")
+plot(bar_index % 15 == 14 ? (roc - constructed) * 1e11 : na, "ROC_BUILTIN_MINUS_CONSTRUCTED")
+a = 77949.99 + z
+b = 77758.24 + z
+plot((100.0 * (a - b) / b - r) * 1e11, "ROC_MULTIPLY_THEN_DIVIDE")
+plot(((a - b) / b * 100.0 - r) * 1e11, "ROC_DIVIDE_THEN_MULTIPLY")
+angle = 1.5 + z
+rad = math.toradians(angle)
+long = 0.026179938779914945
+short = 0.0261799387799149
+made = short + z + 13.0 * math.pow(2.0 + z, -58.0)
+plot((long - short) * 1e18, "RADIANS_LITERAL_MINUS_SHORT")
+plot((long - made) * 1e18, "RADIANS_LITERAL_MINUS_CONSTRUCTED")
+plot((rad - long) * 1e11, "RADIANS_BUILTIN_MINUS_LITERAL")
+plot((rad - made) * 1e11, "RADIANS_BUILTIN_MINUS_CONSTRUCTED")
+plot((angle * math.pi / 180.0 - made) * 1e11, "RADIANS_MULTIPLY_THEN_DIVIDE")
+plot((angle * (math.pi / 180.0) - made) * 1e11, "RADIANS_DIVIDE_CONSTANT_FIRST")
+plot((0.05001859024270687 - 0.0500185902427069) * 1e18, "ROC_SECOND_LITERAL_SHIFT")
+plot((0.053886223088963583 - 0.0538862230889636) * 1e18, "ROC_THIRD_LITERAL_SHIFT")
+plot((0.013089969389957472 - 0.0130899693899575) * 1e18, "RADIANS_HALF_LITERAL_SHIFT")
+plot((0.00000000000000017 + z) * 1e18, "TINY_DECIMAL_RUNTIME")
+plot((1.7e-16 + z) * 1e18, "TINY_SCI_RUNTIME")
+plot(bar_index, "BAR_INDEX")
+plot(time, "TIME_MS")

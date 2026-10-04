@@ -1,0 +1,10 @@
+//@version=6
+indicator("line width 0 trace v17 v1",overlay=false,precision=16)
+if barstate.islast
+    line.new(bar_index-40,2,bar_index-3,2,width=100,color=color.blue)
+    line.new(bar_index-40,8,bar_index-3,8,width=0,color=color.red)
+plot(0,"SCALE_MIN",color=color.new(color.gray,100))
+plot(10,"SCALE_MAX",color=color.new(color.gray,100))
+plot(bar_index,"INPUT_BAR_INDEX",display=display.data_window)
+plot(0,"REQUESTED_WIDTH",display=display.data_window)
+plot(barstate.islast?1:na,"CREATION_REACHED",display=display.data_window)
