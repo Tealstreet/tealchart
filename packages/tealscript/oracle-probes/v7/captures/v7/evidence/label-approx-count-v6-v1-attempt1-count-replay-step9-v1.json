@@ -1,0 +1,654 @@
+{
+  "browser_utc": "2026-10-04T07:20:52.051Z",
+  "tickerid": "BINANCE:BTCUSDT",
+  "timeframe": "2",
+  "timezone": "Etc/UTC",
+  "replay": true,
+  "subscription": "pro_premium",
+  "native_end_of_data": true,
+  "dataset_first": {
+    "index": -24375,
+    "value": [
+      1788134400,
+      77682,
+      77682.01,
+      77572,
+      77674.04,
+      51.86295
+    ]
+  },
+  "host_last": {
+    "index": 308,
+    "value": [
+      1791096360,
+      84964,
+      84988.01,
+      84964,
+      84988.01,
+      1.95837
+    ]
+  },
+  "study_status": {
+    "type": 2
+  },
+  "study_last": {
+    "index": 308,
+    "value": [
+      1791096360,
+      6
+    ]
+  },
+  "native_plot_rows": [
+    {
+      "native_index": 287,
+      "host": [
+        1791093840,
+        84916,
+        84922.49,
+        84916,
+        84922.49,
+        5.62915
+      ],
+      "source": [
+        1791093840,
+        3
+      ]
+    },
+    {
+      "native_index": 288,
+      "host": [
+        1791093960,
+        84922.49,
+        84922.49,
+        84922.48,
+        84922.48,
+        2.27678
+      ],
+      "source": [
+        1791093960,
+        4
+      ]
+    },
+    {
+      "native_index": 289,
+      "host": [
+        1791094080,
+        84922.48,
+        84922.49,
+        84922.48,
+        84922.48,
+        3.59195
+      ],
+      "source": [
+        1791094080,
+        5
+      ]
+    },
+    {
+      "native_index": 290,
+      "host": [
+        1791094200,
+        84922.48,
+        84922.49,
+        84922.48,
+        84922.48,
+        2.55244
+      ],
+      "source": [
+        1791094200,
+        6
+      ]
+    },
+    {
+      "native_index": 291,
+      "host": [
+        1791094320,
+        84922.49,
+        84922.49,
+        84922.48,
+        84922.48,
+        5.16366
+      ],
+      "source": [
+        1791094320,
+        7
+      ]
+    },
+    {
+      "native_index": 292,
+      "host": [
+        1791094440,
+        84922.48,
+        84922.61,
+        84916,
+        84922.61,
+        15.92288
+      ],
+      "source": [
+        1791094440,
+        2
+      ]
+    },
+    {
+      "native_index": 293,
+      "host": [
+        1791094560,
+        84922.61,
+        84925.58,
+        84922.6,
+        84925.58,
+        4.10421
+      ],
+      "source": [
+        1791094560,
+        3
+      ]
+    },
+    {
+      "native_index": 294,
+      "host": [
+        1791094680,
+        84925.58,
+        84930.01,
+        84925.56,
+        84930,
+        20.79635
+      ],
+      "source": [
+        1791094680,
+        4
+      ]
+    },
+    {
+      "native_index": 295,
+      "host": [
+        1791094800,
+        84930,
+        84971.99,
+        84930,
+        84971.99,
+        12.27031
+      ],
+      "source": [
+        1791094800,
+        5
+      ]
+    },
+    {
+      "native_index": 296,
+      "host": [
+        1791094920,
+        84971.98,
+        85058.01,
+        84964,
+        84964,
+        56.87612
+      ],
+      "source": [
+        1791094920,
+        6
+      ]
+    },
+    {
+      "native_index": 297,
+      "host": [
+        1791095040,
+        84964.01,
+        84964.01,
+        84935.98,
+        84935.99,
+        19.1083
+      ],
+      "source": [
+        1791095040,
+        7
+      ]
+    },
+    {
+      "native_index": 298,
+      "host": [
+        1791095160,
+        84935.98,
+        84935.98,
+        84900,
+        84900.01,
+        8.89687
+      ],
+      "source": [
+        1791095160,
+        2
+      ]
+    },
+    {
+      "native_index": 299,
+      "host": [
+        1791095280,
+        84900.01,
+        84958.01,
+        84877.18,
+        84947.61,
+        15.51224
+      ],
+      "source": [
+        1791095280,
+        3
+      ]
+    },
+    {
+      "native_index": 300,
+      "host": [
+        1791095400,
+        84947.62,
+        84947.62,
+        84919.74,
+        84931.99,
+        8.11579
+      ],
+      "source": [
+        1791095400,
+        4
+      ]
+    },
+    {
+      "native_index": 301,
+      "host": [
+        1791095520,
+        84932,
+        85017.13,
+        84931.99,
+        85010.13,
+        15.24578
+      ],
+      "source": [
+        1791095520,
+        5
+      ]
+    },
+    {
+      "native_index": 302,
+      "host": [
+        1791095640,
+        85010.13,
+        85022.01,
+        85010.13,
+        85022.01,
+        7.17196
+      ],
+      "source": [
+        1791095640,
+        6
+      ]
+    },
+    {
+      "native_index": 303,
+      "host": [
+        1791095760,
+        85022.01,
+        85029.2,
+        84989.04,
+        84989.04,
+        20.34329
+      ],
+      "source": [
+        1791095760,
+        7
+      ]
+    },
+    {
+      "native_index": 304,
+      "host": [
+        1791095880,
+        84989.04,
+        84989.05,
+        84979.01,
+        84980,
+        5.44553
+      ],
+      "source": [
+        1791095880,
+        2
+      ]
+    },
+    {
+      "native_index": 305,
+      "host": [
+        1791096000,
+        84980.01,
+        84980.01,
+        84978.35,
+        84978.36,
+        2.11768
+      ],
+      "source": [
+        1791096000,
+        3
+      ]
+    },
+    {
+      "native_index": 306,
+      "host": [
+        1791096120,
+        84978.36,
+        84978.36,
+        84948.34,
+        84957.58,
+        24.70147
+      ],
+      "source": [
+        1791096120,
+        4
+      ]
+    },
+    {
+      "native_index": 307,
+      "host": [
+        1791096240,
+        84957.58,
+        84964.01,
+        84957.58,
+        84964.01,
+        4.36726
+      ],
+      "source": [
+        1791096240,
+        5
+      ]
+    },
+    {
+      "native_index": 308,
+      "host": [
+        1791096360,
+        84964,
+        84988.01,
+        84964,
+        84988.01,
+        1.95837
+      ],
+      "source": [
+        1791096360,
+        6
+      ]
+    }
+  ],
+  "graphics_index_map": [
+    303,
+    304,
+    305,
+    306,
+    307,
+    308
+  ],
+  "graphic_groups": [
+    {
+      "name": "labels",
+      "collections": [
+        {
+          "key": false,
+          "raw": [
+            [
+              24687,
+              {
+                "id": 24687,
+                "x": 0,
+                "y": 84989.04,
+                "yl": "pr",
+                "t": "24678",
+                "st": "ldn",
+                "ci": 0,
+                "tci": 1,
+                "sz": "normal",
+                "ta": "center",
+                "tt": ""
+              }
+            ],
+            [
+              24690,
+              {
+                "id": 24690,
+                "x": 1,
+                "y": 84980,
+                "yl": "pr",
+                "t": "24679",
+                "st": "ldn",
+                "ci": 0,
+                "tci": 1,
+                "sz": "normal",
+                "ta": "center",
+                "tt": ""
+              }
+            ],
+            [
+              24693,
+              {
+                "id": 24693,
+                "x": 2,
+                "y": 84978.36,
+                "yl": "pr",
+                "t": "24680",
+                "st": "ldn",
+                "ci": 0,
+                "tci": 1,
+                "sz": "normal",
+                "ta": "center",
+                "tt": ""
+              }
+            ],
+            [
+              24696,
+              {
+                "id": 24696,
+                "x": 3,
+                "y": 84957.58,
+                "yl": "pr",
+                "t": "24681",
+                "st": "ldn",
+                "ci": 0,
+                "tci": 1,
+                "sz": "normal",
+                "ta": "center",
+                "tt": ""
+              }
+            ],
+            [
+              24699,
+              {
+                "id": 24699,
+                "x": 4,
+                "y": 84964.01,
+                "yl": "pr",
+                "t": "24682",
+                "st": "ldn",
+                "ci": 0,
+                "tci": 1,
+                "sz": "normal",
+                "ta": "center",
+                "tt": ""
+              }
+            ],
+            [
+              24702,
+              {
+                "id": 24702,
+                "x": 5,
+                "y": 84988.01,
+                "yl": "pr",
+                "t": "24683",
+                "st": "ldn",
+                "ci": 0,
+                "tci": 1,
+                "sz": "normal",
+                "ta": "center",
+                "tt": ""
+              }
+            ]
+          ],
+          "materialized": [
+            {
+              "x": 303,
+              "y": 84989.04,
+              "yloc": "pr",
+              "text": "24678",
+              "style": "ldn",
+              "size": "normal",
+              "colorIndex": 0,
+              "textColorIndex": 1,
+              "textAlign": "center",
+              "tooltip": "",
+              "fontType": null,
+              "textFormatting": 0
+            },
+            {
+              "x": 304,
+              "y": 84980,
+              "yloc": "pr",
+              "text": "24679",
+              "style": "ldn",
+              "size": "normal",
+              "colorIndex": 0,
+              "textColorIndex": 1,
+              "textAlign": "center",
+              "tooltip": "",
+              "fontType": null,
+              "textFormatting": 0
+            },
+            {
+              "x": 305,
+              "y": 84978.36,
+              "yloc": "pr",
+              "text": "24680",
+              "style": "ldn",
+              "size": "normal",
+              "colorIndex": 0,
+              "textColorIndex": 1,
+              "textAlign": "center",
+              "tooltip": "",
+              "fontType": null,
+              "textFormatting": 0
+            },
+            {
+              "x": 306,
+              "y": 84957.58,
+              "yloc": "pr",
+              "text": "24681",
+              "style": "ldn",
+              "size": "normal",
+              "colorIndex": 0,
+              "textColorIndex": 1,
+              "textAlign": "center",
+              "tooltip": "",
+              "fontType": null,
+              "textFormatting": 0
+            },
+            {
+              "x": 307,
+              "y": 84964.01,
+              "yloc": "pr",
+              "text": "24682",
+              "style": "ldn",
+              "size": "normal",
+              "colorIndex": 0,
+              "textColorIndex": 1,
+              "textAlign": "center",
+              "tooltip": "",
+              "fontType": null,
+              "textFormatting": 0
+            },
+            {
+              "x": 308,
+              "y": 84988.01,
+              "yloc": "pr",
+              "text": "24683",
+              "style": "ldn",
+              "size": "normal",
+              "colorIndex": 0,
+              "textColorIndex": 1,
+              "textAlign": "center",
+              "tooltip": "",
+              "fontType": null,
+              "textFormatting": 0
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  },
+  "visible_range": {
+    "_firstBar": 286,
+    "_lastBar": 312
+  },
+  "limits": "Raw IDs are TradingView renderer primitive IDs; Pine object IDs are not independently exposed. Label texts are literal Pine bar_index strings from the unchanged source. Count and retained renderer objects are separately observed, never derived from declared max count.",
+  "replay_selection": {
+    "browser_utc": "2026-10-04T07:20:19.247Z",
+    "clicked_native_index": 276,
+    "host": [
+      1791095400,
+      84947.62,
+      84947.62,
+      84919.74,
+      84931.99,
+      8.11579
+    ],
+    "clicked_coordinates": {
+      "x": 312.8461538461539,
+      "y": 242
+    }
+  },
+  "replay_ready": {
+    "browser_utc": "2026-10-04T07:20:22.097Z",
+    "bars": 24675,
+    "end": true,
+    "first": {
+      "index": -24375,
+      "value": [
+        1788134400,
+        77682,
+        77682.01,
+        77572,
+        77674.04,
+        51.86295
+      ]
+    },
+    "last": {
+      "index": 299,
+      "value": [
+        1791095280,
+        84900.01,
+        84958.01,
+        84877.18,
+        84947.61,
+        15.51224
+      ]
+    },
+    "timezone": "Etc/UTC",
+    "studies": [
+      {
+        "name": "V7 label count",
+        "status": {
+          "type": 2
+        },
+        "size": 24675,
+        "first": {
+          "index": -24375,
+          "value": [
+            1788134400,
+            1
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791095280,
+            3
+          ]
+        }
+      }
+    ]
+  },
+  "replay_step": 9,
+  "ui_snapshot": "## Latest page snapshot\nuid=198_0 RootWebArea \"BTCUSDT 84,959.35 ▲ +0.24% basic\" url=\"https://www.tradingview.com/chart/xlvYwHdH/?symbol=BINANCE%3ABTCUSDT&interval=2\"\n  uid=198_1 button \"Logged in as sours-lat Active layout: basic\" haspopup=\"menu\"\n  uid=198_2 StaticText \"11\"\n  uid=198_3 button \"BTCUSDT\" description=\"Symbol search\"\n  uid=198_4 button \"Switch data type\"\n  uid=198_5 button \"Compare symbols\" haspopup=\"dialog\"\n  uid=198_6 radio \"3 minutes\"\n  uid=198_7 radio \"5 minutes\"\n  uid=198_8 radio \"15 minutes\"\n  uid=198_9 radio \"30 minutes\"\n  uid=198_10 radio \"45 minutes\"\n  uid=198_11 radio \"1 hour\"\n  uid=198_12 radio \"2 hours\"\n  uid=198_13 radio \"3 hours\"\n  uid=198_14 radio \"4 hours\"\n  uid=198_15 radio \"8 hours\"\n  uid=198_16 radio \"10 hours\"\n  uid=198_17 radio \"12 hours\"\n  uid=198_18 radio \"1 day\"\n  uid=198_19 radio \"3 days\"\n  uid=198_20 radio \"10 days\"\n  uid=198_21 radio \"1 week\"\n  uid=198_22 radio \"1 month\"\n  uid=198_23 radio \"2 minutes\" checked\n  uid=198_24 button \"Chart interval\" haspopup=\"menu\"\n  uid=198_25 radio \"Candles\" checked\n  uid=198_26 radio \"Line\"\n  uid=198_27 radio \"High-low\"\n  uid=198_28 button \"Bar's style\" haspopup=\"menu\"\n  uid=198_29 button \"Indicators, metrics, and strategies\"\n  uid=198_30 button \"Favorite indicators\" haspopup=\"menu\"\n  uid=198_31 button \"Indicator templates\" haspopup=\"menu\"\n  uid=198_32 button \"Create alert\"\n  uid=198_33 button \"Bar replay\" pressed\n  uid=198_34 button disableable disabled\n  uid=198_35 button disableable disabled\n  uid=198_36 button \"Layout setup\" haspopup=\"menu\"\n  uid=198_37 button \"All changes saved\" disableable disabled\n  uid=198_38 button \"Manage layouts\" haspopup=\"menu\"\n  uid=198_39 button \"Quick search\"\n  uid=198_40 button \"Settings\"\n  uid=198_41 button \"Fullscreen mode\"\n  uid=198_42 button \"Take a snapshot\" haspopup=\"menu\"\n  uid=198_43 button \"Share your idea with the trade community\" haspopup=\"menu\"\n  uid=198_44 button \"Trade\"\n  uid=207_0 button \"Trading options\"\n  uid=198_45 button \"Cross\"\n  uid=198_46 button \"Cursors\" pressed\n  uid=198_47 button \"Trendline\"\n  uid=198_48 button \"Trend tools\"\n  uid=198_49 button \"Fib retracement\"\n  uid=198_50 button \"Gann and Fibonacci tools\"\n  uid=198_51 button \"XABCD pattern\"\n  uid=198_52 button \"Patterns\"\n  uid=198_53 button \"Long position\"\n  uid=198_54 button \"Forecasting and measurement tools\"\n  uid=198_55 button \"Brush\"\n  uid=198_56 button \"Geometric shapes\"\n  uid=198_57 button \"Text\"\n  uid=198_58 button \"Annotation tools\"\n  uid=198_59 button \"Icon\"\n  uid=198_60 button \"Icons\"\n  uid=198_61 button \"Measure\"\n  uid=198_62 button \"Zoom in\"\n  uid=198_63 button \"Magnet mode snaps drawings placed near price bars to the closest OHLC value\" pressed\n  uid=198_64 button \"Magnets\" pressed\n  uid=198_65 button \"Keep drawing\"\n  uid=198_66 button \"Lock drawings and indicators\"\n  uid=198_67 button \"Lock options\"\n  uid=198_68 button \"Hide all drawings, indicators, positions, and orders\"\n  uid=198_69 button \"Hide options\"\n  uid=198_70 button \"New drawings will not be synced\"\n  uid=198_71 button \"Sync drawings options\"\n  uid=198_72 button \"Remove objects\"\n  uid=198_73 button \"Remove options\"\n  uid=198_74 button \"Show Favorite Drawing Tools Toolbar\"\n  uid=207_1 StaticText \"Select bar\"\n  uid=207_2 generic description=\"Play\"\n  uid=207_3 generic description=\"Forward\"\n  uid=207_4 StaticText \"10x\"\n  uid=207_5 StaticText \"2m\"\n  uid=207_6 generic description=\"Jump to real-time chart\"\n  uid=207_7 generic description=\"Exit Bar Replay\"\n  uid=198_75 region \"Chart #1\"\n    uid=198_76 StaticText \"B\"\n    uid=198_77 button \"Change symbol\"\n    uid=198_78 StaticText \"·\"\n    uid=198_79 button \"Change interval\"\n    uid=198_78 StaticText \"·\"\n    uid=198_80 StaticText \"Binance\"\n    uid=198_81 button \"Unflag symbol\"\n    uid=198_82 button \"More\" description=\"More\"\n    uid=207_8 button \"Replay mode\"\n    uid=198_84 StaticText \"O\"\n    uid=198_85 StaticText \"84,964.00\"\n    uid=198_86 StaticText \"H\"\n    uid=198_87 StaticText \"84,988.01\"\n    uid=198_88 StaticText \"L\"\n    uid=198_89 StaticText \"84,964.00\"\n    uid=198_90 StaticText \"C\"\n    uid=198_91 StaticText \"84,988.01\"\n    uid=198_92 StaticText \"+24.00 (+0.03%)\"\n    uid=198_93 StaticText \"84,988.01\"\n    uid=216_0 StaticText \"SELL\"\n    uid=198_95 StaticText \"0.00\"\n    uid=198_96 StaticText \"84,988.01\"\n    uid=216_1 StaticText \"BUY\"\n    uid=198_98 button \"Hide indicator legend\" description=\"Hide indicator legend\"\n    uid=198_99 StaticText \"V7 label count\"\n    uid=198_100 button \"Hide\" description=\"Hide\"\n    uid=198_101 button \"Settings\" description=\"Settings\"\n    uid=198_102 button \"Remove\" description=\"Remove\"\n    uid=198_103 button \"More\" description=\"More\"\n    uid=198_104 StaticText \"6.00\"\n    uid=198_105 Canvas \"Chart for BINANCE:BTCUSDT, 2 minutes\"\n  uid=198_106 button \"1 day in 1 minute intervals\"\n  uid=198_107 button \"5 days in 5 minutes intervals\"\n  uid=198_108 button \"1 month in 30 minutes intervals\"\n  uid=198_109 button \"3 months in 1 hour intervals\"\n  uid=198_110 button \"6 months in 2 hours intervals\"\n  uid=198_111 button \"Year to day in 1 day intervals\"\n  uid=198_112 button \"1 year in 1 day intervals\"\n  uid=198_113 button \"5 years in 1 week intervals\"\n  uid=198_114 button \"All data in 1 month intervals\"\n  uid=198_115 button \"Go to\"\n  uid=198_116 button \"Timezone\"\n  uid=198_117 button \"Watchlist, details, and news\"\n  uid=198_118 button \"Alerts\"\n  uid=198_119 button \"Object tree and data window\" pressed\n  uid=198_120 button \"AI Copilot\"\n  uid=198_121 button \"Screeners\"\n  uid=198_122 button \"Pine\"\n  uid=198_123 button \"Calendars\"\n  uid=198_124 button \"Community\"\n  uid=198_125 button \"Notifications\"\n  uid=198_126 button \"Chats\"\n  uid=198_127 button \"Products\" haspopup=\"menu\"\n  uid=198_128 button \"Help Center\"\n  uid=204_0 tab \"Object tree\" selectable\n  uid=204_1 tab \"Data window\" selectable selected\n  uid=204_2 generic disableable disabled\n    uid=204_3 StaticText \"Date\"\n    uid=204_4 StaticText \"Sun 04 Oct '26\"\n    uid=204_5 StaticText \"Time\"\n    uid=204_6 StaticText \"06:46\"\n  uid=204_7 row \"BTCUSDT · 2 · Binance Open 84,964.00 High 84,988.01 Low 84,964.00 Close 84,988.01 Change +24.00 (+0.03%) Vol 1.96 Last day change +205.79 (+0.24%)\"\n    uid=204_8 StaticText \"BTCUSDT · 2 · Binance\"\n    uid=204_9 button \"Hide data\"\n    uid=204_10 StaticText \"Open\"\n    uid=204_11 StaticText \"84,964.00\"\n    uid=204_12 StaticText \"High\"\n    uid=204_13 StaticText \"84,988.01\"\n    uid=204_14 StaticText \"Low\"\n    uid=204_15 StaticText \"84,964.00\"\n    uid=204_16 StaticText \"Close\"\n    uid=204_17 StaticText \"84,988.01\"\n    uid=204_18 StaticText \"Change\"\n    uid=204_19 StaticText \"+24.00 (+0.03%)\"\n    uid=204_20 StaticText \"Vol\"\n    uid=204_21 StaticText \"1.96\"\n    uid=204_22 StaticText \"Last day change\"\n    uid=204_23 StaticText \"+205.79 (+0.24%)\"\n  uid=204_24 row \"V7 label count COUNT 6.00\"\n    uid=204_25 StaticText \"V7 label count\"\n    uid=204_26 button \"Hide data\"\n    uid=207_11 StaticText \"COUNT\"\n    uid=207_12 StaticText \"6.00\"\n  uid=207_13 button \"Close Replay Trading\"\n  uid=207_14 button \"Open context menu\" expandable haspopup=\"menu\"\n  uid=207_15 button \"Collapse panel\"\n  uid=207_16 button \"Maximize panel\"\n  uid=207_17 generic\n    uid=207_18 tab selectable selected\n    uid=207_19 tab selectable\n  uid=198_129 generic \"Trading panel\"\n    uid=198_130 generic\n  uid=198_131 generic live=\"polite\" relevant=\"additions\"\n  uid=198_132 generic live=\"polite\" relevant=\"additions\"\n  uid=198_133 generic live=\"assertive\" relevant=\"additions\"\n  uid=198_134 generic live=\"assertive\" relevant=\"additions\"\n  uid=207_20 StaticText \"Bar replay\"\n  uid=198_135 generic live=\"polite\" relevant=\"additions text\"\n  uid=198_136 log live=\"polite\" relevant=\"additions text\"\n  uid=198_137 log live=\"polite\" relevant=\"additions text\"\n  uid=198_138 log live=\"polite\" relevant=\"additions text\"\n  uid=198_139 log live=\"polite\" relevant=\"additions text\"\n  uid=198_140 log live=\"polite\" relevant=\"additions text\"\n  uid=198_141 log live=\"polite\" relevant=\"additions text\"\n  uid=198_142 log live=\"polite\" relevant=\"additions text\"\n  uid=198_143 log live=\"polite\" relevant=\"additions text\"\n  uid=198_144 log live=\"polite\" relevant=\"additions text\"\n  uid=198_145 log live=\"polite\" relevant=\"additions text\"\n  uid=198_146 log live=\"polite\" relevant=\"additions text\"\n  uid=198_147 log live=\"polite\" relevant=\"additions text\"\n  uid=198_148 log live=\"polite\" relevant=\"additions text\"\n  uid=198_149 log live=\"polite\" relevant=\"additions text\"\n  uid=198_150 log live=\"polite\" relevant=\"additions text\"\n  uid=198_151 log live=\"polite\" relevant=\"additions text\"\n  uid=198_152 log live=\"polite\" relevant=\"additions text\"\n  uid=198_153 log live=\"polite\" relevant=\"additions text\"\n  uid=198_154 log live=\"polite\" relevant=\"additions text\"\n  uid=198_155 log live=\"polite\" relevant=\"additions text\"\n  uid=198_156 log live=\"polite\" relevant=\"additions text\"\n"
+}

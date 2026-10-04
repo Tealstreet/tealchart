@@ -1,0 +1,553 @@
+{
+  "browser_utc": "2026-10-04T07:28:41.700Z",
+  "tickerid": "BINANCE:BTCUSDT",
+  "timeframe": "2",
+  "timezone": "Etc/UTC",
+  "replay": true,
+  "subscription": "pro_premium",
+  "native_end_of_data": true,
+  "dataset_first": {
+    "index": -24378,
+    "value": [
+      1788134400,
+      77682,
+      77682.01,
+      77572,
+      77674.04,
+      51.86295
+    ]
+  },
+  "host_last": {
+    "index": 311,
+    "value": [
+      1791097080,
+      85040.94,
+      85040.94,
+      85040.94,
+      85040.94,
+      1.242075
+    ]
+  },
+  "study_status": {
+    "type": 2
+  },
+  "study_last": {
+    "index": 311,
+    "value": [
+      1791097080,
+      2
+    ]
+  },
+  "native_plot_rows": [
+    {
+      "native_index": 290,
+      "host": [
+        1791094560,
+        84922.61,
+        84925.58,
+        84922.6,
+        84925.58,
+        4.10421
+      ],
+      "source": [
+        1791094560,
+        3
+      ]
+    },
+    {
+      "native_index": 291,
+      "host": [
+        1791094680,
+        84925.58,
+        84930.01,
+        84925.56,
+        84930,
+        20.79635
+      ],
+      "source": [
+        1791094680,
+        4
+      ]
+    },
+    {
+      "native_index": 292,
+      "host": [
+        1791094800,
+        84930,
+        84971.99,
+        84930,
+        84971.99,
+        12.27031
+      ],
+      "source": [
+        1791094800,
+        5
+      ]
+    },
+    {
+      "native_index": 293,
+      "host": [
+        1791094920,
+        84971.98,
+        85058.01,
+        84964,
+        84964,
+        56.87612
+      ],
+      "source": [
+        1791094920,
+        6
+      ]
+    },
+    {
+      "native_index": 294,
+      "host": [
+        1791095040,
+        84964.01,
+        84964.01,
+        84935.98,
+        84935.99,
+        19.1083
+      ],
+      "source": [
+        1791095040,
+        7
+      ]
+    },
+    {
+      "native_index": 295,
+      "host": [
+        1791095160,
+        84935.98,
+        84935.98,
+        84900,
+        84900.01,
+        8.89687
+      ],
+      "source": [
+        1791095160,
+        2
+      ]
+    },
+    {
+      "native_index": 296,
+      "host": [
+        1791095280,
+        84900.01,
+        84958.01,
+        84877.18,
+        84947.61,
+        15.51224
+      ],
+      "source": [
+        1791095280,
+        3
+      ]
+    },
+    {
+      "native_index": 297,
+      "host": [
+        1791095400,
+        84947.62,
+        84947.62,
+        84919.74,
+        84931.99,
+        8.11579
+      ],
+      "source": [
+        1791095400,
+        4
+      ]
+    },
+    {
+      "native_index": 298,
+      "host": [
+        1791095520,
+        84932,
+        85017.13,
+        84931.99,
+        85010.13,
+        15.24578
+      ],
+      "source": [
+        1791095520,
+        5
+      ]
+    },
+    {
+      "native_index": 299,
+      "host": [
+        1791095640,
+        85010.13,
+        85022.01,
+        85010.13,
+        85022.01,
+        7.17196
+      ],
+      "source": [
+        1791095640,
+        6
+      ]
+    },
+    {
+      "native_index": 300,
+      "host": [
+        1791095760,
+        85022.01,
+        85029.2,
+        84989.04,
+        84989.04,
+        20.34329
+      ],
+      "source": [
+        1791095760,
+        7
+      ]
+    },
+    {
+      "native_index": 301,
+      "host": [
+        1791095880,
+        84989.04,
+        84989.05,
+        84979.01,
+        84980,
+        5.44553
+      ],
+      "source": [
+        1791095880,
+        8
+      ]
+    },
+    {
+      "native_index": 302,
+      "host": [
+        1791096000,
+        84980.01,
+        84980.01,
+        84978.35,
+        84978.36,
+        2.11768
+      ],
+      "source": [
+        1791096000,
+        9
+      ]
+    },
+    {
+      "native_index": 303,
+      "host": [
+        1791096120,
+        84978.36,
+        84978.36,
+        84948.34,
+        84957.58,
+        24.70147
+      ],
+      "source": [
+        1791096120,
+        10
+      ]
+    },
+    {
+      "native_index": 304,
+      "host": [
+        1791096240,
+        84957.58,
+        84964.01,
+        84957.58,
+        84964.01,
+        4.36726
+      ],
+      "source": [
+        1791096240,
+        11
+      ]
+    },
+    {
+      "native_index": 305,
+      "host": [
+        1791096360,
+        84964,
+        84988.01,
+        84964,
+        84988.01,
+        1.95837
+      ],
+      "source": [
+        1791096360,
+        3
+      ]
+    },
+    {
+      "native_index": 306,
+      "host": [
+        1791096480,
+        84988,
+        84995.41,
+        84988,
+        84995.08,
+        2.8296
+      ],
+      "source": [
+        1791096480,
+        4
+      ]
+    },
+    {
+      "native_index": 307,
+      "host": [
+        1791096600,
+        84995.09,
+        85029.83,
+        84995.08,
+        85029.83,
+        3.2457
+      ],
+      "source": [
+        1791096600,
+        5
+      ]
+    },
+    {
+      "native_index": 308,
+      "host": [
+        1791096720,
+        85029.82,
+        85046.01,
+        85029.82,
+        85046,
+        3.49037
+      ],
+      "source": [
+        1791096720,
+        6
+      ]
+    },
+    {
+      "native_index": 309,
+      "host": [
+        1791096840,
+        85046.01,
+        85072.54,
+        85046,
+        85055.11,
+        7.63132
+      ],
+      "source": [
+        1791096840,
+        7
+      ]
+    },
+    {
+      "native_index": 310,
+      "host": [
+        1791096960,
+        85055.11,
+        85055.12,
+        85038.27,
+        85040.94,
+        6.01232
+      ],
+      "source": [
+        1791096960,
+        8
+      ]
+    },
+    {
+      "native_index": 311,
+      "host": [
+        1791097080,
+        85040.94,
+        85040.94,
+        85040.94,
+        85040.94,
+        1.242075
+      ],
+      "source": [
+        1791097080,
+        2
+      ]
+    }
+  ],
+  "graphics_index_map": [
+    310,
+    311,
+    312
+  ],
+  "graphic_groups": [
+    {
+      "name": "polylines",
+      "collections": [
+        {
+          "key": false,
+          "raw": [
+            [
+              24712,
+              {
+                "id": 24712,
+                "points": [
+                  {
+                    "x": 0,
+                    "y": 85040.94
+                  },
+                  {
+                    "x": 1,
+                    "y": 85041.94
+                  }
+                ],
+                "w": 1,
+                "crv": false,
+                "cls": false,
+                "c": 0,
+                "fc": null,
+                "st": "sol"
+              }
+            ],
+            [
+              24713,
+              {
+                "id": 24713,
+                "points": [
+                  {
+                    "x": 1,
+                    "y": 85040.94
+                  },
+                  {
+                    "x": 2,
+                    "y": 85041.94
+                  }
+                ],
+                "w": 1,
+                "crv": false,
+                "cls": false,
+                "c": 0,
+                "fc": null,
+                "st": "sol"
+              }
+            ]
+          ],
+          "materialized": [
+            {
+              "id": 24712,
+              "points": [
+                {
+                  "x": 310,
+                  "y": 85040.94
+                },
+                {
+                  "x": 311,
+                  "y": 85041.94
+                }
+              ],
+              "width": 1,
+              "curved": false,
+              "closed": false,
+              "color": 0,
+              "fillColor": null,
+              "style": "sol"
+            },
+            {
+              "id": 24713,
+              "points": [
+                {
+                  "x": 311,
+                  "y": 85040.94
+                },
+                {
+                  "x": 312,
+                  "y": 85041.94
+                }
+              ],
+              "width": 1,
+              "curved": false,
+              "closed": false,
+              "color": 0,
+              "fillColor": null,
+              "style": "sol"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  },
+  "visible_range": {
+    "_firstBar": 289,
+    "_lastBar": 315
+  },
+  "limits": "Raw IDs are TradingView renderer primitive IDs; Pine object IDs are not independently exposed. Label texts are literal Pine bar_index strings from the unchanged source. Count and retained renderer objects are separately observed, never derived from declared max count.",
+  "replay_selection": {
+    "browser_utc": "2026-10-04T07:27:37.739Z",
+    "clicked_native_index": 274,
+    "host": [
+      1791095760,
+      85022.01,
+      85029.2,
+      84989.04,
+      84989.04,
+      20.34329
+    ],
+    "clicked_coordinates": {
+      "x": 312.8461538461539,
+      "y": 242
+    }
+  },
+  "replay_ready": {
+    "browser_utc": "2026-10-04T07:27:40.296Z",
+    "bars": 24678,
+    "end": true,
+    "first": {
+      "index": -24378,
+      "value": [
+        1788134400,
+        77682,
+        77682.01,
+        77572,
+        77674.04,
+        51.86295
+      ]
+    },
+    "last": {
+      "index": 299,
+      "value": [
+        1791095640,
+        85010.13,
+        85022.01,
+        85010.13,
+        85022.01,
+        7.17196
+      ]
+    },
+    "timezone": "Etc/UTC",
+    "studies": [
+      {
+        "name": "V7 polyline count",
+        "status": {
+          "type": 2
+        },
+        "size": 24678,
+        "first": {
+          "index": -24378,
+          "value": [
+            1788134400,
+            1
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791095640,
+            6
+          ]
+        }
+      }
+    ]
+  },
+  "replay_step": 12,
+  "ui_snapshot": "## Latest page snapshot\nuid=332_0 RootWebArea \"BTCUSDT 84,980.64 ▲ +0.27% basic\" url=\"https://www.tradingview.com/chart/xlvYwHdH/?symbol=BINANCE%3ABTCUSDT&interval=2\"\n  uid=332_1 button \"Logged in as sours-lat Active layout: basic\" haspopup=\"menu\"\n  uid=332_2 StaticText \"11\"\n  uid=332_3 button \"BTCUSDT\" description=\"Symbol search\"\n  uid=332_4 button \"Switch data type\"\n  uid=332_5 button \"Compare symbols\" haspopup=\"dialog\"\n  uid=332_6 radio \"3 minutes\"\n  uid=332_7 radio \"5 minutes\"\n  uid=332_8 radio \"15 minutes\"\n  uid=332_9 radio \"30 minutes\"\n  uid=332_10 radio \"45 minutes\"\n  uid=332_11 radio \"1 hour\"\n  uid=332_12 radio \"2 hours\"\n  uid=332_13 radio \"3 hours\"\n  uid=332_14 radio \"4 hours\"\n  uid=332_15 radio \"8 hours\"\n  uid=332_16 radio \"10 hours\"\n  uid=332_17 radio \"12 hours\"\n  uid=332_18 radio \"1 day\"\n  uid=332_19 radio \"3 days\"\n  uid=332_20 radio \"10 days\"\n  uid=332_21 radio \"1 week\"\n  uid=332_22 radio \"1 month\"\n  uid=332_23 radio \"2 minutes\" checked\n  uid=332_24 button \"Chart interval\" haspopup=\"menu\"\n  uid=332_25 radio \"Candles\" checked\n  uid=332_26 radio \"Line\"\n  uid=332_27 radio \"High-low\"\n  uid=332_28 button \"Bar's style\" haspopup=\"menu\"\n  uid=332_29 button \"Indicators, metrics, and strategies\"\n  uid=332_30 button \"Favorite indicators\" haspopup=\"menu\"\n  uid=332_31 button \"Indicator templates\" haspopup=\"menu\"\n  uid=332_32 button \"Create alert\"\n  uid=332_33 button \"Bar replay\" pressed\n  uid=332_34 button disableable disabled\n  uid=332_35 button disableable disabled\n  uid=332_36 button \"Layout setup\" haspopup=\"menu\"\n  uid=332_37 button \"All changes saved\" disableable disabled\n  uid=332_38 button \"Manage layouts\" haspopup=\"menu\"\n  uid=332_39 button \"Quick search\"\n  uid=332_40 button \"Settings\"\n  uid=332_41 button \"Fullscreen mode\"\n  uid=332_42 button \"Take a snapshot\" haspopup=\"menu\"\n  uid=332_43 button \"Share your idea with the trade community\" haspopup=\"menu\"\n  uid=332_44 button \"Trade\"\n  uid=341_0 button \"Trading options\"\n  uid=332_45 button \"Cross\"\n  uid=332_46 button \"Cursors\" pressed\n  uid=332_47 button \"Trendline\"\n  uid=332_48 button \"Trend tools\"\n  uid=332_49 button \"Fib retracement\"\n  uid=332_50 button \"Gann and Fibonacci tools\"\n  uid=332_51 button \"XABCD pattern\"\n  uid=332_52 button \"Patterns\"\n  uid=332_53 button \"Long position\"\n  uid=332_54 button \"Forecasting and measurement tools\"\n  uid=332_55 button \"Brush\"\n  uid=332_56 button \"Geometric shapes\"\n  uid=332_57 button \"Text\"\n  uid=332_58 button \"Annotation tools\"\n  uid=332_59 button \"Icon\"\n  uid=332_60 button \"Icons\"\n  uid=332_61 button \"Measure\"\n  uid=332_62 button \"Zoom in\"\n  uid=332_63 button \"Magnet mode snaps drawings placed near price bars to the closest OHLC value\" pressed\n  uid=332_64 button \"Magnets\" pressed\n  uid=332_65 button \"Keep drawing\"\n  uid=332_66 button \"Lock drawings and indicators\"\n  uid=332_67 button \"Lock options\"\n  uid=332_68 button \"Hide all drawings, indicators, positions, and orders\"\n  uid=332_69 button \"Hide options\"\n  uid=332_70 button \"New drawings will not be synced\"\n  uid=332_71 button \"Sync drawings options\"\n  uid=332_72 button \"Remove objects\"\n  uid=332_73 button \"Remove options\"\n  uid=332_74 button \"Show Favorite Drawing Tools Toolbar\"\n  uid=341_1 StaticText \"Select bar\"\n  uid=341_2 generic description=\"Play\"\n  uid=341_3 generic description=\"Forward\"\n  uid=341_4 StaticText \"10x\"\n  uid=341_5 StaticText \"2m\"\n  uid=341_6 generic description=\"Jump to real-time chart\"\n  uid=341_7 generic description=\"Exit Bar Replay\"\n  uid=332_75 region \"Chart #1\"\n    uid=332_76 StaticText \"B\"\n    uid=332_77 button \"Change symbol\"\n    uid=332_78 StaticText \"·\"\n    uid=332_79 button \"Change interval\"\n    uid=332_78 StaticText \"·\"\n    uid=332_80 StaticText \"Binance\"\n    uid=332_81 button \"Unflag symbol\"\n    uid=332_82 button \"More\" description=\"More\"\n    uid=341_8 button \"Replay mode\"\n    uid=332_84 StaticText \"O\"\n    uid=332_85 StaticText \"85,040.94\"\n    uid=332_86 StaticText \"H\"\n    uid=332_87 StaticText \"85,040.95\"\n    uid=332_88 StaticText \"L\"\n    uid=332_89 StaticText \"85,031.73\"\n    uid=332_90 StaticText \"C\"\n    uid=332_91 StaticText \"85,031.74\"\n    uid=332_92 StaticText \"−9.20 (−0.01%)\"\n    uid=332_93 StaticText \"85,040.94\"\n    uid=352_0 StaticText \"SELL\"\n    uid=332_95 StaticText \"0.00\"\n    uid=332_96 StaticText \"85,040.94\"\n    uid=352_1 StaticText \"BUY\"\n    uid=332_98 button \"Hide indicator legend\" description=\"Hide indicator legend\"\n    uid=332_99 StaticText \"V7 polyline count\"\n    uid=332_100 button \"Hide\" description=\"Hide\"\n    uid=332_101 button \"Settings\" description=\"Settings\"\n    uid=332_102 button \"Remove\" description=\"Remove\"\n    uid=332_103 button \"More\" description=\"More\"\n    uid=332_104 StaticText \"9.00\"\n    uid=332_105 Canvas \"Chart for BINANCE:BTCUSDT, 2 minutes\"\n  uid=332_106 button \"1 day in 1 minute intervals\"\n  uid=332_107 button \"5 days in 5 minutes intervals\"\n  uid=332_108 button \"1 month in 30 minutes intervals\"\n  uid=332_109 button \"3 months in 1 hour intervals\"\n  uid=332_110 button \"6 months in 2 hours intervals\"\n  uid=332_111 button \"Year to day in 1 day intervals\"\n  uid=332_112 button \"1 year in 1 day intervals\"\n  uid=332_113 button \"5 years in 1 week intervals\"\n  uid=332_114 button \"All data in 1 month intervals\"\n  uid=332_115 button \"Go to\"\n  uid=332_116 button \"Timezone\"\n  uid=332_117 button \"Watchlist, details, and news\"\n  uid=332_118 button \"Alerts\"\n  uid=332_119 button \"Object tree and data window\" pressed\n  uid=332_120 button \"AI Copilot\"\n  uid=332_121 button \"Screeners\"\n  uid=332_122 button \"Pine\"\n  uid=332_123 button \"Calendars\"\n  uid=332_124 button \"Community\"\n  uid=332_125 button \"Notifications\"\n  uid=332_126 button \"Chats\"\n  uid=332_127 button \"Products\" haspopup=\"menu\"\n  uid=332_128 button \"Help Center\"\n  uid=338_0 tab \"Object tree\" selectable\n  uid=338_1 tab \"Data window\" selectable selected\n  uid=338_2 generic disableable disabled\n    uid=338_3 StaticText \"Date\"\n    uid=338_4 StaticText \"Sun 04 Oct '26\"\n    uid=338_5 StaticText \"Time\"\n    uid=338_6 StaticText \"06:58\"\n  uid=338_7 row \"BTCUSDT · 2 · Binance Open 85,040.94 High 85,040.95 Low 85,031.73 Close 85,031.74 Change −9.20 (−0.01%) Vol 4.97 Last day change +227.08 (+0.27%)\"\n    uid=338_8 StaticText \"BTCUSDT · 2 · Binance\"\n    uid=338_9 button \"Hide data\"\n    uid=338_10 StaticText \"Open\"\n    uid=338_11 StaticText \"85,040.94\"\n    uid=338_12 StaticText \"High\"\n    uid=338_13 StaticText \"85,040.95\"\n    uid=338_14 StaticText \"Low\"\n    uid=338_15 StaticText \"85,031.73\"\n    uid=338_16 StaticText \"Close\"\n    uid=338_17 StaticText \"85,031.74\"\n    uid=338_18 StaticText \"Change\"\n    uid=338_19 StaticText \"−9.20 (−0.01%)\"\n    uid=338_20 StaticText \"Vol\"\n    uid=338_21 StaticText \"4.97\"\n    uid=338_22 StaticText \"Last day change\"\n    uid=338_23 StaticText \"+227.08 (+0.27%)\"\n  uid=338_24 row \"V7 polyline count COUNT 9.00\"\n    uid=338_25 StaticText \"V7 polyline count\"\n    uid=338_26 button \"Hide data\"\n    uid=341_11 StaticText \"COUNT\"\n    uid=341_12 StaticText \"9.00\"\n  uid=341_13 button \"Close Replay Trading\"\n  uid=341_14 button \"Open context menu\" expandable haspopup=\"menu\"\n  uid=341_15 button \"Collapse panel\"\n  uid=341_16 button \"Maximize panel\"\n  uid=341_17 generic\n    uid=341_18 tab selectable selected\n    uid=341_19 tab selectable\n  uid=332_129 generic \"Trading panel\"\n    uid=332_130 generic\n  uid=332_131 generic live=\"polite\" relevant=\"additions\"\n  uid=332_132 generic live=\"polite\" relevant=\"additions\"\n  uid=332_133 generic live=\"assertive\" relevant=\"additions\"\n  uid=332_134 generic live=\"assertive\" relevant=\"additions\"\n  uid=341_20 StaticText \"Bar replay\"\n  uid=332_135 generic live=\"polite\" relevant=\"additions text\"\n  uid=332_136 log live=\"polite\" relevant=\"additions text\"\n  uid=332_137 log live=\"polite\" relevant=\"additions text\"\n  uid=332_138 log live=\"polite\" relevant=\"additions text\"\n  uid=332_139 log live=\"polite\" relevant=\"additions text\"\n  uid=332_140 log live=\"polite\" relevant=\"additions text\"\n  uid=332_141 log live=\"polite\" relevant=\"additions text\"\n  uid=332_142 log live=\"polite\" relevant=\"additions text\"\n  uid=332_143 log live=\"polite\" relevant=\"additions text\"\n  uid=332_144 log live=\"polite\" relevant=\"additions text\"\n  uid=332_145 log live=\"polite\" relevant=\"additions text\"\n  uid=332_146 log live=\"polite\" relevant=\"additions text\"\n  uid=332_147 log live=\"polite\" relevant=\"additions text\"\n  uid=332_148 log live=\"polite\" relevant=\"additions text\"\n  uid=332_149 log live=\"polite\" relevant=\"additions text\"\n  uid=332_150 log live=\"polite\" relevant=\"additions text\"\n  uid=332_151 log live=\"polite\" relevant=\"additions text\"\n  uid=332_152 log live=\"polite\" relevant=\"additions text\"\n  uid=332_153 log live=\"polite\" relevant=\"additions text\"\n  uid=332_154 log live=\"polite\" relevant=\"additions text\"\n  uid=332_155 log live=\"polite\" relevant=\"additions text\"\n  uid=332_156 log live=\"polite\" relevant=\"additions text\"\n"
+}

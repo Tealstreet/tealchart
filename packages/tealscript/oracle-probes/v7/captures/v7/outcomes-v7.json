@@ -40596,5 +40596,1565 @@
     },
     "data_window_witness": "captures/v7/evidence/analyst-target-availability-v6-v1-attempt3-data-window-v1.json",
     "readiness_instrument_note": "Native accepted status2 with one last-bar-only row of analyst fields after full daily AAPL history. Initial helper incorrectly expected>=600 study cache rows; direct raw CSV and native Data Window capture confirm RUNS. Exact resetUTC was not retained after helper timeout; resetUTC=null is intentional. Host/history/source and CSV minimum checks remain required. Native primary/pro_name NASDAQ:AAPL, actual selected/resolved OHLC feed BATS:AAPL/Cboe One. This does not claim NASDAQ OHLC capture."
+  },
+  {
+    "script": "label-approx-count-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "20dc7596fc8f62c3f26e7d333b7bcbe22392f127df784ce09d82727120dd5c05",
+    "indicator_title": "V7 label count",
+    "status": "RUNS",
+    "csv_file": "captures/v7/label-approx-count-v6-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T151757.056.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 label count",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24399,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24699,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T07:17:48.285Z",
+    "live_candle_open_utc": "2026-10-04T07:16:00.000Z",
+    "export_utc": "2026-10-04T07:17:57.742Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/label-approx-count-v6-v1-attempt1-setup.png",
+      "captures/v7/evidence/label-approx-count-v6-v1-attempt1-export.png",
+      "captures/v7/evidence/label-approx-count-v6-v1-attempt1-logs.txt",
+      "captures/v7/evidence/label-approx-count-v6-v1-attempt1-logs-v1.json",
+      "captures/v7/evidence/label-approx-count-v6-v1-attempt1-logs.png",
+      "captures/v7/evidence/label-approx-count-v6-v1-attempt1-visual.png",
+      "captures/v7/evidence/label-approx-count-v6-v1-attempt1-data-window-v1.png",
+      "captures/v7/evidence/label-approx-count-v6-v1-attempt1-data-window-v1.json",
+      "captures/v7/evidence/label-approx-count-v6-v1-attempt1-data-window-v1.txt",
+      "captures/v7/evidence/label-approx-count-v6-v1-attempt1-count-replay-step0-v1.json",
+      "captures/v7/evidence/label-approx-count-v6-v1-attempt1-count-replay-step0-v1.png",
+      "captures/v7/evidence/label-approx-count-v6-v1-attempt1-count-replay-step1-v1.json",
+      "captures/v7/evidence/label-approx-count-v6-v1-attempt1-count-replay-step1-v1.png",
+      "captures/v7/evidence/label-approx-count-v6-v1-attempt1-count-replay-step2-v1.json",
+      "captures/v7/evidence/label-approx-count-v6-v1-attempt1-count-replay-step2-v1.png",
+      "captures/v7/evidence/label-approx-count-v6-v1-attempt1-count-replay-step3-v1.json",
+      "captures/v7/evidence/label-approx-count-v6-v1-attempt1-count-replay-step3-v1.png",
+      "captures/v7/evidence/label-approx-count-v6-v1-attempt1-count-replay-step4-v1.json",
+      "captures/v7/evidence/label-approx-count-v6-v1-attempt1-count-replay-step4-v1.png",
+      "captures/v7/evidence/label-approx-count-v6-v1-attempt1-count-replay-step5-v1.json",
+      "captures/v7/evidence/label-approx-count-v6-v1-attempt1-count-replay-step5-v1.png",
+      "captures/v7/evidence/label-approx-count-v6-v1-attempt1-count-replay-step6-v1.json",
+      "captures/v7/evidence/label-approx-count-v6-v1-attempt1-count-replay-step6-v1.png",
+      "captures/v7/evidence/label-approx-count-v6-v1-attempt1-count-replay-step7-v1.json",
+      "captures/v7/evidence/label-approx-count-v6-v1-attempt1-count-replay-step7-v1.png",
+      "captures/v7/evidence/label-approx-count-v6-v1-attempt1-count-replay-step8-v1.json",
+      "captures/v7/evidence/label-approx-count-v6-v1-attempt1-count-replay-step8-v1.png",
+      "captures/v7/evidence/label-approx-count-v6-v1-attempt1-count-replay-step9-v1.json",
+      "captures/v7/evidence/label-approx-count-v6-v1-attempt1-count-replay-step9-v1.png",
+      "captures/v7/evidence/label-approx-count-v6-v1-attempt1-count-replay-step10-v1.json",
+      "captures/v7/evidence/label-approx-count-v6-v1-attempt1-count-replay-step10-v1.png",
+      "captures/v7/evidence/label-approx-count-v6-v1-attempt1-count-replay-step11-v1.json",
+      "captures/v7/evidence/label-approx-count-v6-v1-attempt1-count-replay-step11-v1.png",
+      "captures/v7/evidence/label-approx-count-v6-v1-attempt1-count-replay-step12-v1.json",
+      "captures/v7/evidence/label-approx-count-v6-v1-attempt1-count-replay-step12-v1.png",
+      "captures/v7/evidence/label-approx-count-v6-v1-attempt1-count-replay-step13-v1.json",
+      "captures/v7/evidence/label-approx-count-v6-v1-attempt1-count-replay-step13-v1.png",
+      "captures/v7/evidence/label-approx-count-v6-v1-attempt1-count-replay-step14-v1.json",
+      "captures/v7/evidence/label-approx-count-v6-v1-attempt1-count-replay-step14-v1.png",
+      "captures/v7/evidence/label-approx-count-v6-v1-attempt1-count-replay-step15-v1.json",
+      "captures/v7/evidence/label-approx-count-v6-v1-attempt1-count-replay-step15-v1.png",
+      "captures/v7/evidence/label-approx-count-v6-v1-attempt1-count-replay-step16-v1.json",
+      "captures/v7/evidence/label-approx-count-v6-v1-attempt1-count-replay-step16-v1.png",
+      "captures/v7/evidence/label-approx-count-v6-v1-attempt1-count-replay-step17-v1.json",
+      "captures/v7/evidence/label-approx-count-v6-v1-attempt1-count-replay-step17-v1.png",
+      "captures/v7/evidence/label-approx-count-v6-v1-attempt1-count-replay-step18-v1.json",
+      "captures/v7/evidence/label-approx-count-v6-v1-attempt1-count-replay-step18-v1.png",
+      "captures/v7/evidence/label-approx-count-v6-v1-attempt1-count-replay-step19-v1.json",
+      "captures/v7/evidence/label-approx-count-v6-v1-attempt1-count-replay-step19-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T07:17:49.153Z",
+        "bars": 2556,
+        "end": false,
+        "first": {
+          "index": -2256,
+          "value": [
+            1790791560,
+            83986,
+            83994.01,
+            83930.15,
+            83994.01,
+            13.74363
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791098160,
+            84972,
+            84972.01,
+            84948.77,
+            84948.78,
+            6.75805
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 label count",
+            "status": {
+              "type": 2
+            },
+            "size": 2556,
+            "first": {
+              "index": -2256,
+              "value": [
+                1790791560,
+                4
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791098160,
+                3
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:17:50.513Z",
+        "bars": 24699,
+        "end": true,
+        "first": {
+          "index": -24399,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791098160,
+            84972,
+            84972.01,
+            84948.77,
+            84948.77,
+            6.80104
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 label count",
+            "status": {
+              "type": 2
+            },
+            "size": 24699,
+            "first": {
+              "index": -24399,
+              "value": [
+                1788134400,
+                1
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791098160,
+                3
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   07:16",
+    "historical_compare_before_unix_seconds": 1791098160,
+    "pine_logs": {
+      "paths": [
+        "evidence/label-approx-count-v6-v1-attempt1-logs.txt",
+        "evidence/label-approx-count-v6-v1-attempt1-logs-v1.json",
+        "evidence/label-approx-count-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "e49e31dbf8082ee2d8927cd6ec9605eccd2d86d64457459d4983ae0d2ab31d95",
+    "csv_bytes": 1142192,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "COUNT"
+    ],
+    "declared_to_native_header_mapping": {
+      "COUNT": "COUNT"
+    },
+    "csv_rows": 24699,
+    "historical_rows": 24698,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791098160,
+    "first_historical_values": {
+      "COUNT": "1"
+    },
+    "last_historical_values": {
+      "COUNT": "2"
+    },
+    "data_window_witness": "captures/v7/evidence/label-approx-count-v6-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "script": "label-approx-count-v6-v1.pine",
+    "attempt": 2,
+    "source_sha256": "20dc7596fc8f62c3f26e7d333b7bcbe22392f127df784ce09d82727120dd5c05",
+    "indicator_title": "V7 label count",
+    "status": "RUNS",
+    "csv_file": "captures/v7/label-approx-count-v6-v1-attempt2.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T152214.364.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 label count",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24402,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24702,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T07:22:05.051Z",
+    "live_candle_open_utc": "2026-10-04T07:22:00.000Z",
+    "export_utc": "2026-10-04T07:22:14.825Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/label-approx-count-v6-v1-attempt2-setup.png",
+      "captures/v7/evidence/label-approx-count-v6-v1-attempt2-export.png",
+      "captures/v7/evidence/label-approx-count-v6-v1-attempt2-logs.txt",
+      "captures/v7/evidence/label-approx-count-v6-v1-attempt2-logs-v1.json",
+      "captures/v7/evidence/label-approx-count-v6-v1-attempt2-logs.png",
+      "captures/v7/evidence/label-approx-count-v6-v1-attempt2-visual.png",
+      "captures/v7/evidence/label-approx-count-v6-v1-attempt2-data-window-v1.png",
+      "captures/v7/evidence/label-approx-count-v6-v1-attempt2-data-window-v1.json",
+      "captures/v7/evidence/label-approx-count-v6-v1-attempt2-data-window-v1.txt",
+      "captures/v7/evidence/label-approx-count-v6-v1-attempt2-count-live-ticks-v1.json",
+      "captures/v7/evidence/label-approx-count-v6-v1-attempt2-count-live-ticks-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T07:22:05.873Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790793360,
+            83828.12,
+            83834.27,
+            83811.95,
+            83811.96,
+            9.68983
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791098520,
+            84960,
+            84960,
+            84959.99,
+            84959.99,
+            0.26576
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 label count",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790793360,
+                7
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791098520,
+                6
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:22:07.223Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790793360,
+            83828.12,
+            83834.27,
+            83811.95,
+            83811.96,
+            9.68983
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791098520,
+            84960,
+            84960,
+            84959.99,
+            84959.99,
+            0.26576
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 label count",
+            "status": {
+              "type": 2
+            },
+            "size": 24702,
+            "first": {
+              "index": -1022158,
+              "value": [
+                1788134400,
+                1
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791098520,
+                6
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:22:08.079Z",
+        "bars": 24702,
+        "end": true,
+        "first": {
+          "index": -24402,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791098520,
+            84960,
+            84960,
+            84959.99,
+            84960,
+            0.26876
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 label count",
+            "status": {
+              "type": 2
+            },
+            "size": 24702,
+            "first": {
+              "index": -24402,
+              "value": [
+                1788134400,
+                1
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791098520,
+                6
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   07:22",
+    "historical_compare_before_unix_seconds": 1791098520,
+    "pine_logs": {
+      "paths": [
+        "evidence/label-approx-count-v6-v1-attempt2-logs.txt",
+        "evidence/label-approx-count-v6-v1-attempt2-logs-v1.json",
+        "evidence/label-approx-count-v6-v1-attempt2-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "aecd905ef69ee32e51025f264d956ecd452dadc920c3269847cf19fa9c827bd5",
+    "csv_bytes": 1142318,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "COUNT"
+    ],
+    "declared_to_native_header_mapping": {
+      "COUNT": "COUNT"
+    },
+    "csv_rows": 24702,
+    "historical_rows": 24701,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791098520,
+    "first_historical_values": {
+      "COUNT": "1"
+    },
+    "last_historical_values": {
+      "COUNT": "5"
+    },
+    "data_window_witness": "captures/v7/evidence/label-approx-count-v6-v1-attempt2-data-window-v1.json"
+  },
+  {
+    "script": "line-approx-count-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "8ca35533a517d7fe5a223df2e3351ae0b95ab0cea79b7089f9ed9e08565335b1",
+    "indicator_title": "V7 line count",
+    "status": "RUNS",
+    "csv_file": "captures/v7/line-approx-count-v6-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T152324.064.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 line count",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24402,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24702,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T07:23:11.830Z",
+    "live_candle_open_utc": "2026-10-04T07:22:00.000Z",
+    "export_utc": "2026-10-04T07:23:24.499Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/line-approx-count-v6-v1-attempt1-setup.png",
+      "captures/v7/evidence/line-approx-count-v6-v1-attempt1-export.png",
+      "captures/v7/evidence/line-approx-count-v6-v1-attempt1-logs.txt",
+      "captures/v7/evidence/line-approx-count-v6-v1-attempt1-logs-v1.json",
+      "captures/v7/evidence/line-approx-count-v6-v1-attempt1-logs.png",
+      "captures/v7/evidence/line-approx-count-v6-v1-attempt1-visual.png",
+      "captures/v7/evidence/line-approx-count-v6-v1-attempt1-data-window-v1.png",
+      "captures/v7/evidence/line-approx-count-v6-v1-attempt1-data-window-v1.json",
+      "captures/v7/evidence/line-approx-count-v6-v1-attempt1-data-window-v1.txt",
+      "captures/v7/evidence/line-approx-count-v6-v1-attempt1-count-replay-step0-v1.json",
+      "captures/v7/evidence/line-approx-count-v6-v1-attempt1-count-replay-step0-v1.png",
+      "captures/v7/evidence/line-approx-count-v6-v1-attempt1-count-replay-step1-v1.json",
+      "captures/v7/evidence/line-approx-count-v6-v1-attempt1-count-replay-step1-v1.png",
+      "captures/v7/evidence/line-approx-count-v6-v1-attempt1-count-replay-step2-v1.json",
+      "captures/v7/evidence/line-approx-count-v6-v1-attempt1-count-replay-step2-v1.png",
+      "captures/v7/evidence/line-approx-count-v6-v1-attempt1-count-replay-step3-v1.json",
+      "captures/v7/evidence/line-approx-count-v6-v1-attempt1-count-replay-step3-v1.png",
+      "captures/v7/evidence/line-approx-count-v6-v1-attempt1-count-replay-step4-v1.json",
+      "captures/v7/evidence/line-approx-count-v6-v1-attempt1-count-replay-step4-v1.png",
+      "captures/v7/evidence/line-approx-count-v6-v1-attempt1-count-replay-step5-v1.json",
+      "captures/v7/evidence/line-approx-count-v6-v1-attempt1-count-replay-step5-v1.png",
+      "captures/v7/evidence/line-approx-count-v6-v1-attempt1-count-replay-step6-v1.json",
+      "captures/v7/evidence/line-approx-count-v6-v1-attempt1-count-replay-step6-v1.png",
+      "captures/v7/evidence/line-approx-count-v6-v1-attempt1-count-replay-step7-v1.json",
+      "captures/v7/evidence/line-approx-count-v6-v1-attempt1-count-replay-step7-v1.png",
+      "captures/v7/evidence/line-approx-count-v6-v1-attempt1-count-replay-step8-v1.json",
+      "captures/v7/evidence/line-approx-count-v6-v1-attempt1-count-replay-step8-v1.png",
+      "captures/v7/evidence/line-approx-count-v6-v1-attempt1-count-replay-step9-v1.json",
+      "captures/v7/evidence/line-approx-count-v6-v1-attempt1-count-replay-step9-v1.png",
+      "captures/v7/evidence/line-approx-count-v6-v1-attempt1-count-replay-step10-v1.json",
+      "captures/v7/evidence/line-approx-count-v6-v1-attempt1-count-replay-step10-v1.png",
+      "captures/v7/evidence/line-approx-count-v6-v1-attempt1-count-replay-step11-v1.json",
+      "captures/v7/evidence/line-approx-count-v6-v1-attempt1-count-replay-step11-v1.png",
+      "captures/v7/evidence/line-approx-count-v6-v1-attempt1-count-replay-step12-v1.json",
+      "captures/v7/evidence/line-approx-count-v6-v1-attempt1-count-replay-step12-v1.png",
+      "captures/v7/evidence/line-approx-count-v6-v1-attempt1-count-replay-step13-v1.json",
+      "captures/v7/evidence/line-approx-count-v6-v1-attempt1-count-replay-step13-v1.png",
+      "captures/v7/evidence/line-approx-count-v6-v1-attempt1-count-replay-step14-v1.json",
+      "captures/v7/evidence/line-approx-count-v6-v1-attempt1-count-replay-step14-v1.png",
+      "captures/v7/evidence/line-approx-count-v6-v1-attempt1-count-replay-step15-v1.json",
+      "captures/v7/evidence/line-approx-count-v6-v1-attempt1-count-replay-step15-v1.png",
+      "captures/v7/evidence/line-approx-count-v6-v1-attempt1-count-replay-step16-v1.json",
+      "captures/v7/evidence/line-approx-count-v6-v1-attempt1-count-replay-step16-v1.png",
+      "captures/v7/evidence/line-approx-count-v6-v1-attempt1-count-replay-step17-v1.json",
+      "captures/v7/evidence/line-approx-count-v6-v1-attempt1-count-replay-step17-v1.png",
+      "captures/v7/evidence/line-approx-count-v6-v1-attempt1-count-replay-step18-v1.json",
+      "captures/v7/evidence/line-approx-count-v6-v1-attempt1-count-replay-step18-v1.png",
+      "captures/v7/evidence/line-approx-count-v6-v1-attempt1-count-replay-step19-v1.json",
+      "captures/v7/evidence/line-approx-count-v6-v1-attempt1-count-replay-step19-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T07:23:13.004Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790793360,
+            83828.12,
+            83834.27,
+            83811.95,
+            83811.96,
+            9.68983
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791098520,
+            84960,
+            84980.01,
+            84959.99,
+            84980,
+            3.35948
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 line count",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790793360,
+                7
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791098520,
+                6
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:23:14.291Z",
+        "bars": 24702,
+        "end": true,
+        "first": {
+          "index": -24402,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791098520,
+            84960,
+            84980.01,
+            84959.99,
+            84980,
+            3.36231
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 line count",
+            "status": {
+              "type": 2
+            },
+            "size": 24702,
+            "first": {
+              "index": -24402,
+              "value": [
+                1788134400,
+                1
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791098520,
+                6
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   07:22",
+    "historical_compare_before_unix_seconds": 1791098520,
+    "pine_logs": {
+      "paths": [
+        "evidence/line-approx-count-v6-v1-attempt1-logs.txt",
+        "evidence/line-approx-count-v6-v1-attempt1-logs-v1.json",
+        "evidence/line-approx-count-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "5a56aec34b34bca8ed796e316a59df2bd3b14ca47c480a2874e97eb10e8c4ed2",
+    "csv_bytes": 1142318,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "COUNT"
+    ],
+    "declared_to_native_header_mapping": {
+      "COUNT": "COUNT"
+    },
+    "csv_rows": 24702,
+    "historical_rows": 24701,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791098520,
+    "first_historical_values": {
+      "COUNT": "1"
+    },
+    "last_historical_values": {
+      "COUNT": "5"
+    },
+    "data_window_witness": "captures/v7/evidence/line-approx-count-v6-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "script": "line-approx-count-v6-v1.pine",
+    "attempt": 2,
+    "source_sha256": "8ca35533a517d7fe5a223df2e3351ae0b95ab0cea79b7089f9ed9e08565335b1",
+    "indicator_title": "V7 line count",
+    "status": "RUNS",
+    "csv_file": "captures/v7/line-approx-count-v6-v1-attempt2.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T152545.465.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 line count",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24403,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24703,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T07:25:35.879Z",
+    "live_candle_open_utc": "2026-10-04T07:24:00.000Z",
+    "export_utc": "2026-10-04T07:25:45.852Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/line-approx-count-v6-v1-attempt2-setup.png",
+      "captures/v7/evidence/line-approx-count-v6-v1-attempt2-export.png",
+      "captures/v7/evidence/line-approx-count-v6-v1-attempt2-logs.txt",
+      "captures/v7/evidence/line-approx-count-v6-v1-attempt2-logs-v1.json",
+      "captures/v7/evidence/line-approx-count-v6-v1-attempt2-logs.png",
+      "captures/v7/evidence/line-approx-count-v6-v1-attempt2-visual.png",
+      "captures/v7/evidence/line-approx-count-v6-v1-attempt2-data-window-v1.png",
+      "captures/v7/evidence/line-approx-count-v6-v1-attempt2-data-window-v1.json",
+      "captures/v7/evidence/line-approx-count-v6-v1-attempt2-data-window-v1.txt",
+      "captures/v7/evidence/line-approx-count-v6-v1-attempt2-count-live-ticks-v1.json",
+      "captures/v7/evidence/line-approx-count-v6-v1-attempt2-count-live-ticks-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T07:25:37.014Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790793480,
+            83811.95,
+            83829.29,
+            83810.93,
+            83817.04,
+            13.7071
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791098640,
+            84988,
+            84988.74,
+            84987.99,
+            84988.74,
+            3.23473
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 line count",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790793480,
+                2
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791098640,
+                7
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:25:38.241Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790793480,
+            83811.95,
+            83829.29,
+            83810.93,
+            83817.04,
+            13.7071
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791098640,
+            84988,
+            84988.74,
+            84987.99,
+            84988.74,
+            3.23473
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 line count",
+            "status": {
+              "type": 2
+            },
+            "size": 24703,
+            "first": {
+              "index": -1022159,
+              "value": [
+                1788134400,
+                1
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791098640,
+                7
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:25:39.394Z",
+        "bars": 24703,
+        "end": true,
+        "first": {
+          "index": -24403,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791098640,
+            84988,
+            84988.74,
+            84987.99,
+            84988.73,
+            3.26803
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 line count",
+            "status": {
+              "type": 2
+            },
+            "size": 24703,
+            "first": {
+              "index": -24403,
+              "value": [
+                1788134400,
+                1
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791098640,
+                7
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   07:24",
+    "historical_compare_before_unix_seconds": 1791098640,
+    "pine_logs": {
+      "paths": [
+        "evidence/line-approx-count-v6-v1-attempt2-logs.txt",
+        "evidence/line-approx-count-v6-v1-attempt2-logs-v1.json",
+        "evidence/line-approx-count-v6-v1-attempt2-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "c40468a0af9625fe2db9da5e7a658074393dfae141e7fdc9759e9b217131f18c",
+    "csv_bytes": 1142361,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "COUNT"
+    ],
+    "declared_to_native_header_mapping": {
+      "COUNT": "COUNT"
+    },
+    "csv_rows": 24703,
+    "historical_rows": 24702,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791098640,
+    "first_historical_values": {
+      "COUNT": "1"
+    },
+    "last_historical_values": {
+      "COUNT": "6"
+    },
+    "data_window_witness": "captures/v7/evidence/line-approx-count-v6-v1-attempt2-data-window-v1.json"
+  },
+  {
+    "script": "polyline-approx-count-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "00bba33b794c673d7be956e7b842aef9f85d452e1c0bdccefdbd19cf5029885f",
+    "indicator_title": "V7 polyline count",
+    "status": "RUNS",
+    "csv_file": "captures/v7/polyline-approx-count-v6-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T152715.931.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 polyline count",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24404,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24704,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T07:27:06.937Z",
+    "live_candle_open_utc": "2026-10-04T07:26:00.000Z",
+    "export_utc": "2026-10-04T07:27:16.420Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/polyline-approx-count-v6-v1-attempt1-setup.png",
+      "captures/v7/evidence/polyline-approx-count-v6-v1-attempt1-export.png",
+      "captures/v7/evidence/polyline-approx-count-v6-v1-attempt1-logs.txt",
+      "captures/v7/evidence/polyline-approx-count-v6-v1-attempt1-logs-v1.json",
+      "captures/v7/evidence/polyline-approx-count-v6-v1-attempt1-logs.png",
+      "captures/v7/evidence/polyline-approx-count-v6-v1-attempt1-visual.png",
+      "captures/v7/evidence/polyline-approx-count-v6-v1-attempt1-data-window-v1.png",
+      "captures/v7/evidence/polyline-approx-count-v6-v1-attempt1-data-window-v1.json",
+      "captures/v7/evidence/polyline-approx-count-v6-v1-attempt1-data-window-v1.txt",
+      "captures/v7/evidence/polyline-approx-count-v6-v1-attempt1-count-replay-step0-v1.json",
+      "captures/v7/evidence/polyline-approx-count-v6-v1-attempt1-count-replay-step0-v1.png",
+      "captures/v7/evidence/polyline-approx-count-v6-v1-attempt1-count-replay-step1-v1.json",
+      "captures/v7/evidence/polyline-approx-count-v6-v1-attempt1-count-replay-step1-v1.png",
+      "captures/v7/evidence/polyline-approx-count-v6-v1-attempt1-count-replay-step2-v1.json",
+      "captures/v7/evidence/polyline-approx-count-v6-v1-attempt1-count-replay-step2-v1.png",
+      "captures/v7/evidence/polyline-approx-count-v6-v1-attempt1-count-replay-step3-v1.json",
+      "captures/v7/evidence/polyline-approx-count-v6-v1-attempt1-count-replay-step3-v1.png",
+      "captures/v7/evidence/polyline-approx-count-v6-v1-attempt1-count-replay-step4-v1.json",
+      "captures/v7/evidence/polyline-approx-count-v6-v1-attempt1-count-replay-step4-v1.png",
+      "captures/v7/evidence/polyline-approx-count-v6-v1-attempt1-count-replay-step5-v1.json",
+      "captures/v7/evidence/polyline-approx-count-v6-v1-attempt1-count-replay-step5-v1.png",
+      "captures/v7/evidence/polyline-approx-count-v6-v1-attempt1-count-replay-step6-v1.json",
+      "captures/v7/evidence/polyline-approx-count-v6-v1-attempt1-count-replay-step6-v1.png",
+      "captures/v7/evidence/polyline-approx-count-v6-v1-attempt1-count-replay-step7-v1.json",
+      "captures/v7/evidence/polyline-approx-count-v6-v1-attempt1-count-replay-step7-v1.png",
+      "captures/v7/evidence/polyline-approx-count-v6-v1-attempt1-count-replay-step8-v1.json",
+      "captures/v7/evidence/polyline-approx-count-v6-v1-attempt1-count-replay-step8-v1.png",
+      "captures/v7/evidence/polyline-approx-count-v6-v1-attempt1-count-replay-step9-v1.json",
+      "captures/v7/evidence/polyline-approx-count-v6-v1-attempt1-count-replay-step9-v1.png",
+      "captures/v7/evidence/polyline-approx-count-v6-v1-attempt1-count-replay-step10-v1.json",
+      "captures/v7/evidence/polyline-approx-count-v6-v1-attempt1-count-replay-step10-v1.png",
+      "captures/v7/evidence/polyline-approx-count-v6-v1-attempt1-count-replay-step11-v1.json",
+      "captures/v7/evidence/polyline-approx-count-v6-v1-attempt1-count-replay-step11-v1.png",
+      "captures/v7/evidence/polyline-approx-count-v6-v1-attempt1-count-replay-step12-v1.json",
+      "captures/v7/evidence/polyline-approx-count-v6-v1-attempt1-count-replay-step12-v1.png",
+      "captures/v7/evidence/polyline-approx-count-v6-v1-attempt1-count-replay-step13-v1.json",
+      "captures/v7/evidence/polyline-approx-count-v6-v1-attempt1-count-replay-step13-v1.png",
+      "captures/v7/evidence/polyline-approx-count-v6-v1-attempt1-count-replay-step14-v1.json",
+      "captures/v7/evidence/polyline-approx-count-v6-v1-attempt1-count-replay-step14-v1.png",
+      "captures/v7/evidence/polyline-approx-count-v6-v1-attempt1-count-replay-step15-v1.json",
+      "captures/v7/evidence/polyline-approx-count-v6-v1-attempt1-count-replay-step15-v1.png",
+      "captures/v7/evidence/polyline-approx-count-v6-v1-attempt1-count-replay-step16-v1.json",
+      "captures/v7/evidence/polyline-approx-count-v6-v1-attempt1-count-replay-step16-v1.png",
+      "captures/v7/evidence/polyline-approx-count-v6-v1-attempt1-count-replay-step17-v1.json",
+      "captures/v7/evidence/polyline-approx-count-v6-v1-attempt1-count-replay-step17-v1.png",
+      "captures/v7/evidence/polyline-approx-count-v6-v1-attempt1-count-replay-step18-v1.json",
+      "captures/v7/evidence/polyline-approx-count-v6-v1-attempt1-count-replay-step18-v1.png",
+      "captures/v7/evidence/polyline-approx-count-v6-v1-attempt1-count-replay-step19-v1.json",
+      "captures/v7/evidence/polyline-approx-count-v6-v1-attempt1-count-replay-step19-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T07:27:08.105Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790793600,
+            83817.04,
+            83862.87,
+            83814.73,
+            83847.98,
+            19.02586
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791098760,
+            84996.01,
+            84996.01,
+            84980.64,
+            84980.64,
+            2.35698
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 polyline count",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790793600,
+                3
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791098760,
+                8
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:27:09.140Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790793600,
+            83817.04,
+            83862.87,
+            83814.73,
+            83847.98,
+            19.02586
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791098760,
+            84996.01,
+            84996.01,
+            84980.64,
+            84980.64,
+            2.35698
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 polyline count",
+            "status": {
+              "type": 2
+            },
+            "size": 24704,
+            "first": {
+              "index": -1022160,
+              "value": [
+                1788134400,
+                1
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791098760,
+                8
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:27:09.846Z",
+        "bars": 24704,
+        "end": true,
+        "first": {
+          "index": -24404,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791098760,
+            84996.01,
+            84996.01,
+            84980.64,
+            84980.65,
+            3.59133
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 polyline count",
+            "status": {
+              "type": 2
+            },
+            "size": 24704,
+            "first": {
+              "index": -24404,
+              "value": [
+                1788134400,
+                1
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791098760,
+                8
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   07:26",
+    "historical_compare_before_unix_seconds": 1791098760,
+    "pine_logs": {
+      "paths": [
+        "evidence/polyline-approx-count-v6-v1-attempt1-logs.txt",
+        "evidence/polyline-approx-count-v6-v1-attempt1-logs-v1.json",
+        "evidence/polyline-approx-count-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "13454c4fd11e51e6f1a8105fcd034bb20d5ba5615bd6bf73a1005f6fd8f5bbc4",
+    "csv_bytes": 1142413,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "COUNT"
+    ],
+    "declared_to_native_header_mapping": {
+      "COUNT": "COUNT"
+    },
+    "csv_rows": 24704,
+    "historical_rows": 24703,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791098760,
+    "first_historical_values": {
+      "COUNT": "1"
+    },
+    "last_historical_values": {
+      "COUNT": "7"
+    },
+    "data_window_witness": "captures/v7/evidence/polyline-approx-count-v6-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "script": "polyline-approx-count-v6-v1.pine",
+    "attempt": 2,
+    "source_sha256": "00bba33b794c673d7be956e7b842aef9f85d452e1c0bdccefdbd19cf5029885f",
+    "indicator_title": "V7 polyline count",
+    "status": "RUNS",
+    "csv_file": "captures/v7/polyline-approx-count-v6-v1-attempt2.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T152944.817.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 polyline count",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24405,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24705,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T07:29:36.753Z",
+    "live_candle_open_utc": "2026-10-04T07:28:00.000Z",
+    "export_utc": "2026-10-04T07:29:45.089Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/polyline-approx-count-v6-v1-attempt2-setup.png",
+      "captures/v7/evidence/polyline-approx-count-v6-v1-attempt2-export.png",
+      "captures/v7/evidence/polyline-approx-count-v6-v1-attempt2-logs.txt",
+      "captures/v7/evidence/polyline-approx-count-v6-v1-attempt2-logs-v1.json",
+      "captures/v7/evidence/polyline-approx-count-v6-v1-attempt2-logs.png",
+      "captures/v7/evidence/polyline-approx-count-v6-v1-attempt2-visual.png",
+      "captures/v7/evidence/polyline-approx-count-v6-v1-attempt2-data-window-v1.png",
+      "captures/v7/evidence/polyline-approx-count-v6-v1-attempt2-data-window-v1.json",
+      "captures/v7/evidence/polyline-approx-count-v6-v1-attempt2-data-window-v1.txt",
+      "captures/v7/evidence/polyline-approx-count-v6-v1-attempt2-count-live-ticks-v1.json",
+      "captures/v7/evidence/polyline-approx-count-v6-v1-attempt2-count-live-ticks-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T07:29:37.923Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790793720,
+            83847.98,
+            83876.01,
+            83837.57,
+            83870.01,
+            8.58587
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791098880,
+            84980.65,
+            84980.65,
+            84980.64,
+            84980.65,
+            3.20995
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 polyline count",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790793720,
+                4
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791098880,
+                3
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:29:39.085Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790793720,
+            83847.98,
+            83876.01,
+            83837.57,
+            83870.01,
+            8.58587
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791098880,
+            84980.65,
+            84980.65,
+            84980.64,
+            84980.65,
+            3.20995
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 polyline count",
+            "status": {
+              "type": 2
+            },
+            "size": 24705,
+            "first": {
+              "index": -1022161,
+              "value": [
+                1788134400,
+                1
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791098880,
+                3
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:29:39.846Z",
+        "bars": 24705,
+        "end": true,
+        "first": {
+          "index": -24405,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791098880,
+            84980.65,
+            84980.65,
+            84980.64,
+            84980.65,
+            3.21433
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 polyline count",
+            "status": {
+              "type": 2
+            },
+            "size": 24705,
+            "first": {
+              "index": -24405,
+              "value": [
+                1788134400,
+                1
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791098880,
+                3
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   07:28",
+    "historical_compare_before_unix_seconds": 1791098880,
+    "pine_logs": {
+      "paths": [
+        "evidence/polyline-approx-count-v6-v1-attempt2-logs.txt",
+        "evidence/polyline-approx-count-v6-v1-attempt2-logs-v1.json",
+        "evidence/polyline-approx-count-v6-v1-attempt2-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "9cb998fa937d7a07955bc18b16f2c6440e22bc0912b80ac26551b51fd969cfae",
+    "csv_bytes": 1142462,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "COUNT"
+    ],
+    "declared_to_native_header_mapping": {
+      "COUNT": "COUNT"
+    },
+    "csv_rows": 24705,
+    "historical_rows": 24704,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791098880,
+    "first_historical_values": {
+      "COUNT": "1"
+    },
+    "last_historical_values": {
+      "COUNT": "2"
+    },
+    "data_window_witness": "captures/v7/evidence/polyline-approx-count-v6-v1-attempt2-data-window-v1.json"
   }
 ]
