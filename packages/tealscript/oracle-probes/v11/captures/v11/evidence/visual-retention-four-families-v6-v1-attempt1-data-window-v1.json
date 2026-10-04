@@ -1,0 +1,38 @@
+{
+  "index": 299,
+  "bar": [
+    1791130320,
+    85259.37,
+    85259.38,
+    85259.37,
+    85259.37,
+    1.73761
+  ],
+  "source_row": [
+    1791130320,
+    24966,
+    32,
+    8,
+    24,
+    8,
+    24,
+    8,
+    24,
+    8,
+    24
+  ],
+  "browser_utc": "2026-10-04T16:14:13.644Z",
+  "title": "V11 four-family retention",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   16:12",
+  "visible_range": {
+    "_firstBar": 264,
+    "_lastBar": 302
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}

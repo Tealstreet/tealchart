@@ -21441,5 +21441,1350 @@
       "ZERO_CHAR": ""
     },
     "data_window_witness": "captures/v11/evidence/visual-offsets-grouped-v5-v1-attempt2-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T16:10:29.180Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v11 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "visual-curves-point-copy-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "b11d4849cb197f806e1c5ed790482ae7d8de296f0e84f567981d883dacf8f7ca",
+    "indicator_title": "V11 curve geometry and point copies",
+    "status": "RUNS",
+    "csv_file": "captures/v11/visual-curves-point-copy-v6-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-05T001028.356.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V11 curve geometry and point copies",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24666,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24966,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T16:10:14.016Z",
+    "live_candle_open_utc": "2026-10-04T16:10:00.000Z",
+    "export_utc": "2026-10-04T16:10:28.632Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v11/evidence/visual-curves-point-copy-v6-v1-attempt1-setup.png",
+      "captures/v11/evidence/visual-curves-point-copy-v6-v1-attempt1-export.png",
+      "captures/v11/evidence/visual-curves-point-copy-v6-v1-attempt1-logs.txt",
+      "captures/v11/evidence/visual-curves-point-copy-v6-v1-attempt1-logs-v1.json",
+      "captures/v11/evidence/visual-curves-point-copy-v6-v1-attempt1-logs.png",
+      "captures/v11/evidence/visual-curves-point-copy-v6-v1-attempt1-visual.png",
+      "captures/v11/evidence/visual-curves-point-copy-v6-v1-attempt1-data-window-v1.png",
+      "captures/v11/evidence/visual-curves-point-copy-v6-v1-attempt1-data-window-v1.json",
+      "captures/v11/evidence/visual-curves-point-copy-v6-v1-attempt1-data-window-v1.txt",
+      "captures/v11/evidence/visual-curves-point-copy-v6-v1-attempt1-authority-object-geometry-v1.json",
+      "captures/v11/evidence/visual-curves-point-copy-v6-v1-attempt1-authority-object-geometry-v1.png",
+      "captures/v11/evidence/visual-curves-point-copy-v6-v1-attempt1-curve-base-v1.json",
+      "captures/v11/evidence/visual-curves-point-copy-v6-v1-attempt1-curve-base-v1.png",
+      "captures/v11/evidence/visual-curves-point-copy-v6-v1-attempt1-curve-double-v1.json",
+      "captures/v11/evidence/visual-curves-point-copy-v6-v1-attempt1-curve-double-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T16:10:14.861Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790825040,
+            83465.79,
+            83465.79,
+            83448.87,
+            83448.87,
+            3.19788
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791130200,
+            85256.01,
+            85256.01,
+            85256,
+            85256.01,
+            0.09635
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 curve geometry and point copies",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790825040,
+                22422,
+                null,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791130200,
+                24965,
+                null,
+                5
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T16:10:15.910Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790825040,
+            83465.79,
+            83465.79,
+            83448.87,
+            83448.87,
+            3.19788
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791130200,
+            85256.01,
+            85256.01,
+            85256,
+            85256.01,
+            0.09635
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 curve geometry and point copies",
+            "status": {
+              "type": 2
+            },
+            "size": 24966,
+            "first": {
+              "index": -1022422,
+              "value": [
+                1788134400,
+                0,
+                null,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791130200,
+                24965,
+                null,
+                5
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T16:10:17.107Z",
+        "bars": 24966,
+        "end": true,
+        "first": {
+          "index": -24666,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791130200,
+            85256.01,
+            85270.01,
+            85256,
+            85270.01,
+            0.46655
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 curve geometry and point copies",
+            "status": {
+              "type": 2
+            },
+            "size": 24966,
+            "first": {
+              "index": -24666,
+              "value": [
+                1788134400,
+                0,
+                null,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791130200,
+                24965,
+                null,
+                5
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   16:10",
+    "historical_compare_before_unix_seconds": 1791130200,
+    "pine_logs": {
+      "paths": [
+        "evidence/visual-curves-point-copy-v6-v1-attempt1-logs.txt",
+        "evidence/visual-curves-point-copy-v6-v1-attempt1-logs-v1.json",
+        "evidence/visual-curves-point-copy-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "b627e15488d1d594f02ed9d542e40fe0bf8c93cb573c0f487d601c74461685de",
+    "csv_bytes": 1318404,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "BAR_INDEX",
+      "DRAWING_END_INDEX",
+      "POLYLINE_COUNT"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "BAR_INDEX": 5,
+      "DRAWING_END_INDEX": 6,
+      "POLYLINE_COUNT": 7
+    },
+    "first_historical_cells": [
+      "1788134400",
+      "77682",
+      "77682.01",
+      "77572",
+      "77674.04",
+      "0",
+      "",
+      "0"
+    ],
+    "last_historical_cells": [
+      "1791130080",
+      "85220.65",
+      "85256.01",
+      "85220.65",
+      "85256.01",
+      "24964",
+      "24964",
+      "5"
+    ],
+    "declared_to_native_header_mapping": {
+      "BAR_INDEX": "BAR_INDEX",
+      "DRAWING_END_INDEX": "DRAWING_END_INDEX",
+      "POLYLINE_COUNT": "POLYLINE_COUNT"
+    },
+    "csv_rows": 24966,
+    "historical_rows": 24965,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791130200,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791130200",
+    "first_historical_values": {
+      "BAR_INDEX": "0",
+      "DRAWING_END_INDEX": "",
+      "POLYLINE_COUNT": "0"
+    },
+    "last_historical_values": {
+      "BAR_INDEX": "24964",
+      "DRAWING_END_INDEX": "24964",
+      "POLYLINE_COUNT": "5"
+    },
+    "data_window_witness": "captures/v11/evidence/visual-curves-point-copy-v6-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T16:12:48.669Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v11 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "visual-curves-point-copy-v6-v1.pine",
+    "attempt": 2,
+    "source_sha256": "b11d4849cb197f806e1c5ed790482ae7d8de296f0e84f567981d883dacf8f7ca",
+    "indicator_title": "V11 curve geometry and point copies",
+    "status": "RUNS",
+    "csv_file": "captures/v11/visual-curves-point-copy-v6-v1-attempt2.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-05T001247.677.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V11 curve geometry and point copies",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24667,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24967,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T16:12:39.635Z",
+    "live_candle_open_utc": "2026-10-04T16:12:00.000Z",
+    "export_utc": "2026-10-04T16:12:48.158Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v11/evidence/visual-curves-point-copy-v6-v1-attempt2-setup.png",
+      "captures/v11/evidence/visual-curves-point-copy-v6-v1-attempt2-export.png",
+      "captures/v11/evidence/visual-curves-point-copy-v6-v1-attempt2-logs.txt",
+      "captures/v11/evidence/visual-curves-point-copy-v6-v1-attempt2-logs-v1.json",
+      "captures/v11/evidence/visual-curves-point-copy-v6-v1-attempt2-logs.png",
+      "captures/v11/evidence/visual-curves-point-copy-v6-v1-attempt2-visual.png",
+      "captures/v11/evidence/visual-curves-point-copy-v6-v1-attempt2-data-window-v1.png",
+      "captures/v11/evidence/visual-curves-point-copy-v6-v1-attempt2-data-window-v1.json",
+      "captures/v11/evidence/visual-curves-point-copy-v6-v1-attempt2-data-window-v1.txt",
+      "captures/v11/evidence/visual-curves-point-copy-v6-v1-attempt2-authority-object-geometry-v1.json",
+      "captures/v11/evidence/visual-curves-point-copy-v6-v1-attempt2-authority-object-geometry-v1.png",
+      "captures/v11/evidence/visual-curves-point-copy-v6-v1-attempt2-curve-base-v1.json",
+      "captures/v11/evidence/visual-curves-point-copy-v6-v1-attempt2-curve-base-v1.png",
+      "captures/v11/evidence/visual-curves-point-copy-v6-v1-attempt2-curve-double-v1.json",
+      "captures/v11/evidence/visual-curves-point-copy-v6-v1-attempt2-curve-double-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T16:12:40.504Z",
+        "bars": 2556,
+        "end": false,
+        "first": {
+          "index": -2256,
+          "value": [
+            1790823720,
+            83520.39,
+            83520.39,
+            83484.16,
+            83484.17,
+            7.9109
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791130320,
+            85259.37,
+            85259.38,
+            85259.37,
+            85259.37,
+            0.33513
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 curve geometry and point copies",
+            "status": {
+              "type": 2
+            },
+            "size": 2556,
+            "first": {
+              "index": -2256,
+              "value": [
+                1790823720,
+                22411,
+                null,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791130320,
+                24966,
+                null,
+                5
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T16:12:41.960Z",
+        "bars": 24967,
+        "end": true,
+        "first": {
+          "index": -24667,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791130320,
+            85259.37,
+            85259.38,
+            85259.37,
+            85259.37,
+            0.36664
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 curve geometry and point copies",
+            "status": {
+              "type": 2
+            },
+            "size": 24967,
+            "first": {
+              "index": -24667,
+              "value": [
+                1788134400,
+                0,
+                null,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791130320,
+                24966,
+                null,
+                5
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   16:12",
+    "historical_compare_before_unix_seconds": 1791130320,
+    "pine_logs": {
+      "paths": [
+        "evidence/visual-curves-point-copy-v6-v1-attempt2-logs.txt",
+        "evidence/visual-curves-point-copy-v6-v1-attempt2-logs-v1.json",
+        "evidence/visual-curves-point-copy-v6-v1-attempt2-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "b7ef55f4213f0733d5a42ee44912e16af6a21c5c15e719788dd174849ad5281c",
+    "csv_bytes": 1318459,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "BAR_INDEX",
+      "DRAWING_END_INDEX",
+      "POLYLINE_COUNT"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "BAR_INDEX": 5,
+      "DRAWING_END_INDEX": 6,
+      "POLYLINE_COUNT": 7
+    },
+    "first_historical_cells": [
+      "1788134400",
+      "77682",
+      "77682.01",
+      "77572",
+      "77674.04",
+      "0",
+      "",
+      "0"
+    ],
+    "last_historical_cells": [
+      "1791130200",
+      "85256.01",
+      "85295.3",
+      "85256",
+      "85259.38",
+      "24965",
+      "24965",
+      "5"
+    ],
+    "declared_to_native_header_mapping": {
+      "BAR_INDEX": "BAR_INDEX",
+      "DRAWING_END_INDEX": "DRAWING_END_INDEX",
+      "POLYLINE_COUNT": "POLYLINE_COUNT"
+    },
+    "csv_rows": 24967,
+    "historical_rows": 24966,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791130320,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791130320",
+    "first_historical_values": {
+      "BAR_INDEX": "0",
+      "DRAWING_END_INDEX": "",
+      "POLYLINE_COUNT": "0"
+    },
+    "last_historical_values": {
+      "BAR_INDEX": "24965",
+      "DRAWING_END_INDEX": "24965",
+      "POLYLINE_COUNT": "5"
+    },
+    "data_window_witness": "captures/v11/evidence/visual-curves-point-copy-v6-v1-attempt2-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T16:14:07.329Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v11 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "visual-retention-four-families-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "7e4d1af7396346ce4ccceef05b32a73a365ad38a4d43847f53400f0c927cd7b1",
+    "indicator_title": "V11 four-family retention",
+    "status": "RUNS",
+    "csv_file": "captures/v11/visual-retention-four-families-v6-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-05T001406.478.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V11 four-family retention",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24667,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24968,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T16:13:57.119Z",
+    "live_candle_open_utc": "2026-10-04T16:14:00.000Z",
+    "export_utc": "2026-10-04T16:14:06.915Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v11/evidence/visual-retention-four-families-v6-v1-attempt1-setup.png",
+      "captures/v11/evidence/visual-retention-four-families-v6-v1-attempt1-export.png",
+      "captures/v11/evidence/visual-retention-four-families-v6-v1-attempt1-logs.txt",
+      "captures/v11/evidence/visual-retention-four-families-v6-v1-attempt1-logs-v1.json",
+      "captures/v11/evidence/visual-retention-four-families-v6-v1-attempt1-logs.png",
+      "captures/v11/evidence/visual-retention-four-families-v6-v1-attempt1-visual.png",
+      "captures/v11/evidence/visual-retention-four-families-v6-v1-attempt1-data-window-v1.png",
+      "captures/v11/evidence/visual-retention-four-families-v6-v1-attempt1-data-window-v1.json",
+      "captures/v11/evidence/visual-retention-four-families-v6-v1-attempt1-data-window-v1.txt",
+      "captures/v11/evidence/visual-retention-four-families-v6-v1-attempt1-authority-object-geometry-v1.json",
+      "captures/v11/evidence/visual-retention-four-families-v6-v1-attempt1-authority-object-geometry-v1.png",
+      "captures/v11/evidence/visual-retention-four-families-v6-v1-attempt1-retention-index-0-v1.json",
+      "captures/v11/evidence/visual-retention-four-families-v6-v1-attempt1-retention-index-0-v1.png",
+      "captures/v11/evidence/visual-retention-four-families-v6-v1-attempt1-retention-index-7-v1.json",
+      "captures/v11/evidence/visual-retention-four-families-v6-v1-attempt1-retention-index-7-v1.png",
+      "captures/v11/evidence/visual-retention-four-families-v6-v1-attempt1-retention-index-8-v1.json",
+      "captures/v11/evidence/visual-retention-four-families-v6-v1-attempt1-retention-index-8-v1.png",
+      "captures/v11/evidence/visual-retention-four-families-v6-v1-attempt1-retention-index-31-v1.json",
+      "captures/v11/evidence/visual-retention-four-families-v6-v1-attempt1-retention-index-31-v1.png",
+      "captures/v11/evidence/visual-retention-four-families-v6-v1-attempt1-retention-index-32-v1.json",
+      "captures/v11/evidence/visual-retention-four-families-v6-v1-attempt1-retention-index-32-v1.png",
+      "captures/v11/evidence/visual-retention-four-families-v6-v1-attempt1-retention-index-63-v1.json",
+      "captures/v11/evidence/visual-retention-four-families-v6-v1-attempt1-retention-index-63-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T16:13:58.034Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790825160,
+            83448.88,
+            83516.01,
+            83448.87,
+            83506.17,
+            10.09374
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791130320,
+            85259.37,
+            85259.38,
+            85259.37,
+            85259.37,
+            1.72635
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 four-family retention",
+            "status": {
+              "type": 1,
+              "startTime": 1791130437270
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T16:13:59.532Z",
+        "bars": 24967,
+        "end": true,
+        "first": {
+          "index": -24667,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791130320,
+            85259.37,
+            85259.38,
+            85259.37,
+            85259.38,
+            1.7288
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 four-family retention",
+            "status": {
+              "type": 2
+            },
+            "size": 24967,
+            "first": {
+              "index": -24667,
+              "value": [
+                1788134400,
+                0,
+                1,
+                1,
+                0,
+                1,
+                0,
+                1,
+                0,
+                1,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791130320,
+                24966,
+                32,
+                8,
+                24,
+                8,
+                24,
+                8,
+                24,
+                8,
+                24
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   16:14",
+    "historical_compare_before_unix_seconds": 1791130440,
+    "pine_logs": {
+      "paths": [
+        "evidence/visual-retention-four-families-v6-v1-attempt1-logs.txt",
+        "evidence/visual-retention-four-families-v6-v1-attempt1-logs-v1.json",
+        "evidence/visual-retention-four-families-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "2cac27006075346a478d171e290250f669876cdd13e8f1877e73ac130d35eb95",
+    "csv_bytes": 1817912,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "BAR_INDEX",
+      "CREATED",
+      "LABEL_COUNT",
+      "LABEL_OLDEST_CREATED",
+      "LINE_COUNT",
+      "LINE_OLDEST_CREATED",
+      "BOX_COUNT",
+      "BOX_OLDEST_CREATED",
+      "POLYLINE_COUNT",
+      "POLYLINE_OLDEST_CREATED"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "BAR_INDEX": 5,
+      "CREATED": 6,
+      "LABEL_COUNT": 7,
+      "LABEL_OLDEST_CREATED": 8,
+      "LINE_COUNT": 9,
+      "LINE_OLDEST_CREATED": 10,
+      "BOX_COUNT": 11,
+      "BOX_OLDEST_CREATED": 12,
+      "POLYLINE_COUNT": 13,
+      "POLYLINE_OLDEST_CREATED": 14
+    },
+    "first_historical_cells": [
+      "1788134400",
+      "77682",
+      "77682.01",
+      "77572",
+      "77674.04",
+      "0",
+      "1",
+      "1",
+      "0",
+      "1",
+      "0",
+      "1",
+      "0",
+      "1",
+      "0"
+    ],
+    "last_historical_cells": [
+      "1791130320",
+      "85259.37",
+      "85259.38",
+      "85259.37",
+      "85259.37",
+      "24966",
+      "32",
+      "8",
+      "24",
+      "8",
+      "24",
+      "8",
+      "24",
+      "8",
+      "24"
+    ],
+    "declared_to_native_header_mapping": {
+      "BAR_INDEX": "BAR_INDEX",
+      "CREATED": "CREATED",
+      "LABEL_COUNT": "LABEL_COUNT",
+      "LABEL_OLDEST_CREATED": "LABEL_OLDEST_CREATED",
+      "LINE_COUNT": "LINE_COUNT",
+      "LINE_OLDEST_CREATED": "LINE_OLDEST_CREATED",
+      "BOX_COUNT": "BOX_COUNT",
+      "BOX_OLDEST_CREATED": "BOX_OLDEST_CREATED",
+      "POLYLINE_COUNT": "POLYLINE_COUNT",
+      "POLYLINE_OLDEST_CREATED": "POLYLINE_OLDEST_CREATED"
+    },
+    "csv_rows": 24968,
+    "historical_rows": 24967,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791130440,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791130440",
+    "first_historical_values": {
+      "BAR_INDEX": "0",
+      "CREATED": "1",
+      "LABEL_COUNT": "1",
+      "LABEL_OLDEST_CREATED": "0",
+      "LINE_COUNT": "1",
+      "LINE_OLDEST_CREATED": "0",
+      "BOX_COUNT": "1",
+      "BOX_OLDEST_CREATED": "0",
+      "POLYLINE_COUNT": "1",
+      "POLYLINE_OLDEST_CREATED": "0"
+    },
+    "last_historical_values": {
+      "BAR_INDEX": "24966",
+      "CREATED": "32",
+      "LABEL_COUNT": "8",
+      "LABEL_OLDEST_CREATED": "24",
+      "LINE_COUNT": "8",
+      "LINE_OLDEST_CREATED": "24",
+      "BOX_COUNT": "8",
+      "BOX_OLDEST_CREATED": "24",
+      "POLYLINE_COUNT": "8",
+      "POLYLINE_OLDEST_CREATED": "24"
+    },
+    "data_window_witness": "captures/v11/evidence/visual-retention-four-families-v6-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T16:16:19.412Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v11 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "visual-retention-four-families-v6-v1.pine",
+    "attempt": 2,
+    "source_sha256": "7e4d1af7396346ce4ccceef05b32a73a365ad38a4d43847f53400f0c927cd7b1",
+    "indicator_title": "V11 four-family retention",
+    "status": "RUNS",
+    "csv_file": "captures/v11/visual-retention-four-families-v6-v1-attempt2.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-05T001618.101.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V11 four-family retention",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24669,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24969,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T16:16:09.154Z",
+    "live_candle_open_utc": "2026-10-04T16:16:00.000Z",
+    "export_utc": "2026-10-04T16:16:18.725Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v11/evidence/visual-retention-four-families-v6-v1-attempt2-setup.png",
+      "captures/v11/evidence/visual-retention-four-families-v6-v1-attempt2-export.png",
+      "captures/v11/evidence/visual-retention-four-families-v6-v1-attempt2-logs.txt",
+      "captures/v11/evidence/visual-retention-four-families-v6-v1-attempt2-logs-v1.json",
+      "captures/v11/evidence/visual-retention-four-families-v6-v1-attempt2-logs.png",
+      "captures/v11/evidence/visual-retention-four-families-v6-v1-attempt2-visual.png",
+      "captures/v11/evidence/visual-retention-four-families-v6-v1-attempt2-data-window-v1.png",
+      "captures/v11/evidence/visual-retention-four-families-v6-v1-attempt2-data-window-v1.json",
+      "captures/v11/evidence/visual-retention-four-families-v6-v1-attempt2-data-window-v1.txt",
+      "captures/v11/evidence/visual-retention-four-families-v6-v1-attempt2-authority-object-geometry-v1.json",
+      "captures/v11/evidence/visual-retention-four-families-v6-v1-attempt2-authority-object-geometry-v1.png",
+      "captures/v11/evidence/visual-retention-four-families-v6-v1-attempt2-retention-index-0-v1.json",
+      "captures/v11/evidence/visual-retention-four-families-v6-v1-attempt2-retention-index-0-v1.png",
+      "captures/v11/evidence/visual-retention-four-families-v6-v1-attempt2-retention-index-7-v1.json",
+      "captures/v11/evidence/visual-retention-four-families-v6-v1-attempt2-retention-index-7-v1.png",
+      "captures/v11/evidence/visual-retention-four-families-v6-v1-attempt2-retention-index-8-v1.json",
+      "captures/v11/evidence/visual-retention-four-families-v6-v1-attempt2-retention-index-8-v1.png",
+      "captures/v11/evidence/visual-retention-four-families-v6-v1-attempt2-retention-index-31-v1.json",
+      "captures/v11/evidence/visual-retention-four-families-v6-v1-attempt2-retention-index-31-v1.png",
+      "captures/v11/evidence/visual-retention-four-families-v6-v1-attempt2-retention-index-32-v1.json",
+      "captures/v11/evidence/visual-retention-four-families-v6-v1-attempt2-retention-index-32-v1.png",
+      "captures/v11/evidence/visual-retention-four-families-v6-v1-attempt2-retention-index-63-v1.json",
+      "captures/v11/evidence/visual-retention-four-families-v6-v1-attempt2-retention-index-63-v1.png",
+      "captures/v11/evidence/visual-retention-four-families-v6-v1-attempt2-retained-family-geometry-v1.json",
+      "captures/v11/evidence/visual-retention-four-families-v6-v1-attempt2-retained-family-geometry-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T16:16:10.099Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790825400,
+            83529.32,
+            83529.32,
+            83470,
+            83470,
+            5.32612
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791130560,
+            85296.01,
+            85296.01,
+            85296,
+            85296,
+            0.06949
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 four-family retention",
+            "status": {
+              "type": 1,
+              "startTime": 1791130569819
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T16:16:11.250Z",
+        "bars": 24969,
+        "end": true,
+        "first": {
+          "index": -24669,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791130560,
+            85296.01,
+            85296.01,
+            85296,
+            85296.01,
+            0.07824
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 four-family retention",
+            "status": {
+              "type": 2
+            },
+            "size": 24969,
+            "first": {
+              "index": -24669,
+              "value": [
+                1788134400,
+                0,
+                1,
+                1,
+                0,
+                1,
+                0,
+                1,
+                0,
+                1,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791130560,
+                24968,
+                32,
+                8,
+                24,
+                8,
+                24,
+                8,
+                24,
+                8,
+                24
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   16:16",
+    "historical_compare_before_unix_seconds": 1791130560,
+    "pine_logs": {
+      "paths": [
+        "evidence/visual-retention-four-families-v6-v1-attempt2-logs.txt",
+        "evidence/visual-retention-four-families-v6-v1-attempt2-logs-v1.json",
+        "evidence/visual-retention-four-families-v6-v1-attempt2-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "1096fffa257f80fb20c58401f49a67d283a2f43c588e771d3372126c6939e9d7",
+    "csv_bytes": 1817982,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "BAR_INDEX",
+      "CREATED",
+      "LABEL_COUNT",
+      "LABEL_OLDEST_CREATED",
+      "LINE_COUNT",
+      "LINE_OLDEST_CREATED",
+      "BOX_COUNT",
+      "BOX_OLDEST_CREATED",
+      "POLYLINE_COUNT",
+      "POLYLINE_OLDEST_CREATED"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "BAR_INDEX": 5,
+      "CREATED": 6,
+      "LABEL_COUNT": 7,
+      "LABEL_OLDEST_CREATED": 8,
+      "LINE_COUNT": 9,
+      "LINE_OLDEST_CREATED": 10,
+      "BOX_COUNT": 11,
+      "BOX_OLDEST_CREATED": 12,
+      "POLYLINE_COUNT": 13,
+      "POLYLINE_OLDEST_CREATED": 14
+    },
+    "first_historical_cells": [
+      "1788134400",
+      "77682",
+      "77682.01",
+      "77572",
+      "77674.04",
+      "0",
+      "1",
+      "1",
+      "0",
+      "1",
+      "0",
+      "1",
+      "0",
+      "1",
+      "0"
+    ],
+    "last_historical_cells": [
+      "1791130440",
+      "85259.38",
+      "85296.01",
+      "85259.37",
+      "85296.01",
+      "24967",
+      "32",
+      "8",
+      "24",
+      "8",
+      "24",
+      "8",
+      "24",
+      "8",
+      "24"
+    ],
+    "declared_to_native_header_mapping": {
+      "BAR_INDEX": "BAR_INDEX",
+      "CREATED": "CREATED",
+      "LABEL_COUNT": "LABEL_COUNT",
+      "LABEL_OLDEST_CREATED": "LABEL_OLDEST_CREATED",
+      "LINE_COUNT": "LINE_COUNT",
+      "LINE_OLDEST_CREATED": "LINE_OLDEST_CREATED",
+      "BOX_COUNT": "BOX_COUNT",
+      "BOX_OLDEST_CREATED": "BOX_OLDEST_CREATED",
+      "POLYLINE_COUNT": "POLYLINE_COUNT",
+      "POLYLINE_OLDEST_CREATED": "POLYLINE_OLDEST_CREATED"
+    },
+    "csv_rows": 24969,
+    "historical_rows": 24968,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791130560,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791130560",
+    "first_historical_values": {
+      "BAR_INDEX": "0",
+      "CREATED": "1",
+      "LABEL_COUNT": "1",
+      "LABEL_OLDEST_CREATED": "0",
+      "LINE_COUNT": "1",
+      "LINE_OLDEST_CREATED": "0",
+      "BOX_COUNT": "1",
+      "BOX_OLDEST_CREATED": "0",
+      "POLYLINE_COUNT": "1",
+      "POLYLINE_OLDEST_CREATED": "0"
+    },
+    "last_historical_values": {
+      "BAR_INDEX": "24967",
+      "CREATED": "32",
+      "LABEL_COUNT": "8",
+      "LABEL_OLDEST_CREATED": "24",
+      "LINE_COUNT": "8",
+      "LINE_OLDEST_CREATED": "24",
+      "BOX_COUNT": "8",
+      "BOX_OLDEST_CREATED": "24",
+      "POLYLINE_COUNT": "8",
+      "POLYLINE_OLDEST_CREATED": "24"
+    },
+    "data_window_witness": "captures/v11/evidence/visual-retention-four-families-v6-v1-attempt2-data-window-v1.json"
   }
 ]
