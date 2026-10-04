@@ -1,0 +1,554 @@
+{
+  "schemaVersion": 1,
+  "bundle": "v16",
+  "version": 4,
+  "status": "FROZEN",
+  "frozen": true,
+  "scripts": [
+    {
+      "probe": "inherited-v7-223-v15-v1.pine",
+      "pineVersion": 5,
+      "rowIds": [
+        "v7:223"
+      ],
+      "question": "Does this exact corpus source compile on current TradingView? Capture the first refusal if rejected.",
+      "captureKind": "compile-only",
+      "minimumHistoryBars": 1,
+      "limits": [
+        "Expected native phase UNSPECIFIED. Whole-source first error may not isolate the suspected root. No source allowlist."
+      ],
+      "sourceSha256": "e7958936970570ea33b0e2d85ba4504003952a384f24d7998fc4fd1a0d1515fa",
+      "path": "inherited-v7-223-v15-v1.pine",
+      "owner": "codex-tkxtd0",
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "observation": "Actual exact-source compile acceptance or complete first diagnostic"
+      },
+      "instructions": "instructions/inherited-v7-223-v15-v1.md",
+      "instructionSha256": "5c3ced105df540bec244b28f4a427a445fb4bb8e112ab8622e1ac84e35b11cd2",
+      "provenance": "/home/sam/cs/docs/tealscript-parity-archive/ledger/inherited-refusals-b8f-tkxtd0-v1/v15-compile-drafts-v1/inherited-v7-223-v15-v1.json"
+    },
+    {
+      "probe": "inherited-v7-379-v15-v1.pine",
+      "pineVersion": 6,
+      "rowIds": [
+        "v7:379"
+      ],
+      "question": "Does this exact corpus source compile on current TradingView? Capture the first refusal if rejected.",
+      "captureKind": "compile-only",
+      "minimumHistoryBars": 1,
+      "limits": [
+        "Expected native phase UNSPECIFIED. Whole-source first error may not isolate the suspected root. No source allowlist."
+      ],
+      "sourceSha256": "cf5633f25bcc1fe142d68bb7c49427c3f9a8d7db4c7ad25d4a80a10c46592334",
+      "path": "inherited-v7-379-v15-v1.pine",
+      "owner": "codex-tkxtd0",
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "observation": "Actual exact-source compile acceptance or complete first diagnostic"
+      },
+      "instructions": "instructions/inherited-v7-379-v15-v1.md",
+      "instructionSha256": "7abb6823e2132a063aceab4de1edde5da52fe5d1220b7275329be56cede4ab2b",
+      "provenance": "/home/sam/cs/docs/tealscript-parity-archive/ledger/inherited-refusals-b8f-tkxtd0-v1/v15-compile-drafts-v1/inherited-v7-379-v15-v1.json"
+    },
+    {
+      "probe": "htf-context-6m-v16-v1.pine",
+      "pineVersion": 6,
+      "rowIds": [
+        "v1:htf6_close_clean_gapsoff_lookaheadon",
+        "v1:htf6_close_hole_gapsoff_lookaheadon",
+        "v1:htf6_close_clean_gapson_lookaheadon",
+        "v1:htf6_close_hole_gapson_lookaheadon"
+      ],
+      "question": "Capture actual chart and 6m requested contexts, including final HTF completion, to score v1 incomplete-bucket close cells without synthetic feed substitution.",
+      "captureKind": "csv+pine-logs+context-screenshots",
+      "minimumHistoryBars": 300,
+      "sourceSha256": "43480ab6a125839f72b97dfb54fb9b9c3aa8b2675cf7cf008956a1fffeb6f49f",
+      "limits": [
+        "Native phases/values UNSPECIFIED. New evidence cannot reconstruct an old developing tick unless original capture context and feed history are recovered.",
+        "Fresh requested bar_index may differ from v1; hole-mask comparisons require exported request_index alignment, not inferred CSV indices.",
+        "Only completed matching requested buckets become scorable; mismatched symbols/sessions/ticks or missing feed remain context holds."
+      ],
+      "captureInstructions": "Read CAPTURE-INSTRUCTIONS-v1.md; export full CSV plus Pine logs/settings and paired native requested-TF raw OHLCV. Preserve separate developing and confirmed/reloaded attempts.",
+      "affectedCells": 6,
+      "plotCount": 33,
+      "requestCount": 3,
+      "originalContextColumns": [
+        "htf6_close_clean_gapsoff_lookaheadon",
+        "htf6_close_hole_gapsoff_lookaheadon",
+        "htf6_close_clean_gapson_lookaheadon",
+        "htf6_close_hole_gapson_lookaheadon"
+      ],
+      "path": "htf-context-6m-v16-v1.pine",
+      "owner": "codex-tkxtd0",
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED",
+        "observation": "Actual contemporaneous chart/requested feeds and separate developing/closed attempts; matching complete buckets only"
+      },
+      "instructions": "instructions/htf-context-6m-v16-v1.md",
+      "instructionSha256": "6051d30c1a002eb2b48dc6e138cd2456a1bef5e28b76e431fb58cdf50d013c24",
+      "provenance": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v16-outcomes/contributors/tkxtd0/htf-context-v1/htf-context-6m-v16-v1.json",
+      "contributorManifest": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v16-outcomes/contributors/tkxtd0/htf-context-v1/SHA-MANIFEST-v1.json"
+    },
+    {
+      "probe": "htf-context-10m-v16-v1.pine",
+      "pineVersion": 6,
+      "rowIds": [
+        "v1:htf10_close_clean_gapsoff_lookaheadon",
+        "v1:htf10_close_hole_gapsoff_lookaheadon",
+        "v1:htf10_close_clean_gapson_lookaheadon",
+        "v1:htf10_close_hole_gapson_lookaheadon"
+      ],
+      "question": "Capture actual chart and 10m requested contexts, including final HTF completion, to score v1 incomplete-bucket close cells without synthetic feed substitution.",
+      "captureKind": "csv+pine-logs+context-screenshots",
+      "minimumHistoryBars": 300,
+      "sourceSha256": "c8d160adb0e4aa264da1a574b1809a610d82b656ad506ecca393b434b6c35973",
+      "limits": [
+        "Native phases/values UNSPECIFIED. New evidence cannot reconstruct an old developing tick unless original capture context and feed history are recovered.",
+        "Fresh requested bar_index may differ from v1; hole-mask comparisons require exported request_index alignment, not inferred CSV indices.",
+        "Only completed matching requested buckets become scorable; mismatched symbols/sessions/ticks or missing feed remain context holds."
+      ],
+      "captureInstructions": "Read CAPTURE-INSTRUCTIONS-v1.md; export full CSV plus Pine logs/settings and paired native requested-TF raw OHLCV. Preserve separate developing and confirmed/reloaded attempts.",
+      "affectedCells": 10,
+      "plotCount": 33,
+      "requestCount": 3,
+      "originalContextColumns": [
+        "htf10_close_clean_gapsoff_lookaheadon",
+        "htf10_close_hole_gapsoff_lookaheadon",
+        "htf10_close_clean_gapson_lookaheadon",
+        "htf10_close_hole_gapson_lookaheadon"
+      ],
+      "path": "htf-context-10m-v16-v1.pine",
+      "owner": "codex-tkxtd0",
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED",
+        "observation": "Actual contemporaneous chart/requested feeds and separate developing/closed attempts; matching complete buckets only"
+      },
+      "instructions": "instructions/htf-context-10m-v16-v1.md",
+      "instructionSha256": "5c61fb106afba7e22e9b665b5146c0aa01be3d92282b0749a7cf02fbaf2266fe",
+      "provenance": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v16-outcomes/contributors/tkxtd0/htf-context-v1/htf-context-10m-v16-v1.json",
+      "contributorManifest": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v16-outcomes/contributors/tkxtd0/htf-context-v1/SHA-MANIFEST-v1.json"
+    },
+    {
+      "probe": "htf-context-30m-v16-v1.pine",
+      "pineVersion": 6,
+      "rowIds": [
+        "v1:htf30_close_clean_gapsoff_lookaheadon",
+        "v1:htf30_close_hole_gapsoff_lookaheadon",
+        "v1:htf30_close_clean_gapson_lookaheadon",
+        "v1:htf30_close_hole_gapson_lookaheadon"
+      ],
+      "question": "Capture actual chart and 30m requested contexts, including final HTF completion, to score v1 incomplete-bucket close cells without synthetic feed substitution.",
+      "captureKind": "csv+pine-logs+context-screenshots",
+      "minimumHistoryBars": 300,
+      "sourceSha256": "5561e8e59413ca5e79de79a54915e0df0371b364bba4cb58f7784f26d581b256",
+      "limits": [
+        "Native phases/values UNSPECIFIED. New evidence cannot reconstruct an old developing tick unless original capture context and feed history are recovered.",
+        "Fresh requested bar_index may differ from v1; hole-mask comparisons require exported request_index alignment, not inferred CSV indices.",
+        "Only completed matching requested buckets become scorable; mismatched symbols/sessions/ticks or missing feed remain context holds."
+      ],
+      "captureInstructions": "Read CAPTURE-INSTRUCTIONS-v1.md; export full CSV plus Pine logs/settings and paired native requested-TF raw OHLCV. Preserve separate developing and confirmed/reloaded attempts.",
+      "affectedCells": 30,
+      "plotCount": 33,
+      "requestCount": 3,
+      "originalContextColumns": [
+        "htf30_close_clean_gapsoff_lookaheadon",
+        "htf30_close_hole_gapsoff_lookaheadon",
+        "htf30_close_clean_gapson_lookaheadon",
+        "htf30_close_hole_gapson_lookaheadon"
+      ],
+      "path": "htf-context-30m-v16-v1.pine",
+      "owner": "codex-tkxtd0",
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED",
+        "observation": "Actual contemporaneous chart/requested feeds and separate developing/closed attempts; matching complete buckets only"
+      },
+      "instructions": "instructions/htf-context-30m-v16-v1.md",
+      "instructionSha256": "d3368e75a6bc7054925b3e7cf685948ac659eb59d4d80bd3f5aeda7c571fae84",
+      "provenance": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v16-outcomes/contributors/tkxtd0/htf-context-v1/htf-context-30m-v16-v1.json",
+      "contributorManifest": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v16-outcomes/contributors/tkxtd0/htf-context-v1/SHA-MANIFEST-v1.json"
+    },
+    {
+      "probe": "visual21-199-bgcolor-v3-offset-discriminator-v1.pine",
+      "path": "visual21-199-bgcolor-v3-offset-discriminator-v1.pine",
+      "sourceSha256": "551480f18312e83306fbab44f5572c36b04dd3bed85a78aa8844711b4fd48511",
+      "owner": "codex-v6aeqx",
+      "rowIds": [
+        "ledger:199"
+      ],
+      "pineVersion": 3,
+      "indicatorOnly": true,
+      "captureKind": "compile-and-native-renderer-geometry",
+      "nativeStatus": "UNOBSERVED",
+      "expectedOutcome": {
+        "phase": "COMPILE or RUNS",
+        "observation": "Final-offset destinations0/3 versus per-source4/7; same-source zero-input control2/5, relative to observed cycle start."
+      },
+      "instructions": "instructions/visual21-199-bgcolor-v3-offset-discriminator-v1.md",
+      "instructionSha256": "14c246e762957631de3d076659f689fee3b01c5163f057217e6f93021aa94ada",
+      "minimumHistoryBars": 64,
+      "decision": {
+        "latestShift": -2,
+        "sourcePhases": [
+          2,
+          5
+        ],
+        "perSourceShift": 2,
+        "finalDestinationPhases": [
+          0,
+          3
+        ],
+        "perSourceDestinationPhases": [
+          4,
+          7
+        ],
+        "zeroDestinationPhases": [
+          2,
+          5
+        ]
+      },
+      "authorPreflightReceipt": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v16-outcomes/contributors/v6aeqx-visual21-holds-v1/PREFLIGHT-v2.json"
+    },
+    {
+      "probe": "visual21-513-barcolor-v3-offset-discriminator-v1.pine",
+      "path": "visual21-513-barcolor-v3-offset-discriminator-v1.pine",
+      "sourceSha256": "c84f7eeccf8575ce6d4f3483c903e25516984f0ef41e68d92ba276c05a10586b",
+      "owner": "codex-v6aeqx",
+      "rowIds": [
+        "ledger:513"
+      ],
+      "pineVersion": 3,
+      "indicatorOnly": true,
+      "captureKind": "compile-and-native-renderer-geometry",
+      "nativeStatus": "UNOBSERVED",
+      "expectedOutcome": {
+        "phase": "COMPILE or RUNS",
+        "observation": "Final-offset destinations0/3 versus per-source4/7; same-source zero-input control2/5, relative to observed cycle start."
+      },
+      "instructions": "instructions/visual21-513-barcolor-v3-offset-discriminator-v1.md",
+      "instructionSha256": "3e6fb17ef0a7b37b30099c16888ae206cdec9dc0883b41d27043934e7de385ae",
+      "minimumHistoryBars": 64,
+      "decision": {
+        "latestShift": -2,
+        "sourcePhases": [
+          2,
+          5
+        ],
+        "perSourceShift": 2,
+        "finalDestinationPhases": [
+          0,
+          3
+        ],
+        "perSourceDestinationPhases": [
+          4,
+          7
+        ],
+        "zeroDestinationPhases": [
+          2,
+          5
+        ]
+      },
+      "authorPreflightReceipt": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v16-outcomes/contributors/v6aeqx-visual21-holds-v1/PREFLIGHT-v2.json"
+    },
+    {
+      "probe": "visual21-736-plotchar-v3-offset-discriminator-v1.pine",
+      "path": "visual21-736-plotchar-v3-offset-discriminator-v1.pine",
+      "sourceSha256": "164e7b62ce24806d0fd26efd7f6f36a42ae265df12bfbe466c34631372746ecd",
+      "owner": "codex-v6aeqx",
+      "rowIds": [
+        "ledger:736"
+      ],
+      "pineVersion": 3,
+      "indicatorOnly": true,
+      "captureKind": "compile-and-native-renderer-geometry",
+      "nativeStatus": "UNOBSERVED",
+      "expectedOutcome": {
+        "phase": "COMPILE or RUNS",
+        "observation": "Final-offset destinations0/3 versus per-source4/7; same-source zero-input control2/5, relative to observed cycle start."
+      },
+      "instructions": "instructions/visual21-736-plotchar-v3-offset-discriminator-v1.md",
+      "instructionSha256": "058119b35f9314bf85dec35610b32c52e4e68418b8e07fd500743dd38fb5092d",
+      "minimumHistoryBars": 64,
+      "decision": {
+        "latestShift": -2,
+        "sourcePhases": [
+          2,
+          5
+        ],
+        "perSourceShift": 2,
+        "finalDestinationPhases": [
+          0,
+          3
+        ],
+        "perSourceDestinationPhases": [
+          4,
+          7
+        ],
+        "zeroDestinationPhases": [
+          2,
+          5
+        ]
+      },
+      "authorPreflightReceipt": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v16-outcomes/contributors/v6aeqx-visual21-holds-v1/PREFLIGHT-v2.json"
+    },
+    {
+      "probe": "visual21-1370-plotarrow-v3-offset-discriminator-v1.pine",
+      "path": "visual21-1370-plotarrow-v3-offset-discriminator-v1.pine",
+      "sourceSha256": "48c476c26133e62d9ce7f53c93d4f8fc85ebe04aeeeb19c7d6df7c4ff0a49d63",
+      "owner": "codex-v6aeqx",
+      "rowIds": [
+        "ledger:1370"
+      ],
+      "pineVersion": 3,
+      "indicatorOnly": true,
+      "captureKind": "compile-and-native-renderer-geometry",
+      "nativeStatus": "UNOBSERVED",
+      "expectedOutcome": {
+        "phase": "COMPILE or RUNS",
+        "observation": "Final-offset destinations0/3 versus per-source4/7; same-source zero-input control2/5, relative to observed cycle start."
+      },
+      "instructions": "instructions/visual21-1370-plotarrow-v3-offset-discriminator-v1.md",
+      "instructionSha256": "c851d96130d652c02881eeb4ecad9f1a6f484f6d0c703d79a6e9814f22feed6e",
+      "minimumHistoryBars": 64,
+      "decision": {
+        "latestShift": -2,
+        "sourcePhases": [
+          2,
+          5
+        ],
+        "perSourceShift": 2,
+        "finalDestinationPhases": [
+          0,
+          3
+        ],
+        "perSourceDestinationPhases": [
+          4,
+          7
+        ],
+        "zeroDestinationPhases": [
+          2,
+          5
+        ]
+      },
+      "authorPreflightReceipt": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v16-outcomes/contributors/v6aeqx-visual21-holds-v1/PREFLIGHT-v2.json"
+    },
+    {
+      "probe": "visual21-705-chart-foreground-threshold-v6-v1.pine",
+      "path": "visual21-705-chart-foreground-threshold-v6-v1.pine",
+      "sourceSha256": "7c6b4786d4f3d190f7dcb59845187a8087fabd5aef29823384feb8e930883190",
+      "owner": "codex-v6aeqx",
+      "rowIds": [
+        "ledger:705"
+      ],
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "captureKind": "numeric-and-host-settings",
+      "nativeStatus": "UNOBSERVED",
+      "expectedOutcome": {
+        "phase": "RUNS",
+        "observation": "Neighboring solid grays127/128 distinguish brightness<128; literal numeric BG/FG channels eliminate unrelated tostring(color) refusal."
+      },
+      "instructions": "instructions/visual21-705-chart-foreground-threshold-v6-v1.md",
+      "instructionSha256": "b5b3a4970532dc8313eb322fd614ce970fcbb26dd07d839028514ee6050afd4b",
+      "minimumHistoryBars": 16,
+      "decision": {
+        "settings": [
+          "#000000",
+          "#FFFFFF",
+          "#7F7F7F",
+          "#808080"
+        ],
+        "expectedForegroundRGB": [
+          [
+            219,
+            219,
+            219
+          ],
+          [
+            15,
+            15,
+            15
+          ],
+          [
+            219,
+            219,
+            219
+          ],
+          [
+            15,
+            15,
+            15
+          ]
+        ],
+        "expectedTransparency": 0
+      },
+      "authorPreflightReceipt": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v16-outcomes/contributors/v6aeqx-visual21-holds-v1/PREFLIGHT-v2.json"
+    },
+    {
+      "probe": "visual21-856-polyline-kernel-trace-v6-v1.pine",
+      "path": "visual21-856-polyline-kernel-trace-v6-v1.pine",
+      "sourceSha256": "bf523f9a6c94359c52abaf6693416d2312f846bfd4a8b8f65038d963faddf52c",
+      "owner": "codex-v6aeqx",
+      "rowIds": [
+        "ledger:856"
+      ],
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "captureKind": "native-pre-raster-path-trace",
+      "nativeStatus": "UNOBSERVED",
+      "expectedOutcome": {
+        "phase": "RUNS plus TRACE",
+        "observation": "Asymmetric four-point stencil distinguishes the frozen uniform Catmull-Rom cubic controls from a different native path basis."
+      },
+      "instructions": "instructions/visual21-856-polyline-kernel-trace-v6-v2.md",
+      "instructionSha256": "78723eb5d99ca410b6c177d2a2fe9f760a3f7840df08f2b4a6e6ae5ff592c6c3",
+      "minimumHistoryBars": 32,
+      "decision": {
+        "pointsRelativeToAnchor": [
+          [
+            -12,
+            0
+          ],
+          [
+            -10,
+            80
+          ],
+          [
+            -4,
+            -20
+          ],
+          [
+            -1,
+            40
+          ]
+        ],
+        "predictedUniformCubics": [
+          {
+            "start": [
+              -12,
+              0
+            ],
+            "control1": [
+              -11.666666666666666,
+              13.333333333333334
+            ],
+            "control2": [
+              -11.333333333333334,
+              83.33333333333333
+            ],
+            "end": [
+              -10,
+              80
+            ]
+          },
+          {
+            "start": [
+              -10,
+              80
+            ],
+            "control1": [
+              -8.666666666666666,
+              76.66666666666667
+            ],
+            "control2": [
+              -5.5,
+              -13.333333333333332
+            ],
+            "end": [
+              -4,
+              -20
+            ]
+          },
+          {
+            "start": [
+              -4,
+              -20
+            ],
+            "control1": [
+              -2.5,
+              -26.666666666666668
+            ],
+            "control2": [
+              -1.5,
+              30.0
+            ],
+            "end": [
+              -1,
+              40
+            ]
+          }
+        ],
+        "coordinates": "x relative to anchorN; y literal indicator prices. Apply the observed same-frame affine projection to compare native controls.",
+        "requiredNativeEvidence": "native commands/control points or sampled pre-raster path with interpolation basis; vertices/CSV/screenshot alone are insufficient."
+      },
+      "authorPreflightReceipt": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v16-outcomes/contributors/v6aeqx-visual21-holds-v1/PREFLIGHT-v2.json"
+    },
+    {
+      "probe": "inherited-box-split-alias-v6-v1.pine",
+      "path": "inherited-box-split-alias-v6-v1.pine",
+      "sourceSha256": "12099753ad4b684d2ddd7d447d6f89fab527a7cb79df3949c9f56c00c959663d",
+      "owner": "codex-hp45ai",
+      "rowIds": [
+        "v56:542",
+        "v56:563"
+      ],
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "captureKind": "compile-and-csv",
+      "nativeStatus": "UNOBSERVED",
+      "question": "Does TV admit the aliased series-width max/division box coordinate; if RUNS compare right getter to split without assuming coercion?",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "observation": "UNOBSERVED; record compile acceptance or exact diagnostic; if accepted export displayed columns"
+      },
+      "instructions": "instructions/inherited-box-split-alias-v6-v1.md",
+      "instructionSha256": "2ddd9a23c276caad78fa18ad2cd8180cdb2d683abf33d9283422cea139b8f196",
+      "minimumHistoryBars": 256,
+      "provenance": "/home/sam/cs/docs/tealscript-parity-archive/oracle-replay-v1/inherited-refusals-audit-hp45ai-v1/v15-probes-v1/HANDOFF-v1.json"
+    },
+    {
+      "probe": "inherited-preset-reassignment-length-v6-v1.pine",
+      "path": "inherited-preset-reassignment-length-v6-v1.pine",
+      "sourceSha256": "188bf56ecfa355a1dda2bf712326adce71f18b1c5f98d74da1933899ff196a63",
+      "owner": "codex-hp45ai",
+      "rowIds": [
+        "v56:484"
+      ],
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "captureKind": "compile-and-csv",
+      "nativeStatus": "UNOBSERVED",
+      "question": "Does TV admit preset/timeframe-derived reassignment of ATR/RSI/EMA simple lengths, or refuse as series?",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "observation": "UNOBSERVED; record compile acceptance or exact diagnostic; if accepted export displayed columns"
+      },
+      "instructions": "instructions/inherited-preset-reassignment-length-v6-v1.md",
+      "instructionSha256": "feee633a96dec4db065bfa1f84fa182590d1240015e481de366ce12de33f8491",
+      "minimumHistoryBars": 256,
+      "provenance": "/home/sam/cs/docs/tealscript-parity-archive/oracle-replay-v1/inherited-refusals-audit-hp45ai-v1/v15-probes-v1/HANDOFF-v1.json"
+    }
+  ],
+  "scriptCount": 13,
+  "responsePath": "v16/captures/v16/RESPONSE-v16.md",
+  "reuseReferences": [
+    {
+      "bundle": "v15",
+      "manifest": "bundle-manifest-v9.json",
+      "question": "20 UK quota probes and fractional-price v2 already shipped dce789781a; no repeat paste"
+    }
+  ]
+}

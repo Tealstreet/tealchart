@@ -1,0 +1,18 @@
+//@version=6
+indicator("Inherited box split alias v1", overlay=true, max_boxes_count=2)
+maxOH = input.int(11, "Width", minval=1, maxval=100)
+vpHO = input.int(1, "Offset", minval=0, maxval=10)
+ratio = high != low ? math.abs(close - open) / (high - low) : 0.5
+width = math.max(int(ratio * maxOH), 0)
+anchorBI = bar_index + vpHO + 1
+split = anchorBI + math.max(width * 2 / 3, 1)
+var box id = na
+if not na(id)
+    box.delete(id)
+id := box.new(anchorBI, high, split, low, color(na), bgcolor=color.new(color.blue, 80))
+plot(anchorBI, "ANCHOR", display=display.data_window)
+plot(split, "SPLIT", display=display.data_window)
+plot(box.get_left(id), "LEFT", display=display.data_window)
+plot(box.get_right(id), "RIGHT", display=display.data_window)
+plot(width, "WIDTH", display=display.data_window)
+plot(bar_index, "BAR_INDEX", display=display.data_window)

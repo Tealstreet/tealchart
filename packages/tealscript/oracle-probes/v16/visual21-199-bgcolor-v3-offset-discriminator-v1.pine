@@ -1,0 +1,12 @@
+//@version=3
+study("V16 visual21 199 bgcolor", overlay=false)
+use_series = input(true, "Use series offset")
+phase = n % 16
+code = phase == 2 ? 1 : phase == 5 ? 2 : 0
+source_shift = phase < 8 ? 2 : -2
+shift = use_series ? source_shift : 0
+bgcolor(code == 1 ? red : code == 2 ? lime : na, offset=shift, transp=0)
+plot(n, "N", transp=100)
+plot(phase, "PHASE", transp=100)
+plot(code, "SOURCE_CODE", transp=100)
+plot(shift, "CALL_OFFSET", transp=100)
