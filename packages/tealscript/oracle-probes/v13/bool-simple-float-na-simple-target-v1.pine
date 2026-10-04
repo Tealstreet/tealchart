@@ -1,0 +1,5 @@
+//@version=6
+indicator("Bool simple float NA simple target v1")
+simple float source = float(na)
+simple bool converted = bool(source)
+plot(converted ? 1 : 0, title="CONVERTED")

@@ -1,0 +1,3 @@
+//@version=6
+indicator("V11 Data Window coded display", overlay=false)
+plot(close, "WINDOW_ONLY", display=display.data_window, editable=true)

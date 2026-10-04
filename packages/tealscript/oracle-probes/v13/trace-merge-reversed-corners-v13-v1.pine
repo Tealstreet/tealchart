@@ -1,0 +1,9 @@
+//@version=6
+indicator("Silent audit merge-reversed-corners v13 v1", overlay=true, precision=16)
+var t=table.new(position.top_right,2,2)
+if barstate.isfirst
+    table.cell(t,0,0,"TOP LEFT",bgcolor=color.blue)
+    table.cell(t,1,1,"START BOTTOM RIGHT",bgcolor=color.red)
+    table.merge_cells(t,1,1,0,0)
+plot(bar_index,"INPUT_BAR_INDEX",display=display.data_window)
+plot(1,"OUTCOME",display=display.data_window)

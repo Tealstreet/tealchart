@@ -1,0 +1,7 @@
+//@version=6
+indicator("Silent audit table-zero-columns v13 v1", overlay=true, precision=16)
+var t=table.new(position.top_right,0,1)
+if barstate.isfirst
+    table.cell(t,0,0,"COLUMN ZERO CELL")
+plot(bar_index,"INPUT_BAR_INDEX",display=display.data_window)
+plot(1,"OUTCOME",display=display.data_window)

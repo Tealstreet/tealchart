@@ -1,0 +1,7 @@
+//@version=6
+indicator("Silent audit drawing count501 v13 v1",max_lines_count=501)
+if barstate.isfirst
+    for i=0 to 500
+        line.new(0,1,1,1)
+plot(bar_index,"INPUT_BAR_INDEX",display=display.data_window)
+plot(array.size(line.all),"OUTCOME",display=display.data_window)

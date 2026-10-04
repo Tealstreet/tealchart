@@ -1,0 +1,10 @@
+//@version=6
+indicator("V13 security confirmed context BK v1")
+[requestedConfirmed, requestedTime, requestedCloseTime, requestedIndex] = request.security(syminfo.tickerid, "5", [barstate.isconfirmed ? 1 : 0, time, time_close, bar_index])
+plot(barstate.isconfirmed ? 1 : 0, "CHART_CONFIRMED")
+plot(requestedConfirmed, "REQUESTED_CONFIRMED")
+plot(requestedTime, "REQUESTED_TIME")
+plot(requestedCloseTime, "REQUESTED_CLOSE_TIME")
+plot(requestedIndex, "REQUESTED_INDEX")
+plot(time, "CHART_TIME")
+plot(bar_index, "BAR_INDEX")

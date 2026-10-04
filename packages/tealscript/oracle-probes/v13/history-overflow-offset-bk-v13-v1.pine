@@ -1,0 +1,8 @@
+//@version=6
+indicator("V13 history overflow offset BK v1")
+offset = math.exp(1000.0 + bar_index * 0.0)
+plot(offset, "OVERFLOW_OFFSET")
+plot(close[offset], "TARGET")
+plot(close[float(na)], "MISSING_CONTROL")
+plot(close, "CLOSE_CONTROL")
+plot(bar_index, "BAR_INDEX")

@@ -1,0 +1,11 @@
+//@version=6
+indicator("V13 DMI actual missing OHLC v1", precision=16)
+[plus, minus, adx] = ta.dmi(3, 3)
+plot(time, "INPUT_TIME")
+plot(high, "ACTUAL_HIGH")
+plot(low, "ACTUAL_LOW")
+plot(close, "ACTUAL_CLOSE")
+plot(na(high) or na(low) or na(close) ? 1 : 0, "OHLC_MISSING")
+plot(plus, "PLUS")
+plot(minus, "MINUS")
+plot(adx, "ADX")

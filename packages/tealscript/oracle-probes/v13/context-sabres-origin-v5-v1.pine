@@ -1,0 +1,10 @@
+//@version=5
+indicator("V13 Sabres execution origin v1")
+length = input.int(50)
+p = chart.point.from_index(bar_index + (length / 2 - 1), low)
+var int firstTime = time
+plot(close, "ORIGINAL_close")
+plot(bar_index, "INPUT_index", display=display.data_window)
+plot(time, "INPUT_time", display=display.data_window)
+plot(firstTime, "INPUT_first_time", display=display.data_window)
+plot(length, "INPUT_length", display=display.data_window)

@@ -1,0 +1,7 @@
+//@version=6
+indicator("Silent audit array-linear-percentile101 v13 v1", overlay=false, precision=16)
+a=array.from(1.0,2.0)
+p=bar_index==0?100.0:101.0
+plot(bar_index,"INPUT_BAR_INDEX",display=display.data_window)
+plot(p,"INPUT_PERCENTAGE",display=display.data_window)
+plot(array.percentile_linear_interpolation(a,p),"OUTCOME",display=display.data_window)

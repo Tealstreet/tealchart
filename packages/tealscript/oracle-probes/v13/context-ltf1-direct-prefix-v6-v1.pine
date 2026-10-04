@@ -1,0 +1,16 @@
+//@version=6
+indicator("V13 independent minute prefix v1", precision=12)
+if timeframe.period != "1"
+    runtime.error("Use BINANCE BTCUSDT standard 1-minute candles")
+var int firstTime = time
+plot(open, "INPUT_open", display=display.data_window)
+plot(high, "INPUT_high", display=display.data_window)
+plot(low, "INPUT_low", display=display.data_window)
+plot(close, "INPUT_close", display=display.data_window)
+plot(volume, "INPUT_volume", display=display.data_window)
+plot(time, "INPUT_time", display=display.data_window)
+plot(time_close, "INPUT_time_close", display=display.data_window)
+plot(bar_index, "INPUT_index", display=display.data_window)
+plot(firstTime, "INPUT_first_time", display=display.data_window)
+plot(ta.sma(close, 7), "CTRL_sma7", display=display.data_window)
+plot(timenow, "INPUT_clock", display=display.data_window)

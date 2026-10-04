@@ -1,0 +1,5 @@
+//@version=6
+indicator("Silent audit time-offset-negative501 v13 v1", overlay=false, precision=16)
+plot(bar_index,"INPUT_BAR_INDEX",display=display.data_window)
+plot(time,"INPUT_TIME",display=display.data_window)
+plot(time("",bars_back=-501),"OUTCOME",display=display.data_window)

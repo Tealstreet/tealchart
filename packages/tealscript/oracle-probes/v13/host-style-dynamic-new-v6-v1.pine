@@ -1,0 +1,3 @@
+//@version=6
+indicator("V11 Style dynamic color new", overlay=false)
+plot(close, "PRICE", color=color.new(color.blue, bar_index % 80), editable=true)

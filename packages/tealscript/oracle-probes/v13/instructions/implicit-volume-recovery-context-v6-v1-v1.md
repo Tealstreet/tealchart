@@ -1,0 +1,9 @@
+# Implicit volume context capture v1
+
+Paste the unchanged SHA-pinned indicator in isolation. Preserve any native refusal/error with full diagnostic, source identity, title and UTC; do not repair it. Export all23 outputs with raw native OHLCV, complete available execution history, dataset extent/end-of-data, actual Pine INPUT_INDEX, timezone/session, symbol/account/feed settings and historical/live cutoff. Do not require index0 merely from a CSV row number. Keep independent host OHLCV snapshots and each source/capture/settings SHA.
+
+Acquire BINANCE:BTCUSDT2m as finite-price/volume control; TVC:DXY2m as sustained missing-volume context if actually missing; SP_DLY:SPX2m for flat ranges if supplied/entitled. Verify the raw INPUT_VOLUME field, not an expected indicator result. Record which conditions actually occur. Do not substitute zero for missing volume. Missing entitlement is distinct from native missing-volume data.
+
+The unresolved clauses need actual intermittent host OHLC/volume absence and return to finite input. Locate a native symbol/history exposing such a transition if available, save at least32 bars before/after with complete cumulative prefix, and verify VOLUME_RECOVERY plus raw fields. Report no qualifying transition when none exists. Sustained DXY absence does not settle post-hole recovery. Source code deliberately creates PATTERN_SOURCE holes; those never stand for missing chart volume or prices.
+
+All native outcomes are UNSPECIFIED. OBV/PVT/WAD/ACCDIST and MFI are measured together only to export common independent inputs; no arithmetic/predicate/NA policy is predicted. The source supersedes missing raw volume in old accdist CSVs. Original settled MFI source-hole captures are not requested again, and VMP owns any MFI predicate repair. No synthetic feed or source rewrite is a native implicit-hole witness.

@@ -1,0 +1,7 @@
+//@version=6
+indicator("V11 joint time price input", overlay=true)
+selectedTime = input.time(1700000000000, "Time", inline="point", group="Anchor", confirm=true)
+selectedPrice = input.price(100.0, "Price", inline="point", group="Anchor", confirm=true)
+plot(selectedTime, "INPUT_TIME", display=display.data_window)
+plot(selectedPrice, "INPUT_PRICE", display=display.data_window)
+plot(time == selectedTime ? selectedPrice : na, "SELECTED_POINT", style=plot.style_circles, linewidth=3)

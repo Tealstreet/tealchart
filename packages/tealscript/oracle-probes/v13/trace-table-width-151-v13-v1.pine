@@ -1,0 +1,7 @@
+//@version=6
+indicator("Silent audit table-width-151 v13 v1", overlay=true, precision=16)
+var t=table.new(position.top_right,1,1,frame_width=151,border_width=151,frame_color=color.red,border_color=color.red)
+if barstate.islast
+    table.cell(t,0,0,"target width 151",width=20,height=20)
+plot(bar_index,"INPUT_BAR_INDEX",display=display.data_window)
+plot(151,"REQUESTED_WIDTH",display=display.data_window)
