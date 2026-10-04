@@ -1,0 +1,20 @@
+// @test regression/coverage-footprint
+// @description #52 coverage build-out: the entire footprint / volume_row namespace plus request.footprint - none of it appeared in any fixture (fixture-coverage census 2026-06-10). Exercises every footprint.* accessor on a request.footprint result and every volume_row.* accessor on rows obtained via footprint.rows / get_row_by_price / poc / vah / val.
+// @expects parse: success
+// @expects no-errors
+
+//@version=6
+indicator("coverage footprint")
+fp = request.footprint(10)
+rows = footprint.rows(fp)
+byPrice = footprint.get_row_by_price(fp, close)
+pocRow = footprint.poc(fp)
+vahRow = footprint.vah(fp)
+valRow = footprint.val(fp)
+fpVol = footprint.buy_volume(fp) + footprint.sell_volume(fp) + footprint.total_volume(fp) + footprint.delta(fp)
+rowStats = 0.0
+if array.size(rows) > 0
+    r = array.get(rows, 0)
+    rowStats := volume_row.buy_volume(r) + volume_row.sell_volume(r) + volume_row.total_volume(r) + volume_row.delta(r) + volume_row.up_price(r) + volume_row.down_price(r) + (volume_row.has_buy_imbalance(r) ? 1 : 0) + (volume_row.has_sell_imbalance(r) ? 1 : 0)
+useRows = volume_row.up_price(byPrice) + volume_row.down_price(pocRow) + volume_row.up_price(vahRow) + volume_row.down_price(valRow)
+plot(fpVol + rowStats + useRows)
