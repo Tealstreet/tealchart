@@ -1,0 +1,44 @@
+{
+  "index": 298,
+  "bar": [
+    1790861400,
+    330,
+    332.4816,
+    325.81,
+    330.32,
+    36306346
+  ],
+  "source_row": [
+    1790861400,
+    null,
+    1,
+    null,
+    1,
+    null,
+    1,
+    null,
+    1,
+    null,
+    1,
+    null,
+    1,
+    1790861400000,
+    330.32,
+    0,
+    1
+  ],
+  "browser_utc": "2026-10-04T18:37:48.953Z",
+  "title": "V13 analyst target unavailable context v1",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Thu 01 Oct '26",
+  "visible_range": {
+    "_firstBar": 263,
+    "_lastBar": 301
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}

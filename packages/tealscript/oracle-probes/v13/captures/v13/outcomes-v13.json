@@ -10615,5 +10615,4579 @@
     "data_window_witness": "captures/v13/evidence/context-ltf1-direct-prefix-v6-v1-attempt2-data-window-v1.json",
     "supplemental_only": true,
     "context_role": "Independent ETH1m spread leg; primary BTC prefix capture remains attempt1"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T18:31:43.965Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "arm",
+        "bitness": "64",
+        "brands": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156"
+          }
+        ],
+        "fullVersionList": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8.0.0.0"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156.0.8075.0"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156.0.8075.0"
+          }
+        ],
+        "mobile": false,
+        "platform": "macOS",
+        "platformVersion": "27.2.0"
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v13 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "implicit-volume-recovery-context-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "dfed95b86ac09f895d24cc64b6f4c64347067118a5a765358926bbd11f62b77b",
+    "indicator_title": "V13 implicit volume recovery context v1",
+    "status": "RUNS",
+    "csv_file": "captures/v13/implicit-volume-recovery-context-v6-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-05T023143.028.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "minmove": 1,
+      "pricescale": 100,
+      "pointvalue": 1,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V13 implicit volume recovery context v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24736,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 25036,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T18:31:32.204Z",
+    "live_candle_open_utc": "2026-10-04T18:30:00.000Z",
+    "export_utc": "2026-10-04T18:31:43.418Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v13/evidence/implicit-volume-recovery-context-v6-v1-attempt1-setup.png",
+      "captures/v13/evidence/implicit-volume-recovery-context-v6-v1-attempt1-export.png",
+      "captures/v13/evidence/implicit-volume-recovery-context-v6-v1-attempt1-logs.txt",
+      "captures/v13/evidence/implicit-volume-recovery-context-v6-v1-attempt1-logs-v1.json",
+      "captures/v13/evidence/implicit-volume-recovery-context-v6-v1-attempt1-logs.png",
+      "captures/v13/evidence/implicit-volume-recovery-context-v6-v1-attempt1-visual.png",
+      "captures/v13/evidence/implicit-volume-recovery-context-v6-v1-attempt1-data-window-v1.png",
+      "captures/v13/evidence/implicit-volume-recovery-context-v6-v1-attempt1-data-window-v1.json",
+      "captures/v13/evidence/implicit-volume-recovery-context-v6-v1-attempt1-data-window-v1.txt",
+      "captures/v13/evidence/implicit-volume-recovery-context-v6-v1-attempt1-authority-object-geometry-v1.json",
+      "captures/v13/evidence/implicit-volume-recovery-context-v6-v1-attempt1-authority-object-geometry-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T18:31:33.150Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790833440,
+            84224.01,
+            84230.01,
+            84208,
+            84230.01,
+            11.78077
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791138600,
+            85325.97,
+            85337.68,
+            85325.97,
+            85337.68,
+            1.17915
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V13 implicit volume recovery context v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790833440,
+                84224.01,
+                84230.01,
+                84208,
+                84230.01,
+                11.78077,
+                1790833440000,
+                22492,
+                0,
+                0,
+                0,
+                0,
+                1652.4871499999792,
+                -0.9327692107028177,
+                8969.639999997904,
+                258.59090701014503,
+                17.629664003493133,
+                22,
+                82.88405136914113,
+                1640.7063799999792,
+                -0.9336098550286623,
+                8947.62999999791,
+                246.81013701014504,
+                38.014440830587134
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791138600,
+                85325.97,
+                85337.68,
+                85325.97,
+                85337.68,
+                1.17915,
+                1791138600000,
+                25035,
+                0,
+                0,
+                0,
+                0,
+                2897.8734199999762,
+                0.9105390423879237,
+                10440.82999999792,
+                -633.0659123250934,
+                73.82580822878165,
+                21,
+                77.54223009458293,
+                2896.6942699999763,
+                0.9103773559355678,
+                10429.119999997929,
+                -634.2450623250935,
+                56.217583624350645
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T18:31:34.475Z",
+        "bars": 25036,
+        "end": true,
+        "first": {
+          "index": -24736,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791138600,
+            85325.97,
+            85337.92,
+            85325.97,
+            85337.92,
+            1.18541
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V13 implicit volume recovery context v1",
+            "status": {
+              "type": 1,
+              "startTime": 1791138693823
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790833440,
+                84224.01,
+                84230.01,
+                84208,
+                84230.01,
+                11.78077,
+                1790833440000,
+                22492,
+                0,
+                0,
+                0,
+                0,
+                1652.4871499999792,
+                -0.9327692107028177,
+                8969.639999997904,
+                258.59090701014503,
+                17.629664003493133,
+                22,
+                82.88405136914113,
+                1640.7063799999792,
+                -0.9336098550286623,
+                8947.62999999791,
+                246.81013701014504,
+                38.014440830587134
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791138600,
+                85325.97,
+                85337.92,
+                85325.97,
+                85337.92,
+                1.18541,
+                1791138600000,
+                25035,
+                0,
+                0,
+                0,
+                0,
+                2897.8796799999764,
+                0.9105432350195233,
+                10441.069999997926,
+                -633.0596523250935,
+                73.8446434308858,
+                21,
+                77.56255223283787,
+                2896.6942699999763,
+                0.9103773559355678,
+                10429.119999997929,
+                -634.2450623250935,
+                56.217583624350645
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T18:31:35.414Z",
+        "bars": 25036,
+        "end": true,
+        "first": {
+          "index": -24736,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791138600,
+            85325.97,
+            85337.92,
+            85325.97,
+            85337.92,
+            1.18656
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V13 implicit volume recovery context v1",
+            "status": {
+              "type": 2
+            },
+            "size": 25036,
+            "first": {
+              "index": -24736,
+              "value": [
+                1788134400,
+                77682,
+                77682.01,
+                77572,
+                77674.04,
+                51.86295,
+                1788134400000,
+                0,
+                0,
+                0,
+                0,
+                0,
+                null,
+                null,
+                0,
+                44.348220220887555,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791138600,
+                85325.97,
+                85337.92,
+                85325.97,
+                85337.92,
+                1.18656,
+                1791138600000,
+                25035,
+                0,
+                0,
+                0,
+                0,
+                2897.8808299999764,
+                0.9105433959435466,
+                10441.069999997926,
+                -633.0585023250935,
+                73.84809940445643,
+                21,
+                77.56628153477027,
+                2896.6942699999763,
+                0.9103773559355678,
+                10429.119999997929,
+                -634.2450623250935,
+                56.217583624350645
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   18:30",
+    "historical_compare_before_unix_seconds": 1791138600,
+    "pine_logs": {
+      "paths": [
+        "evidence/implicit-volume-recovery-context-v6-v1-attempt1-logs.txt",
+        "evidence/implicit-volume-recovery-context-v6-v1-attempt1-logs-v1.json",
+        "evidence/implicit-volume-recovery-context-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "all_exported_column_occurrences": [
+      {
+        "title": "time",
+        "occurrence": 1,
+        "position": 0
+      },
+      {
+        "title": "open",
+        "occurrence": 1,
+        "position": 1
+      },
+      {
+        "title": "high",
+        "occurrence": 1,
+        "position": 2
+      },
+      {
+        "title": "low",
+        "occurrence": 1,
+        "position": 3
+      },
+      {
+        "title": "close",
+        "occurrence": 1,
+        "position": 4
+      },
+      {
+        "title": "INPUT_OPEN",
+        "occurrence": 1,
+        "position": 5
+      },
+      {
+        "title": "INPUT_HIGH",
+        "occurrence": 1,
+        "position": 6
+      },
+      {
+        "title": "INPUT_LOW",
+        "occurrence": 1,
+        "position": 7
+      },
+      {
+        "title": "INPUT_CLOSE",
+        "occurrence": 1,
+        "position": 8
+      },
+      {
+        "title": "INPUT_VOLUME",
+        "occurrence": 1,
+        "position": 9
+      },
+      {
+        "title": "INPUT_TIME",
+        "occurrence": 1,
+        "position": 10
+      },
+      {
+        "title": "INPUT_INDEX",
+        "occurrence": 1,
+        "position": 11
+      },
+      {
+        "title": "OHLC_MISSING",
+        "occurrence": 1,
+        "position": 12
+      },
+      {
+        "title": "VOLUME_MISSING",
+        "occurrence": 1,
+        "position": 13
+      },
+      {
+        "title": "VOLUME_RECOVERY",
+        "occurrence": 1,
+        "position": 14
+      },
+      {
+        "title": "FLAT_RANGE",
+        "occurrence": 1,
+        "position": 15
+      },
+      {
+        "title": "OBV",
+        "occurrence": 1,
+        "position": 16
+      },
+      {
+        "title": "PVT",
+        "occurrence": 1,
+        "position": 17
+      },
+      {
+        "title": "WAD",
+        "occurrence": 1,
+        "position": 18
+      },
+      {
+        "title": "ACCDIST",
+        "occurrence": 1,
+        "position": 19
+      },
+      {
+        "title": "MFI_HLC3",
+        "occurrence": 1,
+        "position": 20
+      },
+      {
+        "title": "PATTERN_SOURCE",
+        "occurrence": 1,
+        "position": 21
+      },
+      {
+        "title": "MFI_PATTERN",
+        "occurrence": 1,
+        "position": 22
+      },
+      {
+        "title": "PREV_OBV",
+        "occurrence": 1,
+        "position": 23
+      },
+      {
+        "title": "PREV_PVT",
+        "occurrence": 1,
+        "position": 24
+      },
+      {
+        "title": "PREV_WAD",
+        "occurrence": 1,
+        "position": 25
+      },
+      {
+        "title": "PREV_ACCDIST",
+        "occurrence": 1,
+        "position": 26
+      },
+      {
+        "title": "PREV_MFI_HLC3",
+        "occurrence": 1,
+        "position": 27
+      }
+    ],
+    "declared_to_native_column_occurrences": [
+      {
+        "declared_title": "INPUT_OPEN",
+        "native_title": "INPUT_OPEN",
+        "occurrence": 1,
+        "position": 5
+      },
+      {
+        "declared_title": "INPUT_HIGH",
+        "native_title": "INPUT_HIGH",
+        "occurrence": 1,
+        "position": 6
+      },
+      {
+        "declared_title": "INPUT_LOW",
+        "native_title": "INPUT_LOW",
+        "occurrence": 1,
+        "position": 7
+      },
+      {
+        "declared_title": "INPUT_CLOSE",
+        "native_title": "INPUT_CLOSE",
+        "occurrence": 1,
+        "position": 8
+      },
+      {
+        "declared_title": "INPUT_VOLUME",
+        "native_title": "INPUT_VOLUME",
+        "occurrence": 1,
+        "position": 9
+      },
+      {
+        "declared_title": "INPUT_TIME",
+        "native_title": "INPUT_TIME",
+        "occurrence": 1,
+        "position": 10
+      },
+      {
+        "declared_title": "INPUT_INDEX",
+        "native_title": "INPUT_INDEX",
+        "occurrence": 1,
+        "position": 11
+      },
+      {
+        "declared_title": "OHLC_MISSING",
+        "native_title": "OHLC_MISSING",
+        "occurrence": 1,
+        "position": 12
+      },
+      {
+        "declared_title": "VOLUME_MISSING",
+        "native_title": "VOLUME_MISSING",
+        "occurrence": 1,
+        "position": 13
+      },
+      {
+        "declared_title": "VOLUME_RECOVERY",
+        "native_title": "VOLUME_RECOVERY",
+        "occurrence": 1,
+        "position": 14
+      },
+      {
+        "declared_title": "FLAT_RANGE",
+        "native_title": "FLAT_RANGE",
+        "occurrence": 1,
+        "position": 15
+      },
+      {
+        "declared_title": "OBV",
+        "native_title": "OBV",
+        "occurrence": 1,
+        "position": 16
+      },
+      {
+        "declared_title": "PVT",
+        "native_title": "PVT",
+        "occurrence": 1,
+        "position": 17
+      },
+      {
+        "declared_title": "WAD",
+        "native_title": "WAD",
+        "occurrence": 1,
+        "position": 18
+      },
+      {
+        "declared_title": "ACCDIST",
+        "native_title": "ACCDIST",
+        "occurrence": 1,
+        "position": 19
+      },
+      {
+        "declared_title": "MFI_HLC3",
+        "native_title": "MFI_HLC3",
+        "occurrence": 1,
+        "position": 20
+      },
+      {
+        "declared_title": "PATTERN_SOURCE",
+        "native_title": "PATTERN_SOURCE",
+        "occurrence": 1,
+        "position": 21
+      },
+      {
+        "declared_title": "MFI_PATTERN",
+        "native_title": "MFI_PATTERN",
+        "occurrence": 1,
+        "position": 22
+      },
+      {
+        "declared_title": "PREV_OBV",
+        "native_title": "PREV_OBV",
+        "occurrence": 1,
+        "position": 23
+      },
+      {
+        "declared_title": "PREV_PVT",
+        "native_title": "PREV_PVT",
+        "occurrence": 1,
+        "position": 24
+      },
+      {
+        "declared_title": "PREV_WAD",
+        "native_title": "PREV_WAD",
+        "occurrence": 1,
+        "position": 25
+      },
+      {
+        "declared_title": "PREV_ACCDIST",
+        "native_title": "PREV_ACCDIST",
+        "occurrence": 1,
+        "position": 26
+      },
+      {
+        "declared_title": "PREV_MFI_HLC3",
+        "native_title": "PREV_MFI_HLC3",
+        "occurrence": 1,
+        "position": 27
+      }
+    ],
+    "named_value_map_scope": "Legacy title maps show the first occurrence only; original positional cells and occurrence tables retain every duplicate without renaming.",
+    "csv_sha256": "305e8363874a5de89d9fa137977875acaed776765f19b7866644d26f69e95ce9",
+    "csv_bytes": 7823205,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "INPUT_OPEN",
+      "INPUT_HIGH",
+      "INPUT_LOW",
+      "INPUT_CLOSE",
+      "INPUT_VOLUME",
+      "INPUT_TIME",
+      "INPUT_INDEX",
+      "OHLC_MISSING",
+      "VOLUME_MISSING",
+      "VOLUME_RECOVERY",
+      "FLAT_RANGE",
+      "OBV",
+      "PVT",
+      "WAD",
+      "ACCDIST",
+      "MFI_HLC3",
+      "PATTERN_SOURCE",
+      "MFI_PATTERN",
+      "PREV_OBV",
+      "PREV_PVT",
+      "PREV_WAD",
+      "PREV_ACCDIST",
+      "PREV_MFI_HLC3"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "INPUT_OPEN": 5,
+      "INPUT_HIGH": 6,
+      "INPUT_LOW": 7,
+      "INPUT_CLOSE": 8,
+      "INPUT_VOLUME": 9,
+      "INPUT_TIME": 10,
+      "INPUT_INDEX": 11,
+      "OHLC_MISSING": 12,
+      "VOLUME_MISSING": 13,
+      "VOLUME_RECOVERY": 14,
+      "FLAT_RANGE": 15,
+      "OBV": 16,
+      "PVT": 17,
+      "WAD": 18,
+      "ACCDIST": 19,
+      "MFI_HLC3": 20,
+      "PATTERN_SOURCE": 21,
+      "MFI_PATTERN": 22,
+      "PREV_OBV": 23,
+      "PREV_PVT": 24,
+      "PREV_WAD": 25,
+      "PREV_ACCDIST": 26,
+      "PREV_MFI_HLC3": 27
+    },
+    "first_historical_cells": [
+      "1788134400",
+      "77682",
+      "77682.01",
+      "77572",
+      "77674.04",
+      "77682",
+      "77682.01",
+      "77572",
+      "77674.04",
+      "51.86295",
+      "1788134400000",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "",
+      "",
+      "0",
+      "44.348220220887555",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""
+    ],
+    "last_historical_cells": [
+      "1791138480",
+      "85319.29",
+      "85325.98",
+      "85319.28",
+      "85325.98",
+      "85319.29",
+      "85325.98",
+      "85319.28",
+      "85325.98",
+      "1.6298",
+      "1791138480000",
+      "25034",
+      "0",
+      "0",
+      "0",
+      "0",
+      "2896.6942699999763",
+      "0.9103773559355678",
+      "10429.119999997929",
+      "-634.2450623250935",
+      "56.217583624350645",
+      "20",
+      "86.53098926156716",
+      "2895.064469999976",
+      "0.9102493700922742",
+      "10422.419999997932",
+      "-635.8748623250935",
+      "39.15286294497087"
+    ],
+    "declared_to_native_header_mapping": {
+      "INPUT_OPEN": "INPUT_OPEN",
+      "INPUT_HIGH": "INPUT_HIGH",
+      "INPUT_LOW": "INPUT_LOW",
+      "INPUT_CLOSE": "INPUT_CLOSE",
+      "INPUT_VOLUME": "INPUT_VOLUME",
+      "INPUT_TIME": "INPUT_TIME",
+      "INPUT_INDEX": "INPUT_INDEX",
+      "OHLC_MISSING": "OHLC_MISSING",
+      "VOLUME_MISSING": "VOLUME_MISSING",
+      "VOLUME_RECOVERY": "VOLUME_RECOVERY",
+      "FLAT_RANGE": "FLAT_RANGE",
+      "OBV": "OBV",
+      "PVT": "PVT",
+      "WAD": "WAD",
+      "ACCDIST": "ACCDIST",
+      "MFI_HLC3": "MFI_HLC3",
+      "PATTERN_SOURCE": "PATTERN_SOURCE",
+      "MFI_PATTERN": "MFI_PATTERN",
+      "PREV_OBV": "PREV_OBV",
+      "PREV_PVT": "PREV_PVT",
+      "PREV_WAD": "PREV_WAD",
+      "PREV_ACCDIST": "PREV_ACCDIST",
+      "PREV_MFI_HLC3": "PREV_MFI_HLC3"
+    },
+    "csv_rows": 25036,
+    "historical_rows": 25035,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791138600,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791138600",
+    "first_historical_values": {
+      "INPUT_OPEN": "77682",
+      "INPUT_HIGH": "77682.01",
+      "INPUT_LOW": "77572",
+      "INPUT_CLOSE": "77674.04",
+      "INPUT_VOLUME": "51.86295",
+      "INPUT_TIME": "1788134400000",
+      "INPUT_INDEX": "0",
+      "OHLC_MISSING": "0",
+      "VOLUME_MISSING": "0",
+      "VOLUME_RECOVERY": "0",
+      "FLAT_RANGE": "0",
+      "OBV": "",
+      "PVT": "",
+      "WAD": "0",
+      "ACCDIST": "44.348220220887555",
+      "MFI_HLC3": "",
+      "PATTERN_SOURCE": "",
+      "MFI_PATTERN": "",
+      "PREV_OBV": "",
+      "PREV_PVT": "",
+      "PREV_WAD": "",
+      "PREV_ACCDIST": "",
+      "PREV_MFI_HLC3": ""
+    },
+    "last_historical_values": {
+      "INPUT_OPEN": "85319.29",
+      "INPUT_HIGH": "85325.98",
+      "INPUT_LOW": "85319.28",
+      "INPUT_CLOSE": "85325.98",
+      "INPUT_VOLUME": "1.6298",
+      "INPUT_TIME": "1791138480000",
+      "INPUT_INDEX": "25034",
+      "OHLC_MISSING": "0",
+      "VOLUME_MISSING": "0",
+      "VOLUME_RECOVERY": "0",
+      "FLAT_RANGE": "0",
+      "OBV": "2896.6942699999763",
+      "PVT": "0.9103773559355678",
+      "WAD": "10429.119999997929",
+      "ACCDIST": "-634.2450623250935",
+      "MFI_HLC3": "56.217583624350645",
+      "PATTERN_SOURCE": "20",
+      "MFI_PATTERN": "86.53098926156716",
+      "PREV_OBV": "2895.064469999976",
+      "PREV_PVT": "0.9102493700922742",
+      "PREV_WAD": "10422.419999997932",
+      "PREV_ACCDIST": "-635.8748623250935",
+      "PREV_MFI_HLC3": "39.15286294497087"
+    },
+    "declared_unexported_columns": [],
+    "data_window_witness": "captures/v13/evidence/implicit-volume-recovery-context-v6-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T18:32:25.064Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "arm",
+        "bitness": "64",
+        "brands": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156"
+          }
+        ],
+        "fullVersionList": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8.0.0.0"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156.0.8075.0"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156.0.8075.0"
+          }
+        ],
+        "mobile": false,
+        "platform": "macOS",
+        "platformVersion": "27.2.0"
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v13 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "implicit-volume-recovery-context-v6-v1.pine",
+    "attempt": 2,
+    "source_sha256": "dfed95b86ac09f895d24cc64b6f4c64347067118a5a765358926bbd11f62b77b",
+    "indicator_title": "V13 implicit volume recovery context v1",
+    "status": "RUNS",
+    "csv_file": "captures/v13/implicit-volume-recovery-context-v6-v1-attempt2.csv",
+    "original_download_filename": "TVC_DXY, 2 (7).csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "TVC:DXY",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "minmove": 1,
+      "pricescale": 1000,
+      "pointvalue": 1,
+      "mintick": 0.001,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V13 implicit volume recovery context v1",
+      "dataset_start_utc": "2026-08-23T22:00:00.000Z",
+      "first_chart_bar": {
+        "index": -19815,
+        "value": [
+          1787522400,
+          98.856,
+          98.887,
+          98.846,
+          98.882
+        ]
+      },
+      "chart_bars": 20115,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "America/New_York",
+      "exchange_session": "1900-1900:3456|1700F-1900:2",
+      "currency": "USD",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T18:32:17.262Z",
+    "live_candle_open_utc": "2026-10-02T20:58:00.000Z",
+    "export_utc": "2026-10-04T18:32:24.694Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v13/evidence/implicit-volume-recovery-context-v6-v1-attempt2-setup.png",
+      "captures/v13/evidence/implicit-volume-recovery-context-v6-v1-attempt2-export.png",
+      "captures/v13/evidence/implicit-volume-recovery-context-v6-v1-attempt2-logs.txt",
+      "captures/v13/evidence/implicit-volume-recovery-context-v6-v1-attempt2-logs-v1.json",
+      "captures/v13/evidence/implicit-volume-recovery-context-v6-v1-attempt2-logs.png",
+      "captures/v13/evidence/implicit-volume-recovery-context-v6-v1-attempt2-visual.png",
+      "captures/v13/evidence/implicit-volume-recovery-context-v6-v1-attempt2-data-window-v1.png",
+      "captures/v13/evidence/implicit-volume-recovery-context-v6-v1-attempt2-data-window-v1.json",
+      "captures/v13/evidence/implicit-volume-recovery-context-v6-v1-attempt2-data-window-v1.txt",
+      "captures/v13/evidence/implicit-volume-recovery-context-v6-v1-attempt2-authority-object-geometry-v1.json",
+      "captures/v13/evidence/implicit-volume-recovery-context-v6-v1-attempt2-authority-object-geometry-v1.png",
+      "captures/v13/evidence/implicit-volume-recovery-context-v6-v1-attempt2-sp-dly-search-unavailable-v1.json",
+      "captures/v13/evidence/implicit-volume-recovery-context-v6-v1-attempt2-sp-dly-search-unavailable-v1.png"
+    ],
+    "notes": "Native TVC:DXY 2m missing-volume context; raw missing fields remain blank. No post-hole recovery inferred from sustained absence.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T18:32:18.040Z",
+        "bars": 2556,
+        "end": false,
+        "first": {
+          "index": -2256,
+          "value": [
+            1790650800,
+            101.211,
+            101.214,
+            101.207,
+            101.209
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1790974680,
+            101.939,
+            101.942,
+            101.923,
+            101.923
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V13 implicit volume recovery context v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2556,
+            "first": {
+              "index": -2256,
+              "value": [
+                1790650800,
+                101.211,
+                101.214,
+                101.207,
+                101.209,
+                null,
+                1790650800000,
+                17559,
+                0,
+                1,
+                0,
+                0,
+                null,
+                null,
+                -3.1179999999991566,
+                null,
+                null,
+                17,
+                null,
+                null,
+                null,
+                -3.112999999999161,
+                null,
+                null
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1790974680,
+                101.939,
+                101.942,
+                101.923,
+                101.923,
+                null,
+                1790974680000,
+                20114,
+                0,
+                1,
+                0,
+                0,
+                null,
+                null,
+                -2.6489999999991483,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                -2.629999999999157,
+                null,
+                null
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T18:32:19.031Z",
+        "bars": 20115,
+        "end": true,
+        "first": {
+          "index": -19815,
+          "value": [
+            1787522400,
+            98.856,
+            98.887,
+            98.846,
+            98.882
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1790974680,
+            101.939,
+            101.942,
+            101.923,
+            101.923
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V13 implicit volume recovery context v1",
+            "status": {
+              "type": 2
+            },
+            "size": 20115,
+            "first": {
+              "index": -19815,
+              "value": [
+                1787522400,
+                98.856,
+                98.887,
+                98.846,
+                98.882,
+                null,
+                1787522400000,
+                0,
+                0,
+                1,
+                0,
+                0,
+                null,
+                null,
+                0,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1790974680,
+                101.939,
+                101.942,
+                101.923,
+                101.923,
+                null,
+                1790974680000,
+                20114,
+                0,
+                1,
+                0,
+                0,
+                null,
+                null,
+                -2.6489999999991483,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                -2.629999999999157,
+                null,
+                null
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Fri 02 Oct '26   20:58",
+    "historical_compare_before_unix_seconds": 1790974680,
+    "pine_logs": {
+      "paths": [
+        "evidence/implicit-volume-recovery-context-v6-v1-attempt2-logs.txt",
+        "evidence/implicit-volume-recovery-context-v6-v1-attempt2-logs-v1.json",
+        "evidence/implicit-volume-recovery-context-v6-v1-attempt2-logs.png"
+      ],
+      "entries": 0
+    },
+    "all_exported_column_occurrences": [
+      {
+        "title": "time",
+        "occurrence": 1,
+        "position": 0
+      },
+      {
+        "title": "open",
+        "occurrence": 1,
+        "position": 1
+      },
+      {
+        "title": "high",
+        "occurrence": 1,
+        "position": 2
+      },
+      {
+        "title": "low",
+        "occurrence": 1,
+        "position": 3
+      },
+      {
+        "title": "close",
+        "occurrence": 1,
+        "position": 4
+      },
+      {
+        "title": "INPUT_OPEN",
+        "occurrence": 1,
+        "position": 5
+      },
+      {
+        "title": "INPUT_HIGH",
+        "occurrence": 1,
+        "position": 6
+      },
+      {
+        "title": "INPUT_LOW",
+        "occurrence": 1,
+        "position": 7
+      },
+      {
+        "title": "INPUT_CLOSE",
+        "occurrence": 1,
+        "position": 8
+      },
+      {
+        "title": "INPUT_VOLUME",
+        "occurrence": 1,
+        "position": 9
+      },
+      {
+        "title": "INPUT_TIME",
+        "occurrence": 1,
+        "position": 10
+      },
+      {
+        "title": "INPUT_INDEX",
+        "occurrence": 1,
+        "position": 11
+      },
+      {
+        "title": "OHLC_MISSING",
+        "occurrence": 1,
+        "position": 12
+      },
+      {
+        "title": "VOLUME_MISSING",
+        "occurrence": 1,
+        "position": 13
+      },
+      {
+        "title": "VOLUME_RECOVERY",
+        "occurrence": 1,
+        "position": 14
+      },
+      {
+        "title": "FLAT_RANGE",
+        "occurrence": 1,
+        "position": 15
+      },
+      {
+        "title": "OBV",
+        "occurrence": 1,
+        "position": 16
+      },
+      {
+        "title": "PVT",
+        "occurrence": 1,
+        "position": 17
+      },
+      {
+        "title": "WAD",
+        "occurrence": 1,
+        "position": 18
+      },
+      {
+        "title": "ACCDIST",
+        "occurrence": 1,
+        "position": 19
+      },
+      {
+        "title": "MFI_HLC3",
+        "occurrence": 1,
+        "position": 20
+      },
+      {
+        "title": "PATTERN_SOURCE",
+        "occurrence": 1,
+        "position": 21
+      },
+      {
+        "title": "MFI_PATTERN",
+        "occurrence": 1,
+        "position": 22
+      },
+      {
+        "title": "PREV_OBV",
+        "occurrence": 1,
+        "position": 23
+      },
+      {
+        "title": "PREV_PVT",
+        "occurrence": 1,
+        "position": 24
+      },
+      {
+        "title": "PREV_WAD",
+        "occurrence": 1,
+        "position": 25
+      },
+      {
+        "title": "PREV_ACCDIST",
+        "occurrence": 1,
+        "position": 26
+      },
+      {
+        "title": "PREV_MFI_HLC3",
+        "occurrence": 1,
+        "position": 27
+      }
+    ],
+    "declared_to_native_column_occurrences": [
+      {
+        "declared_title": "INPUT_OPEN",
+        "native_title": "INPUT_OPEN",
+        "occurrence": 1,
+        "position": 5
+      },
+      {
+        "declared_title": "INPUT_HIGH",
+        "native_title": "INPUT_HIGH",
+        "occurrence": 1,
+        "position": 6
+      },
+      {
+        "declared_title": "INPUT_LOW",
+        "native_title": "INPUT_LOW",
+        "occurrence": 1,
+        "position": 7
+      },
+      {
+        "declared_title": "INPUT_CLOSE",
+        "native_title": "INPUT_CLOSE",
+        "occurrence": 1,
+        "position": 8
+      },
+      {
+        "declared_title": "INPUT_VOLUME",
+        "native_title": "INPUT_VOLUME",
+        "occurrence": 1,
+        "position": 9
+      },
+      {
+        "declared_title": "INPUT_TIME",
+        "native_title": "INPUT_TIME",
+        "occurrence": 1,
+        "position": 10
+      },
+      {
+        "declared_title": "INPUT_INDEX",
+        "native_title": "INPUT_INDEX",
+        "occurrence": 1,
+        "position": 11
+      },
+      {
+        "declared_title": "OHLC_MISSING",
+        "native_title": "OHLC_MISSING",
+        "occurrence": 1,
+        "position": 12
+      },
+      {
+        "declared_title": "VOLUME_MISSING",
+        "native_title": "VOLUME_MISSING",
+        "occurrence": 1,
+        "position": 13
+      },
+      {
+        "declared_title": "VOLUME_RECOVERY",
+        "native_title": "VOLUME_RECOVERY",
+        "occurrence": 1,
+        "position": 14
+      },
+      {
+        "declared_title": "FLAT_RANGE",
+        "native_title": "FLAT_RANGE",
+        "occurrence": 1,
+        "position": 15
+      },
+      {
+        "declared_title": "OBV",
+        "native_title": "OBV",
+        "occurrence": 1,
+        "position": 16
+      },
+      {
+        "declared_title": "PVT",
+        "native_title": "PVT",
+        "occurrence": 1,
+        "position": 17
+      },
+      {
+        "declared_title": "WAD",
+        "native_title": "WAD",
+        "occurrence": 1,
+        "position": 18
+      },
+      {
+        "declared_title": "ACCDIST",
+        "native_title": "ACCDIST",
+        "occurrence": 1,
+        "position": 19
+      },
+      {
+        "declared_title": "MFI_HLC3",
+        "native_title": "MFI_HLC3",
+        "occurrence": 1,
+        "position": 20
+      },
+      {
+        "declared_title": "PATTERN_SOURCE",
+        "native_title": "PATTERN_SOURCE",
+        "occurrence": 1,
+        "position": 21
+      },
+      {
+        "declared_title": "MFI_PATTERN",
+        "native_title": "MFI_PATTERN",
+        "occurrence": 1,
+        "position": 22
+      },
+      {
+        "declared_title": "PREV_OBV",
+        "native_title": "PREV_OBV",
+        "occurrence": 1,
+        "position": 23
+      },
+      {
+        "declared_title": "PREV_PVT",
+        "native_title": "PREV_PVT",
+        "occurrence": 1,
+        "position": 24
+      },
+      {
+        "declared_title": "PREV_WAD",
+        "native_title": "PREV_WAD",
+        "occurrence": 1,
+        "position": 25
+      },
+      {
+        "declared_title": "PREV_ACCDIST",
+        "native_title": "PREV_ACCDIST",
+        "occurrence": 1,
+        "position": 26
+      },
+      {
+        "declared_title": "PREV_MFI_HLC3",
+        "native_title": "PREV_MFI_HLC3",
+        "occurrence": 1,
+        "position": 27
+      }
+    ],
+    "named_value_map_scope": "Legacy title maps show the first occurrence only; original positional cells and occurrence tables retain every duplicate without renaming.",
+    "csv_sha256": "9ad0a6e4b318c62e7d30fbf48e42d9a82215245a7f1b1c47b6280a02ef90c91a",
+    "csv_bytes": 2988360,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "INPUT_OPEN",
+      "INPUT_HIGH",
+      "INPUT_LOW",
+      "INPUT_CLOSE",
+      "INPUT_VOLUME",
+      "INPUT_TIME",
+      "INPUT_INDEX",
+      "OHLC_MISSING",
+      "VOLUME_MISSING",
+      "VOLUME_RECOVERY",
+      "FLAT_RANGE",
+      "OBV",
+      "PVT",
+      "WAD",
+      "ACCDIST",
+      "MFI_HLC3",
+      "PATTERN_SOURCE",
+      "MFI_PATTERN",
+      "PREV_OBV",
+      "PREV_PVT",
+      "PREV_WAD",
+      "PREV_ACCDIST",
+      "PREV_MFI_HLC3"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "INPUT_OPEN": 5,
+      "INPUT_HIGH": 6,
+      "INPUT_LOW": 7,
+      "INPUT_CLOSE": 8,
+      "INPUT_VOLUME": 9,
+      "INPUT_TIME": 10,
+      "INPUT_INDEX": 11,
+      "OHLC_MISSING": 12,
+      "VOLUME_MISSING": 13,
+      "VOLUME_RECOVERY": 14,
+      "FLAT_RANGE": 15,
+      "OBV": 16,
+      "PVT": 17,
+      "WAD": 18,
+      "ACCDIST": 19,
+      "MFI_HLC3": 20,
+      "PATTERN_SOURCE": 21,
+      "MFI_PATTERN": 22,
+      "PREV_OBV": 23,
+      "PREV_PVT": 24,
+      "PREV_WAD": 25,
+      "PREV_ACCDIST": 26,
+      "PREV_MFI_HLC3": 27
+    },
+    "first_historical_cells": [
+      "1787522400",
+      "98.856",
+      "98.887",
+      "98.846",
+      "98.882",
+      "98.856",
+      "98.887",
+      "98.846",
+      "98.882",
+      "",
+      "1787522400000",
+      "0",
+      "0",
+      "1",
+      "0",
+      "0",
+      "",
+      "",
+      "0",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""
+    ],
+    "last_historical_cells": [
+      "1790974560",
+      "101.944",
+      "101.945",
+      "101.936",
+      "101.938",
+      "101.944",
+      "101.945",
+      "101.936",
+      "101.938",
+      "",
+      "1790974560000",
+      "20113",
+      "0",
+      "1",
+      "0",
+      "0",
+      "",
+      "",
+      "-2.629999999999157",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "-2.622999999999166",
+      "",
+      ""
+    ],
+    "declared_to_native_header_mapping": {
+      "INPUT_OPEN": "INPUT_OPEN",
+      "INPUT_HIGH": "INPUT_HIGH",
+      "INPUT_LOW": "INPUT_LOW",
+      "INPUT_CLOSE": "INPUT_CLOSE",
+      "INPUT_VOLUME": "INPUT_VOLUME",
+      "INPUT_TIME": "INPUT_TIME",
+      "INPUT_INDEX": "INPUT_INDEX",
+      "OHLC_MISSING": "OHLC_MISSING",
+      "VOLUME_MISSING": "VOLUME_MISSING",
+      "VOLUME_RECOVERY": "VOLUME_RECOVERY",
+      "FLAT_RANGE": "FLAT_RANGE",
+      "OBV": "OBV",
+      "PVT": "PVT",
+      "WAD": "WAD",
+      "ACCDIST": "ACCDIST",
+      "MFI_HLC3": "MFI_HLC3",
+      "PATTERN_SOURCE": "PATTERN_SOURCE",
+      "MFI_PATTERN": "MFI_PATTERN",
+      "PREV_OBV": "PREV_OBV",
+      "PREV_PVT": "PREV_PVT",
+      "PREV_WAD": "PREV_WAD",
+      "PREV_ACCDIST": "PREV_ACCDIST",
+      "PREV_MFI_HLC3": "PREV_MFI_HLC3"
+    },
+    "csv_rows": 20115,
+    "historical_rows": 20114,
+    "first_csv_timestamp_seconds": 1787522400,
+    "last_csv_timestamp_seconds": 1790974680,
+    "first_csv_time_raw": "1787522400",
+    "last_csv_time_raw": "1790974680",
+    "first_historical_values": {
+      "INPUT_OPEN": "98.856",
+      "INPUT_HIGH": "98.887",
+      "INPUT_LOW": "98.846",
+      "INPUT_CLOSE": "98.882",
+      "INPUT_VOLUME": "",
+      "INPUT_TIME": "1787522400000",
+      "INPUT_INDEX": "0",
+      "OHLC_MISSING": "0",
+      "VOLUME_MISSING": "1",
+      "VOLUME_RECOVERY": "0",
+      "FLAT_RANGE": "0",
+      "OBV": "",
+      "PVT": "",
+      "WAD": "0",
+      "ACCDIST": "",
+      "MFI_HLC3": "",
+      "PATTERN_SOURCE": "",
+      "MFI_PATTERN": "",
+      "PREV_OBV": "",
+      "PREV_PVT": "",
+      "PREV_WAD": "",
+      "PREV_ACCDIST": "",
+      "PREV_MFI_HLC3": ""
+    },
+    "last_historical_values": {
+      "INPUT_OPEN": "101.944",
+      "INPUT_HIGH": "101.945",
+      "INPUT_LOW": "101.936",
+      "INPUT_CLOSE": "101.938",
+      "INPUT_VOLUME": "",
+      "INPUT_TIME": "1790974560000",
+      "INPUT_INDEX": "20113",
+      "OHLC_MISSING": "0",
+      "VOLUME_MISSING": "1",
+      "VOLUME_RECOVERY": "0",
+      "FLAT_RANGE": "0",
+      "OBV": "",
+      "PVT": "",
+      "WAD": "-2.629999999999157",
+      "ACCDIST": "",
+      "MFI_HLC3": "",
+      "PATTERN_SOURCE": "",
+      "MFI_PATTERN": "",
+      "PREV_OBV": "",
+      "PREV_PVT": "",
+      "PREV_WAD": "-2.622999999999166",
+      "PREV_ACCDIST": "",
+      "PREV_MFI_HLC3": ""
+    },
+    "declared_unexported_columns": [],
+    "data_window_witness": "captures/v13/evidence/implicit-volume-recovery-context-v6-v1-attempt2-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T18:33:49.043Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "arm",
+        "bitness": "64",
+        "brands": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156"
+          }
+        ],
+        "fullVersionList": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8.0.0.0"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156.0.8075.0"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156.0.8075.0"
+          }
+        ],
+        "mobile": false,
+        "platform": "macOS",
+        "platformVersion": "27.2.0"
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v13 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "implicit-volume-recovery-context-v6-v1.pine",
+    "attempt": 3,
+    "source_sha256": "dfed95b86ac09f895d24cc64b6f4c64347067118a5a765358926bbd11f62b77b",
+    "indicator_title": "V13 implicit volume recovery context v1",
+    "status": "RUNS",
+    "csv_file": "captures/v13/implicit-volume-recovery-context-v6-v1-attempt3.csv",
+    "original_download_filename": "SP_DLY_SPX, 2 (1).csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "SP_DLY:SPX",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "minmove": 1,
+      "pricescale": 100,
+      "pointvalue": 1,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V13 implicit volume recovery context v1",
+      "dataset_start_utc": "2026-05-11T13:30:00.000Z",
+      "first_chart_bar": {
+        "index": -19819,
+        "value": [
+          1778506200,
+          7388.85,
+          7395.42,
+          7384.2,
+          7395.13,
+          153400431
+        ]
+      },
+      "chart_bars": 20119,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "America/New_York",
+      "exchange_session": "0930-1610",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T18:33:41.269Z",
+    "live_candle_open_utc": "2026-10-02T20:08:00.000Z",
+    "export_utc": "2026-10-04T18:33:48.688Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v13/evidence/implicit-volume-recovery-context-v6-v1-attempt3-setup.png",
+      "captures/v13/evidence/implicit-volume-recovery-context-v6-v1-attempt3-export.png",
+      "captures/v13/evidence/implicit-volume-recovery-context-v6-v1-attempt3-logs.txt",
+      "captures/v13/evidence/implicit-volume-recovery-context-v6-v1-attempt3-logs-v1.json",
+      "captures/v13/evidence/implicit-volume-recovery-context-v6-v1-attempt3-logs.png",
+      "captures/v13/evidence/implicit-volume-recovery-context-v6-v1-attempt3-visual.png",
+      "captures/v13/evidence/implicit-volume-recovery-context-v6-v1-attempt3-data-window-v1.png",
+      "captures/v13/evidence/implicit-volume-recovery-context-v6-v1-attempt3-data-window-v1.json",
+      "captures/v13/evidence/implicit-volume-recovery-context-v6-v1-attempt3-data-window-v1.txt",
+      "captures/v13/evidence/implicit-volume-recovery-context-v6-v1-attempt3-resolved-provider-v1.json",
+      "captures/v13/evidence/implicit-volume-recovery-context-v6-v1-attempt3-resolved-provider-v1.png",
+      "captures/v13/evidence/implicit-volume-recovery-context-v6-v1-attempt3-authority-object-geometry-v1.json",
+      "captures/v13/evidence/implicit-volume-recovery-context-v6-v1-attempt3-authority-object-geometry-v1.png",
+      "captures/v13/evidence/implicit-volume-recovery-context-v6-v1-attempt3-independent-host-feed-v1.json",
+      "captures/v13/evidence/implicit-volume-recovery-context-v6-v1-attempt3-independent-host-feed-v1.png"
+    ],
+    "notes": "Requested SP_DLY:SPX literal search had no match; selecting SP:SPX index through native search resolves full_name SP_DLY:SPX, delay 600 seconds, provider ICE. Complete native identity receipt retained. No entitlement or synthetic missing-volume assumption.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T18:33:42.337Z",
+        "bars": 2556,
+        "end": false,
+        "first": {
+          "index": -2256,
+          "value": [
+            1789570680,
+            7609.28,
+            7613.1,
+            7608.93,
+            7612.93,
+            11487936
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1790971680,
+            7722.72,
+            7722.72,
+            7722.72,
+            7722.72,
+            1533440
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V13 implicit volume recovery context v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2556,
+            "first": {
+              "index": -2256,
+              "value": [
+                1789570680,
+                7609.28,
+                7613.1,
+                7608.93,
+                7612.93,
+                11487936,
+                1789570680000,
+                17563,
+                0,
+                0,
+                0,
+                0,
+                3202393443,
+                7264379.521199981,
+                272.4299999999912,
+                -7326084953.029432,
+                77.27055699675354,
+                21,
+                82.46506037567217,
+                3190905507,
+                7258974.748009104,
+                268.4299999999912,
+                -7336636222.784827,
+                47.05684117579484
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1790971680,
+                7722.72,
+                7722.72,
+                7722.72,
+                7722.72,
+                1533440,
+                1790971680000,
+                20118,
+                0,
+                0,
+                0,
+                1,
+                4985632937,
+                10652094.805881111,
+                426.6599999999662,
+                -9882897951.130686,
+                0,
+                16,
+                52.954727253284155,
+                4985632937,
+                10652094.805881111,
+                426.6599999999662,
+                -9882897951.130686,
+                83.64393969528058
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T18:33:43.366Z",
+        "bars": 20119,
+        "end": true,
+        "first": {
+          "index": -19819,
+          "value": [
+            1778506200,
+            7388.85,
+            7395.42,
+            7384.2,
+            7395.13,
+            153400431
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1790971680,
+            7722.72,
+            7722.72,
+            7722.72,
+            7722.72,
+            1533440
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V13 implicit volume recovery context v1",
+            "status": {
+              "type": 2
+            },
+            "size": 20119,
+            "first": {
+              "index": -19819,
+              "value": [
+                1778506200,
+                7388.85,
+                7395.42,
+                7384.2,
+                7395.13,
+                153400431,
+                1778506200000,
+                0,
+                0,
+                0,
+                0,
+                0,
+                null,
+                null,
+                0,
+                145470640.44919905,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1790971680,
+                7722.72,
+                7722.72,
+                7722.72,
+                7722.72,
+                1533440,
+                1790971680000,
+                20118,
+                0,
+                0,
+                0,
+                1,
+                4985632937,
+                10652094.805881111,
+                426.6599999999662,
+                -9882897951.130686,
+                0,
+                16,
+                52.954727253284155,
+                4985632937,
+                10652094.805881111,
+                426.6599999999662,
+                -9882897951.130686,
+                83.64393969528058
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Fri 02 Oct '26   20:08",
+    "historical_compare_before_unix_seconds": 1790971680,
+    "pine_logs": {
+      "paths": [
+        "evidence/implicit-volume-recovery-context-v6-v1-attempt3-logs.txt",
+        "evidence/implicit-volume-recovery-context-v6-v1-attempt3-logs-v1.json",
+        "evidence/implicit-volume-recovery-context-v6-v1-attempt3-logs.png"
+      ],
+      "entries": 0
+    },
+    "all_exported_column_occurrences": [
+      {
+        "title": "time",
+        "occurrence": 1,
+        "position": 0
+      },
+      {
+        "title": "open",
+        "occurrence": 1,
+        "position": 1
+      },
+      {
+        "title": "high",
+        "occurrence": 1,
+        "position": 2
+      },
+      {
+        "title": "low",
+        "occurrence": 1,
+        "position": 3
+      },
+      {
+        "title": "close",
+        "occurrence": 1,
+        "position": 4
+      },
+      {
+        "title": "INPUT_OPEN",
+        "occurrence": 1,
+        "position": 5
+      },
+      {
+        "title": "INPUT_HIGH",
+        "occurrence": 1,
+        "position": 6
+      },
+      {
+        "title": "INPUT_LOW",
+        "occurrence": 1,
+        "position": 7
+      },
+      {
+        "title": "INPUT_CLOSE",
+        "occurrence": 1,
+        "position": 8
+      },
+      {
+        "title": "INPUT_VOLUME",
+        "occurrence": 1,
+        "position": 9
+      },
+      {
+        "title": "INPUT_TIME",
+        "occurrence": 1,
+        "position": 10
+      },
+      {
+        "title": "INPUT_INDEX",
+        "occurrence": 1,
+        "position": 11
+      },
+      {
+        "title": "OHLC_MISSING",
+        "occurrence": 1,
+        "position": 12
+      },
+      {
+        "title": "VOLUME_MISSING",
+        "occurrence": 1,
+        "position": 13
+      },
+      {
+        "title": "VOLUME_RECOVERY",
+        "occurrence": 1,
+        "position": 14
+      },
+      {
+        "title": "FLAT_RANGE",
+        "occurrence": 1,
+        "position": 15
+      },
+      {
+        "title": "OBV",
+        "occurrence": 1,
+        "position": 16
+      },
+      {
+        "title": "PVT",
+        "occurrence": 1,
+        "position": 17
+      },
+      {
+        "title": "WAD",
+        "occurrence": 1,
+        "position": 18
+      },
+      {
+        "title": "ACCDIST",
+        "occurrence": 1,
+        "position": 19
+      },
+      {
+        "title": "MFI_HLC3",
+        "occurrence": 1,
+        "position": 20
+      },
+      {
+        "title": "PATTERN_SOURCE",
+        "occurrence": 1,
+        "position": 21
+      },
+      {
+        "title": "MFI_PATTERN",
+        "occurrence": 1,
+        "position": 22
+      },
+      {
+        "title": "PREV_OBV",
+        "occurrence": 1,
+        "position": 23
+      },
+      {
+        "title": "PREV_PVT",
+        "occurrence": 1,
+        "position": 24
+      },
+      {
+        "title": "PREV_WAD",
+        "occurrence": 1,
+        "position": 25
+      },
+      {
+        "title": "PREV_ACCDIST",
+        "occurrence": 1,
+        "position": 26
+      },
+      {
+        "title": "PREV_MFI_HLC3",
+        "occurrence": 1,
+        "position": 27
+      }
+    ],
+    "declared_to_native_column_occurrences": [
+      {
+        "declared_title": "INPUT_OPEN",
+        "native_title": "INPUT_OPEN",
+        "occurrence": 1,
+        "position": 5
+      },
+      {
+        "declared_title": "INPUT_HIGH",
+        "native_title": "INPUT_HIGH",
+        "occurrence": 1,
+        "position": 6
+      },
+      {
+        "declared_title": "INPUT_LOW",
+        "native_title": "INPUT_LOW",
+        "occurrence": 1,
+        "position": 7
+      },
+      {
+        "declared_title": "INPUT_CLOSE",
+        "native_title": "INPUT_CLOSE",
+        "occurrence": 1,
+        "position": 8
+      },
+      {
+        "declared_title": "INPUT_VOLUME",
+        "native_title": "INPUT_VOLUME",
+        "occurrence": 1,
+        "position": 9
+      },
+      {
+        "declared_title": "INPUT_TIME",
+        "native_title": "INPUT_TIME",
+        "occurrence": 1,
+        "position": 10
+      },
+      {
+        "declared_title": "INPUT_INDEX",
+        "native_title": "INPUT_INDEX",
+        "occurrence": 1,
+        "position": 11
+      },
+      {
+        "declared_title": "OHLC_MISSING",
+        "native_title": "OHLC_MISSING",
+        "occurrence": 1,
+        "position": 12
+      },
+      {
+        "declared_title": "VOLUME_MISSING",
+        "native_title": "VOLUME_MISSING",
+        "occurrence": 1,
+        "position": 13
+      },
+      {
+        "declared_title": "VOLUME_RECOVERY",
+        "native_title": "VOLUME_RECOVERY",
+        "occurrence": 1,
+        "position": 14
+      },
+      {
+        "declared_title": "FLAT_RANGE",
+        "native_title": "FLAT_RANGE",
+        "occurrence": 1,
+        "position": 15
+      },
+      {
+        "declared_title": "OBV",
+        "native_title": "OBV",
+        "occurrence": 1,
+        "position": 16
+      },
+      {
+        "declared_title": "PVT",
+        "native_title": "PVT",
+        "occurrence": 1,
+        "position": 17
+      },
+      {
+        "declared_title": "WAD",
+        "native_title": "WAD",
+        "occurrence": 1,
+        "position": 18
+      },
+      {
+        "declared_title": "ACCDIST",
+        "native_title": "ACCDIST",
+        "occurrence": 1,
+        "position": 19
+      },
+      {
+        "declared_title": "MFI_HLC3",
+        "native_title": "MFI_HLC3",
+        "occurrence": 1,
+        "position": 20
+      },
+      {
+        "declared_title": "PATTERN_SOURCE",
+        "native_title": "PATTERN_SOURCE",
+        "occurrence": 1,
+        "position": 21
+      },
+      {
+        "declared_title": "MFI_PATTERN",
+        "native_title": "MFI_PATTERN",
+        "occurrence": 1,
+        "position": 22
+      },
+      {
+        "declared_title": "PREV_OBV",
+        "native_title": "PREV_OBV",
+        "occurrence": 1,
+        "position": 23
+      },
+      {
+        "declared_title": "PREV_PVT",
+        "native_title": "PREV_PVT",
+        "occurrence": 1,
+        "position": 24
+      },
+      {
+        "declared_title": "PREV_WAD",
+        "native_title": "PREV_WAD",
+        "occurrence": 1,
+        "position": 25
+      },
+      {
+        "declared_title": "PREV_ACCDIST",
+        "native_title": "PREV_ACCDIST",
+        "occurrence": 1,
+        "position": 26
+      },
+      {
+        "declared_title": "PREV_MFI_HLC3",
+        "native_title": "PREV_MFI_HLC3",
+        "occurrence": 1,
+        "position": 27
+      }
+    ],
+    "named_value_map_scope": "Legacy title maps show the first occurrence only; original positional cells and occurrence tables retain every duplicate without renaming.",
+    "csv_sha256": "66d80cfd96cc71963cb64d461b4b406e03af4bb63e213076722861ff1a3339b6",
+    "csv_bytes": 5898975,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "INPUT_OPEN",
+      "INPUT_HIGH",
+      "INPUT_LOW",
+      "INPUT_CLOSE",
+      "INPUT_VOLUME",
+      "INPUT_TIME",
+      "INPUT_INDEX",
+      "OHLC_MISSING",
+      "VOLUME_MISSING",
+      "VOLUME_RECOVERY",
+      "FLAT_RANGE",
+      "OBV",
+      "PVT",
+      "WAD",
+      "ACCDIST",
+      "MFI_HLC3",
+      "PATTERN_SOURCE",
+      "MFI_PATTERN",
+      "PREV_OBV",
+      "PREV_PVT",
+      "PREV_WAD",
+      "PREV_ACCDIST",
+      "PREV_MFI_HLC3"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "INPUT_OPEN": 5,
+      "INPUT_HIGH": 6,
+      "INPUT_LOW": 7,
+      "INPUT_CLOSE": 8,
+      "INPUT_VOLUME": 9,
+      "INPUT_TIME": 10,
+      "INPUT_INDEX": 11,
+      "OHLC_MISSING": 12,
+      "VOLUME_MISSING": 13,
+      "VOLUME_RECOVERY": 14,
+      "FLAT_RANGE": 15,
+      "OBV": 16,
+      "PVT": 17,
+      "WAD": 18,
+      "ACCDIST": 19,
+      "MFI_HLC3": 20,
+      "PATTERN_SOURCE": 21,
+      "MFI_PATTERN": 22,
+      "PREV_OBV": 23,
+      "PREV_PVT": 24,
+      "PREV_WAD": 25,
+      "PREV_ACCDIST": 26,
+      "PREV_MFI_HLC3": 27
+    },
+    "first_historical_cells": [
+      "1778506200",
+      "7388.85",
+      "7395.42",
+      "7384.2",
+      "7395.13",
+      "7388.85",
+      "7395.42",
+      "7384.2",
+      "7395.13",
+      "153400431",
+      "1778506200000",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "",
+      "",
+      "0",
+      "145470640.44919905",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""
+    ],
+    "last_historical_cells": [
+      "1790971560",
+      "7722.72",
+      "7722.72",
+      "7722.72",
+      "7722.72",
+      "7722.72",
+      "7722.72",
+      "7722.72",
+      "7722.72",
+      "1084236",
+      "1790971560000",
+      "20117",
+      "0",
+      "0",
+      "0",
+      "1",
+      "4985632937",
+      "10652094.805881111",
+      "426.6599999999662",
+      "-9882897951.130686",
+      "83.64393969528058",
+      "15",
+      "66.2893629236309",
+      "4985632937",
+      "10652094.805881111",
+      "426.6599999999662",
+      "-9882897951.130686",
+      "69.68492779727018"
+    ],
+    "declared_to_native_header_mapping": {
+      "INPUT_OPEN": "INPUT_OPEN",
+      "INPUT_HIGH": "INPUT_HIGH",
+      "INPUT_LOW": "INPUT_LOW",
+      "INPUT_CLOSE": "INPUT_CLOSE",
+      "INPUT_VOLUME": "INPUT_VOLUME",
+      "INPUT_TIME": "INPUT_TIME",
+      "INPUT_INDEX": "INPUT_INDEX",
+      "OHLC_MISSING": "OHLC_MISSING",
+      "VOLUME_MISSING": "VOLUME_MISSING",
+      "VOLUME_RECOVERY": "VOLUME_RECOVERY",
+      "FLAT_RANGE": "FLAT_RANGE",
+      "OBV": "OBV",
+      "PVT": "PVT",
+      "WAD": "WAD",
+      "ACCDIST": "ACCDIST",
+      "MFI_HLC3": "MFI_HLC3",
+      "PATTERN_SOURCE": "PATTERN_SOURCE",
+      "MFI_PATTERN": "MFI_PATTERN",
+      "PREV_OBV": "PREV_OBV",
+      "PREV_PVT": "PREV_PVT",
+      "PREV_WAD": "PREV_WAD",
+      "PREV_ACCDIST": "PREV_ACCDIST",
+      "PREV_MFI_HLC3": "PREV_MFI_HLC3"
+    },
+    "csv_rows": 20119,
+    "historical_rows": 20118,
+    "first_csv_timestamp_seconds": 1778506200,
+    "last_csv_timestamp_seconds": 1790971680,
+    "first_csv_time_raw": "1778506200",
+    "last_csv_time_raw": "1790971680",
+    "first_historical_values": {
+      "INPUT_OPEN": "7388.85",
+      "INPUT_HIGH": "7395.42",
+      "INPUT_LOW": "7384.2",
+      "INPUT_CLOSE": "7395.13",
+      "INPUT_VOLUME": "153400431",
+      "INPUT_TIME": "1778506200000",
+      "INPUT_INDEX": "0",
+      "OHLC_MISSING": "0",
+      "VOLUME_MISSING": "0",
+      "VOLUME_RECOVERY": "0",
+      "FLAT_RANGE": "0",
+      "OBV": "",
+      "PVT": "",
+      "WAD": "0",
+      "ACCDIST": "145470640.44919905",
+      "MFI_HLC3": "",
+      "PATTERN_SOURCE": "",
+      "MFI_PATTERN": "",
+      "PREV_OBV": "",
+      "PREV_PVT": "",
+      "PREV_WAD": "",
+      "PREV_ACCDIST": "",
+      "PREV_MFI_HLC3": ""
+    },
+    "last_historical_values": {
+      "INPUT_OPEN": "7722.72",
+      "INPUT_HIGH": "7722.72",
+      "INPUT_LOW": "7722.72",
+      "INPUT_CLOSE": "7722.72",
+      "INPUT_VOLUME": "1084236",
+      "INPUT_TIME": "1790971560000",
+      "INPUT_INDEX": "20117",
+      "OHLC_MISSING": "0",
+      "VOLUME_MISSING": "0",
+      "VOLUME_RECOVERY": "0",
+      "FLAT_RANGE": "1",
+      "OBV": "4985632937",
+      "PVT": "10652094.805881111",
+      "WAD": "426.6599999999662",
+      "ACCDIST": "-9882897951.130686",
+      "MFI_HLC3": "83.64393969528058",
+      "PATTERN_SOURCE": "15",
+      "MFI_PATTERN": "66.2893629236309",
+      "PREV_OBV": "4985632937",
+      "PREV_PVT": "10652094.805881111",
+      "PREV_WAD": "426.6599999999662",
+      "PREV_ACCDIST": "-9882897951.130686",
+      "PREV_MFI_HLC3": "69.68492779727018"
+    },
+    "declared_unexported_columns": [],
+    "data_window_witness": "captures/v13/evidence/implicit-volume-recovery-context-v6-v1-attempt3-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T18:35:47.717Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "arm",
+        "bitness": "64",
+        "brands": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156"
+          }
+        ],
+        "fullVersionList": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8.0.0.0"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156.0.8075.0"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156.0.8075.0"
+          }
+        ],
+        "mobile": false,
+        "platform": "macOS",
+        "platformVersion": "27.2.0"
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v13 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "analyst-target-unavailable-context-v13-v1.pine",
+    "attempt": 1,
+    "source_sha256": "95dd9803c21679bbbafe8ecb825dc5bb3de38dbb7c4ab619cf0824f5edcd1d25",
+    "indicator_title": "V13 analyst target unavailable context v1",
+    "status": "RUNS",
+    "csv_file": "captures/v13/analyst-target-unavailable-context-v13-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_ETHUSDT, 2.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:ETHUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "minmove": 1,
+      "pricescale": 100,
+      "pointvalue": 1,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V13 analyst target unavailable context v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24738,
+        "value": [
+          1788134400,
+          2416.89,
+          2417.13,
+          2410.62,
+          2417.13,
+          1569.0032
+        ]
+      },
+      "chart_bars": 25038,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T18:35:40.091Z",
+    "live_candle_open_utc": "2026-10-04T18:34:00.000Z",
+    "export_utc": "2026-10-04T18:35:47.251Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v13/evidence/analyst-target-unavailable-context-v13-v1-attempt1-setup.png",
+      "captures/v13/evidence/analyst-target-unavailable-context-v13-v1-attempt1-export.png",
+      "captures/v13/evidence/analyst-target-unavailable-context-v13-v1-attempt1-logs.txt",
+      "captures/v13/evidence/analyst-target-unavailable-context-v13-v1-attempt1-logs-v1.json",
+      "captures/v13/evidence/analyst-target-unavailable-context-v13-v1-attempt1-logs.png",
+      "captures/v13/evidence/analyst-target-unavailable-context-v13-v1-attempt1-visual.png",
+      "captures/v13/evidence/analyst-target-unavailable-context-v13-v1-attempt1-data-window-v1.png",
+      "captures/v13/evidence/analyst-target-unavailable-context-v13-v1-attempt1-data-window-v1.json",
+      "captures/v13/evidence/analyst-target-unavailable-context-v13-v1-attempt1-data-window-v1.txt",
+      "captures/v13/evidence/analyst-target-unavailable-context-v13-v1-attempt1-authority-object-geometry-v1.json",
+      "captures/v13/evidence/analyst-target-unavailable-context-v13-v1-attempt1-authority-object-geometry-v1.png"
+    ],
+    "notes": "Required native ETH2m analyst context; missing targets recorded without universal publication inference.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T18:35:40.886Z",
+        "bars": 2556,
+        "end": false,
+        "first": {
+          "index": -2256,
+          "value": [
+            1790832240,
+            2713.32,
+            2714.19,
+            2713.05,
+            2713.06,
+            147.011
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791138840,
+            2700.81,
+            2701.52,
+            2700.81,
+            2701.31,
+            69.445
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V13 analyst target unavailable context v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2556,
+            "first": {
+              "index": -2256,
+              "value": [
+                1790832240,
+                null,
+                1,
+                null,
+                1,
+                null,
+                1,
+                null,
+                1,
+                null,
+                1,
+                null,
+                1,
+                1790832240000,
+                2713.06,
+                0,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791138840,
+                null,
+                1,
+                null,
+                1,
+                null,
+                1,
+                null,
+                1,
+                null,
+                1,
+                null,
+                1,
+                1791138840000,
+                2701.31,
+                1,
+                0
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T18:35:41.908Z",
+        "bars": 25038,
+        "end": true,
+        "first": {
+          "index": -24738,
+          "value": [
+            1788134400,
+            2416.89,
+            2417.13,
+            2410.62,
+            2417.13,
+            1569.0032
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791138840,
+            2700.81,
+            2701.52,
+            2700.81,
+            2701.31,
+            69.72
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V13 analyst target unavailable context v1",
+            "status": {
+              "type": 2
+            },
+            "size": 25038,
+            "first": {
+              "index": -24738,
+              "value": [
+                1788134400,
+                null,
+                1,
+                null,
+                1,
+                null,
+                1,
+                null,
+                1,
+                null,
+                1,
+                null,
+                1,
+                1788134400000,
+                2417.13,
+                0,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791138840,
+                null,
+                1,
+                null,
+                1,
+                null,
+                1,
+                null,
+                1,
+                null,
+                1,
+                null,
+                1,
+                1791138840000,
+                2701.31,
+                1,
+                0
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   18:34",
+    "historical_compare_before_unix_seconds": 1791138840,
+    "pine_logs": {
+      "paths": [
+        "evidence/analyst-target-unavailable-context-v13-v1-attempt1-logs.txt",
+        "evidence/analyst-target-unavailable-context-v13-v1-attempt1-logs-v1.json",
+        "evidence/analyst-target-unavailable-context-v13-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "all_exported_column_occurrences": [
+      {
+        "title": "time",
+        "occurrence": 1,
+        "position": 0
+      },
+      {
+        "title": "open",
+        "occurrence": 1,
+        "position": 1
+      },
+      {
+        "title": "high",
+        "occurrence": 1,
+        "position": 2
+      },
+      {
+        "title": "low",
+        "occurrence": 1,
+        "position": 3
+      },
+      {
+        "title": "close",
+        "occurrence": 1,
+        "position": 4
+      },
+      {
+        "title": "TARGET_HIGH",
+        "occurrence": 1,
+        "position": 5
+      },
+      {
+        "title": "HIGH_IS_NA",
+        "occurrence": 1,
+        "position": 6
+      },
+      {
+        "title": "TARGET_LOW",
+        "occurrence": 1,
+        "position": 7
+      },
+      {
+        "title": "LOW_IS_NA",
+        "occurrence": 1,
+        "position": 8
+      },
+      {
+        "title": "TARGET_MEDIAN",
+        "occurrence": 1,
+        "position": 9
+      },
+      {
+        "title": "MEDIAN_IS_NA",
+        "occurrence": 1,
+        "position": 10
+      },
+      {
+        "title": "TARGET_AVERAGE",
+        "occurrence": 1,
+        "position": 11
+      },
+      {
+        "title": "AVERAGE_IS_NA",
+        "occurrence": 1,
+        "position": 12
+      },
+      {
+        "title": "TARGET_DATE",
+        "occurrence": 1,
+        "position": 13
+      },
+      {
+        "title": "DATE_IS_NA",
+        "occurrence": 1,
+        "position": 14
+      },
+      {
+        "title": "TARGET_ESTIMATES",
+        "occurrence": 1,
+        "position": 15
+      },
+      {
+        "title": "ESTIMATES_IS_NA",
+        "occurrence": 1,
+        "position": 16
+      },
+      {
+        "title": "INPUT_TIME",
+        "occurrence": 1,
+        "position": 17
+      },
+      {
+        "title": "INPUT_CLOSE",
+        "occurrence": 1,
+        "position": 18
+      },
+      {
+        "title": "IS_LAST",
+        "occurrence": 1,
+        "position": 19
+      },
+      {
+        "title": "TYPE_STOCK",
+        "occurrence": 1,
+        "position": 20
+      }
+    ],
+    "declared_to_native_column_occurrences": [
+      {
+        "declared_title": "TARGET_HIGH",
+        "native_title": "TARGET_HIGH",
+        "occurrence": 1,
+        "position": 5
+      },
+      {
+        "declared_title": "HIGH_IS_NA",
+        "native_title": "HIGH_IS_NA",
+        "occurrence": 1,
+        "position": 6
+      },
+      {
+        "declared_title": "TARGET_LOW",
+        "native_title": "TARGET_LOW",
+        "occurrence": 1,
+        "position": 7
+      },
+      {
+        "declared_title": "LOW_IS_NA",
+        "native_title": "LOW_IS_NA",
+        "occurrence": 1,
+        "position": 8
+      },
+      {
+        "declared_title": "TARGET_MEDIAN",
+        "native_title": "TARGET_MEDIAN",
+        "occurrence": 1,
+        "position": 9
+      },
+      {
+        "declared_title": "MEDIAN_IS_NA",
+        "native_title": "MEDIAN_IS_NA",
+        "occurrence": 1,
+        "position": 10
+      },
+      {
+        "declared_title": "TARGET_AVERAGE",
+        "native_title": "TARGET_AVERAGE",
+        "occurrence": 1,
+        "position": 11
+      },
+      {
+        "declared_title": "AVERAGE_IS_NA",
+        "native_title": "AVERAGE_IS_NA",
+        "occurrence": 1,
+        "position": 12
+      },
+      {
+        "declared_title": "TARGET_DATE",
+        "native_title": "TARGET_DATE",
+        "occurrence": 1,
+        "position": 13
+      },
+      {
+        "declared_title": "DATE_IS_NA",
+        "native_title": "DATE_IS_NA",
+        "occurrence": 1,
+        "position": 14
+      },
+      {
+        "declared_title": "TARGET_ESTIMATES",
+        "native_title": "TARGET_ESTIMATES",
+        "occurrence": 1,
+        "position": 15
+      },
+      {
+        "declared_title": "ESTIMATES_IS_NA",
+        "native_title": "ESTIMATES_IS_NA",
+        "occurrence": 1,
+        "position": 16
+      },
+      {
+        "declared_title": "INPUT_TIME",
+        "native_title": "INPUT_TIME",
+        "occurrence": 1,
+        "position": 17
+      },
+      {
+        "declared_title": "INPUT_CLOSE",
+        "native_title": "INPUT_CLOSE",
+        "occurrence": 1,
+        "position": 18
+      },
+      {
+        "declared_title": "IS_LAST",
+        "native_title": "IS_LAST",
+        "occurrence": 1,
+        "position": 19
+      },
+      {
+        "declared_title": "TYPE_STOCK",
+        "native_title": "TYPE_STOCK",
+        "occurrence": 1,
+        "position": 20
+      }
+    ],
+    "named_value_map_scope": "Legacy title maps show the first occurrence only; original positional cells and occurrence tables retain every duplicate without renaming.",
+    "csv_sha256": "20a360c61948c74e7dabfb210da4647df7fee2426317e1522d0f30977fa0db14",
+    "csv_bytes": 2154459,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "TARGET_HIGH",
+      "HIGH_IS_NA",
+      "TARGET_LOW",
+      "LOW_IS_NA",
+      "TARGET_MEDIAN",
+      "MEDIAN_IS_NA",
+      "TARGET_AVERAGE",
+      "AVERAGE_IS_NA",
+      "TARGET_DATE",
+      "DATE_IS_NA",
+      "TARGET_ESTIMATES",
+      "ESTIMATES_IS_NA",
+      "INPUT_TIME",
+      "INPUT_CLOSE",
+      "IS_LAST",
+      "TYPE_STOCK"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "TARGET_HIGH": 5,
+      "HIGH_IS_NA": 6,
+      "TARGET_LOW": 7,
+      "LOW_IS_NA": 8,
+      "TARGET_MEDIAN": 9,
+      "MEDIAN_IS_NA": 10,
+      "TARGET_AVERAGE": 11,
+      "AVERAGE_IS_NA": 12,
+      "TARGET_DATE": 13,
+      "DATE_IS_NA": 14,
+      "TARGET_ESTIMATES": 15,
+      "ESTIMATES_IS_NA": 16,
+      "INPUT_TIME": 17,
+      "INPUT_CLOSE": 18,
+      "IS_LAST": 19,
+      "TYPE_STOCK": 20
+    },
+    "first_historical_cells": [
+      "1788134400",
+      "2416.89",
+      "2417.13",
+      "2410.62",
+      "2417.13",
+      "",
+      "1",
+      "",
+      "1",
+      "",
+      "1",
+      "",
+      "1",
+      "",
+      "1",
+      "",
+      "1",
+      "1788134400000",
+      "2417.13",
+      "0",
+      "0"
+    ],
+    "last_historical_cells": [
+      "1791138720",
+      "2701.95",
+      "2701.96",
+      "2700.81",
+      "2700.82",
+      "",
+      "1",
+      "",
+      "1",
+      "",
+      "1",
+      "",
+      "1",
+      "",
+      "1",
+      "",
+      "1",
+      "1791138720000",
+      "2700.82",
+      "0",
+      "0"
+    ],
+    "declared_to_native_header_mapping": {
+      "TARGET_HIGH": "TARGET_HIGH",
+      "HIGH_IS_NA": "HIGH_IS_NA",
+      "TARGET_LOW": "TARGET_LOW",
+      "LOW_IS_NA": "LOW_IS_NA",
+      "TARGET_MEDIAN": "TARGET_MEDIAN",
+      "MEDIAN_IS_NA": "MEDIAN_IS_NA",
+      "TARGET_AVERAGE": "TARGET_AVERAGE",
+      "AVERAGE_IS_NA": "AVERAGE_IS_NA",
+      "TARGET_DATE": "TARGET_DATE",
+      "DATE_IS_NA": "DATE_IS_NA",
+      "TARGET_ESTIMATES": "TARGET_ESTIMATES",
+      "ESTIMATES_IS_NA": "ESTIMATES_IS_NA",
+      "INPUT_TIME": "INPUT_TIME",
+      "INPUT_CLOSE": "INPUT_CLOSE",
+      "IS_LAST": "IS_LAST",
+      "TYPE_STOCK": "TYPE_STOCK"
+    },
+    "csv_rows": 25038,
+    "historical_rows": 25037,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791138840,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791138840",
+    "first_historical_values": {
+      "TARGET_HIGH": "",
+      "HIGH_IS_NA": "1",
+      "TARGET_LOW": "",
+      "LOW_IS_NA": "1",
+      "TARGET_MEDIAN": "",
+      "MEDIAN_IS_NA": "1",
+      "TARGET_AVERAGE": "",
+      "AVERAGE_IS_NA": "1",
+      "TARGET_DATE": "",
+      "DATE_IS_NA": "1",
+      "TARGET_ESTIMATES": "",
+      "ESTIMATES_IS_NA": "1",
+      "INPUT_TIME": "1788134400000",
+      "INPUT_CLOSE": "2417.13",
+      "IS_LAST": "0",
+      "TYPE_STOCK": "0"
+    },
+    "last_historical_values": {
+      "TARGET_HIGH": "",
+      "HIGH_IS_NA": "1",
+      "TARGET_LOW": "",
+      "LOW_IS_NA": "1",
+      "TARGET_MEDIAN": "",
+      "MEDIAN_IS_NA": "1",
+      "TARGET_AVERAGE": "",
+      "AVERAGE_IS_NA": "1",
+      "TARGET_DATE": "",
+      "DATE_IS_NA": "1",
+      "TARGET_ESTIMATES": "",
+      "ESTIMATES_IS_NA": "1",
+      "INPUT_TIME": "1791138720000",
+      "INPUT_CLOSE": "2700.82",
+      "IS_LAST": "0",
+      "TYPE_STOCK": "0"
+    },
+    "declared_unexported_columns": [],
+    "data_window_witness": "captures/v13/evidence/analyst-target-unavailable-context-v13-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T18:36:49.297Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "arm",
+        "bitness": "64",
+        "brands": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156"
+          }
+        ],
+        "fullVersionList": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8.0.0.0"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156.0.8075.0"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156.0.8075.0"
+          }
+        ],
+        "mobile": false,
+        "platform": "macOS",
+        "platformVersion": "27.2.0"
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v13 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "analyst-target-unavailable-context-v13-v1.pine",
+    "attempt": 2,
+    "source_sha256": "95dd9803c21679bbbafe8ecb825dc5bb3de38dbb7c4ab619cf0824f5edcd1d25",
+    "indicator_title": "V13 analyst target unavailable context v1",
+    "status": "RUNS",
+    "csv_file": "captures/v13/analyst-target-unavailable-context-v13-v1-attempt2.csv",
+    "original_download_filename": "OANDA_EURUSD, 1D.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "OANDA:EURUSD",
+      "timeframe": "1D",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "minmove": 1,
+      "pricescale": 100000,
+      "pointvalue": 1,
+      "mintick": 1e-05,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V13 analyst target unavailable context v1",
+      "dataset_start_utc": "2002-05-05T21:00:00.000Z",
+      "first_chart_bar": {
+        "index": -6041,
+        "value": [
+          1020632400,
+          0.91825,
+          0.91825,
+          0.91825,
+          0.91825,
+          1
+        ]
+      },
+      "chart_bars": 6341,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "America/New_York",
+      "exchange_session": "1700-1700",
+      "currency": "USD",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T18:36:42.075Z",
+    "live_candle_open_utc": "2026-10-01T21:00:00.000Z",
+    "export_utc": "2026-10-04T18:36:48.920Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v13/evidence/analyst-target-unavailable-context-v13-v1-attempt2-setup.png",
+      "captures/v13/evidence/analyst-target-unavailable-context-v13-v1-attempt2-export.png",
+      "captures/v13/evidence/analyst-target-unavailable-context-v13-v1-attempt2-logs.txt",
+      "captures/v13/evidence/analyst-target-unavailable-context-v13-v1-attempt2-logs-v1.json",
+      "captures/v13/evidence/analyst-target-unavailable-context-v13-v1-attempt2-logs.png",
+      "captures/v13/evidence/analyst-target-unavailable-context-v13-v1-attempt2-visual.png",
+      "captures/v13/evidence/analyst-target-unavailable-context-v13-v1-attempt2-data-window-v1.png",
+      "captures/v13/evidence/analyst-target-unavailable-context-v13-v1-attempt2-data-window-v1.json",
+      "captures/v13/evidence/analyst-target-unavailable-context-v13-v1-attempt2-data-window-v1.txt",
+      "captures/v13/evidence/analyst-target-unavailable-context-v13-v1-attempt2-authority-object-geometry-v1.json",
+      "captures/v13/evidence/analyst-target-unavailable-context-v13-v1-attempt2-authority-object-geometry-v1.png"
+    ],
+    "notes": "Required OANDA:EURUSD daily analyst context; exact finite inputs and target NA states retained; provider publication/open-event history remains unobserved.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T18:36:42.835Z",
+        "bars": 2556,
+        "end": false,
+        "first": {
+          "index": -2256,
+          "value": [
+            1479852000,
+            1.062745,
+            1.064375,
+            1.052625,
+            1.05525,
+            119771
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1790888400,
+            1.12415,
+            1.12855,
+            1.12209,
+            1.12524,
+            184363
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V13 analyst target unavailable context v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2556,
+            "first": {
+              "index": -2256,
+              "value": [
+                1479852000,
+                null,
+                1,
+                null,
+                1,
+                null,
+                1,
+                null,
+                1,
+                null,
+                1,
+                null,
+                1,
+                1479852000000,
+                1.05525,
+                0,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1790888400,
+                null,
+                1,
+                null,
+                1,
+                null,
+                1,
+                null,
+                1,
+                null,
+                1,
+                null,
+                1,
+                1790888400000,
+                1.12524,
+                1,
+                0
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T18:36:43.798Z",
+        "bars": 6341,
+        "end": true,
+        "first": {
+          "index": -6041,
+          "value": [
+            1020632400,
+            0.91825,
+            0.91825,
+            0.91825,
+            0.91825,
+            1
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1790888400,
+            1.12415,
+            1.12855,
+            1.12209,
+            1.12524,
+            184363
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V13 analyst target unavailable context v1",
+            "status": {
+              "type": 2
+            },
+            "size": 6341,
+            "first": {
+              "index": -6041,
+              "value": [
+                1020632400,
+                null,
+                1,
+                null,
+                1,
+                null,
+                1,
+                null,
+                1,
+                null,
+                1,
+                null,
+                1,
+                1020632400000,
+                0.91825,
+                0,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1790888400,
+                null,
+                1,
+                null,
+                1,
+                null,
+                1,
+                null,
+                1,
+                null,
+                1,
+                null,
+                1,
+                1790888400000,
+                1.12524,
+                1,
+                0
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Fri 02 Oct '26",
+    "historical_compare_before_unix_seconds": 1790888400,
+    "pine_logs": {
+      "paths": [
+        "evidence/analyst-target-unavailable-context-v13-v1-attempt2-logs.txt",
+        "evidence/analyst-target-unavailable-context-v13-v1-attempt2-logs-v1.json",
+        "evidence/analyst-target-unavailable-context-v13-v1-attempt2-logs.png"
+      ],
+      "entries": 0
+    },
+    "all_exported_column_occurrences": [
+      {
+        "title": "time",
+        "occurrence": 1,
+        "position": 0
+      },
+      {
+        "title": "open",
+        "occurrence": 1,
+        "position": 1
+      },
+      {
+        "title": "high",
+        "occurrence": 1,
+        "position": 2
+      },
+      {
+        "title": "low",
+        "occurrence": 1,
+        "position": 3
+      },
+      {
+        "title": "close",
+        "occurrence": 1,
+        "position": 4
+      },
+      {
+        "title": "TARGET_HIGH",
+        "occurrence": 1,
+        "position": 5
+      },
+      {
+        "title": "HIGH_IS_NA",
+        "occurrence": 1,
+        "position": 6
+      },
+      {
+        "title": "TARGET_LOW",
+        "occurrence": 1,
+        "position": 7
+      },
+      {
+        "title": "LOW_IS_NA",
+        "occurrence": 1,
+        "position": 8
+      },
+      {
+        "title": "TARGET_MEDIAN",
+        "occurrence": 1,
+        "position": 9
+      },
+      {
+        "title": "MEDIAN_IS_NA",
+        "occurrence": 1,
+        "position": 10
+      },
+      {
+        "title": "TARGET_AVERAGE",
+        "occurrence": 1,
+        "position": 11
+      },
+      {
+        "title": "AVERAGE_IS_NA",
+        "occurrence": 1,
+        "position": 12
+      },
+      {
+        "title": "TARGET_DATE",
+        "occurrence": 1,
+        "position": 13
+      },
+      {
+        "title": "DATE_IS_NA",
+        "occurrence": 1,
+        "position": 14
+      },
+      {
+        "title": "TARGET_ESTIMATES",
+        "occurrence": 1,
+        "position": 15
+      },
+      {
+        "title": "ESTIMATES_IS_NA",
+        "occurrence": 1,
+        "position": 16
+      },
+      {
+        "title": "INPUT_TIME",
+        "occurrence": 1,
+        "position": 17
+      },
+      {
+        "title": "INPUT_CLOSE",
+        "occurrence": 1,
+        "position": 18
+      },
+      {
+        "title": "IS_LAST",
+        "occurrence": 1,
+        "position": 19
+      },
+      {
+        "title": "TYPE_STOCK",
+        "occurrence": 1,
+        "position": 20
+      }
+    ],
+    "declared_to_native_column_occurrences": [
+      {
+        "declared_title": "TARGET_HIGH",
+        "native_title": "TARGET_HIGH",
+        "occurrence": 1,
+        "position": 5
+      },
+      {
+        "declared_title": "HIGH_IS_NA",
+        "native_title": "HIGH_IS_NA",
+        "occurrence": 1,
+        "position": 6
+      },
+      {
+        "declared_title": "TARGET_LOW",
+        "native_title": "TARGET_LOW",
+        "occurrence": 1,
+        "position": 7
+      },
+      {
+        "declared_title": "LOW_IS_NA",
+        "native_title": "LOW_IS_NA",
+        "occurrence": 1,
+        "position": 8
+      },
+      {
+        "declared_title": "TARGET_MEDIAN",
+        "native_title": "TARGET_MEDIAN",
+        "occurrence": 1,
+        "position": 9
+      },
+      {
+        "declared_title": "MEDIAN_IS_NA",
+        "native_title": "MEDIAN_IS_NA",
+        "occurrence": 1,
+        "position": 10
+      },
+      {
+        "declared_title": "TARGET_AVERAGE",
+        "native_title": "TARGET_AVERAGE",
+        "occurrence": 1,
+        "position": 11
+      },
+      {
+        "declared_title": "AVERAGE_IS_NA",
+        "native_title": "AVERAGE_IS_NA",
+        "occurrence": 1,
+        "position": 12
+      },
+      {
+        "declared_title": "TARGET_DATE",
+        "native_title": "TARGET_DATE",
+        "occurrence": 1,
+        "position": 13
+      },
+      {
+        "declared_title": "DATE_IS_NA",
+        "native_title": "DATE_IS_NA",
+        "occurrence": 1,
+        "position": 14
+      },
+      {
+        "declared_title": "TARGET_ESTIMATES",
+        "native_title": "TARGET_ESTIMATES",
+        "occurrence": 1,
+        "position": 15
+      },
+      {
+        "declared_title": "ESTIMATES_IS_NA",
+        "native_title": "ESTIMATES_IS_NA",
+        "occurrence": 1,
+        "position": 16
+      },
+      {
+        "declared_title": "INPUT_TIME",
+        "native_title": "INPUT_TIME",
+        "occurrence": 1,
+        "position": 17
+      },
+      {
+        "declared_title": "INPUT_CLOSE",
+        "native_title": "INPUT_CLOSE",
+        "occurrence": 1,
+        "position": 18
+      },
+      {
+        "declared_title": "IS_LAST",
+        "native_title": "IS_LAST",
+        "occurrence": 1,
+        "position": 19
+      },
+      {
+        "declared_title": "TYPE_STOCK",
+        "native_title": "TYPE_STOCK",
+        "occurrence": 1,
+        "position": 20
+      }
+    ],
+    "named_value_map_scope": "Legacy title maps show the first occurrence only; original positional cells and occurrence tables retain every duplicate without renaming.",
+    "csv_sha256": "df9089520c429ad478af73bf3340d645b36038d464d8c14146ed2e3311e09ed8",
+    "csv_bytes": 552979,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "TARGET_HIGH",
+      "HIGH_IS_NA",
+      "TARGET_LOW",
+      "LOW_IS_NA",
+      "TARGET_MEDIAN",
+      "MEDIAN_IS_NA",
+      "TARGET_AVERAGE",
+      "AVERAGE_IS_NA",
+      "TARGET_DATE",
+      "DATE_IS_NA",
+      "TARGET_ESTIMATES",
+      "ESTIMATES_IS_NA",
+      "INPUT_TIME",
+      "INPUT_CLOSE",
+      "IS_LAST",
+      "TYPE_STOCK"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "TARGET_HIGH": 5,
+      "HIGH_IS_NA": 6,
+      "TARGET_LOW": 7,
+      "LOW_IS_NA": 8,
+      "TARGET_MEDIAN": 9,
+      "MEDIAN_IS_NA": 10,
+      "TARGET_AVERAGE": 11,
+      "AVERAGE_IS_NA": 12,
+      "TARGET_DATE": 13,
+      "DATE_IS_NA": 14,
+      "TARGET_ESTIMATES": 15,
+      "ESTIMATES_IS_NA": 16,
+      "INPUT_TIME": 17,
+      "INPUT_CLOSE": 18,
+      "IS_LAST": 19,
+      "TYPE_STOCK": 20
+    },
+    "first_historical_cells": [
+      "1020632400",
+      "0.91825",
+      "0.91825",
+      "0.91825",
+      "0.91825",
+      "",
+      "1",
+      "",
+      "1",
+      "",
+      "1",
+      "",
+      "1",
+      "",
+      "1",
+      "",
+      "1",
+      "1020632400000",
+      "0.91825",
+      "0",
+      "0"
+    ],
+    "last_historical_cells": [
+      "1790802000",
+      "1.13317",
+      "1.13368",
+      "1.12152",
+      "1.12426",
+      "",
+      "1",
+      "",
+      "1",
+      "",
+      "1",
+      "",
+      "1",
+      "",
+      "1",
+      "",
+      "1",
+      "1790802000000",
+      "1.12426",
+      "0",
+      "0"
+    ],
+    "declared_to_native_header_mapping": {
+      "TARGET_HIGH": "TARGET_HIGH",
+      "HIGH_IS_NA": "HIGH_IS_NA",
+      "TARGET_LOW": "TARGET_LOW",
+      "LOW_IS_NA": "LOW_IS_NA",
+      "TARGET_MEDIAN": "TARGET_MEDIAN",
+      "MEDIAN_IS_NA": "MEDIAN_IS_NA",
+      "TARGET_AVERAGE": "TARGET_AVERAGE",
+      "AVERAGE_IS_NA": "AVERAGE_IS_NA",
+      "TARGET_DATE": "TARGET_DATE",
+      "DATE_IS_NA": "DATE_IS_NA",
+      "TARGET_ESTIMATES": "TARGET_ESTIMATES",
+      "ESTIMATES_IS_NA": "ESTIMATES_IS_NA",
+      "INPUT_TIME": "INPUT_TIME",
+      "INPUT_CLOSE": "INPUT_CLOSE",
+      "IS_LAST": "IS_LAST",
+      "TYPE_STOCK": "TYPE_STOCK"
+    },
+    "csv_rows": 6341,
+    "historical_rows": 6340,
+    "first_csv_timestamp_seconds": 1020632400,
+    "last_csv_timestamp_seconds": 1790888400,
+    "first_csv_time_raw": "1020632400",
+    "last_csv_time_raw": "1790888400",
+    "first_historical_values": {
+      "TARGET_HIGH": "",
+      "HIGH_IS_NA": "1",
+      "TARGET_LOW": "",
+      "LOW_IS_NA": "1",
+      "TARGET_MEDIAN": "",
+      "MEDIAN_IS_NA": "1",
+      "TARGET_AVERAGE": "",
+      "AVERAGE_IS_NA": "1",
+      "TARGET_DATE": "",
+      "DATE_IS_NA": "1",
+      "TARGET_ESTIMATES": "",
+      "ESTIMATES_IS_NA": "1",
+      "INPUT_TIME": "1020632400000",
+      "INPUT_CLOSE": "0.91825",
+      "IS_LAST": "0",
+      "TYPE_STOCK": "0"
+    },
+    "last_historical_values": {
+      "TARGET_HIGH": "",
+      "HIGH_IS_NA": "1",
+      "TARGET_LOW": "",
+      "LOW_IS_NA": "1",
+      "TARGET_MEDIAN": "",
+      "MEDIAN_IS_NA": "1",
+      "TARGET_AVERAGE": "",
+      "AVERAGE_IS_NA": "1",
+      "TARGET_DATE": "",
+      "DATE_IS_NA": "1",
+      "TARGET_ESTIMATES": "",
+      "ESTIMATES_IS_NA": "1",
+      "INPUT_TIME": "1790802000000",
+      "INPUT_CLOSE": "1.12426",
+      "IS_LAST": "0",
+      "TYPE_STOCK": "0"
+    },
+    "declared_unexported_columns": [],
+    "data_window_witness": "captures/v13/evidence/analyst-target-unavailable-context-v13-v1-attempt2-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T18:37:44.572Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "arm",
+        "bitness": "64",
+        "brands": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156"
+          }
+        ],
+        "fullVersionList": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8.0.0.0"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156.0.8075.0"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156.0.8075.0"
+          }
+        ],
+        "mobile": false,
+        "platform": "macOS",
+        "platformVersion": "27.2.0"
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v13 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "analyst-target-unavailable-context-v13-v1.pine",
+    "attempt": 3,
+    "source_sha256": "95dd9803c21679bbbafe8ecb825dc5bb3de38dbb7c4ab619cf0824f5edcd1d25",
+    "indicator_title": "V13 analyst target unavailable context v1",
+    "status": "RUNS",
+    "csv_file": "captures/v13/analyst-target-unavailable-context-v13-v1-attempt3.csv",
+    "original_download_filename": "BATS_AAPL, 1D (4).csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BATS:AAPL",
+      "timeframe": "1D",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "minmove": 1,
+      "pricescale": 100,
+      "pointvalue": 1,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V13 analyst target unavailable context v1",
+      "dataset_start_utc": "1980-12-12T14:30:00.000Z",
+      "first_chart_bar": {
+        "index": -11238,
+        "value": [
+          345479400,
+          0.128348,
+          0.128348,
+          0.128348,
+          0.128348,
+          469034068
+        ]
+      },
+      "chart_bars": 11538,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "America/New_York",
+      "exchange_session": "0930-1600",
+      "currency": "USD",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T18:37:37.016Z",
+    "live_candle_open_utc": "2026-10-02T13:30:00.000Z",
+    "export_utc": "2026-10-04T18:37:44.171Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v13/evidence/analyst-target-unavailable-context-v13-v1-attempt3-setup.png",
+      "captures/v13/evidence/analyst-target-unavailable-context-v13-v1-attempt3-export.png",
+      "captures/v13/evidence/analyst-target-unavailable-context-v13-v1-attempt3-logs.txt",
+      "captures/v13/evidence/analyst-target-unavailable-context-v13-v1-attempt3-logs-v1.json",
+      "captures/v13/evidence/analyst-target-unavailable-context-v13-v1-attempt3-logs.png",
+      "captures/v13/evidence/analyst-target-unavailable-context-v13-v1-attempt3-visual.png",
+      "captures/v13/evidence/analyst-target-unavailable-context-v13-v1-attempt3-data-window-v1.png",
+      "captures/v13/evidence/analyst-target-unavailable-context-v13-v1-attempt3-data-window-v1.json",
+      "captures/v13/evidence/analyst-target-unavailable-context-v13-v1-attempt3-data-window-v1.txt",
+      "captures/v13/evidence/analyst-target-unavailable-context-v13-v1-attempt3-resolved-provider-v1.json",
+      "captures/v13/evidence/analyst-target-unavailable-context-v13-v1-attempt3-resolved-provider-v1.png",
+      "captures/v13/evidence/analyst-target-unavailable-context-v13-v1-attempt3-authority-object-geometry-v1.json",
+      "captures/v13/evidence/analyst-target-unavailable-context-v13-v1-attempt3-authority-object-geometry-v1.png"
+    ],
+    "notes": "Required AAPL daily analyst control. Native NASDAQ:AAPL search selection resolves BATS:AAPL (CboeOne) under this account; full resolved identity retained. Closed-market timing observed; no provider publication timestamp or open-event invented.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T18:37:37.970Z",
+        "bars": 2556,
+        "end": false,
+        "first": {
+          "index": -2256,
+          "value": [
+            1470231000,
+            26.2025,
+            26.46,
+            26.1925,
+            26.4475,
+            120810564
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1790947800,
+            333.26,
+            334.54,
+            330.61,
+            333.69,
+            33278552
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V13 analyst target unavailable context v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2556,
+            "first": {
+              "index": -2256,
+              "value": [
+                1470231000,
+                null,
+                1,
+                null,
+                1,
+                null,
+                1,
+                null,
+                1,
+                null,
+                1,
+                null,
+                1,
+                1470231000000,
+                26.4475,
+                0,
+                1
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                0,
+                245,
+                0,
+                340,
+                0,
+                335.751907,
+                0,
+                1790899200000,
+                0,
+                35,
+                0,
+                1790947800000,
+                333.69,
+                1,
+                1
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T18:37:38.974Z",
+        "bars": 11538,
+        "end": true,
+        "first": {
+          "index": -11238,
+          "value": [
+            345479400,
+            0.128348,
+            0.128348,
+            0.128348,
+            0.128348,
+            469034068
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1790947800,
+            333.26,
+            334.54,
+            330.61,
+            333.69,
+            33278552
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V13 analyst target unavailable context v1",
+            "status": {
+              "type": 2
+            },
+            "size": 11538,
+            "first": {
+              "index": -11238,
+              "value": [
+                345479400,
+                null,
+                1,
+                null,
+                1,
+                null,
+                1,
+                null,
+                1,
+                null,
+                1,
+                null,
+                1,
+                345479400000,
+                0.128348,
+                0,
+                1
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                0,
+                245,
+                0,
+                340,
+                0,
+                335.751907,
+                0,
+                1790899200000,
+                0,
+                35,
+                0,
+                1790947800000,
+                333.69,
+                1,
+                1
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Fri 02 Oct '26",
+    "historical_compare_before_unix_seconds": 1790947800,
+    "pine_logs": {
+      "paths": [
+        "evidence/analyst-target-unavailable-context-v13-v1-attempt3-logs.txt",
+        "evidence/analyst-target-unavailable-context-v13-v1-attempt3-logs-v1.json",
+        "evidence/analyst-target-unavailable-context-v13-v1-attempt3-logs.png"
+      ],
+      "entries": 0
+    },
+    "all_exported_column_occurrences": [
+      {
+        "title": "time",
+        "occurrence": 1,
+        "position": 0
+      },
+      {
+        "title": "open",
+        "occurrence": 1,
+        "position": 1
+      },
+      {
+        "title": "high",
+        "occurrence": 1,
+        "position": 2
+      },
+      {
+        "title": "low",
+        "occurrence": 1,
+        "position": 3
+      },
+      {
+        "title": "close",
+        "occurrence": 1,
+        "position": 4
+      },
+      {
+        "title": "TARGET_HIGH",
+        "occurrence": 1,
+        "position": 5
+      },
+      {
+        "title": "HIGH_IS_NA",
+        "occurrence": 1,
+        "position": 6
+      },
+      {
+        "title": "TARGET_LOW",
+        "occurrence": 1,
+        "position": 7
+      },
+      {
+        "title": "LOW_IS_NA",
+        "occurrence": 1,
+        "position": 8
+      },
+      {
+        "title": "TARGET_MEDIAN",
+        "occurrence": 1,
+        "position": 9
+      },
+      {
+        "title": "MEDIAN_IS_NA",
+        "occurrence": 1,
+        "position": 10
+      },
+      {
+        "title": "TARGET_AVERAGE",
+        "occurrence": 1,
+        "position": 11
+      },
+      {
+        "title": "AVERAGE_IS_NA",
+        "occurrence": 1,
+        "position": 12
+      },
+      {
+        "title": "TARGET_DATE",
+        "occurrence": 1,
+        "position": 13
+      },
+      {
+        "title": "DATE_IS_NA",
+        "occurrence": 1,
+        "position": 14
+      },
+      {
+        "title": "TARGET_ESTIMATES",
+        "occurrence": 1,
+        "position": 15
+      },
+      {
+        "title": "ESTIMATES_IS_NA",
+        "occurrence": 1,
+        "position": 16
+      },
+      {
+        "title": "INPUT_TIME",
+        "occurrence": 1,
+        "position": 17
+      },
+      {
+        "title": "INPUT_CLOSE",
+        "occurrence": 1,
+        "position": 18
+      },
+      {
+        "title": "IS_LAST",
+        "occurrence": 1,
+        "position": 19
+      },
+      {
+        "title": "TYPE_STOCK",
+        "occurrence": 1,
+        "position": 20
+      }
+    ],
+    "declared_to_native_column_occurrences": [
+      {
+        "declared_title": "TARGET_HIGH",
+        "native_title": "TARGET_HIGH",
+        "occurrence": 1,
+        "position": 5
+      },
+      {
+        "declared_title": "HIGH_IS_NA",
+        "native_title": "HIGH_IS_NA",
+        "occurrence": 1,
+        "position": 6
+      },
+      {
+        "declared_title": "TARGET_LOW",
+        "native_title": "TARGET_LOW",
+        "occurrence": 1,
+        "position": 7
+      },
+      {
+        "declared_title": "LOW_IS_NA",
+        "native_title": "LOW_IS_NA",
+        "occurrence": 1,
+        "position": 8
+      },
+      {
+        "declared_title": "TARGET_MEDIAN",
+        "native_title": "TARGET_MEDIAN",
+        "occurrence": 1,
+        "position": 9
+      },
+      {
+        "declared_title": "MEDIAN_IS_NA",
+        "native_title": "MEDIAN_IS_NA",
+        "occurrence": 1,
+        "position": 10
+      },
+      {
+        "declared_title": "TARGET_AVERAGE",
+        "native_title": "TARGET_AVERAGE",
+        "occurrence": 1,
+        "position": 11
+      },
+      {
+        "declared_title": "AVERAGE_IS_NA",
+        "native_title": "AVERAGE_IS_NA",
+        "occurrence": 1,
+        "position": 12
+      },
+      {
+        "declared_title": "TARGET_DATE",
+        "native_title": "TARGET_DATE",
+        "occurrence": 1,
+        "position": 13
+      },
+      {
+        "declared_title": "DATE_IS_NA",
+        "native_title": "DATE_IS_NA",
+        "occurrence": 1,
+        "position": 14
+      },
+      {
+        "declared_title": "TARGET_ESTIMATES",
+        "native_title": "TARGET_ESTIMATES",
+        "occurrence": 1,
+        "position": 15
+      },
+      {
+        "declared_title": "ESTIMATES_IS_NA",
+        "native_title": "ESTIMATES_IS_NA",
+        "occurrence": 1,
+        "position": 16
+      },
+      {
+        "declared_title": "INPUT_TIME",
+        "native_title": "INPUT_TIME",
+        "occurrence": 1,
+        "position": 17
+      },
+      {
+        "declared_title": "INPUT_CLOSE",
+        "native_title": "INPUT_CLOSE",
+        "occurrence": 1,
+        "position": 18
+      },
+      {
+        "declared_title": "IS_LAST",
+        "native_title": "IS_LAST",
+        "occurrence": 1,
+        "position": 19
+      },
+      {
+        "declared_title": "TYPE_STOCK",
+        "native_title": "TYPE_STOCK",
+        "occurrence": 1,
+        "position": 20
+      }
+    ],
+    "named_value_map_scope": "Legacy title maps show the first occurrence only; original positional cells and occurrence tables retain every duplicate without renaming.",
+    "csv_sha256": "fb64d5aea91f92b067025e2c50e7cc6431b2dc64fe7d87748241a2295cb89c88",
+    "csv_bytes": 1020308,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "TARGET_HIGH",
+      "HIGH_IS_NA",
+      "TARGET_LOW",
+      "LOW_IS_NA",
+      "TARGET_MEDIAN",
+      "MEDIAN_IS_NA",
+      "TARGET_AVERAGE",
+      "AVERAGE_IS_NA",
+      "TARGET_DATE",
+      "DATE_IS_NA",
+      "TARGET_ESTIMATES",
+      "ESTIMATES_IS_NA",
+      "INPUT_TIME",
+      "INPUT_CLOSE",
+      "IS_LAST",
+      "TYPE_STOCK"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "TARGET_HIGH": 5,
+      "HIGH_IS_NA": 6,
+      "TARGET_LOW": 7,
+      "LOW_IS_NA": 8,
+      "TARGET_MEDIAN": 9,
+      "MEDIAN_IS_NA": 10,
+      "TARGET_AVERAGE": 11,
+      "AVERAGE_IS_NA": 12,
+      "TARGET_DATE": 13,
+      "DATE_IS_NA": 14,
+      "TARGET_ESTIMATES": 15,
+      "ESTIMATES_IS_NA": 16,
+      "INPUT_TIME": 17,
+      "INPUT_CLOSE": 18,
+      "IS_LAST": 19,
+      "TYPE_STOCK": 20
+    },
+    "first_historical_cells": [
+      "345479400",
+      "0.128348",
+      "0.128348",
+      "0.128348",
+      "0.128348",
+      "",
+      "1",
+      "",
+      "1",
+      "",
+      "1",
+      "",
+      "1",
+      "",
+      "1",
+      "",
+      "1",
+      "345479400000",
+      "0.128348",
+      "0",
+      "1"
+    ],
+    "last_historical_cells": [
+      "1790861400",
+      "330",
+      "332.4816",
+      "325.81",
+      "330.32",
+      "",
+      "1",
+      "",
+      "1",
+      "",
+      "1",
+      "",
+      "1",
+      "",
+      "1",
+      "",
+      "1",
+      "1790861400000",
+      "330.32",
+      "0",
+      "1"
+    ],
+    "declared_to_native_header_mapping": {
+      "TARGET_HIGH": "TARGET_HIGH",
+      "HIGH_IS_NA": "HIGH_IS_NA",
+      "TARGET_LOW": "TARGET_LOW",
+      "LOW_IS_NA": "LOW_IS_NA",
+      "TARGET_MEDIAN": "TARGET_MEDIAN",
+      "MEDIAN_IS_NA": "MEDIAN_IS_NA",
+      "TARGET_AVERAGE": "TARGET_AVERAGE",
+      "AVERAGE_IS_NA": "AVERAGE_IS_NA",
+      "TARGET_DATE": "TARGET_DATE",
+      "DATE_IS_NA": "DATE_IS_NA",
+      "TARGET_ESTIMATES": "TARGET_ESTIMATES",
+      "ESTIMATES_IS_NA": "ESTIMATES_IS_NA",
+      "INPUT_TIME": "INPUT_TIME",
+      "INPUT_CLOSE": "INPUT_CLOSE",
+      "IS_LAST": "IS_LAST",
+      "TYPE_STOCK": "TYPE_STOCK"
+    },
+    "csv_rows": 11538,
+    "historical_rows": 11537,
+    "first_csv_timestamp_seconds": 345479400,
+    "last_csv_timestamp_seconds": 1790947800,
+    "first_csv_time_raw": "345479400",
+    "last_csv_time_raw": "1790947800",
+    "first_historical_values": {
+      "TARGET_HIGH": "",
+      "HIGH_IS_NA": "1",
+      "TARGET_LOW": "",
+      "LOW_IS_NA": "1",
+      "TARGET_MEDIAN": "",
+      "MEDIAN_IS_NA": "1",
+      "TARGET_AVERAGE": "",
+      "AVERAGE_IS_NA": "1",
+      "TARGET_DATE": "",
+      "DATE_IS_NA": "1",
+      "TARGET_ESTIMATES": "",
+      "ESTIMATES_IS_NA": "1",
+      "INPUT_TIME": "345479400000",
+      "INPUT_CLOSE": "0.128348",
+      "IS_LAST": "0",
+      "TYPE_STOCK": "1"
+    },
+    "last_historical_values": {
+      "TARGET_HIGH": "",
+      "HIGH_IS_NA": "1",
+      "TARGET_LOW": "",
+      "LOW_IS_NA": "1",
+      "TARGET_MEDIAN": "",
+      "MEDIAN_IS_NA": "1",
+      "TARGET_AVERAGE": "",
+      "AVERAGE_IS_NA": "1",
+      "TARGET_DATE": "",
+      "DATE_IS_NA": "1",
+      "TARGET_ESTIMATES": "",
+      "ESTIMATES_IS_NA": "1",
+      "INPUT_TIME": "1790861400000",
+      "INPUT_CLOSE": "330.32",
+      "IS_LAST": "0",
+      "TYPE_STOCK": "1"
+    },
+    "declared_unexported_columns": [],
+    "data_window_witness": "captures/v13/evidence/analyst-target-unavailable-context-v13-v1-attempt3-data-window-v1.json"
   }
 ]

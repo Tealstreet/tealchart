@@ -1,0 +1,345 @@
+{
+  "artifact": "Analyst unavailable contexts v1",
+  "source_sha256": "95dd9803c21679bbbafe8ecb825dc5bb3de38dbb7c4ab619cf0824f5edcd1d25",
+  "contexts": [
+    {
+      "attempt": 1,
+      "setup": {
+        "tickerid": "BINANCE:ETHUSDT",
+        "timeframe": "2",
+        "chart_type": "standard candles",
+        "native_style": 1,
+        "timezone": "Etc/UTC",
+        "bar_replay": false,
+        "minmove": 1,
+        "pricescale": 100,
+        "pointvalue": 1,
+        "mintick": 0.01,
+        "defaults_confirmed": true,
+        "native_user_inputs": [],
+        "observed_indicator_title": "V13 analyst target unavailable context v1",
+        "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+        "first_chart_bar": {
+          "index": -24738,
+          "value": [
+            1788134400,
+            2416.89,
+            2417.13,
+            2410.62,
+            2417.13,
+            1569.0032
+          ]
+        },
+        "chart_bars": 25038,
+        "subscription": "pro_premium",
+        "native_end_of_data": true,
+        "exchange_timezone": "Etc/UTC",
+        "exchange_session": "24x7",
+        "currency": "USDT",
+        "chart_session": "regular",
+        "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+      },
+      "reset_utc": "2026-10-04T18:35:40.091Z",
+      "export_utc": "2026-10-04T18:35:47.251Z",
+      "rows": 25038,
+      "missing_flags": {
+        "HIGH_IS_NA": {
+          "1": 25038
+        },
+        "LOW_IS_NA": {
+          "1": 25038
+        },
+        "MEDIAN_IS_NA": {
+          "1": 25038
+        },
+        "AVERAGE_IS_NA": {
+          "1": 25038
+        },
+        "DATE_IS_NA": {
+          "1": 25038
+        },
+        "ESTIMATES_IS_NA": {
+          "1": 25038
+        }
+      },
+      "first_row": {
+        "time": "1788134400",
+        "open": "2416.89",
+        "high": "2417.13",
+        "low": "2410.62",
+        "close": "2417.13",
+        "TARGET_HIGH": "",
+        "HIGH_IS_NA": "1",
+        "TARGET_LOW": "",
+        "LOW_IS_NA": "1",
+        "TARGET_MEDIAN": "",
+        "MEDIAN_IS_NA": "1",
+        "TARGET_AVERAGE": "",
+        "AVERAGE_IS_NA": "1",
+        "TARGET_DATE": "",
+        "DATE_IS_NA": "1",
+        "TARGET_ESTIMATES": "",
+        "ESTIMATES_IS_NA": "1",
+        "INPUT_TIME": "1788134400000",
+        "INPUT_CLOSE": "2417.13",
+        "IS_LAST": "0",
+        "TYPE_STOCK": "0"
+      },
+      "last_row": {
+        "time": "1791138840",
+        "open": "2700.81",
+        "high": "2701.52",
+        "low": "2700.81",
+        "close": "2701.31",
+        "TARGET_HIGH": "",
+        "HIGH_IS_NA": "1",
+        "TARGET_LOW": "",
+        "LOW_IS_NA": "1",
+        "TARGET_MEDIAN": "",
+        "MEDIAN_IS_NA": "1",
+        "TARGET_AVERAGE": "",
+        "AVERAGE_IS_NA": "1",
+        "TARGET_DATE": "",
+        "DATE_IS_NA": "1",
+        "TARGET_ESTIMATES": "",
+        "ESTIMATES_IS_NA": "1",
+        "INPUT_TIME": "1791138840000",
+        "INPUT_CLOSE": "2701.31",
+        "IS_LAST": "1",
+        "TYPE_STOCK": "0"
+      },
+      "INPUT_TIME_missing": 0,
+      "INPUT_CLOSE_missing": 0
+    },
+    {
+      "attempt": 2,
+      "setup": {
+        "tickerid": "OANDA:EURUSD",
+        "timeframe": "1D",
+        "chart_type": "standard candles",
+        "native_style": 1,
+        "timezone": "Etc/UTC",
+        "bar_replay": false,
+        "minmove": 1,
+        "pricescale": 100000,
+        "pointvalue": 1,
+        "mintick": 1e-05,
+        "defaults_confirmed": true,
+        "native_user_inputs": [],
+        "observed_indicator_title": "V13 analyst target unavailable context v1",
+        "dataset_start_utc": "2002-05-05T21:00:00.000Z",
+        "first_chart_bar": {
+          "index": -6041,
+          "value": [
+            1020632400,
+            0.91825,
+            0.91825,
+            0.91825,
+            0.91825,
+            1
+          ]
+        },
+        "chart_bars": 6341,
+        "subscription": "pro_premium",
+        "native_end_of_data": true,
+        "exchange_timezone": "America/New_York",
+        "exchange_session": "1700-1700",
+        "currency": "USD",
+        "chart_session": "regular",
+        "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+      },
+      "reset_utc": "2026-10-04T18:36:42.075Z",
+      "export_utc": "2026-10-04T18:36:48.920Z",
+      "rows": 6341,
+      "missing_flags": {
+        "HIGH_IS_NA": {
+          "1": 6341
+        },
+        "LOW_IS_NA": {
+          "1": 6341
+        },
+        "MEDIAN_IS_NA": {
+          "1": 6341
+        },
+        "AVERAGE_IS_NA": {
+          "1": 6341
+        },
+        "DATE_IS_NA": {
+          "1": 6341
+        },
+        "ESTIMATES_IS_NA": {
+          "1": 6341
+        }
+      },
+      "first_row": {
+        "time": "1020632400",
+        "open": "0.91825",
+        "high": "0.91825",
+        "low": "0.91825",
+        "close": "0.91825",
+        "TARGET_HIGH": "",
+        "HIGH_IS_NA": "1",
+        "TARGET_LOW": "",
+        "LOW_IS_NA": "1",
+        "TARGET_MEDIAN": "",
+        "MEDIAN_IS_NA": "1",
+        "TARGET_AVERAGE": "",
+        "AVERAGE_IS_NA": "1",
+        "TARGET_DATE": "",
+        "DATE_IS_NA": "1",
+        "TARGET_ESTIMATES": "",
+        "ESTIMATES_IS_NA": "1",
+        "INPUT_TIME": "1020632400000",
+        "INPUT_CLOSE": "0.91825",
+        "IS_LAST": "0",
+        "TYPE_STOCK": "0"
+      },
+      "last_row": {
+        "time": "1790888400",
+        "open": "1.12415",
+        "high": "1.12855",
+        "low": "1.12209",
+        "close": "1.12524",
+        "TARGET_HIGH": "",
+        "HIGH_IS_NA": "1",
+        "TARGET_LOW": "",
+        "LOW_IS_NA": "1",
+        "TARGET_MEDIAN": "",
+        "MEDIAN_IS_NA": "1",
+        "TARGET_AVERAGE": "",
+        "AVERAGE_IS_NA": "1",
+        "TARGET_DATE": "",
+        "DATE_IS_NA": "1",
+        "TARGET_ESTIMATES": "",
+        "ESTIMATES_IS_NA": "1",
+        "INPUT_TIME": "1790888400000",
+        "INPUT_CLOSE": "1.12524",
+        "IS_LAST": "1",
+        "TYPE_STOCK": "0"
+      },
+      "INPUT_TIME_missing": 0,
+      "INPUT_CLOSE_missing": 0
+    },
+    {
+      "attempt": 3,
+      "setup": {
+        "tickerid": "BATS:AAPL",
+        "timeframe": "1D",
+        "chart_type": "standard candles",
+        "native_style": 1,
+        "timezone": "Etc/UTC",
+        "bar_replay": false,
+        "minmove": 1,
+        "pricescale": 100,
+        "pointvalue": 1,
+        "mintick": 0.01,
+        "defaults_confirmed": true,
+        "native_user_inputs": [],
+        "observed_indicator_title": "V13 analyst target unavailable context v1",
+        "dataset_start_utc": "1980-12-12T14:30:00.000Z",
+        "first_chart_bar": {
+          "index": -11238,
+          "value": [
+            345479400,
+            0.128348,
+            0.128348,
+            0.128348,
+            0.128348,
+            469034068
+          ]
+        },
+        "chart_bars": 11538,
+        "subscription": "pro_premium",
+        "native_end_of_data": true,
+        "exchange_timezone": "America/New_York",
+        "exchange_session": "0930-1600",
+        "currency": "USD",
+        "chart_session": "regular",
+        "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+      },
+      "reset_utc": "2026-10-04T18:37:37.016Z",
+      "export_utc": "2026-10-04T18:37:44.171Z",
+      "rows": 11538,
+      "missing_flags": {
+        "HIGH_IS_NA": {
+          "1": 11537,
+          "0": 1
+        },
+        "LOW_IS_NA": {
+          "1": 11537,
+          "0": 1
+        },
+        "MEDIAN_IS_NA": {
+          "1": 11537,
+          "0": 1
+        },
+        "AVERAGE_IS_NA": {
+          "1": 11537,
+          "0": 1
+        },
+        "DATE_IS_NA": {
+          "1": 11537,
+          "0": 1
+        },
+        "ESTIMATES_IS_NA": {
+          "1": 11537,
+          "0": 1
+        }
+      },
+      "first_row": {
+        "time": "345479400",
+        "open": "0.128348",
+        "high": "0.128348",
+        "low": "0.128348",
+        "close": "0.128348",
+        "TARGET_HIGH": "",
+        "HIGH_IS_NA": "1",
+        "TARGET_LOW": "",
+        "LOW_IS_NA": "1",
+        "TARGET_MEDIAN": "",
+        "MEDIAN_IS_NA": "1",
+        "TARGET_AVERAGE": "",
+        "AVERAGE_IS_NA": "1",
+        "TARGET_DATE": "",
+        "DATE_IS_NA": "1",
+        "TARGET_ESTIMATES": "",
+        "ESTIMATES_IS_NA": "1",
+        "INPUT_TIME": "345479400000",
+        "INPUT_CLOSE": "0.128348",
+        "IS_LAST": "0",
+        "TYPE_STOCK": "1"
+      },
+      "last_row": {
+        "time": "1790947800",
+        "open": "333.26",
+        "high": "334.54",
+        "low": "330.61",
+        "close": "333.69",
+        "TARGET_HIGH": "405",
+        "HIGH_IS_NA": "0",
+        "TARGET_LOW": "245",
+        "LOW_IS_NA": "0",
+        "TARGET_MEDIAN": "340",
+        "MEDIAN_IS_NA": "0",
+        "TARGET_AVERAGE": "335.751907",
+        "AVERAGE_IS_NA": "0",
+        "TARGET_DATE": "1790899200000",
+        "DATE_IS_NA": "0",
+        "TARGET_ESTIMATES": "35",
+        "ESTIMATES_IS_NA": "0",
+        "INPUT_TIME": "1790947800000",
+        "INPUT_CLOSE": "333.69",
+        "IS_LAST": "1",
+        "TYPE_STOCK": "1"
+      },
+      "INPUT_TIME_missing": 0,
+      "INPUT_CLOSE_missing": 0
+    }
+  ],
+  "required_unobserved": [
+    "Provider publication/update timestamp and eligible stock market-open analyst transition unobserved. Source execution clock is not provider publication time."
+  ],
+  "limits": [
+    "Uniform target absence narrows these recorded contexts only; no universal instrument defect or unavailable-symbol contract."
+  ]
+}
