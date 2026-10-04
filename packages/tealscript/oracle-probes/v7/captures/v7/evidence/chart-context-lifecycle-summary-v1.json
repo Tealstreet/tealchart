@@ -1,0 +1,559 @@
+{
+  "artifact": "Chart lifecycle operation summary v1",
+  "plot_columns": [
+    "EXEC_COUNT",
+    "WALL_CLOCK",
+    "LEFT_VISIBLE",
+    "RIGHT_VISIBLE"
+  ],
+  "observations": [
+    {
+      "evidence": "captures/v7/evidence/chart-context-lifecycle-v6-v1-attempt1-lifecycle-after-pine-scan-v1.json",
+      "browser_utc": "2026-10-04T08:47:18.349Z",
+      "operation": {
+        "action": "After native Scan completed in standalone Pine Screener; chart source observed independently"
+      },
+      "source_status": {
+        "type": 2
+      },
+      "study_last": {
+        "index": 303,
+        "value": [
+          1791103560,
+          24744,
+          1791103637380,
+          1791082680000,
+          1791088920000
+        ]
+      },
+      "visible_range": {
+        "_firstBar": 129,
+        "_lastBar": 181
+      },
+      "background": "rgba(15, 15, 15, 1)",
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "dpr": 2
+      }
+    },
+    {
+      "evidence": "captures/v7/evidence/chart-context-lifecycle-v6-v1-attempt1-lifecycle-background-restored-v1.json",
+      "browser_utc": "2026-10-04T08:40:18.710Z",
+      "operation": {
+        "action": "Original native Canvas background restored"
+      },
+      "source_status": {
+        "type": 2
+      },
+      "study_last": {
+        "index": 300,
+        "value": [
+          1791103200,
+          24741,
+          1791103217635,
+          1791084360000,
+          1791088920000
+        ]
+      },
+      "visible_range": {
+        "_firstBar": 143,
+        "_lastBar": 181
+      },
+      "background": "rgba(15, 15, 15, 1)",
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "dpr": 2
+      }
+    },
+    {
+      "evidence": "captures/v7/evidence/chart-context-lifecycle-v6-v1-attempt1-lifecycle-background-v1.json",
+      "browser_utc": "2026-10-04T08:40:14.062Z",
+      "operation": {
+        "action": "Native Canvas background changed from #0F0F0F to #2E2E2E"
+      },
+      "source_status": {
+        "type": 2
+      },
+      "study_last": {
+        "index": 300,
+        "value": [
+          1791103200,
+          24741,
+          1791103213431,
+          1791084360000,
+          1791088920000
+        ]
+      },
+      "visible_range": {
+        "_firstBar": 143,
+        "_lastBar": 181
+      },
+      "background": "rgba(46, 46, 46, 1)",
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "dpr": 2
+      }
+    },
+    {
+      "evidence": "captures/v7/evidence/chart-context-lifecycle-v6-v1-attempt1-lifecycle-before-pine-scan-v1.json",
+      "browser_utc": "2026-10-04T08:46:39.997Z",
+      "operation": {
+        "action": "Before scanning unchanged saved source in standalone Pine Screener; Red list,1D,7 symbols"
+      },
+      "source_status": {
+        "type": 2
+      },
+      "study_last": {
+        "index": 303,
+        "value": [
+          1791103560,
+          24744,
+          1791103599881,
+          1791082680000,
+          1791088920000
+        ]
+      },
+      "visible_range": {
+        "_firstBar": 129,
+        "_lastBar": 181
+      },
+      "background": "rgba(15, 15, 15, 1)",
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "dpr": 2
+      }
+    },
+    {
+      "evidence": "captures/v7/evidence/chart-context-lifecycle-v6-v1-attempt1-lifecycle-defaults-v1.json",
+      "browser_utc": "2026-10-04T08:39:05.278Z",
+      "operation": {},
+      "source_status": {
+        "type": 2
+      },
+      "study_last": {
+        "index": 299,
+        "value": [
+          1791103080,
+          24740,
+          1791103144467,
+          1791098760000,
+          1791103080000
+        ]
+      },
+      "visible_range": {
+        "_firstBar": 263,
+        "_lastBar": 301
+      },
+      "background": "#0F0F0F",
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "dpr": 2
+      }
+    },
+    {
+      "evidence": "captures/v7/evidence/chart-context-lifecycle-v6-v1-attempt1-lifecycle-editor-open-v1.json",
+      "browser_utc": "2026-10-04T08:40:27.504Z",
+      "operation": {
+        "action": "Opened native Pine Editor to access Logs/Profiler"
+      },
+      "source_status": {
+        "type": 2
+      },
+      "study_last": {
+        "index": 300,
+        "value": [
+          1791103200,
+          24741,
+          1791103226650,
+          1791088200000,
+          1791088920000
+        ]
+      },
+      "visible_range": {
+        "_firstBar": 175,
+        "_lastBar": 181
+      },
+      "background": "rgba(15, 15, 15, 1)",
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "dpr": 2
+      }
+    },
+    {
+      "evidence": "captures/v7/evidence/chart-context-lifecycle-v6-v1-attempt1-lifecycle-logging-disabled-v1.json",
+      "browser_utc": "2026-10-04T08:40:57.249Z",
+      "operation": {
+        "action": "Native logging disabled"
+      },
+      "source_status": {
+        "type": 2
+      },
+      "study_last": {
+        "index": 300,
+        "value": [
+          1791103200,
+          24741,
+          1791103256365,
+          1791088200000,
+          1791088920000
+        ]
+      },
+      "visible_range": {
+        "_firstBar": 175,
+        "_lastBar": 181
+      },
+      "background": "rgba(15, 15, 15, 1)",
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "dpr": 2
+      }
+    },
+    {
+      "evidence": "captures/v7/evidence/chart-context-lifecycle-v6-v1-attempt1-lifecycle-logging-enabled-v1.json",
+      "browser_utc": "2026-10-04T08:42:06.742Z",
+      "operation": {
+        "action": "Native logging enabled with observed toggle-logs control"
+      },
+      "source_status": {
+        "type": 2
+      },
+      "study_last": {
+        "index": 301,
+        "value": [
+          1791103320,
+          24742,
+          1791103326580,
+          1791088200000,
+          1791088920000
+        ]
+      },
+      "visible_range": {
+        "_firstBar": 175,
+        "_lastBar": 181
+      },
+      "background": "rgba(15, 15, 15, 1)",
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "dpr": 2
+      }
+    },
+    {
+      "evidence": "captures/v7/evidence/chart-context-lifecycle-v6-v1-attempt1-lifecycle-logs-closed-v1.json",
+      "browser_utc": "2026-10-04T08:42:09.352Z",
+      "operation": {
+        "action": "Native Pine logs panel closed"
+      },
+      "source_status": {
+        "type": 2
+      },
+      "study_last": {
+        "index": 301,
+        "value": [
+          1791103320,
+          24742,
+          1791103328362,
+          1791088200000,
+          1791088920000
+        ]
+      },
+      "visible_range": {
+        "_firstBar": 161,
+        "_lastBar": 181
+      },
+      "background": "rgba(15, 15, 15, 1)",
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "dpr": 2
+      }
+    },
+    {
+      "evidence": "captures/v7/evidence/chart-context-lifecycle-v6-v1-attempt1-lifecycle-logs-open-v1.json",
+      "browser_utc": "2026-10-04T08:40:37.147Z",
+      "operation": {
+        "action": "Native Pine logs opened from editor More menu"
+      },
+      "source_status": {
+        "type": 2
+      },
+      "study_last": {
+        "index": 300,
+        "value": [
+          1791103200,
+          24741,
+          1791103236841,
+          1791088200000,
+          1791088920000
+        ]
+      },
+      "visible_range": {
+        "_firstBar": 175,
+        "_lastBar": 181
+      },
+      "background": "rgba(15, 15, 15, 1)",
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "dpr": 2
+      }
+    },
+    {
+      "evidence": "captures/v7/evidence/chart-context-lifecycle-v6-v1-attempt1-lifecycle-no-input-controls-v1.json",
+      "browser_utc": "2026-10-04T08:42:49.610Z",
+      "operation": {
+        "action": "Opened native study settings; only Style and Visibility tabs exist",
+        "clause": "Changing a source input is NOT-EXERCISED: the frozen source declares no inputs."
+      },
+      "source_status": {
+        "type": 2
+      },
+      "study_last": {
+        "index": 301,
+        "value": [
+          1791103320,
+          24742,
+          1791103369447,
+          1791082680000,
+          1791088920000
+        ]
+      },
+      "visible_range": {
+        "_firstBar": 129,
+        "_lastBar": 181
+      },
+      "background": "rgba(15, 15, 15, 1)",
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "dpr": 2
+      }
+    },
+    {
+      "evidence": "captures/v7/evidence/chart-context-lifecycle-v6-v1-attempt1-lifecycle-pan-v1.json",
+      "browser_utc": "2026-10-04T08:39:08.033Z",
+      "operation": {
+        "action": "Native visible range shifted 120 bars earlier",
+        "before": {
+          "_firstBar": 263,
+          "_lastBar": 301
+        }
+      },
+      "source_status": {
+        "type": 2
+      },
+      "study_last": {
+        "index": 299,
+        "value": [
+          1791103080,
+          24740,
+          1791103147472,
+          1791098760000,
+          1791103080000
+        ]
+      },
+      "visible_range": {
+        "_firstBar": 143,
+        "_lastBar": 181
+      },
+      "background": "#0F0F0F",
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "dpr": 2
+      }
+    },
+    {
+      "evidence": "captures/v7/evidence/chart-context-lifecycle-v6-v1-attempt1-lifecycle-profiler-disabled-v1.json",
+      "browser_utc": "2026-10-04T08:42:35.280Z",
+      "operation": {
+        "action": "Native Profiler mode switched off"
+      },
+      "source_status": {
+        "type": 2
+      },
+      "study_last": {
+        "index": 301,
+        "value": [
+          1791103320,
+          24742,
+          1791103354462,
+          1791086520000,
+          1791088920000
+        ]
+      },
+      "visible_range": {
+        "_firstBar": 161,
+        "_lastBar": 181
+      },
+      "background": "rgba(15, 15, 15, 1)",
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "dpr": 2
+      }
+    },
+    {
+      "evidence": "captures/v7/evidence/chart-context-lifecycle-v6-v1-attempt1-lifecycle-profiler-enabled-v1.json",
+      "browser_utc": "2026-10-04T08:42:12.730Z",
+      "operation": {
+        "action": "Native Profiler mode switched on"
+      },
+      "source_status": {
+        "type": 2
+      },
+      "study_last": {
+        "index": 301,
+        "value": [
+          1791103320,
+          24742,
+          1791103332570,
+          1791086520000,
+          1791088920000
+        ]
+      },
+      "visible_range": {
+        "_firstBar": 161,
+        "_lastBar": 181
+      },
+      "background": "rgba(15, 15, 15, 1)",
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "dpr": 2
+      }
+    },
+    {
+      "evidence": "captures/v7/evidence/chart-context-lifecycle-v6-v1-attempt1-lifecycle-profiler-running-v1.json",
+      "browser_utc": "2026-10-04T08:42:31.154Z",
+      "operation": {
+        "action": "Profiler active; menu dismissed for native line timing UI"
+      },
+      "source_status": {
+        "type": 2
+      },
+      "study_last": {
+        "index": 301,
+        "value": [
+          1791103320,
+          24742,
+          1791103350581,
+          1791086520000,
+          1791088920000
+        ]
+      },
+      "visible_range": {
+        "_firstBar": 161,
+        "_lastBar": 181
+      },
+      "background": "rgba(15, 15, 15, 1)",
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "dpr": 2
+      }
+    },
+    {
+      "evidence": "captures/v7/evidence/chart-context-lifecycle-v6-v1-attempt1-lifecycle-reload-v1.json",
+      "browser_utc": "2026-10-04T08:47:52.635Z",
+      "operation": {
+        "action": "Native chart page reloaded with unchanged source and full-history restoration",
+        "native_reset_utc": "2026-10-04T08:47:48.467Z"
+      },
+      "source_status": {
+        "type": 2
+      },
+      "study_last": {
+        "index": 299,
+        "value": [
+          1791103560,
+          24744,
+          1791103671786,
+          1790803680000,
+          1791103560000
+        ]
+      },
+      "visible_range": {
+        "_firstBar": -2060,
+        "_lastBar": 309
+      },
+      "background": "rgba(15, 15, 15, 1)",
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "dpr": 2
+      }
+    },
+    {
+      "evidence": "captures/v7/evidence/chart-context-lifecycle-v6-v1-attempt1-lifecycle-screeners-open-v1.json",
+      "browser_utc": "2026-10-04T08:42:59.366Z",
+      "operation": {
+        "action": "Native Screeners opened"
+      },
+      "source_status": {
+        "type": 2
+      },
+      "study_last": {
+        "index": 301,
+        "value": [
+          1791103320,
+          24742,
+          1791103378730,
+          1791086520000,
+          1791088920000
+        ]
+      },
+      "visible_range": {
+        "_firstBar": 161,
+        "_lastBar": 181
+      },
+      "background": "rgba(15, 15, 15, 1)",
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "dpr": 2
+      }
+    },
+    {
+      "evidence": "captures/v7/evidence/chart-context-lifecycle-v6-v1-attempt1-lifecycle-stock-screener-refresh-v1.json",
+      "browser_utc": "2026-10-04T08:43:40.546Z",
+      "operation": {
+        "action": "Native Stock Screener Refresh executed; chart source rows observed separately",
+        "clause": "Stock screener refresh is not an execution of this custom Pine source"
+      },
+      "source_status": {
+        "type": 2
+      },
+      "study_last": {
+        "index": 301,
+        "value": [
+          1791103320,
+          24742,
+          1791103420429,
+          1791086520000,
+          1791088920000
+        ]
+      },
+      "visible_range": {
+        "_firstBar": 161,
+        "_lastBar": 181
+      },
+      "background": "rgba(15, 15, 15, 1)",
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "dpr": 2
+      }
+    }
+  ],
+  "pine_screener": "Native standalone scan completed on Red list,1D. Six valid symbols displayed count500 and visible times0; archived XBTUSDTU2023 blank. Dataset first execution origin UNKNOWN. Raw before/after UI and PNG retained.",
+  "input_clause": "NOT-EXERCISED: unchanged source declares no input(), and native settings expose only Style/Visibility.",
+  "limits": "These output/UI observations do not certify internal caching, optimization, or causation isolated from live ticks and viewport resizing."
+}

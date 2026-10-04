@@ -1,0 +1,32 @@
+{
+  "index": 298,
+  "bar": [
+    1791102960,
+    85059.03,
+    85065.07,
+    85053.01,
+    85053.02,
+    6.17862
+  ],
+  "source_row": [
+    1791102960,
+    24739,
+    1791103111533,
+    1790820000000,
+    1791103080000
+  ],
+  "browser_utc": "2026-10-04T08:38:39.571Z",
+  "title": "V7 chart-context-lifecycle-v6-v1",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   08:36",
+  "visible_range": {
+    "_firstBar": 263,
+    "_lastBar": 301
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}
