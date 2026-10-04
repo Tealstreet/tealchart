@@ -1,0 +1,43 @@
+Could not find function or function reference 'ta.barsince'
+{
+  "error": "Could not find {kind} '{fullName}'",
+  "editorError": {
+    "code": "CE10271",
+    "ctx": {
+      "fullName": "ta.barsince",
+      "kind": "function or function reference"
+    },
+    "end": {
+      "column": 16,
+      "line": 3
+    },
+    "message": "Could not find {kind} '{fullName}'",
+    "start": {
+      "column": 6,
+      "line": 3
+    },
+    "id": "USER;3fa352ebe01549a2915c4f7ff7e193c2"
+  },
+  "title": "Compilation error",
+  "compiler_markers": [
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///49f5656c-6130-4a40-ab96-361f2b224843.pine?placement%3Ddialog",
+        "path": "/49f5656c-6130-4a40-ab96-361f2b224843.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "code": "CE10271",
+      "severity": 8,
+      "message": "Could not find function or function reference 'ta.barsince'",
+      "startLineNumber": 3,
+      "startColumn": 6,
+      "endLineNumber": 3,
+      "endColumn": 17
+    }
+  ],
+  "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,361.84\nH\n85,377.80\nL\n85,361.84\nC\n85,377.79\n+15.95 (+0.02%)\n85,372.00\nSELL\n0.01\n85,372.01\nBUY\nUSDT\nrename-authority-barsince-v6-probe-v1.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n17:36:31 UTC\n99+\nPine Editor\nrename-authority-barsince-v6-probe-v1.pine\nPublish script\n1\n2\n3\n4\n//@version=6\nindicator(\"rename-authority-barsince-v6-probe-v1\")\nplot(ta.barsince(bar_index>0),\"result\")\n1 of 1 problem\nCould not find function or function reference 'ta.barsince'(CE10271)\n1 ∙ Today, 01:36\nLine 3, Col 6\nPine Script® v6\nCompilation error: CE10271\n\nCould not find function or function reference 'ta.barsince'\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+  "context_substituted_message": "Could not find function or function reference 'ta.barsince'"
+}

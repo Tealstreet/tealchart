@@ -1,0 +1,905 @@
+{
+  "artifact": "Rename and enum admission context v1",
+  "attempts": [
+    {
+      "source": "rename-authority-acos-number-v5-probe-v1.pine",
+      "sha256": "ac49cad430a8154254ba73d273d4f8e88d6073fe246e693ac5eb0eb38cb258e2",
+      "attempt": 1,
+      "status": "COMPILE-ERROR",
+      "diagnostic": {
+        "code": null,
+        "text": "The 'math.acos' function does not have an argument with the name 'number'",
+        "line": 3,
+        "column": 16,
+        "first_bar_index": null,
+        "first_bar_time_utc": null,
+        "native": {
+          "error": "The 'math.acos' function does not have an argument with the name 'number'",
+          "editorError": {
+            "end": {
+              "column": 21,
+              "line": 3
+            },
+            "message": "The 'math.acos' function does not have an argument with the name 'number'",
+            "start": {
+              "column": 16,
+              "line": 3
+            },
+            "id": "USER;de210928f2334bba909d6362c39e8af7"
+          },
+          "title": "Compilation error",
+          "compiler_markers": [
+            {
+              "resource": {
+                "$mid": 1,
+                "external": "file:///0f4bb4af-55bd-48e3-a1c9-0d9e4dda8463.pine?placement%3Ddialog",
+                "path": "/0f4bb4af-55bd-48e3-a1c9-0d9e4dda8463.pine",
+                "scheme": "file",
+                "query": "placement=dialog"
+              },
+              "owner": "_generated_diagnostic_collection_name_#0",
+              "code": "PINE_VERSION_OUTDATED",
+              "severity": 4,
+              "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+              "startLineNumber": 1,
+              "startColumn": 3,
+              "endLineNumber": 1,
+              "endColumn": 12
+            },
+            {
+              "resource": {
+                "$mid": 1,
+                "external": "file:///0f4bb4af-55bd-48e3-a1c9-0d9e4dda8463.pine?placement%3Ddialog",
+                "path": "/0f4bb4af-55bd-48e3-a1c9-0d9e4dda8463.pine",
+                "scheme": "file",
+                "query": "placement=dialog"
+              },
+              "owner": "_generated_diagnostic_collection_name_#0",
+              "severity": 8,
+              "message": "The 'math.acos' function does not have an argument with the name 'number'",
+              "startLineNumber": 3,
+              "startColumn": 16,
+              "endLineNumber": 3,
+              "endColumn": 22
+            },
+            {
+              "resource": {
+                "$mid": 1,
+                "external": "file:///0f4bb4af-55bd-48e3-a1c9-0d9e4dda8463.pine?placement%3Ddialog",
+                "path": "/0f4bb4af-55bd-48e3-a1c9-0d9e4dda8463.pine",
+                "scheme": "file",
+                "query": "placement=dialog"
+              },
+              "owner": "_generated_diagnostic_collection_name_#0",
+              "severity": 8,
+              "message": "No value assigned to the `angle` parameter in math.acos()",
+              "startLineNumber": 3,
+              "startColumn": 16,
+              "endLineNumber": 3,
+              "endColumn": 22
+            }
+          ],
+          "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,336.19\nH\n85,340.01\nL\n85,336.18\nC\n85,340.01\n+3.82 (+0.00%)\n85,387.99\nSELL\n0.01\n85,388.00\nBUY\nUSDT\nrename-authority-acos-number-v5-probe-v1.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n17:26:50 UTC\n99+\nPine Editor\nrename-authority-acos-number-v5-probe-v1.pine\nPublish script\n1\n2\n3\n4\n//@version=5\nindicator(\"rename-authority-acos-number-v5-probe-v1\")\nplot(math.acos(number=0.5),\"result\")\n1 of 3 problems\nThe 'math.acos' function does not have an argument with the name 'number'\n1 \u2219 Today, 01:26\nLine 3, Col 16\nPine Script\u00ae v5\nCompilation error\n\nThe 'math.acos' function does not have an argument with the name 'number'\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+          "context_substituted_message": "The 'math.acos' function does not have an argument with the name 'number'"
+        }
+      },
+      "csv": null,
+      "first_values": null,
+      "last_values": null,
+      "evidence": [
+        "captures/v12/evidence/rename-authority-acos-number-v5-probe-v1-attempt1-error.png",
+        "captures/v12/evidence/rename-authority-acos-number-v5-probe-v1-attempt1-error.txt",
+        "captures/v12/evidence/rename-authority-acos-number-v5-probe-v1-attempt1-logs.txt",
+        "captures/v12/evidence/rename-authority-acos-number-v5-probe-v1-attempt1-logs-v1.json",
+        "captures/v12/evidence/rename-authority-acos-number-v5-probe-v1-attempt1-logs.png"
+      ]
+    },
+    {
+      "source": "rename-authority-acos-angle-v5-probe-v1.pine",
+      "sha256": "2ad6a3f2d84242b182ed72a310ecd907738bfc1d596388e782047100cff1c792",
+      "attempt": 1,
+      "status": "RUNS",
+      "diagnostic": {
+        "code": null,
+        "text": null,
+        "line": null,
+        "column": null,
+        "first_bar_index": null,
+        "first_bar_time_utc": null
+      },
+      "csv": "captures/v12/rename-authority-acos-angle-v5-probe-v1-attempt1.csv",
+      "first_values": {
+        "result": "1.0471975511965979"
+      },
+      "last_values": {
+        "result": "1.0471975511965979"
+      },
+      "evidence": [
+        "captures/v12/evidence/rename-authority-acos-angle-v5-probe-v1-attempt1-setup.png",
+        "captures/v12/evidence/rename-authority-acos-angle-v5-probe-v1-attempt1-export.png",
+        "captures/v12/evidence/rename-authority-acos-angle-v5-probe-v1-attempt1-logs.txt",
+        "captures/v12/evidence/rename-authority-acos-angle-v5-probe-v1-attempt1-logs-v1.json",
+        "captures/v12/evidence/rename-authority-acos-angle-v5-probe-v1-attempt1-logs.png",
+        "captures/v12/evidence/rename-authority-acos-angle-v5-probe-v1-attempt1-visual.png",
+        "captures/v12/evidence/rename-authority-acos-angle-v5-probe-v1-attempt1-data-window-v1.png",
+        "captures/v12/evidence/rename-authority-acos-angle-v5-probe-v1-attempt1-data-window-v1.json",
+        "captures/v12/evidence/rename-authority-acos-angle-v5-probe-v1-attempt1-data-window-v1.txt",
+        "captures/v12/evidence/rename-authority-acos-angle-v5-probe-v1-attempt1-authority-object-geometry-v1.json",
+        "captures/v12/evidence/rename-authority-acos-angle-v5-probe-v1-attempt1-authority-object-geometry-v1.png"
+      ]
+    },
+    {
+      "source": "rename-authority-atan-number-v5-probe-v1.pine",
+      "sha256": "254886ae6dc0516513a60fffef8273dcfe3d3027902b9f768dfdda731ff1087b",
+      "attempt": 1,
+      "status": "COMPILE-ERROR",
+      "diagnostic": {
+        "code": null,
+        "text": "The 'math.atan' function does not have an argument with the name 'number'",
+        "line": 3,
+        "column": 16,
+        "first_bar_index": null,
+        "first_bar_time_utc": null,
+        "native": {
+          "error": "The 'math.atan' function does not have an argument with the name 'number'",
+          "editorError": {
+            "end": {
+              "column": 21,
+              "line": 3
+            },
+            "message": "The 'math.atan' function does not have an argument with the name 'number'",
+            "start": {
+              "column": 16,
+              "line": 3
+            },
+            "id": "USER;005258eff3cd45c3ad76e1c434a90700"
+          },
+          "title": "Compilation error",
+          "compiler_markers": [
+            {
+              "resource": {
+                "$mid": 1,
+                "external": "file:///0df5f29d-b3ad-4608-8dc6-c0a96b0601f5.pine?placement%3Ddialog",
+                "path": "/0df5f29d-b3ad-4608-8dc6-c0a96b0601f5.pine",
+                "scheme": "file",
+                "query": "placement=dialog"
+              },
+              "owner": "_generated_diagnostic_collection_name_#0",
+              "code": "PINE_VERSION_OUTDATED",
+              "severity": 4,
+              "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+              "startLineNumber": 1,
+              "startColumn": 3,
+              "endLineNumber": 1,
+              "endColumn": 12
+            },
+            {
+              "resource": {
+                "$mid": 1,
+                "external": "file:///0df5f29d-b3ad-4608-8dc6-c0a96b0601f5.pine?placement%3Ddialog",
+                "path": "/0df5f29d-b3ad-4608-8dc6-c0a96b0601f5.pine",
+                "scheme": "file",
+                "query": "placement=dialog"
+              },
+              "owner": "_generated_diagnostic_collection_name_#0",
+              "severity": 8,
+              "message": "The 'math.atan' function does not have an argument with the name 'number'",
+              "startLineNumber": 3,
+              "startColumn": 16,
+              "endLineNumber": 3,
+              "endColumn": 22
+            },
+            {
+              "resource": {
+                "$mid": 1,
+                "external": "file:///0df5f29d-b3ad-4608-8dc6-c0a96b0601f5.pine?placement%3Ddialog",
+                "path": "/0df5f29d-b3ad-4608-8dc6-c0a96b0601f5.pine",
+                "scheme": "file",
+                "query": "placement=dialog"
+              },
+              "owner": "_generated_diagnostic_collection_name_#0",
+              "severity": 8,
+              "message": "No value assigned to the `angle` parameter in math.atan()",
+              "startLineNumber": 3,
+              "startColumn": 16,
+              "endLineNumber": 3,
+              "endColumn": 22
+            }
+          ],
+          "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,336.19\nH\n85,340.01\nL\n85,336.18\nC\n85,340.01\n+3.82 (+0.00%)\n85,391.45\nSELL\n0.01\n85,391.46\nBUY\nUSDT\nrename-authority-atan-number-v5-probe-v1.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n17:28:21 UTC\n99+\nPine Editor\nrename-authority-atan-number-v5-probe-v1.pine\nPublish script\n1\n2\n3\n4\n//@version=5\nindicator(\"rename-authority-atan-number-v5-probe-v1\")\nplot(math.atan(number=0.5),\"result\")\n1 of 3 problems\nThe 'math.atan' function does not have an argument with the name 'number'\n1 \u2219 Today, 01:28\nLine 3, Col 16\nPine Script\u00ae v5\nCompilation error\n\nThe 'math.atan' function does not have an argument with the name 'number'\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+          "context_substituted_message": "The 'math.atan' function does not have an argument with the name 'number'"
+        }
+      },
+      "csv": null,
+      "first_values": null,
+      "last_values": null,
+      "evidence": [
+        "captures/v12/evidence/rename-authority-atan-number-v5-probe-v1-attempt1-error.png",
+        "captures/v12/evidence/rename-authority-atan-number-v5-probe-v1-attempt1-error.txt",
+        "captures/v12/evidence/rename-authority-atan-number-v5-probe-v1-attempt1-logs.txt",
+        "captures/v12/evidence/rename-authority-atan-number-v5-probe-v1-attempt1-logs-v1.json",
+        "captures/v12/evidence/rename-authority-atan-number-v5-probe-v1-attempt1-logs.png"
+      ]
+    },
+    {
+      "source": "rename-authority-atan-angle-v5-probe-v1.pine",
+      "sha256": "c953cbaa044717ae56428f0227efa6183cc77d418b59670a0b3fb57e5d127ca6",
+      "attempt": 1,
+      "status": "RUNS",
+      "diagnostic": {
+        "code": null,
+        "text": null,
+        "line": null,
+        "column": null,
+        "first_bar_index": null,
+        "first_bar_time_utc": null
+      },
+      "csv": "captures/v12/rename-authority-atan-angle-v5-probe-v1-attempt1.csv",
+      "first_values": {
+        "result": "0.4636476090008061"
+      },
+      "last_values": {
+        "result": "0.4636476090008061"
+      },
+      "evidence": [
+        "captures/v12/evidence/rename-authority-atan-angle-v5-probe-v1-attempt1-setup.png",
+        "captures/v12/evidence/rename-authority-atan-angle-v5-probe-v1-attempt1-export.png",
+        "captures/v12/evidence/rename-authority-atan-angle-v5-probe-v1-attempt1-logs.txt",
+        "captures/v12/evidence/rename-authority-atan-angle-v5-probe-v1-attempt1-logs-v1.json",
+        "captures/v12/evidence/rename-authority-atan-angle-v5-probe-v1-attempt1-logs.png",
+        "captures/v12/evidence/rename-authority-atan-angle-v5-probe-v1-attempt1-visual.png",
+        "captures/v12/evidence/rename-authority-atan-angle-v5-probe-v1-attempt1-data-window-v1.png",
+        "captures/v12/evidence/rename-authority-atan-angle-v5-probe-v1-attempt1-data-window-v1.json",
+        "captures/v12/evidence/rename-authority-atan-angle-v5-probe-v1-attempt1-data-window-v1.txt",
+        "captures/v12/evidence/rename-authority-atan-angle-v5-probe-v1-attempt1-authority-object-geometry-v1.json",
+        "captures/v12/evidence/rename-authority-atan-angle-v5-probe-v1-attempt1-authority-object-geometry-v1.png"
+      ]
+    },
+    {
+      "source": "rename-authority-barsince-v5-probe-v1.pine",
+      "sha256": "aa7251703b03ff169c89e9e3180079d0a77c2c2564c84aabcd1625d654617896",
+      "attempt": 1,
+      "status": "COMPILE-ERROR",
+      "diagnostic": {
+        "code": null,
+        "text": "Could not find function or function reference 'ta.barsince'",
+        "line": 3,
+        "column": 6,
+        "first_bar_index": null,
+        "first_bar_time_utc": null,
+        "native": {
+          "error": "Could not find function or function reference 'ta.barsince'",
+          "editorError": {
+            "end": {
+              "column": 16,
+              "line": 3
+            },
+            "message": "Could not find function or function reference 'ta.barsince'",
+            "start": {
+              "column": 6,
+              "line": 3
+            },
+            "id": "USER;0023ca1997ad4e29b3ff9a71c32fc5b8"
+          },
+          "title": "Compilation error",
+          "compiler_markers": [
+            {
+              "resource": {
+                "$mid": 1,
+                "external": "file:///e4c66990-cd25-430d-85ec-8334932ab881.pine?placement%3Ddialog",
+                "path": "/e4c66990-cd25-430d-85ec-8334932ab881.pine",
+                "scheme": "file",
+                "query": "placement=dialog"
+              },
+              "owner": "_generated_diagnostic_collection_name_#0",
+              "code": "PINE_VERSION_OUTDATED",
+              "severity": 4,
+              "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+              "startLineNumber": 1,
+              "startColumn": 3,
+              "endLineNumber": 1,
+              "endColumn": 12
+            },
+            {
+              "resource": {
+                "$mid": 1,
+                "external": "file:///e4c66990-cd25-430d-85ec-8334932ab881.pine?placement%3Ddialog",
+                "path": "/e4c66990-cd25-430d-85ec-8334932ab881.pine",
+                "scheme": "file",
+                "query": "placement=dialog"
+              },
+              "owner": "_generated_diagnostic_collection_name_#0",
+              "severity": 8,
+              "message": "Could not find function or function reference 'ta.barsince'",
+              "startLineNumber": 3,
+              "startColumn": 6,
+              "endLineNumber": 3,
+              "endColumn": 17
+            }
+          ],
+          "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,340.01\nH\n85,433.16\nL\n85,340.00\nC\n85,432.01\n+92.00 (+0.11%)\n85,405.45\nSELL\n0.01\n85,405.46\nBUY\nUSDT\nrename-authority-barsince-v5-probe-v1.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n17:33:54 UTC\n99+\nPine Editor\nrename-authority-barsince-v5-probe-v1.pine\nPublish script\n1\n2\n3\n4\n//@version=5\nindicator(\"rename-authority-barsince-v5-probe-v1\")\nplot(ta.barsince(bar_index>0),\"result\")\n1 of 2 problems\nCould not find function or function reference 'ta.barsince'\n1 \u2219 Today, 01:33\nLine 3, Col 6\nPine Script\u00ae v5\nCompilation error\n\nCould not find function or function reference 'ta.barsince'\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+          "context_substituted_message": "Could not find function or function reference 'ta.barsince'"
+        }
+      },
+      "csv": null,
+      "first_values": null,
+      "last_values": null,
+      "evidence": [
+        "captures/v12/evidence/rename-authority-barsince-v5-probe-v1-attempt1-error.png",
+        "captures/v12/evidence/rename-authority-barsince-v5-probe-v1-attempt1-error.txt",
+        "captures/v12/evidence/rename-authority-barsince-v5-probe-v1-attempt1-logs.txt",
+        "captures/v12/evidence/rename-authority-barsince-v5-probe-v1-attempt1-logs-v1.json",
+        "captures/v12/evidence/rename-authority-barsince-v5-probe-v1-attempt1-logs.png"
+      ]
+    },
+    {
+      "source": "rename-authority-barssince-v5-probe-v1.pine",
+      "sha256": "68652ce1666e6ae6e1c859939140c9473bb128a0f7b6d6761bce670ca458aaf7",
+      "attempt": 1,
+      "status": "RUNS",
+      "diagnostic": {
+        "code": null,
+        "text": null,
+        "line": null,
+        "column": null,
+        "first_bar_index": null,
+        "first_bar_time_utc": null
+      },
+      "csv": "captures/v12/rename-authority-barssince-v5-probe-v1-attempt1.csv",
+      "first_values": {
+        "result": ""
+      },
+      "last_values": {
+        "result": "0"
+      },
+      "evidence": [
+        "captures/v12/evidence/rename-authority-barssince-v5-probe-v1-attempt1-setup.png",
+        "captures/v12/evidence/rename-authority-barssince-v5-probe-v1-attempt1-export.png",
+        "captures/v12/evidence/rename-authority-barssince-v5-probe-v1-attempt1-logs.txt",
+        "captures/v12/evidence/rename-authority-barssince-v5-probe-v1-attempt1-logs-v1.json",
+        "captures/v12/evidence/rename-authority-barssince-v5-probe-v1-attempt1-logs.png",
+        "captures/v12/evidence/rename-authority-barssince-v5-probe-v1-attempt1-visual.png",
+        "captures/v12/evidence/rename-authority-barssince-v5-probe-v1-attempt1-data-window-v1.png",
+        "captures/v12/evidence/rename-authority-barssince-v5-probe-v1-attempt1-data-window-v1.json",
+        "captures/v12/evidence/rename-authority-barssince-v5-probe-v1-attempt1-data-window-v1.txt",
+        "captures/v12/evidence/rename-authority-barssince-v5-probe-v1-attempt1-authority-object-geometry-v1.json",
+        "captures/v12/evidence/rename-authority-barssince-v5-probe-v1-attempt1-authority-object-geometry-v1.png"
+      ]
+    },
+    {
+      "source": "rename-authority-acos-number-v6-probe-v1.pine",
+      "sha256": "56a1440348d168d101ef5c5173f11660a1bde813faf07caf922b368b4b499a5a",
+      "attempt": 1,
+      "status": "COMPILE-ERROR",
+      "diagnostic": {
+        "code": "CE10120",
+        "text": "The \"math.acos\" function does not have an argument with the name \"number\"",
+        "line": 3,
+        "column": 16,
+        "first_bar_index": null,
+        "first_bar_time_utc": null,
+        "native": {
+          "error": "The \"{signature}\" function does not have an argument with the name \"{name}\"",
+          "editorError": {
+            "code": "CE10120",
+            "ctx": {
+              "name": "number",
+              "signature": "math.acos"
+            },
+            "end": {
+              "column": 21,
+              "line": 3
+            },
+            "message": "The \"{signature}\" function does not have an argument with the name \"{name}\"",
+            "start": {
+              "column": 16,
+              "line": 3
+            },
+            "id": "USER;64eb9fe01ecd4728859be8cb120fa590"
+          },
+          "title": "Compilation error",
+          "compiler_markers": [
+            {
+              "resource": {
+                "$mid": 1,
+                "external": "file:///9a9ef354-7ae2-4d54-a2ef-6d97e0f6c38c.pine?placement%3Ddialog",
+                "path": "/9a9ef354-7ae2-4d54-a2ef-6d97e0f6c38c.pine",
+                "scheme": "file",
+                "query": "placement=dialog"
+              },
+              "owner": "_generated_diagnostic_collection_name_#0",
+              "code": "CE10120",
+              "severity": 8,
+              "message": "The \"math.acos\" function does not have an argument with the name \"number\"",
+              "startLineNumber": 3,
+              "startColumn": 16,
+              "endLineNumber": 3,
+              "endColumn": 22
+            },
+            {
+              "resource": {
+                "$mid": 1,
+                "external": "file:///9a9ef354-7ae2-4d54-a2ef-6d97e0f6c38c.pine?placement%3Ddialog",
+                "path": "/9a9ef354-7ae2-4d54-a2ef-6d97e0f6c38c.pine",
+                "scheme": "file",
+                "query": "placement=dialog"
+              },
+              "owner": "_generated_diagnostic_collection_name_#0",
+              "code": "CE10165",
+              "severity": 8,
+              "message": "No value assigned to the \"angle\" parameter in math.acos()",
+              "startLineNumber": 3,
+              "startColumn": 16,
+              "endLineNumber": 3,
+              "endColumn": 22
+            }
+          ],
+          "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,372.00\nH\n85,372.01\nL\n85,348.51\nC\n85,361.84\n\u221210.16 (\u22120.01%)\n85,372.00\nSELL\n0.01\n85,372.01\nBUY\nUSDT\nOracle na holes crosses v1\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n17:34:37 UTC\n99+\nPine Editor\nrename-authority-acos-number-v6-probe-v1.pine\nPublish script\n1\n2\n3\n4\n//@version=6\nindicator(\"rename-authority-acos-number-v6-probe-v1\")\nplot(math.acos(number=0.5),\"result\")\n2 of 2 problems\nNo value assigned to the \"angle\" parameter in math.acos()(CE10165)\n1 \u2219 Today, 01:34\nLine 3, Col 16\nPine Script\u00ae v6\nCompilation error: CE10120\nCompilation error: CE10120\n\nThe \"math.acos\" function does not have an argument with the name \"number\"\n\nOpen in editor",
+          "context_substituted_message": "The \"math.acos\" function does not have an argument with the name \"number\""
+        }
+      },
+      "csv": null,
+      "first_values": null,
+      "last_values": null,
+      "evidence": [
+        "captures/v12/evidence/rename-authority-acos-number-v6-probe-v1-attempt1-error.png",
+        "captures/v12/evidence/rename-authority-acos-number-v6-probe-v1-attempt1-error.txt",
+        "captures/v12/evidence/rename-authority-acos-number-v6-probe-v1-attempt1-logs.txt",
+        "captures/v12/evidence/rename-authority-acos-number-v6-probe-v1-attempt1-logs-v1.json",
+        "captures/v12/evidence/rename-authority-acos-number-v6-probe-v1-attempt1-logs.png"
+      ]
+    },
+    {
+      "source": "rename-authority-acos-angle-v6-probe-v1.pine",
+      "sha256": "e17481e689b37dcf437114d51342bee90c50395a4c83e139b99b8a2a967887ae",
+      "attempt": 1,
+      "status": "RUNS",
+      "diagnostic": {
+        "code": null,
+        "text": null,
+        "line": null,
+        "column": null,
+        "first_bar_index": null,
+        "first_bar_time_utc": null
+      },
+      "csv": "captures/v12/rename-authority-acos-angle-v6-probe-v1-attempt1.csv",
+      "first_values": {
+        "result": "1.0471975511965979"
+      },
+      "last_values": {
+        "result": "1.0471975511965979"
+      },
+      "evidence": [
+        "captures/v12/evidence/rename-authority-acos-angle-v6-probe-v1-attempt1-setup.png",
+        "captures/v12/evidence/rename-authority-acos-angle-v6-probe-v1-attempt1-export.png",
+        "captures/v12/evidence/rename-authority-acos-angle-v6-probe-v1-attempt1-logs.txt",
+        "captures/v12/evidence/rename-authority-acos-angle-v6-probe-v1-attempt1-logs-v1.json",
+        "captures/v12/evidence/rename-authority-acos-angle-v6-probe-v1-attempt1-logs.png",
+        "captures/v12/evidence/rename-authority-acos-angle-v6-probe-v1-attempt1-visual.png",
+        "captures/v12/evidence/rename-authority-acos-angle-v6-probe-v1-attempt1-data-window-v1.png",
+        "captures/v12/evidence/rename-authority-acos-angle-v6-probe-v1-attempt1-data-window-v1.json",
+        "captures/v12/evidence/rename-authority-acos-angle-v6-probe-v1-attempt1-data-window-v1.txt",
+        "captures/v12/evidence/rename-authority-acos-angle-v6-probe-v1-attempt1-authority-object-geometry-v1.json",
+        "captures/v12/evidence/rename-authority-acos-angle-v6-probe-v1-attempt1-authority-object-geometry-v1.png"
+      ]
+    },
+    {
+      "source": "rename-authority-atan-number-v6-probe-v1.pine",
+      "sha256": "89d43c01f979d4a317d3ebe633f1e902ba54317bff131ceb3f845b71647d38f6",
+      "attempt": 1,
+      "status": "COMPILE-ERROR",
+      "diagnostic": {
+        "code": "CE10120",
+        "text": "The \"math.atan\" function does not have an argument with the name \"number\"",
+        "line": 3,
+        "column": 16,
+        "first_bar_index": null,
+        "first_bar_time_utc": null,
+        "native": {
+          "error": "The \"{signature}\" function does not have an argument with the name \"{name}\"",
+          "editorError": {
+            "code": "CE10120",
+            "ctx": {
+              "name": "number",
+              "signature": "math.atan"
+            },
+            "end": {
+              "column": 21,
+              "line": 3
+            },
+            "message": "The \"{signature}\" function does not have an argument with the name \"{name}\"",
+            "start": {
+              "column": 16,
+              "line": 3
+            },
+            "id": "USER;bd30d3c427284bd1bb268aa027173da8"
+          },
+          "title": "Compilation error",
+          "compiler_markers": [
+            {
+              "resource": {
+                "$mid": 1,
+                "external": "file:///0348c840-2f7d-4a3b-9767-bb0043d50873.pine?placement%3Ddialog",
+                "path": "/0348c840-2f7d-4a3b-9767-bb0043d50873.pine",
+                "scheme": "file",
+                "query": "placement=dialog"
+              },
+              "owner": "_generated_diagnostic_collection_name_#0",
+              "code": "CE10120",
+              "severity": 8,
+              "message": "The \"math.atan\" function does not have an argument with the name \"number\"",
+              "startLineNumber": 3,
+              "startColumn": 16,
+              "endLineNumber": 3,
+              "endColumn": 22
+            },
+            {
+              "resource": {
+                "$mid": 1,
+                "external": "file:///0348c840-2f7d-4a3b-9767-bb0043d50873.pine?placement%3Ddialog",
+                "path": "/0348c840-2f7d-4a3b-9767-bb0043d50873.pine",
+                "scheme": "file",
+                "query": "placement=dialog"
+              },
+              "owner": "_generated_diagnostic_collection_name_#0",
+              "code": "CE10165",
+              "severity": 8,
+              "message": "No value assigned to the \"angle\" parameter in math.atan()",
+              "startLineNumber": 3,
+              "startColumn": 16,
+              "endLineNumber": 3,
+              "endColumn": 22
+            }
+          ],
+          "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,372.00\nH\n85,372.01\nL\n85,348.51\nC\n85,361.84\n\u221210.16 (\u22120.01%)\n85,372.00\nSELL\n0.01\n85,372.01\nBUY\nUSDT\nrename-authority-atan-number-v6-probe-v1.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n17:35:47 UTC\n99+\nPine Editor\nrename-authority-atan-number-v6-probe-v1.pine\nPublish script\n1\n2\n3\n4\n//@version=6\nindicator(\"rename-authority-atan-number-v6-probe-v1\")\nplot(math.atan(number=0.5),\"result\")\n1 of 2 problems\nThe \"math.atan\" function does not have an argument with the name \"number\"(CE10120)\n1 \u2219 Today, 01:35\nLine 3, Col 16\nPine Script\u00ae v6\nCompilation error: CE10120\n\nThe \"math.atan\" function does not have an argument with the name \"number\"\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+          "context_substituted_message": "The \"math.atan\" function does not have an argument with the name \"number\""
+        }
+      },
+      "csv": null,
+      "first_values": null,
+      "last_values": null,
+      "evidence": [
+        "captures/v12/evidence/rename-authority-atan-number-v6-probe-v1-attempt1-error.png",
+        "captures/v12/evidence/rename-authority-atan-number-v6-probe-v1-attempt1-error.txt",
+        "captures/v12/evidence/rename-authority-atan-number-v6-probe-v1-attempt1-logs.txt",
+        "captures/v12/evidence/rename-authority-atan-number-v6-probe-v1-attempt1-logs-v1.json",
+        "captures/v12/evidence/rename-authority-atan-number-v6-probe-v1-attempt1-logs.png"
+      ]
+    },
+    {
+      "source": "rename-authority-atan-angle-v6-probe-v1.pine",
+      "sha256": "77c06a18f7d37d4068edd2490f0cb7ef996b061b62fb61d371440194092420a0",
+      "attempt": 1,
+      "status": "RUNS",
+      "diagnostic": {
+        "code": null,
+        "text": null,
+        "line": null,
+        "column": null,
+        "first_bar_index": null,
+        "first_bar_time_utc": null
+      },
+      "csv": "captures/v12/rename-authority-atan-angle-v6-probe-v1-attempt1.csv",
+      "first_values": {
+        "result": "0.4636476090008061"
+      },
+      "last_values": {
+        "result": "0.4636476090008061"
+      },
+      "evidence": [
+        "captures/v12/evidence/rename-authority-atan-angle-v6-probe-v1-attempt1-setup.png",
+        "captures/v12/evidence/rename-authority-atan-angle-v6-probe-v1-attempt1-export.png",
+        "captures/v12/evidence/rename-authority-atan-angle-v6-probe-v1-attempt1-logs.txt",
+        "captures/v12/evidence/rename-authority-atan-angle-v6-probe-v1-attempt1-logs-v1.json",
+        "captures/v12/evidence/rename-authority-atan-angle-v6-probe-v1-attempt1-logs.png",
+        "captures/v12/evidence/rename-authority-atan-angle-v6-probe-v1-attempt1-visual.png",
+        "captures/v12/evidence/rename-authority-atan-angle-v6-probe-v1-attempt1-data-window-v1.png",
+        "captures/v12/evidence/rename-authority-atan-angle-v6-probe-v1-attempt1-data-window-v1.json",
+        "captures/v12/evidence/rename-authority-atan-angle-v6-probe-v1-attempt1-data-window-v1.txt",
+        "captures/v12/evidence/rename-authority-atan-angle-v6-probe-v1-attempt1-authority-object-geometry-v1.json",
+        "captures/v12/evidence/rename-authority-atan-angle-v6-probe-v1-attempt1-authority-object-geometry-v1.png"
+      ]
+    },
+    {
+      "source": "rename-authority-barsince-v6-probe-v1.pine",
+      "sha256": "fd019ed886abfff9638aa79880b24af314a6b0b830b80e3a98bd87f0e7f871a5",
+      "attempt": 1,
+      "status": "COMPILE-ERROR",
+      "diagnostic": {
+        "code": "CE10271",
+        "text": "Could not find function or function reference 'ta.barsince'",
+        "line": 3,
+        "column": 6,
+        "first_bar_index": null,
+        "first_bar_time_utc": null,
+        "native": {
+          "error": "Could not find {kind} '{fullName}'",
+          "editorError": {
+            "code": "CE10271",
+            "ctx": {
+              "fullName": "ta.barsince",
+              "kind": "function or function reference"
+            },
+            "end": {
+              "column": 16,
+              "line": 3
+            },
+            "message": "Could not find {kind} '{fullName}'",
+            "start": {
+              "column": 6,
+              "line": 3
+            },
+            "id": "USER;3fa352ebe01549a2915c4f7ff7e193c2"
+          },
+          "title": "Compilation error",
+          "compiler_markers": [
+            {
+              "resource": {
+                "$mid": 1,
+                "external": "file:///49f5656c-6130-4a40-ab96-361f2b224843.pine?placement%3Ddialog",
+                "path": "/49f5656c-6130-4a40-ab96-361f2b224843.pine",
+                "scheme": "file",
+                "query": "placement=dialog"
+              },
+              "owner": "_generated_diagnostic_collection_name_#0",
+              "code": "CE10271",
+              "severity": 8,
+              "message": "Could not find function or function reference 'ta.barsince'",
+              "startLineNumber": 3,
+              "startColumn": 6,
+              "endLineNumber": 3,
+              "endColumn": 17
+            }
+          ],
+          "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,361.84\nH\n85,377.80\nL\n85,361.84\nC\n85,377.79\n+15.95 (+0.02%)\n85,372.00\nSELL\n0.01\n85,372.01\nBUY\nUSDT\nrename-authority-barsince-v6-probe-v1.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n17:36:31 UTC\n99+\nPine Editor\nrename-authority-barsince-v6-probe-v1.pine\nPublish script\n1\n2\n3\n4\n//@version=6\nindicator(\"rename-authority-barsince-v6-probe-v1\")\nplot(ta.barsince(bar_index>0),\"result\")\n1 of 1 problem\nCould not find function or function reference 'ta.barsince'(CE10271)\n1 \u2219 Today, 01:36\nLine 3, Col 6\nPine Script\u00ae v6\nCompilation error: CE10271\n\nCould not find function or function reference 'ta.barsince'\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+          "context_substituted_message": "Could not find function or function reference 'ta.barsince'"
+        }
+      },
+      "csv": null,
+      "first_values": null,
+      "last_values": null,
+      "evidence": [
+        "captures/v12/evidence/rename-authority-barsince-v6-probe-v1-attempt1-error.png",
+        "captures/v12/evidence/rename-authority-barsince-v6-probe-v1-attempt1-error.txt",
+        "captures/v12/evidence/rename-authority-barsince-v6-probe-v1-attempt1-logs.txt",
+        "captures/v12/evidence/rename-authority-barsince-v6-probe-v1-attempt1-logs-v1.json",
+        "captures/v12/evidence/rename-authority-barsince-v6-probe-v1-attempt1-logs.png"
+      ]
+    },
+    {
+      "source": "rename-authority-barssince-v6-probe-v1.pine",
+      "sha256": "8dc3a3a4fd387c7cde1043a7829cd5e2bf548ccf533c1e805daf0ba83c37f541",
+      "attempt": 1,
+      "status": "RUNS",
+      "diagnostic": {
+        "code": null,
+        "text": null,
+        "line": null,
+        "column": null,
+        "first_bar_index": null,
+        "first_bar_time_utc": null
+      },
+      "csv": "captures/v12/rename-authority-barssince-v6-probe-v1-attempt1.csv",
+      "first_values": {
+        "result": ""
+      },
+      "last_values": {
+        "result": "0"
+      },
+      "evidence": [
+        "captures/v12/evidence/rename-authority-barssince-v6-probe-v1-attempt1-setup.png",
+        "captures/v12/evidence/rename-authority-barssince-v6-probe-v1-attempt1-export.png",
+        "captures/v12/evidence/rename-authority-barssince-v6-probe-v1-attempt1-logs.txt",
+        "captures/v12/evidence/rename-authority-barssince-v6-probe-v1-attempt1-logs-v1.json",
+        "captures/v12/evidence/rename-authority-barssince-v6-probe-v1-attempt1-logs.png",
+        "captures/v12/evidence/rename-authority-barssince-v6-probe-v1-attempt1-visual.png",
+        "captures/v12/evidence/rename-authority-barssince-v6-probe-v1-attempt1-data-window-v1.png",
+        "captures/v12/evidence/rename-authority-barssince-v6-probe-v1-attempt1-data-window-v1.json",
+        "captures/v12/evidence/rename-authority-barssince-v6-probe-v1-attempt1-data-window-v1.txt",
+        "captures/v12/evidence/rename-authority-barssince-v6-probe-v1-attempt1-authority-object-geometry-v1.json",
+        "captures/v12/evidence/rename-authority-barssince-v6-probe-v1-attempt1-authority-object-geometry-v1.png"
+      ]
+    },
+    {
+      "source": "varip-enum-array-w0-v1.pine",
+      "sha256": "62bfdc762b282d5859453d7fd74d7f168df97b4f13924e6732e5747a78392196",
+      "attempt": 1,
+      "status": "COMPILE-ERROR",
+      "diagnostic": {
+        "code": "CE10128",
+        "text": "Variables with varip modifier cannot have type \"array<State>\".",
+        "line": 5,
+        "column": 1,
+        "first_bar_index": null,
+        "first_bar_time_utc": null,
+        "native": {
+          "error": "Variables with varip modifier cannot have type \"{typeExpression}\".",
+          "editorError": {
+            "code": "CE10128",
+            "ctx": {
+              "typeExpression": "array<State>"
+            },
+            "end": {
+              "column": 5,
+              "line": 5
+            },
+            "message": "Variables with varip modifier cannot have type \"{typeExpression}\".",
+            "start": {
+              "column": 1,
+              "line": 5
+            },
+            "id": "USER;fa00015f33c2407d84f470bc35535b66"
+          },
+          "title": "Compilation error",
+          "compiler_markers": [
+            {
+              "resource": {
+                "$mid": 1,
+                "external": "file:///619dfc70-3282-43e9-8c88-298727c07c7a.pine?placement%3Ddialog",
+                "path": "/619dfc70-3282-43e9-8c88-298727c07c7a.pine",
+                "scheme": "file",
+                "query": "placement=dialog"
+              },
+              "owner": "_generated_diagnostic_collection_name_#0",
+              "code": "CE10128",
+              "severity": 8,
+              "message": "Variables with varip modifier cannot have type \"array<State>\".",
+              "startLineNumber": 5,
+              "startColumn": 1,
+              "endLineNumber": 5,
+              "endColumn": 6
+            }
+          ],
+          "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,361.84\nH\n85,377.80\nL\n85,361.84\nC\n85,377.79\n+15.95 (+0.02%)\n85,372.00\nSELL\n0.01\n85,372.01\nBUY\nUSDT\nvarip-enum-array-w0-v1.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n17:37:26 UTC\n99+\nPine Editor\nvarip-enum-array-w0-v1.pine\nPublish script\n1\n2\n3\n4\n5\n6\n7\n//@version=6\nindicator(\"varip\u00a0enum\u00a0array\u00a0eligibility\")\nenum\u00a0State\n\u00a0\u00a0\u00a0\u00a0member\nvarip\u00a0array<State>\u00a0values\u00a0=\u00a0array.new<State>()\nplot(array.size(values),\u00a0\"OUTCOME\")\n1 of 1 problem\nVariables with varip modifier cannot have type \"array<State>\".(CE10128)\n1 \u2219 Today, 01:37\nLine 5, Col 1\nPine Script\u00ae v6\nCompilation error: CE10128\n\nVariables with varip modifier cannot have type \"array<State>\".\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+          "context_substituted_message": "Variables with varip modifier cannot have type \"array<State>\"."
+        }
+      },
+      "csv": null,
+      "first_values": null,
+      "last_values": null,
+      "evidence": [
+        "captures/v12/evidence/varip-enum-array-w0-v1-attempt1-error.png",
+        "captures/v12/evidence/varip-enum-array-w0-v1-attempt1-error.txt",
+        "captures/v12/evidence/varip-enum-array-w0-v1-attempt1-logs.txt",
+        "captures/v12/evidence/varip-enum-array-w0-v1-attempt1-logs-v1.json",
+        "captures/v12/evidence/varip-enum-array-w0-v1-attempt1-logs.png"
+      ]
+    },
+    {
+      "source": "varip-enum-matrix-w0-v1.pine",
+      "sha256": "4b9b370d028b5958f907574d5d760b2cb631842d2d2c227569ea489545ac112f",
+      "attempt": 1,
+      "status": "COMPILE-ERROR",
+      "diagnostic": {
+        "code": "CE10128",
+        "text": "Variables with varip modifier cannot have type \"matrix<State>\".",
+        "line": 5,
+        "column": 1,
+        "first_bar_index": null,
+        "first_bar_time_utc": null,
+        "native": {
+          "error": "Variables with varip modifier cannot have type \"{typeExpression}\".",
+          "editorError": {
+            "code": "CE10128",
+            "ctx": {
+              "typeExpression": "matrix<State>"
+            },
+            "end": {
+              "column": 5,
+              "line": 5
+            },
+            "message": "Variables with varip modifier cannot have type \"{typeExpression}\".",
+            "start": {
+              "column": 1,
+              "line": 5
+            },
+            "id": "USER;5a4c9b53ecae4026a2520b0359db7ade"
+          },
+          "title": "Compilation error",
+          "compiler_markers": [
+            {
+              "resource": {
+                "$mid": 1,
+                "external": "file:///688973ba-ce85-4f3a-bc14-db9983c8d051.pine?placement%3Ddialog",
+                "path": "/688973ba-ce85-4f3a-bc14-db9983c8d051.pine",
+                "scheme": "file",
+                "query": "placement=dialog"
+              },
+              "owner": "_generated_diagnostic_collection_name_#0",
+              "code": "CE10128",
+              "severity": 8,
+              "message": "Variables with varip modifier cannot have type \"matrix<State>\".",
+              "startLineNumber": 5,
+              "startColumn": 1,
+              "endLineNumber": 5,
+              "endColumn": 6
+            }
+          ],
+          "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,372.00\nH\n85,372.01\nL\n85,372.00\nC\n85,372.00\n\u22120.01 (\u22120.00%)\n85,372.00\nSELL\n0.01\n85,372.01\nBUY\nUSDT\nvarip-enum-matrix-w0-v1.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n17:37:39 UTC\n99+\nPine Editor\nvarip-enum-matrix-w0-v1.pine\nPublish script\n1\n2\n3\n4\n5\n6\n7\n//@version=6\nindicator(\"varip\u00a0enum\u00a0matrix\u00a0eligibility\")\nenum\u00a0State\n\u00a0\u00a0\u00a0\u00a0member\nvarip\u00a0matrix<State>\u00a0values\u00a0=\u00a0matrix.new<State>()\nplot(matrix.rows(values),\u00a0\"OUTCOME\")\n1 of 1 problem\nVariables with varip modifier cannot have type \"matrix<State>\".(CE10128)\n1 \u2219 Today, 01:37\nLine 5, Col 1\nPine Script\u00ae v6\nCompilation error: CE10128\n\nVariables with varip modifier cannot have type \"matrix<State>\".\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+          "context_substituted_message": "Variables with varip modifier cannot have type \"matrix<State>\"."
+        }
+      },
+      "csv": null,
+      "first_values": null,
+      "last_values": null,
+      "evidence": [
+        "captures/v12/evidence/varip-enum-matrix-w0-v1-attempt1-error.png",
+        "captures/v12/evidence/varip-enum-matrix-w0-v1-attempt1-error.txt",
+        "captures/v12/evidence/varip-enum-matrix-w0-v1-attempt1-logs.txt",
+        "captures/v12/evidence/varip-enum-matrix-w0-v1-attempt1-logs-v1.json",
+        "captures/v12/evidence/varip-enum-matrix-w0-v1-attempt1-logs.png"
+      ]
+    },
+    {
+      "source": "varip-enum-map-w0-v1.pine",
+      "sha256": "81e6aed7f701a5da563184bc34cf882f330afae24fa43efd81d8a3d2e656498a",
+      "attempt": 1,
+      "status": "COMPILE-ERROR",
+      "diagnostic": {
+        "code": "CE10128",
+        "text": "Variables with varip modifier cannot have type \"map<int, State>\".",
+        "line": 5,
+        "column": 1,
+        "first_bar_index": null,
+        "first_bar_time_utc": null,
+        "native": {
+          "error": "Variables with varip modifier cannot have type \"{typeExpression}\".",
+          "editorError": {
+            "code": "CE10128",
+            "ctx": {
+              "typeExpression": "map<int, State>"
+            },
+            "end": {
+              "column": 5,
+              "line": 5
+            },
+            "message": "Variables with varip modifier cannot have type \"{typeExpression}\".",
+            "start": {
+              "column": 1,
+              "line": 5
+            },
+            "id": "USER;6461c402b3f34b2e97743aeeeb6d5067"
+          },
+          "title": "Compilation error",
+          "compiler_markers": [
+            {
+              "resource": {
+                "$mid": 1,
+                "external": "file:///bbc71f9a-dd2b-4e2b-918f-d6b056d08715.pine?placement%3Ddialog",
+                "path": "/bbc71f9a-dd2b-4e2b-918f-d6b056d08715.pine",
+                "scheme": "file",
+                "query": "placement=dialog"
+              },
+              "owner": "_generated_diagnostic_collection_name_#0",
+              "code": "CE10128",
+              "severity": 8,
+              "message": "Variables with varip modifier cannot have type \"map<int, State>\".",
+              "startLineNumber": 5,
+              "startColumn": 1,
+              "endLineNumber": 5,
+              "endColumn": 6
+            }
+          ],
+          "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,372.00\nH\n85,372.01\nL\n85,367.06\nC\n85,367.07\n\u22124.94 (\u22120.01%)\n85,367.06\nSELL\n0.01\n85,367.07\nBUY\nUSDT\nvarip-enum-map-w0-v1.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n17:37:52 UTC\n99+\nPine Editor\nvarip-enum-map-w0-v1.pine\nPublish script\n1\n2\n3\n4\n5\n6\n7\n//@version=6\nindicator(\"varip\u00a0enum\u00a0map\u00a0eligibility\")\nenum\u00a0State\n\u00a0\u00a0\u00a0\u00a0member\nvarip\u00a0map<int,\u00a0State>\u00a0values\u00a0=\u00a0map.new<int,\u00a0State>()\nplot(map.size(values),\u00a0\"OUTCOME\")\n1 of 1 problem\nVariables with varip modifier cannot have type \"map<int, State>\".(CE10128)\n1 \u2219 Today, 01:37\nLine 5, Col 1\nPine Script\u00ae v6\nCompilation error: CE10128\n\nVariables with varip modifier cannot have type \"map<int, State>\".\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+          "context_substituted_message": "Variables with varip modifier cannot have type \"map<int, State>\"."
+        }
+      },
+      "csv": null,
+      "first_values": null,
+      "last_values": null,
+      "evidence": [
+        "captures/v12/evidence/varip-enum-map-w0-v1-attempt1-error.png",
+        "captures/v12/evidence/varip-enum-map-w0-v1-attempt1-error.txt",
+        "captures/v12/evidence/varip-enum-map-w0-v1-attempt1-logs.txt",
+        "captures/v12/evidence/varip-enum-map-w0-v1-attempt1-logs-v1.json",
+        "captures/v12/evidence/varip-enum-map-w0-v1-attempt1-logs.png"
+      ]
+    }
+  ],
+  "limits": [
+    "V5 and v6 argument/spelling probes are separate source/version acquisitions.",
+    "First refusal only; no inferred downstream behavior.",
+    "All three enum collection probes refuse declaration. No realtime varip persistence observed or inferred.",
+    "Full native diagnostics and compiler markers are retained even if marker ranges or locations are unavailable."
+  ]
+}

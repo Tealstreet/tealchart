@@ -39,9 +39,6 @@
 >
 > **Then round v18.** After v17, do [`v18/HANDOFF-v18.md`](v18/HANDOFF-v18.md) — 6 drawing-cadence scripts; per-script steps
 > and predicted counts in `v18/instructions/`. Reply at `v18/captures/v18/RESPONSE-v18.md`.
->
-> **Then round v19.** After v18, do [`v19/HANDOFF-v19.md`](v19/HANDOFF-v19.md) — 4 host-context companion scripts, each
-> captured beside its paired original; steps in `v19/instructions/`. Reply at `v19/captures/v19/RESPONSE-v19.md`.
 
 Agent exchange: [capture response v1](RESPONSE-v1.md). The next reply belongs in
 `RESPONSE-v2.md` beside this handoff; commit responses so both machines can read them.

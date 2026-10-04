@@ -9189,5 +9189,3049 @@
     },
     "declared_unexported_columns": [],
     "data_window_witness": "captures/v12/evidence/rename-authority-atan-angle-v5-probe-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T17:33:52.300Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "arm",
+        "bitness": "64",
+        "brands": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156"
+          }
+        ],
+        "fullVersionList": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8.0.0.0"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156.0.8075.0"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156.0.8075.0"
+          }
+        ],
+        "mobile": false,
+        "platform": "macOS",
+        "platformVersion": "27.2.0"
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v12 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "rename-authority-barsince-v5-probe-v1.pine",
+    "attempt": 1,
+    "source_sha256": "aa7251703b03ff169c89e9e3180079d0a77c2c2564c84aabcd1625d654617896",
+    "indicator_title": "rename-authority-barsince-v5-probe-v1",
+    "status": "COMPILE-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": "Could not find function or function reference 'ta.barsince'",
+      "line": 3,
+      "column": 6,
+      "first_bar_index": null,
+      "first_bar_time_utc": null,
+      "native": {
+        "error": "Could not find function or function reference 'ta.barsince'",
+        "editorError": {
+          "end": {
+            "column": 16,
+            "line": 3
+          },
+          "message": "Could not find function or function reference 'ta.barsince'",
+          "start": {
+            "column": 6,
+            "line": 3
+          },
+          "id": "USER;0023ca1997ad4e29b3ff9a71c32fc5b8"
+        },
+        "title": "Compilation error",
+        "compiler_markers": [
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///e4c66990-cd25-430d-85ec-8334932ab881.pine?placement%3Ddialog",
+              "path": "/e4c66990-cd25-430d-85ec-8334932ab881.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "code": "PINE_VERSION_OUTDATED",
+            "severity": 4,
+            "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+            "startLineNumber": 1,
+            "startColumn": 3,
+            "endLineNumber": 1,
+            "endColumn": 12
+          },
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///e4c66990-cd25-430d-85ec-8334932ab881.pine?placement%3Ddialog",
+              "path": "/e4c66990-cd25-430d-85ec-8334932ab881.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "severity": 8,
+            "message": "Could not find function or function reference 'ta.barsince'",
+            "startLineNumber": 3,
+            "startColumn": 6,
+            "endLineNumber": 3,
+            "endColumn": 17
+          }
+        ],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,340.01\nH\n85,433.16\nL\n85,340.00\nC\n85,432.01\n+92.00 (+0.11%)\n85,405.45\nSELL\n0.01\n85,405.46\nBUY\nUSDT\nrename-authority-barsince-v5-probe-v1.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n17:33:54 UTC\n99+\nPine Editor\nrename-authority-barsince-v5-probe-v1.pine\nPublish script\n1\n2\n3\n4\n//@version=5\nindicator(\"rename-authority-barsince-v5-probe-v1\")\nplot(ta.barsince(bar_index>0),\"result\")\n1 of 2 problems\nCould not find function or function reference 'ta.barsince'\n1 \u2219 Today, 01:33\nLine 3, Col 6\nPine Script\u00ae v5\nCompilation error\n\nCould not find function or function reference 'ta.barsince'\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+        "context_substituted_message": "Could not find function or function reference 'ta.barsince'"
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "rename-authority-barsince-v5-probe-v1.pine",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24705,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 25007,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v12/evidence/rename-authority-barsince-v5-probe-v1-attempt1-error.png",
+      "captures/v12/evidence/rename-authority-barsince-v5-probe-v1-attempt1-error.txt",
+      "captures/v12/evidence/rename-authority-barsince-v5-probe-v1-attempt1-logs.txt",
+      "captures/v12/evidence/rename-authority-barsince-v5-probe-v1-attempt1-logs-v1.json",
+      "captures/v12/evidence/rename-authority-barsince-v5-probe-v1-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": null,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///e4c66990-cd25-430d-85ec-8334932ab881.pine?placement%3Ddialog",
+          "path": "/e4c66990-cd25-430d-85ec-8334932ab881.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      },
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///e4c66990-cd25-430d-85ec-8334932ab881.pine?placement%3Ddialog",
+          "path": "/e4c66990-cd25-430d-85ec-8334932ab881.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "severity": 8,
+        "message": "Could not find function or function reference 'ta.barsince'",
+        "startLineNumber": 3,
+        "startColumn": 6,
+        "endLineNumber": 3,
+        "endColumn": 17
+      }
+    ],
+    "error_observed_utc": "2026-10-04T17:33:56.271Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/rename-authority-barsince-v5-probe-v1-attempt1-logs.txt",
+        "evidence/rename-authority-barsince-v5-probe-v1-attempt1-logs-v1.json",
+        "evidence/rename-authority-barsince-v5-probe-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T17:34:18.093Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "arm",
+        "bitness": "64",
+        "brands": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156"
+          }
+        ],
+        "fullVersionList": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8.0.0.0"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156.0.8075.0"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156.0.8075.0"
+          }
+        ],
+        "mobile": false,
+        "platform": "macOS",
+        "platformVersion": "27.2.0"
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v12 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "rename-authority-barssince-v5-probe-v1.pine",
+    "attempt": 1,
+    "source_sha256": "68652ce1666e6ae6e1c859939140c9473bb128a0f7b6d6761bce670ca458aaf7",
+    "indicator_title": "rename-authority-barssince-v5-probe-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v12/rename-authority-barssince-v5-probe-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-05T013417.474.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "rename-authority-barssince-v5-probe-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24708,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 25008,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T17:34:09.699Z",
+    "live_candle_open_utc": "2026-10-04T17:34:00.000Z",
+    "export_utc": "2026-10-04T17:34:17.714Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v12/evidence/rename-authority-barssince-v5-probe-v1-attempt1-setup.png",
+      "captures/v12/evidence/rename-authority-barssince-v5-probe-v1-attempt1-export.png",
+      "captures/v12/evidence/rename-authority-barssince-v5-probe-v1-attempt1-logs.txt",
+      "captures/v12/evidence/rename-authority-barssince-v5-probe-v1-attempt1-logs-v1.json",
+      "captures/v12/evidence/rename-authority-barssince-v5-probe-v1-attempt1-logs.png",
+      "captures/v12/evidence/rename-authority-barssince-v5-probe-v1-attempt1-visual.png",
+      "captures/v12/evidence/rename-authority-barssince-v5-probe-v1-attempt1-data-window-v1.png",
+      "captures/v12/evidence/rename-authority-barssince-v5-probe-v1-attempt1-data-window-v1.json",
+      "captures/v12/evidence/rename-authority-barssince-v5-probe-v1-attempt1-data-window-v1.txt",
+      "captures/v12/evidence/rename-authority-barssince-v5-probe-v1-attempt1-authority-object-geometry-v1.json",
+      "captures/v12/evidence/rename-authority-barssince-v5-probe-v1-attempt1-authority-object-geometry-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T17:34:10.532Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790830080,
+            84036.01,
+            84140,
+            84036.01,
+            84110.01,
+            15.70098
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791135240,
+            85398,
+            85398.01,
+            85387.15,
+            85387.16,
+            2.12317
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "rename-authority-barssince-v5-probe-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790830080,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791135240,
+                0
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T17:34:11.655Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790830080,
+            84036.01,
+            84140,
+            84036.01,
+            84110.01,
+            15.70098
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791135240,
+            85398,
+            85398.01,
+            85387.15,
+            85387.15,
+            2.12317
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "rename-authority-barssince-v5-probe-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 25007,
+            "first": {
+              "index": -1022463,
+              "value": [
+                1788134520,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791135240,
+                0
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T17:34:12.332Z",
+        "bars": 25008,
+        "end": true,
+        "first": {
+          "index": -24708,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791135240,
+            85398,
+            85398.01,
+            85386,
+            85386,
+            2.28761
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "rename-authority-barssince-v5-probe-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 25007,
+            "first": {
+              "index": -24707,
+              "value": [
+                1788134520,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791135240,
+                0
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///00de2069-6eaa-41e3-96bc-b396c58e0224.pine?placement%3Ddialog",
+          "path": "/00de2069-6eaa-41e3-96bc-b396c58e0224.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "live_tooltip": "Sun 04 Oct '26   17:34",
+    "historical_compare_before_unix_seconds": 1791135240,
+    "pine_logs": {
+      "paths": [
+        "evidence/rename-authority-barssince-v5-probe-v1-attempt1-logs.txt",
+        "evidence/rename-authority-barssince-v5-probe-v1-attempt1-logs-v1.json",
+        "evidence/rename-authority-barssince-v5-probe-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "all_exported_column_occurrences": [
+      {
+        "title": "time",
+        "occurrence": 1,
+        "position": 0
+      },
+      {
+        "title": "open",
+        "occurrence": 1,
+        "position": 1
+      },
+      {
+        "title": "high",
+        "occurrence": 1,
+        "position": 2
+      },
+      {
+        "title": "low",
+        "occurrence": 1,
+        "position": 3
+      },
+      {
+        "title": "close",
+        "occurrence": 1,
+        "position": 4
+      },
+      {
+        "title": "result",
+        "occurrence": 1,
+        "position": 5
+      }
+    ],
+    "declared_to_native_column_occurrences": [
+      {
+        "declared_title": "result",
+        "native_title": "result",
+        "occurrence": 1,
+        "position": 5
+      }
+    ],
+    "named_value_map_scope": "Legacy title maps show the first occurrence only; original positional cells and occurrence tables retain every duplicate without renaming.",
+    "csv_sha256": "d615257ef047dae02220c721bc9e0c4090d5040b2912e90ab56f450b804b8b66",
+    "csv_bytes": 1156662,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "result"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "result": 5
+    },
+    "first_historical_cells": [
+      "1788134400",
+      "77682",
+      "77682.01",
+      "77572",
+      "77674.04",
+      ""
+    ],
+    "last_historical_cells": [
+      "1791135120",
+      "85397.65",
+      "85405.46",
+      "85397.64",
+      "85398.01",
+      "0"
+    ],
+    "declared_to_native_header_mapping": {
+      "result": "result"
+    },
+    "csv_rows": 25008,
+    "historical_rows": 25007,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791135240,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791135240",
+    "first_historical_values": {
+      "result": ""
+    },
+    "last_historical_values": {
+      "result": "0"
+    },
+    "declared_unexported_columns": [],
+    "data_window_witness": "captures/v12/evidence/rename-authority-barssince-v5-probe-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T17:34:36.181Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "arm",
+        "bitness": "64",
+        "brands": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156"
+          }
+        ],
+        "fullVersionList": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8.0.0.0"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156.0.8075.0"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156.0.8075.0"
+          }
+        ],
+        "mobile": false,
+        "platform": "macOS",
+        "platformVersion": "27.2.0"
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v12 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "rename-authority-acos-number-v6-probe-v1.pine",
+    "attempt": 1,
+    "source_sha256": "56a1440348d168d101ef5c5173f11660a1bde813faf07caf922b368b4b499a5a",
+    "indicator_title": "rename-authority-acos-number-v6-probe-v1",
+    "status": "COMPILE-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": "CE10120",
+      "text": "The \"math.acos\" function does not have an argument with the name \"number\"",
+      "line": 3,
+      "column": 16,
+      "first_bar_index": null,
+      "first_bar_time_utc": null,
+      "native": {
+        "error": "The \"{signature}\" function does not have an argument with the name \"{name}\"",
+        "editorError": {
+          "code": "CE10120",
+          "ctx": {
+            "name": "number",
+            "signature": "math.acos"
+          },
+          "end": {
+            "column": 21,
+            "line": 3
+          },
+          "message": "The \"{signature}\" function does not have an argument with the name \"{name}\"",
+          "start": {
+            "column": 16,
+            "line": 3
+          },
+          "id": "USER;64eb9fe01ecd4728859be8cb120fa590"
+        },
+        "title": "Compilation error",
+        "compiler_markers": [
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///9a9ef354-7ae2-4d54-a2ef-6d97e0f6c38c.pine?placement%3Ddialog",
+              "path": "/9a9ef354-7ae2-4d54-a2ef-6d97e0f6c38c.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "code": "CE10120",
+            "severity": 8,
+            "message": "The \"math.acos\" function does not have an argument with the name \"number\"",
+            "startLineNumber": 3,
+            "startColumn": 16,
+            "endLineNumber": 3,
+            "endColumn": 22
+          },
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///9a9ef354-7ae2-4d54-a2ef-6d97e0f6c38c.pine?placement%3Ddialog",
+              "path": "/9a9ef354-7ae2-4d54-a2ef-6d97e0f6c38c.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "code": "CE10165",
+            "severity": 8,
+            "message": "No value assigned to the \"angle\" parameter in math.acos()",
+            "startLineNumber": 3,
+            "startColumn": 16,
+            "endLineNumber": 3,
+            "endColumn": 22
+          }
+        ],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,372.00\nH\n85,372.01\nL\n85,348.51\nC\n85,361.84\n\u221210.16 (\u22120.01%)\n85,372.00\nSELL\n0.01\n85,372.01\nBUY\nUSDT\nOracle na holes crosses v1\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n17:34:37 UTC\n99+\nPine Editor\nrename-authority-acos-number-v6-probe-v1.pine\nPublish script\n1\n2\n3\n4\n//@version=6\nindicator(\"rename-authority-acos-number-v6-probe-v1\")\nplot(math.acos(number=0.5),\"result\")\n2 of 2 problems\nNo value assigned to the \"angle\" parameter in math.acos()(CE10165)\n1 \u2219 Today, 01:34\nLine 3, Col 16\nPine Script\u00ae v6\nCompilation error: CE10120\nCompilation error: CE10120\n\nThe \"math.acos\" function does not have an argument with the name \"number\"\n\nOpen in editor",
+        "context_substituted_message": "The \"math.acos\" function does not have an argument with the name \"number\""
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "Oracle na holes crosses v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24708,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 25008,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v12/evidence/rename-authority-acos-number-v6-probe-v1-attempt1-error.png",
+      "captures/v12/evidence/rename-authority-acos-number-v6-probe-v1-attempt1-error.txt",
+      "captures/v12/evidence/rename-authority-acos-number-v6-probe-v1-attempt1-logs.txt",
+      "captures/v12/evidence/rename-authority-acos-number-v6-probe-v1-attempt1-logs-v1.json",
+      "captures/v12/evidence/rename-authority-acos-number-v6-probe-v1-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": null,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///9a9ef354-7ae2-4d54-a2ef-6d97e0f6c38c.pine?placement%3Ddialog",
+          "path": "/9a9ef354-7ae2-4d54-a2ef-6d97e0f6c38c.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "CE10120",
+        "severity": 8,
+        "message": "The \"math.acos\" function does not have an argument with the name \"number\"",
+        "startLineNumber": 3,
+        "startColumn": 16,
+        "endLineNumber": 3,
+        "endColumn": 22
+      },
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///9a9ef354-7ae2-4d54-a2ef-6d97e0f6c38c.pine?placement%3Ddialog",
+          "path": "/9a9ef354-7ae2-4d54-a2ef-6d97e0f6c38c.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "CE10165",
+        "severity": 8,
+        "message": "No value assigned to the \"angle\" parameter in math.acos()",
+        "startLineNumber": 3,
+        "startColumn": 16,
+        "endLineNumber": 3,
+        "endColumn": 22
+      }
+    ],
+    "error_observed_utc": "2026-10-04T17:34:39.829Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/rename-authority-acos-number-v6-probe-v1-attempt1-logs.txt",
+        "evidence/rename-authority-acos-number-v6-probe-v1-attempt1-logs-v1.json",
+        "evidence/rename-authority-acos-number-v6-probe-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T17:35:01.600Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "arm",
+        "bitness": "64",
+        "brands": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156"
+          }
+        ],
+        "fullVersionList": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8.0.0.0"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156.0.8075.0"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156.0.8075.0"
+          }
+        ],
+        "mobile": false,
+        "platform": "macOS",
+        "platformVersion": "27.2.0"
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v12 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "rename-authority-acos-angle-v6-probe-v1.pine",
+    "attempt": 1,
+    "source_sha256": "e17481e689b37dcf437114d51342bee90c50395a4c83e139b99b8a2a967887ae",
+    "indicator_title": "rename-authority-acos-angle-v6-probe-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v12/rename-authority-acos-angle-v6-probe-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-05T013500.992.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "rename-authority-acos-angle-v6-probe-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24708,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 25008,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T17:34:53.643Z",
+    "live_candle_open_utc": "2026-10-04T17:34:00.000Z",
+    "export_utc": "2026-10-04T17:35:01.225Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v12/evidence/rename-authority-acos-angle-v6-probe-v1-attempt1-setup.png",
+      "captures/v12/evidence/rename-authority-acos-angle-v6-probe-v1-attempt1-export.png",
+      "captures/v12/evidence/rename-authority-acos-angle-v6-probe-v1-attempt1-logs.txt",
+      "captures/v12/evidence/rename-authority-acos-angle-v6-probe-v1-attempt1-logs-v1.json",
+      "captures/v12/evidence/rename-authority-acos-angle-v6-probe-v1-attempt1-logs.png",
+      "captures/v12/evidence/rename-authority-acos-angle-v6-probe-v1-attempt1-visual.png",
+      "captures/v12/evidence/rename-authority-acos-angle-v6-probe-v1-attempt1-data-window-v1.png",
+      "captures/v12/evidence/rename-authority-acos-angle-v6-probe-v1-attempt1-data-window-v1.json",
+      "captures/v12/evidence/rename-authority-acos-angle-v6-probe-v1-attempt1-data-window-v1.txt",
+      "captures/v12/evidence/rename-authority-acos-angle-v6-probe-v1-attempt1-authority-object-geometry-v1.json",
+      "captures/v12/evidence/rename-authority-acos-angle-v6-probe-v1-attempt1-authority-object-geometry-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T17:34:54.416Z",
+        "bars": 2556,
+        "end": false,
+        "first": {
+          "index": -2256,
+          "value": [
+            1790828640,
+            83805.51,
+            83805.51,
+            83788,
+            83790,
+            9.37232
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791135240,
+            85398,
+            85398.01,
+            85372,
+            85372,
+            3.7941
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "rename-authority-acos-angle-v6-probe-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2556,
+            "first": {
+              "index": -2256,
+              "value": [
+                1790828640,
+                1.0471975511965979
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791135240,
+                1.0471975511965979
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T17:34:55.405Z",
+        "bars": 2556,
+        "end": false,
+        "first": {
+          "index": -2256,
+          "value": [
+            1790828640,
+            83805.51,
+            83805.51,
+            83788,
+            83790,
+            9.37232
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791135240,
+            85398,
+            85398.01,
+            85372,
+            85372,
+            3.80967
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "rename-authority-acos-angle-v6-probe-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 25008,
+            "first": {
+              "index": -1022452,
+              "value": [
+                1788134400,
+                1.0471975511965979
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791135240,
+                1.0471975511965979
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T17:34:56.063Z",
+        "bars": 25008,
+        "end": true,
+        "first": {
+          "index": -24708,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791135240,
+            85398,
+            85398.01,
+            85372,
+            85372.01,
+            3.81341
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "rename-authority-acos-angle-v6-probe-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 25008,
+            "first": {
+              "index": -24708,
+              "value": [
+                1788134400,
+                1.0471975511965979
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791135240,
+                1.0471975511965979
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   17:34",
+    "historical_compare_before_unix_seconds": 1791135240,
+    "pine_logs": {
+      "paths": [
+        "evidence/rename-authority-acos-angle-v6-probe-v1-attempt1-logs.txt",
+        "evidence/rename-authority-acos-angle-v6-probe-v1-attempt1-logs-v1.json",
+        "evidence/rename-authority-acos-angle-v6-probe-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "all_exported_column_occurrences": [
+      {
+        "title": "time",
+        "occurrence": 1,
+        "position": 0
+      },
+      {
+        "title": "open",
+        "occurrence": 1,
+        "position": 1
+      },
+      {
+        "title": "high",
+        "occurrence": 1,
+        "position": 2
+      },
+      {
+        "title": "low",
+        "occurrence": 1,
+        "position": 3
+      },
+      {
+        "title": "close",
+        "occurrence": 1,
+        "position": 4
+      },
+      {
+        "title": "result",
+        "occurrence": 1,
+        "position": 5
+      }
+    ],
+    "declared_to_native_column_occurrences": [
+      {
+        "declared_title": "result",
+        "native_title": "result",
+        "occurrence": 1,
+        "position": 5
+      }
+    ],
+    "named_value_map_scope": "Legacy title maps show the first occurrence only; original positional cells and occurrence tables retain every duplicate without renaming.",
+    "csv_sha256": "505bb25aa2597515f668a0f53a0f792d3ac58c37c8bab87b782c8ba7fc2bc5bd",
+    "csv_bytes": 1581794,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "result"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "result": 5
+    },
+    "first_historical_cells": [
+      "1788134400",
+      "77682",
+      "77682.01",
+      "77572",
+      "77674.04",
+      "1.0471975511965979"
+    ],
+    "last_historical_cells": [
+      "1791135120",
+      "85397.65",
+      "85405.46",
+      "85397.64",
+      "85398.01",
+      "1.0471975511965979"
+    ],
+    "declared_to_native_header_mapping": {
+      "result": "result"
+    },
+    "csv_rows": 25008,
+    "historical_rows": 25007,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791135240,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791135240",
+    "first_historical_values": {
+      "result": "1.0471975511965979"
+    },
+    "last_historical_values": {
+      "result": "1.0471975511965979"
+    },
+    "declared_unexported_columns": [],
+    "data_window_witness": "captures/v12/evidence/rename-authority-acos-angle-v6-probe-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T17:35:46.017Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "arm",
+        "bitness": "64",
+        "brands": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156"
+          }
+        ],
+        "fullVersionList": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8.0.0.0"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156.0.8075.0"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156.0.8075.0"
+          }
+        ],
+        "mobile": false,
+        "platform": "macOS",
+        "platformVersion": "27.2.0"
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v12 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "rename-authority-atan-number-v6-probe-v1.pine",
+    "attempt": 1,
+    "source_sha256": "89d43c01f979d4a317d3ebe633f1e902ba54317bff131ceb3f845b71647d38f6",
+    "indicator_title": "rename-authority-atan-number-v6-probe-v1",
+    "status": "COMPILE-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": "CE10120",
+      "text": "The \"math.atan\" function does not have an argument with the name \"number\"",
+      "line": 3,
+      "column": 16,
+      "first_bar_index": null,
+      "first_bar_time_utc": null,
+      "native": {
+        "error": "The \"{signature}\" function does not have an argument with the name \"{name}\"",
+        "editorError": {
+          "code": "CE10120",
+          "ctx": {
+            "name": "number",
+            "signature": "math.atan"
+          },
+          "end": {
+            "column": 21,
+            "line": 3
+          },
+          "message": "The \"{signature}\" function does not have an argument with the name \"{name}\"",
+          "start": {
+            "column": 16,
+            "line": 3
+          },
+          "id": "USER;bd30d3c427284bd1bb268aa027173da8"
+        },
+        "title": "Compilation error",
+        "compiler_markers": [
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///0348c840-2f7d-4a3b-9767-bb0043d50873.pine?placement%3Ddialog",
+              "path": "/0348c840-2f7d-4a3b-9767-bb0043d50873.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "code": "CE10120",
+            "severity": 8,
+            "message": "The \"math.atan\" function does not have an argument with the name \"number\"",
+            "startLineNumber": 3,
+            "startColumn": 16,
+            "endLineNumber": 3,
+            "endColumn": 22
+          },
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///0348c840-2f7d-4a3b-9767-bb0043d50873.pine?placement%3Ddialog",
+              "path": "/0348c840-2f7d-4a3b-9767-bb0043d50873.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "code": "CE10165",
+            "severity": 8,
+            "message": "No value assigned to the \"angle\" parameter in math.atan()",
+            "startLineNumber": 3,
+            "startColumn": 16,
+            "endLineNumber": 3,
+            "endColumn": 22
+          }
+        ],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,372.00\nH\n85,372.01\nL\n85,348.51\nC\n85,361.84\n\u221210.16 (\u22120.01%)\n85,372.00\nSELL\n0.01\n85,372.01\nBUY\nUSDT\nrename-authority-atan-number-v6-probe-v1.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n17:35:47 UTC\n99+\nPine Editor\nrename-authority-atan-number-v6-probe-v1.pine\nPublish script\n1\n2\n3\n4\n//@version=6\nindicator(\"rename-authority-atan-number-v6-probe-v1\")\nplot(math.atan(number=0.5),\"result\")\n1 of 2 problems\nThe \"math.atan\" function does not have an argument with the name \"number\"(CE10120)\n1 \u2219 Today, 01:35\nLine 3, Col 16\nPine Script\u00ae v6\nCompilation error: CE10120\n\nThe \"math.atan\" function does not have an argument with the name \"number\"\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+        "context_substituted_message": "The \"math.atan\" function does not have an argument with the name \"number\""
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "rename-authority-atan-number-v6-probe-v1.pine",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24708,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 25008,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v12/evidence/rename-authority-atan-number-v6-probe-v1-attempt1-error.png",
+      "captures/v12/evidence/rename-authority-atan-number-v6-probe-v1-attempt1-error.txt",
+      "captures/v12/evidence/rename-authority-atan-number-v6-probe-v1-attempt1-logs.txt",
+      "captures/v12/evidence/rename-authority-atan-number-v6-probe-v1-attempt1-logs-v1.json",
+      "captures/v12/evidence/rename-authority-atan-number-v6-probe-v1-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": null,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///0348c840-2f7d-4a3b-9767-bb0043d50873.pine?placement%3Ddialog",
+          "path": "/0348c840-2f7d-4a3b-9767-bb0043d50873.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "CE10120",
+        "severity": 8,
+        "message": "The \"math.atan\" function does not have an argument with the name \"number\"",
+        "startLineNumber": 3,
+        "startColumn": 16,
+        "endLineNumber": 3,
+        "endColumn": 22
+      },
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///0348c840-2f7d-4a3b-9767-bb0043d50873.pine?placement%3Ddialog",
+          "path": "/0348c840-2f7d-4a3b-9767-bb0043d50873.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "CE10165",
+        "severity": 8,
+        "message": "No value assigned to the \"angle\" parameter in math.atan()",
+        "startLineNumber": 3,
+        "startColumn": 16,
+        "endLineNumber": 3,
+        "endColumn": 22
+      }
+    ],
+    "error_observed_utc": "2026-10-04T17:35:49.695Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/rename-authority-atan-number-v6-probe-v1-attempt1-logs.txt",
+        "evidence/rename-authority-atan-number-v6-probe-v1-attempt1-logs-v1.json",
+        "evidence/rename-authority-atan-number-v6-probe-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T17:36:11.477Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "arm",
+        "bitness": "64",
+        "brands": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156"
+          }
+        ],
+        "fullVersionList": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8.0.0.0"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156.0.8075.0"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156.0.8075.0"
+          }
+        ],
+        "mobile": false,
+        "platform": "macOS",
+        "platformVersion": "27.2.0"
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v12 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "rename-authority-atan-angle-v6-probe-v1.pine",
+    "attempt": 1,
+    "source_sha256": "77c06a18f7d37d4068edd2490f0cb7ef996b061b62fb61d371440194092420a0",
+    "indicator_title": "rename-authority-atan-angle-v6-probe-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v12/rename-authority-atan-angle-v6-probe-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-05T013610.842.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "rename-authority-atan-angle-v6-probe-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24709,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 25009,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T17:36:02.680Z",
+    "live_candle_open_utc": "2026-10-04T17:36:00.000Z",
+    "export_utc": "2026-10-04T17:36:11.096Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v12/evidence/rename-authority-atan-angle-v6-probe-v1-attempt1-setup.png",
+      "captures/v12/evidence/rename-authority-atan-angle-v6-probe-v1-attempt1-export.png",
+      "captures/v12/evidence/rename-authority-atan-angle-v6-probe-v1-attempt1-logs.txt",
+      "captures/v12/evidence/rename-authority-atan-angle-v6-probe-v1-attempt1-logs-v1.json",
+      "captures/v12/evidence/rename-authority-atan-angle-v6-probe-v1-attempt1-logs.png",
+      "captures/v12/evidence/rename-authority-atan-angle-v6-probe-v1-attempt1-visual.png",
+      "captures/v12/evidence/rename-authority-atan-angle-v6-probe-v1-attempt1-data-window-v1.png",
+      "captures/v12/evidence/rename-authority-atan-angle-v6-probe-v1-attempt1-data-window-v1.json",
+      "captures/v12/evidence/rename-authority-atan-angle-v6-probe-v1-attempt1-data-window-v1.txt",
+      "captures/v12/evidence/rename-authority-atan-angle-v6-probe-v1-attempt1-authority-object-geometry-v1.json",
+      "captures/v12/evidence/rename-authority-atan-angle-v6-probe-v1-attempt1-authority-object-geometry-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T17:36:03.607Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790830200,
+            84110.01,
+            84181.64,
+            84106,
+            84168,
+            34.38179
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791135360,
+            85372,
+            85372.01,
+            85372,
+            85372.01,
+            0.04011
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "rename-authority-atan-angle-v6-probe-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790830200,
+                0.4636476090008061
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791135360,
+                0.4636476090008061
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T17:36:04.920Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790830200,
+            84110.01,
+            84181.64,
+            84106,
+            84168,
+            34.38179
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791135360,
+            85372,
+            85372.01,
+            85372,
+            85372.01,
+            0.04011
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "rename-authority-atan-angle-v6-probe-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 25009,
+            "first": {
+              "index": -1022465,
+              "value": [
+                1788134400,
+                0.4636476090008061
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791135360,
+                0.4636476090008061
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T17:36:05.592Z",
+        "bars": 25009,
+        "end": true,
+        "first": {
+          "index": -24709,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791135360,
+            85372,
+            85372.01,
+            85372,
+            85372,
+            0.04738
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "rename-authority-atan-angle-v6-probe-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 25009,
+            "first": {
+              "index": -24709,
+              "value": [
+                1788134400,
+                0.4636476090008061
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791135360,
+                0.4636476090008061
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   17:36",
+    "historical_compare_before_unix_seconds": 1791135360,
+    "pine_logs": {
+      "paths": [
+        "evidence/rename-authority-atan-angle-v6-probe-v1-attempt1-logs.txt",
+        "evidence/rename-authority-atan-angle-v6-probe-v1-attempt1-logs-v1.json",
+        "evidence/rename-authority-atan-angle-v6-probe-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "all_exported_column_occurrences": [
+      {
+        "title": "time",
+        "occurrence": 1,
+        "position": 0
+      },
+      {
+        "title": "open",
+        "occurrence": 1,
+        "position": 1
+      },
+      {
+        "title": "high",
+        "occurrence": 1,
+        "position": 2
+      },
+      {
+        "title": "low",
+        "occurrence": 1,
+        "position": 3
+      },
+      {
+        "title": "close",
+        "occurrence": 1,
+        "position": 4
+      },
+      {
+        "title": "result",
+        "occurrence": 1,
+        "position": 5
+      }
+    ],
+    "declared_to_native_column_occurrences": [
+      {
+        "declared_title": "result",
+        "native_title": "result",
+        "occurrence": 1,
+        "position": 5
+      }
+    ],
+    "named_value_map_scope": "Legacy title maps show the first occurrence only; original positional cells and occurrence tables retain every duplicate without renaming.",
+    "csv_sha256": "6c7e4d5b856fe24a8ef1310974ac2f55767db1567e6f1af7c7a957564b343fb6",
+    "csv_bytes": 1581854,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "result"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "result": 5
+    },
+    "first_historical_cells": [
+      "1788134400",
+      "77682",
+      "77682.01",
+      "77572",
+      "77674.04",
+      "0.4636476090008061"
+    ],
+    "last_historical_cells": [
+      "1791135240",
+      "85398",
+      "85398.01",
+      "85372",
+      "85372.01",
+      "0.4636476090008061"
+    ],
+    "declared_to_native_header_mapping": {
+      "result": "result"
+    },
+    "csv_rows": 25009,
+    "historical_rows": 25008,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791135360,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791135360",
+    "first_historical_values": {
+      "result": "0.4636476090008061"
+    },
+    "last_historical_values": {
+      "result": "0.4636476090008061"
+    },
+    "declared_unexported_columns": [],
+    "data_window_witness": "captures/v12/evidence/rename-authority-atan-angle-v6-probe-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T17:36:29.931Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "arm",
+        "bitness": "64",
+        "brands": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156"
+          }
+        ],
+        "fullVersionList": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8.0.0.0"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156.0.8075.0"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156.0.8075.0"
+          }
+        ],
+        "mobile": false,
+        "platform": "macOS",
+        "platformVersion": "27.2.0"
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v12 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "rename-authority-barsince-v6-probe-v1.pine",
+    "attempt": 1,
+    "source_sha256": "fd019ed886abfff9638aa79880b24af314a6b0b830b80e3a98bd87f0e7f871a5",
+    "indicator_title": "rename-authority-barsince-v6-probe-v1",
+    "status": "COMPILE-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": "CE10271",
+      "text": "Could not find function or function reference 'ta.barsince'",
+      "line": 3,
+      "column": 6,
+      "first_bar_index": null,
+      "first_bar_time_utc": null,
+      "native": {
+        "error": "Could not find {kind} '{fullName}'",
+        "editorError": {
+          "code": "CE10271",
+          "ctx": {
+            "fullName": "ta.barsince",
+            "kind": "function or function reference"
+          },
+          "end": {
+            "column": 16,
+            "line": 3
+          },
+          "message": "Could not find {kind} '{fullName}'",
+          "start": {
+            "column": 6,
+            "line": 3
+          },
+          "id": "USER;3fa352ebe01549a2915c4f7ff7e193c2"
+        },
+        "title": "Compilation error",
+        "compiler_markers": [
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///49f5656c-6130-4a40-ab96-361f2b224843.pine?placement%3Ddialog",
+              "path": "/49f5656c-6130-4a40-ab96-361f2b224843.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "code": "CE10271",
+            "severity": 8,
+            "message": "Could not find function or function reference 'ta.barsince'",
+            "startLineNumber": 3,
+            "startColumn": 6,
+            "endLineNumber": 3,
+            "endColumn": 17
+          }
+        ],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,361.84\nH\n85,377.80\nL\n85,361.84\nC\n85,377.79\n+15.95 (+0.02%)\n85,372.00\nSELL\n0.01\n85,372.01\nBUY\nUSDT\nrename-authority-barsince-v6-probe-v1.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n17:36:31 UTC\n99+\nPine Editor\nrename-authority-barsince-v6-probe-v1.pine\nPublish script\n1\n2\n3\n4\n//@version=6\nindicator(\"rename-authority-barsince-v6-probe-v1\")\nplot(ta.barsince(bar_index>0),\"result\")\n1 of 1 problem\nCould not find function or function reference 'ta.barsince'(CE10271)\n1 \u2219 Today, 01:36\nLine 3, Col 6\nPine Script\u00ae v6\nCompilation error: CE10271\n\nCould not find function or function reference 'ta.barsince'\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+        "context_substituted_message": "Could not find function or function reference 'ta.barsince'"
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "rename-authority-barsince-v6-probe-v1.pine",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24709,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 25009,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v12/evidence/rename-authority-barsince-v6-probe-v1-attempt1-error.png",
+      "captures/v12/evidence/rename-authority-barsince-v6-probe-v1-attempt1-error.txt",
+      "captures/v12/evidence/rename-authority-barsince-v6-probe-v1-attempt1-logs.txt",
+      "captures/v12/evidence/rename-authority-barsince-v6-probe-v1-attempt1-logs-v1.json",
+      "captures/v12/evidence/rename-authority-barsince-v6-probe-v1-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": null,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///49f5656c-6130-4a40-ab96-361f2b224843.pine?placement%3Ddialog",
+          "path": "/49f5656c-6130-4a40-ab96-361f2b224843.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "CE10271",
+        "severity": 8,
+        "message": "Could not find function or function reference 'ta.barsince'",
+        "startLineNumber": 3,
+        "startColumn": 6,
+        "endLineNumber": 3,
+        "endColumn": 17
+      }
+    ],
+    "error_observed_utc": "2026-10-04T17:36:33.717Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/rename-authority-barsince-v6-probe-v1-attempt1-logs.txt",
+        "evidence/rename-authority-barsince-v6-probe-v1-attempt1-logs-v1.json",
+        "evidence/rename-authority-barsince-v6-probe-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T17:36:55.546Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "arm",
+        "bitness": "64",
+        "brands": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156"
+          }
+        ],
+        "fullVersionList": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8.0.0.0"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156.0.8075.0"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156.0.8075.0"
+          }
+        ],
+        "mobile": false,
+        "platform": "macOS",
+        "platformVersion": "27.2.0"
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v12 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "rename-authority-barssince-v6-probe-v1.pine",
+    "attempt": 1,
+    "source_sha256": "8dc3a3a4fd387c7cde1043a7829cd5e2bf548ccf533c1e805daf0ba83c37f541",
+    "indicator_title": "rename-authority-barssince-v6-probe-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v12/rename-authority-barssince-v6-probe-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-05T013654.789.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "rename-authority-barssince-v6-probe-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24709,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 25009,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T17:36:46.656Z",
+    "live_candle_open_utc": "2026-10-04T17:36:00.000Z",
+    "export_utc": "2026-10-04T17:36:55.155Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v12/evidence/rename-authority-barssince-v6-probe-v1-attempt1-setup.png",
+      "captures/v12/evidence/rename-authority-barssince-v6-probe-v1-attempt1-export.png",
+      "captures/v12/evidence/rename-authority-barssince-v6-probe-v1-attempt1-logs.txt",
+      "captures/v12/evidence/rename-authority-barssince-v6-probe-v1-attempt1-logs-v1.json",
+      "captures/v12/evidence/rename-authority-barssince-v6-probe-v1-attempt1-logs.png",
+      "captures/v12/evidence/rename-authority-barssince-v6-probe-v1-attempt1-visual.png",
+      "captures/v12/evidence/rename-authority-barssince-v6-probe-v1-attempt1-data-window-v1.png",
+      "captures/v12/evidence/rename-authority-barssince-v6-probe-v1-attempt1-data-window-v1.json",
+      "captures/v12/evidence/rename-authority-barssince-v6-probe-v1-attempt1-data-window-v1.txt",
+      "captures/v12/evidence/rename-authority-barssince-v6-probe-v1-attempt1-authority-object-geometry-v1.json",
+      "captures/v12/evidence/rename-authority-barssince-v6-probe-v1-attempt1-authority-object-geometry-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T17:36:47.481Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790830200,
+            84110.01,
+            84181.64,
+            84106,
+            84168,
+            34.38179
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791135360,
+            85372,
+            85372.01,
+            85372,
+            85372.01,
+            0.36588
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "rename-authority-barssince-v6-probe-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790830200,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791135360,
+                0
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T17:36:48.761Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790830200,
+            84110.01,
+            84181.64,
+            84106,
+            84168,
+            34.38179
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791135360,
+            85372,
+            85372.01,
+            85372,
+            85372,
+            0.36919
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "rename-authority-barssince-v6-probe-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 25008,
+            "first": {
+              "index": -1022464,
+              "value": [
+                1788134520,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791135360,
+                0
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T17:36:49.461Z",
+        "bars": 25009,
+        "end": true,
+        "first": {
+          "index": -24709,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791135360,
+            85372,
+            85372.01,
+            85372,
+            85372,
+            0.39201
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "rename-authority-barssince-v6-probe-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 25008,
+            "first": {
+              "index": -24708,
+              "value": [
+                1788134520,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791135360,
+                0
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   17:36",
+    "historical_compare_before_unix_seconds": 1791135360,
+    "pine_logs": {
+      "paths": [
+        "evidence/rename-authority-barssince-v6-probe-v1-attempt1-logs.txt",
+        "evidence/rename-authority-barssince-v6-probe-v1-attempt1-logs-v1.json",
+        "evidence/rename-authority-barssince-v6-probe-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "all_exported_column_occurrences": [
+      {
+        "title": "time",
+        "occurrence": 1,
+        "position": 0
+      },
+      {
+        "title": "open",
+        "occurrence": 1,
+        "position": 1
+      },
+      {
+        "title": "high",
+        "occurrence": 1,
+        "position": 2
+      },
+      {
+        "title": "low",
+        "occurrence": 1,
+        "position": 3
+      },
+      {
+        "title": "close",
+        "occurrence": 1,
+        "position": 4
+      },
+      {
+        "title": "result",
+        "occurrence": 1,
+        "position": 5
+      }
+    ],
+    "declared_to_native_column_occurrences": [
+      {
+        "declared_title": "result",
+        "native_title": "result",
+        "occurrence": 1,
+        "position": 5
+      }
+    ],
+    "named_value_map_scope": "Legacy title maps show the first occurrence only; original positional cells and occurrence tables retain every duplicate without renaming.",
+    "csv_sha256": "071e1b1bd5d66121c017f9e0eccc73e1c11f525c175f60b34efffa475ef92ec8",
+    "csv_bytes": 1156700,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "result"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "result": 5
+    },
+    "first_historical_cells": [
+      "1788134400",
+      "77682",
+      "77682.01",
+      "77572",
+      "77674.04",
+      ""
+    ],
+    "last_historical_cells": [
+      "1791135240",
+      "85398",
+      "85398.01",
+      "85372",
+      "85372.01",
+      "0"
+    ],
+    "declared_to_native_header_mapping": {
+      "result": "result"
+    },
+    "csv_rows": 25009,
+    "historical_rows": 25008,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791135360,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791135360",
+    "first_historical_values": {
+      "result": ""
+    },
+    "last_historical_values": {
+      "result": "0"
+    },
+    "declared_unexported_columns": [],
+    "data_window_witness": "captures/v12/evidence/rename-authority-barssince-v6-probe-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T17:37:25.245Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "arm",
+        "bitness": "64",
+        "brands": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156"
+          }
+        ],
+        "fullVersionList": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8.0.0.0"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156.0.8075.0"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156.0.8075.0"
+          }
+        ],
+        "mobile": false,
+        "platform": "macOS",
+        "platformVersion": "27.2.0"
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v12 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "varip-enum-array-w0-v1.pine",
+    "attempt": 1,
+    "source_sha256": "62bfdc762b282d5859453d7fd74d7f168df97b4f13924e6732e5747a78392196",
+    "indicator_title": "varip enum array eligibility",
+    "status": "COMPILE-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": "CE10128",
+      "text": "Variables with varip modifier cannot have type \"array<State>\".",
+      "line": 5,
+      "column": 1,
+      "first_bar_index": null,
+      "first_bar_time_utc": null,
+      "native": {
+        "error": "Variables with varip modifier cannot have type \"{typeExpression}\".",
+        "editorError": {
+          "code": "CE10128",
+          "ctx": {
+            "typeExpression": "array<State>"
+          },
+          "end": {
+            "column": 5,
+            "line": 5
+          },
+          "message": "Variables with varip modifier cannot have type \"{typeExpression}\".",
+          "start": {
+            "column": 1,
+            "line": 5
+          },
+          "id": "USER;fa00015f33c2407d84f470bc35535b66"
+        },
+        "title": "Compilation error",
+        "compiler_markers": [
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///619dfc70-3282-43e9-8c88-298727c07c7a.pine?placement%3Ddialog",
+              "path": "/619dfc70-3282-43e9-8c88-298727c07c7a.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "code": "CE10128",
+            "severity": 8,
+            "message": "Variables with varip modifier cannot have type \"array<State>\".",
+            "startLineNumber": 5,
+            "startColumn": 1,
+            "endLineNumber": 5,
+            "endColumn": 6
+          }
+        ],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,361.84\nH\n85,377.80\nL\n85,361.84\nC\n85,377.79\n+15.95 (+0.02%)\n85,372.00\nSELL\n0.01\n85,372.01\nBUY\nUSDT\nvarip-enum-array-w0-v1.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n17:37:26 UTC\n99+\nPine Editor\nvarip-enum-array-w0-v1.pine\nPublish script\n1\n2\n3\n4\n5\n6\n7\n//@version=6\nindicator(\"varip\u00a0enum\u00a0array\u00a0eligibility\")\nenum\u00a0State\n\u00a0\u00a0\u00a0\u00a0member\nvarip\u00a0array<State>\u00a0values\u00a0=\u00a0array.new<State>()\nplot(array.size(values),\u00a0\"OUTCOME\")\n1 of 1 problem\nVariables with varip modifier cannot have type \"array<State>\".(CE10128)\n1 \u2219 Today, 01:37\nLine 5, Col 1\nPine Script\u00ae v6\nCompilation error: CE10128\n\nVariables with varip modifier cannot have type \"array<State>\".\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+        "context_substituted_message": "Variables with varip modifier cannot have type \"array<State>\"."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "varip-enum-array-w0-v1.pine",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24709,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 25009,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v12/evidence/varip-enum-array-w0-v1-attempt1-error.png",
+      "captures/v12/evidence/varip-enum-array-w0-v1-attempt1-error.txt",
+      "captures/v12/evidence/varip-enum-array-w0-v1-attempt1-logs.txt",
+      "captures/v12/evidence/varip-enum-array-w0-v1-attempt1-logs-v1.json",
+      "captures/v12/evidence/varip-enum-array-w0-v1-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": null,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///619dfc70-3282-43e9-8c88-298727c07c7a.pine?placement%3Ddialog",
+          "path": "/619dfc70-3282-43e9-8c88-298727c07c7a.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "CE10128",
+        "severity": 8,
+        "message": "Variables with varip modifier cannot have type \"array<State>\".",
+        "startLineNumber": 5,
+        "startColumn": 1,
+        "endLineNumber": 5,
+        "endColumn": 6
+      }
+    ],
+    "error_observed_utc": "2026-10-04T17:37:28.978Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/varip-enum-array-w0-v1-attempt1-logs.txt",
+        "evidence/varip-enum-array-w0-v1-attempt1-logs-v1.json",
+        "evidence/varip-enum-array-w0-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T17:37:38.372Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "arm",
+        "bitness": "64",
+        "brands": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156"
+          }
+        ],
+        "fullVersionList": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8.0.0.0"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156.0.8075.0"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156.0.8075.0"
+          }
+        ],
+        "mobile": false,
+        "platform": "macOS",
+        "platformVersion": "27.2.0"
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v12 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "varip-enum-matrix-w0-v1.pine",
+    "attempt": 1,
+    "source_sha256": "4b9b370d028b5958f907574d5d760b2cb631842d2d2c227569ea489545ac112f",
+    "indicator_title": "varip enum matrix eligibility",
+    "status": "COMPILE-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": "CE10128",
+      "text": "Variables with varip modifier cannot have type \"matrix<State>\".",
+      "line": 5,
+      "column": 1,
+      "first_bar_index": null,
+      "first_bar_time_utc": null,
+      "native": {
+        "error": "Variables with varip modifier cannot have type \"{typeExpression}\".",
+        "editorError": {
+          "code": "CE10128",
+          "ctx": {
+            "typeExpression": "matrix<State>"
+          },
+          "end": {
+            "column": 5,
+            "line": 5
+          },
+          "message": "Variables with varip modifier cannot have type \"{typeExpression}\".",
+          "start": {
+            "column": 1,
+            "line": 5
+          },
+          "id": "USER;5a4c9b53ecae4026a2520b0359db7ade"
+        },
+        "title": "Compilation error",
+        "compiler_markers": [
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///688973ba-ce85-4f3a-bc14-db9983c8d051.pine?placement%3Ddialog",
+              "path": "/688973ba-ce85-4f3a-bc14-db9983c8d051.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "code": "CE10128",
+            "severity": 8,
+            "message": "Variables with varip modifier cannot have type \"matrix<State>\".",
+            "startLineNumber": 5,
+            "startColumn": 1,
+            "endLineNumber": 5,
+            "endColumn": 6
+          }
+        ],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,372.00\nH\n85,372.01\nL\n85,372.00\nC\n85,372.00\n\u22120.01 (\u22120.00%)\n85,372.00\nSELL\n0.01\n85,372.01\nBUY\nUSDT\nvarip-enum-matrix-w0-v1.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n17:37:39 UTC\n99+\nPine Editor\nvarip-enum-matrix-w0-v1.pine\nPublish script\n1\n2\n3\n4\n5\n6\n7\n//@version=6\nindicator(\"varip\u00a0enum\u00a0matrix\u00a0eligibility\")\nenum\u00a0State\n\u00a0\u00a0\u00a0\u00a0member\nvarip\u00a0matrix<State>\u00a0values\u00a0=\u00a0matrix.new<State>()\nplot(matrix.rows(values),\u00a0\"OUTCOME\")\n1 of 1 problem\nVariables with varip modifier cannot have type \"matrix<State>\".(CE10128)\n1 \u2219 Today, 01:37\nLine 5, Col 1\nPine Script\u00ae v6\nCompilation error: CE10128\n\nVariables with varip modifier cannot have type \"matrix<State>\".\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+        "context_substituted_message": "Variables with varip modifier cannot have type \"matrix<State>\"."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "varip-enum-matrix-w0-v1.pine",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24709,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 25009,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v12/evidence/varip-enum-matrix-w0-v1-attempt1-error.png",
+      "captures/v12/evidence/varip-enum-matrix-w0-v1-attempt1-error.txt",
+      "captures/v12/evidence/varip-enum-matrix-w0-v1-attempt1-logs.txt",
+      "captures/v12/evidence/varip-enum-matrix-w0-v1-attempt1-logs-v1.json",
+      "captures/v12/evidence/varip-enum-matrix-w0-v1-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": null,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///688973ba-ce85-4f3a-bc14-db9983c8d051.pine?placement%3Ddialog",
+          "path": "/688973ba-ce85-4f3a-bc14-db9983c8d051.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "CE10128",
+        "severity": 8,
+        "message": "Variables with varip modifier cannot have type \"matrix<State>\".",
+        "startLineNumber": 5,
+        "startColumn": 1,
+        "endLineNumber": 5,
+        "endColumn": 6
+      }
+    ],
+    "error_observed_utc": "2026-10-04T17:37:42.120Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/varip-enum-matrix-w0-v1-attempt1-logs.txt",
+        "evidence/varip-enum-matrix-w0-v1-attempt1-logs-v1.json",
+        "evidence/varip-enum-matrix-w0-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T17:37:51.370Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "arm",
+        "bitness": "64",
+        "brands": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156"
+          }
+        ],
+        "fullVersionList": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8.0.0.0"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156.0.8075.0"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156.0.8075.0"
+          }
+        ],
+        "mobile": false,
+        "platform": "macOS",
+        "platformVersion": "27.2.0"
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v12 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "varip-enum-map-w0-v1.pine",
+    "attempt": 1,
+    "source_sha256": "81e6aed7f701a5da563184bc34cf882f330afae24fa43efd81d8a3d2e656498a",
+    "indicator_title": "varip enum map eligibility",
+    "status": "COMPILE-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": "CE10128",
+      "text": "Variables with varip modifier cannot have type \"map<int, State>\".",
+      "line": 5,
+      "column": 1,
+      "first_bar_index": null,
+      "first_bar_time_utc": null,
+      "native": {
+        "error": "Variables with varip modifier cannot have type \"{typeExpression}\".",
+        "editorError": {
+          "code": "CE10128",
+          "ctx": {
+            "typeExpression": "map<int, State>"
+          },
+          "end": {
+            "column": 5,
+            "line": 5
+          },
+          "message": "Variables with varip modifier cannot have type \"{typeExpression}\".",
+          "start": {
+            "column": 1,
+            "line": 5
+          },
+          "id": "USER;6461c402b3f34b2e97743aeeeb6d5067"
+        },
+        "title": "Compilation error",
+        "compiler_markers": [
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///bbc71f9a-dd2b-4e2b-918f-d6b056d08715.pine?placement%3Ddialog",
+              "path": "/bbc71f9a-dd2b-4e2b-918f-d6b056d08715.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "code": "CE10128",
+            "severity": 8,
+            "message": "Variables with varip modifier cannot have type \"map<int, State>\".",
+            "startLineNumber": 5,
+            "startColumn": 1,
+            "endLineNumber": 5,
+            "endColumn": 6
+          }
+        ],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,372.00\nH\n85,372.01\nL\n85,367.06\nC\n85,367.07\n\u22124.94 (\u22120.01%)\n85,367.06\nSELL\n0.01\n85,367.07\nBUY\nUSDT\nvarip-enum-map-w0-v1.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n17:37:52 UTC\n99+\nPine Editor\nvarip-enum-map-w0-v1.pine\nPublish script\n1\n2\n3\n4\n5\n6\n7\n//@version=6\nindicator(\"varip\u00a0enum\u00a0map\u00a0eligibility\")\nenum\u00a0State\n\u00a0\u00a0\u00a0\u00a0member\nvarip\u00a0map<int,\u00a0State>\u00a0values\u00a0=\u00a0map.new<int,\u00a0State>()\nplot(map.size(values),\u00a0\"OUTCOME\")\n1 of 1 problem\nVariables with varip modifier cannot have type \"map<int, State>\".(CE10128)\n1 \u2219 Today, 01:37\nLine 5, Col 1\nPine Script\u00ae v6\nCompilation error: CE10128\n\nVariables with varip modifier cannot have type \"map<int, State>\".\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+        "context_substituted_message": "Variables with varip modifier cannot have type \"map<int, State>\"."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "varip-enum-map-w0-v1.pine",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24709,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 25009,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v12/evidence/varip-enum-map-w0-v1-attempt1-error.png",
+      "captures/v12/evidence/varip-enum-map-w0-v1-attempt1-error.txt",
+      "captures/v12/evidence/varip-enum-map-w0-v1-attempt1-logs.txt",
+      "captures/v12/evidence/varip-enum-map-w0-v1-attempt1-logs-v1.json",
+      "captures/v12/evidence/varip-enum-map-w0-v1-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": null,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///bbc71f9a-dd2b-4e2b-918f-d6b056d08715.pine?placement%3Ddialog",
+          "path": "/bbc71f9a-dd2b-4e2b-918f-d6b056d08715.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "CE10128",
+        "severity": 8,
+        "message": "Variables with varip modifier cannot have type \"map<int, State>\".",
+        "startLineNumber": 5,
+        "startColumn": 1,
+        "endLineNumber": 5,
+        "endColumn": 6
+      }
+    ],
+    "error_observed_utc": "2026-10-04T17:37:55.167Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/varip-enum-map-w0-v1-attempt1-logs.txt",
+        "evidence/varip-enum-map-w0-v1-attempt1-logs-v1.json",
+        "evidence/varip-enum-map-w0-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
   }
 ]

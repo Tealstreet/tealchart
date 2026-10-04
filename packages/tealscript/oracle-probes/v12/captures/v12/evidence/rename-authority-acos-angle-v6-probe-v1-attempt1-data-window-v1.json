@@ -1,0 +1,29 @@
+{
+  "index": 298,
+  "bar": [
+    1791135120,
+    85397.65,
+    85405.46,
+    85397.64,
+    85398.01,
+    4.64543
+  ],
+  "source_row": [
+    1791135120,
+    1.0471975511965979
+  ],
+  "browser_utc": "2026-10-04T17:35:06.124Z",
+  "title": "rename-authority-acos-angle-v6-probe-v1",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   17:32",
+  "visible_range": {
+    "_firstBar": 263,
+    "_lastBar": 301
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}
