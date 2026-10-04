@@ -1,0 +1,2624 @@
+[
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T15:25:19.171Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v11 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "const-polyline-declaration-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "a9852222909928931136dfc9b99ede4c1281e43093fa99d6e82de6b5b95bd3e8",
+    "indicator_title": "Const polyline declaration",
+    "status": "RUNS",
+    "csv_file": "captures/v11/const-polyline-declaration-v6-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T232518.330.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "Const polyline declaration",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24643,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24943,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T15:25:04.279Z",
+    "live_candle_open_utc": "2026-10-04T15:24:00.000Z",
+    "export_utc": "2026-10-04T15:25:18.615Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v11/evidence/const-polyline-declaration-v6-v1-attempt1-setup.png",
+      "captures/v11/evidence/const-polyline-declaration-v6-v1-attempt1-export.png",
+      "captures/v11/evidence/const-polyline-declaration-v6-v1-attempt1-logs.txt",
+      "captures/v11/evidence/const-polyline-declaration-v6-v1-attempt1-logs-v1.json",
+      "captures/v11/evidence/const-polyline-declaration-v6-v1-attempt1-logs.png",
+      "captures/v11/evidence/const-polyline-declaration-v6-v1-attempt1-visual.png",
+      "captures/v11/evidence/const-polyline-declaration-v6-v1-attempt1-data-window-v1.png",
+      "captures/v11/evidence/const-polyline-declaration-v6-v1-attempt1-data-window-v1.json",
+      "captures/v11/evidence/const-polyline-declaration-v6-v1-attempt1-data-window-v1.txt",
+      "captures/v11/evidence/const-polyline-declaration-v6-v1-attempt1-authority-object-geometry-v1.json",
+      "captures/v11/evidence/const-polyline-declaration-v6-v1-attempt1-authority-object-geometry-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T15:25:05.544Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790822280,
+            83467.6,
+            83467.61,
+            83423.92,
+            83437.49,
+            38.18339
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791127440,
+            85382.01,
+            85382.01,
+            85348.02,
+            85348.34,
+            10.47995
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Const polyline declaration",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790822280,
+                83437.49
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791127440,
+                85348.33
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T15:25:07.484Z",
+        "bars": 24943,
+        "end": true,
+        "first": {
+          "index": -24643,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791127440,
+            85382.01,
+            85382.01,
+            85348.02,
+            85348.33,
+            12.48229
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Const polyline declaration",
+            "status": {
+              "type": 2
+            },
+            "size": 24943,
+            "first": {
+              "index": -24643,
+              "value": [
+                1788134400,
+                77674.04
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791127440,
+                85348.33
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   15:24",
+    "historical_compare_before_unix_seconds": 1791127440,
+    "pine_logs": {
+      "paths": [
+        "evidence/const-polyline-declaration-v6-v1-attempt1-logs.txt",
+        "evidence/const-polyline-declaration-v6-v1-attempt1-logs-v1.json",
+        "evidence/const-polyline-declaration-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "7bbe63cbfac5c3d40c96939d1df4ab55e102678fa5ec76b22e302f6f951c9d49",
+    "csv_bytes": 1313494,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "OUTCOME"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "OUTCOME": 5
+    },
+    "first_historical_cells": [
+      "1788134400",
+      "77682",
+      "77682.01",
+      "77572",
+      "77674.04",
+      "77674.04"
+    ],
+    "last_historical_cells": [
+      "1791127320",
+      "85399.42",
+      "85402.01",
+      "85382",
+      "85382",
+      "85382"
+    ],
+    "declared_to_native_header_mapping": {
+      "OUTCOME": "OUTCOME"
+    },
+    "csv_rows": 24943,
+    "historical_rows": 24942,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791127440,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791127440",
+    "first_historical_values": {
+      "OUTCOME": "77674.04"
+    },
+    "last_historical_values": {
+      "OUTCOME": "85382"
+    },
+    "data_window_witness": "captures/v11/evidence/const-polyline-declaration-v6-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T15:25:53.700Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v11 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "const-polyline-reassignment-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "0af19de931c8d6d0c883a7737b9e3a6001c33fe6ea6908f5dfb5c79ab15a4867",
+    "indicator_title": "Const polyline ID replacement",
+    "status": "COMPILE-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": "CE10085",
+      "text": "A variable declared with the \"const\" type form cannot be modified.",
+      "line": 4,
+      "column": 1,
+      "first_bar_index": null,
+      "first_bar_time_utc": null,
+      "native": {
+        "error": "A variable declared with the \"const\" type form cannot be modified.",
+        "editorError": {
+          "code": "CE10085",
+          "end": {
+            "column": 5,
+            "line": 4
+          },
+          "message": "A variable declared with the \"const\" type form cannot be modified.",
+          "start": {
+            "column": 1,
+            "line": 4
+          },
+          "id": "USER;4559a07b1e3740aa8999b87169c8e7d9"
+        },
+        "title": "Compilation error",
+        "compiler_markers": [
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///97727fb4-5c77-41b3-8975-88efd02ee5f1.pine?placement%3Ddialog",
+              "path": "/97727fb4-5c77-41b3-8975-88efd02ee5f1.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "code": "CE10085",
+            "severity": 8,
+            "message": "A variable declared with the \"const\" type form cannot be modified.",
+            "startLineNumber": 4,
+            "startColumn": 1,
+            "endLineNumber": 4,
+            "endColumn": 6
+          }
+        ],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,126.86\nH\n85,126.86\nL\n85,126.85\nC\n85,126.85\n0.00 (0.00%)\n85,312.70\nSELL\n0.01\n85,312.71\nBUY\nUSDT\nconst-polyline-reassignment-v6-v1.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n15:25:56 UTC\n99+\nPine Editor\nconst-polyline-reassignment-v6-v1.pine\nPublish script\n1\n2\n3\n4\n5\n6\n//@version=6\nindicator(\"Const\u00a0polyline\u00a0ID\u00a0replacement\")\nconst\u00a0polyline\u00a0value\u00a0=\u00a0polyline.new(array.from(chart.point.from_index(0,\u00a0close),\u00a0chart.point.from_index(1,\u00a0close)))\nvalue\u00a0:=\u00a0value\nplot(close,\u00a0\"OUTCOME\")\n1 of 1 problem\nA variable declared with the \"const\" type form cannot be modified.(CE10085)\n1 \u2219 Today, 23:25\nLine 4, Col 1\nPine Script\u00ae v6\nCompilation error: CE10085\n\nA variable declared with the \"const\" type form cannot be modified.\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+        "context_substituted_message": "A variable declared with the \"const\" type form cannot be modified."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "const-polyline-reassignment-v6-v1.pine",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24643,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24943,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v11/evidence/const-polyline-reassignment-v6-v1-attempt1-error.png",
+      "captures/v11/evidence/const-polyline-reassignment-v6-v1-attempt1-error.txt",
+      "captures/v11/evidence/const-polyline-reassignment-v6-v1-attempt1-logs.txt",
+      "captures/v11/evidence/const-polyline-reassignment-v6-v1-attempt1-logs-v1.json",
+      "captures/v11/evidence/const-polyline-reassignment-v6-v1-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": null,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///97727fb4-5c77-41b3-8975-88efd02ee5f1.pine?placement%3Ddialog",
+          "path": "/97727fb4-5c77-41b3-8975-88efd02ee5f1.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "CE10085",
+        "severity": 8,
+        "message": "A variable declared with the \"const\" type form cannot be modified.",
+        "startLineNumber": 4,
+        "startColumn": 1,
+        "endLineNumber": 4,
+        "endColumn": 6
+      }
+    ],
+    "error_observed_utc": "2026-10-04T15:25:59.035Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/const-polyline-reassignment-v6-v1-attempt1-logs.txt",
+        "evidence/const-polyline-reassignment-v6-v1-attempt1-logs-v1.json",
+        "evidence/const-polyline-reassignment-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T15:26:21.512Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v11 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "const-point-mutation-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "3cab29f8d297f173133a9e630a767f49a5f63e7dc16eaae47193f0b5e4b0a4ee",
+    "indicator_title": "Const point content mutation",
+    "status": "COMPILE-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": "CE10085",
+      "text": "A variable declared with the \"const\" type form cannot be modified.",
+      "line": 4,
+      "column": 1,
+      "first_bar_index": null,
+      "first_bar_time_utc": null,
+      "native": {
+        "error": "A variable declared with the \"const\" type form cannot be modified.",
+        "editorError": {
+          "code": "CE10085",
+          "end": {
+            "column": 11,
+            "line": 4
+          },
+          "message": "A variable declared with the \"const\" type form cannot be modified.",
+          "start": {
+            "column": 1,
+            "line": 4
+          },
+          "id": "USER;aa2862a7f7e7444d9c9e43db7641c804"
+        },
+        "title": "Compilation error",
+        "compiler_markers": [
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///264dc469-20fa-4168-88db-3ecd61ef0d98.pine?placement%3Ddialog",
+              "path": "/264dc469-20fa-4168-88db-3ecd61ef0d98.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "code": "CE10085",
+            "severity": 8,
+            "message": "A variable declared with the \"const\" type form cannot be modified.",
+            "startLineNumber": 4,
+            "startColumn": 1,
+            "endLineNumber": 4,
+            "endColumn": 12
+          }
+        ],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,304.00\nH\n85,304.00\nL\n85,291.45\nC\n85,299.99\n\u22124.02 (\u22120.00%)\n85,299.99\nSELL\n0.01\n85,300.00\nBUY\nUSDT\nconst-point-mutation-v6-v1.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n15:26:25 UTC\n99+\nPine Editor\nconst-point-mutation-v6-v1.pine\nPublish script\n1\n2\n3\n4\n5\n6\n7\n//@version=6\nindicator(\"Const\u00a0point\u00a0content\u00a0mutation\")\nconst\u00a0chart.point\u00a0value\u00a0=\u00a0chart.point.from_index(bar_index,\u00a0close)\nvalue.price\u00a0:=\u00a0close\u00a0+\u00a01\nplot(value.price,\u00a0\"MUTATED_PRICE\")\nplot(close,\u00a0\"CLOSE_CONTROL\")\n1 of 1 problem\nA variable declared with the \"const\" type form cannot be modified.(CE10085)\n1 \u2219 Today, 23:26\nLine 4, Col 1\nPine Script\u00ae v6\nCompilation error: CE10085\n\nA variable declared with the \"const\" type form cannot be modified.\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+        "context_substituted_message": "A variable declared with the \"const\" type form cannot be modified."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "const-point-mutation-v6-v1.pine",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24643,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24944,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v11/evidence/const-point-mutation-v6-v1-attempt1-error.png",
+      "captures/v11/evidence/const-point-mutation-v6-v1-attempt1-error.txt",
+      "captures/v11/evidence/const-point-mutation-v6-v1-attempt1-logs.txt",
+      "captures/v11/evidence/const-point-mutation-v6-v1-attempt1-logs-v1.json",
+      "captures/v11/evidence/const-point-mutation-v6-v1-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": null,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///264dc469-20fa-4168-88db-3ecd61ef0d98.pine?placement%3Ddialog",
+          "path": "/264dc469-20fa-4168-88db-3ecd61ef0d98.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "CE10085",
+        "severity": 8,
+        "message": "A variable declared with the \"const\" type form cannot be modified.",
+        "startLineNumber": 4,
+        "startColumn": 1,
+        "endLineNumber": 4,
+        "endColumn": 12
+      }
+    ],
+    "error_observed_utc": "2026-10-04T15:26:29.594Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/const-point-mutation-v6-v1-attempt1-logs.txt",
+        "evidence/const-point-mutation-v6-v1-attempt1-logs-v1.json",
+        "evidence/const-point-mutation-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T15:26:41.259Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v11 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "const-point-reassignment-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "9c96638edc3fac5100a486d44f2dfc25d0e52db43d3c5412b02c3e868e4e9bef",
+    "indicator_title": "Const point ID replacement",
+    "status": "COMPILE-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": "CE10085",
+      "text": "A variable declared with the \"const\" type form cannot be modified.",
+      "line": 4,
+      "column": 1,
+      "first_bar_index": null,
+      "first_bar_time_utc": null,
+      "native": {
+        "error": "A variable declared with the \"const\" type form cannot be modified.",
+        "editorError": {
+          "code": "CE10085",
+          "end": {
+            "column": 5,
+            "line": 4
+          },
+          "message": "A variable declared with the \"const\" type form cannot be modified.",
+          "start": {
+            "column": 1,
+            "line": 4
+          },
+          "id": "USER;6c77cace5434436fa5269fee603f1049"
+        },
+        "title": "Compilation error",
+        "compiler_markers": [
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///fd622b58-633d-4c1f-839c-aaa926a0aaa3.pine?placement%3Ddialog",
+              "path": "/fd622b58-633d-4c1f-839c-aaa926a0aaa3.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "code": "CE10085",
+            "severity": 8,
+            "message": "A variable declared with the \"const\" type form cannot be modified.",
+            "startLineNumber": 4,
+            "startColumn": 1,
+            "endLineNumber": 4,
+            "endColumn": 6
+          }
+        ],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,304.00\nH\n85,304.00\nL\n85,291.45\nC\n85,300.00\n\u22124.01 (\u22120.00%)\n85,299.99\nSELL\n0.01\n85,300.00\nBUY\nUSDT\nconst-point-reassignment-v6-v1.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n15:26:42 UTC\n99+\nPine Editor\nconst-point-reassignment-v6-v1.pine\nPublish script\n1\n2\n3\n4\n5\n6\n//@version=6\nindicator(\"Const\u00a0point\u00a0ID\u00a0replacement\")\nconst\u00a0chart.point\u00a0value\u00a0=\u00a0chart.point.from_index(bar_index,\u00a0close)\nvalue\u00a0:=\u00a0value\nplot(close,\u00a0\"OUTCOME\")\n1 of 1 problem\nA variable declared with the \"const\" type form cannot be modified.(CE10085)\n1 \u2219 Today, 23:26\nLine 4, Col 1\nPine Script\u00ae v6\nCompilation error: CE10085\n\nA variable declared with the \"const\" type form cannot be modified.\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+        "context_substituted_message": "A variable declared with the \"const\" type form cannot be modified."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "const-point-reassignment-v6-v1.pine",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24643,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24944,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v11/evidence/const-point-reassignment-v6-v1-attempt1-error.png",
+      "captures/v11/evidence/const-point-reassignment-v6-v1-attempt1-error.txt",
+      "captures/v11/evidence/const-point-reassignment-v6-v1-attempt1-logs.txt",
+      "captures/v11/evidence/const-point-reassignment-v6-v1-attempt1-logs-v1.json",
+      "captures/v11/evidence/const-point-reassignment-v6-v1-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": null,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///fd622b58-633d-4c1f-839c-aaa926a0aaa3.pine?placement%3Ddialog",
+          "path": "/fd622b58-633d-4c1f-839c-aaa926a0aaa3.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "CE10085",
+        "severity": 8,
+        "message": "A variable declared with the \"const\" type form cannot be modified.",
+        "startLineNumber": 4,
+        "startColumn": 1,
+        "endLineNumber": 4,
+        "endColumn": 6
+      }
+    ],
+    "error_observed_utc": "2026-10-04T15:26:45.344Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/const-point-reassignment-v6-v1-attempt1-logs.txt",
+        "evidence/const-point-reassignment-v6-v1-attempt1-logs-v1.json",
+        "evidence/const-point-reassignment-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T15:26:57.423Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v11 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "const-udt-declaration-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "493132183bba70f55abbad5538638d31117b705cec747cb2845bd6a4f353835b",
+    "indicator_title": "Const UDT annotation",
+    "status": "COMPILE-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": "CE10260",
+      "text": "Cannot use the \"const\" keyword when declaring a variable or parameter that accepts a user-defined type. Use the \"series\" keyword instead or remove the qualifier keyword from the declaration.",
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null,
+      "native": {
+        "error": "Cannot use the \"{typeKindName}\" keyword when declaring a variable or parameter that accepts a user-defined type. Use the \"series\" keyword instead or remove the qualifier keyword from the declaration.",
+        "editorError": {
+          "code": "CE10260",
+          "ctx": {
+            "typeKindName": "const"
+          },
+          "message": "Cannot use the \"{typeKindName}\" keyword when declaring a variable or parameter that accepts a user-defined type. Use the \"series\" keyword instead or remove the qualifier keyword from the declaration.",
+          "id": "USER;0cf5315f94c34d088024d40a164a54ba"
+        },
+        "title": "Compilation error",
+        "compiler_markers": [
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///bd59e415-9f15-402f-9a96-79523b2adfe5.pine?placement%3Ddialog",
+              "path": "/bd59e415-9f15-402f-9a96-79523b2adfe5.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "code": "CE10260",
+            "severity": 8,
+            "message": "Cannot use the \"const\" keyword when declaring a variable or parameter that accepts a user-defined type. Use the \"series\" keyword instead or remove the qualifier keyword from the declaration.",
+            "startLineNumber": 1,
+            "startColumn": 1,
+            "endLineNumber": 7,
+            "endColumn": 9007199254740992
+          },
+          {
+            "resource": {
+              "$mid": 1,
+              "fsPath": "/bd59e415-9f15-402f-9a96-79523b2adfe5.pine",
+              "external": "file:///bd59e415-9f15-402f-9a96-79523b2adfe5.pine?placement%3Ddialog",
+              "path": "/bd59e415-9f15-402f-9a96-79523b2adfe5.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "owner",
+            "code": "CE10260",
+            "severity": 8,
+            "message": "Cannot use the \"const\" keyword when declaring a variable or parameter that accepts a user-defined type. Use the \"series\" keyword instead or remove the qualifier keyword from the declaration.",
+            "startLineNumber": 1,
+            "startColumn": 1,
+            "endLineNumber": 1,
+            "endColumn": 1
+          }
+        ],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,304.00\nH\n85,304.00\nL\n85,291.35\nC\n85,291.36\n\u221212.65 (\u22120.01%)\n85,291.35\nSELL\n0.01\n85,291.36\nBUY\nUSDT\nconst-udt-declaration-v6-v1.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n15:26:59 UTC\n99+\nPine Editor\nconst-udt-declaration-v6-v1.pine\nPublish script\n1\n2\n3\n4\n5\n6\n7\n//@version=6\nindicator(\"Const\u00a0UDT\u00a0annotation\")\ntype\u00a0Node\n\u00a0\u00a0\u00a0\u00a0float\u00a0price\nconst\u00a0Node\u00a0value\u00a0=\u00a0Node.new(close)\nplot(value.price,\u00a0\"OUTCOME\")\n1 of 2 problems\nCannot use the \"const\" keyword when declaring a variable or parameter that accepts a user-defined type. Use the \"series\" keyword instead or remove the qualifier keyword from the declaration.(CE10260)\n1 \u2219 Today, 23:26\nLine 1, Col 1\nPine Script\u00ae v6\nCompilation error: CE10260\n\nCannot use the \"const\" keyword when declaring a variable or parameter that accepts a user-defined type. Use the \"series\" keyword instead or remove the qualifier keyword from the declaration.\n\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+        "context_substituted_message": "Cannot use the \"const\" keyword when declaring a variable or parameter that accepts a user-defined type. Use the \"series\" keyword instead or remove the qualifier keyword from the declaration."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "const-udt-declaration-v6-v1.pine",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24643,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24944,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v11/evidence/const-udt-declaration-v6-v1-attempt1-error.png",
+      "captures/v11/evidence/const-udt-declaration-v6-v1-attempt1-error.txt",
+      "captures/v11/evidence/const-udt-declaration-v6-v1-attempt1-logs.txt",
+      "captures/v11/evidence/const-udt-declaration-v6-v1-attempt1-logs-v1.json",
+      "captures/v11/evidence/const-udt-declaration-v6-v1-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": null,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///bd59e415-9f15-402f-9a96-79523b2adfe5.pine?placement%3Ddialog",
+          "path": "/bd59e415-9f15-402f-9a96-79523b2adfe5.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "CE10260",
+        "severity": 8,
+        "message": "Cannot use the \"const\" keyword when declaring a variable or parameter that accepts a user-defined type. Use the \"series\" keyword instead or remove the qualifier keyword from the declaration.",
+        "startLineNumber": 1,
+        "startColumn": 1,
+        "endLineNumber": 7,
+        "endColumn": 9007199254740992
+      },
+      {
+        "resource": {
+          "$mid": 1,
+          "fsPath": "/bd59e415-9f15-402f-9a96-79523b2adfe5.pine",
+          "external": "file:///bd59e415-9f15-402f-9a96-79523b2adfe5.pine?placement%3Ddialog",
+          "path": "/bd59e415-9f15-402f-9a96-79523b2adfe5.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "owner",
+        "code": "CE10260",
+        "severity": 8,
+        "message": "Cannot use the \"const\" keyword when declaring a variable or parameter that accepts a user-defined type. Use the \"series\" keyword instead or remove the qualifier keyword from the declaration.",
+        "startLineNumber": 1,
+        "startColumn": 1,
+        "endLineNumber": 1,
+        "endColumn": 1
+      }
+    ],
+    "error_observed_utc": "2026-10-04T15:27:02.170Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/const-udt-declaration-v6-v1-attempt1-logs.txt",
+        "evidence/const-udt-declaration-v6-v1-attempt1-logs-v1.json",
+        "evidence/const-udt-declaration-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T15:27:26.507Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v11 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "ordinary-udt-declaration-v6-control-v1.pine",
+    "attempt": 1,
+    "source_sha256": "ab08bee190b9767723a358de92281ee026e413da42e350eb77dea8d913afca8e",
+    "indicator_title": "Ordinary UDT control",
+    "status": "RUNS",
+    "csv_file": "captures/v11/ordinary-udt-declaration-v6-control-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T232725.656.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "Ordinary UDT control",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24644,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24944,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T15:27:16.221Z",
+    "live_candle_open_utc": "2026-10-04T15:26:00.000Z",
+    "export_utc": "2026-10-04T15:27:26.059Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v11/evidence/ordinary-udt-declaration-v6-control-v1-attempt1-setup.png",
+      "captures/v11/evidence/ordinary-udt-declaration-v6-control-v1-attempt1-export.png",
+      "captures/v11/evidence/ordinary-udt-declaration-v6-control-v1-attempt1-logs.txt",
+      "captures/v11/evidence/ordinary-udt-declaration-v6-control-v1-attempt1-logs-v1.json",
+      "captures/v11/evidence/ordinary-udt-declaration-v6-control-v1-attempt1-logs.png",
+      "captures/v11/evidence/ordinary-udt-declaration-v6-control-v1-attempt1-visual.png",
+      "captures/v11/evidence/ordinary-udt-declaration-v6-control-v1-attempt1-data-window-v1.png",
+      "captures/v11/evidence/ordinary-udt-declaration-v6-control-v1-attempt1-data-window-v1.json",
+      "captures/v11/evidence/ordinary-udt-declaration-v6-control-v1-attempt1-data-window-v1.txt",
+      "captures/v11/evidence/ordinary-udt-declaration-v6-control-v1-attempt1-authority-object-geometry-v1.json",
+      "captures/v11/evidence/ordinary-udt-declaration-v6-control-v1-attempt1-authority-object-geometry-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T15:27:17.039Z",
+        "bars": 2556,
+        "end": false,
+        "first": {
+          "index": -2256,
+          "value": [
+            1790820960,
+            83581.74,
+            83591.64,
+            83568.01,
+            83573.78,
+            10.0196
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791127560,
+            85304,
+            85304,
+            85291.35,
+            85291.35,
+            4.85712
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Ordinary UDT control",
+            "status": {
+              "type": 2
+            },
+            "size": 2556,
+            "first": {
+              "index": -2256,
+              "value": [
+                1790820960,
+                83573.78
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791127560,
+                85291.35
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T15:27:18.241Z",
+        "bars": 24944,
+        "end": true,
+        "first": {
+          "index": -24644,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791127560,
+            85304,
+            85304,
+            85291.35,
+            85291.35,
+            4.85712
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Ordinary UDT control",
+            "status": {
+              "type": 2
+            },
+            "size": 24944,
+            "first": {
+              "index": -24644,
+              "value": [
+                1788134400,
+                77674.04
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791127560,
+                85291.35
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   15:26",
+    "historical_compare_before_unix_seconds": 1791127560,
+    "pine_logs": {
+      "paths": [
+        "evidence/ordinary-udt-declaration-v6-control-v1-attempt1-logs.txt",
+        "evidence/ordinary-udt-declaration-v6-control-v1-attempt1-logs-v1.json",
+        "evidence/ordinary-udt-declaration-v6-control-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "a04d6b11298c8d00d6f721fc673199b8bc2bb28162a71c397ad46950d2051f11",
+    "csv_bytes": 1313532,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "OUTCOME"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "OUTCOME": 5
+    },
+    "first_historical_cells": [
+      "1788134400",
+      "77682",
+      "77682.01",
+      "77572",
+      "77674.04",
+      "77674.04"
+    ],
+    "last_historical_cells": [
+      "1791127440",
+      "85382.01",
+      "85382.01",
+      "85304",
+      "85304.01",
+      "85304.01"
+    ],
+    "declared_to_native_header_mapping": {
+      "OUTCOME": "OUTCOME"
+    },
+    "csv_rows": 24944,
+    "historical_rows": 24943,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791127560,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791127560",
+    "first_historical_values": {
+      "OUTCOME": "77674.04"
+    },
+    "last_historical_values": {
+      "OUTCOME": "85304.01"
+    },
+    "data_window_witness": "captures/v11/evidence/ordinary-udt-declaration-v6-control-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "script": "mutable-ema-first-two-v5-v1.pine",
+    "attempt": 1,
+    "source_sha256": "2b6a798408522b6c15d993786017bf90f8572ae1e9c77c76b0e4151809f5dddc",
+    "indicator_title": "Mutable EMA first length two native",
+    "status": "RUNS",
+    "csv_file": "../v6/captures/v6/mutable-ema-first-two-v5-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T125444.384.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "Mutable EMA first length two native",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24328,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24628,
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T04:54:38.184Z",
+    "live_candle_open_utc": "2026-10-04T04:54:00.000Z",
+    "export_utc": "2026-10-04T04:54:44.753Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "../v6/captures/v6/evidence/mutable-ema-first-two-v5-v1-attempt1-setup.png",
+      "../v6/captures/v6/evidence/mutable-ema-first-two-v5-v1-attempt1-export.png",
+      "../v6/captures/v6/evidence/mutable-ema-first-two-v5-v1-attempt1-logs.txt",
+      "../v6/captures/v6/evidence/mutable-ema-first-two-v5-v1-attempt1-logs-v1.json",
+      "../v6/captures/v6/evidence/mutable-ema-first-two-v5-v1-attempt1-logs.png",
+      "../v6/captures/v6/evidence/mutable-ema-first-two-v5-v1-attempt1-visual.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///628c2bda-3371-4fbe-b1f1-abc0511243e3.pine?placement%3Ddialog",
+          "path": "/628c2bda-3371-4fbe-b1f1-abc0511243e3.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "live_tooltip": "Sun 04 Oct '26   04:54",
+    "historical_compare_before_unix_seconds": 1791089640,
+    "pine_logs": {
+      "paths": [
+        "evidence/mutable-ema-first-two-v5-v1-attempt1-logs.txt",
+        "evidence/mutable-ema-first-two-v5-v1-attempt1-logs-v1.json",
+        "evidence/mutable-ema-first-two-v5-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "b70e09e36d91238a7d4ea420e36f44961d77ee9efa56bfef6ad5b3710489ec0a",
+    "csv_bytes": 2104591,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "MUTABLE_TWO",
+      "FIXED_TWO",
+      "LIVE_LENGTH"
+    ],
+    "declared_to_native_header_mapping": {
+      "MUTABLE_TWO": "MUTABLE_TWO",
+      "FIXED_TWO": "FIXED_TWO",
+      "LIVE_LENGTH": "LIVE_LENGTH"
+    },
+    "csv_rows": 24628,
+    "historical_rows": 24627,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791089640,
+    "first_historical_values": {
+      "MUTABLE_TWO": "",
+      "FIXED_TWO": "",
+      "LIVE_LENGTH": "2"
+    },
+    "last_historical_values": {
+      "MUTABLE_TWO": "84812.00999962814",
+      "FIXED_TWO": "84812.00999962814",
+      "LIVE_LENGTH": "24628"
+    },
+    "reused_acquisition": {
+      "bundle": "v6",
+      "script": "mutable-ema-first-two-v5-v1.pine",
+      "attempt": 1,
+      "original_outcomes": "../v6/captures/v6/outcomes-v6.json",
+      "verified_utc": "2026-10-04T15:28:33.460809+00:00",
+      "original_export_utc": "2026-10-04T04:54:44.753Z",
+      "original_csv_sha256": "b70e09e36d91238a7d4ea420e36f44961d77ee9efa56bfef6ad5b3710489ec0a",
+      "evidence_sha256": {
+        "captures/v6/evidence/mutable-ema-first-two-v5-v1-attempt1-setup.png": "f39ddae6e44070d5fe3ffd3b55c24d8e69d554942b2ec2942db736c892b6c871",
+        "captures/v6/evidence/mutable-ema-first-two-v5-v1-attempt1-export.png": "eeabc6df8200d481dbabe3c24882b2c96e3d2bf047506969a82f29eaada48622",
+        "captures/v6/evidence/mutable-ema-first-two-v5-v1-attempt1-logs.txt": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+        "captures/v6/evidence/mutable-ema-first-two-v5-v1-attempt1-logs-v1.json": "c90f9bdff131b28bfd708320b07c32cb75032d8ffd71852e53e68a5d7333ad5a",
+        "captures/v6/evidence/mutable-ema-first-two-v5-v1-attempt1-logs.png": "a822fe7ffb46cdc8390a26411586b1c2d805ce5ee0449ad2c075c30cec6d676e",
+        "captures/v6/evidence/mutable-ema-first-two-v5-v1-attempt1-visual.png": "6095ce94630cb016649ee9e79efe8eb8b53db8510b3b681815c7e4a7b73e8542"
+      },
+      "limits": "Original v6 acquisition retained; no new browser run or new reset/cutoff. Reuse does not adjudicate engine parity."
+    }
+  },
+  {
+    "script": "mutable-ema-udf-two-calls-v5-v1.pine",
+    "attempt": 2,
+    "source_sha256": "0d9151129271433f9e29bc1e02762a4f6948fe0f9d20423e207b5248992615fc",
+    "indicator_title": "Mutable EMA separate UDF calls native",
+    "status": "RUNS",
+    "csv_file": "../v6/captures/v6/mutable-ema-udf-two-calls-v5-v1-attempt2.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T125653.674.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "Mutable EMA separate UDF calls native",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24329,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24629,
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T04:56:47.816Z",
+    "live_candle_open_utc": "2026-10-04T04:56:00.000Z",
+    "export_utc": "2026-10-04T04:56:54.121Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "../v6/captures/v6/evidence/mutable-ema-udf-two-calls-v5-v1-attempt2-setup.png",
+      "../v6/captures/v6/evidence/mutable-ema-udf-two-calls-v5-v1-attempt2-export.png",
+      "../v6/captures/v6/evidence/mutable-ema-udf-two-calls-v5-v1-attempt2-logs.txt",
+      "../v6/captures/v6/evidence/mutable-ema-udf-two-calls-v5-v1-attempt2-logs-v1.json",
+      "../v6/captures/v6/evidence/mutable-ema-udf-two-calls-v5-v1-attempt2-logs.png",
+      "../v6/captures/v6/evidence/mutable-ema-udf-two-calls-v5-v1-attempt2-visual.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///912a5291-4151-4845-b331-efbcfe3438db.pine?placement%3Ddialog",
+          "path": "/912a5291-4151-4845-b331-efbcfe3438db.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "live_tooltip": "Sun 04 Oct '26   04:56",
+    "historical_compare_before_unix_seconds": 1791089760,
+    "pine_logs": {
+      "paths": [
+        "evidence/mutable-ema-udf-two-calls-v5-v1-attempt2-logs.txt",
+        "evidence/mutable-ema-udf-two-calls-v5-v1-attempt2-logs-v1.json",
+        "evidence/mutable-ema-udf-two-calls-v5-v1-attempt2-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "e05cc00437ce6b1716988e92a751957fc7d6f206b4dba8f9018ca7d27451bea2",
+    "csv_bytes": 2846698,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "MUTABLE_UDF_TWO",
+      "FIXED_UDF_FOUR",
+      "FIXED_TWO",
+      "FIXED_FOUR"
+    ],
+    "declared_to_native_header_mapping": {
+      "MUTABLE_UDF_TWO": "MUTABLE_UDF_TWO",
+      "FIXED_UDF_FOUR": "FIXED_UDF_FOUR",
+      "FIXED_TWO": "FIXED_TWO",
+      "FIXED_FOUR": "FIXED_FOUR"
+    },
+    "csv_rows": 24629,
+    "historical_rows": 24628,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791089760,
+    "first_historical_values": {
+      "MUTABLE_UDF_TWO": "",
+      "FIXED_UDF_FOUR": "",
+      "FIXED_TWO": "",
+      "FIXED_FOUR": ""
+    },
+    "last_historical_values": {
+      "MUTABLE_UDF_TWO": "84812.00333320937",
+      "FIXED_UDF_FOUR": "84812.00582290102",
+      "FIXED_TWO": "84812.00333320937",
+      "FIXED_FOUR": "84812.00582290102"
+    },
+    "reused_acquisition": {
+      "bundle": "v6",
+      "script": "mutable-ema-udf-two-calls-v5-v1.pine",
+      "attempt": 2,
+      "original_outcomes": "../v6/captures/v6/outcomes-v6.json",
+      "verified_utc": "2026-10-04T15:28:33.491091+00:00",
+      "original_export_utc": "2026-10-04T04:56:54.121Z",
+      "original_csv_sha256": "e05cc00437ce6b1716988e92a751957fc7d6f206b4dba8f9018ca7d27451bea2",
+      "evidence_sha256": {
+        "captures/v6/evidence/mutable-ema-udf-two-calls-v5-v1-attempt2-setup.png": "64b3a37c3c0b8527a7d843179ee084f18512a554a19000ae23ae9848eea102d7",
+        "captures/v6/evidence/mutable-ema-udf-two-calls-v5-v1-attempt2-export.png": "962695d7b16e7622aa1243d23dfd87be910bd845d53f49dd29a4fd3a67f74aa2",
+        "captures/v6/evidence/mutable-ema-udf-two-calls-v5-v1-attempt2-logs.txt": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+        "captures/v6/evidence/mutable-ema-udf-two-calls-v5-v1-attempt2-logs-v1.json": "f8e61d09a8c2ebd0200aa1e568f0c93c125d57f1126600afa3b83c9be6d725b6",
+        "captures/v6/evidence/mutable-ema-udf-two-calls-v5-v1-attempt2-logs.png": "33ca964076873b8802f6f90c9c521d83884ab53f543e299be4c01cb564ec1eb8",
+        "captures/v6/evidence/mutable-ema-udf-two-calls-v5-v1-attempt2-visual.png": "d33cefb25b7fb4ab1c436647e542ca8f3a98ac9382b05569ccbf7f46e823b668"
+      },
+      "limits": "Original v6 acquisition retained; no new browser run or new reset/cutoff. Reuse does not adjudicate engine parity."
+    }
+  },
+  {
+    "script": "fixed-ema-input-three-v5-control-v1.pine",
+    "attempt": 1,
+    "source_sha256": "9034640287d9543e1d3ad5833a9646666eac2f69e6878a218ed2ff8ff56bdfa6",
+    "indicator_title": "Fixed EMA input native control",
+    "status": "RUNS",
+    "csv_file": "../v6/captures/v6/fixed-ema-input-three-v5-control-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T125718.707.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [
+        {
+          "id": "in_0",
+          "name": "length",
+          "value": 3,
+          "default": 3
+        }
+      ],
+      "observed_indicator_title": "Fixed EMA input native control",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24329,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24629,
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T04:57:12.397Z",
+    "live_candle_open_utc": "2026-10-04T04:56:00.000Z",
+    "export_utc": "2026-10-04T04:57:19.159Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "../v6/captures/v6/evidence/fixed-ema-input-three-v5-control-v1-attempt1-setup.png",
+      "../v6/captures/v6/evidence/fixed-ema-input-three-v5-control-v1-attempt1-export.png",
+      "../v6/captures/v6/evidence/fixed-ema-input-three-v5-control-v1-attempt1-logs.txt",
+      "../v6/captures/v6/evidence/fixed-ema-input-three-v5-control-v1-attempt1-logs-v1.json",
+      "../v6/captures/v6/evidence/fixed-ema-input-three-v5-control-v1-attempt1-logs.png",
+      "../v6/captures/v6/evidence/fixed-ema-input-three-v5-control-v1-attempt1-inputs.png",
+      "../v6/captures/v6/evidence/fixed-ema-input-three-v5-control-v1-attempt1-visual.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///47c01c8a-2543-4087-bbaa-a4b4133a0f1b.pine?placement%3Ddialog",
+          "path": "/47c01c8a-2543-4087-bbaa-a4b4133a0f1b.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "live_tooltip": "Sun 04 Oct '26   04:56",
+    "historical_compare_before_unix_seconds": 1791089760,
+    "pine_logs": {
+      "paths": [
+        "evidence/fixed-ema-input-three-v5-control-v1-attempt1-logs.txt",
+        "evidence/fixed-ema-input-three-v5-control-v1-attempt1-logs-v1.json",
+        "evidence/fixed-ema-input-three-v5-control-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "d6c7e0ea13aa48c6205eb7f9e35e665d2a630bd6e092f5ff17553eef58694a10",
+    "csv_bytes": 1968320,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "FIXED_INPUT_THREE",
+      "FIXED_LITERAL_THREE"
+    ],
+    "declared_to_native_header_mapping": {
+      "FIXED_INPUT_THREE": "FIXED_INPUT_THREE",
+      "FIXED_LITERAL_THREE": "FIXED_LITERAL_THREE"
+    },
+    "csv_rows": 24629,
+    "historical_rows": 24628,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791089760,
+    "first_historical_values": {
+      "FIXED_INPUT_THREE": "",
+      "FIXED_LITERAL_THREE": ""
+    },
+    "last_historical_values": {
+      "FIXED_INPUT_THREE": "84812.00498371762",
+      "FIXED_LITERAL_THREE": "84812.00498371762"
+    },
+    "reused_acquisition": {
+      "bundle": "v6",
+      "script": "fixed-ema-input-three-v5-control-v1.pine",
+      "attempt": 1,
+      "original_outcomes": "../v6/captures/v6/outcomes-v6.json",
+      "verified_utc": "2026-10-04T15:28:33.516571+00:00",
+      "original_export_utc": "2026-10-04T04:57:19.159Z",
+      "original_csv_sha256": "d6c7e0ea13aa48c6205eb7f9e35e665d2a630bd6e092f5ff17553eef58694a10",
+      "evidence_sha256": {
+        "captures/v6/evidence/fixed-ema-input-three-v5-control-v1-attempt1-setup.png": "d6a37eec9e45b935d8d62ad15aff55b8e203141fe6dc6d603d6042743d39c15e",
+        "captures/v6/evidence/fixed-ema-input-three-v5-control-v1-attempt1-export.png": "8da771b3389dd17daf921acf2c57be9f2e8fdc7149e8342c40d5dd7d592ad09e",
+        "captures/v6/evidence/fixed-ema-input-three-v5-control-v1-attempt1-logs.txt": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+        "captures/v6/evidence/fixed-ema-input-three-v5-control-v1-attempt1-logs-v1.json": "1e17aca18def0eff908827dde1868f90110b0c649f6fc6ac73982a106a529733",
+        "captures/v6/evidence/fixed-ema-input-three-v5-control-v1-attempt1-logs.png": "429a9435ac67502561d37a03d989fbd95dd1eb933a445803ebee79a710f386b9",
+        "captures/v6/evidence/fixed-ema-input-three-v5-control-v1-attempt1-inputs.png": "17530f9f793ae14bea3a8faaa10f8b91883db11eadeaa6612028d70d26b001a9",
+        "captures/v6/evidence/fixed-ema-input-three-v5-control-v1-attempt1-visual.png": "1b45bec2f33c528b2d0e7c9d788aefc3a66f8545bc67d7ba6e17c9fe42dffce7"
+      },
+      "limits": "Original v6 acquisition retained; no new browser run or new reset/cutoff. Reuse does not adjudicate engine parity."
+    }
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T15:30:11.125Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v11 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "corpus-909-history-limit-v1.pine",
+    "attempt": 1,
+    "source_sha256": "b24f7fea74f8750d9b4729273c61c59010e297f6bb0af6cd32ef1be7d1430234",
+    "indicator_title": "Support Resistance Classification (VR) [LuxAlgo]",
+    "status": "RUNS",
+    "csv_file": "captures/v11/corpus-909-history-limit-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T233010.071.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [
+        {
+          "id": "in_0",
+          "name": "fade",
+          "value": 5,
+          "default": 5
+        },
+        {
+          "id": "in_1",
+          "name": "value",
+          "value": "line",
+          "default": "line"
+        },
+        {
+          "id": "in_2",
+          "name": "\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0",
+          "value": "#00E676",
+          "default": "#00E676"
+        },
+        {
+          "id": "in_3",
+          "name": "",
+          "value": "#FF5252",
+          "default": "#FF5252"
+        },
+        {
+          "id": "in_4",
+          "name": "left",
+          "value": 10,
+          "default": 10
+        },
+        {
+          "id": "in_5",
+          "name": "right",
+          "value": 1,
+          "default": 1
+        },
+        {
+          "id": "in_6",
+          "name": "show",
+          "value": false,
+          "default": false
+        },
+        {
+          "id": "in_7",
+          "name": "1",
+          "value": "SMA",
+          "default": "SMA"
+        },
+        {
+          "id": "in_8",
+          "name": "",
+          "value": 50,
+          "default": 50
+        },
+        {
+          "id": "in_9",
+          "name": "",
+          "value": 2,
+          "default": 2
+        },
+        {
+          "id": "in_10",
+          "name": "",
+          "value": "D",
+          "default": "D"
+        },
+        {
+          "id": "in_11",
+          "name": "2",
+          "value": "SMA",
+          "default": "SMA"
+        },
+        {
+          "id": "in_12",
+          "name": "",
+          "value": 100,
+          "default": 100
+        },
+        {
+          "id": "in_13",
+          "name": "",
+          "value": 2,
+          "default": 2
+        },
+        {
+          "id": "in_14",
+          "name": "",
+          "value": "D",
+          "default": "D"
+        },
+        {
+          "id": "in_15",
+          "name": "3",
+          "value": "SMA",
+          "default": "SMA"
+        },
+        {
+          "id": "in_16",
+          "name": "",
+          "value": 20,
+          "default": 20
+        },
+        {
+          "id": "in_17",
+          "name": "",
+          "value": 2,
+          "default": 2
+        },
+        {
+          "id": "in_18",
+          "name": "",
+          "value": "W",
+          "default": "W"
+        },
+        {
+          "id": "in_19",
+          "name": "4",
+          "value": "Previous High",
+          "default": "Previous High"
+        },
+        {
+          "id": "in_20",
+          "name": "",
+          "value": 20,
+          "default": 20
+        },
+        {
+          "id": "in_21",
+          "name": "",
+          "value": 2,
+          "default": 2
+        },
+        {
+          "id": "in_22",
+          "name": "",
+          "value": "W",
+          "default": "W"
+        },
+        {
+          "id": "in_23",
+          "name": "5",
+          "value": "Previous Low",
+          "default": "Previous Low"
+        },
+        {
+          "id": "in_24",
+          "name": "",
+          "value": 20,
+          "default": 20
+        },
+        {
+          "id": "in_25",
+          "name": "",
+          "value": 2,
+          "default": 2
+        },
+        {
+          "id": "in_26",
+          "name": "",
+          "value": "W",
+          "default": "W"
+        },
+        {
+          "id": "in_27",
+          "name": "6",
+          "value": "Upper",
+          "default": "Upper"
+        },
+        {
+          "id": "in_28",
+          "name": "",
+          "value": 20,
+          "default": 20
+        },
+        {
+          "id": "in_29",
+          "name": "",
+          "value": 2,
+          "default": 2
+        },
+        {
+          "id": "in_30",
+          "name": "",
+          "value": "D",
+          "default": "D"
+        },
+        {
+          "id": "in_31",
+          "name": "7",
+          "value": "Lower",
+          "default": "Lower"
+        },
+        {
+          "id": "in_32",
+          "name": "",
+          "value": 20,
+          "default": 20
+        },
+        {
+          "id": "in_33",
+          "name": "",
+          "value": 2,
+          "default": 2
+        },
+        {
+          "id": "in_34",
+          "name": "",
+          "value": "D",
+          "default": "D"
+        },
+        {
+          "id": "in_35",
+          "name": "8",
+          "value": "Swings",
+          "default": "Swings"
+        },
+        {
+          "id": "in_36",
+          "name": "",
+          "value": 20,
+          "default": 20
+        },
+        {
+          "id": "in_37",
+          "name": "",
+          "value": 2,
+          "default": 2
+        },
+        {
+          "id": "in_38",
+          "name": "",
+          "value": "D",
+          "default": "D"
+        },
+        {
+          "id": "in_39",
+          "name": "9",
+          "value": "Fibonacci",
+          "default": "Fibonacci"
+        },
+        {
+          "id": "in_40",
+          "name": "",
+          "value": 20,
+          "default": 20
+        },
+        {
+          "id": "in_41",
+          "name": "",
+          "value": 2,
+          "default": 2
+        },
+        {
+          "id": "in_42",
+          "name": "",
+          "value": "W",
+          "default": "W"
+        },
+        {
+          "id": "in_43",
+          "name": "A",
+          "value": false,
+          "default": false
+        },
+        {
+          "id": "in_44",
+          "name": "",
+          "value": 1,
+          "default": 1
+        },
+        {
+          "id": "in_45",
+          "name": "B",
+          "value": false,
+          "default": false
+        },
+        {
+          "id": "in_46",
+          "name": "",
+          "value": 3,
+          "default": 3
+        },
+        {
+          "id": "in_47",
+          "name": "C",
+          "value": false,
+          "default": false
+        },
+        {
+          "id": "in_48",
+          "name": "",
+          "value": 5,
+          "default": 5
+        },
+        {
+          "id": "in_49",
+          "name": "D",
+          "value": false,
+          "default": false
+        },
+        {
+          "id": "in_50",
+          "name": "",
+          "value": 7,
+          "default": 7
+        },
+        {
+          "id": "in_51",
+          "name": "E",
+          "value": false,
+          "default": false
+        },
+        {
+          "id": "in_52",
+          "name": "",
+          "value": 9,
+          "default": 9
+        }
+      ],
+      "observed_indicator_title": "Support Resistance Classification (VR) [LuxAlgo]",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24645,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24946,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T15:29:59.003Z",
+    "live_candle_open_utc": "2026-10-04T15:30:00.000Z",
+    "export_utc": "2026-10-04T15:30:10.695Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v11/evidence/corpus-909-history-limit-v1-attempt1-setup.png",
+      "captures/v11/evidence/corpus-909-history-limit-v1-attempt1-export.png",
+      "captures/v11/evidence/corpus-909-history-limit-v1-attempt1-logs.txt",
+      "captures/v11/evidence/corpus-909-history-limit-v1-attempt1-logs-v1.json",
+      "captures/v11/evidence/corpus-909-history-limit-v1-attempt1-logs.png",
+      "captures/v11/evidence/corpus-909-history-limit-v1-attempt1-inputs.png",
+      "captures/v11/evidence/corpus-909-history-limit-v1-attempt1-visual.png",
+      "captures/v11/evidence/corpus-909-history-limit-v1-attempt1-data-window-v1.png",
+      "captures/v11/evidence/corpus-909-history-limit-v1-attempt1-data-window-v1.json",
+      "captures/v11/evidence/corpus-909-history-limit-v1-attempt1-data-window-v1.txt",
+      "captures/v11/evidence/corpus-909-history-limit-v1-attempt1-authority-object-geometry-v1.json",
+      "captures/v11/evidence/corpus-909-history-limit-v1-attempt1-authority-object-geometry-v1.png",
+      "captures/v11/evidence/corpus-909-history-limit-v1-attempt1-editor-buffer-v1.txt",
+      "captures/v11/evidence/corpus-909-history-limit-v1-attempt1-editor-normalization-v1.json"
+    ],
+    "notes": "Submitted frozen CRCRLF source unchanged. Native editor line-ending normalization recorded separately; all source defaults retained. First dataset Pine index not plotted; native chart order does not prove it.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": "Non-line-ending characters and newline-unit sequence verified; original byte identity is false due to recorded Monaco normalization",
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T15:29:59.774Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790822520,
+            83451.89,
+            83470.01,
+            83448.31,
+            83453.71,
+            3.39291
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791127680,
+            85350,
+            85354.01,
+            85320,
+            85320.01,
+            5.97837
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Support Resistance Classification (VR) [LuxAlgo]",
+            "status": {
+              "type": 1,
+              "startTime": 1791127799337
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T15:30:00.986Z",
+        "bars": 24945,
+        "end": true,
+        "first": {
+          "index": -24645,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791127680,
+            85350,
+            85354.01,
+            85320,
+            85320,
+            5.98442
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Support Resistance Classification (VR) [LuxAlgo]",
+            "status": {
+              "type": 2
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T15:30:01.894Z",
+        "bars": 24945,
+        "end": true,
+        "first": {
+          "index": -24645,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791127680,
+            85350,
+            85354.01,
+            85320,
+            85320.01,
+            5.98615
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Support Resistance Classification (VR) [LuxAlgo]",
+            "status": {
+              "type": 2
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T15:30:03.024Z",
+        "bars": 24946,
+        "end": true,
+        "first": {
+          "index": -24645,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 300,
+          "value": [
+            1791127800,
+            85320.01,
+            85320.01,
+            85320.01,
+            85320.01,
+            0
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Support Resistance Classification (VR) [LuxAlgo]",
+            "status": {
+              "type": 2
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T15:30:03.773Z",
+        "bars": 24946,
+        "end": true,
+        "first": {
+          "index": -24645,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 300,
+          "value": [
+            1791127800,
+            85320.01,
+            85320.01,
+            85320.01,
+            85320.01,
+            0.00438
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Support Resistance Classification (VR) [LuxAlgo]",
+            "status": {
+              "type": 1,
+              "startTime": 1791127803292
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T15:30:04.456Z",
+        "bars": 24946,
+        "end": true,
+        "first": {
+          "index": -24645,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 300,
+          "value": [
+            1791127800,
+            85320.01,
+            85320.01,
+            85320.01,
+            85320.01,
+            0.00438
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Support Resistance Classification (VR) [LuxAlgo]",
+            "status": {
+              "type": 2
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///614bc904-fa32-4de2-bf8d-48e2c43d9eed.pine?placement%3Ddialog",
+          "path": "/614bc904-fa32-4de2-bf8d-48e2c43d9eed.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 7,
+        "startColumn": 3,
+        "endLineNumber": 7,
+        "endColumn": 12
+      },
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///614bc904-fa32-4de2-bf8d-48e2c43d9eed.pine?placement%3Ddialog",
+          "path": "/614bc904-fa32-4de2-bf8d-48e2c43d9eed.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "severity": 4,
+        "message": "The `condition` parameter of the `if` accepts a 'bool' argument. To avoid potential unexpected results, pass a 'bool' value or expression to this parameter.",
+        "startLineNumber": 257,
+        "startColumn": 12,
+        "endLineNumber": 257,
+        "endColumn": 14
+      },
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///614bc904-fa32-4de2-bf8d-48e2c43d9eed.pine?placement%3Ddialog",
+          "path": "/614bc904-fa32-4de2-bf8d-48e2c43d9eed.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "severity": 4,
+        "message": "The `condition` parameter of the `if` accepts a 'bool' argument. To avoid potential unexpected results, pass a 'bool' value or expression to this parameter.",
+        "startLineNumber": 273,
+        "startColumn": 12,
+        "endLineNumber": 273,
+        "endColumn": 14
+      }
+    ],
+    "live_tooltip": "Sun 04 Oct '26   15:30",
+    "historical_compare_before_unix_seconds": 1791127800,
+    "pine_logs": {
+      "paths": [
+        "evidence/corpus-909-history-limit-v1-attempt1-logs.txt",
+        "evidence/corpus-909-history-limit-v1-attempt1-logs-v1.json",
+        "evidence/corpus-909-history-limit-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "cefc7375ac0c9733358b1bda5e436e92697d6ff00d0edaf440add4fed473b026",
+    "csv_bytes": 2476001,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "A",
+      "A",
+      "A",
+      "A",
+      "A",
+      "A",
+      "A",
+      "A",
+      "A",
+      "A",
+      "A",
+      "B",
+      "B",
+      "B",
+      "B",
+      "B",
+      "B",
+      "B",
+      "B",
+      "B",
+      "B",
+      "B",
+      "C",
+      "C",
+      "C",
+      "C",
+      "C",
+      "C",
+      "C",
+      "C",
+      "C",
+      "C",
+      "C",
+      "D",
+      "D",
+      "D",
+      "D",
+      "D",
+      "D",
+      "D",
+      "D",
+      "D",
+      "D",
+      "D",
+      "E",
+      "E",
+      "E",
+      "E",
+      "E",
+      "E",
+      "E",
+      "E",
+      "E",
+      "E",
+      "E"
+    ],
+    "duplicate_headers_preserved": true,
+    "declared_to_native_column_positions": {
+      "A": 5,
+      "B": 16,
+      "C": 27,
+      "D": 38,
+      "E": 49
+    },
+    "first_historical_cells": [
+      "1788134400",
+      "77682",
+      "77682.01",
+      "77572",
+      "77674.04",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""
+    ],
+    "last_historical_cells": [
+      "1791127680",
+      "85350",
+      "85354.01",
+      "85320",
+      "85320.01",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""
+    ],
+    "declared_to_native_header_mapping": {
+      "A": "A",
+      "B": "B",
+      "C": "C",
+      "D": "D",
+      "E": "E"
+    },
+    "csv_rows": 24946,
+    "historical_rows": 24945,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791127800,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791127800",
+    "first_historical_values": {
+      "A": "",
+      "B": "",
+      "C": "",
+      "D": "",
+      "E": ""
+    },
+    "last_historical_values": {
+      "A": "",
+      "B": "",
+      "C": "",
+      "D": "",
+      "E": ""
+    },
+    "data_window_witness": "captures/v11/evidence/corpus-909-history-limit-v1-attempt1-data-window-v1.json",
+    "submitted_source_sha256": "b24f7fea74f8750d9b4729273c61c59010e297f6bb0af6cd32ef1be7d1430234",
+    "editor_source_sha256": "4971e9d4c5294cac47c458ef25e31bcbe1b83dd20cf8ba8c47994ba9d0452c71"
+  }
+]

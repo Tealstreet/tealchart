@@ -1,0 +1,1143 @@
+{
+  "batch_start_utc": "2026-10-04T15:24:37.335967+00:00",
+  "frozen_source_commit": "2a413d81d1",
+  "manifest": "bundle-manifest-v9.json",
+  "manifest_sha256": "c9e28652a4981bbff92df7b4290a8cda8f2701dade38126f2b1a69ad91efc488",
+  "scripts": [
+    {
+      "script": "const-polyline-declaration-v6-v1.pine",
+      "sha256": "a9852222909928931136dfc9b99ede4c1281e43093fa99d6e82de6b5b95bd3e8",
+      "title": "Const polyline declaration",
+      "shorttitle": null,
+      "columns": [
+        "OUTCOME"
+      ],
+      "minimumHistoryBars": 8,
+      "manifestMinimumHistoryBars": 8,
+      "instructions": "instructions/const-polyline-declaration-v6-v1.md",
+      "pineVersion": 6,
+      "captureKind": "COMPILE-OR-NUMERIC-CSV"
+    },
+    {
+      "script": "const-polyline-reassignment-v6-v1.pine",
+      "sha256": "0af19de931c8d6d0c883a7737b9e3a6001c33fe6ea6908f5dfb5c79ab15a4867",
+      "title": "Const polyline ID replacement",
+      "shorttitle": null,
+      "columns": [
+        "OUTCOME"
+      ],
+      "minimumHistoryBars": 8,
+      "manifestMinimumHistoryBars": 8,
+      "instructions": "instructions/const-polyline-reassignment-v6-v1.md",
+      "pineVersion": 6,
+      "captureKind": "COMPILE-DIAGNOSTIC"
+    },
+    {
+      "script": "const-point-mutation-v6-v1.pine",
+      "sha256": "3cab29f8d297f173133a9e630a767f49a5f63e7dc16eaae47193f0b5e4b0a4ee",
+      "title": "Const point content mutation",
+      "shorttitle": null,
+      "columns": [
+        "MUTATED_PRICE",
+        "CLOSE_CONTROL"
+      ],
+      "minimumHistoryBars": 8,
+      "manifestMinimumHistoryBars": 8,
+      "instructions": "instructions/const-point-mutation-v6-v1.md",
+      "pineVersion": 6,
+      "captureKind": "COMPILE-OR-NUMERIC-CSV"
+    },
+    {
+      "script": "const-point-reassignment-v6-v1.pine",
+      "sha256": "9c96638edc3fac5100a486d44f2dfc25d0e52db43d3c5412b02c3e868e4e9bef",
+      "title": "Const point ID replacement",
+      "shorttitle": null,
+      "columns": [
+        "OUTCOME"
+      ],
+      "minimumHistoryBars": 8,
+      "manifestMinimumHistoryBars": 8,
+      "instructions": "instructions/const-point-reassignment-v6-v1.md",
+      "pineVersion": 6,
+      "captureKind": "COMPILE-DIAGNOSTIC"
+    },
+    {
+      "script": "const-udt-declaration-v6-v1.pine",
+      "sha256": "493132183bba70f55abbad5538638d31117b705cec747cb2845bd6a4f353835b",
+      "title": "Const UDT annotation",
+      "shorttitle": null,
+      "columns": [
+        "OUTCOME"
+      ],
+      "minimumHistoryBars": 8,
+      "manifestMinimumHistoryBars": 8,
+      "instructions": "instructions/const-udt-declaration-v6-v1.md",
+      "pineVersion": 6,
+      "captureKind": "COMPILE-OR-NUMERIC-CSV"
+    },
+    {
+      "script": "ordinary-udt-declaration-v6-control-v1.pine",
+      "sha256": "ab08bee190b9767723a358de92281ee026e413da42e350eb77dea8d913afca8e",
+      "title": "Ordinary UDT control",
+      "shorttitle": null,
+      "columns": [
+        "OUTCOME"
+      ],
+      "minimumHistoryBars": 8,
+      "manifestMinimumHistoryBars": 8,
+      "instructions": "instructions/ordinary-udt-declaration-v6-control-v1.md",
+      "pineVersion": 6,
+      "captureKind": "NUMERIC-CSV"
+    },
+    {
+      "script": "mutable-ema-first-two-v5-v1.pine",
+      "sha256": "2b6a798408522b6c15d993786017bf90f8572ae1e9c77c76b0e4151809f5dddc",
+      "title": "Mutable EMA first length two native",
+      "shorttitle": null,
+      "columns": [
+        "MUTABLE_TWO",
+        "FIXED_TWO",
+        "LIVE_LENGTH"
+      ],
+      "minimumHistoryBars": 128,
+      "manifestMinimumHistoryBars": 128,
+      "instructions": "instructions/mutable-ema-first-two-v5-v1.md",
+      "pineVersion": 5,
+      "captureKind": "COMPILE-OR-NUMERIC-CSV"
+    },
+    {
+      "script": "mutable-ema-udf-two-calls-v5-v1.pine",
+      "sha256": "0d9151129271433f9e29bc1e02762a4f6948fe0f9d20423e207b5248992615fc",
+      "title": "Mutable EMA separate UDF calls native",
+      "shorttitle": null,
+      "columns": [
+        "MUTABLE_UDF_TWO",
+        "FIXED_UDF_FOUR",
+        "FIXED_TWO",
+        "FIXED_FOUR"
+      ],
+      "minimumHistoryBars": 128,
+      "manifestMinimumHistoryBars": 128,
+      "instructions": "instructions/mutable-ema-udf-two-calls-v5-v1.md",
+      "pineVersion": 5,
+      "captureKind": "COMPILE-OR-NUMERIC-CSV"
+    },
+    {
+      "script": "fixed-ema-input-three-v5-control-v1.pine",
+      "sha256": "9034640287d9543e1d3ad5833a9646666eac2f69e6878a218ed2ff8ff56bdfa6",
+      "title": "Fixed EMA input native control",
+      "shorttitle": null,
+      "columns": [
+        "FIXED_INPUT_THREE",
+        "FIXED_LITERAL_THREE"
+      ],
+      "minimumHistoryBars": 128,
+      "manifestMinimumHistoryBars": 128,
+      "instructions": "instructions/fixed-ema-input-three-v5-control-v1.md",
+      "pineVersion": 5,
+      "captureKind": "COMPILE-OR-NUMERIC-CSV"
+    },
+    {
+      "script": "corpus-909-history-limit-v1.pine",
+      "sha256": "b24f7fea74f8750d9b4729273c61c59010e297f6bb0af6cd32ef1be7d1430234",
+      "title": "Support Resistance Classification (VR) [LuxAlgo]",
+      "shorttitle": "LuxAlgo - Support Resistance Classification (VR)",
+      "columns": [
+        "A",
+        "A",
+        "A",
+        "A",
+        "A",
+        "A",
+        "A",
+        "A",
+        "A",
+        "A",
+        "A",
+        "B",
+        "B",
+        "B",
+        "B",
+        "B",
+        "B",
+        "B",
+        "B",
+        "B",
+        "B",
+        "B",
+        "C",
+        "C",
+        "C",
+        "C",
+        "C",
+        "C",
+        "C",
+        "C",
+        "C",
+        "C",
+        "C",
+        "D",
+        "D",
+        "D",
+        "D",
+        "D",
+        "D",
+        "D",
+        "D",
+        "D",
+        "D",
+        "D",
+        "E",
+        "E",
+        "E",
+        "E",
+        "E",
+        "E",
+        "E",
+        "E",
+        "E",
+        "E",
+        "E"
+      ],
+      "minimumHistoryBars": 10002,
+      "manifestMinimumHistoryBars": 10002,
+      "instructions": "instructions/corpus-909-history-limit-v1.md",
+      "pineVersion": 5,
+      "captureKind": "COMPILE-OR-RUNTIME-OUTCOME-AND-NUMERIC-CSV"
+    },
+    {
+      "script": "ternary-int-string-v6-v1.pine",
+      "sha256": "a248a4930909cae257bbccf20fad6470da39a3c319b6f8e4171ea8961eeb4fb2",
+      "title": "V6 ternary int-string",
+      "shorttitle": null,
+      "columns": [],
+      "minimumHistoryBars": 8,
+      "manifestMinimumHistoryBars": 8,
+      "instructions": "instructions/ternary-int-string-v6-v1.md",
+      "pineVersion": 6,
+      "captureKind": "COMPILE-OR-NUMERIC-CSV"
+    },
+    {
+      "script": "ternary-float-bool-v6-v1.pine",
+      "sha256": "7458063a4bcf8bf1a5a7d89fc2ff719d3b89b8d41c1d99bef7a28a76da8e764d",
+      "title": "V6 ternary float-bool",
+      "shorttitle": null,
+      "columns": [],
+      "minimumHistoryBars": 8,
+      "manifestMinimumHistoryBars": 8,
+      "instructions": "instructions/ternary-float-bool-v6-v1.md",
+      "pineVersion": 6,
+      "captureKind": "COMPILE-OR-NUMERIC-CSV"
+    },
+    {
+      "script": "ternary-color-int-v6-v1.pine",
+      "sha256": "bcfafc256becbec63d47b444eeaa8dcba647bdd65d0c0dfd3f2b236d99b82e77",
+      "title": "V6 ternary color-int",
+      "shorttitle": null,
+      "columns": [],
+      "minimumHistoryBars": 8,
+      "manifestMinimumHistoryBars": 8,
+      "instructions": "instructions/ternary-color-int-v6-v1.md",
+      "pineVersion": 6,
+      "captureKind": "COMPILE-OR-NUMERIC-CSV"
+    },
+    {
+      "script": "ternary-string-bool-v6-v1.pine",
+      "sha256": "295f5fa08433d07734975a15910aac13640243bc74cca0553c98cd8f0d043723",
+      "title": "V6 ternary string-bool",
+      "shorttitle": null,
+      "columns": [],
+      "minimumHistoryBars": 8,
+      "manifestMinimumHistoryBars": 8,
+      "instructions": "instructions/ternary-string-bool-v6-v1.md",
+      "pineVersion": 6,
+      "captureKind": "COMPILE-OR-NUMERIC-CSV"
+    },
+    {
+      "script": "ternary-bool-int-v6-v1.pine",
+      "sha256": "d44793e6a01fd2664cdf359e94cde5c82abb5feff4582c075bf066dcd5abe5a8",
+      "title": "V6 ternary bool-int",
+      "shorttitle": null,
+      "columns": [],
+      "minimumHistoryBars": 8,
+      "manifestMinimumHistoryBars": 8,
+      "instructions": "instructions/ternary-bool-int-v6-v1.md",
+      "pineVersion": 6,
+      "captureKind": "COMPILE-OR-NUMERIC-CSV"
+    },
+    {
+      "script": "ternary-color-string-v6-v1.pine",
+      "sha256": "df7705c525fcf3bbcd34702b3d84c3e1409895167622b2c98ae962888160fc8e",
+      "title": "V6 ternary color-string",
+      "shorttitle": null,
+      "columns": [],
+      "minimumHistoryBars": 8,
+      "manifestMinimumHistoryBars": 8,
+      "instructions": "instructions/ternary-color-string-v6-v1.md",
+      "pineVersion": 6,
+      "captureKind": "COMPILE-OR-NUMERIC-CSV"
+    },
+    {
+      "script": "ternary-compatible-v6-control-v1.pine",
+      "sha256": "d91dd989b660b9d99f34fa44b2114d959eaa1e3aa9079e4ec1021d7fb4e84ec5",
+      "title": "V6 ternary compatible control",
+      "shorttitle": null,
+      "columns": [],
+      "minimumHistoryBars": 8,
+      "manifestMinimumHistoryBars": 8,
+      "instructions": "instructions/ternary-compatible-v6-control-v1.md",
+      "pineVersion": 6,
+      "captureKind": "NUMERIC-CSV"
+    },
+    {
+      "script": "source-window-hole-matrix-v1.pine",
+      "sha256": "20b43a7a1c1f73848ad1b3c962cf1d7e5c1f219c6cab549aab8369519ee1a1a1",
+      "title": "V11 source-window-hole-matrix-v1",
+      "shorttitle": null,
+      "columns": [
+        "BAR_INDEX",
+        "CLEAN",
+        "SOURCE",
+        "PEER",
+        "RSI4",
+        "CMO4",
+        "HMA4",
+        "HIGHESTBARS4",
+        "LOWESTBARS4",
+        "CORRELATION4",
+        "RISING4",
+        "NEAREST4P50",
+        "PIVOTLOW2",
+        "PIVOTHIGH2",
+        "MIN",
+        "RCI4"
+      ],
+      "minimumHistoryBars": 96,
+      "manifestMinimumHistoryBars": 96,
+      "instructions": "instructions/source-window-hole-matrix-v1.md",
+      "pineVersion": 6,
+      "captureKind": "NUMERIC-CSV"
+    },
+    {
+      "script": "source-stateful-hole-matrix-v1.pine",
+      "sha256": "b4e7554dc489c8fd96b7bc718cc401b27975234058db6cb29719b2023fbcc367",
+      "title": "V11 source-stateful-hole-matrix-v1",
+      "shorttitle": null,
+      "columns": [
+        "BAR_INDEX",
+        "CLEAN",
+        "SOURCE",
+        "PEER",
+        "CUM",
+        "FIXNAN",
+        "VALUEWHEN0",
+        "VALUEWHEN3",
+        "MACD",
+        "SIGNAL",
+        "HISTOGRAM"
+      ],
+      "minimumHistoryBars": 96,
+      "manifestMinimumHistoryBars": 96,
+      "instructions": "instructions/source-stateful-hole-matrix-v1.md",
+      "pineVersion": 6,
+      "captureKind": "NUMERIC-CSV"
+    },
+    {
+      "script": "array-linear-standardize-matrix-v1.pine",
+      "sha256": "eb5ecbaadd3dd02ad2bd67f0eea65adf60358558ae637bbeb064f4479ece6053",
+      "title": "V11 array-linear-standardize-matrix-v1",
+      "shorttitle": null,
+      "columns": [
+        "STANDARD_SIZE",
+        "STANDARD_0",
+        "STANDARD_1",
+        "STANDARD_2",
+        "STANDARD_3",
+        "AF_P25_NS",
+        "AF_P25_METHOD",
+        "AF_P50_NS",
+        "AF_P50_METHOD",
+        "AF_P75_NS",
+        "AF_P75_METHOD",
+        "AI_P25_NS",
+        "AI_P25_METHOD",
+        "AI_P50_NS",
+        "AI_P50_METHOD",
+        "AI_P75_NS",
+        "AI_P75_METHOD"
+      ],
+      "minimumHistoryBars": 4,
+      "manifestMinimumHistoryBars": 4,
+      "instructions": "instructions/array-linear-standardize-matrix-v1.md",
+      "pineVersion": 6,
+      "captureKind": "NUMERIC-CSV"
+    },
+    {
+      "script": "analyst-target-context-matrix-v1.pine",
+      "sha256": "775ca708549742f1fe32849d4b013cccbd6bbd06a1b12aa9f102dd18302c2be1",
+      "title": "V11 analyst-target-context-matrix-v1",
+      "shorttitle": null,
+      "columns": [
+        "TARGET_AVERAGE",
+        "AVERAGE_MISSING",
+        "TARGET_MEDIAN",
+        "MEDIAN_MISSING",
+        "TARGET_DATE",
+        "DATE_MISSING",
+        "TARGET_ESTIMATES",
+        "ESTIMATES_MISSING",
+        "TARGET_HIGH",
+        "HIGH_MISSING",
+        "TARGET_LOW",
+        "LOW_MISSING",
+        "BAR_TIME",
+        "OBSERVATION_TIME"
+      ],
+      "minimumHistoryBars": 96,
+      "manifestMinimumHistoryBars": 96,
+      "instructions": "instructions/analyst-target-context-matrix-v1.md",
+      "pineVersion": 6,
+      "captureKind": "NUMERIC-CSV+SCREENSHOT"
+    },
+    {
+      "script": "hline-gradient-six-slots-v1.pine",
+      "sha256": "910fef2fe25495b79d98db55be06f7879eadf1c3a67aa0af2a0d2d944bb5d877",
+      "title": "V11 hline-gradient-six-slots-v1",
+      "shorttitle": null,
+      "columns": [
+        "MIDPOINT"
+      ],
+      "minimumHistoryBars": 4,
+      "manifestMinimumHistoryBars": 4,
+      "instructions": "instructions/hline-gradient-six-slots-v1.md",
+      "pineVersion": 6,
+      "captureKind": "OUTCOME+SCREENSHOT"
+    },
+    {
+      "script": "all-na-seed-matrix-v1.pine",
+      "sha256": "91e15a50011ee88e0fc141d68afc15f46a4a0ff02152da57bbbf651be39c575c",
+      "title": "V11 all-na-seed-matrix-v1",
+      "shorttitle": null,
+      "columns": [
+        "BAR_INDEX",
+        "FIXNAN_ALL_NA",
+        "MAX_ALL_NA",
+        "MIN_ALL_NA"
+      ],
+      "minimumHistoryBars": 96,
+      "manifestMinimumHistoryBars": 96,
+      "instructions": "instructions/all-na-seed-matrix-v1.md",
+      "pineVersion": 6,
+      "captureKind": "NUMERIC-CSV"
+    },
+    {
+      "script": "legacy-cross-hole-matrix-v1.pine",
+      "sha256": "69af5cc922092d1ffe462d6aab104d896eddf9977bb3d2d25dad4d4187b6b9fb",
+      "title": "V11 legacy-cross-hole-matrix-v1",
+      "shorttitle": null,
+      "columns": [
+        "BAR_INDEX",
+        "X",
+        "Y",
+        "CROSSOVER_STATE",
+        "CROSSUNDER_STATE",
+        "CROSS_STATE"
+      ],
+      "minimumHistoryBars": 96,
+      "manifestMinimumHistoryBars": 96,
+      "instructions": "instructions/legacy-cross-hole-matrix-v1.md",
+      "pineVersion": 5,
+      "captureKind": "NUMERIC-CSV"
+    },
+    {
+      "script": "chart-context-lifecycle-matrix-v1.pine",
+      "sha256": "72d27050859eed864c1966a2ceefcdfce45487a005380a816c15ea23b52d6b98",
+      "title": "V11 chart-context-lifecycle-matrix-v1",
+      "shorttitle": null,
+      "columns": [
+        "BAR_INDEX",
+        "BAR_TIME",
+        "CLOCK",
+        "LIVE_UPDATES",
+        "VISIBLE_LEFT",
+        "VISIBLE_RIGHT",
+        "BG_R",
+        "BG_G",
+        "BG_B",
+        "FG_R",
+        "FG_G",
+        "FG_B",
+        "EXECUTION_COUNT",
+        "RESET_DISPLAY"
+      ],
+      "minimumHistoryBars": 96,
+      "manifestMinimumHistoryBars": 96,
+      "instructions": "instructions/chart-context-lifecycle-matrix-v1.md",
+      "pineVersion": 6,
+      "captureKind": "NUMERIC-CSV+SCREENSHOT"
+    },
+    {
+      "script": "default-string-text-pair-v1.pine",
+      "sha256": "d5edf390dd59de188f6ac1e27fe159ed7ed97fec191a4d6a81abc3df15cbb29e",
+      "title": "V11 default-string-text-pair-v1",
+      "shorttitle": null,
+      "columns": [
+        "FIRST_LENGTH",
+        "SECOND_LENGTH"
+      ],
+      "minimumHistoryBars": 96,
+      "manifestMinimumHistoryBars": 96,
+      "instructions": "instructions/default-string-text-pair-v1.md",
+      "pineVersion": 6,
+      "captureKind": "LOG+SCREENSHOT"
+    },
+    {
+      "script": "inactive-if-string-pair-v1.pine",
+      "sha256": "fe1e5e3fac02f1a802d754865e3b6c6f99bdbc922b9b770c61ef697cfdb85991",
+      "title": "V11 inactive-if-string-pair-v1",
+      "shorttitle": null,
+      "columns": [
+        "BAR_INDEX",
+        "STRING_IS_NA",
+        "STRING_LENGTH"
+      ],
+      "minimumHistoryBars": 96,
+      "manifestMinimumHistoryBars": 96,
+      "instructions": "instructions/inactive-if-string-pair-v1.md",
+      "pineVersion": 6,
+      "captureKind": "NUMERIC-CSV+LOG"
+    },
+    {
+      "script": "matrix-predicate-orientation-epsilon-v1.pine",
+      "sha256": "197e5394d611cf679406f83dcf654371fbf6fc6cd872fd9a82c23a44675c3507",
+      "title": "V11 matrix-predicate-orientation-epsilon-v1",
+      "shorttitle": null,
+      "columns": [
+        "ROW_STOCHASTIC",
+        "COLUMN_STOCHASTIC",
+        "ZERO",
+        "BINARY",
+        "IDENTITY",
+        "SYMMETRIC",
+        "EPSILON"
+      ],
+      "minimumHistoryBars": 4,
+      "manifestMinimumHistoryBars": 4,
+      "instructions": "instructions/matrix-predicate-orientation-epsilon-v1.md",
+      "pineVersion": 6,
+      "captureKind": "NUMERIC-CSV"
+    },
+    {
+      "script": "modulo-assignment-sign-matrix-v1.pine",
+      "sha256": "2e6b353c8f1f1569361279928fb9de106dadf5070ee67b55e64b8908a52545ca",
+      "title": "V11 modulo-assignment-sign-matrix-v1",
+      "shorttitle": null,
+      "columns": [
+        "BAR_INDEX",
+        "A",
+        "B",
+        "MODULO",
+        "MODULO_ASSIGN"
+      ],
+      "minimumHistoryBars": 16,
+      "manifestMinimumHistoryBars": 16,
+      "instructions": "instructions/modulo-assignment-sign-matrix-v1.md",
+      "pineVersion": 6,
+      "captureKind": "NUMERIC-CSV"
+    },
+    {
+      "script": "requested-confirmation-pair-v1.pine",
+      "sha256": "5c4484388ec0be90d4a73561af9b8d764d353cd702a785d400894403f87f0488",
+      "title": "V11 requested-confirmation-pair-v1",
+      "shorttitle": null,
+      "columns": [
+        "LOCAL_CONFIRMED",
+        "REQUEST_CONFIRMED",
+        "LOCAL_TIME",
+        "REQUEST_TIME"
+      ],
+      "minimumHistoryBars": 96,
+      "manifestMinimumHistoryBars": 96,
+      "instructions": "instructions/requested-confirmation-pair-v1.md",
+      "pineVersion": 6,
+      "captureKind": "NUMERIC-CSV+SCREENSHOT"
+    },
+    {
+      "script": "numeric-array-every-float-method-v1.pine",
+      "sha256": "0b667c5c01e0e4fdf54051be332a11c83d2651e9d8375a0ec9ad1d617e3fe9f9",
+      "title": "V11 numeric-array-every-float-method-v1",
+      "shorttitle": null,
+      "columns": [
+        "RESULT"
+      ],
+      "minimumHistoryBars": 4,
+      "manifestMinimumHistoryBars": 4,
+      "instructions": "instructions/numeric-array-every-float-method-v1.md",
+      "pineVersion": 6,
+      "captureKind": "OUTCOME+NUMERIC-CSV"
+    },
+    {
+      "script": "numeric-array-every-float-namespace-v1.pine",
+      "sha256": "8b9196658175656b964c5e2835f89f2b705bc1e90e47b4efa4c15f230692ac9b",
+      "title": "V11 numeric-array-every-float-namespace-v1",
+      "shorttitle": null,
+      "columns": [
+        "RESULT"
+      ],
+      "minimumHistoryBars": 4,
+      "manifestMinimumHistoryBars": 4,
+      "instructions": "instructions/numeric-array-every-float-namespace-v1.md",
+      "pineVersion": 6,
+      "captureKind": "OUTCOME+NUMERIC-CSV"
+    },
+    {
+      "script": "numeric-array-every-int-method-v1.pine",
+      "sha256": "a04566b29f2eea9dd1e8feebc8fe3ac4f71b6fad44dfe2790425178227f2c7c6",
+      "title": "V11 numeric-array-every-int-method-v1",
+      "shorttitle": null,
+      "columns": [
+        "RESULT"
+      ],
+      "minimumHistoryBars": 4,
+      "manifestMinimumHistoryBars": 4,
+      "instructions": "instructions/numeric-array-every-int-method-v1.md",
+      "pineVersion": 6,
+      "captureKind": "OUTCOME+NUMERIC-CSV"
+    },
+    {
+      "script": "numeric-array-every-int-namespace-v1.pine",
+      "sha256": "5b2b003a21c85e4f47baa423d5800403e01061f9d6a7667c72584dba70186061",
+      "title": "V11 numeric-array-every-int-namespace-v1",
+      "shorttitle": null,
+      "columns": [
+        "RESULT"
+      ],
+      "minimumHistoryBars": 4,
+      "manifestMinimumHistoryBars": 4,
+      "instructions": "instructions/numeric-array-every-int-namespace-v1.md",
+      "pineVersion": 6,
+      "captureKind": "OUTCOME+NUMERIC-CSV"
+    },
+    {
+      "script": "numeric-array-some-float-method-v1.pine",
+      "sha256": "0686a8120285e47b57c677229cb7af5102414caefd22658745811bec16c75dd0",
+      "title": "V11 numeric-array-some-float-method-v1",
+      "shorttitle": null,
+      "columns": [
+        "RESULT"
+      ],
+      "minimumHistoryBars": 4,
+      "manifestMinimumHistoryBars": 4,
+      "instructions": "instructions/numeric-array-some-float-method-v1.md",
+      "pineVersion": 6,
+      "captureKind": "OUTCOME+NUMERIC-CSV"
+    },
+    {
+      "script": "numeric-array-some-float-namespace-v1.pine",
+      "sha256": "017d2d98b8acb3ba1f41e86127eba0cbf2a4148b94ecd236cb55bccfa1b09d27",
+      "title": "V11 numeric-array-some-float-namespace-v1",
+      "shorttitle": null,
+      "columns": [
+        "RESULT"
+      ],
+      "minimumHistoryBars": 4,
+      "manifestMinimumHistoryBars": 4,
+      "instructions": "instructions/numeric-array-some-float-namespace-v1.md",
+      "pineVersion": 6,
+      "captureKind": "OUTCOME+NUMERIC-CSV"
+    },
+    {
+      "script": "numeric-array-some-int-method-v1.pine",
+      "sha256": "0d49144827ee4d2670f19a0bbe52ccf62a1c3d3bfcd66c62ae76b2ccd15c9c25",
+      "title": "V11 numeric-array-some-int-method-v1",
+      "shorttitle": null,
+      "columns": [
+        "RESULT"
+      ],
+      "minimumHistoryBars": 4,
+      "manifestMinimumHistoryBars": 4,
+      "instructions": "instructions/numeric-array-some-int-method-v1.md",
+      "pineVersion": 6,
+      "captureKind": "OUTCOME+NUMERIC-CSV"
+    },
+    {
+      "script": "numeric-array-some-int-namespace-v1.pine",
+      "sha256": "e88abec471de121ed94f72342304bcc998ad00652819ee6da1f1b1d208d88199",
+      "title": "V11 numeric-array-some-int-namespace-v1",
+      "shorttitle": null,
+      "columns": [
+        "RESULT"
+      ],
+      "minimumHistoryBars": 4,
+      "manifestMinimumHistoryBars": 4,
+      "instructions": "instructions/numeric-array-some-int-namespace-v1.md",
+      "pineVersion": 6,
+      "captureKind": "OUTCOME+NUMERIC-CSV"
+    },
+    {
+      "script": "plotbar-four-input-reorder-v1.pine",
+      "sha256": "ac065233567922127390d637b80141e9e0903047270ae5a41acbb16fafa0058d",
+      "title": "V11 plotbar-four-input-reorder-v1",
+      "shorttitle": null,
+      "columns": [
+        "BAR_INDEX",
+        "INPUT_OPEN",
+        "INPUT_HIGH",
+        "INPUT_LOW",
+        "INPUT_CLOSE"
+      ],
+      "minimumHistoryBars": 16,
+      "manifestMinimumHistoryBars": 16,
+      "instructions": "instructions/plotbar-four-input-reorder-v1.md",
+      "pineVersion": 6,
+      "captureKind": "NUMERIC-CSV+SCREENSHOT"
+    },
+    {
+      "script": "sparse-udf-history-pair-v1.pine",
+      "sha256": "9d068c73947aefa5ec1e271574bad113bf6be3de776ba77c62685783fae2af8e",
+      "title": "V11 sparse-udf-history-pair-v1",
+      "shorttitle": null,
+      "columns": [
+        "BAR_INDEX",
+        "CURRENT",
+        "PRIOR1",
+        "PRIOR2",
+        "PRIOR3"
+      ],
+      "minimumHistoryBars": 96,
+      "manifestMinimumHistoryBars": 96,
+      "instructions": "instructions/sparse-udf-history-pair-v1.md",
+      "pineVersion": 6,
+      "captureKind": "NUMERIC-CSV"
+    },
+    {
+      "script": "tagged-udt-equal-key-sort-v1.pine",
+      "sha256": "3f53206b2f33c3d948394588f4dc11808871116e4e767a3184ac5b6fe332c47c",
+      "title": "V11 tagged-udt-equal-key-sort-v1",
+      "shorttitle": null,
+      "columns": [
+        "TAG0",
+        "TAG1",
+        "TAG2",
+        "TAG3",
+        "TAG4"
+      ],
+      "minimumHistoryBars": 4,
+      "manifestMinimumHistoryBars": 4,
+      "instructions": "instructions/tagged-udt-equal-key-sort-v1.md",
+      "pineVersion": 6,
+      "captureKind": "NUMERIC-CSV"
+    },
+    {
+      "script": "visual-curves-point-copy-v6-v1.pine",
+      "sha256": "b11d4849cb197f806e1c5ed790482ae7d8de296f0e84f567981d883dacf8f7ca",
+      "title": "V11 curve geometry and point copies",
+      "shorttitle": null,
+      "columns": [
+        "BAR_INDEX",
+        "DRAWING_END_INDEX",
+        "POLYLINE_COUNT"
+      ],
+      "minimumHistoryBars": 64,
+      "manifestMinimumHistoryBars": 64,
+      "instructions": "instructions/visual-curves-point-copy-v6-v1.md",
+      "pineVersion": 6,
+      "captureKind": "OUTCOME-AND-NUMERIC-CSV-AND-SCREENSHOT"
+    },
+    {
+      "script": "visual-offset-bgcolor-v3-v1.pine",
+      "sha256": "540029e342e1c9b67fe384c071b831d4c6b608090c835d5cd5f08fb969cdf394",
+      "title": "V11 isolated bgcolor offset v3",
+      "shorttitle": null,
+      "columns": [
+        "SOURCE_INDEX_SCALED",
+        "SOURCE_SHIFT",
+        "EVENT_INDEX_SCALED"
+      ],
+      "minimumHistoryBars": 128,
+      "manifestMinimumHistoryBars": 128,
+      "instructions": "instructions/visual-offset-bgcolor-v3-v1.md",
+      "pineVersion": 3,
+      "captureKind": "OUTCOME-AND-NUMERIC-CSV-AND-SCREENSHOT"
+    },
+    {
+      "script": "visual-offset-bgcolor-v4-v1.pine",
+      "sha256": "62ebd00671f01b54e44ef41fef4c43dd491fa0be208e052d000e7a05fbe1f48a",
+      "title": "V11 isolated bgcolor offset v4",
+      "shorttitle": null,
+      "columns": [
+        "SOURCE_INDEX_SCALED",
+        "SOURCE_SHIFT",
+        "EVENT_INDEX_SCALED"
+      ],
+      "minimumHistoryBars": 128,
+      "manifestMinimumHistoryBars": 128,
+      "instructions": "instructions/visual-offset-bgcolor-v4-v1.md",
+      "pineVersion": 4,
+      "captureKind": "OUTCOME-AND-NUMERIC-CSV-AND-SCREENSHOT"
+    },
+    {
+      "script": "visual-offset-bgcolor-v5-v1.pine",
+      "sha256": "299e52ebc904804ecdc62029d062ad74f936f941c6c6483d7e7ea6a6f11de12b",
+      "title": "V11 isolated bgcolor offset v5",
+      "shorttitle": null,
+      "columns": [
+        "SOURCE_INDEX_SCALED",
+        "SOURCE_SHIFT",
+        "EVENT_INDEX_SCALED"
+      ],
+      "minimumHistoryBars": 128,
+      "manifestMinimumHistoryBars": 128,
+      "instructions": "instructions/visual-offset-bgcolor-v5-v1.md",
+      "pineVersion": 5,
+      "captureKind": "OUTCOME-AND-NUMERIC-CSV-AND-SCREENSHOT"
+    },
+    {
+      "script": "visual-offset-plotarrow-v3-v1.pine",
+      "sha256": "286f8259fdca58e86d5a24a659e012e46eef867c7ddd99e49667937d69354280",
+      "title": "V11 isolated plotarrow offset v3",
+      "shorttitle": null,
+      "columns": [
+        "SOURCE_INDEX_SCALED",
+        "SOURCE_SHIFT",
+        "EVENT_INDEX_SCALED"
+      ],
+      "minimumHistoryBars": 128,
+      "manifestMinimumHistoryBars": 128,
+      "instructions": "instructions/visual-offset-plotarrow-v3-v1.md",
+      "pineVersion": 3,
+      "captureKind": "OUTCOME-AND-NUMERIC-CSV-AND-SCREENSHOT"
+    },
+    {
+      "script": "visual-offset-plotarrow-v4-v1.pine",
+      "sha256": "1f7a538473f60082990a975227cf1fc23ca6810021492478e57b76fbb31cc0be",
+      "title": "V11 isolated plotarrow offset v4",
+      "shorttitle": null,
+      "columns": [
+        "SOURCE_INDEX_SCALED",
+        "SOURCE_SHIFT",
+        "EVENT_INDEX_SCALED"
+      ],
+      "minimumHistoryBars": 128,
+      "manifestMinimumHistoryBars": 128,
+      "instructions": "instructions/visual-offset-plotarrow-v4-v1.md",
+      "pineVersion": 4,
+      "captureKind": "OUTCOME-AND-NUMERIC-CSV-AND-SCREENSHOT"
+    },
+    {
+      "script": "visual-offset-plotarrow-v5-v1.pine",
+      "sha256": "9293edc3aa8c57428f6b7d3609239207abccf4735552f469b83404097692ac4e",
+      "title": "V11 isolated plotarrow offset v5",
+      "shorttitle": null,
+      "columns": [
+        "SOURCE_INDEX_SCALED",
+        "SOURCE_SHIFT",
+        "EVENT_INDEX_SCALED"
+      ],
+      "minimumHistoryBars": 128,
+      "manifestMinimumHistoryBars": 128,
+      "instructions": "instructions/visual-offset-plotarrow-v5-v1.md",
+      "pineVersion": 5,
+      "captureKind": "OUTCOME-AND-NUMERIC-CSV-AND-SCREENSHOT"
+    },
+    {
+      "script": "visual-offsets-grouped-v3-v1.pine",
+      "sha256": "29e9db124e5f6e3ed2d5bd0c6db059ceff6dd38bf29f38fba2940a7d115659b5",
+      "title": "V11 visual offsets v3",
+      "shorttitle": null,
+      "columns": [
+        "SOURCE_INDEX_SCALED",
+        "SOURCE_SHIFT",
+        "EVENT_INDEX_SCALED",
+        "DYNAMIC_PLOT",
+        "ZERO_PLOT",
+        "DYNAMIC_SHAPE",
+        "ZERO_SHAPE",
+        "DYNAMIC_CHAR",
+        "ZERO_CHAR"
+      ],
+      "minimumHistoryBars": 128,
+      "manifestMinimumHistoryBars": 128,
+      "instructions": "instructions/visual-offsets-grouped-v3-v1.md",
+      "pineVersion": 3,
+      "captureKind": "OUTCOME-AND-NUMERIC-CSV-AND-SCREENSHOT"
+    },
+    {
+      "script": "visual-offsets-grouped-v4-v1.pine",
+      "sha256": "4a29122ac5fe4cd964e1c1e66afbe179d364bf11bb0a3cd338658bf61ce16a5f",
+      "title": "V11 visual offsets v4",
+      "shorttitle": null,
+      "columns": [
+        "SOURCE_INDEX_SCALED",
+        "SOURCE_SHIFT",
+        "EVENT_INDEX_SCALED",
+        "DYNAMIC_PLOT",
+        "ZERO_PLOT",
+        "DYNAMIC_SHAPE",
+        "ZERO_SHAPE",
+        "DYNAMIC_CHAR",
+        "ZERO_CHAR"
+      ],
+      "minimumHistoryBars": 128,
+      "manifestMinimumHistoryBars": 128,
+      "instructions": "instructions/visual-offsets-grouped-v4-v1.md",
+      "pineVersion": 4,
+      "captureKind": "OUTCOME-AND-NUMERIC-CSV-AND-SCREENSHOT"
+    },
+    {
+      "script": "visual-offsets-grouped-v5-v1.pine",
+      "sha256": "6bd0cdc63a91bade545285c66bc20b508167277408754ff7d30972a4bb797cd8",
+      "title": "V11 visual offsets v5",
+      "shorttitle": null,
+      "columns": [
+        "SOURCE_INDEX_SCALED",
+        "SOURCE_SHIFT",
+        "EVENT_INDEX_SCALED",
+        "DYNAMIC_PLOT",
+        "ZERO_PLOT",
+        "DYNAMIC_SHAPE",
+        "ZERO_SHAPE",
+        "DYNAMIC_CHAR",
+        "ZERO_CHAR"
+      ],
+      "minimumHistoryBars": 128,
+      "manifestMinimumHistoryBars": 128,
+      "instructions": "instructions/visual-offsets-grouped-v5-v1.md",
+      "pineVersion": 5,
+      "captureKind": "OUTCOME-AND-NUMERIC-CSV-AND-SCREENSHOT"
+    },
+    {
+      "script": "visual-retention-four-families-v6-v1.pine",
+      "sha256": "7e4d1af7396346ce4ccceef05b32a73a365ad38a4d43847f53400f0c927cd7b1",
+      "title": "V11 four-family retention",
+      "shorttitle": null,
+      "columns": [
+        "BAR_INDEX",
+        "CREATED",
+        "LABEL_COUNT",
+        "LABEL_OLDEST_CREATED",
+        "LINE_COUNT",
+        "LINE_OLDEST_CREATED",
+        "BOX_COUNT",
+        "BOX_OLDEST_CREATED",
+        "POLYLINE_COUNT",
+        "POLYLINE_OLDEST_CREATED"
+      ],
+      "minimumHistoryBars": 64,
+      "manifestMinimumHistoryBars": 64,
+      "instructions": "instructions/visual-retention-four-families-v6-v1.md",
+      "pineVersion": 6,
+      "captureKind": "OUTCOME-AND-NUMERIC-CSV-AND-SCREENSHOT"
+    },
+    {
+      "script": "udt-variable-ticker-namespace-v1.pine",
+      "sha256": "39b2d2c1d657aadb07e0a5e6a4ba53e029df3eb1cb3bf89a3d2c968d36d4bc44",
+      "title": "UDT namespace ticker discriminator v1",
+      "shorttitle": null,
+      "columns": [
+        "method_result"
+      ],
+      "minimumHistoryBars": 16,
+      "manifestMinimumHistoryBars": 16,
+      "instructions": "instructions/udt-variable-ticker-namespace-v1.md",
+      "pineVersion": 6,
+      "captureKind": "COMPILE-OR-NUMERIC-CSV"
+    },
+    {
+      "script": "udt-variable-holder-method-control-v1.pine",
+      "sha256": "fe5a3cd202b3916d0dae2a04146945c5ab3eeb600f247d5b703c2194d09a760a",
+      "title": "UDT namespace ticker control v1",
+      "shorttitle": null,
+      "columns": [
+        "method_result"
+      ],
+      "minimumHistoryBars": 16,
+      "manifestMinimumHistoryBars": 16,
+      "instructions": "instructions/udt-variable-holder-method-control-v1.md",
+      "pineVersion": 6,
+      "captureKind": "COMPILE-OR-NUMERIC-CSV"
+    },
+    {
+      "script": "provider6m-snapshot-pack-v6-v1.pine",
+      "sha256": "2203c338134a38131d8c0fb525fffc2dadcf07d5591b7c6b55944a3475d87976",
+      "title": "V11 requested6m snapshot pack",
+      "shorttitle": null,
+      "columns": [
+        "htf6_goff_lon_close_clean",
+        "htf6_goff_lon_sum_close_len3_clean",
+        "htf6_goff_lon_sum_close_len3_hole",
+        "htf6_goff_lon_range",
+        "htf6_goff_lon_hl2",
+        "htf6_goff_lon_hlc3",
+        "htf6_goff_lon_ohlc4",
+        "htf6_goff_lon_close_history2",
+        "htf6_goff_lon_time_close",
+        "htf6_goff_lon_dayofweek",
+        "htf6_goff_lon_daily_open",
+        "htf6_goff_lon_close_hole97",
+        "htf6_goff_lon_INPUT_open",
+        "htf6_goff_lon_INPUT_high",
+        "htf6_goff_lon_INPUT_low",
+        "htf6_goff_lon_INPUT_volume",
+        "htf6_goff_lon_INPUT_time",
+        "htf6_goff_lon_INPUT_index",
+        "htf6_goff_lon_INPUT_first_time",
+        "htf6_gon_lon_close_clean",
+        "htf6_gon_lon_sum_close_len3_clean",
+        "htf6_gon_lon_sum_close_len3_hole",
+        "htf6_gon_lon_range",
+        "htf6_gon_lon_hl2",
+        "htf6_gon_lon_hlc3",
+        "htf6_gon_lon_ohlc4",
+        "htf6_gon_lon_close_history2",
+        "htf6_gon_lon_time_close",
+        "htf6_gon_lon_dayofweek",
+        "htf6_gon_lon_daily_open",
+        "htf6_gon_lon_close_hole97",
+        "htf6_gon_lon_INPUT_open",
+        "htf6_gon_lon_INPUT_high",
+        "htf6_gon_lon_INPUT_low",
+        "htf6_gon_lon_INPUT_volume",
+        "htf6_gon_lon_INPUT_time",
+        "htf6_gon_lon_INPUT_index",
+        "htf6_gon_lon_INPUT_first_time",
+        "CHART_open",
+        "CHART_high",
+        "CHART_low",
+        "CHART_close",
+        "CHART_volume",
+        "CHART_time",
+        "CHART_time_close",
+        "CHART_bar_index",
+        "CHART_timenow"
+      ],
+      "minimumHistoryBars": 600,
+      "manifestMinimumHistoryBars": null,
+      "instructions": "instructions/provider6m-snapshot-pack-v6-v1.md",
+      "pineVersion": 6,
+      "captureKind": "PROVIDER-INPUT-CSV-AND-BOUNDARY-OBSERVATIONS"
+    },
+    {
+      "script": "provider6m-revision-pack-v6-v1.pine",
+      "sha256": "1cdc583f11b8473f037101b1d44bdb2833440d9fccd467cc046083d2c5e238f0",
+      "title": "V11 requested6m revision pack",
+      "shorttitle": null,
+      "columns": [
+        "htf6_gapsoff_clean",
+        "htf6_gapsoff_hole",
+        "htf6_gapsoff_sma4",
+        "htf6_gapsoff_rma4",
+        "htf6_gapsoff_INPUT_open",
+        "htf6_gapsoff_INPUT_high",
+        "htf6_gapsoff_INPUT_low",
+        "htf6_gapsoff_INPUT_volume",
+        "htf6_gapsoff_INPUT_time",
+        "htf6_gapsoff_INPUT_time_close",
+        "htf6_gapsoff_INPUT_index",
+        "htf6_gapsoff_INPUT_first_time",
+        "htf6_gapson_clean",
+        "htf6_gapson_hole",
+        "htf6_gapson_sma4",
+        "htf6_gapson_rma4",
+        "htf6_gapson_INPUT_open",
+        "htf6_gapson_INPUT_high",
+        "htf6_gapson_INPUT_low",
+        "htf6_gapson_INPUT_volume",
+        "htf6_gapson_INPUT_time",
+        "htf6_gapson_INPUT_time_close",
+        "htf6_gapson_INPUT_index",
+        "htf6_gapson_INPUT_first_time",
+        "CHART_open",
+        "CHART_high",
+        "CHART_low",
+        "CHART_close",
+        "CHART_volume",
+        "CHART_time",
+        "CHART_time_close",
+        "CHART_bar_index",
+        "CHART_timenow"
+      ],
+      "minimumHistoryBars": 600,
+      "manifestMinimumHistoryBars": null,
+      "instructions": "instructions/provider6m-revision-pack-v6-v1.md",
+      "pineVersion": 6,
+      "captureKind": "PROVIDER-INPUT-CSV-AND-BOUNDARY-OBSERVATIONS"
+    },
+    {
+      "script": "provider6m-direct-feed-v6-v1.pine",
+      "sha256": "199fae24c3f8a66e0eacf90c9f3b8657847065b4eacd9089b8110b6662e0c6db",
+      "title": "V11 direct6m provider feed",
+      "shorttitle": null,
+      "columns": [
+        "FEED_open",
+        "FEED_high",
+        "FEED_low",
+        "FEED_close",
+        "FEED_volume",
+        "FEED_time",
+        "FEED_time_close",
+        "FEED_bar_index",
+        "FEED_timenow",
+        "FEED_first_time"
+      ],
+      "minimumHistoryBars": 600,
+      "manifestMinimumHistoryBars": null,
+      "instructions": "instructions/provider6m-direct-feed-v6-v1.md",
+      "pineVersion": 6,
+      "captureKind": "PROVIDER-INPUT-CSV-AND-BOUNDARY-OBSERVATIONS"
+    },
+    {
+      "script": "provider-daily-counter-prefix-v5-v1.pine",
+      "sha256": "7dd9d11947f936a8a1edaa069a36d3cbade4f9d7328adeadaf90a29161c20a0b",
+      "title": "V11 daily requested counter prefix",
+      "shorttitle": null,
+      "columns": [
+        "OUTCOME",
+        "REQUEST_INPUT_open",
+        "REQUEST_INPUT_high",
+        "REQUEST_INPUT_low",
+        "REQUEST_INPUT_close",
+        "REQUEST_INPUT_volume",
+        "REQUEST_INPUT_time",
+        "REQUEST_INPUT_time_close",
+        "REQUEST_INPUT_index",
+        "REQUEST_INPUT_first_time",
+        "REQUEST_INPUT_first_count",
+        "CHART_time",
+        "CHART_time_close",
+        "CHART_bar_index",
+        "CHART_timenow"
+      ],
+      "minimumHistoryBars": 600,
+      "manifestMinimumHistoryBars": null,
+      "instructions": "instructions/provider-daily-counter-prefix-v5-v1.md",
+      "pineVersion": 5,
+      "captureKind": "PROVIDER-INPUT-CSV-AND-BOUNDARY-OBSERVATIONS"
+    },
+    {
+      "script": "provider-daily-direct-feed-v5-v2.pine",
+      "sha256": "7bf2000b22aba46d5212c79ef411ff9ad0e51ed35a5f73b979d815af88929dcf",
+      "title": "V11 direct daily provider prefix",
+      "shorttitle": null,
+      "columns": [
+        "FEED_open",
+        "FEED_high",
+        "FEED_low",
+        "FEED_close",
+        "FEED_volume",
+        "FEED_time",
+        "FEED_time_close",
+        "FEED_bar_index",
+        "FEED_timenow",
+        "FEED_first_time",
+        "FEED_first_count",
+        "FEED_counter_control"
+      ],
+      "minimumHistoryBars": 600,
+      "manifestMinimumHistoryBars": null,
+      "instructions": "instructions/provider-daily-direct-feed-v5-v2.md",
+      "pineVersion": 5,
+      "captureKind": "PROVIDER-INPUT-CSV-AND-BOUNDARY-OBSERVATIONS"
+    }
+  ]
+}

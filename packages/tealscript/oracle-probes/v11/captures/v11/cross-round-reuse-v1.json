@@ -1,0 +1,60 @@
+{
+  "artifact": "v11 exact native reuse v1",
+  "receipts": [
+    {
+      "bundle": "v6",
+      "script": "mutable-ema-first-two-v5-v1.pine",
+      "attempt": 1,
+      "original_outcomes": "../v6/captures/v6/outcomes-v6.json",
+      "verified_utc": "2026-10-04T15:28:33.460809+00:00",
+      "original_export_utc": "2026-10-04T04:54:44.753Z",
+      "original_csv_sha256": "b70e09e36d91238a7d4ea420e36f44961d77ee9efa56bfef6ad5b3710489ec0a",
+      "evidence_sha256": {
+        "captures/v6/evidence/mutable-ema-first-two-v5-v1-attempt1-setup.png": "f39ddae6e44070d5fe3ffd3b55c24d8e69d554942b2ec2942db736c892b6c871",
+        "captures/v6/evidence/mutable-ema-first-two-v5-v1-attempt1-export.png": "eeabc6df8200d481dbabe3c24882b2c96e3d2bf047506969a82f29eaada48622",
+        "captures/v6/evidence/mutable-ema-first-two-v5-v1-attempt1-logs.txt": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+        "captures/v6/evidence/mutable-ema-first-two-v5-v1-attempt1-logs-v1.json": "c90f9bdff131b28bfd708320b07c32cb75032d8ffd71852e53e68a5d7333ad5a",
+        "captures/v6/evidence/mutable-ema-first-two-v5-v1-attempt1-logs.png": "a822fe7ffb46cdc8390a26411586b1c2d805ce5ee0449ad2c075c30cec6d676e",
+        "captures/v6/evidence/mutable-ema-first-two-v5-v1-attempt1-visual.png": "6095ce94630cb016649ee9e79efe8eb8b53db8510b3b681815c7e4a7b73e8542"
+      },
+      "limits": "Original v6 acquisition retained; no new browser run or new reset/cutoff. Reuse does not adjudicate engine parity."
+    },
+    {
+      "bundle": "v6",
+      "script": "mutable-ema-udf-two-calls-v5-v1.pine",
+      "attempt": 2,
+      "original_outcomes": "../v6/captures/v6/outcomes-v6.json",
+      "verified_utc": "2026-10-04T15:28:33.491091+00:00",
+      "original_export_utc": "2026-10-04T04:56:54.121Z",
+      "original_csv_sha256": "e05cc00437ce6b1716988e92a751957fc7d6f206b4dba8f9018ca7d27451bea2",
+      "evidence_sha256": {
+        "captures/v6/evidence/mutable-ema-udf-two-calls-v5-v1-attempt2-setup.png": "64b3a37c3c0b8527a7d843179ee084f18512a554a19000ae23ae9848eea102d7",
+        "captures/v6/evidence/mutable-ema-udf-two-calls-v5-v1-attempt2-export.png": "962695d7b16e7622aa1243d23dfd87be910bd845d53f49dd29a4fd3a67f74aa2",
+        "captures/v6/evidence/mutable-ema-udf-two-calls-v5-v1-attempt2-logs.txt": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+        "captures/v6/evidence/mutable-ema-udf-two-calls-v5-v1-attempt2-logs-v1.json": "f8e61d09a8c2ebd0200aa1e568f0c93c125d57f1126600afa3b83c9be6d725b6",
+        "captures/v6/evidence/mutable-ema-udf-two-calls-v5-v1-attempt2-logs.png": "33ca964076873b8802f6f90c9c521d83884ab53f543e299be4c01cb564ec1eb8",
+        "captures/v6/evidence/mutable-ema-udf-two-calls-v5-v1-attempt2-visual.png": "d33cefb25b7fb4ab1c436647e542ca8f3a98ac9382b05569ccbf7f46e823b668"
+      },
+      "limits": "Original v6 acquisition retained; no new browser run or new reset/cutoff. Reuse does not adjudicate engine parity."
+    },
+    {
+      "bundle": "v6",
+      "script": "fixed-ema-input-three-v5-control-v1.pine",
+      "attempt": 1,
+      "original_outcomes": "../v6/captures/v6/outcomes-v6.json",
+      "verified_utc": "2026-10-04T15:28:33.516571+00:00",
+      "original_export_utc": "2026-10-04T04:57:19.159Z",
+      "original_csv_sha256": "d6c7e0ea13aa48c6205eb7f9e35e665d2a630bd6e092f5ff17553eef58694a10",
+      "evidence_sha256": {
+        "captures/v6/evidence/fixed-ema-input-three-v5-control-v1-attempt1-setup.png": "d6a37eec9e45b935d8d62ad15aff55b8e203141fe6dc6d603d6042743d39c15e",
+        "captures/v6/evidence/fixed-ema-input-three-v5-control-v1-attempt1-export.png": "8da771b3389dd17daf921acf2c57be9f2e8fdc7149e8342c40d5dd7d592ad09e",
+        "captures/v6/evidence/fixed-ema-input-three-v5-control-v1-attempt1-logs.txt": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+        "captures/v6/evidence/fixed-ema-input-three-v5-control-v1-attempt1-logs-v1.json": "1e17aca18def0eff908827dde1868f90110b0c649f6fc6ac73982a106a529733",
+        "captures/v6/evidence/fixed-ema-input-three-v5-control-v1-attempt1-logs.png": "429a9435ac67502561d37a03d989fbd95dd1eb933a445803ebee79a710f386b9",
+        "captures/v6/evidence/fixed-ema-input-three-v5-control-v1-attempt1-inputs.png": "17530f9f793ae14bea3a8faaa10f8b91883db11eadeaa6612028d70d26b001a9",
+        "captures/v6/evidence/fixed-ema-input-three-v5-control-v1-attempt1-visual.png": "1b45bec2f33c528b2d0e7c9d788aefc3a66f8545bc67d7ba6e17c9fe42dffce7"
+      },
+      "limits": "Original v6 acquisition retained; no new browser run or new reset/cutoff. Reuse does not adjudicate engine parity."
+    }
+  ]
+}

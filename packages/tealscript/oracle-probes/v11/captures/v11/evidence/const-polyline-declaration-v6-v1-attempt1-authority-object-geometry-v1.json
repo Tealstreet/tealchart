@@ -1,0 +1,300 @@
+{
+  "artifact": "Native authority object geometry v1",
+  "browser_utc": "2026-10-04T15:25:31.167Z",
+  "title": "Const polyline declaration",
+  "source_status": {
+    "type": 2
+  },
+  "host_last": {
+    "index": 299,
+    "value": [
+      1791127440,
+      85382.01,
+      85382.01,
+      85348,
+      85348,
+      12.82392
+    ]
+  },
+  "timezone": "Etc/UTC",
+  "replay": false,
+  "source_last": {
+    "index": 299,
+    "value": [
+      1791127440,
+      85348
+    ]
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  },
+  "zoom": {
+    "range": {
+      "_firstBar": 279,
+      "_lastBar": 307
+    },
+    "spacing": 43.275862068965516,
+    "right_offset": 8
+  },
+  "panes": [
+    {
+      "width": 1255,
+      "height": 526.5,
+      "scale_range": {
+        "_minValue": 85094,
+        "_maxValue": 85470
+      },
+      "scale_mode": {
+        "autoScale": true,
+        "lockScale": false,
+        "percentage": false,
+        "indexedTo100": false,
+        "log": false
+      }
+    },
+    {
+      "width": 1255,
+      "height": 263.5,
+      "scale_range": {
+        "_minValue": 85109.53,
+        "_maxValue": 85446
+      },
+      "scale_mode": {
+        "autoScale": true,
+        "lockScale": false,
+        "percentage": false,
+        "indexedTo100": false,
+        "log": false
+      }
+    }
+  ],
+  "labels": [],
+  "lines": [],
+  "boxes": [],
+  "tables": [],
+  "cells": [],
+  "graphic_index_map": [
+    244,
+    245,
+    246,
+    247,
+    248,
+    249,
+    250,
+    251,
+    252,
+    253,
+    254,
+    255,
+    256,
+    257,
+    258,
+    259,
+    260,
+    261,
+    262,
+    263,
+    264,
+    265,
+    266,
+    267,
+    268,
+    269,
+    270,
+    271,
+    272,
+    273,
+    274,
+    275,
+    276,
+    277,
+    278,
+    279,
+    280,
+    281,
+    282,
+    283,
+    284,
+    285,
+    286,
+    287,
+    288,
+    289,
+    290,
+    291,
+    292,
+    293,
+    294,
+    295,
+    296,
+    297,
+    298,
+    299
+  ],
+  "chart_properties": {
+    "timezone": "Etc/UTC",
+    "priceScaleSelectionStrategyName": "auto",
+    "inactivityGaps": false,
+    "paneProperties": {
+      "backgroundType": "solid",
+      "vertGridProperties": {
+        "style": 0,
+        "visible": true,
+        "color": "rgba(242, 242, 242, 0.06)"
+      },
+      "horzGridProperties": {
+        "style": 0,
+        "visible": true,
+        "color": "rgba(242, 242, 242, 0.06)"
+      },
+      "crossHairProperties": {
+        "style": 2,
+        "transparency": 0,
+        "width": 1,
+        "color": "#9C9C9C"
+      },
+      "topMargin": 10,
+      "bottomMargin": 8,
+      "axisProperties": {
+        "autoScale": true,
+        "autoScaleDisabled": false,
+        "lockScale": false,
+        "percentage": false,
+        "percentageDisabled": false,
+        "indexedTo100": false,
+        "log": false,
+        "logDisabled": false,
+        "alignLabels": true,
+        "isInverted": false
+      },
+      "legendProperties": {
+        "showStudyArguments": true,
+        "showStudyTitles": true,
+        "showStudyValues": true,
+        "showSeriesTitle": true,
+        "showSeriesOHLC": true,
+        "showLegend": true,
+        "showLastDayChange": false,
+        "showBarChange": true,
+        "showVolume": false,
+        "showBackground": true,
+        "showPriceSource": true,
+        "backgroundTransparency": 50,
+        "showLogo": true,
+        "showTradingButtons": true,
+        "showTradingButtonsMobile": true,
+        "showSeriesLegendCloseOnMobile": true,
+        "barChangeUpColor": "#089981",
+        "barChangeDownColor": "#F23645",
+        "useBarChangeCustomColors": false
+      },
+      "separatorColor": "#2E2E2E",
+      "background": "rgba(15, 15, 15, 1)",
+      "backgroundGradientStartColor": "#1F1F1F",
+      "backgroundGradientEndColor": "#0F0F0F"
+    },
+    "scalesProperties": {
+      "fontSize": 12,
+      "scaleSeriesOnly": false,
+      "showSeriesLastValue": true,
+      "seriesLastValueMode": 1,
+      "showSeriesPrevCloseValue": false,
+      "showStudyLastValue": true,
+      "showSymbolLabels": false,
+      "showStudyPlotLabels": false,
+      "showBidAskLabels": false,
+      "showPrePostMarketPriceLabel": true,
+      "showFundamentalNameLabel": false,
+      "showFundamentalLastValue": true,
+      "barSpacing": 6,
+      "axisHighlightColor": "rgba(41, 98, 255, 0.25)",
+      "axisHoverHighlightColor": "",
+      "axisLineToolLabelBackgroundColorCommon": "#2962FF",
+      "axisLineToolLabelBackgroundColorActive": "#143EB2",
+      "showPriceScaleCrosshairLabel": true,
+      "showTimeScaleCrosshairLabel": true,
+      "crosshairLabelBgColorLight": "#0F0F0F",
+      "crosshairLabelBgColorDark": "#3D3D3D",
+      "saveLeftEdge": false,
+      "textColor": "#B8B8B8",
+      "lineColor": "rgba(242, 242, 242, 0)",
+      "backgroundColor": "#ffffff"
+    },
+    "chartEventsSourceProperties": {
+      "visible": true,
+      "futureOnly": true,
+      "breaks": {
+        "color": "#555555",
+        "visible": false,
+        "style": 2,
+        "width": 1
+      }
+    },
+    "tradingProperties": {
+      "showPositions": true,
+      "positionAndBracketsPL": true,
+      "positionPL": {
+        "visibility": true,
+        "display": 0
+      },
+      "bracketsPL": {
+        "visibility": true,
+        "display": 0
+      },
+      "showOrders": true,
+      "showProjectMarketOrder": true,
+      "showExecutions": true,
+      "showExecutionsLabels": false,
+      "showReverse": true,
+      "extendLeft": true,
+      "lineLength": 5,
+      "horizontalAlignment": 2,
+      "lineWidth": 1,
+      "lineStyle": 0
+    },
+    "volumePaneSize": "large"
+  },
+  "body_font": "",
+  "font_status": "loaded",
+  "limits": "Unchanged exact source admission and rendered object geometry only. Native renderer IDs/indices are not Pine IDs/indices. Materialized coordinates and raw index map retained without substituting documented integer signatures or rounding expectations. Future anchors have no invented UTC when host bar absent.",
+  "environment": {
+    "browser_utc": "2026-10-04T15:25:32.287Z",
+    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+    "platform": "MacIntel",
+    "user_agent_data": {
+      "architecture": "",
+      "bitness": "",
+      "brands": [],
+      "fullVersionList": [],
+      "mobile": false,
+      "platform": "",
+      "platformVersion": ""
+    },
+    "device_pixel_ratio": 2,
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "visual_viewport_scale": 1
+    },
+    "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v11 batch; visualViewport scale recorded independently.",
+    "tradingview_build": null,
+    "tradingview_script_urls": [
+      "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+      "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+      "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+      "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+      "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+      "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+      "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+      "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+      "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+      "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+      "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+      "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+    ],
+    "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+  },
+  "ui_snapshot": "Emulating viewport: {\"deviceScaleFactor\":2,\"isMobile\":false,\"hasTouch\":false,\"isLandscape\":false,\"width\":1440,\"height\":900}\n## Latest page snapshot\nuid=6660_0 RootWebArea \"BTCUSDT 85,328.01 ▲ +0.68% basic\" url=\"https://www.tradingview.com/chart/xlvYwHdH/?symbol=BINANCE%3ABTCUSDT&interval=2\"\n  uid=6660_1 button \"Logged in as sours-lat Active layout: basic\" haspopup=\"menu\"\n  uid=6660_2 StaticText \"11\"\n  uid=6660_3 button \"BTCUSDT\" description=\"Symbol search\"\n  uid=6660_4 button \"Switch data type\"\n  uid=6660_5 button \"Compare symbols\" haspopup=\"dialog\"\n  uid=6660_6 radio \"3 minutes\"\n  uid=6660_7 radio \"5 minutes\"\n  uid=6660_8 radio \"15 minutes\"\n  uid=6660_9 radio \"30 minutes\"\n  uid=6660_10 radio \"45 minutes\"\n  uid=6660_11 radio \"1 hour\"\n  uid=6660_12 radio \"2 hours\"\n  uid=6660_13 radio \"3 hours\"\n  uid=6660_14 radio \"4 hours\"\n  uid=6660_15 radio \"8 hours\"\n  uid=6660_16 radio \"10 hours\"\n  uid=6660_17 radio \"12 hours\"\n  uid=6660_18 radio \"1 day\"\n  uid=6660_19 radio \"3 days\"\n  uid=6660_20 radio \"10 days\"\n  uid=6660_21 radio \"1 week\"\n  uid=6660_22 radio \"1 month\"\n  uid=6660_23 radio \"2 minutes\" checked\n  uid=6660_24 button \"Chart interval\" haspopup=\"menu\"\n  uid=6660_25 radio \"Candles\" checked\n  uid=6660_26 radio \"Line\"\n  uid=6660_27 radio \"High-low\"\n  uid=6660_28 button \"Bar's style\" haspopup=\"menu\"\n  uid=6660_29 button \"Indicators, metrics, and strategies\"\n  uid=6660_30 button \"Favorite indicators\" haspopup=\"menu\"\n  uid=6660_31 button \"Indicator templates\" haspopup=\"menu\"\n  uid=6660_32 button \"Create alert\"\n  uid=6660_33 button \"Bar replay\"\n  uid=6660_34 button disableable disabled\n  uid=6660_35 button disableable disabled\n  uid=6660_36 button \"Layout setup\" haspopup=\"menu\"\n  uid=6660_37 button \"All changes saved\" disableable disabled\n  uid=6660_38 button \"Manage layouts\" haspopup=\"menu\"\n  uid=6660_39 button \"Quick search\"\n  uid=6660_40 button \"Settings\"\n  uid=6660_41 button \"Fullscreen mode\"\n  uid=6660_42 button \"Take a snapshot\" haspopup=\"menu\"\n  uid=6660_43 button \"Share your idea with the trade community\" haspopup=\"menu\"\n  uid=6660_44 button \"Trade\"\n  uid=6660_45 button \"Cross\"\n  uid=6660_46 button \"Cursors\" pressed\n  uid=6660_47 button \"Trendline\"\n  uid=6660_48 button \"Trend tools\"\n  uid=6660_49 button \"Fib retracement\"\n  uid=6660_50 button \"Gann and Fibonacci tools\"\n  uid=6660_51 button \"XABCD pattern\"\n  uid=6660_52 button \"Patterns\"\n  uid=6660_53 button \"Long position\"\n  uid=6660_54 button \"Forecasting and measurement tools\"\n  uid=6660_55 button \"Brush\"\n  uid=6660_56 button \"Geometric shapes\"\n  uid=6660_57 button \"Text\"\n  uid=6660_58 button \"Annotation tools\"\n  uid=6660_59 button \"Icon\"\n  uid=6660_60 button \"Icons\"\n  uid=6660_61 button \"Measure\"\n  uid=6660_62 button \"Zoom in\"\n  uid=6660_63 button \"Magnet mode snaps drawings placed near price bars to the closest OHLC value\" pressed\n  uid=6660_64 button \"Magnets\" pressed\n  uid=6660_65 button \"Keep drawing\"\n  uid=6660_66 button \"Lock drawings and indicators\"\n  uid=6660_67 button \"Lock options\"\n  uid=6660_68 button \"Hide all drawings, indicators, positions, and orders\"\n  uid=6660_69 button \"Hide options\"\n  uid=6660_70 button \"New drawings will not be synced\"\n  uid=6660_71 button \"Sync drawings options\"\n  uid=6660_72 button \"Remove objects\"\n  uid=6660_73 button \"Remove options\"\n  uid=6660_74 button \"Show Favorite Drawing Tools Toolbar\"\n  uid=6660_75 region \"Chart #1\"\n    uid=6660_76 StaticText \"B\"\n    uid=6660_77 button \"Change symbol\"\n    uid=6660_78 StaticText \"·\"\n    uid=6660_79 button \"Change interval\"\n    uid=6660_78 StaticText \"·\"\n    uid=6660_80 StaticText \"Binance\"\n    uid=6660_81 button \"Unflag symbol\"\n    uid=6660_82 button \"More\" description=\"More\"\n    uid=6660_83 button \"Market open\"\n    uid=6660_84 StaticText \"O\"\n    uid=6660_85 StaticText \"85,126.86\"\n    uid=6660_86 StaticText \"H\"\n    uid=6660_87 StaticText \"85,126.86\"\n    uid=6660_88 StaticText \"L\"\n    uid=6660_89 StaticText \"85,126.85\"\n    uid=6660_90 StaticText \"C\"\n    uid=6660_91 StaticText \"85,126.85\"\n    uid=6660_92 StaticText \"0.00 (0.00%)\"\n    uid=6660_93 StaticText \"85,328.00\"\n    uid=6670_0 StaticText \"SELL\"\n    uid=6660_95 StaticText \"0.01\"\n    uid=6660_96 StaticText \"85,328.01\"\n    uid=6670_1 StaticText \"BUY\"\n    uid=6660_98 Canvas \"Chart for BINANCE:BTCUSDT, 2 minutes\"\n    uid=6660_99 StaticText \"Const polyline declaration\"\n    uid=6660_100 button \"Hide\" description=\"Hide\"\n    uid=6660_101 button \"Settings\" description=\"Settings\"\n    uid=6660_102 button \"Remove\" description=\"Remove\"\n    uid=6660_103 button \"More\" description=\"More\"\n    uid=6660_104 StaticText \"85,126.85\"\n  uid=6660_105 button \"1 day in 1 minute intervals\"\n  uid=6660_106 button \"5 days in 5 minutes intervals\"\n  uid=6660_107 button \"1 month in 30 minutes intervals\"\n  uid=6660_108 button \"3 months in 1 hour intervals\"\n  uid=6660_109 button \"6 months in 2 hours intervals\"\n  uid=6660_110 button \"Year to day in 1 day intervals\"\n  uid=6660_111 button \"1 year in 1 day intervals\"\n  uid=6660_112 button \"5 years in 1 week intervals\"\n  uid=6660_113 button \"All data in 1 month intervals\"\n  uid=6660_114 button \"Go to\"\n  uid=6660_115 button \"Timezone\"\n  uid=6660_116 button \"Watchlist, details, and news\"\n  uid=6660_117 button \"Alerts\"\n  uid=6660_118 button \"Object tree and data window\"\n  uid=6660_119 button \"AI Copilot\"\n  uid=6660_120 button \"Screeners\"\n  uid=6660_121 button \"Pine\"\n  uid=6660_122 button \"Calendars\"\n  uid=6660_123 button \"Community\"\n  uid=6660_124 button \"Notifications\"\n  uid=6660_125 button \"Chats\"\n  uid=6660_126 button \"Products\" haspopup=\"menu\"\n  uid=6660_127 button \"Help Center\"\n  uid=6660_128 generic \"Trading panel\"\n    uid=6660_129 generic\n  uid=6660_130 generic live=\"polite\" relevant=\"additions\"\n  uid=6660_131 generic live=\"polite\" relevant=\"additions\"\n  uid=6660_132 generic live=\"assertive\" relevant=\"additions\"\n  uid=6660_133 generic live=\"assertive\" relevant=\"additions\"\n  uid=6660_134 generic live=\"polite\" relevant=\"additions text\"\n  uid=6660_135 log live=\"polite\" relevant=\"additions text\"\n  uid=6660_136 log live=\"polite\" relevant=\"additions text\"\n  uid=6660_137 log live=\"polite\" relevant=\"additions text\"\n  uid=6660_138 log live=\"polite\" relevant=\"additions text\"\n  uid=6660_139 log live=\"polite\" relevant=\"additions text\"\n  uid=6660_140 log live=\"polite\" relevant=\"additions text\"\n  uid=6660_141 log live=\"polite\" relevant=\"additions text\"\n  uid=6660_142 log live=\"polite\" relevant=\"additions text\"\n  uid=6660_143 log live=\"polite\" relevant=\"additions text\"\n  uid=6660_144 log live=\"polite\" relevant=\"additions text\"\n  uid=6660_145 log live=\"polite\" relevant=\"additions text\"\n  uid=6660_146 log live=\"polite\" relevant=\"additions text\"\n  uid=6660_147 log live=\"polite\" relevant=\"additions text\"\n  uid=6660_148 log live=\"polite\" relevant=\"additions text\"\n  uid=6660_149 log live=\"polite\" relevant=\"additions text\"\n  uid=6660_150 log live=\"polite\" relevant=\"additions text\"\n  uid=6660_151 log live=\"polite\" relevant=\"additions text\"\n  uid=6660_152 log live=\"polite\" relevant=\"additions text\"\n  uid=6660_153 log live=\"polite\" relevant=\"additions text\"\n  uid=6660_154 log live=\"polite\" relevant=\"additions text\"\n  uid=6660_155 log live=\"polite\" relevant=\"additions text\"\n"
+}
