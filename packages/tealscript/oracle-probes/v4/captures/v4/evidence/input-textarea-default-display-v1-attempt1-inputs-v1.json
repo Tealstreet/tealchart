@@ -1,0 +1,48 @@
+{
+  "artifact": "Native input UI witness v1",
+  "script": "input-textarea-default-display-v1.pine",
+  "attempt": 1,
+  "observed_utc": "2026-10-04T02:23:19.213Z",
+  "user_input_metadata": [
+    {
+      "active": true,
+      "defval": "DEFAULT",
+      "display": 0,
+      "id": "in_0",
+      "isFake": true,
+      "name": "TextDefault",
+      "type": "text_area"
+    },
+    {
+      "active": true,
+      "defval": "ALL",
+      "display": 4294967295,
+      "id": "in_1",
+      "isFake": true,
+      "name": "TextAll",
+      "type": "text_area"
+    },
+    {
+      "active": true,
+      "defval": "NONE",
+      "display": 0,
+      "id": "in_2",
+      "isFake": true,
+      "name": "TextNone",
+      "type": "text_area"
+    }
+  ],
+  "values": {
+    "in_0": "DEFAULT",
+    "in_1": "ALL",
+    "in_2": "NONE"
+  },
+  "evidence_files": [
+    "captures/v4/evidence/input-textarea-default-display-v1-attempt1-data-window-v1.png",
+    "captures/v4/evidence/input-textarea-default-display-v1-attempt1-data-window-v1.txt",
+    "captures/v4/evidence/input-textarea-default-display-v1-attempt1-inputs-context-v1.png",
+    "captures/v4/evidence/input-textarea-default-display-v1-attempt1-inputs-context-v1.txt",
+    "captures/v4/evidence/input-textarea-default-display-v1-attempt1-inputs-v1.json"
+  ],
+  "view_change": "Post-export Inputs and Data Window inspection with no input edits. Cancel settings and close sidebar afterward."
+}

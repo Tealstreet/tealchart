@@ -1,0 +1,29 @@
+{
+  "artifact": "Native input UI witness v1",
+  "script": "input-time-marker-kind-v1.pine",
+  "attempt": 3,
+  "observed_utc": "2026-10-04T02:29:03.946Z",
+  "user_input_metadata": [
+    {
+      "active": true,
+      "confirm": true,
+      "defval": 1700000000000,
+      "display": 0,
+      "id": "in_0",
+      "isFake": true,
+      "name": "TimeMarker",
+      "type": "time"
+    }
+  ],
+  "values": {
+    "in_0": 1700000000000
+  },
+  "evidence_files": [
+    "captures/v4/evidence/input-time-marker-kind-v1-attempt3-data-window-v1.png",
+    "captures/v4/evidence/input-time-marker-kind-v1-attempt3-data-window-v1.txt",
+    "captures/v4/evidence/input-time-marker-kind-v1-attempt3-inputs-context-v1.png",
+    "captures/v4/evidence/input-time-marker-kind-v1-attempt3-inputs-context-v1.txt",
+    "captures/v4/evidence/input-time-marker-kind-v1-attempt3-inputs-v1.json"
+  ],
+  "view_change": "Post-export Inputs and Data Window inspection with no input edits. Cancel settings and close sidebar afterward."
+}

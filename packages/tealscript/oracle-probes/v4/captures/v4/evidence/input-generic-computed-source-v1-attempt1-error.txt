@@ -1,0 +1,21 @@
+Arguments of input function must be of constant type, or "source" builtin variables.
+{
+  "error": "Arguments of input function must be of constant type, or \"source\" builtin variables.",
+  "editorError": {
+    "code": "CE10212",
+    "end": {
+      "column": 40,
+      "line": 3
+    },
+    "message": "Arguments of input function must be of constant type, or \"source\" builtin variables.",
+    "start": {
+      "column": 10,
+      "line": 3
+    },
+    "id": "USER;2f38ae12eb8447a494c2d7cb2c624fa7"
+  },
+  "title": "Compilation error",
+  "compiler_markers": [],
+  "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,827.76\nH\n84,827.76\nL\n84,827.75\nC\n84,827.76\n+0.01 (+0.00%)\n84,827.75\nSELL\n0.01\n84,827.76\nBUY\nUSDT\ninput-generic-computed-source-v1.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n02:20:44 UTC\n99+\nPine Editor\ninput-generic-computed-source-v1.pine\nPublish script\n1\n2\n3\n4\n5\n//@version=6\nindicator(\"INPUT-GENERIC-SOURCE-DEFAULT-AUTHORITY\")\nselected=input(close*2,\"ComputedSource\")\nplot(close,\"OUTCOME\")\n1 ∙ Today, 10:20\nLine 3, Col 10\nPine Script® v6\nCompilation error: CE10212\n\nArguments of input function must be of constant type, or \"source\" builtin variables.\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+  "context_substituted_message": "Arguments of input function must be of constant type, or \"source\" builtin variables."
+}

@@ -1,0 +1,240 @@
+{
+  "artifact": "Native HMA source-index witness v1",
+  "basis": "Exact native log bar index and barTime joined to unchanged CSV time; no row-number index inference.",
+  "bars": [
+    {
+      "native_log": {
+        "barTime": 1788138840000,
+        "time": 1788138840000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 7,
+            "column": 5
+          },
+          "end": {
+            "line": 7,
+            "column": 158
+          }
+        },
+        "message": "bar=37 source=1383 hma=1312.1339869281048"
+      },
+      "exact_csv_row": {
+        "time": "1788138840",
+        "open": "77607.96",
+        "high": "77672",
+        "low": "77578",
+        "close": "77609.05",
+        "OUTCOME": "1312.1339869281048"
+      }
+    },
+    {
+      "native_log": {
+        "barTime": 1788138960000,
+        "time": 1788138960000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 7,
+            "column": 5
+          },
+          "end": {
+            "line": 7,
+            "column": 158
+          }
+        },
+        "message": "bar=38 source=1465 hma=1386.1638071895427"
+      },
+      "exact_csv_row": {
+        "time": "1788138960",
+        "open": "77609.05",
+        "high": "77651.47",
+        "low": "77600",
+        "close": "77614.39",
+        "OUTCOME": "1386.1638071895427"
+      }
+    },
+    {
+      "native_log": {
+        "barTime": 1788139080000,
+        "time": 1788139080000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 7,
+            "column": 5
+          },
+          "end": {
+            "line": 7,
+            "column": 158
+          }
+        },
+        "message": "bar=39 source=1549 hma=1464.5069444444446"
+      },
+      "exact_csv_row": {
+        "time": "1788139080",
+        "open": "77614.38",
+        "high": "77780",
+        "low": "77609.25",
+        "close": "77778.45",
+        "OUTCOME": "1464.5069444444446"
+      }
+    },
+    {
+      "native_log": {
+        "barTime": 1788139200000,
+        "time": 1788139200000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 7,
+            "column": 5
+          },
+          "end": {
+            "line": 7,
+            "column": 158
+          }
+        },
+        "message": "bar=40 source=NaN hma=NaN"
+      },
+      "exact_csv_row": {
+        "time": "1788139200",
+        "open": "77778.45",
+        "high": "77828",
+        "low": "77708",
+        "close": "77743.47",
+        "OUTCOME": ""
+      }
+    },
+    {
+      "native_log": {
+        "barTime": 1788139320000,
+        "time": 1788139320000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 7,
+            "column": 5
+          },
+          "end": {
+            "line": 7,
+            "column": 158
+          }
+        },
+        "message": "bar=41 source=1688 hma=1592.2729575163398"
+      },
+      "exact_csv_row": {
+        "time": "1788139320",
+        "open": "77743.47",
+        "high": "77840.01",
+        "low": "77733.55",
+        "close": "77796.01",
+        "OUTCOME": "1592.2729575163398"
+      }
+    },
+    {
+      "native_log": {
+        "barTime": 1788139440000,
+        "time": 1788139440000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 7,
+            "column": 5
+          },
+          "end": {
+            "line": 7,
+            "column": 158
+          }
+        },
+        "message": "bar=42 source=1778 hma=1676.6992647058821"
+      },
+      "exact_csv_row": {
+        "time": "1788139440",
+        "open": "77796",
+        "high": "77851.41",
+        "low": "77764",
+        "close": "77819.73",
+        "OUTCOME": "1676.6992647058821"
+      }
+    },
+    {
+      "native_log": {
+        "barTime": 1788139560000,
+        "time": 1788139560000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 7,
+            "column": 5
+          },
+          "end": {
+            "line": 7,
+            "column": 158
+          }
+        },
+        "message": "bar=43 source=1870 hma=1767.0110294117646"
+      },
+      "exact_csv_row": {
+        "time": "1788139560",
+        "open": "77819.74",
+        "high": "77847.18",
+        "low": "77758.23",
+        "close": "77797.99",
+        "OUTCOME": "1767.0110294117646"
+      }
+    },
+    {
+      "native_log": {
+        "barTime": 1788139680000,
+        "time": 1788139680000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 7,
+            "column": 5
+          },
+          "end": {
+            "line": 7,
+            "column": 158
+          }
+        },
+        "message": "bar=44 source=1964 hma=1863.5486111111109"
+      },
+      "exact_csv_row": {
+        "time": "1788139680",
+        "open": "77798",
+        "high": "77827.64",
+        "low": "77766.73",
+        "close": "77775.26",
+        "OUTCOME": "1863.5486111111109"
+      }
+    },
+    {
+      "native_log": {
+        "barTime": 1788139800000,
+        "time": 1788139800000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 7,
+            "column": 5
+          },
+          "end": {
+            "line": 7,
+            "column": 158
+          }
+        },
+        "message": "bar=45 source=2025 hma=1953.5306372549016"
+      },
+      "exact_csv_row": {
+        "time": "1788139800",
+        "open": "77775.27",
+        "high": "77808",
+        "low": "77742.36",
+        "close": "77742.36",
+        "OUTCOME": "1953.5306372549016"
+      }
+    }
+  ]
+}

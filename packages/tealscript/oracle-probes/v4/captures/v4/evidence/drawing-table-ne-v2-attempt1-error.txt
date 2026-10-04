@@ -1,0 +1,98 @@
+Cannot call "operator !=" with argument "expr0"="a". An argument of "series table" type was used but a "simple string"  is expected.
+{
+  "error": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+  "editorError": {
+    "code": "CE10123",
+    "ctx": {
+      "argDisplayName": "expr0",
+      "argUserFriendlyRepresentation": "a",
+      "argumentType": "series table",
+      "currentTypeDocStr": "simple string",
+      "funId": "operator !=",
+      "typePostfix": ""
+    },
+    "end": {
+      "column": 7,
+      "line": 6
+    },
+    "message": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+    "start": {
+      "column": 7,
+      "line": 6
+    },
+    "id": "USER;a0d42dbb99194ef9912743fa83f731bc"
+  },
+  "title": "Compilation error",
+  "compiler_markers": [
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///ce521a35-cc3c-407e-8bda-019e3800ceaf.pine?placement%3Ddialog",
+        "path": "/ce521a35-cc3c-407e-8bda-019e3800ceaf.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "code": "CE10123",
+      "severity": 8,
+      "message": "Cannot call \"operator !=\" with argument \"expr0\"=\"a\". An argument of \"series table\" type was used but a \"simple string\"  is expected.",
+      "startLineNumber": 6,
+      "startColumn": 7,
+      "endLineNumber": 6,
+      "endColumn": 8
+    },
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///ce521a35-cc3c-407e-8bda-019e3800ceaf.pine?placement%3Ddialog",
+        "path": "/ce521a35-cc3c-407e-8bda-019e3800ceaf.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "code": "CE10123",
+      "severity": 8,
+      "message": "Cannot call \"operator !=\" with argument \"expr1\"=\"b\". An argument of \"series table\" type was used but a \"simple string\"  is expected.",
+      "startLineNumber": 6,
+      "startColumn": 12,
+      "endLineNumber": 6,
+      "endColumn": 13
+    },
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///ce521a35-cc3c-407e-8bda-019e3800ceaf.pine?placement%3Ddialog",
+        "path": "/ce521a35-cc3c-407e-8bda-019e3800ceaf.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "code": "CE10123",
+      "severity": 8,
+      "message": "Cannot call \"operator !=\" with argument \"expr0\"=\"a\". An argument of \"series table\" type was used but a \"simple string\"  is expected.",
+      "startLineNumber": 6,
+      "startColumn": 30,
+      "endLineNumber": 6,
+      "endColumn": 31
+    },
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///ce521a35-cc3c-407e-8bda-019e3800ceaf.pine?placement%3Ddialog",
+        "path": "/ce521a35-cc3c-407e-8bda-019e3800ceaf.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "code": "CE10123",
+      "severity": 8,
+      "message": "Cannot call \"operator !=\" with argument \"expr1\"=\"other\". An argument of \"series table\" type was used but a \"simple string\"  is expected.",
+      "startLineNumber": 6,
+      "startColumn": 35,
+      "endLineNumber": 6,
+      "endColumn": 40
+    }
+  ],
+  "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,827.76\nH\n84,827.76\nL\n84,827.75\nC\n84,827.75\n0.00 (0.00%)\n84,827.75\nSELL\n0.01\n84,827.76\nBUY\ndrawing-table-ne-v2.pine\nUSDT\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n02:20:08 UTC\n99+\nPine Editor\ndrawing-table-ne-v2.pine\nPublish script\n1\n2\n3\n4\n5\n6\n7\n//@version=6\nindicator(\"V4-DRAWING-TABLE-NE\",overlay=true)\nvar a=table.new(position.top_left,1,1)\nb=a\nvar other=table.new(position.top_left,1,1)\nplot((a != b ? 1 : 0) + 2 * (a != other ? 1 : 0),\"OUTCOME\")\n2 of 4 problems\nCannot call \"operator !=\" with argument \"expr1\"=\"b\". An argument of \"series table\" type was used but a \"simple string\" is expected.(CE10123)\n1 ∙ Today, 10:20\nLine 6, Col 12\nPine Script® v6\nCompilation error: CE10123\n\nCannot call \"operator !=\" with argument \"expr0\"=\"a\". An argument of \"series table\" type was used but a \"simple string\" is expected.\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+  "context_substituted_message": "Cannot call \"operator !=\" with argument \"expr0\"=\"a\". An argument of \"series table\" type was used but a \"simple string\"  is expected."
+}

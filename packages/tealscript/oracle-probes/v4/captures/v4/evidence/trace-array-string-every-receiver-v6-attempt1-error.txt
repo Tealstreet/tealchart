@@ -1,0 +1,47 @@
+Cannot call "array.every" with argument "id"="values". An argument of "array<string>" type was used but a "array<bool>"  is expected.
+{
+  "error": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+  "editorError": {
+    "code": "CE10123",
+    "ctx": {
+      "argDisplayName": "id",
+      "argUserFriendlyRepresentation": "values",
+      "argumentType": "array<string>",
+      "currentTypeDocStr": "array<bool>",
+      "funId": "array.every",
+      "typePostfix": ""
+    },
+    "end": {
+      "column": 15,
+      "line": 4
+    },
+    "message": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+    "start": {
+      "column": 10,
+      "line": 4
+    },
+    "id": "USER;e66eb3c4019a436faa78dbd5a13b9ef6"
+  },
+  "title": "Compilation error",
+  "compiler_markers": [
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///e6296d19-0c15-4872-a09a-1d8e9e0ccba0.pine?placement%3Ddialog",
+        "path": "/e6296d19-0c15-4872-a09a-1d8e9e0ccba0.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "code": "CE10123",
+      "severity": 8,
+      "message": "Cannot call \"array.every\" with argument \"id\"=\"values\". An argument of \"array<string>\" type was used but a \"array<bool>\"  is expected.",
+      "startLineNumber": 4,
+      "startColumn": 10,
+      "endLineNumber": 4,
+      "endColumn": 16
+    }
+  ],
+  "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,782.80\nH\n84,782.80\nL\n84,782.79\nC\n84,782.80\n0.00 (0.00%)\n84,782.79\nSELL\n0.01\n84,782.80\nBUY\nUSDT\ntrace-array-string-every-receiver-v6.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n02:54:58 UTC\n99+\nPine Editor\ntrace-array-string-every-receiver-v6.pine\nPublish script\n1\n2\n3\n4\n5\n6\n//@version=6\nindicator(\"V4-ARRAY-STRING-EVERY-RECEIVER-V6\")\nvalues = array.from(\"\", \"alpha\")\nresult = values.every()\nplot(result == true ? 1 : result == false ? 0 : -1, \"OUTCOME\")\n1 of 1 problem\nCannot call \"array.every\" with argument \"id\"=\"values\". An argument of \"array<string>\" type was used but a \"array<bool>\" is expected.(CE10123)\n1 ∙ Today, 10:54\nLine 4, Col 10\nPine Script® v6\nCompilation error: CE10123\n\nCannot call \"array.every\" with argument \"id\"=\"values\". An argument of \"array<string>\" type was used but a \"array<bool>\" is expected.\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+  "context_substituted_message": "Cannot call \"array.every\" with argument \"id\"=\"values\". An argument of \"array<string>\" type was used but a \"array<bool>\"  is expected."
+}

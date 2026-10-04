@@ -1,0 +1,13 @@
+{
+  "browser_utc": "2026-10-04T02:49:26.322Z",
+  "theme": "is-authenticated is-pro theme-dark mac_os_system feature-no-touch feature-no-mobiletouch",
+  "background_type": "solid",
+  "background": "#818181",
+  "native_logs": [],
+  "experiment": "129 grey",
+  "after_csv": {
+    "theme": "is-authenticated is-pro theme-dark mac_os_system feature-no-touch feature-no-mobiletouch",
+    "background_type": "solid",
+    "background": "#818181"
+  }
+}
