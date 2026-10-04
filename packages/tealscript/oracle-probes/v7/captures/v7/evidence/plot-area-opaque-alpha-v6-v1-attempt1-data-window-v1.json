@@ -1,0 +1,30 @@
+{
+  "index": 298,
+  "bar": [
+    1791105000,
+    85126.01,
+    85141.96,
+    85126,
+    85141.15,
+    9.46008
+  ],
+  "source_row": [
+    1791105000,
+    2,
+    0
+  ],
+  "browser_utc": "2026-10-04T09:12:46.492Z",
+  "title": "V7 plot-area-opaque-alpha-v6-v1",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   09:10",
+  "visible_range": {
+    "_firstBar": 263,
+    "_lastBar": 301
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 1
+  }
+}

@@ -66912,5 +66912,1298 @@
       "STATUS_ONLY": "85112.51"
     },
     "data_window_witness": "captures/v7/evidence/display-host-options-v6-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "script": "plot-area-opaque-alpha-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "6a6b402375592462a585af0530c21352eb266ae9e918d05969b979303593b03e",
+    "indicator_title": "V7 plot-area-opaque-alpha-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/plot-area-opaque-alpha-v6-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T171238.871.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 plot-area-opaque-alpha-v6-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24457,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24757,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T09:12:26.546Z",
+    "live_candle_open_utc": "2026-10-04T09:12:00.000Z",
+    "export_utc": "2026-10-04T09:12:39.295Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/plot-area-opaque-alpha-v6-v1-attempt1-setup.png",
+      "captures/v7/evidence/plot-area-opaque-alpha-v6-v1-attempt1-export.png",
+      "captures/v7/evidence/plot-area-opaque-alpha-v6-v1-attempt1-logs.txt",
+      "captures/v7/evidence/plot-area-opaque-alpha-v6-v1-attempt1-logs-v1.json",
+      "captures/v7/evidence/plot-area-opaque-alpha-v6-v1-attempt1-logs.png",
+      "captures/v7/evidence/plot-area-opaque-alpha-v6-v1-attempt1-visual.png",
+      "captures/v7/evidence/plot-area-opaque-alpha-v6-v1-attempt1-data-window-v1.png",
+      "captures/v7/evidence/plot-area-opaque-alpha-v6-v1-attempt1-data-window-v1.json",
+      "captures/v7/evidence/plot-area-opaque-alpha-v6-v1-attempt1-data-window-v1.txt",
+      "captures/v7/evidence/plot-area-opaque-alpha-v6-v1-attempt1-white-background-dpr1-v1.json",
+      "captures/v7/evidence/plot-area-opaque-alpha-v6-v1-attempt1-white-background-dpr1-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T09:12:27.777Z",
+        "bars": 2556,
+        "end": false,
+        "first": {
+          "index": -2256,
+          "value": [
+            1790798520,
+            83598,
+            83608.01,
+            83550,
+            83596.01,
+            18.91061
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791105120,
+            85141.14,
+            85141.15,
+            85141.14,
+            85141.15,
+            1.6691
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 plot-area-opaque-alpha-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2556,
+            "first": {
+              "index": -2256,
+              "value": [
+                1790798520,
+                2,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791105120,
+                2,
+                0
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T09:12:29.133Z",
+        "bars": 2556,
+        "end": false,
+        "first": {
+          "index": -2256,
+          "value": [
+            1790798520,
+            83598,
+            83608.01,
+            83550,
+            83596.01,
+            18.91061
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791105120,
+            85141.14,
+            85141.15,
+            85141.14,
+            85141.15,
+            1.6691
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 plot-area-opaque-alpha-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24757,
+            "first": {
+              "index": -1022201,
+              "value": [
+                1788134400,
+                2,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791105120,
+                2,
+                0
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T09:12:30.168Z",
+        "bars": 24757,
+        "end": true,
+        "first": {
+          "index": -24457,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791105120,
+            85141.14,
+            85141.15,
+            85141.14,
+            85141.14,
+            1.68866
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 plot-area-opaque-alpha-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24757,
+            "first": {
+              "index": -24457,
+              "value": [
+                1788134400,
+                2,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791105120,
+                2,
+                0
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   09:12",
+    "historical_compare_before_unix_seconds": 1791105120,
+    "pine_logs": {
+      "paths": [
+        "evidence/plot-area-opaque-alpha-v6-v1-attempt1-logs.txt",
+        "evidence/plot-area-opaque-alpha-v6-v1-attempt1-logs-v1.json",
+        "evidence/plot-area-opaque-alpha-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "5a02ca118559a7d6955fa6efb374ac9a278817a3f5b6115f57ee453252c2d3db",
+    "csv_bytes": 1194405,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "TARGET",
+      "BASE"
+    ],
+    "declared_to_native_header_mapping": {
+      "TARGET": "TARGET",
+      "BASE": "BASE"
+    },
+    "csv_rows": 24757,
+    "historical_rows": 24756,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791105120,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791105120",
+    "first_historical_values": {
+      "TARGET": "2",
+      "BASE": "0"
+    },
+    "last_historical_values": {
+      "TARGET": "2",
+      "BASE": "0"
+    },
+    "data_window_witness": "captures/v7/evidence/plot-area-opaque-alpha-v6-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "script": "plot-areabr-opaque-alpha-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "956516d8eaeff71cf615afa693f51207cebc5d446ee9247f3f88f6e34c947393",
+    "indicator_title": "V7 plot-areabr-opaque-alpha-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/plot-areabr-opaque-alpha-v6-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T171437.182.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 plot-areabr-opaque-alpha-v6-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24458,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24758,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T09:14:22.561Z",
+    "live_candle_open_utc": "2026-10-04T09:14:00.000Z",
+    "export_utc": "2026-10-04T09:14:38.391Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/plot-areabr-opaque-alpha-v6-v1-attempt1-setup.png",
+      "captures/v7/evidence/plot-areabr-opaque-alpha-v6-v1-attempt1-export.png",
+      "captures/v7/evidence/plot-areabr-opaque-alpha-v6-v1-attempt1-logs.txt",
+      "captures/v7/evidence/plot-areabr-opaque-alpha-v6-v1-attempt1-logs-v1.json",
+      "captures/v7/evidence/plot-areabr-opaque-alpha-v6-v1-attempt1-logs.png",
+      "captures/v7/evidence/plot-areabr-opaque-alpha-v6-v1-attempt1-visual.png",
+      "captures/v7/evidence/plot-areabr-opaque-alpha-v6-v1-attempt1-data-window-v1.png",
+      "captures/v7/evidence/plot-areabr-opaque-alpha-v6-v1-attempt1-data-window-v1.json",
+      "captures/v7/evidence/plot-areabr-opaque-alpha-v6-v1-attempt1-data-window-v1.txt",
+      "captures/v7/evidence/plot-areabr-opaque-alpha-v6-v1-attempt1-white-background-dpr1-v1.json",
+      "captures/v7/evidence/plot-areabr-opaque-alpha-v6-v1-attempt1-white-background-dpr1-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T09:14:23.637Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790800080,
+            83767.63,
+            83771.16,
+            83725.98,
+            83725.99,
+            19.0218
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791105240,
+            85141.15,
+            85141.15,
+            85141.14,
+            85141.14,
+            0.25934
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 plot-areabr-opaque-alpha-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790800080,
+                2,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791105240,
+                2,
+                0
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T09:14:25.194Z",
+        "bars": 24758,
+        "end": true,
+        "first": {
+          "index": -24458,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791105240,
+            85141.15,
+            85141.15,
+            85141.14,
+            85141.14,
+            0.35613
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 plot-areabr-opaque-alpha-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24758,
+            "first": {
+              "index": -24458,
+              "value": [
+                1788134400,
+                2,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791105240,
+                2,
+                0
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   09:14",
+    "historical_compare_before_unix_seconds": 1791105240,
+    "pine_logs": {
+      "paths": [
+        "evidence/plot-areabr-opaque-alpha-v6-v1-attempt1-logs.txt",
+        "evidence/plot-areabr-opaque-alpha-v6-v1-attempt1-logs-v1.json",
+        "evidence/plot-areabr-opaque-alpha-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "cbc11b45da7e8827dd6bfb6ab8e028efb27aa197438105d740be6d2a45b5e7b2",
+    "csv_bytes": 1194456,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "TARGET",
+      "BASE"
+    ],
+    "declared_to_native_header_mapping": {
+      "TARGET": "TARGET",
+      "BASE": "BASE"
+    },
+    "csv_rows": 24758,
+    "historical_rows": 24757,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791105240,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791105240",
+    "first_historical_values": {
+      "TARGET": "2",
+      "BASE": "0"
+    },
+    "last_historical_values": {
+      "TARGET": "2",
+      "BASE": "0"
+    },
+    "data_window_witness": "captures/v7/evidence/plot-areabr-opaque-alpha-v6-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "script": "plotshape-textcolor-na-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "f1ef65a6e01104a403e82c3030111f94308ccf93f5cd915d575f0af8ddea3714",
+    "indicator_title": "V7 plotshape-textcolor-na-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/plotshape-textcolor-na-v6-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T171527.081.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 plotshape-textcolor-na-v6-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24458,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24758,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T09:15:19.141Z",
+    "live_candle_open_utc": "2026-10-04T09:14:00.000Z",
+    "export_utc": "2026-10-04T09:15:27.286Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/plotshape-textcolor-na-v6-v1-attempt1-setup.png",
+      "captures/v7/evidence/plotshape-textcolor-na-v6-v1-attempt1-export.png",
+      "captures/v7/evidence/plotshape-textcolor-na-v6-v1-attempt1-logs.txt",
+      "captures/v7/evidence/plotshape-textcolor-na-v6-v1-attempt1-logs-v1.json",
+      "captures/v7/evidence/plotshape-textcolor-na-v6-v1-attempt1-logs.png",
+      "captures/v7/evidence/plotshape-textcolor-na-v6-v1-attempt1-visual.png",
+      "captures/v7/evidence/plotshape-textcolor-na-v6-v1-attempt1-data-window-v1.png",
+      "captures/v7/evidence/plotshape-textcolor-na-v6-v1-attempt1-data-window-v1.json",
+      "captures/v7/evidence/plotshape-textcolor-na-v6-v1-attempt1-data-window-v1.txt",
+      "captures/v7/evidence/plotshape-textcolor-na-v6-v1-attempt1-white-background-dpr1-v1.json",
+      "captures/v7/evidence/plotshape-textcolor-na-v6-v1-attempt1-white-background-dpr1-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T09:15:20.027Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790800080,
+            83767.63,
+            83771.16,
+            83725.98,
+            83725.99,
+            19.0218
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791105240,
+            85141.15,
+            85141.15,
+            85128.01,
+            85130.54,
+            19.08922
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 plotshape-textcolor-na-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790800080,
+                1,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791105240,
+                1,
+                0
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T09:15:21.367Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790800080,
+            83767.63,
+            83771.16,
+            83725.98,
+            83725.99,
+            19.0218
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791105240,
+            85141.15,
+            85141.15,
+            85128.01,
+            85130.54,
+            19.08922
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 plotshape-textcolor-na-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24758,
+            "first": {
+              "index": -1022214,
+              "value": [
+                1788134400,
+                1,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791105240,
+                1,
+                0
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T09:15:22.045Z",
+        "bars": 24758,
+        "end": true,
+        "first": {
+          "index": -24458,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791105240,
+            85141.15,
+            85141.15,
+            85128.01,
+            85130.54,
+            19.09591
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 plotshape-textcolor-na-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24758,
+            "first": {
+              "index": -24458,
+              "value": [
+                1788134400,
+                1,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791105240,
+                1,
+                0
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   09:14",
+    "historical_compare_before_unix_seconds": 1791105240,
+    "pine_logs": {
+      "paths": [
+        "evidence/plotshape-textcolor-na-v6-v1-attempt1-logs.txt",
+        "evidence/plotshape-textcolor-na-v6-v1-attempt1-logs-v1.json",
+        "evidence/plotshape-textcolor-na-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "35fde4a1de294611c525ac451d5f2d0c714faca7bd0c6d9a9014e3564bca4228",
+    "csv_bytes": 1144935,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "TARGET"
+    ],
+    "declared_to_native_header_mapping": {
+      "TARGET": "TARGET"
+    },
+    "csv_rows": 24758,
+    "historical_rows": 24757,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791105240,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791105240",
+    "first_historical_values": {
+      "TARGET": "1"
+    },
+    "last_historical_values": {
+      "TARGET": "1"
+    },
+    "data_window_witness": "captures/v7/evidence/plotshape-textcolor-na-v6-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "script": "plotchar-textcolor-na-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "4b8db32326b626a3112eca7a2a16c989e46b894228428c4673a4baf6b54698ab",
+    "indicator_title": "V7 plotchar-textcolor-na-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/plotchar-textcolor-na-v6-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T171604.305.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 plotchar-textcolor-na-v6-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24458,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24759,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T09:15:52.160Z",
+    "live_candle_open_utc": "2026-10-04T09:14:00.000Z",
+    "export_utc": "2026-10-04T09:16:04.166Z",
+    "live_boundary_confirmed_unchanged": false,
+    "evidence_files": [
+      "captures/v7/evidence/plotchar-textcolor-na-v6-v1-attempt1-setup.png",
+      "captures/v7/evidence/plotchar-textcolor-na-v6-v1-attempt1-export.png",
+      "captures/v7/evidence/plotchar-textcolor-na-v6-v1-attempt1-logs.txt",
+      "captures/v7/evidence/plotchar-textcolor-na-v6-v1-attempt1-logs-v1.json",
+      "captures/v7/evidence/plotchar-textcolor-na-v6-v1-attempt1-logs.png",
+      "captures/v7/evidence/plotchar-textcolor-na-v6-v1-attempt1-visual.png",
+      "captures/v7/evidence/plotchar-textcolor-na-v6-v1-attempt1-data-window-v1.png",
+      "captures/v7/evidence/plotchar-textcolor-na-v6-v1-attempt1-data-window-v1.json",
+      "captures/v7/evidence/plotchar-textcolor-na-v6-v1-attempt1-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T09:15:53.354Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790800080,
+            83767.63,
+            83771.16,
+            83725.98,
+            83725.99,
+            19.0218
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791105240,
+            85141.15,
+            85141.15,
+            85128.01,
+            85139.74,
+            19.92991
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 plotchar-textcolor-na-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790800080,
+                1,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791105240,
+                1,
+                0
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T09:15:54.822Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790800080,
+            83767.63,
+            83771.16,
+            83725.98,
+            83725.99,
+            19.0218
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791105240,
+            85141.15,
+            85141.15,
+            85128.01,
+            85139.75,
+            19.94036
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 plotchar-textcolor-na-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24758,
+            "first": {
+              "index": -1022214,
+              "value": [
+                1788134400,
+                1,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791105240,
+                1,
+                0
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T09:15:55.917Z",
+        "bars": 24758,
+        "end": true,
+        "first": {
+          "index": -24458,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791105240,
+            85141.15,
+            85141.15,
+            85128.01,
+            85140.01,
+            19.99487
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 plotchar-textcolor-na-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24758,
+            "first": {
+              "index": -24458,
+              "value": [
+                1788134400,
+                1,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791105240,
+                1,
+                0
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   09:14",
+    "historical_compare_before_unix_seconds": 1791105240,
+    "pine_logs": {
+      "paths": [
+        "evidence/plotchar-textcolor-na-v6-v1-attempt1-logs.txt",
+        "evidence/plotchar-textcolor-na-v6-v1-attempt1-logs-v1.json",
+        "evidence/plotchar-textcolor-na-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "5f930cf12caa0f1052b98a52a27d6feb5b14537b58ecf9c61928ca3f6bbac32e",
+    "csv_bytes": 1144978,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "TARGET"
+    ],
+    "declared_to_native_header_mapping": {
+      "TARGET": "TARGET"
+    },
+    "csv_rows": 24759,
+    "historical_rows": 24757,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791105360,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791105360",
+    "first_historical_values": {
+      "TARGET": "1"
+    },
+    "last_historical_values": {
+      "TARGET": "1"
+    },
+    "data_window_witness": "captures/v7/evidence/plotchar-textcolor-na-v6-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "script": "plotchar-textcolor-na-v6-v1.pine",
+    "attempt": 2,
+    "source_sha256": "4b8db32326b626a3112eca7a2a16c989e46b894228428c4673a4baf6b54698ab",
+    "indicator_title": "V7 plotchar-textcolor-na-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/plotchar-textcolor-na-v6-v1-attempt2.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T171719.327.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 plotchar-textcolor-na-v6-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24459,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24759,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T09:17:11.567Z",
+    "live_candle_open_utc": "2026-10-04T09:16:00.000Z",
+    "export_utc": "2026-10-04T09:17:19.802Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/plotchar-textcolor-na-v6-v1-attempt2-setup.png",
+      "captures/v7/evidence/plotchar-textcolor-na-v6-v1-attempt2-export.png",
+      "captures/v7/evidence/plotchar-textcolor-na-v6-v1-attempt2-logs.txt",
+      "captures/v7/evidence/plotchar-textcolor-na-v6-v1-attempt2-logs-v1.json",
+      "captures/v7/evidence/plotchar-textcolor-na-v6-v1-attempt2-logs.png",
+      "captures/v7/evidence/plotchar-textcolor-na-v6-v1-attempt2-visual.png",
+      "captures/v7/evidence/plotchar-textcolor-na-v6-v1-attempt2-data-window-v1.png",
+      "captures/v7/evidence/plotchar-textcolor-na-v6-v1-attempt2-data-window-v1.json",
+      "captures/v7/evidence/plotchar-textcolor-na-v6-v1-attempt2-data-window-v1.txt",
+      "captures/v7/evidence/plotchar-textcolor-na-v6-v1-attempt2-white-background-dpr1-v1.json",
+      "captures/v7/evidence/plotchar-textcolor-na-v6-v1-attempt2-white-background-dpr1-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T09:17:12.398Z",
+        "bars": 2556,
+        "end": false,
+        "first": {
+          "index": -2256,
+          "value": [
+            1790798760,
+            83600.94,
+            83620.01,
+            83530.11,
+            83614.01,
+            33.22808
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791105360,
+            85140,
+            85154.01,
+            85140,
+            85154,
+            3.38613
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 plotchar-textcolor-na-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2556,
+            "first": {
+              "index": -2256,
+              "value": [
+                1790798760,
+                1,
+                null
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791105360,
+                1,
+                0
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T09:17:13.480Z",
+        "bars": 2556,
+        "end": false,
+        "first": {
+          "index": -2256,
+          "value": [
+            1790798760,
+            83600.94,
+            83620.01,
+            83530.11,
+            83614.01,
+            33.22808
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791105360,
+            85140,
+            85154.01,
+            85140,
+            85154,
+            3.40351
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 plotchar-textcolor-na-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24759,
+            "first": {
+              "index": -1022203,
+              "value": [
+                1788134400,
+                1,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791105360,
+                1,
+                0
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T09:17:14.137Z",
+        "bars": 24759,
+        "end": true,
+        "first": {
+          "index": -24459,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791105360,
+            85140,
+            85154.01,
+            85140,
+            85154.01,
+            3.42241
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 plotchar-textcolor-na-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24759,
+            "first": {
+              "index": -24459,
+              "value": [
+                1788134400,
+                1,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791105360,
+                1,
+                0
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   09:16",
+    "historical_compare_before_unix_seconds": 1791105360,
+    "pine_logs": {
+      "paths": [
+        "evidence/plotchar-textcolor-na-v6-v1-attempt2-logs.txt",
+        "evidence/plotchar-textcolor-na-v6-v1-attempt2-logs-v1.json",
+        "evidence/plotchar-textcolor-na-v6-v1-attempt2-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "e1e97023173ec27923dd83ed64ad5fed04262c3a4a90dd3d418db67ec3801831",
+    "csv_bytes": 1144975,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "TARGET"
+    ],
+    "declared_to_native_header_mapping": {
+      "TARGET": "TARGET"
+    },
+    "csv_rows": 24759,
+    "historical_rows": 24758,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791105360,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791105360",
+    "first_historical_values": {
+      "TARGET": "1"
+    },
+    "last_historical_values": {
+      "TARGET": "1"
+    },
+    "data_window_witness": "captures/v7/evidence/plotchar-textcolor-na-v6-v1-attempt2-data-window-v1.json"
   }
 ]
