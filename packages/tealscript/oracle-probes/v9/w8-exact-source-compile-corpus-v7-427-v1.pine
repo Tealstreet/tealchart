@@ -1,0 +1,512 @@
+//@version=5
+indicator(title="MJ - VWAP SUite", shorttitle="MJ - VWAP Suite", overlay=true)
+
+var cumVol = 0.
+cumVol += nz(volume)
+
+groupShared = 'Shared'
+inlineDev = 'Deviations'
+inlineSharedStyles = 'Styling'
+inlineSharedToggles = 'Toggles'
+
+hideonDWM = input(false, title="Hide VWAP 1D / Above", group=groupShared, inline=inlineSharedToggles)
+showBands = input(true, title="Show Bands", group=groupShared, inline=inlineSharedToggles)
+// TrackCloses = input(false, title="Track Dates", group=groupShared, inline=inlineSharedToggles)
+
+stdevMult = input(1.0, title="B1", group=groupShared, inline=inlineDev, step=0.1)
+stdevMult2 = input(1.5, title="B2", group=groupShared, inline=inlineDev, step=0.1)
+stdevMult3 = input(2.0, title="B3", group=groupShared, inline=inlineDev, step=0.1)
+
+VwapStyle = input.string("line", options = ["circles","line","cross"],title = "VWAP", group=groupShared, inline=inlineSharedStyles)
+//CloseStyle = input.string("circles", options = ["circles","line","cross"],title = "Close", group=groupShared, inline=inlineSharedStyles)
+BandStyle = input.string("line", options = ["circles","line","cross"],title = "Bands", group=groupShared, inline=inlineSharedStyles)
+plotStylePVA = input.string("line", options = ["circles","line","cross"],title = "PVA", group=groupShared, inline=inlineSharedStyles)
+plotStylePpoc = input.string("cross", options = ["circles","line","cross"],title = "PPOC", group=groupShared, inline=inlineSharedStyles)
+
+LabelSize = input.string("small", options = ["small","medium","large"],title = "Label Size", group=groupShared, inline=inlineSharedStyles)
+labelOffset = input.int(0, title="Label Offset", group=groupShared, inline=inlineSharedStyles)
+
+_getLineStyle(_style) => (_style == "line") ? plot.style_line : (_style == "circles") ? plot.style_circles : (_style == "cross") ? plot.style_cross : na
+
+VwapStyleHolder = _getLineStyle(VwapStyle)
+//CloseStyleHolder = _getLineStyle(CloseStyle)
+BandStyleHolder = _getLineStyle(BandStyle)
+pvaPlotStyleHolder = _getLineStyle(plotStylePVA)
+ppocPlotStyle = _getLineStyle(plotStylePpoc)
+
+TextColor = color.white
+
+_labelText(TF, multiple) => TF + " " + str.tostring(multiple)
+
+dayColor = '#ffcc80'
+weekColor = '#00bcd4'
+monthColor = '#7b1fa2'
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// --- VWAP 1 ---
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+groupV1 = 'VWAP1'
+inlineOptions1 = 'V1 Options'
+inlineMain1 = 'main1'
+inlineFine1 = 'fine1'
+
+var anchorS1 = input.string(defval = "D", title="VWAP 1 Anchor", options=["None","D", "W", "M", "3M", "6M", "12M"], group=groupV1, inline=inlineMain1)
+var anchorOneDefined = anchorS1 != "None"
+
+_oneOffset = input(5, title="Offset", group=groupV1, inline=inlineMain1)
+oneTextColor = input.color(color.new(#ffcc80, 40), title="Text", group=groupV1, inline=inlineMain1)
+oneVwapColor = input.color(color.new(#ffcc80, 30), title = "VWAP/Close", group=groupV1, inline=inlineMain1)
+oneBandColor = input.color(color.new(#090720, 70), title = "Bands", group=groupV1, inline=inlineMain1)
+onePpocColor = input.color(color.new(color.white, 75), title = "PPOC", group=groupV1, inline=inlineMain1)
+onePvaEdgeColor = input.color(color.new(color.white, 80), title = "PVA Edge", group=groupV1, inline=inlineMain1)
+onePvaFillColor = input.color(color.new(color.white, 88), title = "PVA Fill", group=groupV1, inline=inlineMain1)
+oneDvaFillColor = input.color(color.new(#87524f, 85), title = "DVA Fill", group=groupV1, inline=inlineMain1)
+
+Sizeholder= size.small
+if LabelSize == "medium"
+    Sizeholder := size.normal
+else if LabelSize == "large"
+    Sizeholder := size.large
+
+showOneLines = input(true, title="Lines", group=groupV1, inline=inlineOptions1) and anchorOneDefined
+showOneLabels = input(true, title="Labels", group=groupV1, inline=inlineOptions1) and anchorOneDefined
+showOneVwap = input(true, title="VWAP", group=groupV1, inline=inlineOptions1) and anchorOneDefined and showOneLines
+showOneBands = input(true, title="Bands", group=groupV1, inline=inlineOptions1) and anchorOneDefined and showOneLines
+showOnePPOC = input(true, title="PPOC", group=groupV1, inline=inlineOptions1) and anchorOneDefined and showOneLines
+showOnePva = input(true, title="PVA", group=groupV1, inline=inlineOptions1) and anchorOneDefined and showOneLines
+onePvaFillActive = input(true, title="PVA Fill", group=groupV1, inline=inlineOptions1) and anchorOneDefined
+oneDvaFillActive = input(true, title="DVA Fill", group=groupV1, inline=inlineOptions1) and anchorOneDefined
+showOneBand1 = input(true, title="B1", group=groupV1, inline=inlineFine1) and showBands and showOneBands
+showOneBand2 = input(true, title="B2", group=groupV1, inline=inlineFine1) and showBands and showOneBands
+showOneBand3 = input(true, title="B3", group=groupV1, inline=inlineFine1) and showBands and showOneBands
+showOneLabelC = input(true, title="LC", group=groupV1, inline=inlineFine1) and showOneLabels
+showOneLabel1 = input(true, title="L1", group=groupV1, inline=inlineFine1) and showOneLabels
+showOneLabel2 = input(true, title="L2", group=groupV1, inline=inlineFine1) and showOneLabels
+showOneLabel3 = input(true, title="L3", group=groupV1, inline=inlineFine1) and showOneLabels
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// --- VWAP 2 ---
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+groupV2 = 'VWAP2'
+inlineOptions2 = 'V2 Options'
+inlineMain2 = 'main2'
+inlineFine2 = 'fine2'
+
+var anchorS2 = input.string(defval = "W", title="V2 Anchor", options=["None","D", "W", "M", "3M", "6M", "12M"], group=groupV2, inline=inlineMain2)
+var anchorTwoDefined = anchorS2 != "None"
+
+_twoOffset = input(5, title="Offset", group=groupV2, inline=inlineMain2)
+twoTextColor = input.color(color.new(#00bcd4, 0), title="Text", group=groupV2, inline=inlineMain2)
+twoVwapColor = input.color(color.new(#00bcd4, 20), title = "VWAP/Close",group=groupV2, inline=inlineMain2)
+twoBandColor = input.color(color.new(#090720, 70), title = "Bands",group=groupV2, inline=inlineMain2)
+twoPpocColor = input.color(color.new(color.white, 75), title = "PPOC", group=groupV2, inline=inlineMain2)
+twoPvaEdgeColor = input.color(color.new(#00bcd4, 80), title = "PVA Edge", group=groupV2, inline=inlineMain2)
+twoPvaFillColor = input.color(color.new(color.white, 90), title = "PVA Fill", group=groupV2, inline=inlineMain2)
+twoDvaFillColor = input.color(color.new(#00332a, 80), title = "DVA Fill", group=groupV2, inline=inlineMain2)
+
+showTwoLines = input(false, title="Lines", group=groupV2, inline=inlineOptions2) and anchorTwoDefined
+showTwoLabels = input(true, title="Labels", group=groupV2, inline=inlineOptions2) and anchorTwoDefined
+showTwoVwap = input(true, title="VWAP", group=groupV2, inline=inlineOptions2) and anchorTwoDefined and showTwoLines
+showTwoBands = input(true, title="Bands", group=groupV2, inline=inlineOptions2) and anchorTwoDefined and showTwoLines
+showTwoPPOC = input(true, title="PPOC", group=groupV2, inline=inlineOptions2) and anchorTwoDefined and showTwoLines
+showTwoPva = input(true, title="PVA", group=groupV2, inline=inlineOptions2) and anchorTwoDefined and showTwoLines
+twoPvaFillActive = input(true, title="PVA Fill", group=groupV2, inline=inlineOptions2) and anchorTwoDefined
+twoDvaFillActive = input(true, title="DVA Fill", group=groupV2, inline=inlineOptions2) and anchorTwoDefined
+showTwoBand1 = input(true, title="B1", group=groupV2, inline=inlineFine2) and showBands and showTwoBands
+showTwoBand2 = input(true, title="B2", group=groupV2, inline=inlineFine2) and showBands and showTwoBands
+showTwoBand3 = input(true, title="B3", group=groupV2, inline=inlineFine2) and showBands and showTwoBands
+showTwoLabelC = input(true, title="LC", group=groupV2, inline=inlineFine2) and showTwoLabels
+showTwoLabel1 = input(true, title="L1", group=groupV2, inline=inlineFine2) and showTwoLabels
+showTwoLabel2 = input(true, title="L2", group=groupV2, inline=inlineFine2) and showTwoLabels
+showTwoLabel3 = input(true, title="L3", group=groupV2, inline=inlineFine2) and showTwoLabels
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// --- VWAP 3 ---
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+groupV3 = 'VWAP3'
+inlineOptions3 = 'V3 Options'
+inlineMain3 = 'main3'
+inlineFine3 = 'fine3'
+
+var anchorS3 = input.string(defval = "M", title="VWAP 3 Anchor", options=["None","D", "W", "M", "3M", "6M", "12M"], group=groupV3, inline=inlineMain3)
+var anchorThreeDefined = anchorS3 != "None"
+
+_threeOffset = input(5, title="Offset", group=groupV3, inline=inlineMain3)
+threeTextColor = input.color(color.new(#7b1fa2, 0), title="Text", group=groupV3, inline=inlineMain3)
+threeVwapColor = input.color(color.new(#7b1fa2, 0), title = "VWAP/Close",group=groupV3, inline=inlineMain3)
+threeBandColor = input.color(color.new(#090720, 70), title = "Bands",group=groupV3, inline=inlineMain3)
+threePpocColor = input.color(color.new(color.white, 75), title = "PPOC", group=groupV3, inline=inlineMain3)
+threePvaEdgeColor = input.color(color.new(#7b1fa2, 80), title = "PVA Edge", group=groupV3, inline=inlineMain3)
+threePvaFillColor = input.color(color.new(color.white, 90), title = "PVA Fill", group=groupV3, inline=inlineMain3)
+threeDvaFillColor = input.color(color.new(#7b1fa2, 88), title = "DVA Fill", group=groupV3, inline=inlineMain3)
+
+showThreeLines = input(false, title="Lines", group=groupV3, inline=inlineOptions3)
+showThreeLabels = input(true, title="Labels", group=groupV3, inline=inlineOptions3)
+showThreeVwap = input(true, title="VWAP", group=groupV3, inline=inlineOptions3) and showThreeLines
+showThreeBands = input(true, title="Bands", group=groupV3, inline=inlineOptions3) and showThreeLines
+showThreePPOC = input(true, title="PPOC", group=groupV3, inline=inlineOptions3) and showThreeLines
+showThreePva = input(true, title="PVA", group=groupV3, inline=inlineOptions3) and showThreeLines
+threePvaFillActive = input(true, title="PVA Fill", group=groupV3, inline=inlineOptions3)
+threeDvaFillActive = input(true, title="DVA Fill", group=groupV3, inline=inlineOptions3)
+showThreeBand1 = input(true, title="B1", group=groupV3, inline=inlineFine3) and showBands and showThreeBands
+showThreeBand2 = input(true, title="B2", group=groupV3, inline=inlineFine3) and showBands and showThreeBands
+showThreeBand3 = input(true, title="B3", group=groupV3, inline=inlineFine3) and showBands and showThreeBands
+showThreeLabel1 = input(true, title="L1", group=groupV3, inline=inlineFine3) and showThreeLabels
+showThreeLabel2 = input(true, title="L2", group=groupV3, inline=inlineFine3) and showThreeLabels
+showThreeLabel3 = input(true, title="L3", group=groupV3, inline=inlineFine3) and showThreeLabels
+showThreeLabelC = input(true, title="LC", group=groupV3, inline=inlineFine3) and showThreeLabels
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// --- FUNCTIONS ---
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+setLabelPrice(_label, _price,_offset) =>
+    label.set_y(_label,_price)
+    label.set_x(_label,bar_index + _offset)
+
+computeVWAP(src, isNewPeriod) =>
+	var float sumSrcVol = na
+	var float sumVol = na
+
+	sumSrcVol := isNewPeriod ? src * volume : src * volume + sumSrcVol[1]
+	sumVol := isNewPeriod ? volume : volume + sumVol[1]
+	// sumSrcSrcVol calculates the dividend of the equation that is later used to calculate the standard deviation
+
+	_vwap = sumSrcVol / sumVol
+
+	[_vwap,sumVol]
+
+
+computeBANDS(src,isNewPeriod,stDevMultiplier,_vwap,sumVol) =>
+    var float sumSrcSrcVol = na
+
+    sumSrcSrcVol := isNewPeriod ? volume * math.pow(src, 2) : volume * math.pow(src, 2) + sumSrcSrcVol[1]
+	variance = sumSrcSrcVol / sumVol - math.pow(_vwap, 2)
+	variance := variance < 0 ? 0 : variance
+	stDev = math.sqrt(variance)
+	lowerBand = _vwap - stDev * stDevMultiplier
+	upperBand = _vwap + stDev * stDevMultiplier
+
+	[lowerBand, upperBand]
+
+timeChange(period) =>
+	ta.change(time(period))
+
+
+is_newbar(res) =>
+    if res == 'None'
+        false
+    else
+        t = time(res)
+        not na(t) and (na(t[1]) or t > t[1])
+
+getDay()=>
+    (dayofweek == dayofweek.monday) ? "Saturday" : (dayofweek == dayofweek.tuesday) ? "Sunday" : (dayofweek == dayofweek.wednesday) ? "Monday" : (dayofweek == dayofweek.thursday) ? "Tuesday" : (dayofweek == dayofweek.friday) ? "Wednesday" : (dayofweek == dayofweek.saturday) ? "Thursday" : (dayofweek == dayofweek.sunday) ? "Friday" : na
+
+getWeek()=>
+    weekofyear[1]
+
+getMonth()=>
+    realmonth = month - 2
+    if realmonth < 1
+        realmonth := 12
+    (realmonth == 1) ? "January" :(realmonth == 2) ? "February" :(realmonth == 3) ? "March" :(realmonth == 4) ? "April" :(realmonth == 5) ? "May" :(realmonth == 6) ? "June" :(realmonth == 7) ? "July" :(realmonth == 8) ? "August" :(realmonth == 9) ? "September" :(realmonth == 10) ? "October" :(realmonth == 11) ? "November" :(realmonth == 12) ? "December" : na
+
+getYear()=>
+    year - 2
+
+trackClosesText(anchor)=>
+    if anchor == "D"
+        getDay()
+
+    else if anchor == "W"
+        str.tostring(getWeek()) + " " + " /52"
+
+    else if anchor == "M" or anchor == "3M" or anchor == "6M"
+        str.tostring(getMonth())
+    else
+        str.tostring(getYear())
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// --- LABEL OFFSETS ---
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// auto position based on whether the other TF labels are visible
+
+__oneOffset = showOneLabels ? _oneOffset : 0
+__twoOffset = showTwoLabels ? _twoOffset : 0
+__threeOffset = showThreeLabels ? _threeOffset : 0
+
+oneOffset = labelOffset + __oneOffset
+twoOffset = oneOffset + __twoOffset
+threeOffset = twoOffset + __threeOffset
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// --- PLOTTING VWAP 1 ---
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+var label L1V1S1 = (showOneLabel1) ? label.new(bar_index,high,style = label.style_none,text=_labelText(anchorS1, stdevMult), textcolor=oneTextColor, size = Sizeholder) :na
+var label L2V1S1 = (showOneLabel1) ? label.new(bar_index,high,style = label.style_none,text=_labelText(anchorS1, stdevMult * -1), textcolor=oneTextColor, size = Sizeholder) :na
+var label L1V1S2 = (showOneLabel2) ? label.new(bar_index,high,style = label.style_none,text=_labelText(anchorS1, stdevMult2), textcolor=oneTextColor, size = Sizeholder) :na
+var label L2V1S2 = (showOneLabel2) ? label.new(bar_index,high,style = label.style_none,text=_labelText(anchorS1, stdevMult2 * -1), textcolor=oneTextColor, size = Sizeholder) :na
+var label L1V1S3 = (showOneLabel3) ? label.new(bar_index,high,style = label.style_none,text=_labelText(anchorS1, stdevMult3), textcolor=oneTextColor, size = Sizeholder) :na
+var label L2V1S3 = (showOneLabel3) ? label.new(bar_index,high,style = label.style_none,text=_labelText(anchorS1, stdevMult3 * -1), textcolor=oneTextColor, size = Sizeholder) :na
+var label L1V1C = (showOneLabelC) ? label.new(bar_index,high,style = label.style_none,text=anchorS1 + " 0", textcolor=oneTextColor, size = Sizeholder) :na
+
+if barstate.islast and cumVol == 0
+    runtime.error("No volume is provided by the data vendor.")
+
+isFirstBarPeriod1 = anchorOneDefined and is_newbar(anchorS1)
+
+var float vwapValueS1 = na
+var float onePPOC = na
+var float onePVAH = na
+var float onePVAL = na
+var float oneDVAH = na
+var float oneDVAL = na
+float upBand2S1 = na
+float lowBand2S1 = na
+float upBand3S1 = na
+float lowBand3S1 = na
+
+if anchorOneDefined
+    if showOnePPOC and isFirstBarPeriod1
+        //if TrackCloses
+            //label.new(bar_index[1],onePPOC, text=str.tostring(trackClosesText(anchorS1)) + " VWAP Close", style = label.style_none, textcolor=TextColor)
+        onePPOC := vwapValueS1
+
+    if isFirstBarPeriod1 and showOnePva
+        onePVAH := oneDVAH
+        onePVAL := oneDVAL
+
+    if not (hideonDWM and timeframe.isdwm)
+        [_vwap,sumVol] = computeVWAP(hlc3, isFirstBarPeriod1)
+        vwapValueS1 := _vwap
+
+        if showOneLabelC
+            setLabelPrice(L1V1C,vwapValueS1,oneOffset)
+
+        //if showOneBand1
+        [lowerBandValues, upperBandValues] = computeBANDS(hlc3,isFirstBarPeriod1,stdevMult,_vwap,sumVol)
+        oneDVAH := upperBandValues
+        oneDVAL :=lowerBandValues
+        if showOneLabel1
+            setLabelPrice(L1V1S1,oneDVAH,oneOffset)
+            setLabelPrice(L2V1S1,oneDVAL,oneOffset)
+
+        //if showOneBand2
+        [lowerBandValues2, upperBandValues2] = computeBANDS(hlc3,isFirstBarPeriod1,stdevMult2,_vwap,sumVol)
+        upBand2S1 := upperBandValues2
+        lowBand2S1 :=lowerBandValues2
+        if showOneLabel2
+            setLabelPrice(L1V1S2,upBand2S1,oneOffset)
+            setLabelPrice(L2V1S2,lowBand2S1,oneOffset)
+
+        //if showOneBand3
+        [lowerBandValues3, upperBandValues3] = computeBANDS(hlc3,isFirstBarPeriod1,stdevMult3,_vwap,sumVol)
+        upBand3S1 := upperBandValues3
+        lowBand3S1 :=lowerBandValues3
+        if showOneLabel3
+            setLabelPrice(L1V1S3,upBand3S1,oneOffset)
+            setLabelPrice(L2V1S3,lowBand3S1,oneOffset)
+
+onePpocPlot = plot(onePPOC, title="One PPOC", color=onePpocColor, offset=0,style=ppocPlotStyle)
+onePvahPlot = plot(onePVAH, title="One PVAH", color=onePvaEdgeColor, offset=0,style=pvaPlotStyleHolder)
+onePvalPlot = plot(onePVAL, title="One PVAL", color=onePvaEdgeColor, offset=0,style=pvaPlotStyleHolder)
+fill(onePvalPlot, onePvahPlot, onePvaFillActive ? onePvaFillColor : na, title='One PVA Fill')
+
+plot(showOneVwap ? vwapValueS1 : na, title="VWAP 1", color=oneVwapColor, offset=0, style = VwapStyleHolder)
+
+oneDvahPlot = plot(showOneBand1 ? oneDVAH : na, title="One DVAH", color=oneBandColor, offset=0, style=BandStyleHolder)
+oneDvalPlot = plot(showOneBand1 ? oneDVAL : na, title="One DVAL", color=oneBandColor, offset=0, style=BandStyleHolder)
+fill(oneDvalPlot, oneDvahPlot, oneDvaFillActive ? oneDvaFillColor : na, title='One DVA Fill')
+
+plot(showOneBand2 ? upBand2S1 : na, title="One +1.5", color=oneBandColor, offset=0, style =BandStyleHolder)
+plot(showOneBand2 ? lowBand2S1 : na, title="One -1.5", color=oneBandColor, offset=0, style =BandStyleHolder)
+plot(showOneBand3 ? upBand3S1 : na, title="One +2", color=oneBandColor, offset=0, style =BandStyleHolder)
+plot(showOneBand3 ? lowBand3S1 : na, title="One -2", color=oneBandColor, offset=0, style =BandStyleHolder)
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// --- PLOTTING VWAP 2 ---
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+var label L1V2S1 = (showTwoLabel1) ? label.new(bar_index,high,style = label.style_none,text=_labelText(anchorS2, stdevMult), textcolor=twoTextColor, size = Sizeholder) :na
+var label L2V2S1 = (showTwoLabel1) ? label.new(bar_index,high,style = label.style_none,text=_labelText(anchorS2, stdevMult * -1), textcolor=twoTextColor, size = Sizeholder) :na
+var label L1V2S2 = (showTwoLabel2) ? label.new(bar_index,high,style = label.style_none,text=_labelText(anchorS2, stdevMult2), textcolor=twoTextColor, size = Sizeholder) :na
+var label L2V2S2 = (showTwoLabel2) ? label.new(bar_index,high,style = label.style_none,text=_labelText(anchorS2, stdevMult2 *-1), textcolor=twoTextColor, size = Sizeholder) :na
+var label L1V2S3 = (showTwoLabel3) ? label.new(bar_index,high,style = label.style_none,text=_labelText(anchorS2, stdevMult3), textcolor=twoTextColor, size = Sizeholder) :na
+var label L2V2S3 = (showTwoLabel3) ? label.new(bar_index,high,style = label.style_none,text=_labelText(anchorS2, stdevMult3 * -1), textcolor=twoTextColor, size = Sizeholder) :na
+var label L1V2C = (showTwoLabelC) ? label.new(bar_index,high,style = label.style_none,text=anchorS2 + " 0", textcolor=twoTextColor, size = Sizeholder) :na
+
+isFirstBarPeriod2 = anchorTwoDefined and is_newbar(anchorS2)
+
+var float vwapValueS2 = na
+var float twoPPOC = na
+var float twoDVAH = na
+var float twoDVAL = na
+var float twoPVAH = na
+var float twoPVAL = na
+float upBand2S2 = na
+float lowBand2S2 = na
+float upBand3S2 = na
+float lowBand3S2 = na
+
+if anchorTwoDefined
+    if showTwoPPOC and isFirstBarPeriod2
+        //if TrackCloses
+            //label.new(bar_index[1],twoPPOC, text=str.tostring(trackClosesText(anchorS2)) + " VWAP Close", style = label.style_none, textcolor=TextColor)
+        twoPPOC := vwapValueS2
+
+    if isFirstBarPeriod2 and showTwoPva
+        twoPVAH := twoDVAH
+        twoPVAL := twoDVAL
+
+    if not (hideonDWM and timeframe.isdwm)
+        [_vwap,sumVol] = computeVWAP(hlc3, isFirstBarPeriod2)
+        vwapValueS2 := _vwap
+
+        if showTwoLabelC
+            setLabelPrice(L1V2C,vwapValueS2,twoOffset)
+
+        //if showTwoBand1
+        [lowerBandValues, upperBandValues] = computeBANDS(hlc3,isFirstBarPeriod2,stdevMult,_vwap,sumVol)
+        twoDVAH := upperBandValues
+        twoDVAL :=lowerBandValues
+        if showTwoLabel1
+            setLabelPrice(L1V2S1,twoDVAH,twoOffset)
+            setLabelPrice(L2V2S1,twoDVAL,twoOffset)
+
+        //if showTwoBand2
+        [lowerBandValues2, upperBandValues2] = computeBANDS(hlc3,isFirstBarPeriod2,stdevMult2,_vwap,sumVol)
+        upBand2S2 := upperBandValues2
+        lowBand2S2 :=lowerBandValues2
+        if showTwoLabel2
+            setLabelPrice(L1V2S2,upBand2S2,twoOffset)
+            setLabelPrice(L2V2S2,lowBand2S2,twoOffset)
+
+        //if showTwoBand3
+        [lowerBandValues3, upperBandValues3] = computeBANDS(hlc3,isFirstBarPeriod2,stdevMult3,_vwap,sumVol)
+        upBand3S2 := upperBandValues3
+        lowBand3S2 :=lowerBandValues3
+        if showTwoLabel3
+            setLabelPrice(L1V2S3,upBand3S2,twoOffset)
+            setLabelPrice(L2V2S3,lowBand3S2,twoOffset)
+
+twoPpocPlot = plot(twoPPOC, title="Two PPOC", color=twoPpocColor, offset=0,style=ppocPlotStyle)
+twoPvahPlot = plot(twoPVAH, title="Two PVAH", color=twoPvaEdgeColor, offset=0, style=pvaPlotStyleHolder)
+twoPvalPlot = plot(twoPVAL, title="Two PVAL", color=twoPvaEdgeColor, offset=0, style=pvaPlotStyleHolder)
+fill(twoPvalPlot, twoPvahPlot, twoPvaFillActive ? twoPvaFillColor : na, title='Two PVA Fill')
+
+plot(showTwoVwap ? vwapValueS2 : na, title="VWAP 2", color=twoVwapColor, offset=0, style = VwapStyleHolder)
+
+twoDvahPlot = plot(showTwoBand1 ? twoDVAH : na, title="Two DVAH", color=twoBandColor, offset=0, style =BandStyleHolder)
+twoDvalPlot = plot(showTwoBand1 ? twoDVAL : na, title="Two DVAL", color=twoBandColor, offset=0, style =BandStyleHolder)
+fill(twoDvalPlot, twoDvahPlot, twoDvaFillActive ? twoDvaFillColor : na, title='Two DVA Fill')
+
+plot(showTwoBand2 ? upBand2S2 : na, title="Two +1.5", color=twoBandColor, offset=0, style =BandStyleHolder)
+plot(showTwoBand2 ? lowBand2S2 : na, title="Two -1.5", color=twoBandColor, offset=0, style =BandStyleHolder)
+plot(showTwoBand3 ? upBand3S2 : na, title="Two +2", color=twoBandColor, offset=0, style =BandStyleHolder)
+plot(showTwoBand3 ? lowBand3S2 : na, title="Two -2", color=twoBandColor, offset=0, style =BandStyleHolder)
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// --- PLOTTING VWAP 3 ---
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+var label L1V3S1 = (showThreeLabel1) ? label.new(bar_index,high,style = label.style_none,text=_labelText(anchorS3, stdevMult), textcolor=threeTextColor, size = Sizeholder) :na
+var label L2V3S1 = (showThreeLabel1) ? label.new(bar_index,high,style = label.style_none,text=_labelText(anchorS3, stdevMult *-1), textcolor=threeTextColor, size = Sizeholder) :na
+var label L1V3S2 = (showThreeLabel2) ? label.new(bar_index,high,style = label.style_none,text=_labelText(anchorS3, stdevMult2), textcolor=threeTextColor, size = Sizeholder) :na
+var label L2V3S2 = (showThreeLabel2) ? label.new(bar_index,high,style = label.style_none,text=_labelText(anchorS3, stdevMult2 *-1), textcolor=threeTextColor, size = Sizeholder) :na
+var label L1V3S3 = (showThreeLabel3) ? label.new(bar_index,high,style = label.style_none,text=_labelText(anchorS3, stdevMult3), textcolor=threeTextColor, size = Sizeholder) :na
+var label L2V3S3 = (showThreeLabel3) ? label.new(bar_index,high,style = label.style_none,text=_labelText(anchorS3, stdevMult3 *-1), textcolor=threeTextColor, size = Sizeholder) :na
+var label L1V3C = (showThreeLabelC) ? label.new(bar_index,high,style = label.style_none,text=_labelText(anchorS3, 0), textcolor=threeTextColor, size = Sizeholder) :na
+
+isFirstBarPeriod3 = anchorThreeDefined and is_newbar(anchorS3)
+
+var float vwapValueS3 = na
+var float threePPOC = na
+var float threeDVAH = na
+var float threeDVAL = na
+var float threePVAH = na
+var float threePVAL = na
+float upBand2S3 = na
+float lowBand2S3 = na
+float upBand3S3 = na
+float lowBand3S3 = na
+
+if anchorThreeDefined
+    if showThreePPOC and isFirstBarPeriod3
+        //if TrackCloses
+            //label.new(bar_index[1],threePPOC, text=str.tostring(trackClosesText(anchorS3)) + " VWAP Close", style = label.style_none, textcolor=TextColor)
+        threePPOC := vwapValueS3
+
+    if isFirstBarPeriod3 and showThreePva
+        threePVAH := threeDVAH
+        threePVAL := threeDVAL
+
+    if not (hideonDWM and timeframe.isdwm)
+        [_vwap,sumVol] = computeVWAP(hlc3, isFirstBarPeriod3)
+        vwapValueS3 := _vwap
+
+        if showThreeLabelC
+            setLabelPrice(L1V3C,vwapValueS3,threeOffset)
+
+        //if showThreeBand1
+        [lowerBandValues, upperBandValues] = computeBANDS(hlc3,isFirstBarPeriod3,stdevMult,_vwap,sumVol)
+        threeDVAH := upperBandValues
+        threeDVAL :=lowerBandValues
+        if showThreeLabel1
+            setLabelPrice(L1V3S1,threeDVAH,threeOffset)
+            setLabelPrice(L2V3S1,threeDVAL,threeOffset)
+
+        //if showThreeBand2
+        [lowerBandValues2, upperBandValues2] = computeBANDS(hlc3,isFirstBarPeriod3,stdevMult2,_vwap,sumVol)
+        upBand2S3 := upperBandValues2
+        lowBand2S3 :=lowerBandValues2
+        if showThreeLabel2
+            setLabelPrice(L1V3S2,upBand2S3,threeOffset)
+            setLabelPrice(L2V3S2,lowBand2S3,threeOffset)
+
+        //if showThreeBand3
+        [lowerBandValues3, upperBandValues3] = computeBANDS(hlc3,isFirstBarPeriod3,stdevMult3,_vwap,sumVol)
+        upBand3S3 := upperBandValues3
+        lowBand3S3 :=lowerBandValues3
+        if showThreeLabel3
+            setLabelPrice(L1V3S3,upBand3S3,threeOffset)
+            setLabelPrice(L2V3S3,lowBand3S3,threeOffset)
+
+//threePpocPlot = plot(threePPOC, title="Three PPOC", color=threePpocColor, offset=0,style=ppocPlotStyle)
+threePvahPlot = plot(threePVAH, title="Three PVAH", color=threePvaEdgeColor, offset=0, style=pvaPlotStyleHolder)
+threePvalPlot = plot(threePVAL, title="Three PVAL", color=threePvaEdgeColor, offset=0, style=pvaPlotStyleHolder)
+fill(threePvalPlot, threePvahPlot, threePvaFillActive ? threePvaFillColor : na, title='Three PVA Fill')
+
+plot(showThreeVwap ? vwapValueS3 : na, title="VWAP 3", color=threeVwapColor, offset=0, style = VwapStyleHolder)
+
+threeDvahPlot = plot(showThreeBand1 ? threeDVAH : na, title="Three DVAH", color=threeBandColor, offset=0, style =BandStyleHolder)
+threeDvalPlot = plot(showThreeBand1 ? threeDVAL : na, title="Three DVAL", color=threeBandColor, offset=0, style =BandStyleHolder)
+fill(threeDvalPlot, threeDvahPlot, threeDvaFillActive ? threeDvaFillColor : na, title='Three DVA Fill')
+
+plot(showThreeBand2 ? upBand2S3 : na, title="Three +1.5", color=threeBandColor, offset=0, style =BandStyleHolder)
+plot(showThreeBand2 ? lowBand2S3 : na, title="Three -1.5", color=threeBandColor, offset=0, style =BandStyleHolder)
+plot(showThreeBand3 ? upBand3S3 : na, title="Three +2", color=threeBandColor, offset=0, style =BandStyleHolder)
+plot(showThreeBand3 ? lowBand3S3 : na, title="Three -2", color=threeBandColor, offset=0, style =BandStyleHolder)

@@ -1,0 +1,7 @@
+//@version=6
+indicator("W8 exp overflow 709.0 v1", precision=12)
+argument = input.float(709.0, "Argument") + bar_index * 0.0
+result = math.exp(argument)
+plot(argument, "ARGUMENT")
+plot(result, "RESULT")
+plot(na(result) ? 1 : 0, "RESULT_NA")

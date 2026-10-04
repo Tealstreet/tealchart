@@ -1,0 +1,11 @@
+//@version=6
+indicator("V9 corpus v7 392 continuation")
+wtd_pct = close > open ? 0.06 : -0.06
+grayBg = color.gray
+var color observedBg = na
+if barstate.islast
+    wtdBg = not na(wtd_pct) and wtd_pct > 0.05  ? color.new(color.green, 40) :
+            not na(wtd_pct) and wtd_pct < -0.05 ? color.new(color.red,   40) : grayBg
+    observedBg := wtdBg
+bgcolor(observedBg)
+plot(1, "OUTCOME")

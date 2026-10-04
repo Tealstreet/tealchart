@@ -1,0 +1,3 @@
+//@version=6
+indicator("W8 timeframe nested v1")
+plot(timeframe.in_seconds(timeframe.from_seconds(1)), "RESULT")

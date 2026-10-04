@@ -1,0 +1,88 @@
+//@version=6
+indicator("Footprint Alert for Pandora", shorttitle="Trojan-Horse", overlay=true)
+
+// === Settings ===
+ticksPerRow     = input.int(10,    "Ticks Per Row",           minval=1,   maxval=100)
+vaPercent       = input.float(70,  "Value Area %",            minval=50,  maxval=95)
+imbalancePct    = input.float(300, "Imbalance Threshold %",   minval=150, maxval=500)
+minStackedRows  = input.int(4,     "Min Stacked Rows",        minval=2,   maxval=8)
+minDensityPct   = input.float(40,  "Min Imbalance Density %", minval=20,  maxval=80)
+minVolRatio     = input.float(1.3, "Min Volume vs 20-SMA",    minval=0.5, maxval=3.0, step=0.1)
+minZoneCoverage = input.float(30,  "Min Zone % of Bar Range", minval=10,  maxval=80)
+webhookSecret   = input.string("", "Webhook Secret",          tooltip="Must match TRADINGVIEW_WEBHOOK_SECRET env var")
+
+// === Volume Filter ===
+volSMA = ta.sma(volume, 20)
+volRatio = volSMA > 0 ? volume / volSMA : 1.0
+volOK = volRatio >= minVolRatio
+
+// === Footprint Data ===
+fpData = request.footprint(ticksPerRow, vaPercent, imbalancePct)
+rows = not na(fpData) ? footprint.rows(fpData) : na
+
+// === Analyze Imbalances ===
+var int maxBuyStreak  = 0
+var int maxSellStreak = 0
+var int buyCount      = 0
+var int sellCount     = 0
+var int totalRows     = 0
+
+if not na(rows)
+    int curBuy  = 0
+    int curSell = 0
+    maxBuyStreak  := 0
+    maxSellStreak := 0
+    buyCount  := 0
+    sellCount := 0
+    totalRows := array.size(rows)
+
+    for i = 0 to totalRows - 1
+        row = array.get(rows, i)
+        if volume_row.has_buy_imbalance(row)
+            buyCount += 1
+            curBuy   += 1
+            curSell  := 0
+        else
+            if curBuy > maxBuyStreak
+                maxBuyStreak := curBuy
+            curBuy := 0
+
+        if volume_row.has_sell_imbalance(row)
+            sellCount += 1
+            curSell   += 1
+            curBuy    := 0
+        else
+            if curSell > maxSellStreak
+                maxSellStreak := curSell
+            curSell := 0
+
+    if curBuy  > maxBuyStreak
+        maxBuyStreak  := curBuy
+    if curSell > maxSellStreak
+        maxSellStreak := curSell
+
+// === Density & Zone Coverage ===
+float buyDensity  = totalRows > 0 ? (buyCount  / totalRows) * 100 : 0
+float sellDensity = totalRows > 0 ? (sellCount / totalRows) * 100 : 0
+
+float barRange       = high - low
+float stackedZonePx  = math.max(maxBuyStreak, maxSellStreak) * ticksPerRow * syminfo.mintick
+float zoneCoveragePct = barRange > 0 ? (stackedZonePx / barRange) * 100 : 0
+
+// === Signal Detection (stacked imbalances only, absorption removed) ===
+bool hasStackedBuy  = maxBuyStreak  >= minStackedRows and close > open and buyDensity  >= minDensityPct and zoneCoveragePct >= minZoneCoverage and volOK
+bool hasStackedSell = maxSellStreak >= minStackedRows and close < open and sellDensity >= minDensityPct and zoneCoveragePct >= minZoneCoverage and volOK
+
+// === Determine signal type ===
+string signalType = hasStackedBuy ? "stacked_buy" : hasStackedSell ? "stacked_sell" : ""
+string direction  = hasStackedBuy ? "LONG" : hasStackedSell ? "SHORT" : ""
+
+bool shouldFire = barstate.isconfirmed and not na(fpData) and str.length(signalType) > 0
+
+// === Single alert with JSON payload ===
+if shouldFire
+    alert('{"signal":"FOOTPRINT","ticker":"' + syminfo.ticker + '","tf":"' + timeframe.period + '","sub_type":"' + signalType + '","direction":"' + direction + '","price":' + str.tostring(close) + ',"stacked_layers":' + str.tostring(math.max(maxBuyStreak, maxSellStreak)) + ',"buy_imb_count":' + str.tostring(buyCount) + ',"sell_imb_count":' + str.tostring(sellCount) + ',"density_pct":' + str.tostring(math.max(buyDensity, sellDensity), "#.#") + ',"zone_coverage_pct":' + str.tostring(zoneCoveragePct, "#.#") + ',"vol_ratio":' + str.tostring(volRatio, "#.##") + ',"secret":"' + webhookSecret + '"}', alert.freq_once_per_bar)
+
+// === Visual markers ===
+plotshape(hasStackedBuy,  "Stacked Buy",  location=location.belowbar, color=color.new(color.green, 30), style=shape.triangleup,   size=size.small)
+plotshape(hasStackedSell, "Stacked Sell", location=location.abovebar, color=color.new(color.red, 30),   style=shape.triangledown, size=size.small)

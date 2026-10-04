@@ -1,0 +1,107 @@
+//@version=6
+indicator("coverage-math-2-v1 — BTCUSDT 2m", overlay=false, precision=12, max_bars_back=200)
+// Standard BINANCE:BTCUSDT 2-minute chart. Export all 60 Data Window columns.
+// Leading na at b0..7; recurring interior na at b%97=40,41,42.
+if timeframe.period != "2"
+    runtime.error("Use BTCUSDT standard 2-minute candles")
+int b = bar_index
+bool hole = b % 97 == 40 or b % 97 == 41 or b % 97 == 42
+float clean = (b % 17 - 8) / 4.0
+float holes = hole ? na : clean
+float warm = b < 8 ? na : clean
+float randomClean = math.random(0.0, 1.0, 42)
+float randomHole = hole ? na : randomClean
+float randomWarm = b < 8 ? na : randomClean
+
+_v9_original_plot_000 = open
+_v9_original_plot_001 = high
+_v9_original_plot_002 = low
+_v9_original_plot_003 = close
+_v9_original_plot_004 = volume
+_v9_original_plot_005 = time
+_v9_original_plot_006 = bar_index
+_v9_original_plot_007 = math.avg(clean, 2.0, -1.0)
+_v9_original_plot_008 = math.avg(holes, 2.0, -1.0)
+_v9_original_plot_009 = math.avg(warm, 2.0, -1.0)
+_v9_original_plot_010 = math.max(clean, -1.0, 1.0)
+_v9_original_plot_011 = math.max(holes, -1.0, 1.0)
+_v9_original_plot_012 = math.max(warm, -1.0, 1.0)
+_v9_original_plot_013 = math.min(clean, -1.0, 1.0)
+_v9_original_plot_014 = math.min(holes, -1.0, 1.0)
+_v9_original_plot_015 = math.min(warm, -1.0, 1.0)
+_v9_original_plot_016 = math.todegrees(clean)
+_v9_original_plot_017 = math.todegrees(holes)
+_v9_original_plot_018 = math.todegrees(warm)
+_v9_original_plot_019 = math.toradians(clean)
+_v9_original_plot_020 = math.toradians(holes)
+_v9_original_plot_021 = math.toradians(warm)
+_v9_original_plot_022 = math.sum(clean, 5)
+_v9_original_plot_023 = math.sum(holes, 5)
+_v9_original_plot_024 = math.sum(warm, 5)
+_v9_original_plot_025 = randomClean
+_v9_original_plot_026 = randomHole
+_v9_original_plot_027 = randomWarm
+_v9_original_plot_028 = math.pi
+_v9_original_plot_029 = math.e
+_v9_original_plot_030 = math.phi
+_v9_original_plot_031 = math.rphi
+_v9_original_plot_032 = math.sum(clean, 1)
+_v9_original_plot_033 = math.sum(holes, 1)
+_v9_original_plot_034 = math.sum(warm, 1)
+_v9_original_plot_035 = math.sum(clean, 3)
+_v9_original_plot_036 = math.sum(holes, 3)
+_v9_original_plot_037 = math.sum(warm, 3)
+_v9_original_plot_038 = math.sum(clean, b % 5 + 1)
+_v9_original_plot_039 = math.sum(holes, b % 5 + 1)
+_v9_original_plot_040 = math.sum(warm, b % 5 + 1)
+_v9_original_plot_041 = math.round(0.5)
+_v9_original_plot_042 = math.round(-0.5)
+_v9_original_plot_043 = math.round(1.5)
+_v9_original_plot_044 = math.round(-1.5)
+_v9_original_plot_045 = math.round(clean,0)
+_v9_original_plot_046 = math.round(clean/3,2)
+_v9_original_plot_047 = math.round(clean/3,b%3)
+_v9_original_plot_048 = b < 4 ? na : clean+clean[1]+clean[2]+clean[3]+clean[4]
+_v9_original_plot_049 = (clean+2.0-1.0)/3.0
+_v9_original_plot_050 = math.todegrees(math.toradians(clean))
+_v9_original_plot_051 = false ? na : request.currency_rate("USD", "USD")
+_v9_original_plot_052 = hole ? na : request.currency_rate("USD", "USD")
+_v9_original_plot_053 = b < 8 ? na : request.currency_rate("USD", "USD")
+_v9_original_plot_054 = int(clean)
+_v9_original_plot_055 = int(holes)
+_v9_original_plot_056 = int(warm)
+_v9_original_plot_057 = float(clean)
+_v9_original_plot_058 = float(holes)
+_v9_original_plot_059 = float(warm)
+
+plot(_v9_original_plot_000, "input_open", display=display.data_window)
+plot(_v9_original_plot_001, "input_high", display=display.data_window)
+plot(_v9_original_plot_002, "input_low", display=display.data_window)
+plot(_v9_original_plot_003, "input_close", display=display.data_window)
+plot(_v9_original_plot_004, "input_volume", display=display.data_window)
+plot(_v9_original_plot_005, "input_time", display=display.data_window)
+plot(_v9_original_plot_006, "input_bar_index", display=display.data_window)
+plot(_v9_original_plot_019, "toradians_clean", display=display.data_window)
+plot(na(_v9_original_plot_019) ? 1 : 0, "V9_TARGET_NA", display=display.data_window)
+_v9_match_0 = time == 1788134640000 and bar_index == 2
+plot(_v9_match_0 ? 1 : 0, "V9_MATCH_0", display=display.data_window)
+plot(_v9_match_0 ? (_v9_original_plot_019 == -0.026179938779914945 ? 1 : 0) : na, "V9_EQ_0", display=display.data_window)
+plot(_v9_match_0 ? (_v9_original_plot_019 - -0.026179938779914945) * 1e11 : na, "V9_RESIDUAL_0", display=display.data_window)
+_v9_match_1 = time == 1788135000000 and bar_index == 5
+plot(_v9_match_1 ? 1 : 0, "V9_MATCH_1", display=display.data_window)
+plot(_v9_match_1 ? (_v9_original_plot_019 == -0.013089969389957472 ? 1 : 0) : na, "V9_EQ_1", display=display.data_window)
+plot(_v9_match_1 ? (_v9_original_plot_019 - -0.013089969389957472) * 1e11 : na, "V9_RESIDUAL_1", display=display.data_window)
+_v9_match_2 = time == 1788135720000 and bar_index == 11
+plot(_v9_match_2 ? 1 : 0, "V9_MATCH_2", display=display.data_window)
+plot(_v9_match_2 ? (_v9_original_plot_019 == 0.013089969389957472 ? 1 : 0) : na, "V9_EQ_2", display=display.data_window)
+plot(_v9_match_2 ? (_v9_original_plot_019 - 0.013089969389957472) * 1e11 : na, "V9_RESIDUAL_2", display=display.data_window)
+_v9_match_3 = time == 1788136080000 and bar_index == 14
+plot(_v9_match_3 ? 1 : 0, "V9_MATCH_3", display=display.data_window)
+plot(_v9_match_3 ? (_v9_original_plot_019 == 0.026179938779914945 ? 1 : 0) : na, "V9_EQ_3", display=display.data_window)
+plot(_v9_match_3 ? (_v9_original_plot_019 - 0.026179938779914945) * 1e11 : na, "V9_RESIDUAL_3", display=display.data_window)
+_v9_match_4 = time == 1788136680000 and bar_index == 19
+plot(_v9_match_4 ? 1 : 0, "V9_MATCH_4", display=display.data_window)
+plot(_v9_match_4 ? (_v9_original_plot_019 == -0.026179938779914945 ? 1 : 0) : na, "V9_EQ_4", display=display.data_window)
+plot(_v9_match_4 ? (_v9_original_plot_019 - -0.026179938779914945) * 1e11 : na, "V9_RESIDUAL_4", display=display.data_window)
+plot(time, "V9_TIME_MS", display=display.data_window)
+plot(bar_index, "V9_BAR_INDEX", display=display.data_window)

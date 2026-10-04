@@ -1,0 +1,114 @@
+//@version=6
+indicator("TA coverage 4 v1", overlay=false, precision=12, max_bars_back=200)
+// Capture on BINANCE:BTCUSDT standard 2-minute candles; export full history 0..at least 200.
+// All calls execute on every bar. No changing lengths and no HMA length 1.
+hole = bar_index == 40 or bar_index == 41
+s_clean = close
+s_hole40_41 = hole ? na : close
+s_lead0_4 = bar_index < 5 ? na : close
+_v9_original_plot_000 = open
+_v9_original_plot_001 = high
+_v9_original_plot_002 = low
+_v9_original_plot_003 = close
+_v9_original_plot_004 = volume
+_v9_original_plot_005 = time
+_v9_original_plot_006 = bar_index
+_v9_original_plot_007 = hole ? 1 : 0
+// Pivot levels read implicit OHLC. Anchor suppression is NOT an OHLC na injection.
+a_regular = bar_index % 20 == 0
+a_delayed40 = bar_index == 40
+a_skip_hole = a_regular and not hole
+a_never = false
+p_trad = ta.pivot_point_levels("Traditional", a_regular, false)
+p_fib_dev = ta.pivot_point_levels("Fibonacci", a_regular, true)
+p_woodie = ta.pivot_point_levels("Woodie", a_delayed40, false)
+p_skip = ta.pivot_point_levels("Traditional", a_skip_hole, false)
+_v9_original_plot_008 = array.size(p_trad) > 0 ? array.get(p_trad, 0) : na
+_v9_original_plot_009 = array.size(p_trad) > 1 ? array.get(p_trad, 1) : na
+_v9_original_plot_010 = array.size(p_trad) > 2 ? array.get(p_trad, 2) : na
+_v9_original_plot_011 = array.size(p_trad) > 3 ? array.get(p_trad, 3) : na
+_v9_original_plot_012 = array.size(p_trad) > 4 ? array.get(p_trad, 4) : na
+_v9_original_plot_013 = array.size(p_trad) > 5 ? array.get(p_trad, 5) : na
+_v9_original_plot_014 = array.size(p_trad) > 6 ? array.get(p_trad, 6) : na
+_v9_original_plot_015 = array.size(p_trad) > 7 ? array.get(p_trad, 7) : na
+_v9_original_plot_016 = array.size(p_trad) > 8 ? array.get(p_trad, 8) : na
+_v9_original_plot_017 = array.size(p_trad) > 9 ? array.get(p_trad, 9) : na
+_v9_original_plot_018 = array.size(p_trad) > 10 ? array.get(p_trad, 10) : na
+_v9_original_plot_019 = array.size(p_trad)
+_v9_original_plot_020 = array.size(p_fib_dev) > 0 ? array.get(p_fib_dev, 0) : na
+_v9_original_plot_021 = array.size(p_fib_dev) > 1 ? array.get(p_fib_dev, 1) : na
+_v9_original_plot_022 = array.size(p_fib_dev) > 2 ? array.get(p_fib_dev, 2) : na
+_v9_original_plot_023 = array.size(p_fib_dev) > 3 ? array.get(p_fib_dev, 3) : na
+_v9_original_plot_024 = array.size(p_fib_dev) > 4 ? array.get(p_fib_dev, 4) : na
+_v9_original_plot_025 = array.size(p_fib_dev) > 5 ? array.get(p_fib_dev, 5) : na
+_v9_original_plot_026 = array.size(p_fib_dev) > 6 ? array.get(p_fib_dev, 6) : na
+_v9_original_plot_027 = array.size(p_fib_dev) > 7 ? array.get(p_fib_dev, 7) : na
+_v9_original_plot_028 = array.size(p_fib_dev) > 8 ? array.get(p_fib_dev, 8) : na
+_v9_original_plot_029 = array.size(p_fib_dev) > 9 ? array.get(p_fib_dev, 9) : na
+_v9_original_plot_030 = array.size(p_fib_dev) > 10 ? array.get(p_fib_dev, 10) : na
+_v9_original_plot_031 = array.size(p_fib_dev)
+_v9_original_plot_032 = array.size(p_woodie) > 0 ? array.get(p_woodie, 0) : na
+_v9_original_plot_033 = array.size(p_woodie) > 1 ? array.get(p_woodie, 1) : na
+_v9_original_plot_034 = array.size(p_woodie) > 2 ? array.get(p_woodie, 2) : na
+_v9_original_plot_035 = array.size(p_woodie) > 3 ? array.get(p_woodie, 3) : na
+_v9_original_plot_036 = array.size(p_woodie) > 4 ? array.get(p_woodie, 4) : na
+_v9_original_plot_037 = array.size(p_woodie) > 5 ? array.get(p_woodie, 5) : na
+_v9_original_plot_038 = array.size(p_woodie) > 6 ? array.get(p_woodie, 6) : na
+_v9_original_plot_039 = array.size(p_woodie) > 7 ? array.get(p_woodie, 7) : na
+_v9_original_plot_040 = array.size(p_woodie) > 8 ? array.get(p_woodie, 8) : na
+_v9_original_plot_041 = array.size(p_woodie) > 9 ? array.get(p_woodie, 9) : na
+_v9_original_plot_042 = array.size(p_woodie) > 10 ? array.get(p_woodie, 10) : na
+_v9_original_plot_043 = array.size(p_woodie)
+_v9_original_plot_044 = array.size(p_skip) > 0 ? array.get(p_skip, 0) : na
+_v9_original_plot_045 = array.size(p_skip) > 1 ? array.get(p_skip, 1) : na
+_v9_original_plot_046 = array.size(p_skip) > 2 ? array.get(p_skip, 2) : na
+_v9_original_plot_047 = array.size(p_skip) > 3 ? array.get(p_skip, 3) : na
+_v9_original_plot_048 = array.size(p_skip) > 4 ? array.get(p_skip, 4) : na
+_v9_original_plot_049 = array.size(p_skip) > 5 ? array.get(p_skip, 5) : na
+_v9_original_plot_050 = array.size(p_skip) > 6 ? array.get(p_skip, 6) : na
+_v9_original_plot_051 = array.size(p_skip) > 7 ? array.get(p_skip, 7) : na
+_v9_original_plot_052 = array.size(p_skip) > 8 ? array.get(p_skip, 8) : na
+_v9_original_plot_053 = array.size(p_skip) > 9 ? array.get(p_skip, 9) : na
+_v9_original_plot_054 = array.size(p_skip) > 10 ? array.get(p_skip, 10) : na
+_v9_original_plot_055 = array.size(p_skip)
+_v9_original_plot_056 = a_regular ? 1 : 0
+_v9_original_plot_057 = a_delayed40 ? 1 : 0
+_v9_original_plot_058 = a_skip_hole ? 1 : 0
+_v9_original_plot_059 = a_never ? 1 : 0
+
+plot(_v9_original_plot_000, "input_open", display=display.data_window)
+plot(_v9_original_plot_001, "input_high", display=display.data_window)
+plot(_v9_original_plot_002, "input_low", display=display.data_window)
+plot(_v9_original_plot_003, "input_close", display=display.data_window)
+plot(_v9_original_plot_004, "input_volume", display=display.data_window)
+plot(_v9_original_plot_005, "input_time", display=display.data_window)
+plot(_v9_original_plot_006, "input_bar_index", display=display.data_window)
+plot(_v9_original_plot_007, "input_hole_bar40_41", display=display.data_window)
+plot(_v9_original_plot_056, "input_a_regular", display=display.data_window)
+plot(_v9_original_plot_057, "input_a_delayed40", display=display.data_window)
+plot(_v9_original_plot_058, "input_a_skip_hole", display=display.data_window)
+plot(_v9_original_plot_059, "input_a_never", display=display.data_window)
+plot(_v9_original_plot_054, "pivot_levels_traditional_anchor20_skip40_frozen_S5", display=display.data_window)
+plot(na(_v9_original_plot_054) ? 1 : 0, "V9_TARGET_NA", display=display.data_window)
+_v9_match_0 = time == 1788141600000 and bar_index == 60
+plot(_v9_match_0 ? 1 : 0, "V9_MATCH_0", display=display.data_window)
+plot(_v9_match_0 ? (_v9_original_plot_054 == 76319.77333333336 ? 1 : 0) : na, "V9_EQ_0", display=display.data_window)
+plot(_v9_match_0 ? (_v9_original_plot_054 - 76319.77333333336) * 1e11 : na, "V9_RESIDUAL_0", display=display.data_window)
+_v9_match_1 = time == 1788141720000 and bar_index == 61
+plot(_v9_match_1 ? 1 : 0, "V9_MATCH_1", display=display.data_window)
+plot(_v9_match_1 ? (_v9_original_plot_054 == 76319.77333333336 ? 1 : 0) : na, "V9_EQ_1", display=display.data_window)
+plot(_v9_match_1 ? (_v9_original_plot_054 - 76319.77333333336) * 1e11 : na, "V9_RESIDUAL_1", display=display.data_window)
+_v9_match_2 = time == 1788141840000 and bar_index == 62
+plot(_v9_match_2 ? 1 : 0, "V9_MATCH_2", display=display.data_window)
+plot(_v9_match_2 ? (_v9_original_plot_054 == 76319.77333333336 ? 1 : 0) : na, "V9_EQ_2", display=display.data_window)
+plot(_v9_match_2 ? (_v9_original_plot_054 - 76319.77333333336) * 1e11 : na, "V9_RESIDUAL_2", display=display.data_window)
+_v9_match_3 = time == 1788141960000 and bar_index == 63
+plot(_v9_match_3 ? 1 : 0, "V9_MATCH_3", display=display.data_window)
+plot(_v9_match_3 ? (_v9_original_plot_054 == 76319.77333333336 ? 1 : 0) : na, "V9_EQ_3", display=display.data_window)
+plot(_v9_match_3 ? (_v9_original_plot_054 - 76319.77333333336) * 1e11 : na, "V9_RESIDUAL_3", display=display.data_window)
+_v9_match_4 = time == 1788142080000 and bar_index == 64
+plot(_v9_match_4 ? 1 : 0, "V9_MATCH_4", display=display.data_window)
+plot(_v9_match_4 ? (_v9_original_plot_054 == 76319.77333333336 ? 1 : 0) : na, "V9_EQ_4", display=display.data_window)
+plot(_v9_match_4 ? (_v9_original_plot_054 - 76319.77333333336) * 1e11 : na, "V9_RESIDUAL_4", display=display.data_window)
+plot(time, "V9_TIME_MS", display=display.data_window)
+plot(bar_index, "V9_BAR_INDEX", display=display.data_window)
