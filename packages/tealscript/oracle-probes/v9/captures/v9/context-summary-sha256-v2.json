@@ -1,0 +1,8 @@
+{
+  "artifact": "v9 context summary SHA256 v2",
+  "sha256": {
+    "cross-round-reuse-v1.json": "d16d70257de232ad8baf7dbf93c48587bdf23345ffeb07a97a207204a7243220",
+    "lexical-wma-context-summary-v1.json": "5d87961c7336aeb2595822e55c5d846b8c09f903d639632934ba9f64a8806245",
+    "corpus-native-context-summary-v1.json": "8d9d3a31e1a1771fbee548933d07eca57968fbfb1dff2058c8ee19caa1a2b88d"
+  }
+}

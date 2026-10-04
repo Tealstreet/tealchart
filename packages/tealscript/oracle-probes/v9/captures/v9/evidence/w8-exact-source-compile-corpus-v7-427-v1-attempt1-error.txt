@@ -1,0 +1,71 @@
+The arguments 'maxval', 'minval', and 'step' cannot be used with the input() function. You can use the input.int() or input.float() functions to specify a range of input data values
+{
+  "error": "The arguments 'maxval', 'minval', and 'step' cannot be used with the input() function. You can use the input.int() or input.float() functions to specify a range of input data values",
+  "editorError": {
+    "end": {
+      "column": 81,
+      "line": 16
+    },
+    "message": "The arguments 'maxval', 'minval', and 'step' cannot be used with the input() function. You can use the input.int() or input.float() functions to specify a range of input data values",
+    "start": {
+      "column": 13,
+      "line": 16
+    },
+    "id": "USER;7dd6283a3e994807a46e1f07b0a4bb69"
+  },
+  "title": "Compilation error",
+  "compiler_markers": [
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///68de48a3-b9c7-4c27-b72f-9a5876fe0834.pine?placement%3Ddialog",
+        "path": "/68de48a3-b9c7-4c27-b72f-9a5876fe0834.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "code": "SHORT_TITLE_TOO_LONG",
+      "severity": 4,
+      "message": "The shorttitle is too long (15 characters). It should be 10 characters or less.",
+      "startLineNumber": 2,
+      "startColumn": 48,
+      "endLineNumber": 2,
+      "endColumn": 63
+    },
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///68de48a3-b9c7-4c27-b72f-9a5876fe0834.pine?placement%3Ddialog",
+        "path": "/68de48a3-b9c7-4c27-b72f-9a5876fe0834.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "code": "PINE_VERSION_OUTDATED",
+      "severity": 4,
+      "message": "Version 5 of Pine Script® is outdated. We recommend using the current version, which is 6.",
+      "startLineNumber": 1,
+      "startColumn": 3,
+      "endLineNumber": 1,
+      "endColumn": 12
+    },
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///68de48a3-b9c7-4c27-b72f-9a5876fe0834.pine?placement%3Ddialog",
+        "path": "/68de48a3-b9c7-4c27-b72f-9a5876fe0834.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "severity": 8,
+      "message": "The arguments 'maxval', 'minval', and 'step' cannot be used with the input() function. You can use the input.int() or input.float() functions to specify a range of input data values",
+      "startLineNumber": 16,
+      "startColumn": 13,
+      "endLineNumber": 16,
+      "endColumn": 82
+    }
+  ],
+  "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\nC\n85,278.01\n−1.99 (−0.00%)\n85,278.00\nSELL\n0.01\n85,278.01\nBUY\nw8-exact-source-compile-corpus-v7-427-v1.pine\nUSDT\nDate Range\n12:35:02 UTC\n99+\nObject tree\nData window\nDate\nSun 04 Oct '26\nTime\n12:34\nBTCUSDT · 2 · Binance\nOpen\n85,280.00\nHigh\n85,280.01\nLow\n85,278.00\nClose\n85,278.01\nChange\n−1.99 (−0.00%)\nVol\n1.84\nLast day change\n+524.45 (+0.62%)\nw8-exact-source-compile-corpus-v7-427-v1.pine\nPine Editor\nw8-exact-source-compile-corpus-v7-427-v1.pine\nPublish script\n7\n8\n9\n10\n11\n12\n13\n14\n15\n16\n17\n18\n19\n20\n21\n22\n23\n24\n25\n26\n27\n28\n29\n30\n31\n32\n33\n34\n35\n36\n37\n38\n39\n1\n2\n3\n4\n5\n6\ngroupShared = 'Shared'\ninlineDev = 'Deviations'\ninlineSharedStyles = 'Styling'\ninlineSharedToggles = 'Toggles'\nhideonDWM = input(false, title=\"Hide VWAP 1D / Above\", group=groupShared, inline=inlineSharedToggles)\nshowBands = input(true, title=\"Show Bands\", group=groupShared, inline=inlineSharedToggles)\n// TrackCloses = input(false, title=\"Track Dates\", group=groupShared, inline=inlineSharedToggles)\nstdevMult = input(1.0, title=\"B1\", group=groupShared, inline=inlineDev, step=0.1)\nstdevMult2 = input(1.5, title=\"B2\", group=groupShared, inline=inlineDev, step=0.1)\nstdevMult3 = input(2.0, title=\"B3\", group=groupShared, inline=inlineDev, step=0.1)\nVwapStyle = input.string(\"line\", options = [\"circles\",\"line\",\"cross\"],title = \"VWAP\", group=groupShared, inline=inlineSharedStyles)\n//CloseStyle = input.string(\"circles\", options = [\"circles\",\"line\",\"cross\"],title = \"Close\", group=groupShared, inline=inlineSharedStyles)\nBandStyle = input.string(\"line\", options = [\"circles\",\"line\",\"cross\"],title = \"Bands\", group=groupShared, inline=inlineSharedStyles)\nplotStylePVA = input.string(\"line\", options = [\"circles\",\"line\",\"cross\"],title = \"PVA\", group=groupShared, inline=inlineSharedStyles)\nplotStylePpoc = input.string(\"cross\", options = [\"circles\",\"line\",\"cross\"],title = \"PPOC\", group=groupShared, inline=inlineSharedStyles)\nLabelSize = input.string(\"small\", options = [\"small\",\"medium\",\"large\"],title = \"Label Size\", group=groupShared, inline=inlineSharedStyles)\nlabelOffset = input.int(0, title=\"Label Offset\", group=groupShared, inline=inlineSharedStyles)\n_getLineStyle(_style) => (_style == \"line\") ? plot.style_line : (_style == \"circles\") ? plot.style_circles : (_style == \"cross\") ? plot.style_cross : na\nVwapStyleHolder = _getLineStyle(VwapStyle)\n//CloseStyleHolder = _getLineStyle(CloseStyle)\nBandStyleHolder = _getLineStyle(BandStyle)\npvaPlotStyleHolder = _getLineStyle(plotStylePVA)\nppocPlotStyle = _getLineStyle(plotStylePpoc)\nTextColor =  color.white\n_labelText(TF, multiple) => TF + \" \" + str.tostring(multiple)\n//@version=5\nindicator(title=\"MJ - VWAP SUite\", shorttitle=\"MJ - VWAP Suite\", overlay=true)\nvar cumVol = 0.\ncumVol += nz(volume)\n2 of 3 problems\nVersion 5 of Pine Script® is outdated. We recommend using the current version, which is 6.(PINE_VERSION_OUTDATED)\n1 ∙ Today, 20:34\nLine 1, Col 3\nPine Script® v5\nCompilation error\n\nThe arguments 'maxval', 'minval', and 'step' cannot be used with the input() function. You can use the input.int() or input.float() functions to specify a range of input data values\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+  "context_substituted_message": "The arguments 'maxval', 'minval', and 'step' cannot be used with the input() function. You can use the input.int() or input.float() functions to specify a range of input data values"
+}
