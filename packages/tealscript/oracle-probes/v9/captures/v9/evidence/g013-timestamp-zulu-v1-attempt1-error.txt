@@ -1,0 +1,21 @@
+timestamp(s): unrecognized datetime format
+{
+  "error": "timestamp(s): unrecognized datetime format",
+  "editorError": {
+    "code": "CE10275",
+    "end": {
+      "column": 37,
+      "line": 3
+    },
+    "message": "timestamp(s): unrecognized datetime format",
+    "start": {
+      "column": 16,
+      "line": 3
+    },
+    "id": "USER;b8fde04db80c495b97f228424bb6a66b"
+  },
+  "title": "Compilation error",
+  "compiler_markers": [],
+  "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,273.54\nH\n85,290.01\nL\n85,273.54\nC\n85,290.01\n+16.46 (+0.02%)\n85,187.77\nSELL\n0.01\n85,187.78\nBUY\nUSDT\ng013-timestamp-zulu-v1.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n14:29:43 UTC\n99+\nPine Editor\ng013-timestamp-zulu-v1.pine\nPublish script\n1\n2\n3\n4\n//@version=6\nindicator(\"Timestamp zulu v1\")\nplot(timestamp(\"2026-01-01T00:00:00Z\"), title=\"Timestamp\")\n1 ∙ Today, 22:29\nLine 3, Col 16\nPine Script® v6\nCompilation error: CE10275\n\ntimestamp(s): unrecognized datetime format\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+  "context_substituted_message": "timestamp(s): unrecognized datetime format"
+}

@@ -1,0 +1,29 @@
+{
+  "index": 299,
+  "bar": [
+    1791123960,
+    85170.91,
+    85187.96,
+    85170,
+    85187.96,
+    4.93785
+  ],
+  "source_row": [
+    1791123960,
+    1
+  ],
+  "browser_utc": "2026-10-04T14:28:12.816Z",
+  "title": "W8 timeframe nested v1",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   14:26",
+  "visible_range": {
+    "_firstBar": 264,
+    "_lastBar": 302
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}
