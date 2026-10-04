@@ -1,0 +1,32 @@
+{
+  "index": 298,
+  "bar": [
+    1791151320,
+    86008.59,
+    86272.34,
+    86008.58,
+    86183.07,
+    149.75139
+  ],
+  "source_row": [
+    1791151320,
+    20042,
+    1791151320000,
+    1,
+    1
+  ],
+  "browser_utc": "2026-10-04T22:03:32.684Z",
+  "title": "silent-p3-table-one-column-control-v20-v1",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   22:02",
+  "visible_range": {
+    "_firstBar": 263,
+    "_lastBar": 301
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}

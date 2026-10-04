@@ -1,0 +1,33 @@
+{
+  "index": 298,
+  "bar": [
+    1791150840,
+    85954,
+    85954.01,
+    85880,
+    85880.01,
+    4.94853
+  ],
+  "source_row": [
+    1791150840,
+    20034,
+    1791150840000,
+    500,
+    1,
+    501
+  ],
+  "browser_utc": "2026-10-04T21:55:42.044Z",
+  "title": "silent-s3-max-lines-500-v20-v1",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   21:54",
+  "visible_range": {
+    "_firstBar": 263,
+    "_lastBar": 301
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}

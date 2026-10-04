@@ -1,0 +1,48 @@
+Error on bar 20041: Column 0 is out of table bounds, number of columns is 0.
+{
+  "ctx": {
+    "col": 0,
+    "code": "RE10039",
+    "bar_index": 20041,
+    "cols": 0
+  },
+  "error": "Error on bar {bar_index}: Column {col} is out of table bounds, number of columns is {cols}.",
+  "stack_trace": [
+    {
+      "n": "#main",
+      "p": 6
+    }
+  ],
+  "title": "Runtime error",
+  "showReportItButton": false,
+  "studyAccessBlocked": false,
+  "native_context_scalar_types": [
+    {
+      "key": "col",
+      "type": "number",
+      "nonfinite": false,
+      "native_string": "0"
+    },
+    {
+      "key": "code",
+      "type": "string",
+      "nonfinite": false,
+      "native_string": "RE10039"
+    },
+    {
+      "key": "bar_index",
+      "type": "number",
+      "nonfinite": false,
+      "native_string": "20041"
+    },
+    {
+      "key": "cols",
+      "type": "number",
+      "nonfinite": false,
+      "native_string": "0"
+    }
+  ],
+  "compiler_markers": [],
+  "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n1m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n1\nBinance\nO\n86,183.06\nH\n86,183.06\nL\n86,183.06\nC\n86,183.06\n−0.01 (−0.00%)\n86,183.05\nSELL\n0.01\n86,183.06\nBUY\nUSDT\nsilent-p3-table-cell-zero-v20-v1\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n22:03:01 UTC\n99+\nRuntime error: RE10039\nRuntime error: RE10039\nError on bar 20041: Column 0 is out of table bounds, number of columns is 0.\nat #main():6\nOpen in editor",
+  "context_substituted_message": "Error on bar 20041: Column 0 is out of table bounds, number of columns is 0."
+}

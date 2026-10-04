@@ -1,0 +1,35 @@
+{
+  "index": 299,
+  "bar": [
+    1791151740,
+    86213.9,
+    86269.14,
+    86213.9,
+    86238.52,
+    14.48961
+  ],
+  "source_row": [
+    1791151740,
+    20049,
+    1791151740000,
+    151,
+    1,
+    3,
+    6,
+    -1
+  ],
+  "browser_utc": "2026-10-04T22:10:08.287Z",
+  "title": "silent-s1-line-new-width-151-v20-v1",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   22:09",
+  "visible_range": {
+    "_firstBar": 264,
+    "_lastBar": 302
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}

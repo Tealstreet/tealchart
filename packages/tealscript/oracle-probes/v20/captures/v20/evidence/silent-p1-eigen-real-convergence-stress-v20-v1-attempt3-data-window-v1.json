@@ -1,0 +1,37 @@
+{
+  "index": 298,
+  "bar": [
+    1791151440,
+    86088,
+    86204.01,
+    86070,
+    86200,
+    18.54179
+  ],
+  "source_row": [
+    1791151440,
+    20044,
+    1791151440000,
+    32,
+    1e-12,
+    32,
+    0,
+    5.44e-10,
+    3.2450870974312075e-11,
+    6.801849878457553e-13
+  ],
+  "browser_utc": "2026-10-04T22:05:46.591Z",
+  "title": "silent-p1-eigen-real-convergence-stress-v20-v1",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   22:04",
+  "visible_range": {
+    "_firstBar": 263,
+    "_lastBar": 301
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}

@@ -1,0 +1,136 @@
+{
+  "artifact": "Original PNG stroke raster measurements v1",
+  "image_width": 2880,
+  "image_height": 1800,
+  "scale_x": 2,
+  "scale_y": 2,
+  "scans": [
+    {
+      "axis": "vertical",
+      "kind": "blue",
+      "fixed": 197.23999999999998,
+      "start": 42,
+      "end": 833,
+      "reason": "Internal horizontal separator at clear table column; external top/bottom frame may also appear.",
+      "image_fixed": 394,
+      "runs": [
+        {
+          "start": 198,
+          "end": 199,
+          "device_pixels": 2,
+          "css_pixels": 1
+        },
+        {
+          "start": 1352,
+          "end": 1551,
+          "device_pixels": 200,
+          "css_pixels": 100
+        },
+        {
+          "start": 1646,
+          "end": 1665,
+          "device_pixels": 20,
+          "css_pixels": 10
+        }
+      ]
+    },
+    {
+      "axis": "vertical",
+      "kind": "blue",
+      "fixed": 291.4,
+      "start": 42,
+      "end": 833,
+      "reason": "Internal horizontal separator at clear table column; external top/bottom frame may also appear.",
+      "image_fixed": 583,
+      "runs": [
+        {
+          "start": 1352,
+          "end": 1665,
+          "device_pixels": 314,
+          "css_pixels": 157
+        }
+      ]
+    },
+    {
+      "axis": "vertical",
+      "kind": "blue",
+      "fixed": 997.6,
+      "start": 42,
+      "end": 833,
+      "reason": "Internal horizontal separator at clear table column; external top/bottom frame may also appear.",
+      "image_fixed": 1995,
+      "runs": [
+        {
+          "start": 84,
+          "end": 499,
+          "device_pixels": 416,
+          "css_pixels": 208
+        }
+      ]
+    },
+    {
+      "axis": "vertical",
+      "kind": "blue",
+      "fixed": 1091.76,
+      "start": 42,
+      "end": 833,
+      "reason": "Internal horizontal separator at clear table column; external top/bottom frame may also appear.",
+      "image_fixed": 2184,
+      "runs": [
+        {
+          "start": 84,
+          "end": 103,
+          "device_pixels": 20,
+          "css_pixels": 10
+        },
+        {
+          "start": 198,
+          "end": 499,
+          "device_pixels": 302,
+          "css_pixels": 151
+        }
+      ]
+    },
+    {
+      "axis": "horizontal",
+      "kind": "blue",
+      "fixed": 200.20000000000002,
+      "start": 56,
+      "end": 1233,
+      "reason": "External vertical frames at clear rows; row separators may appear as broad horizontal fills.",
+      "image_fixed": 400,
+      "runs": [
+        {
+          "start": 1843,
+          "end": 2465,
+          "device_pixels": 623,
+          "css_pixels": 311.5
+        }
+      ]
+    },
+    {
+      "axis": "horizontal",
+      "kind": "blue",
+      "fixed": 318.84999999999997,
+      "start": 56,
+      "end": 1233,
+      "reason": "External vertical frames at clear rows; row separators may appear as broad horizontal fills.",
+      "image_fixed": 638,
+      "runs": []
+    },
+    {
+      "axis": "horizontal",
+      "kind": "blue",
+      "fixed": 437.5,
+      "start": 56,
+      "end": 1233,
+      "reason": "External vertical frames at clear rows; row separators may appear as broad horizontal fills.",
+      "image_fixed": 875,
+      "runs": []
+    }
+  ],
+  "source": "silent-s2-table-frame-width-151-v20-v2.pine",
+  "png": "captures/v20/evidence/silent-s2-table-frame-width-151-v20-v2-attempt1-fixed-pane-width-rendering-v1.png",
+  "geometry": "captures/v20/evidence/silent-s2-table-frame-width-151-v20-v2-attempt1-fixed-pane-width-rendering-v1.json",
+  "method": "Original untouched PNG decoded through native browser Image and OffscreenCanvas; maximal consecutive red/blue/green dominant runs at stated CSS scans, predicate red/blue channel>170 or green>100, and channel>1.6 times both other channels; divide by independently observed PNG/viewport scale. No image alteration."
+}

@@ -1,0 +1,46 @@
+The script max_lines_count value (501) is greater than the maximum possible value (500)
+{
+  "error": "The script {drwName} value ({value}) is greater than the maximum possible value ({MAX_DRAWINGS_COUNT})",
+  "editorError": {
+    "code": "CE10178",
+    "ctx": {
+      "MAX_DRAWINGS_COUNT": 500,
+      "drwName": "max_lines_count",
+      "value": 501
+    },
+    "end": {
+      "column": 77,
+      "line": 2
+    },
+    "message": "The script {drwName} value ({value}) is greater than the maximum possible value ({MAX_DRAWINGS_COUNT})",
+    "start": {
+      "column": 75,
+      "line": 2
+    },
+    "id": "USER;64eb9fe01ecd4728859be8cb120fa590"
+  },
+  "title": "Compilation error",
+  "native_context_scalar_types": [
+    {
+      "key": "MAX_DRAWINGS_COUNT",
+      "type": "number",
+      "nonfinite": false,
+      "native_string": "500"
+    },
+    {
+      "key": "drwName",
+      "type": "string",
+      "nonfinite": false,
+      "native_string": "max_lines_count"
+    },
+    {
+      "key": "value",
+      "type": "number",
+      "nonfinite": false,
+      "native_string": "501"
+    }
+  ],
+  "compiler_markers": [],
+  "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n1m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\nC\n85,886.86\n−67.15 (−0.08%)\n85,886.86\nSELL\n0.01\n85,886.87\nBUY\nUSDT\nOracle na holes crosses v1\nDate Range\n21:54:53 UTC\n99+\nPine logs\nHow to work with logs\nAdd the indicator to the chart\nUse the log functions\nEnable logging\nPine Editor\nsilent-s3-max-lines-501-v20-v1.pine\nPublish script\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n//@version=6\nindicator(\"silent-s3-max-lines-501-v20-v1\", precision=16, max_lines_count=501)\nvar int completed = 0\nif barstate.islastconfirmedhistory\n    for i = 0 to 500\n        line.new(bar_index - 1, float(i), bar_index, float(i))\n    completed := 1\nplot(bar_index, title=\"CHART_INDEX\", display=display.data_window)\nplot(time, title=\"CHART_TIME_MS\", display=display.data_window)\nplot(501, title=\"DECLARED_MAX_LINES\", display=display.data_window)\nplot(completed, title=\"CALL_COMPLETED\", display=display.data_window)\nplot(array.size(line.all), title=\"LINE_ALL_SIZE\", display=display.data_window)\n1 ∙ Today, 05:54\nLine 2, Col 75\nPine Script® v6\nCompilation error: CE10178\n\nThe script max_lines_count value (501) is greater than the maximum possible value (500)\n\nOpen in editor",
+  "context_substituted_message": "The script max_lines_count value (501) is greater than the maximum possible value (500)"
+}

@@ -1,0 +1,32 @@
+{
+  "index": 298,
+  "bar": [
+    1791152160,
+    86349.49,
+    86649,
+    86349.49,
+    86579.58,
+    133.7244
+  ],
+  "source_row": [
+    1791152160,
+    20056,
+    1791152160000,
+    151,
+    1
+  ],
+  "browser_utc": "2026-10-04T22:17:21.041Z",
+  "title": "silent-s2-table-border-width-151-v20-v2",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   22:16",
+  "visible_range": {
+    "_firstBar": 263,
+    "_lastBar": 301
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}

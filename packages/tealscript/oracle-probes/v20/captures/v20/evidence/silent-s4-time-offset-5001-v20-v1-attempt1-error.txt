@@ -1,0 +1,78 @@
+Invalid value "5001" for "bars_back" parameter of the "time()" function. It must be between -500 and 5000
+{
+  "error": "Invalid value \"{value}\" for \"{argument_name}\" parameter of the \"{funId}()\" function. It must be between {min_value} and {max_value}",
+  "editorError": {
+    "code": "CE10041",
+    "ctx": {
+      "argument_name": "bars_back",
+      "funId": "time",
+      "max_value": 5000,
+      "min_value": -500,
+      "value": 5001
+    },
+    "end": {
+      "column": 37,
+      "line": 3
+    },
+    "message": "Invalid value \"{value}\" for \"{argument_name}\" parameter of the \"{funId}()\" function. It must be between {min_value} and {max_value}",
+    "start": {
+      "column": 34,
+      "line": 3
+    },
+    "id": "USER;80386034890e499fa75515c8eb18302c"
+  },
+  "title": "Compilation error",
+  "native_context_scalar_types": [
+    {
+      "key": "argument_name",
+      "type": "string",
+      "nonfinite": false,
+      "native_string": "bars_back"
+    },
+    {
+      "key": "funId",
+      "type": "string",
+      "nonfinite": false,
+      "native_string": "time"
+    },
+    {
+      "key": "max_value",
+      "type": "number",
+      "nonfinite": false,
+      "native_string": "5000"
+    },
+    {
+      "key": "min_value",
+      "type": "number",
+      "nonfinite": false,
+      "native_string": "-500"
+    },
+    {
+      "key": "value",
+      "type": "number",
+      "nonfinite": false,
+      "native_string": "5001"
+    }
+  ],
+  "compiler_markers": [
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///ecdfd069-a90d-4189-b94e-dbd0c3fc1382.pine?placement%3Ddialog",
+        "path": "/ecdfd069-a90d-4189-b94e-dbd0c3fc1382.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "code": "CE10041",
+      "severity": 8,
+      "message": "Invalid value \"5001\" for \"bars_back\" parameter of the \"time()\" function. It must be between -500 and 5000",
+      "startLineNumber": 3,
+      "startColumn": 34,
+      "endLineNumber": 3,
+      "endColumn": 38
+    }
+  ],
+  "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n1m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\nC\n85,880.01\n−74.00 (−0.09%)\n85,912.87\nSELL\n0.01\n85,912.88\nBUY\nUSDT\nsilent-s4-time-offset-5001-v20-v1.pine\nDate Range\n21:56:05 UTC\n99+\nObject tree\nData window\nDate\nSun 04 Oct '26\nTime\n21:54\nBTCUSDT · 1 · Binance\nOpen\n85,954.00\nHigh\n85,954.01\nLow\n85,880.00\nClose\n85,880.01\nChange\n−74.00 (−0.09%)\nVol\n4.95\nLast day change\n+1,159.31 (+1.37%)\nsilent-s4-time-offset-5001-v20-v1.pine\nPlot\n∅\nPine Editor\nsilent-s4-time-offset-5001-v20-v1.pine\nPublish script\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n//@version=6\nindicator(\"silent-s4-time-offset-5001-v20-v1\", precision=16, calc_bars_count=6000)\nint result = time(\"1\", bars_back=5001)\nplot(bar_index, title=\"CHART_INDEX\", display=display.data_window)\nplot(time, title=\"CHART_TIME_MS\", display=display.data_window)\nplot(5001, title=\"REQUESTED_BARS_BACK\", display=display.data_window)\nplot(result, title=\"TIME_RESULT_MS\", display=display.data_window)\nplot(na(result) ? 1 : 0, title=\"RESULT_NA\", display=display.data_window)\nplot(na(result) ? na : result - time, title=\"RESULT_MINUS_CHART_MS\", display=display.data_window)\n1 of 1 problem\nInvalid value \"5001\" for \"bars_back\" parameter of the \"time()\" function. It must be between -500 and 5000(CE10041)\n1 ∙ Today, 05:56\nLine 3, Col 34\nPine Script® v6\nCompilation error: CE10041\n\nInvalid value \"5001\" for \"bars_back\" parameter of the \"time()\" function. It must be between -500 and 5000\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+  "context_substituted_message": "Invalid value \"5001\" for \"bars_back\" parameter of the \"time()\" function. It must be between -500 and 5000"
+}

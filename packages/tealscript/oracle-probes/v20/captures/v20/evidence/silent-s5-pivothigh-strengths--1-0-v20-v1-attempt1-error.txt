@@ -1,0 +1,62 @@
+Error on bar 0: Invalid value of the 'leftbars' argument (-1) in the 'pivothigh' function. It must be >= 0.
+{
+  "ctx": {
+    "op": ">=",
+    "code": "RE10001",
+    "argName": "leftbars",
+    "bar_index": 0,
+    "value": -1,
+    "funName": "pivothigh"
+  },
+  "error": "Error on bar {bar_index}: Invalid value of the '{argName}' argument ({value}) in the '{funName}' function. It must be {op} 0.",
+  "stack_trace": [
+    {
+      "n": "#main",
+      "p": 4
+    }
+  ],
+  "title": "Runtime error",
+  "showReportItButton": false,
+  "studyAccessBlocked": false,
+  "native_context_scalar_types": [
+    {
+      "key": "op",
+      "type": "string",
+      "nonfinite": false,
+      "native_string": ">="
+    },
+    {
+      "key": "code",
+      "type": "string",
+      "nonfinite": false,
+      "native_string": "RE10001"
+    },
+    {
+      "key": "argName",
+      "type": "string",
+      "nonfinite": false,
+      "native_string": "leftbars"
+    },
+    {
+      "key": "bar_index",
+      "type": "number",
+      "nonfinite": false,
+      "native_string": "0"
+    },
+    {
+      "key": "value",
+      "type": "number",
+      "nonfinite": false,
+      "native_string": "-1"
+    },
+    {
+      "key": "funName",
+      "type": "string",
+      "nonfinite": false,
+      "native_string": "pivothigh"
+    }
+  ],
+  "compiler_markers": [],
+  "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n1m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n1\nBinance\nO\n85,858.00\nH\n85,858.00\nL\n85,820.00\nC\n85,820.00\n−38.01 (−0.04%)\n85,820.00\nSELL\n0.01\n85,820.01\nBUY\nUSDT\nsilent-s5-pivothigh-strengths--1-0-v20-v1\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n21:58:28 UTC\n99+\nRuntime error: RE10001\nRuntime error: RE10001\nError on bar 0: Invalid value of the 'leftbars' argument (-1) in the 'pivothigh' function. It must be >= 0.\nat #main():4\nOpen in editor",
+  "context_substituted_message": "Error on bar 0: Invalid value of the 'leftbars' argument (-1) in the 'pivothigh' function. It must be >= 0."
+}

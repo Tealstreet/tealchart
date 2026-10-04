@@ -1,0 +1,36 @@
+{
+  "index": 298,
+  "bar": [
+    1791151200,
+    85865.43,
+    86023.44,
+    85865.43,
+    86015.8,
+    31.64134
+  ],
+  "source_row": [
+    1791151200,
+    20040,
+    1791151200000,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0
+  ],
+  "browser_utc": "2026-10-04T22:01:24.958Z",
+  "title": "silent-p1-eigen-complex-v20-v1",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   22:00",
+  "visible_range": {
+    "_firstBar": 263,
+    "_lastBar": 301
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}
