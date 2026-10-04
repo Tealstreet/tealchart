@@ -1,0 +1,32 @@
+{
+  "index": 298,
+  "bar": [
+    1791093720,
+    84916.01,
+    84916.01,
+    84916,
+    84916,
+    1.79864
+  ],
+  "source_row": [
+    1791093720,
+    10,
+    -0.42921607844187015,
+    -0.11018255579739789,
+    -0.31903352264447227
+  ],
+  "browser_utc": "2026-10-04T06:05:16.588Z",
+  "title": "V7 ta-macd-first-bar-warmup-v6-v1",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   06:02",
+  "visible_range": {
+    "_firstBar": 263,
+    "_lastBar": 301
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}

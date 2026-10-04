@@ -14359,5 +14359,4188 @@
       "FIXNAN_ALL_NA": ""
     },
     "data_window_witness": "captures/v7/evidence/ta-cum-fixnan-leading-holes-v6-v1-attempt2-data-window-v1.json"
+  },
+  {
+    "script": "ta-cross-nullable-operands-v5-v1.pine",
+    "attempt": 1,
+    "source_sha256": "147fbc1403ec0f490e16df4c24ab93f899d9d96638a51b1bd488943419004e9e",
+    "indicator_title": "V7 ta-cross-nullable-operands-v5-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/ta-cross-nullable-operands-v5-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T135812.684.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 ta-cross-nullable-operands-v5-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24360,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24660,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T05:58:05.221Z",
+    "live_candle_open_utc": "2026-10-04T05:58:00.000Z",
+    "export_utc": "2026-10-04T05:58:13.076Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/ta-cross-nullable-operands-v5-v1-attempt1-setup.png",
+      "captures/v7/evidence/ta-cross-nullable-operands-v5-v1-attempt1-export.png",
+      "captures/v7/evidence/ta-cross-nullable-operands-v5-v1-attempt1-logs.txt",
+      "captures/v7/evidence/ta-cross-nullable-operands-v5-v1-attempt1-logs-v1.json",
+      "captures/v7/evidence/ta-cross-nullable-operands-v5-v1-attempt1-logs.png",
+      "captures/v7/evidence/ta-cross-nullable-operands-v5-v1-attempt1-visual.png",
+      "captures/v7/evidence/ta-cross-nullable-operands-v5-v1-attempt1-data-window-v1.png",
+      "captures/v7/evidence/ta-cross-nullable-operands-v5-v1-attempt1-data-window-v1.json",
+      "captures/v7/evidence/ta-cross-nullable-operands-v5-v1-attempt1-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T05:58:06.099Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790788320,
+            84293.97,
+            84342.42,
+            84281.99,
+            84306,
+            16.94923
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791093480,
+            84912,
+            84912.01,
+            84912,
+            84912,
+            0.02674
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-cross-nullable-operands-v5-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790788320,
+                4,
+                3.5,
+                1
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791093480,
+                null,
+                3.5,
+                -1
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T05:58:07.067Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790788320,
+            84293.97,
+            84342.42,
+            84281.99,
+            84306,
+            16.94923
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791093480,
+            84912,
+            84912.01,
+            84912,
+            84912,
+            0.02674
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-cross-nullable-operands-v5-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24660,
+            "first": {
+              "index": -1022116,
+              "value": [
+                1788134400,
+                0,
+                3.5,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791093480,
+                null,
+                3.5,
+                -1
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T05:58:07.728Z",
+        "bars": 24660,
+        "end": true,
+        "first": {
+          "index": -24360,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791093480,
+            84912,
+            84912.01,
+            84912,
+            84912.01,
+            0.03121
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-cross-nullable-operands-v5-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24660,
+            "first": {
+              "index": -24360,
+              "value": [
+                1788134400,
+                0,
+                3.5,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791093480,
+                null,
+                3.5,
+                -1
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///c9602162-387e-4422-8cfc-88b1e72acd0a.pine?placement%3Ddialog",
+          "path": "/c9602162-387e-4422-8cfc-88b1e72acd0a.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "live_tooltip": "Sun 04 Oct '26   05:58",
+    "historical_compare_before_unix_seconds": 1791093480,
+    "pine_logs": {
+      "paths": [
+        "evidence/ta-cross-nullable-operands-v5-v1-attempt1-logs.txt",
+        "evidence/ta-cross-nullable-operands-v5-v1-attempt1-logs-v1.json",
+        "evidence/ta-cross-nullable-operands-v5-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "398384c65410bba4388e9739ceae26ad51498cf0186dd536bc4fa96317c2e2f2",
+    "csv_bytes": 1282173,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "A",
+      "B",
+      "BOOL_NA_MINUS1"
+    ],
+    "declared_to_native_header_mapping": {
+      "A": "A",
+      "B": "B",
+      "BOOL_NA_MINUS1": "BOOL_NA_MINUS1"
+    },
+    "csv_rows": 24660,
+    "historical_rows": 24659,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791093480,
+    "first_historical_values": {
+      "A": "0",
+      "B": "3.5",
+      "BOOL_NA_MINUS1": "0"
+    },
+    "last_historical_values": {
+      "A": "",
+      "B": "3.5",
+      "BOOL_NA_MINUS1": "-1"
+    },
+    "data_window_witness": "captures/v7/evidence/ta-cross-nullable-operands-v5-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "script": "ta-cross-nullable-operands-v5-v1.pine",
+    "attempt": 2,
+    "source_sha256": "147fbc1403ec0f490e16df4c24ab93f899d9d96638a51b1bd488943419004e9e",
+    "indicator_title": "V7 ta-cross-nullable-operands-v5-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/ta-cross-nullable-operands-v5-v1-attempt2.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T135839.900.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 ta-cross-nullable-operands-v5-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24360,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24660,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T05:58:32.716Z",
+    "live_candle_open_utc": "2026-10-04T05:58:00.000Z",
+    "export_utc": "2026-10-04T05:58:40.270Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/ta-cross-nullable-operands-v5-v1-attempt2-setup.png",
+      "captures/v7/evidence/ta-cross-nullable-operands-v5-v1-attempt2-export.png",
+      "captures/v7/evidence/ta-cross-nullable-operands-v5-v1-attempt2-logs.txt",
+      "captures/v7/evidence/ta-cross-nullable-operands-v5-v1-attempt2-logs-v1.json",
+      "captures/v7/evidence/ta-cross-nullable-operands-v5-v1-attempt2-logs.png",
+      "captures/v7/evidence/ta-cross-nullable-operands-v5-v1-attempt2-visual.png",
+      "captures/v7/evidence/ta-cross-nullable-operands-v5-v1-attempt2-data-window-v1.png",
+      "captures/v7/evidence/ta-cross-nullable-operands-v5-v1-attempt2-data-window-v1.json",
+      "captures/v7/evidence/ta-cross-nullable-operands-v5-v1-attempt2-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T05:58:33.511Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790788320,
+            84293.97,
+            84342.42,
+            84281.99,
+            84306,
+            16.94923
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791093480,
+            84912,
+            84912.01,
+            84912,
+            84912.01,
+            0.37467
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-cross-nullable-operands-v5-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790788320,
+                4,
+                3.5,
+                1
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791093480,
+                null,
+                3.5,
+                -1
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T05:58:34.771Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790788320,
+            84293.97,
+            84342.42,
+            84281.99,
+            84306,
+            16.94923
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791093480,
+            84912,
+            84912.01,
+            84912,
+            84912,
+            0.37919
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-cross-nullable-operands-v5-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24660,
+            "first": {
+              "index": -1022116,
+              "value": [
+                1788134400,
+                0,
+                3.5,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791093480,
+                null,
+                3.5,
+                -1
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T05:58:35.455Z",
+        "bars": 24660,
+        "end": true,
+        "first": {
+          "index": -24360,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791093480,
+            84912,
+            84912.01,
+            84912,
+            84912.01,
+            0.38355
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-cross-nullable-operands-v5-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24660,
+            "first": {
+              "index": -24360,
+              "value": [
+                1788134400,
+                0,
+                3.5,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791093480,
+                null,
+                3.5,
+                -1
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///014c7a70-2abb-4c50-ba41-00c2d04e21ad.pine?placement%3Ddialog",
+          "path": "/014c7a70-2abb-4c50-ba41-00c2d04e21ad.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "live_tooltip": "Sun 04 Oct '26   05:58",
+    "historical_compare_before_unix_seconds": 1791093480,
+    "pine_logs": {
+      "paths": [
+        "evidence/ta-cross-nullable-operands-v5-v1-attempt2-logs.txt",
+        "evidence/ta-cross-nullable-operands-v5-v1-attempt2-logs-v1.json",
+        "evidence/ta-cross-nullable-operands-v5-v1-attempt2-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "5081b46eee10374af501e1672bc5d582ebc46b3a0c9f13b3bc882226ca832693",
+    "csv_bytes": 1282170,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "A",
+      "B",
+      "BOOL_NA_MINUS1"
+    ],
+    "declared_to_native_header_mapping": {
+      "A": "A",
+      "B": "B",
+      "BOOL_NA_MINUS1": "BOOL_NA_MINUS1"
+    },
+    "csv_rows": 24660,
+    "historical_rows": 24659,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791093480,
+    "first_historical_values": {
+      "A": "0",
+      "B": "3.5",
+      "BOOL_NA_MINUS1": "0"
+    },
+    "last_historical_values": {
+      "A": "",
+      "B": "3.5",
+      "BOOL_NA_MINUS1": "-1"
+    },
+    "data_window_witness": "captures/v7/evidence/ta-cross-nullable-operands-v5-v1-attempt2-data-window-v1.json"
+  },
+  {
+    "script": "ta-crossover-nullable-operands-v5-v1.pine",
+    "attempt": 1,
+    "source_sha256": "fd55c27ab2a2d5f0c055c7c13d6affe71d46c4acddd4b8089735554eeb134122",
+    "indicator_title": "V7 ta-crossover-nullable-operands-v5-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/ta-crossover-nullable-operands-v5-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T135907.681.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 ta-crossover-nullable-operands-v5-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24360,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24660,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T05:59:00.177Z",
+    "live_candle_open_utc": "2026-10-04T05:58:00.000Z",
+    "export_utc": "2026-10-04T05:59:08.117Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/ta-crossover-nullable-operands-v5-v1-attempt1-setup.png",
+      "captures/v7/evidence/ta-crossover-nullable-operands-v5-v1-attempt1-export.png",
+      "captures/v7/evidence/ta-crossover-nullable-operands-v5-v1-attempt1-logs.txt",
+      "captures/v7/evidence/ta-crossover-nullable-operands-v5-v1-attempt1-logs-v1.json",
+      "captures/v7/evidence/ta-crossover-nullable-operands-v5-v1-attempt1-logs.png",
+      "captures/v7/evidence/ta-crossover-nullable-operands-v5-v1-attempt1-visual.png",
+      "captures/v7/evidence/ta-crossover-nullable-operands-v5-v1-attempt1-data-window-v1.png",
+      "captures/v7/evidence/ta-crossover-nullable-operands-v5-v1-attempt1-data-window-v1.json",
+      "captures/v7/evidence/ta-crossover-nullable-operands-v5-v1-attempt1-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T05:59:01.280Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790788320,
+            84293.97,
+            84342.42,
+            84281.99,
+            84306,
+            16.94923
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791093480,
+            84912,
+            84912.01,
+            84912,
+            84912.01,
+            0.55067
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-crossover-nullable-operands-v5-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790788320,
+                4,
+                3.5,
+                1
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791093480,
+                null,
+                3.5,
+                -1
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T05:59:02.280Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790788320,
+            84293.97,
+            84342.42,
+            84281.99,
+            84306,
+            16.94923
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791093480,
+            84912,
+            84912.01,
+            84912,
+            84912.01,
+            0.55477
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-crossover-nullable-operands-v5-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24660,
+            "first": {
+              "index": -1022116,
+              "value": [
+                1788134400,
+                0,
+                3.5,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791093480,
+                null,
+                3.5,
+                -1
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T05:59:02.966Z",
+        "bars": 24660,
+        "end": true,
+        "first": {
+          "index": -24360,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791093480,
+            84912,
+            84912.01,
+            84912,
+            84912.01,
+            0.55921
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-crossover-nullable-operands-v5-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24660,
+            "first": {
+              "index": -24360,
+              "value": [
+                1788134400,
+                0,
+                3.5,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791093480,
+                null,
+                3.5,
+                -1
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///6c4b1f3f-1c27-43d2-ab86-1155a8e418b5.pine?placement%3Ddialog",
+          "path": "/6c4b1f3f-1c27-43d2-ab86-1155a8e418b5.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "live_tooltip": "Sun 04 Oct '26   05:58",
+    "historical_compare_before_unix_seconds": 1791093480,
+    "pine_logs": {
+      "paths": [
+        "evidence/ta-crossover-nullable-operands-v5-v1-attempt1-logs.txt",
+        "evidence/ta-crossover-nullable-operands-v5-v1-attempt1-logs-v1.json",
+        "evidence/ta-crossover-nullable-operands-v5-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "761dc7c56734bd83c5379d066b0fbe69bd9a16182a9a742767cf87dfd6f3942a",
+    "csv_bytes": 1282170,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "A",
+      "B",
+      "BOOL_NA_MINUS1"
+    ],
+    "declared_to_native_header_mapping": {
+      "A": "A",
+      "B": "B",
+      "BOOL_NA_MINUS1": "BOOL_NA_MINUS1"
+    },
+    "csv_rows": 24660,
+    "historical_rows": 24659,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791093480,
+    "first_historical_values": {
+      "A": "0",
+      "B": "3.5",
+      "BOOL_NA_MINUS1": "0"
+    },
+    "last_historical_values": {
+      "A": "",
+      "B": "3.5",
+      "BOOL_NA_MINUS1": "-1"
+    },
+    "data_window_witness": "captures/v7/evidence/ta-crossover-nullable-operands-v5-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "script": "ta-crossover-nullable-operands-v5-v1.pine",
+    "attempt": 2,
+    "source_sha256": "fd55c27ab2a2d5f0c055c7c13d6affe71d46c4acddd4b8089735554eeb134122",
+    "indicator_title": "V7 ta-crossover-nullable-operands-v5-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/ta-crossover-nullable-operands-v5-v1-attempt2.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T135941.446.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 ta-crossover-nullable-operands-v5-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24360,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24660,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T05:59:30.441Z",
+    "live_candle_open_utc": "2026-10-04T05:58:00.000Z",
+    "export_utc": "2026-10-04T05:59:41.862Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/ta-crossover-nullable-operands-v5-v1-attempt2-setup.png",
+      "captures/v7/evidence/ta-crossover-nullable-operands-v5-v1-attempt2-export.png",
+      "captures/v7/evidence/ta-crossover-nullable-operands-v5-v1-attempt2-logs.txt",
+      "captures/v7/evidence/ta-crossover-nullable-operands-v5-v1-attempt2-logs-v1.json",
+      "captures/v7/evidence/ta-crossover-nullable-operands-v5-v1-attempt2-logs.png",
+      "captures/v7/evidence/ta-crossover-nullable-operands-v5-v1-attempt2-visual.png",
+      "captures/v7/evidence/ta-crossover-nullable-operands-v5-v1-attempt2-data-window-v1.png",
+      "captures/v7/evidence/ta-crossover-nullable-operands-v5-v1-attempt2-data-window-v1.json",
+      "captures/v7/evidence/ta-crossover-nullable-operands-v5-v1-attempt2-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T05:59:31.454Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790788320,
+            84293.97,
+            84342.42,
+            84281.99,
+            84306,
+            16.94923
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791093480,
+            84912,
+            84912.01,
+            84912,
+            84912.01,
+            0.92107
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-crossover-nullable-operands-v5-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790788320,
+                4,
+                3.5,
+                1
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791093480,
+                null,
+                3.5,
+                -1
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T05:59:33.100Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790788320,
+            84293.97,
+            84342.42,
+            84281.99,
+            84306,
+            16.94923
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791093480,
+            84912,
+            84912.01,
+            84912,
+            84912.01,
+            0.92239
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-crossover-nullable-operands-v5-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24660,
+            "first": {
+              "index": -1022116,
+              "value": [
+                1788134400,
+                0,
+                3.5,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791093480,
+                null,
+                3.5,
+                -1
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T05:59:34.019Z",
+        "bars": 24660,
+        "end": true,
+        "first": {
+          "index": -24360,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791093480,
+            84912,
+            84912.01,
+            84912,
+            84912,
+            0.93409
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-crossover-nullable-operands-v5-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24660,
+            "first": {
+              "index": -24360,
+              "value": [
+                1788134400,
+                0,
+                3.5,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791093480,
+                null,
+                3.5,
+                -1
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///997ea01e-d953-4545-811e-05e711990cdd.pine?placement%3Ddialog",
+          "path": "/997ea01e-d953-4545-811e-05e711990cdd.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "live_tooltip": "Sun 04 Oct '26   05:58",
+    "historical_compare_before_unix_seconds": 1791093480,
+    "pine_logs": {
+      "paths": [
+        "evidence/ta-crossover-nullable-operands-v5-v1-attempt2-logs.txt",
+        "evidence/ta-crossover-nullable-operands-v5-v1-attempt2-logs-v1.json",
+        "evidence/ta-crossover-nullable-operands-v5-v1-attempt2-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "761dc7c56734bd83c5379d066b0fbe69bd9a16182a9a742767cf87dfd6f3942a",
+    "csv_bytes": 1282170,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "A",
+      "B",
+      "BOOL_NA_MINUS1"
+    ],
+    "declared_to_native_header_mapping": {
+      "A": "A",
+      "B": "B",
+      "BOOL_NA_MINUS1": "BOOL_NA_MINUS1"
+    },
+    "csv_rows": 24660,
+    "historical_rows": 24659,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791093480,
+    "first_historical_values": {
+      "A": "0",
+      "B": "3.5",
+      "BOOL_NA_MINUS1": "0"
+    },
+    "last_historical_values": {
+      "A": "",
+      "B": "3.5",
+      "BOOL_NA_MINUS1": "-1"
+    },
+    "data_window_witness": "captures/v7/evidence/ta-crossover-nullable-operands-v5-v1-attempt2-data-window-v1.json"
+  },
+  {
+    "script": "ta-crossunder-nullable-operands-v5-v1.pine",
+    "attempt": 1,
+    "source_sha256": "413b0e040aec610a7b6c63b4fc141db4462ab2513735a2779c65824d2072ee15",
+    "indicator_title": "V7 ta-crossunder-nullable-operands-v5-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/ta-crossunder-nullable-operands-v5-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T140024.728.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 ta-crossunder-nullable-operands-v5-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24361,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24661,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T06:00:12.819Z",
+    "live_candle_open_utc": "2026-10-04T06:00:00.000Z",
+    "export_utc": "2026-10-04T06:00:25.111Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/ta-crossunder-nullable-operands-v5-v1-attempt1-setup.png",
+      "captures/v7/evidence/ta-crossunder-nullable-operands-v5-v1-attempt1-export.png",
+      "captures/v7/evidence/ta-crossunder-nullable-operands-v5-v1-attempt1-logs.txt",
+      "captures/v7/evidence/ta-crossunder-nullable-operands-v5-v1-attempt1-logs-v1.json",
+      "captures/v7/evidence/ta-crossunder-nullable-operands-v5-v1-attempt1-logs.png",
+      "captures/v7/evidence/ta-crossunder-nullable-operands-v5-v1-attempt1-visual.png",
+      "captures/v7/evidence/ta-crossunder-nullable-operands-v5-v1-attempt1-data-window-v1.png",
+      "captures/v7/evidence/ta-crossunder-nullable-operands-v5-v1-attempt1-data-window-v1.json",
+      "captures/v7/evidence/ta-crossunder-nullable-operands-v5-v1-attempt1-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T06:00:14.344Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790788440,
+            84306,
+            84340.08,
+            84185.36,
+            84185.37,
+            18.275
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791093600,
+            84912.01,
+            84912.01,
+            84912,
+            84912.01,
+            0.1915
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-crossunder-nullable-operands-v5-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790788440,
+                5,
+                null,
+                -1
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791093600,
+                4,
+                3.5,
+                0
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T06:00:16.513Z",
+        "bars": 24661,
+        "end": true,
+        "first": {
+          "index": -24361,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791093600,
+            84912.01,
+            84912.01,
+            84912,
+            84912.01,
+            0.1987
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-crossunder-nullable-operands-v5-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24661,
+            "first": {
+              "index": -24361,
+              "value": [
+                1788134400,
+                0,
+                3.5,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791093600,
+                4,
+                3.5,
+                0
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///03fd7baf-c3cf-41ac-9d9c-cf8e3edc00fd.pine?placement%3Ddialog",
+          "path": "/03fd7baf-c3cf-41ac-9d9c-cf8e3edc00fd.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "live_tooltip": "Sun 04 Oct '26   06:00",
+    "historical_compare_before_unix_seconds": 1791093600,
+    "pine_logs": {
+      "paths": [
+        "evidence/ta-crossunder-nullable-operands-v5-v1-attempt1-logs.txt",
+        "evidence/ta-crossunder-nullable-operands-v5-v1-attempt1-logs-v1.json",
+        "evidence/ta-crossunder-nullable-operands-v5-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "d1f47f93bfb943db6deca8998947a92ae48b4102a5da907e5494d2fc7e3e41e1",
+    "csv_bytes": 1282222,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "A",
+      "B",
+      "BOOL_NA_MINUS1"
+    ],
+    "declared_to_native_header_mapping": {
+      "A": "A",
+      "B": "B",
+      "BOOL_NA_MINUS1": "BOOL_NA_MINUS1"
+    },
+    "csv_rows": 24661,
+    "historical_rows": 24660,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791093600,
+    "first_historical_values": {
+      "A": "0",
+      "B": "3.5",
+      "BOOL_NA_MINUS1": "0"
+    },
+    "last_historical_values": {
+      "A": "",
+      "B": "3.5",
+      "BOOL_NA_MINUS1": "-1"
+    },
+    "data_window_witness": "captures/v7/evidence/ta-crossunder-nullable-operands-v5-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "script": "ta-crossunder-nullable-operands-v5-v1.pine",
+    "attempt": 2,
+    "source_sha256": "413b0e040aec610a7b6c63b4fc141db4462ab2513735a2779c65824d2072ee15",
+    "indicator_title": "V7 ta-crossunder-nullable-operands-v5-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/ta-crossunder-nullable-operands-v5-v1-attempt2.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T140052.516.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 ta-crossunder-nullable-operands-v5-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24361,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24661,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T06:00:44.580Z",
+    "live_candle_open_utc": "2026-10-04T06:00:00.000Z",
+    "export_utc": "2026-10-04T06:00:52.760Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/ta-crossunder-nullable-operands-v5-v1-attempt2-setup.png",
+      "captures/v7/evidence/ta-crossunder-nullable-operands-v5-v1-attempt2-export.png",
+      "captures/v7/evidence/ta-crossunder-nullable-operands-v5-v1-attempt2-logs.txt",
+      "captures/v7/evidence/ta-crossunder-nullable-operands-v5-v1-attempt2-logs-v1.json",
+      "captures/v7/evidence/ta-crossunder-nullable-operands-v5-v1-attempt2-logs.png",
+      "captures/v7/evidence/ta-crossunder-nullable-operands-v5-v1-attempt2-visual.png",
+      "captures/v7/evidence/ta-crossunder-nullable-operands-v5-v1-attempt2-data-window-v1.png",
+      "captures/v7/evidence/ta-crossunder-nullable-operands-v5-v1-attempt2-data-window-v1.json",
+      "captures/v7/evidence/ta-crossunder-nullable-operands-v5-v1-attempt2-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T06:00:45.422Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790788440,
+            84306,
+            84340.08,
+            84185.36,
+            84185.37,
+            18.275
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791093600,
+            84912.01,
+            84916.01,
+            84912,
+            84916.01,
+            2.57335
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-crossunder-nullable-operands-v5-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790788440,
+                5,
+                null,
+                -1
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791093600,
+                4,
+                3.5,
+                0
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T06:00:46.469Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790788440,
+            84306,
+            84340.08,
+            84185.36,
+            84185.37,
+            18.275
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791093600,
+            84912.01,
+            84916.01,
+            84912,
+            84916.01,
+            2.57335
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-crossunder-nullable-operands-v5-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24661,
+            "first": {
+              "index": -1022117,
+              "value": [
+                1788134400,
+                0,
+                3.5,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791093600,
+                4,
+                3.5,
+                0
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T06:00:47.164Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790788440,
+            84306,
+            84340.08,
+            84185.36,
+            84185.37,
+            18.275
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791093600,
+            84912.01,
+            84916.01,
+            84912,
+            84916.01,
+            2.57335
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-crossunder-nullable-operands-v5-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24661,
+            "first": {
+              "index": -1022117,
+              "value": [
+                1788134400,
+                0,
+                3.5,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791093600,
+                4,
+                3.5,
+                0
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T06:00:47.947Z",
+        "bars": 24661,
+        "end": true,
+        "first": {
+          "index": -24361,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791093600,
+            84912.01,
+            84916.01,
+            84912,
+            84916,
+            2.57961
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-crossunder-nullable-operands-v5-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24661,
+            "first": {
+              "index": -24361,
+              "value": [
+                1788134400,
+                0,
+                3.5,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791093600,
+                4,
+                3.5,
+                0
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///810d0d34-e0b3-4210-9ece-b28ba06db2b5.pine?placement%3Ddialog",
+          "path": "/810d0d34-e0b3-4210-9ece-b28ba06db2b5.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "live_tooltip": "Sun 04 Oct '26   06:00",
+    "historical_compare_before_unix_seconds": 1791093600,
+    "pine_logs": {
+      "paths": [
+        "evidence/ta-crossunder-nullable-operands-v5-v1-attempt2-logs.txt",
+        "evidence/ta-crossunder-nullable-operands-v5-v1-attempt2-logs-v1.json",
+        "evidence/ta-crossunder-nullable-operands-v5-v1-attempt2-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "b327cdad7da2c56d4bfa4fbee9624010f8ced11bfcc5a1db8cafa62fb66b77e9",
+    "csv_bytes": 1282225,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "A",
+      "B",
+      "BOOL_NA_MINUS1"
+    ],
+    "declared_to_native_header_mapping": {
+      "A": "A",
+      "B": "B",
+      "BOOL_NA_MINUS1": "BOOL_NA_MINUS1"
+    },
+    "csv_rows": 24661,
+    "historical_rows": 24660,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791093600,
+    "first_historical_values": {
+      "A": "0",
+      "B": "3.5",
+      "BOOL_NA_MINUS1": "0"
+    },
+    "last_historical_values": {
+      "A": "",
+      "B": "3.5",
+      "BOOL_NA_MINUS1": "-1"
+    },
+    "data_window_witness": "captures/v7/evidence/ta-crossunder-nullable-operands-v5-v1-attempt2-data-window-v1.json"
+  },
+  {
+    "script": "ta-correlation-asymmetric-holes-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "7901e9839e2f95f52c6d71b64b3363cf5baa65ef44f30b52fad0b4ce94190e2a",
+    "indicator_title": "V7 ta-correlation-asymmetric-holes-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/ta-correlation-asymmetric-holes-v6-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T140120.151.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 ta-correlation-asymmetric-holes-v6-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24361,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24661,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T06:01:13.039Z",
+    "live_candle_open_utc": "2026-10-04T06:00:00.000Z",
+    "export_utc": "2026-10-04T06:01:20.552Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/ta-correlation-asymmetric-holes-v6-v1-attempt1-setup.png",
+      "captures/v7/evidence/ta-correlation-asymmetric-holes-v6-v1-attempt1-export.png",
+      "captures/v7/evidence/ta-correlation-asymmetric-holes-v6-v1-attempt1-logs.txt",
+      "captures/v7/evidence/ta-correlation-asymmetric-holes-v6-v1-attempt1-logs-v1.json",
+      "captures/v7/evidence/ta-correlation-asymmetric-holes-v6-v1-attempt1-logs.png",
+      "captures/v7/evidence/ta-correlation-asymmetric-holes-v6-v1-attempt1-visual.png",
+      "captures/v7/evidence/ta-correlation-asymmetric-holes-v6-v1-attempt1-data-window-v1.png",
+      "captures/v7/evidence/ta-correlation-asymmetric-holes-v6-v1-attempt1-data-window-v1.json",
+      "captures/v7/evidence/ta-correlation-asymmetric-holes-v6-v1-attempt1-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T06:01:13.739Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790788440,
+            84306,
+            84340.08,
+            84185.36,
+            84185.37,
+            18.275
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791093600,
+            84912.01,
+            84916.01,
+            84912,
+            84916,
+            2.95204
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-correlation-asymmetric-holes-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790788440,
+                5,
+                null,
+                -1.384057302982864
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791093600,
+                null,
+                16,
+                -0.354374653931171
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T06:01:15.003Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790788440,
+            84306,
+            84340.08,
+            84185.36,
+            84185.37,
+            18.275
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791093600,
+            84912.01,
+            84916.01,
+            84912,
+            84916.01,
+            2.96019
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-correlation-asymmetric-holes-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24661,
+            "first": {
+              "index": -1022117,
+              "value": [
+                1788134400,
+                0,
+                0,
+                null
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791093600,
+                null,
+                16,
+                -0.354374653931171
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T06:01:15.681Z",
+        "bars": 24661,
+        "end": true,
+        "first": {
+          "index": -24361,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791093600,
+            84912.01,
+            84916.01,
+            84912,
+            84916.01,
+            2.96409
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-correlation-asymmetric-holes-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24661,
+            "first": {
+              "index": -24361,
+              "value": [
+                1788134400,
+                0,
+                0,
+                null
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791093600,
+                null,
+                16,
+                -0.354374653931171
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   06:00",
+    "historical_compare_before_unix_seconds": 1791093600,
+    "pine_logs": {
+      "paths": [
+        "evidence/ta-correlation-asymmetric-holes-v6-v1-attempt1-logs.txt",
+        "evidence/ta-correlation-asymmetric-holes-v6-v1-attempt1-logs-v1.json",
+        "evidence/ta-correlation-asymmetric-holes-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "b752d30c7a7df328e952c8053250375557145376186b0a4a96872acb8c4208ea",
+    "csv_bytes": 1690600,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "A",
+      "B",
+      "TARGET"
+    ],
+    "declared_to_native_header_mapping": {
+      "A": "A",
+      "B": "B",
+      "TARGET": "TARGET"
+    },
+    "csv_rows": 24661,
+    "historical_rows": 24660,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791093600,
+    "first_historical_values": {
+      "A": "0",
+      "B": "0",
+      "TARGET": ""
+    },
+    "last_historical_values": {
+      "A": "3",
+      "B": "9",
+      "TARGET": "0.9583148474999098"
+    },
+    "data_window_witness": "captures/v7/evidence/ta-correlation-asymmetric-holes-v6-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "script": "ta-correlation-asymmetric-holes-v6-v1.pine",
+    "attempt": 2,
+    "source_sha256": "7901e9839e2f95f52c6d71b64b3363cf5baa65ef44f30b52fad0b4ce94190e2a",
+    "indicator_title": "V7 ta-correlation-asymmetric-holes-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/ta-correlation-asymmetric-holes-v6-v1-attempt2.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T140202.062.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 ta-correlation-asymmetric-holes-v6-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24361,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24662,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T06:01:51.705Z",
+    "live_candle_open_utc": "2026-10-04T06:00:00.000Z",
+    "export_utc": "2026-10-04T06:02:03.182Z",
+    "live_boundary_confirmed_unchanged": false,
+    "evidence_files": [
+      "captures/v7/evidence/ta-correlation-asymmetric-holes-v6-v1-attempt2-setup.png",
+      "captures/v7/evidence/ta-correlation-asymmetric-holes-v6-v1-attempt2-export.png",
+      "captures/v7/evidence/ta-correlation-asymmetric-holes-v6-v1-attempt2-logs.txt",
+      "captures/v7/evidence/ta-correlation-asymmetric-holes-v6-v1-attempt2-logs-v1.json",
+      "captures/v7/evidence/ta-correlation-asymmetric-holes-v6-v1-attempt2-logs.png",
+      "captures/v7/evidence/ta-correlation-asymmetric-holes-v6-v1-attempt2-visual.png",
+      "captures/v7/evidence/ta-correlation-asymmetric-holes-v6-v1-attempt2-data-window-v1.png",
+      "captures/v7/evidence/ta-correlation-asymmetric-holes-v6-v1-attempt2-data-window-v1.json",
+      "captures/v7/evidence/ta-correlation-asymmetric-holes-v6-v1-attempt2-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T06:01:52.972Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790788440,
+            84306,
+            84340.08,
+            84185.36,
+            84185.37,
+            18.275
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791093600,
+            84912.01,
+            84916.01,
+            84912,
+            84916.01,
+            3.51452
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-correlation-asymmetric-holes-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790788440,
+                5,
+                null,
+                -1.384057302982864
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791093600,
+                null,
+                16,
+                -0.354374653931171
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T06:01:54.535Z",
+        "bars": 24661,
+        "end": true,
+        "first": {
+          "index": -24361,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791093600,
+            84912.01,
+            84916.01,
+            84912,
+            84916.01,
+            3.51604
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-correlation-asymmetric-holes-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24661,
+            "first": {
+              "index": -24361,
+              "value": [
+                1788134400,
+                0,
+                0,
+                null
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791093600,
+                null,
+                16,
+                -0.354374653931171
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   06:00",
+    "historical_compare_before_unix_seconds": 1791093600,
+    "pine_logs": {
+      "paths": [
+        "evidence/ta-correlation-asymmetric-holes-v6-v1-attempt2-logs.txt",
+        "evidence/ta-correlation-asymmetric-holes-v6-v1-attempt2-logs-v1.json",
+        "evidence/ta-correlation-asymmetric-holes-v6-v1-attempt2-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "0f8c18a2d437786abc4748fbade066d66b2f10baff1c1039550b926d54cefc83",
+    "csv_bytes": 1690672,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "A",
+      "B",
+      "TARGET"
+    ],
+    "declared_to_native_header_mapping": {
+      "A": "A",
+      "B": "B",
+      "TARGET": "TARGET"
+    },
+    "csv_rows": 24662,
+    "historical_rows": 24660,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791093720,
+    "first_historical_values": {
+      "A": "0",
+      "B": "0",
+      "TARGET": ""
+    },
+    "last_historical_values": {
+      "A": "3",
+      "B": "9",
+      "TARGET": "0.9583148474999098"
+    },
+    "data_window_witness": "captures/v7/evidence/ta-correlation-asymmetric-holes-v6-v1-attempt2-data-window-v1.json"
+  },
+  {
+    "script": "ta-correlation-asymmetric-holes-v6-v1.pine",
+    "attempt": 3,
+    "source_sha256": "7901e9839e2f95f52c6d71b64b3363cf5baa65ef44f30b52fad0b4ce94190e2a",
+    "indicator_title": "V7 ta-correlation-asymmetric-holes-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/ta-correlation-asymmetric-holes-v6-v1-attempt3.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T140243.663.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 ta-correlation-asymmetric-holes-v6-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24362,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24662,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T06:02:34.331Z",
+    "live_candle_open_utc": "2026-10-04T06:02:00.000Z",
+    "export_utc": "2026-10-04T06:02:43.940Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/ta-correlation-asymmetric-holes-v6-v1-attempt3-setup.png",
+      "captures/v7/evidence/ta-correlation-asymmetric-holes-v6-v1-attempt3-export.png",
+      "captures/v7/evidence/ta-correlation-asymmetric-holes-v6-v1-attempt3-logs.txt",
+      "captures/v7/evidence/ta-correlation-asymmetric-holes-v6-v1-attempt3-logs-v1.json",
+      "captures/v7/evidence/ta-correlation-asymmetric-holes-v6-v1-attempt3-logs.png",
+      "captures/v7/evidence/ta-correlation-asymmetric-holes-v6-v1-attempt3-visual.png",
+      "captures/v7/evidence/ta-correlation-asymmetric-holes-v6-v1-attempt3-data-window-v1.png",
+      "captures/v7/evidence/ta-correlation-asymmetric-holes-v6-v1-attempt3-data-window-v1.json",
+      "captures/v7/evidence/ta-correlation-asymmetric-holes-v6-v1-attempt3-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T06:02:35.532Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790788560,
+            84185.36,
+            84196,
+            84161.58,
+            84188,
+            16.93317
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791093720,
+            84916.01,
+            84916.01,
+            84916,
+            84916,
+            0.31021
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-correlation-asymmetric-holes-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790788560,
+                6,
+                36,
+                -0.10390924892332425
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791093720,
+                5,
+                null,
+                -1.384057302982864
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T06:02:36.960Z",
+        "bars": 24662,
+        "end": true,
+        "first": {
+          "index": -24362,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791093720,
+            84916.01,
+            84916.01,
+            84916,
+            84916,
+            0.31905
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-correlation-asymmetric-holes-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24662,
+            "first": {
+              "index": -24362,
+              "value": [
+                1788134400,
+                0,
+                0,
+                null
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791093720,
+                5,
+                null,
+                -1.384057302982864
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   06:02",
+    "historical_compare_before_unix_seconds": 1791093720,
+    "pine_logs": {
+      "paths": [
+        "evidence/ta-correlation-asymmetric-holes-v6-v1-attempt3-logs.txt",
+        "evidence/ta-correlation-asymmetric-holes-v6-v1-attempt3-logs-v1.json",
+        "evidence/ta-correlation-asymmetric-holes-v6-v1-attempt3-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "a71666f2feb843ba8573e65ac67e57082578d246b2dabf0430ebdb5b128e2b66",
+    "csv_bytes": 1690669,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "A",
+      "B",
+      "TARGET"
+    ],
+    "declared_to_native_header_mapping": {
+      "A": "A",
+      "B": "B",
+      "TARGET": "TARGET"
+    },
+    "csv_rows": 24662,
+    "historical_rows": 24661,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791093720,
+    "first_historical_values": {
+      "A": "0",
+      "B": "0",
+      "TARGET": ""
+    },
+    "last_historical_values": {
+      "A": "",
+      "B": "16",
+      "TARGET": "-0.354374653931171"
+    },
+    "data_window_witness": "captures/v7/evidence/ta-correlation-asymmetric-holes-v6-v1-attempt3-data-window-v1.json"
+  },
+  {
+    "script": "ta-valuewhen-missing-and-insufficient-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "c43b48d20d3bc9fb7bf03aad657439a011e8bf4559d38ca50c8e4c69133841ce",
+    "indicator_title": "V7 ta-valuewhen-missing-and-insufficient-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/ta-valuewhen-missing-and-insufficient-v6-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T140321.222.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 ta-valuewhen-missing-and-insufficient-v6-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24362,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24662,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T06:03:13.725Z",
+    "live_candle_open_utc": "2026-10-04T06:02:00.000Z",
+    "export_utc": "2026-10-04T06:03:21.420Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/ta-valuewhen-missing-and-insufficient-v6-v1-attempt1-setup.png",
+      "captures/v7/evidence/ta-valuewhen-missing-and-insufficient-v6-v1-attempt1-export.png",
+      "captures/v7/evidence/ta-valuewhen-missing-and-insufficient-v6-v1-attempt1-logs.txt",
+      "captures/v7/evidence/ta-valuewhen-missing-and-insufficient-v6-v1-attempt1-logs-v1.json",
+      "captures/v7/evidence/ta-valuewhen-missing-and-insufficient-v6-v1-attempt1-logs.png",
+      "captures/v7/evidence/ta-valuewhen-missing-and-insufficient-v6-v1-attempt1-visual.png",
+      "captures/v7/evidence/ta-valuewhen-missing-and-insufficient-v6-v1-attempt1-data-window-v1.png",
+      "captures/v7/evidence/ta-valuewhen-missing-and-insufficient-v6-v1-attempt1-data-window-v1.json",
+      "captures/v7/evidence/ta-valuewhen-missing-and-insufficient-v6-v1-attempt1-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T06:03:14.610Z",
+        "bars": 2556,
+        "end": false,
+        "first": {
+          "index": -2256,
+          "value": [
+            1790787120,
+            84351.8,
+            84386.64,
+            84340.29,
+            84357.98,
+            8.66758
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791093720,
+            84916.01,
+            84916.01,
+            84916,
+            84916,
+            0.95773
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-valuewhen-missing-and-insufficient-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2556,
+            "first": {
+              "index": -2256,
+              "value": [
+                1790787120,
+                1,
+                22106,
+                22106,
+                22090
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791093720,
+                0,
+                24661,
+                null,
+                null
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T06:03:15.599Z",
+        "bars": 2556,
+        "end": false,
+        "first": {
+          "index": -2256,
+          "value": [
+            1790787120,
+            84351.8,
+            84386.64,
+            84340.29,
+            84357.98,
+            8.66758
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791093720,
+            84916.01,
+            84916.01,
+            84916,
+            84916,
+            0.95773
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-valuewhen-missing-and-insufficient-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24662,
+            "first": {
+              "index": -1022106,
+              "value": [
+                1788134400,
+                0,
+                0,
+                null,
+                null
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791093720,
+                0,
+                24661,
+                null,
+                null
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T06:03:16.491Z",
+        "bars": 24662,
+        "end": true,
+        "first": {
+          "index": -24362,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791093720,
+            84916.01,
+            84916.01,
+            84916,
+            84916,
+            0.96419
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-valuewhen-missing-and-insufficient-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24662,
+            "first": {
+              "index": -24362,
+              "value": [
+                1788134400,
+                0,
+                0,
+                null,
+                null
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791093720,
+                0,
+                24661,
+                null,
+                null
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   06:02",
+    "historical_compare_before_unix_seconds": 1791093720,
+    "pine_logs": {
+      "paths": [
+        "evidence/ta-valuewhen-missing-and-insufficient-v6-v1-attempt1-logs.txt",
+        "evidence/ta-valuewhen-missing-and-insufficient-v6-v1-attempt1-logs-v1.json",
+        "evidence/ta-valuewhen-missing-and-insufficient-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "dc482189bedb0c1b97b4407bcbae12c6ad6974ca09863cbabd0baf1b078bf666",
+    "csv_bytes": 1431809,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "HIT",
+      "SOURCE",
+      "OCCURRENCE0",
+      "OCCURRENCE2"
+    ],
+    "declared_to_native_header_mapping": {
+      "HIT": "HIT",
+      "SOURCE": "SOURCE",
+      "OCCURRENCE0": "OCCURRENCE0",
+      "OCCURRENCE2": "OCCURRENCE2"
+    },
+    "csv_rows": 24662,
+    "historical_rows": 24661,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791093720,
+    "first_historical_values": {
+      "HIT": "0",
+      "SOURCE": "0",
+      "OCCURRENCE0": "",
+      "OCCURRENCE2": ""
+    },
+    "last_historical_values": {
+      "HIT": "0",
+      "SOURCE": "24660",
+      "OCCURRENCE0": "",
+      "OCCURRENCE2": ""
+    },
+    "data_window_witness": "captures/v7/evidence/ta-valuewhen-missing-and-insufficient-v6-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "script": "ta-valuewhen-missing-and-insufficient-v6-v1.pine",
+    "attempt": 2,
+    "source_sha256": "c43b48d20d3bc9fb7bf03aad657439a011e8bf4559d38ca50c8e4c69133841ce",
+    "indicator_title": "V7 ta-valuewhen-missing-and-insufficient-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/ta-valuewhen-missing-and-insufficient-v6-v1-attempt2.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T140348.836.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 ta-valuewhen-missing-and-insufficient-v6-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24362,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24662,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T06:03:41.362Z",
+    "live_candle_open_utc": "2026-10-04T06:02:00.000Z",
+    "export_utc": "2026-10-04T06:03:49.200Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/ta-valuewhen-missing-and-insufficient-v6-v1-attempt2-setup.png",
+      "captures/v7/evidence/ta-valuewhen-missing-and-insufficient-v6-v1-attempt2-export.png",
+      "captures/v7/evidence/ta-valuewhen-missing-and-insufficient-v6-v1-attempt2-logs.txt",
+      "captures/v7/evidence/ta-valuewhen-missing-and-insufficient-v6-v1-attempt2-logs-v1.json",
+      "captures/v7/evidence/ta-valuewhen-missing-and-insufficient-v6-v1-attempt2-logs.png",
+      "captures/v7/evidence/ta-valuewhen-missing-and-insufficient-v6-v1-attempt2-visual.png",
+      "captures/v7/evidence/ta-valuewhen-missing-and-insufficient-v6-v1-attempt2-data-window-v1.png",
+      "captures/v7/evidence/ta-valuewhen-missing-and-insufficient-v6-v1-attempt2-data-window-v1.json",
+      "captures/v7/evidence/ta-valuewhen-missing-and-insufficient-v6-v1-attempt2-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T06:03:42.321Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790788560,
+            84185.36,
+            84196,
+            84161.58,
+            84188,
+            16.93317
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791093720,
+            84916.01,
+            84916.01,
+            84916,
+            84916.01,
+            1.54157
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-valuewhen-missing-and-insufficient-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790788560,
+                0,
+                22118,
+                null,
+                null
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791093720,
+                0,
+                24661,
+                null,
+                null
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T06:03:43.365Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790788560,
+            84185.36,
+            84196,
+            84161.58,
+            84188,
+            16.93317
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791093720,
+            84916.01,
+            84916.01,
+            84916,
+            84916.01,
+            1.54157
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-valuewhen-missing-and-insufficient-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24662,
+            "first": {
+              "index": -1022118,
+              "value": [
+                1788134400,
+                0,
+                0,
+                null,
+                null
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791093720,
+                0,
+                24661,
+                null,
+                null
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T06:03:44.042Z",
+        "bars": 24662,
+        "end": true,
+        "first": {
+          "index": -24362,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791093720,
+            84916.01,
+            84916.01,
+            84916,
+            84916,
+            1.54516
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-valuewhen-missing-and-insufficient-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24662,
+            "first": {
+              "index": -24362,
+              "value": [
+                1788134400,
+                0,
+                0,
+                null,
+                null
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791093720,
+                0,
+                24661,
+                null,
+                null
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   06:02",
+    "historical_compare_before_unix_seconds": 1791093720,
+    "pine_logs": {
+      "paths": [
+        "evidence/ta-valuewhen-missing-and-insufficient-v6-v1-attempt2-logs.txt",
+        "evidence/ta-valuewhen-missing-and-insufficient-v6-v1-attempt2-logs-v1.json",
+        "evidence/ta-valuewhen-missing-and-insufficient-v6-v1-attempt2-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "dc482189bedb0c1b97b4407bcbae12c6ad6974ca09863cbabd0baf1b078bf666",
+    "csv_bytes": 1431809,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "HIT",
+      "SOURCE",
+      "OCCURRENCE0",
+      "OCCURRENCE2"
+    ],
+    "declared_to_native_header_mapping": {
+      "HIT": "HIT",
+      "SOURCE": "SOURCE",
+      "OCCURRENCE0": "OCCURRENCE0",
+      "OCCURRENCE2": "OCCURRENCE2"
+    },
+    "csv_rows": 24662,
+    "historical_rows": 24661,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791093720,
+    "first_historical_values": {
+      "HIT": "0",
+      "SOURCE": "0",
+      "OCCURRENCE0": "",
+      "OCCURRENCE2": ""
+    },
+    "last_historical_values": {
+      "HIT": "0",
+      "SOURCE": "24660",
+      "OCCURRENCE0": "",
+      "OCCURRENCE2": ""
+    },
+    "data_window_witness": "captures/v7/evidence/ta-valuewhen-missing-and-insufficient-v6-v1-attempt2-data-window-v1.json"
+  },
+  {
+    "script": "ta-macd-first-bar-warmup-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "d88ae23defaca50d5a2f30643ea1bd1a0a27462268db85d9d5837f58ff22ed50",
+    "indicator_title": "V7 ta-macd-first-bar-warmup-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/ta-macd-first-bar-warmup-v6-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T140510.276.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 ta-macd-first-bar-warmup-v6-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24363,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24663,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T06:05:01.367Z",
+    "live_candle_open_utc": "2026-10-04T06:04:00.000Z",
+    "export_utc": "2026-10-04T06:05:10.546Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/ta-macd-first-bar-warmup-v6-v1-attempt1-setup.png",
+      "captures/v7/evidence/ta-macd-first-bar-warmup-v6-v1-attempt1-export.png",
+      "captures/v7/evidence/ta-macd-first-bar-warmup-v6-v1-attempt1-logs.txt",
+      "captures/v7/evidence/ta-macd-first-bar-warmup-v6-v1-attempt1-logs-v1.json",
+      "captures/v7/evidence/ta-macd-first-bar-warmup-v6-v1-attempt1-logs.png",
+      "captures/v7/evidence/ta-macd-first-bar-warmup-v6-v1-attempt1-visual.png",
+      "captures/v7/evidence/ta-macd-first-bar-warmup-v6-v1-attempt1-data-window-v1.png",
+      "captures/v7/evidence/ta-macd-first-bar-warmup-v6-v1-attempt1-data-window-v1.json",
+      "captures/v7/evidence/ta-macd-first-bar-warmup-v6-v1-attempt1-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T06:05:02.220Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790788680,
+            84188.01,
+            84256,
+            84160.9,
+            84160.91,
+            26.78277
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791093840,
+            84916,
+            84916.01,
+            84916,
+            84916,
+            0.41788
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-macd-first-bar-warmup-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790788680,
+                16,
+                0.6199554098962494,
+                0.5278844894915466,
+                0.09207092040470277
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791093840,
+                11,
+                -0.5407372281475986,
+                -0.397219004030865,
+                -0.1435182241167336
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T06:05:03.328Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790788680,
+            84188.01,
+            84256,
+            84160.9,
+            84160.91,
+            26.78277
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791093840,
+            84916,
+            84916.01,
+            84916,
+            84916.01,
+            0.4202
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-macd-first-bar-warmup-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24663,
+            "first": {
+              "index": -1022119,
+              "value": [
+                1788134400,
+                10,
+                null,
+                null,
+                null
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791093840,
+                11,
+                -0.5407372281475986,
+                -0.397219004030865,
+                -0.1435182241167336
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T06:05:04.249Z",
+        "bars": 24663,
+        "end": true,
+        "first": {
+          "index": -24363,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791093840,
+            84916,
+            84916.01,
+            84916,
+            84916.01,
+            0.42204
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-macd-first-bar-warmup-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24663,
+            "first": {
+              "index": -24363,
+              "value": [
+                1788134400,
+                10,
+                null,
+                null,
+                null
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791093840,
+                11,
+                -0.5407372281475986,
+                -0.397219004030865,
+                -0.1435182241167336
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   06:04",
+    "historical_compare_before_unix_seconds": 1791093840,
+    "pine_logs": {
+      "paths": [
+        "evidence/ta-macd-first-bar-warmup-v6-v1-attempt1-logs.txt",
+        "evidence/ta-macd-first-bar-warmup-v6-v1-attempt1-logs-v1.json",
+        "evidence/ta-macd-first-bar-warmup-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "0d296fb4fa65e7500aaa1e7f72f83c16b55d557e5b0714e8167a86e0e2b71b54",
+    "csv_bytes": 2648085,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "SOURCE",
+      "MACD",
+      "SIGNAL",
+      "HIST"
+    ],
+    "declared_to_native_header_mapping": {
+      "SOURCE": "SOURCE",
+      "MACD": "MACD",
+      "SIGNAL": "SIGNAL",
+      "HIST": "HIST"
+    },
+    "csv_rows": 24663,
+    "historical_rows": 24662,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791093840,
+    "first_historical_values": {
+      "SOURCE": "10",
+      "MACD": "",
+      "SIGNAL": "",
+      "HIST": ""
+    },
+    "last_historical_values": {
+      "SOURCE": "10",
+      "MACD": "-0.42921607844187015",
+      "SIGNAL": "-0.11018255579739789",
+      "HIST": "-0.31903352264447227"
+    },
+    "data_window_witness": "captures/v7/evidence/ta-macd-first-bar-warmup-v6-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "script": "ta-macd-first-bar-warmup-v6-v1.pine",
+    "attempt": 2,
+    "source_sha256": "d88ae23defaca50d5a2f30643ea1bd1a0a27462268db85d9d5837f58ff22ed50",
+    "indicator_title": "V7 ta-macd-first-bar-warmup-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/ta-macd-first-bar-warmup-v6-v1-attempt2.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T140544.899.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 ta-macd-first-bar-warmup-v6-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24363,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24663,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T06:05:36.492Z",
+    "live_candle_open_utc": "2026-10-04T06:04:00.000Z",
+    "export_utc": "2026-10-04T06:05:45.367Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/ta-macd-first-bar-warmup-v6-v1-attempt2-setup.png",
+      "captures/v7/evidence/ta-macd-first-bar-warmup-v6-v1-attempt2-export.png",
+      "captures/v7/evidence/ta-macd-first-bar-warmup-v6-v1-attempt2-logs.txt",
+      "captures/v7/evidence/ta-macd-first-bar-warmup-v6-v1-attempt2-logs-v1.json",
+      "captures/v7/evidence/ta-macd-first-bar-warmup-v6-v1-attempt2-logs.png",
+      "captures/v7/evidence/ta-macd-first-bar-warmup-v6-v1-attempt2-visual.png",
+      "captures/v7/evidence/ta-macd-first-bar-warmup-v6-v1-attempt2-data-window-v1.png",
+      "captures/v7/evidence/ta-macd-first-bar-warmup-v6-v1-attempt2-data-window-v1.json",
+      "captures/v7/evidence/ta-macd-first-bar-warmup-v6-v1-attempt2-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T06:05:37.385Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790788680,
+            84188.01,
+            84256,
+            84160.9,
+            84160.91,
+            26.78277
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791093840,
+            84916,
+            84922.49,
+            84916,
+            84922.48,
+            5.5102
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-macd-first-bar-warmup-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790788680,
+                16,
+                0.6199554098962494,
+                0.5278844894915466,
+                0.09207092040470277
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791093840,
+                11,
+                -0.5407372281475986,
+                -0.397219004030865,
+                -0.1435182241167336
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T06:05:38.982Z",
+        "bars": 24663,
+        "end": true,
+        "first": {
+          "index": -24363,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791093840,
+            84916,
+            84922.49,
+            84916,
+            84922.48,
+            5.51589
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-macd-first-bar-warmup-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24663,
+            "first": {
+              "index": -24363,
+              "value": [
+                1788134400,
+                10,
+                null,
+                null,
+                null
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791093840,
+                11,
+                -0.5407372281475986,
+                -0.397219004030865,
+                -0.1435182241167336
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   06:04",
+    "historical_compare_before_unix_seconds": 1791093840,
+    "pine_logs": {
+      "paths": [
+        "evidence/ta-macd-first-bar-warmup-v6-v1-attempt2-logs.txt",
+        "evidence/ta-macd-first-bar-warmup-v6-v1-attempt2-logs-v1.json",
+        "evidence/ta-macd-first-bar-warmup-v6-v1-attempt2-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "77073aea8c364306e29ad534d769d653c607e00e3632ad38c660caab95fc7f5a",
+    "csv_bytes": 2648088,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "SOURCE",
+      "MACD",
+      "SIGNAL",
+      "HIST"
+    ],
+    "declared_to_native_header_mapping": {
+      "SOURCE": "SOURCE",
+      "MACD": "MACD",
+      "SIGNAL": "SIGNAL",
+      "HIST": "HIST"
+    },
+    "csv_rows": 24663,
+    "historical_rows": 24662,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791093840,
+    "first_historical_values": {
+      "SOURCE": "10",
+      "MACD": "",
+      "SIGNAL": "",
+      "HIST": ""
+    },
+    "last_historical_values": {
+      "SOURCE": "10",
+      "MACD": "-0.42921607844187015",
+      "SIGNAL": "-0.11018255579739789",
+      "HIST": "-0.31903352264447227"
+    },
+    "data_window_witness": "captures/v7/evidence/ta-macd-first-bar-warmup-v6-v1-attempt2-data-window-v1.json"
+  },
+  {
+    "script": "ta-vwap-mfi-source-holes-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "d8d9449d171b55949a72f1ec6cba88b6b28ddbff659b3bfd74eb9da77b219433",
+    "indicator_title": "V7 ta-vwap-mfi-source-holes-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/ta-vwap-mfi-source-holes-v6-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T140620.344.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 ta-vwap-mfi-source-holes-v6-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24364,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24664,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T06:06:10.781Z",
+    "live_candle_open_utc": "2026-10-04T06:06:00.000Z",
+    "export_utc": "2026-10-04T06:06:20.745Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/ta-vwap-mfi-source-holes-v6-v1-attempt1-setup.png",
+      "captures/v7/evidence/ta-vwap-mfi-source-holes-v6-v1-attempt1-export.png",
+      "captures/v7/evidence/ta-vwap-mfi-source-holes-v6-v1-attempt1-logs.txt",
+      "captures/v7/evidence/ta-vwap-mfi-source-holes-v6-v1-attempt1-logs-v1.json",
+      "captures/v7/evidence/ta-vwap-mfi-source-holes-v6-v1-attempt1-logs.png",
+      "captures/v7/evidence/ta-vwap-mfi-source-holes-v6-v1-attempt1-visual.png",
+      "captures/v7/evidence/ta-vwap-mfi-source-holes-v6-v1-attempt1-data-window-v1.png",
+      "captures/v7/evidence/ta-vwap-mfi-source-holes-v6-v1-attempt1-data-window-v1.json",
+      "captures/v7/evidence/ta-vwap-mfi-source-holes-v6-v1-attempt1-data-window-v1.txt",
+      "captures/v7/source-hole-host-volume-coverage-v1.json"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T06:06:11.616Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790788800,
+            84160.91,
+            84200,
+            84124,
+            84190.01,
+            14.7022
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791093960,
+            84922.49,
+            84922.49,
+            84922.48,
+            84922.49,
+            0.13577
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-vwap-mfi-source-holes-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790788800,
+                null,
+                18,
+                14.7022,
+                0,
+                null,
+                100
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791093960,
+                17,
+                17,
+                0.13577,
+                0,
+                null,
+                100
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T06:06:12.835Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790788800,
+            84160.91,
+            84200,
+            84124,
+            84190.01,
+            14.7022
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791093960,
+            84922.49,
+            84922.49,
+            84922.48,
+            84922.49,
+            0.13577
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-vwap-mfi-source-holes-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24664,
+            "first": {
+              "index": -1022120,
+              "value": [
+                1788134400,
+                null,
+                10,
+                51.86295,
+                1,
+                null,
+                null
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791093960,
+                17,
+                17,
+                0.13577,
+                0,
+                null,
+                100
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T06:06:13.632Z",
+        "bars": 24664,
+        "end": true,
+        "first": {
+          "index": -24364,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791093960,
+            84922.49,
+            84922.49,
+            84922.48,
+            84922.48,
+            0.15954
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-vwap-mfi-source-holes-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24664,
+            "first": {
+              "index": -24364,
+              "value": [
+                1788134400,
+                null,
+                10,
+                51.86295,
+                1,
+                null,
+                null
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791093960,
+                17,
+                17,
+                0.15954,
+                0,
+                null,
+                100
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   06:06",
+    "historical_compare_before_unix_seconds": 1791093960,
+    "pine_logs": {
+      "paths": [
+        "evidence/ta-vwap-mfi-source-holes-v6-v1-attempt1-logs.txt",
+        "evidence/ta-vwap-mfi-source-holes-v6-v1-attempt1-logs-v1.json",
+        "evidence/ta-vwap-mfi-source-holes-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "a176c1dfcc0209751256ef1d98cd9262030db1d7fd8b94e08e4fa5da3c17bd8b",
+    "csv_bytes": 1777576,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "SOURCE",
+      "CLEAN",
+      "ACTUAL_VOLUME",
+      "ANCHOR",
+      "VWAP_SOURCE_HOLE",
+      "MFI_SOURCE_HOLE"
+    ],
+    "declared_to_native_header_mapping": {
+      "SOURCE": "SOURCE",
+      "CLEAN": "CLEAN",
+      "ACTUAL_VOLUME": "ACTUAL_VOLUME",
+      "ANCHOR": "ANCHOR",
+      "VWAP_SOURCE_HOLE": "VWAP_SOURCE_HOLE",
+      "MFI_SOURCE_HOLE": "MFI_SOURCE_HOLE"
+    },
+    "csv_rows": 24664,
+    "historical_rows": 24663,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791093960,
+    "first_historical_values": {
+      "SOURCE": "",
+      "CLEAN": "10",
+      "ACTUAL_VOLUME": "51.86295",
+      "ANCHOR": "1",
+      "VWAP_SOURCE_HOLE": "",
+      "MFI_SOURCE_HOLE": ""
+    },
+    "last_historical_values": {
+      "SOURCE": "16",
+      "CLEAN": "16",
+      "ACTUAL_VOLUME": "5.62915",
+      "ANCHOR": "0",
+      "VWAP_SOURCE_HOLE": "",
+      "MFI_SOURCE_HOLE": "92.74186856592397"
+    },
+    "data_window_witness": "captures/v7/evidence/ta-vwap-mfi-source-holes-v6-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "script": "ta-vwap-mfi-source-holes-v6-v1.pine",
+    "attempt": 2,
+    "source_sha256": "d8d9449d171b55949a72f1ec6cba88b6b28ddbff659b3bfd74eb9da77b219433",
+    "indicator_title": "V7 ta-vwap-mfi-source-holes-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/ta-vwap-mfi-source-holes-v6-v1-attempt2.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T140654.979.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 ta-vwap-mfi-source-holes-v6-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24364,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24664,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T06:06:45.441Z",
+    "live_candle_open_utc": "2026-10-04T06:06:00.000Z",
+    "export_utc": "2026-10-04T06:06:55.293Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/ta-vwap-mfi-source-holes-v6-v1-attempt2-setup.png",
+      "captures/v7/evidence/ta-vwap-mfi-source-holes-v6-v1-attempt2-export.png",
+      "captures/v7/evidence/ta-vwap-mfi-source-holes-v6-v1-attempt2-logs.txt",
+      "captures/v7/evidence/ta-vwap-mfi-source-holes-v6-v1-attempt2-logs-v1.json",
+      "captures/v7/evidence/ta-vwap-mfi-source-holes-v6-v1-attempt2-logs.png",
+      "captures/v7/evidence/ta-vwap-mfi-source-holes-v6-v1-attempt2-visual.png",
+      "captures/v7/evidence/ta-vwap-mfi-source-holes-v6-v1-attempt2-data-window-v1.png",
+      "captures/v7/evidence/ta-vwap-mfi-source-holes-v6-v1-attempt2-data-window-v1.json",
+      "captures/v7/evidence/ta-vwap-mfi-source-holes-v6-v1-attempt2-data-window-v1.txt",
+      "captures/v7/source-hole-host-volume-coverage-v1.json"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T06:06:46.301Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790788800,
+            84160.91,
+            84200,
+            84124,
+            84190.01,
+            14.7022
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791093960,
+            84922.49,
+            84922.49,
+            84922.48,
+            84922.48,
+            0.49459
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-vwap-mfi-source-holes-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790788800,
+                null,
+                18,
+                14.7022,
+                0,
+                null,
+                100
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791093960,
+                17,
+                17,
+                0.49459,
+                0,
+                null,
+                100
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T06:06:47.420Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790788800,
+            84160.91,
+            84200,
+            84124,
+            84190.01,
+            14.7022
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791093960,
+            84922.49,
+            84922.49,
+            84922.48,
+            84922.49,
+            0.49576
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-vwap-mfi-source-holes-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24664,
+            "first": {
+              "index": -1022120,
+              "value": [
+                1788134400,
+                null,
+                10,
+                51.86295,
+                1,
+                null,
+                null
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791093960,
+                17,
+                17,
+                0.49576,
+                0,
+                null,
+                100
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T06:06:48.415Z",
+        "bars": 24664,
+        "end": true,
+        "first": {
+          "index": -24364,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791093960,
+            84922.49,
+            84922.49,
+            84922.48,
+            84922.48,
+            0.49914
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 ta-vwap-mfi-source-holes-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24664,
+            "first": {
+              "index": -24364,
+              "value": [
+                1788134400,
+                null,
+                10,
+                51.86295,
+                1,
+                null,
+                null
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791093960,
+                17,
+                17,
+                0.49914,
+                0,
+                null,
+                100
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   06:06",
+    "historical_compare_before_unix_seconds": 1791093960,
+    "pine_logs": {
+      "paths": [
+        "evidence/ta-vwap-mfi-source-holes-v6-v1-attempt2-logs.txt",
+        "evidence/ta-vwap-mfi-source-holes-v6-v1-attempt2-logs-v1.json",
+        "evidence/ta-vwap-mfi-source-holes-v6-v1-attempt2-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "e1f629b50d2455d0a8b246302467a450a26d86f76df878e02b8c50ef3c827d0d",
+    "csv_bytes": 1777577,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "SOURCE",
+      "CLEAN",
+      "ACTUAL_VOLUME",
+      "ANCHOR",
+      "VWAP_SOURCE_HOLE",
+      "MFI_SOURCE_HOLE"
+    ],
+    "declared_to_native_header_mapping": {
+      "SOURCE": "SOURCE",
+      "CLEAN": "CLEAN",
+      "ACTUAL_VOLUME": "ACTUAL_VOLUME",
+      "ANCHOR": "ANCHOR",
+      "VWAP_SOURCE_HOLE": "VWAP_SOURCE_HOLE",
+      "MFI_SOURCE_HOLE": "MFI_SOURCE_HOLE"
+    },
+    "csv_rows": 24664,
+    "historical_rows": 24663,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791093960,
+    "first_historical_values": {
+      "SOURCE": "",
+      "CLEAN": "10",
+      "ACTUAL_VOLUME": "51.86295",
+      "ANCHOR": "1",
+      "VWAP_SOURCE_HOLE": "",
+      "MFI_SOURCE_HOLE": ""
+    },
+    "last_historical_values": {
+      "SOURCE": "16",
+      "CLEAN": "16",
+      "ACTUAL_VOLUME": "5.62915",
+      "ANCHOR": "0",
+      "VWAP_SOURCE_HOLE": "",
+      "MFI_SOURCE_HOLE": "92.74186856592397"
+    },
+    "data_window_witness": "captures/v7/evidence/ta-vwap-mfi-source-holes-v6-v1-attempt2-data-window-v1.json"
   }
 ]

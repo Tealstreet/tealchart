@@ -1,0 +1,31 @@
+{
+  "index": 298,
+  "bar": [
+    1791093480,
+    84912,
+    84912.01,
+    84912,
+    84912.01,
+    1.09136
+  ],
+  "source_row": [
+    1791093480,
+    3,
+    9,
+    0.9583148474999098
+  ],
+  "browser_utc": "2026-10-04T06:01:30.279Z",
+  "title": "V7 ta-correlation-asymmetric-holes-v6-v1",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   05:58",
+  "visible_range": {
+    "_firstBar": 263,
+    "_lastBar": 301
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}

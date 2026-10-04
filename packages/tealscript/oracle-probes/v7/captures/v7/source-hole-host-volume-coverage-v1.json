@@ -1,0 +1,23 @@
+{
+  "artifact": "Native host volume coverage v1",
+  "observations": [
+    {
+      "attempt": 1,
+      "ticker": "BINANCE:BTCUSDT",
+      "historical_rows": 24663,
+      "actual_volume_missing_rows": 0,
+      "actual_volume_zero_rows": 0,
+      "host_volume_hole_clause": "NOT-EXERCISED",
+      "source_holes": "Controlled unchanged synthetic source holes are present; distinct from actual volume absence."
+    },
+    {
+      "attempt": 2,
+      "ticker": "BINANCE:BTCUSDT",
+      "historical_rows": 24663,
+      "actual_volume_missing_rows": 0,
+      "actual_volume_zero_rows": 0,
+      "host_volume_hole_clause": "NOT-EXERCISED",
+      "source_holes": "Controlled unchanged synthetic source holes are present; distinct from actual volume absence."
+    }
+  ]
+}
