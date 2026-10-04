@@ -1,0 +1,29 @@
+{
+  "index": 298,
+  "bar": [
+    1791102120,
+    85131.38,
+    85146,
+    85131.37,
+    85145.99,
+    2.77848
+  ],
+  "source_row": [
+    1791102120,
+    1
+  ],
+  "browser_utc": "2026-10-04T08:25:54.998Z",
+  "title": "V7 plotshape-series-offset-v5-v1",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   08:22",
+  "visible_range": {
+    "_firstBar": 263,
+    "_lastBar": 301
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}

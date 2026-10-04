@@ -1,0 +1,10 @@
+{
+  "artifact": "Chrome MCP interrupted acquisition v1",
+  "source": "plotshape-series-offset-v5-v1.pine",
+  "phase": "reload readiness after accepted installation, before CSV/export",
+  "native_result": "No compile/runtime error observed; native installation reported RUNS",
+  "tool_error": "Transport send error: HTTP request failed for http://127.0.0.1:9223/mcp",
+  "monitor_log": "Sun Oct 4 16:23:46 +08 2026: 22 ESTABLISHED connections on :9223 (threshold 20) — kickstarting local.chrome-devtools-mcp",
+  "repair": "Health monitor now restarts only after failed MCP/CDP browser probes; healthy concurrent connections are counted for diagnostics. Local dotfiles commit recorded separately; no unrelated repository push.",
+  "capture_action": "Repeat unchanged source on fresh install/reload; interrupted acquisition is not a native Pine refusal."
+}

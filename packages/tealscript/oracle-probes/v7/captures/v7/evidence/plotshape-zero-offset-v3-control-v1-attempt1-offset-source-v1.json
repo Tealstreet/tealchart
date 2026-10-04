@@ -1,0 +1,1708 @@
+{
+  "last": {
+    "index": 299,
+    "value": [
+      1791102000,
+      85130,
+      85130.01,
+      85124,
+      85124,
+      1.59632
+    ]
+  },
+  "latest_host_expression_offset": -1,
+  "source_index": 295,
+  "destination_index_from_native_latest_offset": 295,
+  "latest_native_offset": 0,
+  "source_host_bar": [
+    1791101520,
+    85160,
+    85175.54,
+    85160,
+    85175.54,
+    3.68482
+  ],
+  "source_plot_row": [
+    1791101520,
+    1
+  ],
+  "source_bar_expression_offset": 1,
+  "browser_utc": "2026-10-04T08:20:24.258Z",
+  "title": "V7 plotshape-zero-offset-v3-control-v1",
+  "timezone": "Etc/UTC",
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  },
+  "visible_range": {
+    "_firstBar": 269,
+    "_lastBar": 301
+  },
+  "crosshair_label": "Sun 04 Oct '26   08:12",
+  "crosshair_host_bar": [
+    1791101520,
+    85160,
+    85175.54,
+    85160,
+    85175.54,
+    3.68482
+  ],
+  "latest_source_row": {
+    "index": 299,
+    "value": [
+      1791102000,
+      0
+    ]
+  },
+  "plots": [
+    {
+      "id": "plot_0",
+      "type": "shapes"
+    }
+  ],
+  "styles": {
+    "plot_0": {
+      "color": "#2962FF",
+      "display": 15,
+      "location": "AboveBar",
+      "plottype": "shape_xcross",
+      "textColor": "#2962FF",
+      "transparency": 35,
+      "visible": true,
+      "linestyle": 0,
+      "linewidth": 2,
+      "trackPrice": false,
+      "title": "plot_0"
+    }
+  },
+  "pane_views": [
+    {
+      "plot": "plot_0",
+      "items": [
+        {
+          "price": null,
+          "timePointIndex": 266,
+          "left": -114.09090909090901,
+          "center": -95.0757575757575,
+          "right": -76.060606060606,
+          "y": null,
+          "coordinate_native_index": 266,
+          "host_row_at_rendered_index": [
+            1791098040,
+            84992.97,
+            84992.98,
+            84970.03,
+            84972,
+            9.21328
+          ],
+          "source_row_at_rendered_index": [
+            1791098040,
+            0
+          ],
+          "source_row_at_rendered_index_minus_latest_offset": [
+            1791098040,
+            0
+          ]
+        },
+        {
+          "price": null,
+          "timePointIndex": 267,
+          "left": -76.060606060606,
+          "center": -57.045454545454504,
+          "right": -38.030303030303,
+          "y": null,
+          "coordinate_native_index": 267,
+          "host_row_at_rendered_index": [
+            1791098160,
+            84972,
+            84972.01,
+            84948.77,
+            84948.77,
+            6.88184
+          ],
+          "source_row_at_rendered_index": [
+            1791098160,
+            0
+          ],
+          "source_row_at_rendered_index_minus_latest_offset": [
+            1791098160,
+            0
+          ]
+        },
+        {
+          "price": null,
+          "timePointIndex": 268,
+          "left": -38.030303030303,
+          "center": -19.0151515151515,
+          "right": 0,
+          "y": null,
+          "coordinate_native_index": 268,
+          "host_row_at_rendered_index": [
+            1791098280,
+            84948.77,
+            84948.78,
+            84934,
+            84934,
+            4.9814
+          ],
+          "source_row_at_rendered_index": [
+            1791098280,
+            0
+          ],
+          "source_row_at_rendered_index_minus_latest_offset": [
+            1791098280,
+            0
+          ]
+        },
+        {
+          "y": 217.39021125933692,
+          "price": 84960,
+          "timePointIndex": 269,
+          "style": {
+            "color": "rgba(41, 98, 255, 0.65)",
+            "borderColor": "rgba(41, 98, 255, 0.65)",
+            "textColor": "rgba(41, 98, 255, 0.65)"
+          },
+          "left": 0,
+          "center": 19.0151515151515,
+          "right": 38.030303030303,
+          "coordinate_native_index": 269,
+          "host_row_at_rendered_index": [
+            1791098400,
+            84934.01,
+            84960,
+            84934,
+            84960,
+            3.47577
+          ],
+          "source_row_at_rendered_index": [
+            1791098400,
+            1
+          ],
+          "source_row_at_rendered_index_minus_latest_offset": [
+            1791098400,
+            1
+          ]
+        },
+        {
+          "y": 198.431798051716,
+          "price": 84988,
+          "timePointIndex": 270,
+          "style": {
+            "color": "rgba(41, 98, 255, 0.65)",
+            "borderColor": "rgba(41, 98, 255, 0.65)",
+            "textColor": "rgba(41, 98, 255, 0.65)"
+          },
+          "left": 38.030303030303,
+          "center": 57.045454545454504,
+          "right": 76.060606060606,
+          "coordinate_native_index": 270,
+          "host_row_at_rendered_index": [
+            1791098520,
+            84960,
+            84988,
+            84959.99,
+            84987.99,
+            5.16206
+          ],
+          "source_row_at_rendered_index": [
+            1791098520,
+            1
+          ],
+          "source_row_at_rendered_index_minus_latest_offset": [
+            1791098520,
+            1
+          ]
+        },
+        {
+          "y": 189.094779546967,
+          "price": 85001.79,
+          "timePointIndex": 271,
+          "style": {
+            "color": "rgba(41, 98, 255, 0.65)",
+            "borderColor": "rgba(41, 98, 255, 0.65)",
+            "textColor": "rgba(41, 98, 255, 0.65)"
+          },
+          "left": 76.060606060606,
+          "center": 95.0757575757575,
+          "right": 114.09090909090901,
+          "coordinate_native_index": 271,
+          "host_row_at_rendered_index": [
+            1791098640,
+            84988,
+            85001.79,
+            84987.99,
+            84996.01,
+            13.88509
+          ],
+          "source_row_at_rendered_index": [
+            1791098640,
+            1
+          ],
+          "source_row_at_rendered_index_minus_latest_offset": [
+            1791098640,
+            1
+          ]
+        },
+        {
+          "price": null,
+          "timePointIndex": 272,
+          "left": 114.09090909090901,
+          "center": 133.1060606060605,
+          "right": 152.121212121212,
+          "y": null,
+          "coordinate_native_index": 272,
+          "host_row_at_rendered_index": [
+            1791098760,
+            84996.01,
+            84996.01,
+            84980.64,
+            84980.64,
+            3.85045
+          ],
+          "source_row_at_rendered_index": [
+            1791098760,
+            0
+          ],
+          "source_row_at_rendered_index_minus_latest_offset": [
+            1791098760,
+            0
+          ]
+        },
+        {
+          "price": null,
+          "timePointIndex": 273,
+          "left": 152.121212121212,
+          "center": 171.1363636363635,
+          "right": 190.151515151515,
+          "y": null,
+          "coordinate_native_index": 273,
+          "host_row_at_rendered_index": [
+            1791098880,
+            84980.65,
+            84980.65,
+            84972.73,
+            84972.74,
+            9.39879
+          ],
+          "source_row_at_rendered_index": [
+            1791098880,
+            0
+          ],
+          "source_row_at_rendered_index_minus_latest_offset": [
+            1791098880,
+            0
+          ]
+        },
+        {
+          "price": null,
+          "timePointIndex": 274,
+          "left": 190.151515151515,
+          "center": 209.16666666666674,
+          "right": 228.18181818181824,
+          "y": null,
+          "coordinate_native_index": 274,
+          "host_row_at_rendered_index": [
+            1791099000,
+            84972.73,
+            84972.74,
+            84936.41,
+            84944.81,
+            12.29636
+          ],
+          "source_row_at_rendered_index": [
+            1791099000,
+            0
+          ],
+          "source_row_at_rendered_index_minus_latest_offset": [
+            1791099000,
+            0
+          ]
+        },
+        {
+          "price": null,
+          "timePointIndex": 275,
+          "left": 228.18181818181824,
+          "center": 247.19696969696963,
+          "right": 266.21212121212125,
+          "y": null,
+          "coordinate_native_index": 275,
+          "host_row_at_rendered_index": [
+            1791099120,
+            84944.82,
+            84944.82,
+            84926.7,
+            84926.71,
+            7.24627
+          ],
+          "source_row_at_rendered_index": [
+            1791099120,
+            0
+          ],
+          "source_row_at_rendered_index_minus_latest_offset": [
+            1791099120,
+            0
+          ]
+        },
+        {
+          "y": 224.76367982472908,
+          "price": 84949.11,
+          "timePointIndex": 276,
+          "style": {
+            "color": "rgba(41, 98, 255, 0.65)",
+            "borderColor": "rgba(41, 98, 255, 0.65)",
+            "textColor": "rgba(41, 98, 255, 0.65)"
+          },
+          "left": 266.21212121212125,
+          "center": 285.22727272727275,
+          "right": 304.24242424242425,
+          "coordinate_native_index": 276,
+          "host_row_at_rendered_index": [
+            1791099240,
+            84926.71,
+            84949.11,
+            84924.51,
+            84949.1,
+            8.45798
+          ],
+          "source_row_at_rendered_index": [
+            1791099240,
+            1
+          ],
+          "source_row_at_rendered_index_minus_latest_offset": [
+            1791099240,
+            1
+          ]
+        },
+        {
+          "y": 221.46627009897816,
+          "price": 84953.98,
+          "timePointIndex": 277,
+          "style": {
+            "color": "rgba(41, 98, 255, 0.65)",
+            "borderColor": "rgba(41, 98, 255, 0.65)",
+            "textColor": "rgba(41, 98, 255, 0.65)"
+          },
+          "left": 304.24242424242425,
+          "center": 323.25757575757575,
+          "right": 342.27272727272725,
+          "coordinate_native_index": 277,
+          "host_row_at_rendered_index": [
+            1791099360,
+            84949.1,
+            84953.98,
+            84949.1,
+            84953.97,
+            2.24297
+          ],
+          "source_row_at_rendered_index": [
+            1791099360,
+            1
+          ],
+          "source_row_at_rendered_index_minus_latest_offset": [
+            1791099360,
+            1
+          ]
+        },
+        {
+          "price": null,
+          "timePointIndex": 278,
+          "left": 342.27272727272725,
+          "center": 361.28787878787875,
+          "right": 380.30303030303025,
+          "y": null,
+          "coordinate_native_index": 278,
+          "host_row_at_rendered_index": [
+            1791099480,
+            84953.98,
+            84953.98,
+            84935.38,
+            84935.54,
+            7.26305
+          ],
+          "source_row_at_rendered_index": [
+            1791099480,
+            0
+          ],
+          "source_row_at_rendered_index_minus_latest_offset": [
+            1791099480,
+            0
+          ]
+        },
+        {
+          "y": 219.08292672430306,
+          "price": 84957.5,
+          "timePointIndex": 279,
+          "style": {
+            "color": "rgba(41, 98, 255, 0.65)",
+            "borderColor": "rgba(41, 98, 255, 0.65)",
+            "textColor": "rgba(41, 98, 255, 0.65)"
+          },
+          "left": 380.30303030303025,
+          "center": 399.31818181818176,
+          "right": 418.33333333333326,
+          "coordinate_native_index": 279,
+          "host_row_at_rendered_index": [
+            1791099600,
+            84935.54,
+            84957.5,
+            84935.53,
+            84957.49,
+            2.71029
+          ],
+          "source_row_at_rendered_index": [
+            1791099600,
+            1
+          ],
+          "source_row_at_rendered_index_minus_latest_offset": [
+            1791099600,
+            1
+          ]
+        },
+        {
+          "y": 209.25840616564304,
+          "price": 84972.01,
+          "timePointIndex": 280,
+          "style": {
+            "color": "rgba(41, 98, 255, 0.65)",
+            "borderColor": "rgba(41, 98, 255, 0.65)",
+            "textColor": "rgba(41, 98, 255, 0.65)"
+          },
+          "left": 418.33333333333326,
+          "center": 437.3484848484849,
+          "right": 456.3636363636364,
+          "coordinate_native_index": 280,
+          "host_row_at_rendered_index": [
+            1791099720,
+            84957.5,
+            84972.01,
+            84957.49,
+            84972,
+            5.03671
+          ],
+          "source_row_at_rendered_index": [
+            1791099720,
+            1
+          ],
+          "source_row_at_rendered_index_minus_latest_offset": [
+            1791099720,
+            1
+          ]
+        },
+        {
+          "y": 190.30676381987843,
+          "price": 85000,
+          "timePointIndex": 281,
+          "style": {
+            "color": "rgba(41, 98, 255, 0.65)",
+            "borderColor": "rgba(41, 98, 255, 0.65)",
+            "textColor": "rgba(41, 98, 255, 0.65)"
+          },
+          "left": 456.3636363636364,
+          "center": 475.3787878787879,
+          "right": 494.3939393939394,
+          "coordinate_native_index": 281,
+          "host_row_at_rendered_index": [
+            1791099840,
+            84972,
+            85000,
+            84972,
+            84999.99,
+            1.89636
+          ],
+          "source_row_at_rendered_index": [
+            1791099840,
+            1
+          ],
+          "source_row_at_rendered_index_minus_latest_offset": [
+            1791099840,
+            1
+          ]
+        },
+        {
+          "price": null,
+          "timePointIndex": 282,
+          "left": 494.3939393939394,
+          "center": 513.4090909090909,
+          "right": 532.4242424242424,
+          "y": null,
+          "coordinate_native_index": 282,
+          "host_row_at_rendered_index": [
+            1791099960,
+            85000,
+            85000,
+            84999.99,
+            84999.99,
+            2.08456
+          ],
+          "source_row_at_rendered_index": [
+            1791099960,
+            0
+          ],
+          "source_row_at_rendered_index_minus_latest_offset": [
+            1791099960,
+            0
+          ]
+        },
+        {
+          "y": 174.35461327803895,
+          "price": 85023.56,
+          "timePointIndex": 283,
+          "style": {
+            "color": "rgba(41, 98, 255, 0.65)",
+            "borderColor": "rgba(41, 98, 255, 0.65)",
+            "textColor": "rgba(41, 98, 255, 0.65)"
+          },
+          "left": 532.4242424242424,
+          "center": 551.4393939393939,
+          "right": 570.4545454545455,
+          "coordinate_native_index": 283,
+          "host_row_at_rendered_index": [
+            1791100080,
+            85000,
+            85023.56,
+            84999.99,
+            85023.55,
+            5.41502
+          ],
+          "source_row_at_rendered_index": [
+            1791100080,
+            1
+          ],
+          "source_row_at_rendered_index_minus_latest_offset": [
+            1791100080,
+            1
+          ]
+        },
+        {
+          "y": 169.262925159418,
+          "price": 85031.08,
+          "timePointIndex": 284,
+          "style": {
+            "color": "rgba(41, 98, 255, 0.65)",
+            "borderColor": "rgba(41, 98, 255, 0.65)",
+            "textColor": "rgba(41, 98, 255, 0.65)"
+          },
+          "left": 570.4545454545455,
+          "center": 589.469696969697,
+          "right": 608.4848484848485,
+          "coordinate_native_index": 284,
+          "host_row_at_rendered_index": [
+            1791100200,
+            85023.55,
+            85031.08,
+            85023.55,
+            85031.08,
+            2.53933
+          ],
+          "source_row_at_rendered_index": [
+            1791100200,
+            1
+          ],
+          "source_row_at_rendered_index_minus_latest_offset": [
+            1791100200,
+            1
+          ]
+        },
+        {
+          "y": 149.7966973123072,
+          "price": 85059.83,
+          "timePointIndex": 285,
+          "style": {
+            "color": "rgba(41, 98, 255, 0.65)",
+            "borderColor": "rgba(41, 98, 255, 0.65)",
+            "textColor": "rgba(41, 98, 255, 0.65)"
+          },
+          "left": 608.4848484848485,
+          "center": 627.5,
+          "right": 646.5151515151515,
+          "coordinate_native_index": 285,
+          "host_row_at_rendered_index": [
+            1791100320,
+            85031.07,
+            85059.83,
+            85031.07,
+            85058.04,
+            41.19536
+          ],
+          "source_row_at_rendered_index": [
+            1791100320,
+            1
+          ],
+          "source_row_at_rendered_index_minus_latest_offset": [
+            1791100320,
+            1
+          ]
+        },
+        {
+          "price": null,
+          "timePointIndex": 286,
+          "left": 646.5151515151515,
+          "center": 665.530303030303,
+          "right": 684.5454545454545,
+          "y": null,
+          "coordinate_native_index": 286,
+          "host_row_at_rendered_index": [
+            1791100440,
+            85058.04,
+            85058.05,
+            85023.43,
+            85035.94,
+            28.46298
+          ],
+          "source_row_at_rendered_index": [
+            1791100440,
+            0
+          ],
+          "source_row_at_rendered_index_minus_latest_offset": [
+            1791100440,
+            0
+          ]
+        },
+        {
+          "y": 144.70500919368624,
+          "price": 85067.35,
+          "timePointIndex": 287,
+          "style": {
+            "color": "rgba(41, 98, 255, 0.65)",
+            "borderColor": "rgba(41, 98, 255, 0.65)",
+            "textColor": "rgba(41, 98, 255, 0.65)"
+          },
+          "left": 684.5454545454545,
+          "center": 703.560606060606,
+          "right": 722.5757575757575,
+          "coordinate_native_index": 287,
+          "host_row_at_rendered_index": [
+            1791100560,
+            85035.95,
+            85067.35,
+            85021.92,
+            85054.25,
+            19.64267
+          ],
+          "source_row_at_rendered_index": [
+            1791100560,
+            1
+          ],
+          "source_row_at_rendered_index_minus_latest_offset": [
+            1791100560,
+            1
+          ]
+        },
+        {
+          "y": 114.03300496850738,
+          "price": 85112.65,
+          "timePointIndex": 288,
+          "style": {
+            "color": "rgba(41, 98, 255, 0.65)",
+            "borderColor": "rgba(41, 98, 255, 0.65)",
+            "textColor": "rgba(41, 98, 255, 0.65)"
+          },
+          "left": 722.5757575757575,
+          "center": 741.5909090909091,
+          "right": 760.6060606060606,
+          "coordinate_native_index": 288,
+          "host_row_at_rendered_index": [
+            1791100680,
+            85054.26,
+            85112.65,
+            85054.26,
+            85106,
+            14.54156
+          ],
+          "source_row_at_rendered_index": [
+            1791100680,
+            1
+          ],
+          "source_row_at_rendered_index_minus_latest_offset": [
+            1791100680,
+            1
+          ]
+        },
+        {
+          "y": 75.07346582684085,
+          "price": 85170.19,
+          "timePointIndex": 289,
+          "style": {
+            "color": "rgba(41, 98, 255, 0.65)",
+            "borderColor": "rgba(41, 98, 255, 0.65)",
+            "textColor": "rgba(41, 98, 255, 0.65)"
+          },
+          "left": 760.6060606060606,
+          "center": 779.6212121212121,
+          "right": 798.6363636363636,
+          "coordinate_native_index": 289,
+          "host_row_at_rendered_index": [
+            1791100800,
+            85106.01,
+            85170.19,
+            85105.73,
+            85170.19,
+            26.31063
+          ],
+          "source_row_at_rendered_index": [
+            1791100800,
+            1
+          ],
+          "source_row_at_rendered_index_minus_latest_offset": [
+            1791100800,
+            1
+          ]
+        },
+        {
+          "price": null,
+          "timePointIndex": 290,
+          "left": 798.6363636363636,
+          "center": 817.6515151515151,
+          "right": 836.6666666666666,
+          "y": null,
+          "coordinate_native_index": 290,
+          "host_row_at_rendered_index": [
+            1791100920,
+            85170.18,
+            85180.12,
+            85115.99,
+            85116,
+            25.4994
+          ],
+          "source_row_at_rendered_index": [
+            1791100920,
+            0
+          ],
+          "source_row_at_rendered_index_minus_latest_offset": [
+            1791100920,
+            0
+          ]
+        },
+        {
+          "y": 98.21627166386324,
+          "price": 85136.01,
+          "timePointIndex": 291,
+          "style": {
+            "color": "rgba(41, 98, 255, 0.65)",
+            "borderColor": "rgba(41, 98, 255, 0.65)",
+            "textColor": "rgba(41, 98, 255, 0.65)"
+          },
+          "left": 836.6666666666666,
+          "center": 855.6818181818182,
+          "right": 874.6969696969697,
+          "coordinate_native_index": 291,
+          "host_row_at_rendered_index": [
+            1791101040,
+            85115.99,
+            85136.01,
+            85115.99,
+            85136.01,
+            6.06442
+          ],
+          "source_row_at_rendered_index": [
+            1791101040,
+            1
+          ],
+          "source_row_at_rendered_index_minus_latest_offset": [
+            1791101040,
+            1
+          ]
+        },
+        {
+          "price": null,
+          "timePointIndex": 292,
+          "left": 874.6969696969697,
+          "center": 893.7121212121212,
+          "right": 912.7272727272727,
+          "y": null,
+          "coordinate_native_index": 292,
+          "host_row_at_rendered_index": [
+            1791101160,
+            85136,
+            85153.65,
+            85112.49,
+            85112.49,
+            10.44812
+          ],
+          "source_row_at_rendered_index": [
+            1791101160,
+            0
+          ],
+          "source_row_at_rendered_index_minus_latest_offset": [
+            1791101160,
+            0
+          ]
+        },
+        {
+          "y": 106.22620124408425,
+          "price": 85124.18,
+          "timePointIndex": 293,
+          "style": {
+            "color": "rgba(41, 98, 255, 0.65)",
+            "borderColor": "rgba(41, 98, 255, 0.65)",
+            "textColor": "rgba(41, 98, 255, 0.65)"
+          },
+          "left": 912.7272727272727,
+          "center": 931.7424242424242,
+          "right": 950.7575757575758,
+          "coordinate_native_index": 293,
+          "host_row_at_rendered_index": [
+            1791101280,
+            85112.49,
+            85124.18,
+            85096.01,
+            85124.18,
+            40.62046
+          ],
+          "source_row_at_rendered_index": [
+            1791101280,
+            1
+          ],
+          "source_row_at_rendered_index_minus_latest_offset": [
+            1791101280,
+            1
+          ]
+        },
+        {
+          "y": 81.96620320018815,
+          "price": 85160.01,
+          "timePointIndex": 294,
+          "style": {
+            "color": "rgba(41, 98, 255, 0.65)",
+            "borderColor": "rgba(41, 98, 255, 0.65)",
+            "textColor": "rgba(41, 98, 255, 0.65)"
+          },
+          "left": 950.7575757575758,
+          "center": 969.7727272727273,
+          "right": 988.7878787878788,
+          "coordinate_native_index": 294,
+          "host_row_at_rendered_index": [
+            1791101400,
+            85124.17,
+            85160.01,
+            85124.17,
+            85160,
+            6.53075
+          ],
+          "source_row_at_rendered_index": [
+            1791101400,
+            1
+          ],
+          "source_row_at_rendered_index_minus_latest_offset": [
+            1791101400,
+            1
+          ]
+        },
+        {
+          "y": 71.45105473181917,
+          "price": 85175.54,
+          "timePointIndex": 295,
+          "style": {
+            "color": "rgba(41, 98, 255, 0.65)",
+            "borderColor": "rgba(41, 98, 255, 0.65)",
+            "textColor": "rgba(41, 98, 255, 0.65)"
+          },
+          "left": 988.7878787878788,
+          "center": 1007.8030303030303,
+          "right": 1026.8181818181818,
+          "coordinate_native_index": 295,
+          "host_row_at_rendered_index": [
+            1791101520,
+            85160,
+            85175.54,
+            85160,
+            85175.54,
+            3.68482
+          ],
+          "source_row_at_rendered_index": [
+            1791101520,
+            1
+          ],
+          "source_row_at_rendered_index_minus_latest_offset": [
+            1791101520,
+            1
+          ]
+        },
+        {
+          "price": null,
+          "timePointIndex": 296,
+          "left": 1026.8181818181818,
+          "center": 1045.8333333333333,
+          "right": 1064.8484848484848,
+          "y": null,
+          "coordinate_native_index": 296,
+          "host_row_at_rendered_index": [
+            1791101640,
+            85175.54,
+            85175.54,
+            85149.9,
+            85149.9,
+            8.15273
+          ],
+          "source_row_at_rendered_index": [
+            1791101640,
+            0
+          ],
+          "source_row_at_rendered_index_minus_latest_offset": [
+            1791101640,
+            0
+          ]
+        },
+        {
+          "price": null,
+          "timePointIndex": 297,
+          "left": 1064.8484848484848,
+          "center": 1083.8636363636365,
+          "right": 1102.878787878788,
+          "y": null,
+          "coordinate_native_index": 297,
+          "host_row_at_rendered_index": [
+            1791101760,
+            85149.91,
+            85149.91,
+            85134.3,
+            85148,
+            5.01369
+          ],
+          "source_row_at_rendered_index": [
+            1791101760,
+            0
+          ],
+          "source_row_at_rendered_index_minus_latest_offset": [
+            1791101760,
+            0
+          ]
+        },
+        {
+          "price": null,
+          "timePointIndex": 298,
+          "left": 1102.878787878788,
+          "center": 1121.8939393939395,
+          "right": 1140.909090909091,
+          "y": null,
+          "coordinate_native_index": 298,
+          "host_row_at_rendered_index": [
+            1791101880,
+            85148,
+            85148,
+            85130,
+            85130.01,
+            4.11884
+          ],
+          "source_row_at_rendered_index": [
+            1791101880,
+            0
+          ],
+          "source_row_at_rendered_index_minus_latest_offset": [
+            1791101880,
+            0
+          ]
+        },
+        {
+          "price": null,
+          "timePointIndex": 299,
+          "left": 1140.909090909091,
+          "center": 1159.9242424242425,
+          "right": 1178.939393939394,
+          "y": null,
+          "coordinate_native_index": 299,
+          "host_row_at_rendered_index": [
+            1791102000,
+            85130,
+            85130.01,
+            85124,
+            85124.01,
+            1.79358
+          ],
+          "source_row_at_rendered_index": [
+            1791102000,
+            0
+          ],
+          "source_row_at_rendered_index_minus_latest_offset": [
+            1791102000,
+            0
+          ]
+        }
+      ]
+    }
+  ],
+  "native_main_candles": [
+    {
+      "center": 19.0151515151515,
+      "open": 467.3714909432339,
+      "high": 423.5755803763459,
+      "low": 467.3883420053901,
+      "close": 423.5755803763459,
+      "left": 0,
+      "right": 38.030303030303,
+      "timePointIndex": 269,
+      "color": "#089981",
+      "borderColor": "#089981",
+      "wickColor": "#089981",
+      "host_row": [
+        1791098400,
+        84934.01,
+        84960,
+        84934,
+        84960,
+        3.47577
+      ]
+    },
+    {
+      "center": 57.045454545454504,
+      "open": 423.5755803763459,
+      "high": 376.39260631429835,
+      "low": 423.5924314385021,
+      "close": 376.40945737645455,
+      "left": 38.030303030303,
+      "right": 76.060606060606,
+      "timePointIndex": 270,
+      "color": "#089981",
+      "borderColor": "#089981",
+      "wickColor": "#089981",
+      "host_row": [
+        1791098520,
+        84960,
+        84988,
+        84959.99,
+        84987.99,
+        5.16206
+      ]
+    },
+    {
+      "center": 95.0757575757575,
+      "open": 376.39260631429835,
+      "high": 353.1549915887507,
+      "low": 376.40945737645455,
+      "close": 362.8949055201286,
+      "left": 76.060606060606,
+      "right": 114.09090909090901,
+      "timePointIndex": 271,
+      "color": "#089981",
+      "borderColor": "#089981",
+      "wickColor": "#089981",
+      "host_row": [
+        1791098640,
+        84988,
+        85001.79,
+        84987.99,
+        84996.01,
+        13.88509
+      ]
+    },
+    {
+      "center": 133.1060606060605,
+      "open": 362.8949055201286,
+      "high": 362.8949055201286,
+      "low": 388.79498806775183,
+      "close": 388.79498806775183,
+      "left": 114.09090909090901,
+      "right": 152.121212121212,
+      "timePointIndex": 272,
+      "color": "#F23645",
+      "borderColor": "#F23645",
+      "wickColor": "#F23645",
+      "host_row": [
+        1791098760,
+        84996.01,
+        84996.01,
+        84980.64,
+        84980.64,
+        3.85045
+      ]
+    },
+    {
+      "center": 171.1363636363635,
+      "open": 388.7781370055957,
+      "high": 388.7781370055957,
+      "low": 402.12417824028614,
+      "close": 402.10732717810544,
+      "left": 152.121212121212,
+      "right": 190.151515151515,
+      "timePointIndex": 273,
+      "color": "#F23645",
+      "borderColor": "#F23645",
+      "wickColor": "#F23645",
+      "host_row": [
+        1791098880,
+        84980.65,
+        84980.65,
+        84972.73,
+        84972.74,
+        9.39879
+      ]
+    },
+    {
+      "center": 209.16666666666674,
+      "open": 402.12417824028614,
+      "high": 402.10732717810544,
+      "low": 463.3272360236151,
+      "close": 449.17234380501066,
+      "left": 190.151515151515,
+      "right": 228.18181818181824,
+      "timePointIndex": 274,
+      "color": "#F23645",
+      "borderColor": "#F23645",
+      "wickColor": "#F23645",
+      "host_row": [
+        1791099000,
+        84972.73,
+        84972.74,
+        84936.41,
+        84944.81,
+        12.29636
+      ]
+    },
+    {
+      "center": 247.19696969696963,
+      "open": 449.1554927428299,
+      "high": 449.1554927428299,
+      "low": 479.68961738585733,
+      "close": 479.6727663236766,
+      "left": 228.18181818181824,
+      "right": 266.21212121212125,
+      "timePointIndex": 275,
+      "color": "#F23645",
+      "borderColor": "#F23645",
+      "wickColor": "#F23645",
+      "host_row": [
+        1791099120,
+        84944.82,
+        84944.82,
+        84926.7,
+        84926.71,
+        7.24627
+      ]
+    },
+    {
+      "center": 285.22727272727275,
+      "open": 479.6727663236766,
+      "high": 441.9263870740484,
+      "low": 483.38,
+      "close": 441.9432381362046,
+      "left": 266.21212121212125,
+      "right": 304.24242424242425,
+      "timePointIndex": 276,
+      "color": "#089981",
+      "borderColor": "#089981",
+      "wickColor": "#089981",
+      "host_row": [
+        1791099240,
+        84926.71,
+        84949.11,
+        84924.51,
+        84949.1,
+        8.45798
+      ]
+    },
+    {
+      "center": 323.25757575757575,
+      "open": 441.9432381362046,
+      "high": 433.719919799693,
+      "low": 441.9432381362046,
+      "close": 433.7367708618492,
+      "left": 304.24242424242425,
+      "right": 342.27272727272725,
+      "timePointIndex": 277,
+      "color": "#089981",
+      "borderColor": "#089981",
+      "wickColor": "#089981",
+      "host_row": [
+        1791099360,
+        84949.1,
+        84953.98,
+        84949.1,
+        84953.97,
+        2.24297
+      ]
+    },
+    {
+      "center": 361.28787878787875,
+      "open": 433.719919799693,
+      "high": 433.719919799693,
+      "low": 465.0628954266099,
+      "close": 464.79327843198826,
+      "left": 342.27272727272725,
+      "right": 380.30303030303025,
+      "timePointIndex": 278,
+      "color": "#F23645",
+      "borderColor": "#F23645",
+      "wickColor": "#F23645",
+      "host_row": [
+        1791099480,
+        84953.98,
+        84953.98,
+        84935.38,
+        84935.54,
+        7.26305
+      ]
+    },
+    {
+      "center": 399.31818181818176,
+      "open": 464.79327843198826,
+      "high": 427.78834591760017,
+      "low": 464.8101294941444,
+      "close": 427.8051969797564,
+      "left": 380.30303030303025,
+      "right": 418.33333333333326,
+      "timePointIndex": 279,
+      "color": "#089981",
+      "borderColor": "#089981",
+      "wickColor": "#089981",
+      "host_row": [
+        1791099600,
+        84935.54,
+        84957.5,
+        84935.53,
+        84957.49,
+        2.71029
+      ]
+    },
+    {
+      "center": 437.3484848484849,
+      "open": 427.78834591760017,
+      "high": 403.3374547161693,
+      "low": 427.8051969797564,
+      "close": 403.3543057783255,
+      "left": 418.33333333333326,
+      "right": 456.3636363636364,
+      "timePointIndex": 280,
+      "color": "#089981",
+      "borderColor": "#089981",
+      "wickColor": "#089981",
+      "host_row": [
+        1791099720,
+        84957.5,
+        84972.01,
+        84957.49,
+        84972,
+        5.03671
+      ]
+    },
+    {
+      "center": 475.3787878787879,
+      "open": 403.3543057783255,
+      "high": 356.171331716278,
+      "low": 403.3543057783255,
+      "close": 356.18818277843417,
+      "left": 456.3636363636364,
+      "right": 494.3939393939394,
+      "timePointIndex": 281,
+      "color": "#089981",
+      "borderColor": "#089981",
+      "wickColor": "#089981",
+      "host_row": [
+        1791099840,
+        84972,
+        85000,
+        84972,
+        84999.99,
+        1.89636
+      ]
+    },
+    {
+      "center": 513.4090909090909,
+      "open": 356.171331716278,
+      "high": 356.171331716278,
+      "low": 356.18818277843417,
+      "close": 356.18818277843417,
+      "left": 494.3939393939394,
+      "right": 532.4242424242424,
+      "timePointIndex": 282,
+      "color": "#F23645",
+      "borderColor": "#F23645",
+      "wickColor": "#F23645",
+      "host_row": [
+        1791099960,
+        85000,
+        85000,
+        84999.99,
+        84999.99,
+        2.08456
+      ]
+    },
+    {
+      "center": 551.4393939393939,
+      "open": 356.171331716278,
+      "high": 316.47022925550186,
+      "low": 356.18818277843417,
+      "close": 316.48708031765807,
+      "left": 532.4242424242424,
+      "right": 570.4545454545455,
+      "timePointIndex": 283,
+      "color": "#089981",
+      "borderColor": "#089981",
+      "wickColor": "#089981",
+      "host_row": [
+        1791100080,
+        85000,
+        85023.56,
+        84999.99,
+        85023.55,
+        5.41502
+      ]
+    },
+    {
+      "center": 589.469696969697,
+      "open": 316.48708031765807,
+      "high": 303.79823050740225,
+      "low": 316.48708031765807,
+      "close": 303.79823050740225,
+      "left": 570.4545454545455,
+      "right": 608.4848484848485,
+      "timePointIndex": 284,
+      "color": "#089981",
+      "borderColor": "#089981",
+      "wickColor": "#089981",
+      "host_row": [
+        1791100200,
+        85023.55,
+        85031.08,
+        85023.55,
+        85031.08,
+        2.53933
+      ]
+    },
+    {
+      "center": 627.5,
+      "open": 303.81508156955846,
+      "high": 255.35142678297842,
+      "low": 303.81508156955846,
+      "close": 258.36776691053024,
+      "left": 608.4848484848485,
+      "right": 646.5151515151515,
+      "timePointIndex": 285,
+      "color": "#089981",
+      "borderColor": "#089981",
+      "wickColor": "#089981",
+      "host_row": [
+        1791100320,
+        85031.07,
+        85059.83,
+        85031.07,
+        85058.04,
+        41.19536
+      ]
+    },
+    {
+      "center": 665.530303030303,
+      "open": 258.36776691053024,
+      "high": 258.35091584834953,
+      "low": 316.689293063655,
+      "close": 295.608614295203,
+      "left": 646.5151515151515,
+      "right": 684.5454545454545,
+      "timePointIndex": 286,
+      "color": "#F23645",
+      "borderColor": "#F23645",
+      "wickColor": "#F23645",
+      "host_row": [
+        1791100440,
+        85058.04,
+        85058.05,
+        85023.43,
+        85035.94,
+        28.46298
+      ]
+    },
+    {
+      "center": 703.560606060606,
+      "open": 295.59176323304683,
+      "high": 242.6794280348788,
+      "low": 319.2338034505637,
+      "close": 264.75431947106085,
+      "left": 684.5454545454545,
+      "right": 722.5757575757575,
+      "timePointIndex": 287,
+      "color": "#089981",
+      "borderColor": "#089981",
+      "wickColor": "#089981",
+      "host_row": [
+        1791100560,
+        85035.95,
+        85067.35,
+        85021.92,
+        85054.25,
+        19.64267
+      ]
+    },
+    {
+      "center": 741.5909090909091,
+      "open": 264.7374684089047,
+      "high": 166.3441164273715,
+      "low": 264.7374684089047,
+      "close": 177.55007276709796,
+      "left": 722.5757575757575,
+      "right": 760.6060606060606,
+      "timePointIndex": 288,
+      "color": "#089981",
+      "borderColor": "#089981",
+      "wickColor": "#089981",
+      "host_row": [
+        1791100680,
+        85054.26,
+        85112.65,
+        85054.26,
+        85106,
+        14.54156
+      ]
+    },
+    {
+      "center": 779.6212121212121,
+      "open": 177.5332217049418,
+      "high": 69.38310472985006,
+      "low": 178.0050514455603,
+      "close": 69.38310472985006,
+      "left": 760.6060606060606,
+      "right": 798.6363636363636,
+      "timePointIndex": 289,
+      "color": "#089981",
+      "borderColor": "#089981",
+      "wickColor": "#089981",
+      "host_row": [
+        1791100800,
+        85106.01,
+        85170.19,
+        85105.73,
+        85170.19,
+        26.31063
+      ]
+    },
+    {
+      "center": 817.6515151515151,
+      "open": 69.39995579203077,
+      "high": 52.64999999999998,
+      "low": 160.7158616642372,
+      "close": 160.699010602081,
+      "left": 798.6363636363636,
+      "right": 836.6666666666666,
+      "timePointIndex": 290,
+      "color": "#F23645",
+      "borderColor": "#F23645",
+      "wickColor": "#F23645",
+      "host_row": [
+        1791100920,
+        85170.18,
+        85180.12,
+        85115.99,
+        85116,
+        25.4994
+      ]
+    },
+    {
+      "center": 855.6818181818182,
+      "open": 160.7158616642372,
+      "high": 126.98003520989084,
+      "low": 160.7158616642372,
+      "close": 126.98003520989084,
+      "left": 836.6666666666666,
+      "right": 874.6969696969697,
+      "timePointIndex": 291,
+      "color": "#089981",
+      "borderColor": "#089981",
+      "wickColor": "#089981",
+      "host_row": [
+        1791101040,
+        85115.99,
+        85136.01,
+        85115.99,
+        85136.01,
+        6.06442
+      ]
+    },
+    {
+      "center": 893.7121212121212,
+      "open": 126.99688627204705,
+      "high": 97.25476155080185,
+      "low": 166.61373342199312,
+      "close": 166.61373342199312,
+      "left": 874.6969696969697,
+      "right": 912.7272727272727,
+      "timePointIndex": 292,
+      "color": "#F23645",
+      "borderColor": "#F23645",
+      "wickColor": "#F23645",
+      "host_row": [
+        1791101160,
+        85136,
+        85153.65,
+        85112.49,
+        85112.49,
+        10.44812
+      ]
+    },
+    {
+      "center": 931.7424242424242,
+      "open": 166.61373342199312,
+      "high": 146.9148417511089,
+      "low": 194.38428386995878,
+      "close": 146.9148417511089,
+      "left": 912.7272727272727,
+      "right": 950.7575757575758,
+      "timePointIndex": 293,
+      "color": "#089981",
+      "borderColor": "#089981",
+      "wickColor": "#089981",
+      "host_row": [
+        1791101280,
+        85112.49,
+        85124.18,
+        85096.01,
+        85124.18,
+        40.62046
+      ]
+    },
+    {
+      "center": 969.7727272727273,
+      "open": 146.93169281326504,
+      "high": 86.53748601385007,
+      "low": 146.93169281326504,
+      "close": 86.55433707600628,
+      "left": 950.7575757575758,
+      "right": 988.7878787878788,
+      "timePointIndex": 294,
+      "color": "#089981",
+      "borderColor": "#089981",
+      "wickColor": "#089981",
+      "host_row": [
+        1791101400,
+        85124.17,
+        85160.01,
+        85124.17,
+        85160,
+        6.53075
+      ]
+    },
+    {
+      "center": 1007.8030303030303,
+      "open": 86.55433707600628,
+      "high": 60.3677864715807,
+      "low": 86.55433707600628,
+      "close": 60.3677864715807,
+      "left": 988.7878787878788,
+      "right": 1026.8181818181818,
+      "timePointIndex": 295,
+      "color": "#089981",
+      "borderColor": "#089981",
+      "wickColor": "#089981",
+      "host_row": [
+        1791101520,
+        85160,
+        85175.54,
+        85160,
+        85175.54,
+        3.68482
+      ]
+    },
+    {
+      "center": 1045.8333333333333,
+      "open": 60.3677864715807,
+      "high": 60.3677864715807,
+      "low": 103.57390986268325,
+      "close": 103.57390986268325,
+      "left": 1026.8181818181818,
+      "right": 1064.8484848484848,
+      "timePointIndex": 296,
+      "color": "#F23645",
+      "borderColor": "#F23645",
+      "wickColor": "#F23645",
+      "host_row": [
+        1791101640,
+        85175.54,
+        85175.54,
+        85149.9,
+        85149.9,
+        8.15273
+      ]
+    },
+    {
+      "center": 1083.8636363636365,
+      "open": 103.55705880050255,
+      "high": 103.55705880050255,
+      "low": 129.861566840095,
+      "close": 106.77561167402666,
+      "left": 1064.8484848484848,
+      "right": 1102.878787878788,
+      "timePointIndex": 297,
+      "color": "#F23645",
+      "borderColor": "#F23645",
+      "wickColor": "#F23645",
+      "host_row": [
+        1791101760,
+        85149.91,
+        85149.91,
+        85134.3,
+        85148,
+        5.01369
+      ]
+    },
+    {
+      "center": 1121.8939393939395,
+      "open": 106.77561167402666,
+      "high": 106.77561167402666,
+      "low": 137.10752357105724,
+      "close": 137.09067250890104,
+      "left": 1102.878787878788,
+      "right": 1140.909090909091,
+      "timePointIndex": 298,
+      "color": "#F23645",
+      "borderColor": "#F23645",
+      "wickColor": "#F23645",
+      "host_row": [
+        1791101880,
+        85148,
+        85148,
+        85130,
+        85130.01,
+        4.11884
+      ]
+    },
+    {
+      "center": 1159.9242424242425,
+      "open": 137.10752357105724,
+      "high": 137.09067250890104,
+      "low": 147.21816087006744,
+      "close": 147.20130980791123,
+      "left": 1140.909090909091,
+      "right": 1178.939393939394,
+      "timePointIndex": 299,
+      "color": "#F23645",
+      "borderColor": "#F23645",
+      "wickColor": "#F23645",
+      "host_row": [
+        1791102000,
+        85130,
+        85130.01,
+        85124,
+        85124.01,
+        1.79358
+      ]
+    }
+  ],
+  "pane_scales": [
+    {
+      "price_range": {
+        "_minValue": 84924.51,
+        "_maxValue": 85180.12
+      },
+      "mode": {
+        "autoScale": true,
+        "lockScale": false,
+        "percentage": false,
+        "indexedTo100": false,
+        "log": false
+      }
+    },
+    {
+      "price_range": {
+        "_minValue": 84924.51,
+        "_maxValue": 85180.12
+      },
+      "mode": {
+        "autoScale": true,
+        "lockScale": false,
+        "percentage": false,
+        "indexedTo100": false,
+        "log": false
+      }
+    }
+  ],
+  "context_limit": "Source and destination crosshairs are timestamped native chart indices. Destination selection uses the exposed latest native plot offset; item geometry and source rows are retained separately to test historical placement rather than infer it from CSV."
+}
