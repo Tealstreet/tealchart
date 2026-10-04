@@ -33627,5 +33627,1736 @@
     },
     "declared_unexported_columns": [],
     "data_window_witness": "captures/v11/evidence/requested-confirmation-pair-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T17:17:14.454Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v11 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "requested-confirmation-pair-v1.pine",
+    "attempt": 2,
+    "source_sha256": "5c4484388ec0be90d4a73561af9b8d764d353cd702a785d400894403f87f0488",
+    "indicator_title": "V11 requested-confirmation-pair-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v11/requested-confirmation-pair-v1-attempt2.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-05T011713.714.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [
+        {
+          "id": "in_0",
+          "name": "Requested timeframe",
+          "value": "15",
+          "default": "15"
+        }
+      ],
+      "observed_indicator_title": "V11 requested-confirmation-pair-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24699,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24999,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T17:17:05.206Z",
+    "live_candle_open_utc": "2026-10-04T17:16:00.000Z",
+    "export_utc": "2026-10-04T17:17:14.104Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v11/evidence/requested-confirmation-pair-v1-attempt2-setup.png",
+      "captures/v11/evidence/requested-confirmation-pair-v1-attempt2-export.png",
+      "captures/v11/evidence/requested-confirmation-pair-v1-attempt2-logs.txt",
+      "captures/v11/evidence/requested-confirmation-pair-v1-attempt2-logs-v1.json",
+      "captures/v11/evidence/requested-confirmation-pair-v1-attempt2-logs.png",
+      "captures/v11/evidence/requested-confirmation-pair-v1-attempt2-inputs.png",
+      "captures/v11/evidence/requested-confirmation-pair-v1-attempt2-visual.png",
+      "captures/v11/evidence/requested-confirmation-pair-v1-attempt2-data-window-v1.png",
+      "captures/v11/evidence/requested-confirmation-pair-v1-attempt2-data-window-v1.json",
+      "captures/v11/evidence/requested-confirmation-pair-v1-attempt2-data-window-v1.txt",
+      "captures/v11/evidence/requested-confirmation-pair-v1-attempt2-authority-object-geometry-v1.json",
+      "captures/v11/evidence/requested-confirmation-pair-v1-attempt2-authority-object-geometry-v1.png",
+      "captures/v11/evidence/requested-confirmation-pair-v1-attempt2-recovered-live-pre-boundary-v1.json",
+      "captures/v11/evidence/requested-confirmation-pair-v1-attempt2-recovered-live-pre-boundary-v1.png",
+      "captures/v11/evidence/requested-confirmation-pair-v1-attempt2-recovered-live-before-htf-close-v1.json",
+      "captures/v11/evidence/requested-confirmation-pair-v1-attempt2-recovered-live-before-htf-close-v1.png",
+      "captures/v11/evidence/requested-confirmation-pair-v1-attempt2-native-live-closing-before-htf-boundary-v1.json",
+      "captures/v11/evidence/requested-confirmation-pair-v1-attempt2-native-live-closing-before-htf-boundary-v1.png",
+      "captures/v11/evidence/requested-confirmation-pair-v1-attempt2-native-live-opening-after-htf-boundary-v1.json",
+      "captures/v11/evidence/requested-confirmation-pair-v1-attempt2-native-live-opening-after-htf-boundary-v1.png",
+      "captures/v11/evidence/requested-confirmation-pair-v1-attempt2-native-live-subsequent-after-htf-boundary-v1.json",
+      "captures/v11/evidence/requested-confirmation-pair-v1-attempt2-native-live-subsequent-after-htf-boundary-v1.png",
+      "captures/v11/evidence/requested-confirmation-pair-v1-attempt2-recovered-live-boundary-observations-v1.json",
+      "captures/v11/evidence/requested-confirmation-pair-v1-attempt2-recovered-live-boundary-observations-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T17:17:06.282Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790829000,
+            83860,
+            83896.01,
+            83846,
+            83846,
+            15.04462
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791134160,
+            85317.85,
+            85317.85,
+            85317.84,
+            85317.85,
+            0.85464
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 requested-confirmation-pair-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790829000,
+                1,
+                1,
+                1790829000000,
+                1790828100000
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791134160,
+                0,
+                0,
+                1791134160000,
+                1791134100000
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T17:17:07.353Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790829000,
+            83860,
+            83896.01,
+            83846,
+            83846,
+            15.04462
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791134160,
+            85317.85,
+            85317.85,
+            85317.84,
+            85317.84,
+            0.85502
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 requested-confirmation-pair-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24999,
+            "first": {
+              "index": -1022455,
+              "value": [
+                1788134400,
+                1,
+                0,
+                1788134400000,
+                null
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791134160,
+                0,
+                0,
+                1791134160000,
+                1791134100000
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T17:17:08.398Z",
+        "bars": 24999,
+        "end": true,
+        "first": {
+          "index": -24699,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791134160,
+            85317.85,
+            85317.85,
+            85317.84,
+            85317.84,
+            0.85878
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 requested-confirmation-pair-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24999,
+            "first": {
+              "index": -24699,
+              "value": [
+                1788134400,
+                1,
+                0,
+                1788134400000,
+                null
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791134160,
+                0,
+                0,
+                1791134160000,
+                1791134100000
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   17:16",
+    "historical_compare_before_unix_seconds": 1791134160,
+    "pine_logs": {
+      "paths": [
+        "evidence/requested-confirmation-pair-v1-attempt2-logs.txt",
+        "evidence/requested-confirmation-pair-v1-attempt2-logs-v1.json",
+        "evidence/requested-confirmation-pair-v1-attempt2-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "5147b83d7e7a668c87d5faa62635469fec6183b6dac5b04cf5f5e46d426d32a1",
+    "csv_bytes": 1896833,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "LOCAL_CONFIRMED",
+      "REQUEST_CONFIRMED",
+      "LOCAL_TIME",
+      "REQUEST_TIME"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "LOCAL_CONFIRMED": 5,
+      "REQUEST_CONFIRMED": 6,
+      "LOCAL_TIME": 7,
+      "REQUEST_TIME": 8
+    },
+    "first_historical_cells": [
+      "1788134400",
+      "77682",
+      "77682.01",
+      "77572",
+      "77674.04",
+      "1",
+      "0",
+      "1788134400000",
+      ""
+    ],
+    "last_historical_cells": [
+      "1791134040",
+      "85317.85",
+      "85317.85",
+      "85317.84",
+      "85317.84",
+      "1",
+      "1",
+      "1791134040000",
+      "1791133200000"
+    ],
+    "declared_to_native_header_mapping": {
+      "LOCAL_CONFIRMED": "LOCAL_CONFIRMED",
+      "REQUEST_CONFIRMED": "REQUEST_CONFIRMED",
+      "LOCAL_TIME": "LOCAL_TIME",
+      "REQUEST_TIME": "REQUEST_TIME"
+    },
+    "csv_rows": 24999,
+    "historical_rows": 24998,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791134160,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791134160",
+    "first_historical_values": {
+      "LOCAL_CONFIRMED": "1",
+      "REQUEST_CONFIRMED": "0",
+      "LOCAL_TIME": "1788134400000",
+      "REQUEST_TIME": ""
+    },
+    "last_historical_values": {
+      "LOCAL_CONFIRMED": "1",
+      "REQUEST_CONFIRMED": "1",
+      "LOCAL_TIME": "1791134040000",
+      "REQUEST_TIME": "1791133200000"
+    },
+    "declared_unexported_columns": [],
+    "data_window_witness": "captures/v11/evidence/requested-confirmation-pair-v1-attempt2-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T17:18:47.594Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "arm",
+        "bitness": "64",
+        "brands": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156"
+          }
+        ],
+        "fullVersionList": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8.0.0.0"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156.0.8075.0"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156.0.8075.0"
+          }
+        ],
+        "mobile": false,
+        "platform": "macOS",
+        "platformVersion": "27.2.0"
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v11 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "provider-daily-counter-prefix-v5-v1.pine",
+    "attempt": 1,
+    "source_sha256": "7dd9d11947f936a8a1edaa069a36d3cbade4f9d7328adeadaf90a29161c20a0b",
+    "indicator_title": "V11 daily requested counter prefix",
+    "status": "RUNS",
+    "csv_file": "captures/v11/provider-daily-counter-prefix-v5-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-05T011846.849.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V11 daily requested counter prefix",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24700,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 25000,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T17:18:38.381Z",
+    "live_candle_open_utc": "2026-10-04T17:18:00.000Z",
+    "export_utc": "2026-10-04T17:18:47.217Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v11/evidence/provider-daily-counter-prefix-v5-v1-attempt1-setup.png",
+      "captures/v11/evidence/provider-daily-counter-prefix-v5-v1-attempt1-export.png",
+      "captures/v11/evidence/provider-daily-counter-prefix-v5-v1-attempt1-logs.txt",
+      "captures/v11/evidence/provider-daily-counter-prefix-v5-v1-attempt1-logs-v1.json",
+      "captures/v11/evidence/provider-daily-counter-prefix-v5-v1-attempt1-logs.png",
+      "captures/v11/evidence/provider-daily-counter-prefix-v5-v1-attempt1-visual.png",
+      "captures/v11/evidence/provider-daily-counter-prefix-v5-v1-attempt1-data-window-v1.png",
+      "captures/v11/evidence/provider-daily-counter-prefix-v5-v1-attempt1-data-window-v1.json",
+      "captures/v11/evidence/provider-daily-counter-prefix-v5-v1-attempt1-data-window-v1.txt",
+      "captures/v11/evidence/provider-daily-counter-prefix-v5-v1-attempt1-authority-object-geometry-v1.json",
+      "captures/v11/evidence/provider-daily-counter-prefix-v5-v1-attempt1-authority-object-geometry-v1.png",
+      "captures/v11/evidence/provider-daily-counter-prefix-v5-v1-attempt1-requested-daily-prefix-origin-v1.json",
+      "captures/v11/evidence/provider-daily-counter-prefix-v5-v1-attempt1-requested-daily-prefix-origin-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T17:18:39.232Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790829120,
+            83846,
+            83846.01,
+            83782.84,
+            83792.01,
+            14.01384
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791134280,
+            85326,
+            85326,
+            85325.99,
+            85325.99,
+            0.31888
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 daily requested counter prefix",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790829120,
+                3332,
+                83623.59,
+                85273.65,
+                83186,
+                84880.05,
+                16766.05675,
+                1790812800000,
+                1790899200000,
+                3332,
+                1502928000000,
+                0,
+                1790829120000,
+                1790829240000,
+                22456,
+                1791134318691
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791134280,
+                3335,
+                84753.57,
+                85470,
+                84719.99,
+                85325.99,
+                4534.92068,
+                1791072000000,
+                1791158400000,
+                3335,
+                1502928000000,
+                0,
+                1791134280000,
+                1791134400000,
+                24999,
+                1791134318695
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T17:18:40.274Z",
+        "bars": 25000,
+        "end": true,
+        "first": {
+          "index": -24700,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791134280,
+            85326,
+            85326,
+            85325.99,
+            85325.99,
+            0.31888
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 daily requested counter prefix",
+            "status": {
+              "type": 1,
+              "startTime": 1791134319699
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790829120,
+                3332,
+                83623.59,
+                85273.65,
+                83186,
+                84880.05,
+                16766.05675,
+                1790812800000,
+                1790899200000,
+                3332,
+                1502928000000,
+                0,
+                1790829120000,
+                1790829240000,
+                22456,
+                1791134318691
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791134280,
+                3335,
+                84753.57,
+                85470,
+                84719.99,
+                85325.99,
+                4534.9294,
+                1791072000000,
+                1791158400000,
+                3335,
+                1502928000000,
+                0,
+                1791134280000,
+                1791134400000,
+                24999,
+                1791134319481
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T17:18:40.969Z",
+        "bars": 25000,
+        "end": true,
+        "first": {
+          "index": -24700,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791134280,
+            85326,
+            85326,
+            85325.99,
+            85325.99,
+            0.32778
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 daily requested counter prefix",
+            "status": {
+              "type": 2
+            },
+            "size": 25000,
+            "first": {
+              "index": -24700,
+              "value": [
+                1788134400,
+                3301,
+                77682,
+                79250,
+                77392,
+                78581.29,
+                15303.90602,
+                1788134400000,
+                1788220800000,
+                3301,
+                1502928000000,
+                0,
+                1788134400000,
+                1788134520000,
+                0,
+                1791134318650
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791134280,
+                3335,
+                84753.57,
+                85470,
+                84719.99,
+                85325.99,
+                4534.92958,
+                1791072000000,
+                1791158400000,
+                3335,
+                1502928000000,
+                0,
+                1791134280000,
+                1791134400000,
+                24999,
+                1791134320534
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///7df0ccd2-4f99-4a99-a4db-b52147fcb0fb.pine?placement%3Ddialog",
+          "path": "/7df0ccd2-4f99-4a99-a4db-b52147fcb0fb.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "live_tooltip": "Sun 04 Oct '26   17:18",
+    "historical_compare_before_unix_seconds": 1791134280,
+    "pine_logs": {
+      "paths": [
+        "evidence/provider-daily-counter-prefix-v5-v1-attempt1-logs.txt",
+        "evidence/provider-daily-counter-prefix-v5-v1-attempt1-logs-v1.json",
+        "evidence/provider-daily-counter-prefix-v5-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "ef452100485af7acd1ea8baa4d04a92bfa6a96163a29c912a4f465dd1d304f78",
+    "csv_bytes": 4736818,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "OUTCOME",
+      "REQUEST_INPUT_open",
+      "REQUEST_INPUT_high",
+      "REQUEST_INPUT_low",
+      "REQUEST_INPUT_close",
+      "REQUEST_INPUT_volume",
+      "REQUEST_INPUT_time",
+      "REQUEST_INPUT_time_close",
+      "REQUEST_INPUT_index",
+      "REQUEST_INPUT_first_time",
+      "REQUEST_INPUT_first_count",
+      "CHART_time",
+      "CHART_time_close",
+      "CHART_bar_index",
+      "CHART_timenow"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "OUTCOME": 5,
+      "REQUEST_INPUT_open": 6,
+      "REQUEST_INPUT_high": 7,
+      "REQUEST_INPUT_low": 8,
+      "REQUEST_INPUT_close": 9,
+      "REQUEST_INPUT_volume": 10,
+      "REQUEST_INPUT_time": 11,
+      "REQUEST_INPUT_time_close": 12,
+      "REQUEST_INPUT_index": 13,
+      "REQUEST_INPUT_first_time": 14,
+      "REQUEST_INPUT_first_count": 15,
+      "CHART_time": 16,
+      "CHART_time_close": 17,
+      "CHART_bar_index": 18,
+      "CHART_timenow": 19
+    },
+    "first_historical_cells": [
+      "1788134400",
+      "77682",
+      "77682.01",
+      "77572",
+      "77674.04",
+      "3301",
+      "77682",
+      "79250",
+      "77392",
+      "78581.29",
+      "15303.90602",
+      "1788134400000",
+      "1788220800000",
+      "3301",
+      "1502928000000",
+      "0",
+      "1788134400000",
+      "1788134520000",
+      "0",
+      "1791134318650"
+    ],
+    "last_historical_cells": [
+      "1791134160",
+      "85317.85",
+      "85326",
+      "85317.84",
+      "85325.99",
+      "3335",
+      "84753.57",
+      "85470",
+      "84719.99",
+      "85325.99",
+      "4534.92068",
+      "1791072000000",
+      "1791158400000",
+      "3335",
+      "1502928000000",
+      "0",
+      "1791134160000",
+      "1791134280000",
+      "24998",
+      "1791134318695"
+    ],
+    "declared_to_native_header_mapping": {
+      "OUTCOME": "OUTCOME",
+      "REQUEST_INPUT_open": "REQUEST_INPUT_open",
+      "REQUEST_INPUT_high": "REQUEST_INPUT_high",
+      "REQUEST_INPUT_low": "REQUEST_INPUT_low",
+      "REQUEST_INPUT_close": "REQUEST_INPUT_close",
+      "REQUEST_INPUT_volume": "REQUEST_INPUT_volume",
+      "REQUEST_INPUT_time": "REQUEST_INPUT_time",
+      "REQUEST_INPUT_time_close": "REQUEST_INPUT_time_close",
+      "REQUEST_INPUT_index": "REQUEST_INPUT_index",
+      "REQUEST_INPUT_first_time": "REQUEST_INPUT_first_time",
+      "REQUEST_INPUT_first_count": "REQUEST_INPUT_first_count",
+      "CHART_time": "CHART_time",
+      "CHART_time_close": "CHART_time_close",
+      "CHART_bar_index": "CHART_bar_index",
+      "CHART_timenow": "CHART_timenow"
+    },
+    "csv_rows": 25000,
+    "historical_rows": 24999,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791134280,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791134280",
+    "first_historical_values": {
+      "OUTCOME": "3301",
+      "REQUEST_INPUT_open": "77682",
+      "REQUEST_INPUT_high": "79250",
+      "REQUEST_INPUT_low": "77392",
+      "REQUEST_INPUT_close": "78581.29",
+      "REQUEST_INPUT_volume": "15303.90602",
+      "REQUEST_INPUT_time": "1788134400000",
+      "REQUEST_INPUT_time_close": "1788220800000",
+      "REQUEST_INPUT_index": "3301",
+      "REQUEST_INPUT_first_time": "1502928000000",
+      "REQUEST_INPUT_first_count": "0",
+      "CHART_time": "1788134400000",
+      "CHART_time_close": "1788134520000",
+      "CHART_bar_index": "0",
+      "CHART_timenow": "1791134318650"
+    },
+    "last_historical_values": {
+      "OUTCOME": "3335",
+      "REQUEST_INPUT_open": "84753.57",
+      "REQUEST_INPUT_high": "85470",
+      "REQUEST_INPUT_low": "84719.99",
+      "REQUEST_INPUT_close": "85325.99",
+      "REQUEST_INPUT_volume": "4534.92068",
+      "REQUEST_INPUT_time": "1791072000000",
+      "REQUEST_INPUT_time_close": "1791158400000",
+      "REQUEST_INPUT_index": "3335",
+      "REQUEST_INPUT_first_time": "1502928000000",
+      "REQUEST_INPUT_first_count": "0",
+      "CHART_time": "1791134160000",
+      "CHART_time_close": "1791134280000",
+      "CHART_bar_index": "24998",
+      "CHART_timenow": "1791134318695"
+    },
+    "declared_unexported_columns": [],
+    "data_window_witness": "captures/v11/evidence/provider-daily-counter-prefix-v5-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T17:19:53.214Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "arm",
+        "bitness": "64",
+        "brands": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156"
+          }
+        ],
+        "fullVersionList": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8.0.0.0"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156.0.8075.0"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156.0.8075.0"
+          }
+        ],
+        "mobile": false,
+        "platform": "macOS",
+        "platformVersion": "27.2.0"
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v11 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "provider-daily-direct-feed-v5-v2.pine",
+    "attempt": 1,
+    "source_sha256": "7bf2000b22aba46d5212c79ef411ff9ad0e51ed35a5f73b979d815af88929dcf",
+    "indicator_title": "V11 direct daily provider prefix",
+    "status": "RUNS",
+    "csv_file": "captures/v11/provider-daily-direct-feed-v5-v2-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 1D (2).csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "1D",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V11 direct daily provider prefix",
+      "dataset_start_utc": "2017-08-17T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -3036,
+        "value": [
+          1502928000,
+          4261.48,
+          4485.39,
+          4200.74,
+          4285.08,
+          795.150377
+        ]
+      },
+      "chart_bars": 3336,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T17:19:45.428Z",
+    "live_candle_open_utc": "2026-10-04T00:00:00.000Z",
+    "export_utc": "2026-10-04T17:19:52.867Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v11/evidence/provider-daily-direct-feed-v5-v2-attempt1-setup.png",
+      "captures/v11/evidence/provider-daily-direct-feed-v5-v2-attempt1-export.png",
+      "captures/v11/evidence/provider-daily-direct-feed-v5-v2-attempt1-logs.txt",
+      "captures/v11/evidence/provider-daily-direct-feed-v5-v2-attempt1-logs-v1.json",
+      "captures/v11/evidence/provider-daily-direct-feed-v5-v2-attempt1-logs.png",
+      "captures/v11/evidence/provider-daily-direct-feed-v5-v2-attempt1-visual.png",
+      "captures/v11/evidence/provider-daily-direct-feed-v5-v2-attempt1-data-window-v1.png",
+      "captures/v11/evidence/provider-daily-direct-feed-v5-v2-attempt1-data-window-v1.json",
+      "captures/v11/evidence/provider-daily-direct-feed-v5-v2-attempt1-data-window-v1.txt",
+      "captures/v11/evidence/provider-daily-direct-feed-v5-v2-attempt1-authority-object-geometry-v1.json",
+      "captures/v11/evidence/provider-daily-direct-feed-v5-v2-attempt1-authority-object-geometry-v1.png",
+      "captures/v11/evidence/provider-daily-direct-feed-v5-v2-attempt1-daily-native-prefix-origin-v1.json",
+      "captures/v11/evidence/provider-daily-direct-feed-v5-v2-attempt1-daily-native-prefix-origin-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T17:19:46.235Z",
+        "bars": 2556,
+        "end": false,
+        "first": {
+          "index": -2256,
+          "value": [
+            1570320000,
+            8127.55,
+            8153.87,
+            7785,
+            7854.25,
+            34676.104049
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791072000,
+            84753.57,
+            85470,
+            84719.99,
+            85325.99,
+            4535.68648
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 direct daily provider prefix",
+            "status": {
+              "type": 2
+            },
+            "size": 2556,
+            "first": {
+              "index": -2256,
+              "value": [
+                1570320000,
+                8127.55,
+                8153.87,
+                7785,
+                7854.25,
+                34676.104049,
+                1570320000000,
+                1570406400000,
+                780,
+                1791134385503,
+                1502928000000,
+                0,
+                780
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791072000,
+                84753.57,
+                85470,
+                84719.99,
+                85325.99,
+                4535.68648,
+                1791072000000,
+                1791158400000,
+                3335,
+                1791134386019,
+                1502928000000,
+                0,
+                3335
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T17:19:47.317Z",
+        "bars": 3336,
+        "end": true,
+        "first": {
+          "index": -3036,
+          "value": [
+            1502928000,
+            4261.48,
+            4485.39,
+            4200.74,
+            4285.08,
+            795.150377
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791072000,
+            84753.57,
+            85470,
+            84719.99,
+            85325.99,
+            4535.68648
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 direct daily provider prefix",
+            "status": {
+              "type": 2
+            },
+            "size": 3336,
+            "first": {
+              "index": -3036,
+              "value": [
+                1502928000,
+                4261.48,
+                4485.39,
+                4200.74,
+                4285.08,
+                795.150377,
+                1502928000000,
+                1503014400000,
+                0,
+                1791134385500,
+                1502928000000,
+                0,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791072000,
+                84753.57,
+                85470,
+                84719.99,
+                85325.99,
+                4535.68648,
+                1791072000000,
+                1791158400000,
+                3335,
+                1791134386487,
+                1502928000000,
+                0,
+                3335
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///da472408-609e-43e6-a768-578195d0c4c3.pine?placement%3Ddialog",
+          "path": "/da472408-609e-43e6-a768-578195d0c4c3.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "live_tooltip": "Sun 04 Oct '26",
+    "historical_compare_before_unix_seconds": 1791072000,
+    "pine_logs": {
+      "paths": [
+        "evidence/provider-daily-direct-feed-v5-v2-attempt1-logs.txt",
+        "evidence/provider-daily-direct-feed-v5-v2-attempt1-logs-v1.json",
+        "evidence/provider-daily-direct-feed-v5-v2-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "885c04e9a43a7a904acd03804d5a3a5e7db6fba2bb0cb88369020e2c391b9537",
+    "csv_bytes": 516226,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "FEED_open",
+      "FEED_high",
+      "FEED_low",
+      "FEED_close",
+      "FEED_volume",
+      "FEED_time",
+      "FEED_time_close",
+      "FEED_bar_index",
+      "FEED_timenow",
+      "FEED_first_time",
+      "FEED_first_count",
+      "FEED_counter_control"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "FEED_open": 5,
+      "FEED_high": 6,
+      "FEED_low": 7,
+      "FEED_close": 8,
+      "FEED_volume": 9,
+      "FEED_time": 10,
+      "FEED_time_close": 11,
+      "FEED_bar_index": 12,
+      "FEED_timenow": 13,
+      "FEED_first_time": 14,
+      "FEED_first_count": 15,
+      "FEED_counter_control": 16
+    },
+    "first_historical_cells": [
+      "1502928000",
+      "4261.48",
+      "4485.39",
+      "4200.74",
+      "4285.08",
+      "4261.48",
+      "4485.39",
+      "4200.74",
+      "4285.08",
+      "795.150377",
+      "1502928000000",
+      "1503014400000",
+      "0",
+      "1791134385500",
+      "1502928000000",
+      "0",
+      "0"
+    ],
+    "last_historical_cells": [
+      "1790985600",
+      "84518",
+      "85037.63",
+      "84456.02",
+      "84753.56",
+      "84518",
+      "85037.63",
+      "84456.02",
+      "84753.56",
+      "6889.63623",
+      "1790985600000",
+      "1791072000000",
+      "3334",
+      "1791134385513",
+      "1502928000000",
+      "0",
+      "3334"
+    ],
+    "declared_to_native_header_mapping": {
+      "FEED_open": "FEED_open",
+      "FEED_high": "FEED_high",
+      "FEED_low": "FEED_low",
+      "FEED_close": "FEED_close",
+      "FEED_volume": "FEED_volume",
+      "FEED_time": "FEED_time",
+      "FEED_time_close": "FEED_time_close",
+      "FEED_bar_index": "FEED_bar_index",
+      "FEED_timenow": "FEED_timenow",
+      "FEED_first_time": "FEED_first_time",
+      "FEED_first_count": "FEED_first_count",
+      "FEED_counter_control": "FEED_counter_control"
+    },
+    "csv_rows": 3336,
+    "historical_rows": 3335,
+    "first_csv_timestamp_seconds": 1502928000,
+    "last_csv_timestamp_seconds": 1791072000,
+    "first_csv_time_raw": "1502928000",
+    "last_csv_time_raw": "1791072000",
+    "first_historical_values": {
+      "FEED_open": "4261.48",
+      "FEED_high": "4485.39",
+      "FEED_low": "4200.74",
+      "FEED_close": "4285.08",
+      "FEED_volume": "795.150377",
+      "FEED_time": "1502928000000",
+      "FEED_time_close": "1503014400000",
+      "FEED_bar_index": "0",
+      "FEED_timenow": "1791134385500",
+      "FEED_first_time": "1502928000000",
+      "FEED_first_count": "0",
+      "FEED_counter_control": "0"
+    },
+    "last_historical_values": {
+      "FEED_open": "84518",
+      "FEED_high": "85037.63",
+      "FEED_low": "84456.02",
+      "FEED_close": "84753.56",
+      "FEED_volume": "6889.63623",
+      "FEED_time": "1790985600000",
+      "FEED_time_close": "1791072000000",
+      "FEED_bar_index": "3334",
+      "FEED_timenow": "1791134385513",
+      "FEED_first_time": "1502928000000",
+      "FEED_first_count": "0",
+      "FEED_counter_control": "3334"
+    },
+    "declared_unexported_columns": [],
+    "data_window_witness": "captures/v11/evidence/provider-daily-direct-feed-v5-v2-attempt1-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T17:31:03.531Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v11 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "requested-confirmation-pair-v1.pine",
+    "attempt": 3,
+    "source_sha256": "5c4484388ec0be90d4a73561af9b8d764d353cd702a785d400894403f87f0488",
+    "indicator_title": "V11 requested-confirmation-pair-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v11/requested-confirmation-pair-v1-attempt3.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-05T013102.774.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [
+        {
+          "id": "in_0",
+          "name": "Requested timeframe",
+          "value": "15",
+          "default": "15"
+        }
+      ],
+      "observed_indicator_title": "V11 requested-confirmation-pair-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24699,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 25006,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T17:17:05.206Z",
+    "live_candle_open_utc": "2026-10-04T17:30:00.000Z",
+    "export_utc": "2026-10-04T17:31:03.064Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v11/evidence/requested-confirmation-pair-v1-attempt3-setup.png",
+      "captures/v11/evidence/requested-confirmation-pair-v1-attempt3-export.png",
+      "captures/v11/evidence/requested-confirmation-pair-v1-attempt3-logs.txt",
+      "captures/v11/evidence/requested-confirmation-pair-v1-attempt3-logs-v1.json",
+      "captures/v11/evidence/requested-confirmation-pair-v1-attempt3-logs.png",
+      "captures/v11/evidence/requested-confirmation-pair-v1-attempt3-inputs.png",
+      "captures/v11/evidence/requested-confirmation-pair-v1-attempt3-visual.png",
+      "captures/v11/evidence/requested-confirmation-pair-v1-attempt3-data-window-v1.png",
+      "captures/v11/evidence/requested-confirmation-pair-v1-attempt3-data-window-v1.json",
+      "captures/v11/evidence/requested-confirmation-pair-v1-attempt3-data-window-v1.txt",
+      "captures/v11/evidence/requested-confirmation-pair-v1-attempt3-authority-object-geometry-v1.json",
+      "captures/v11/evidence/requested-confirmation-pair-v1-attempt3-authority-object-geometry-v1.png"
+    ],
+    "notes": "Independent post-17:30 requested15m boundary export without reload after recovered reset attempt2. Original reset UTC retained; live opening/subsequent/late pre-boundary samples and native prior-bar confirmation are separate receipts. Frozen source unchanged.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T17:17:06.282Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790829000,
+            83860,
+            83896.01,
+            83846,
+            83846,
+            15.04462
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791134160,
+            85317.85,
+            85317.85,
+            85317.84,
+            85317.85,
+            0.85464
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 requested-confirmation-pair-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790829000,
+                1,
+                1,
+                1790829000000,
+                1790828100000
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791134160,
+                0,
+                0,
+                1791134160000,
+                1791134100000
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T17:17:07.353Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790829000,
+            83860,
+            83896.01,
+            83846,
+            83846,
+            15.04462
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791134160,
+            85317.85,
+            85317.85,
+            85317.84,
+            85317.84,
+            0.85502
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 requested-confirmation-pair-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24999,
+            "first": {
+              "index": -1022455,
+              "value": [
+                1788134400,
+                1,
+                0,
+                1788134400000,
+                null
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791134160,
+                0,
+                0,
+                1791134160000,
+                1791134100000
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T17:17:08.398Z",
+        "bars": 24999,
+        "end": true,
+        "first": {
+          "index": -24699,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791134160,
+            85317.85,
+            85317.85,
+            85317.84,
+            85317.84,
+            0.85878
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 requested-confirmation-pair-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24999,
+            "first": {
+              "index": -24699,
+              "value": [
+                1788134400,
+                1,
+                0,
+                1788134400000,
+                null
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791134160,
+                0,
+                0,
+                1791134160000,
+                1791134100000
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   17:30",
+    "historical_compare_before_unix_seconds": 1791135000,
+    "pine_logs": {
+      "paths": [
+        "evidence/requested-confirmation-pair-v1-attempt3-logs.txt",
+        "evidence/requested-confirmation-pair-v1-attempt3-logs-v1.json",
+        "evidence/requested-confirmation-pair-v1-attempt3-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "02f93baf79efd9c585f07c974387c16cb58199394b56f11083a1a24345de48f8",
+    "csv_bytes": 1897350,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "LOCAL_CONFIRMED",
+      "REQUEST_CONFIRMED",
+      "LOCAL_TIME",
+      "REQUEST_TIME"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "LOCAL_CONFIRMED": 5,
+      "REQUEST_CONFIRMED": 6,
+      "LOCAL_TIME": 7,
+      "REQUEST_TIME": 8
+    },
+    "first_historical_cells": [
+      "1788134400",
+      "77682",
+      "77682.01",
+      "77572",
+      "77674.04",
+      "1",
+      "0",
+      "1788134400000",
+      ""
+    ],
+    "last_historical_cells": [
+      "1791134880",
+      "85391.45",
+      "85391.46",
+      "85386",
+      "85386",
+      "1",
+      "0",
+      "1791134880000",
+      "1791134100000"
+    ],
+    "declared_to_native_header_mapping": {
+      "LOCAL_CONFIRMED": "LOCAL_CONFIRMED",
+      "REQUEST_CONFIRMED": "REQUEST_CONFIRMED",
+      "LOCAL_TIME": "LOCAL_TIME",
+      "REQUEST_TIME": "REQUEST_TIME"
+    },
+    "csv_rows": 25006,
+    "historical_rows": 25005,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791135000,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791135000",
+    "first_historical_values": {
+      "LOCAL_CONFIRMED": "1",
+      "REQUEST_CONFIRMED": "0",
+      "LOCAL_TIME": "1788134400000",
+      "REQUEST_TIME": ""
+    },
+    "last_historical_values": {
+      "LOCAL_CONFIRMED": "1",
+      "REQUEST_CONFIRMED": "0",
+      "LOCAL_TIME": "1791134880000",
+      "REQUEST_TIME": "1791134100000"
+    },
+    "declared_unexported_columns": [],
+    "data_window_witness": "captures/v11/evidence/requested-confirmation-pair-v1-attempt3-data-window-v1.json"
   }
 ]

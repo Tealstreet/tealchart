@@ -1,0 +1,40 @@
+{
+  "index": 298,
+  "bar": [
+    1790985600,
+    84518,
+    85037.63,
+    84456.02,
+    84753.56,
+    6889.63623
+  ],
+  "source_row": [
+    1790985600,
+    84518,
+    85037.63,
+    84456.02,
+    84753.56,
+    6889.63623,
+    1790985600000,
+    1791072000000,
+    3334,
+    1791134385513,
+    1502928000000,
+    0,
+    3334
+  ],
+  "browser_utc": "2026-10-04T17:19:57.697Z",
+  "title": "V11 direct daily provider prefix",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sat 03 Oct '26",
+  "visible_range": {
+    "_firstBar": 263,
+    "_lastBar": 301
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}

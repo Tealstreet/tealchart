@@ -1,0 +1,164 @@
+{
+  "artifact": "Coordinate context v1",
+  "sources": [
+    {
+      "script": "static-model-coordinate-new-v1.pine",
+      "sha256": "a3a3cc6f9ee4a4b9e5f60a0d309290e58d4cf7901fa5e6d47e5d68736d305c32",
+      "attempt": 1,
+      "csv": "captures/v12/static-model-coordinate-new-v1-attempt1.csv",
+      "historical_rows": 25001,
+      "first": {
+        "time": "1788134400",
+        "open": "77682",
+        "high": "77682.01",
+        "low": "77572",
+        "close": "77674.04",
+        "LABEL_X": "",
+        "EXPRESSION": "",
+        "INPUT_TIME": "1788134400000"
+      },
+      "last": {
+        "time": "1791134520",
+        "open": "85331.82",
+        "high": "85348.01",
+        "low": "85330.45",
+        "close": "85348.01",
+        "LABEL_X": "1791134460000",
+        "EXPRESSION": "1791134460000",
+        "INPUT_TIME": "1791134520000"
+      },
+      "observed_fractional_expression_rows": 0,
+      "observed_label_expression_difference_rows": 0,
+      "default_inputs": [
+        {
+          "id": "in_0",
+          "name": "invLabelPos",
+          "value": "Center",
+          "default": "Center"
+        }
+      ],
+      "evidence": [
+        "captures/v12/evidence/static-model-coordinate-new-v1-attempt1-setup.png",
+        "captures/v12/evidence/static-model-coordinate-new-v1-attempt1-export.png",
+        "captures/v12/evidence/static-model-coordinate-new-v1-attempt1-logs.txt",
+        "captures/v12/evidence/static-model-coordinate-new-v1-attempt1-logs-v1.json",
+        "captures/v12/evidence/static-model-coordinate-new-v1-attempt1-logs.png",
+        "captures/v12/evidence/static-model-coordinate-new-v1-attempt1-inputs.png",
+        "captures/v12/evidence/static-model-coordinate-new-v1-attempt1-visual.png",
+        "captures/v12/evidence/static-model-coordinate-new-v1-attempt1-data-window-v1.png",
+        "captures/v12/evidence/static-model-coordinate-new-v1-attempt1-data-window-v1.json",
+        "captures/v12/evidence/static-model-coordinate-new-v1-attempt1-data-window-v1.txt",
+        "captures/v12/evidence/static-model-coordinate-new-v1-attempt1-authority-object-geometry-v1.json",
+        "captures/v12/evidence/static-model-coordinate-new-v1-attempt1-authority-object-geometry-v1.png"
+      ]
+    },
+    {
+      "script": "static-model-coordinate-set-x-v1.pine",
+      "sha256": "d1edc6a5f97e7fac941787f4276e06b28169e68b54b3599e5df8bfd278ba0d5e",
+      "attempt": 1,
+      "csv": "captures/v12/static-model-coordinate-set-x-v1-attempt1.csv",
+      "historical_rows": 25002,
+      "first": {
+        "time": "1788134400",
+        "open": "77682",
+        "high": "77682.01",
+        "low": "77572",
+        "close": "77674.04",
+        "LABEL_X": "",
+        "EXPRESSION": "",
+        "INPUT_TIME": "1788134400000"
+      },
+      "last": {
+        "time": "1791134640",
+        "open": "85348",
+        "high": "85361.43",
+        "low": "85348",
+        "close": "85361.43",
+        "LABEL_X": "1791134580000",
+        "EXPRESSION": "1791134580000",
+        "INPUT_TIME": "1791134640000"
+      },
+      "observed_fractional_expression_rows": 0,
+      "observed_label_expression_difference_rows": 0,
+      "default_inputs": [
+        {
+          "id": "in_0",
+          "name": "invLabelPos",
+          "value": "Center",
+          "default": "Center"
+        }
+      ],
+      "evidence": [
+        "captures/v12/evidence/static-model-coordinate-set-x-v1-attempt1-setup.png",
+        "captures/v12/evidence/static-model-coordinate-set-x-v1-attempt1-export.png",
+        "captures/v12/evidence/static-model-coordinate-set-x-v1-attempt1-logs.txt",
+        "captures/v12/evidence/static-model-coordinate-set-x-v1-attempt1-logs-v1.json",
+        "captures/v12/evidence/static-model-coordinate-set-x-v1-attempt1-logs.png",
+        "captures/v12/evidence/static-model-coordinate-set-x-v1-attempt1-inputs.png",
+        "captures/v12/evidence/static-model-coordinate-set-x-v1-attempt1-visual.png",
+        "captures/v12/evidence/static-model-coordinate-set-x-v1-attempt1-data-window-v1.png",
+        "captures/v12/evidence/static-model-coordinate-set-x-v1-attempt1-data-window-v1.json",
+        "captures/v12/evidence/static-model-coordinate-set-x-v1-attempt1-data-window-v1.txt",
+        "captures/v12/evidence/static-model-coordinate-set-x-v1-attempt1-authority-object-geometry-v1.json",
+        "captures/v12/evidence/static-model-coordinate-set-x-v1-attempt1-authority-object-geometry-v1.png"
+      ]
+    },
+    {
+      "script": "static-model-coordinate-explicit-cast-control-v1.pine",
+      "sha256": "44831f6269f282ef7245164d63c81385a0ebb8689702ca914283476f1b6daff3",
+      "attempt": 1,
+      "csv": "captures/v12/static-model-coordinate-explicit-cast-control-v1-attempt1.csv",
+      "historical_rows": 25002,
+      "first": {
+        "time": "1788134400",
+        "open": "77682",
+        "high": "77682.01",
+        "low": "77572",
+        "close": "77674.04",
+        "LABEL_X": "",
+        "EXPRESSION": "",
+        "INPUT_TIME": "1788134400000"
+      },
+      "last": {
+        "time": "1791134640",
+        "open": "85348",
+        "high": "85371.13",
+        "low": "85348",
+        "close": "85371.12",
+        "LABEL_X": "1791134580000",
+        "EXPRESSION": "1791134580000",
+        "INPUT_TIME": "1791134640000"
+      },
+      "observed_fractional_expression_rows": 0,
+      "observed_label_expression_difference_rows": 0,
+      "default_inputs": [
+        {
+          "id": "in_0",
+          "name": "invLabelPos",
+          "value": "Center",
+          "default": "Center"
+        }
+      ],
+      "evidence": [
+        "captures/v12/evidence/static-model-coordinate-explicit-cast-control-v1-attempt1-setup.png",
+        "captures/v12/evidence/static-model-coordinate-explicit-cast-control-v1-attempt1-export.png",
+        "captures/v12/evidence/static-model-coordinate-explicit-cast-control-v1-attempt1-logs.txt",
+        "captures/v12/evidence/static-model-coordinate-explicit-cast-control-v1-attempt1-logs-v1.json",
+        "captures/v12/evidence/static-model-coordinate-explicit-cast-control-v1-attempt1-logs.png",
+        "captures/v12/evidence/static-model-coordinate-explicit-cast-control-v1-attempt1-inputs.png",
+        "captures/v12/evidence/static-model-coordinate-explicit-cast-control-v1-attempt1-visual.png",
+        "captures/v12/evidence/static-model-coordinate-explicit-cast-control-v1-attempt1-data-window-v1.png",
+        "captures/v12/evidence/static-model-coordinate-explicit-cast-control-v1-attempt1-data-window-v1.json",
+        "captures/v12/evidence/static-model-coordinate-explicit-cast-control-v1-attempt1-data-window-v1.txt",
+        "captures/v12/evidence/static-model-coordinate-explicit-cast-control-v1-attempt1-authority-object-geometry-v1.json",
+        "captures/v12/evidence/static-model-coordinate-explicit-cast-control-v1-attempt1-authority-object-geometry-v1.png"
+      ]
+    }
+  ],
+  "limits": [
+    "All three sources RUNS with native labels and original raw exports.",
+    "This standard2m dataset produced no fractional EXPRESSION values; acceptance and observed coordinates do not settle fractional coordinate rounding.",
+    "Missing initial time[1] is retained as blank; no imputed coordinate.",
+    "Source titles, default Center and exact Pine6 bytes verified separately."
+  ]
+}

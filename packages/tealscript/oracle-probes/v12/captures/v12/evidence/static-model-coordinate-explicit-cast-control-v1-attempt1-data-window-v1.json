@@ -1,0 +1,31 @@
+{
+  "index": 299,
+  "bar": [
+    1791134640,
+    85348,
+    85371.13,
+    85348,
+    85371.12,
+    8.39245
+  ],
+  "source_row": [
+    1791134640,
+    1791134580000,
+    1791134580000,
+    1791134640000
+  ],
+  "browser_utc": "2026-10-04T17:26:08.933Z",
+  "title": "Static model coordinate explicit-cast-control v1",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   17:24",
+  "visible_range": {
+    "_firstBar": 264,
+    "_lastBar": 302
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}
