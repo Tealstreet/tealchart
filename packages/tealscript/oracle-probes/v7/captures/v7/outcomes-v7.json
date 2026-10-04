@@ -90845,5 +90845,1337 @@
       ],
       "entries": 0
     }
+  },
+  {
+    "script": "trackprice-offset--1-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "ca3404f875571c1529290a439fdad10902ff6357cdfb551bbf6ec4687efe2490",
+    "indicator_title": "V7 trackprice-offset--1-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/trackprice-offset--1-v6-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T185358.507.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 trackprice-offset--1-v6-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24507,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24807,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T10:53:50.410Z",
+    "live_candle_open_utc": "2026-10-04T10:52:00.000Z",
+    "export_utc": "2026-10-04T10:53:58.704Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/trackprice-offset--1-v6-v1-attempt1-setup.png",
+      "captures/v7/evidence/trackprice-offset--1-v6-v1-attempt1-export.png",
+      "captures/v7/evidence/trackprice-offset--1-v6-v1-attempt1-logs.txt",
+      "captures/v7/evidence/trackprice-offset--1-v6-v1-attempt1-logs-v1.json",
+      "captures/v7/evidence/trackprice-offset--1-v6-v1-attempt1-logs.png",
+      "captures/v7/evidence/trackprice-offset--1-v6-v1-attempt1-visual.png",
+      "captures/v7/evidence/trackprice-offset--1-v6-v1-attempt1-data-window-v1.png",
+      "captures/v7/evidence/trackprice-offset--1-v6-v1-attempt1-data-window-v1.json",
+      "captures/v7/evidence/trackprice-offset--1-v6-v1-attempt1-data-window-v1.txt",
+      "captures/v7/evidence/trackprice-offset--1-v6-v1-attempt1-track-future4-source-last-v1.json",
+      "captures/v7/evidence/trackprice-offset--1-v6-v1-attempt1-track-future4-source-last-v1.png",
+      "captures/v7/evidence/trackprice-offset--1-v6-v1-attempt1-track-future4-last-visible-renderer-point-v1.json",
+      "captures/v7/evidence/trackprice-offset--1-v6-v1-attempt1-track-future4-last-visible-renderer-point-v1.png",
+      "captures/v7/evidence/trackprice-offset--1-v6-v1-attempt1-track-margin0-source-last-v1.json",
+      "captures/v7/evidence/trackprice-offset--1-v6-v1-attempt1-track-margin0-source-last-v1.png",
+      "captures/v7/evidence/trackprice-offset--1-v6-v1-attempt1-track-margin0-last-visible-renderer-point-v1.json",
+      "captures/v7/evidence/trackprice-offset--1-v6-v1-attempt1-track-margin0-last-visible-renderer-point-v1.png",
+      "captures/v7/evidence/trackprice-offset--1-v6-v1-attempt1-track-panned-endpoint-source-last-v1.json",
+      "captures/v7/evidence/trackprice-offset--1-v6-v1-attempt1-track-panned-endpoint-source-last-v1.png",
+      "captures/v7/evidence/trackprice-offset--1-v6-v1-attempt1-track-panned-endpoint-last-visible-renderer-point-v1.json",
+      "captures/v7/evidence/trackprice-offset--1-v6-v1-attempt1-track-panned-endpoint-last-visible-renderer-point-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T10:53:51.112Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790805960,
+            83718.94,
+            83718.94,
+            83580.29,
+            83594.01,
+            29.59186
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791111120,
+            85334.69,
+            85334.69,
+            85334.68,
+            85334.68,
+            2.99791
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 trackprice-offset--1-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 3,
+            "first": {
+              "index": 297,
+              "value": [
+                1791110880,
+                100
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791111120,
+                120
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T10:53:52.282Z",
+        "bars": 24807,
+        "end": true,
+        "first": {
+          "index": -24507,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791111120,
+            85334.69,
+            85334.69,
+            85334.68,
+            85334.68,
+            3.00376
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 trackprice-offset--1-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 3,
+            "first": {
+              "index": 297,
+              "value": [
+                1791110880,
+                100
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791111120,
+                120
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   10:52",
+    "historical_compare_before_unix_seconds": 1791111120,
+    "pine_logs": {
+      "paths": [
+        "evidence/trackprice-offset--1-v6-v1-attempt1-logs.txt",
+        "evidence/trackprice-offset--1-v6-v1-attempt1-logs-v1.json",
+        "evidence/trackprice-offset--1-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "b8db16f76fcf69e645157745c88996144e0f38921c730f77fc301c163aef6cea",
+    "csv_bytes": 1122454,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "TRACKED_SOURCE"
+    ],
+    "declared_to_native_header_mapping": {
+      "TRACKED_SOURCE": "TRACKED_SOURCE"
+    },
+    "csv_rows": 24807,
+    "historical_rows": 24806,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791111120,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791111120",
+    "first_historical_values": {
+      "TRACKED_SOURCE": ""
+    },
+    "last_historical_values": {
+      "TRACKED_SOURCE": "120"
+    },
+    "data_window_witness": "captures/v7/evidence/trackprice-offset--1-v6-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "script": "trackprice-offset-0-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "a4bad029b19d4ba09b843936c287fd7f2750a010461fb13d2ae0868ce1d1512b",
+    "indicator_title": "V7 trackprice-offset-0-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/trackprice-offset-0-v6-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T185628.175.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 trackprice-offset-0-v6-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24509,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24809,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T10:56:15.217Z",
+    "live_candle_open_utc": "2026-10-04T10:56:00.000Z",
+    "export_utc": "2026-10-04T10:56:29.579Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/trackprice-offset-0-v6-v1-attempt1-setup.png",
+      "captures/v7/evidence/trackprice-offset-0-v6-v1-attempt1-export.png",
+      "captures/v7/evidence/trackprice-offset-0-v6-v1-attempt1-logs.txt",
+      "captures/v7/evidence/trackprice-offset-0-v6-v1-attempt1-logs-v1.json",
+      "captures/v7/evidence/trackprice-offset-0-v6-v1-attempt1-logs.png",
+      "captures/v7/evidence/trackprice-offset-0-v6-v1-attempt1-visual.png",
+      "captures/v7/evidence/trackprice-offset-0-v6-v1-attempt1-data-window-v1.png",
+      "captures/v7/evidence/trackprice-offset-0-v6-v1-attempt1-data-window-v1.json",
+      "captures/v7/evidence/trackprice-offset-0-v6-v1-attempt1-data-window-v1.txt",
+      "captures/v7/evidence/trackprice-offset-0-v6-v1-attempt1-track-future4-source-last-v1.json",
+      "captures/v7/evidence/trackprice-offset-0-v6-v1-attempt1-track-future4-source-last-v1.png",
+      "captures/v7/evidence/trackprice-offset-0-v6-v1-attempt1-track-future4-last-visible-renderer-point-v1.json",
+      "captures/v7/evidence/trackprice-offset-0-v6-v1-attempt1-track-future4-last-visible-renderer-point-v1.png",
+      "captures/v7/evidence/trackprice-offset-0-v6-v1-attempt1-track-margin0-source-last-v1.json",
+      "captures/v7/evidence/trackprice-offset-0-v6-v1-attempt1-track-margin0-source-last-v1.png",
+      "captures/v7/evidence/trackprice-offset-0-v6-v1-attempt1-track-margin0-last-visible-renderer-point-v1.json",
+      "captures/v7/evidence/trackprice-offset-0-v6-v1-attempt1-track-margin0-last-visible-renderer-point-v1.png",
+      "captures/v7/evidence/trackprice-offset-0-v6-v1-attempt1-track-panned-endpoint-source-last-v1.json",
+      "captures/v7/evidence/trackprice-offset-0-v6-v1-attempt1-track-panned-endpoint-source-last-v1.png",
+      "captures/v7/evidence/trackprice-offset-0-v6-v1-attempt1-track-panned-endpoint-last-visible-renderer-point-v1.json",
+      "captures/v7/evidence/trackprice-offset-0-v6-v1-attempt1-track-panned-endpoint-last-visible-renderer-point-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T10:56:16.297Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790806200,
+            83606,
+            83654.62,
+            83606,
+            83654.61,
+            5.06913
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791111360,
+            85334.68,
+            85334.69,
+            85334.68,
+            85334.68,
+            0.10678
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 trackprice-offset-0-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 3,
+            "first": {
+              "index": 297,
+              "value": [
+                1791111120,
+                100
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791111360,
+                120
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T10:56:17.782Z",
+        "bars": 24809,
+        "end": true,
+        "first": {
+          "index": -24509,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791111360,
+            85334.68,
+            85334.69,
+            85334.68,
+            85334.69,
+            0.15918
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 trackprice-offset-0-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 3,
+            "first": {
+              "index": 297,
+              "value": [
+                1791111120,
+                100
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791111360,
+                120
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   10:56",
+    "historical_compare_before_unix_seconds": 1791111360,
+    "pine_logs": {
+      "paths": [
+        "evidence/trackprice-offset-0-v6-v1-attempt1-logs.txt",
+        "evidence/trackprice-offset-0-v6-v1-attempt1-logs-v1.json",
+        "evidence/trackprice-offset-0-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "9f0a5d89cab1733e79d659f75a6fb3b9e41a6d7a8a215f271112fb202ee73324",
+    "csv_bytes": 1122550,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "TRACKED_SOURCE"
+    ],
+    "declared_to_native_header_mapping": {
+      "TRACKED_SOURCE": "TRACKED_SOURCE"
+    },
+    "csv_rows": 24809,
+    "historical_rows": 24808,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791111360,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791111360",
+    "first_historical_values": {
+      "TRACKED_SOURCE": ""
+    },
+    "last_historical_values": {
+      "TRACKED_SOURCE": "110"
+    },
+    "data_window_witness": "captures/v7/evidence/trackprice-offset-0-v6-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "script": "trackprice-offset-1-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "26b4a2585684e3a4231c2bd8c910843a9841aed1b8d05eed5ea44c5b25ebaedc",
+    "indicator_title": "V7 trackprice-offset-1-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/trackprice-offset-1-v6-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T185738.364.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 trackprice-offset-1-v6-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24509,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24809,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T10:57:28.687Z",
+    "live_candle_open_utc": "2026-10-04T10:56:00.000Z",
+    "export_utc": "2026-10-04T10:57:39.045Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/trackprice-offset-1-v6-v1-attempt1-setup.png",
+      "captures/v7/evidence/trackprice-offset-1-v6-v1-attempt1-export.png",
+      "captures/v7/evidence/trackprice-offset-1-v6-v1-attempt1-logs.txt",
+      "captures/v7/evidence/trackprice-offset-1-v6-v1-attempt1-logs-v1.json",
+      "captures/v7/evidence/trackprice-offset-1-v6-v1-attempt1-logs.png",
+      "captures/v7/evidence/trackprice-offset-1-v6-v1-attempt1-visual.png",
+      "captures/v7/evidence/trackprice-offset-1-v6-v1-attempt1-data-window-v1.png",
+      "captures/v7/evidence/trackprice-offset-1-v6-v1-attempt1-data-window-v1.json",
+      "captures/v7/evidence/trackprice-offset-1-v6-v1-attempt1-data-window-v1.txt",
+      "captures/v7/evidence/trackprice-offset-1-v6-v1-attempt1-track-future4-source-last-v1.json",
+      "captures/v7/evidence/trackprice-offset-1-v6-v1-attempt1-track-future4-source-last-v1.png",
+      "captures/v7/evidence/trackprice-offset-1-v6-v1-attempt1-track-future4-last-visible-renderer-point-v1.json",
+      "captures/v7/evidence/trackprice-offset-1-v6-v1-attempt1-track-future4-last-visible-renderer-point-v1.png",
+      "captures/v7/evidence/trackprice-offset-1-v6-v1-attempt1-track-margin0-source-last-v1.json",
+      "captures/v7/evidence/trackprice-offset-1-v6-v1-attempt1-track-margin0-source-last-v1.png",
+      "captures/v7/evidence/trackprice-offset-1-v6-v1-attempt1-track-margin0-last-visible-renderer-point-v1.json",
+      "captures/v7/evidence/trackprice-offset-1-v6-v1-attempt1-track-margin0-last-visible-renderer-point-v1.png",
+      "captures/v7/evidence/trackprice-offset-1-v6-v1-attempt1-track-panned-endpoint-source-last-v1.json",
+      "captures/v7/evidence/trackprice-offset-1-v6-v1-attempt1-track-panned-endpoint-source-last-v1.png",
+      "captures/v7/evidence/trackprice-offset-1-v6-v1-attempt1-track-panned-endpoint-last-visible-renderer-point-v1.json",
+      "captures/v7/evidence/trackprice-offset-1-v6-v1-attempt1-track-panned-endpoint-last-visible-renderer-point-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T10:57:29.886Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790806200,
+            83606,
+            83654.62,
+            83606,
+            83654.61,
+            5.06913
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791111360,
+            85334.68,
+            85334.69,
+            85313.44,
+            85313.44,
+            5.66956
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 trackprice-offset-1-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 3,
+            "first": {
+              "index": 297,
+              "value": [
+                1791111120,
+                100
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791111360,
+                120
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T10:57:31.144Z",
+        "bars": 24809,
+        "end": true,
+        "first": {
+          "index": -24509,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791111360,
+            85334.68,
+            85334.69,
+            85313.44,
+            85313.45,
+            6.17849
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 trackprice-offset-1-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 3,
+            "first": {
+              "index": 297,
+              "value": [
+                1791111120,
+                100
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791111360,
+                120
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   10:56",
+    "historical_compare_before_unix_seconds": 1791111360,
+    "pine_logs": {
+      "paths": [
+        "evidence/trackprice-offset-1-v6-v1-attempt1-logs.txt",
+        "evidence/trackprice-offset-1-v6-v1-attempt1-logs-v1.json",
+        "evidence/trackprice-offset-1-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "e1ade6f246e46d2915717e53effcab4b6d045ecc0c37707682d108cb012898fd",
+    "csv_bytes": 1122547,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "TRACKED_SOURCE"
+    ],
+    "declared_to_native_header_mapping": {
+      "TRACKED_SOURCE": "TRACKED_SOURCE"
+    },
+    "csv_rows": 24809,
+    "historical_rows": 24808,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791111360,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791111360",
+    "first_historical_values": {
+      "TRACKED_SOURCE": ""
+    },
+    "last_historical_values": {
+      "TRACKED_SOURCE": "100"
+    },
+    "data_window_witness": "captures/v7/evidence/trackprice-offset-1-v6-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "script": "trackprice-offset--1-v6-v1.pine",
+    "attempt": 2,
+    "source_sha256": "ca3404f875571c1529290a439fdad10902ff6357cdfb551bbf6ec4687efe2490",
+    "indicator_title": "V7 trackprice-offset--1-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/trackprice-offset--1-v6-v1-attempt2.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T185953.646.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": true,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 trackprice-offset--1-v6-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24480,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24780,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T10:59:33.909Z",
+    "live_candle_open_utc": "2026-10-04T09:58:00.000Z",
+    "export_utc": "2026-10-04T10:59:54.304Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/trackprice-offset--1-v6-v1-attempt2-setup.png",
+      "captures/v7/evidence/trackprice-offset--1-v6-v1-attempt2-export.png",
+      "captures/v7/evidence/trackprice-offset--1-v6-v1-attempt2-logs.txt",
+      "captures/v7/evidence/trackprice-offset--1-v6-v1-attempt2-logs-v1.json",
+      "captures/v7/evidence/trackprice-offset--1-v6-v1-attempt2-logs.png",
+      "captures/v7/evidence/trackprice-offset--1-v6-v1-attempt2-visual.png",
+      "captures/v7/evidence/trackprice-offset--1-v6-v1-attempt2-data-window-v1.png",
+      "captures/v7/evidence/trackprice-offset--1-v6-v1-attempt2-data-window-v1.json",
+      "captures/v7/evidence/trackprice-offset--1-v6-v1-attempt2-data-window-v1.txt",
+      "captures/v7/evidence/trackprice-offset--1-v6-v1-attempt2-track-future4-source-last-v1.json",
+      "captures/v7/evidence/trackprice-offset--1-v6-v1-attempt2-track-future4-source-last-v1.png",
+      "captures/v7/evidence/trackprice-offset--1-v6-v1-attempt2-track-future4-last-visible-renderer-point-v1.json",
+      "captures/v7/evidence/trackprice-offset--1-v6-v1-attempt2-track-future4-last-visible-renderer-point-v1.png",
+      "captures/v7/evidence/trackprice-offset--1-v6-v1-attempt2-track-margin0-source-last-v1.json",
+      "captures/v7/evidence/trackprice-offset--1-v6-v1-attempt2-track-margin0-source-last-v1.png",
+      "captures/v7/evidence/trackprice-offset--1-v6-v1-attempt2-track-margin0-last-visible-renderer-point-v1.json",
+      "captures/v7/evidence/trackprice-offset--1-v6-v1-attempt2-track-margin0-last-visible-renderer-point-v1.png",
+      "captures/v7/evidence/trackprice-offset--1-v6-v1-attempt2-track-panned-endpoint-source-last-v1.json",
+      "captures/v7/evidence/trackprice-offset--1-v6-v1-attempt2-track-panned-endpoint-source-last-v1.png",
+      "captures/v7/evidence/trackprice-offset--1-v6-v1-attempt2-track-panned-endpoint-last-visible-renderer-point-v1.json",
+      "captures/v7/evidence/trackprice-offset--1-v6-v1-attempt2-track-panned-endpoint-last-visible-renderer-point-v1.png",
+      "captures/v7/evidence/trackprice-offset--1-v6-v1-attempt2-fixed-history-replay-v1.json",
+      "captures/v7/evidence/trackprice-offset--1-v6-v1-attempt2-fixed-history-replay-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T10:59:34.868Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790806320,
+            83654.61,
+            83697.39,
+            83654.61,
+            83697.38,
+            3.14988
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791111480,
+            85302.01,
+            85302.02,
+            85266,
+            85266.01,
+            13.91762
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 trackprice-offset--1-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 3,
+            "first": {
+              "index": 297,
+              "value": [
+                1791111240,
+                100
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791111480,
+                120
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T10:59:35.933Z",
+        "bars": 24810,
+        "end": true,
+        "first": {
+          "index": -24510,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791111480,
+            85302.01,
+            85302.02,
+            85266,
+            85266.01,
+            13.91867
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 trackprice-offset--1-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 3,
+            "first": {
+              "index": 297,
+              "value": [
+                1791111240,
+                100
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791111480,
+                120
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   09:58",
+    "historical_compare_before_unix_seconds": 1791107880,
+    "pine_logs": {
+      "paths": [
+        "evidence/trackprice-offset--1-v6-v1-attempt2-logs.txt",
+        "evidence/trackprice-offset--1-v6-v1-attempt2-logs-v1.json",
+        "evidence/trackprice-offset--1-v6-v1-attempt2-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "95f4c7eed28c3c0e9355094b18f2ebf114ff9e135ebace4e09b685d563d52312",
+    "csv_bytes": 1121214,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "TRACKED_SOURCE"
+    ],
+    "declared_to_native_header_mapping": {
+      "TRACKED_SOURCE": "TRACKED_SOURCE"
+    },
+    "csv_rows": 24780,
+    "historical_rows": 24779,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791107880,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791107880",
+    "first_historical_values": {
+      "TRACKED_SOURCE": ""
+    },
+    "last_historical_values": {
+      "TRACKED_SOURCE": "120"
+    },
+    "data_window_witness": "captures/v7/evidence/trackprice-offset--1-v6-v1-attempt2-data-window-v1.json"
+  },
+  {
+    "script": "trackprice-offset-0-v6-v1.pine",
+    "attempt": 2,
+    "source_sha256": "a4bad029b19d4ba09b843936c287fd7f2750a010461fb13d2ae0868ce1d1512b",
+    "indicator_title": "V7 trackprice-offset-0-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/trackprice-offset-0-v6-v1-attempt2.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T190121.181.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": true,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 trackprice-offset-0-v6-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24480,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24780,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T11:01:07.260Z",
+    "live_candle_open_utc": "2026-10-04T09:58:00.000Z",
+    "export_utc": "2026-10-04T11:01:22.158Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/trackprice-offset-0-v6-v1-attempt2-setup.png",
+      "captures/v7/evidence/trackprice-offset-0-v6-v1-attempt2-export.png",
+      "captures/v7/evidence/trackprice-offset-0-v6-v1-attempt2-logs.txt",
+      "captures/v7/evidence/trackprice-offset-0-v6-v1-attempt2-logs-v1.json",
+      "captures/v7/evidence/trackprice-offset-0-v6-v1-attempt2-logs.png",
+      "captures/v7/evidence/trackprice-offset-0-v6-v1-attempt2-visual.png",
+      "captures/v7/evidence/trackprice-offset-0-v6-v1-attempt2-data-window-v1.png",
+      "captures/v7/evidence/trackprice-offset-0-v6-v1-attempt2-data-window-v1.json",
+      "captures/v7/evidence/trackprice-offset-0-v6-v1-attempt2-data-window-v1.txt",
+      "captures/v7/evidence/trackprice-offset-0-v6-v1-attempt2-track-future4-source-last-v1.json",
+      "captures/v7/evidence/trackprice-offset-0-v6-v1-attempt2-track-future4-source-last-v1.png",
+      "captures/v7/evidence/trackprice-offset-0-v6-v1-attempt2-track-future4-last-visible-renderer-point-v1.json",
+      "captures/v7/evidence/trackprice-offset-0-v6-v1-attempt2-track-future4-last-visible-renderer-point-v1.png",
+      "captures/v7/evidence/trackprice-offset-0-v6-v1-attempt2-track-margin0-source-last-v1.json",
+      "captures/v7/evidence/trackprice-offset-0-v6-v1-attempt2-track-margin0-source-last-v1.png",
+      "captures/v7/evidence/trackprice-offset-0-v6-v1-attempt2-track-margin0-last-visible-renderer-point-v1.json",
+      "captures/v7/evidence/trackprice-offset-0-v6-v1-attempt2-track-margin0-last-visible-renderer-point-v1.png",
+      "captures/v7/evidence/trackprice-offset-0-v6-v1-attempt2-track-panned-endpoint-source-last-v1.json",
+      "captures/v7/evidence/trackprice-offset-0-v6-v1-attempt2-track-panned-endpoint-source-last-v1.png",
+      "captures/v7/evidence/trackprice-offset-0-v6-v1-attempt2-track-panned-endpoint-last-visible-renderer-point-v1.json",
+      "captures/v7/evidence/trackprice-offset-0-v6-v1-attempt2-track-panned-endpoint-last-visible-renderer-point-v1.png",
+      "captures/v7/evidence/trackprice-offset-0-v6-v1-attempt2-fixed-history-replay-v1.json",
+      "captures/v7/evidence/trackprice-offset-0-v6-v1-attempt2-fixed-history-replay-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T11:01:08.227Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790806440,
+            83697.38,
+            83739.7,
+            83697.38,
+            83739.7,
+            3.41536
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791111600,
+            85264.01,
+            85264.01,
+            85254.57,
+            85254.58,
+            4.17865
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 trackprice-offset-0-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 3,
+            "first": {
+              "index": 297,
+              "value": [
+                1791111360,
+                100
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791111600,
+                120
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T11:01:09.625Z",
+        "bars": 24811,
+        "end": true,
+        "first": {
+          "index": -24511,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791111600,
+            85264.01,
+            85264.01,
+            85254.57,
+            85254.57,
+            4.19874
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 trackprice-offset-0-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 3,
+            "first": {
+              "index": 297,
+              "value": [
+                1791111360,
+                100
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791111600,
+                120
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   09:58",
+    "historical_compare_before_unix_seconds": 1791107880,
+    "pine_logs": {
+      "paths": [
+        "evidence/trackprice-offset-0-v6-v1-attempt2-logs.txt",
+        "evidence/trackprice-offset-0-v6-v1-attempt2-logs-v1.json",
+        "evidence/trackprice-offset-0-v6-v1-attempt2-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "99c674608e7146f8a2d5234a156711466fc1198027fe1b85c59c5b28432cf3b0",
+    "csv_bytes": 1121214,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "TRACKED_SOURCE"
+    ],
+    "declared_to_native_header_mapping": {
+      "TRACKED_SOURCE": "TRACKED_SOURCE"
+    },
+    "csv_rows": 24780,
+    "historical_rows": 24779,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791107880,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791107880",
+    "first_historical_values": {
+      "TRACKED_SOURCE": ""
+    },
+    "last_historical_values": {
+      "TRACKED_SOURCE": "110"
+    },
+    "data_window_witness": "captures/v7/evidence/trackprice-offset-0-v6-v1-attempt2-data-window-v1.json"
+  },
+  {
+    "script": "trackprice-offset-1-v6-v1.pine",
+    "attempt": 2,
+    "source_sha256": "26b4a2585684e3a4231c2bd8c910843a9841aed1b8d05eed5ea44c5b25ebaedc",
+    "indicator_title": "V7 trackprice-offset-1-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/trackprice-offset-1-v6-v1-attempt2.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T190225.679.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": true,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 trackprice-offset-1-v6-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24480,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24780,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T11:02:12.716Z",
+    "live_candle_open_utc": "2026-10-04T09:58:00.000Z",
+    "export_utc": "2026-10-04T11:02:26.173Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/trackprice-offset-1-v6-v1-attempt2-setup.png",
+      "captures/v7/evidence/trackprice-offset-1-v6-v1-attempt2-export.png",
+      "captures/v7/evidence/trackprice-offset-1-v6-v1-attempt2-logs.txt",
+      "captures/v7/evidence/trackprice-offset-1-v6-v1-attempt2-logs-v1.json",
+      "captures/v7/evidence/trackprice-offset-1-v6-v1-attempt2-logs.png",
+      "captures/v7/evidence/trackprice-offset-1-v6-v1-attempt2-visual.png",
+      "captures/v7/evidence/trackprice-offset-1-v6-v1-attempt2-data-window-v1.png",
+      "captures/v7/evidence/trackprice-offset-1-v6-v1-attempt2-data-window-v1.json",
+      "captures/v7/evidence/trackprice-offset-1-v6-v1-attempt2-data-window-v1.txt",
+      "captures/v7/evidence/trackprice-offset-1-v6-v1-attempt2-track-future4-source-last-v1.json",
+      "captures/v7/evidence/trackprice-offset-1-v6-v1-attempt2-track-future4-source-last-v1.png",
+      "captures/v7/evidence/trackprice-offset-1-v6-v1-attempt2-track-future4-last-visible-renderer-point-v1.json",
+      "captures/v7/evidence/trackprice-offset-1-v6-v1-attempt2-track-future4-last-visible-renderer-point-v1.png",
+      "captures/v7/evidence/trackprice-offset-1-v6-v1-attempt2-track-margin0-source-last-v1.json",
+      "captures/v7/evidence/trackprice-offset-1-v6-v1-attempt2-track-margin0-source-last-v1.png",
+      "captures/v7/evidence/trackprice-offset-1-v6-v1-attempt2-track-margin0-last-visible-renderer-point-v1.json",
+      "captures/v7/evidence/trackprice-offset-1-v6-v1-attempt2-track-margin0-last-visible-renderer-point-v1.png",
+      "captures/v7/evidence/trackprice-offset-1-v6-v1-attempt2-track-panned-endpoint-source-last-v1.json",
+      "captures/v7/evidence/trackprice-offset-1-v6-v1-attempt2-track-panned-endpoint-source-last-v1.png",
+      "captures/v7/evidence/trackprice-offset-1-v6-v1-attempt2-track-panned-endpoint-last-visible-renderer-point-v1.json",
+      "captures/v7/evidence/trackprice-offset-1-v6-v1-attempt2-track-panned-endpoint-last-visible-renderer-point-v1.png",
+      "captures/v7/evidence/trackprice-offset-1-v6-v1-attempt2-fixed-history-replay-v1.json",
+      "captures/v7/evidence/trackprice-offset-1-v6-v1-attempt2-fixed-history-replay-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T11:02:13.693Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790806560,
+            83739.7,
+            83751.72,
+            83739.69,
+            83751.72,
+            3.01015
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791111720,
+            85250.01,
+            85250.01,
+            85242,
+            85242,
+            2.51678
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 trackprice-offset-1-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 3,
+            "first": {
+              "index": 297,
+              "value": [
+                1791111480,
+                100
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791111720,
+                120
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T11:02:14.757Z",
+        "bars": 24812,
+        "end": true,
+        "first": {
+          "index": -24512,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791111720,
+            85250.01,
+            85250.01,
+            85242,
+            85242.01,
+            2.51678
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 trackprice-offset-1-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 3,
+            "first": {
+              "index": 297,
+              "value": [
+                1791111480,
+                100
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791111720,
+                120
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   09:58",
+    "historical_compare_before_unix_seconds": 1791107880,
+    "pine_logs": {
+      "paths": [
+        "evidence/trackprice-offset-1-v6-v1-attempt2-logs.txt",
+        "evidence/trackprice-offset-1-v6-v1-attempt2-logs-v1.json",
+        "evidence/trackprice-offset-1-v6-v1-attempt2-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "cddce67360ca29e24cc4ca099e1418bc7d5ed90967661f457e5b3c6780640de9",
+    "csv_bytes": 1121211,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "TRACKED_SOURCE"
+    ],
+    "declared_to_native_header_mapping": {
+      "TRACKED_SOURCE": "TRACKED_SOURCE"
+    },
+    "csv_rows": 24780,
+    "historical_rows": 24779,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791107880,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791107880",
+    "first_historical_values": {
+      "TRACKED_SOURCE": ""
+    },
+    "last_historical_values": {
+      "TRACKED_SOURCE": "100"
+    },
+    "data_window_witness": "captures/v7/evidence/trackprice-offset-1-v6-v1-attempt2-data-window-v1.json"
   }
 ]

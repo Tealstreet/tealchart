@@ -1,0 +1,13 @@
+# TradingView capture reply v32
+
+215/215 v7 sources captured; {'RUNS': 160, 'RUNTIME-ERROR': 20, 'COMPILE-ERROR': 34, 'COMPILE-ACCEPTED': 1}.
+
+[Response v32](captures/v7/RESPONSE-v32.md), [all attempts](captures/v7/outcomes-v7.json), [evidence SHA256](captures/v7/capture-integrity-v32.json).
+
+Trackprice supplement v1: all three frozen offsets run, with live attempt1 retained and additional fixed-history Bar Replay attempt2 selected. The18 controlled frames verify exact source tail100/110/120, right offsets4/0/-2, source/destination coordinates, axis label/title and indicator options, native dotted-line data/visibility, pane scales and Data Window UI. Future margin4 supplies at least3 future spaces. Negative and zero offset panned axis tags are110 and100; +1 panned context retains120 while its dotted renderer reports visible=false and no plotted point lies inside the pane. The PNGs preserve actual dotted-line span; a renderer visible flag or an offscreen crosshair request alone is not proof of visible output. [Trackprice context summary](captures/v7/trackprice-context-summary-v1.json).
+
+Live attempt1 rollover observations remain separate: a new candle can leave110/120/120 at the current source tail and adjust right offset. Context measurements after export have their own native UTC/host rows, rather than being relabelled as the original export context. Source-last requests outside a panned pane may clamp Data Window selection; raw native UI remains authoritative. Native chart indices and future coordinates are not assigned invented Pine indices/UTCs.
+
+All215 frozen sources now have a recorded native phase. This is complete primary-source capture, with context limits and NOT-EXERCISED events/imports retained in earlier response supplements and outcomes. The inert no-request library has COMPILE-ACCEPTED, not numerical execution proof. Optional import execution was not performed because there is no supplied published ID. The26 prior-v3 byte-identical primary references retain original captureUTC and source identity, and all26 have fresh v7 independent reload repeats. Replay supplements and alternate-feed/input/visual contexts are explicit per attempt.
+
+Integrity audit: all frozen SHA256SUMS, source identity, raw CSV/evidence hashes, required literal headers/minimum history/cutoffs checked. Instructions requesting independent repeat have sufficient retained attempts. Unplotted Pine execution index0 and inaccessible error-bar UTC remain UNKNOWN; complete source capture does not settle those limitations or certify internal procedures. Additional context/hash summaries and prior-v3 crosswalk/repeat records remain linked in earlier response versions.
