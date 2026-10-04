@@ -1,0 +1,30 @@
+{
+  "index": 298,
+  "bar": [
+    1791092520,
+    84901.2,
+    84909.71,
+    84901.2,
+    84909.71,
+    12.41907
+  ],
+  "source_row": [
+    1791092520,
+    84782.7,
+    299
+  ],
+  "browser_utc": "2026-10-04T05:45:26.956Z",
+  "title": "V7 history-buffer-late-jump-v6-v1",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   05:42",
+  "visible_range": {
+    "_firstBar": 263,
+    "_lastBar": 301
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}

@@ -1,0 +1,557 @@
+{
+  "artifact": "Late history jump native observations v1",
+  "observations": [
+    {
+      "attempt": 1,
+      "first_finite_target": {
+        "time": "1788134520",
+        "open": "77674.5",
+        "high": "77780.34",
+        "low": "77646",
+        "close": "77758.24",
+        "TARGET": "77674.04",
+        "OFFSET": "1"
+      },
+      "first_observed_offset299_row": {
+        "time": "1788170400",
+        "open": "78511.03",
+        "high": "78525.39",
+        "low": "78478",
+        "close": "78494.37",
+        "TARGET": "77758.24",
+        "OFFSET": "299"
+      },
+      "native_status_observations": [
+        {
+          "browser_utc": "2026-10-04T05:45:15.621Z",
+          "bars": 2544,
+          "end": false,
+          "first": {
+            "index": -2244,
+            "value": [
+              1790787480,
+              84323.59,
+              84349.44,
+              84322,
+              84349.44,
+              22.96209
+            ]
+          },
+          "last": {
+            "index": 299,
+            "value": [
+              1791092640,
+              84909.7,
+              84923.68,
+              84909.7,
+              84923.68,
+              2.04291
+            ]
+          },
+          "timezone": "Etc/UTC",
+          "studies": [
+            {
+              "name": "V7 history-buffer-late-jump-v6-v1",
+              "status": {
+                "type": 2
+              },
+              "size": 2544,
+              "first": {
+                "index": -2244,
+                "value": [
+                  1790787480,
+                  83008.01,
+                  299
+                ]
+              },
+              "last": {
+                "index": 299,
+                "value": [
+                  1791092640,
+                  84742,
+                  299
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "browser_utc": "2026-10-04T05:45:16.638Z",
+          "bars": 2544,
+          "end": false,
+          "first": {
+            "index": -2244,
+            "value": [
+              1790787480,
+              84323.59,
+              84349.44,
+              84322,
+              84349.44,
+              22.96209
+            ]
+          },
+          "last": {
+            "index": 299,
+            "value": [
+              1791092640,
+              84909.7,
+              84923.68,
+              84909.7,
+              84923.67,
+              2.04291
+            ]
+          },
+          "timezone": "Etc/UTC",
+          "studies": [
+            {
+              "name": "V7 history-buffer-late-jump-v6-v1",
+              "status": {
+                "type": 2
+              },
+              "size": 24653,
+              "first": {
+                "index": -1022109,
+                "value": [
+                  1788134400,
+                  null,
+                  1
+                ]
+              },
+              "last": {
+                "index": 299,
+                "value": [
+                  1791092640,
+                  84742,
+                  299
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "browser_utc": "2026-10-04T05:45:17.297Z",
+          "bars": 24653,
+          "end": true,
+          "first": {
+            "index": -24353,
+            "value": [
+              1788134400,
+              77682,
+              77682.01,
+              77572,
+              77674.04,
+              51.86295
+            ]
+          },
+          "last": {
+            "index": 299,
+            "value": [
+              1791092640,
+              84909.7,
+              84923.68,
+              84909.7,
+              84923.68,
+              2.04301
+            ]
+          },
+          "timezone": "Etc/UTC",
+          "studies": [
+            {
+              "name": "V7 history-buffer-late-jump-v6-v1",
+              "status": {
+                "type": 2
+              },
+              "size": 24653,
+              "first": {
+                "index": -24353,
+                "value": [
+                  1788134400,
+                  null,
+                  1
+                ]
+              },
+              "last": {
+                "index": 299,
+                "value": [
+                  1791092640,
+                  84742,
+                  299
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "automatic_internal_retry": "NOT-OBSERVED in retained native polling; internal mechanism is inaccessible",
+      "index_limit": "Source has no plotted Pine index; row number is not an execution-index witness."
+    },
+    {
+      "attempt": 2,
+      "first_finite_target": {
+        "time": "1788134520",
+        "open": "77674.5",
+        "high": "77780.34",
+        "low": "77646",
+        "close": "77758.24",
+        "TARGET": "77674.04",
+        "OFFSET": "1"
+      },
+      "first_observed_offset299_row": {
+        "time": "1788170400",
+        "open": "78511.03",
+        "high": "78525.39",
+        "low": "78478",
+        "close": "78494.37",
+        "TARGET": "77758.24",
+        "OFFSET": "299"
+      },
+      "native_status_observations": [
+        {
+          "browser_utc": "2026-10-04T05:45:43.001Z",
+          "bars": 2544,
+          "end": false,
+          "first": {
+            "index": -2244,
+            "value": [
+              1790787480,
+              84323.59,
+              84349.44,
+              84322,
+              84349.44,
+              22.96209
+            ]
+          },
+          "last": {
+            "index": 299,
+            "value": [
+              1791092640,
+              84909.7,
+              84923.68,
+              84909.7,
+              84923.68,
+              2.28129
+            ]
+          },
+          "timezone": "Etc/UTC",
+          "studies": [
+            {
+              "name": "V7 history-buffer-late-jump-v6-v1",
+              "status": {
+                "type": 2
+              },
+              "size": 2544,
+              "first": {
+                "index": -2244,
+                "value": [
+                  1790787480,
+                  83008.01,
+                  299
+                ]
+              },
+              "last": {
+                "index": 299,
+                "value": [
+                  1791092640,
+                  84742,
+                  299
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "browser_utc": "2026-10-04T05:45:44.065Z",
+          "bars": 2544,
+          "end": false,
+          "first": {
+            "index": -2244,
+            "value": [
+              1790787480,
+              84323.59,
+              84349.44,
+              84322,
+              84349.44,
+              22.96209
+            ]
+          },
+          "last": {
+            "index": 299,
+            "value": [
+              1791092640,
+              84909.7,
+              84923.68,
+              84909.7,
+              84923.68,
+              2.28129
+            ]
+          },
+          "timezone": "Etc/UTC",
+          "studies": [
+            {
+              "name": "V7 history-buffer-late-jump-v6-v1",
+              "status": {
+                "type": 2
+              },
+              "size": 24653,
+              "first": {
+                "index": -1022109,
+                "value": [
+                  1788134400,
+                  null,
+                  1
+                ]
+              },
+              "last": {
+                "index": 299,
+                "value": [
+                  1791092640,
+                  84742,
+                  299
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "browser_utc": "2026-10-04T05:45:44.725Z",
+          "bars": 24653,
+          "end": true,
+          "first": {
+            "index": -24353,
+            "value": [
+              1788134400,
+              77682,
+              77682.01,
+              77572,
+              77674.04,
+              51.86295
+            ]
+          },
+          "last": {
+            "index": 299,
+            "value": [
+              1791092640,
+              84909.7,
+              84923.68,
+              84909.7,
+              84923.67,
+              2.28346
+            ]
+          },
+          "timezone": "Etc/UTC",
+          "studies": [
+            {
+              "name": "V7 history-buffer-late-jump-v6-v1",
+              "status": {
+                "type": 2
+              },
+              "size": 24653,
+              "first": {
+                "index": -24353,
+                "value": [
+                  1788134400,
+                  null,
+                  1
+                ]
+              },
+              "last": {
+                "index": 299,
+                "value": [
+                  1791092640,
+                  84742,
+                  299
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "automatic_internal_retry": "NOT-OBSERVED in retained native polling; internal mechanism is inaccessible",
+      "index_limit": "Source has no plotted Pine index; row number is not an execution-index witness."
+    },
+    {
+      "attempt": 3,
+      "first_finite_target": {
+        "time": "1788134520",
+        "open": "77674.5",
+        "high": "77780.34",
+        "low": "77646",
+        "close": "77758.24",
+        "TARGET": "77674.04",
+        "OFFSET": "1"
+      },
+      "first_observed_offset299_row": {
+        "time": "1788170400",
+        "open": "78511.03",
+        "high": "78525.39",
+        "low": "78478",
+        "close": "78494.37",
+        "TARGET": "77758.24",
+        "OFFSET": "299"
+      },
+      "native_status_observations": [
+        {
+          "browser_utc": "2026-10-04T05:46:10.334Z",
+          "bars": 2544,
+          "end": false,
+          "first": {
+            "index": -2244,
+            "value": [
+              1790787600,
+              84349.44,
+              84356.02,
+              84320.29,
+              84329.99,
+              23.1666
+            ]
+          },
+          "last": {
+            "index": 299,
+            "value": [
+              1791092760,
+              84923.67,
+              84923.68,
+              84923.67,
+              84923.67,
+              0.228
+            ]
+          },
+          "timezone": "Etc/UTC",
+          "studies": [
+            {
+              "name": "V7 history-buffer-late-jump-v6-v1",
+              "status": {
+                "type": 2
+              },
+              "size": 2544,
+              "first": {
+                "index": -2244,
+                "value": [
+                  1790787600,
+                  83076.94,
+                  299
+                ]
+              },
+              "last": {
+                "index": 299,
+                "value": [
+                  1791092760,
+                  84767.09,
+                  299
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "browser_utc": "2026-10-04T05:46:11.420Z",
+          "bars": 2544,
+          "end": false,
+          "first": {
+            "index": -2244,
+            "value": [
+              1790787600,
+              84349.44,
+              84356.02,
+              84320.29,
+              84329.99,
+              23.1666
+            ]
+          },
+          "last": {
+            "index": 299,
+            "value": [
+              1791092760,
+              84923.67,
+              84923.68,
+              84923.67,
+              84923.67,
+              0.228
+            ]
+          },
+          "timezone": "Etc/UTC",
+          "studies": [
+            {
+              "name": "V7 history-buffer-late-jump-v6-v1",
+              "status": {
+                "type": 2
+              },
+              "size": 24654,
+              "first": {
+                "index": -1022110,
+                "value": [
+                  1788134400,
+                  null,
+                  1
+                ]
+              },
+              "last": {
+                "index": 299,
+                "value": [
+                  1791092760,
+                  84767.09,
+                  299
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "browser_utc": "2026-10-04T05:46:12.253Z",
+          "bars": 24654,
+          "end": true,
+          "first": {
+            "index": -24354,
+            "value": [
+              1788134400,
+              77682,
+              77682.01,
+              77572,
+              77674.04,
+              51.86295
+            ]
+          },
+          "last": {
+            "index": 299,
+            "value": [
+              1791092760,
+              84923.67,
+              84923.68,
+              84923.67,
+              84923.67,
+              0.22849
+            ]
+          },
+          "timezone": "Etc/UTC",
+          "studies": [
+            {
+              "name": "V7 history-buffer-late-jump-v6-v1",
+              "status": {
+                "type": 2
+              },
+              "size": 24654,
+              "first": {
+                "index": -24354,
+                "value": [
+                  1788134400,
+                  null,
+                  1
+                ]
+              },
+              "last": {
+                "index": 299,
+                "value": [
+                  1791092760,
+                  84767.09,
+                  299
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "automatic_internal_retry": "NOT-OBSERVED in retained native polling; internal mechanism is inaccessible",
+      "index_limit": "Source has no plotted Pine index; row number is not an execution-index witness."
+    }
+  ]
+}
