@@ -8120,9 +8120,30 @@
       "captures/v9/evidence/w8-exact-source-compile-corpus-v7-434-v1-attempt1-logs.png",
       "captures/v9/evidence/w8-exact-source-compile-corpus-v7-434-v1-attempt1-setup.png",
       "captures/v9/evidence/w8-exact-source-compile-corpus-v7-434-v1-attempt1-logs.txt",
-      "captures/v9/evidence/w8-exact-source-compile-corpus-v7-434-v1-attempt1-collector-receipt-v1.json"
+      "captures/v9/evidence/w8-exact-source-compile-corpus-v7-434-v1-attempt1-collector-receipt-v1.json",
+      "captures/v9/evidence/w8-exact-source-compile-corpus-v7-434-v1-companion-2-attempt1-receipt-v1.json",
+      "captures/v9/w8-exact-source-compile-corpus-v7-434-v1-companion-2-attempt1.csv",
+      "captures/v9/evidence/w8-exact-source-compile-corpus-v7-434-v1-companion-2-attempt1-setup-v1.png",
+      "captures/v9/evidence/w8-exact-source-compile-corpus-v7-434-v1-companion-2-attempt1-export-v1.png",
+      "captures/v9/evidence/w8-exact-source-compile-corpus-v7-434-v1-companion-60-attempt1-receipt-v1.json",
+      "captures/v9/w8-exact-source-compile-corpus-v7-434-v1-companion-60-attempt1.csv",
+      "captures/v9/evidence/w8-exact-source-compile-corpus-v7-434-v1-companion-60-attempt1-setup-v1.png",
+      "captures/v9/evidence/w8-exact-source-compile-corpus-v7-434-v1-companion-60-attempt1-export-v1.png",
+      "captures/v9/evidence/w8-exact-source-compile-corpus-v7-434-v1-companion-240-attempt1-receipt-v1.json",
+      "captures/v9/w8-exact-source-compile-corpus-v7-434-v1-companion-240-attempt1.csv",
+      "captures/v9/evidence/w8-exact-source-compile-corpus-v7-434-v1-companion-240-attempt1-setup-v1.png",
+      "captures/v9/evidence/w8-exact-source-compile-corpus-v7-434-v1-companion-240-attempt1-export-v1.png",
+      "captures/v9/evidence/w8-exact-source-compile-corpus-v7-434-v1-companion-1D-attempt1-receipt-v1.json",
+      "captures/v9/w8-exact-source-compile-corpus-v7-434-v1-companion-1D-attempt1.csv",
+      "captures/v9/evidence/w8-exact-source-compile-corpus-v7-434-v1-companion-1D-attempt1-setup-v1.png",
+      "captures/v9/evidence/w8-exact-source-compile-corpus-v7-434-v1-companion-1D-attempt1-export-v1.png",
+      "captures/v9/evidence/w8-exact-source-compile-corpus-v7-434-v1-companion-1W-attempt1-receipt-v1.json",
+      "captures/v9/w8-exact-source-compile-corpus-v7-434-v1-companion-1W-attempt1.csv",
+      "captures/v9/evidence/w8-exact-source-compile-corpus-v7-434-v1-companion-1W-attempt1-setup-v1.png",
+      "captures/v9/evidence/w8-exact-source-compile-corpus-v7-434-v1-companion-1W-attempt1-export-v1.png",
+      "captures/v9/pivot-candles-companion-context-v1.json"
     ],
-    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index. Duplicate blank headers retained positionally in original CSV and first/last cell arrays. Collector attempt1 failure is an instrument refusal, not a native compile/runtime error. All36 native numeric line plots match exported column order. Higher-timeframe companion work remains pending at the requested handoff checkpoint.",
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index. Duplicate blank headers retained positionally in original CSV and first/last cell arrays. Collector attempt1 failure is an instrument refusal, not a native compile/runtime error. All36 native numeric line plots match exported column order. Higher-timeframe companion work remains pending at the requested handoff checkpoint. Resume supplement captures all five native OHLCV chart feeds. Prior NOT-CAPTURED request-feed checkpoint is superseded by the companion receipt; internal Pine request expression/origin evidence remains unexposed.",
     "independent_page_reload_utc": null,
     "source_identity_verified": true,
     "reset_native_observations": [
@@ -12567,7 +12588,8 @@
       "all_native_numeric_line_plots_exported": true
     },
     "external_companions": {
-      "status": "NOT-CAPTURED",
+      "status": "NATIVE-CHART-FEEDS-CAPTURED",
+      "receipt": "captures/v9/pivot-candles-companion-context-v1.json",
       "requested_intervals": [
         "2",
         "60",
@@ -12575,8 +12597,16 @@
         "D",
         "W"
       ],
-      "ticker": "BINANCE:BTCUSDT",
-      "observations": "Default native inputs and plot/request context saved. Source has request.security expressions. Requested feed/history origins and consumed expression values are not independently captured; OHLC CSV has no raw volume field. Do not score external-host numerical parity from this CSV alone."
+      "observed_chart_intervals": [
+        "2",
+        "60",
+        "240",
+        "1D",
+        "1W"
+      ],
+      "internal_request_expression_values": "UNOBSERVED",
+      "requested_pine_execution_origins": "UNKNOWN",
+      "parent_historical_ohlc_rows_matched": 24858
     }
   }
 ]
