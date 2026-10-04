@@ -1,0 +1,4124 @@
+{
+  "artifact": "v19 native ordered footprint chunk integrity v1",
+  "observations": [
+    {
+      "script": "footprint-ten-default-host-v19-v1.pine",
+      "ordered_row_count": 23087,
+      "verified_literal_span": [
+        0,
+        31
+      ],
+      "chunks": [
+        {
+          "log": "captures/v19/evidence/footprint-ten-default-host-v19-v1-chunk-0-3-v1-attempt1-logs-v1.json",
+          "entries": 4176,
+          "bars": [
+            {
+              "bar_index": 0,
+              "time_ms": 1788739200000,
+              "ordered_rows": 1258,
+              "selected_rows": [
+                {
+                  "chartTime": 1788739200000,
+                  "role": "POC",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80293.1,
+                  "down": 80293,
+                  "buy": 0.03406,
+                  "sell": 0.01717,
+                  "total": 0.05123,
+                  "delta": 0.01689,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788739200000,
+                  "role": "VAH",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80305.90000000001,
+                  "down": 80305.8,
+                  "buy": 0,
+                  "sell": 0.01717,
+                  "total": 0.01717,
+                  "delta": -0.01717,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788739200000,
+                  "role": "VAL",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80246.1,
+                  "down": 80246,
+                  "buy": 0.03065,
+                  "sell": 0.01717,
+                  "total": 0.04782,
+                  "delta": 0.01348,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788739200000,
+                  "role": "CLOSE_SELECTED",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80293.3,
+                  "down": 80293.2,
+                  "buy": 0.0106599999999184,
+                  "sell": 0.01717,
+                  "total": 0.0278299999999184,
+                  "delta": -0.0065100000000816,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                }
+              ]
+            },
+            {
+              "bar_index": 1,
+              "time_ms": 1788739320000,
+              "ordered_rows": 746,
+              "selected_rows": [
+                {
+                  "chartTime": 1788739320000,
+                  "role": "POC",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80330.5,
+                  "down": 80330.40000000001,
+                  "buy": 0.03259,
+                  "sell": 0.03025,
+                  "total": 0.06284,
+                  "delta": 0.00234,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788739320000,
+                  "role": "VAH",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80346.7,
+                  "down": 80346.6,
+                  "buy": 0.0250299999998724,
+                  "sell": 0.03025,
+                  "total": 0.0552799999998724,
+                  "delta": -0.0052200000001276,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788739320000,
+                  "role": "VAL",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80304.8,
+                  "down": 80304.7,
+                  "buy": 0.03259,
+                  "sell": 0,
+                  "total": 0.03259,
+                  "delta": 0.03259,
+                  "buyImbalance": true,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788739320000,
+                  "role": "CLOSE_SELECTED",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80314.1,
+                  "down": 80314,
+                  "buy": 0.03259,
+                  "sell": 0.02722,
+                  "total": 0.05981,
+                  "delta": 0.00537,
+                  "buyImbalance": true,
+                  "sellImbalance": false
+                }
+              ]
+            },
+            {
+              "bar_index": 2,
+              "time_ms": 1788739440000,
+              "ordered_rows": 1160,
+              "selected_rows": [
+                {
+                  "chartTime": 1788739440000,
+                  "role": "POC",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80333.90000000001,
+                  "down": 80333.8,
+                  "buy": 0.07312,
+                  "sell": 0,
+                  "total": 0.07312,
+                  "delta": 0.07312,
+                  "buyImbalance": true,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788739440000,
+                  "role": "VAH",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80372.8,
+                  "down": 80372.7,
+                  "buy": 0.01986,
+                  "sell": 0,
+                  "total": 0.01986,
+                  "delta": 0.01986,
+                  "buyImbalance": true,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788739440000,
+                  "role": "VAL",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80310.1,
+                  "down": 80310,
+                  "buy": 0.05326,
+                  "sell": 0,
+                  "total": 0.05326,
+                  "delta": 0.05326,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788739440000,
+                  "role": "CLOSE_SELECTED",
+                  "order": -1,
+                  "missing": true
+                }
+              ]
+            },
+            {
+              "bar_index": 3,
+              "time_ms": 1788739560000,
+              "ordered_rows": 990,
+              "selected_rows": [
+                {
+                  "chartTime": 1788739560000,
+                  "role": "POC",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80424,
+                  "down": 80423.90000000001,
+                  "buy": 0,
+                  "sell": 0.0328000000000084,
+                  "total": 0.0328000000000084,
+                  "delta": -0.0328000000000084,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788739560000,
+                  "role": "VAH",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80424,
+                  "down": 80423.90000000001,
+                  "buy": 0,
+                  "sell": 0.0328000000000084,
+                  "total": 0.0328000000000084,
+                  "delta": -0.0328000000000084,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788739560000,
+                  "role": "VAL",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80372.5,
+                  "down": 80372.40000000001,
+                  "buy": 0,
+                  "sell": 0.02889,
+                  "total": 0.02889,
+                  "delta": -0.02889,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788739560000,
+                  "role": "CLOSE_SELECTED",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80345.2,
+                  "down": 80345.1,
+                  "buy": 0,
+                  "sell": 0.00742,
+                  "total": 0.00742,
+                  "delta": -0.00742,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "log": "captures/v19/evidence/footprint-ten-default-host-v19-v1-chunk-4-7-v1-attempt1-logs-v1.json",
+          "entries": 2408,
+          "bars": [
+            {
+              "bar_index": 4,
+              "time_ms": 1788739680000,
+              "ordered_rows": 850,
+              "selected_rows": [
+                {
+                  "chartTime": 1788739680000,
+                  "role": "POC",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80387.5,
+                  "down": 80387.40000000001,
+                  "buy": 0.01305,
+                  "sell": 0.01086,
+                  "total": 0.02391,
+                  "delta": 0.00219,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788739680000,
+                  "role": "VAH",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80405.40000000001,
+                  "down": 80405.3,
+                  "buy": 0.0055500000000961,
+                  "sell": 0.01086,
+                  "total": 0.0164100000000961,
+                  "delta": -0.0053099999999039,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788739680000,
+                  "role": "VAL",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80354.2,
+                  "down": 80354.1,
+                  "buy": 0.01305,
+                  "sell": 0,
+                  "total": 0.01305,
+                  "delta": 0.01305,
+                  "buyImbalance": true,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788739680000,
+                  "role": "CLOSE_SELECTED",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80384.1,
+                  "down": 80384,
+                  "buy": 0.01305,
+                  "sell": 0.01086,
+                  "total": 0.02391,
+                  "delta": 0.00219,
+                  "buyImbalance": true,
+                  "sellImbalance": false
+                }
+              ]
+            },
+            {
+              "bar_index": 5,
+              "time_ms": 1788739800000,
+              "ordered_rows": 396,
+              "selected_rows": [
+                {
+                  "chartTime": 1788739800000,
+                  "role": "POC",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80364.3,
+                  "down": 80364.2,
+                  "buy": 0,
+                  "sell": 0.02946,
+                  "total": 0.02946,
+                  "delta": -0.02946,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788739800000,
+                  "role": "VAH",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80377.40000000001,
+                  "down": 80377.3,
+                  "buy": 0,
+                  "sell": 0.02946,
+                  "total": 0.02946,
+                  "delta": -0.02946,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788739800000,
+                  "role": "VAL",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80351.2,
+                  "down": 80351.1,
+                  "buy": 0,
+                  "sell": 0.02946,
+                  "total": 0.02946,
+                  "delta": -0.02946,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788739800000,
+                  "role": "CLOSE_SELECTED",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80346.8,
+                  "down": 80346.7,
+                  "buy": 0,
+                  "sell": 0.01761,
+                  "total": 0.01761,
+                  "delta": -0.01761,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                }
+              ]
+            },
+            {
+              "bar_index": 6,
+              "time_ms": 1788739920000,
+              "ordered_rows": 280,
+              "selected_rows": [
+                {
+                  "chartTime": 1788739920000,
+                  "role": "POC",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80336,
+                  "down": 80335.90000000001,
+                  "buy": 0.02183,
+                  "sell": 0.01387,
+                  "total": 0.0357,
+                  "delta": 0.00796,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788739920000,
+                  "role": "VAH",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80345.1,
+                  "down": 80345,
+                  "buy": 0.02183,
+                  "sell": 0.01387,
+                  "total": 0.0357,
+                  "delta": 0.00796,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788739920000,
+                  "role": "VAL",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80328.1,
+                  "down": 80328,
+                  "buy": 0.02183,
+                  "sell": 0.01387,
+                  "total": 0.0357,
+                  "delta": 0.00796,
+                  "buyImbalance": true,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788739920000,
+                  "role": "CLOSE_SELECTED",
+                  "order": -1,
+                  "missing": true
+                }
+              ]
+            },
+            {
+              "bar_index": 7,
+              "time_ms": 1788740040000,
+              "ordered_rows": 860,
+              "selected_rows": [
+                {
+                  "chartTime": 1788740040000,
+                  "role": "POC",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80336,
+                  "down": 80335.90000000001,
+                  "buy": 0,
+                  "sell": 0.0438400000000508,
+                  "total": 0.0438400000000508,
+                  "delta": -0.0438400000000508,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788740040000,
+                  "role": "VAH",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80363.90000000001,
+                  "down": 80363.8,
+                  "buy": 0,
+                  "sell": 0.02921,
+                  "total": 0.02921,
+                  "delta": -0.02921,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788740040000,
+                  "role": "VAL",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80317.8,
+                  "down": 80317.7,
+                  "buy": 0,
+                  "sell": 0.01408,
+                  "total": 0.01408,
+                  "delta": -0.01408,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788740040000,
+                  "role": "CLOSE_SELECTED",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80279.5,
+                  "down": 80279.40000000001,
+                  "buy": 0,
+                  "sell": 0.01408,
+                  "total": 0.01408,
+                  "delta": -0.01408,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "log": "captures/v19/evidence/footprint-ten-default-host-v19-v1-chunk-8-11-v1-attempt1-logs-v1.json",
+          "entries": 4054,
+          "bars": [
+            {
+              "bar_index": 8,
+              "time_ms": 1788740160000,
+              "ordered_rows": 896,
+              "selected_rows": [
+                {
+                  "chartTime": 1788740160000,
+                  "role": "POC",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80270,
+                  "down": 80269.90000000001,
+                  "buy": 0,
+                  "sell": 0.0463199999998032,
+                  "total": 0.0463199999998032,
+                  "delta": -0.0463199999998032,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788740160000,
+                  "role": "VAH",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80282,
+                  "down": 80281.90000000001,
+                  "buy": 0,
+                  "sell": 0.022559999999995,
+                  "total": 0.022559999999995,
+                  "delta": -0.022559999999995,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788740160000,
+                  "role": "VAL",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80219.8,
+                  "down": 80219.7,
+                  "buy": 0,
+                  "sell": 0.02073,
+                  "total": 0.02073,
+                  "delta": -0.02073,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788740160000,
+                  "role": "CLOSE_SELECTED",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80212.7,
+                  "down": 80212.6,
+                  "buy": 0,
+                  "sell": 0.02073,
+                  "total": 0.02073,
+                  "delta": -0.02073,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                }
+              ]
+            },
+            {
+              "bar_index": 9,
+              "time_ms": 1788740280000,
+              "ordered_rows": 1330,
+              "selected_rows": [
+                {
+                  "chartTime": 1788740280000,
+                  "role": "POC",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80157.90000000001,
+                  "down": 80157.8,
+                  "buy": 0,
+                  "sell": 0.0411,
+                  "total": 0.0411,
+                  "delta": -0.0411,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788740280000,
+                  "role": "VAH",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80212.6,
+                  "down": 80212.5,
+                  "buy": 0,
+                  "sell": 0.0255,
+                  "total": 0.0255,
+                  "delta": -0.0255,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788740280000,
+                  "role": "VAL",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80140.90000000001,
+                  "down": 80140.8,
+                  "buy": 0,
+                  "sell": 0.0156,
+                  "total": 0.0156,
+                  "delta": -0.0156,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788740280000,
+                  "role": "CLOSE_SELECTED",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80099.3,
+                  "down": 80099.2,
+                  "buy": 0,
+                  "sell": 0.0156,
+                  "total": 0.0156,
+                  "delta": -0.0156,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                }
+              ]
+            },
+            {
+              "bar_index": 10,
+              "time_ms": 1788740400000,
+              "ordered_rows": 1211,
+              "selected_rows": [
+                {
+                  "chartTime": 1788740400000,
+                  "role": "POC",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80119.6,
+                  "down": 80119.5,
+                  "buy": 0.0167,
+                  "sell": 0,
+                  "total": 0.0167,
+                  "delta": 0.0167,
+                  "buyImbalance": true,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788740400000,
+                  "role": "VAH",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80138.2,
+                  "down": 80138.1,
+                  "buy": 0.01124,
+                  "sell": 0,
+                  "total": 0.01124,
+                  "delta": 0.01124,
+                  "buyImbalance": true,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788740400000,
+                  "role": "VAL",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80062,
+                  "down": 80061.90000000001,
+                  "buy": 0.0167,
+                  "sell": 0,
+                  "total": 0.0167,
+                  "delta": 0.0167,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788740400000,
+                  "role": "CLOSE_SELECTED",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80182,
+                  "down": 80181.90000000001,
+                  "buy": 0.01124,
+                  "sell": 0,
+                  "total": 0.01124,
+                  "delta": 0.01124,
+                  "buyImbalance": true,
+                  "sellImbalance": false
+                }
+              ]
+            },
+            {
+              "bar_index": 11,
+              "time_ms": 1788740520000,
+              "ordered_rows": 595,
+              "selected_rows": [
+                {
+                  "chartTime": 1788740520000,
+                  "role": "POC",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80177.3,
+                  "down": 80177.2,
+                  "buy": 0.04568,
+                  "sell": 0.01694,
+                  "total": 0.06262,
+                  "delta": 0.02874,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788740520000,
+                  "role": "VAH",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80199,
+                  "down": 80198.90000000001,
+                  "buy": 0.04568,
+                  "sell": 0.01694,
+                  "total": 0.06262,
+                  "delta": 0.02874,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788740520000,
+                  "role": "VAL",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80175.1,
+                  "down": 80175,
+                  "buy": 0.04568,
+                  "sell": 0.01694,
+                  "total": 0.06262,
+                  "delta": 0.02874,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788740520000,
+                  "role": "CLOSE_SELECTED",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80147.6,
+                  "down": 80147.5,
+                  "buy": 0,
+                  "sell": 0.01355,
+                  "total": 0.01355,
+                  "delta": -0.01355,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "log": "captures/v19/evidence/footprint-ten-default-host-v19-v1-chunk-12-15-v1-attempt1-logs-v1.json",
+          "entries": 2121,
+          "bars": [
+            {
+              "bar_index": 12,
+              "time_ms": 1788740640000,
+              "ordered_rows": 433,
+              "selected_rows": [
+                {
+                  "chartTime": 1788740640000,
+                  "role": "POC",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80161.40000000001,
+                  "down": 80161.3,
+                  "buy": 0.00716,
+                  "sell": 0.01325,
+                  "total": 0.02041,
+                  "delta": -0.00609,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788740640000,
+                  "role": "VAH",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80176.90000000001,
+                  "down": 80176.8,
+                  "buy": 0.00716,
+                  "sell": 0.01325,
+                  "total": 0.02041,
+                  "delta": -0.00609,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788740640000,
+                  "role": "VAL",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80153.6,
+                  "down": 80153.5,
+                  "buy": 0.00716,
+                  "sell": 0.01325,
+                  "total": 0.02041,
+                  "delta": -0.00609,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788740640000,
+                  "role": "CLOSE_SELECTED",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80176.1,
+                  "down": 80176,
+                  "buy": 0.00716,
+                  "sell": 0.01325,
+                  "total": 0.02041,
+                  "delta": -0.00609,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                }
+              ]
+            },
+            {
+              "bar_index": 13,
+              "time_ms": 1788740760000,
+              "ordered_rows": 593,
+              "selected_rows": [
+                {
+                  "chartTime": 1788740760000,
+                  "role": "POC",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80200.1,
+                  "down": 80200,
+                  "buy": 0.01972,
+                  "sell": 0,
+                  "total": 0.01972,
+                  "delta": 0.01972,
+                  "buyImbalance": true,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788740760000,
+                  "role": "VAH",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80222,
+                  "down": 80221.90000000001,
+                  "buy": 0.0146899999999968,
+                  "sell": 0,
+                  "total": 0.0146899999999968,
+                  "delta": 0.0146899999999968,
+                  "buyImbalance": true,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788740760000,
+                  "role": "VAL",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80195,
+                  "down": 80194.90000000001,
+                  "buy": 0.00506,
+                  "sell": 0,
+                  "total": 0.00506,
+                  "delta": 0.00506,
+                  "buyImbalance": true,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788740760000,
+                  "role": "CLOSE_SELECTED",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80220.8,
+                  "down": 80220.7,
+                  "buy": 0.01466,
+                  "sell": 0,
+                  "total": 0.01466,
+                  "delta": 0.01466,
+                  "buyImbalance": true,
+                  "sellImbalance": false
+                }
+              ]
+            },
+            {
+              "bar_index": 14,
+              "time_ms": 1788740880000,
+              "ordered_rows": 351,
+              "selected_rows": [
+                {
+                  "chartTime": 1788740880000,
+                  "role": "POC",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80199.90000000001,
+                  "down": 80199.8,
+                  "buy": 0,
+                  "sell": 0.48333,
+                  "total": 0.48333,
+                  "delta": -0.48333,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788740880000,
+                  "role": "VAH",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80211.5,
+                  "down": 80211.40000000001,
+                  "buy": 0,
+                  "sell": 0.01034,
+                  "total": 0.01034,
+                  "delta": -0.01034,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788740880000,
+                  "role": "VAL",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80188.40000000001,
+                  "down": 80188.3,
+                  "buy": 0,
+                  "sell": 0.01034,
+                  "total": 0.01034,
+                  "delta": -0.01034,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788740880000,
+                  "role": "CLOSE_SELECTED",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80199.90000000001,
+                  "down": 80199.8,
+                  "buy": 0,
+                  "sell": 0.48333,
+                  "total": 0.48333,
+                  "delta": -0.48333,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                }
+              ]
+            },
+            {
+              "bar_index": 15,
+              "time_ms": 1788741000000,
+              "ordered_rows": 722,
+              "selected_rows": [
+                {
+                  "chartTime": 1788741000000,
+                  "role": "POC",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80235.90000000001,
+                  "down": 80235.8,
+                  "buy": 0.0147,
+                  "sell": 0.01459,
+                  "total": 0.02929,
+                  "delta": 0.00011,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788741000000,
+                  "role": "VAH",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80254,
+                  "down": 80253.90000000001,
+                  "buy": 0.0116499999999102,
+                  "sell": 0.01459,
+                  "total": 0.0262399999999102,
+                  "delta": -0.0029400000000898,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788741000000,
+                  "role": "VAL",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80210.8,
+                  "down": 80210.7,
+                  "buy": 0.0147,
+                  "sell": 0,
+                  "total": 0.0147,
+                  "delta": 0.0147,
+                  "buyImbalance": true,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788741000000,
+                  "role": "CLOSE_SELECTED",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80230.1,
+                  "down": 80230,
+                  "buy": 0.0147,
+                  "sell": 0.01459,
+                  "total": 0.02929,
+                  "delta": 0.00011,
+                  "buyImbalance": true,
+                  "sellImbalance": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "log": "captures/v19/evidence/footprint-ten-default-host-v19-v1-chunk-16-19-v1-attempt1-logs-v1.json",
+          "entries": 2319,
+          "bars": [
+            {
+              "bar_index": 16,
+              "time_ms": 1788741120000,
+              "ordered_rows": 683,
+              "selected_rows": [
+                {
+                  "chartTime": 1788741120000,
+                  "role": "POC",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80220,
+                  "down": 80219.90000000001,
+                  "buy": 0,
+                  "sell": 0.0431799999999968,
+                  "total": 0.0431799999999968,
+                  "delta": -0.0431799999999968,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788741120000,
+                  "role": "VAH",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80220,
+                  "down": 80219.90000000001,
+                  "buy": 0,
+                  "sell": 0.0431799999999968,
+                  "total": 0.0431799999999968,
+                  "delta": -0.0431799999999968,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788741120000,
+                  "role": "VAL",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80180.90000000001,
+                  "down": 80180.8,
+                  "buy": 0,
+                  "sell": 0.02393,
+                  "total": 0.02393,
+                  "delta": -0.02393,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788741120000,
+                  "role": "CLOSE_SELECTED",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80177.8,
+                  "down": 80177.7,
+                  "buy": 0,
+                  "sell": 0.02154,
+                  "total": 0.02154,
+                  "delta": -0.02154,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                }
+              ]
+            },
+            {
+              "bar_index": 17,
+              "time_ms": 1788741240000,
+              "ordered_rows": 647,
+              "selected_rows": [
+                {
+                  "chartTime": 1788741240000,
+                  "role": "POC",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80160,
+                  "down": 80159.90000000001,
+                  "buy": 0.01301,
+                  "sell": 0.00894,
+                  "total": 0.02195,
+                  "delta": 0.00407,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788741240000,
+                  "role": "VAH",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80183.8,
+                  "down": 80183.7,
+                  "buy": 0.01301,
+                  "sell": 0,
+                  "total": 0.01301,
+                  "delta": 0.01301,
+                  "buyImbalance": true,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788741240000,
+                  "role": "VAL",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80149.3,
+                  "down": 80149.2,
+                  "buy": 0.0052,
+                  "sell": 0.00894,
+                  "total": 0.01414,
+                  "delta": -0.00374,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788741240000,
+                  "role": "CLOSE_SELECTED",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80172,
+                  "down": 80171.90000000001,
+                  "buy": 0.01301,
+                  "sell": 0.00894,
+                  "total": 0.02195,
+                  "delta": 0.00407,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                }
+              ]
+            },
+            {
+              "bar_index": 18,
+              "time_ms": 1788741360000,
+              "ordered_rows": 408,
+              "selected_rows": [
+                {
+                  "chartTime": 1788741360000,
+                  "role": "POC",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80163.3,
+                  "down": 80163.2,
+                  "buy": 0,
+                  "sell": 0.03955,
+                  "total": 0.03955,
+                  "delta": -0.03955,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788741360000,
+                  "role": "VAH",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80171.7,
+                  "down": 80171.6,
+                  "buy": 0,
+                  "sell": 0.0240999999999776,
+                  "total": 0.0240999999999776,
+                  "delta": -0.0240999999999776,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788741360000,
+                  "role": "VAL",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80146.90000000001,
+                  "down": 80146.8,
+                  "buy": 0,
+                  "sell": 0.02008,
+                  "total": 0.02008,
+                  "delta": -0.02008,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788741360000,
+                  "role": "CLOSE_SELECTED",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80150.7,
+                  "down": 80150.6,
+                  "buy": 0,
+                  "sell": 0.02008,
+                  "total": 0.02008,
+                  "delta": -0.02008,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                }
+              ]
+            },
+            {
+              "bar_index": 19,
+              "time_ms": 1788741480000,
+              "ordered_rows": 559,
+              "selected_rows": [
+                {
+                  "chartTime": 1788741480000,
+                  "role": "POC",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80142.8,
+                  "down": 80142.7,
+                  "buy": 0.00516,
+                  "sell": 0.01374,
+                  "total": 0.0189,
+                  "delta": -0.00858,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788741480000,
+                  "role": "VAH",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80150.6,
+                  "down": 80150.5,
+                  "buy": 0.00516,
+                  "sell": 0.01374,
+                  "total": 0.0189,
+                  "delta": -0.00858,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788741480000,
+                  "role": "VAL",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80121.8,
+                  "down": 80121.7,
+                  "buy": 0.00516,
+                  "sell": 0.01374,
+                  "total": 0.0189,
+                  "delta": -0.00858,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788741480000,
+                  "role": "CLOSE_SELECTED",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80164.90000000001,
+                  "down": 80164.8,
+                  "buy": 0.00516,
+                  "sell": 0,
+                  "total": 0.00516,
+                  "delta": 0.00516,
+                  "buyImbalance": true,
+                  "sellImbalance": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "log": "captures/v19/evidence/footprint-ten-default-host-v19-v1-chunk-20-23-v1-attempt1-logs-v1.json",
+          "entries": 2425,
+          "bars": [
+            {
+              "bar_index": 20,
+              "time_ms": 1788741600000,
+              "ordered_rows": 610,
+              "selected_rows": [
+                {
+                  "chartTime": 1788741600000,
+                  "role": "POC",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80128.2,
+                  "down": 80128.1,
+                  "buy": 0.02323,
+                  "sell": 0.00887,
+                  "total": 0.0321,
+                  "delta": 0.01436,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788741600000,
+                  "role": "VAH",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80131.90000000001,
+                  "down": 80131.8,
+                  "buy": 0,
+                  "sell": 0.00887,
+                  "total": 0.00887,
+                  "delta": -0.00887,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788741600000,
+                  "role": "VAL",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80104,
+                  "down": 80103.90000000001,
+                  "buy": 0.02323,
+                  "sell": 0,
+                  "total": 0.02323,
+                  "delta": 0.02323,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788741600000,
+                  "role": "CLOSE_SELECTED",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80128.3,
+                  "down": 80128.2,
+                  "buy": 0.0051200000000189,
+                  "sell": 0.00887,
+                  "total": 0.0139900000000189,
+                  "delta": -0.0037499999999811,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                }
+              ]
+            },
+            {
+              "bar_index": 21,
+              "time_ms": 1788741720000,
+              "ordered_rows": 414,
+              "selected_rows": [
+                {
+                  "chartTime": 1788741720000,
+                  "role": "POC",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80148.1,
+                  "down": 80148,
+                  "buy": 0.04356,
+                  "sell": 0,
+                  "total": 0.04356,
+                  "delta": 0.04356,
+                  "buyImbalance": true,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788741720000,
+                  "role": "VAH",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80162.3,
+                  "down": 80162.2,
+                  "buy": 0.04356,
+                  "sell": 0,
+                  "total": 0.04356,
+                  "delta": 0.04356,
+                  "buyImbalance": true,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788741720000,
+                  "role": "VAL",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80134,
+                  "down": 80133.90000000001,
+                  "buy": 0.04356,
+                  "sell": 0,
+                  "total": 0.04356,
+                  "delta": 0.04356,
+                  "buyImbalance": true,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788741720000,
+                  "role": "CLOSE_SELECTED",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80159.3,
+                  "down": 80159.2,
+                  "buy": 0.04356,
+                  "sell": 0,
+                  "total": 0.04356,
+                  "delta": 0.04356,
+                  "buyImbalance": true,
+                  "sellImbalance": false
+                }
+              ]
+            },
+            {
+              "bar_index": 22,
+              "time_ms": 1788741840000,
+              "ordered_rows": 480,
+              "selected_rows": [
+                {
+                  "chartTime": 1788741840000,
+                  "role": "POC",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80153.2,
+                  "down": 80153.1,
+                  "buy": 0,
+                  "sell": 0.0197,
+                  "total": 0.0197,
+                  "delta": -0.0197,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788741840000,
+                  "role": "VAH",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80162.2,
+                  "down": 80162.1,
+                  "buy": 0,
+                  "sell": 0.00933,
+                  "total": 0.00933,
+                  "delta": -0.00933,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788741840000,
+                  "role": "VAL",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80136.3,
+                  "down": 80136.2,
+                  "buy": 0,
+                  "sell": 0.0114,
+                  "total": 0.0114,
+                  "delta": -0.0114,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788741840000,
+                  "role": "CLOSE_SELECTED",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80137.1,
+                  "down": 80137,
+                  "buy": 0,
+                  "sell": 0.0197,
+                  "total": 0.0197,
+                  "delta": -0.0197,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                }
+              ]
+            },
+            {
+              "bar_index": 23,
+              "time_ms": 1788741960000,
+              "ordered_rows": 899,
+              "selected_rows": [
+                {
+                  "chartTime": 1788741960000,
+                  "role": "POC",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80136.8,
+                  "down": 80136.7,
+                  "buy": 0.01302,
+                  "sell": 0.00594,
+                  "total": 0.01896,
+                  "delta": 0.00708,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788741960000,
+                  "role": "VAH",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80165.1,
+                  "down": 80165,
+                  "buy": 0.01302,
+                  "sell": 0.00594,
+                  "total": 0.01896,
+                  "delta": 0.00708,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788741960000,
+                  "role": "VAL",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80109.90000000001,
+                  "down": 80109.8,
+                  "buy": 0.01302,
+                  "sell": 0.00594,
+                  "total": 0.01896,
+                  "delta": 0.00708,
+                  "buyImbalance": true,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788741960000,
+                  "role": "CLOSE_SELECTED",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80181.7,
+                  "down": 80181.6,
+                  "buy": 0.000550000000225,
+                  "sell": 0,
+                  "total": 0.000550000000225,
+                  "delta": 0.000550000000225,
+                  "buyImbalance": true,
+                  "sellImbalance": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "log": "captures/v19/evidence/footprint-ten-default-host-v19-v1-chunk-24-27-v1-attempt1-logs-v1.json",
+          "entries": 2207,
+          "bars": [
+            {
+              "bar_index": 24,
+              "time_ms": 1788742080000,
+              "ordered_rows": 524,
+              "selected_rows": [
+                {
+                  "chartTime": 1788742080000,
+                  "role": "POC",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80167,
+                  "down": 80166.90000000001,
+                  "buy": 0.0101399999999763,
+                  "sell": 0.00784,
+                  "total": 0.0179799999999763,
+                  "delta": 0.0022999999999763,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788742080000,
+                  "role": "VAH",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80167,
+                  "down": 80166.90000000001,
+                  "buy": 0.0101399999999763,
+                  "sell": 0.00784,
+                  "total": 0.0179799999999763,
+                  "delta": 0.0022999999999763,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788742080000,
+                  "role": "VAL",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80136,
+                  "down": 80135.90000000001,
+                  "buy": 0.00903,
+                  "sell": 0.00784,
+                  "total": 0.01687,
+                  "delta": 0.00119,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788742080000,
+                  "role": "CLOSE_SELECTED",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80163.2,
+                  "down": 80163.1,
+                  "buy": 0.00903,
+                  "sell": 0.00784,
+                  "total": 0.01687,
+                  "delta": 0.00119,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                }
+              ]
+            },
+            {
+              "bar_index": 25,
+              "time_ms": 1788742200000,
+              "ordered_rows": 416,
+              "selected_rows": [
+                {
+                  "chartTime": 1788742200000,
+                  "role": "POC",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80139.6,
+                  "down": 80139.5,
+                  "buy": 0.0067499999999997,
+                  "sell": 0.00867,
+                  "total": 0.0154199999999997,
+                  "delta": -0.0019200000000003,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788742200000,
+                  "role": "VAH",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80148.2,
+                  "down": 80148.1,
+                  "buy": 0,
+                  "sell": 0.00867,
+                  "total": 0.00867,
+                  "delta": -0.00867,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788742200000,
+                  "role": "VAL",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80122.7,
+                  "down": 80122.6,
+                  "buy": 0.00424,
+                  "sell": 0.00867,
+                  "total": 0.01291,
+                  "delta": -0.00443,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788742200000,
+                  "role": "CLOSE_SELECTED",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80139.7,
+                  "down": 80139.6,
+                  "buy": 0,
+                  "sell": 0.00867,
+                  "total": 0.00867,
+                  "delta": -0.00867,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                }
+              ]
+            },
+            {
+              "bar_index": 26,
+              "time_ms": 1788742320000,
+              "ordered_rows": 667,
+              "selected_rows": [
+                {
+                  "chartTime": 1788742320000,
+                  "role": "POC",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80165,
+                  "down": 80164.90000000001,
+                  "buy": 0.01872,
+                  "sell": 0.01633,
+                  "total": 0.03505,
+                  "delta": 0.00239,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788742320000,
+                  "role": "VAH",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80174.90000000001,
+                  "down": 80174.8,
+                  "buy": 0,
+                  "sell": 0.01633,
+                  "total": 0.01633,
+                  "delta": -0.01633,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788742320000,
+                  "role": "VAL",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80139.7,
+                  "down": 80139.6,
+                  "buy": 0.01872,
+                  "sell": 0.01633,
+                  "total": 0.03505,
+                  "delta": 0.00239,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788742320000,
+                  "role": "CLOSE_SELECTED",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80131.7,
+                  "down": 80131.6,
+                  "buy": 0,
+                  "sell": 0.00653,
+                  "total": 0.00653,
+                  "delta": -0.00653,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                }
+              ]
+            },
+            {
+              "bar_index": 27,
+              "time_ms": 1788742440000,
+              "ordered_rows": 578,
+              "selected_rows": [
+                {
+                  "chartTime": 1788742440000,
+                  "role": "POC",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80152.8,
+                  "down": 80152.7,
+                  "buy": 0.03015,
+                  "sell": 0,
+                  "total": 0.03015,
+                  "delta": 0.03015,
+                  "buyImbalance": true,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788742440000,
+                  "role": "VAH",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80157.6,
+                  "down": 80157.5,
+                  "buy": 0.01106,
+                  "sell": 0,
+                  "total": 0.01106,
+                  "delta": 0.01106,
+                  "buyImbalance": true,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788742440000,
+                  "role": "VAL",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80127.2,
+                  "down": 80127.1,
+                  "buy": 0.01336,
+                  "sell": 0,
+                  "total": 0.01336,
+                  "delta": 0.01336,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788742440000,
+                  "role": "CLOSE_SELECTED",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80179.3,
+                  "down": 80179.2,
+                  "buy": 0.01106,
+                  "sell": 0,
+                  "total": 0.01106,
+                  "delta": 0.01106,
+                  "buyImbalance": true,
+                  "sellImbalance": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "log": "captures/v19/evidence/footprint-ten-default-host-v19-v1-chunk-28-31-v1-attempt1-logs-v1.json",
+          "entries": 3553,
+          "bars": [
+            {
+              "bar_index": 28,
+              "time_ms": 1788742560000,
+              "ordered_rows": 1202,
+              "selected_rows": [
+                {
+                  "chartTime": 1788742560000,
+                  "role": "POC",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80131.90000000001,
+                  "down": 80131.8,
+                  "buy": 0,
+                  "sell": 0.03421,
+                  "total": 0.03421,
+                  "delta": -0.03421,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788742560000,
+                  "role": "VAH",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80136.40000000001,
+                  "down": 80136.3,
+                  "buy": 0,
+                  "sell": 0.03421,
+                  "total": 0.03421,
+                  "delta": -0.03421,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788742560000,
+                  "role": "VAL",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80070.3,
+                  "down": 80070.2,
+                  "buy": 0,
+                  "sell": 0.02407,
+                  "total": 0.02407,
+                  "delta": -0.02407,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788742560000,
+                  "role": "CLOSE_SELECTED",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80103.8,
+                  "down": 80103.7,
+                  "buy": 0,
+                  "sell": 0.02407,
+                  "total": 0.02407,
+                  "delta": -0.02407,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                }
+              ]
+            },
+            {
+              "bar_index": 29,
+              "time_ms": 1788742680000,
+              "ordered_rows": 794,
+              "selected_rows": [
+                {
+                  "chartTime": 1788742680000,
+                  "role": "POC",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80103.7,
+                  "down": 80103.6,
+                  "buy": 0.01469,
+                  "sell": 0.02437,
+                  "total": 0.03906,
+                  "delta": -0.00968,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788742680000,
+                  "role": "VAH",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80127.90000000001,
+                  "down": 80127.8,
+                  "buy": 0.01469,
+                  "sell": 0,
+                  "total": 0.01469,
+                  "delta": 0.01469,
+                  "buyImbalance": true,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788742680000,
+                  "role": "VAL",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80080.90000000001,
+                  "down": 80080.8,
+                  "buy": 0,
+                  "sell": 0.02437,
+                  "total": 0.02437,
+                  "delta": -0.02437,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788742680000,
+                  "role": "CLOSE_SELECTED",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80160.1,
+                  "down": 80160,
+                  "buy": 0.002220000000067,
+                  "sell": 0,
+                  "total": 0.002220000000067,
+                  "delta": 0.002220000000067,
+                  "buyImbalance": true,
+                  "sellImbalance": false
+                }
+              ]
+            },
+            {
+              "bar_index": 30,
+              "time_ms": 1788742800000,
+              "ordered_rows": 601,
+              "selected_rows": [
+                {
+                  "chartTime": 1788742800000,
+                  "role": "POC",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80130.1,
+                  "down": 80130,
+                  "buy": 0.02332,
+                  "sell": 0.01483,
+                  "total": 0.03815,
+                  "delta": 0.00849,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788742800000,
+                  "role": "VAH",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80148.6,
+                  "down": 80148.5,
+                  "buy": 0.0132399999999962,
+                  "sell": 0.01483,
+                  "total": 0.0280699999999962,
+                  "delta": -0.0015900000000038,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788742800000,
+                  "role": "VAL",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80114.5,
+                  "down": 80114.40000000001,
+                  "buy": 0.02332,
+                  "sell": 0,
+                  "total": 0.02332,
+                  "delta": 0.02332,
+                  "buyImbalance": true,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788742800000,
+                  "role": "CLOSE_SELECTED",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80147.5,
+                  "down": 80147.40000000001,
+                  "buy": 0.02332,
+                  "sell": 0.01483,
+                  "total": 0.03815,
+                  "delta": 0.00849,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                }
+              ]
+            },
+            {
+              "bar_index": 31,
+              "time_ms": 1788742920000,
+              "ordered_rows": 934,
+              "selected_rows": [
+                {
+                  "chartTime": 1788742920000,
+                  "role": "POC",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80194.1,
+                  "down": 80194,
+                  "buy": 0.00799,
+                  "sell": 0.01372,
+                  "total": 0.02171,
+                  "delta": -0.00573,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788742920000,
+                  "role": "VAH",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80220.40000000001,
+                  "down": 80220.3,
+                  "buy": 0,
+                  "sell": 0.01372,
+                  "total": 0.01372,
+                  "delta": -0.01372,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788742920000,
+                  "role": "VAL",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80170,
+                  "down": 80169.90000000001,
+                  "buy": 0.00799,
+                  "sell": 0.0096,
+                  "total": 0.01759,
+                  "delta": -0.00161,
+                  "buyImbalance": true,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788742920000,
+                  "role": "CLOSE_SELECTED",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80213.5,
+                  "down": 80213.40000000001,
+                  "buy": 0.00799,
+                  "sell": 0.01372,
+                  "total": 0.02171,
+                  "delta": -0.00573,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "remaining_span": "All other exported bars lack complete ordered log coverage and remain held; no reconstruction from aggregates."
+    },
+    {
+      "script": "footprint-ten-70-300-host-v19-v1.pine",
+      "ordered_row_count": 23087,
+      "verified_literal_span": [
+        0,
+        31
+      ],
+      "chunks": [
+        {
+          "log": "captures/v19/evidence/footprint-ten-70-300-host-v19-v1-chunk-0-3-v1-attempt1-logs-v1.json",
+          "entries": 4176,
+          "bars": [
+            {
+              "bar_index": 0,
+              "time_ms": 1788739200000,
+              "ordered_rows": 1258,
+              "selected_rows": [
+                {
+                  "chartTime": 1788739200000,
+                  "role": "POC",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80293.1,
+                  "down": 80293,
+                  "buy": 0.03406,
+                  "sell": 0.01717,
+                  "total": 0.05123,
+                  "delta": 0.01689,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788739200000,
+                  "role": "VAH",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80305.90000000001,
+                  "down": 80305.8,
+                  "buy": 0,
+                  "sell": 0.01717,
+                  "total": 0.01717,
+                  "delta": -0.01717,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788739200000,
+                  "role": "VAL",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80246.1,
+                  "down": 80246,
+                  "buy": 0.03065,
+                  "sell": 0.01717,
+                  "total": 0.04782,
+                  "delta": 0.01348,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788739200000,
+                  "role": "CLOSE_SELECTED",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80293.3,
+                  "down": 80293.2,
+                  "buy": 0.0106599999999184,
+                  "sell": 0.01717,
+                  "total": 0.0278299999999184,
+                  "delta": -0.0065100000000816,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                }
+              ]
+            },
+            {
+              "bar_index": 1,
+              "time_ms": 1788739320000,
+              "ordered_rows": 746,
+              "selected_rows": [
+                {
+                  "chartTime": 1788739320000,
+                  "role": "POC",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80330.5,
+                  "down": 80330.40000000001,
+                  "buy": 0.03259,
+                  "sell": 0.03025,
+                  "total": 0.06284,
+                  "delta": 0.00234,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788739320000,
+                  "role": "VAH",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80346.7,
+                  "down": 80346.6,
+                  "buy": 0.0250299999998724,
+                  "sell": 0.03025,
+                  "total": 0.0552799999998724,
+                  "delta": -0.0052200000001276,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788739320000,
+                  "role": "VAL",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80304.8,
+                  "down": 80304.7,
+                  "buy": 0.03259,
+                  "sell": 0,
+                  "total": 0.03259,
+                  "delta": 0.03259,
+                  "buyImbalance": true,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788739320000,
+                  "role": "CLOSE_SELECTED",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80314.1,
+                  "down": 80314,
+                  "buy": 0.03259,
+                  "sell": 0.02722,
+                  "total": 0.05981,
+                  "delta": 0.00537,
+                  "buyImbalance": true,
+                  "sellImbalance": false
+                }
+              ]
+            },
+            {
+              "bar_index": 2,
+              "time_ms": 1788739440000,
+              "ordered_rows": 1160,
+              "selected_rows": [
+                {
+                  "chartTime": 1788739440000,
+                  "role": "POC",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80333.90000000001,
+                  "down": 80333.8,
+                  "buy": 0.07312,
+                  "sell": 0,
+                  "total": 0.07312,
+                  "delta": 0.07312,
+                  "buyImbalance": true,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788739440000,
+                  "role": "VAH",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80372.8,
+                  "down": 80372.7,
+                  "buy": 0.01986,
+                  "sell": 0,
+                  "total": 0.01986,
+                  "delta": 0.01986,
+                  "buyImbalance": true,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788739440000,
+                  "role": "VAL",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80310.1,
+                  "down": 80310,
+                  "buy": 0.05326,
+                  "sell": 0,
+                  "total": 0.05326,
+                  "delta": 0.05326,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788739440000,
+                  "role": "CLOSE_SELECTED",
+                  "order": -1,
+                  "missing": true
+                }
+              ]
+            },
+            {
+              "bar_index": 3,
+              "time_ms": 1788739560000,
+              "ordered_rows": 990,
+              "selected_rows": [
+                {
+                  "chartTime": 1788739560000,
+                  "role": "POC",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80424,
+                  "down": 80423.90000000001,
+                  "buy": 0,
+                  "sell": 0.0328000000000084,
+                  "total": 0.0328000000000084,
+                  "delta": -0.0328000000000084,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788739560000,
+                  "role": "VAH",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80424,
+                  "down": 80423.90000000001,
+                  "buy": 0,
+                  "sell": 0.0328000000000084,
+                  "total": 0.0328000000000084,
+                  "delta": -0.0328000000000084,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788739560000,
+                  "role": "VAL",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80372.5,
+                  "down": 80372.40000000001,
+                  "buy": 0,
+                  "sell": 0.02889,
+                  "total": 0.02889,
+                  "delta": -0.02889,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788739560000,
+                  "role": "CLOSE_SELECTED",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80345.2,
+                  "down": 80345.1,
+                  "buy": 0,
+                  "sell": 0.00742,
+                  "total": 0.00742,
+                  "delta": -0.00742,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "log": "captures/v19/evidence/footprint-ten-70-300-host-v19-v1-chunk-4-7-v1-attempt1-logs-v1.json",
+          "entries": 2408,
+          "bars": [
+            {
+              "bar_index": 4,
+              "time_ms": 1788739680000,
+              "ordered_rows": 850,
+              "selected_rows": [
+                {
+                  "chartTime": 1788739680000,
+                  "role": "POC",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80387.5,
+                  "down": 80387.40000000001,
+                  "buy": 0.01305,
+                  "sell": 0.01086,
+                  "total": 0.02391,
+                  "delta": 0.00219,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788739680000,
+                  "role": "VAH",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80405.40000000001,
+                  "down": 80405.3,
+                  "buy": 0.0055500000000961,
+                  "sell": 0.01086,
+                  "total": 0.0164100000000961,
+                  "delta": -0.0053099999999039,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788739680000,
+                  "role": "VAL",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80354.2,
+                  "down": 80354.1,
+                  "buy": 0.01305,
+                  "sell": 0,
+                  "total": 0.01305,
+                  "delta": 0.01305,
+                  "buyImbalance": true,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788739680000,
+                  "role": "CLOSE_SELECTED",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80384.1,
+                  "down": 80384,
+                  "buy": 0.01305,
+                  "sell": 0.01086,
+                  "total": 0.02391,
+                  "delta": 0.00219,
+                  "buyImbalance": true,
+                  "sellImbalance": false
+                }
+              ]
+            },
+            {
+              "bar_index": 5,
+              "time_ms": 1788739800000,
+              "ordered_rows": 396,
+              "selected_rows": [
+                {
+                  "chartTime": 1788739800000,
+                  "role": "POC",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80364.3,
+                  "down": 80364.2,
+                  "buy": 0,
+                  "sell": 0.02946,
+                  "total": 0.02946,
+                  "delta": -0.02946,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788739800000,
+                  "role": "VAH",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80377.40000000001,
+                  "down": 80377.3,
+                  "buy": 0,
+                  "sell": 0.02946,
+                  "total": 0.02946,
+                  "delta": -0.02946,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788739800000,
+                  "role": "VAL",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80351.2,
+                  "down": 80351.1,
+                  "buy": 0,
+                  "sell": 0.02946,
+                  "total": 0.02946,
+                  "delta": -0.02946,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788739800000,
+                  "role": "CLOSE_SELECTED",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80346.8,
+                  "down": 80346.7,
+                  "buy": 0,
+                  "sell": 0.01761,
+                  "total": 0.01761,
+                  "delta": -0.01761,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                }
+              ]
+            },
+            {
+              "bar_index": 6,
+              "time_ms": 1788739920000,
+              "ordered_rows": 280,
+              "selected_rows": [
+                {
+                  "chartTime": 1788739920000,
+                  "role": "POC",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80336,
+                  "down": 80335.90000000001,
+                  "buy": 0.02183,
+                  "sell": 0.01387,
+                  "total": 0.0357,
+                  "delta": 0.00796,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788739920000,
+                  "role": "VAH",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80345.1,
+                  "down": 80345,
+                  "buy": 0.02183,
+                  "sell": 0.01387,
+                  "total": 0.0357,
+                  "delta": 0.00796,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788739920000,
+                  "role": "VAL",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80328.1,
+                  "down": 80328,
+                  "buy": 0.02183,
+                  "sell": 0.01387,
+                  "total": 0.0357,
+                  "delta": 0.00796,
+                  "buyImbalance": true,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788739920000,
+                  "role": "CLOSE_SELECTED",
+                  "order": -1,
+                  "missing": true
+                }
+              ]
+            },
+            {
+              "bar_index": 7,
+              "time_ms": 1788740040000,
+              "ordered_rows": 860,
+              "selected_rows": [
+                {
+                  "chartTime": 1788740040000,
+                  "role": "POC",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80336,
+                  "down": 80335.90000000001,
+                  "buy": 0,
+                  "sell": 0.0438400000000508,
+                  "total": 0.0438400000000508,
+                  "delta": -0.0438400000000508,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788740040000,
+                  "role": "VAH",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80363.90000000001,
+                  "down": 80363.8,
+                  "buy": 0,
+                  "sell": 0.02921,
+                  "total": 0.02921,
+                  "delta": -0.02921,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788740040000,
+                  "role": "VAL",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80317.8,
+                  "down": 80317.7,
+                  "buy": 0,
+                  "sell": 0.01408,
+                  "total": 0.01408,
+                  "delta": -0.01408,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788740040000,
+                  "role": "CLOSE_SELECTED",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80279.5,
+                  "down": 80279.40000000001,
+                  "buy": 0,
+                  "sell": 0.01408,
+                  "total": 0.01408,
+                  "delta": -0.01408,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "log": "captures/v19/evidence/footprint-ten-70-300-host-v19-v1-chunk-8-11-v1-attempt1-logs-v1.json",
+          "entries": 4054,
+          "bars": [
+            {
+              "bar_index": 8,
+              "time_ms": 1788740160000,
+              "ordered_rows": 896,
+              "selected_rows": [
+                {
+                  "chartTime": 1788740160000,
+                  "role": "POC",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80270,
+                  "down": 80269.90000000001,
+                  "buy": 0,
+                  "sell": 0.0463199999998032,
+                  "total": 0.0463199999998032,
+                  "delta": -0.0463199999998032,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788740160000,
+                  "role": "VAH",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80282,
+                  "down": 80281.90000000001,
+                  "buy": 0,
+                  "sell": 0.022559999999995,
+                  "total": 0.022559999999995,
+                  "delta": -0.022559999999995,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788740160000,
+                  "role": "VAL",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80219.8,
+                  "down": 80219.7,
+                  "buy": 0,
+                  "sell": 0.02073,
+                  "total": 0.02073,
+                  "delta": -0.02073,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788740160000,
+                  "role": "CLOSE_SELECTED",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80212.7,
+                  "down": 80212.6,
+                  "buy": 0,
+                  "sell": 0.02073,
+                  "total": 0.02073,
+                  "delta": -0.02073,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                }
+              ]
+            },
+            {
+              "bar_index": 9,
+              "time_ms": 1788740280000,
+              "ordered_rows": 1330,
+              "selected_rows": [
+                {
+                  "chartTime": 1788740280000,
+                  "role": "POC",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80157.90000000001,
+                  "down": 80157.8,
+                  "buy": 0,
+                  "sell": 0.0411,
+                  "total": 0.0411,
+                  "delta": -0.0411,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788740280000,
+                  "role": "VAH",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80212.6,
+                  "down": 80212.5,
+                  "buy": 0,
+                  "sell": 0.0255,
+                  "total": 0.0255,
+                  "delta": -0.0255,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788740280000,
+                  "role": "VAL",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80140.90000000001,
+                  "down": 80140.8,
+                  "buy": 0,
+                  "sell": 0.0156,
+                  "total": 0.0156,
+                  "delta": -0.0156,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788740280000,
+                  "role": "CLOSE_SELECTED",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80099.3,
+                  "down": 80099.2,
+                  "buy": 0,
+                  "sell": 0.0156,
+                  "total": 0.0156,
+                  "delta": -0.0156,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                }
+              ]
+            },
+            {
+              "bar_index": 10,
+              "time_ms": 1788740400000,
+              "ordered_rows": 1211,
+              "selected_rows": [
+                {
+                  "chartTime": 1788740400000,
+                  "role": "POC",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80119.6,
+                  "down": 80119.5,
+                  "buy": 0.0167,
+                  "sell": 0,
+                  "total": 0.0167,
+                  "delta": 0.0167,
+                  "buyImbalance": true,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788740400000,
+                  "role": "VAH",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80138.2,
+                  "down": 80138.1,
+                  "buy": 0.01124,
+                  "sell": 0,
+                  "total": 0.01124,
+                  "delta": 0.01124,
+                  "buyImbalance": true,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788740400000,
+                  "role": "VAL",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80062,
+                  "down": 80061.90000000001,
+                  "buy": 0.0167,
+                  "sell": 0,
+                  "total": 0.0167,
+                  "delta": 0.0167,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788740400000,
+                  "role": "CLOSE_SELECTED",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80182,
+                  "down": 80181.90000000001,
+                  "buy": 0.01124,
+                  "sell": 0,
+                  "total": 0.01124,
+                  "delta": 0.01124,
+                  "buyImbalance": true,
+                  "sellImbalance": false
+                }
+              ]
+            },
+            {
+              "bar_index": 11,
+              "time_ms": 1788740520000,
+              "ordered_rows": 595,
+              "selected_rows": [
+                {
+                  "chartTime": 1788740520000,
+                  "role": "POC",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80177.3,
+                  "down": 80177.2,
+                  "buy": 0.04568,
+                  "sell": 0.01694,
+                  "total": 0.06262,
+                  "delta": 0.02874,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788740520000,
+                  "role": "VAH",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80199,
+                  "down": 80198.90000000001,
+                  "buy": 0.04568,
+                  "sell": 0.01694,
+                  "total": 0.06262,
+                  "delta": 0.02874,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788740520000,
+                  "role": "VAL",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80175.1,
+                  "down": 80175,
+                  "buy": 0.04568,
+                  "sell": 0.01694,
+                  "total": 0.06262,
+                  "delta": 0.02874,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788740520000,
+                  "role": "CLOSE_SELECTED",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80147.6,
+                  "down": 80147.5,
+                  "buy": 0,
+                  "sell": 0.01355,
+                  "total": 0.01355,
+                  "delta": -0.01355,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "log": "captures/v19/evidence/footprint-ten-70-300-host-v19-v1-chunk-12-15-v1-attempt1-logs-v1.json",
+          "entries": 2121,
+          "bars": [
+            {
+              "bar_index": 12,
+              "time_ms": 1788740640000,
+              "ordered_rows": 433,
+              "selected_rows": [
+                {
+                  "chartTime": 1788740640000,
+                  "role": "POC",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80161.40000000001,
+                  "down": 80161.3,
+                  "buy": 0.00716,
+                  "sell": 0.01325,
+                  "total": 0.02041,
+                  "delta": -0.00609,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788740640000,
+                  "role": "VAH",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80176.90000000001,
+                  "down": 80176.8,
+                  "buy": 0.00716,
+                  "sell": 0.01325,
+                  "total": 0.02041,
+                  "delta": -0.00609,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788740640000,
+                  "role": "VAL",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80153.6,
+                  "down": 80153.5,
+                  "buy": 0.00716,
+                  "sell": 0.01325,
+                  "total": 0.02041,
+                  "delta": -0.00609,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788740640000,
+                  "role": "CLOSE_SELECTED",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80176.1,
+                  "down": 80176,
+                  "buy": 0.00716,
+                  "sell": 0.01325,
+                  "total": 0.02041,
+                  "delta": -0.00609,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                }
+              ]
+            },
+            {
+              "bar_index": 13,
+              "time_ms": 1788740760000,
+              "ordered_rows": 593,
+              "selected_rows": [
+                {
+                  "chartTime": 1788740760000,
+                  "role": "POC",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80200.1,
+                  "down": 80200,
+                  "buy": 0.01972,
+                  "sell": 0,
+                  "total": 0.01972,
+                  "delta": 0.01972,
+                  "buyImbalance": true,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788740760000,
+                  "role": "VAH",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80222,
+                  "down": 80221.90000000001,
+                  "buy": 0.0146899999999968,
+                  "sell": 0,
+                  "total": 0.0146899999999968,
+                  "delta": 0.0146899999999968,
+                  "buyImbalance": true,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788740760000,
+                  "role": "VAL",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80195,
+                  "down": 80194.90000000001,
+                  "buy": 0.00506,
+                  "sell": 0,
+                  "total": 0.00506,
+                  "delta": 0.00506,
+                  "buyImbalance": true,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788740760000,
+                  "role": "CLOSE_SELECTED",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80220.8,
+                  "down": 80220.7,
+                  "buy": 0.01466,
+                  "sell": 0,
+                  "total": 0.01466,
+                  "delta": 0.01466,
+                  "buyImbalance": true,
+                  "sellImbalance": false
+                }
+              ]
+            },
+            {
+              "bar_index": 14,
+              "time_ms": 1788740880000,
+              "ordered_rows": 351,
+              "selected_rows": [
+                {
+                  "chartTime": 1788740880000,
+                  "role": "POC",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80199.90000000001,
+                  "down": 80199.8,
+                  "buy": 0,
+                  "sell": 0.48333,
+                  "total": 0.48333,
+                  "delta": -0.48333,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788740880000,
+                  "role": "VAH",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80211.5,
+                  "down": 80211.40000000001,
+                  "buy": 0,
+                  "sell": 0.01034,
+                  "total": 0.01034,
+                  "delta": -0.01034,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788740880000,
+                  "role": "VAL",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80188.40000000001,
+                  "down": 80188.3,
+                  "buy": 0,
+                  "sell": 0.01034,
+                  "total": 0.01034,
+                  "delta": -0.01034,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788740880000,
+                  "role": "CLOSE_SELECTED",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80199.90000000001,
+                  "down": 80199.8,
+                  "buy": 0,
+                  "sell": 0.48333,
+                  "total": 0.48333,
+                  "delta": -0.48333,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                }
+              ]
+            },
+            {
+              "bar_index": 15,
+              "time_ms": 1788741000000,
+              "ordered_rows": 722,
+              "selected_rows": [
+                {
+                  "chartTime": 1788741000000,
+                  "role": "POC",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80235.90000000001,
+                  "down": 80235.8,
+                  "buy": 0.0147,
+                  "sell": 0.01459,
+                  "total": 0.02929,
+                  "delta": 0.00011,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788741000000,
+                  "role": "VAH",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80254,
+                  "down": 80253.90000000001,
+                  "buy": 0.0116499999999102,
+                  "sell": 0.01459,
+                  "total": 0.0262399999999102,
+                  "delta": -0.0029400000000898,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788741000000,
+                  "role": "VAL",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80210.8,
+                  "down": 80210.7,
+                  "buy": 0.0147,
+                  "sell": 0,
+                  "total": 0.0147,
+                  "delta": 0.0147,
+                  "buyImbalance": true,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788741000000,
+                  "role": "CLOSE_SELECTED",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80230.1,
+                  "down": 80230,
+                  "buy": 0.0147,
+                  "sell": 0.01459,
+                  "total": 0.02929,
+                  "delta": 0.00011,
+                  "buyImbalance": true,
+                  "sellImbalance": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "log": "captures/v19/evidence/footprint-ten-70-300-host-v19-v1-chunk-16-19-v1-attempt1-logs-v1.json",
+          "entries": 2319,
+          "bars": [
+            {
+              "bar_index": 16,
+              "time_ms": 1788741120000,
+              "ordered_rows": 683,
+              "selected_rows": [
+                {
+                  "chartTime": 1788741120000,
+                  "role": "POC",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80220,
+                  "down": 80219.90000000001,
+                  "buy": 0,
+                  "sell": 0.0431799999999968,
+                  "total": 0.0431799999999968,
+                  "delta": -0.0431799999999968,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788741120000,
+                  "role": "VAH",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80220,
+                  "down": 80219.90000000001,
+                  "buy": 0,
+                  "sell": 0.0431799999999968,
+                  "total": 0.0431799999999968,
+                  "delta": -0.0431799999999968,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788741120000,
+                  "role": "VAL",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80180.90000000001,
+                  "down": 80180.8,
+                  "buy": 0,
+                  "sell": 0.02393,
+                  "total": 0.02393,
+                  "delta": -0.02393,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788741120000,
+                  "role": "CLOSE_SELECTED",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80177.8,
+                  "down": 80177.7,
+                  "buy": 0,
+                  "sell": 0.02154,
+                  "total": 0.02154,
+                  "delta": -0.02154,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                }
+              ]
+            },
+            {
+              "bar_index": 17,
+              "time_ms": 1788741240000,
+              "ordered_rows": 647,
+              "selected_rows": [
+                {
+                  "chartTime": 1788741240000,
+                  "role": "POC",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80160,
+                  "down": 80159.90000000001,
+                  "buy": 0.01301,
+                  "sell": 0.00894,
+                  "total": 0.02195,
+                  "delta": 0.00407,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788741240000,
+                  "role": "VAH",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80183.8,
+                  "down": 80183.7,
+                  "buy": 0.01301,
+                  "sell": 0,
+                  "total": 0.01301,
+                  "delta": 0.01301,
+                  "buyImbalance": true,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788741240000,
+                  "role": "VAL",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80149.3,
+                  "down": 80149.2,
+                  "buy": 0.0052,
+                  "sell": 0.00894,
+                  "total": 0.01414,
+                  "delta": -0.00374,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788741240000,
+                  "role": "CLOSE_SELECTED",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80172,
+                  "down": 80171.90000000001,
+                  "buy": 0.01301,
+                  "sell": 0.00894,
+                  "total": 0.02195,
+                  "delta": 0.00407,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                }
+              ]
+            },
+            {
+              "bar_index": 18,
+              "time_ms": 1788741360000,
+              "ordered_rows": 408,
+              "selected_rows": [
+                {
+                  "chartTime": 1788741360000,
+                  "role": "POC",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80163.3,
+                  "down": 80163.2,
+                  "buy": 0,
+                  "sell": 0.03955,
+                  "total": 0.03955,
+                  "delta": -0.03955,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788741360000,
+                  "role": "VAH",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80171.7,
+                  "down": 80171.6,
+                  "buy": 0,
+                  "sell": 0.0240999999999776,
+                  "total": 0.0240999999999776,
+                  "delta": -0.0240999999999776,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788741360000,
+                  "role": "VAL",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80146.90000000001,
+                  "down": 80146.8,
+                  "buy": 0,
+                  "sell": 0.02008,
+                  "total": 0.02008,
+                  "delta": -0.02008,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788741360000,
+                  "role": "CLOSE_SELECTED",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80150.7,
+                  "down": 80150.6,
+                  "buy": 0,
+                  "sell": 0.02008,
+                  "total": 0.02008,
+                  "delta": -0.02008,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                }
+              ]
+            },
+            {
+              "bar_index": 19,
+              "time_ms": 1788741480000,
+              "ordered_rows": 559,
+              "selected_rows": [
+                {
+                  "chartTime": 1788741480000,
+                  "role": "POC",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80142.8,
+                  "down": 80142.7,
+                  "buy": 0.00516,
+                  "sell": 0.01374,
+                  "total": 0.0189,
+                  "delta": -0.00858,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788741480000,
+                  "role": "VAH",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80150.6,
+                  "down": 80150.5,
+                  "buy": 0.00516,
+                  "sell": 0.01374,
+                  "total": 0.0189,
+                  "delta": -0.00858,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788741480000,
+                  "role": "VAL",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80121.8,
+                  "down": 80121.7,
+                  "buy": 0.00516,
+                  "sell": 0.01374,
+                  "total": 0.0189,
+                  "delta": -0.00858,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788741480000,
+                  "role": "CLOSE_SELECTED",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80164.90000000001,
+                  "down": 80164.8,
+                  "buy": 0.00516,
+                  "sell": 0,
+                  "total": 0.00516,
+                  "delta": 0.00516,
+                  "buyImbalance": true,
+                  "sellImbalance": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "log": "captures/v19/evidence/footprint-ten-70-300-host-v19-v1-chunk-20-23-v1-attempt1-logs-v1.json",
+          "entries": 2425,
+          "bars": [
+            {
+              "bar_index": 20,
+              "time_ms": 1788741600000,
+              "ordered_rows": 610,
+              "selected_rows": [
+                {
+                  "chartTime": 1788741600000,
+                  "role": "POC",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80128.2,
+                  "down": 80128.1,
+                  "buy": 0.02323,
+                  "sell": 0.00887,
+                  "total": 0.0321,
+                  "delta": 0.01436,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788741600000,
+                  "role": "VAH",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80131.90000000001,
+                  "down": 80131.8,
+                  "buy": 0,
+                  "sell": 0.00887,
+                  "total": 0.00887,
+                  "delta": -0.00887,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788741600000,
+                  "role": "VAL",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80104,
+                  "down": 80103.90000000001,
+                  "buy": 0.02323,
+                  "sell": 0,
+                  "total": 0.02323,
+                  "delta": 0.02323,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788741600000,
+                  "role": "CLOSE_SELECTED",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80128.3,
+                  "down": 80128.2,
+                  "buy": 0.0051200000000189,
+                  "sell": 0.00887,
+                  "total": 0.0139900000000189,
+                  "delta": -0.0037499999999811,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                }
+              ]
+            },
+            {
+              "bar_index": 21,
+              "time_ms": 1788741720000,
+              "ordered_rows": 414,
+              "selected_rows": [
+                {
+                  "chartTime": 1788741720000,
+                  "role": "POC",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80148.1,
+                  "down": 80148,
+                  "buy": 0.04356,
+                  "sell": 0,
+                  "total": 0.04356,
+                  "delta": 0.04356,
+                  "buyImbalance": true,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788741720000,
+                  "role": "VAH",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80162.3,
+                  "down": 80162.2,
+                  "buy": 0.04356,
+                  "sell": 0,
+                  "total": 0.04356,
+                  "delta": 0.04356,
+                  "buyImbalance": true,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788741720000,
+                  "role": "VAL",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80134,
+                  "down": 80133.90000000001,
+                  "buy": 0.04356,
+                  "sell": 0,
+                  "total": 0.04356,
+                  "delta": 0.04356,
+                  "buyImbalance": true,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788741720000,
+                  "role": "CLOSE_SELECTED",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80159.3,
+                  "down": 80159.2,
+                  "buy": 0.04356,
+                  "sell": 0,
+                  "total": 0.04356,
+                  "delta": 0.04356,
+                  "buyImbalance": true,
+                  "sellImbalance": false
+                }
+              ]
+            },
+            {
+              "bar_index": 22,
+              "time_ms": 1788741840000,
+              "ordered_rows": 480,
+              "selected_rows": [
+                {
+                  "chartTime": 1788741840000,
+                  "role": "POC",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80153.2,
+                  "down": 80153.1,
+                  "buy": 0,
+                  "sell": 0.0197,
+                  "total": 0.0197,
+                  "delta": -0.0197,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788741840000,
+                  "role": "VAH",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80162.2,
+                  "down": 80162.1,
+                  "buy": 0,
+                  "sell": 0.00933,
+                  "total": 0.00933,
+                  "delta": -0.00933,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788741840000,
+                  "role": "VAL",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80136.3,
+                  "down": 80136.2,
+                  "buy": 0,
+                  "sell": 0.0114,
+                  "total": 0.0114,
+                  "delta": -0.0114,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788741840000,
+                  "role": "CLOSE_SELECTED",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80137.1,
+                  "down": 80137,
+                  "buy": 0,
+                  "sell": 0.0197,
+                  "total": 0.0197,
+                  "delta": -0.0197,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                }
+              ]
+            },
+            {
+              "bar_index": 23,
+              "time_ms": 1788741960000,
+              "ordered_rows": 899,
+              "selected_rows": [
+                {
+                  "chartTime": 1788741960000,
+                  "role": "POC",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80136.8,
+                  "down": 80136.7,
+                  "buy": 0.01302,
+                  "sell": 0.00594,
+                  "total": 0.01896,
+                  "delta": 0.00708,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788741960000,
+                  "role": "VAH",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80165.1,
+                  "down": 80165,
+                  "buy": 0.01302,
+                  "sell": 0.00594,
+                  "total": 0.01896,
+                  "delta": 0.00708,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788741960000,
+                  "role": "VAL",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80109.90000000001,
+                  "down": 80109.8,
+                  "buy": 0.01302,
+                  "sell": 0.00594,
+                  "total": 0.01896,
+                  "delta": 0.00708,
+                  "buyImbalance": true,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788741960000,
+                  "role": "CLOSE_SELECTED",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80181.7,
+                  "down": 80181.6,
+                  "buy": 0.000550000000225,
+                  "sell": 0,
+                  "total": 0.000550000000225,
+                  "delta": 0.000550000000225,
+                  "buyImbalance": true,
+                  "sellImbalance": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "log": "captures/v19/evidence/footprint-ten-70-300-host-v19-v1-chunk-24-27-v1-attempt1-logs-v1.json",
+          "entries": 2207,
+          "bars": [
+            {
+              "bar_index": 24,
+              "time_ms": 1788742080000,
+              "ordered_rows": 524,
+              "selected_rows": [
+                {
+                  "chartTime": 1788742080000,
+                  "role": "POC",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80167,
+                  "down": 80166.90000000001,
+                  "buy": 0.0101399999999763,
+                  "sell": 0.00784,
+                  "total": 0.0179799999999763,
+                  "delta": 0.0022999999999763,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788742080000,
+                  "role": "VAH",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80167,
+                  "down": 80166.90000000001,
+                  "buy": 0.0101399999999763,
+                  "sell": 0.00784,
+                  "total": 0.0179799999999763,
+                  "delta": 0.0022999999999763,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788742080000,
+                  "role": "VAL",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80136,
+                  "down": 80135.90000000001,
+                  "buy": 0.00903,
+                  "sell": 0.00784,
+                  "total": 0.01687,
+                  "delta": 0.00119,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788742080000,
+                  "role": "CLOSE_SELECTED",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80163.2,
+                  "down": 80163.1,
+                  "buy": 0.00903,
+                  "sell": 0.00784,
+                  "total": 0.01687,
+                  "delta": 0.00119,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                }
+              ]
+            },
+            {
+              "bar_index": 25,
+              "time_ms": 1788742200000,
+              "ordered_rows": 416,
+              "selected_rows": [
+                {
+                  "chartTime": 1788742200000,
+                  "role": "POC",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80139.6,
+                  "down": 80139.5,
+                  "buy": 0.0067499999999997,
+                  "sell": 0.00867,
+                  "total": 0.0154199999999997,
+                  "delta": -0.0019200000000003,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788742200000,
+                  "role": "VAH",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80148.2,
+                  "down": 80148.1,
+                  "buy": 0,
+                  "sell": 0.00867,
+                  "total": 0.00867,
+                  "delta": -0.00867,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788742200000,
+                  "role": "VAL",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80122.7,
+                  "down": 80122.6,
+                  "buy": 0.00424,
+                  "sell": 0.00867,
+                  "total": 0.01291,
+                  "delta": -0.00443,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788742200000,
+                  "role": "CLOSE_SELECTED",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80139.7,
+                  "down": 80139.6,
+                  "buy": 0,
+                  "sell": 0.00867,
+                  "total": 0.00867,
+                  "delta": -0.00867,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                }
+              ]
+            },
+            {
+              "bar_index": 26,
+              "time_ms": 1788742320000,
+              "ordered_rows": 667,
+              "selected_rows": [
+                {
+                  "chartTime": 1788742320000,
+                  "role": "POC",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80165,
+                  "down": 80164.90000000001,
+                  "buy": 0.01872,
+                  "sell": 0.01633,
+                  "total": 0.03505,
+                  "delta": 0.00239,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788742320000,
+                  "role": "VAH",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80174.90000000001,
+                  "down": 80174.8,
+                  "buy": 0,
+                  "sell": 0.01633,
+                  "total": 0.01633,
+                  "delta": -0.01633,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788742320000,
+                  "role": "VAL",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80139.7,
+                  "down": 80139.6,
+                  "buy": 0.01872,
+                  "sell": 0.01633,
+                  "total": 0.03505,
+                  "delta": 0.00239,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788742320000,
+                  "role": "CLOSE_SELECTED",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80131.7,
+                  "down": 80131.6,
+                  "buy": 0,
+                  "sell": 0.00653,
+                  "total": 0.00653,
+                  "delta": -0.00653,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                }
+              ]
+            },
+            {
+              "bar_index": 27,
+              "time_ms": 1788742440000,
+              "ordered_rows": 578,
+              "selected_rows": [
+                {
+                  "chartTime": 1788742440000,
+                  "role": "POC",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80152.8,
+                  "down": 80152.7,
+                  "buy": 0.03015,
+                  "sell": 0,
+                  "total": 0.03015,
+                  "delta": 0.03015,
+                  "buyImbalance": true,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788742440000,
+                  "role": "VAH",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80157.6,
+                  "down": 80157.5,
+                  "buy": 0.01106,
+                  "sell": 0,
+                  "total": 0.01106,
+                  "delta": 0.01106,
+                  "buyImbalance": true,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788742440000,
+                  "role": "VAL",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80127.2,
+                  "down": 80127.1,
+                  "buy": 0.01336,
+                  "sell": 0,
+                  "total": 0.01336,
+                  "delta": 0.01336,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788742440000,
+                  "role": "CLOSE_SELECTED",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80179.3,
+                  "down": 80179.2,
+                  "buy": 0.01106,
+                  "sell": 0,
+                  "total": 0.01106,
+                  "delta": 0.01106,
+                  "buyImbalance": true,
+                  "sellImbalance": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "log": "captures/v19/evidence/footprint-ten-70-300-host-v19-v1-chunk-28-31-v1-attempt1-logs-v1.json",
+          "entries": 3553,
+          "bars": [
+            {
+              "bar_index": 28,
+              "time_ms": 1788742560000,
+              "ordered_rows": 1202,
+              "selected_rows": [
+                {
+                  "chartTime": 1788742560000,
+                  "role": "POC",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80131.90000000001,
+                  "down": 80131.8,
+                  "buy": 0,
+                  "sell": 0.03421,
+                  "total": 0.03421,
+                  "delta": -0.03421,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788742560000,
+                  "role": "VAH",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80136.40000000001,
+                  "down": 80136.3,
+                  "buy": 0,
+                  "sell": 0.03421,
+                  "total": 0.03421,
+                  "delta": -0.03421,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788742560000,
+                  "role": "VAL",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80070.3,
+                  "down": 80070.2,
+                  "buy": 0,
+                  "sell": 0.02407,
+                  "total": 0.02407,
+                  "delta": -0.02407,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788742560000,
+                  "role": "CLOSE_SELECTED",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80103.8,
+                  "down": 80103.7,
+                  "buy": 0,
+                  "sell": 0.02407,
+                  "total": 0.02407,
+                  "delta": -0.02407,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                }
+              ]
+            },
+            {
+              "bar_index": 29,
+              "time_ms": 1788742680000,
+              "ordered_rows": 794,
+              "selected_rows": [
+                {
+                  "chartTime": 1788742680000,
+                  "role": "POC",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80103.7,
+                  "down": 80103.6,
+                  "buy": 0.01469,
+                  "sell": 0.02437,
+                  "total": 0.03906,
+                  "delta": -0.00968,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788742680000,
+                  "role": "VAH",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80127.90000000001,
+                  "down": 80127.8,
+                  "buy": 0.01469,
+                  "sell": 0,
+                  "total": 0.01469,
+                  "delta": 0.01469,
+                  "buyImbalance": true,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788742680000,
+                  "role": "VAL",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80080.90000000001,
+                  "down": 80080.8,
+                  "buy": 0,
+                  "sell": 0.02437,
+                  "total": 0.02437,
+                  "delta": -0.02437,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788742680000,
+                  "role": "CLOSE_SELECTED",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80160.1,
+                  "down": 80160,
+                  "buy": 0.002220000000067,
+                  "sell": 0,
+                  "total": 0.002220000000067,
+                  "delta": 0.002220000000067,
+                  "buyImbalance": true,
+                  "sellImbalance": false
+                }
+              ]
+            },
+            {
+              "bar_index": 30,
+              "time_ms": 1788742800000,
+              "ordered_rows": 601,
+              "selected_rows": [
+                {
+                  "chartTime": 1788742800000,
+                  "role": "POC",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80130.1,
+                  "down": 80130,
+                  "buy": 0.02332,
+                  "sell": 0.01483,
+                  "total": 0.03815,
+                  "delta": 0.00849,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788742800000,
+                  "role": "VAH",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80148.6,
+                  "down": 80148.5,
+                  "buy": 0.0132399999999962,
+                  "sell": 0.01483,
+                  "total": 0.0280699999999962,
+                  "delta": -0.0015900000000038,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788742800000,
+                  "role": "VAL",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80114.5,
+                  "down": 80114.40000000001,
+                  "buy": 0.02332,
+                  "sell": 0,
+                  "total": 0.02332,
+                  "delta": 0.02332,
+                  "buyImbalance": true,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788742800000,
+                  "role": "CLOSE_SELECTED",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80147.5,
+                  "down": 80147.40000000001,
+                  "buy": 0.02332,
+                  "sell": 0.01483,
+                  "total": 0.03815,
+                  "delta": 0.00849,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                }
+              ]
+            },
+            {
+              "bar_index": 31,
+              "time_ms": 1788742920000,
+              "ordered_rows": 934,
+              "selected_rows": [
+                {
+                  "chartTime": 1788742920000,
+                  "role": "POC",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80194.1,
+                  "down": 80194,
+                  "buy": 0.00799,
+                  "sell": 0.01372,
+                  "total": 0.02171,
+                  "delta": -0.00573,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788742920000,
+                  "role": "VAH",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80220.40000000001,
+                  "down": 80220.3,
+                  "buy": 0,
+                  "sell": 0.01372,
+                  "total": 0.01372,
+                  "delta": -0.01372,
+                  "buyImbalance": false,
+                  "sellImbalance": true
+                },
+                {
+                  "chartTime": 1788742920000,
+                  "role": "VAL",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80170,
+                  "down": 80169.90000000001,
+                  "buy": 0.00799,
+                  "sell": 0.0096,
+                  "total": 0.01759,
+                  "delta": -0.00161,
+                  "buyImbalance": true,
+                  "sellImbalance": false
+                },
+                {
+                  "chartTime": 1788742920000,
+                  "role": "CLOSE_SELECTED",
+                  "order": -1,
+                  "missing": false,
+                  "up": 80213.5,
+                  "down": 80213.40000000001,
+                  "buy": 0.00799,
+                  "sell": 0.01372,
+                  "total": 0.02171,
+                  "delta": -0.00573,
+                  "buyImbalance": false,
+                  "sellImbalance": false
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "remaining_span": "All other exported bars lack complete ordered log coverage and remain held; no reconstruction from aggregates."
+    }
+  ],
+  "limits": "Complete row order and four selected roles only over literal0..31 at actual chunk capture clocks. Original global alert/state behavior remains separate; no full exported-history closure or retroactive old context claim."
+}

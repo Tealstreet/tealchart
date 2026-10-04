@@ -1,0 +1,368 @@
+{
+  "artifact": "Complete bounded footprint native log chunk v1",
+  "script": "footprint-ten-70-300-host-v19-v1.pine",
+  "log_bounds": {
+    "start": 28,
+    "end": 31
+  },
+  "setup": {
+    "tickerid": "BINANCE:BTCUSDT",
+    "timeframe": "2",
+    "chart_type": "standard candles",
+    "native_style": 1,
+    "timezone": "Etc/UTC",
+    "bar_replay": false,
+    "minmove": 1,
+    "pricescale": 100,
+    "pointvalue": 1,
+    "mintick": 0.01,
+    "defaults_confirmed": false,
+    "native_user_inputs": [
+      {
+        "id": "in_0",
+        "name": "Log first Pine index",
+        "value": 28,
+        "default": 0
+      },
+      {
+        "id": "in_1",
+        "name": "Log last Pine index",
+        "value": 31,
+        "default": 31
+      },
+      {
+        "id": "in_2",
+        "name": "Ticks Per Row",
+        "value": 10,
+        "default": 10
+      },
+      {
+        "id": "in_3",
+        "name": "Value Area %",
+        "value": 70,
+        "default": 70
+      },
+      {
+        "id": "in_4",
+        "name": "Imbalance Threshold %",
+        "value": 300,
+        "default": 300
+      },
+      {
+        "id": "in_5",
+        "name": "Min Stacked Rows",
+        "value": 4,
+        "default": 4
+      },
+      {
+        "id": "in_6",
+        "name": "Min Imbalance Density %",
+        "value": 40,
+        "default": 40
+      },
+      {
+        "id": "in_7",
+        "name": "Min Volume vs 20-SMA",
+        "value": 1.3,
+        "default": 1.3
+      },
+      {
+        "id": "in_8",
+        "name": "Min Zone % of Bar Range",
+        "value": 30,
+        "default": 30
+      }
+    ],
+    "observed_indicator_title": "Guarded footprint ordered rows companion v1",
+    "dataset_start_utc": "2026-09-07T00:00:00.000Z",
+    "first_chart_bar": {
+      "index": -19786,
+      "value": [
+        1788739200,
+        80341.83,
+        80356,
+        80230.29,
+        80293.23,
+        37.66955
+      ]
+    },
+    "chart_bars": 20087,
+    "subscription": "pro_premium",
+    "native_end_of_data": true,
+    "exchange_timezone": "Etc/UTC",
+    "exchange_session": "24x7",
+    "currency": "USDT",
+    "chart_session": "regular",
+    "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+  },
+  "native_source_rows": {
+    "browser_utc": "2026-10-04T21:33:10.509Z",
+    "title": "Guarded footprint ordered rows companion v1",
+    "status": {
+      "type": 2
+    },
+    "plot_ids": [
+      {
+        "id": "plot_0",
+        "type": "line"
+      },
+      {
+        "id": "plot_1",
+        "type": "line"
+      },
+      {
+        "id": "plot_2",
+        "type": "line"
+      },
+      {
+        "id": "plot_3",
+        "type": "line"
+      },
+      {
+        "id": "plot_4",
+        "type": "line"
+      },
+      {
+        "id": "plot_5",
+        "type": "line"
+      },
+      {
+        "id": "plot_6",
+        "type": "line"
+      },
+      {
+        "id": "plot_7",
+        "type": "line"
+      },
+      {
+        "id": "plot_8",
+        "type": "line"
+      },
+      {
+        "id": "plot_9",
+        "type": "line"
+      },
+      {
+        "id": "plot_10",
+        "type": "line"
+      },
+      {
+        "id": "plot_11",
+        "type": "line"
+      },
+      {
+        "id": "plot_12",
+        "type": "line"
+      },
+      {
+        "id": "plot_13",
+        "type": "line"
+      },
+      {
+        "id": "plot_14",
+        "type": "line"
+      },
+      {
+        "id": "plot_15",
+        "type": "line"
+      },
+      {
+        "id": "plot_16",
+        "type": "line"
+      },
+      {
+        "id": "plot_17",
+        "type": "line"
+      },
+      {
+        "id": "plot_18",
+        "type": "line"
+      },
+      {
+        "id": "plot_19",
+        "type": "line"
+      },
+      {
+        "id": "plot_20",
+        "type": "line"
+      },
+      {
+        "id": "plot_21",
+        "type": "line"
+      },
+      {
+        "id": "plot_22",
+        "type": "line"
+      },
+      {
+        "id": "plot_23",
+        "type": "line"
+      },
+      {
+        "id": "plot_24",
+        "type": "line"
+      },
+      {
+        "id": "plot_25",
+        "type": "line"
+      },
+      {
+        "id": "plot_26",
+        "type": "line"
+      },
+      {
+        "id": "plot_27",
+        "type": "line"
+      }
+    ],
+    "rows": [
+      {
+        "native_index": -19758,
+        "value": [
+          1788742560,
+          1788742560000,
+          1788742680000,
+          28,
+          20086,
+          1788739200000,
+          80179.25,
+          80179.26,
+          80059.11,
+          80103.76,
+          23.4332,
+          1,
+          0,
+          1202,
+          0,
+          23.43320000000012,
+          23.433199999999644,
+          -23.43320000000012,
+          0,
+          1201,
+          0,
+          1201,
+          12.970951,
+          1.8065907426525627,
+          0,
+          99.91680532445923,
+          99.95838535164863,
+          0,
+          1
+        ]
+      },
+      {
+        "native_index": -19757,
+        "value": [
+          1788742680,
+          1788742680000,
+          1788742800000,
+          29,
+          20086,
+          1788739200000,
+          80103.77,
+          80160.02,
+          80080.74,
+          80160.01,
+          15.78039,
+          1,
+          0,
+          794,
+          10.1677,
+          5.612690000000001,
+          15.780389999999977,
+          4.555009999999999,
+          562,
+          100,
+          562,
+          100,
+          12.170490999999998,
+          1.2966107940920382,
+          70.7808564231738,
+          12.594458438287154,
+          70.88799192734716,
+          0,
+          0
+        ]
+      },
+      {
+        "native_index": -19756,
+        "value": [
+          1788742800,
+          1788742800000,
+          1788742920000,
+          30,
+          20086,
+          1788739200000,
+          80160.01,
+          80160.02,
+          80100,
+          80147.46,
+          16.79194,
+          1,
+          0,
+          601,
+          11.323439999999998,
+          5.468500000000001,
+          16.79193999999994,
+          5.854939999999997,
+          231,
+          115,
+          231,
+          115,
+          12.172093499999999,
+          1.3795441186842676,
+          38.43594009983361,
+          19.13477537437604,
+          38.48717094301639,
+          0,
+          0
+        ]
+      },
+      {
+        "native_index": -19755,
+        "value": [
+          1788742920,
+          1788742920000,
+          1788743040000,
+          31,
+          20086,
+          1788739200000,
+          80147.46,
+          80240.8,
+          80147.46,
+          80213.42,
+          15.31229,
+          1,
+          0,
+          934,
+          5.589150000000001,
+          9.72314,
+          15.31228999999967,
+          -4.13399,
+          225,
+          234,
+          225,
+          234,
+          11.862262999999997,
+          1.2908405419775304,
+          24.089935760171304,
+          25.053533190578158,
+          25.0696378830093,
+          0,
+          0
+        ]
+      }
+    ]
+  },
+  "pine_logs": {
+    "paths": [
+      "evidence/footprint-ten-70-300-host-v19-v1-chunk-28-31-v1-attempt1-logs.txt",
+      "evidence/footprint-ten-70-300-host-v19-v1-chunk-28-31-v1-attempt1-logs-v1.json",
+      "evidence/footprint-ten-70-300-host-v19-v1-chunk-28-31-v1-attempt1-logs.png"
+    ],
+    "entries": 3553,
+    "last_message_time_ms": 1791149400000,
+    "last_bar_time_ms": 1791149400000
+  },
+  "limits": "Actual sequential prefix chunk, logging bounds only. Native timestamp/source rows and provider inputs retained; complete only for this stated span. Aggregate CSV cannot replace missing ordered streams."
+}

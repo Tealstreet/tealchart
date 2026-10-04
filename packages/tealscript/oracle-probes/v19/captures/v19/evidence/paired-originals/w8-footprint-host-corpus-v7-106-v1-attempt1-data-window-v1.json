@@ -1,0 +1,30 @@
+{
+  "index": 299,
+  "bar": [
+    1791148680,
+    86022.79,
+    86042.1,
+    86005.09,
+    86005.09,
+    21.7646
+  ],
+  "source_row": [
+    1791148680,
+    0,
+    0
+  ],
+  "browser_utc": "2026-10-04T21:20:11.090Z",
+  "title": "Footprint Alert for Pandora",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   21:18",
+  "visible_range": {
+    "_firstBar": 264,
+    "_lastBar": 302
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}

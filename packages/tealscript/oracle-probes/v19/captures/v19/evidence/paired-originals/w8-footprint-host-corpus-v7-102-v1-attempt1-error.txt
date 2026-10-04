@@ -1,0 +1,41 @@
+Error on bar 2: The `volume_row` ID used in the `up_price()` call cannot be `na`.
+{
+  "ctx": {
+    "bar_index": 2,
+    "method_name": "up_price",
+    "code": "RE10145"
+  },
+  "error": "Error on bar {bar_index}: The `volume_row` ID used in the `{method_name}()` call cannot be `na`.",
+  "stack_trace": [
+    {
+      "n": "#main",
+      "p": 19
+    }
+  ],
+  "title": "Runtime error",
+  "showReportItButton": false,
+  "studyAccessBlocked": false,
+  "native_context_scalar_types": [
+    {
+      "key": "bar_index",
+      "type": "number",
+      "nonfinite": false,
+      "native_string": "2"
+    },
+    {
+      "key": "method_name",
+      "type": "string",
+      "nonfinite": false,
+      "native_string": "up_price"
+    },
+    {
+      "key": "code",
+      "type": "string",
+      "nonfinite": false,
+      "native_string": "RE10145"
+    }
+  ],
+  "compiler_markers": [],
+  "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n86,022.79\nH\n86,032.12\nL\n86,022.79\nC\n86,032.11\n+9.32 (+0.01%)\n86,032.11\nSELL\n0.01\n86,032.12\nBUY\nUSDT\ncoverage footprint\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n21:18:48 UTC\n99+\nRuntime error: RE10145\nRuntime error: RE10145\nError on bar 2: The `volume_row` ID used in the `up_price()` call cannot be `na`.\nat #main():19\nOpen in editor",
+  "context_substituted_message": "Error on bar 2: The `volume_row` ID used in the `up_price()` call cannot be `na`."
+}

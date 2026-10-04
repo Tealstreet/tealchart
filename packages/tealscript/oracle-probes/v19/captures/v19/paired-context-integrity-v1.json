@@ -1,0 +1,311 @@
+{
+  "artifact": "v19 actual fresh original companion pairing v1",
+  "pairs": [
+    {
+      "pair_id": "pivot-request-feed-origin-v19-v1-new-context-v1",
+      "companion": {
+        "source": "pivot-request-feed-origin-v19-v1.pine",
+        "attempt": 1,
+        "sha256": "94b023d3963b9c142732f97e1d5fd53ce98cc35dd4cc81b0f6eb5ec7b8a145de",
+        "status": "RUNS"
+      },
+      "original": {
+        "source": "paired-originals/w8-exact-source-compile-corpus-v7-434-v1.pine",
+        "attempt": 1,
+        "sha256": "41a231f89c514f2153e22c72bd72d819e17d4cac3cb9a2e83b43326351ead712",
+        "status": "RUNS",
+        "diagnostic": {
+          "code": null,
+          "text": null,
+          "line": null,
+          "column": null,
+          "first_bar_index": null,
+          "first_bar_time_utc": null
+        }
+      },
+      "verified_matching_setup_keys": {
+        "tickerid": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chart_type": "standard candles",
+        "native_style": 1,
+        "timezone": "Etc/UTC",
+        "bar_replay": false,
+        "minmove": 1,
+        "pricescale": 100,
+        "mintick": 0.01,
+        "exchange_timezone": "Etc/UTC",
+        "exchange_session": "24x7",
+        "currency": "USDT",
+        "chart_session": "regular",
+        "subscription": "pro_premium",
+        "dataset_start_utc": "2026-09-07T00:00:00.000Z",
+        "native_end_of_data": true
+      },
+      "companion_cutoff": 1791148560,
+      "original_cutoff": 1791148560,
+      "strict_common_cutoff": 1791148560,
+      "literal_chart_prefix": {
+        "first_index": "0",
+        "first_time": "1788739200000",
+        "closed_rows": 20078
+      },
+      "observed_companion_origin_fields": {
+        "CHART_FIRST_EXECUTION_MS": "1788739200000",
+        "TF_2_GAPS_OFF_FIRST": "1788739200000",
+        "TF_60_GAPS_OFF_FIRST": "1779152400000",
+        "TF_240_GAPS_OFF_FIRST": "1779163200000",
+        "TF_D_GAPS_OFF_FIRST": "1779235200000",
+        "TF_W_GAPS_OFF_FIRST": "1779667200000"
+      },
+      "original_first_execution_origin": "UNKNOWN: unchanged original does not expose a literal origin channel; matching chart origin alone is not proof of its hidden request/execution origin.",
+      "original_closed_chart_ohlc_comparison": {
+        "matched_rows": 20078,
+        "differences": []
+      },
+      "independent_native_chart_ohlcv_differences": [
+        {
+          "time": "1791148440",
+          "differences": [
+            {
+              "column": "CHART_VOLUME",
+              "source_csv": "24.280140000000003",
+              "independent_native": "24.28014"
+            }
+          ]
+        }
+      ],
+      "native_feed_receipts": [
+        "captures/v19/native-BINANCE_BTCUSDT-1W-raw-v1-attempt1-receipt-v1.json",
+        "captures/v19/native-BINANCE_BTCUSDT-1D-raw-v1-attempt1-receipt-v1.json",
+        "captures/v19/native-BINANCE_BTCUSDT-240-raw-v1-attempt1-receipt-v1.json",
+        "captures/v19/native-BINANCE_BTCUSDT-60-raw-v1-attempt1-receipt-v1.json",
+        "captures/v19/native-BINANCE_BTCUSDT-2-raw-v1-attempt1-receipt-v1.json"
+      ],
+      "limits": "Fresh paired span only. Original historical origin/provider revisions/entitlement details not exposed by recorded setup stay held; no retroactive old capture recovery or expected-output replay inputs. All adjustments are preserved in independent native main-series property receipts, not inferred for the old context."
+    },
+    {
+      "pair_id": "financial-nine-series-host-v19-v1-new-context-v1",
+      "companion": {
+        "source": "financial-nine-series-host-v19-v1.pine",
+        "attempt": 1,
+        "sha256": "7cc46b7cd312a3112825bf06ca4145dd06b076df095a8753742a5803da48d200",
+        "status": "RUNS"
+      },
+      "original": {
+        "source": "paired-originals/w8-financial-host-corpus-v7-353-v1.pine",
+        "attempt": 1,
+        "sha256": "2319f696d5fd5847e482944c116f692ecae8b1af81c8bab44ca11136baadf05b",
+        "status": "RUNS",
+        "diagnostic": {
+          "code": null,
+          "text": null,
+          "line": null,
+          "column": null,
+          "first_bar_index": null,
+          "first_bar_time_utc": null
+        }
+      },
+      "verified_matching_setup_keys": {
+        "tickerid": "BATS:AAPL",
+        "timeframe": "1D",
+        "chart_type": "standard candles",
+        "native_style": 1,
+        "timezone": "Etc/UTC",
+        "bar_replay": false,
+        "minmove": 1,
+        "pricescale": 100,
+        "mintick": 0.01,
+        "exchange_timezone": "America/New_York",
+        "exchange_session": "0930-1600",
+        "currency": "USD",
+        "chart_session": "regular",
+        "subscription": "pro_premium",
+        "dataset_start_utc": "1980-12-12T14:30:00.000Z",
+        "native_end_of_data": true
+      },
+      "companion_cutoff": 1790947800,
+      "original_cutoff": 1790947800,
+      "strict_common_cutoff": 1790947800,
+      "literal_chart_prefix": {
+        "first_index": "0",
+        "first_time": "345479400000",
+        "closed_rows": 11537
+      },
+      "observed_companion_origin_fields": {
+        "CHART_FIRST_EXECUTION_MS": "345479400000",
+        "D_FIRST_EXECUTION": "345479400000"
+      },
+      "original_first_execution_origin": "UNKNOWN: unchanged original does not expose a literal origin channel; matching chart origin alone is not proof of its hidden request/execution origin.",
+      "original_closed_chart_ohlc_comparison": {
+        "matched_rows": 11537,
+        "differences": []
+      },
+      "independent_native_chart_ohlcv_differences": [],
+      "native_feed_receipts": [
+        "captures/v19/native-BATS_AAPL-1D-raw-v1-attempt1-receipt-v1.json"
+      ],
+      "limits": "Fresh paired span only. Original historical origin/provider revisions/entitlement details not exposed by recorded setup stay held; no retroactive old capture recovery or expected-output replay inputs. All adjustments are preserved in independent native main-series property receipts, not inferred for the old context."
+    },
+    {
+      "pair_id": "footprint-ten-default-host-v19-v1-new-context-v1",
+      "companion": {
+        "source": "footprint-ten-default-host-v19-v1.pine",
+        "attempt": 1,
+        "sha256": "82e79008890e70d3e2c386f5214e8c9b49a0c85937afdbd084936d0a9812763c",
+        "status": "RUNS"
+      },
+      "original": {
+        "source": "paired-originals/w8-footprint-host-corpus-v7-102-v1.pine",
+        "attempt": 1,
+        "sha256": "bd4a615aa84dc1d47a6a53772df3268e9db817805a39a11ef78e9bcb65b1d06d",
+        "status": "RUNTIME-ERROR",
+        "diagnostic": {
+          "code": "RE10145",
+          "text": "Error on bar 2: The `volume_row` ID used in the `up_price()` call cannot be `na`.",
+          "line": 19,
+          "column": null,
+          "first_bar_index": 2,
+          "first_bar_time_utc": null,
+          "native": {
+            "ctx": {
+              "bar_index": 2,
+              "method_name": "up_price",
+              "code": "RE10145"
+            },
+            "error": "Error on bar {bar_index}: The `volume_row` ID used in the `{method_name}()` call cannot be `na`.",
+            "stack_trace": [
+              {
+                "n": "#main",
+                "p": 19
+              }
+            ],
+            "title": "Runtime error",
+            "showReportItButton": false,
+            "studyAccessBlocked": false,
+            "native_context_scalar_types": [
+              {
+                "key": "bar_index",
+                "type": "number",
+                "nonfinite": false,
+                "native_string": "2"
+              },
+              {
+                "key": "method_name",
+                "type": "string",
+                "nonfinite": false,
+                "native_string": "up_price"
+              },
+              {
+                "key": "code",
+                "type": "string",
+                "nonfinite": false,
+                "native_string": "RE10145"
+              }
+            ],
+            "compiler_markers": [],
+            "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n86,022.79\nH\n86,032.12\nL\n86,022.79\nC\n86,032.11\n+9.32 (+0.01%)\n86,032.11\nSELL\n0.01\n86,032.12\nBUY\nUSDT\ncoverage footprint\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n21:18:48 UTC\n99+\nRuntime error: RE10145\nRuntime error: RE10145\nError on bar 2: The `volume_row` ID used in the `up_price()` call cannot be `na`.\nat #main():19\nOpen in editor",
+            "context_substituted_message": "Error on bar 2: The `volume_row` ID used in the `up_price()` call cannot be `na`."
+          }
+        }
+      },
+      "verified_matching_setup_keys": {
+        "tickerid": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chart_type": "standard candles",
+        "native_style": 1,
+        "timezone": "Etc/UTC",
+        "bar_replay": false,
+        "minmove": 1,
+        "pricescale": 100,
+        "mintick": 0.01,
+        "exchange_timezone": "Etc/UTC",
+        "exchange_session": "24x7",
+        "currency": "USDT",
+        "chart_session": "regular",
+        "subscription": "pro_premium",
+        "dataset_start_utc": "2026-09-07T00:00:00.000Z",
+        "native_end_of_data": true
+      },
+      "companion_cutoff": 1791148680,
+      "original_cutoff": 1791148680,
+      "strict_common_cutoff": 1791148680,
+      "literal_chart_prefix": {
+        "first_index": "0",
+        "first_time": "1788739200000",
+        "closed_rows": 20079
+      },
+      "observed_companion_origin_fields": {
+        "CHART_FIRST_EXECUTION_MS": "1788739200000"
+      },
+      "original_first_execution_origin": "UNKNOWN: unchanged original does not expose a literal origin channel; matching chart origin alone is not proof of its hidden request/execution origin.",
+      "original_closed_chart_ohlc_comparison": null,
+      "independent_native_chart_ohlcv_differences": [],
+      "native_feed_receipts": [
+        "captures/v19/native-BINANCE_BTCUSDT-2-raw-v1-attempt1-receipt-v1.json"
+      ],
+      "limits": "Fresh paired span only. Original historical origin/provider revisions/entitlement details not exposed by recorded setup stay held; no retroactive old capture recovery or expected-output replay inputs. All adjustments are preserved in independent native main-series property receipts, not inferred for the old context."
+    },
+    {
+      "pair_id": "footprint-ten-70-300-host-v19-v1-new-context-v1",
+      "companion": {
+        "source": "footprint-ten-70-300-host-v19-v1.pine",
+        "attempt": 1,
+        "sha256": "e59f1409d65fa41b56abcafc677054f532fa1d763ae9b97097a125f5d959083e",
+        "status": "RUNS"
+      },
+      "original": {
+        "source": "paired-originals/w8-footprint-host-corpus-v7-106-v1.pine",
+        "attempt": 2,
+        "sha256": "6374b7b75aad54bcbdba5cb250c10ef093b08b0efcc8201b574393544666d090",
+        "status": "RUNS",
+        "diagnostic": {
+          "code": null,
+          "text": null,
+          "line": null,
+          "column": null,
+          "first_bar_index": null,
+          "first_bar_time_utc": null
+        }
+      },
+      "verified_matching_setup_keys": {
+        "tickerid": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chart_type": "standard candles",
+        "native_style": 1,
+        "timezone": "Etc/UTC",
+        "bar_replay": false,
+        "minmove": 1,
+        "pricescale": 100,
+        "mintick": 0.01,
+        "exchange_timezone": "Etc/UTC",
+        "exchange_session": "24x7",
+        "currency": "USDT",
+        "chart_session": "regular",
+        "subscription": "pro_premium",
+        "dataset_start_utc": "2026-09-07T00:00:00.000Z",
+        "native_end_of_data": true
+      },
+      "companion_cutoff": 1791148680,
+      "original_cutoff": 1791148800,
+      "strict_common_cutoff": 1791148680,
+      "literal_chart_prefix": {
+        "first_index": "0",
+        "first_time": "1788739200000",
+        "closed_rows": 20079
+      },
+      "observed_companion_origin_fields": {
+        "CHART_FIRST_EXECUTION_MS": "1788739200000"
+      },
+      "original_first_execution_origin": "UNKNOWN: unchanged original does not expose a literal origin channel; matching chart origin alone is not proof of its hidden request/execution origin.",
+      "original_closed_chart_ohlc_comparison": {
+        "matched_rows": 20079,
+        "differences": []
+      },
+      "independent_native_chart_ohlcv_differences": [],
+      "native_feed_receipts": [
+        "captures/v19/native-BINANCE_BTCUSDT-2-raw-v1-attempt1-receipt-v1.json"
+      ],
+      "limits": "Fresh paired span only. Original historical origin/provider revisions/entitlement details not exposed by recorded setup stay held; no retroactive old capture recovery or expected-output replay inputs. All adjustments are preserved in independent native main-series property receipts, not inferred for the old context."
+    }
+  ]
+}
