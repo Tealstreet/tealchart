@@ -1,0 +1,68 @@
+{
+  "artifact": "Supertrend discriminator ordered columns v2",
+  "source": "supertrend-factor-paired-fixed2-v2.pine",
+  "sourceSha256": "73556b702f0b324d1d9ffee4387d1564a66ed61b1482b18a1983aa67406c9bab",
+  "plotCount": 12,
+  "columns": [
+    {
+      "index": 0,
+      "title": "input_time_ms",
+      "expression": "time"
+    },
+    {
+      "index": 1,
+      "title": "input_bar_index",
+      "expression": "bar_index"
+    },
+    {
+      "index": 2,
+      "title": "input_open",
+      "expression": "open"
+    },
+    {
+      "index": 3,
+      "title": "input_high",
+      "expression": "high"
+    },
+    {
+      "index": 4,
+      "title": "input_low",
+      "expression": "low"
+    },
+    {
+      "index": 5,
+      "title": "input_close",
+      "expression": "close"
+    },
+    {
+      "index": 6,
+      "title": "input_volume",
+      "expression": "volume"
+    },
+    {
+      "index": 7,
+      "title": "input_factor",
+      "expression": "factor"
+    },
+    {
+      "index": 8,
+      "title": "dynamic_line",
+      "expression": "line"
+    },
+    {
+      "index": 9,
+      "title": "dynamic_direction",
+      "expression": "direction"
+    },
+    {
+      "index": 10,
+      "title": "fixed2_line",
+      "expression": "fixedLine"
+    },
+    {
+      "index": 11,
+      "title": "fixed2_direction",
+      "expression": "fixedDirection"
+    }
+  ]
+}

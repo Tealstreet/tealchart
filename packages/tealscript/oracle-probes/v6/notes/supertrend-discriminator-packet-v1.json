@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "artifact": "Standalone Supertrend factor discriminator v1",
+  "engineCommit": "dc2b27571b661cc71352661c16647292ff5abf2e",
+  "authority": "Native capture pending; no factor-freeze conclusion",
+  "question": "Compare alternating series factor alone (2 first and 3 first) versus identical dynamic call paired with fixed factor2. Distinguish first-value retention from call sharing.",
+  "probes": [
+    {
+      "source": "supertrend-factor-alone-first3-v2.pine",
+      "sourceSha256": "6c68c0b2c5d5aed235f7102b1fffe0525cea2da6410f270e4cc331fcbd63e3ca",
+      "standalone": true
+    },
+    {
+      "source": "supertrend-factor-alone-v2.pine",
+      "sourceSha256": "9744da2fd144dbaab123dec19935a38b703014c28e9f4100f0a90c6dbf53311c",
+      "standalone": true
+    },
+    {
+      "source": "supertrend-factor-paired-fixed2-v2.pine",
+      "sourceSha256": "73556b702f0b324d1d9ffee4387d1564a66ed61b1482b18a1983aa67406c9bab",
+      "standalone": false
+    }
+  ],
+  "captureRequirements": [
+    "Same symbol, timeframe, chart history and export for all three scripts",
+    "Historical dataset starts at plotted bar_index0; export at least256 historical rows",
+    "Reload each script before capture; preserve exact source and CSV SHA256",
+    "Plot factor and OHLCV inputs alongside line/direction; do not infer factor retention from paired call alone"
+  ],
+  "scope": "External oracle probes only; no engine or retained functional-test edit"
+}

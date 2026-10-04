@@ -1,0 +1,7 @@
+//@version=5
+indicator("Color array warmup na index v1")
+var colors = array.new_color(101, color.blue)
+_percent = close[1] - close[1]
+int index = math.round(_percent)
+color selected = array.get(colors, index)
+plot(na(selected) ? 1 : 0, "OUTCOME")

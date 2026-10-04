@@ -1,0 +1,4 @@
+//@version=6
+indicator("Reserved variable text v6")
+float text = close
+plot(text, "VALUE")

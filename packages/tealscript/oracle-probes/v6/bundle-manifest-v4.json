@@ -1,0 +1,986 @@
+{
+  "artifact": "TradingView capture bundle v6 release v2",
+  "version": 2,
+  "captureRound": 6,
+  "owner": "codex-9tqhik",
+  "frozen": true,
+  "createdAt": "2026-10-04T00:20:16.218424+00:00",
+  "lock": "/home/sam/.cache/fleet-tmp/v3-bundle.lock",
+  "chart": {
+    "symbol": "BINANCE:BTCUSDT",
+    "timeframe": "2",
+    "type": "standard candles",
+    "timezone": "UTC"
+  },
+  "scriptCount": 18,
+  "counts": {
+    "numeric": 8,
+    "outcome": 10
+  },
+  "requestGroupCounts": {
+    "MFI zero boundary": 1,
+    "V5 color-array NA index": 2,
+    "Range/text reserved identifiers": 4,
+    "Mutable v5 EMA first length": 4,
+    "Supertrend standalone/paired factors": 3,
+    "Linear percentile interior-hole order": 4
+  },
+  "pineVersionCounts": {
+    "6": 10,
+    "5": 8
+  },
+  "authority": "All native answers UNOBSERVED. Existing local gates and hypotheses establish readiness only; no engine-derived value is promoted to TradingView truth.",
+  "scripts": [
+    {
+      "probe": "mfi-private-zero-boundary-v1.pine",
+      "path": "mfi-private-zero-boundary-v1.pine",
+      "sourceSha256": "8a3b2eef2595ac0d920ee374df9420fc03e41259ccf515304fb9b8f583322dc4",
+      "pineVersion": 6,
+      "owner": "codex-ymk07v",
+      "requestGroup": "MFI zero boundary",
+      "captureGroup": "numeric",
+      "captureKind": "NUMERIC-CSV",
+      "nativeStatus": "UNOBSERVED",
+      "minimumHistoryBars": 600,
+      "question": "Does native builtin MFI change at tiny source scales? Distinguish source-comparison changes, private zero handling and signed carry; the 1e-10 candidate is not a native rule.",
+      "captureInstructions": [
+        "Export all60 columns at seven scales with raw signed values and empty cells.",
+        "Use the longest available history from script bar_index0; retain the same initial history as prior MFI captures when possible.",
+        "Inspect scaled-sign and unscaled-sign flow controls before attributing a result to a threshold."
+      ],
+      "plotCount": 60,
+      "columns": [
+        "input_time_ms",
+        "input_bar_index",
+        "input_close",
+        "input_volume",
+        "pow2_minus0_builtin",
+        "pow2_minus0_pine_reference",
+        "pow2_minus0_unscaled_sign_reference",
+        "pow2_minus0_guard_candidate",
+        "pow2_minus0_upper_restored",
+        "pow2_minus0_lower_restored",
+        "pow2_minus0_pine_up_flow_restored",
+        "pow2_minus0_pine_down_flow_restored",
+        "pow2_minus20_builtin",
+        "pow2_minus20_pine_reference",
+        "pow2_minus20_unscaled_sign_reference",
+        "pow2_minus20_guard_candidate",
+        "pow2_minus20_upper_restored",
+        "pow2_minus20_lower_restored",
+        "pow2_minus20_pine_up_flow_restored",
+        "pow2_minus20_pine_down_flow_restored",
+        "pow2_minus30_builtin",
+        "pow2_minus30_pine_reference",
+        "pow2_minus30_unscaled_sign_reference",
+        "pow2_minus30_guard_candidate",
+        "pow2_minus30_upper_restored",
+        "pow2_minus30_lower_restored",
+        "pow2_minus30_pine_up_flow_restored",
+        "pow2_minus30_pine_down_flow_restored",
+        "pow2_minus40_builtin",
+        "pow2_minus40_pine_reference",
+        "pow2_minus40_unscaled_sign_reference",
+        "pow2_minus40_guard_candidate",
+        "pow2_minus40_upper_restored",
+        "pow2_minus40_lower_restored",
+        "pow2_minus40_pine_up_flow_restored",
+        "pow2_minus40_pine_down_flow_restored",
+        "pow2_minus45_builtin",
+        "pow2_minus45_pine_reference",
+        "pow2_minus45_unscaled_sign_reference",
+        "pow2_minus45_guard_candidate",
+        "pow2_minus45_upper_restored",
+        "pow2_minus45_lower_restored",
+        "pow2_minus45_pine_up_flow_restored",
+        "pow2_minus45_pine_down_flow_restored",
+        "pow2_minus50_builtin",
+        "pow2_minus50_pine_reference",
+        "pow2_minus50_unscaled_sign_reference",
+        "pow2_minus50_guard_candidate",
+        "pow2_minus50_upper_restored",
+        "pow2_minus50_lower_restored",
+        "pow2_minus50_pine_up_flow_restored",
+        "pow2_minus50_pine_down_flow_restored",
+        "pow2_minus60_builtin",
+        "pow2_minus60_pine_reference",
+        "pow2_minus60_unscaled_sign_reference",
+        "pow2_minus60_guard_candidate",
+        "pow2_minus60_upper_restored",
+        "pow2_minus60_lower_restored",
+        "pow2_minus60_pine_up_flow_restored",
+        "pow2_minus60_pine_down_flow_restored"
+      ],
+      "registrationEvidence": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v5-outcomes/mfi-private-zero-boundary-v1.columns.json",
+      "originalSourcePath": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v5-outcomes/mfi-private-zero-boundary-v1.pine",
+      "requiredFirstBarIndex": 0,
+      "columnMap": "notes/mfi-private-zero-boundary-v1.columns.json",
+      "operatorNotes": "notes/MFI-PRIVATE-ZERO-BOUNDARY-v1.md",
+      "localGate": "notes/mfi-private-zero-boundary-v1.gate-v1.json"
+    },
+    {
+      "probe": "corpus-color-array-warmup-na-index-v5-v1.pine",
+      "path": "corpus-color-array-warmup-na-index-v5-v1.pine",
+      "sourceSha256": "941479a5b41f7fc53db81226abc1e45245e8760ec409a0301a03f9aaa3751d6a",
+      "pineVersion": 5,
+      "owner": "codex-115868",
+      "requestGroup": "V5 color-array NA index",
+      "captureGroup": "outcome",
+      "captureKind": "COMPILE-OR-RUNTIME-OUTCOME",
+      "nativeStatus": "UNOBSERVED",
+      "minimumHistoryBars": 4,
+      "question": "Does Pine v5 admit and execute array.get on a color array with a warmup missing series-int index? Compare with the matched finite zero-index control.",
+      "captureInstructions": [
+        "Exact compiler diagnostic if refused",
+        "Runtime error/code/bar if admitted then fails",
+        "CSV including OUTCOME if accepted and executes",
+        "Keep both sources independent; a refusal must not suppress the finite control."
+      ],
+      "plotCount": 1,
+      "columns": [
+        "OUTCOME"
+      ],
+      "registrationEvidence": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v6-outcomes/corpus-color-array-na-index-packet-v1.json",
+      "originalSourcePath": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v6-outcomes/corpus-color-array-warmup-na-index-v5-v1.pine",
+      "sourcePacket": "notes/corpus-color-array-na-index-packet-v1.json",
+      "localPrediction": [
+        1,
+        0,
+        0,
+        0
+      ],
+      "predictionAuthority": "Conditional local prediction only; not a native verdict"
+    },
+    {
+      "probe": "corpus-color-array-finite-index-control-v5-v1.pine",
+      "path": "corpus-color-array-finite-index-control-v5-v1.pine",
+      "sourceSha256": "8ffc2d3db73ea904247b79deaffee14af5624bd19d434bcd0b6627d75e6ab35c",
+      "pineVersion": 5,
+      "owner": "codex-115868",
+      "requestGroup": "V5 color-array NA index",
+      "captureGroup": "outcome",
+      "captureKind": "COMPILE-OR-RUNTIME-OUTCOME",
+      "nativeStatus": "UNOBSERVED",
+      "minimumHistoryBars": 4,
+      "question": "Does Pine v5 admit and execute array.get on a color array with a warmup missing series-int index? Compare with the matched finite zero-index control.",
+      "captureInstructions": [
+        "Exact compiler diagnostic if refused",
+        "Runtime error/code/bar if admitted then fails",
+        "CSV including OUTCOME if accepted and executes",
+        "Keep both sources independent; a refusal must not suppress the finite control."
+      ],
+      "plotCount": 1,
+      "columns": [
+        "OUTCOME"
+      ],
+      "registrationEvidence": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v6-outcomes/corpus-color-array-na-index-packet-v1.json",
+      "originalSourcePath": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v6-outcomes/corpus-color-array-finite-index-control-v5-v1.pine",
+      "sourcePacket": "notes/corpus-color-array-na-index-packet-v1.json",
+      "localPrediction": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "predictionAuthority": "Conditional local prediction only; not a native verdict"
+    },
+    {
+      "probe": "reserved-variable-range-v5-v6-round-v1.pine",
+      "path": "reserved-variable-range-v5-v6-round-v1.pine",
+      "sourceSha256": "daec96e12ae61d5c20747837daa30f3df4a3debdc04e01216d2a869dbdb90029",
+      "pineVersion": 5,
+      "owner": "codex-p4250m",
+      "requestGroup": "Range/text reserved identifiers",
+      "captureGroup": "outcome",
+      "captureKind": "COMPILE-OR-RUNTIME-OUTCOME",
+      "nativeStatus": "UNOBSERVED",
+      "minimumHistoryBars": 3,
+      "question": "Does declared Pine v5 refuse range as a variable name, or compile and output VALUE=close?",
+      "captureInstructions": [
+        "Paste each unchanged source separately in TradingView. Record exact compile diagnostic/code/location or successful compile and VALUE output. Any chart/timeframe is sufficient for compiler acceptance. If admitted, export at least 3 confirmed bars with close and VALUE. Do not rename the identifier or edit the version."
+      ],
+      "plotCount": 1,
+      "columns": [
+        "VALUE"
+      ],
+      "registrationEvidence": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v5-outcomes/reserved-variable-range-text-v6-round-probe-spec-v1.json",
+      "originalSourcePath": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v5-outcomes/reserved-variable-range-v5-v6-round-v1.pine",
+      "sourcePacket": "notes/reserved-variable-range-text-v6-round-probe-spec-v1.json",
+      "authorityLimit": "The list explicitly introduces the restriction in v5. Application to v6 is a carry-forward inference from the currently maintained v6 manual and migration changes, not a separate native v6 observation."
+    },
+    {
+      "probe": "reserved-variable-text-v5-v6-round-v1.pine",
+      "path": "reserved-variable-text-v5-v6-round-v1.pine",
+      "sourceSha256": "f9c91862b80a0ba1dd7bffefafd9a0d3b539ae7aab30f0d6854eac8d190d0ced",
+      "pineVersion": 5,
+      "owner": "codex-p4250m",
+      "requestGroup": "Range/text reserved identifiers",
+      "captureGroup": "outcome",
+      "captureKind": "COMPILE-OR-RUNTIME-OUTCOME",
+      "nativeStatus": "UNOBSERVED",
+      "minimumHistoryBars": 3,
+      "question": "Does declared Pine v5 refuse text as a variable name, or compile and output VALUE=close?",
+      "captureInstructions": [
+        "Paste each unchanged source separately in TradingView. Record exact compile diagnostic/code/location or successful compile and VALUE output. Any chart/timeframe is sufficient for compiler acceptance. If admitted, export at least 3 confirmed bars with close and VALUE. Do not rename the identifier or edit the version."
+      ],
+      "plotCount": 1,
+      "columns": [
+        "VALUE"
+      ],
+      "registrationEvidence": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v5-outcomes/reserved-variable-range-text-v6-round-probe-spec-v1.json",
+      "originalSourcePath": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v5-outcomes/reserved-variable-text-v5-v6-round-v1.pine",
+      "sourcePacket": "notes/reserved-variable-range-text-v6-round-probe-spec-v1.json",
+      "authorityLimit": "The list explicitly introduces the restriction in v5. Application to v6 is a carry-forward inference from the currently maintained v6 manual and migration changes, not a separate native v6 observation."
+    },
+    {
+      "probe": "reserved-variable-range-v6-v6-round-v1.pine",
+      "path": "reserved-variable-range-v6-v6-round-v1.pine",
+      "sourceSha256": "1f3e9d5451d0c31b24f352bff58e168cc497c9f4fbf6e5a9206635615bac08be",
+      "pineVersion": 6,
+      "owner": "codex-p4250m",
+      "requestGroup": "Range/text reserved identifiers",
+      "captureGroup": "outcome",
+      "captureKind": "COMPILE-OR-RUNTIME-OUTCOME",
+      "nativeStatus": "UNOBSERVED",
+      "minimumHistoryBars": 3,
+      "question": "Does declared Pine v6 refuse range as a variable name, or compile and output VALUE=close?",
+      "captureInstructions": [
+        "Paste each unchanged source separately in TradingView. Record exact compile diagnostic/code/location or successful compile and VALUE output. Any chart/timeframe is sufficient for compiler acceptance. If admitted, export at least 3 confirmed bars with close and VALUE. Do not rename the identifier or edit the version."
+      ],
+      "plotCount": 1,
+      "columns": [
+        "VALUE"
+      ],
+      "registrationEvidence": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v5-outcomes/reserved-variable-range-text-v6-round-probe-spec-v1.json",
+      "originalSourcePath": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v5-outcomes/reserved-variable-range-v6-v6-round-v1.pine",
+      "sourcePacket": "notes/reserved-variable-range-text-v6-round-probe-spec-v1.json",
+      "authorityLimit": "The list explicitly introduces the restriction in v5. Application to v6 is a carry-forward inference from the currently maintained v6 manual and migration changes, not a separate native v6 observation."
+    },
+    {
+      "probe": "reserved-variable-text-v6-v6-round-v1.pine",
+      "path": "reserved-variable-text-v6-v6-round-v1.pine",
+      "sourceSha256": "b540e38eaface58dc7c47cf807e0cc2f0df695d12d79c2e794ae033f2bb148ab",
+      "pineVersion": 6,
+      "owner": "codex-p4250m",
+      "requestGroup": "Range/text reserved identifiers",
+      "captureGroup": "outcome",
+      "captureKind": "COMPILE-OR-RUNTIME-OUTCOME",
+      "nativeStatus": "UNOBSERVED",
+      "minimumHistoryBars": 3,
+      "question": "Does declared Pine v6 refuse text as a variable name, or compile and output VALUE=close?",
+      "captureInstructions": [
+        "Paste each unchanged source separately in TradingView. Record exact compile diagnostic/code/location or successful compile and VALUE output. Any chart/timeframe is sufficient for compiler acceptance. If admitted, export at least 3 confirmed bars with close and VALUE. Do not rename the identifier or edit the version."
+      ],
+      "plotCount": 1,
+      "columns": [
+        "VALUE"
+      ],
+      "registrationEvidence": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v5-outcomes/reserved-variable-range-text-v6-round-probe-spec-v1.json",
+      "originalSourcePath": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v5-outcomes/reserved-variable-text-v6-v6-round-v1.pine",
+      "sourcePacket": "notes/reserved-variable-range-text-v6-round-probe-spec-v1.json",
+      "authorityLimit": "The list explicitly introduces the restriction in v5. Application to v6 is a carry-forward inference from the currently maintained v6 manual and migration changes, not a separate native v6 observation."
+    },
+    {
+      "probe": "mutable-ema-first-one-v5-v1.pine",
+      "path": "mutable-ema-first-one-v5-v1.pine",
+      "sourceSha256": "27209eafee7707329b362132295164ebe07a0cfc572983071725c941eff22596",
+      "pineVersion": 5,
+      "owner": "codex-p4250m",
+      "requestGroup": "Mutable v5 EMA first length",
+      "captureGroup": "outcome",
+      "captureKind": "COMPILE-OR-RUNTIME-OUTCOME",
+      "nativeStatus": "UNOBSERVED",
+      "minimumHistoryBars": 128,
+      "question": "Does native refuse a changing v5 EMA length, retain the first constructor length, or evaluate another way? Compare first lengths1/2, separate written UDF calls and fixed input3 without assuming the mechanism.",
+      "captureInstructions": [
+        "Paste unchanged sources separately. Record exact compile/runtime diagnostics and phase/location, or export all plots plus native OHLC/time. Keep native lengths and startup rows; do not inject seeded values or treat engine-generated fixed controls as native truth. Length-one prior first-source seeding did not establish constructor freezing. Length-two and two written UDF calls distinguish freeze from fresh per-argument construction. Input-three is the separately valid fixed-length control."
+      ],
+      "plotCount": 3,
+      "columns": [
+        "MUTABLE_ONE",
+        "FIXED_ONE",
+        "LIVE_LENGTH"
+      ],
+      "registrationEvidence": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v5-outcomes/mutable-ema-first-length-probe-spec-v1.json",
+      "originalSourcePath": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v5-outcomes/mutable-ema-first-one-v5-v1.pine",
+      "sourcePacket": "notes/mutable-ema-first-length-probe-spec-v1.json",
+      "hypotheses": [
+        "Native compile refusal of changing v5 length",
+        "First recorded length reuse: MUTABLE_ONE equals FIXED_ONE; MUTABLE_TWO matches FIXED_TWO after its native startup, and two UDF states remain distinct",
+        "Repeated or other constructor evaluation: capture every column and missing pattern without assuming an implementation"
+      ]
+    },
+    {
+      "probe": "mutable-ema-first-two-v5-v1.pine",
+      "path": "mutable-ema-first-two-v5-v1.pine",
+      "sourceSha256": "2b6a798408522b6c15d993786017bf90f8572ae1e9c77c76b0e4151809f5dddc",
+      "pineVersion": 5,
+      "owner": "codex-p4250m",
+      "requestGroup": "Mutable v5 EMA first length",
+      "captureGroup": "outcome",
+      "captureKind": "COMPILE-OR-RUNTIME-OUTCOME",
+      "nativeStatus": "UNOBSERVED",
+      "minimumHistoryBars": 128,
+      "question": "Does native refuse a changing v5 EMA length, retain the first constructor length, or evaluate another way? Compare first lengths1/2, separate written UDF calls and fixed input3 without assuming the mechanism.",
+      "captureInstructions": [
+        "Paste unchanged sources separately. Record exact compile/runtime diagnostics and phase/location, or export all plots plus native OHLC/time. Keep native lengths and startup rows; do not inject seeded values or treat engine-generated fixed controls as native truth. Length-one prior first-source seeding did not establish constructor freezing. Length-two and two written UDF calls distinguish freeze from fresh per-argument construction. Input-three is the separately valid fixed-length control."
+      ],
+      "plotCount": 3,
+      "columns": [
+        "MUTABLE_TWO",
+        "FIXED_TWO",
+        "LIVE_LENGTH"
+      ],
+      "registrationEvidence": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v5-outcomes/mutable-ema-first-length-probe-spec-v1.json",
+      "originalSourcePath": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v5-outcomes/mutable-ema-first-two-v5-v1.pine",
+      "sourcePacket": "notes/mutable-ema-first-length-probe-spec-v1.json",
+      "hypotheses": [
+        "Native compile refusal of changing v5 length",
+        "First recorded length reuse: MUTABLE_ONE equals FIXED_ONE; MUTABLE_TWO matches FIXED_TWO after its native startup, and two UDF states remain distinct",
+        "Repeated or other constructor evaluation: capture every column and missing pattern without assuming an implementation"
+      ]
+    },
+    {
+      "probe": "mutable-ema-udf-two-calls-v5-v1.pine",
+      "path": "mutable-ema-udf-two-calls-v5-v1.pine",
+      "sourceSha256": "0d9151129271433f9e29bc1e02762a4f6948fe0f9d20423e207b5248992615fc",
+      "pineVersion": 5,
+      "owner": "codex-p4250m",
+      "requestGroup": "Mutable v5 EMA first length",
+      "captureGroup": "outcome",
+      "captureKind": "COMPILE-OR-RUNTIME-OUTCOME",
+      "nativeStatus": "UNOBSERVED",
+      "minimumHistoryBars": 128,
+      "question": "Does native refuse a changing v5 EMA length, retain the first constructor length, or evaluate another way? Compare first lengths1/2, separate written UDF calls and fixed input3 without assuming the mechanism.",
+      "captureInstructions": [
+        "Paste unchanged sources separately. Record exact compile/runtime diagnostics and phase/location, or export all plots plus native OHLC/time. Keep native lengths and startup rows; do not inject seeded values or treat engine-generated fixed controls as native truth. Length-one prior first-source seeding did not establish constructor freezing. Length-two and two written UDF calls distinguish freeze from fresh per-argument construction. Input-three is the separately valid fixed-length control."
+      ],
+      "plotCount": 4,
+      "columns": [
+        "MUTABLE_UDF_TWO",
+        "FIXED_UDF_FOUR",
+        "FIXED_TWO",
+        "FIXED_FOUR"
+      ],
+      "registrationEvidence": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v5-outcomes/mutable-ema-first-length-probe-spec-v1.json",
+      "originalSourcePath": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v5-outcomes/mutable-ema-udf-two-calls-v5-v1.pine",
+      "sourcePacket": "notes/mutable-ema-first-length-probe-spec-v1.json",
+      "hypotheses": [
+        "Native compile refusal of changing v5 length",
+        "First recorded length reuse: MUTABLE_ONE equals FIXED_ONE; MUTABLE_TWO matches FIXED_TWO after its native startup, and two UDF states remain distinct",
+        "Repeated or other constructor evaluation: capture every column and missing pattern without assuming an implementation"
+      ]
+    },
+    {
+      "probe": "fixed-ema-input-three-v5-control-v1.pine",
+      "path": "fixed-ema-input-three-v5-control-v1.pine",
+      "sourceSha256": "9034640287d9543e1d3ad5833a9646666eac2f69e6878a218ed2ff8ff56bdfa6",
+      "pineVersion": 5,
+      "owner": "codex-p4250m",
+      "requestGroup": "Mutable v5 EMA first length",
+      "captureGroup": "outcome",
+      "captureKind": "COMPILE-OR-RUNTIME-OUTCOME",
+      "nativeStatus": "UNOBSERVED",
+      "minimumHistoryBars": 128,
+      "question": "Does native refuse a changing v5 EMA length, retain the first constructor length, or evaluate another way? Compare first lengths1/2, separate written UDF calls and fixed input3 without assuming the mechanism.",
+      "captureInstructions": [
+        "Paste unchanged sources separately. Record exact compile/runtime diagnostics and phase/location, or export all plots plus native OHLC/time. Keep native lengths and startup rows; do not inject seeded values or treat engine-generated fixed controls as native truth. Length-one prior first-source seeding did not establish constructor freezing. Length-two and two written UDF calls distinguish freeze from fresh per-argument construction. Input-three is the separately valid fixed-length control."
+      ],
+      "plotCount": 2,
+      "columns": [
+        "FIXED_INPUT_THREE",
+        "FIXED_LITERAL_THREE"
+      ],
+      "registrationEvidence": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v5-outcomes/mutable-ema-first-length-probe-spec-v1.json",
+      "originalSourcePath": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v5-outcomes/fixed-ema-input-three-v5-control-v1.pine",
+      "sourcePacket": "notes/mutable-ema-first-length-probe-spec-v1.json",
+      "hypotheses": [
+        "Native compile refusal of changing v5 length",
+        "First recorded length reuse: MUTABLE_ONE equals FIXED_ONE; MUTABLE_TWO matches FIXED_TWO after its native startup, and two UDF states remain distinct",
+        "Repeated or other constructor evaluation: capture every column and missing pattern without assuming an implementation"
+      ]
+    },
+    {
+      "probe": "supertrend-factor-alone-first3-v2.pine",
+      "path": "supertrend-factor-alone-first3-v2.pine",
+      "sourceSha256": "6c68c0b2c5d5aed235f7102b1fffe0525cea2da6410f270e4cc331fcbd63e3ca",
+      "pineVersion": 6,
+      "owner": "codex-i5qr9c",
+      "requestGroup": "Supertrend standalone/paired factors",
+      "captureGroup": "numeric",
+      "captureKind": "NUMERIC-CSV",
+      "nativeStatus": "UNOBSERVED",
+      "minimumHistoryBars": 256,
+      "question": "Compare alternating series factor alone (2 first and 3 first) versus identical dynamic call paired with fixed factor2. Distinguish first-value retention from call sharing.",
+      "captureInstructions": [
+        "Same symbol, timeframe, chart history and export for all three scripts",
+        "Historical dataset starts at plotted bar_index0; export at least256 historical rows",
+        "Reload each script before capture; preserve exact source and CSV SHA256",
+        "Plot factor and OHLCV inputs alongside line/direction; do not infer factor retention from paired call alone"
+      ],
+      "plotCount": 10,
+      "columns": [
+        "input_time_ms",
+        "input_bar_index",
+        "input_open",
+        "input_high",
+        "input_low",
+        "input_close",
+        "input_volume",
+        "input_factor",
+        "dynamic_line",
+        "dynamic_direction"
+      ],
+      "registrationEvidence": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v6-outcomes/supertrend-discriminator-packet-v1.json",
+      "originalSourcePath": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v6-outcomes/supertrend-factor-alone-first3-v2.pine",
+      "sourcePacket": "notes/supertrend-discriminator-packet-v1.json",
+      "columnMap": "notes/supertrend-factor-alone-first3-v2.columns.json",
+      "requiredFirstBarIndex": 0,
+      "standalone": true
+    },
+    {
+      "probe": "supertrend-factor-alone-v2.pine",
+      "path": "supertrend-factor-alone-v2.pine",
+      "sourceSha256": "9744da2fd144dbaab123dec19935a38b703014c28e9f4100f0a90c6dbf53311c",
+      "pineVersion": 6,
+      "owner": "codex-i5qr9c",
+      "requestGroup": "Supertrend standalone/paired factors",
+      "captureGroup": "numeric",
+      "captureKind": "NUMERIC-CSV",
+      "nativeStatus": "UNOBSERVED",
+      "minimumHistoryBars": 256,
+      "question": "Compare alternating series factor alone (2 first and 3 first) versus identical dynamic call paired with fixed factor2. Distinguish first-value retention from call sharing.",
+      "captureInstructions": [
+        "Same symbol, timeframe, chart history and export for all three scripts",
+        "Historical dataset starts at plotted bar_index0; export at least256 historical rows",
+        "Reload each script before capture; preserve exact source and CSV SHA256",
+        "Plot factor and OHLCV inputs alongside line/direction; do not infer factor retention from paired call alone"
+      ],
+      "plotCount": 10,
+      "columns": [
+        "input_time_ms",
+        "input_bar_index",
+        "input_open",
+        "input_high",
+        "input_low",
+        "input_close",
+        "input_volume",
+        "input_factor",
+        "dynamic_line",
+        "dynamic_direction"
+      ],
+      "registrationEvidence": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v6-outcomes/supertrend-discriminator-packet-v1.json",
+      "originalSourcePath": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v6-outcomes/supertrend-factor-alone-v2.pine",
+      "sourcePacket": "notes/supertrend-discriminator-packet-v1.json",
+      "columnMap": "notes/supertrend-factor-alone-v2.columns.json",
+      "requiredFirstBarIndex": 0,
+      "standalone": true
+    },
+    {
+      "probe": "supertrend-factor-paired-fixed2-v2.pine",
+      "path": "supertrend-factor-paired-fixed2-v2.pine",
+      "sourceSha256": "73556b702f0b324d1d9ffee4387d1564a66ed61b1482b18a1983aa67406c9bab",
+      "pineVersion": 6,
+      "owner": "codex-i5qr9c",
+      "requestGroup": "Supertrend standalone/paired factors",
+      "captureGroup": "numeric",
+      "captureKind": "NUMERIC-CSV",
+      "nativeStatus": "UNOBSERVED",
+      "minimumHistoryBars": 256,
+      "question": "Compare alternating series factor alone (2 first and 3 first) versus identical dynamic call paired with fixed factor2. Distinguish first-value retention from call sharing.",
+      "captureInstructions": [
+        "Same symbol, timeframe, chart history and export for all three scripts",
+        "Historical dataset starts at plotted bar_index0; export at least256 historical rows",
+        "Reload each script before capture; preserve exact source and CSV SHA256",
+        "Plot factor and OHLCV inputs alongside line/direction; do not infer factor retention from paired call alone"
+      ],
+      "plotCount": 12,
+      "columns": [
+        "input_time_ms",
+        "input_bar_index",
+        "input_open",
+        "input_high",
+        "input_low",
+        "input_close",
+        "input_volume",
+        "input_factor",
+        "dynamic_line",
+        "dynamic_direction",
+        "fixed2_line",
+        "fixed2_direction"
+      ],
+      "registrationEvidence": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v6-outcomes/supertrend-discriminator-packet-v1.json",
+      "originalSourcePath": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v6-outcomes/supertrend-factor-paired-fixed2-v2.pine",
+      "sourcePacket": "notes/supertrend-discriminator-packet-v1.json",
+      "columnMap": "notes/supertrend-factor-paired-fixed2-v2.columns.json",
+      "requiredFirstBarIndex": 0,
+      "standalone": false
+    },
+    {
+      "probe": "linear-hole-order-ascending-len4-v1.pine",
+      "path": "linear-hole-order-ascending-len4-v1.pine",
+      "sourceSha256": "65dccfe743c0613071fc21f5ff4a6188d992942304aa16ca38e800d6ad59c4af",
+      "pineVersion": 6,
+      "owner": "codex-6y3sjh",
+      "requestGroup": "Linear percentile interior-hole order",
+      "captureGroup": "numeric",
+      "captureKind": "NUMERIC-CSV",
+      "nativeStatus": "UNOBSERVED",
+      "minimumHistoryBars": 256,
+      "question": "Does each standalone source emit finite or missing through current holes and their physical-window recovery? At the first finite bar after both holes age out, does the output immediately return to the mathematically sorted finite window? Do lengths4 and14 show the same source-order behavior on increasing versus decreasing deterministic inputs? Preserve the exact numeric vectors; no model or expected native verdict has been supplied.",
+      "captureInstructions": [
+        "Standard chart BINANCE:BTCUSDT 2 minutes UTC",
+        "Reload every standalone script before capture; export all7plots from input_bar_index0 with at least256 confirmed historical rows",
+        "Keep blank NA cells, original CSV headers, timestamps, source/CSV hashes and setup evidence; exclude final live bar from historical comparisons"
+      ],
+      "plotCount": 7,
+      "columns": [
+        "input_time_ms",
+        "input_bar_index",
+        "input_phase",
+        "input_clean",
+        "input_source",
+        "input_missing",
+        "linear_hole_p75"
+      ],
+      "registrationEvidence": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v6-outcomes/linear-hole-order-packet-v1.json",
+      "originalSourcePath": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v6-outcomes/linear-hole-order-ascending-len4-v1.pine",
+      "sourcePacket": "notes/linear-hole-order-packet-v1.json",
+      "columnMap": "notes/linear-hole-order-ascending-len4-v1.columns.json",
+      "requiredFirstBarIndex": 0,
+      "operatorNotes": "notes/LINEAR-HOLE-ORDER-v1.md",
+      "standalone": true,
+      "length": 4,
+      "sourceDirection": "ascending"
+    },
+    {
+      "probe": "linear-hole-order-descending-len4-v1.pine",
+      "path": "linear-hole-order-descending-len4-v1.pine",
+      "sourceSha256": "488176ac17bd8a566d22fa7c5ac86b8846ae0d627dc3737c7faa7dd063d14829",
+      "pineVersion": 6,
+      "owner": "codex-6y3sjh",
+      "requestGroup": "Linear percentile interior-hole order",
+      "captureGroup": "numeric",
+      "captureKind": "NUMERIC-CSV",
+      "nativeStatus": "UNOBSERVED",
+      "minimumHistoryBars": 256,
+      "question": "Does each standalone source emit finite or missing through current holes and their physical-window recovery? At the first finite bar after both holes age out, does the output immediately return to the mathematically sorted finite window? Do lengths4 and14 show the same source-order behavior on increasing versus decreasing deterministic inputs? Preserve the exact numeric vectors; no model or expected native verdict has been supplied.",
+      "captureInstructions": [
+        "Standard chart BINANCE:BTCUSDT 2 minutes UTC",
+        "Reload every standalone script before capture; export all7plots from input_bar_index0 with at least256 confirmed historical rows",
+        "Keep blank NA cells, original CSV headers, timestamps, source/CSV hashes and setup evidence; exclude final live bar from historical comparisons"
+      ],
+      "plotCount": 7,
+      "columns": [
+        "input_time_ms",
+        "input_bar_index",
+        "input_phase",
+        "input_clean",
+        "input_source",
+        "input_missing",
+        "linear_hole_p75"
+      ],
+      "registrationEvidence": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v6-outcomes/linear-hole-order-packet-v1.json",
+      "originalSourcePath": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v6-outcomes/linear-hole-order-descending-len4-v1.pine",
+      "sourcePacket": "notes/linear-hole-order-packet-v1.json",
+      "columnMap": "notes/linear-hole-order-descending-len4-v1.columns.json",
+      "requiredFirstBarIndex": 0,
+      "operatorNotes": "notes/LINEAR-HOLE-ORDER-v1.md",
+      "standalone": true,
+      "length": 4,
+      "sourceDirection": "descending"
+    },
+    {
+      "probe": "linear-hole-order-ascending-len14-v1.pine",
+      "path": "linear-hole-order-ascending-len14-v1.pine",
+      "sourceSha256": "2e8a66aab073ca55b2d80037dd838cfb20de34377d6d0bfc0e03ee8a7ab0fc54",
+      "pineVersion": 6,
+      "owner": "codex-6y3sjh",
+      "requestGroup": "Linear percentile interior-hole order",
+      "captureGroup": "numeric",
+      "captureKind": "NUMERIC-CSV",
+      "nativeStatus": "UNOBSERVED",
+      "minimumHistoryBars": 256,
+      "question": "Does each standalone source emit finite or missing through current holes and their physical-window recovery? At the first finite bar after both holes age out, does the output immediately return to the mathematically sorted finite window? Do lengths4 and14 show the same source-order behavior on increasing versus decreasing deterministic inputs? Preserve the exact numeric vectors; no model or expected native verdict has been supplied.",
+      "captureInstructions": [
+        "Standard chart BINANCE:BTCUSDT 2 minutes UTC",
+        "Reload every standalone script before capture; export all7plots from input_bar_index0 with at least256 confirmed historical rows",
+        "Keep blank NA cells, original CSV headers, timestamps, source/CSV hashes and setup evidence; exclude final live bar from historical comparisons"
+      ],
+      "plotCount": 7,
+      "columns": [
+        "input_time_ms",
+        "input_bar_index",
+        "input_phase",
+        "input_clean",
+        "input_source",
+        "input_missing",
+        "linear_hole_p75"
+      ],
+      "registrationEvidence": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v6-outcomes/linear-hole-order-packet-v1.json",
+      "originalSourcePath": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v6-outcomes/linear-hole-order-ascending-len14-v1.pine",
+      "sourcePacket": "notes/linear-hole-order-packet-v1.json",
+      "columnMap": "notes/linear-hole-order-ascending-len14-v1.columns.json",
+      "requiredFirstBarIndex": 0,
+      "operatorNotes": "notes/LINEAR-HOLE-ORDER-v1.md",
+      "standalone": true,
+      "length": 14,
+      "sourceDirection": "ascending"
+    },
+    {
+      "probe": "linear-hole-order-descending-len14-v1.pine",
+      "path": "linear-hole-order-descending-len14-v1.pine",
+      "sourceSha256": "c64cc95797229e7cbf395f9869e2b834ee2173e2ed35d000963cad3d8ae4a493",
+      "pineVersion": 6,
+      "owner": "codex-6y3sjh",
+      "requestGroup": "Linear percentile interior-hole order",
+      "captureGroup": "numeric",
+      "captureKind": "NUMERIC-CSV",
+      "nativeStatus": "UNOBSERVED",
+      "minimumHistoryBars": 256,
+      "question": "Does each standalone source emit finite or missing through current holes and their physical-window recovery? At the first finite bar after both holes age out, does the output immediately return to the mathematically sorted finite window? Do lengths4 and14 show the same source-order behavior on increasing versus decreasing deterministic inputs? Preserve the exact numeric vectors; no model or expected native verdict has been supplied.",
+      "captureInstructions": [
+        "Standard chart BINANCE:BTCUSDT 2 minutes UTC",
+        "Reload every standalone script before capture; export all7plots from input_bar_index0 with at least256 confirmed historical rows",
+        "Keep blank NA cells, original CSV headers, timestamps, source/CSV hashes and setup evidence; exclude final live bar from historical comparisons"
+      ],
+      "plotCount": 7,
+      "columns": [
+        "input_time_ms",
+        "input_bar_index",
+        "input_phase",
+        "input_clean",
+        "input_source",
+        "input_missing",
+        "linear_hole_p75"
+      ],
+      "registrationEvidence": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v6-outcomes/linear-hole-order-packet-v1.json",
+      "originalSourcePath": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v6-outcomes/linear-hole-order-descending-len14-v1.pine",
+      "sourcePacket": "notes/linear-hole-order-packet-v1.json",
+      "columnMap": "notes/linear-hole-order-descending-len14-v1.columns.json",
+      "requiredFirstBarIndex": 0,
+      "operatorNotes": "notes/LINEAR-HOLE-ORDER-v1.md",
+      "standalone": true,
+      "length": 14,
+      "sourceDirection": "descending"
+    }
+  ],
+  "excludedAlreadyInV5": [
+    {
+      "probe": "drawing-future-index-first-local-v1.pine",
+      "reason": "Already included unchanged in frozen v5 release; user requested only if missing from v5",
+      "sourceSha256": "3a4c0743e976160a9b6e352feea6522a5d33a5d44ff72f88dc4e531626e20825",
+      "v5Manifest": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v5-release-v2/bundle-manifest-v2.json"
+    },
+    {
+      "probe": "drawing-future-index-first-last-v1.pine",
+      "reason": "Already included unchanged in frozen v5 release; user requested only if missing from v5",
+      "sourceSha256": "c63b8704de16e05496a105a47039335eafb836e9ce63dd4d2bc09563c664dde3",
+      "v5Manifest": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v5-release-v2/bundle-manifest-v2.json"
+    },
+    {
+      "probe": "percentile-rank-readout-v1.pine",
+      "sourceSha256": "ad748e178a99fa681eae9f00304d19bb793bdf09ab6dd4bb971a5ddfe78f15ad",
+      "reason": "Removed by explicit overseer ruling: byte-identical source already shipped in v5 on master",
+      "v5Manifest": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v5-release-v2/bundle-manifest-v2.json"
+    },
+    {
+      "probe": "collection11-symmetric-eigenvectors-integer-pinv-v1.pine",
+      "sourceSha256": "e8a6fe4efd7b7adf7528ab218e63375b60fae5d094a5c47e9dcc836240bbb20f",
+      "reason": "Removed by explicit overseer ruling: byte-identical source already shipped in v5 on master",
+      "v5Manifest": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v5-release-v2/bundle-manifest-v2.json"
+    },
+    {
+      "probe": "drawing-default-blue-v5-v3.pine",
+      "sourceSha256": "b4bc6878af440096452e0a6576c9ff2d001af0a5054c71de75e76fa07d8c57c1",
+      "reason": "Byte-identical to already-shipped v5 source; filename revision changes metadata only",
+      "v5Path": "drawing-default-blue-v5-v2.pine",
+      "v5Manifest": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v5-release-v2/bundle-manifest-v2.json",
+      "registrationEvidence": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v6-outcomes/drawing-default-blue-packet-v3.json"
+    },
+    {
+      "probe": "drawing-default-blue-v6-v3.pine",
+      "sourceSha256": "eabb8499d58e33aa4f2d0f7158cb8d125fb30ca503a880555f927ec0cd3cbb27",
+      "reason": "Byte-identical to already-shipped v5 source; filename revision changes metadata only",
+      "v5Path": "drawing-default-blue-v6-v2.pine",
+      "v5Manifest": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v5-release-v2/bundle-manifest-v2.json",
+      "registrationEvidence": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v6-outcomes/drawing-default-blue-packet-v3.json"
+    }
+  ],
+  "sourceInputs": [
+    {
+      "path": "/home/sam/.cache/fleet-tmp/o/BACKLOG-v1.md",
+      "sha256": "7b4f23416aef04dcc886e49d5d1217c3f56cf5b1fe769c1c0043e1284b38870d"
+    },
+    {
+      "path": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v5-outcomes/COLLECTION11-PROBES-v1.md",
+      "sha256": "c4b536a8c47bb29411966c549f39f7770ffa5e87028bf8f6766d787c4087430e"
+    },
+    {
+      "path": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v5-outcomes/MFI-PRIVATE-ZERO-BOUNDARY-v1.md",
+      "sha256": "dd677da31b15f3f8df147873d14210b3472987576f35fc66b4cd10cbaa84ed5c"
+    },
+    {
+      "path": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v5-outcomes/PERCENTILE-RANK-READOUT-v1.md",
+      "sha256": "b34403cb4ae2c351f0b8fa3b9d7c0735ac09d001c59405b5838bd8f600abda84"
+    },
+    {
+      "path": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v5-outcomes/collection11-symmetric-eigenvectors-integer-pinv-v1.gate-v1.json",
+      "sha256": "6f745c8898fd9e8302ab06a02adbbff01b875cf609d1c8ee34bb2b0fe8fff78e"
+    },
+    {
+      "path": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v5-outcomes/collection11-symmetric-eigenvectors-integer-pinv-v1.pine",
+      "sha256": "e8a6fe4efd7b7adf7528ab218e63375b60fae5d094a5c47e9dcc836240bbb20f"
+    },
+    {
+      "path": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v5-outcomes/drawing-future-index-first-last-v1.pine",
+      "sha256": "c63b8704de16e05496a105a47039335eafb836e9ce63dd4d2bc09563c664dde3"
+    },
+    {
+      "path": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v5-outcomes/drawing-future-index-first-local-v1.pine",
+      "sha256": "3a4c0743e976160a9b6e352feea6522a5d33a5d44ff72f88dc4e531626e20825"
+    },
+    {
+      "path": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v5-outcomes/fixed-ema-input-three-v5-control-v1.pine",
+      "sha256": "9034640287d9543e1d3ad5833a9646666eac2f69e6878a218ed2ff8ff56bdfa6"
+    },
+    {
+      "path": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v5-outcomes/mfi-private-zero-boundary-v1.columns.json",
+      "sha256": "21e5172f21f4c40a22b5903189f65196504293ac9da57878bf56c1888e51a2ec"
+    },
+    {
+      "path": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v5-outcomes/mfi-private-zero-boundary-v1.gate-v1.json",
+      "sha256": "6798827337a76e96fab3b2a9d3ff97a9db5f3c7d8106d2e44a0ca509bb5ac591"
+    },
+    {
+      "path": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v5-outcomes/mfi-private-zero-boundary-v1.pine",
+      "sha256": "8a3b2eef2595ac0d920ee374df9420fc03e41259ccf515304fb9b8f583322dc4"
+    },
+    {
+      "path": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v5-outcomes/mutable-ema-first-length-probe-spec-v1.json",
+      "sha256": "665ee8cac753eef3c6d485a70d2b4ebe2931cead8283c84a57e91c30a035a52b"
+    },
+    {
+      "path": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v5-outcomes/mutable-ema-first-one-v5-v1.pine",
+      "sha256": "27209eafee7707329b362132295164ebe07a0cfc572983071725c941eff22596"
+    },
+    {
+      "path": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v5-outcomes/mutable-ema-first-two-v5-v1.pine",
+      "sha256": "2b6a798408522b6c15d993786017bf90f8572ae1e9c77c76b0e4151809f5dddc"
+    },
+    {
+      "path": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v5-outcomes/mutable-ema-udf-two-calls-v5-v1.pine",
+      "sha256": "0d9151129271433f9e29bc1e02762a4f6948fe0f9d20423e207b5248992615fc"
+    },
+    {
+      "path": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v5-outcomes/percentile-rank-readout-v1.columns.json",
+      "sha256": "c3e6ee7ec5bf812c4dbd6aa127c1644b8012a0db95426a1fa7b380f25ea034a7"
+    },
+    {
+      "path": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v5-outcomes/percentile-rank-readout-v1.gate-v1.json",
+      "sha256": "87eff920684fd175a431c60141e494137e8c3937d892fa2ea18424a70a1a2633"
+    },
+    {
+      "path": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v5-outcomes/percentile-rank-readout-v1.pine",
+      "sha256": "ad748e178a99fa681eae9f00304d19bb793bdf09ab6dd4bb971a5ddfe78f15ad"
+    },
+    {
+      "path": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v5-outcomes/reserved-variable-range-text-v6-round-probe-spec-v1.json",
+      "sha256": "2d4ca4f63ba9bf6af271d3ac5410bc859ec5b0f8c340b426b8aaab66bf949af3"
+    },
+    {
+      "path": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v5-outcomes/reserved-variable-range-v5-v6-round-v1.pine",
+      "sha256": "daec96e12ae61d5c20747837daa30f3df4a3debdc04e01216d2a869dbdb90029"
+    },
+    {
+      "path": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v5-outcomes/reserved-variable-range-v6-v6-round-v1.pine",
+      "sha256": "1f3e9d5451d0c31b24f352bff58e168cc497c9f4fbf6e5a9206635615bac08be"
+    },
+    {
+      "path": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v5-outcomes/reserved-variable-text-v5-v6-round-v1.pine",
+      "sha256": "f9c91862b80a0ba1dd7bffefafd9a0d3b539ae7aab30f0d6854eac8d190d0ced"
+    },
+    {
+      "path": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v5-outcomes/reserved-variable-text-v6-v6-round-v1.pine",
+      "sha256": "b540e38eaface58dc7c47cf807e0cc2f0df695d12d79c2e794ae033f2bb148ab"
+    },
+    {
+      "path": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v5-release-v2/bundle-manifest-v2.json",
+      "sha256": "248a266490d352750c82977b40cc3e9eaaf47801e5e1c71e110f4d55de965d32"
+    },
+    {
+      "path": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v5-release-v2/drawing-future-index-first-last-v1.pine",
+      "sha256": "c63b8704de16e05496a105a47039335eafb836e9ce63dd4d2bc09563c664dde3"
+    },
+    {
+      "path": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v5-release-v2/drawing-future-index-first-local-v1.pine",
+      "sha256": "3a4c0743e976160a9b6e352feea6522a5d33a5d44ff72f88dc4e531626e20825"
+    },
+    {
+      "path": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v6-outcomes/LINEAR-HOLE-ORDER-v1.md",
+      "sha256": "94cca81c475b3fa5bb6a891dd59c4f95abfb93151a9340f23b43b62bba706607"
+    },
+    {
+      "path": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v6-outcomes/corpus-color-array-finite-index-control-v5-v1.pine",
+      "sha256": "8ffc2d3db73ea904247b79deaffee14af5624bd19d434bcd0b6627d75e6ab35c"
+    },
+    {
+      "path": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v6-outcomes/corpus-color-array-na-index-packet-v1.json",
+      "sha256": "bbaebf6340609d765da86c5154f9a7d21f578fcdb09200031ed1709939677f3a"
+    },
+    {
+      "path": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v6-outcomes/corpus-color-array-na-index-preflight-v1.json",
+      "sha256": "cce651e90f3e5d86a8676971b996b8b59d9636cdf678d0d1c42ea16586486d9c"
+    },
+    {
+      "path": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v6-outcomes/corpus-color-array-warmup-na-index-v5-v1.pine",
+      "sha256": "941479a5b41f7fc53db81226abc1e45245e8760ec409a0301a03f9aaa3751d6a"
+    },
+    {
+      "path": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v6-outcomes/linear-hole-order-ascending-len14-v1.columns.json",
+      "sha256": "d0495e1a703ab893d5218db5a32e57cbf03c8f90da15d68f8b572ccf23242a7f"
+    },
+    {
+      "path": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v6-outcomes/linear-hole-order-ascending-len14-v1.pine",
+      "sha256": "2e8a66aab073ca55b2d80037dd838cfb20de34377d6d0bfc0e03ee8a7ab0fc54"
+    },
+    {
+      "path": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v6-outcomes/linear-hole-order-ascending-len4-v1.columns.json",
+      "sha256": "18e495e708265e368fdc152f358b5a6a8dc2dd88c8aab5916e18f845121b0f8a"
+    },
+    {
+      "path": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v6-outcomes/linear-hole-order-ascending-len4-v1.pine",
+      "sha256": "65dccfe743c0613071fc21f5ff4a6188d992942304aa16ca38e800d6ad59c4af"
+    },
+    {
+      "path": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v6-outcomes/linear-hole-order-descending-len14-v1.columns.json",
+      "sha256": "a04c6ca29b51c29552f7d7402daa6008ed94c30dda932e0dd2926fed1a76edf9"
+    },
+    {
+      "path": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v6-outcomes/linear-hole-order-descending-len14-v1.pine",
+      "sha256": "c64cc95797229e7cbf395f9869e2b834ee2173e2ed35d000963cad3d8ae4a493"
+    },
+    {
+      "path": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v6-outcomes/linear-hole-order-descending-len4-v1.columns.json",
+      "sha256": "01963da0cc23084537b11e16885d08ff505976c8c8d088a38053119783c929f3"
+    },
+    {
+      "path": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v6-outcomes/linear-hole-order-descending-len4-v1.pine",
+      "sha256": "488176ac17bd8a566d22fa7c5ac86b8846ae0d627dc3737c7faa7dd063d14829"
+    },
+    {
+      "path": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v6-outcomes/linear-hole-order-packet-v1.json",
+      "sha256": "8b8cfca7cc170d297163ddf08a423c92974c1f78cd5148eee2b01dedc2d37924"
+    },
+    {
+      "path": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v6-outcomes/linear-hole-order-preflight-v1.json",
+      "sha256": "ad6e0fbc0b1125d9cbc257c72cf28cc78826121f1b81b572cfd6a81021c1bd6d"
+    },
+    {
+      "path": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v6-outcomes/supertrend-discriminator-packet-v1.json",
+      "sha256": "69096bb905c48653d05c37afaec05e0ec89d2873fb6f2bd0f352d19ae1e622b2"
+    },
+    {
+      "path": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v6-outcomes/supertrend-discriminator-preflight-v1.json",
+      "sha256": "545e9c9a14e6eaab3ab9287258195addae6db08db77e0df0b19cf3cf6bce6735"
+    },
+    {
+      "path": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v6-outcomes/supertrend-factor-alone-first3-v2.columns.json",
+      "sha256": "8befe575f4d1215bd55cfcdf6e36f797e27f6bee353a3f92b36813cff6655219"
+    },
+    {
+      "path": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v6-outcomes/supertrend-factor-alone-first3-v2.pine",
+      "sha256": "6c68c0b2c5d5aed235f7102b1fffe0525cea2da6410f270e4cc331fcbd63e3ca"
+    },
+    {
+      "path": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v6-outcomes/supertrend-factor-alone-v2.columns.json",
+      "sha256": "60ad6187118a756a6815d3a6fcf3b30117f76edca89acc5c67a45f09f50a133d"
+    },
+    {
+      "path": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v6-outcomes/supertrend-factor-alone-v2.pine",
+      "sha256": "9744da2fd144dbaab123dec19935a38b703014c28e9f4100f0a90c6dbf53311c"
+    },
+    {
+      "path": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v6-outcomes/supertrend-factor-paired-fixed2-v2.columns.json",
+      "sha256": "398b544dabac66fd71665a245d182a8276bdfc4f4864c09c9e75610c2c382e59"
+    },
+    {
+      "path": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v6-outcomes/supertrend-factor-paired-fixed2-v2.pine",
+      "sha256": "73556b702f0b324d1d9ffee4387d1564a66ed61b1482b18a1983aa67406c9bab"
+    },
+    {
+      "path": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v6-outcomes/drawing-default-blue-packet-v3.json",
+      "sha256": "c49326803e7ac51f223c288971d107c27aa49e1a9b71aa190358c95cd30137db"
+    },
+    {
+      "path": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v6-outcomes/DRAWING-DEFAULT-BLUE-v3.md",
+      "sha256": "37b8aac9ccbca065b30ee4e74b9d8c7375a6d7e28890e6cf054be4e9ceff8426"
+    },
+    {
+      "path": "/home/sam/cs/docs/tealscript-parity-archive/oracle-replay-v2/nvi-pvi-residual-be9795-v1/V6-PROBE-HANDOFF-v1.json",
+      "sha256": "92527e9056c3c4d27d923b37c3ce6cde8aabfc71be09cc4a3b566a504696d78e"
+    }
+  ],
+  "stagedV6Audit": {
+    "sourceCount": 11,
+    "included": [
+      "corpus-color-array-finite-index-control-v5-v1.pine",
+      "corpus-color-array-warmup-na-index-v5-v1.pine",
+      "linear-hole-order-ascending-len14-v1.pine",
+      "linear-hole-order-ascending-len4-v1.pine",
+      "linear-hole-order-descending-len14-v1.pine",
+      "linear-hole-order-descending-len4-v1.pine",
+      "supertrend-factor-alone-first3-v2.pine",
+      "supertrend-factor-alone-v2.pine",
+      "supertrend-factor-paired-fixed2-v2.pine"
+    ],
+    "excludedAlreadyInV5": [
+      "drawing-default-blue-v5-v3.pine",
+      "drawing-default-blue-v6-v3.pine"
+    ],
+    "missing": []
+  },
+  "backlogV6Requests": [
+    "- [2026-10-03T22:29:25Z] v6 TV ask candidate: ymk07v mfi-private-zero-boundary-v1 (SHA 8a3b2eef..., README MFI-PRIVATE-ZERO-BOUNDARY-v1.md in v5-outcomes staging) \u2014 v5 shipped f10a9888d8 without it",
+    "- [2026-10-03T22:38:05Z] v6 TV ask: 3rye5w future-limit timing controls drawing-future-index-first-local-v1.pine + drawing-future-index-first-last-v1.pine (check whether already in v5 release before re-asking)",
+    "- [2026-10-03T23:14:40Z] v6 TV ask: be9795 native 11-column collection probe (ranks 401-440, SVD/QL) staged in v5-outcomes, unobserved",
+    "- [2026-10-03T23:33:41Z] v6 TV ask: p4250m reserved identifiers range/text as variable names in v5 vs v6 (ledger47 refusals v56:161/176/192/193/930/1670)",
+    "- [2026-10-03T23:56:11Z] v6 TV ask: p4250m mutable-ema-first-length-probe-spec-v1.json (v5 mutable EMA first length, 4 sources)"
+  ],
+  "verification": {
+    "sourceHashesMatched": 18,
+    "sourceHashMismatches": 0,
+    "columnMapsMatched": 8,
+    "copiedFileHashesMatched": true,
+    "sourceEdited": false,
+    "engineJobsRun": false,
+    "commitAttempted": false,
+    "removedV5Duplicates": 2,
+    "stagedSourcesAccountedFor": 11,
+    "removedV5DuplicateSourcesTotal": 6,
+    "v4MagnitudeBytesMatchPinnedMaster": true
+  },
+  "supersedes": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v6-release-v1/bundle-manifest-v1.json",
+  "assemblyRevision": 4,
+  "frozenAt": "2026-10-04T01:04:52.845803+00:00",
+  "conditionalNviPviHandoff": {
+    "status": "EXCLUDED-ALREADY-SHIPPED-V4",
+    "owner": "codex-be9795",
+    "sourceSha256": "3fabe6f76e9461c1ad1ec7d7cba3029c07be9f3e34b10cb8e840c8a87be5d5df",
+    "handoffReceived": true,
+    "includedSourceCount": 0,
+    "nativeOutcome": "UNOBSERVED"
+  },
+  "excludedAlreadyInV4": [
+    {
+      "probe": "native-float-magnitude-output-v1.pine",
+      "sourceSha256": "3fabe6f76e9461c1ad1ec7d7cba3029c07be9f3e34b10cb8e840c8a87be5d5df",
+      "registeredSource": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v4-outcomes-shipped/native-float-magnitude-output-v1.pine",
+      "shippedMasterPath": "packages/tealscript/oracle-probes/v4/native-float-magnitude-output-v1.pine",
+      "pinnedMaster": "f10a9888d8683be7462fb83d5c610973158e6bce",
+      "reason": "Explicit overseer ruling: byte-identical probe already shipped in v4 on master; Sam runs v4 first",
+      "registrationEvidence": "/home/sam/cs/docs/tealscript-parity-archive/oracle-replay-v2/nvi-pvi-residual-be9795-v1/V6-PROBE-HANDOFF-v1.json",
+      "nativeOutcome": "UNOBSERVED"
+    }
+  ]
+}

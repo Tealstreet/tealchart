@@ -1,0 +1,4 @@
+//@version=6
+indicator("Reserved variable range v6")
+float range = close
+plot(range, "VALUE")

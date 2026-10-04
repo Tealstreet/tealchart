@@ -1,0 +1,47 @@
+{
+  "owner": "codex-p4250m",
+  "captureRound": "v6",
+  "status": "UNOBSERVED",
+  "purpose": "Determine whether range and text are refused as variable names in each declared language version. Separate scripts ensure the first diagnostic cannot mask the other identifier.",
+  "citations": {
+    "v5": "https://www.tradingview.com/pine-script-docs/v5/migration-guides/to-pine-version-5/#reserved-keywords",
+    "v6ManualRetainedMigrationList": "https://www.tradingview.com/pine-script-docs/migration-guides/to-pine-version-5/#reserved-keywords",
+    "v6CarryForwardContext": "https://www.tradingview.com/pine-script-docs/migration-guides/to-pine-version-6/"
+  },
+  "authorityLimit": "The list explicitly introduces the restriction in v5. Application to v6 is a carry-forward inference from the currently maintained v6 manual and migration changes, not a separate native v6 observation.",
+  "captureInstructions": "Paste each unchanged source separately in TradingView. Record exact compile diagnostic/code/location or successful compile and VALUE output. Any chart/timeframe is sufficient for compiler acceptance. If admitted, export at least 3 confirmed bars with close and VALUE. Do not rename the identifier or edit the version.",
+  "hypotheses": [
+    "Reserved-name compiler refusal",
+    "Successful compilation; VALUE equals close"
+  ],
+  "cases": [
+    {
+      "source": "reserved-variable-range-v5-v6-round-v1.pine",
+      "sourceSha256": "daec96e12ae61d5c20747837daa30f3df4a3debdc04e01216d2a869dbdb90029",
+      "declaredVersion": 5,
+      "identifier": "range",
+      "nativeOutcome": "UNOBSERVED"
+    },
+    {
+      "source": "reserved-variable-text-v5-v6-round-v1.pine",
+      "sourceSha256": "f9c91862b80a0ba1dd7bffefafd9a0d3b539ae7aab30f0d6854eac8d190d0ced",
+      "declaredVersion": 5,
+      "identifier": "text",
+      "nativeOutcome": "UNOBSERVED"
+    },
+    {
+      "source": "reserved-variable-range-v6-v6-round-v1.pine",
+      "sourceSha256": "1f3e9d5451d0c31b24f352bff58e168cc497c9f4fbf6e5a9206635615bac08be",
+      "declaredVersion": 6,
+      "identifier": "range",
+      "nativeOutcome": "UNOBSERVED"
+    },
+    {
+      "source": "reserved-variable-text-v6-v6-round-v1.pine",
+      "sourceSha256": "b540e38eaface58dc7c47cf807e0cc2f0df695d12d79c2e794ae033f2bb148ab",
+      "declaredVersion": 6,
+      "identifier": "text",
+      "nativeOutcome": "UNOBSERVED"
+    }
+  ]
+}

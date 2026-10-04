@@ -1,0 +1,35 @@
+{
+  "source": "linear-hole-order-ascending-len4-v1.pine",
+  "sourceSha256": "65dccfe743c0613071fc21f5ff4a6188d992942304aa16ca38e800d6ad59c4af",
+  "plotCount": 7,
+  "columns": [
+    {
+      "index": 0,
+      "title": "input_time_ms"
+    },
+    {
+      "index": 1,
+      "title": "input_bar_index"
+    },
+    {
+      "index": 2,
+      "title": "input_phase"
+    },
+    {
+      "index": 3,
+      "title": "input_clean"
+    },
+    {
+      "index": 4,
+      "title": "input_source"
+    },
+    {
+      "index": 5,
+      "title": "input_missing"
+    },
+    {
+      "index": 6,
+      "title": "linear_hole_p75"
+    }
+  ]
+}

@@ -1,0 +1,5 @@
+//@version=5
+indicator("Fixed EMA input native control")
+length = input.int(3)
+plot(ta.ema(close, length), "FIXED_INPUT_THREE")
+plot(ta.ema(close, 3), "FIXED_LITERAL_THREE")

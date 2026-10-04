@@ -1,0 +1,56 @@
+{
+  "version": 1,
+  "owner": "codex-6y3sjh",
+  "artifact": "TA linear interior-hole order discriminator; no engine rule inferred",
+  "baselineEngine": "123bad2ffbc1bbdeec512a762de25872fbcbc007",
+  "sourceProbes": [
+    {
+      "source": "linear-hole-order-ascending-len4-v1.pine",
+      "sourceSha256": "65dccfe743c0613071fc21f5ff4a6188d992942304aa16ca38e800d6ad59c4af",
+      "columnMap": "linear-hole-order-ascending-len4-v1.columns.json",
+      "length": 4,
+      "direction": "ascending",
+      "nativeOutcome": "UNSPECIFIED",
+      "standalone": true
+    },
+    {
+      "source": "linear-hole-order-descending-len4-v1.pine",
+      "sourceSha256": "488176ac17bd8a566d22fa7c5ac86b8846ae0d627dc3737c7faa7dd063d14829",
+      "columnMap": "linear-hole-order-descending-len4-v1.columns.json",
+      "length": 4,
+      "direction": "descending",
+      "nativeOutcome": "UNSPECIFIED",
+      "standalone": true
+    },
+    {
+      "source": "linear-hole-order-ascending-len14-v1.pine",
+      "sourceSha256": "2e8a66aab073ca55b2d80037dd838cfb20de34377d6d0bfc0e03ee8a7ab0fc54",
+      "columnMap": "linear-hole-order-ascending-len14-v1.columns.json",
+      "length": 14,
+      "direction": "ascending",
+      "nativeOutcome": "UNSPECIFIED",
+      "standalone": true
+    },
+    {
+      "source": "linear-hole-order-descending-len14-v1.pine",
+      "sourceSha256": "c64cc95797229e7cbf395f9869e2b834ee2173e2ed35d000963cad3d8ae4a493",
+      "columnMap": "linear-hole-order-descending-len14-v1.columns.json",
+      "length": 14,
+      "direction": "descending",
+      "nativeOutcome": "UNSPECIFIED",
+      "standalone": true
+    }
+  ],
+  "questions": [
+    "Does each standalone source emit finite or missing through current holes and their physical-window recovery?",
+    "At the first finite bar after both holes age out, does the output immediately return to the mathematically sorted finite window?",
+    "Do lengths4 and14 show the same source-order behavior on increasing versus decreasing deterministic inputs?",
+    "Preserve the exact numeric vectors; no model or expected native verdict has been supplied."
+  ],
+  "requirements": [
+    "Standard chart BINANCE:BTCUSDT 2 minutes UTC",
+    "Reload every standalone script before capture; export all7plots from input_bar_index0 with at least256 confirmed historical rows",
+    "Keep blank NA cells, original CSV headers, timestamps, source/CSV hashes and setup evidence; exclude final live bar from historical comparisons"
+  ],
+  "existingProbeBoundary": "Existing J v5 standalone hole sources remain frozen and distinct; this packet adds monotonic synthetic inputs only. No nearest-rank call or clean paired TA call; no capture manufactured or added to shipped manifests."
+}
