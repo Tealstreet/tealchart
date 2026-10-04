@@ -1,0 +1,4 @@
+//@version=4
+study("V7 plot-zero-offset-v4-control-v1")
+o = close > open ? 1 : -1
+plot(close + 100, title="TARGET", offset=0)

@@ -1,0 +1,5 @@
+//@version=5
+indicator("V7 corpus-fullwidth-code-indent-v5-v1")
+if close > open
+　　　　x = 1
+plot(close)

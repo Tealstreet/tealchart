@@ -1,0 +1,6 @@
+//@version=6
+indicator("V7 polyline-curved-asymmetric-v6-v1")
+if barstate.islastconfirmedhistory
+    points = array.from(chart.point.from_index(bar_index-8,1),chart.point.from_index(bar_index-6,4),chart.point.from_index(bar_index-3,-2),chart.point.from_index(bar_index,2))
+    polyline.new(points,curved=true,line_color=color.red)
+    polyline.new(points,curved=false,line_color=color.blue)

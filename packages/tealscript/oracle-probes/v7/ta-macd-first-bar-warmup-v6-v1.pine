@@ -1,0 +1,8 @@
+//@version=6
+indicator("V7 ta-macd-first-bar-warmup-v6-v1")
+s = 10.0 + bar_index % 7
+[m, sig, hist] = ta.macd(s,3,5,2)
+plot(s, "SOURCE")
+plot(m, "MACD")
+plot(sig, "SIGNAL")
+plot(hist, "HIST")

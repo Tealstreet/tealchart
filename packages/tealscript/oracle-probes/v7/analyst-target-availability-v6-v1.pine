@@ -1,0 +1,8 @@
+//@version=6
+indicator("V7 analyst-target-availability-v6-v1")
+plot(syminfo.target_price_high,"HIGH")
+plot(syminfo.target_price_low,"LOW")
+plot(syminfo.target_price_median,"MEDIAN")
+plot(syminfo.target_price_average,"AVERAGE")
+plot(syminfo.target_price_date,"DATE")
+plot(syminfo.target_price_estimates,"ESTIMATES")

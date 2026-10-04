@@ -1,0 +1,3 @@
+//@version=4
+study("V7 legacy-atan-v4-v1")
+plot(atan(x=0.5),"TARGET")

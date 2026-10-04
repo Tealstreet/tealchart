@@ -1,0 +1,16 @@
+//@version=6
+indicator("V7 map-put-all-capacity-v6-v1")
+var target = map.new<int,int>()
+var source = map.new<int,int>()
+if bar_index < 500
+    for j = 0 to 99
+        k = bar_index * 100 + j
+        if k < 49999
+            map.put(target,k,k)
+if bar_index == 500
+    map.put(source,50001,1)
+    map.put(source,50002,2)
+    map.put_all(target,source)
+plot(map.size(target),"SIZE")
+plot(map.contains(target,50001) ? 1 : 0,"FIRST_NEW")
+plot(map.contains(target,50002) ? 1 : 0,"SECOND_NEW")

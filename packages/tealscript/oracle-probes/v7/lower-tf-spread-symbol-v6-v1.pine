@@ -1,0 +1,7 @@
+//@version=6
+indicator("V7 lower-tf-spread-symbol-v6-v1")
+symbol = input.symbol("BINANCE:BTCUSDT-BINANCE:ETHUSDT","Spread")
+a = request.security_lower_tf(symbol,"1",close,ignore_invalid_symbol=true)
+plot(array.size(a),"INTRABARS")
+plot(array.size(a) > 0 ? array.get(a,0) : na,"FIRST")
+plot(array.size(a) > 0 ? array.get(a,array.size(a)-1) : na,"LAST")

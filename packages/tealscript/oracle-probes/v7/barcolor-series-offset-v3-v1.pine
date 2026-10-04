@@ -1,0 +1,4 @@
+//@version=3
+study("V7 barcolor-series-offset-v3-v1")
+o = close > open ? 1 : -1
+barcolor(red, offset=o)

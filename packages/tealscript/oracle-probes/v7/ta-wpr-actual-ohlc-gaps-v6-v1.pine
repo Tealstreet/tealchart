@@ -1,0 +1,10 @@
+//@version=6
+indicator("V7 ta-wpr-actual-ohlc-gaps-v6-v1")
+plot(open, "ACTUAL_OPEN")
+plot(high, "ACTUAL_HIGH")
+plot(low, "ACTUAL_LOW")
+plot(close, "ACTUAL_CLOSE")
+plot(volume, "ACTUAL_VOLUME")
+plot(na(open) or na(high) or na(low) or na(close) ? 1 : 0, "OHLC_MISSING")
+plot(na(volume) ? 1 : 0, "VOLUME_MISSING")
+plot(ta.wpr(4),"WPR")

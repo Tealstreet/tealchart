@@ -1,0 +1,4 @@
+//@version=6
+indicator("V7 native-error-text-log-unmatched-right-v6-v1")
+log.info("}",1)
+plot(close)

@@ -1,0 +1,5 @@
+//@version=6
+indicator("V7 array-covariance-unequal-3-2-v6-v1")
+a = array.from(1.0,2.0,3.0)
+b = array.from(1.0,4.0)
+plot(array.covariance(a,b),"TARGET")

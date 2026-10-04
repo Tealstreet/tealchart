@@ -1,0 +1,11 @@
+//@version=6
+indicator("V7 ta-cum-fixnan-leading-holes-v6-v1")
+phase = bar_index % 16
+clean = 10.0 + phase
+s = phase < 3 or phase == 8 or phase == 9 ? na : clean
+plot(s, "SOURCE")
+plot(clean, "CLEAN")
+plot(ta.cum(s), "CUM")
+plot(fixnan(s), "FIXNAN")
+float missing = na
+plot(fixnan(missing), "FIXNAN_ALL_NA")

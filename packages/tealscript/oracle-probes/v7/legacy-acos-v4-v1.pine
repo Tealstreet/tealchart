@@ -1,0 +1,3 @@
+//@version=4
+study("V7 legacy-acos-v4-v1")
+plot(acos(x=0.5),"TARGET")

@@ -1,0 +1,10 @@
+//@version=6
+indicator("V7 color-new-dynamic-negative-v6-v1")
+t = bar_index % 8 == 3 ? -1 : 50
+c = color.new(color.red,t)
+plot(t,"TRANSP")
+plot(color.r(c),"R")
+plot(color.g(c),"G")
+plot(color.b(c),"B")
+plot(color.t(c),"T")
+plot(1,"SWATCH",color=c)

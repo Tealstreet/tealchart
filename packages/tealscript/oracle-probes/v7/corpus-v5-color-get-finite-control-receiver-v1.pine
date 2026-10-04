@@ -1,0 +1,4 @@
+//@version=5
+indicator("corpus-v5-color-get-finite-control-receiver-v1")
+colors = array.from(color.red, color.green, color.blue)
+plot(colors.get(0) == color.red ? 1 : 0, "OUTCOME")

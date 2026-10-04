@@ -1,0 +1,11 @@
+//@version=6
+indicator("V3-TOSTRING-DEFAULT-PRECISION")
+priceText = str.tostring(78477.59079999999)
+thirdText = str.tostring(1.0 / 3.0)
+var table display = table.new(position.top_right, 1, 2)
+if barstate.isfirst
+    table.cell(display, 0, 0, "PRICE=" + priceText)
+    table.cell(display, 0, 1, "THIRD=" + thirdText)
+    log.info("PRICE=" + priceText)
+    log.info("THIRD=" + thirdText)
+plot(1, "OUTCOME")

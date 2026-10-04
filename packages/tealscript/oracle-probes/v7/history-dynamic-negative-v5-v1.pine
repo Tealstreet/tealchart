@@ -1,0 +1,5 @@
+//@version=5
+indicator("V7 history-dynamic-negative-v5-v1")
+o = bar_index % 2 == 0 ? -1 : 1
+plot(close[o], "TARGET")
+plot(close, "CONTROL")

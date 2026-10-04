@@ -1,0 +1,4 @@
+//@version=5
+indicator("V7 corpus-label-bgcolor-v1")
+label.new(bar_index,close,"X",bgcolor=color.red)
+plot(close)

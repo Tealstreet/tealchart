@@ -1,0 +1,7 @@
+//@version=6
+indicator("V7 array-abs-copy-v6-v1")
+a = array.from(-2,-3,4)
+b = array.abs(a)
+array.set(b,0,99)
+plot(array.get(a,0),"SOURCE")
+plot(array.get(b,0),"RESULT")

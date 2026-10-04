@@ -1,0 +1,5 @@
+//@version=6
+indicator("V3-CONST-REF-LINE-ACCEPT-MUTATE")
+const line value = line.new(bar_index, close, bar_index + 1, close)
+line.set_y1(value, close + 1)
+plot(line.get_y1(value), "OUTCOME")

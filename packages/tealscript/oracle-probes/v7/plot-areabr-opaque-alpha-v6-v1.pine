@@ -1,0 +1,4 @@
+//@version=6
+indicator("V7 plot-areabr-opaque-alpha-v6-v1")
+plot(2,"TARGET",style=plot.style_areabr,color=color.red,histbase=0)
+plot(0,"BASE",color=color.black)

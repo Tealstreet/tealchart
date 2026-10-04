@@ -1,0 +1,4 @@
+//@version=6
+indicator("V7 plotchar-textcolor-na-v6-v1")
+c = bar_index % 8 == 3 or bar_index % 8 == 4 ? na : color.black
+plotchar(true,"TARGET",char="X",text="TEXT",color=color.red,textcolor=c)

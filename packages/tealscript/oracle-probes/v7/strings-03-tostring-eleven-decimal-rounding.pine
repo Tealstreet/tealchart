@@ -1,0 +1,11 @@
+//@version=6
+indicator("V3-TOSTRING-ELEVEN-DECIMAL-ROUNDING")
+positiveText = str.tostring(1.12345678901)
+negativeText = str.tostring(-1.12345678901)
+var table results = table.new(position.top_right, 1, 2)
+if barstate.isfirst
+    table.cell(results, 0, 0, "POSITIVE=" + positiveText)
+    table.cell(results, 0, 1, "NEGATIVE=" + negativeText)
+    log.info("POSITIVE=" + positiveText)
+    log.info("NEGATIVE=" + negativeText)
+plot(1, "OUTCOME")

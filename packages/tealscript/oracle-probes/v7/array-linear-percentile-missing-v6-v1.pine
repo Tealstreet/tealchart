@@ -1,0 +1,6 @@
+//@version=6
+indicator("V7 array-linear-percentile-missing-v6-v1")
+a = array.from(1.0,2.0,4.0)
+x = bar_index % 8 == 3 ? float(na) : 50.0
+plot(x,"PERCENT")
+plot(array.percentile_linear_interpolation(a,x),"TARGET")

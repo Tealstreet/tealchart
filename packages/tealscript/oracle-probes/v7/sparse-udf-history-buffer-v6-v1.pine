@@ -1,0 +1,7 @@
+//@version=6
+indicator("V7 sparse-udf-history-buffer-v6-v1")
+f() =>
+    close[299]
+s = bar_index % 17 == 0 ? f() : na
+plot(s,"SPARSE")
+plot(close[299],"DENSE")

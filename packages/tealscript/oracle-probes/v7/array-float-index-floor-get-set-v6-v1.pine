@@ -1,0 +1,23 @@
+//@version=6
+indicator("V7 array-float-index-floor-get-set-v6-v1")
+phase = bar_index % 8
+float index = phase == 0 ? 1.0 : phase == 1 ? 1.5 : phase == 2 ? 1.999 : phase == 3 ? -0.5 : phase == 4 ? 0.0 : phase == 5 ? 0.999 : phase == 6 ? -1.5 : 2.999
+a = array.from(10,20,30,40)
+b = array.from(10,20,30,40)
+getRaw = array.get(a,index)
+array.set(a,index,99)
+floored = int(math.floor(index))
+getFloor = array.get(b,floored)
+array.set(b,floored,99)
+plot(index,"FLOAT_INDEX")
+plot(floored,"EXPLICIT_FLOOR")
+plot(getRaw,"GET_RAW")
+plot(getFloor,"GET_FLOOR_CONTROL")
+plot(array.get(a,0),"SET_RAW_0")
+plot(array.get(a,1),"SET_RAW_1")
+plot(array.get(a,2),"SET_RAW_2")
+plot(array.get(a,3),"SET_RAW_3")
+plot(array.get(b,0),"SET_FLOOR_0")
+plot(array.get(b,1),"SET_FLOOR_1")
+plot(array.get(b,2),"SET_FLOOR_2")
+plot(array.get(b,3),"SET_FLOOR_3")

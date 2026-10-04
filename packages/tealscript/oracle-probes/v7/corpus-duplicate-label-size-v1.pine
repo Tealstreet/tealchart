@@ -1,0 +1,4 @@
+//@version=5
+indicator("V7 corpus-duplicate-label-size-v1")
+label.new(bar_index,close,"X",size=size.small,size=size.large)
+plot(close)

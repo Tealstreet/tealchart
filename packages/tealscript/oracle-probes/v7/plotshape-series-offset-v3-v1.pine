@@ -1,0 +1,4 @@
+//@version=3
+study("V7 plotshape-series-offset-v3-v1")
+o = close > open ? 1 : -1
+plotshape(close > open,title="TARGET",offset=o)

@@ -1,0 +1,3 @@
+//@version=6
+indicator("V7 corpus-math-cbrt-v1")
+plot(math.cbrt(-8.0),"TARGET")

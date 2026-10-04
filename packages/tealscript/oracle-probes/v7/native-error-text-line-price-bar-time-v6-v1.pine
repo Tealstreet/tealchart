@@ -1,0 +1,4 @@
+//@version=6
+indicator("V7 native-error-text-line-price-bar-time-v6-v1")
+line x = line.new(time,close,time+60000,close+1,xloc=xloc.bar_time)
+plot(line.get_price(x,bar_index),"TARGET")

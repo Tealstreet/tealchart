@@ -1,0 +1,3 @@
+//@version=4
+study("V7 legacy-barsince-v4-v1")
+plot(barsince(close>open),"TARGET")
