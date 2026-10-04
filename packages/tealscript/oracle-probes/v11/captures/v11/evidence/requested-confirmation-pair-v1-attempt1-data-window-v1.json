@@ -1,0 +1,32 @@
+{
+  "index": 298,
+  "bar": [
+    1791133560,
+    85392.01,
+    85392.01,
+    85368,
+    85368,
+    7.33036
+  ],
+  "source_row": [
+    1791133560,
+    1,
+    1,
+    1791133560000,
+    1791132300000
+  ],
+  "browser_utc": "2026-10-04T17:09:01.869Z",
+  "title": "V11 requested-confirmation-pair-v1",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   17:06",
+  "visible_range": {
+    "_firstBar": 263,
+    "_lastBar": 301
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}

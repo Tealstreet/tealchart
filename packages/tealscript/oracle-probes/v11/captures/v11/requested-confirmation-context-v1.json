@@ -1,0 +1,98 @@
+{
+  "artifact": "Requested confirmation context v1",
+  "source": "requested-confirmation-pair-v1.pine",
+  "source_sha256": "5c4484388ec0be90d4a73561af9b8d764d353cd702a785d400894403f87f0488",
+  "attempt": 1,
+  "csv": "captures/v11/requested-confirmation-pair-v1-attempt1.csv",
+  "setup": {
+    "tickerid": "BINANCE:BTCUSDT",
+    "timeframe": "2",
+    "chart_type": "standard candles",
+    "native_style": 1,
+    "timezone": "Etc/UTC",
+    "bar_replay": false,
+    "mintick": 0.01,
+    "defaults_confirmed": true,
+    "native_user_inputs": [
+      {
+        "id": "in_0",
+        "name": "Requested timeframe",
+        "value": "15",
+        "default": "15"
+      }
+    ],
+    "observed_indicator_title": "V11 requested-confirmation-pair-v1",
+    "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+    "first_chart_bar": {
+      "index": -24695,
+      "value": [
+        1788134400,
+        77682,
+        77682.01,
+        77572,
+        77674.04,
+        51.86295
+      ]
+    },
+    "chart_bars": 24995,
+    "subscription": "pro_premium",
+    "native_end_of_data": true,
+    "exchange_timezone": "Etc/UTC",
+    "exchange_session": "24x7",
+    "currency": "USDT",
+    "chart_session": "regular",
+    "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+  },
+  "reset_utc": "2026-10-04T17:08:46.124Z",
+  "export_utc": "2026-10-04T17:08:53.962Z",
+  "live_candle_open_utc": "2026-10-04T17:08:00.000Z",
+  "historical_cutoff_unix_seconds": 1791133680,
+  "first_exported_row": {
+    "time": "1788134400",
+    "open": "77682",
+    "high": "77682.01",
+    "low": "77572",
+    "close": "77674.04",
+    "LOCAL_CONFIRMED": "1",
+    "REQUEST_CONFIRMED": "0",
+    "LOCAL_TIME": "1788134400000",
+    "REQUEST_TIME": ""
+  },
+  "last_exported_row": {
+    "time": "1791133680",
+    "open": "85368",
+    "high": "85368.01",
+    "low": "85342.38",
+    "close": "85346.72",
+    "LOCAL_CONFIRMED": "0",
+    "REQUEST_CONFIRMED": "0",
+    "LOCAL_TIME": "1791133680000",
+    "REQUEST_TIME": "1791133200000"
+  },
+  "observations": "Historical export and original live readings retained. Subsequent browser observations stopped advancing while UTC progressed; prodata ping and native WebSocket timed out. Reload did not initialize a chart. Fresh standard /chart/ navigation also failed to initialize native chart.",
+  "required_unobserved": [
+    "Opening/subsequent/closing live witnesses across requested15m boundary not certified.",
+    "Literal Pine first BAR_INDEX0 cannot be observed: frozen script exposes no bar_index plot. Native full-history endOfData and dataset first timestamp do not establish it."
+  ],
+  "limits": "No requested barstate policy or cache mechanism inferred. Native source RUNS; acquisition interruption is distinct from Pine compile/runtime failure.",
+  "evidence": [
+    "captures/v11/evidence/requested-confirmation-pair-v1-attempt1-setup.png",
+    "captures/v11/evidence/requested-confirmation-pair-v1-attempt1-export.png",
+    "captures/v11/evidence/requested-confirmation-pair-v1-attempt1-logs.txt",
+    "captures/v11/evidence/requested-confirmation-pair-v1-attempt1-logs-v1.json",
+    "captures/v11/evidence/requested-confirmation-pair-v1-attempt1-logs.png",
+    "captures/v11/evidence/requested-confirmation-pair-v1-attempt1-inputs.png",
+    "captures/v11/evidence/requested-confirmation-pair-v1-attempt1-visual.png",
+    "captures/v11/evidence/requested-confirmation-pair-v1-attempt1-data-window-v1.png",
+    "captures/v11/evidence/requested-confirmation-pair-v1-attempt1-data-window-v1.json",
+    "captures/v11/evidence/requested-confirmation-pair-v1-attempt1-data-window-v1.txt",
+    "captures/v11/evidence/requested-confirmation-pair-v1-attempt1-authority-object-geometry-v1.json",
+    "captures/v11/evidence/requested-confirmation-pair-v1-attempt1-authority-object-geometry-v1.png",
+    "captures/v11/evidence/requested-confirmation-pair-v1-attempt1-stalled-native-live-v1.json",
+    "captures/v11/evidence/requested-confirmation-pair-v1-attempt1-stalled-native-live-v1.png",
+    "captures/v11/evidence/requested-confirmation-pair-v1-attempt1-native-provider-reload-timeout-v1.json",
+    "captures/v11/evidence/requested-confirmation-pair-v1-attempt1-native-provider-reload-timeout-v1.png",
+    "captures/v11/evidence/requested-confirmation-pair-v1-attempt1-native-fresh-navigation-timeout-v1.json",
+    "captures/v11/evidence/requested-confirmation-pair-v1-attempt1-native-fresh-navigation-timeout-v1.png"
+  ]
+}

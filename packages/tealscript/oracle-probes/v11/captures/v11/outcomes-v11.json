@@ -33254,5 +33254,378 @@
       "RESET_DISPLAY"
     ],
     "data_window_witness": "captures/v11/evidence/chart-context-lifecycle-matrix-v1-attempt13-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T17:08:54.330Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v11 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "requested-confirmation-pair-v1.pine",
+    "attempt": 1,
+    "source_sha256": "5c4484388ec0be90d4a73561af9b8d764d353cd702a785d400894403f87f0488",
+    "indicator_title": "V11 requested-confirmation-pair-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v11/requested-confirmation-pair-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-05T010853.581.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [
+        {
+          "id": "in_0",
+          "name": "Requested timeframe",
+          "value": "15",
+          "default": "15"
+        }
+      ],
+      "observed_indicator_title": "V11 requested-confirmation-pair-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24695,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24995,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T17:08:46.124Z",
+    "live_candle_open_utc": "2026-10-04T17:08:00.000Z",
+    "export_utc": "2026-10-04T17:08:53.962Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v11/evidence/requested-confirmation-pair-v1-attempt1-setup.png",
+      "captures/v11/evidence/requested-confirmation-pair-v1-attempt1-export.png",
+      "captures/v11/evidence/requested-confirmation-pair-v1-attempt1-logs.txt",
+      "captures/v11/evidence/requested-confirmation-pair-v1-attempt1-logs-v1.json",
+      "captures/v11/evidence/requested-confirmation-pair-v1-attempt1-logs.png",
+      "captures/v11/evidence/requested-confirmation-pair-v1-attempt1-inputs.png",
+      "captures/v11/evidence/requested-confirmation-pair-v1-attempt1-visual.png",
+      "captures/v11/evidence/requested-confirmation-pair-v1-attempt1-data-window-v1.png",
+      "captures/v11/evidence/requested-confirmation-pair-v1-attempt1-data-window-v1.json",
+      "captures/v11/evidence/requested-confirmation-pair-v1-attempt1-data-window-v1.txt",
+      "captures/v11/evidence/requested-confirmation-pair-v1-attempt1-authority-object-geometry-v1.json",
+      "captures/v11/evidence/requested-confirmation-pair-v1-attempt1-authority-object-geometry-v1.png",
+      "captures/v11/evidence/requested-confirmation-pair-v1-attempt1-stalled-native-live-v1.json",
+      "captures/v11/evidence/requested-confirmation-pair-v1-attempt1-stalled-native-live-v1.png",
+      "captures/v11/evidence/requested-confirmation-pair-v1-attempt1-native-provider-reload-timeout-v1.json",
+      "captures/v11/evidence/requested-confirmation-pair-v1-attempt1-native-provider-reload-timeout-v1.png",
+      "captures/v11/evidence/requested-confirmation-pair-v1-attempt1-native-fresh-navigation-timeout-v1.json",
+      "captures/v11/evidence/requested-confirmation-pair-v1-attempt1-native-fresh-navigation-timeout-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T17:08:46.935Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790828520,
+            83764.01,
+            83824.01,
+            83756.04,
+            83805.5,
+            11.42254
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791133680,
+            85368,
+            85368.01,
+            85342.38,
+            85342.63,
+            2.37684
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 requested-confirmation-pair-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790828520,
+                1,
+                1,
+                1790828520000,
+                1790827200000
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791133680,
+                0,
+                0,
+                1791133680000,
+                1791133200000
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T17:08:47.963Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790828520,
+            83764.01,
+            83824.01,
+            83756.04,
+            83805.5,
+            11.42254
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791133680,
+            85368,
+            85368.01,
+            85342.38,
+            85342.63,
+            2.37684
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 requested-confirmation-pair-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24995,
+            "first": {
+              "index": -1022451,
+              "value": [
+                1788134400,
+                1,
+                0,
+                1788134400000,
+                null
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791133680,
+                0,
+                0,
+                1791133680000,
+                1791133200000
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T17:08:48.660Z",
+        "bars": 24995,
+        "end": true,
+        "first": {
+          "index": -24695,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791133680,
+            85368,
+            85368.01,
+            85342.38,
+            85342.63,
+            2.38792
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V11 requested-confirmation-pair-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24995,
+            "first": {
+              "index": -24695,
+              "value": [
+                1788134400,
+                1,
+                0,
+                1788134400000,
+                null
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791133680,
+                0,
+                0,
+                1791133680000,
+                1791133200000
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   17:08",
+    "historical_compare_before_unix_seconds": 1791133680,
+    "pine_logs": {
+      "paths": [
+        "evidence/requested-confirmation-pair-v1-attempt1-logs.txt",
+        "evidence/requested-confirmation-pair-v1-attempt1-logs-v1.json",
+        "evidence/requested-confirmation-pair-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "fd8f01d2580206f220b778c914717242dcc0544e6f1613366adf630651db4296",
+    "csv_bytes": 1896523,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "LOCAL_CONFIRMED",
+      "REQUEST_CONFIRMED",
+      "LOCAL_TIME",
+      "REQUEST_TIME"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "LOCAL_CONFIRMED": 5,
+      "REQUEST_CONFIRMED": 6,
+      "LOCAL_TIME": 7,
+      "REQUEST_TIME": 8
+    },
+    "first_historical_cells": [
+      "1788134400",
+      "77682",
+      "77682.01",
+      "77572",
+      "77674.04",
+      "1",
+      "0",
+      "1788134400000",
+      ""
+    ],
+    "last_historical_cells": [
+      "1791133560",
+      "85392.01",
+      "85392.01",
+      "85368",
+      "85368",
+      "1",
+      "1",
+      "1791133560000",
+      "1791132300000"
+    ],
+    "declared_to_native_header_mapping": {
+      "LOCAL_CONFIRMED": "LOCAL_CONFIRMED",
+      "REQUEST_CONFIRMED": "REQUEST_CONFIRMED",
+      "LOCAL_TIME": "LOCAL_TIME",
+      "REQUEST_TIME": "REQUEST_TIME"
+    },
+    "csv_rows": 24995,
+    "historical_rows": 24994,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791133680,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791133680",
+    "first_historical_values": {
+      "LOCAL_CONFIRMED": "1",
+      "REQUEST_CONFIRMED": "0",
+      "LOCAL_TIME": "1788134400000",
+      "REQUEST_TIME": ""
+    },
+    "last_historical_values": {
+      "LOCAL_CONFIRMED": "1",
+      "REQUEST_CONFIRMED": "1",
+      "LOCAL_TIME": "1791133560000",
+      "REQUEST_TIME": "1791132300000"
+    },
+    "declared_unexported_columns": [],
+    "data_window_witness": "captures/v11/evidence/requested-confirmation-pair-v1-attempt1-data-window-v1.json"
   }
 ]
