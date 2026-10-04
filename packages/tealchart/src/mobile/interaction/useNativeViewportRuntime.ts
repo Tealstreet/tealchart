@@ -28,6 +28,7 @@ import {
   applyNativePriceAutoScale,
   createNativeAutoScaleBars,
   fitNativeRestoredViewportPrice,
+  getNativeVisibleBarsBoundingBox,
 } from './nativeAutoScale';
 import { resetNativeViewportGestureActiveFlags, syncNativeViewportGestureMetrics } from './nativeViewportGestureState';
 import {
@@ -70,6 +71,8 @@ export interface NativeApplyViewportOptions {
   /** The layout's own auto-scale setting, which the store has not applied yet during a restore. */
   autoScaleEnabled?: boolean;
   fitPriceToBars?: boolean;
+  /** Internal: the deferral giving up, so the fit must not defer again. */
+  neverDeferPriceFit?: boolean;
 }
 
 export interface NativeViewportRuntime {
@@ -92,6 +95,12 @@ export const NATIVE_EMPTY_RENDER_VIEWPORT: Viewport = {
   priceMax: 1,
 };
 const EMPTY_NATIVE_VIEWPORT_BARS: readonly Bar[] = [];
+/**
+ * How long a deferred price fit waits for a backfill that may never come.
+ * Generous enough for a slow round trip; the cost of being wrong is one
+ * fallback to the auto viewport, which is what used to happen immediately.
+ */
+const DEFERRED_PRICE_FIT_TIMEOUT_MS = 10_000;
 
 function normalizeNativeViewport(viewport: Viewport | null, bars: readonly Bar[]): Viewport | null {
   if (viewport) return viewport;
@@ -322,7 +331,13 @@ export function useNativeViewportRuntime({
   );
 
   const autoScaleBars = useMemo(() => createNativeAutoScaleBars(viewportBars), [viewportBars]);
-  const pendingRestorePriceFitRef = useRef<{ autoScaleEnabled: boolean; viewport: Viewport } | null>(null);
+  const pendingRestorePriceFitRef = useRef<{
+    autoScaleEnabled: boolean;
+    deferredAt: number;
+    /** Earliest loaded bar when the fit was deferred; `undefined` means none were loaded. */
+    earliestBarTime: number | undefined;
+    viewport: Viewport;
+  } | null>(null);
 
   useEffect(() => {
     priceAutoScale.bars.value = autoScaleBars;
@@ -721,12 +736,40 @@ export function useNativeViewportRuntime({
     (nextViewport?: Viewport | null, options: NativeApplyViewportOptions = {}): boolean => {
       if (!nextViewport) return false;
       const autoScaleEnabledForFit = options.autoScaleEnabled ?? priceAutoScale.active.value;
+      // Decided BEFORE the fit, and from the CALLER's viewport rather than the
+      // fitted one. A window that starts before the earliest loaded bar is a
+      // backfill request: the data for it is on its way. Fitting such a window
+      // is what produced the reported "chart jumps" — the fit finds no bars
+      // inside it, falls back to the auto viewport, and that replaces the
+      // user's scrolled-back position with the default window. It also
+      // suppressed the request that would have fixed it, because the hint used
+      // to be computed from the fitted viewport and the default window never
+      // starts before the earliest bar.
+      const backfillHint = resolveViewportHistoryBackfillHint({
+        earliestBarTime: autoScaleBars[0]?.time,
+        hasMoreHistoricalData: true,
+        viewport: nextViewport,
+      });
+      // Both halves matter. A window that merely STARTS before the loaded page
+      // can still hold bars — it straddles the page edge — and those should be
+      // measured as usual. Only a window with nothing inside it has nothing for
+      // the fit to answer with, and only then is waiting better than guessing.
+      //
+      // Only the price fit waits. The window the user asked for is applied now,
+      // so the chart stays where they put it while the bars arrive.
+      const deferPriceFitForBackfill =
+        options.neverDeferPriceFit !== true &&
+        options.fitPriceToBars === true &&
+        autoScaleEnabledForFit &&
+        backfillHint !== null &&
+        !getNativeVisibleBarsBoundingBox(autoScaleBars, nextViewport.startTime, nextViewport.endTime);
+
       // Fitted before it is committed, never after: the commit is what the
       // confirmation, the candidate and the shared viewport are all compared
       // against, and a viewport that gets adjusted downstream of it never
       // confirms.
       const viewportToApply =
-        options.fitPriceToBars === true
+        options.fitPriceToBars === true && !deferPriceFitForBackfill
           ? fitNativeRestoredViewportPrice({
               autoScaleEnabled: autoScaleEnabledForFit,
               autoViewport,
@@ -738,9 +781,21 @@ export function useNativeViewportRuntime({
       // nothing to measure against until they do. The restore is remembered so
       // the first matching bars can re-frame it; without that the saved range
       // stands forever, because committing it claims a manual viewport.
+      //
+      // `deferPriceFitForBackfill` is the same problem one step along: bars
+      // exist, just none inside this window. The bars-change effect cannot
+      // rescue it either, since committing here claims a manual viewport and
+      // that effect bails on one.
       pendingRestorePriceFitRef.current =
-        options.fitPriceToBars === true && autoScaleEnabledForFit && autoScaleBars.length === 0
-          ? { autoScaleEnabled: autoScaleEnabledForFit, viewport: viewportToApply }
+        options.fitPriceToBars === true &&
+        autoScaleEnabledForFit &&
+        (autoScaleBars.length === 0 || deferPriceFitForBackfill)
+          ? {
+              autoScaleEnabled: autoScaleEnabledForFit,
+              deferredAt: Date.now(),
+              earliestBarTime: autoScaleBars[0]?.time,
+              viewport: viewportToApply,
+            }
           : null;
       setViewportOwnership(commitNativeViewportOwnership(viewportOwnershipRef.current, viewportToApply));
       candidateViewportRef.current = viewportToApply;
@@ -752,13 +807,9 @@ export function useNativeViewportRuntime({
       onViewportChange?.(viewportToApply);
 
       // A saved layout carries absolute times, so it can outrun the loaded page
-      // by more than a restored view scale does.
-      const hint = resolveViewportHistoryBackfillHint({
-        earliestBarTime: autoScaleBars[0]?.time,
-        hasMoreHistoricalData: true,
-        viewport: viewportToApply,
-      });
-      if (hint) onRequestMoreBars?.('left', hint);
+      // by more than a restored view scale does. Computed above, from the
+      // requested window rather than the fitted one.
+      if (backfillHint) onRequestMoreBars?.('left', backfillHint);
       return true;
     },
     [
@@ -783,10 +834,33 @@ export function useNativeViewportRuntime({
   useEffect(() => {
     const pending = pendingRestorePriceFitRef.current;
     if (!pending || autoScaleBars.length === 0) return;
+    // `bars` is a fresh array on every emit, so this effect runs on every
+    // realtime tick. Re-applying then would re-commit ownership and reset the
+    // gesture flags each tick — which cancels an in-flight pan. Wait for the
+    // page to actually grow LEFT, which is the only thing that can give the
+    // deferred fit something to measure.
+    //
+    // It also has to terminate: `hasMoreHistoricalData` is hard-coded true and
+    // the core drops requests once history is exhausted, so the hint alone
+    // would keep this pending forever. When the earliest bar stops moving, this
+    // simply stops firing and the price stays as applied — correct, since a
+    // window with no bars has nothing to fit to anyway.
+    const earliestBarTime = autoScaleBars[0]?.time;
+    const pageGrewLeft =
+      pending.earliestBarTime === undefined ||
+      (earliestBarTime !== undefined && earliestBarTime < pending.earliestBarTime);
+    // Waiting cannot be unbounded. A window older than the market's first bar
+    // is never going to be covered — the core stops backfilling and tells this
+    // hook nothing — and a chart left on a layout's stale saved price range
+    // with no bars in frame is worse than the auto viewport it used to fall
+    // back to. Give the backfill a fair chance, then take the fallback.
+    const gaveUpWaiting = !pageGrewLeft && Date.now() - pending.deferredAt >= DEFERRED_PRICE_FIT_TIMEOUT_MS;
+    if (!pageGrewLeft && !gaveUpWaiting) return;
     pendingRestorePriceFitRef.current = null;
     applyNativeViewport(pending.viewport, {
       autoScaleEnabled: pending.autoScaleEnabled,
       fitPriceToBars: true,
+      neverDeferPriceFit: gaveUpWaiting,
     });
   }, [applyNativeViewport, autoScaleBars]);
 
