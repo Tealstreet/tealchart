@@ -1,0 +1,47 @@
+Cannot call "ta.atr" with argument "length"="length". An argument of "series int" type was used but a "simple int"  is expected.
+{
+  "error": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+  "editorError": {
+    "code": "CE10123",
+    "ctx": {
+      "argDisplayName": "length",
+      "argUserFriendlyRepresentation": "length",
+      "argumentType": "series int",
+      "currentTypeDocStr": "simple int",
+      "funId": "ta.atr",
+      "typePostfix": ""
+    },
+    "end": {
+      "column": 18,
+      "line": 6
+    },
+    "message": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+    "start": {
+      "column": 13,
+      "line": 6
+    },
+    "id": "USER;64eb9fe01ecd4728859be8cb120fa590"
+  },
+  "title": "Compilation error",
+  "compiler_markers": [
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///84298604-9b1e-4b65-b019-4fc5db0a1c25.pine?placement%3Ddialog",
+        "path": "/84298604-9b1e-4b65-b019-4fc5db0a1c25.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "code": "CE10123",
+      "severity": 8,
+      "message": "Cannot call \"ta.atr\" with argument \"length\"=\"length\". An argument of \"series int\" type was used but a \"simple int\"  is expected.",
+      "startLineNumber": 6,
+      "startColumn": 13,
+      "endLineNumber": 6,
+      "endColumn": 19
+    }
+  ],
+  "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\nC\n85,311.98\n+2.52 (+0.00%)\n85,311.98\nSELL\n0.01\n85,311.99\nBUY\nUSDT\nOracle na holes crosses v1\nDate Range\n12:00:44 UTC\n99+\nObject tree\nData window\nDate\nSun 04 Oct '26\nTime\n12:00\nBTCUSDT · 2 · Binance\nOpen\n85,309.47\nHigh\n85,311.99\nLow\n85,309.46\nClose\n85,311.98\nChange\n+2.52 (+0.00%)\nVol\n11.28\nLast day change\n+558.42 (+0.66%)\nOracle na holes crosses v1\nPine Editor\nUntitled script\nPublish script\n1\n2\n3\n4\n5\n6\n7\n//@version=6\nindicator(\"Authority ATR mutable length v1\")\nint length = input.int(14)\nif close > open\n    length := 10\nplot(ta.atr(length))\n1 of 1 problem\nCannot call \"ta.atr\" with argument \"length\"=\"length\". An argument of \"series int\" type was used but a \"simple int\" is expected.(CE10123)\nLine 6, Col 13\nPine Script® v6\nCompilation error: CE10123\n\nCannot call \"ta.atr\" with argument \"length\"=\"length\". An argument of \"series int\" type was used but a \"simple int\" is expected.\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+  "context_substituted_message": "Cannot call \"ta.atr\" with argument \"length\"=\"length\". An argument of \"series int\" type was used but a \"simple int\"  is expected."
+}

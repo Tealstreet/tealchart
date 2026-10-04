@@ -1,0 +1,1128 @@
+{
+  "artifact": "Native framework length and published coordinate context v1",
+  "attempts": [
+    {
+      "script": "authority-framework-guarded-factor-v5-v1.pine",
+      "attempt": 1,
+      "status": "RUNS",
+      "first_historical_values": {
+        "Plot": "0"
+      },
+      "independent_page_reload_utc": null,
+      "live_boundary_confirmed_unchanged": true,
+      "diagnostic": {
+        "code": null,
+        "text": null,
+        "line": null,
+        "column": null,
+        "first_bar_index": null,
+        "first_bar_time_utc": null
+      },
+      "first_8_rows": [
+        {
+          "time": "1788134400",
+          "open": "77682",
+          "high": "77682.01",
+          "low": "77572",
+          "close": "77674.04",
+          "Plot": "0"
+        },
+        {
+          "time": "1788134520",
+          "open": "77674.5",
+          "high": "77780.34",
+          "low": "77646",
+          "close": "77758.24",
+          "Plot": "0"
+        },
+        {
+          "time": "1788134640",
+          "open": "77758.24",
+          "high": "77827.99",
+          "low": "77724",
+          "close": "77740.01",
+          "Plot": "0"
+        },
+        {
+          "time": "1788134760",
+          "open": "77740.01",
+          "high": "77751.37",
+          "low": "77490",
+          "close": "77508.86",
+          "Plot": "0"
+        },
+        {
+          "time": "1788134880",
+          "open": "77508.86",
+          "high": "77525.28",
+          "low": "77436.4",
+          "close": "77437.58",
+          "Plot": "0"
+        },
+        {
+          "time": "1788135000",
+          "open": "77437.57",
+          "high": "77636",
+          "low": "77436.41",
+          "close": "77636",
+          "Plot": "0"
+        },
+        {
+          "time": "1788135120",
+          "open": "77635.99",
+          "high": "77726",
+          "low": "77576",
+          "close": "77725.99",
+          "Plot": "0"
+        },
+        {
+          "time": "1788135240",
+          "open": "77726",
+          "high": "77797.91",
+          "low": "77720.88",
+          "close": "77797.91",
+          "Plot": "0"
+        }
+      ]
+    },
+    {
+      "script": "authority-framework-guarded-factor-v5-v1.pine",
+      "attempt": 2,
+      "status": "RUNS",
+      "first_historical_values": {
+        "Plot": "0"
+      },
+      "independent_page_reload_utc": "2026-10-04T11:56:09.400Z",
+      "live_boundary_confirmed_unchanged": true,
+      "diagnostic": {
+        "code": null,
+        "text": null,
+        "line": null,
+        "column": null,
+        "first_bar_index": null,
+        "first_bar_time_utc": null
+      },
+      "first_8_rows": [
+        {
+          "time": "1788134400",
+          "open": "77682",
+          "high": "77682.01",
+          "low": "77572",
+          "close": "77674.04",
+          "Plot": "0"
+        },
+        {
+          "time": "1788134520",
+          "open": "77674.5",
+          "high": "77780.34",
+          "low": "77646",
+          "close": "77758.24",
+          "Plot": "0"
+        },
+        {
+          "time": "1788134640",
+          "open": "77758.24",
+          "high": "77827.99",
+          "low": "77724",
+          "close": "77740.01",
+          "Plot": "0"
+        },
+        {
+          "time": "1788134760",
+          "open": "77740.01",
+          "high": "77751.37",
+          "low": "77490",
+          "close": "77508.86",
+          "Plot": "0"
+        },
+        {
+          "time": "1788134880",
+          "open": "77508.86",
+          "high": "77525.28",
+          "low": "77436.4",
+          "close": "77437.58",
+          "Plot": "0"
+        },
+        {
+          "time": "1788135000",
+          "open": "77437.57",
+          "high": "77636",
+          "low": "77436.41",
+          "close": "77636",
+          "Plot": "0"
+        },
+        {
+          "time": "1788135120",
+          "open": "77635.99",
+          "high": "77726",
+          "low": "77576",
+          "close": "77725.99",
+          "Plot": "0"
+        },
+        {
+          "time": "1788135240",
+          "open": "77726",
+          "high": "77797.91",
+          "low": "77720.88",
+          "close": "77797.91",
+          "Plot": "0"
+        }
+      ]
+    },
+    {
+      "script": "authority-framework-negative-control-v5-v1.pine",
+      "attempt": 1,
+      "status": "RUNTIME-ERROR",
+      "first_historical_values": null,
+      "independent_page_reload_utc": null,
+      "live_boundary_confirmed_unchanged": null,
+      "diagnostic": {
+        "code": "RE10045",
+        "text": "Error on bar 0: In 'array.get()' function. Index -1 is out of bounds, array size is 1.",
+        "line": 3,
+        "column": null,
+        "first_bar_index": 0,
+        "first_bar_time_utc": null
+      }
+    },
+    {
+      "script": "authority-framework-negative-control-v5-v1.pine",
+      "attempt": 2,
+      "status": "RUNTIME-ERROR",
+      "first_historical_values": null,
+      "independent_page_reload_utc": "2026-10-04T11:57:10.420Z",
+      "live_boundary_confirmed_unchanged": null,
+      "diagnostic": {
+        "code": "RE10045",
+        "text": "Error on bar 0: In 'array.get()' function. Index -1 is out of bounds, array size is 1.",
+        "line": 3,
+        "column": null,
+        "first_bar_index": 0,
+        "first_bar_time_utc": null
+      }
+    },
+    {
+      "script": "authority-sma-float-length-v6-v1.pine",
+      "attempt": 1,
+      "status": "COMPILE-ERROR",
+      "first_historical_values": null,
+      "independent_page_reload_utc": null,
+      "live_boundary_confirmed_unchanged": null,
+      "diagnostic": {
+        "code": "CE10123",
+        "text": "Cannot call \"ta.sma\" with argument \"length\"=\"length\". An argument of \"input float\" type was used but a \"series int\"  is expected.",
+        "line": 4,
+        "column": 20,
+        "first_bar_index": null,
+        "first_bar_time_utc": null
+      }
+    },
+    {
+      "script": "authority-sma-float-length-v6-v1.pine",
+      "attempt": 2,
+      "status": "COMPILE-ERROR",
+      "first_historical_values": null,
+      "independent_page_reload_utc": "2026-10-04T11:57:53.403Z",
+      "live_boundary_confirmed_unchanged": null,
+      "diagnostic": {
+        "code": "CE10123",
+        "text": "Cannot call \"ta.sma\" with argument \"length\"=\"length\". An argument of \"input float\" type was used but a \"series int\"  is expected.",
+        "line": 4,
+        "column": 20,
+        "first_bar_index": null,
+        "first_bar_time_utc": null
+      }
+    },
+    {
+      "script": "authority-wma-division-length-v6-v1.pine",
+      "attempt": 1,
+      "status": "RUNS",
+      "first_historical_values": {
+        "Plot": ""
+      },
+      "independent_page_reload_utc": null,
+      "live_boundary_confirmed_unchanged": true,
+      "diagnostic": {
+        "code": null,
+        "text": null,
+        "line": null,
+        "column": null,
+        "first_bar_index": null,
+        "first_bar_time_utc": null
+      },
+      "first_8_rows": [
+        {
+          "time": "1788134400",
+          "open": "77682",
+          "high": "77682.01",
+          "low": "77572",
+          "close": "77674.04",
+          "Plot": ""
+        },
+        {
+          "time": "1788134520",
+          "open": "77674.5",
+          "high": "77780.34",
+          "low": "77646",
+          "close": "77758.24",
+          "Plot": "77730.17333333334"
+        },
+        {
+          "time": "1788134640",
+          "open": "77758.24",
+          "high": "77827.99",
+          "low": "77724",
+          "close": "77740.01",
+          "Plot": "77746.08666666667"
+        },
+        {
+          "time": "1788134760",
+          "open": "77740.01",
+          "high": "77751.37",
+          "low": "77490",
+          "close": "77508.86",
+          "Plot": "77585.90999999999"
+        },
+        {
+          "time": "1788134880",
+          "open": "77508.86",
+          "high": "77525.28",
+          "low": "77436.4",
+          "close": "77437.58",
+          "Plot": "77461.34000000001"
+        },
+        {
+          "time": "1788135000",
+          "open": "77437.57",
+          "high": "77636",
+          "low": "77436.41",
+          "close": "77636",
+          "Plot": "77569.86"
+        },
+        {
+          "time": "1788135120",
+          "open": "77635.99",
+          "high": "77726",
+          "low": "77576",
+          "close": "77725.99",
+          "Plot": "77695.99333333333"
+        },
+        {
+          "time": "1788135240",
+          "open": "77726",
+          "high": "77797.91",
+          "low": "77720.88",
+          "close": "77797.91",
+          "Plot": "77773.93666666666"
+        }
+      ]
+    },
+    {
+      "script": "authority-wma-division-length-v6-v1.pine",
+      "attempt": 2,
+      "status": "RUNS",
+      "first_historical_values": {
+        "Plot": ""
+      },
+      "independent_page_reload_utc": "2026-10-04T11:58:50.704Z",
+      "live_boundary_confirmed_unchanged": true,
+      "diagnostic": {
+        "code": null,
+        "text": null,
+        "line": null,
+        "column": null,
+        "first_bar_index": null,
+        "first_bar_time_utc": null
+      },
+      "first_8_rows": [
+        {
+          "time": "1788134400",
+          "open": "77682",
+          "high": "77682.01",
+          "low": "77572",
+          "close": "77674.04",
+          "Plot": ""
+        },
+        {
+          "time": "1788134520",
+          "open": "77674.5",
+          "high": "77780.34",
+          "low": "77646",
+          "close": "77758.24",
+          "Plot": "77730.17333333334"
+        },
+        {
+          "time": "1788134640",
+          "open": "77758.24",
+          "high": "77827.99",
+          "low": "77724",
+          "close": "77740.01",
+          "Plot": "77746.08666666667"
+        },
+        {
+          "time": "1788134760",
+          "open": "77740.01",
+          "high": "77751.37",
+          "low": "77490",
+          "close": "77508.86",
+          "Plot": "77585.90999999999"
+        },
+        {
+          "time": "1788134880",
+          "open": "77508.86",
+          "high": "77525.28",
+          "low": "77436.4",
+          "close": "77437.58",
+          "Plot": "77461.34000000001"
+        },
+        {
+          "time": "1788135000",
+          "open": "77437.57",
+          "high": "77636",
+          "low": "77436.41",
+          "close": "77636",
+          "Plot": "77569.86"
+        },
+        {
+          "time": "1788135120",
+          "open": "77635.99",
+          "high": "77726",
+          "low": "77576",
+          "close": "77725.99",
+          "Plot": "77695.99333333333"
+        },
+        {
+          "time": "1788135240",
+          "open": "77726",
+          "high": "77797.91",
+          "low": "77720.88",
+          "close": "77797.91",
+          "Plot": "77773.93666666666"
+        }
+      ]
+    },
+    {
+      "script": "authority-atr-mutable-length-v6-v1.pine",
+      "attempt": 1,
+      "status": "COMPILE-ERROR",
+      "first_historical_values": null,
+      "independent_page_reload_utc": null,
+      "live_boundary_confirmed_unchanged": null,
+      "diagnostic": {
+        "code": "CE10123",
+        "text": "Cannot call \"ta.atr\" with argument \"length\"=\"length\". An argument of \"series int\" type was used but a \"simple int\"  is expected.",
+        "line": 6,
+        "column": 13,
+        "first_bar_index": null,
+        "first_bar_time_utc": null
+      }
+    },
+    {
+      "script": "authority-atr-mutable-length-v6-v1.pine",
+      "attempt": 2,
+      "status": "COMPILE-ERROR",
+      "first_historical_values": null,
+      "independent_page_reload_utc": "2026-10-04T12:00:31.027Z",
+      "live_boundary_confirmed_unchanged": null,
+      "diagnostic": {
+        "code": "CE10123",
+        "text": "Cannot call \"ta.atr\" with argument \"length\"=\"length\". An argument of \"series int\" type was used but a \"simple int\"  is expected.",
+        "line": 6,
+        "column": 13,
+        "first_bar_index": null,
+        "first_bar_time_utc": null
+      }
+    },
+    {
+      "script": "authority-framework-na-search-v5-v1.pine",
+      "attempt": 1,
+      "status": "RUNS",
+      "first_historical_values": {
+        "includes": "0",
+        "indexof": "-1"
+      },
+      "independent_page_reload_utc": null,
+      "live_boundary_confirmed_unchanged": true,
+      "diagnostic": {
+        "code": null,
+        "text": null,
+        "line": null,
+        "column": null,
+        "first_bar_index": null,
+        "first_bar_time_utc": null
+      },
+      "first_8_rows": [
+        {
+          "time": "1788134400",
+          "open": "77682",
+          "high": "77682.01",
+          "low": "77572",
+          "close": "77674.04",
+          "includes": "0",
+          "indexof": "-1"
+        },
+        {
+          "time": "1788134520",
+          "open": "77674.5",
+          "high": "77780.34",
+          "low": "77646",
+          "close": "77758.24",
+          "includes": "0",
+          "indexof": "-1"
+        },
+        {
+          "time": "1788134640",
+          "open": "77758.24",
+          "high": "77827.99",
+          "low": "77724",
+          "close": "77740.01",
+          "includes": "0",
+          "indexof": "-1"
+        },
+        {
+          "time": "1788134760",
+          "open": "77740.01",
+          "high": "77751.37",
+          "low": "77490",
+          "close": "77508.86",
+          "includes": "0",
+          "indexof": "-1"
+        },
+        {
+          "time": "1788134880",
+          "open": "77508.86",
+          "high": "77525.28",
+          "low": "77436.4",
+          "close": "77437.58",
+          "includes": "0",
+          "indexof": "-1"
+        },
+        {
+          "time": "1788135000",
+          "open": "77437.57",
+          "high": "77636",
+          "low": "77436.41",
+          "close": "77636",
+          "includes": "0",
+          "indexof": "-1"
+        },
+        {
+          "time": "1788135120",
+          "open": "77635.99",
+          "high": "77726",
+          "low": "77576",
+          "close": "77725.99",
+          "includes": "0",
+          "indexof": "-1"
+        },
+        {
+          "time": "1788135240",
+          "open": "77726",
+          "high": "77797.91",
+          "low": "77720.88",
+          "close": "77797.91",
+          "includes": "0",
+          "indexof": "-1"
+        }
+      ]
+    },
+    {
+      "script": "authority-framework-na-search-v5-v1.pine",
+      "attempt": 2,
+      "status": "RUNS",
+      "first_historical_values": {
+        "includes": "0",
+        "indexof": "-1"
+      },
+      "independent_page_reload_utc": "2026-10-04T12:01:23.552Z",
+      "live_boundary_confirmed_unchanged": true,
+      "diagnostic": {
+        "code": null,
+        "text": null,
+        "line": null,
+        "column": null,
+        "first_bar_index": null,
+        "first_bar_time_utc": null
+      },
+      "first_8_rows": [
+        {
+          "time": "1788134400",
+          "open": "77682",
+          "high": "77682.01",
+          "low": "77572",
+          "close": "77674.04",
+          "includes": "0",
+          "indexof": "-1"
+        },
+        {
+          "time": "1788134520",
+          "open": "77674.5",
+          "high": "77780.34",
+          "low": "77646",
+          "close": "77758.24",
+          "includes": "0",
+          "indexof": "-1"
+        },
+        {
+          "time": "1788134640",
+          "open": "77758.24",
+          "high": "77827.99",
+          "low": "77724",
+          "close": "77740.01",
+          "includes": "0",
+          "indexof": "-1"
+        },
+        {
+          "time": "1788134760",
+          "open": "77740.01",
+          "high": "77751.37",
+          "low": "77490",
+          "close": "77508.86",
+          "includes": "0",
+          "indexof": "-1"
+        },
+        {
+          "time": "1788134880",
+          "open": "77508.86",
+          "high": "77525.28",
+          "low": "77436.4",
+          "close": "77437.58",
+          "includes": "0",
+          "indexof": "-1"
+        },
+        {
+          "time": "1788135000",
+          "open": "77437.57",
+          "high": "77636",
+          "low": "77436.41",
+          "close": "77636",
+          "includes": "0",
+          "indexof": "-1"
+        },
+        {
+          "time": "1788135120",
+          "open": "77635.99",
+          "high": "77726",
+          "low": "77576",
+          "close": "77725.99",
+          "includes": "0",
+          "indexof": "-1"
+        },
+        {
+          "time": "1788135240",
+          "open": "77726",
+          "high": "77797.91",
+          "low": "77720.88",
+          "close": "77797.91",
+          "includes": "0",
+          "indexof": "-1"
+        }
+      ]
+    },
+    {
+      "script": "authority-label-published-constant-v6-v1.pine",
+      "attempt": 1,
+      "status": "RUNS",
+      "first_historical_values": {
+        "Plot": "77674.04"
+      },
+      "independent_page_reload_utc": null,
+      "live_boundary_confirmed_unchanged": true,
+      "diagnostic": {
+        "code": null,
+        "text": null,
+        "line": null,
+        "column": null,
+        "first_bar_index": null,
+        "first_bar_time_utc": null
+      },
+      "first_8_rows": [
+        {
+          "time": "1788134400",
+          "open": "77682",
+          "high": "77682.01",
+          "low": "77572",
+          "close": "77674.04",
+          "Plot": "77674.04"
+        },
+        {
+          "time": "1788134520",
+          "open": "77674.5",
+          "high": "77780.34",
+          "low": "77646",
+          "close": "77758.24",
+          "Plot": "77758.24"
+        },
+        {
+          "time": "1788134640",
+          "open": "77758.24",
+          "high": "77827.99",
+          "low": "77724",
+          "close": "77740.01",
+          "Plot": "77740.01"
+        },
+        {
+          "time": "1788134760",
+          "open": "77740.01",
+          "high": "77751.37",
+          "low": "77490",
+          "close": "77508.86",
+          "Plot": "77508.86"
+        },
+        {
+          "time": "1788134880",
+          "open": "77508.86",
+          "high": "77525.28",
+          "low": "77436.4",
+          "close": "77437.58",
+          "Plot": "77437.58"
+        },
+        {
+          "time": "1788135000",
+          "open": "77437.57",
+          "high": "77636",
+          "low": "77436.41",
+          "close": "77636",
+          "Plot": "77636"
+        },
+        {
+          "time": "1788135120",
+          "open": "77635.99",
+          "high": "77726",
+          "low": "77576",
+          "close": "77725.99",
+          "Plot": "77725.99"
+        },
+        {
+          "time": "1788135240",
+          "open": "77726",
+          "high": "77797.91",
+          "low": "77720.88",
+          "close": "77797.91",
+          "Plot": "77797.91"
+        }
+      ]
+    },
+    {
+      "script": "authority-label-published-constant-v6-v1.pine",
+      "attempt": 2,
+      "status": "RUNS",
+      "first_historical_values": {
+        "Plot": "77674.04"
+      },
+      "independent_page_reload_utc": "2026-10-04T12:02:40.024Z",
+      "live_boundary_confirmed_unchanged": true,
+      "diagnostic": {
+        "code": null,
+        "text": null,
+        "line": null,
+        "column": null,
+        "first_bar_index": null,
+        "first_bar_time_utc": null
+      },
+      "first_8_rows": [
+        {
+          "time": "1788134400",
+          "open": "77682",
+          "high": "77682.01",
+          "low": "77572",
+          "close": "77674.04",
+          "Plot": "77674.04"
+        },
+        {
+          "time": "1788134520",
+          "open": "77674.5",
+          "high": "77780.34",
+          "low": "77646",
+          "close": "77758.24",
+          "Plot": "77758.24"
+        },
+        {
+          "time": "1788134640",
+          "open": "77758.24",
+          "high": "77827.99",
+          "low": "77724",
+          "close": "77740.01",
+          "Plot": "77740.01"
+        },
+        {
+          "time": "1788134760",
+          "open": "77740.01",
+          "high": "77751.37",
+          "low": "77490",
+          "close": "77508.86",
+          "Plot": "77508.86"
+        },
+        {
+          "time": "1788134880",
+          "open": "77508.86",
+          "high": "77525.28",
+          "low": "77436.4",
+          "close": "77437.58",
+          "Plot": "77437.58"
+        },
+        {
+          "time": "1788135000",
+          "open": "77437.57",
+          "high": "77636",
+          "low": "77436.41",
+          "close": "77636",
+          "Plot": "77636"
+        },
+        {
+          "time": "1788135120",
+          "open": "77635.99",
+          "high": "77726",
+          "low": "77576",
+          "close": "77725.99",
+          "Plot": "77725.99"
+        },
+        {
+          "time": "1788135240",
+          "open": "77726",
+          "high": "77797.91",
+          "low": "77720.88",
+          "close": "77797.91",
+          "Plot": "77797.91"
+        }
+      ]
+    },
+    {
+      "script": "authority-point-published-input-v5-v1.pine",
+      "attempt": 1,
+      "status": "RUNS",
+      "first_historical_values": {
+        "Plot": "24"
+      },
+      "independent_page_reload_utc": null,
+      "live_boundary_confirmed_unchanged": true,
+      "diagnostic": {
+        "code": null,
+        "text": null,
+        "line": null,
+        "column": null,
+        "first_bar_index": null,
+        "first_bar_time_utc": null
+      },
+      "first_8_rows": [
+        {
+          "time": "1788134400",
+          "open": "77682",
+          "high": "77682.01",
+          "low": "77572",
+          "close": "77674.04",
+          "Plot": "24"
+        },
+        {
+          "time": "1788134520",
+          "open": "77674.5",
+          "high": "77780.34",
+          "low": "77646",
+          "close": "77758.24",
+          "Plot": "24"
+        },
+        {
+          "time": "1788134640",
+          "open": "77758.24",
+          "high": "77827.99",
+          "low": "77724",
+          "close": "77740.01",
+          "Plot": "24"
+        },
+        {
+          "time": "1788134760",
+          "open": "77740.01",
+          "high": "77751.37",
+          "low": "77490",
+          "close": "77508.86",
+          "Plot": "24"
+        },
+        {
+          "time": "1788134880",
+          "open": "77508.86",
+          "high": "77525.28",
+          "low": "77436.4",
+          "close": "77437.58",
+          "Plot": "24"
+        },
+        {
+          "time": "1788135000",
+          "open": "77437.57",
+          "high": "77636",
+          "low": "77436.41",
+          "close": "77636",
+          "Plot": "24"
+        },
+        {
+          "time": "1788135120",
+          "open": "77635.99",
+          "high": "77726",
+          "low": "77576",
+          "close": "77725.99",
+          "Plot": "24"
+        },
+        {
+          "time": "1788135240",
+          "open": "77726",
+          "high": "77797.91",
+          "low": "77720.88",
+          "close": "77797.91",
+          "Plot": "24"
+        }
+      ]
+    },
+    {
+      "script": "authority-point-published-input-v5-v1.pine",
+      "attempt": 2,
+      "status": "RUNS",
+      "first_historical_values": {
+        "Plot": "24"
+      },
+      "independent_page_reload_utc": "2026-10-04T12:03:56.549Z",
+      "live_boundary_confirmed_unchanged": true,
+      "diagnostic": {
+        "code": null,
+        "text": null,
+        "line": null,
+        "column": null,
+        "first_bar_index": null,
+        "first_bar_time_utc": null
+      },
+      "first_8_rows": [
+        {
+          "time": "1788134400",
+          "open": "77682",
+          "high": "77682.01",
+          "low": "77572",
+          "close": "77674.04",
+          "Plot": "24"
+        },
+        {
+          "time": "1788134520",
+          "open": "77674.5",
+          "high": "77780.34",
+          "low": "77646",
+          "close": "77758.24",
+          "Plot": "24"
+        },
+        {
+          "time": "1788134640",
+          "open": "77758.24",
+          "high": "77827.99",
+          "low": "77724",
+          "close": "77740.01",
+          "Plot": "24"
+        },
+        {
+          "time": "1788134760",
+          "open": "77740.01",
+          "high": "77751.37",
+          "low": "77490",
+          "close": "77508.86",
+          "Plot": "24"
+        },
+        {
+          "time": "1788134880",
+          "open": "77508.86",
+          "high": "77525.28",
+          "low": "77436.4",
+          "close": "77437.58",
+          "Plot": "24"
+        },
+        {
+          "time": "1788135000",
+          "open": "77437.57",
+          "high": "77636",
+          "low": "77436.41",
+          "close": "77636",
+          "Plot": "24"
+        },
+        {
+          "time": "1788135120",
+          "open": "77635.99",
+          "high": "77726",
+          "low": "77576",
+          "close": "77725.99",
+          "Plot": "24"
+        },
+        {
+          "time": "1788135240",
+          "open": "77726",
+          "high": "77797.91",
+          "low": "77720.88",
+          "close": "77797.91",
+          "Plot": "24"
+        }
+      ]
+    },
+    {
+      "script": "authority-framework-reference-na-factorization-v5-v1.pine",
+      "attempt": 1,
+      "status": "RUNS",
+      "first_historical_values": {
+        "Plot": "2"
+      },
+      "independent_page_reload_utc": null,
+      "live_boundary_confirmed_unchanged": true,
+      "diagnostic": {
+        "code": null,
+        "text": null,
+        "line": null,
+        "column": null,
+        "first_bar_index": null,
+        "first_bar_time_utc": null
+      },
+      "first_8_rows": [
+        {
+          "time": "1788134400",
+          "open": "77682",
+          "high": "77682.01",
+          "low": "77572",
+          "close": "77674.04",
+          "Plot": "2"
+        },
+        {
+          "time": "1788134520",
+          "open": "77674.5",
+          "high": "77780.34",
+          "low": "77646",
+          "close": "77758.24",
+          "Plot": "2"
+        },
+        {
+          "time": "1788134640",
+          "open": "77758.24",
+          "high": "77827.99",
+          "low": "77724",
+          "close": "77740.01",
+          "Plot": "2"
+        },
+        {
+          "time": "1788134760",
+          "open": "77740.01",
+          "high": "77751.37",
+          "low": "77490",
+          "close": "77508.86",
+          "Plot": "2"
+        },
+        {
+          "time": "1788134880",
+          "open": "77508.86",
+          "high": "77525.28",
+          "low": "77436.4",
+          "close": "77437.58",
+          "Plot": "2"
+        },
+        {
+          "time": "1788135000",
+          "open": "77437.57",
+          "high": "77636",
+          "low": "77436.41",
+          "close": "77636",
+          "Plot": "2"
+        },
+        {
+          "time": "1788135120",
+          "open": "77635.99",
+          "high": "77726",
+          "low": "77576",
+          "close": "77725.99",
+          "Plot": "2"
+        },
+        {
+          "time": "1788135240",
+          "open": "77726",
+          "high": "77797.91",
+          "low": "77720.88",
+          "close": "77797.91",
+          "Plot": "2"
+        }
+      ]
+    },
+    {
+      "script": "authority-framework-reference-na-factorization-v5-v1.pine",
+      "attempt": 2,
+      "status": "RUNS",
+      "first_historical_values": {
+        "Plot": "2"
+      },
+      "independent_page_reload_utc": "2026-10-04T12:05:14.083Z",
+      "live_boundary_confirmed_unchanged": true,
+      "diagnostic": {
+        "code": null,
+        "text": null,
+        "line": null,
+        "column": null,
+        "first_bar_index": null,
+        "first_bar_time_utc": null
+      },
+      "first_8_rows": [
+        {
+          "time": "1788134400",
+          "open": "77682",
+          "high": "77682.01",
+          "low": "77572",
+          "close": "77674.04",
+          "Plot": "2"
+        },
+        {
+          "time": "1788134520",
+          "open": "77674.5",
+          "high": "77780.34",
+          "low": "77646",
+          "close": "77758.24",
+          "Plot": "2"
+        },
+        {
+          "time": "1788134640",
+          "open": "77758.24",
+          "high": "77827.99",
+          "low": "77724",
+          "close": "77740.01",
+          "Plot": "2"
+        },
+        {
+          "time": "1788134760",
+          "open": "77740.01",
+          "high": "77751.37",
+          "low": "77490",
+          "close": "77508.86",
+          "Plot": "2"
+        },
+        {
+          "time": "1788134880",
+          "open": "77508.86",
+          "high": "77525.28",
+          "low": "77436.4",
+          "close": "77437.58",
+          "Plot": "2"
+        },
+        {
+          "time": "1788135000",
+          "open": "77437.57",
+          "high": "77636",
+          "low": "77436.41",
+          "close": "77636",
+          "Plot": "2"
+        },
+        {
+          "time": "1788135120",
+          "open": "77635.99",
+          "high": "77726",
+          "low": "77576",
+          "close": "77725.99",
+          "Plot": "2"
+        },
+        {
+          "time": "1788135240",
+          "open": "77726",
+          "high": "77797.91",
+          "low": "77720.88",
+          "close": "77797.91",
+          "Plot": "2"
+        }
+      ]
+    }
+  ],
+  "limits": "Unchanged guarded/unguarded controls independent; output cannot prove eager evaluation. Exact v5 float-array NA includes0/indexof-1 does not establish other types/versions. Reference factorization prints returned array size2 only; factor contents and algorithm unobserved. Literal input.float SMA and mutable ATR refusals independent from admitted input-int division WMA. Published label native graphics saved; published input point output24 independent from odd-length point1.5. No cast/source repair or engine/baseline edit."
+}

@@ -13458,5 +13458,5424 @@
       "Plot": "85280.94"
     },
     "data_window_witness": "captures/v8/evidence/authority-table-remerge-once-v5-v1-attempt2-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T11:55:59.565Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v8 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "authority-framework-guarded-factor-v5-v1.pine",
+    "attempt": 1,
+    "source_sha256": "6cb5ea9d9f40c7e9cf6112c9158ac3937a2254e363c03c5a46a7411b7b14c02f",
+    "indicator_title": "Guarded factor lookup",
+    "status": "RUNS",
+    "csv_file": "captures/v8/authority-framework-guarded-factor-v5-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T195558.691.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "Guarded factor lookup",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24538,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24838,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T11:55:42.723Z",
+    "live_candle_open_utc": "2026-10-04T11:54:00.000Z",
+    "export_utc": "2026-10-04T11:55:58.954Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v8/evidence/authority-framework-guarded-factor-v5-v1-attempt1-setup.png",
+      "captures/v8/evidence/authority-framework-guarded-factor-v5-v1-attempt1-export.png",
+      "captures/v8/evidence/authority-framework-guarded-factor-v5-v1-attempt1-logs.txt",
+      "captures/v8/evidence/authority-framework-guarded-factor-v5-v1-attempt1-logs-v1.json",
+      "captures/v8/evidence/authority-framework-guarded-factor-v5-v1-attempt1-logs.png",
+      "captures/v8/evidence/authority-framework-guarded-factor-v5-v1-attempt1-visual.png",
+      "captures/v8/evidence/authority-framework-guarded-factor-v5-v1-attempt1-data-window-v1.png",
+      "captures/v8/evidence/authority-framework-guarded-factor-v5-v1-attempt1-data-window-v1.json",
+      "captures/v8/evidence/authority-framework-guarded-factor-v5-v1-attempt1-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T11:55:43.464Z",
+        "bars": 300,
+        "end": false,
+        "first": {
+          "index": 0,
+          "value": [
+            1791078960,
+            84807.98,
+            84807.98,
+            84802.59,
+            84802.59,
+            11.13715
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791114840,
+            85302.01,
+            85302.01,
+            85302,
+            85302,
+            0.69596
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Guarded factor lookup",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -1002244,
+              "value": [
+                1790809680,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791114840,
+                0
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T11:55:44.408Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790809680,
+            83692,
+            83692,
+            83646,
+            83668.01,
+            7.49872
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791114840,
+            85302.01,
+            85302.01,
+            85302,
+            85302.01,
+            0.69959
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Guarded factor lookup",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790809680,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791114840,
+                0
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T11:55:45.147Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790809680,
+            83692,
+            83692,
+            83646,
+            83668.01,
+            7.49872
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791114840,
+            85302.01,
+            85302.01,
+            85302,
+            85302.01,
+            0.70234
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Guarded factor lookup",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790809680,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791114840,
+                0
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T11:55:45.903Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790809680,
+            83692,
+            83692,
+            83646,
+            83668.01,
+            7.49872
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791114840,
+            85302.01,
+            85302.01,
+            85302,
+            85302.01,
+            0.70234
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Guarded factor lookup",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790809680,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791114840,
+                0
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T11:55:46.616Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790809680,
+            83692,
+            83692,
+            83646,
+            83668.01,
+            7.49872
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791114840,
+            85302.01,
+            85302.01,
+            85302,
+            85302.01,
+            0.70234
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Guarded factor lookup",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790809680,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791114840,
+                0
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T11:55:47.320Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790809680,
+            83692,
+            83692,
+            83646,
+            83668.01,
+            7.49872
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791114840,
+            85302.01,
+            85302.01,
+            85302,
+            85302,
+            0.71499
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Guarded factor lookup",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790809680,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791114840,
+                0
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T11:55:48.115Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790809680,
+            83692,
+            83692,
+            83646,
+            83668.01,
+            7.49872
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791114840,
+            85302.01,
+            85302.01,
+            85302,
+            85302.01,
+            0.71702
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Guarded factor lookup",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790809680,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791114840,
+                0
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T11:55:48.807Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790809680,
+            83692,
+            83692,
+            83646,
+            83668.01,
+            7.49872
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791114840,
+            85302.01,
+            85302.01,
+            85302,
+            85302,
+            0.71992
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Guarded factor lookup",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790809680,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791114840,
+                0
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T11:55:49.500Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790809680,
+            83692,
+            83692,
+            83646,
+            83668.01,
+            7.49872
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791114840,
+            85302.01,
+            85302.01,
+            85302,
+            85302,
+            0.71992
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Guarded factor lookup",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790809680,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791114840,
+                0
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T11:55:50.671Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790809680,
+            83692,
+            83692,
+            83646,
+            83668.01,
+            7.49872
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791114840,
+            85302.01,
+            85302.01,
+            85302,
+            85302,
+            0.71992
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Guarded factor lookup",
+            "status": {
+              "type": 2
+            },
+            "size": 24838,
+            "first": {
+              "index": -1022294,
+              "value": [
+                1788134400,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791114840,
+                0
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T11:55:51.381Z",
+        "bars": 24838,
+        "end": true,
+        "first": {
+          "index": -24538,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791114840,
+            85302.01,
+            85302.01,
+            85302,
+            85302.01,
+            0.7272
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Guarded factor lookup",
+            "status": {
+              "type": 2
+            },
+            "size": 24838,
+            "first": {
+              "index": -24538,
+              "value": [
+                1788134400,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791114840,
+                0
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///f90f3d6e-9c3b-4d15-b3c2-87e36116cab2.pine?placement%3Ddialog",
+          "path": "/f90f3d6e-9c3b-4d15-b3c2-87e36116cab2.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "live_tooltip": "Sun 04 Oct '26   11:54",
+    "historical_compare_before_unix_seconds": 1791114840,
+    "pine_logs": {
+      "paths": [
+        "evidence/authority-framework-guarded-factor-v5-v1-attempt1-logs.txt",
+        "evidence/authority-framework-guarded-factor-v5-v1-attempt1-logs-v1.json",
+        "evidence/authority-framework-guarded-factor-v5-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "497b59078d806a8a8b1983a4d3d704949a47698d1490d2289c4a848f2c62668d",
+    "csv_bytes": 1148711,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "Plot"
+    ],
+    "declared_to_native_header_mapping": {
+      "Plot": "Plot"
+    },
+    "csv_rows": 24838,
+    "historical_rows": 24837,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791114840,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791114840",
+    "first_historical_values": {
+      "Plot": "0"
+    },
+    "last_historical_values": {
+      "Plot": "0"
+    },
+    "data_window_witness": "captures/v8/evidence/authority-framework-guarded-factor-v5-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T11:56:35.695Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v8 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "authority-framework-guarded-factor-v5-v1.pine",
+    "attempt": 2,
+    "source_sha256": "6cb5ea9d9f40c7e9cf6112c9158ac3937a2254e363c03c5a46a7411b7b14c02f",
+    "indicator_title": "Guarded factor lookup",
+    "status": "RUNS",
+    "csv_file": "captures/v8/authority-framework-guarded-factor-v5-v1-attempt2.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T195634.601.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "Guarded factor lookup",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24539,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24839,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T11:56:25.326Z",
+    "live_candle_open_utc": "2026-10-04T11:56:00.000Z",
+    "export_utc": "2026-10-04T11:56:35.239Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v8/evidence/authority-framework-guarded-factor-v5-v1-attempt2-setup.png",
+      "captures/v8/evidence/authority-framework-guarded-factor-v5-v1-attempt2-export.png",
+      "captures/v8/evidence/authority-framework-guarded-factor-v5-v1-attempt2-logs.txt",
+      "captures/v8/evidence/authority-framework-guarded-factor-v5-v1-attempt2-logs-v1.json",
+      "captures/v8/evidence/authority-framework-guarded-factor-v5-v1-attempt2-logs.png",
+      "captures/v8/evidence/authority-framework-guarded-factor-v5-v1-attempt2-visual.png",
+      "captures/v8/evidence/authority-framework-guarded-factor-v5-v1-attempt2-data-window-v1.png",
+      "captures/v8/evidence/authority-framework-guarded-factor-v5-v1-attempt2-data-window-v1.json",
+      "captures/v8/evidence/authority-framework-guarded-factor-v5-v1-attempt2-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": "2026-10-04T11:56:09.400Z",
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T11:56:26.374Z",
+        "bars": 2556,
+        "end": false,
+        "first": {
+          "index": -2256,
+          "value": [
+            1790808360,
+            83810.65,
+            83810.65,
+            83798,
+            83798.01,
+            1.42247
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791114960,
+            85302,
+            85302.01,
+            85302,
+            85302.01,
+            0.17076
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Guarded factor lookup",
+            "status": {
+              "type": 2
+            },
+            "size": 2556,
+            "first": {
+              "index": -2256,
+              "value": [
+                1790808360,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791114960,
+                0
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T11:56:27.457Z",
+        "bars": 2556,
+        "end": false,
+        "first": {
+          "index": -2256,
+          "value": [
+            1790808360,
+            83810.65,
+            83810.65,
+            83798,
+            83798.01,
+            1.42247
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791114960,
+            85302,
+            85302.01,
+            85302,
+            85302,
+            0.17729
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Guarded factor lookup",
+            "status": {
+              "type": 2
+            },
+            "size": 24839,
+            "first": {
+              "index": -1022283,
+              "value": [
+                1788134400,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791114960,
+                0
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T11:56:28.238Z",
+        "bars": 24839,
+        "end": true,
+        "first": {
+          "index": -24539,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791114960,
+            85302,
+            85302.01,
+            85302,
+            85302,
+            0.22178
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Guarded factor lookup",
+            "status": {
+              "type": 2
+            },
+            "size": 24839,
+            "first": {
+              "index": -24539,
+              "value": [
+                1788134400,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791114960,
+                0
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///f8e276f8-d86f-4fee-8f7e-2a3ab16cdde5.pine?placement%3Ddialog",
+          "path": "/f8e276f8-d86f-4fee-8f7e-2a3ab16cdde5.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "live_tooltip": "Sun 04 Oct '26   11:56",
+    "historical_compare_before_unix_seconds": 1791114960,
+    "pine_logs": {
+      "paths": [
+        "evidence/authority-framework-guarded-factor-v5-v1-attempt2-logs.txt",
+        "evidence/authority-framework-guarded-factor-v5-v1-attempt2-logs-v1.json",
+        "evidence/authority-framework-guarded-factor-v5-v1-attempt2-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "de534881cc7d98830b2bbea5986b7b4ad9bcd863e34c762eda6cc8767ae8b5fc",
+    "csv_bytes": 1148748,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "Plot"
+    ],
+    "declared_to_native_header_mapping": {
+      "Plot": "Plot"
+    },
+    "csv_rows": 24839,
+    "historical_rows": 24838,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791114960,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791114960",
+    "first_historical_values": {
+      "Plot": "0"
+    },
+    "last_historical_values": {
+      "Plot": "0"
+    },
+    "data_window_witness": "captures/v8/evidence/authority-framework-guarded-factor-v5-v1-attempt2-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T11:57:00.930Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v8 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "authority-framework-negative-control-v5-v1.pine",
+    "attempt": 1,
+    "source_sha256": "5650ce4e5baa96b5e2f54db27da41c61fcfafeb5172bb6246fe535675393a401",
+    "indicator_title": "Authority negative index control v1",
+    "status": "RUNTIME-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": "RE10045",
+      "text": "Error on bar 0: In 'array.get()' function. Index -1 is out of bounds, array size is 1.",
+      "line": 3,
+      "column": null,
+      "first_bar_index": 0,
+      "first_bar_time_utc": null,
+      "native": {
+        "ctx": {
+          "funcName": "get",
+          "index": -1,
+          "code": "RE10045",
+          "size": 1,
+          "bar_index": 0
+        },
+        "error": "Error on bar {bar_index}: In 'array.{funcName}()' function. Index {index} is out of bounds, array size is {size}.",
+        "stack_trace": [
+          {
+            "n": "#main",
+            "p": 3
+          }
+        ],
+        "title": "Runtime error",
+        "showReportItButton": false,
+        "studyAccessBlocked": false,
+        "compiler_markers": [],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,302.00\nH\n85,302.01\nL\n85,302.00\nC\n85,302.01\n+0.01 (+0.00%)\n85,302.00\nSELL\n0.01\n85,302.01\nBUY\nUSDT\nAuthority negative index control v1\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n11:57:02 UTC\n99+\nRuntime error: RE10045\nRuntime error: RE10045\nError on bar 0: In 'array.get()' function. Index -1 is out of bounds, array size is 1.\nat #main():3\nOpen in editor",
+        "context_substituted_message": "Error on bar 0: In 'array.get()' function. Index -1 is out of bounds, array size is 1."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "Authority negative index control v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24539,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24839,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T11:56:58.357Z",
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v8/evidence/authority-framework-negative-control-v5-v1-attempt1-error.png",
+      "captures/v8/evidence/authority-framework-negative-control-v5-v1-attempt1-error.txt",
+      "captures/v8/evidence/authority-framework-negative-control-v5-v1-attempt1-logs.txt",
+      "captures/v8/evidence/authority-framework-negative-control-v5-v1-attempt1-logs-v1.json",
+      "captures/v8/evidence/authority-framework-negative-control-v5-v1-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T11:56:59.364Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790809800,
+            83668,
+            83668,
+            83636,
+            83636,
+            3.55175
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791114960,
+            85302,
+            85302.01,
+            85302,
+            85302.01,
+            0.82747
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Authority negative index control v1",
+            "status": {
+              "type": 3,
+              "errorDescription": {
+                "ctx": {
+                  "funcName": "get",
+                  "index": -1,
+                  "code": "RE10045",
+                  "size": 1,
+                  "bar_index": 0
+                },
+                "error": "Error on bar {bar_index}: In 'array.{funcName}()' function. Index {index} is out of bounds, array size is {size}.",
+                "stack_trace": [
+                  {
+                    "n": "#main",
+                    "p": 3
+                  }
+                ],
+                "title": "Runtime error",
+                "showReportItButton": false,
+                "studyAccessBlocked": false
+              }
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T11:57:00.546Z",
+        "bars": 24839,
+        "end": true,
+        "first": {
+          "index": -24539,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791114960,
+            85302,
+            85302.01,
+            85302,
+            85302.01,
+            0.83687
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Authority negative index control v1",
+            "status": {
+              "type": 3,
+              "errorDescription": {
+                "ctx": {
+                  "funcName": "get",
+                  "index": -1,
+                  "code": "RE10045",
+                  "size": 1,
+                  "bar_index": 0
+                },
+                "error": "Error on bar {bar_index}: In 'array.{funcName}()' function. Index {index} is out of bounds, array size is {size}.",
+                "stack_trace": [
+                  {
+                    "n": "#main",
+                    "p": 3
+                  }
+                ],
+                "title": "Runtime error",
+                "showReportItButton": false,
+                "studyAccessBlocked": false
+              }
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///76a7547f-d0ad-4d3d-a6c3-f2a1255bb7c3.pine?placement%3Ddialog",
+          "path": "/76a7547f-d0ad-4d3d-a6c3-f2a1255bb7c3.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "error_observed_utc": "2026-10-04T11:57:06.685Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/authority-framework-negative-control-v5-v1-attempt1-logs.txt",
+        "evidence/authority-framework-negative-control-v5-v1-attempt1-logs-v1.json",
+        "evidence/authority-framework-negative-control-v5-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T11:57:30.179Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v8 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "authority-framework-negative-control-v5-v1.pine",
+    "attempt": 2,
+    "source_sha256": "5650ce4e5baa96b5e2f54db27da41c61fcfafeb5172bb6246fe535675393a401",
+    "indicator_title": "Authority negative index control v1",
+    "status": "RUNTIME-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": "RE10045",
+      "text": "Error on bar 0: In 'array.get()' function. Index -1 is out of bounds, array size is 1.",
+      "line": 3,
+      "column": null,
+      "first_bar_index": 0,
+      "first_bar_time_utc": null,
+      "native": {
+        "ctx": {
+          "funcName": "get",
+          "index": -1,
+          "code": "RE10045",
+          "size": 1,
+          "bar_index": 0
+        },
+        "error": "Error on bar {bar_index}: In 'array.{funcName}()' function. Index {index} is out of bounds, array size is {size}.",
+        "stack_trace": [
+          {
+            "n": "#main",
+            "p": 3
+          }
+        ],
+        "title": "Runtime error",
+        "showReportItButton": false,
+        "studyAccessBlocked": false,
+        "compiler_markers": [],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,302.00\nH\n85,302.01\nL\n85,302.00\nC\n85,302.00\n0.00 (0.00%)\n85,302.00\nSELL\n0.01\n85,302.01\nBUY\nUSDT\nAuthority negative index control v1\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n11:57:32 UTC\n99+\nRuntime error: RE10045\nRuntime error: RE10045\nError on bar 0: In 'array.get()' function. Index -1 is out of bounds, array size is 1.\nat #main():3\nOpen in editor",
+        "context_substituted_message": "Error on bar 0: In 'array.get()' function. Index -1 is out of bounds, array size is 1."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "Authority negative index control v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24539,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24839,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T11:57:27.141Z",
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v8/evidence/authority-framework-negative-control-v5-v1-attempt2-error.png",
+      "captures/v8/evidence/authority-framework-negative-control-v5-v1-attempt2-error.txt",
+      "captures/v8/evidence/authority-framework-negative-control-v5-v1-attempt2-logs.txt",
+      "captures/v8/evidence/authority-framework-negative-control-v5-v1-attempt2-logs-v1.json",
+      "captures/v8/evidence/authority-framework-negative-control-v5-v1-attempt2-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": "2026-10-04T11:57:10.420Z",
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T11:57:27.871Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790809800,
+            83668,
+            83668,
+            83636,
+            83636,
+            3.55175
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791114960,
+            85302,
+            85302.01,
+            85302,
+            85302,
+            1.81537
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Authority negative index control v1",
+            "status": {
+              "type": 3,
+              "errorDescription": {
+                "ctx": {
+                  "funcName": "get",
+                  "index": -1,
+                  "code": "RE10045",
+                  "size": 1,
+                  "bar_index": 0
+                },
+                "error": "Error on bar {bar_index}: In 'array.{funcName}()' function. Index {index} is out of bounds, array size is {size}.",
+                "stack_trace": [
+                  {
+                    "n": "#main",
+                    "p": 3
+                  }
+                ],
+                "title": "Runtime error",
+                "showReportItButton": false,
+                "studyAccessBlocked": false
+              }
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T11:57:28.985Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790809800,
+            83668,
+            83668,
+            83636,
+            83636,
+            3.55175
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791114960,
+            85302,
+            85302.01,
+            85302,
+            85302.01,
+            1.81749
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Authority negative index control v1",
+            "status": {
+              "type": 3,
+              "errorDescription": {
+                "ctx": {
+                  "funcName": "get",
+                  "index": -1,
+                  "code": "RE10045",
+                  "size": 1,
+                  "bar_index": 0
+                },
+                "error": "Error on bar {bar_index}: In 'array.{funcName}()' function. Index {index} is out of bounds, array size is {size}.",
+                "stack_trace": [
+                  {
+                    "n": "#main",
+                    "p": 3
+                  }
+                ],
+                "title": "Runtime error",
+                "showReportItButton": false,
+                "studyAccessBlocked": false
+              }
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T11:57:29.827Z",
+        "bars": 24839,
+        "end": true,
+        "first": {
+          "index": -24539,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791114960,
+            85302,
+            85302.01,
+            85302,
+            85302,
+            1.82065
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Authority negative index control v1",
+            "status": {
+              "type": 3,
+              "errorDescription": {
+                "ctx": {
+                  "funcName": "get",
+                  "index": -1,
+                  "code": "RE10045",
+                  "size": 1,
+                  "bar_index": 0
+                },
+                "error": "Error on bar {bar_index}: In 'array.{funcName}()' function. Index {index} is out of bounds, array size is {size}.",
+                "stack_trace": [
+                  {
+                    "n": "#main",
+                    "p": 3
+                  }
+                ],
+                "title": "Runtime error",
+                "showReportItButton": false,
+                "studyAccessBlocked": false
+              }
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///4204aa6d-bb84-4d76-bf16-5284ef27cfd1.pine?placement%3Ddialog",
+          "path": "/4204aa6d-bb84-4d76-bf16-5284ef27cfd1.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "error_observed_utc": "2026-10-04T11:57:34.665Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/authority-framework-negative-control-v5-v1-attempt2-logs.txt",
+        "evidence/authority-framework-negative-control-v5-v1-attempt2-logs-v1.json",
+        "evidence/authority-framework-negative-control-v5-v1-attempt2-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T11:57:46.426Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v8 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "authority-sma-float-length-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "49ff7de044be8ef1e449dffd3642d46e186075f33f21470eec347421df5b527b",
+    "indicator_title": "Authority SMA float v1",
+    "status": "COMPILE-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": "CE10123",
+      "text": "Cannot call \"ta.sma\" with argument \"length\"=\"length\". An argument of \"input float\" type was used but a \"series int\"  is expected.",
+      "line": 4,
+      "column": 20,
+      "first_bar_index": null,
+      "first_bar_time_utc": null,
+      "native": {
+        "error": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+        "editorError": {
+          "code": "CE10123",
+          "ctx": {
+            "argDisplayName": "length",
+            "argUserFriendlyRepresentation": "length",
+            "argumentType": "input float",
+            "currentTypeDocStr": "series int",
+            "funId": "ta.sma",
+            "typePostfix": ""
+          },
+          "end": {
+            "column": 25,
+            "line": 4
+          },
+          "message": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+          "start": {
+            "column": 20,
+            "line": 4
+          },
+          "id": "USER;f009bb5c754b4e8c90ae11056c6fcdf8"
+        },
+        "title": "Compilation error",
+        "compiler_markers": [
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///90a826a8-a4ed-400f-8d3a-1947628df703.pine?placement%3Ddialog",
+              "path": "/90a826a8-a4ed-400f-8d3a-1947628df703.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "code": "CE10123",
+            "severity": 8,
+            "message": "Cannot call \"ta.sma\" with argument \"length\"=\"length\". An argument of \"input float\" type was used but a \"series int\"  is expected.",
+            "startLineNumber": 4,
+            "startColumn": 20,
+            "endLineNumber": 4,
+            "endColumn": 26
+          }
+        ],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,302.00\nH\n85,302.01\nL\n85,302.00\nC\n85,302.00\n0.00 (0.00%)\n85,302.00\nSELL\n0.01\n85,302.01\nBUY\nUSDT\nauthority-sma-float-length-v6-v1.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n11:57:49 UTC\n99+\nPine Editor\nauthority-sma-float-length-v6-v1.pine\nPublish script\n1\n2\n3\n4\n5\n//@version=6\nindicator(\"Authority\u00a0SMA\u00a0float\u00a0v1\")\nlength\u00a0=\u00a0input.float(5.0)\nplot(ta.sma(close,\u00a0length))\n1 of 1 problem\nCannot call \"ta.sma\" with argument \"length\"=\"length\". An argument of \"input float\" type was used but a \"series int\" is expected.(CE10123)\n1 \u2219 Today, 19:57\nLine 4, Col 20\nPine Script\u00ae v6\nCompilation error: CE10123\n\nCannot call \"ta.sma\" with argument \"length\"=\"length\". An argument of \"input float\" type was used but a \"series int\" is expected.\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+        "context_substituted_message": "Cannot call \"ta.sma\" with argument \"length\"=\"length\". An argument of \"input float\" type was used but a \"series int\"  is expected."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "authority-sma-float-length-v6-v1.pine",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24539,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24839,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v8/evidence/authority-sma-float-length-v6-v1-attempt1-error.png",
+      "captures/v8/evidence/authority-sma-float-length-v6-v1-attempt1-error.txt",
+      "captures/v8/evidence/authority-sma-float-length-v6-v1-attempt1-logs.txt",
+      "captures/v8/evidence/authority-sma-float-length-v6-v1-attempt1-logs-v1.json",
+      "captures/v8/evidence/authority-sma-float-length-v6-v1-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": null,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///90a826a8-a4ed-400f-8d3a-1947628df703.pine?placement%3Ddialog",
+          "path": "/90a826a8-a4ed-400f-8d3a-1947628df703.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "CE10123",
+        "severity": 8,
+        "message": "Cannot call \"ta.sma\" with argument \"length\"=\"length\". An argument of \"input float\" type was used but a \"series int\"  is expected.",
+        "startLineNumber": 4,
+        "startColumn": 20,
+        "endLineNumber": 4,
+        "endColumn": 26
+      }
+    ],
+    "error_observed_utc": "2026-10-04T11:57:51.240Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/authority-sma-float-length-v6-v1-attempt1-logs.txt",
+        "evidence/authority-sma-float-length-v6-v1-attempt1-logs-v1.json",
+        "evidence/authority-sma-float-length-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T11:58:03.931Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v8 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "authority-sma-float-length-v6-v1.pine",
+    "attempt": 2,
+    "source_sha256": "49ff7de044be8ef1e449dffd3642d46e186075f33f21470eec347421df5b527b",
+    "indicator_title": "Authority SMA float v1",
+    "status": "COMPILE-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": "CE10123",
+      "text": "Cannot call \"ta.sma\" with argument \"length\"=\"length\". An argument of \"input float\" type was used but a \"series int\"  is expected.",
+      "line": 4,
+      "column": 20,
+      "first_bar_index": null,
+      "first_bar_time_utc": null,
+      "native": {
+        "error": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+        "editorError": {
+          "code": "CE10123",
+          "ctx": {
+            "argDisplayName": "length",
+            "argUserFriendlyRepresentation": "length",
+            "argumentType": "input float",
+            "currentTypeDocStr": "series int",
+            "funId": "ta.sma",
+            "typePostfix": ""
+          },
+          "end": {
+            "column": 25,
+            "line": 4
+          },
+          "message": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+          "start": {
+            "column": 20,
+            "line": 4
+          },
+          "id": "USER;64eb9fe01ecd4728859be8cb120fa590"
+        },
+        "title": "Compilation error",
+        "compiler_markers": [
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///bdac8001-9206-42e8-83cf-ca0d32f1cb79.pine?placement%3Ddialog",
+              "path": "/bdac8001-9206-42e8-83cf-ca0d32f1cb79.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "code": "CE10123",
+            "severity": 8,
+            "message": "Cannot call \"ta.sma\" with argument \"length\"=\"length\". An argument of \"input float\" type was used but a \"series int\"  is expected.",
+            "startLineNumber": 4,
+            "startColumn": 20,
+            "endLineNumber": 4,
+            "endColumn": 26
+          }
+        ],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,302.01\nH\n85,302.01\nL\n85,302.00\nC\n85,302.00\n0.00 (0.00%)\n85,302.00\nSELL\n0.01\n85,302.01\nBUY\nUSDT\nOracle na holes crosses v1\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n11:58:06 UTC\n99+\nPine Editor\nUntitled script\nPublish script\n1\n2\n3\n4\n5\n//@version=6\nindicator(\"Authority\u00a0SMA\u00a0float\u00a0v1\")\nlength\u00a0=\u00a0input.float(5.0)\nplot(ta.sma(close,\u00a0length))\n1 of 1 problem\nCannot call \"ta.sma\" with argument \"length\"=\"length\". An argument of \"input float\" type was used but a \"series int\" is expected.(CE10123)\nLine 4, Col 20\nPine Script\u00ae v6\nCompilation error: CE10123\n\nCannot call \"ta.sma\" with argument \"length\"=\"length\". An argument of \"input float\" type was used but a \"series int\" is expected.\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+        "context_substituted_message": "Cannot call \"ta.sma\" with argument \"length\"=\"length\". An argument of \"input float\" type was used but a \"series int\"  is expected."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "Oracle na holes crosses v1",
+      "dataset_start_utc": "2026-10-04T01:58:00.000Z",
+      "first_chart_bar": {
+        "index": 0,
+        "value": [
+          1791079080,
+          84802.6,
+          84802.6,
+          84802.59,
+          84802.59,
+          4.9568
+        ]
+      },
+      "chart_bars": 301,
+      "subscription": "pro_premium",
+      "native_end_of_data": false,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v8/evidence/authority-sma-float-length-v6-v1-attempt2-error.png",
+      "captures/v8/evidence/authority-sma-float-length-v6-v1-attempt2-error.txt",
+      "captures/v8/evidence/authority-sma-float-length-v6-v1-attempt2-logs.txt",
+      "captures/v8/evidence/authority-sma-float-length-v6-v1-attempt2-logs-v1.json",
+      "captures/v8/evidence/authority-sma-float-length-v6-v1-attempt2-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": "2026-10-04T11:57:53.403Z",
+    "source_identity_verified": true,
+    "reset_native_observations": null,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///bdac8001-9206-42e8-83cf-ca0d32f1cb79.pine?placement%3Ddialog",
+          "path": "/bdac8001-9206-42e8-83cf-ca0d32f1cb79.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "CE10123",
+        "severity": 8,
+        "message": "Cannot call \"ta.sma\" with argument \"length\"=\"length\". An argument of \"input float\" type was used but a \"series int\"  is expected.",
+        "startLineNumber": 4,
+        "startColumn": 20,
+        "endLineNumber": 4,
+        "endColumn": 26
+      }
+    ],
+    "error_observed_utc": "2026-10-04T11:58:09.513Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/authority-sma-float-length-v6-v1-attempt2-logs.txt",
+        "evidence/authority-sma-float-length-v6-v1-attempt2-logs-v1.json",
+        "evidence/authority-sma-float-length-v6-v1-attempt2-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T11:58:37.376Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v8 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "authority-wma-division-length-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "01ee5a9ebf60f78f16ec0663ed1153e62564dc27e15a290da25240c8534587a5",
+    "indicator_title": "Authority WMA division v1",
+    "status": "RUNS",
+    "csv_file": "captures/v8/authority-wma-division-length-v6-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T195836.389.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [
+        {
+          "id": "in_0",
+          "name": "length",
+          "value": 5,
+          "default": 5
+        }
+      ],
+      "observed_indicator_title": "Authority WMA division v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24540,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24840,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T11:58:25.754Z",
+    "live_candle_open_utc": "2026-10-04T11:58:00.000Z",
+    "export_utc": "2026-10-04T11:58:36.785Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v8/evidence/authority-wma-division-length-v6-v1-attempt1-setup.png",
+      "captures/v8/evidence/authority-wma-division-length-v6-v1-attempt1-export.png",
+      "captures/v8/evidence/authority-wma-division-length-v6-v1-attempt1-logs.txt",
+      "captures/v8/evidence/authority-wma-division-length-v6-v1-attempt1-logs-v1.json",
+      "captures/v8/evidence/authority-wma-division-length-v6-v1-attempt1-logs.png",
+      "captures/v8/evidence/authority-wma-division-length-v6-v1-attempt1-inputs.png",
+      "captures/v8/evidence/authority-wma-division-length-v6-v1-attempt1-visual.png",
+      "captures/v8/evidence/authority-wma-division-length-v6-v1-attempt1-data-window-v1.png",
+      "captures/v8/evidence/authority-wma-division-length-v6-v1-attempt1-data-window-v1.json",
+      "captures/v8/evidence/authority-wma-division-length-v6-v1-attempt1-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T11:58:26.833Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790809920,
+            83636.01,
+            83709,
+            83636,
+            83709,
+            91.87138
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791115080,
+            85302.01,
+            85302.01,
+            85302,
+            85302.01,
+            0.30657
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Authority WMA division v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790809920,
+                83684.66666666667
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791115080,
+                85302.00666666667
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T11:58:28.474Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790809920,
+            83636.01,
+            83709,
+            83636,
+            83709,
+            91.87138
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791115080,
+            85302.01,
+            85302.01,
+            85302,
+            85302,
+            0.30973
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Authority WMA division v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24839,
+            "first": {
+              "index": -1022295,
+              "value": [
+                1788134520,
+                77730.17333333334
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791115080,
+                85302
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T11:58:29.451Z",
+        "bars": 24840,
+        "end": true,
+        "first": {
+          "index": -24540,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791115080,
+            85302.01,
+            85302.01,
+            85302,
+            85302.01,
+            0.31289
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Authority WMA division v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24839,
+            "first": {
+              "index": -24539,
+              "value": [
+                1788134520,
+                77730.17333333334
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791115080,
+                85302.00666666667
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   11:58",
+    "historical_compare_before_unix_seconds": 1791115080,
+    "pine_logs": {
+      "paths": [
+        "evidence/authority-wma-division-length-v6-v1-attempt1-logs.txt",
+        "evidence/authority-wma-division-length-v6-v1-attempt1-logs-v1.json",
+        "evidence/authority-wma-division-length-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "5497088a9d18e4ca26d504a500f6edeb76c26b7c708c9381175cc20a40d749b5",
+    "csv_bytes": 1484607,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "Plot"
+    ],
+    "declared_to_native_header_mapping": {
+      "Plot": "Plot"
+    },
+    "csv_rows": 24840,
+    "historical_rows": 24839,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791115080,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791115080",
+    "first_historical_values": {
+      "Plot": ""
+    },
+    "last_historical_values": {
+      "Plot": "85302"
+    },
+    "data_window_witness": "captures/v8/evidence/authority-wma-division-length-v6-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T11:59:16.804Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v8 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "authority-wma-division-length-v6-v1.pine",
+    "attempt": 2,
+    "source_sha256": "01ee5a9ebf60f78f16ec0663ed1153e62564dc27e15a290da25240c8534587a5",
+    "indicator_title": "Authority WMA division v1",
+    "status": "RUNS",
+    "csv_file": "captures/v8/authority-wma-division-length-v6-v1-attempt2.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T195915.852.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [
+        {
+          "id": "in_0",
+          "name": "length",
+          "value": 5,
+          "default": 5
+        }
+      ],
+      "observed_indicator_title": "Authority WMA division v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24540,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24840,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T11:59:06.683Z",
+    "live_candle_open_utc": "2026-10-04T11:58:00.000Z",
+    "export_utc": "2026-10-04T11:59:16.366Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v8/evidence/authority-wma-division-length-v6-v1-attempt2-setup.png",
+      "captures/v8/evidence/authority-wma-division-length-v6-v1-attempt2-export.png",
+      "captures/v8/evidence/authority-wma-division-length-v6-v1-attempt2-logs.txt",
+      "captures/v8/evidence/authority-wma-division-length-v6-v1-attempt2-logs-v1.json",
+      "captures/v8/evidence/authority-wma-division-length-v6-v1-attempt2-logs.png",
+      "captures/v8/evidence/authority-wma-division-length-v6-v1-attempt2-inputs.png",
+      "captures/v8/evidence/authority-wma-division-length-v6-v1-attempt2-visual.png",
+      "captures/v8/evidence/authority-wma-division-length-v6-v1-attempt2-data-window-v1.png",
+      "captures/v8/evidence/authority-wma-division-length-v6-v1-attempt2-data-window-v1.json",
+      "captures/v8/evidence/authority-wma-division-length-v6-v1-attempt2-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": "2026-10-04T11:58:50.704Z",
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T11:59:07.603Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790809920,
+            83636.01,
+            83709,
+            83636,
+            83709,
+            91.87138
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791115080,
+            85302.01,
+            85302.01,
+            85297.9,
+            85299.34,
+            36.45828
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Authority WMA division v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790809920,
+                83684.66666666667
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791115080,
+                85300.22666666667
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T11:59:08.947Z",
+        "bars": 24840,
+        "end": true,
+        "first": {
+          "index": -24540,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791115080,
+            85302.01,
+            85302.01,
+            85297.9,
+            85299.33,
+            36.50021
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Authority WMA division v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24839,
+            "first": {
+              "index": -24539,
+              "value": [
+                1788134520,
+                77730.17333333334
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791115080,
+                85300.22
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   11:58",
+    "historical_compare_before_unix_seconds": 1791115080,
+    "pine_logs": {
+      "paths": [
+        "evidence/authority-wma-division-length-v6-v1-attempt2-logs.txt",
+        "evidence/authority-wma-division-length-v6-v1-attempt2-logs-v1.json",
+        "evidence/authority-wma-division-length-v6-v1-attempt2-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "449c11a8255ca49f1fb1d49e4cad032a7484384a29f43558b21dca11968acb13",
+    "csv_bytes": 1484609,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "Plot"
+    ],
+    "declared_to_native_header_mapping": {
+      "Plot": "Plot"
+    },
+    "csv_rows": 24840,
+    "historical_rows": 24839,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791115080,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791115080",
+    "first_historical_values": {
+      "Plot": ""
+    },
+    "last_historical_values": {
+      "Plot": "85302"
+    },
+    "data_window_witness": "captures/v8/evidence/authority-wma-division-length-v6-v1-attempt2-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T12:00:23.472Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v8 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "authority-atr-mutable-length-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "6ad83762b075cb527bac658af4c3b6640c439dfd1dbfc92759deedb5e72b9186",
+    "indicator_title": "Authority ATR mutable length v1",
+    "status": "COMPILE-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": "CE10123",
+      "text": "Cannot call \"ta.atr\" with argument \"length\"=\"length\". An argument of \"series int\" type was used but a \"simple int\"  is expected.",
+      "line": 6,
+      "column": 13,
+      "first_bar_index": null,
+      "first_bar_time_utc": null,
+      "native": {
+        "error": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+        "editorError": {
+          "code": "CE10123",
+          "ctx": {
+            "argDisplayName": "length",
+            "argUserFriendlyRepresentation": "length",
+            "argumentType": "series int",
+            "currentTypeDocStr": "simple int",
+            "funId": "ta.atr",
+            "typePostfix": ""
+          },
+          "end": {
+            "column": 18,
+            "line": 6
+          },
+          "message": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+          "start": {
+            "column": 13,
+            "line": 6
+          },
+          "id": "USER;64eb9fe01ecd4728859be8cb120fa590"
+        },
+        "title": "Compilation error",
+        "compiler_markers": [
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///1640cf41-8c0a-4b75-9f5e-07e00e57f1a0.pine?placement%3Ddialog",
+              "path": "/1640cf41-8c0a-4b75-9f5e-07e00e57f1a0.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "code": "CE10123",
+            "severity": 8,
+            "message": "Cannot call \"ta.atr\" with argument \"length\"=\"length\". An argument of \"series int\" type was used but a \"simple int\"  is expected.",
+            "startLineNumber": 6,
+            "startColumn": 13,
+            "endLineNumber": 6,
+            "endColumn": 19
+          }
+        ],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\nC\n85,302.00\n0.00 (0.00%)\n85,311.56\nSELL\n0.01\n85,311.57\nBUY\nUSDT\nOracle na holes crosses v1\nDate Range\n12:00:25 UTC\n99+\nObject tree\nData window\nDate\nSun 04 Oct '26\nTime\n11:56\nBTCUSDT \u00b7 2 \u00b7 Binance\nOpen\n85,302.00\nHigh\n85,302.01\nLow\n85,302.00\nClose\n85,302.00\nChange\n0.00 (0.00%)\nVol\n2.7\nLast day change\n+558.01 (+0.66%)\nOracle na holes crosses v1\nPlot\n\u2205\nPine Editor\nauthority-atr-mutable-length-v6-v1.pine\nPublish script\n1\n2\n3\n4\n5\n6\n7\n//@version=6\nindicator(\"Authority\u00a0ATR\u00a0mutable\u00a0length\u00a0v1\")\nint\u00a0length\u00a0=\u00a0input.int(14)\nif\u00a0close\u00a0>\u00a0open\n\u00a0\u00a0\u00a0\u00a0length\u00a0:=\u00a010\nplot(ta.atr(length))\n1 of 1 problem\nCannot call \"ta.atr\" with argument \"length\"=\"length\". An argument of \"series int\" type was used but a \"simple int\" is expected.(CE10123)\n1 \u2219 Today, 20:00\nLine 6, Col 13\nPine Script\u00ae v6\nCompilation error: CE10123\nCompilation error: CE10123\n\nCannot call \"ta.atr\" with argument \"length\"=\"length\". An argument of \"series int\" type was used but a \"simple int\" is expected.\n\nOpen in editor",
+        "context_substituted_message": "Cannot call \"ta.atr\" with argument \"length\"=\"length\". An argument of \"series int\" type was used but a \"simple int\"  is expected."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "Oracle na holes crosses v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24540,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24841,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v8/evidence/authority-atr-mutable-length-v6-v1-attempt1-error.png",
+      "captures/v8/evidence/authority-atr-mutable-length-v6-v1-attempt1-error.txt",
+      "captures/v8/evidence/authority-atr-mutable-length-v6-v1-attempt1-logs.txt",
+      "captures/v8/evidence/authority-atr-mutable-length-v6-v1-attempt1-logs-v1.json",
+      "captures/v8/evidence/authority-atr-mutable-length-v6-v1-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": null,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///1640cf41-8c0a-4b75-9f5e-07e00e57f1a0.pine?placement%3Ddialog",
+          "path": "/1640cf41-8c0a-4b75-9f5e-07e00e57f1a0.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "CE10123",
+        "severity": 8,
+        "message": "Cannot call \"ta.atr\" with argument \"length\"=\"length\". An argument of \"series int\" type was used but a \"simple int\"  is expected.",
+        "startLineNumber": 6,
+        "startColumn": 13,
+        "endLineNumber": 6,
+        "endColumn": 19
+      }
+    ],
+    "error_observed_utc": "2026-10-04T12:00:28.513Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/authority-atr-mutable-length-v6-v1-attempt1-logs.txt",
+        "evidence/authority-atr-mutable-length-v6-v1-attempt1-logs-v1.json",
+        "evidence/authority-atr-mutable-length-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T12:00:42.162Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v8 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "authority-atr-mutable-length-v6-v1.pine",
+    "attempt": 2,
+    "source_sha256": "6ad83762b075cb527bac658af4c3b6640c439dfd1dbfc92759deedb5e72b9186",
+    "indicator_title": "Authority ATR mutable length v1",
+    "status": "COMPILE-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": "CE10123",
+      "text": "Cannot call \"ta.atr\" with argument \"length\"=\"length\". An argument of \"series int\" type was used but a \"simple int\"  is expected.",
+      "line": 6,
+      "column": 13,
+      "first_bar_index": null,
+      "first_bar_time_utc": null,
+      "native": {
+        "error": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+        "editorError": {
+          "code": "CE10123",
+          "ctx": {
+            "argDisplayName": "length",
+            "argUserFriendlyRepresentation": "length",
+            "argumentType": "series int",
+            "currentTypeDocStr": "simple int",
+            "funId": "ta.atr",
+            "typePostfix": ""
+          },
+          "end": {
+            "column": 18,
+            "line": 6
+          },
+          "message": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+          "start": {
+            "column": 13,
+            "line": 6
+          },
+          "id": "USER;64eb9fe01ecd4728859be8cb120fa590"
+        },
+        "title": "Compilation error",
+        "compiler_markers": [
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///84298604-9b1e-4b65-b019-4fc5db0a1c25.pine?placement%3Ddialog",
+              "path": "/84298604-9b1e-4b65-b019-4fc5db0a1c25.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "code": "CE10123",
+            "severity": 8,
+            "message": "Cannot call \"ta.atr\" with argument \"length\"=\"length\". An argument of \"series int\" type was used but a \"simple int\"  is expected.",
+            "startLineNumber": 6,
+            "startColumn": 13,
+            "endLineNumber": 6,
+            "endColumn": 19
+          }
+        ],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\nC\n85,311.98\n+2.52 (+0.00%)\n85,311.98\nSELL\n0.01\n85,311.99\nBUY\nUSDT\nOracle na holes crosses v1\nDate Range\n12:00:44 UTC\n99+\nObject tree\nData window\nDate\nSun 04 Oct '26\nTime\n12:00\nBTCUSDT \u00b7 2 \u00b7 Binance\nOpen\n85,309.47\nHigh\n85,311.99\nLow\n85,309.46\nClose\n85,311.98\nChange\n+2.52 (+0.00%)\nVol\n11.28\nLast day change\n+558.42 (+0.66%)\nOracle na holes crosses v1\nPine Editor\nUntitled script\nPublish script\n1\n2\n3\n4\n5\n6\n7\n//@version=6\nindicator(\"Authority\u00a0ATR\u00a0mutable\u00a0length\u00a0v1\")\nint\u00a0length\u00a0=\u00a0input.int(14)\nif\u00a0close\u00a0>\u00a0open\n\u00a0\u00a0\u00a0\u00a0length\u00a0:=\u00a010\nplot(ta.atr(length))\n1 of 1 problem\nCannot call \"ta.atr\" with argument \"length\"=\"length\". An argument of \"series int\" type was used but a \"simple int\" is expected.(CE10123)\nLine 6, Col 13\nPine Script\u00ae v6\nCompilation error: CE10123\n\nCannot call \"ta.atr\" with argument \"length\"=\"length\". An argument of \"series int\" type was used but a \"simple int\" is expected.\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+        "context_substituted_message": "Cannot call \"ta.atr\" with argument \"length\"=\"length\". An argument of \"series int\" type was used but a \"simple int\"  is expected."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "Oracle na holes crosses v1",
+      "dataset_start_utc": "2026-10-04T02:02:00.000Z",
+      "first_chart_bar": {
+        "index": 0,
+        "value": [
+          1791079320,
+          84820,
+          84831.89,
+          84819.99,
+          84831.88,
+          11.04894
+        ]
+      },
+      "chart_bars": 300,
+      "subscription": "pro_premium",
+      "native_end_of_data": false,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v8/evidence/authority-atr-mutable-length-v6-v1-attempt2-error.png",
+      "captures/v8/evidence/authority-atr-mutable-length-v6-v1-attempt2-error.txt",
+      "captures/v8/evidence/authority-atr-mutable-length-v6-v1-attempt2-logs.txt",
+      "captures/v8/evidence/authority-atr-mutable-length-v6-v1-attempt2-logs-v1.json",
+      "captures/v8/evidence/authority-atr-mutable-length-v6-v1-attempt2-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": "2026-10-04T12:00:31.027Z",
+    "source_identity_verified": true,
+    "reset_native_observations": null,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///84298604-9b1e-4b65-b019-4fc5db0a1c25.pine?placement%3Ddialog",
+          "path": "/84298604-9b1e-4b65-b019-4fc5db0a1c25.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "CE10123",
+        "severity": 8,
+        "message": "Cannot call \"ta.atr\" with argument \"length\"=\"length\". An argument of \"series int\" type was used but a \"simple int\"  is expected.",
+        "startLineNumber": 6,
+        "startColumn": 13,
+        "endLineNumber": 6,
+        "endColumn": 19
+      }
+    ],
+    "error_observed_utc": "2026-10-04T12:00:47.350Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/authority-atr-mutable-length-v6-v1-attempt2-logs.txt",
+        "evidence/authority-atr-mutable-length-v6-v1-attempt2-logs-v1.json",
+        "evidence/authority-atr-mutable-length-v6-v1-attempt2-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T12:01:13.475Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v8 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "authority-framework-na-search-v5-v1.pine",
+    "attempt": 1,
+    "source_sha256": "06c0bb9ec09791c1d2380b44388d05612a9ffed8cb0dc9d47f5d08006b9f1e11",
+    "indicator_title": "NA search consistency v1",
+    "status": "RUNS",
+    "csv_file": "captures/v8/authority-framework-na-search-v5-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T200112.204.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "NA search consistency v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24541,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24841,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T12:01:03.014Z",
+    "live_candle_open_utc": "2026-10-04T12:00:00.000Z",
+    "export_utc": "2026-10-04T12:01:12.457Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v8/evidence/authority-framework-na-search-v5-v1-attempt1-setup.png",
+      "captures/v8/evidence/authority-framework-na-search-v5-v1-attempt1-export.png",
+      "captures/v8/evidence/authority-framework-na-search-v5-v1-attempt1-logs.txt",
+      "captures/v8/evidence/authority-framework-na-search-v5-v1-attempt1-logs-v1.json",
+      "captures/v8/evidence/authority-framework-na-search-v5-v1-attempt1-logs.png",
+      "captures/v8/evidence/authority-framework-na-search-v5-v1-attempt1-visual.png",
+      "captures/v8/evidence/authority-framework-na-search-v5-v1-attempt1-data-window-v1.png",
+      "captures/v8/evidence/authority-framework-na-search-v5-v1-attempt1-data-window-v1.json",
+      "captures/v8/evidence/authority-framework-na-search-v5-v1-attempt1-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T12:01:04.018Z",
+        "bars": 2556,
+        "end": false,
+        "first": {
+          "index": -2256,
+          "value": [
+            1790808600,
+            83763.04,
+            83775.56,
+            83715.22,
+            83715.23,
+            5.02744
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791115200,
+            85309.47,
+            85311.99,
+            85309.46,
+            85311.98,
+            11.6168
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "NA search consistency v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2556,
+            "first": {
+              "index": -2256,
+              "value": [
+                1790808600,
+                0,
+                -1
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791115200,
+                0,
+                -1
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T12:01:05.155Z",
+        "bars": 2556,
+        "end": false,
+        "first": {
+          "index": -2256,
+          "value": [
+            1790808600,
+            83763.04,
+            83775.56,
+            83715.22,
+            83715.23,
+            5.02744
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791115200,
+            85309.47,
+            85311.99,
+            85309.46,
+            85311.98,
+            11.62472
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "NA search consistency v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24841,
+            "first": {
+              "index": -1022285,
+              "value": [
+                1788134400,
+                0,
+                -1
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791115200,
+                0,
+                -1
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T12:01:06.008Z",
+        "bars": 24841,
+        "end": true,
+        "first": {
+          "index": -24541,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791115200,
+            85309.47,
+            85311.99,
+            85309.46,
+            85311.99,
+            11.63875
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "NA search consistency v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24841,
+            "first": {
+              "index": -24541,
+              "value": [
+                1788134400,
+                0,
+                -1
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791115200,
+                0,
+                -1
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///f3b57731-c286-4e3d-975b-bc6bee686309.pine?placement%3Ddialog",
+          "path": "/f3b57731-c286-4e3d-975b-bc6bee686309.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "live_tooltip": "Sun 04 Oct '26   12:00",
+    "historical_compare_before_unix_seconds": 1791115200,
+    "pine_logs": {
+      "paths": [
+        "evidence/authority-framework-na-search-v5-v1-attempt1-logs.txt",
+        "evidence/authority-framework-na-search-v5-v1-attempt1-logs-v1.json",
+        "evidence/authority-framework-na-search-v5-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "e74b59e1493dc943deeb6cd55c605fe29f363a1381ecb7faea4cde628508f11a",
+    "csv_bytes": 1223380,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "includes",
+      "indexof"
+    ],
+    "declared_to_native_header_mapping": {
+      "includes": "includes",
+      "indexof": "indexof"
+    },
+    "csv_rows": 24841,
+    "historical_rows": 24840,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791115200,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791115200",
+    "first_historical_values": {
+      "includes": "0",
+      "indexof": "-1"
+    },
+    "last_historical_values": {
+      "includes": "0",
+      "indexof": "-1"
+    },
+    "data_window_witness": "captures/v8/evidence/authority-framework-na-search-v5-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T12:01:51.006Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v8 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "authority-framework-na-search-v5-v1.pine",
+    "attempt": 2,
+    "source_sha256": "06c0bb9ec09791c1d2380b44388d05612a9ffed8cb0dc9d47f5d08006b9f1e11",
+    "indicator_title": "NA search consistency v1",
+    "status": "RUNS",
+    "csv_file": "captures/v8/authority-framework-na-search-v5-v1-attempt2.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T200149.855.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "NA search consistency v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24541,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24841,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T12:01:40.131Z",
+    "live_candle_open_utc": "2026-10-04T12:00:00.000Z",
+    "export_utc": "2026-10-04T12:01:50.559Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v8/evidence/authority-framework-na-search-v5-v1-attempt2-setup.png",
+      "captures/v8/evidence/authority-framework-na-search-v5-v1-attempt2-export.png",
+      "captures/v8/evidence/authority-framework-na-search-v5-v1-attempt2-logs.txt",
+      "captures/v8/evidence/authority-framework-na-search-v5-v1-attempt2-logs-v1.json",
+      "captures/v8/evidence/authority-framework-na-search-v5-v1-attempt2-logs.png",
+      "captures/v8/evidence/authority-framework-na-search-v5-v1-attempt2-visual.png",
+      "captures/v8/evidence/authority-framework-na-search-v5-v1-attempt2-data-window-v1.png",
+      "captures/v8/evidence/authority-framework-na-search-v5-v1-attempt2-data-window-v1.json",
+      "captures/v8/evidence/authority-framework-na-search-v5-v1-attempt2-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": "2026-10-04T12:01:23.552Z",
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T12:01:40.991Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790810040,
+            83709,
+            83726.01,
+            83682,
+            83682,
+            35.11908
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791115200,
+            85309.47,
+            85338,
+            85309.46,
+            85338,
+            16.30851
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "NA search consistency v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790810040,
+                0,
+                -1
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791115200,
+                0,
+                -1
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T12:01:42.084Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790810040,
+            83709,
+            83726.01,
+            83682,
+            83682,
+            35.11908
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791115200,
+            85309.47,
+            85338,
+            85309.46,
+            85338,
+            16.30851
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "NA search consistency v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24841,
+            "first": {
+              "index": -1022297,
+              "value": [
+                1788134400,
+                0,
+                -1
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791115200,
+                0,
+                -1
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T12:01:43.080Z",
+        "bars": 24841,
+        "end": true,
+        "first": {
+          "index": -24541,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791115200,
+            85309.47,
+            85338,
+            85309.46,
+            85338,
+            16.60073
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "NA search consistency v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24841,
+            "first": {
+              "index": -24541,
+              "value": [
+                1788134400,
+                0,
+                -1
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791115200,
+                0,
+                -1
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///821e0ba4-4c7c-41d3-8d0d-2a8c702ea878.pine?placement%3Ddialog",
+          "path": "/821e0ba4-4c7c-41d3-8d0d-2a8c702ea878.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "live_tooltip": "Sun 04 Oct '26   12:00",
+    "historical_compare_before_unix_seconds": 1791115200,
+    "pine_logs": {
+      "paths": [
+        "evidence/authority-framework-na-search-v5-v1-attempt2-logs.txt",
+        "evidence/authority-framework-na-search-v5-v1-attempt2-logs-v1.json",
+        "evidence/authority-framework-na-search-v5-v1-attempt2-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "9227704fee9d5fb54fbd711653c264fd1651524e9709a4be0de0ce9b3376fa23",
+    "csv_bytes": 1223377,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "includes",
+      "indexof"
+    ],
+    "declared_to_native_header_mapping": {
+      "includes": "includes",
+      "indexof": "indexof"
+    },
+    "csv_rows": 24841,
+    "historical_rows": 24840,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791115200,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791115200",
+    "first_historical_values": {
+      "includes": "0",
+      "indexof": "-1"
+    },
+    "last_historical_values": {
+      "includes": "0",
+      "indexof": "-1"
+    },
+    "data_window_witness": "captures/v8/evidence/authority-framework-na-search-v5-v1-attempt2-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T12:02:26.490Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v8 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "authority-label-published-constant-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "dd982d953c5442d08e9b1bccd12818f65f3b9a109472f6d1fd49ab6a8aa142e2",
+    "indicator_title": "Authority published label division v1",
+    "status": "RUNS",
+    "csv_file": "captures/v8/authority-label-published-constant-v6-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T200225.277.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "Authority published label division v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24542,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24842,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T12:02:15.411Z",
+    "live_candle_open_utc": "2026-10-04T12:02:00.000Z",
+    "export_utc": "2026-10-04T12:02:25.946Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v8/evidence/authority-label-published-constant-v6-v1-attempt1-setup.png",
+      "captures/v8/evidence/authority-label-published-constant-v6-v1-attempt1-export.png",
+      "captures/v8/evidence/authority-label-published-constant-v6-v1-attempt1-logs.txt",
+      "captures/v8/evidence/authority-label-published-constant-v6-v1-attempt1-logs-v1.json",
+      "captures/v8/evidence/authority-label-published-constant-v6-v1-attempt1-logs.png",
+      "captures/v8/evidence/authority-label-published-constant-v6-v1-attempt1-visual.png",
+      "captures/v8/evidence/authority-label-published-constant-v6-v1-attempt1-data-window-v1.png",
+      "captures/v8/evidence/authority-label-published-constant-v6-v1-attempt1-data-window-v1.json",
+      "captures/v8/evidence/authority-label-published-constant-v6-v1-attempt1-data-window-v1.txt",
+      "captures/v8/evidence/authority-label-published-constant-v6-v1-attempt1-authority-object-geometry-v1.json",
+      "captures/v8/evidence/authority-label-published-constant-v6-v1-attempt1-authority-object-geometry-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T12:02:16.383Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790810160,
+            83682,
+            83749.04,
+            83671.02,
+            83716.02,
+            16.18204
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791115320,
+            85339.99,
+            85340,
+            85339.99,
+            85339.99,
+            0.20752
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Authority published label division v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790810160,
+                83716.02
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791115320,
+                85339.99
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T12:02:17.995Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790810160,
+            83682,
+            83749.04,
+            83671.02,
+            83716.02,
+            16.18204
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791115320,
+            85339.99,
+            85340,
+            85339.99,
+            85340,
+            0.21478
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Authority published label division v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24842,
+            "first": {
+              "index": -1022298,
+              "value": [
+                1788134400,
+                77674.04
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791115320,
+                85340
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T12:02:18.798Z",
+        "bars": 24842,
+        "end": true,
+        "first": {
+          "index": -24542,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791115320,
+            85339.99,
+            85340,
+            85339.99,
+            85339.99,
+            0.23425
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Authority published label division v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24842,
+            "first": {
+              "index": -24542,
+              "value": [
+                1788134400,
+                77674.04
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791115320,
+                85339.99
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   12:02",
+    "historical_compare_before_unix_seconds": 1791115320,
+    "pine_logs": {
+      "paths": [
+        "evidence/authority-label-published-constant-v6-v1-attempt1-logs.txt",
+        "evidence/authority-label-published-constant-v6-v1-attempt1-logs-v1.json",
+        "evidence/authority-label-published-constant-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "73cf9675d7856a1d10ccd0e6d83feb523890da18042edd667a4bd693133bb916",
+    "csv_bytes": 1308092,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "Plot"
+    ],
+    "declared_to_native_header_mapping": {
+      "Plot": "Plot"
+    },
+    "csv_rows": 24842,
+    "historical_rows": 24841,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791115320,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791115320",
+    "first_historical_values": {
+      "Plot": "77674.04"
+    },
+    "last_historical_values": {
+      "Plot": "85340"
+    },
+    "data_window_witness": "captures/v8/evidence/authority-label-published-constant-v6-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T12:03:07.645Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v8 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "authority-label-published-constant-v6-v1.pine",
+    "attempt": 2,
+    "source_sha256": "dd982d953c5442d08e9b1bccd12818f65f3b9a109472f6d1fd49ab6a8aa142e2",
+    "indicator_title": "Authority published label division v1",
+    "status": "RUNS",
+    "csv_file": "captures/v8/authority-label-published-constant-v6-v1-attempt2.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T200306.511.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "Authority published label division v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24542,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24842,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T12:02:56.460Z",
+    "live_candle_open_utc": "2026-10-04T12:02:00.000Z",
+    "export_utc": "2026-10-04T12:03:07.058Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v8/evidence/authority-label-published-constant-v6-v1-attempt2-setup.png",
+      "captures/v8/evidence/authority-label-published-constant-v6-v1-attempt2-export.png",
+      "captures/v8/evidence/authority-label-published-constant-v6-v1-attempt2-logs.txt",
+      "captures/v8/evidence/authority-label-published-constant-v6-v1-attempt2-logs-v1.json",
+      "captures/v8/evidence/authority-label-published-constant-v6-v1-attempt2-logs.png",
+      "captures/v8/evidence/authority-label-published-constant-v6-v1-attempt2-visual.png",
+      "captures/v8/evidence/authority-label-published-constant-v6-v1-attempt2-data-window-v1.png",
+      "captures/v8/evidence/authority-label-published-constant-v6-v1-attempt2-data-window-v1.json",
+      "captures/v8/evidence/authority-label-published-constant-v6-v1-attempt2-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": "2026-10-04T12:02:40.024Z",
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T12:02:57.790Z",
+        "bars": 2556,
+        "end": false,
+        "first": {
+          "index": -2256,
+          "value": [
+            1790808720,
+            83715.22,
+            83746.01,
+            83715.22,
+            83724.36,
+            4.16547
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791115320,
+            85339.99,
+            85341.65,
+            85339.99,
+            85341.64,
+            0.91419
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Authority published label division v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2556,
+            "first": {
+              "index": -2256,
+              "value": [
+                1790808720,
+                83724.36
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791115320,
+                85341.64
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T12:02:58.968Z",
+        "bars": 2556,
+        "end": false,
+        "first": {
+          "index": -2256,
+          "value": [
+            1790808720,
+            83715.22,
+            83746.01,
+            83715.22,
+            83724.36,
+            4.16547
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791115320,
+            85339.99,
+            85341.65,
+            85339.99,
+            85341.64,
+            0.91419
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Authority published label division v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24842,
+            "first": {
+              "index": -1022286,
+              "value": [
+                1788134400,
+                77674.04
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791115320,
+                85341.64
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T12:02:59.962Z",
+        "bars": 24842,
+        "end": true,
+        "first": {
+          "index": -24542,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791115320,
+            85339.99,
+            85341.65,
+            85339.99,
+            85341.65,
+            0.93223
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Authority published label division v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24842,
+            "first": {
+              "index": -24542,
+              "value": [
+                1788134400,
+                77674.04
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791115320,
+                85341.65
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   12:02",
+    "historical_compare_before_unix_seconds": 1791115320,
+    "pine_logs": {
+      "paths": [
+        "evidence/authority-label-published-constant-v6-v1-attempt2-logs.txt",
+        "evidence/authority-label-published-constant-v6-v1-attempt2-logs-v1.json",
+        "evidence/authority-label-published-constant-v6-v1-attempt2-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "a0bb4b55ddea77f4225b056fce8556a793317ef7e5fbf091cfd2145c96140bc4",
+    "csv_bytes": 1308095,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "Plot"
+    ],
+    "declared_to_native_header_mapping": {
+      "Plot": "Plot"
+    },
+    "csv_rows": 24842,
+    "historical_rows": 24841,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791115320,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791115320",
+    "first_historical_values": {
+      "Plot": "77674.04"
+    },
+    "last_historical_values": {
+      "Plot": "85340"
+    },
+    "data_window_witness": "captures/v8/evidence/authority-label-published-constant-v6-v1-attempt2-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T12:03:42.812Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v8 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "authority-point-published-input-v5-v1.pine",
+    "attempt": 1,
+    "source_sha256": "b41b609c3b9c9b90a1f9ffcc3e43779fecdbc8d88a7f792ef673d6526f5c58f3",
+    "indicator_title": "Authority published point division v1",
+    "status": "RUNS",
+    "csv_file": "captures/v8/authority-point-published-input-v5-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T200341.865.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [
+        {
+          "id": "in_0",
+          "name": "len",
+          "value": 50,
+          "default": 50
+        }
+      ],
+      "observed_indicator_title": "Authority published point division v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24542,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24842,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T12:03:31.762Z",
+    "live_candle_open_utc": "2026-10-04T12:02:00.000Z",
+    "export_utc": "2026-10-04T12:03:42.313Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v8/evidence/authority-point-published-input-v5-v1-attempt1-setup.png",
+      "captures/v8/evidence/authority-point-published-input-v5-v1-attempt1-export.png",
+      "captures/v8/evidence/authority-point-published-input-v5-v1-attempt1-logs.txt",
+      "captures/v8/evidence/authority-point-published-input-v5-v1-attempt1-logs-v1.json",
+      "captures/v8/evidence/authority-point-published-input-v5-v1-attempt1-logs.png",
+      "captures/v8/evidence/authority-point-published-input-v5-v1-attempt1-inputs.png",
+      "captures/v8/evidence/authority-point-published-input-v5-v1-attempt1-visual.png",
+      "captures/v8/evidence/authority-point-published-input-v5-v1-attempt1-data-window-v1.png",
+      "captures/v8/evidence/authority-point-published-input-v5-v1-attempt1-data-window-v1.json",
+      "captures/v8/evidence/authority-point-published-input-v5-v1-attempt1-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T12:03:32.636Z",
+        "bars": 2556,
+        "end": false,
+        "first": {
+          "index": -2256,
+          "value": [
+            1790808720,
+            83715.22,
+            83746.01,
+            83715.22,
+            83724.36,
+            4.16547
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791115320,
+            85339.99,
+            85341.65,
+            85339.99,
+            85341.65,
+            1.28213
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Authority published point division v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2556,
+            "first": {
+              "index": -2256,
+              "value": [
+                1790808720,
+                24
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791115320,
+                24
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T12:03:34.024Z",
+        "bars": 2556,
+        "end": false,
+        "first": {
+          "index": -2256,
+          "value": [
+            1790808720,
+            83715.22,
+            83746.01,
+            83715.22,
+            83724.36,
+            4.16547
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791115320,
+            85339.99,
+            85341.65,
+            85339.99,
+            85341.65,
+            1.28213
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Authority published point division v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24842,
+            "first": {
+              "index": -1022286,
+              "value": [
+                1788134400,
+                24
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791115320,
+                24
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T12:03:34.779Z",
+        "bars": 24842,
+        "end": true,
+        "first": {
+          "index": -24542,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791115320,
+            85339.99,
+            85341.65,
+            85339.99,
+            85341.65,
+            1.28773
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Authority published point division v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24842,
+            "first": {
+              "index": -24542,
+              "value": [
+                1788134400,
+                24
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791115320,
+                24
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///80e6863a-90c9-4998-bc5d-9b1c6f92bafc.pine?placement%3Ddialog",
+          "path": "/80e6863a-90c9-4998-bc5d-9b1c6f92bafc.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "live_tooltip": "Sun 04 Oct '26   12:02",
+    "historical_compare_before_unix_seconds": 1791115320,
+    "pine_logs": {
+      "paths": [
+        "evidence/authority-point-published-input-v5-v1-attempt1-logs.txt",
+        "evidence/authority-point-published-input-v5-v1-attempt1-logs-v1.json",
+        "evidence/authority-point-published-input-v5-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "5f45cc1ef23dd2bd1a8490e9fac322280b060711748960b1f5fe0f459c139539",
+    "csv_bytes": 1173730,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "Plot"
+    ],
+    "declared_to_native_header_mapping": {
+      "Plot": "Plot"
+    },
+    "csv_rows": 24842,
+    "historical_rows": 24841,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791115320,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791115320",
+    "first_historical_values": {
+      "Plot": "24"
+    },
+    "last_historical_values": {
+      "Plot": "24"
+    },
+    "data_window_witness": "captures/v8/evidence/authority-point-published-input-v5-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T12:04:24.786Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v8 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "authority-point-published-input-v5-v1.pine",
+    "attempt": 2,
+    "source_sha256": "b41b609c3b9c9b90a1f9ffcc3e43779fecdbc8d88a7f792ef673d6526f5c58f3",
+    "indicator_title": "Authority published point division v1",
+    "status": "RUNS",
+    "csv_file": "captures/v8/authority-point-published-input-v5-v1-attempt2.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T200423.814.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [
+        {
+          "id": "in_0",
+          "name": "len",
+          "value": 50,
+          "default": 50
+        }
+      ],
+      "observed_indicator_title": "Authority published point division v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24543,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24843,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T12:04:13.337Z",
+    "live_candle_open_utc": "2026-10-04T12:04:00.000Z",
+    "export_utc": "2026-10-04T12:04:24.275Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v8/evidence/authority-point-published-input-v5-v1-attempt2-setup.png",
+      "captures/v8/evidence/authority-point-published-input-v5-v1-attempt2-export.png",
+      "captures/v8/evidence/authority-point-published-input-v5-v1-attempt2-logs.txt",
+      "captures/v8/evidence/authority-point-published-input-v5-v1-attempt2-logs-v1.json",
+      "captures/v8/evidence/authority-point-published-input-v5-v1-attempt2-logs.png",
+      "captures/v8/evidence/authority-point-published-input-v5-v1-attempt2-inputs.png",
+      "captures/v8/evidence/authority-point-published-input-v5-v1-attempt2-visual.png",
+      "captures/v8/evidence/authority-point-published-input-v5-v1-attempt2-data-window-v1.png",
+      "captures/v8/evidence/authority-point-published-input-v5-v1-attempt2-data-window-v1.json",
+      "captures/v8/evidence/authority-point-published-input-v5-v1-attempt2-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": "2026-10-04T12:03:56.549Z",
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T12:04:14.488Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790810280,
+            83716.02,
+            83733.86,
+            83708.01,
+            83728.46,
+            7.67783
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791115440,
+            85341.64,
+            85341.65,
+            85341.64,
+            85341.65,
+            0.04637
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Authority published point division v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790810280,
+                24
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791115440,
+                24
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T12:04:15.625Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790810280,
+            83716.02,
+            83733.86,
+            83708.01,
+            83728.46,
+            7.67783
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791115440,
+            85341.64,
+            85341.65,
+            85341.64,
+            85341.64,
+            0.04637
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Authority published point division v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24843,
+            "first": {
+              "index": -1022299,
+              "value": [
+                1788134400,
+                24
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791115440,
+                24
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T12:04:16.347Z",
+        "bars": 24843,
+        "end": true,
+        "first": {
+          "index": -24543,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791115440,
+            85341.64,
+            85341.65,
+            85341.64,
+            85341.65,
+            0.05059
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Authority published point division v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24843,
+            "first": {
+              "index": -24543,
+              "value": [
+                1788134400,
+                24
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791115440,
+                24
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///86abfe82-d9cd-4d7d-b066-fa1095c9fd00.pine?placement%3Ddialog",
+          "path": "/86abfe82-d9cd-4d7d-b066-fa1095c9fd00.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "live_tooltip": "Sun 04 Oct '26   12:04",
+    "historical_compare_before_unix_seconds": 1791115440,
+    "pine_logs": {
+      "paths": [
+        "evidence/authority-point-published-input-v5-v1-attempt2-logs.txt",
+        "evidence/authority-point-published-input-v5-v1-attempt2-logs-v1.json",
+        "evidence/authority-point-published-input-v5-v1-attempt2-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "507674f403efd1c2049912f7bdd551a3ecf07eec185c08619a4d5e664f328037",
+    "csv_bytes": 1173780,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "Plot"
+    ],
+    "declared_to_native_header_mapping": {
+      "Plot": "Plot"
+    },
+    "csv_rows": 24843,
+    "historical_rows": 24842,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791115440,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791115440",
+    "first_historical_values": {
+      "Plot": "24"
+    },
+    "last_historical_values": {
+      "Plot": "24"
+    },
+    "data_window_witness": "captures/v8/evidence/authority-point-published-input-v5-v1-attempt2-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T12:05:03.599Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v8 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "authority-framework-reference-na-factorization-v5-v1.pine",
+    "attempt": 1,
+    "source_sha256": "7ddee8d186ee4beff61eed673a190c67461daf8dfa41c18739fb054aab46a0d7",
+    "indicator_title": "Published framework NA factorization v1",
+    "status": "RUNS",
+    "csv_file": "captures/v8/authority-framework-reference-na-factorization-v5-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T200502.679.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "Published framework NA factorization v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24543,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24843,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T12:04:52.475Z",
+    "live_candle_open_utc": "2026-10-04T12:04:00.000Z",
+    "export_utc": "2026-10-04T12:05:03.157Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v8/evidence/authority-framework-reference-na-factorization-v5-v1-attempt1-setup.png",
+      "captures/v8/evidence/authority-framework-reference-na-factorization-v5-v1-attempt1-export.png",
+      "captures/v8/evidence/authority-framework-reference-na-factorization-v5-v1-attempt1-logs.txt",
+      "captures/v8/evidence/authority-framework-reference-na-factorization-v5-v1-attempt1-logs-v1.json",
+      "captures/v8/evidence/authority-framework-reference-na-factorization-v5-v1-attempt1-logs.png",
+      "captures/v8/evidence/authority-framework-reference-na-factorization-v5-v1-attempt1-visual.png",
+      "captures/v8/evidence/authority-framework-reference-na-factorization-v5-v1-attempt1-data-window-v1.png",
+      "captures/v8/evidence/authority-framework-reference-na-factorization-v5-v1-attempt1-data-window-v1.json",
+      "captures/v8/evidence/authority-framework-reference-na-factorization-v5-v1-attempt1-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T12:04:53.575Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790810280,
+            83716.02,
+            83733.86,
+            83708.01,
+            83728.46,
+            7.67783
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791115440,
+            85341.64,
+            85341.65,
+            85341.64,
+            85341.65,
+            0.29252
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Published framework NA factorization v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790810280,
+                2
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791115440,
+                2
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T12:04:54.713Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790810280,
+            83716.02,
+            83733.86,
+            83708.01,
+            83728.46,
+            7.67783
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791115440,
+            85341.64,
+            85341.65,
+            85341.64,
+            85341.64,
+            0.29252
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Published framework NA factorization v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24843,
+            "first": {
+              "index": -1022299,
+              "value": [
+                1788134400,
+                2
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791115440,
+                2
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T12:04:55.478Z",
+        "bars": 24843,
+        "end": true,
+        "first": {
+          "index": -24543,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791115440,
+            85341.64,
+            85341.65,
+            85341.64,
+            85341.65,
+            0.29623
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Published framework NA factorization v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24843,
+            "first": {
+              "index": -24543,
+              "value": [
+                1788134400,
+                2
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791115440,
+                2
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///8e909e91-52b7-411f-af66-a942a0ba3acc.pine?placement%3Ddialog",
+          "path": "/8e909e91-52b7-411f-af66-a942a0ba3acc.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "live_tooltip": "Sun 04 Oct '26   12:04",
+    "historical_compare_before_unix_seconds": 1791115440,
+    "pine_logs": {
+      "paths": [
+        "evidence/authority-framework-reference-na-factorization-v5-v1-attempt1-logs.txt",
+        "evidence/authority-framework-reference-na-factorization-v5-v1-attempt1-logs-v1.json",
+        "evidence/authority-framework-reference-na-factorization-v5-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "dabf996cd8cfc61f026391a9aa998ff7675a70961138601cc5cbf83d63f53e27",
+    "csv_bytes": 1148937,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "Plot"
+    ],
+    "declared_to_native_header_mapping": {
+      "Plot": "Plot"
+    },
+    "csv_rows": 24843,
+    "historical_rows": 24842,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791115440,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791115440",
+    "first_historical_values": {
+      "Plot": "2"
+    },
+    "last_historical_values": {
+      "Plot": "2"
+    },
+    "data_window_witness": "captures/v8/evidence/authority-framework-reference-na-factorization-v5-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T12:05:43.161Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v8 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "authority-framework-reference-na-factorization-v5-v1.pine",
+    "attempt": 2,
+    "source_sha256": "7ddee8d186ee4beff61eed673a190c67461daf8dfa41c18739fb054aab46a0d7",
+    "indicator_title": "Published framework NA factorization v1",
+    "status": "RUNS",
+    "csv_file": "captures/v8/authority-framework-reference-na-factorization-v5-v1-attempt2.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T200542.094.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "Published framework NA factorization v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24543,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24843,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T12:05:32.280Z",
+    "live_candle_open_utc": "2026-10-04T12:04:00.000Z",
+    "export_utc": "2026-10-04T12:05:42.695Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v8/evidence/authority-framework-reference-na-factorization-v5-v1-attempt2-setup.png",
+      "captures/v8/evidence/authority-framework-reference-na-factorization-v5-v1-attempt2-export.png",
+      "captures/v8/evidence/authority-framework-reference-na-factorization-v5-v1-attempt2-logs.txt",
+      "captures/v8/evidence/authority-framework-reference-na-factorization-v5-v1-attempt2-logs-v1.json",
+      "captures/v8/evidence/authority-framework-reference-na-factorization-v5-v1-attempt2-logs.png",
+      "captures/v8/evidence/authority-framework-reference-na-factorization-v5-v1-attempt2-visual.png",
+      "captures/v8/evidence/authority-framework-reference-na-factorization-v5-v1-attempt2-data-window-v1.png",
+      "captures/v8/evidence/authority-framework-reference-na-factorization-v5-v1-attempt2-data-window-v1.json",
+      "captures/v8/evidence/authority-framework-reference-na-factorization-v5-v1-attempt2-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": "2026-10-04T12:05:14.083Z",
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T12:05:33.100Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790810280,
+            83716.02,
+            83733.86,
+            83708.01,
+            83728.46,
+            7.67783
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791115440,
+            85341.64,
+            85344.89,
+            85341.64,
+            85344.88,
+            2.95038
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Published framework NA factorization v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790810280,
+                2
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791115440,
+                2
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T12:05:34.180Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790810280,
+            83716.02,
+            83733.86,
+            83708.01,
+            83728.46,
+            7.67783
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791115440,
+            85341.64,
+            85344.89,
+            85341.64,
+            85344.88,
+            2.95038
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Published framework NA factorization v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24843,
+            "first": {
+              "index": -1022299,
+              "value": [
+                1788134400,
+                2
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791115440,
+                2
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T12:05:34.904Z",
+        "bars": 24843,
+        "end": true,
+        "first": {
+          "index": -24543,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791115440,
+            85341.64,
+            85344.89,
+            85341.64,
+            85344.88,
+            2.96872
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Published framework NA factorization v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24843,
+            "first": {
+              "index": -24543,
+              "value": [
+                1788134400,
+                2
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791115440,
+                2
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///e263ff04-d9de-44c5-a02c-8079ccc00457.pine?placement%3Ddialog",
+          "path": "/e263ff04-d9de-44c5-a02c-8079ccc00457.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "live_tooltip": "Sun 04 Oct '26   12:04",
+    "historical_compare_before_unix_seconds": 1791115440,
+    "pine_logs": {
+      "paths": [
+        "evidence/authority-framework-reference-na-factorization-v5-v1-attempt2-logs.txt",
+        "evidence/authority-framework-reference-na-factorization-v5-v1-attempt2-logs-v1.json",
+        "evidence/authority-framework-reference-na-factorization-v5-v1-attempt2-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "af07b9510a507d611a21c23d139e1c166e92bd94adaed01b06dd9da30f555366",
+    "csv_bytes": 1148937,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "Plot"
+    ],
+    "declared_to_native_header_mapping": {
+      "Plot": "Plot"
+    },
+    "csv_rows": 24843,
+    "historical_rows": 24842,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791115440,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791115440",
+    "first_historical_values": {
+      "Plot": "2"
+    },
+    "last_historical_values": {
+      "Plot": "2"
+    },
+    "data_window_witness": "captures/v8/evidence/authority-framework-reference-na-factorization-v5-v1-attempt2-data-window-v1.json"
   }
 ]

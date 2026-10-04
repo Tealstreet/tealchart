@@ -1,0 +1,29 @@
+{
+  "index": 299,
+  "bar": [
+    1791114840,
+    85302.01,
+    85302.01,
+    85302,
+    85302,
+    0.80014
+  ],
+  "source_row": [
+    1791114840,
+    0
+  ],
+  "browser_utc": "2026-10-04T11:56:05.117Z",
+  "title": "Guarded factor lookup",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   11:54",
+  "visible_range": {
+    "_firstBar": 264,
+    "_lastBar": 302
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}
