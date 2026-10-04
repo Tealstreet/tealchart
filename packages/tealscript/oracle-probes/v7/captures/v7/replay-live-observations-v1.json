@@ -1,0 +1,1077 @@
+{
+  "artifact": "Native replay and live confirmation observations v1",
+  "live_trace_attempt": 2,
+  "live_trace_observations": 76,
+  "live_trace_first_utc": "2026-10-04T06:57:05.285Z",
+  "live_trace_last_utc": "2026-10-04T07:00:13.557Z",
+  "events": {
+    "2m-before": {
+      "browser_utc": "2026-10-04T06:57:59.157Z",
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "timezone": "Etc/UTC",
+      "replay": false,
+      "study_status": {
+        "type": 2
+      },
+      "native_end_of_data": true,
+      "dataset_start": {
+        "index": -24389,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "main_last": {
+        "index": 299,
+        "value": [
+          1791096960,
+          85055.11,
+          85055.12,
+          85038.27,
+          85040.94,
+          6.00142
+        ]
+      },
+      "study_last": {
+        "index": 299,
+        "value": [
+          1791096960,
+          0,
+          0
+        ]
+      },
+      "rows": [
+        {
+          "native_index": 292,
+          "host": [
+            1791096120,
+            84978.36,
+            84978.36,
+            84948.34,
+            84957.58,
+            24.70147
+          ],
+          "source": [
+            1791096120,
+            1,
+            1
+          ]
+        },
+        {
+          "native_index": 293,
+          "host": [
+            1791096240,
+            84957.58,
+            84964.01,
+            84957.58,
+            84964.01,
+            4.36726
+          ],
+          "source": [
+            1791096240,
+            1,
+            1
+          ]
+        },
+        {
+          "native_index": 294,
+          "host": [
+            1791096360,
+            84964,
+            84988.01,
+            84964,
+            84988.01,
+            1.95837
+          ],
+          "source": [
+            1791096360,
+            1,
+            1
+          ]
+        },
+        {
+          "native_index": 295,
+          "host": [
+            1791096480,
+            84988,
+            84995.41,
+            84988,
+            84995.08,
+            2.8296
+          ],
+          "source": [
+            1791096480,
+            1,
+            1
+          ]
+        },
+        {
+          "native_index": 296,
+          "host": [
+            1791096600,
+            84995.09,
+            85029.83,
+            84995.08,
+            85029.83,
+            3.2457
+          ],
+          "source": [
+            1791096600,
+            1,
+            1
+          ]
+        },
+        {
+          "native_index": 297,
+          "host": [
+            1791096720,
+            85029.82,
+            85046.01,
+            85029.82,
+            85046,
+            3.49037
+          ],
+          "source": [
+            1791096720,
+            1,
+            1
+          ]
+        },
+        {
+          "native_index": 298,
+          "host": [
+            1791096840,
+            85046.01,
+            85072.54,
+            85046,
+            85055.11,
+            7.63132
+          ],
+          "source": [
+            1791096840,
+            1,
+            1
+          ]
+        },
+        {
+          "native_index": 299,
+          "host": [
+            1791096960,
+            85055.11,
+            85055.12,
+            85038.27,
+            85040.94,
+            6.00142
+          ],
+          "source": [
+            1791096960,
+            0,
+            0
+          ]
+        }
+      ],
+      "plot_order": [
+        {
+          "id": "plot_0",
+          "type": "line"
+        },
+        {
+          "id": "plot_1",
+          "type": "line"
+        }
+      ],
+      "subscription": "pro_premium"
+    },
+    "2m-after": {
+      "browser_utc": "2026-10-04T06:58:01.969Z",
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "timezone": "Etc/UTC",
+      "replay": false,
+      "study_status": {
+        "type": 2
+      },
+      "native_end_of_data": true,
+      "dataset_start": {
+        "index": -24389,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "main_last": {
+        "index": 300,
+        "value": [
+          1791097080,
+          85040.94,
+          85040.94,
+          85040.94,
+          85040.94,
+          0
+        ]
+      },
+      "study_last": {
+        "index": 300,
+        "value": [
+          1791097080,
+          0,
+          0
+        ]
+      },
+      "rows": [
+        {
+          "native_index": 293,
+          "host": [
+            1791096240,
+            84957.58,
+            84964.01,
+            84957.58,
+            84964.01,
+            4.36726
+          ],
+          "source": [
+            1791096240,
+            1,
+            1
+          ]
+        },
+        {
+          "native_index": 294,
+          "host": [
+            1791096360,
+            84964,
+            84988.01,
+            84964,
+            84988.01,
+            1.95837
+          ],
+          "source": [
+            1791096360,
+            1,
+            1
+          ]
+        },
+        {
+          "native_index": 295,
+          "host": [
+            1791096480,
+            84988,
+            84995.41,
+            84988,
+            84995.08,
+            2.8296
+          ],
+          "source": [
+            1791096480,
+            1,
+            1
+          ]
+        },
+        {
+          "native_index": 296,
+          "host": [
+            1791096600,
+            84995.09,
+            85029.83,
+            84995.08,
+            85029.83,
+            3.2457
+          ],
+          "source": [
+            1791096600,
+            1,
+            1
+          ]
+        },
+        {
+          "native_index": 297,
+          "host": [
+            1791096720,
+            85029.82,
+            85046.01,
+            85029.82,
+            85046,
+            3.49037
+          ],
+          "source": [
+            1791096720,
+            1,
+            1
+          ]
+        },
+        {
+          "native_index": 298,
+          "host": [
+            1791096840,
+            85046.01,
+            85072.54,
+            85046,
+            85055.11,
+            7.63132
+          ],
+          "source": [
+            1791096840,
+            1,
+            1
+          ]
+        },
+        {
+          "native_index": 299,
+          "host": [
+            1791096960,
+            85055.11,
+            85055.12,
+            85038.27,
+            85040.94,
+            6.01232
+          ],
+          "source": [
+            1791096960,
+            1,
+            0
+          ]
+        },
+        {
+          "native_index": 300,
+          "host": [
+            1791097080,
+            85040.94,
+            85040.94,
+            85040.94,
+            85040.94,
+            0
+          ],
+          "source": [
+            1791097080,
+            0,
+            0
+          ]
+        }
+      ],
+      "plot_order": [
+        {
+          "id": "plot_0",
+          "type": "line"
+        },
+        {
+          "id": "plot_1",
+          "type": "line"
+        }
+      ],
+      "subscription": "pro_premium"
+    },
+    "5m-before": {
+      "browser_utc": "2026-10-04T06:59:55.335Z",
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "timezone": "Etc/UTC",
+      "replay": false,
+      "study_status": {
+        "type": 2
+      },
+      "native_end_of_data": true,
+      "dataset_start": {
+        "index": -24389,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "main_last": {
+        "index": 300,
+        "value": [
+          1791097080,
+          85040.94,
+          85040.95,
+          85031.73,
+          85031.73,
+          4.95239
+        ]
+      },
+      "study_last": {
+        "index": 300,
+        "value": [
+          1791097080,
+          0,
+          0
+        ]
+      },
+      "rows": [
+        {
+          "native_index": 293,
+          "host": [
+            1791096240,
+            84957.58,
+            84964.01,
+            84957.58,
+            84964.01,
+            4.36726
+          ],
+          "source": [
+            1791096240,
+            1,
+            1
+          ]
+        },
+        {
+          "native_index": 294,
+          "host": [
+            1791096360,
+            84964,
+            84988.01,
+            84964,
+            84988.01,
+            1.95837
+          ],
+          "source": [
+            1791096360,
+            1,
+            1
+          ]
+        },
+        {
+          "native_index": 295,
+          "host": [
+            1791096480,
+            84988,
+            84995.41,
+            84988,
+            84995.08,
+            2.8296
+          ],
+          "source": [
+            1791096480,
+            1,
+            1
+          ]
+        },
+        {
+          "native_index": 296,
+          "host": [
+            1791096600,
+            84995.09,
+            85029.83,
+            84995.08,
+            85029.83,
+            3.2457
+          ],
+          "source": [
+            1791096600,
+            1,
+            1
+          ]
+        },
+        {
+          "native_index": 297,
+          "host": [
+            1791096720,
+            85029.82,
+            85046.01,
+            85029.82,
+            85046,
+            3.49037
+          ],
+          "source": [
+            1791096720,
+            1,
+            1
+          ]
+        },
+        {
+          "native_index": 298,
+          "host": [
+            1791096840,
+            85046.01,
+            85072.54,
+            85046,
+            85055.11,
+            7.63132
+          ],
+          "source": [
+            1791096840,
+            1,
+            1
+          ]
+        },
+        {
+          "native_index": 299,
+          "host": [
+            1791096960,
+            85055.11,
+            85055.12,
+            85038.27,
+            85040.94,
+            6.01232
+          ],
+          "source": [
+            1791096960,
+            1,
+            0
+          ]
+        },
+        {
+          "native_index": 300,
+          "host": [
+            1791097080,
+            85040.94,
+            85040.95,
+            85031.73,
+            85031.73,
+            4.95239
+          ],
+          "source": [
+            1791097080,
+            0,
+            0
+          ]
+        }
+      ],
+      "plot_order": [
+        {
+          "id": "plot_0",
+          "type": "line"
+        },
+        {
+          "id": "plot_1",
+          "type": "line"
+        }
+      ],
+      "subscription": "pro_premium"
+    },
+    "5m-after": {
+      "browser_utc": "2026-10-04T07:00:01.738Z",
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "timezone": "Etc/UTC",
+      "replay": false,
+      "study_status": {
+        "type": 2
+      },
+      "native_end_of_data": true,
+      "dataset_start": {
+        "index": -24389,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "main_last": {
+        "index": 301,
+        "value": [
+          1791097200,
+          85031.74,
+          85031.74,
+          85031.74,
+          85031.74,
+          0
+        ]
+      },
+      "study_last": {
+        "index": 301,
+        "value": [
+          1791097200,
+          0,
+          0
+        ]
+      },
+      "rows": [
+        {
+          "native_index": 294,
+          "host": [
+            1791096360,
+            84964,
+            84988.01,
+            84964,
+            84988.01,
+            1.95837
+          ],
+          "source": [
+            1791096360,
+            1,
+            1
+          ]
+        },
+        {
+          "native_index": 295,
+          "host": [
+            1791096480,
+            84988,
+            84995.41,
+            84988,
+            84995.08,
+            2.8296
+          ],
+          "source": [
+            1791096480,
+            1,
+            1
+          ]
+        },
+        {
+          "native_index": 296,
+          "host": [
+            1791096600,
+            84995.09,
+            85029.83,
+            84995.08,
+            85029.83,
+            3.2457
+          ],
+          "source": [
+            1791096600,
+            1,
+            1
+          ]
+        },
+        {
+          "native_index": 297,
+          "host": [
+            1791096720,
+            85029.82,
+            85046.01,
+            85029.82,
+            85046,
+            3.49037
+          ],
+          "source": [
+            1791096720,
+            1,
+            1
+          ]
+        },
+        {
+          "native_index": 298,
+          "host": [
+            1791096840,
+            85046.01,
+            85072.54,
+            85046,
+            85055.11,
+            7.63132
+          ],
+          "source": [
+            1791096840,
+            1,
+            1
+          ]
+        },
+        {
+          "native_index": 299,
+          "host": [
+            1791096960,
+            85055.11,
+            85055.12,
+            85038.27,
+            85040.94,
+            6.01232
+          ],
+          "source": [
+            1791096960,
+            1,
+            0
+          ]
+        },
+        {
+          "native_index": 300,
+          "host": [
+            1791097080,
+            85040.94,
+            85040.95,
+            85031.73,
+            85031.74,
+            4.9683
+          ],
+          "source": [
+            1791097080,
+            1,
+            0
+          ]
+        },
+        {
+          "native_index": 301,
+          "host": [
+            1791097200,
+            85031.74,
+            85031.74,
+            85031.74,
+            85031.74,
+            0
+          ],
+          "source": [
+            1791097200,
+            0,
+            0
+          ]
+        }
+      ],
+      "plot_order": [
+        {
+          "id": "plot_0",
+          "type": "line"
+        },
+        {
+          "id": "plot_1",
+          "type": "line"
+        }
+      ],
+      "subscription": "pro_premium"
+    }
+  },
+  "reload": {
+    "browser_utc": "2026-10-04T07:01:02.726Z",
+    "tickerid": "BINANCE:BTCUSDT",
+    "timeframe": "2",
+    "timezone": "Etc/UTC",
+    "replay": false,
+    "study_status": {
+      "type": 2
+    },
+    "native_end_of_data": true,
+    "dataset_start": {
+      "index": -24391,
+      "value": [
+        1788134400,
+        77682,
+        77682.01,
+        77572,
+        77674.04,
+        51.86295
+      ]
+    },
+    "main_last": {
+      "index": 299,
+      "value": [
+        1791097200,
+        85031.74,
+        85031.74,
+        85026.32,
+        85026.33,
+        2.65301
+      ]
+    },
+    "study_last": {
+      "index": 299,
+      "value": [
+        1791097200,
+        0,
+        0
+      ]
+    },
+    "rows": [
+      {
+        "native_index": 292,
+        "host": [
+          1791096360,
+          84964,
+          84988.01,
+          84964,
+          84988.01,
+          1.95837
+        ],
+        "source": [
+          1791096360,
+          1,
+          1
+        ]
+      },
+      {
+        "native_index": 293,
+        "host": [
+          1791096480,
+          84988,
+          84995.41,
+          84988,
+          84995.08,
+          2.8296
+        ],
+        "source": [
+          1791096480,
+          1,
+          1
+        ]
+      },
+      {
+        "native_index": 294,
+        "host": [
+          1791096600,
+          84995.09,
+          85029.83,
+          84995.08,
+          85029.83,
+          3.2457
+        ],
+        "source": [
+          1791096600,
+          1,
+          1
+        ]
+      },
+      {
+        "native_index": 295,
+        "host": [
+          1791096720,
+          85029.82,
+          85046.01,
+          85029.82,
+          85046,
+          3.49037
+        ],
+        "source": [
+          1791096720,
+          1,
+          1
+        ]
+      },
+      {
+        "native_index": 296,
+        "host": [
+          1791096840,
+          85046.01,
+          85072.54,
+          85046,
+          85055.11,
+          7.63132
+        ],
+        "source": [
+          1791096840,
+          1,
+          1
+        ]
+      },
+      {
+        "native_index": 297,
+        "host": [
+          1791096960,
+          85055.11,
+          85055.12,
+          85038.27,
+          85040.94,
+          6.01232
+        ],
+        "source": [
+          1791096960,
+          1,
+          1
+        ]
+      },
+      {
+        "native_index": 298,
+        "host": [
+          1791097080,
+          85040.94,
+          85040.95,
+          85031.73,
+          85031.74,
+          4.9683
+        ],
+        "source": [
+          1791097080,
+          1,
+          1
+        ]
+      },
+      {
+        "native_index": 299,
+        "host": [
+          1791097200,
+          85031.74,
+          85031.74,
+          85026.32,
+          85026.33,
+          2.65301
+        ],
+        "source": [
+          1791097200,
+          0,
+          0
+        ]
+      }
+    ],
+    "plot_order": [
+      {
+        "id": "plot_0",
+        "type": "line"
+      },
+      {
+        "id": "plot_1",
+        "type": "line"
+      }
+    ],
+    "subscription": "pro_premium"
+  },
+  "axis_phases": {
+    "5": {
+      "browser_utc": "2026-10-04T06:49:17.200Z",
+      "last": {
+        "index": 299,
+        "value": [
+          1791094680,
+          84925.58,
+          84930.01,
+          84925.56,
+          84930,
+          20.79635
+        ]
+      },
+      "axis": {
+        "text": "84,930.00",
+        "color": "#ffffff",
+        "background": "rgba(41, 98, 255, 1)",
+        "coordinate": 67.14999999992142,
+        "visible": true,
+        "common": {
+          "coordinate": 67.14999999992142,
+          "textColor": "#ffffff",
+          "background": "rgba(41, 98, 255, 1)",
+          "additionalPaddingBottom": 0,
+          "additionalPaddingTop": 0,
+          "fixedCoordinate": 50.14999999992142
+        },
+        "data": {
+          "text": "84,930.00",
+          "visible": true,
+          "separatorVisible": true,
+          "borderVisible": false,
+          "ignoreAdditionalPaddingInner": false
+        }
+      },
+      "native_end_of_data": true,
+      "phase_basis": "Phase identified from unchanged source's unique two-blue-defined/two-blue-missing/four-red-defined cycle and native cache rows, not from assigning Pine index to native chart index."
+    },
+    "6": {
+      "browser_utc": "2026-10-04T06:50:00.573Z",
+      "last": {
+        "index": 300,
+        "value": [
+          1791094800,
+          84930,
+          84971.99,
+          84930,
+          84971.99,
+          12.27031
+        ]
+      },
+      "axis": {
+        "text": "84,930.00",
+        "color": "#ffffff",
+        "background": "rgba(41, 98, 255, 1)",
+        "coordinate": 392.29052126006815,
+        "visible": true,
+        "common": {
+          "coordinate": 392.29052126006815,
+          "textColor": "#ffffff",
+          "background": "rgba(41, 98, 255, 1)",
+          "additionalPaddingBottom": 0,
+          "additionalPaddingTop": 0,
+          "fixedCoordinate": 392.29052126006815
+        },
+        "data": {
+          "text": "84,930.00",
+          "visible": true,
+          "separatorVisible": true,
+          "borderVisible": false,
+          "ignoreAdditionalPaddingInner": false,
+          "selectedMarkColor": "rgba(41, 98, 255, 1)"
+        }
+      },
+      "native_end_of_data": true,
+      "phase_basis": "Phase identified from unchanged source's unique two-blue-defined/two-blue-missing/four-red-defined cycle and native cache rows, not from assigning Pine index to native chart index."
+    },
+    "7": {
+      "browser_utc": "2026-10-04T06:50:26.717Z",
+      "last": {
+        "index": 301,
+        "value": [
+          1791094920,
+          84971.98,
+          84971.98,
+          84971.98,
+          84971.98,
+          14.21903
+        ]
+      },
+      "axis": {
+        "text": "84,930.00",
+        "color": "#ffffff",
+        "background": "rgba(41, 98, 255, 1)",
+        "coordinate": 392.29052126006815,
+        "visible": true,
+        "common": {
+          "coordinate": 392.29052126006815,
+          "textColor": "#ffffff",
+          "background": "rgba(41, 98, 255, 1)",
+          "additionalPaddingBottom": 0,
+          "additionalPaddingTop": 0,
+          "fixedCoordinate": 392.29052126006815
+        },
+        "data": {
+          "text": "84,930.00",
+          "visible": true,
+          "separatorVisible": true,
+          "borderVisible": false,
+          "ignoreAdditionalPaddingInner": false,
+          "selectedMarkColor": "rgba(41, 98, 255, 1)"
+        }
+      },
+      "native_end_of_data": true,
+      "phase_basis": "Phase identified from unchanged source's unique two-blue-defined/two-blue-missing/four-red-defined cycle and native cache rows, not from assigning Pine index to native chart index."
+    },
+    "0": {
+      "browser_utc": "2026-10-04T06:50:29.947Z",
+      "last": {
+        "index": 302,
+        "value": [
+          1791095040,
+          84964.01,
+          84964.01,
+          84935.98,
+          84935.99,
+          19.1083
+        ]
+      },
+      "axis": {
+        "text": "84,935.99",
+        "color": "#ffffff",
+        "background": "rgba(242, 54, 69, 1)",
+        "coordinate": 514.3577216204939,
+        "visible": true,
+        "common": {
+          "coordinate": 514.3577216204939,
+          "textColor": "#ffffff",
+          "background": "rgba(242, 54, 69, 1)",
+          "additionalPaddingBottom": 0,
+          "additionalPaddingTop": 0,
+          "fixedCoordinate": 497.35772162049386
+        },
+        "data": {
+          "text": "84,935.99",
+          "visible": true,
+          "separatorVisible": true,
+          "borderVisible": false,
+          "ignoreAdditionalPaddingInner": false,
+          "selectedMarkColor": "rgba(242, 54, 69, 1)"
+        }
+      },
+      "native_end_of_data": true,
+      "phase_basis": "Phase identified from unchanged source's unique two-blue-defined/two-blue-missing/four-red-defined cycle and native cache rows, not from assigning Pine index to native chart index."
+    }
+  },
+  "limits": "Direct observations of exact frozen sources only. Native indices are not Pine indices. The interrupted live attempt1 retains two snapshots and an instrument-failure note; it does not certify a close transition. Replay phase7 includes an early host transport OHLC update. No internal request confirmation policy or mathematical kernel is inferred."
+}

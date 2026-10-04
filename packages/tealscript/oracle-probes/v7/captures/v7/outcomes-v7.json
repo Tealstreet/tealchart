@@ -34382,5 +34382,1099 @@
       ],
       "entries": 0
     }
+  },
+  {
+    "script": "axis-last-defined-color-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "ea48e664091d7b52d9abc4bf7d594d2b286dee797e906efb88457200e1ef0ebd",
+    "indicator_title": "V7 axis last defined",
+    "status": "RUNS",
+    "csv_file": "captures/v7/axis-last-defined-color-v6-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T144625.558.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 axis last defined",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24384,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24684,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T06:46:16.803Z",
+    "live_candle_open_utc": "2026-10-04T06:46:00.000Z",
+    "export_utc": "2026-10-04T06:46:26.741Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/axis-last-defined-color-v6-v1-attempt1-setup.png",
+      "captures/v7/evidence/axis-last-defined-color-v6-v1-attempt1-export.png",
+      "captures/v7/evidence/axis-last-defined-color-v6-v1-attempt1-logs.txt",
+      "captures/v7/evidence/axis-last-defined-color-v6-v1-attempt1-logs-v1.json",
+      "captures/v7/evidence/axis-last-defined-color-v6-v1-attempt1-logs.png",
+      "captures/v7/evidence/axis-last-defined-color-v6-v1-attempt1-visual.png",
+      "captures/v7/evidence/axis-last-defined-color-v6-v1-attempt1-data-window-v1.png",
+      "captures/v7/evidence/axis-last-defined-color-v6-v1-attempt1-data-window-v1.json",
+      "captures/v7/evidence/axis-last-defined-color-v6-v1-attempt1-data-window-v1.txt",
+      "captures/v7/evidence/axis-last-defined-color-v6-v1-attempt1-replay-phase5-v1.json",
+      "captures/v7/evidence/axis-last-defined-color-v6-v1-attempt1-replay-phase5-v1.png",
+      "captures/v7/evidence/axis-last-defined-color-v6-v1-attempt1-replay-phase6-v1.json",
+      "captures/v7/evidence/axis-last-defined-color-v6-v1-attempt1-replay-phase6-v1.png",
+      "captures/v7/evidence/axis-last-defined-color-v6-v1-attempt1-replay-phase7-v1.json",
+      "captures/v7/evidence/axis-last-defined-color-v6-v1-attempt1-replay-phase7-v1.png",
+      "captures/v7/evidence/axis-last-defined-color-v6-v1-attempt1-replay-phase0-v1.json",
+      "captures/v7/evidence/axis-last-defined-color-v6-v1-attempt1-replay-phase0-v1.png",
+      "captures/v7/evidence/axis-last-defined-color-v6-v1-attempt1-replay-settings-v1.png",
+      "captures/v7/evidence/axis-last-defined-color-v6-v1-attempt1-replay-settings-v2.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T06:46:17.765Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790791200,
+            84031.47,
+            84078.55,
+            83991.77,
+            83991.78,
+            18.58068
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791096360,
+            84964,
+            84964.01,
+            84964,
+            84964.01,
+            0.11865
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 axis last defined",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790791200,
+                83991.78,
+                1
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791096360,
+                84964.01,
+                0
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T06:46:18.888Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790791200,
+            84031.47,
+            84078.55,
+            83991.77,
+            83991.78,
+            18.58068
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791096360,
+            84964,
+            84964.01,
+            84964,
+            84964.01,
+            0.11865
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 axis last defined",
+            "status": {
+              "type": 2
+            },
+            "size": 24684,
+            "first": {
+              "index": -1022140,
+              "value": [
+                1788134400,
+                77674.04,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791096360,
+                84964.01,
+                0
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T06:46:19.542Z",
+        "bars": 24684,
+        "end": true,
+        "first": {
+          "index": -24384,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791096360,
+            84964,
+            84965.97,
+            84964,
+            84965.97,
+            0.20309
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 axis last defined",
+            "status": {
+              "type": 2
+            },
+            "size": 24684,
+            "first": {
+              "index": -24384,
+              "value": [
+                1788134400,
+                77674.04,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791096360,
+                84965.97,
+                0
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   06:46",
+    "historical_compare_before_unix_seconds": 1791096360,
+    "pine_logs": {
+      "paths": [
+        "evidence/axis-last-defined-color-v6-v1-attempt1-logs.txt",
+        "evidence/axis-last-defined-color-v6-v1-attempt1-logs-v1.json",
+        "evidence/axis-last-defined-color-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "155ba10b896fa179b0ea3ca42051de46188e7616babdb8775300dfe8efd14fa7",
+    "csv_bytes": 1254004,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "LAST_DEFINED"
+    ],
+    "declared_to_native_header_mapping": {
+      "LAST_DEFINED": "LAST_DEFINED"
+    },
+    "csv_rows": 24684,
+    "historical_rows": 24683,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791096360,
+    "first_historical_values": {
+      "LAST_DEFINED": "77674.04"
+    },
+    "last_historical_values": {
+      "LAST_DEFINED": "84964.01"
+    },
+    "data_window_witness": "captures/v7/evidence/axis-last-defined-color-v6-v1-attempt1-data-window-v1.json",
+    "replay_notes": "Replay snapshots retained at cycle phases5,6,7,0, identified from native cache missing/color pattern of unchanged source. Replay starts with only300 bars; requested native history and waited for endOfData=true and original1788134400 start before phase capture. Axis tag is84930.00 blue at phases5/6/7 and84935.99 red at phase0. Phase7 includes an early replay transport update of main OHLC; it is a snapshot, not a final candle claim. Settings-v1 was captured before dialog appeared; actual Style settings are settings-v2. No source inputs or styles changed."
+  },
+  {
+    "script": "barstate-security-confirmed-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "c89a17d7ba31106bbb67297c63770914313a84e4d6a59c82c4c4abde920df319",
+    "indicator_title": "V7 barstate-security-confirmed-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/barstate-security-confirmed-v6-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T145210.128.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 barstate-security-confirmed-v6-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24387,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24687,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T06:52:02.932Z",
+    "live_candle_open_utc": "2026-10-04T06:52:00.000Z",
+    "export_utc": "2026-10-04T06:52:10.489Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/barstate-security-confirmed-v6-v1-attempt1-setup.png",
+      "captures/v7/evidence/barstate-security-confirmed-v6-v1-attempt1-export.png",
+      "captures/v7/evidence/barstate-security-confirmed-v6-v1-attempt1-logs.txt",
+      "captures/v7/evidence/barstate-security-confirmed-v6-v1-attempt1-logs-v1.json",
+      "captures/v7/evidence/barstate-security-confirmed-v6-v1-attempt1-logs.png",
+      "captures/v7/evidence/barstate-security-confirmed-v6-v1-attempt1-visual.png",
+      "captures/v7/evidence/barstate-security-confirmed-v6-v1-attempt1-data-window-v1.png",
+      "captures/v7/evidence/barstate-security-confirmed-v6-v1-attempt1-data-window-v1.json",
+      "captures/v7/evidence/barstate-security-confirmed-v6-v1-attempt1-data-window-v1.txt",
+      "captures/v7/evidence/barstate-security-confirmed-v6-v1-attempt1-live-2m-before-v1.json",
+      "captures/v7/evidence/barstate-security-confirmed-v6-v1-attempt1-live-2m-before-v1.png",
+      "captures/v7/evidence/barstate-security-confirmed-v6-v1-attempt1-live-2m-after-v1.json",
+      "captures/v7/evidence/barstate-security-confirmed-v6-v1-attempt1-live-2m-after-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T06:52:03.741Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790791560,
+            83986,
+            83994.01,
+            83930.15,
+            83994.01,
+            13.74363
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791096720,
+            85029.82,
+            85029.83,
+            85029.82,
+            85029.82,
+            0.0479
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 barstate-security-confirmed-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790791560,
+                1,
+                1
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791096720,
+                0,
+                0
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T06:52:04.824Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790791560,
+            83986,
+            83994.01,
+            83930.15,
+            83994.01,
+            13.74363
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791096720,
+            85029.82,
+            85029.83,
+            85029.82,
+            85029.82,
+            0.0479
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 barstate-security-confirmed-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24687,
+            "first": {
+              "index": -1022143,
+              "value": [
+                1788134400,
+                1,
+                null
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791096720,
+                0,
+                0
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T06:52:05.570Z",
+        "bars": 24687,
+        "end": true,
+        "first": {
+          "index": -24387,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791096720,
+            85029.82,
+            85029.83,
+            85029.82,
+            85029.82,
+            0.0615
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 barstate-security-confirmed-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24687,
+            "first": {
+              "index": -24387,
+              "value": [
+                1788134400,
+                1,
+                null
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791096720,
+                0,
+                0
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   06:52",
+    "historical_compare_before_unix_seconds": 1791096720,
+    "pine_logs": {
+      "paths": [
+        "evidence/barstate-security-confirmed-v6-v1-attempt1-logs.txt",
+        "evidence/barstate-security-confirmed-v6-v1-attempt1-logs-v1.json",
+        "evidence/barstate-security-confirmed-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "f19977c64dbeb6034f38bf919cb3cf2e07008d2f2180a15241fb3c0cd2471003",
+    "csv_bytes": 1191033,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "CHART_CONFIRMED",
+      "REQUESTED_CONFIRMED"
+    ],
+    "declared_to_native_header_mapping": {
+      "CHART_CONFIRMED": "CHART_CONFIRMED",
+      "REQUESTED_CONFIRMED": "REQUESTED_CONFIRMED"
+    },
+    "csv_rows": 24687,
+    "historical_rows": 24686,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791096720,
+    "first_historical_values": {
+      "CHART_CONFIRMED": "1",
+      "REQUESTED_CONFIRMED": ""
+    },
+    "last_historical_values": {
+      "CHART_CONFIRMED": "1",
+      "REQUESTED_CONFIRMED": "1"
+    },
+    "data_window_witness": "captures/v7/evidence/barstate-security-confirmed-v6-v1-attempt1-data-window-v1.json",
+    "live_instrument_note": "First live timeline interrupted by Chrome MCP transport failure around2026-10-04T06:54Z. Before/after2m event snapshots are retained, but the wall-clock-after snapshot still shows the previous native host bar (feed publication not yet observed). No complete close transition or5m observation is certified from this attempt. Healthcheck double-counted both loopback socket ends and repeatedly restarted a healthy connector; corrected in local dotfiles commit79f5010. Independent attempt2 reacquires the live sequence."
+  },
+  {
+    "script": "barstate-security-confirmed-v6-v1.pine",
+    "attempt": 2,
+    "source_sha256": "c89a17d7ba31106bbb67297c63770914313a84e4d6a59c82c4c4abde920df319",
+    "indicator_title": "V7 barstate-security-confirmed-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/barstate-security-confirmed-v6-v1-attempt2.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T145627.578.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 barstate-security-confirmed-v6-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24389,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24689,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T06:56:20.226Z",
+    "live_candle_open_utc": "2026-10-04T06:56:00.000Z",
+    "export_utc": "2026-10-04T06:56:27.972Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/barstate-security-confirmed-v6-v1-attempt2-setup.png",
+      "captures/v7/evidence/barstate-security-confirmed-v6-v1-attempt2-export.png",
+      "captures/v7/evidence/barstate-security-confirmed-v6-v1-attempt2-logs.txt",
+      "captures/v7/evidence/barstate-security-confirmed-v6-v1-attempt2-logs-v1.json",
+      "captures/v7/evidence/barstate-security-confirmed-v6-v1-attempt2-logs.png",
+      "captures/v7/evidence/barstate-security-confirmed-v6-v1-attempt2-visual.png",
+      "captures/v7/evidence/barstate-security-confirmed-v6-v1-attempt2-data-window-v1.png",
+      "captures/v7/evidence/barstate-security-confirmed-v6-v1-attempt2-data-window-v1.json",
+      "captures/v7/evidence/barstate-security-confirmed-v6-v1-attempt2-data-window-v1.txt",
+      "captures/v7/evidence/barstate-security-confirmed-v6-v1-attempt2-live-trace-chunk0-v1.json",
+      "captures/v7/evidence/barstate-security-confirmed-v6-v1-attempt2-live-trace-chunk0-v1.png",
+      "captures/v7/evidence/barstate-security-confirmed-v6-v1-attempt2-live-2m-before-v1.json",
+      "captures/v7/evidence/barstate-security-confirmed-v6-v1-attempt2-live-2m-before-v1.png",
+      "captures/v7/evidence/barstate-security-confirmed-v6-v1-attempt2-live-2m-after-v1.json",
+      "captures/v7/evidence/barstate-security-confirmed-v6-v1-attempt2-live-2m-after-v1.png",
+      "captures/v7/evidence/barstate-security-confirmed-v6-v1-attempt2-live-trace-chunk1-v1.json",
+      "captures/v7/evidence/barstate-security-confirmed-v6-v1-attempt2-live-trace-chunk1-v1.png",
+      "captures/v7/evidence/barstate-security-confirmed-v6-v1-attempt2-live-trace-chunk2-v1.json",
+      "captures/v7/evidence/barstate-security-confirmed-v6-v1-attempt2-live-trace-chunk2-v1.png",
+      "captures/v7/evidence/barstate-security-confirmed-v6-v1-attempt2-live-5m-before-v1.json",
+      "captures/v7/evidence/barstate-security-confirmed-v6-v1-attempt2-live-5m-before-v1.png",
+      "captures/v7/evidence/barstate-security-confirmed-v6-v1-attempt2-live-5m-after-v1.json",
+      "captures/v7/evidence/barstate-security-confirmed-v6-v1-attempt2-live-5m-after-v1.png",
+      "captures/v7/evidence/barstate-security-confirmed-v6-v1-attempt2-live-trace-chunk3-v1.json",
+      "captures/v7/evidence/barstate-security-confirmed-v6-v1-attempt2-live-trace-chunk3-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T06:56:21.066Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790791800,
+            84066.01,
+            84066.01,
+            84026,
+            84066.01,
+            9.76432
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791096960,
+            85055.11,
+            85055.12,
+            85055.11,
+            85055.11,
+            0.70391
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 barstate-security-confirmed-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790791800,
+                1,
+                1
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791096960,
+                0,
+                0
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T06:56:22.106Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790791800,
+            84066.01,
+            84066.01,
+            84026,
+            84066.01,
+            9.76432
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791096960,
+            85055.11,
+            85055.12,
+            85055.11,
+            85055.12,
+            0.73343
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 barstate-security-confirmed-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24689,
+            "first": {
+              "index": -1022145,
+              "value": [
+                1788134400,
+                1,
+                null
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791096960,
+                0,
+                0
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T06:56:22.919Z",
+        "bars": 24689,
+        "end": true,
+        "first": {
+          "index": -24389,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791096960,
+            85055.11,
+            85055.12,
+            85055.11,
+            85055.12,
+            0.73785
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 barstate-security-confirmed-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24689,
+            "first": {
+              "index": -24389,
+              "value": [
+                1788134400,
+                1,
+                null
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791096960,
+                0,
+                0
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   06:56",
+    "historical_compare_before_unix_seconds": 1791096960,
+    "pine_logs": {
+      "paths": [
+        "evidence/barstate-security-confirmed-v6-v1-attempt2-logs.txt",
+        "evidence/barstate-security-confirmed-v6-v1-attempt2-logs-v1.json",
+        "evidence/barstate-security-confirmed-v6-v1-attempt2-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "c1e94e3d83e0809f191a9ec45fea3347167c82ec08de46ad6c0d2f4a6c8fb0cf",
+    "csv_bytes": 1191129,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "CHART_CONFIRMED",
+      "REQUESTED_CONFIRMED"
+    ],
+    "declared_to_native_header_mapping": {
+      "CHART_CONFIRMED": "CHART_CONFIRMED",
+      "REQUESTED_CONFIRMED": "REQUESTED_CONFIRMED"
+    },
+    "csv_rows": 24689,
+    "historical_rows": 24688,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791096960,
+    "first_historical_values": {
+      "CHART_CONFIRMED": "1",
+      "REQUESTED_CONFIRMED": ""
+    },
+    "last_historical_values": {
+      "CHART_CONFIRMED": "1",
+      "REQUESTED_CONFIRMED": "1"
+    },
+    "data_window_witness": "captures/v7/evidence/barstate-security-confirmed-v6-v1-attempt2-data-window-v1.json"
+  },
+  {
+    "script": "barstate-security-confirmed-v6-v1.pine",
+    "attempt": 3,
+    "source_sha256": "c89a17d7ba31106bbb67297c63770914313a84e4d6a59c82c4c4abde920df319",
+    "indicator_title": "V7 barstate-security-confirmed-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/barstate-security-confirmed-v6-v1-attempt3.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T150056.340.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 barstate-security-confirmed-v6-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24391,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24691,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T07:00:48.752Z",
+    "live_candle_open_utc": "2026-10-04T07:00:00.000Z",
+    "export_utc": "2026-10-04T07:00:56.882Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/barstate-security-confirmed-v6-v1-attempt3-setup.png",
+      "captures/v7/evidence/barstate-security-confirmed-v6-v1-attempt3-export.png",
+      "captures/v7/evidence/barstate-security-confirmed-v6-v1-attempt3-logs.txt",
+      "captures/v7/evidence/barstate-security-confirmed-v6-v1-attempt3-logs-v1.json",
+      "captures/v7/evidence/barstate-security-confirmed-v6-v1-attempt3-logs.png",
+      "captures/v7/evidence/barstate-security-confirmed-v6-v1-attempt3-visual.png",
+      "captures/v7/evidence/barstate-security-confirmed-v6-v1-attempt3-data-window-v1.png",
+      "captures/v7/evidence/barstate-security-confirmed-v6-v1-attempt3-data-window-v1.json",
+      "captures/v7/evidence/barstate-security-confirmed-v6-v1-attempt3-data-window-v1.txt",
+      "captures/v7/evidence/barstate-security-confirmed-v6-v1-attempt3-live-reload-v1.json",
+      "captures/v7/evidence/barstate-security-confirmed-v6-v1-attempt3-live-reload-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T07:00:49.656Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790792040,
+            84045.01,
+            84062.25,
+            83990,
+            84000.01,
+            29.30985
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791097200,
+            85031.74,
+            85031.74,
+            85031.73,
+            85031.74,
+            0.62536
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 barstate-security-confirmed-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790792040,
+                1,
+                1
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791097200,
+                0,
+                1
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:00:50.758Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790792040,
+            84045.01,
+            84062.25,
+            83990,
+            84000.01,
+            29.30985
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791097200,
+            85031.74,
+            85031.74,
+            85031.73,
+            85031.74,
+            0.6745
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 barstate-security-confirmed-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24691,
+            "first": {
+              "index": -1022147,
+              "value": [
+                1788134400,
+                1,
+                null
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791097200,
+                0,
+                0
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:00:51.718Z",
+        "bars": 24691,
+        "end": true,
+        "first": {
+          "index": -24391,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791097200,
+            85031.74,
+            85031.74,
+            85031.73,
+            85031.74,
+            0.69888
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 barstate-security-confirmed-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24691,
+            "first": {
+              "index": -24391,
+              "value": [
+                1788134400,
+                1,
+                null
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791097200,
+                0,
+                0
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   07:00",
+    "historical_compare_before_unix_seconds": 1791097200,
+    "pine_logs": {
+      "paths": [
+        "evidence/barstate-security-confirmed-v6-v1-attempt3-logs.txt",
+        "evidence/barstate-security-confirmed-v6-v1-attempt3-logs-v1.json",
+        "evidence/barstate-security-confirmed-v6-v1-attempt3-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "1b4624132abe0b4d2eec60f4f8365f928caf729be8f64afecb9d218da45be228",
+    "csv_bytes": 1191231,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "CHART_CONFIRMED",
+      "REQUESTED_CONFIRMED"
+    ],
+    "declared_to_native_header_mapping": {
+      "CHART_CONFIRMED": "CHART_CONFIRMED",
+      "REQUESTED_CONFIRMED": "REQUESTED_CONFIRMED"
+    },
+    "csv_rows": 24691,
+    "historical_rows": 24690,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791097200,
+    "first_historical_values": {
+      "CHART_CONFIRMED": "1",
+      "REQUESTED_CONFIRMED": ""
+    },
+    "last_historical_values": {
+      "CHART_CONFIRMED": "1",
+      "REQUESTED_CONFIRMED": "1"
+    },
+    "data_window_witness": "captures/v7/evidence/barstate-security-confirmed-v6-v1-attempt3-data-window-v1.json"
   }
 ]
