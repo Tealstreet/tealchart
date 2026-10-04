@@ -1,0 +1,90 @@
+{
+  "artifact": "Native timed chart witness v1",
+  "native_index": -24609,
+  "time": 1788136200,
+  "native_bar": [
+    1788136200,
+    77901.34,
+    77949.99,
+    77892,
+    77949.99,
+    19.87269
+  ],
+  "observed_utc": "2026-10-04T14:50:12.831Z",
+  "title": "Plot magnitude cutoff signed v1",
+  "native_study_row": [
+    1788136200,
+    -9.99e+99,
+    -9.99,
+    0,
+    15,
+    15
+  ],
+  "plots": [
+    {
+      "id": "plot_0",
+      "type": "line"
+    },
+    {
+      "id": "plot_1",
+      "type": "line"
+    },
+    {
+      "id": "plot_2",
+      "type": "line"
+    },
+    {
+      "id": "plot_3",
+      "type": "line"
+    },
+    {
+      "id": "plot_4",
+      "type": "line"
+    }
+  ],
+  "render_items_at_timestamp": [
+    {
+      "plot": "plot_0",
+      "items": [
+        {
+          "price": -9.99e+99,
+          "y": 241.31247574274758,
+          "center": 473.06451612903226,
+          "style": {
+            "color": "rgba(41, 98, 255, 1)",
+            "width": 3,
+            "style": 0
+          }
+        }
+      ]
+    },
+    {
+      "plot": "plot_1",
+      "items": []
+    },
+    {
+      "plot": "plot_2",
+      "items": []
+    },
+    {
+      "plot": "plot_3",
+      "items": []
+    },
+    {
+      "plot": "plot_4",
+      "items": []
+    }
+  ],
+  "crosshair_time_label": "Mon 31 Aug '26   00:30",
+  "visible_range": {
+    "_firstBar": -24626,
+    "_lastBar": -24596
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  },
+  "ui_snapshot": "Emulating viewport: {\"deviceScaleFactor\":2,\"isMobile\":false,\"hasTouch\":false,\"isLandscape\":false,\"width\":1440,\"height\":900}\n## Latest page snapshot\nuid=6492_0 RootWebArea \"BTCUSDT 85,126.00 ▲ +0.44% basic\" url=\"https://www.tradingview.com/chart/xlvYwHdH/?symbol=BINANCE%3ABTCUSDT&interval=2\"\n  uid=6492_1 button \"Logged in as sours-lat Active layout: basic\" haspopup=\"menu\"\n  uid=6492_2 StaticText \"11\"\n  uid=6492_3 button \"BTCUSDT\" description=\"Symbol search\"\n  uid=6492_4 button \"Switch data type\"\n  uid=6492_5 button \"Compare symbols\" haspopup=\"dialog\"\n  uid=6492_6 radio \"3 minutes\"\n  uid=6492_7 radio \"5 minutes\"\n  uid=6492_8 radio \"15 minutes\"\n  uid=6492_9 radio \"30 minutes\"\n  uid=6492_10 radio \"45 minutes\"\n  uid=6492_11 radio \"1 hour\"\n  uid=6492_12 radio \"2 hours\"\n  uid=6492_13 radio \"3 hours\"\n  uid=6492_14 radio \"4 hours\"\n  uid=6492_15 radio \"8 hours\"\n  uid=6492_16 radio \"10 hours\"\n  uid=6492_17 radio \"12 hours\"\n  uid=6492_18 radio \"1 day\"\n  uid=6492_19 radio \"3 days\"\n  uid=6492_20 radio \"10 days\"\n  uid=6492_21 radio \"1 week\"\n  uid=6492_22 radio \"1 month\"\n  uid=6492_23 radio \"2 minutes\" checked\n  uid=6492_24 button \"Chart interval\" haspopup=\"menu\"\n  uid=6492_25 radio \"Candles\" checked\n  uid=6492_26 radio \"Line\"\n  uid=6492_27 radio \"High-low\"\n  uid=6492_28 button \"Bar's style\" haspopup=\"menu\"\n  uid=6492_29 button \"Indicators, metrics, and strategies\"\n  uid=6492_30 button \"Favorite indicators\" haspopup=\"menu\"\n  uid=6492_31 button \"Indicator templates\" haspopup=\"menu\"\n  uid=6492_32 button \"Create alert\"\n  uid=6492_33 button \"Bar replay\"\n  uid=6492_34 button disableable disabled\n  uid=6492_35 button disableable disabled\n  uid=6492_36 button \"Layout setup\" haspopup=\"menu\"\n  uid=6492_37 button \"All changes saved\" disableable disabled\n  uid=6492_38 button \"Manage layouts\" haspopup=\"menu\"\n  uid=6492_39 button \"Quick search\"\n  uid=6492_40 button \"Settings\"\n  uid=6492_41 button \"Fullscreen mode\"\n  uid=6492_42 button \"Take a snapshot\" haspopup=\"menu\"\n  uid=6492_43 button \"Share your idea with the trade community\" haspopup=\"menu\"\n  uid=6492_44 button \"Trade\"\n  uid=6492_45 button \"Cross\"\n  uid=6492_46 button \"Cursors\" pressed\n  uid=6492_47 button \"Trendline\"\n  uid=6492_48 button \"Trend tools\"\n  uid=6492_49 button \"Fib retracement\"\n  uid=6492_50 button \"Gann and Fibonacci tools\"\n  uid=6492_51 button \"XABCD pattern\"\n  uid=6492_52 button \"Patterns\"\n  uid=6492_53 button \"Long position\"\n  uid=6492_54 button \"Forecasting and measurement tools\"\n  uid=6492_55 button \"Brush\"\n  uid=6492_56 button \"Geometric shapes\"\n  uid=6492_57 button \"Text\"\n  uid=6492_58 button \"Annotation tools\"\n  uid=6492_59 button \"Icon\"\n  uid=6492_60 button \"Icons\"\n  uid=6492_61 button \"Measure\"\n  uid=6492_62 button \"Zoom in\"\n  uid=6492_63 button \"Magnet mode snaps drawings placed near price bars to the closest OHLC value\" pressed\n  uid=6492_64 button \"Magnets\" pressed\n  uid=6492_65 button \"Keep drawing\"\n  uid=6492_66 button \"Lock drawings and indicators\"\n  uid=6492_67 button \"Lock options\"\n  uid=6492_68 button \"Hide all drawings, indicators, positions, and orders\"\n  uid=6492_69 button \"Hide options\"\n  uid=6492_70 button \"New drawings will not be synced\"\n  uid=6492_71 button \"Sync drawings options\"\n  uid=6492_72 button \"Remove objects\"\n  uid=6492_73 button \"Remove options\"\n  uid=6492_74 button \"Show Favorite Drawing Tools Toolbar\"\n  uid=6492_75 region \"Chart #1\"\n    uid=6492_76 StaticText \"B\"\n    uid=6492_77 button \"Change symbol\"\n    uid=6492_78 StaticText \"·\"\n    uid=6492_79 button \"Change interval\"\n    uid=6492_78 StaticText \"·\"\n    uid=6492_80 StaticText \"Binance\"\n    uid=6492_81 button \"Unflag symbol\"\n    uid=6492_82 button \"More\" description=\"More\"\n    uid=6492_83 button \"Market open\"\n    uid=6492_84 StaticText \"O\"\n    uid=6492_85 StaticText \"77,901.34\"\n    uid=6492_86 StaticText \"H\"\n    uid=6492_87 StaticText \"77,949.99\"\n    uid=6492_88 StaticText \"L\"\n    uid=6492_89 StaticText \"77,892.00\"\n    uid=6492_90 StaticText \"C\"\n    uid=6492_91 StaticText \"77,949.99\"\n    uid=6509_0 StaticText \"+48.66 (+0.06%)\"\n    uid=6492_93 StaticText \"85,126.00\"\n    uid=6524_0 StaticText \"SELL\"\n    uid=6492_95 StaticText \"0.01\"\n    uid=6492_96 StaticText \"85,126.01\"\n    uid=6524_1 StaticText \"BUY\"\n    uid=6492_98 Canvas \"Chart for BINANCE:BTCUSDT, 2 minutes\"\n    uid=6492_99 StaticText \"Plot magnitude cutoff signed v1\"\n    uid=6492_100 button \"Hide\" description=\"Hide\"\n    uid=6492_101 button \"Settings\" description=\"Settings\"\n    uid=6492_102 button \"Remove\" description=\"Remove\"\n    uid=6492_103 button \"More\" description=\"More\"\n    uid=6492_104 StaticText \"−9.99e+99\"\n  uid=6492_105 button \"1 day in 1 minute intervals\"\n  uid=6492_106 button \"5 days in 5 minutes intervals\"\n  uid=6492_107 button \"1 month in 30 minutes intervals\"\n  uid=6492_108 button \"3 months in 1 hour intervals\"\n  uid=6492_109 button \"6 months in 2 hours intervals\"\n  uid=6492_110 button \"Year to day in 1 day intervals\"\n  uid=6492_111 button \"1 year in 1 day intervals\"\n  uid=6492_112 button \"5 years in 1 week intervals\"\n  uid=6492_113 button \"All data in 1 month intervals\"\n  uid=6492_114 button \"Go to\"\n  uid=6492_115 button \"Timezone\"\n  uid=6492_116 button \"Watchlist, details, and news\"\n  uid=6492_117 button \"Alerts\"\n  uid=6492_118 button \"Object tree and data window\" pressed\n  uid=6492_119 button \"AI Copilot\"\n  uid=6492_120 button \"Screeners\"\n  uid=6492_121 button \"Pine\"\n  uid=6492_122 button \"Calendars\"\n  uid=6492_123 button \"Community\"\n  uid=6492_124 button \"Notifications\"\n  uid=6492_125 button \"Chats\"\n  uid=6492_126 button \"Products\" haspopup=\"menu\"\n  uid=6492_127 button \"Help Center\"\n  uid=6505_0 tab \"Object tree\" selectable\n  uid=6505_1 tab \"Data window\" selectable selected\n  uid=6505_2 generic disableable disabled\n    uid=6505_3 StaticText \"Date\"\n    uid=6505_4 StaticText \"Mon 31 Aug '26\"\n    uid=6505_5 StaticText \"Time\"\n    uid=6505_6 StaticText \"00:30\"\n  uid=6505_7 row \"BTCUSDT · 2 · Binance Open 77,901.34 High 77,949.99 Low 77,892.00 Close 77,949.99 Change +48.66 (+0.06%) Vol 19.87 Last day change +372.45 (+0.44%)\"\n    uid=6505_8 StaticText \"BTCUSDT · 2 · Binance\"\n    uid=6505_9 button \"Hide data\"\n    uid=6505_10 StaticText \"Open\"\n    uid=6505_11 StaticText \"77,901.34\"\n    uid=6505_12 StaticText \"High\"\n    uid=6505_13 StaticText \"77,949.99\"\n    uid=6505_14 StaticText \"Low\"\n    uid=6505_15 StaticText \"77,892.00\"\n    uid=6505_16 StaticText \"Close\"\n    uid=6505_17 StaticText \"77,949.99\"\n    uid=6505_18 StaticText \"Change\"\n    uid=6505_19 StaticText \"+48.66 (+0.06%)\"\n    uid=6505_20 StaticText \"Vol\"\n    uid=6505_21 StaticText \"19.87\"\n    uid=6509_1 StaticText \"Last day change\"\n    uid=6509_2 StaticText \"+372.45 (+0.44%)\"\n  uid=6505_24 row \"Plot magnitude cutoff signed v1 Raw signed magnitude −9.99e+99 Magnitude scaled by 1e99 −9.99000000 Source is NA 0.00000000 Magnitude case index 15.00000000 Input bar index 15.00000000\"\n    uid=6505_25 StaticText \"Plot magnitude cutoff signed v1\"\n    uid=6505_26 button \"Hide data\"\n    uid=6505_27 StaticText \"Raw signed magnitude\"\n    uid=6505_28 StaticText \"−9.99e+99\"\n    uid=6505_29 StaticText \"Magnitude scaled by 1e99\"\n    uid=6505_30 StaticText \"−9.99000000\"\n    uid=6505_31 StaticText \"Source is NA\"\n    uid=6505_32 StaticText \"0.00000000\"\n    uid=6505_33 StaticText \"Magnitude case index\"\n    uid=6505_34 StaticText \"15.00000000\"\n    uid=6505_35 StaticText \"Input bar index\"\n    uid=6505_36 StaticText \"15.00000000\"\n  uid=6492_128 generic \"Trading panel\"\n    uid=6492_129 generic\n  uid=6492_130 generic live=\"polite\" relevant=\"additions\"\n  uid=6492_131 generic live=\"polite\" relevant=\"additions\"\n  uid=6492_132 generic live=\"assertive\" relevant=\"additions\"\n  uid=6492_133 generic live=\"assertive\" relevant=\"additions\"\n  uid=6492_134 generic live=\"polite\" relevant=\"additions text\"\n  uid=6492_135 log live=\"polite\" relevant=\"additions text\"\n  uid=6492_136 log live=\"polite\" relevant=\"additions text\"\n  uid=6492_137 log live=\"polite\" relevant=\"additions text\"\n  uid=6492_138 log live=\"polite\" relevant=\"additions text\"\n  uid=6492_139 log live=\"polite\" relevant=\"additions text\"\n  uid=6492_140 log live=\"polite\" relevant=\"additions text\"\n  uid=6492_141 log live=\"polite\" relevant=\"additions text\"\n  uid=6492_142 log live=\"polite\" relevant=\"additions text\"\n  uid=6492_143 log live=\"polite\" relevant=\"additions text\"\n  uid=6492_144 log live=\"polite\" relevant=\"additions text\"\n  uid=6492_145 log live=\"polite\" relevant=\"additions text\"\n  uid=6492_146 log live=\"polite\" relevant=\"additions text\"\n  uid=6492_147 log live=\"polite\" relevant=\"additions text\"\n  uid=6492_148 log live=\"polite\" relevant=\"additions text\"\n  uid=6492_149 log live=\"polite\" relevant=\"additions text\"\n  uid=6492_150 log live=\"polite\" relevant=\"additions text\"\n  uid=6492_151 log live=\"polite\" relevant=\"additions text\"\n  uid=6492_152 log live=\"polite\" relevant=\"additions text\"\n  uid=6492_153 log live=\"polite\" relevant=\"additions text\"\n  uid=6492_154 log live=\"polite\" relevant=\"additions text\"\n  uid=6492_155 log live=\"polite\" relevant=\"additions text\"\n",
+  "limits": "Native bar index is not Pine index; use literal exported Input bar index. Renderer items are bounded to this timestamp and the accompanying PNG; a null renderer price alone does not establish source NA."
+}

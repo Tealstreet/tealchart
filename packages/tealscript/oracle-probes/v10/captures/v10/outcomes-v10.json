@@ -1256,5 +1256,718 @@
       "b sum": "5450135.680000005"
     },
     "data_window_witness": "captures/v10/evidence/tuple-udf-64-plus64-v6-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T14:46:27.638Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v10 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "plot-magnitude-cutoff-signed-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "864e406f04f713e7ecaa790d3090188b81239cb5c75abba13b1e76170d72d3b7",
+    "indicator_title": "Plot magnitude cutoff signed v1",
+    "status": "RUNS",
+    "csv_file": "captures/v10/plot-magnitude-cutoff-signed-v6-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T224625.306.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "Plot magnitude cutoff signed v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24624,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24924,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T14:46:05.027Z",
+    "live_candle_open_utc": "2026-10-04T14:46:00.000Z",
+    "export_utc": "2026-10-04T14:46:25.763Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v10/evidence/plot-magnitude-cutoff-signed-v6-v1-attempt1-setup.png",
+      "captures/v10/evidence/plot-magnitude-cutoff-signed-v6-v1-attempt1-export.png",
+      "captures/v10/evidence/plot-magnitude-cutoff-signed-v6-v1-attempt1-logs.txt",
+      "captures/v10/evidence/plot-magnitude-cutoff-signed-v6-v1-attempt1-logs-v1.json",
+      "captures/v10/evidence/plot-magnitude-cutoff-signed-v6-v1-attempt1-logs.png",
+      "captures/v10/evidence/plot-magnitude-cutoff-signed-v6-v1-attempt1-visual.png",
+      "captures/v10/evidence/plot-magnitude-cutoff-signed-v6-v1-attempt1-data-window-v1.png",
+      "captures/v10/evidence/plot-magnitude-cutoff-signed-v6-v1-attempt1-data-window-v1.json",
+      "captures/v10/evidence/plot-magnitude-cutoff-signed-v6-v1-attempt1-data-window-v1.txt",
+      "captures/v10/evidence/plot-magnitude-cutoff-signed-v6-v1-attempt1-authority-object-geometry-v1.json",
+      "captures/v10/evidence/plot-magnitude-cutoff-signed-v6-v1-attempt1-authority-object-geometry-v1.png",
+      "captures/v10/evidence/plot-magnitude-cutoff-signed-v6-v1-attempt1-magnitude-case-0-v1.json",
+      "captures/v10/evidence/plot-magnitude-cutoff-signed-v6-v1-attempt1-magnitude-case-0-v1.png",
+      "captures/v10/evidence/plot-magnitude-cutoff-signed-v6-v1-attempt1-magnitude-case-1-v1.json",
+      "captures/v10/evidence/plot-magnitude-cutoff-signed-v6-v1-attempt1-magnitude-case-1-v1.png",
+      "captures/v10/evidence/plot-magnitude-cutoff-signed-v6-v1-attempt1-magnitude-case-4-v1.json",
+      "captures/v10/evidence/plot-magnitude-cutoff-signed-v6-v1-attempt1-magnitude-case-4-v1.png",
+      "captures/v10/evidence/plot-magnitude-cutoff-signed-v6-v1-attempt1-magnitude-case-5-v1.json",
+      "captures/v10/evidence/plot-magnitude-cutoff-signed-v6-v1-attempt1-magnitude-case-5-v1.png",
+      "captures/v10/evidence/plot-magnitude-cutoff-signed-v6-v1-attempt1-magnitude-case-12-v1.json",
+      "captures/v10/evidence/plot-magnitude-cutoff-signed-v6-v1-attempt1-magnitude-case-12-v1.png",
+      "captures/v10/evidence/plot-magnitude-cutoff-signed-v6-v1-attempt1-magnitude-case-13-v1.json",
+      "captures/v10/evidence/plot-magnitude-cutoff-signed-v6-v1-attempt1-magnitude-case-13-v1.png",
+      "captures/v10/evidence/plot-magnitude-cutoff-signed-v6-v1-attempt1-magnitude-case-14-v1.json",
+      "captures/v10/evidence/plot-magnitude-cutoff-signed-v6-v1-attempt1-magnitude-case-14-v1.png",
+      "captures/v10/evidence/plot-magnitude-cutoff-signed-v6-v1-attempt1-magnitude-case-15-v1.json",
+      "captures/v10/evidence/plot-magnitude-cutoff-signed-v6-v1-attempt1-magnitude-case-15-v1.png",
+      "captures/v10/evidence/plot-magnitude-cutoff-signed-v6-v1-attempt1-magnitude-case-20-v1.json",
+      "captures/v10/evidence/plot-magnitude-cutoff-signed-v6-v1-attempt1-magnitude-case-20-v1.png",
+      "captures/v10/evidence/plot-magnitude-cutoff-signed-v6-v1-attempt1-magnitude-case-21-v1.json",
+      "captures/v10/evidence/plot-magnitude-cutoff-signed-v6-v1-attempt1-magnitude-case-21-v1.png",
+      "captures/v10/evidence/plot-magnitude-cutoff-signed-v6-v1-attempt1-magnitude-case-22-v1.json",
+      "captures/v10/evidence/plot-magnitude-cutoff-signed-v6-v1-attempt1-magnitude-case-22-v1.png",
+      "captures/v10/evidence/plot-magnitude-cutoff-signed-v6-v1-attempt1-magnitude-case-23-v1.json",
+      "captures/v10/evidence/plot-magnitude-cutoff-signed-v6-v1-attempt1-magnitude-case-23-v1.png",
+      "captures/v10/magnitude-context-v1.json",
+      "captures/v10/evidence/plot-magnitude-cutoff-signed-v6-v1-attempt1-cycle-preview-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T14:46:06.042Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790820000,
+            83518.07,
+            83567.63,
+            83518.07,
+            83562,
+            6.07269
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791125160,
+            85126.86,
+            85126.86,
+            85126.85,
+            85126.86,
+            0.03721
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Plot magnitude cutoff signed v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790820000,
+                null,
+                10,
+                0,
+                20,
+                22380
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791125160,
+                -9.99e+99,
+                -9.99,
+                0,
+                15,
+                24923
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T14:46:08.499Z",
+        "bars": 24924,
+        "end": true,
+        "first": {
+          "index": -24624,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791125160,
+            85126.86,
+            85126.86,
+            85126.85,
+            85126.86,
+            0.38691
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Plot magnitude cutoff signed v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24924,
+            "first": {
+              "index": -24624,
+              "value": [
+                1788134400,
+                9.26e+99,
+                9.260000000000002,
+                0,
+                0,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791125160,
+                -9.99e+99,
+                -9.99,
+                0,
+                15,
+                24923
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   14:46",
+    "historical_compare_before_unix_seconds": 1791125160,
+    "pine_logs": {
+      "paths": [
+        "evidence/plot-magnitude-cutoff-signed-v6-v1-attempt1-logs.txt",
+        "evidence/plot-magnitude-cutoff-signed-v6-v1-attempt1-logs-v1.json",
+        "evidence/plot-magnitude-cutoff-signed-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "e314f2728412381ad837cca96829db8d789492f669b83da28ec58a76d12df909",
+    "csv_bytes": 1795574,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "Raw signed magnitude",
+      "Magnitude scaled by 1e99",
+      "Source is NA",
+      "Magnitude case index",
+      "Input bar index"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "Raw signed magnitude": 5,
+      "Magnitude scaled by 1e99": 6,
+      "Source is NA": 7,
+      "Magnitude case index": 8,
+      "Input bar index": 9
+    },
+    "first_historical_cells": [
+      "1788134400",
+      "77682",
+      "77682.01",
+      "77572",
+      "77674.04",
+      "9.26e+99",
+      "9.260000000000002",
+      "0",
+      "0",
+      "0"
+    ],
+    "last_historical_cells": [
+      "1791125040",
+      "85126.86",
+      "85126.86",
+      "85126.85",
+      "85126.85",
+      "9.99e+99",
+      "9.99",
+      "0",
+      "14",
+      "24922"
+    ],
+    "declared_to_native_header_mapping": {
+      "Raw signed magnitude": "Raw signed magnitude",
+      "Magnitude scaled by 1e99": "Magnitude scaled by 1e99",
+      "Source is NA": "Source is NA",
+      "Magnitude case index": "Magnitude case index",
+      "Input bar index": "Input bar index"
+    },
+    "csv_rows": 24924,
+    "historical_rows": 24923,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791125160,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791125160",
+    "first_historical_values": {
+      "Raw signed magnitude": "9.26e+99",
+      "Magnitude scaled by 1e99": "9.260000000000002",
+      "Source is NA": "0",
+      "Magnitude case index": "0",
+      "Input bar index": "0"
+    },
+    "last_historical_values": {
+      "Raw signed magnitude": "9.99e+99",
+      "Magnitude scaled by 1e99": "9.99",
+      "Source is NA": "0",
+      "Magnitude case index": "14",
+      "Input bar index": "24922"
+    },
+    "data_window_witness": "captures/v10/evidence/plot-magnitude-cutoff-signed-v6-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T14:51:50.638Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v10 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "nvi-formula-holes-magnitude-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "13ef354f125e70dc1e96565fcb9aa973d0c3e5136e499420bb55c9d2276faee2",
+    "indicator_title": "Synthetic NVI holes and plot magnitude v1",
+    "status": "RUNS",
+    "csv_file": "captures/v10/nvi-formula-holes-magnitude-v6-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T225149.643.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "Synthetic NVI holes and plot magnitude v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24626,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24926,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T14:51:41.438Z",
+    "live_candle_open_utc": "2026-10-04T14:50:00.000Z",
+    "export_utc": "2026-10-04T14:51:50.200Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v10/evidence/nvi-formula-holes-magnitude-v6-v1-attempt1-setup.png",
+      "captures/v10/evidence/nvi-formula-holes-magnitude-v6-v1-attempt1-export.png",
+      "captures/v10/evidence/nvi-formula-holes-magnitude-v6-v1-attempt1-logs.txt",
+      "captures/v10/evidence/nvi-formula-holes-magnitude-v6-v1-attempt1-logs-v1.json",
+      "captures/v10/evidence/nvi-formula-holes-magnitude-v6-v1-attempt1-logs.png",
+      "captures/v10/evidence/nvi-formula-holes-magnitude-v6-v1-attempt1-visual.png",
+      "captures/v10/evidence/nvi-formula-holes-magnitude-v6-v1-attempt1-data-window-v1.png",
+      "captures/v10/evidence/nvi-formula-holes-magnitude-v6-v1-attempt1-data-window-v1.json",
+      "captures/v10/evidence/nvi-formula-holes-magnitude-v6-v1-attempt1-data-window-v1.txt",
+      "captures/v10/evidence/nvi-formula-holes-magnitude-v6-v1-attempt1-authority-object-geometry-v1.json",
+      "captures/v10/evidence/nvi-formula-holes-magnitude-v6-v1-attempt1-authority-object-geometry-v1.png",
+      "captures/v10/evidence/nvi-formula-holes-magnitude-v6-v1-attempt1-nvi-gap-index-19799-v1.json",
+      "captures/v10/evidence/nvi-formula-holes-magnitude-v6-v1-attempt1-nvi-gap-index-19799-v1.png",
+      "captures/v10/evidence/nvi-formula-holes-magnitude-v6-v1-attempt1-nvi-gap-index-19800-v1.json",
+      "captures/v10/evidence/nvi-formula-holes-magnitude-v6-v1-attempt1-nvi-gap-index-19800-v1.png",
+      "captures/v10/evidence/nvi-formula-holes-magnitude-v6-v1-attempt1-nvi-gap-index-19804-v1.json",
+      "captures/v10/evidence/nvi-formula-holes-magnitude-v6-v1-attempt1-nvi-gap-index-19804-v1.png",
+      "captures/v10/nvi-magnitude-context-v1.json",
+      "captures/v10/nvi-magnitude-context-v2.json"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T14:51:42.235Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790820240,
+            83519.65,
+            83570.01,
+            83508.67,
+            83551.64,
+            11.09784
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791125400,
+            85124.01,
+            85139.1,
+            85124,
+            85139.09,
+            1.51811
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Synthetic NVI holes and plot magnitude v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790820240,
+                null,
+                null,
+                83730019538219.08,
+                83730019538219.08,
+                0,
+                0,
+                14,
+                54,
+                46,
+                22382
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791125400,
+                null,
+                null,
+                5.092342801468106e+26,
+                5.092342801468106e+26,
+                0,
+                0,
+                11,
+                71,
+                29,
+                24925
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T14:51:43.303Z",
+        "bars": 24926,
+        "end": true,
+        "first": {
+          "index": -24626,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791125400,
+            85124.01,
+            85139.1,
+            85124,
+            85139.1,
+            1.52928
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Synthetic NVI holes and plot magnitude v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24926,
+            "first": {
+              "index": -24626,
+              "value": [
+                1788134400,
+                1,
+                1,
+                1e-99,
+                1e-99,
+                0,
+                0,
+                10,
+                100,
+                0,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791125400,
+                null,
+                null,
+                5.092342801468106e+26,
+                5.092342801468106e+26,
+                0,
+                0,
+                11,
+                71,
+                29,
+                24925
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   14:50",
+    "historical_compare_before_unix_seconds": 1791125400,
+    "pine_logs": {
+      "paths": [
+        "evidence/nvi-formula-holes-magnitude-v6-v1-attempt1-logs.txt",
+        "evidence/nvi-formula-holes-magnitude-v6-v1-attempt1-logs-v1.json",
+        "evidence/nvi-formula-holes-magnitude-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "1f124eef3fdd3f9229505f68f7f1da2874ec665b3b202d123a622b7356c7ad76",
+    "csv_bytes": 3506734,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "nvi_na_synthetic_doc",
+      "nvi_na_synthetic_legacy",
+      "NVI doc scaled by 1e99",
+      "NVI legacy scaled by 1e99",
+      "NVI doc source is NA",
+      "NVI legacy source is NA",
+      "Input synthetic price",
+      "Input synthetic volume",
+      "Input cycle phase",
+      "Input bar index"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "nvi_na_synthetic_doc": 5,
+      "nvi_na_synthetic_legacy": 6,
+      "NVI doc scaled by 1e99": 7,
+      "NVI legacy scaled by 1e99": 8,
+      "NVI doc source is NA": 9,
+      "NVI legacy source is NA": 10,
+      "Input synthetic price": 11,
+      "Input synthetic volume": 12,
+      "Input cycle phase": 13,
+      "Input bar index": 14
+    },
+    "first_historical_cells": [
+      "1788134400",
+      "77682",
+      "77682.01",
+      "77572",
+      "77674.04",
+      "1",
+      "1",
+      "1e-99",
+      "1e-99",
+      "0",
+      "0",
+      "10",
+      "100",
+      "0",
+      "0"
+    ],
+    "last_historical_cells": [
+      "1791125280",
+      "85109.53",
+      "85124.01",
+      "85106.24",
+      "85124.01",
+      "",
+      "",
+      "4.629402546789188e+26",
+      "4.629402546789188e+26",
+      "0",
+      "0",
+      "10",
+      "72",
+      "28",
+      "24924"
+    ],
+    "declared_to_native_header_mapping": {
+      "nvi_na_synthetic_doc": "nvi_na_synthetic_doc",
+      "nvi_na_synthetic_legacy": "nvi_na_synthetic_legacy",
+      "NVI doc scaled by 1e99": "NVI doc scaled by 1e99",
+      "NVI legacy scaled by 1e99": "NVI legacy scaled by 1e99",
+      "NVI doc source is NA": "NVI doc source is NA",
+      "NVI legacy source is NA": "NVI legacy source is NA",
+      "Input synthetic price": "Input synthetic price",
+      "Input synthetic volume": "Input synthetic volume",
+      "Input cycle phase": "Input cycle phase",
+      "Input bar index": "Input bar index"
+    },
+    "csv_rows": 24926,
+    "historical_rows": 24925,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791125400,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791125400",
+    "first_historical_values": {
+      "nvi_na_synthetic_doc": "1",
+      "nvi_na_synthetic_legacy": "1",
+      "NVI doc scaled by 1e99": "1e-99",
+      "NVI legacy scaled by 1e99": "1e-99",
+      "NVI doc source is NA": "0",
+      "NVI legacy source is NA": "0",
+      "Input synthetic price": "10",
+      "Input synthetic volume": "100",
+      "Input cycle phase": "0",
+      "Input bar index": "0"
+    },
+    "last_historical_values": {
+      "nvi_na_synthetic_doc": "",
+      "nvi_na_synthetic_legacy": "",
+      "NVI doc scaled by 1e99": "4.629402546789188e+26",
+      "NVI legacy scaled by 1e99": "4.629402546789188e+26",
+      "NVI doc source is NA": "0",
+      "NVI legacy source is NA": "0",
+      "Input synthetic price": "10",
+      "Input synthetic volume": "72",
+      "Input cycle phase": "28",
+      "Input bar index": "24924"
+    },
+    "data_window_witness": "captures/v10/evidence/nvi-formula-holes-magnitude-v6-v1-attempt1-data-window-v1.json"
   }
 ]

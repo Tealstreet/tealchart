@@ -1,0 +1,33 @@
+{
+  "index": 298,
+  "bar": [
+    1791125040,
+    85126.86,
+    85126.86,
+    85126.85,
+    85126.85,
+    1.64459
+  ],
+  "source_row": [
+    1791125040,
+    9.99e+99,
+    9.99,
+    0,
+    14,
+    24922
+  ],
+  "browser_utc": "2026-10-04T14:46:40.687Z",
+  "title": "Plot magnitude cutoff signed v1",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   14:44",
+  "visible_range": {
+    "_firstBar": 263,
+    "_lastBar": 301
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}

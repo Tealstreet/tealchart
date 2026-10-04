@@ -1,0 +1,638 @@
+{
+  "artifact": "Signed magnitude context v1",
+  "source": "plot-magnitude-cutoff-signed-v6-v1.pine",
+  "source_sha256": "864e406f04f713e7ecaa790d3090188b81239cb5c75abba13b1e76170d72d3b7",
+  "attempt": 1,
+  "literal_first_input_bar_index": "0",
+  "historical_rows": 24923,
+  "cases": [
+    {
+      "case_index": 0,
+      "first_csv_cells": {
+        "time": "1788134400",
+        "open": "77682",
+        "high": "77682.01",
+        "low": "77572",
+        "close": "77674.04",
+        "Raw signed magnitude": "9.26e+99",
+        "Magnitude scaled by 1e99": "9.260000000000002",
+        "Source is NA": "0",
+        "Magnitude case index": "0",
+        "Input bar index": "0"
+      },
+      "completed_occurrences": 959,
+      "raw_blank_occurrences": 0,
+      "native_witness": "captures/v10/evidence/plot-magnitude-cutoff-signed-v6-v1-attempt1-magnitude-case-0-v1.json",
+      "renderer_items": [
+        {
+          "price": 9.26e+99,
+          "y": 34.307580042258024,
+          "center": 67.58064516129036,
+          "style": {
+            "color": "rgba(41, 98, 255, 1)",
+            "width": 3,
+            "style": 0
+          }
+        }
+      ]
+    },
+    {
+      "case_index": 1,
+      "first_csv_cells": {
+        "time": "1788134520",
+        "open": "77674.5",
+        "high": "77780.34",
+        "low": "77646",
+        "close": "77758.24",
+        "Raw signed magnitude": "-9.26e+99",
+        "Magnitude scaled by 1e99": "-9.260000000000002",
+        "Source is NA": "0",
+        "Magnitude case index": "1",
+        "Input bar index": "1"
+      },
+      "completed_occurrences": 959,
+      "raw_blank_occurrences": 0,
+      "native_witness": "captures/v10/evidence/plot-magnitude-cutoff-signed-v6-v1-attempt1-magnitude-case-1-v1.json",
+      "renderer_items": [
+        {
+          "price": -9.26e+99,
+          "y": 233.462419957742,
+          "center": 94.61290322580646,
+          "style": {
+            "color": "rgba(41, 98, 255, 1)",
+            "width": 3,
+            "style": 0
+          }
+        }
+      ]
+    },
+    {
+      "case_index": 2,
+      "first_csv_cells": {
+        "time": "1788134640",
+        "open": "77758.24",
+        "high": "77827.99",
+        "low": "77724",
+        "close": "77740.01",
+        "Raw signed magnitude": "9.269999e+99",
+        "Magnitude scaled by 1e99": "9.269999",
+        "Source is NA": "0",
+        "Magnitude case index": "2",
+        "Input bar index": "2"
+      },
+      "completed_occurrences": 959,
+      "raw_blank_occurrences": 0,
+      "native_witness": null,
+      "renderer_items": null
+    },
+    {
+      "case_index": 3,
+      "first_csv_cells": {
+        "time": "1788134760",
+        "open": "77740.01",
+        "high": "77751.37",
+        "low": "77490",
+        "close": "77508.86",
+        "Raw signed magnitude": "-9.269999e+99",
+        "Magnitude scaled by 1e99": "-9.269999",
+        "Source is NA": "0",
+        "Magnitude case index": "3",
+        "Input bar index": "3"
+      },
+      "completed_occurrences": 959,
+      "raw_blank_occurrences": 0,
+      "native_witness": null,
+      "renderer_items": null
+    },
+    {
+      "case_index": 4,
+      "first_csv_cells": {
+        "time": "1788134880",
+        "open": "77508.86",
+        "high": "77525.28",
+        "low": "77436.4",
+        "close": "77437.58",
+        "Raw signed magnitude": "9.27e+99",
+        "Magnitude scaled by 1e99": "9.270000000000001",
+        "Source is NA": "0",
+        "Magnitude case index": "4",
+        "Input bar index": "4"
+      },
+      "completed_occurrences": 959,
+      "raw_blank_occurrences": 0,
+      "native_witness": "captures/v10/evidence/plot-magnitude-cutoff-signed-v6-v1-attempt1-magnitude-case-4-v1.json",
+      "renderer_items": [
+        {
+          "price": 9.27e+99,
+          "y": 34.200045031504516,
+          "center": 175.70967741935488,
+          "style": {
+            "color": "rgba(41, 98, 255, 1)",
+            "width": 3,
+            "style": 0
+          }
+        }
+      ]
+    },
+    {
+      "case_index": 5,
+      "first_csv_cells": {
+        "time": "1788135000",
+        "open": "77437.57",
+        "high": "77636",
+        "low": "77436.41",
+        "close": "77636",
+        "Raw signed magnitude": "-9.27e+99",
+        "Magnitude scaled by 1e99": "-9.270000000000001",
+        "Source is NA": "0",
+        "Magnitude case index": "5",
+        "Input bar index": "5"
+      },
+      "completed_occurrences": 959,
+      "raw_blank_occurrences": 0,
+      "native_witness": "captures/v10/evidence/plot-magnitude-cutoff-signed-v6-v1-attempt1-magnitude-case-5-v1.json",
+      "renderer_items": [
+        {
+          "price": -9.27e+99,
+          "y": 233.5699549684955,
+          "center": 202.74193548387098,
+          "style": {
+            "color": "rgba(41, 98, 255, 1)",
+            "width": 3,
+            "style": 0
+          }
+        }
+      ]
+    },
+    {
+      "case_index": 6,
+      "first_csv_cells": {
+        "time": "1788135120",
+        "open": "77635.99",
+        "high": "77726",
+        "low": "77576",
+        "close": "77725.99",
+        "Raw signed magnitude": "9.270001e+99",
+        "Magnitude scaled by 1e99": "9.270001",
+        "Source is NA": "0",
+        "Magnitude case index": "6",
+        "Input bar index": "6"
+      },
+      "completed_occurrences": 959,
+      "raw_blank_occurrences": 0,
+      "native_witness": null,
+      "renderer_items": null
+    },
+    {
+      "case_index": 7,
+      "first_csv_cells": {
+        "time": "1788135240",
+        "open": "77726",
+        "high": "77797.91",
+        "low": "77720.88",
+        "close": "77797.91",
+        "Raw signed magnitude": "-9.270001e+99",
+        "Magnitude scaled by 1e99": "-9.270001",
+        "Source is NA": "0",
+        "Magnitude case index": "7",
+        "Input bar index": "7"
+      },
+      "completed_occurrences": 959,
+      "raw_blank_occurrences": 0,
+      "native_witness": null,
+      "renderer_items": null
+    },
+    {
+      "case_index": 8,
+      "first_csv_cells": {
+        "time": "1788135360",
+        "open": "77797.99",
+        "high": "77896",
+        "low": "77784",
+        "close": "77864.01",
+        "Raw signed magnitude": "9.28e+99",
+        "Magnitude scaled by 1e99": "9.280000000000001",
+        "Source is NA": "0",
+        "Magnitude case index": "8",
+        "Input bar index": "8"
+      },
+      "completed_occurrences": 959,
+      "raw_blank_occurrences": 0,
+      "native_witness": null,
+      "renderer_items": null
+    },
+    {
+      "case_index": 9,
+      "first_csv_cells": {
+        "time": "1788135480",
+        "open": "77864.01",
+        "high": "77880",
+        "low": "77861",
+        "close": "77867.51",
+        "Raw signed magnitude": "-9.28e+99",
+        "Magnitude scaled by 1e99": "-9.280000000000001",
+        "Source is NA": "0",
+        "Magnitude case index": "9",
+        "Input bar index": "9"
+      },
+      "completed_occurrences": 959,
+      "raw_blank_occurrences": 0,
+      "native_witness": null,
+      "renderer_items": null
+    },
+    {
+      "case_index": 10,
+      "first_csv_cells": {
+        "time": "1788135600",
+        "open": "77867.5",
+        "high": "77951.87",
+        "low": "77862",
+        "close": "77924",
+        "Raw signed magnitude": "9.5e+99",
+        "Magnitude scaled by 1e99": "9.5",
+        "Source is NA": "0",
+        "Magnitude case index": "10",
+        "Input bar index": "10"
+      },
+      "completed_occurrences": 959,
+      "raw_blank_occurrences": 0,
+      "native_witness": null,
+      "renderer_items": null
+    },
+    {
+      "case_index": 11,
+      "first_csv_cells": {
+        "time": "1788135720",
+        "open": "77924",
+        "high": "77962.93",
+        "low": "77918",
+        "close": "77962.93",
+        "Raw signed magnitude": "-9.5e+99",
+        "Magnitude scaled by 1e99": "-9.5",
+        "Source is NA": "0",
+        "Magnitude case index": "11",
+        "Input bar index": "11"
+      },
+      "completed_occurrences": 959,
+      "raw_blank_occurrences": 0,
+      "native_witness": null,
+      "renderer_items": null
+    },
+    {
+      "case_index": 12,
+      "first_csv_cells": {
+        "time": "1788135840",
+        "open": "77962.92",
+        "high": "77971.47",
+        "low": "77948",
+        "close": "77971.01",
+        "Raw signed magnitude": "9.9e+99",
+        "Magnitude scaled by 1e99": "9.9",
+        "Source is NA": "0",
+        "Magnitude case index": "12",
+        "Input bar index": "12"
+      },
+      "completed_occurrences": 959,
+      "raw_blank_occurrences": 0,
+      "native_witness": "captures/v10/evidence/plot-magnitude-cutoff-signed-v6-v1-attempt1-magnitude-case-12-v1.json",
+      "renderer_items": [
+        {
+          "price": 9.9e+99,
+          "y": 27.425339354033895,
+          "center": 391.9677419354839,
+          "style": {
+            "color": "rgba(41, 98, 255, 1)",
+            "width": 3,
+            "style": 0
+          }
+        }
+      ]
+    },
+    {
+      "case_index": 13,
+      "first_csv_cells": {
+        "time": "1788135960",
+        "open": "77971",
+        "high": "77971.01",
+        "low": "77894",
+        "close": "77908.34",
+        "Raw signed magnitude": "-9.9e+99",
+        "Magnitude scaled by 1e99": "-9.9",
+        "Source is NA": "0",
+        "Magnitude case index": "13",
+        "Input bar index": "13"
+      },
+      "completed_occurrences": 959,
+      "raw_blank_occurrences": 0,
+      "native_witness": "captures/v10/evidence/plot-magnitude-cutoff-signed-v6-v1-attempt1-magnitude-case-13-v1.json",
+      "renderer_items": [
+        {
+          "price": -9.9e+99,
+          "y": 240.34466064596606,
+          "center": 419,
+          "style": {
+            "color": "rgba(41, 98, 255, 1)",
+            "width": 3,
+            "style": 0
+          }
+        }
+      ]
+    },
+    {
+      "case_index": 14,
+      "first_csv_cells": {
+        "time": "1788136080",
+        "open": "77908.34",
+        "high": "77923.62",
+        "low": "77888",
+        "close": "77901.33",
+        "Raw signed magnitude": "9.99e+99",
+        "Magnitude scaled by 1e99": "9.99",
+        "Source is NA": "0",
+        "Magnitude case index": "14",
+        "Input bar index": "14"
+      },
+      "completed_occurrences": 959,
+      "raw_blank_occurrences": 0,
+      "native_witness": "captures/v10/evidence/plot-magnitude-cutoff-signed-v6-v1-attempt1-magnitude-case-14-v1.json",
+      "renderer_items": [
+        {
+          "price": 9.99e+99,
+          "y": 26.457524257252402,
+          "center": 446.03225806451616,
+          "style": {
+            "color": "rgba(41, 98, 255, 1)",
+            "width": 3,
+            "style": 0
+          }
+        }
+      ]
+    },
+    {
+      "case_index": 15,
+      "first_csv_cells": {
+        "time": "1788136200",
+        "open": "77901.34",
+        "high": "77949.99",
+        "low": "77892",
+        "close": "77949.99",
+        "Raw signed magnitude": "-9.99e+99",
+        "Magnitude scaled by 1e99": "-9.99",
+        "Source is NA": "0",
+        "Magnitude case index": "15",
+        "Input bar index": "15"
+      },
+      "completed_occurrences": 958,
+      "raw_blank_occurrences": 0,
+      "native_witness": "captures/v10/evidence/plot-magnitude-cutoff-signed-v6-v1-attempt1-magnitude-case-15-v1.json",
+      "renderer_items": [
+        {
+          "price": -9.99e+99,
+          "y": 241.31247574274758,
+          "center": 473.06451612903226,
+          "style": {
+            "color": "rgba(41, 98, 255, 1)",
+            "width": 3,
+            "style": 0
+          }
+        }
+      ]
+    },
+    {
+      "case_index": 16,
+      "first_csv_cells": {
+        "time": "1788136320",
+        "open": "77950",
+        "high": "77958",
+        "low": "77932",
+        "close": "77942",
+        "Raw signed magnitude": "9.999e+99",
+        "Magnitude scaled by 1e99": "9.999",
+        "Source is NA": "0",
+        "Magnitude case index": "16",
+        "Input bar index": "16"
+      },
+      "completed_occurrences": 958,
+      "raw_blank_occurrences": 0,
+      "native_witness": null,
+      "renderer_items": null
+    },
+    {
+      "case_index": 17,
+      "first_csv_cells": {
+        "time": "1788136440",
+        "open": "77942",
+        "high": "78155.29",
+        "low": "77938",
+        "close": "78076.74",
+        "Raw signed magnitude": "-9.999e+99",
+        "Magnitude scaled by 1e99": "-9.999",
+        "Source is NA": "0",
+        "Magnitude case index": "17",
+        "Input bar index": "17"
+      },
+      "completed_occurrences": 958,
+      "raw_blank_occurrences": 0,
+      "native_witness": null,
+      "renderer_items": null
+    },
+    {
+      "case_index": 18,
+      "first_csv_cells": {
+        "time": "1788136560",
+        "open": "78076.75",
+        "high": "78185.89",
+        "low": "78039.34",
+        "close": "78050",
+        "Raw signed magnitude": "9.999999e+99",
+        "Magnitude scaled by 1e99": "9.999999",
+        "Source is NA": "0",
+        "Magnitude case index": "18",
+        "Input bar index": "18"
+      },
+      "completed_occurrences": 958,
+      "raw_blank_occurrences": 0,
+      "native_witness": null,
+      "renderer_items": null
+    },
+    {
+      "case_index": 19,
+      "first_csv_cells": {
+        "time": "1788136680",
+        "open": "78050.01",
+        "high": "78056",
+        "low": "77998",
+        "close": "78012.48",
+        "Raw signed magnitude": "-9.999999e+99",
+        "Magnitude scaled by 1e99": "-9.999999",
+        "Source is NA": "0",
+        "Magnitude case index": "19",
+        "Input bar index": "19"
+      },
+      "completed_occurrences": 958,
+      "raw_blank_occurrences": 0,
+      "native_witness": null,
+      "renderer_items": null
+    },
+    {
+      "case_index": 20,
+      "first_csv_cells": {
+        "time": "1788136800",
+        "open": "78013.42",
+        "high": "78052",
+        "low": "78006",
+        "close": "78052",
+        "Raw signed magnitude": "",
+        "Magnitude scaled by 1e99": "10",
+        "Source is NA": "0",
+        "Magnitude case index": "20",
+        "Input bar index": "20"
+      },
+      "completed_occurrences": 958,
+      "raw_blank_occurrences": 958,
+      "native_witness": "captures/v10/evidence/plot-magnitude-cutoff-signed-v6-v1-attempt1-magnitude-case-20-v1.json",
+      "renderer_items": [
+        {
+          "price": null,
+          "y": null,
+          "center": 608.2258064516129,
+          "style": {
+            "color": "rgba(41, 98, 255, 1)",
+            "width": 3,
+            "style": 0
+          }
+        }
+      ]
+    },
+    {
+      "case_index": 21,
+      "first_csv_cells": {
+        "time": "1788136920",
+        "open": "78052",
+        "high": "78070",
+        "low": "78040",
+        "close": "78043.26",
+        "Raw signed magnitude": "",
+        "Magnitude scaled by 1e99": "-10",
+        "Source is NA": "0",
+        "Magnitude case index": "21",
+        "Input bar index": "21"
+      },
+      "completed_occurrences": 958,
+      "raw_blank_occurrences": 958,
+      "native_witness": "captures/v10/evidence/plot-magnitude-cutoff-signed-v6-v1-attempt1-magnitude-case-21-v1.json",
+      "renderer_items": [
+        {
+          "price": null,
+          "y": null,
+          "center": 635.258064516129,
+          "style": {
+            "color": "rgba(41, 98, 255, 1)",
+            "width": 3,
+            "style": 0
+          }
+        }
+      ]
+    },
+    {
+      "case_index": 22,
+      "first_csv_cells": {
+        "time": "1788137040",
+        "open": "78043.26",
+        "high": "78043.26",
+        "low": "77994",
+        "close": "77996.04",
+        "Raw signed magnitude": "",
+        "Magnitude scaled by 1e99": "10.00001",
+        "Source is NA": "0",
+        "Magnitude case index": "22",
+        "Input bar index": "22"
+      },
+      "completed_occurrences": 958,
+      "raw_blank_occurrences": 958,
+      "native_witness": "captures/v10/evidence/plot-magnitude-cutoff-signed-v6-v1-attempt1-magnitude-case-22-v1.json",
+      "renderer_items": [
+        {
+          "price": null,
+          "y": null,
+          "center": 662.2903225806451,
+          "style": {
+            "color": "rgba(41, 98, 255, 1)",
+            "width": 3,
+            "style": 0
+          }
+        }
+      ]
+    },
+    {
+      "case_index": 23,
+      "first_csv_cells": {
+        "time": "1788137160",
+        "open": "77996.05",
+        "high": "78011.54",
+        "low": "77949.99",
+        "close": "77950",
+        "Raw signed magnitude": "",
+        "Magnitude scaled by 1e99": "-10.00001",
+        "Source is NA": "0",
+        "Magnitude case index": "23",
+        "Input bar index": "23"
+      },
+      "completed_occurrences": 958,
+      "raw_blank_occurrences": 958,
+      "native_witness": "captures/v10/evidence/plot-magnitude-cutoff-signed-v6-v1-attempt1-magnitude-case-23-v1.json",
+      "renderer_items": [
+        {
+          "price": null,
+          "y": null,
+          "center": 689.3225806451612,
+          "style": {
+            "color": "rgba(41, 98, 255, 1)",
+            "width": 3,
+            "style": 0
+          }
+        }
+      ]
+    },
+    {
+      "case_index": 24,
+      "first_csv_cells": {
+        "time": "1788137280",
+        "open": "77949.99",
+        "high": "77985.43",
+        "low": "77947.93",
+        "close": "77978",
+        "Raw signed magnitude": "0",
+        "Magnitude scaled by 1e99": "0",
+        "Source is NA": "0",
+        "Magnitude case index": "24",
+        "Input bar index": "24"
+      },
+      "completed_occurrences": 958,
+      "raw_blank_occurrences": 0,
+      "native_witness": null,
+      "renderer_items": null
+    },
+    {
+      "case_index": 25,
+      "first_csv_cells": {
+        "time": "1788137400",
+        "open": "77978",
+        "high": "78031.75",
+        "low": "77978",
+        "close": "77979.5",
+        "Raw signed magnitude": "",
+        "Magnitude scaled by 1e99": "",
+        "Source is NA": "1",
+        "Magnitude case index": "25",
+        "Input bar index": "25"
+      },
+      "completed_occurrences": 958,
+      "raw_blank_occurrences": 958,
+      "native_witness": null,
+      "renderer_items": null
+    }
+  ],
+  "native_visual_observation": "Full first 26-case cycle inspected in original PNG. Blue circles at finite cases0..19 and zero24; gaps at cases20..23 and explicit NA25. Data Window/legend display numeric at sampled cases below1e100, and empty-set glyph at sampled cases20..23. Timed witnesses preserve full native readouts, plotted cache and bounded renderer coordinates.",
+  "limits": "Native source-NA=0 and finite scaled control at cases20..23; raw CSV blanks/readout-empty/missing circles recorded separately. This is a sampled cutoff bracket for this exact Pine6 source and plot style, not universal numeric storage semantics or binary identity."
+}
