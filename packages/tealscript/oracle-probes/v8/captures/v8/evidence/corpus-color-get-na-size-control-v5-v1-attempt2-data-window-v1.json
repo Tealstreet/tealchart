@@ -1,0 +1,30 @@
+{
+  "index": 298,
+  "bar": [
+    1791112920,
+    85288,
+    85288.01,
+    85288,
+    85288.01,
+    1.81261
+  ],
+  "source_row": [
+    1791112920,
+    101,
+    -1
+  ],
+  "browser_utc": "2026-10-04T11:25:50.135Z",
+  "title": "V5 missing size control v1",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   11:22",
+  "visible_range": {
+    "_firstBar": 263,
+    "_lastBar": 301
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}

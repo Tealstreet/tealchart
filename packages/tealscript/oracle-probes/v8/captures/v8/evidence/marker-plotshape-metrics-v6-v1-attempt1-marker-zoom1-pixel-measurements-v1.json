@@ -1,0 +1,305 @@
+{
+  "artifact": "Native marker PNG pixel measurements v1",
+  "metadata": "marker-plotshape-metrics-v6-v1-attempt1-marker-zoom1-v1.json",
+  "metadata_sha256": "37960d7636c1de4f1b191c00caaabd8caf9a4abd35008732d76c409bb1b7788f",
+  "png": "marker-plotshape-metrics-v6-v1-attempt1-marker-zoom1-v1.png",
+  "png_sha256": "411de0ef07d7e567018c13d400c1f2d7bc089ca41b0dd70850ef58432985afc1",
+  "png_size": {
+    "width": 2880,
+    "height": 1800
+  },
+  "png_pixels_per_css_unit": 2.0,
+  "os_observed": "macOS27.2 build26B5091g via sw_vers",
+  "method": "PNG8 truecolor decoded losslessly using standard PNG row filters. Within each isolated midpoint-bounded marker ROI, red threshold r>40 and r>1.8*g and r>1.8*b; blue threshold b>40 and b>1.8*r and b>1.4*g. Bounding boxes include all thresholded pixels. Threshold rule explicit; barely colored antialias pixels below threshold excluded. No image resampling/editing. Every marker source timestamp maps to literal CSV value1.",
+  "observations": [
+    {
+      "title": "circle_tiny",
+      "size": "tiny",
+      "source_utc_seconds": 1791106320,
+      "source_csv_value": "1",
+      "anchor_png_pixels": {
+        "x": 739.5,
+        "y": 1213.46
+      },
+      "color_pixel_bbox_inclusive": {
+        "x_min": 731,
+        "x_max": 747,
+        "y_min": 1205,
+        "y_max": 1221,
+        "width": 17,
+        "height": 17
+      },
+      "bbox_center_minus_anchor_png_pixels": {
+        "x": 0.0,
+        "y": 0.03999999999996362
+      },
+      "colored_pixels": 241,
+      "roi_boundary_touched": false
+    },
+    {
+      "title": "square_tiny",
+      "size": "tiny",
+      "source_utc_seconds": 1791106440,
+      "source_csv_value": "1",
+      "anchor_png_pixels": {
+        "x": 853.590909090909,
+        "y": 1213.46
+      },
+      "color_pixel_bbox_inclusive": {
+        "x_min": 845,
+        "x_max": 862,
+        "y_min": 1204,
+        "y_max": 1221,
+        "width": 18,
+        "height": 18
+      },
+      "bbox_center_minus_anchor_png_pixels": {
+        "x": 0.4090909090909918,
+        "y": -0.4600000000000364
+      },
+      "colored_pixels": 324,
+      "roi_boundary_touched": false
+    },
+    {
+      "title": "triangleup_tiny",
+      "size": "tiny",
+      "source_utc_seconds": 1791106560,
+      "source_csv_value": "1",
+      "anchor_png_pixels": {
+        "x": 967.6818181818182,
+        "y": 1213.46
+      },
+      "color_pixel_bbox_inclusive": {
+        "x_min": 958,
+        "x_max": 977,
+        "y_min": 1200,
+        "y_max": 1216,
+        "width": 20,
+        "height": 17
+      },
+      "bbox_center_minus_anchor_png_pixels": {
+        "x": 0.31818181818175617,
+        "y": -4.960000000000036
+      },
+      "colored_pixels": 185,
+      "roi_boundary_touched": false
+    },
+    {
+      "title": "cross_tiny",
+      "size": "tiny",
+      "source_utc_seconds": 1791106680,
+      "source_csv_value": "1",
+      "anchor_png_pixels": {
+        "x": 1081.7727272727273,
+        "y": 1213.46
+      },
+      "color_pixel_bbox_inclusive": {
+        "x_min": 1074,
+        "x_max": 1089,
+        "y_min": 1206,
+        "y_max": 1221,
+        "width": 16,
+        "height": 16
+      },
+      "bbox_center_minus_anchor_png_pixels": {
+        "x": 0.22727272727274794,
+        "y": 0.5399999999999636
+      },
+      "colored_pixels": 112,
+      "roi_boundary_touched": false
+    },
+    {
+      "title": "circle_normal",
+      "size": "normal",
+      "source_utc_seconds": 1791106800,
+      "source_csv_value": "1",
+      "anchor_png_pixels": {
+        "x": 1195.8636363636363,
+        "y": 1213.46
+      },
+      "color_pixel_bbox_inclusive": {
+        "x_min": 1170,
+        "x_max": 1221,
+        "y_min": 1187,
+        "y_max": 1239,
+        "width": 52,
+        "height": 53
+      },
+      "bbox_center_minus_anchor_png_pixels": {
+        "x": 0.13636363636373972,
+        "y": 0.03999999999996362
+      },
+      "colored_pixels": 2169,
+      "roi_boundary_touched": false
+    },
+    {
+      "title": "square_normal",
+      "size": "normal",
+      "source_utc_seconds": 1791106920,
+      "source_csv_value": "1",
+      "anchor_png_pixels": {
+        "x": 1309.9545454545455,
+        "y": 1213.46
+      },
+      "color_pixel_bbox_inclusive": {
+        "x_min": 1284,
+        "x_max": 1335,
+        "y_min": 1187,
+        "y_max": 1238,
+        "width": 52,
+        "height": 52
+      },
+      "bbox_center_minus_anchor_png_pixels": {
+        "x": 0.045454545454504114,
+        "y": -0.4600000000000364
+      },
+      "colored_pixels": 2704,
+      "roi_boundary_touched": false
+    },
+    {
+      "title": "triangleup_normal",
+      "size": "normal",
+      "source_utc_seconds": 1791107040,
+      "source_csv_value": "1",
+      "anchor_png_pixels": {
+        "x": 1424.0454545454545,
+        "y": 1213.46
+      },
+      "color_pixel_bbox_inclusive": {
+        "x_min": 1397,
+        "x_max": 1450,
+        "y_min": 1180,
+        "y_max": 1231,
+        "width": 54,
+        "height": 52
+      },
+      "bbox_center_minus_anchor_png_pixels": {
+        "x": -0.045454545454504114,
+        "y": -7.460000000000036
+      },
+      "colored_pixels": 1454,
+      "roi_boundary_touched": false
+    },
+    {
+      "title": "cross_normal",
+      "size": "normal",
+      "source_utc_seconds": 1791107160,
+      "source_csv_value": "1",
+      "anchor_png_pixels": {
+        "x": 1538.1363636363635,
+        "y": 1213.46
+      },
+      "color_pixel_bbox_inclusive": {
+        "x_min": 1513,
+        "x_max": 1562,
+        "y_min": 1188,
+        "y_max": 1237,
+        "width": 50,
+        "height": 50
+      },
+      "bbox_center_minus_anchor_png_pixels": {
+        "x": -0.13636363636351234,
+        "y": -0.4600000000000364
+      },
+      "colored_pixels": 384,
+      "roi_boundary_touched": false
+    },
+    {
+      "title": "circle_huge",
+      "size": "huge",
+      "source_utc_seconds": 1791107280,
+      "source_csv_value": "1",
+      "anchor_png_pixels": {
+        "x": 1652.2272727272727,
+        "y": 1213.46
+      },
+      "color_pixel_bbox_inclusive": {
+        "x_min": 1601,
+        "x_max": 1702,
+        "y_min": 1162,
+        "y_max": 1264,
+        "width": 102,
+        "height": 103
+      },
+      "bbox_center_minus_anchor_png_pixels": {
+        "x": -0.22727272727274794,
+        "y": 0.03999999999996362
+      },
+      "colored_pixels": 8251,
+      "roi_boundary_touched": false
+    },
+    {
+      "title": "square_huge",
+      "size": "huge",
+      "source_utc_seconds": 1791107400,
+      "source_csv_value": "1",
+      "anchor_png_pixels": {
+        "x": 1766.3181818181818,
+        "y": 1213.46
+      },
+      "color_pixel_bbox_inclusive": {
+        "x_min": 1715,
+        "x_max": 1816,
+        "y_min": 1162,
+        "y_max": 1263,
+        "width": 102,
+        "height": 102
+      },
+      "bbox_center_minus_anchor_png_pixels": {
+        "x": -0.31818181818175617,
+        "y": -0.4600000000000364
+      },
+      "colored_pixels": 10404,
+      "roi_boundary_touched": false
+    },
+    {
+      "title": "triangleup_huge",
+      "size": "huge",
+      "source_utc_seconds": 1791107520,
+      "source_csv_value": "1",
+      "anchor_png_pixels": {
+        "x": 1880.409090909091,
+        "y": 1213.46
+      },
+      "color_pixel_bbox_inclusive": {
+        "x_min": 1828,
+        "x_max": 1931,
+        "y_min": 1144,
+        "y_max": 1245,
+        "width": 104,
+        "height": 102
+      },
+      "bbox_center_minus_anchor_png_pixels": {
+        "x": -0.4090909090909918,
+        "y": -18.460000000000036
+      },
+      "colored_pixels": 5404,
+      "roi_boundary_touched": false
+    },
+    {
+      "title": "cross_huge",
+      "size": "huge",
+      "source_utc_seconds": 1791107640,
+      "source_csv_value": "1",
+      "anchor_png_pixels": {
+        "x": 1994.5,
+        "y": 1213.46
+      },
+      "color_pixel_bbox_inclusive": {
+        "x_min": 1945,
+        "x_max": 2044,
+        "y_min": 1163,
+        "y_max": 1262,
+        "width": 100,
+        "height": 100
+      },
+      "bbox_center_minus_anchor_png_pixels": {
+        "x": 0.5,
+        "y": -0.4600000000000364
+      },
+      "colored_pixels": 784,
+      "roi_boundary_touched": false
+    }
+  ],
+  "limits": "Measurements certify this screenshot and threshold/environment. Pixel box is colored glyph extent, not clickable bounds, font metric or universal rasterization algorithm. PNG pixel centers use inclusive bounds plus0.5. Native pane anchor coordinates converted using observed PNG/viewport ratio; y-scale and canvas rectangle preserved in metadata."
+}

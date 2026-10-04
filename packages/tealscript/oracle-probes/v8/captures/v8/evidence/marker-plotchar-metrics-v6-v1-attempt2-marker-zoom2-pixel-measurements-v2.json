@@ -1,0 +1,305 @@
+{
+  "artifact": "Native marker PNG pixel measurements v2",
+  "metadata": "marker-plotchar-metrics-v6-v1-attempt2-marker-zoom2-v1.json",
+  "metadata_sha256": "e9c437379b0582d5df65ebc1db88931a692c5e2781e0a322dfd8fbcc587372f0",
+  "png": "marker-plotchar-metrics-v6-v1-attempt2-marker-zoom2-v1.png",
+  "png_sha256": "2e0608139aaf3ae4106fe195c02c1eafe8aa6d531d3e3e6f4b6a640fbfd49986",
+  "png_size": {
+    "width": 2880,
+    "height": 1800
+  },
+  "png_pixels_per_css_unit": 2.0,
+  "os_observed": "macOS27.2 build26B5091g via sw_vers",
+  "method": "Lossless PNG8 truecolor decoding with standard row filters. Within pane x and y1 plus/minus70CSS units, red threshold r>40 and r>1.8*g and r>1.8*b; blue threshold b>40 and b>1.8*r and b>1.4*g. Split the occupied color columns at empty-column gaps: exactly12 separated groups, matched to source order and anchor x. Bounding boxes include all thresholded pixels in each group, including detached dot/stem portions. No resampling/editing. Every source timestamp maps to literal CSV value1.",
+  "observations": [
+    {
+      "title": "char0_tiny",
+      "size": "tiny",
+      "source_utc_seconds": 1791106320,
+      "source_csv_value": "1",
+      "anchor_png_pixels": {
+        "x": 208.5384615384619,
+        "y": 1204.46
+      },
+      "color_pixel_bbox_inclusive": {
+        "x_min": 195,
+        "x_max": 221,
+        "y_min": 1193,
+        "y_max": 1214,
+        "width": 27,
+        "height": 22
+      },
+      "bbox_center_minus_anchor_png_pixels": {
+        "x": -0.03846153846188827,
+        "y": -0.4600000000000364
+      },
+      "colored_pixels": 240,
+      "roi_boundary_touched": false
+    },
+    {
+      "title": "char1_tiny",
+      "size": "tiny",
+      "source_utc_seconds": 1791106440,
+      "source_csv_value": "1",
+      "anchor_png_pixels": {
+        "x": 401.61538461538476,
+        "y": 1204.46
+      },
+      "color_pixel_bbox_inclusive": {
+        "x_min": 400,
+        "x_max": 403,
+        "y_min": 1192,
+        "y_max": 1214,
+        "width": 4,
+        "height": 23
+      },
+      "bbox_center_minus_anchor_png_pixels": {
+        "x": 0.3846153846152447,
+        "y": -0.9600000000000364
+      },
+      "colored_pixels": 74,
+      "roi_boundary_touched": false
+    },
+    {
+      "title": "char2_tiny",
+      "size": "tiny",
+      "source_utc_seconds": 1791106560,
+      "source_csv_value": "1",
+      "anchor_png_pixels": {
+        "x": 594.6923076923078,
+        "y": 1204.46
+      },
+      "color_pixel_bbox_inclusive": {
+        "x_min": 583,
+        "x_max": 606,
+        "y_min": 1192,
+        "y_max": 1216,
+        "width": 24,
+        "height": 25
+      },
+      "bbox_center_minus_anchor_png_pixels": {
+        "x": 0.3076923076921503,
+        "y": 0.03999999999996362
+      },
+      "colored_pixels": 461,
+      "roi_boundary_touched": false
+    },
+    {
+      "title": "char3_tiny",
+      "size": "tiny",
+      "source_utc_seconds": 1791106680,
+      "source_csv_value": "1",
+      "anchor_png_pixels": {
+        "x": 787.769230769231,
+        "y": 1204.46
+      },
+      "color_pixel_bbox_inclusive": {
+        "x_min": 780,
+        "x_max": 795,
+        "y_min": 1198,
+        "y_max": 1214,
+        "width": 16,
+        "height": 17
+      },
+      "bbox_center_minus_anchor_png_pixels": {
+        "x": 0.23076923076905587,
+        "y": 2.0399999999999636
+      },
+      "colored_pixels": 96,
+      "roi_boundary_touched": false
+    },
+    {
+      "title": "char0_normal",
+      "size": "normal",
+      "source_utc_seconds": 1791106800,
+      "source_csv_value": "1",
+      "anchor_png_pixels": {
+        "x": 980.846153846154,
+        "y": 1204.46
+      },
+      "color_pixel_bbox_inclusive": {
+        "x_min": 936,
+        "x_max": 1024,
+        "y_min": 1166,
+        "y_max": 1236,
+        "width": 89,
+        "height": 71
+      },
+      "bbox_center_minus_anchor_png_pixels": {
+        "x": -0.34615384615403855,
+        "y": -2.9600000000000364
+      },
+      "colored_pixels": 2341,
+      "roi_boundary_touched": false
+    },
+    {
+      "title": "char1_normal",
+      "size": "normal",
+      "source_utc_seconds": 1791106920,
+      "source_csv_value": "1",
+      "anchor_png_pixels": {
+        "x": 1173.923076923077,
+        "y": 1204.46
+      },
+      "color_pixel_bbox_inclusive": {
+        "x_min": 1168,
+        "x_max": 1178,
+        "y_min": 1167,
+        "y_max": 1236,
+        "width": 11,
+        "height": 70
+      },
+      "bbox_center_minus_anchor_png_pixels": {
+        "x": -0.4230769230769056,
+        "y": -2.4600000000000364
+      },
+      "colored_pixels": 558,
+      "roi_boundary_touched": false
+    },
+    {
+      "title": "char2_normal",
+      "size": "normal",
+      "source_utc_seconds": 1791107040,
+      "source_csv_value": "1",
+      "anchor_png_pixels": {
+        "x": 1367.0,
+        "y": 1204.46
+      },
+      "color_pixel_bbox_inclusive": {
+        "x_min": 1327,
+        "x_max": 1406,
+        "y_min": 1162,
+        "y_max": 1240,
+        "width": 80,
+        "height": 79
+      },
+      "bbox_center_minus_anchor_png_pixels": {
+        "x": 0.0,
+        "y": -2.9600000000000364
+      },
+      "colored_pixels": 4944,
+      "roi_boundary_touched": false
+    },
+    {
+      "title": "char3_normal",
+      "size": "normal",
+      "source_utc_seconds": 1791107160,
+      "source_csv_value": "1",
+      "anchor_png_pixels": {
+        "x": 1560.076923076923,
+        "y": 1204.46
+      },
+      "color_pixel_bbox_inclusive": {
+        "x_min": 1535,
+        "x_max": 1584,
+        "y_min": 1184,
+        "y_max": 1232,
+        "width": 50,
+        "height": 49
+      },
+      "bbox_center_minus_anchor_png_pixels": {
+        "x": -0.07692307692309441,
+        "y": 4.039999999999964
+      },
+      "colored_pixels": 808,
+      "roi_boundary_touched": false
+    },
+    {
+      "title": "char0_huge",
+      "size": "huge",
+      "source_utc_seconds": 1791107280,
+      "source_csv_value": "1",
+      "anchor_png_pixels": {
+        "x": 1753.1538461538462,
+        "y": 1204.46
+      },
+      "color_pixel_bbox_inclusive": {
+        "x_min": 1664,
+        "x_max": 1841,
+        "y_min": 1127,
+        "y_max": 1268,
+        "width": 178,
+        "height": 142
+      },
+      "bbox_center_minus_anchor_png_pixels": {
+        "x": -0.15384615384618883,
+        "y": -6.460000000000036
+      },
+      "colored_pixels": 9477,
+      "roi_boundary_touched": false
+    },
+    {
+      "title": "char1_huge",
+      "size": "huge",
+      "source_utc_seconds": 1791107400,
+      "source_csv_value": "1",
+      "anchor_png_pixels": {
+        "x": 1946.2307692307693,
+        "y": 1204.46
+      },
+      "color_pixel_bbox_inclusive": {
+        "x_min": 1935,
+        "x_max": 1957,
+        "y_min": 1128,
+        "y_max": 1268,
+        "width": 23,
+        "height": 141
+      },
+      "bbox_center_minus_anchor_png_pixels": {
+        "x": 0.26923076923071676,
+        "y": -5.960000000000036
+      },
+      "colored_pixels": 2360,
+      "roi_boundary_touched": false
+    },
+    {
+      "title": "char2_huge",
+      "size": "huge",
+      "source_utc_seconds": 1791107520,
+      "source_csv_value": "1",
+      "anchor_png_pixels": {
+        "x": 2139.3076923076924,
+        "y": 1204.46
+      },
+      "color_pixel_bbox_inclusive": {
+        "x_min": 2060,
+        "x_max": 2218,
+        "y_min": 1118,
+        "y_max": 1277,
+        "width": 159,
+        "height": 160
+      },
+      "bbox_center_minus_anchor_png_pixels": {
+        "x": 0.19230769230762235,
+        "y": -6.460000000000036
+      },
+      "colored_pixels": 19941,
+      "roi_boundary_touched": false
+    },
+    {
+      "title": "char3_huge",
+      "size": "huge",
+      "source_utc_seconds": 1791107640,
+      "source_csv_value": "1",
+      "anchor_png_pixels": {
+        "x": 2332.3846153846152,
+        "y": 1204.46
+      },
+      "color_pixel_bbox_inclusive": {
+        "x_min": 2282,
+        "x_max": 2382,
+        "y_min": 1162,
+        "y_max": 1259,
+        "width": 101,
+        "height": 98
+      },
+      "bbox_center_minus_anchor_png_pixels": {
+        "x": 0.1153846153847553,
+        "y": 6.539999999999964
+      },
+      "colored_pixels": 3091,
+      "roi_boundary_touched": false
+    }
+  ],
+  "limits": "Colored pixel extent at this explicit threshold/environment, not clickable bounds/font metrics or universal rasterization. Very faint antialias pixels excluded. Inclusive pixel bounds plus0.5 define centers. The separated closer zoom contexts prevent adjacent glyph overlap. Native coordinates converted using observed PNG/viewport ratio and canvas CSS rectangle."
+}
