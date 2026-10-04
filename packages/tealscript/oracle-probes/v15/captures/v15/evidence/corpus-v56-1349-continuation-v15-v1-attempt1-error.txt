@@ -1,0 +1,55 @@
+Syntax error at input 'end of line without line continuation'
+{
+  "error": "Syntax error at input 'end of line without line continuation'",
+  "editorError": {
+    "end": {
+      "column": 29,
+      "line": 84
+    },
+    "message": "Syntax error at input 'end of line without line continuation'",
+    "start": {
+      "column": 29,
+      "line": 84
+    },
+    "id": "USER;e912c5c7ec3646faaa4e8a456c386c72"
+  },
+  "title": "Compilation error",
+  "native_context_scalar_types": [],
+  "compiler_markers": [
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///c14f2ba1-9d7e-4f60-b418-403f16bcbd42.pine?placement%3Ddialog",
+        "path": "/c14f2ba1-9d7e-4f60-b418-403f16bcbd42.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "code": "PINE_VERSION_OUTDATED",
+      "severity": 4,
+      "message": "Version 5 of Pine Script® is outdated. We recommend using the current version, which is 6.",
+      "startLineNumber": 1,
+      "startColumn": 3,
+      "endLineNumber": 1,
+      "endColumn": 12
+    },
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///c14f2ba1-9d7e-4f60-b418-403f16bcbd42.pine?placement%3Ddialog",
+        "path": "/c14f2ba1-9d7e-4f60-b418-403f16bcbd42.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "severity": 8,
+      "message": "Syntax error at input 'end of line without line continuation'",
+      "startLineNumber": 84,
+      "startColumn": 29,
+      "endLineNumber": 84,
+      "endColumn": 30
+    }
+  ],
+  "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\nC\n85,407.03\n0.00 (0.00%)\n85,407.03\nSELL\n0.01\n85,407.04\nBUY\ncorpus-v56-1349-continuation-v15-v1.pine\nUSDT\nDate Range\n20:02:14 UTC\n99+\nObject tree\nData window\nDate\nSun 04 Oct '26\nTime\n20:02\nBTCUSDT · 2 · Binance\nOpen\n85,407.04\nHigh\n85,407.04\nLow\n85,407.03\nClose\n85,407.03\nChange\n0.00 (0.00%)\nVol\n0.42\nLast day change\n+653.47 (+0.77%)\ncorpus-v56-1349-continuation-v15-v1.pine\nPine Editor\ncorpus-v56-1349-continuation-v15-v1.pine\nPublish script\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15\n16\n17\n18\n19\n20\n21\n22\n23\n24\n25\n26\n27\n28\n29\n30\n31\n32\n33\n34\n35\n36\n37\n38\n39\n//@version=5\nindicator(\"CTA Context (Zones + SMAs + VIX)\", overlay=true)\n// ==========================================\n// CTA CONTEXT INDICATOR\n// Purpose: Always-on visual context showing:\n// - CTA Regime Zones (background color)\n// - Key SMAs (20/50/120/200)\n// - VIX Divergence Warning\n// - Distance to key levels\n// ==========================================\n// ==========================================\n// 1. INPUT SETTINGS\n// ==========================================\n// --- CTA SMA Settings ---\ngrp_sma = \"CTA SMAs\"\nshow_sma20 = input.bool(true, \"SMA 20 (Fast)\", group=grp_sma, inline=\"s20\")\ncol_sma20 = input.color( #2196F3, \"\", group=grp_sma, inline=\"s20\")\nwid_sma20 = input.int(2, \"Width\", minval=1, maxval=5, group=grp_sma, inline=\"s20\")\nshow_sma50 = input.bool(true, \"SMA 50 (Core)\", group=grp_sma, inline=\"s50\")\ncol_sma50 = input.color( #FF9800, \"\", group=grp_sma, inline=\"s50\")\nwid_sma50 = input.int(2, \"Width\", minval=1, maxval=5, group=grp_sma, inline=\"s50\")\nshow_sma120 = input.bool(true, \"SMA 120 (Structural)\", group=grp_sma, inline=\"s120\")\ncol_sma120 = input.color( #F44336, \"\", group=grp_sma, inline=\"s120\")\nwid_sma120 = input.int(2, \"Width\", minval=1, maxval=5, group=grp_sma, inline=\"s120\")\nshow_sma200 = input.bool(true, \"SMA 200 (Long-term)\", group=grp_sma, inline=\"s200\")\ncol_sma200 = input.color( #795548, \"\", group=grp_sma, inline=\"s200\")\nwid_sma200 = input.int(1, \"Width\", minval=1, maxval=5, group=grp_sma, inline=\"s200\")\n// --- Zone Visualization ---\ngrp_zone = \"CTA Zone Display\"\nshow_zone_bg = input.bool(true, \"Show Zone Background\", group=grp_zone)\nshow_zone_label = input.bool(true, \"Show Zone Label\", group=grp_zone)\nzone_transparency = input.int(92, \"Background Transparency\", minval=80, maxval=98, group=grp_zone)\n2 of 2 problems\nVersion 5 of Pine Script® is outdated. We recommend using the current version, which is 6.(PINE_VERSION_OUTDATED)\n1 ∙ Today, 04:02\nLine 1, Col 3\nPine Script® v5\nCompilation error\n\nSyntax error at input 'end of line without line continuation'\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+  "context_substituted_message": "Syntax error at input 'end of line without line continuation'"
+}

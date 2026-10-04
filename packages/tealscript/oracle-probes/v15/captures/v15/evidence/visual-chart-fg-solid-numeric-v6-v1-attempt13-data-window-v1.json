@@ -1,0 +1,35 @@
+{
+  "index": 301,
+  "bar": [
+    1791144600,
+    85396.33,
+    85402.01,
+    85396.32,
+    85402.01,
+    5.15457
+  ],
+  "source_row": [
+    1791144600,
+    152,
+    152,
+    152,
+    15,
+    15,
+    15,
+    0
+  ],
+  "browser_utc": "2026-10-04T20:12:05.122Z",
+  "title": "V13 chart foreground numeric channels",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   20:10",
+  "visible_range": {
+    "_firstBar": 266,
+    "_lastBar": 304
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}

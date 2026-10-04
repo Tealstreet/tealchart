@@ -1,0 +1,372 @@
+{
+  "artifact": "Native bounded curve path v1",
+  "browser_utc": "2026-10-04T20:04:57.941Z",
+  "symbol": "BINANCE:BTCUSDT",
+  "interval": "2",
+  "timezone": "Etc/UTC",
+  "replay": false,
+  "status": {
+    "type": 2
+  },
+  "host_first": {
+    "index": -19742,
+    "value": [
+      1788739200,
+      80341.83,
+      80356,
+      80230.29,
+      80293.23,
+      37.66955
+    ]
+  },
+  "host_last": {
+    "index": 300,
+    "value": [
+      1791144240,
+      85430.02,
+      85430.03,
+      85430.02,
+      85430.02,
+      0.39568
+    ]
+  },
+  "source_last": null,
+  "native_polylines": [
+    {
+      "name": "polylines",
+      "collections": [
+        {
+          "key": false,
+          "raw": [
+            [
+              1,
+              {
+                "id": 1,
+                "points": [
+                  {
+                    "x": 0,
+                    "y": 1
+                  },
+                  {
+                    "x": 1,
+                    "y": 4
+                  },
+                  {
+                    "x": 2,
+                    "y": -2
+                  },
+                  {
+                    "x": 3,
+                    "y": 2
+                  }
+                ],
+                "w": 3,
+                "crv": true,
+                "cls": false,
+                "c": 0,
+                "fc": null,
+                "st": "sol"
+              }
+            ],
+            [
+              2,
+              {
+                "id": 2,
+                "points": [
+                  {
+                    "x": 0,
+                    "y": 1
+                  },
+                  {
+                    "x": 1,
+                    "y": 4
+                  },
+                  {
+                    "x": 2,
+                    "y": -2
+                  },
+                  {
+                    "x": 3,
+                    "y": 2
+                  }
+                ],
+                "w": 1,
+                "crv": false,
+                "cls": false,
+                "c": 1,
+                "fc": null,
+                "st": "sol"
+              }
+            ]
+          ],
+          "materialized": [
+            {
+              "id": 1,
+              "points": [
+                {
+                  "x": 290,
+                  "y": 1
+                },
+                {
+                  "x": 292,
+                  "y": 4
+                },
+                {
+                  "x": 295,
+                  "y": -2
+                },
+                {
+                  "x": 298,
+                  "y": 2
+                }
+              ],
+              "width": 3,
+              "curved": true,
+              "closed": false,
+              "color": 0,
+              "fillColor": null,
+              "style": "sol"
+            },
+            {
+              "id": 2,
+              "points": [
+                {
+                  "x": 290,
+                  "y": 1
+                },
+                {
+                  "x": 292,
+                  "y": 4
+                },
+                {
+                  "x": 295,
+                  "y": -2
+                },
+                {
+                  "x": 298,
+                  "y": 2
+                }
+              ],
+              "width": 1,
+              "curved": false,
+              "closed": false,
+              "color": 1,
+              "fillColor": null,
+              "style": "sol"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "index_map": [
+    290,
+    292,
+    295,
+    298
+  ],
+  "visible_range": {
+    "_firstBar": 288,
+    "_lastBar": 303
+  },
+  "bar_spacing": 59.625,
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  },
+  "panes": [
+    {
+      "width": 954,
+      "height": 526.5,
+      "scale_range": {
+        "_minValue": 85399.63,
+        "_maxValue": 85478.01
+      },
+      "scale_mode": {
+        "autoScale": true,
+        "lockScale": false,
+        "percentage": false,
+        "indexedTo100": false,
+        "log": false
+      },
+      "price_to_coordinate": [
+        {
+          "price": -2,
+          "y": 469800.0945943435
+        },
+        {
+          "price": 1,
+          "y": 469783.6083733688
+        },
+        {
+          "price": 2,
+          "y": 469778.1129663772
+        },
+        {
+          "price": 4,
+          "y": 469767.1221523941
+        }
+      ],
+      "native_renderers": [
+        {
+          "class": "D",
+          "data": {
+            "items": []
+          }
+        }
+      ]
+    },
+    {
+      "width": 954,
+      "height": 263.5,
+      "scale_range": {
+        "_minValue": -2,
+        "_maxValue": 4
+      },
+      "scale_mode": {
+        "autoScale": true,
+        "lockScale": false,
+        "percentage": false,
+        "indexedTo100": false,
+        "log": false
+      },
+      "price_to_coordinate": [
+        {
+          "price": -2,
+          "y": 241.42
+        },
+        {
+          "price": 1,
+          "y": 133.885
+        },
+        {
+          "price": 2,
+          "y": 98.03999999999999
+        },
+        {
+          "price": 4,
+          "y": 26.349999999999966
+        }
+      ],
+      "native_renderers": [
+        {
+          "class": "D",
+          "data": {
+            "items": [
+              {
+                "id": 1,
+                "points": [
+                  {
+                    "x": 290,
+                    "y": 1
+                  },
+                  {
+                    "x": 292,
+                    "y": 4
+                  },
+                  {
+                    "x": 295,
+                    "y": -2
+                  },
+                  {
+                    "x": 298,
+                    "y": 2
+                  }
+                ],
+                "width": 3,
+                "curved": true,
+                "closed": false,
+                "color": "rgba(242,54,69,1)",
+                "style": "sol",
+                "bezierCurves": [
+                  [
+                    {
+                      "x": 149.0625,
+                      "y": 133.885
+                    },
+                    {
+                      "x": 158.99999999999773,
+                      "y": 62.19499999999999
+                    },
+                    {
+                      "x": 168.93749999999886,
+                      "y": -9.495000000000005
+                    },
+                    {
+                      "x": 268.3125,
+                      "y": 26.349999999999966
+                    }
+                  ],
+                  [
+                    {
+                      "x": 268.3125,
+                      "y": 26.349999999999966
+                    },
+                    {
+                      "x": 367.68750000000114,
+                      "y": 62.19499999999999
+                    },
+                    {
+                      "x": 327.9375,
+                      "y": 217.52333333333334
+                    },
+                    {
+                      "x": 447.1875,
+                      "y": 241.42
+                    }
+                  ],
+                  [
+                    {
+                      "x": 447.1875,
+                      "y": 241.42
+                    },
+                    {
+                      "x": 566.4375,
+                      "y": 265.31666666666666
+                    },
+                    {
+                      "x": 596.25,
+                      "y": 181.67833333333334
+                    },
+                    {
+                      "x": 626.0625,
+                      "y": 98.03999999999999
+                    }
+                  ]
+                ]
+              },
+              {
+                "id": 2,
+                "points": [
+                  {
+                    "x": 149.0625,
+                    "y": 133.885
+                  },
+                  {
+                    "x": 268.3125,
+                    "y": 26.349999999999966
+                  },
+                  {
+                    "x": 447.1875,
+                    "y": 241.42
+                  },
+                  {
+                    "x": 626.0625,
+                    "y": 98.03999999999999
+                  }
+                ],
+                "width": 1,
+                "curved": false,
+                "closed": false,
+                "color": "rgba(41,98,255,1)",
+                "style": "sol"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "limit": "Actual native pre-raster bezier/line coordinates and original screenshot for this bounded shape and transform only. Native graphics/index IDs are separate from Pine source indices; no universal kernel inference."
+}

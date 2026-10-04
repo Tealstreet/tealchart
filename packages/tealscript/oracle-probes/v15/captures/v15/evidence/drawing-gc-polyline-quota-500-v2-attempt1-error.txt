@@ -1,0 +1,78 @@
+Invalid value "500" for "max_polylines_count" parameter of the "indicator()" function. It must be between 1 and 100
+{
+  "error": "Invalid value \"{value}\" for \"{argument_name}\" parameter of the \"{funId}()\" function. It must be between {min_value} and {max_value}",
+  "editorError": {
+    "code": "CE10041",
+    "ctx": {
+      "argument_name": "max_polylines_count",
+      "funId": "indicator",
+      "max_value": 100,
+      "min_value": 1,
+      "value": 500
+    },
+    "end": {
+      "column": 69,
+      "line": 2
+    },
+    "message": "Invalid value \"{value}\" for \"{argument_name}\" parameter of the \"{funId}()\" function. It must be between {min_value} and {max_value}",
+    "start": {
+      "column": 67,
+      "line": 2
+    },
+    "id": "USER;4b95e8ae4edd48a295008810fed7b69a"
+  },
+  "title": "Compilation error",
+  "native_context_scalar_types": [
+    {
+      "key": "argument_name",
+      "type": "string",
+      "nonfinite": false,
+      "native_string": "max_polylines_count"
+    },
+    {
+      "key": "funId",
+      "type": "string",
+      "nonfinite": false,
+      "native_string": "indicator"
+    },
+    {
+      "key": "max_value",
+      "type": "number",
+      "nonfinite": false,
+      "native_string": "100"
+    },
+    {
+      "key": "min_value",
+      "type": "number",
+      "nonfinite": false,
+      "native_string": "1"
+    },
+    {
+      "key": "value",
+      "type": "number",
+      "nonfinite": false,
+      "native_string": "500"
+    }
+  ],
+  "compiler_markers": [
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///769bd7cf-e1e7-4b46-a113-7c1f129fe962.pine?placement%3Ddialog",
+        "path": "/769bd7cf-e1e7-4b46-a113-7c1f129fe962.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "code": "CE10041",
+      "severity": 8,
+      "message": "Invalid value \"500\" for \"max_polylines_count\" parameter of the \"indicator()\" function. It must be between 1 and 100",
+      "startLineNumber": 2,
+      "startColumn": 67,
+      "endLineNumber": 2,
+      "endColumn": 70
+    }
+  ],
+  "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\nC\n85,428.00\n0.00 (0.00%)\n85,424.39\nSELL\n0.01\n85,424.40\nBUY\nUSDT\ndrawing-gc-polyline-quota-500-v2.pine\nDate Range\n20:00:51 UTC\n99+\nObject tree\nData window\nDate\nSun 04 Oct '26\nTime\n19:58\nBTCUSDT · 2 · Binance\nOpen\n85,427.99\nHigh\n85,428.00\nLow\n85,427.99\nClose\n85,428.00\nChange\n0.00 (0.00%)\nVol\n0.35\nLast day change\n+670.84 (+0.79%)\ndrawing-gc-polyline-quota-500-v2.pine\nPlot\n∅\nPine Editor\ndrawing-gc-polyline-quota-500-v2.pine\nPublish script\n1\n2\n3\n4\n5\n6\n7\n8\n9\n//@version=6\nindicator(\"Drawing GC polyline quota 500 v2\", max_polylines_count=500)\nvar array<polyline> created = array.new<polyline>()\narray.push(created, polyline.new(array.from(chart.point.from_index(bar_index, 1.0), chart.point.from_index(bar_index + 1, 2.0))))\nint count = array.size(polyline.all)\nint oldest = count > 0 ? array.indexof(created, array.get(polyline.all, 0)) : na\nplot(count, \"VISIBLE_COUNT\")\nplot(oldest, \"OLDEST_INDEX\")\n1 of 1 problem\nInvalid value \"500\" for \"max_polylines_count\" parameter of the \"indicator()\" function. It must be between 1 and 100(CE10041)\n1 ∙ Today, 04:00\nLine 2, Col 67\nPine Script® v6\nCompilation error: CE10041\n\nInvalid value \"500\" for \"max_polylines_count\" parameter of the \"indicator()\" function. It must be between 1 and 100\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+  "context_substituted_message": "Invalid value \"500\" for \"max_polylines_count\" parameter of the \"indicator()\" function. It must be between 1 and 100"
+}

@@ -1,0 +1,106 @@
+{
+  "artifact": "Native foreground color setting v1",
+  "browser_utc": "2026-10-04T20:07:44.948Z",
+  "chart_pane_properties": {
+    "backgroundType": "solid",
+    "vertGridProperties": {
+      "style": 0,
+      "visible": true,
+      "color": "rgba(242, 242, 242, 0.06)"
+    },
+    "horzGridProperties": {
+      "style": 0,
+      "visible": true,
+      "color": "rgba(242, 242, 242, 0.06)"
+    },
+    "crossHairProperties": {
+      "style": 2,
+      "transparency": 0,
+      "width": 1,
+      "color": "#9C9C9C"
+    },
+    "topMargin": 10,
+    "bottomMargin": 8,
+    "axisProperties": {
+      "autoScale": true,
+      "autoScaleDisabled": false,
+      "lockScale": false,
+      "percentage": false,
+      "percentageDisabled": false,
+      "indexedTo100": false,
+      "log": false,
+      "logDisabled": false,
+      "alignLabels": true,
+      "isInverted": false
+    },
+    "legendProperties": {
+      "showStudyArguments": true,
+      "showStudyTitles": true,
+      "showStudyValues": true,
+      "showSeriesTitle": true,
+      "showSeriesOHLC": true,
+      "showLegend": true,
+      "showLastDayChange": false,
+      "showBarChange": true,
+      "showVolume": false,
+      "showBackground": true,
+      "showPriceSource": true,
+      "backgroundTransparency": 50,
+      "showLogo": true,
+      "showTradingButtons": true,
+      "showTradingButtonsMobile": true,
+      "showSeriesLegendCloseOnMobile": true,
+      "barChangeUpColor": "#089981",
+      "barChangeDownColor": "#F23645",
+      "useBarChangeCustomColors": false
+    },
+    "separatorColor": "#2E2E2E",
+    "background": "rgba(0, 0, 0, 1)",
+    "backgroundGradientStartColor": "#1F1F1F",
+    "backgroundGradientEndColor": "#0F0F0F"
+  },
+  "document_classes": "is-authenticated is-pro theme-dark mac_os_system feature-no-touch feature-no-mobiletouch",
+  "body_classes": "chart-page unselectable i-no-scroll",
+  "title": "V13 chart foreground numeric channels",
+  "status": {
+    "type": 2
+  },
+  "source_first": {
+    "index": -19744,
+    "value": [
+      1788739200,
+      0,
+      0,
+      0,
+      219,
+      219,
+      219,
+      0
+    ]
+  },
+  "source_last": {
+    "index": 299,
+    "value": [
+      1791144360,
+      0,
+      0,
+      0,
+      219,
+      219,
+      219,
+      0
+    ]
+  },
+  "timezone": "Etc/UTC",
+  "symbol": "BINANCE:BTCUSDT",
+  "interval": "2",
+  "limits": "Exact sampled background/foreground channels only; no universal luminance formula or all-theme claim.",
+  "requested_hex": "#000000",
+  "requested_rgb": [
+    0,
+    0,
+    0
+  ],
+  "settings_ui": "## Latest page snapshot\nuid=11041_0 RootWebArea \"BTCUSDT 85,402.01 ▲ +0.77% basic\" url=\"https://www.tradingview.com/chart/xlvYwHdH/?symbol=BINANCE%3ABTCUSDT&interval=2\"\n  uid=11041_1 button \"Logged in as sours-lat Active layout: basic\" haspopup=\"menu\"\n  uid=11041_2 StaticText \"11\"\n  uid=11041_3 button \"BTCUSDT\" description=\"Symbol search\"\n  uid=11041_4 button \"Switch data type\"\n  uid=11041_5 button \"Compare symbols\" haspopup=\"dialog\"\n  uid=11041_6 radio \"3 minutes\"\n  uid=11041_7 radio \"5 minutes\"\n  uid=11041_8 radio \"15 minutes\"\n  uid=11041_9 radio \"30 minutes\"\n  uid=11041_10 radio \"45 minutes\"\n  uid=11041_11 radio \"1 hour\"\n  uid=11041_12 radio \"2 hours\"\n  uid=11041_13 radio \"3 hours\"\n  uid=11041_14 radio \"4 hours\"\n  uid=11041_15 radio \"8 hours\"\n  uid=11041_16 radio \"10 hours\"\n  uid=11041_17 radio \"12 hours\"\n  uid=11041_18 radio \"1 day\"\n  uid=11041_19 radio \"3 days\"\n  uid=11041_20 radio \"10 days\"\n  uid=11041_21 radio \"1 week\"\n  uid=11041_22 radio \"1 month\"\n  uid=11041_23 radio \"2 minutes\" checked\n  uid=11041_24 button \"Chart interval\" haspopup=\"menu\"\n  uid=11041_25 radio \"Candles\" checked\n  uid=11041_26 radio \"Line\"\n  uid=11041_27 radio \"High-low\"\n  uid=11041_28 button \"Bar's style\" haspopup=\"menu\"\n  uid=11041_29 button \"Indicators, metrics, and strategies\"\n  uid=11041_30 button \"Favorite indicators\" haspopup=\"menu\"\n  uid=11041_31 button \"Indicator templates\" haspopup=\"menu\"\n  uid=11041_32 button \"Create alert\"\n  uid=11041_33 button \"Bar replay\"\n  uid=11041_34 button \"Undo change chart background color\"\n  uid=11041_35 button disableable disabled\n  uid=11041_36 button \"Layout setup\" haspopup=\"menu\"\n  uid=11041_37 button \"Save all charts for all symbols and intervals on your layout\"\n  uid=11041_38 button \"Manage layouts\" haspopup=\"menu\"\n  uid=11041_39 button \"Quick search\"\n  uid=11041_40 button \"Settings\"\n  uid=11041_41 button \"Fullscreen mode\"\n  uid=11041_42 button \"Take a snapshot\" haspopup=\"menu\"\n  uid=11041_43 button \"Share your idea with the trade community\" haspopup=\"menu\"\n  uid=11041_44 button \"Trade\"\n  uid=11041_45 button \"Cross\"\n  uid=11041_46 button \"Cursors\" pressed\n  uid=11041_47 button \"Trendline\"\n  uid=11041_48 button \"Trend tools\"\n  uid=11041_49 button \"Fib retracement\"\n  uid=11041_50 button \"Gann and Fibonacci tools\"\n  uid=11041_51 button \"XABCD pattern\"\n  uid=11041_52 button \"Patterns\"\n  uid=11041_53 button \"Long position\"\n  uid=11041_54 button \"Forecasting and measurement tools\"\n  uid=11041_55 button \"Brush\"\n  uid=11041_56 button \"Geometric shapes\"\n  uid=11041_57 button \"Text\"\n  uid=11041_58 button \"Annotation tools\"\n  uid=11041_59 button \"Icon\"\n  uid=11041_60 button \"Icons\"\n  uid=11041_61 button \"Measure\"\n  uid=11041_62 button \"Zoom in\"\n  uid=11041_63 button \"Magnet mode snaps drawings placed near price bars to the closest OHLC value\" pressed\n  uid=11041_64 button \"Magnets\" pressed\n  uid=11041_65 button \"Keep drawing\"\n  uid=11041_66 button \"Lock drawings and indicators\"\n  uid=11041_67 button \"Lock options\"\n  uid=11041_68 button \"Hide all drawings, indicators, positions, and orders\"\n  uid=11041_69 button \"Hide options\"\n  uid=11041_70 button \"New drawings will not be synced\"\n  uid=11041_71 button \"Sync drawings options\"\n  uid=11041_72 button \"Remove objects\"\n  uid=11041_73 button \"Remove options\"\n  uid=11041_74 button \"Show Favorite Drawing Tools Toolbar\"\n  uid=11041_75 region \"Chart #1\"\n    uid=11041_76 StaticText \"B\"\n    uid=11041_77 button \"Change symbol\"\n    uid=11041_78 StaticText \"·\"\n    uid=11041_79 button \"Change interval\"\n    uid=11041_78 StaticText \"·\"\n    uid=11041_80 StaticText \"Binance\"\n    uid=11041_81 button \"Unflag symbol\"\n    uid=11041_82 button \"More\" description=\"More\"\n    uid=11041_83 button \"Market open\"\n    uid=11041_84 StaticText \"O\"\n    uid=11041_85 StaticText \"85,408.64\"\n    uid=11041_86 StaticText \"H\"\n    uid=11041_87 StaticText \"85,408.65\"\n    uid=11041_88 StaticText \"L\"\n    uid=11041_89 StaticText \"85,402.00\"\n    uid=11041_90 StaticText \"C\"\n    uid=11041_91 StaticText \"85,402.01\"\n    uid=11041_92 StaticText \"−6.63 (−0.01%)\"\n    uid=11041_93 StaticText \"85,402.00\"\n    uid=11054_0 StaticText \"SELL\"\n    uid=11041_95 StaticText \"0.01\"\n    uid=11041_96 StaticText \"85,402.01\"\n    uid=11054_1 StaticText \"BUY\"\n    uid=11041_98 Canvas \"Chart for BINANCE:BTCUSDT, 2 minutes\"\n    uid=11041_99 StaticText \"V13 chart foreground numeric channels\"\n    uid=11041_100 button \"Hide\" description=\"Hide\"\n    uid=11041_101 button \"Settings\" description=\"Settings\"\n    uid=11041_102 button \"Remove\" description=\"Remove\"\n    uid=11041_103 button \"More\" description=\"More\"\n    uid=11041_104 StaticText \"0.00\"\n    uid=11041_105 StaticText \"0.00\"\n    uid=11041_106 StaticText \"0.00\"\n    uid=11041_107 StaticText \"219.00\"\n    uid=11041_108 StaticText \"219.00\"\n    uid=11041_109 StaticText \"219.00\"\n    uid=11041_110 StaticText \"0.00\"\n  uid=11041_111 button \"1 day in 1 minute intervals\"\n  uid=11041_112 button \"5 days in 5 minutes intervals\"\n  uid=11041_113 button \"1 month in 30 minutes intervals\"\n  uid=11041_114 button \"3 months in 1 hour intervals\"\n  uid=11041_115 button \"6 months in 2 hours intervals\"\n  uid=11041_116 button \"Year to day in 1 day intervals\"\n  uid=11041_117 button \"1 year in 1 day intervals\"\n  uid=11041_118 button \"5 years in 1 week intervals\"\n  uid=11041_119 button \"All data in 1 month intervals\"\n  uid=11041_120 button \"Go to\"\n  uid=11041_121 button \"Timezone\"\n  uid=11041_122 button \"Watchlist, details, and news\"\n  uid=11041_123 button \"Alerts\"\n  uid=11041_124 button \"Object tree and data window\"\n  uid=11041_125 button \"AI Copilot\"\n  uid=11041_126 button \"Screeners\"\n  uid=11041_127 button \"Pine\"\n  uid=11041_128 button \"Calendars\"\n  uid=11041_129 button \"Community\"\n  uid=11041_130 button \"Notifications\"\n  uid=11041_131 button \"Chats\"\n  uid=11041_132 button \"Products\" haspopup=\"menu\"\n  uid=11041_133 button \"Help Center\"\n  uid=11041_134 StaticText \"V13 chart foreground numeric channels\"\n  uid=11041_135 generic description=\"Close\"\n  uid=11041_136 generic description=\"Disable logging\"\n  uid=11041_137 generic description=\"Search\"\n  uid=11041_138 generic description=\"Start date\"\n  uid=11041_139 button \"Settings\" expandable haspopup=\"menu\"\n  uid=11054_2 StaticText \"[2026-10-04T20:07:17.435-00:00]: bg=0,0,0 fg=219,219,219\"\n  uid=11054_3 generic description=\"Source code\"\n  uid=11054_4 generic description=\"Scroll to bar\"\n  uid=11054_5 StaticText \"[2026-10-04T20:07:18.323-00:00]: bg=0,0,0 fg=219,219,219\"\n  uid=11054_6 generic description=\"Source code\"\n  uid=11054_7 generic description=\"Scroll to bar\"\n  uid=11054_8 StaticText \"[2026-10-04T20:07:19.214-00:00]: bg=0,0,0 fg=219,219,219\"\n  uid=11054_9 generic description=\"Source code\"\n  uid=11054_10 generic description=\"Scroll to bar\"\n  uid=11054_11 StaticText \"[2026-10-04T20:07:19.531-00:00]: bg=0,0,0 fg=219,219,219\"\n  uid=11054_12 generic description=\"Source code\"\n  uid=11054_13 generic description=\"Scroll to bar\"\n  uid=11054_14 StaticText \"[2026-10-04T20:07:20.398-00:00]: bg=0,0,0 fg=219,219,219\"\n  uid=11054_15 generic description=\"Source code\"\n  uid=11054_16 generic description=\"Scroll to bar\"\n  uid=11054_17 StaticText \"[2026-10-04T20:07:21.315-00:00]: bg=0,0,0 fg=219,219,219\"\n  uid=11054_18 generic description=\"Source code\"\n  uid=11054_19 generic description=\"Scroll to bar\"\n  uid=11054_20 StaticText \"[2026-10-04T20:07:21.643-00:00]: bg=0,0,0 fg=219,219,219\"\n  uid=11054_21 generic description=\"Source code\"\n  uid=11054_22 generic description=\"Scroll to bar\"\n  uid=11054_23 StaticText \"[2026-10-04T20:07:22.845-00:00]: bg=0,0,0 fg=219,219,219\"\n  uid=11054_24 generic description=\"Source code\"\n  uid=11054_25 generic description=\"Scroll to bar\"\n  uid=11054_26 StaticText \"[2026-10-04T20:07:23.745-00:00]: bg=0,0,0 fg=219,219,219\"\n  uid=11054_27 generic description=\"Source code\"\n  uid=11054_28 generic description=\"Scroll to bar\"\n  uid=11054_29 StaticText \"[2026-10-04T20:07:24.945-00:00]: bg=0,0,0 fg=219,219,219\"\n  uid=11054_30 generic description=\"Source code\"\n  uid=11054_31 generic description=\"Scroll to bar\"\n  uid=11054_32 StaticText \"[2026-10-04T20:07:26.115-00:00]: bg=0,0,0 fg=219,219,219\"\n  uid=11054_33 generic description=\"Source code\"\n  uid=11054_34 generic description=\"Scroll to bar\"\n  uid=11054_35 StaticText \"[2026-10-04T20:07:26.402-00:00]: bg=0,0,0 fg=219,219,219\"\n  uid=11054_36 generic description=\"Source code\"\n  uid=11054_37 generic description=\"Scroll to bar\"\n  uid=11054_38 StaticText \"[2026-10-04T20:07:27.598-00:00]: bg=0,0,0 fg=219,219,219\"\n  uid=11054_39 generic description=\"Source code\"\n  uid=11054_40 generic description=\"Scroll to bar\"\n  uid=11054_41 StaticText \"[2026-10-04T20:07:28.500-00:00]: bg=0,0,0 fg=219,219,219\"\n  uid=11054_42 generic description=\"Source code\"\n  uid=11054_43 generic description=\"Scroll to bar\"\n  uid=11054_44 StaticText \"[2026-10-04T20:07:29.325-00:00]: bg=0,0,0 fg=219,219,219\"\n  uid=11054_45 generic description=\"Source code\"\n  uid=11054_46 generic description=\"Scroll to bar\"\n  uid=11054_47 StaticText \"[2026-10-04T20:07:30.414-00:00]: bg=0,0,0 fg=219,219,219\"\n  uid=11054_48 generic description=\"Source code\"\n  uid=11054_49 generic description=\"Scroll to bar\"\n  uid=11046_3 button \"Scroll down\"\n  uid=11041_189 generic \"Trading panel\"\n    uid=11041_190 generic\n  uid=11041_191 generic live=\"polite\" relevant=\"additions\"\n  uid=11041_192 generic live=\"polite\" relevant=\"additions\"\n  uid=11041_193 generic live=\"assertive\" relevant=\"additions\"\n  uid=11041_194 generic live=\"assertive\" relevant=\"additions\"\n  uid=11045_3 StaticText \"Add custom color\"\n  uid=11041_195 generic live=\"polite\" relevant=\"additions text\"\n  uid=11041_196 log live=\"polite\" relevant=\"additions text\"\n  uid=11041_197 log live=\"polite\" relevant=\"additions text\"\n  uid=11041_198 log live=\"polite\" relevant=\"additions text\"\n  uid=11041_199 log live=\"polite\" relevant=\"additions text\"\n  uid=11041_200 log live=\"polite\" relevant=\"additions text\"\n  uid=11041_201 log live=\"polite\" relevant=\"additions text\"\n  uid=11041_202 log live=\"polite\" relevant=\"additions text\"\n  uid=11041_203 log live=\"polite\" relevant=\"additions text\"\n  uid=11041_204 log live=\"polite\" relevant=\"additions text\"\n  uid=11041_205 log live=\"polite\" relevant=\"additions text\"\n  uid=11041_206 log live=\"polite\" relevant=\"additions text\"\n  uid=11041_207 log live=\"polite\" relevant=\"additions text\"\n  uid=11041_208 log live=\"polite\" relevant=\"additions text\"\n  uid=11041_209 log live=\"polite\" relevant=\"additions text\"\n  uid=11041_210 log live=\"polite\" relevant=\"additions text\"\n  uid=11041_211 log live=\"polite\" relevant=\"additions text\"\n  uid=11041_212 log live=\"polite\" relevant=\"additions text\"\n  uid=11041_213 log live=\"polite\" relevant=\"additions text\"\n  uid=11041_214 log live=\"polite\" relevant=\"additions text\"\n  uid=11041_215 log live=\"polite\" relevant=\"additions text\"\n  uid=11041_216 log live=\"polite\" relevant=\"additions text\"\n  uid=11042_4 generic\n    uid=11042_5 StaticText \"Settings\"\n    uid=11042_6 button \"Close menu\"\n    uid=11042_7 tab \"Symbol\" selectable\n    uid=11042_8 tab \"Status line\" selectable\n    uid=11042_9 tab \"Scales and lines\" selectable\n    uid=11042_10 tab \"Canvas\" selectable selected\n    uid=11042_11 tab \"Trading\" selectable\n    uid=11042_12 tab \"Alerts\" selectable\n    uid=11042_13 tab \"Events\" selectable\n    uid=11042_14 StaticText \"CHART BASIC STYLES\"\n    uid=11042_15 StaticText \"Background\"\n    uid=11042_16 combobox expandable haspopup=\"listbox\" value=\"Solid\"\n    uid=11042_17 button\n    uid=11042_18 checkbox \"Vertical grid lines\" checked\n    uid=11042_19 StaticText \"Vertical grid lines\"\n    uid=11042_20 button\n    uid=11042_21 checkbox \"Horizontal grid lines\" checked\n    uid=11042_22 StaticText \"Horizontal grid lines\"\n    uid=11042_23 button\n    uid=11042_24 StaticText \"Pane separators\"\n    uid=11042_25 button\n    uid=11042_26 StaticText \"Crosshair\"\n    uid=11042_27 button\n    uid=11042_28 StaticText \"Watermark\"\n    uid=11042_29 button \"Replay mode\" expandable haspopup=\"menu\"\n    uid=11042_30 button\n    uid=11042_31 StaticText \"SCALES\"\n    uid=11042_32 StaticText \"Text\"\n    uid=11042_33 button\n    uid=11042_34 combobox expandable haspopup=\"listbox\" value=\"12\"\n    uid=11042_35 StaticText \"Lines\"\n    uid=11042_36 button\n    uid=11042_37 StaticText \"BUTTONS\"\n    uid=11042_38 StaticText \"Navigation\"\n    uid=11042_39 combobox expandable haspopup=\"listbox\" value=\"Visible on mouse over\"\n    uid=11042_40 StaticText \"Pane\"\n    uid=11042_41 combobox expandable haspopup=\"listbox\" value=\"Visible on mouse over\"\n    uid=11042_42 StaticText \"MARGINS\"\n    uid=11042_43 StaticText \"Top\"\n    uid=11042_44 generic\n      uid=11042_45 textbox value=\"10\"\n    uid=11042_46 StaticText \"%\"\n    uid=11042_47 StaticText \"Bottom\"\n    uid=11042_48 generic\n      uid=11042_49 textbox value=\"8\"\n    uid=11042_50 StaticText \"%\"\n    uid=11042_51 StaticText \"Right\"\n    uid=11042_52 generic\n      uid=11042_53 textbox value=\"10\"\n    uid=11042_54 StaticText \"bars\"\n    uid=11042_55 button \"Template\" expandable haspopup=\"menu\"\n    uid=11042_56 button \"Cancel\"\n    uid=11042_57 button \"Ok\"\n  uid=11044_0 generic\n    uid=11045_4 StaticText \"#\"\n    uid=11045_5 textbox value=\"000000\"\n    uid=11045_6 button \"Add\" focusable focused\n    uid=11045_7 generic\n    uid=11045_8 generic\n",
+  "settings_screenshot": "captures/v15/evidence/visual-chart-fg-solid-numeric-v6-v1-attempt1-background-settings-v1.png"
+}

@@ -1,0 +1,72 @@
+Syntax error at input 'end of line without line continuation'
+{
+  "error": "Syntax error at input 'end of line without line continuation'",
+  "editorError": {
+    "end": {
+      "column": 10,
+      "line": 43
+    },
+    "message": "Syntax error at input 'end of line without line continuation'",
+    "start": {
+      "column": 10,
+      "line": 43
+    },
+    "id": "USER;4610958b89834826a82693d0b1996302"
+  },
+  "title": "Compilation error",
+  "native_context_scalar_types": [],
+  "compiler_markers": [
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///d38f6053-1133-4b87-baeb-792245c3b36f.pine?placement%3Ddialog",
+        "path": "/d38f6053-1133-4b87-baeb-792245c3b36f.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "code": "SHORT_TITLE_TOO_LONG",
+      "severity": 4,
+      "message": "The shorttitle is too long (17 characters). It should be 10 characters or less.",
+      "startLineNumber": 2,
+      "startColumn": 33,
+      "endLineNumber": 2,
+      "endColumn": 50
+    },
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///d38f6053-1133-4b87-baeb-792245c3b36f.pine?placement%3Ddialog",
+        "path": "/d38f6053-1133-4b87-baeb-792245c3b36f.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "code": "PINE_VERSION_OUTDATED",
+      "severity": 4,
+      "message": "Version 5 of Pine Script® is outdated. We recommend using the current version, which is 6.",
+      "startLineNumber": 1,
+      "startColumn": 3,
+      "endLineNumber": 1,
+      "endColumn": 12
+    },
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///d38f6053-1133-4b87-baeb-792245c3b36f.pine?placement%3Ddialog",
+        "path": "/d38f6053-1133-4b87-baeb-792245c3b36f.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "severity": 8,
+      "message": "Syntax error at input 'end of line without line continuation'",
+      "startLineNumber": 43,
+      "startColumn": 10,
+      "endLineNumber": 43,
+      "endColumn": 11
+    }
+  ],
+  "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\nC\n85,441.18\n+34.15 (+0.04%)\n85,441.18\nSELL\n0.01\n85,441.19\nBUY\nUSDT\ncorpus-v56-1463-continuation-v15-v1.pine\nDate Range\n20:02:28 UTC\n99+\nObject tree\nData window\nDate\nSun 04 Oct '26\nTime\n20:02\nBTCUSDT · 2 · Binance\nOpen\n85,407.04\nHigh\n85,441.19\nLow\n85,407.03\nClose\n85,441.18\nChange\n+34.15 (+0.04%)\nVol\n14.37\nLast day change\n+687.62 (+0.81%)\ncorpus-v56-1463-continuation-v15-v1.pine\nPine Editor\ncorpus-v56-1463-continuation-v15-v1.pine\nPublish script\n34\n35\n36\n37\n38\n39\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15\n16\n17\n18\n19\n20\n21\n22\n23\n24\n25\n26\n27\n28\n29\n30\n31\n32\n33\ntimeframeName = timeframe.period\nformatTimestamp(int unixMs) =>\n    str.format(\"{0,date,yyyy-MM-dd'T'HH:mm:ss'Z'}\", unixMs)\nbuildMetadata(string alertName) =>\n//@version=5\nindicator(\"BTC Dip Alerts HQ\", \"BTC Dip Alerts HQ\", overlay=false)\n// This script is for alert generation only. It does not place trades or send orders.\n// Create one TradingView alert using \"Any alert() function call\" after adding the script to a BTC chart.\ngroupIntraday = \"Intraday Crash Thresholds\"\ngroupDaily = \"Daily Triggers\"\ngroupLadder = \"Cross-Down Ladder\"\nintradayThreshold1 = input.float(4.7, \"Intraday Threshold 1 (%)\", minval=0.1, step=0.1, group=groupIntraday)\nintradayThreshold2 = input.float(7.0, \"Intraday Threshold 2 (%)\", minval=0.1, step=0.1, group=groupIntraday)\nintradayThreshold3 = input.float(9.5, \"Intraday Threshold 3 (%)\", minval=0.1, step=0.1, group=groupIntraday)\nintradayThreshold4 = input.float(12.0, \"Intraday Threshold 4 (%)\", minval=0.1, step=0.1, group=groupIntraday)\nintradayThreshold5 = input.float(15.0, \"Intraday Threshold 5 (%)\", minval=0.1, step=0.1, group=groupIntraday)\nintradayThreshold6 = input.float(18.0, \"Intraday Threshold 6 (%)\", minval=0.1, step=0.1, group=groupIntraday)\ndailyCloseThreshold = input.float(3.3, \"Daily Close Threshold (%)\", minval=0.1, step=0.1, group=groupDaily)\nladderLevel1 = input.float(67000.0, \"Cross-Down Level 1\", step=10.0, group=groupLadder)\nladderLevel2 = input.float(65000.0, \"Cross-Down Level 2\", step=10.0, group=groupLadder)\nladderLevel3 = input.float(63000.0, \"Cross-Down Level 3\", step=10.0, group=groupLadder)\nladderLevel4 = input.float(61000.0, \"Cross-Down Level 4\", step=10.0, group=groupLadder)\nladderLevel5 = input.float(59000.0, \"Cross-Down Level 5\", step=10.0, group=groupLadder)\nladderLevel6 = input.float(57000.0, \"Cross-Down Level 6\", step=10.0, group=groupLadder)\nladderLevel7 = input.float(55000.0, \"Cross-Down Level 7\", step=10.0, group=groupLadder)\nladderLevel8 = input.float(54000.0, \"Cross-Down Level 8\", step=10.0, group=groupLadder)\nintradayThresholds = array.from(intradayThreshold1, intradayThreshold2, intradayThreshold3, intradayThreshold4, intradayThreshold5, intradayThreshold6)\ncrossDownLevels = array.from(ladderLevel1, ladderLevel2, ladderLevel3, ladderLevel4, ladderLevel5, ladderLevel6, ladderLevel7, ladderLevel8)\ncurrentBtcPrice = close\nsymbolName = syminfo.ticker\n2 of 3 problems\nVersion 5 of Pine Script® is outdated. We recommend using the current version, which is 6.(PINE_VERSION_OUTDATED)\n1 ∙ Today, 04:02\nLine 1, Col 3\nPine Script® v5\nCompilation error\n\nSyntax error at input 'end of line without line continuation'\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+  "context_substituted_message": "Syntax error at input 'end of line without line continuation'"
+}

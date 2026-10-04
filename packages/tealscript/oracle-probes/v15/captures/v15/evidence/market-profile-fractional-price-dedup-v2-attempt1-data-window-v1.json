@@ -1,0 +1,41 @@
+{
+  "index": 298,
+  "bar": [
+    1791143880,
+    85427.99,
+    85428,
+    85427.99,
+    85428,
+    0.34661
+  ],
+  "source_row": [
+    1791143880,
+    11,
+    11,
+    0,
+    1,
+    1,
+    17,
+    0,
+    0,
+    1,
+    -1,
+    0,
+    0,
+    1
+  ],
+  "browser_utc": "2026-10-04T20:01:19.699Z",
+  "title": "Market profile fractional price deduplication v2",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   19:58",
+  "visible_range": {
+    "_firstBar": 263,
+    "_lastBar": 301
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}

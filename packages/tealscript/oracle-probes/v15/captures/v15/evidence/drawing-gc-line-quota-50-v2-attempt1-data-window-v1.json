@@ -1,0 +1,30 @@
+{
+  "index": 298,
+  "bar": [
+    1791143520,
+    85442.34,
+    85442.34,
+    85440,
+    85440,
+    5.66859
+  ],
+  "source_row": [
+    1791143520,
+    51,
+    19986
+  ],
+  "browser_utc": "2026-10-04T19:55:54.541Z",
+  "title": "Drawing GC line quota 50 v2",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   19:52",
+  "visible_range": {
+    "_firstBar": 263,
+    "_lastBar": 301
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}

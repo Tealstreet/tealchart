@@ -1,0 +1,26 @@
+{
+  "index": 299,
+  "bar": [
+    1791144120,
+    85407.04,
+    85441.19,
+    85407.03,
+    85430.02,
+    16.48508
+  ],
+  "source_row": null,
+  "browser_utc": "2026-10-04T20:04:05.383Z",
+  "title": "V13 polyline curved native path",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   20:02",
+  "visible_range": {
+    "_firstBar": 264,
+    "_lastBar": 302
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}

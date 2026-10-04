@@ -1,0 +1,329 @@
+{
+  "artifact": "v15 native foreground samples v1",
+  "samples": [
+    {
+      "attempt": 1,
+      "requested_hex": "#000000",
+      "all_historical_channel_values_identical": true,
+      "historical_values": {
+        "BG_R": "0",
+        "BG_G": "0",
+        "BG_B": "0",
+        "FG_R": "219",
+        "FG_G": "219",
+        "FG_B": "219",
+        "FG_T": "0"
+      },
+      "csv_file": "captures/v15/visual-chart-fg-solid-numeric-v6-v1-attempt1.csv",
+      "csv_sha256": "7be530bdfb28855e4499bf5fcd6161c73969fe5518737fea6fade159249ffdd2",
+      "live_boundary_confirmed_unchanged": true,
+      "historical_compare_before_unix_seconds": 1791144360
+    },
+    {
+      "attempt": 2,
+      "requested_hex": "#FFFFFF",
+      "all_historical_channel_values_identical": true,
+      "historical_values": {
+        "BG_R": "255",
+        "BG_G": "255",
+        "BG_B": "255",
+        "FG_R": "15",
+        "FG_G": "15",
+        "FG_B": "15",
+        "FG_T": "0"
+      },
+      "csv_file": "captures/v15/visual-chart-fg-solid-numeric-v6-v1-attempt2.csv",
+      "csv_sha256": "0e3594763ebc78c0f6126ac218ac463242da1b2908bf87422d61f872225a45ec",
+      "live_boundary_confirmed_unchanged": false,
+      "historical_compare_before_unix_seconds": 1791144360
+    },
+    {
+      "attempt": 3,
+      "requested_hex": "#7F7F7F",
+      "all_historical_channel_values_identical": true,
+      "historical_values": {
+        "BG_R": "127",
+        "BG_G": "127",
+        "BG_B": "127",
+        "FG_R": "219",
+        "FG_G": "219",
+        "FG_B": "219",
+        "FG_T": "0"
+      },
+      "csv_file": "captures/v15/visual-chart-fg-solid-numeric-v6-v1-attempt3.csv",
+      "csv_sha256": "1bc3a5692c422f7824466e12274f72dd5131c16b4e6c3d6de0dfc8a6f31f31c5",
+      "live_boundary_confirmed_unchanged": true,
+      "historical_compare_before_unix_seconds": 1791144480
+    },
+    {
+      "attempt": 4,
+      "requested_hex": "#808080",
+      "all_historical_channel_values_identical": true,
+      "historical_values": {
+        "BG_R": "128",
+        "BG_G": "128",
+        "BG_B": "128",
+        "FG_R": "219",
+        "FG_G": "219",
+        "FG_B": "219",
+        "FG_T": "0"
+      },
+      "csv_file": "captures/v15/visual-chart-fg-solid-numeric-v6-v1-attempt4.csv",
+      "csv_sha256": "6656d1e0f4f18a71b941220df271d0b029eda1c6d7d8c70230274e1691cb6ac6",
+      "live_boundary_confirmed_unchanged": true,
+      "historical_compare_before_unix_seconds": 1791144480
+    },
+    {
+      "attempt": 5,
+      "requested_hex": "#404040",
+      "all_historical_channel_values_identical": true,
+      "historical_values": {
+        "BG_R": "64",
+        "BG_G": "64",
+        "BG_B": "64",
+        "FG_R": "219",
+        "FG_G": "219",
+        "FG_B": "219",
+        "FG_T": "0"
+      },
+      "csv_file": "captures/v15/visual-chart-fg-solid-numeric-v6-v1-attempt5.csv",
+      "csv_sha256": "d39cfe3d2bec2d1913f7ac5ed211319e31d5147589ed2f6a927bcdcf552ac926",
+      "live_boundary_confirmed_unchanged": true,
+      "historical_compare_before_unix_seconds": 1791144480
+    },
+    {
+      "attempt": 6,
+      "requested_hex": "#C0C0C0",
+      "all_historical_channel_values_identical": true,
+      "historical_values": {
+        "BG_R": "192",
+        "BG_G": "192",
+        "BG_B": "192",
+        "FG_R": "15",
+        "FG_G": "15",
+        "FG_B": "15",
+        "FG_T": "0"
+      },
+      "csv_file": "captures/v15/visual-chart-fg-solid-numeric-v6-v1-attempt6.csv",
+      "csv_sha256": "ba6a847d8bbea9189c769675b3f50c2e45f83758d292e17c71a100868a340eb6",
+      "live_boundary_confirmed_unchanged": true,
+      "historical_compare_before_unix_seconds": 1791144480
+    },
+    {
+      "attempt": 7,
+      "requested_hex": "#FF0000",
+      "all_historical_channel_values_identical": true,
+      "historical_values": {
+        "BG_R": "255",
+        "BG_G": "0",
+        "BG_B": "0",
+        "FG_R": "219",
+        "FG_G": "219",
+        "FG_B": "219",
+        "FG_T": "0"
+      },
+      "csv_file": "captures/v15/visual-chart-fg-solid-numeric-v6-v1-attempt7.csv",
+      "csv_sha256": "6184ac330ac289e7ded278bd67d69363dcfec84adcc12688e13df5c74e163be9",
+      "live_boundary_confirmed_unchanged": true,
+      "historical_compare_before_unix_seconds": 1791144480
+    },
+    {
+      "attempt": 8,
+      "requested_hex": "#00FF00",
+      "all_historical_channel_values_identical": true,
+      "historical_values": {
+        "BG_R": "0",
+        "BG_G": "255",
+        "BG_B": "0",
+        "FG_R": "15",
+        "FG_G": "15",
+        "FG_B": "15",
+        "FG_T": "0"
+      },
+      "csv_file": "captures/v15/visual-chart-fg-solid-numeric-v6-v1-attempt8.csv",
+      "csv_sha256": "1733d6f3468bd25314afadef552f8e8c435dbf3fb37ff8ad5a39d2707ef457f7",
+      "live_boundary_confirmed_unchanged": true,
+      "historical_compare_before_unix_seconds": 1791144480
+    },
+    {
+      "attempt": 9,
+      "requested_hex": "#0000FF",
+      "all_historical_channel_values_identical": true,
+      "historical_values": {
+        "BG_R": "0",
+        "BG_G": "0",
+        "BG_B": "255",
+        "FG_R": "219",
+        "FG_G": "219",
+        "FG_B": "219",
+        "FG_T": "0"
+      },
+      "csv_file": "captures/v15/visual-chart-fg-solid-numeric-v6-v1-attempt9.csv",
+      "csv_sha256": "eb9f328520a22978e3670667734ec10fa3e8f84efef405268d7230fe61ca1469",
+      "live_boundary_confirmed_unchanged": true,
+      "historical_compare_before_unix_seconds": 1791144600
+    },
+    {
+      "attempt": 10,
+      "requested_hex": "#FFFFFF",
+      "all_historical_channel_values_identical": true,
+      "historical_values": {
+        "BG_R": "255",
+        "BG_G": "255",
+        "BG_B": "255",
+        "FG_R": "15",
+        "FG_G": "15",
+        "FG_B": "15",
+        "FG_T": "0"
+      },
+      "csv_file": "captures/v15/visual-chart-fg-solid-numeric-v6-v1-attempt10.csv",
+      "csv_sha256": "b6a0d7b6877ab31eff44a5b7ff5813b53cd2a9a8f33ce9cba9cee789b1dea3b1",
+      "live_boundary_confirmed_unchanged": true,
+      "historical_compare_before_unix_seconds": 1791144600
+    },
+    {
+      "attempt": 11,
+      "requested_hex": "#A0A0A0",
+      "all_historical_channel_values_identical": true,
+      "historical_values": {
+        "BG_R": "160",
+        "BG_G": "160",
+        "BG_B": "160",
+        "FG_R": "15",
+        "FG_G": "15",
+        "FG_B": "15",
+        "FG_T": "0"
+      },
+      "csv_file": "captures/v15/visual-chart-fg-solid-numeric-v6-v1-attempt11.csv",
+      "csv_sha256": "85e6e7aceb866103db89374ded3667b3b16498c0d33ccf4677e6bdc4f36e142f",
+      "live_boundary_confirmed_unchanged": true,
+      "historical_compare_before_unix_seconds": 1791144600
+    },
+    {
+      "attempt": 12,
+      "requested_hex": "#909090",
+      "all_historical_channel_values_identical": true,
+      "historical_values": {
+        "BG_R": "144",
+        "BG_G": "144",
+        "BG_B": "144",
+        "FG_R": "219",
+        "FG_G": "219",
+        "FG_B": "219",
+        "FG_T": "0"
+      },
+      "csv_file": "captures/v15/visual-chart-fg-solid-numeric-v6-v1-attempt12.csv",
+      "csv_sha256": "a0004d74356a07fb89697aab6eb7a5e5396ac7023ad5e8849cda54c6c9005a53",
+      "live_boundary_confirmed_unchanged": true,
+      "historical_compare_before_unix_seconds": 1791144600
+    },
+    {
+      "attempt": 13,
+      "requested_hex": "#989898",
+      "all_historical_channel_values_identical": true,
+      "historical_values": {
+        "BG_R": "152",
+        "BG_G": "152",
+        "BG_B": "152",
+        "FG_R": "15",
+        "FG_G": "15",
+        "FG_B": "15",
+        "FG_T": "0"
+      },
+      "csv_file": "captures/v15/visual-chart-fg-solid-numeric-v6-v1-attempt13.csv",
+      "csv_sha256": "e2b2693362f683e78276a13fea14c640f34e89b7788dd478431a7317208cf152",
+      "live_boundary_confirmed_unchanged": true,
+      "historical_compare_before_unix_seconds": 1791144600
+    },
+    {
+      "attempt": 14,
+      "requested_hex": "#949494",
+      "all_historical_channel_values_identical": true,
+      "historical_values": {
+        "BG_R": "148",
+        "BG_G": "148",
+        "BG_B": "148",
+        "FG_R": "219",
+        "FG_G": "219",
+        "FG_B": "219",
+        "FG_T": "0"
+      },
+      "csv_file": "captures/v15/visual-chart-fg-solid-numeric-v6-v1-attempt14.csv",
+      "csv_sha256": "35458f7b21a25e2484786eca6db5ebc1093af5c1ac20995439dc4e8035a6103f",
+      "live_boundary_confirmed_unchanged": true,
+      "historical_compare_before_unix_seconds": 1791144720
+    },
+    {
+      "attempt": 15,
+      "requested_hex": "#969696",
+      "all_historical_channel_values_identical": true,
+      "historical_values": {
+        "BG_R": "150",
+        "BG_G": "150",
+        "BG_B": "150",
+        "FG_R": "15",
+        "FG_G": "15",
+        "FG_B": "15",
+        "FG_T": "0"
+      },
+      "csv_file": "captures/v15/visual-chart-fg-solid-numeric-v6-v1-attempt15.csv",
+      "csv_sha256": "a06b8a03c6d48149008f480702305eaa370b84c4087281a6a7a0299045f1387a",
+      "live_boundary_confirmed_unchanged": true,
+      "historical_compare_before_unix_seconds": 1791144720
+    },
+    {
+      "attempt": 16,
+      "requested_hex": "#959595",
+      "all_historical_channel_values_identical": true,
+      "historical_values": {
+        "BG_R": "149",
+        "BG_G": "149",
+        "BG_B": "149",
+        "FG_R": "219",
+        "FG_G": "219",
+        "FG_B": "219",
+        "FG_T": "0"
+      },
+      "csv_file": "captures/v15/visual-chart-fg-solid-numeric-v6-v1-attempt16.csv",
+      "csv_sha256": "1358807522ef7643e0fe1285545aca1b48a4212caeeb0ffbff7eb6afb06da99b",
+      "live_boundary_confirmed_unchanged": true,
+      "historical_compare_before_unix_seconds": 1791144720
+    },
+    {
+      "attempt": 17,
+      "requested_hex": "#0F0F0F",
+      "all_historical_channel_values_identical": true,
+      "historical_values": {
+        "BG_R": "15",
+        "BG_G": "15",
+        "BG_B": "15",
+        "FG_R": "219",
+        "FG_G": "219",
+        "FG_B": "219",
+        "FG_T": "0"
+      },
+      "csv_file": "captures/v15/visual-chart-fg-solid-numeric-v6-v1-attempt17.csv",
+      "csv_sha256": "38cdf016ae9a02bdafa90c72fd3618c18d720ebb4dfdab74a7caae2c9139fcbd",
+      "live_boundary_confirmed_unchanged": true,
+      "historical_compare_before_unix_seconds": 1791144720
+    }
+  ],
+  "bounded_grayscale_transition": {
+    "low": 149,
+    "low_hex": "#959595",
+    "low_foreground": [
+      219,
+      219,
+      219
+    ],
+    "high": 150,
+    "high_hex": "#969696",
+    "high_foreground": [
+      15,
+      15,
+      15
+    ]
+  },
+  "original_background_restored": "#0F0F0F",
+  "limit": "Sampled grayscale bracket and exact color settings in recorded native theme; no global luminance formula. White attempt2 crossed a live boundary and is retained; attempt10 is the stable repeat."
+}

@@ -1,0 +1,55 @@
+Syntax error at input 'end of line without line continuation'
+{
+  "error": "Syntax error at input 'end of line without line continuation'",
+  "editorError": {
+    "end": {
+      "column": 67,
+      "line": 118
+    },
+    "message": "Syntax error at input 'end of line without line continuation'",
+    "start": {
+      "column": 67,
+      "line": 118
+    },
+    "id": "USER;b222c83b8f6e4bf69ba42ec934cb277c"
+  },
+  "title": "Compilation error",
+  "native_context_scalar_types": [],
+  "compiler_markers": [
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///ded01ec8-ae96-4217-9e49-f2a72df6ae4c.pine?placement%3Ddialog",
+        "path": "/ded01ec8-ae96-4217-9e49-f2a72df6ae4c.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "code": "PINE_VERSION_OUTDATED",
+      "severity": 4,
+      "message": "Version 5 of Pine Script® is outdated. We recommend using the current version, which is 6.",
+      "startLineNumber": 1,
+      "startColumn": 3,
+      "endLineNumber": 1,
+      "endColumn": 12
+    },
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///ded01ec8-ae96-4217-9e49-f2a72df6ae4c.pine?placement%3Ddialog",
+        "path": "/ded01ec8-ae96-4217-9e49-f2a72df6ae4c.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "severity": 8,
+      "message": "Syntax error at input 'end of line without line continuation'",
+      "startLineNumber": 118,
+      "startColumn": 67,
+      "endLineNumber": 118,
+      "endColumn": 68
+    }
+  ],
+  "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\nC\n85,441.18\n+34.15 (+0.04%)\n85,441.18\nSELL\n0.01\n85,441.19\nBUY\nUSDT\ncorpus-v56-1643-continuation-v15-v1.pine\nDate Range\n20:02:56 UTC\n99+\nObject tree\nData window\nDate\nSun 04 Oct '26\nTime\n20:02\nBTCUSDT · 2 · Binance\nOpen\n85,407.04\nHigh\n85,441.19\nLow\n85,407.03\nClose\n85,441.18\nChange\n+34.15 (+0.04%)\nVol\n14.5\nLast day change\n+687.62 (+0.81%)\ncorpus-v56-1643-continuation-v15-v1.pine\nPine Editor\ncorpus-v56-1643-continuation-v15-v1.pine\nPublish script\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15\n16\n17\n18\n19\n20\n21\n22\n23\n24\n25\n26\n27\n28\n29\n30\n31\n32\n33\n34\n35\n36\n37\n38\n39\n//@version=5\nindicator(\"LOCAL_AI_ENGINE A/D Context v20.8\", overlay=false, max_labels_count=500, max_lines_count=500)\n// ============================================================================\n// v20.8  (base: v20.7)\n// НОВОЕ:\n//   1. DIV END LINE — линия активной зоны дивергенции на панели flow.\n//      Тянется вправо от точки сигнала, гаснет при противоположном сигнале\n//      или по истечении divLineMaxBars. Управляется через инпуты.\n//   2. TF PRESETS — три независимых набора параметров дивергенции (Preset 1/2/3).\n//      Каждый пресет хранит свой ТФ-ярлык + все пороги.\n//      profileMode = Auto → пресет выбирается по совпадению ТФ графика.\n//      profileMode = Preset N → принудительно этот пресет.\n//      profileMode = Manual → старые ручные параметры (как раньше).\n// ============================================================================\n// ═══════════════════════════════ FLOW ═══════════════════════════════════════\ngrpFlow  = \"Flow\"\nflowMode = input.string(\"Williams AD\",\"Flow Mode\",options=[\"Chaikin AD\",\"Williams AD\"],group=grpFlow)\ncmfLen   = input.int(20, \"CMF Length\",       minval=1, group=grpFlow)\nemaLen   = input.int(21, \"A/D Smoothing EMA\",minval=1, group=grpFlow)\natrLen   = input.int(14, \"ATR Length\",       minval=1, group=grpFlow)\n// ═══════════════════════════ TF PROFILE ═════════════════════════════════════\ngrpTF       = \"Timeframe Profile\"\nprofileMode = input.string(\"Auto\",\"Profile Mode\",\n              options=[\"Auto\",\"Preset 1\",\"Preset 2\",\"Preset 3\",\"Manual\"],\n              group=grpTF,\n              tooltip=\"Auto = пресет выбирается по ТФ графика автоматически.\\nPreset N = принудительный выбор.\\nManual = параметры из группы Divergence.\")\n// ═══════════════════════════ TF PRESETS ═════════════════════════════════════\ngrpP = \"TF Presets\"\n// --- Preset 1 ---\np1_tf    = input.string(\"1h\",\"P1 — Timeframe\",options=[\"1m\",\"3m\",\"5m\",\"15m\",\"30m\",\"1h\",\"2h\",\"4h\",\"6h\",\"12h\",\"1d\"],group=grpP)\np1_pivL  = input.int(8,   \"P1 Pivot Left\",   minval=2,group=grpP)\np1_pivR  = input.int(8,   \"P1 Pivot Right\",  minval=2,group=grpP)\np1_price = input.float(0.005,\"P1 Min Price %\",minval=0,step=0.001,group=grpP,\n           tooltip=\"Доля от цены (0.005 = 0.5%)\")\n2 of 2 problems\nVersion 5 of Pine Script® is outdated. We recommend using the current version, which is 6.(PINE_VERSION_OUTDATED)\n1 ∙ Today, 04:02\nLine 1, Col 3\nPine Script® v5\nCompilation error\n\nSyntax error at input 'end of line without line continuation'\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+  "context_substituted_message": "Syntax error at input 'end of line without line continuation'"
+}
