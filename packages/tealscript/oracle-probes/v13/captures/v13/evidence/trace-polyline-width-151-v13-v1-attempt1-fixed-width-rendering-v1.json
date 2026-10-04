@@ -1,0 +1,169 @@
+{
+  "browser_utc": "2026-10-04T18:52:19.508Z",
+  "title": "Silent audit polyline-width-151 v13 v1",
+  "host_last": {
+    "index": 300,
+    "value": [
+      1791139920,
+      85342.37,
+      85342.37,
+      85342.36,
+      85342.37,
+      0.08136
+    ]
+  },
+  "source_last": {
+    "index": 300,
+    "value": [
+      1791139920,
+      20006,
+      151
+    ]
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  },
+  "canvas": {
+    "x": 56,
+    "y": 42,
+    "width": 1255,
+    "height": 791
+  },
+  "pane": {
+    "width": 1255,
+    "height": 791,
+    "scale": {
+      "_minValue": 0,
+      "_maxValue": 3
+    },
+    "mode": {
+      "autoScale": false,
+      "lockScale": false,
+      "percentage": false,
+      "indexedTo100": false,
+      "log": false
+    }
+  },
+  "zoom": {
+    "range": {
+      "_firstBar": 292,
+      "_lastBar": 302
+    },
+    "spacing": 114.0909090909091,
+    "right_offset": 2
+  },
+  "views": [
+    {
+      "class": "F",
+      "plot": "plot_0",
+      "renderer_data": null,
+      "renderer_keys": [
+        "_renderers",
+        "_globalAlpha"
+      ]
+    },
+    {
+      "class": "F",
+      "plot": "plot_1",
+      "renderer_data": null,
+      "renderer_keys": [
+        "_renderers",
+        "_globalAlpha"
+      ]
+    },
+    {
+      "class": "D",
+      "renderer_data": {
+        "items": [
+          {
+            "id": 3,
+            "points": [
+              {
+                "x": 285.22727272727275,
+                "y": 510.8466666666667
+              },
+              {
+                "x": 741.5909090909091,
+                "y": 510.8466666666667
+              }
+            ],
+            "width": 100,
+            "curved": false,
+            "closed": false,
+            "color": "rgba(41,98,255,1)",
+            "style": "sol"
+          },
+          {
+            "id": 4,
+            "points": [
+              {
+                "x": 285.22727272727275,
+                "y": 294.97333333333336
+              },
+              {
+                "x": 741.5909090909091,
+                "y": 294.97333333333336
+              }
+            ],
+            "width": 151,
+            "curved": false,
+            "closed": false,
+            "color": "rgba(242,54,69,1)",
+            "style": "sol"
+          },
+          {
+            "id": 37,
+            "points": [
+              {
+                "x": 399.31818181818176,
+                "y": 510.8466666666667
+              },
+              {
+                "x": 855.6818181818182,
+                "y": 510.8466666666667
+              }
+            ],
+            "width": 100,
+            "curved": false,
+            "closed": false,
+            "color": "rgba(41,98,255,1)",
+            "style": "sol"
+          },
+          {
+            "id": 38,
+            "points": [
+              {
+                "x": 399.31818181818176,
+                "y": 294.97333333333336
+              },
+              {
+                "x": 855.6818181818182,
+                "y": 294.97333333333336
+              }
+            ],
+            "width": 151,
+            "curved": false,
+            "closed": false,
+            "color": "rgba(242,54,69,1)",
+            "style": "sol"
+          }
+        ]
+      },
+      "renderer_keys": [
+        "_data"
+      ]
+    },
+    {
+      "class": "D",
+      "renderer_data": {
+        "items": []
+      },
+      "renderer_keys": [
+        "_data"
+      ]
+    }
+  ],
+  "limits": "Fixed native chart viewport and manual price range0..3 for corresponding segments. Native requested widths/CSV are not measured stroke widths. Raw PNG retained for CSS/device-pixel measurement; caps/corners must be excluded."
+}

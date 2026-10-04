@@ -1,0 +1,175 @@
+{
+  "artifact": "Drawing width raster measurements v1",
+  "method": "Original PNG decoded with native browser Image/OffscreenCanvas. Scan vertical image pixels at stated chart x, within chart Canvas only. Blue predicate b>170,b>1.6r,b>1.6g; red predicate r>170,r>1.6b,r>1.6g. Maximal consecutive color runs; divide device-pixel span by PNG/viewport vertical scale. Straight segments away from caps and box corners. No image alteration.",
+  "measurements": [
+    {
+      "source": "trace-line-width-0-v13-v1.pine",
+      "png": "captures/v13/evidence/trace-line-width-0-v13-v1-attempt1-fixed-width-rendering-v1.png",
+      "metadata": "captures/v13/evidence/trace-line-width-0-v13-v1-attempt1-fixed-width-rendering-v1.json",
+      "image_width": 2880,
+      "image_height": 1800,
+      "scaleX": 2,
+      "scaleY": 2,
+      "scans": [
+        {
+          "kind": "blue",
+          "chart_x": 610,
+          "image_x": 1332,
+          "runs": [
+            {
+              "start": 1006,
+              "end": 1205,
+              "device_pixels": 200,
+              "css_pixels": 100
+            }
+          ]
+        },
+        {
+          "kind": "red",
+          "chart_x": 610,
+          "image_x": 1332,
+          "runs": [
+            {
+              "start": 673,
+              "end": 674,
+              "device_pixels": 2,
+              "css_pixels": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "source": "trace-line-width-151-v13-v1.pine",
+      "png": "captures/v13/evidence/trace-line-width-151-v13-v1-attempt1-fixed-width-rendering-v1.png",
+      "metadata": "captures/v13/evidence/trace-line-width-151-v13-v1-attempt1-fixed-width-rendering-v1.json",
+      "image_width": 2880,
+      "image_height": 1800,
+      "scaleX": 2,
+      "scaleY": 2,
+      "scans": [
+        {
+          "kind": "blue",
+          "chart_x": 610,
+          "image_x": 1332,
+          "runs": [
+            {
+              "start": 1006,
+              "end": 1205,
+              "device_pixels": 200,
+              "css_pixels": 100
+            }
+          ]
+        },
+        {
+          "kind": "red",
+          "chart_x": 610,
+          "image_x": 1332,
+          "runs": [
+            {
+              "start": 523,
+              "end": 824,
+              "device_pixels": 302,
+              "css_pixels": 151
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "source": "trace-box-width-151-v13-v1.pine",
+      "png": "captures/v13/evidence/trace-box-width-151-v13-v1-attempt1-fixed-width-rendering-v1.png",
+      "metadata": "captures/v13/evidence/trace-box-width-151-v13-v1-attempt1-fixed-width-rendering-v1.json",
+      "image_width": 2880,
+      "image_height": 1800,
+      "scaleX": 2,
+      "scaleY": 2,
+      "scans": [
+        {
+          "kind": "blue",
+          "chart_x": 399.3,
+          "image_x": 911,
+          "runs": [
+            {
+              "start": 574,
+              "end": 773,
+              "device_pixels": 200,
+              "css_pixels": 100
+            },
+            {
+              "start": 1006,
+              "end": 1205,
+              "device_pixels": 200,
+              "css_pixels": 100
+            }
+          ]
+        },
+        {
+          "kind": "red",
+          "chart_x": 741.6,
+          "image_x": 1595,
+          "runs": [
+            {
+              "start": 523,
+              "end": 824,
+              "device_pixels": 302,
+              "css_pixels": 151
+            },
+            {
+              "start": 955,
+              "end": 1256,
+              "device_pixels": 302,
+              "css_pixels": 151
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "source": "trace-polyline-width-151-v13-v1.pine",
+      "png": "captures/v13/evidence/trace-polyline-width-151-v13-v1-attempt1-fixed-width-rendering-v1.png",
+      "metadata": "captures/v13/evidence/trace-polyline-width-151-v13-v1-attempt1-fixed-width-rendering-v1.json",
+      "image_width": 2880,
+      "image_height": 1800,
+      "scaleX": 2,
+      "scaleY": 2,
+      "scans": [
+        {
+          "kind": "blue",
+          "chart_x": 610,
+          "image_x": 1332,
+          "runs": [
+            {
+              "start": 1006,
+              "end": 1205,
+              "device_pixels": 200,
+              "css_pixels": 100
+            }
+          ]
+        },
+        {
+          "kind": "red",
+          "chart_x": 610,
+          "image_x": 1332,
+          "runs": [
+            {
+              "start": 523,
+              "end": 824,
+              "device_pixels": 302,
+              "css_pixels": 151
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "observations": [
+    "Control100 yields200devicepixels=100CSSpixels.",
+    "Target0 line yields2devicepixels=1CSSpixel.",
+    "Target151 line, box and polyline yield302devicepixels=151CSSpixels in recorded contexts."
+  ],
+  "limits": [
+    "Concrete native raster widths and fixed viewport only; no universal width bound policy.",
+    "Native renderer geometry and CSV requested widths are separate receipts; measured widths come from original PNG pixels."
+  ]
+}

@@ -1,0 +1,22 @@
+Error on bar 0: Column 0 is out of table bounds, number of columns is 0.
+{
+  "ctx": {
+    "col": 0,
+    "code": "RE10039",
+    "bar_index": 0,
+    "cols": 0
+  },
+  "error": "Error on bar {bar_index}: Column {col} is out of table bounds, number of columns is {cols}.",
+  "stack_trace": [
+    {
+      "n": "#main",
+      "p": 5
+    }
+  ],
+  "title": "Runtime error",
+  "showReportItButton": false,
+  "studyAccessBlocked": false,
+  "compiler_markers": [],
+  "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,338.84\nH\n85,338.84\nL\n85,338.83\nC\n85,338.84\n0.00 (0.00%)\n85,338.83\nSELL\n0.01\n85,338.84\nBUY\nSilent audit table-zero-columns v13 v1\nUSDT\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n19:00:44 UTC\n99+\nRuntime error: RE10039\nRuntime error: RE10039\nError on bar 0: Column 0 is out of table bounds, number of columns is 0.\nat #main():5\nOpen in editor",
+  "context_substituted_message": "Error on bar 0: Column 0 is out of table bounds, number of columns is 0."
+}

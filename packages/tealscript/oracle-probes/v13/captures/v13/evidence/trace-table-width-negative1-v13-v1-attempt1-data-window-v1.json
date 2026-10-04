@@ -1,0 +1,30 @@
+{
+  "index": 298,
+  "bar": [
+    1791139920,
+    85342.37,
+    85342.37,
+    85342.36,
+    85342.36,
+    1.696
+  ],
+  "source_row": [
+    1791139920,
+    20006,
+    -1
+  ],
+  "browser_utc": "2026-10-04T18:55:07.959Z",
+  "title": "Silent audit table-width-negative1 v13 v1",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   18:52",
+  "visible_range": {
+    "_firstBar": 263,
+    "_lastBar": 301
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}

@@ -1,0 +1,1952 @@
+{
+  "artifact": "Silent normalization audit native contexts v1",
+  "captures": [
+    {
+      "script": "trace-line-width-0-v13-v1.pine",
+      "attempt": 1,
+      "status": "RUNS",
+      "source_sha256": "f1c716f719780e592d3b712ccac7cabd535e38a2fe2572e141e1bd9d9eaad0d3",
+      "reset_utc": "2026-10-04T18:49:25.043Z",
+      "export_utc": "2026-10-04T18:49:32.350Z",
+      "diagnostic": {
+        "code": null,
+        "text": null,
+        "line": null,
+        "column": null,
+        "first_bar_index": null,
+        "first_bar_time_utc": null
+      },
+      "setup": {
+        "tickerid": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chart_type": "standard candles",
+        "native_style": 1,
+        "timezone": "Etc/UTC",
+        "bar_replay": false,
+        "minmove": 1,
+        "pricescale": 100,
+        "pointvalue": 1,
+        "mintick": 0.01,
+        "defaults_confirmed": true,
+        "native_user_inputs": [],
+        "observed_indicator_title": "Silent audit line-width-0 v13 v1",
+        "dataset_start_utc": "2026-09-07T00:00:00.000Z",
+        "first_chart_bar": {
+          "index": -19705,
+          "value": [
+            1788739200,
+            80341.83,
+            80356,
+            80230.29,
+            80293.23,
+            37.66955
+          ]
+        },
+        "chart_bars": 20005,
+        "subscription": "pro_premium",
+        "native_end_of_data": true,
+        "exchange_timezone": "Etc/UTC",
+        "exchange_session": "24x7",
+        "currency": "USDT",
+        "chart_session": "regular",
+        "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+      },
+      "csv_file": "captures/v13/trace-line-width-0-v13-v1-attempt1.csv",
+      "evidence_files": [
+        "captures/v13/evidence/trace-line-width-0-v13-v1-attempt1-setup.png",
+        "captures/v13/evidence/trace-line-width-0-v13-v1-attempt1-export.png",
+        "captures/v13/evidence/trace-line-width-0-v13-v1-attempt1-logs.txt",
+        "captures/v13/evidence/trace-line-width-0-v13-v1-attempt1-logs-v1.json",
+        "captures/v13/evidence/trace-line-width-0-v13-v1-attempt1-logs.png",
+        "captures/v13/evidence/trace-line-width-0-v13-v1-attempt1-visual.png",
+        "captures/v13/evidence/trace-line-width-0-v13-v1-attempt1-data-window-v1.png",
+        "captures/v13/evidence/trace-line-width-0-v13-v1-attempt1-data-window-v1.json",
+        "captures/v13/evidence/trace-line-width-0-v13-v1-attempt1-data-window-v1.txt",
+        "captures/v13/evidence/trace-line-width-0-v13-v1-attempt1-authority-object-geometry-v1.json",
+        "captures/v13/evidence/trace-line-width-0-v13-v1-attempt1-authority-object-geometry-v1.png",
+        "captures/v13/evidence/trace-line-width-0-v13-v1-attempt1-fixed-width-rendering-v1.json",
+        "captures/v13/evidence/trace-line-width-0-v13-v1-attempt1-fixed-width-rendering-v1.png"
+      ],
+      "first_eight_populated_rows": [
+        {
+          "time": "1788739200",
+          "open": "80341.83",
+          "high": "80356",
+          "low": "80230.29",
+          "close": "80293.23",
+          "INPUT_BAR_INDEX": "0",
+          "REQUESTED_WIDTH": "0"
+        },
+        {
+          "time": "1788739320",
+          "open": "80293.23",
+          "high": "80367.8",
+          "low": "80293.23",
+          "close": "80314.01",
+          "INPUT_BAR_INDEX": "1",
+          "REQUESTED_WIDTH": "0"
+        },
+        {
+          "time": "1788739440",
+          "open": "80314.01",
+          "high": "80426",
+          "low": "80310",
+          "close": "80426",
+          "INPUT_BAR_INDEX": "2",
+          "REQUESTED_WIDTH": "0"
+        },
+        {
+          "time": "1788739560",
+          "open": "80426",
+          "high": "80443.99",
+          "low": "80345.09",
+          "close": "80345.1",
+          "INPUT_BAR_INDEX": "3",
+          "REQUESTED_WIDTH": "0"
+        },
+        {
+          "time": "1788739680",
+          "open": "80345.1",
+          "high": "80430",
+          "low": "80345.09",
+          "close": "80384",
+          "INPUT_BAR_INDEX": "4",
+          "REQUESTED_WIDTH": "0"
+        },
+        {
+          "time": "1788739800",
+          "open": "80384",
+          "high": "80384.01",
+          "low": "80344.54",
+          "close": "80346.79",
+          "INPUT_BAR_INDEX": "5",
+          "REQUESTED_WIDTH": "0"
+        },
+        {
+          "time": "1788739920",
+          "open": "80346.96",
+          "high": "80350",
+          "low": "80322.01",
+          "close": "80350",
+          "INPUT_BAR_INDEX": "6",
+          "REQUESTED_WIDTH": "0"
+        },
+        {
+          "time": "1788740040",
+          "open": "80350",
+          "high": "80363.93",
+          "low": "80278",
+          "close": "80279.43",
+          "INPUT_BAR_INDEX": "7",
+          "REQUESTED_WIDTH": "0"
+        }
+      ],
+      "last_row": {
+        "time": "1791139680",
+        "open": "85345.95",
+        "high": "85345.96",
+        "low": "85332",
+        "close": "85332.04",
+        "INPUT_BAR_INDEX": "20004",
+        "REQUESTED_WIDTH": "0"
+      }
+    },
+    {
+      "script": "trace-line-width-151-v13-v1.pine",
+      "attempt": 1,
+      "status": "RUNS",
+      "source_sha256": "ea29fb16253539d2e15e30d8c9148cf6736faa99c5311ff5ac17b7efcfab3243",
+      "reset_utc": "2026-10-04T18:50:53.018Z",
+      "export_utc": "2026-10-04T18:51:00.079Z",
+      "diagnostic": {
+        "code": null,
+        "text": null,
+        "line": null,
+        "column": null,
+        "first_bar_index": null,
+        "first_bar_time_utc": null
+      },
+      "setup": {
+        "tickerid": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chart_type": "standard candles",
+        "native_style": 1,
+        "timezone": "Etc/UTC",
+        "bar_replay": false,
+        "minmove": 1,
+        "pricescale": 100,
+        "pointvalue": 1,
+        "mintick": 0.01,
+        "defaults_confirmed": true,
+        "native_user_inputs": [],
+        "observed_indicator_title": "Silent audit line-width-151 v13 v1",
+        "dataset_start_utc": "2026-09-07T00:00:00.000Z",
+        "first_chart_bar": {
+          "index": -19706,
+          "value": [
+            1788739200,
+            80341.83,
+            80356,
+            80230.29,
+            80293.23,
+            37.66955
+          ]
+        },
+        "chart_bars": 20006,
+        "subscription": "pro_premium",
+        "native_end_of_data": true,
+        "exchange_timezone": "Etc/UTC",
+        "exchange_session": "24x7",
+        "currency": "USDT",
+        "chart_session": "regular",
+        "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+      },
+      "csv_file": "captures/v13/trace-line-width-151-v13-v1-attempt1.csv",
+      "evidence_files": [
+        "captures/v13/evidence/trace-line-width-151-v13-v1-attempt1-setup.png",
+        "captures/v13/evidence/trace-line-width-151-v13-v1-attempt1-export.png",
+        "captures/v13/evidence/trace-line-width-151-v13-v1-attempt1-logs.txt",
+        "captures/v13/evidence/trace-line-width-151-v13-v1-attempt1-logs-v1.json",
+        "captures/v13/evidence/trace-line-width-151-v13-v1-attempt1-logs.png",
+        "captures/v13/evidence/trace-line-width-151-v13-v1-attempt1-visual.png",
+        "captures/v13/evidence/trace-line-width-151-v13-v1-attempt1-data-window-v1.png",
+        "captures/v13/evidence/trace-line-width-151-v13-v1-attempt1-data-window-v1.json",
+        "captures/v13/evidence/trace-line-width-151-v13-v1-attempt1-data-window-v1.txt",
+        "captures/v13/evidence/trace-line-width-151-v13-v1-attempt1-authority-object-geometry-v1.json",
+        "captures/v13/evidence/trace-line-width-151-v13-v1-attempt1-authority-object-geometry-v1.png",
+        "captures/v13/evidence/trace-line-width-151-v13-v1-attempt1-fixed-width-rendering-v1.json",
+        "captures/v13/evidence/trace-line-width-151-v13-v1-attempt1-fixed-width-rendering-v1.png"
+      ],
+      "first_eight_populated_rows": [
+        {
+          "time": "1788739200",
+          "open": "80341.83",
+          "high": "80356",
+          "low": "80230.29",
+          "close": "80293.23",
+          "INPUT_BAR_INDEX": "0",
+          "REQUESTED_WIDTH": "151"
+        },
+        {
+          "time": "1788739320",
+          "open": "80293.23",
+          "high": "80367.8",
+          "low": "80293.23",
+          "close": "80314.01",
+          "INPUT_BAR_INDEX": "1",
+          "REQUESTED_WIDTH": "151"
+        },
+        {
+          "time": "1788739440",
+          "open": "80314.01",
+          "high": "80426",
+          "low": "80310",
+          "close": "80426",
+          "INPUT_BAR_INDEX": "2",
+          "REQUESTED_WIDTH": "151"
+        },
+        {
+          "time": "1788739560",
+          "open": "80426",
+          "high": "80443.99",
+          "low": "80345.09",
+          "close": "80345.1",
+          "INPUT_BAR_INDEX": "3",
+          "REQUESTED_WIDTH": "151"
+        },
+        {
+          "time": "1788739680",
+          "open": "80345.1",
+          "high": "80430",
+          "low": "80345.09",
+          "close": "80384",
+          "INPUT_BAR_INDEX": "4",
+          "REQUESTED_WIDTH": "151"
+        },
+        {
+          "time": "1788739800",
+          "open": "80384",
+          "high": "80384.01",
+          "low": "80344.54",
+          "close": "80346.79",
+          "INPUT_BAR_INDEX": "5",
+          "REQUESTED_WIDTH": "151"
+        },
+        {
+          "time": "1788739920",
+          "open": "80346.96",
+          "high": "80350",
+          "low": "80322.01",
+          "close": "80350",
+          "INPUT_BAR_INDEX": "6",
+          "REQUESTED_WIDTH": "151"
+        },
+        {
+          "time": "1788740040",
+          "open": "80350",
+          "high": "80363.93",
+          "low": "80278",
+          "close": "80279.43",
+          "INPUT_BAR_INDEX": "7",
+          "REQUESTED_WIDTH": "151"
+        }
+      ],
+      "last_row": {
+        "time": "1791139800",
+        "open": "85342.37",
+        "high": "85342.37",
+        "low": "85342.36",
+        "close": "85342.37",
+        "INPUT_BAR_INDEX": "20005",
+        "REQUESTED_WIDTH": "151"
+      }
+    },
+    {
+      "script": "trace-box-width-151-v13-v1.pine",
+      "attempt": 1,
+      "status": "RUNS",
+      "source_sha256": "22500edd42479f46558217a06ab755bcb5ad73ee8d63e5872357e112954d2792",
+      "reset_utc": "2026-10-04T18:51:26.441Z",
+      "export_utc": "2026-10-04T18:51:34.848Z",
+      "diagnostic": {
+        "code": null,
+        "text": null,
+        "line": null,
+        "column": null,
+        "first_bar_index": null,
+        "first_bar_time_utc": null
+      },
+      "setup": {
+        "tickerid": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chart_type": "standard candles",
+        "native_style": 1,
+        "timezone": "Etc/UTC",
+        "bar_replay": false,
+        "minmove": 1,
+        "pricescale": 100,
+        "pointvalue": 1,
+        "mintick": 0.01,
+        "defaults_confirmed": true,
+        "native_user_inputs": [],
+        "observed_indicator_title": "Silent audit box-width-151 v13 v1",
+        "dataset_start_utc": "2026-09-07T00:00:00.000Z",
+        "first_chart_bar": {
+          "index": -19706,
+          "value": [
+            1788739200,
+            80341.83,
+            80356,
+            80230.29,
+            80293.23,
+            37.66955
+          ]
+        },
+        "chart_bars": 20006,
+        "subscription": "pro_premium",
+        "native_end_of_data": true,
+        "exchange_timezone": "Etc/UTC",
+        "exchange_session": "24x7",
+        "currency": "USDT",
+        "chart_session": "regular",
+        "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+      },
+      "csv_file": "captures/v13/trace-box-width-151-v13-v1-attempt1.csv",
+      "evidence_files": [
+        "captures/v13/evidence/trace-box-width-151-v13-v1-attempt1-setup.png",
+        "captures/v13/evidence/trace-box-width-151-v13-v1-attempt1-export.png",
+        "captures/v13/evidence/trace-box-width-151-v13-v1-attempt1-logs.txt",
+        "captures/v13/evidence/trace-box-width-151-v13-v1-attempt1-logs-v1.json",
+        "captures/v13/evidence/trace-box-width-151-v13-v1-attempt1-logs.png",
+        "captures/v13/evidence/trace-box-width-151-v13-v1-attempt1-visual.png",
+        "captures/v13/evidence/trace-box-width-151-v13-v1-attempt1-data-window-v1.png",
+        "captures/v13/evidence/trace-box-width-151-v13-v1-attempt1-data-window-v1.json",
+        "captures/v13/evidence/trace-box-width-151-v13-v1-attempt1-data-window-v1.txt",
+        "captures/v13/evidence/trace-box-width-151-v13-v1-attempt1-authority-object-geometry-v1.json",
+        "captures/v13/evidence/trace-box-width-151-v13-v1-attempt1-authority-object-geometry-v1.png",
+        "captures/v13/evidence/trace-box-width-151-v13-v1-attempt1-fixed-width-rendering-v1.json",
+        "captures/v13/evidence/trace-box-width-151-v13-v1-attempt1-fixed-width-rendering-v1.png"
+      ],
+      "first_eight_populated_rows": [
+        {
+          "time": "1788739200",
+          "open": "80341.83",
+          "high": "80356",
+          "low": "80230.29",
+          "close": "80293.23",
+          "INPUT_BAR_INDEX": "0",
+          "REQUESTED_WIDTH": "151"
+        },
+        {
+          "time": "1788739320",
+          "open": "80293.23",
+          "high": "80367.8",
+          "low": "80293.23",
+          "close": "80314.01",
+          "INPUT_BAR_INDEX": "1",
+          "REQUESTED_WIDTH": "151"
+        },
+        {
+          "time": "1788739440",
+          "open": "80314.01",
+          "high": "80426",
+          "low": "80310",
+          "close": "80426",
+          "INPUT_BAR_INDEX": "2",
+          "REQUESTED_WIDTH": "151"
+        },
+        {
+          "time": "1788739560",
+          "open": "80426",
+          "high": "80443.99",
+          "low": "80345.09",
+          "close": "80345.1",
+          "INPUT_BAR_INDEX": "3",
+          "REQUESTED_WIDTH": "151"
+        },
+        {
+          "time": "1788739680",
+          "open": "80345.1",
+          "high": "80430",
+          "low": "80345.09",
+          "close": "80384",
+          "INPUT_BAR_INDEX": "4",
+          "REQUESTED_WIDTH": "151"
+        },
+        {
+          "time": "1788739800",
+          "open": "80384",
+          "high": "80384.01",
+          "low": "80344.54",
+          "close": "80346.79",
+          "INPUT_BAR_INDEX": "5",
+          "REQUESTED_WIDTH": "151"
+        },
+        {
+          "time": "1788739920",
+          "open": "80346.96",
+          "high": "80350",
+          "low": "80322.01",
+          "close": "80350",
+          "INPUT_BAR_INDEX": "6",
+          "REQUESTED_WIDTH": "151"
+        },
+        {
+          "time": "1788740040",
+          "open": "80350",
+          "high": "80363.93",
+          "low": "80278",
+          "close": "80279.43",
+          "INPUT_BAR_INDEX": "7",
+          "REQUESTED_WIDTH": "151"
+        }
+      ],
+      "last_row": {
+        "time": "1791139800",
+        "open": "85342.37",
+        "high": "85342.37",
+        "low": "85342.36",
+        "close": "85342.37",
+        "INPUT_BAR_INDEX": "20005",
+        "REQUESTED_WIDTH": "151"
+      }
+    },
+    {
+      "script": "trace-polyline-width-151-v13-v1.pine",
+      "attempt": 1,
+      "status": "RUNS",
+      "source_sha256": "695c46b96dc007dee8fc92c59df9e9856556181b00fa87f14f2a3acbcd24aceb",
+      "reset_utc": "2026-10-04T18:52:00.932Z",
+      "export_utc": "2026-10-04T18:52:09.061Z",
+      "diagnostic": {
+        "code": null,
+        "text": null,
+        "line": null,
+        "column": null,
+        "first_bar_index": null,
+        "first_bar_time_utc": null
+      },
+      "setup": {
+        "tickerid": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chart_type": "standard candles",
+        "native_style": 1,
+        "timezone": "Etc/UTC",
+        "bar_replay": false,
+        "minmove": 1,
+        "pricescale": 100,
+        "pointvalue": 1,
+        "mintick": 0.01,
+        "defaults_confirmed": true,
+        "native_user_inputs": [],
+        "observed_indicator_title": "Silent audit polyline-width-151 v13 v1",
+        "dataset_start_utc": "2026-09-07T00:00:00.000Z",
+        "first_chart_bar": {
+          "index": -19706,
+          "value": [
+            1788739200,
+            80341.83,
+            80356,
+            80230.29,
+            80293.23,
+            37.66955
+          ]
+        },
+        "chart_bars": 20007,
+        "subscription": "pro_premium",
+        "native_end_of_data": true,
+        "exchange_timezone": "Etc/UTC",
+        "exchange_session": "24x7",
+        "currency": "USDT",
+        "chart_session": "regular",
+        "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+      },
+      "csv_file": "captures/v13/trace-polyline-width-151-v13-v1-attempt1.csv",
+      "evidence_files": [
+        "captures/v13/evidence/trace-polyline-width-151-v13-v1-attempt1-setup.png",
+        "captures/v13/evidence/trace-polyline-width-151-v13-v1-attempt1-export.png",
+        "captures/v13/evidence/trace-polyline-width-151-v13-v1-attempt1-logs.txt",
+        "captures/v13/evidence/trace-polyline-width-151-v13-v1-attempt1-logs-v1.json",
+        "captures/v13/evidence/trace-polyline-width-151-v13-v1-attempt1-logs.png",
+        "captures/v13/evidence/trace-polyline-width-151-v13-v1-attempt1-visual.png",
+        "captures/v13/evidence/trace-polyline-width-151-v13-v1-attempt1-data-window-v1.png",
+        "captures/v13/evidence/trace-polyline-width-151-v13-v1-attempt1-data-window-v1.json",
+        "captures/v13/evidence/trace-polyline-width-151-v13-v1-attempt1-data-window-v1.txt",
+        "captures/v13/evidence/trace-polyline-width-151-v13-v1-attempt1-authority-object-geometry-v1.json",
+        "captures/v13/evidence/trace-polyline-width-151-v13-v1-attempt1-authority-object-geometry-v1.png",
+        "captures/v13/evidence/trace-polyline-width-151-v13-v1-attempt1-fixed-width-rendering-v1.json",
+        "captures/v13/evidence/trace-polyline-width-151-v13-v1-attempt1-fixed-width-rendering-v1.png"
+      ],
+      "first_eight_populated_rows": [
+        {
+          "time": "1788739200",
+          "open": "80341.83",
+          "high": "80356",
+          "low": "80230.29",
+          "close": "80293.23",
+          "INPUT_BAR_INDEX": "0",
+          "REQUESTED_WIDTH": "151"
+        },
+        {
+          "time": "1788739320",
+          "open": "80293.23",
+          "high": "80367.8",
+          "low": "80293.23",
+          "close": "80314.01",
+          "INPUT_BAR_INDEX": "1",
+          "REQUESTED_WIDTH": "151"
+        },
+        {
+          "time": "1788739440",
+          "open": "80314.01",
+          "high": "80426",
+          "low": "80310",
+          "close": "80426",
+          "INPUT_BAR_INDEX": "2",
+          "REQUESTED_WIDTH": "151"
+        },
+        {
+          "time": "1788739560",
+          "open": "80426",
+          "high": "80443.99",
+          "low": "80345.09",
+          "close": "80345.1",
+          "INPUT_BAR_INDEX": "3",
+          "REQUESTED_WIDTH": "151"
+        },
+        {
+          "time": "1788739680",
+          "open": "80345.1",
+          "high": "80430",
+          "low": "80345.09",
+          "close": "80384",
+          "INPUT_BAR_INDEX": "4",
+          "REQUESTED_WIDTH": "151"
+        },
+        {
+          "time": "1788739800",
+          "open": "80384",
+          "high": "80384.01",
+          "low": "80344.54",
+          "close": "80346.79",
+          "INPUT_BAR_INDEX": "5",
+          "REQUESTED_WIDTH": "151"
+        },
+        {
+          "time": "1788739920",
+          "open": "80346.96",
+          "high": "80350",
+          "low": "80322.01",
+          "close": "80350",
+          "INPUT_BAR_INDEX": "6",
+          "REQUESTED_WIDTH": "151"
+        },
+        {
+          "time": "1788740040",
+          "open": "80350",
+          "high": "80363.93",
+          "low": "80278",
+          "close": "80279.43",
+          "INPUT_BAR_INDEX": "7",
+          "REQUESTED_WIDTH": "151"
+        }
+      ],
+      "last_row": {
+        "time": "1791139920",
+        "open": "85342.37",
+        "high": "85342.37",
+        "low": "85342.36",
+        "close": "85342.37",
+        "INPUT_BAR_INDEX": "20006",
+        "REQUESTED_WIDTH": "151"
+      }
+    },
+    {
+      "script": "trace-table-width-negative1-v13-v1.pine",
+      "attempt": 1,
+      "status": "RUNS",
+      "source_sha256": "8a434172328e2f16e2fb8aa891c338d793e96261179ee786c742bee34434aa10",
+      "reset_utc": "2026-10-04T18:54:55.461Z",
+      "export_utc": "2026-10-04T18:55:03.126Z",
+      "diagnostic": {
+        "code": null,
+        "text": null,
+        "line": null,
+        "column": null,
+        "first_bar_index": null,
+        "first_bar_time_utc": null
+      },
+      "setup": {
+        "tickerid": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chart_type": "standard candles",
+        "native_style": 1,
+        "timezone": "Etc/UTC",
+        "bar_replay": false,
+        "minmove": 1,
+        "pricescale": 100,
+        "pointvalue": 1,
+        "mintick": 0.01,
+        "defaults_confirmed": true,
+        "native_user_inputs": [],
+        "observed_indicator_title": "Silent audit table-width-negative1 v13 v1",
+        "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+        "first_chart_bar": {
+          "index": -24748,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "chart_bars": 25048,
+        "subscription": "pro_premium",
+        "native_end_of_data": true,
+        "exchange_timezone": "Etc/UTC",
+        "exchange_session": "24x7",
+        "currency": "USDT",
+        "chart_session": "regular",
+        "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+      },
+      "csv_file": "captures/v13/trace-table-width-negative1-v13-v1-attempt1.csv",
+      "evidence_files": [
+        "captures/v13/evidence/trace-table-width-negative1-v13-v1-attempt1-setup.png",
+        "captures/v13/evidence/trace-table-width-negative1-v13-v1-attempt1-export.png",
+        "captures/v13/evidence/trace-table-width-negative1-v13-v1-attempt1-logs.txt",
+        "captures/v13/evidence/trace-table-width-negative1-v13-v1-attempt1-logs-v1.json",
+        "captures/v13/evidence/trace-table-width-negative1-v13-v1-attempt1-logs.png",
+        "captures/v13/evidence/trace-table-width-negative1-v13-v1-attempt1-visual.png",
+        "captures/v13/evidence/trace-table-width-negative1-v13-v1-attempt1-data-window-v1.png",
+        "captures/v13/evidence/trace-table-width-negative1-v13-v1-attempt1-data-window-v1.json",
+        "captures/v13/evidence/trace-table-width-negative1-v13-v1-attempt1-data-window-v1.txt",
+        "captures/v13/evidence/trace-table-width-negative1-v13-v1-attempt1-authority-object-geometry-v1.json",
+        "captures/v13/evidence/trace-table-width-negative1-v13-v1-attempt1-authority-object-geometry-v1.png"
+      ],
+      "first_eight_populated_rows": [
+        {
+          "time": "1788739200",
+          "open": "80341.83",
+          "high": "80356",
+          "low": "80230.29",
+          "close": "80293.23",
+          "INPUT_BAR_INDEX": "0",
+          "REQUESTED_WIDTH": "-1"
+        },
+        {
+          "time": "1788739320",
+          "open": "80293.23",
+          "high": "80367.8",
+          "low": "80293.23",
+          "close": "80314.01",
+          "INPUT_BAR_INDEX": "1",
+          "REQUESTED_WIDTH": "-1"
+        },
+        {
+          "time": "1788739440",
+          "open": "80314.01",
+          "high": "80426",
+          "low": "80310",
+          "close": "80426",
+          "INPUT_BAR_INDEX": "2",
+          "REQUESTED_WIDTH": "-1"
+        },
+        {
+          "time": "1788739560",
+          "open": "80426",
+          "high": "80443.99",
+          "low": "80345.09",
+          "close": "80345.1",
+          "INPUT_BAR_INDEX": "3",
+          "REQUESTED_WIDTH": "-1"
+        },
+        {
+          "time": "1788739680",
+          "open": "80345.1",
+          "high": "80430",
+          "low": "80345.09",
+          "close": "80384",
+          "INPUT_BAR_INDEX": "4",
+          "REQUESTED_WIDTH": "-1"
+        },
+        {
+          "time": "1788739800",
+          "open": "80384",
+          "high": "80384.01",
+          "low": "80344.54",
+          "close": "80346.79",
+          "INPUT_BAR_INDEX": "5",
+          "REQUESTED_WIDTH": "-1"
+        },
+        {
+          "time": "1788739920",
+          "open": "80346.96",
+          "high": "80350",
+          "low": "80322.01",
+          "close": "80350",
+          "INPUT_BAR_INDEX": "6",
+          "REQUESTED_WIDTH": "-1"
+        },
+        {
+          "time": "1788740040",
+          "open": "80350",
+          "high": "80363.93",
+          "low": "80278",
+          "close": "80279.43",
+          "INPUT_BAR_INDEX": "7",
+          "REQUESTED_WIDTH": "-1"
+        }
+      ],
+      "last_row": {
+        "time": "1791140040",
+        "open": "85342.36",
+        "high": "85350",
+        "low": "85342.36",
+        "close": "85349.99",
+        "INPUT_BAR_INDEX": "20007",
+        "REQUESTED_WIDTH": "-1"
+      }
+    },
+    {
+      "script": "trace-table-width-151-v13-v1.pine",
+      "attempt": 1,
+      "status": "RUNS",
+      "source_sha256": "3bf30786a4922b5a658ed0da36fde2ea6e4a15dcd49ad3e4b27029c82b6146c5",
+      "reset_utc": "2026-10-04T18:55:26.824Z",
+      "export_utc": "2026-10-04T18:55:35.016Z",
+      "diagnostic": {
+        "code": null,
+        "text": null,
+        "line": null,
+        "column": null,
+        "first_bar_index": null,
+        "first_bar_time_utc": null
+      },
+      "setup": {
+        "tickerid": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chart_type": "standard candles",
+        "native_style": 1,
+        "timezone": "Etc/UTC",
+        "bar_replay": false,
+        "minmove": 1,
+        "pricescale": 100,
+        "pointvalue": 1,
+        "mintick": 0.01,
+        "defaults_confirmed": true,
+        "native_user_inputs": [],
+        "observed_indicator_title": "Silent audit table-width-151 v13 v1",
+        "dataset_start_utc": "2026-09-07T00:00:00.000Z",
+        "first_chart_bar": {
+          "index": -19708,
+          "value": [
+            1788739200,
+            80341.83,
+            80356,
+            80230.29,
+            80293.23,
+            37.66955
+          ]
+        },
+        "chart_bars": 20008,
+        "subscription": "pro_premium",
+        "native_end_of_data": true,
+        "exchange_timezone": "Etc/UTC",
+        "exchange_session": "24x7",
+        "currency": "USDT",
+        "chart_session": "regular",
+        "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+      },
+      "csv_file": "captures/v13/trace-table-width-151-v13-v1-attempt1.csv",
+      "evidence_files": [
+        "captures/v13/evidence/trace-table-width-151-v13-v1-attempt1-setup.png",
+        "captures/v13/evidence/trace-table-width-151-v13-v1-attempt1-export.png",
+        "captures/v13/evidence/trace-table-width-151-v13-v1-attempt1-logs.txt",
+        "captures/v13/evidence/trace-table-width-151-v13-v1-attempt1-logs-v1.json",
+        "captures/v13/evidence/trace-table-width-151-v13-v1-attempt1-logs.png",
+        "captures/v13/evidence/trace-table-width-151-v13-v1-attempt1-visual.png",
+        "captures/v13/evidence/trace-table-width-151-v13-v1-attempt1-data-window-v1.png",
+        "captures/v13/evidence/trace-table-width-151-v13-v1-attempt1-data-window-v1.json",
+        "captures/v13/evidence/trace-table-width-151-v13-v1-attempt1-data-window-v1.txt",
+        "captures/v13/evidence/trace-table-width-151-v13-v1-attempt1-authority-object-geometry-v1.json",
+        "captures/v13/evidence/trace-table-width-151-v13-v1-attempt1-authority-object-geometry-v1.png"
+      ],
+      "first_eight_populated_rows": [
+        {
+          "time": "1788739200",
+          "open": "80341.83",
+          "high": "80356",
+          "low": "80230.29",
+          "close": "80293.23",
+          "INPUT_BAR_INDEX": "0",
+          "REQUESTED_WIDTH": "151"
+        },
+        {
+          "time": "1788739320",
+          "open": "80293.23",
+          "high": "80367.8",
+          "low": "80293.23",
+          "close": "80314.01",
+          "INPUT_BAR_INDEX": "1",
+          "REQUESTED_WIDTH": "151"
+        },
+        {
+          "time": "1788739440",
+          "open": "80314.01",
+          "high": "80426",
+          "low": "80310",
+          "close": "80426",
+          "INPUT_BAR_INDEX": "2",
+          "REQUESTED_WIDTH": "151"
+        },
+        {
+          "time": "1788739560",
+          "open": "80426",
+          "high": "80443.99",
+          "low": "80345.09",
+          "close": "80345.1",
+          "INPUT_BAR_INDEX": "3",
+          "REQUESTED_WIDTH": "151"
+        },
+        {
+          "time": "1788739680",
+          "open": "80345.1",
+          "high": "80430",
+          "low": "80345.09",
+          "close": "80384",
+          "INPUT_BAR_INDEX": "4",
+          "REQUESTED_WIDTH": "151"
+        },
+        {
+          "time": "1788739800",
+          "open": "80384",
+          "high": "80384.01",
+          "low": "80344.54",
+          "close": "80346.79",
+          "INPUT_BAR_INDEX": "5",
+          "REQUESTED_WIDTH": "151"
+        },
+        {
+          "time": "1788739920",
+          "open": "80346.96",
+          "high": "80350",
+          "low": "80322.01",
+          "close": "80350",
+          "INPUT_BAR_INDEX": "6",
+          "REQUESTED_WIDTH": "151"
+        },
+        {
+          "time": "1788740040",
+          "open": "80350",
+          "high": "80363.93",
+          "low": "80278",
+          "close": "80279.43",
+          "INPUT_BAR_INDEX": "7",
+          "REQUESTED_WIDTH": "151"
+        }
+      ],
+      "last_row": {
+        "time": "1791140040",
+        "open": "85342.36",
+        "high": "85353.75",
+        "low": "85342.36",
+        "close": "85353.73",
+        "INPUT_BAR_INDEX": "20007",
+        "REQUESTED_WIDTH": "151"
+      }
+    },
+    {
+      "script": "trace-drawing-count-501-v13-v1.pine",
+      "attempt": 1,
+      "status": "COMPILE-ERROR",
+      "source_sha256": "6108502c887215d5646b68eb8bb0fef1e0d011dd6ae994c01f77f02d4b69de3c",
+      "reset_utc": null,
+      "export_utc": null,
+      "diagnostic": {
+        "code": "CE10178",
+        "text": "The script max_lines_count value (501) is greater than the maximum possible value (500)",
+        "line": 2,
+        "column": 66,
+        "first_bar_index": null,
+        "first_bar_time_utc": null,
+        "native": {
+          "error": "The script {drwName} value ({value}) is greater than the maximum possible value ({MAX_DRAWINGS_COUNT})",
+          "editorError": {
+            "code": "CE10178",
+            "ctx": {
+              "MAX_DRAWINGS_COUNT": 500,
+              "drwName": "max_lines_count",
+              "value": 501
+            },
+            "end": {
+              "column": 68,
+              "line": 2
+            },
+            "message": "The script {drwName} value ({value}) is greater than the maximum possible value ({MAX_DRAWINGS_COUNT})",
+            "start": {
+              "column": 66,
+              "line": 2
+            },
+            "id": "USER;cd390a1332464d7582191a4c30c43f49"
+          },
+          "title": "Compilation error",
+          "compiler_markers": [],
+          "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,319.33\nH\n85,326.78\nL\n85,319.33\nC\n85,326.78\n+7.45 (+0.01%)\n85,353.75\nSELL\n0.01\n85,353.76\nBUY\nUSDT\ntrace-drawing-count-501-v13-v1.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n18:55:56 UTC\n99+\nPine Editor\ntrace-drawing-count-501-v13-v1.pine\nPublish script\n1\n2\n3\n4\n5\n6\n7\n8\n//@version=6\nindicator(\"Silent\u00a0audit\u00a0drawing\u00a0count501\u00a0v13\u00a0v1\",max_lines_count=501)\nif\u00a0barstate.isfirst\n\u00a0\u00a0\u00a0\u00a0for\u00a0i=0\u00a0to\u00a0500\n\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0line.new(0,1,1,1)\nplot(bar_index,\"INPUT_BAR_INDEX\",display=display.data_window)\nplot(array.size(line.all),\"OUTCOME\",display=display.data_window)\n1 \u2219 Today, 02:55\nLine 2, Col 66\nPine Script\u00ae v6\nCompilation error: CE10178\n\nThe script max_lines_count value (501) is greater than the maximum possible value (500)\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+          "context_substituted_message": "The script max_lines_count value (501) is greater than the maximum possible value (500)"
+        }
+      },
+      "setup": {
+        "tickerid": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chart_type": "standard candles",
+        "native_style": 1,
+        "timezone": "Etc/UTC",
+        "bar_replay": false,
+        "minmove": 1,
+        "pricescale": 100,
+        "pointvalue": 1,
+        "mintick": 0.01,
+        "defaults_confirmed": true,
+        "native_user_inputs": [],
+        "observed_indicator_title": "trace-drawing-count-501-v13-v1.pine",
+        "dataset_start_utc": "2026-09-07T00:00:00.000Z",
+        "first_chart_bar": {
+          "index": -19708,
+          "value": [
+            1788739200,
+            80341.83,
+            80356,
+            80230.29,
+            80293.23,
+            37.66955
+          ]
+        },
+        "chart_bars": 20008,
+        "subscription": "pro_premium",
+        "native_end_of_data": true,
+        "exchange_timezone": "Etc/UTC",
+        "exchange_session": "24x7",
+        "currency": "USDT",
+        "chart_session": "regular",
+        "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+      },
+      "csv_file": null,
+      "evidence_files": [
+        "captures/v13/evidence/trace-drawing-count-501-v13-v1-attempt1-error.png",
+        "captures/v13/evidence/trace-drawing-count-501-v13-v1-attempt1-error.txt",
+        "captures/v13/evidence/trace-drawing-count-501-v13-v1-attempt1-logs.txt",
+        "captures/v13/evidence/trace-drawing-count-501-v13-v1-attempt1-logs-v1.json",
+        "captures/v13/evidence/trace-drawing-count-501-v13-v1-attempt1-logs.png"
+      ]
+    },
+    {
+      "script": "trace-time-offset-negative501-v13-v1.pine",
+      "attempt": 1,
+      "status": "COMPILE-ERROR",
+      "source_sha256": "4f8abc03efaae4a1a8055b59effeea12a3c80b9e74f5aa0f0ce24d877d828546",
+      "reset_utc": null,
+      "export_utc": null,
+      "diagnostic": {
+        "code": "CE10041",
+        "text": "Invalid value \"-501\" for \"bars_back\" parameter of the \"time()\" function. It must be between -500 and 5000",
+        "line": 5,
+        "column": 24,
+        "first_bar_index": null,
+        "first_bar_time_utc": null,
+        "native": {
+          "error": "Invalid value \"{value}\" for \"{argument_name}\" parameter of the \"{funId}()\" function. It must be between {min_value} and {max_value}",
+          "editorError": {
+            "code": "CE10041",
+            "ctx": {
+              "argument_name": "bars_back",
+              "funId": "time",
+              "max_value": 5000,
+              "min_value": -500,
+              "value": -501
+            },
+            "end": {
+              "column": 27,
+              "line": 5
+            },
+            "message": "Invalid value \"{value}\" for \"{argument_name}\" parameter of the \"{funId}()\" function. It must be between {min_value} and {max_value}",
+            "start": {
+              "column": 24,
+              "line": 5
+            },
+            "id": "USER;64eb9fe01ecd4728859be8cb120fa590"
+          },
+          "title": "Compilation error",
+          "compiler_markers": [],
+          "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n1m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n1\nBinance\nO\n85,353.76\nH\n85,356.17\nL\n85,353.75\nC\n85,354.00\n+0.24 (+0.00%)\n85,353.99\nSELL\n0.01\n85,354.00\nBUY\nUSDT\nOracle na holes crosses v1\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n18:56:47 UTC\n99+\nPine Editor\ntrace-time-offset-negative501-v13-v1.pine\nPublish script\n1\n2\n3\n4\n5\n6\n//@version=6\nindicator(\"Silent\u00a0audit\u00a0time-offset-negative501\u00a0v13\u00a0v1\",\u00a0overlay=false,\u00a0precision=16)\nplot(bar_index,\"INPUT_BAR_INDEX\",display=display.data_window)\nplot(time,\"INPUT_TIME\",display=display.data_window)\nplot(time(\"\",bars_back=-501),\"OUTCOME\",display=display.data_window)\n1 \u2219 Today, 02:56\nLine 5, Col 24\nPine Script\u00ae v6\nCompilation error: CE10041\nCompilation error: CE10041\n\nInvalid value \"-501\" for \"bars_back\" parameter of the \"time()\" function. It must be between -500 and 5000\n\nOpen in editor",
+          "context_substituted_message": "Invalid value \"-501\" for \"bars_back\" parameter of the \"time()\" function. It must be between -500 and 5000"
+        }
+      },
+      "setup": {
+        "tickerid": "BINANCE:BTCUSDT",
+        "timeframe": "1",
+        "chart_type": "standard candles",
+        "native_style": 1,
+        "timezone": "Etc/UTC",
+        "bar_replay": false,
+        "minmove": 1,
+        "pricescale": 100,
+        "pointvalue": 1,
+        "mintick": 0.01,
+        "defaults_confirmed": true,
+        "native_user_inputs": [],
+        "observed_indicator_title": "Oracle na holes crosses v1",
+        "dataset_start_utc": "2026-10-04T13:57:00.000Z",
+        "first_chart_bar": {
+          "index": 0,
+          "value": [
+            1791122220,
+            85252.28,
+            85252.29,
+            85248.5,
+            85248.5,
+            2.04548
+          ]
+        },
+        "chart_bars": 300,
+        "subscription": "pro_premium",
+        "native_end_of_data": false,
+        "exchange_timezone": "Etc/UTC",
+        "exchange_session": "24x7",
+        "currency": "USDT",
+        "chart_session": "regular",
+        "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+      },
+      "csv_file": null,
+      "evidence_files": [
+        "captures/v13/evidence/trace-time-offset-negative501-v13-v1-attempt1-error.png",
+        "captures/v13/evidence/trace-time-offset-negative501-v13-v1-attempt1-error.txt",
+        "captures/v13/evidence/trace-time-offset-negative501-v13-v1-attempt1-logs.txt",
+        "captures/v13/evidence/trace-time-offset-negative501-v13-v1-attempt1-logs-v1.json",
+        "captures/v13/evidence/trace-time-offset-negative501-v13-v1-attempt1-logs.png"
+      ]
+    },
+    {
+      "script": "trace-time-offset-5001-v13-v1.pine",
+      "attempt": 1,
+      "status": "COMPILE-ERROR",
+      "source_sha256": "bb0646c2dcfb4142e86f73da82ac246f37aa64dd92f8d27c680c866587312909",
+      "reset_utc": null,
+      "export_utc": null,
+      "diagnostic": {
+        "code": "CE10041",
+        "text": "Invalid value \"5001\" for \"bars_back\" parameter of the \"time()\" function. It must be between -500 and 5000",
+        "line": 5,
+        "column": 24,
+        "first_bar_index": null,
+        "first_bar_time_utc": null,
+        "native": {
+          "error": "Invalid value \"{value}\" for \"{argument_name}\" parameter of the \"{funId}()\" function. It must be between {min_value} and {max_value}",
+          "editorError": {
+            "code": "CE10041",
+            "ctx": {
+              "argument_name": "bars_back",
+              "funId": "time",
+              "max_value": 5000,
+              "min_value": -500,
+              "value": 5001
+            },
+            "end": {
+              "column": 27,
+              "line": 5
+            },
+            "message": "Invalid value \"{value}\" for \"{argument_name}\" parameter of the \"{funId}()\" function. It must be between {min_value} and {max_value}",
+            "start": {
+              "column": 24,
+              "line": 5
+            },
+            "id": "USER;64eb9fe01ecd4728859be8cb120fa590"
+          },
+          "title": "Compilation error",
+          "compiler_markers": [
+            {
+              "resource": {
+                "$mid": 1,
+                "external": "file:///087a8d09-949c-4169-a6e3-090b79590ea4.pine?placement%3Ddialog",
+                "path": "/087a8d09-949c-4169-a6e3-090b79590ea4.pine",
+                "scheme": "file",
+                "query": "placement=dialog"
+              },
+              "owner": "_generated_diagnostic_collection_name_#0",
+              "code": "CE10041",
+              "severity": 8,
+              "message": "Invalid value \"5001\" for \"bars_back\" parameter of the \"time()\" function. It must be between -500 and 5000",
+              "startLineNumber": 5,
+              "startColumn": 24,
+              "endLineNumber": 5,
+              "endColumn": 28
+            }
+          ],
+          "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n1m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n1\nBinance\nO\n85,353.76\nH\n85,356.17\nL\n85,353.75\nC\n85,353.99\n+0.23 (+0.00%)\n85,353.99\nSELL\n0.01\n85,354.00\nBUY\nUSDT\nOracle na holes crosses v1\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n18:56:59 UTC\n99+\nPine Editor\ntrace-time-offset-5001-v13-v1.pine\nPublish script\n1\n2\n3\n4\n5\n6\n7\n//@version=6\nindicator(\"Silent\u00a0audit\u00a0time-offset-5001\u00a0v13\u00a0v1\",\u00a0overlay=false,\u00a0precision=16)\nplot(bar_index,\"INPUT_BAR_INDEX\",display=display.data_window)\nplot(time,\"INPUT_TIME\",display=display.data_window)\nplot(time(\"\",bars_back=5001),\"OUTCOME\",display=display.data_window)\nplot(time[5001],\"DIRECT_HISTORY_CONTROL\",display=display.data_window)\n1 of 1 problem\nInvalid value \"5001\" for \"bars_back\" parameter of the \"time()\" function. It must be between -500 and 5000(CE10041)\n1 \u2219 Today, 02:56\nLine 5, Col 24\nPine Script\u00ae v6\nCompilation error: CE10041\nCompilation error: CE10041\n\nInvalid value \"5001\" for \"bars_back\" parameter of the \"time()\" function. It must be between -500 and 5000\n\nOpen in editor",
+          "context_substituted_message": "Invalid value \"5001\" for \"bars_back\" parameter of the \"time()\" function. It must be between -500 and 5000"
+        }
+      },
+      "setup": {
+        "tickerid": "BINANCE:BTCUSDT",
+        "timeframe": "1",
+        "chart_type": "standard candles",
+        "native_style": 1,
+        "timezone": "Etc/UTC",
+        "bar_replay": false,
+        "minmove": 1,
+        "pricescale": 100,
+        "pointvalue": 1,
+        "mintick": 0.01,
+        "defaults_confirmed": true,
+        "native_user_inputs": [],
+        "observed_indicator_title": "Oracle na holes crosses v1",
+        "dataset_start_utc": "2026-10-04T13:57:00.000Z",
+        "first_chart_bar": {
+          "index": 0,
+          "value": [
+            1791122220,
+            85252.28,
+            85252.29,
+            85248.5,
+            85248.5,
+            2.04548
+          ]
+        },
+        "chart_bars": 300,
+        "subscription": "pro_premium",
+        "native_end_of_data": false,
+        "exchange_timezone": "Etc/UTC",
+        "exchange_session": "24x7",
+        "currency": "USDT",
+        "chart_session": "regular",
+        "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+      },
+      "csv_file": null,
+      "evidence_files": [
+        "captures/v13/evidence/trace-time-offset-5001-v13-v1-attempt1-error.png",
+        "captures/v13/evidence/trace-time-offset-5001-v13-v1-attempt1-error.txt",
+        "captures/v13/evidence/trace-time-offset-5001-v13-v1-attempt1-logs.txt",
+        "captures/v13/evidence/trace-time-offset-5001-v13-v1-attempt1-logs-v1.json",
+        "captures/v13/evidence/trace-time-offset-5001-v13-v1-attempt1-logs.png"
+      ]
+    },
+    {
+      "script": "trace-pivot-pivothigh-negative1-v13-v1.pine",
+      "attempt": 1,
+      "status": "RUNTIME-ERROR",
+      "source_sha256": "4716a69c970f15d86b117987f4786d7d083f8934f05b41ccccea86798ca1fa17",
+      "reset_utc": "2026-10-04T18:58:14.464Z",
+      "export_utc": null,
+      "diagnostic": {
+        "code": "RE10001",
+        "text": "Error on bar 0: Invalid value of the 'leftbars' argument (-1) in the 'pivothigh' function. It must be >= 0.",
+        "line": 6,
+        "column": null,
+        "first_bar_index": 0,
+        "first_bar_time_utc": null,
+        "native": {
+          "ctx": {
+            "op": ">=",
+            "code": "RE10001",
+            "argName": "leftbars",
+            "bar_index": 0,
+            "value": -1,
+            "funName": "pivothigh"
+          },
+          "error": "Error on bar {bar_index}: Invalid value of the '{argName}' argument ({value}) in the '{funName}' function. It must be {op} 0.",
+          "stack_trace": [
+            {
+              "n": "#main",
+              "p": 6
+            }
+          ],
+          "title": "Runtime error",
+          "showReportItButton": false,
+          "studyAccessBlocked": false,
+          "compiler_markers": [],
+          "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,354.00\nH\n85,354.00\nL\n85,353.99\nC\n85,354.00\n0.00 (0.00%)\n85,353.99\nSELL\n0.01\n85,354.00\nBUY\nUSDT\nSilent audit pivot-pivothigh-negative1 v13 v1\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n18:58:18 UTC\n99+\nRuntime error: RE10001\nRuntime error: RE10001\nError on bar 0: Invalid value of the 'leftbars' argument (-1) in the 'pivothigh' function. It must be >= 0.\nat #main():6\nOpen in editor",
+          "context_substituted_message": "Error on bar 0: Invalid value of the 'leftbars' argument (-1) in the 'pivothigh' function. It must be >= 0."
+        }
+      },
+      "setup": {
+        "tickerid": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chart_type": "standard candles",
+        "native_style": 1,
+        "timezone": "Etc/UTC",
+        "bar_replay": false,
+        "minmove": 1,
+        "pricescale": 100,
+        "pointvalue": 1,
+        "mintick": 0.01,
+        "defaults_confirmed": true,
+        "native_user_inputs": [],
+        "observed_indicator_title": "Silent audit pivot-pivothigh-negative1 v13 v1",
+        "dataset_start_utc": "2026-09-07T00:00:00.000Z",
+        "first_chart_bar": {
+          "index": -19710,
+          "value": [
+            1788739200,
+            80341.83,
+            80356,
+            80230.29,
+            80293.23,
+            37.66955
+          ]
+        },
+        "chart_bars": 20010,
+        "subscription": "pro_premium",
+        "native_end_of_data": true,
+        "exchange_timezone": "Etc/UTC",
+        "exchange_session": "24x7",
+        "currency": "USDT",
+        "chart_session": "regular",
+        "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+      },
+      "csv_file": null,
+      "evidence_files": [
+        "captures/v13/evidence/trace-pivot-pivothigh-negative1-v13-v1-attempt1-error.png",
+        "captures/v13/evidence/trace-pivot-pivothigh-negative1-v13-v1-attempt1-error.txt",
+        "captures/v13/evidence/trace-pivot-pivothigh-negative1-v13-v1-attempt1-logs.txt",
+        "captures/v13/evidence/trace-pivot-pivothigh-negative1-v13-v1-attempt1-logs-v1.json",
+        "captures/v13/evidence/trace-pivot-pivothigh-negative1-v13-v1-attempt1-logs.png"
+      ]
+    },
+    {
+      "script": "trace-pivot-pivotlow-negative1-v13-v1.pine",
+      "attempt": 1,
+      "status": "RUNTIME-ERROR",
+      "source_sha256": "fb70417390bc80611a3c26fd3a18f19077b5e3965f401c22adde1cfbc0902129",
+      "reset_utc": "2026-10-04T18:58:34.580Z",
+      "export_utc": null,
+      "diagnostic": {
+        "code": "RE10001",
+        "text": "Error on bar 0: Invalid value of the 'leftbars' argument (-1) in the 'pivotlow' function. It must be >= 0.",
+        "line": 6,
+        "column": null,
+        "first_bar_index": 0,
+        "first_bar_time_utc": null,
+        "native": {
+          "ctx": {
+            "op": ">=",
+            "code": "RE10001",
+            "argName": "leftbars",
+            "bar_index": 0,
+            "value": -1,
+            "funName": "pivotlow"
+          },
+          "error": "Error on bar {bar_index}: Invalid value of the '{argName}' argument ({value}) in the '{funName}' function. It must be {op} 0.",
+          "stack_trace": [
+            {
+              "n": "#main",
+              "p": 6
+            }
+          ],
+          "title": "Runtime error",
+          "showReportItButton": false,
+          "studyAccessBlocked": false,
+          "compiler_markers": [],
+          "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,354.00\nH\n85,354.00\nL\n85,353.99\nC\n85,354.00\n0.00 (0.00%)\n85,353.99\nSELL\n0.01\n85,354.00\nBUY\nUSDT\nSilent audit pivot-pivotlow-negative1 v13 v1\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n18:58:38 UTC\n99+\nRuntime error: RE10001\nRuntime error: RE10001\nError on bar 0: Invalid value of the 'leftbars' argument (-1) in the 'pivotlow' function. It must be >= 0.\nat #main():6\nOpen in editor",
+          "context_substituted_message": "Error on bar 0: Invalid value of the 'leftbars' argument (-1) in the 'pivotlow' function. It must be >= 0."
+        }
+      },
+      "setup": {
+        "tickerid": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chart_type": "standard candles",
+        "native_style": 1,
+        "timezone": "Etc/UTC",
+        "bar_replay": false,
+        "minmove": 1,
+        "pricescale": 100,
+        "pointvalue": 1,
+        "mintick": 0.01,
+        "defaults_confirmed": true,
+        "native_user_inputs": [],
+        "observed_indicator_title": "Silent audit pivot-pivotlow-negative1 v13 v1",
+        "dataset_start_utc": "2026-09-07T00:00:00.000Z",
+        "first_chart_bar": {
+          "index": -19710,
+          "value": [
+            1788739200,
+            80341.83,
+            80356,
+            80230.29,
+            80293.23,
+            37.66955
+          ]
+        },
+        "chart_bars": 20010,
+        "subscription": "pro_premium",
+        "native_end_of_data": true,
+        "exchange_timezone": "Etc/UTC",
+        "exchange_session": "24x7",
+        "currency": "USDT",
+        "chart_session": "regular",
+        "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+      },
+      "csv_file": null,
+      "evidence_files": [
+        "captures/v13/evidence/trace-pivot-pivotlow-negative1-v13-v1-attempt1-error.png",
+        "captures/v13/evidence/trace-pivot-pivotlow-negative1-v13-v1-attempt1-error.txt",
+        "captures/v13/evidence/trace-pivot-pivotlow-negative1-v13-v1-attempt1-logs.txt",
+        "captures/v13/evidence/trace-pivot-pivotlow-negative1-v13-v1-attempt1-logs-v1.json",
+        "captures/v13/evidence/trace-pivot-pivotlow-negative1-v13-v1-attempt1-logs.png"
+      ]
+    },
+    {
+      "script": "trace-eigen-tiny-cleanup-v13-v1.pine",
+      "attempt": 1,
+      "status": "RUNS",
+      "source_sha256": "25cd9a5db6e19c2996754ce108ee741c54f971a14231ac25d6b00b0285a444a4",
+      "reset_utc": "2026-10-04T18:58:55.474Z",
+      "export_utc": "2026-10-04T18:59:03.634Z",
+      "diagnostic": {
+        "code": null,
+        "text": null,
+        "line": null,
+        "column": null,
+        "first_bar_index": null,
+        "first_bar_time_utc": null
+      },
+      "setup": {
+        "tickerid": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chart_type": "standard candles",
+        "native_style": 1,
+        "timezone": "Etc/UTC",
+        "bar_replay": false,
+        "minmove": 1,
+        "pricescale": 100,
+        "pointvalue": 1,
+        "mintick": 0.01,
+        "defaults_confirmed": true,
+        "native_user_inputs": [],
+        "observed_indicator_title": "Silent audit eigen-tiny-cleanup v13 v1",
+        "dataset_start_utc": "2026-09-07T00:00:00.000Z",
+        "first_chart_bar": {
+          "index": -19710,
+          "value": [
+            1788739200,
+            80341.83,
+            80356,
+            80230.29,
+            80293.23,
+            37.66955
+          ]
+        },
+        "chart_bars": 20010,
+        "subscription": "pro_premium",
+        "native_end_of_data": true,
+        "exchange_timezone": "Etc/UTC",
+        "exchange_session": "24x7",
+        "currency": "USDT",
+        "chart_session": "regular",
+        "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+      },
+      "csv_file": "captures/v13/trace-eigen-tiny-cleanup-v13-v1-attempt1.csv",
+      "evidence_files": [
+        "captures/v13/evidence/trace-eigen-tiny-cleanup-v13-v1-attempt1-setup.png",
+        "captures/v13/evidence/trace-eigen-tiny-cleanup-v13-v1-attempt1-export.png",
+        "captures/v13/evidence/trace-eigen-tiny-cleanup-v13-v1-attempt1-logs.txt",
+        "captures/v13/evidence/trace-eigen-tiny-cleanup-v13-v1-attempt1-logs-v1.json",
+        "captures/v13/evidence/trace-eigen-tiny-cleanup-v13-v1-attempt1-logs.png",
+        "captures/v13/evidence/trace-eigen-tiny-cleanup-v13-v1-attempt1-visual.png",
+        "captures/v13/evidence/trace-eigen-tiny-cleanup-v13-v1-attempt1-data-window-v1.png",
+        "captures/v13/evidence/trace-eigen-tiny-cleanup-v13-v1-attempt1-data-window-v1.json",
+        "captures/v13/evidence/trace-eigen-tiny-cleanup-v13-v1-attempt1-data-window-v1.txt",
+        "captures/v13/evidence/trace-eigen-tiny-cleanup-v13-v1-attempt1-authority-object-geometry-v1.json",
+        "captures/v13/evidence/trace-eigen-tiny-cleanup-v13-v1-attempt1-authority-object-geometry-v1.png"
+      ],
+      "first_eight_populated_rows": [
+        {
+          "time": "1788739200",
+          "open": "80341.83",
+          "high": "80356",
+          "low": "80230.29",
+          "close": "80293.23",
+          "INPUT_BAR_INDEX": "0",
+          "INPUT_EPSILON": "1e-12",
+          "EIGEN0": "2e-12",
+          "EIGEN1": "1e-12",
+          "SCALED_EIGEN0": "2",
+          "SCALED_EIGEN1": "1"
+        },
+        {
+          "time": "1788739320",
+          "open": "80293.23",
+          "high": "80367.8",
+          "low": "80293.23",
+          "close": "80314.01",
+          "INPUT_BAR_INDEX": "1",
+          "INPUT_EPSILON": "1e-10",
+          "EIGEN0": "2e-10",
+          "EIGEN1": "1e-10",
+          "SCALED_EIGEN0": "200",
+          "SCALED_EIGEN1": "100"
+        },
+        {
+          "time": "1788739440",
+          "open": "80314.01",
+          "high": "80426",
+          "low": "80310",
+          "close": "80426",
+          "INPUT_BAR_INDEX": "2",
+          "INPUT_EPSILON": "1e-9",
+          "EIGEN0": "2e-9",
+          "EIGEN1": "1e-9",
+          "SCALED_EIGEN0": "2000.0000000000002",
+          "SCALED_EIGEN1": "1000.0000000000001"
+        },
+        {
+          "time": "1788739560",
+          "open": "80426",
+          "high": "80443.99",
+          "low": "80345.09",
+          "close": "80345.1",
+          "INPUT_BAR_INDEX": "3",
+          "INPUT_EPSILON": "1",
+          "EIGEN0": "2",
+          "EIGEN1": "1",
+          "SCALED_EIGEN0": "2000000000000",
+          "SCALED_EIGEN1": "1000000000000"
+        },
+        {
+          "time": "1788739680",
+          "open": "80345.1",
+          "high": "80430",
+          "low": "80345.09",
+          "close": "80384",
+          "INPUT_BAR_INDEX": "4",
+          "INPUT_EPSILON": "1e-12",
+          "EIGEN0": "2e-12",
+          "EIGEN1": "1e-12",
+          "SCALED_EIGEN0": "2",
+          "SCALED_EIGEN1": "1"
+        },
+        {
+          "time": "1788739800",
+          "open": "80384",
+          "high": "80384.01",
+          "low": "80344.54",
+          "close": "80346.79",
+          "INPUT_BAR_INDEX": "5",
+          "INPUT_EPSILON": "1e-10",
+          "EIGEN0": "2e-10",
+          "EIGEN1": "1e-10",
+          "SCALED_EIGEN0": "200",
+          "SCALED_EIGEN1": "100"
+        },
+        {
+          "time": "1788739920",
+          "open": "80346.96",
+          "high": "80350",
+          "low": "80322.01",
+          "close": "80350",
+          "INPUT_BAR_INDEX": "6",
+          "INPUT_EPSILON": "1e-9",
+          "EIGEN0": "2e-9",
+          "EIGEN1": "1e-9",
+          "SCALED_EIGEN0": "2000.0000000000002",
+          "SCALED_EIGEN1": "1000.0000000000001"
+        },
+        {
+          "time": "1788740040",
+          "open": "80350",
+          "high": "80363.93",
+          "low": "80278",
+          "close": "80279.43",
+          "INPUT_BAR_INDEX": "7",
+          "INPUT_EPSILON": "1",
+          "EIGEN0": "2",
+          "EIGEN1": "1",
+          "SCALED_EIGEN0": "2000000000000",
+          "SCALED_EIGEN1": "1000000000000"
+        }
+      ],
+      "last_row": {
+        "time": "1791140280",
+        "open": "85354",
+        "high": "85358.01",
+        "low": "85353.99",
+        "close": "85358",
+        "INPUT_BAR_INDEX": "20009",
+        "INPUT_EPSILON": "1e-10",
+        "EIGEN0": "2e-10",
+        "EIGEN1": "1e-10",
+        "SCALED_EIGEN0": "200",
+        "SCALED_EIGEN1": "100"
+      }
+    },
+    {
+      "script": "trace-merge-reversed-corners-v13-v1.pine",
+      "attempt": 1,
+      "status": "RUNTIME-ERROR",
+      "source_sha256": "cc865950749413d86ed64d19aab07352aac9af92f2be83344e209e0b8b8c546b",
+      "reset_utc": "2026-10-04T18:59:27.796Z",
+      "export_utc": null,
+      "diagnostic": {
+        "code": "RE10127",
+        "text": "Error on bar 0: Start cell in [1, 1] cannot be below or to the right of the end cell [0, 0].",
+        "line": 7,
+        "column": null,
+        "first_bar_index": 0,
+        "first_bar_time_utc": null,
+        "native": {
+          "ctx": {
+            "endR": 0,
+            "startCol": 1,
+            "endCol": 0,
+            "code": "RE10127",
+            "bar_index": 0,
+            "startR": 1
+          },
+          "error": "Error on bar {bar_index}: Start cell in [{startCol}, {startR}] cannot be below or to the right of the end cell [{endCol}, {endR}].",
+          "stack_trace": [
+            {
+              "n": "#main",
+              "p": 7
+            }
+          ],
+          "title": "Runtime error",
+          "showReportItButton": false,
+          "studyAccessBlocked": false,
+          "compiler_markers": [],
+          "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,354.00\nH\n85,361.99\nL\n85,336.00\nC\n85,338.84\n\u221215.16 (\u22120.02%)\n85,338.83\nSELL\n0.01\n85,338.84\nBUY\nSilent audit merge-reversed-corners v13 v1\nUSDT\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n18:59:31 UTC\n99+\nRuntime error: RE10127\nRuntime error: RE10127\nError on bar 0: Start cell in [1, 1] cannot be below or to the right of the end cell [0, 0].\nat #main():7\nOpen in editor",
+          "context_substituted_message": "Error on bar 0: Start cell in [1, 1] cannot be below or to the right of the end cell [0, 0]."
+        }
+      },
+      "setup": {
+        "tickerid": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chart_type": "standard candles",
+        "native_style": 1,
+        "timezone": "Etc/UTC",
+        "bar_replay": false,
+        "minmove": 1,
+        "pricescale": 100,
+        "pointvalue": 1,
+        "mintick": 0.01,
+        "defaults_confirmed": true,
+        "native_user_inputs": [],
+        "observed_indicator_title": "Silent audit merge-reversed-corners v13 v1",
+        "dataset_start_utc": "2026-09-07T00:00:00.000Z",
+        "first_chart_bar": {
+          "index": -19710,
+          "value": [
+            1788739200,
+            80341.83,
+            80356,
+            80230.29,
+            80293.23,
+            37.66955
+          ]
+        },
+        "chart_bars": 20010,
+        "subscription": "pro_premium",
+        "native_end_of_data": true,
+        "exchange_timezone": "Etc/UTC",
+        "exchange_session": "24x7",
+        "currency": "USDT",
+        "chart_session": "regular",
+        "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+      },
+      "csv_file": null,
+      "evidence_files": [
+        "captures/v13/evidence/trace-merge-reversed-corners-v13-v1-attempt1-error.png",
+        "captures/v13/evidence/trace-merge-reversed-corners-v13-v1-attempt1-error.txt",
+        "captures/v13/evidence/trace-merge-reversed-corners-v13-v1-attempt1-logs.txt",
+        "captures/v13/evidence/trace-merge-reversed-corners-v13-v1-attempt1-logs-v1.json",
+        "captures/v13/evidence/trace-merge-reversed-corners-v13-v1-attempt1-logs.png"
+      ]
+    },
+    {
+      "script": "trace-eigen-complex-placeholder-v13-v1.pine",
+      "attempt": 1,
+      "status": "RUNS",
+      "source_sha256": "11a0df3d8f1d61cd908151a7dfc315a21be6a7c9d63cfbe1bc67d3fe37e6f998",
+      "reset_utc": "2026-10-04T18:59:48.561Z",
+      "export_utc": "2026-10-04T18:59:56.672Z",
+      "diagnostic": {
+        "code": null,
+        "text": null,
+        "line": null,
+        "column": null,
+        "first_bar_index": null,
+        "first_bar_time_utc": null
+      },
+      "setup": {
+        "tickerid": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chart_type": "standard candles",
+        "native_style": 1,
+        "timezone": "Etc/UTC",
+        "bar_replay": false,
+        "minmove": 1,
+        "pricescale": 100,
+        "pointvalue": 1,
+        "mintick": 0.01,
+        "defaults_confirmed": true,
+        "native_user_inputs": [],
+        "observed_indicator_title": "Silent audit eigen-complex-placeholder v13 v1",
+        "dataset_start_utc": "2026-09-07T00:00:00.000Z",
+        "first_chart_bar": {
+          "index": -19710,
+          "value": [
+            1788739200,
+            80341.83,
+            80356,
+            80230.29,
+            80293.23,
+            37.66955
+          ]
+        },
+        "chart_bars": 20010,
+        "subscription": "pro_premium",
+        "native_end_of_data": true,
+        "exchange_timezone": "Etc/UTC",
+        "exchange_session": "24x7",
+        "currency": "USDT",
+        "chart_session": "regular",
+        "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+      },
+      "csv_file": "captures/v13/trace-eigen-complex-placeholder-v13-v1-attempt1.csv",
+      "evidence_files": [
+        "captures/v13/evidence/trace-eigen-complex-placeholder-v13-v1-attempt1-setup.png",
+        "captures/v13/evidence/trace-eigen-complex-placeholder-v13-v1-attempt1-export.png",
+        "captures/v13/evidence/trace-eigen-complex-placeholder-v13-v1-attempt1-logs.txt",
+        "captures/v13/evidence/trace-eigen-complex-placeholder-v13-v1-attempt1-logs-v1.json",
+        "captures/v13/evidence/trace-eigen-complex-placeholder-v13-v1-attempt1-logs.png",
+        "captures/v13/evidence/trace-eigen-complex-placeholder-v13-v1-attempt1-visual.png",
+        "captures/v13/evidence/trace-eigen-complex-placeholder-v13-v1-attempt1-data-window-v1.png",
+        "captures/v13/evidence/trace-eigen-complex-placeholder-v13-v1-attempt1-data-window-v1.json",
+        "captures/v13/evidence/trace-eigen-complex-placeholder-v13-v1-attempt1-data-window-v1.txt",
+        "captures/v13/evidence/trace-eigen-complex-placeholder-v13-v1-attempt1-authority-object-geometry-v1.json",
+        "captures/v13/evidence/trace-eigen-complex-placeholder-v13-v1-attempt1-authority-object-geometry-v1.png"
+      ],
+      "first_eight_populated_rows": [
+        {
+          "time": "1788739200",
+          "open": "80341.83",
+          "high": "80356",
+          "low": "80230.29",
+          "close": "80293.23",
+          "INPUT_BAR_INDEX": "0",
+          "RESULT_SIZE": "3",
+          "EIGEN0": "0",
+          "EIGEN1": "0",
+          "EIGEN2": "1"
+        },
+        {
+          "time": "1788739320",
+          "open": "80293.23",
+          "high": "80367.8",
+          "low": "80293.23",
+          "close": "80314.01",
+          "INPUT_BAR_INDEX": "1",
+          "RESULT_SIZE": "3",
+          "EIGEN0": "0",
+          "EIGEN1": "0",
+          "EIGEN2": "1"
+        },
+        {
+          "time": "1788739440",
+          "open": "80314.01",
+          "high": "80426",
+          "low": "80310",
+          "close": "80426",
+          "INPUT_BAR_INDEX": "2",
+          "RESULT_SIZE": "3",
+          "EIGEN0": "0",
+          "EIGEN1": "0",
+          "EIGEN2": "1"
+        },
+        {
+          "time": "1788739560",
+          "open": "80426",
+          "high": "80443.99",
+          "low": "80345.09",
+          "close": "80345.1",
+          "INPUT_BAR_INDEX": "3",
+          "RESULT_SIZE": "3",
+          "EIGEN0": "0",
+          "EIGEN1": "0",
+          "EIGEN2": "1"
+        },
+        {
+          "time": "1788739680",
+          "open": "80345.1",
+          "high": "80430",
+          "low": "80345.09",
+          "close": "80384",
+          "INPUT_BAR_INDEX": "4",
+          "RESULT_SIZE": "3",
+          "EIGEN0": "0",
+          "EIGEN1": "0",
+          "EIGEN2": "1"
+        },
+        {
+          "time": "1788739800",
+          "open": "80384",
+          "high": "80384.01",
+          "low": "80344.54",
+          "close": "80346.79",
+          "INPUT_BAR_INDEX": "5",
+          "RESULT_SIZE": "3",
+          "EIGEN0": "0",
+          "EIGEN1": "0",
+          "EIGEN2": "1"
+        },
+        {
+          "time": "1788739920",
+          "open": "80346.96",
+          "high": "80350",
+          "low": "80322.01",
+          "close": "80350",
+          "INPUT_BAR_INDEX": "6",
+          "RESULT_SIZE": "3",
+          "EIGEN0": "0",
+          "EIGEN1": "0",
+          "EIGEN2": "1"
+        },
+        {
+          "time": "1788740040",
+          "open": "80350",
+          "high": "80363.93",
+          "low": "80278",
+          "close": "80279.43",
+          "INPUT_BAR_INDEX": "7",
+          "RESULT_SIZE": "3",
+          "EIGEN0": "0",
+          "EIGEN1": "0",
+          "EIGEN2": "1"
+        }
+      ],
+      "last_row": {
+        "time": "1791140280",
+        "open": "85354",
+        "high": "85361.99",
+        "low": "85336",
+        "close": "85338.83",
+        "INPUT_BAR_INDEX": "20009",
+        "RESULT_SIZE": "3",
+        "EIGEN0": "0",
+        "EIGEN1": "0",
+        "EIGEN2": "1"
+      }
+    },
+    {
+      "script": "trace-array-linear-percentile101-v13-v1.pine",
+      "attempt": 1,
+      "status": "RUNTIME-ERROR",
+      "source_sha256": "fdc07926b4aec4ecea32371c3341a449620af1ce6aed63cf5c5d31b68730245b",
+      "reset_utc": "2026-10-04T19:00:20.696Z",
+      "export_utc": null,
+      "diagnostic": {
+        "code": "RE10002",
+        "text": "Error on bar 1: Invalid value of the 'percentage' argument (101) in the 'array.percentile_linear_interpolation' function. It must be in the range [0..100].",
+        "line": 7,
+        "column": null,
+        "first_bar_index": 1,
+        "first_bar_time_utc": null,
+        "native": {
+          "ctx": {
+            "min": 0,
+            "code": "RE10002",
+            "argName": "percentage",
+            "bar_index": 1,
+            "max": 100,
+            "value": 101,
+            "funName": "array.percentile_linear_interpolation"
+          },
+          "error": "Error on bar {bar_index}: Invalid value of the '{argName}' argument ({value}) in the '{funName}' function. It must be in the range [{min}..{max}].",
+          "stack_trace": [
+            {
+              "n": "#main",
+              "p": 7
+            }
+          ],
+          "title": "Runtime error",
+          "showReportItButton": false,
+          "studyAccessBlocked": false,
+          "compiler_markers": [],
+          "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,338.84\nH\n85,338.84\nL\n85,338.83\nC\n85,338.84\n0.00 (0.00%)\n85,338.83\nSELL\n0.01\n85,338.84\nBUY\nUSDT\nSilent audit array-linear-percentile101 v13 v1\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n19:00:24 UTC\n99+\nRuntime error: RE10002\nRuntime error: RE10002\nError on bar 1: Invalid value of the 'percentage' argument (101) in the 'array.percentile_linear_interpolation' function. It must be in the range [0..100].\nat #main():7\nOpen in editor",
+          "context_substituted_message": "Error on bar 1: Invalid value of the 'percentage' argument (101) in the 'array.percentile_linear_interpolation' function. It must be in the range [0..100]."
+        }
+      },
+      "setup": {
+        "tickerid": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chart_type": "standard candles",
+        "native_style": 1,
+        "timezone": "Etc/UTC",
+        "bar_replay": false,
+        "minmove": 1,
+        "pricescale": 100,
+        "pointvalue": 1,
+        "mintick": 0.01,
+        "defaults_confirmed": true,
+        "native_user_inputs": [],
+        "observed_indicator_title": "Silent audit array-linear-percentile101 v13 v1",
+        "dataset_start_utc": "2026-09-07T00:00:00.000Z",
+        "first_chart_bar": {
+          "index": -19711,
+          "value": [
+            1788739200,
+            80341.83,
+            80356,
+            80230.29,
+            80293.23,
+            37.66955
+          ]
+        },
+        "chart_bars": 20011,
+        "subscription": "pro_premium",
+        "native_end_of_data": true,
+        "exchange_timezone": "Etc/UTC",
+        "exchange_session": "24x7",
+        "currency": "USDT",
+        "chart_session": "regular",
+        "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+      },
+      "csv_file": null,
+      "evidence_files": [
+        "captures/v13/evidence/trace-array-linear-percentile101-v13-v1-attempt1-error.png",
+        "captures/v13/evidence/trace-array-linear-percentile101-v13-v1-attempt1-error.txt",
+        "captures/v13/evidence/trace-array-linear-percentile101-v13-v1-attempt1-logs.txt",
+        "captures/v13/evidence/trace-array-linear-percentile101-v13-v1-attempt1-logs-v1.json",
+        "captures/v13/evidence/trace-array-linear-percentile101-v13-v1-attempt1-logs.png"
+      ]
+    },
+    {
+      "script": "trace-table-zero-columns-v13-v1.pine",
+      "attempt": 1,
+      "status": "RUNTIME-ERROR",
+      "source_sha256": "b6cc8bec9e5efab9bdbc8b0dc210ec1119bbb06186e56b12bbc63f2ea3102a5e",
+      "reset_utc": "2026-10-04T19:00:40.531Z",
+      "export_utc": null,
+      "diagnostic": {
+        "code": "RE10039",
+        "text": "Error on bar 0: Column 0 is out of table bounds, number of columns is 0.",
+        "line": 5,
+        "column": null,
+        "first_bar_index": 0,
+        "first_bar_time_utc": null,
+        "native": {
+          "ctx": {
+            "col": 0,
+            "code": "RE10039",
+            "bar_index": 0,
+            "cols": 0
+          },
+          "error": "Error on bar {bar_index}: Column {col} is out of table bounds, number of columns is {cols}.",
+          "stack_trace": [
+            {
+              "n": "#main",
+              "p": 5
+            }
+          ],
+          "title": "Runtime error",
+          "showReportItButton": false,
+          "studyAccessBlocked": false,
+          "compiler_markers": [],
+          "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,338.84\nH\n85,338.84\nL\n85,338.83\nC\n85,338.84\n0.00 (0.00%)\n85,338.83\nSELL\n0.01\n85,338.84\nBUY\nSilent audit table-zero-columns v13 v1\nUSDT\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n19:00:44 UTC\n99+\nRuntime error: RE10039\nRuntime error: RE10039\nError on bar 0: Column 0 is out of table bounds, number of columns is 0.\nat #main():5\nOpen in editor",
+          "context_substituted_message": "Error on bar 0: Column 0 is out of table bounds, number of columns is 0."
+        }
+      },
+      "setup": {
+        "tickerid": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chart_type": "standard candles",
+        "native_style": 1,
+        "timezone": "Etc/UTC",
+        "bar_replay": false,
+        "minmove": 1,
+        "pricescale": 100,
+        "pointvalue": 1,
+        "mintick": 0.01,
+        "defaults_confirmed": true,
+        "native_user_inputs": [],
+        "observed_indicator_title": "Silent audit table-zero-columns v13 v1",
+        "dataset_start_utc": "2026-09-07T00:00:00.000Z",
+        "first_chart_bar": {
+          "index": -19711,
+          "value": [
+            1788739200,
+            80341.83,
+            80356,
+            80230.29,
+            80293.23,
+            37.66955
+          ]
+        },
+        "chart_bars": 20011,
+        "subscription": "pro_premium",
+        "native_end_of_data": true,
+        "exchange_timezone": "Etc/UTC",
+        "exchange_session": "24x7",
+        "currency": "USDT",
+        "chart_session": "regular",
+        "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+      },
+      "csv_file": null,
+      "evidence_files": [
+        "captures/v13/evidence/trace-table-zero-columns-v13-v1-attempt1-error.png",
+        "captures/v13/evidence/trace-table-zero-columns-v13-v1-attempt1-error.txt",
+        "captures/v13/evidence/trace-table-zero-columns-v13-v1-attempt1-logs.txt",
+        "captures/v13/evidence/trace-table-zero-columns-v13-v1-attempt1-logs-v1.json",
+        "captures/v13/evidence/trace-table-zero-columns-v13-v1-attempt1-logs.png"
+      ]
+    }
+  ],
+  "width_measurements": [
+    "drawing-width-measurements-v1.json",
+    "table-width-measurements-v1.json"
+  ],
+  "limits": [
+    "Refused grouped probes do not establish later calls or universal normalization policies.",
+    "Percentile bar0 valid control output is not preserved after native runtime refusal; do not invent it.",
+    "Eigen finite outputs do not reveal iteration counts or universal convergence policy."
+  ]
+}

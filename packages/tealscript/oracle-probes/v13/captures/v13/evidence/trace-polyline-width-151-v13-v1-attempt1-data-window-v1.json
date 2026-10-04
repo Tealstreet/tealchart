@@ -1,0 +1,30 @@
+{
+  "index": 299,
+  "bar": [
+    1791139800,
+    85342.37,
+    85342.37,
+    85342.36,
+    85342.36,
+    4.2647
+  ],
+  "source_row": [
+    1791139800,
+    20005,
+    151
+  ],
+  "browser_utc": "2026-10-04T18:52:14.157Z",
+  "title": "Silent audit polyline-width-151 v13 v1",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   18:50",
+  "visible_range": {
+    "_firstBar": 264,
+    "_lastBar": 302
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}

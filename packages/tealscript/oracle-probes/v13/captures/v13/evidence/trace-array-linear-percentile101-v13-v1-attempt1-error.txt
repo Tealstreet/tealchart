@@ -1,0 +1,25 @@
+Error on bar 1: Invalid value of the 'percentage' argument (101) in the 'array.percentile_linear_interpolation' function. It must be in the range [0..100].
+{
+  "ctx": {
+    "min": 0,
+    "code": "RE10002",
+    "argName": "percentage",
+    "bar_index": 1,
+    "max": 100,
+    "value": 101,
+    "funName": "array.percentile_linear_interpolation"
+  },
+  "error": "Error on bar {bar_index}: Invalid value of the '{argName}' argument ({value}) in the '{funName}' function. It must be in the range [{min}..{max}].",
+  "stack_trace": [
+    {
+      "n": "#main",
+      "p": 7
+    }
+  ],
+  "title": "Runtime error",
+  "showReportItButton": false,
+  "studyAccessBlocked": false,
+  "compiler_markers": [],
+  "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,338.84\nH\n85,338.84\nL\n85,338.83\nC\n85,338.84\n0.00 (0.00%)\n85,338.83\nSELL\n0.01\n85,338.84\nBUY\nUSDT\nSilent audit array-linear-percentile101 v13 v1\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n19:00:24 UTC\n99+\nRuntime error: RE10002\nRuntime error: RE10002\nError on bar 1: Invalid value of the 'percentage' argument (101) in the 'array.percentile_linear_interpolation' function. It must be in the range [0..100].\nat #main():7\nOpen in editor",
+  "context_substituted_message": "Error on bar 1: Invalid value of the 'percentage' argument (101) in the 'array.percentile_linear_interpolation' function. It must be in the range [0..100]."
+}
