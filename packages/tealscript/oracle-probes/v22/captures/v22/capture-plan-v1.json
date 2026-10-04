@@ -1,0 +1,33 @@
+{
+  "artifact": "v22 capture plan v1",
+  "batch_start_utc": "2026-10-04T23:33:28.300250+00:00",
+  "manifest": "bundle-manifest-v2.json",
+  "manifest_sha256": "fb6fdd2a00abe09795c7dd8723c39139f093b9983bc47c06958802678ca87e6b",
+  "source_commit": "51040e1ccf",
+  "manifest_status": "FROZEN",
+  "frozen": true,
+  "limit": "v23 OPEN manifest retained as received; current committed source SHA identities are pinned individually. No bundle is re-labelled frozen.",
+  "scripts": [
+    {
+      "script": "request-timestamp-exchange-zone-v22-v1.pine",
+      "sha256": "437eb7152ea43abb724a0a721d1fa2e63cc0fa7ce118883f2659a25ba194a482",
+      "title": "Requested timestamp exchange zone v22 v1",
+      "shorttitle": null,
+      "columns": [
+        "CHART_TIME_MS",
+        "CHART_IMPLICIT_LITERAL",
+        "REQUEST_TIME_MS",
+        "REQUEST_IMPLICIT_LITERAL",
+        "REQUEST_EXPLICIT_EXCHANGE_LITERAL",
+        "REQUEST_EXPLICIT_UTC_LITERAL",
+        "REQUEST_IMPLICIT_SERIES_MIDNIGHT",
+        "REQUEST_EXPLICIT_EXCHANGE_SERIES_MIDNIGHT",
+        "REQUEST_DATESTRING_UTC",
+        "REQUEST_ZONE_IS_NEWYORK"
+      ],
+      "minimumHistoryBars": 64,
+      "instructions": "instructions/request-timestamp-exchange-zone-v22-v1.md",
+      "minimum_scope": "Native context and every diagnostic; actual live updates for requested timing, not a historical substitute."
+    }
+  ]
+}
