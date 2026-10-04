@@ -61345,5 +61345,607 @@
       "RIGHT_VISIBLE": "1791103560000"
     },
     "data_window_witness": "captures/v7/evidence/chart-context-lifecycle-v6-v1-attempt2-data-window-v1.json"
+  },
+  {
+    "script": "named-session-futures-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "4fe9f05f1c1e3206383054260b18a0af360f99245b0b158f32d54feb3346f5d7",
+    "indicator_title": "V7 named-session-futures-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/named-session-futures-v6-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T164947.712.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 named-session-futures-v6-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24445,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24745,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T08:49:39.891Z",
+    "live_candle_open_utc": "2026-10-04T08:48:00.000Z",
+    "export_utc": "2026-10-04T08:49:48.109Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/named-session-futures-v6-v1-attempt1-setup.png",
+      "captures/v7/evidence/named-session-futures-v6-v1-attempt1-export.png",
+      "captures/v7/evidence/named-session-futures-v6-v1-attempt1-logs.txt",
+      "captures/v7/evidence/named-session-futures-v6-v1-attempt1-logs-v1.json",
+      "captures/v7/evidence/named-session-futures-v6-v1-attempt1-logs.png",
+      "captures/v7/evidence/named-session-futures-v6-v1-attempt1-visual.png",
+      "captures/v7/evidence/named-session-futures-v6-v1-attempt1-data-window-v1.png",
+      "captures/v7/evidence/named-session-futures-v6-v1-attempt1-data-window-v1.json",
+      "captures/v7/evidence/named-session-futures-v6-v1-attempt1-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T08:49:40.855Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790798520,
+            83598,
+            83608.01,
+            83550,
+            83596.01,
+            18.91061
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791103680,
+            85114.01,
+            85114.01,
+            85114,
+            85114.01,
+            2.89803
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 named-session-futures-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790798520,
+                83596.01,
+                83596.01
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791103680,
+                85114.01,
+                85114.01
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T08:49:41.833Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790798520,
+            83598,
+            83608.01,
+            83550,
+            83596.01,
+            18.91061
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791103680,
+            85114.01,
+            85114.01,
+            85114,
+            85114.01,
+            2.94751
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 named-session-futures-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24745,
+            "first": {
+              "index": -1022201,
+              "value": [
+                1788134400,
+                77674.04,
+                77674.04
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791103680,
+                85114.01,
+                85114.01
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T08:49:42.734Z",
+        "bars": 24745,
+        "end": true,
+        "first": {
+          "index": -24445,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791103680,
+            85114.01,
+            85114.01,
+            85114,
+            85114,
+            2.955
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 named-session-futures-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24745,
+            "first": {
+              "index": -24445,
+              "value": [
+                1788134400,
+                77674.04,
+                77674.04
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791103680,
+                85114,
+                85114
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   08:48",
+    "historical_compare_before_unix_seconds": 1791103680,
+    "pine_logs": {
+      "paths": [
+        "evidence/named-session-futures-v6-v1-attempt1-logs.txt",
+        "evidence/named-session-futures-v6-v1-attempt1-logs-v1.json",
+        "evidence/named-session-futures-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "b3c468482369e27518c8946ca2b1d53799a72acb10d06a1132f6b29e9165a972",
+    "csv_bytes": 1510934,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "REGULAR",
+      "CHART"
+    ],
+    "declared_to_native_header_mapping": {
+      "REGULAR": "REGULAR",
+      "CHART": "CHART"
+    },
+    "csv_rows": 24745,
+    "historical_rows": 24744,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791103680,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791103680",
+    "first_historical_values": {
+      "REGULAR": "77674.04",
+      "CHART": "77674.04"
+    },
+    "last_historical_values": {
+      "REGULAR": "85114",
+      "CHART": "85114"
+    },
+    "data_window_witness": "captures/v7/evidence/named-session-futures-v6-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "script": "named-session-futures-v6-v1.pine",
+    "attempt": 2,
+    "source_sha256": "4fe9f05f1c1e3206383054260b18a0af360f99245b0b158f32d54feb3346f5d7",
+    "indicator_title": "V7 named-session-futures-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/named-session-futures-v6-v1-attempt2.csv",
+    "original_download_filename": "CME_MINI_DL_ES1!, 30.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "CME_MINI_DL:ES1!",
+      "timeframe": "30",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.25,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 named-session-futures-v6-v1",
+      "dataset_start_utc": "2025-01-01T23:00:00.000Z",
+      "first_chart_bar": {
+        "index": -20408,
+        "value": [
+          1735772400,
+          5949.25,
+          5955.5,
+          5943.25,
+          5948,
+          8047
+        ]
+      },
+      "chart_bars": 20708,
+      "subscription": "pro_premium",
+      "native_end_of_data": false,
+      "exchange_timezone": "America/Chicago",
+      "exchange_session": "1700-1600",
+      "currency": "USD",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T08:50:54.578Z",
+    "live_candle_open_utc": "2026-10-02T20:30:00.000Z",
+    "export_utc": "2026-10-04T08:51:00.423Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/named-session-futures-v6-v1-attempt2-setup.png",
+      "captures/v7/evidence/named-session-futures-v6-v1-attempt2-export.png",
+      "captures/v7/evidence/named-session-futures-v6-v1-attempt2-logs.txt",
+      "captures/v7/evidence/named-session-futures-v6-v1-attempt2-logs-v1.json",
+      "captures/v7/evidence/named-session-futures-v6-v1-attempt2-logs.png",
+      "captures/v7/evidence/named-session-futures-v6-v1-attempt2-visual.png",
+      "captures/v7/evidence/named-session-futures-v6-v1-attempt2-data-window-v1.png",
+      "captures/v7/evidence/named-session-futures-v6-v1-attempt2-data-window-v1.json",
+      "captures/v7/evidence/named-session-futures-v6-v1-attempt2-data-window-v1.txt",
+      "captures/v7/evidence/named-session-futures-v6-v1-attempt2-electronic-session-configuration-v1.json",
+      "captures/v7/evidence/named-session-futures-v6-v1-attempt2-electronic-session-configuration-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T08:50:55.350Z",
+        "bars": 2556,
+        "end": false,
+        "first": {
+          "index": -2256,
+          "value": [
+            1784260800,
+            7524.5,
+            7524.75,
+            7512.5,
+            7514.25,
+            8598
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1790973000,
+            7780.5,
+            7780.75,
+            7775,
+            7776.5,
+            7818
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 named-session-futures-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2556,
+            "first": {
+              "index": -2256,
+              "value": [
+                1784260800,
+                7514.25,
+                7514.25
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1790973000,
+                7776.5,
+                7776.5
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Fri 02 Oct '26   20:30",
+    "historical_compare_before_unix_seconds": 1790973000,
+    "pine_logs": {
+      "paths": [
+        "evidence/named-session-futures-v6-v1-attempt2-logs.txt",
+        "evidence/named-session-futures-v6-v1-attempt2-logs-v1.json",
+        "evidence/named-session-futures-v6-v1-attempt2-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "918a274d821934b8ae3ca97e6de3227d5e700c950f13d7734220858755084df4",
+    "csv_bytes": 1096278,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "REGULAR",
+      "CHART"
+    ],
+    "declared_to_native_header_mapping": {
+      "REGULAR": "REGULAR",
+      "CHART": "CHART"
+    },
+    "csv_rows": 20708,
+    "historical_rows": 20707,
+    "first_csv_timestamp_seconds": 1735772400,
+    "last_csv_timestamp_seconds": 1790973000,
+    "first_csv_time_raw": "1735772400",
+    "last_csv_time_raw": "1790973000",
+    "first_historical_values": {
+      "REGULAR": "5948",
+      "CHART": "5948"
+    },
+    "last_historical_values": {
+      "REGULAR": "7780.25",
+      "CHART": "7780.25"
+    },
+    "data_window_witness": "captures/v7/evidence/named-session-futures-v6-v1-attempt2-data-window-v1.json"
+  },
+  {
+    "script": "named-session-futures-v6-v1.pine",
+    "attempt": 3,
+    "source_sha256": "4fe9f05f1c1e3206383054260b18a0af360f99245b0b158f32d54feb3346f5d7",
+    "indicator_title": "V7 named-session-futures-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/named-session-futures-v6-v1-attempt3.csv",
+    "original_download_filename": "CME_MINI_DL_ES1!, 30 (1).csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "CME_MINI_DL:ES1!",
+      "timeframe": "30",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.25,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 named-session-futures-v6-v1",
+      "dataset_start_utc": "2021-01-04T14:30:00.000Z",
+      "first_chart_bar": {
+        "index": -19856,
+        "value": [
+          1609770600,
+          3758.5,
+          3760,
+          3736.5,
+          3740.5,
+          211222
+        ]
+      },
+      "chart_bars": 20156,
+      "subscription": "pro_premium",
+      "native_end_of_data": false,
+      "exchange_timezone": "America/Chicago",
+      "exchange_session": "0830-1515",
+      "currency": "USD",
+      "chart_session": "us_regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T08:56:43.082Z",
+    "live_candle_open_utc": "2026-10-02T20:00:00.000Z",
+    "export_utc": "2026-10-04T08:56:49.553Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/named-session-futures-v6-v1-attempt3-setup.png",
+      "captures/v7/evidence/named-session-futures-v6-v1-attempt3-export.png",
+      "captures/v7/evidence/named-session-futures-v6-v1-attempt3-logs.txt",
+      "captures/v7/evidence/named-session-futures-v6-v1-attempt3-logs-v1.json",
+      "captures/v7/evidence/named-session-futures-v6-v1-attempt3-logs.png",
+      "captures/v7/evidence/named-session-futures-v6-v1-attempt3-visual.png",
+      "captures/v7/evidence/named-session-futures-v6-v1-attempt3-data-window-v1.png",
+      "captures/v7/evidence/named-session-futures-v6-v1-attempt3-data-window-v1.json",
+      "captures/v7/evidence/named-session-futures-v6-v1-attempt3-data-window-v1.txt",
+      "captures/v7/evidence/named-session-futures-v6-v1-attempt3-regular-session-configuration-v1.json",
+      "captures/v7/evidence/named-session-futures-v6-v1-attempt3-regular-session-configuration-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T08:56:43.936Z",
+        "bars": 2556,
+        "end": false,
+        "first": {
+          "index": -2256,
+          "value": [
+            1768239000,
+            7009.25,
+            7011.5,
+            7004.75,
+            7010.5,
+            23711
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1790971200,
+            7779,
+            7784.5,
+            7778.25,
+            7783.25,
+            27700
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 named-session-futures-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2556,
+            "first": {
+              "index": -2256,
+              "value": [
+                1768239000,
+                7010.5,
+                7010.5
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1790971200,
+                null,
+                7783.25
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Fri 02 Oct '26   20:00",
+    "historical_compare_before_unix_seconds": 1790971200,
+    "pine_logs": {
+      "paths": [
+        "evidence/named-session-futures-v6-v1-attempt3-logs.txt",
+        "evidence/named-session-futures-v6-v1-attempt3-logs-v1.json",
+        "evidence/named-session-futures-v6-v1-attempt3-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "06b1c19b1ce6e23508d38e7ae51c72e0854e03c0b50fc684e930a37dc5ab7363",
+    "csv_bytes": 980238,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "REGULAR",
+      "CHART"
+    ],
+    "declared_to_native_header_mapping": {
+      "REGULAR": "REGULAR",
+      "CHART": "CHART"
+    },
+    "csv_rows": 20156,
+    "historical_rows": 20155,
+    "first_csv_timestamp_seconds": 1609770600,
+    "last_csv_timestamp_seconds": 1790971200,
+    "first_csv_time_raw": "1609770600",
+    "last_csv_time_raw": "1790971200",
+    "first_historical_values": {
+      "REGULAR": "",
+      "CHART": "3740.5"
+    },
+    "last_historical_values": {
+      "REGULAR": "7779",
+      "CHART": "7779"
+    },
+    "data_window_witness": "captures/v7/evidence/named-session-futures-v6-v1-attempt3-data-window-v1.json"
   }
 ]
