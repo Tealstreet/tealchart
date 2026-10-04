@@ -1,0 +1,43 @@
+The "hline" function does not have an argument with the name "alpha"
+{
+  "error": "The \"{signature}\" function does not have an argument with the name \"{name}\"",
+  "editorError": {
+    "code": "CE10120",
+    "ctx": {
+      "name": "alpha",
+      "signature": "hline"
+    },
+    "end": {
+      "column": 13,
+      "line": 3
+    },
+    "message": "The \"{signature}\" function does not have an argument with the name \"{name}\"",
+    "start": {
+      "column": 9,
+      "line": 3
+    },
+    "id": "USER;64eb9fe01ecd4728859be8cb120fa590"
+  },
+  "title": "Compilation error",
+  "compiler_markers": [
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///f025d8d1-e0f0-48d2-abaf-780626e2d93a.pine?placement%3Ddialog",
+        "path": "/f025d8d1-e0f0-48d2-abaf-780626e2d93a.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "code": "CE10120",
+      "severity": 8,
+      "message": "The \"hline\" function does not have an argument with the name \"alpha\"",
+      "startLineNumber": 3,
+      "startColumn": 9,
+      "endLineNumber": 3,
+      "endColumn": 14
+    }
+  ],
+  "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\nC\n85,124.14\n+8.14 (+0.01%)\n85,124.14\nSELL\n0.01\n85,124.15\nBUY\nUSDT\nOracle na holes crosses v1\nDate Range\n08:05:06 UTC\n99+\nObject tree\nData window\nDate\nSun 04 Oct '26\nTime\n08:04\nBTCUSDT · 2 · Binance\nOpen\n85,115.99\nHigh\n85,124.15\nLow\n85,115.99\nClose\n85,124.14\nChange\n+8.14 (+0.01%)\nVol\n4.03\nLast day change\n+370.59 (+0.44%)\nOracle na holes crosses v1\nPine Editor\nUntitled script\nPublish script\n1\n2\n3\n4\n//@version=6\nindicator(\"V7 corpus-hline-alpha-v1\")\nhline(1,alpha=50)\n1 of 1 problem\nThe \"hline\" function does not have an argument with the name \"alpha\"(CE10120)\nLine 3, Col 9\nPine Script® v6\nCompilation error: CE10120\n\nThe \"hline\" function does not have an argument with the name \"alpha\"\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+  "context_substituted_message": "The \"hline\" function does not have an argument with the name \"alpha\""
+}

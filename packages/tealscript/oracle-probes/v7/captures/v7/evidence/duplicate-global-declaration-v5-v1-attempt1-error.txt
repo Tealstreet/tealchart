@@ -1,0 +1,54 @@
+'x' is already defined
+{
+  "error": "'x' is already defined",
+  "editorError": {
+    "end": {
+      "column": 5,
+      "line": 4
+    },
+    "message": "'x' is already defined",
+    "start": {
+      "column": 1,
+      "line": 4
+    },
+    "id": "USER;8a7a1e22d3cd45f08c641643cd2914d2"
+  },
+  "title": "Compilation error",
+  "compiler_markers": [
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///c26ee8a3-d85b-48ce-8a4e-fb3999341630.pine?placement%3Ddialog",
+        "path": "/c26ee8a3-d85b-48ce-8a4e-fb3999341630.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "code": "PINE_VERSION_OUTDATED",
+      "severity": 4,
+      "message": "Version 5 of Pine Script® is outdated. We recommend using the current version, which is 6.",
+      "startLineNumber": 1,
+      "startColumn": 3,
+      "endLineNumber": 1,
+      "endColumn": 12
+    },
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///c26ee8a3-d85b-48ce-8a4e-fb3999341630.pine?placement%3Ddialog",
+        "path": "/c26ee8a3-d85b-48ce-8a4e-fb3999341630.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "severity": 8,
+      "message": "'x' is already defined",
+      "startLineNumber": 4,
+      "startColumn": 1,
+      "endLineNumber": 4,
+      "endColumn": 6
+    }
+  ],
+  "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\nC\n85,126.01\n−44.18 (−0.05%)\n85,126.00\nSELL\n85,126.01\nBUY\nUSDT\nduplicate-global-declaration-v5-v1.pine\nDate Range\n08:03:44 UTC\n99+\nObject tree\nData window\nDate\nSun 04 Oct '26\nTime\n08:02\nBTCUSDT · 2 · Binance\nOpen\n85,170.18\nHigh\n85,180.12\nLow\n85,125.43\nClose\n85,126.01\nChange\n−44.18 (−0.05%)\nVol\n24.02\nLast day change\n+372.45 (+0.44%)\nduplicate-global-declaration-v5-v1.pine\nPine Editor\nduplicate-global-declaration-v5-v1.pine\nPublish script\n1\n2\n3\n4\n5\n6\n//@version=5\nindicator(\"V7 duplicate-global-declaration-v5-v1\")\nx = 1\nx = 2\nplot(x,\"TARGET\")\n2 of 2 problems\nVersion 5 of Pine Script® is outdated. We recommend using the current version, which is 6.(PINE_VERSION_OUTDATED)\n1 ∙ Today, 16:03\nLine 1, Col 3\nPine Script® v5\nCompilation error\n\n'x' is already defined\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+  "context_substituted_message": "'x' is already defined"
+}

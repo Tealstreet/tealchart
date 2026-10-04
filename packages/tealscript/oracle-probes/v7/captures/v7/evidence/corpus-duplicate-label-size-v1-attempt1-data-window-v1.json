@@ -1,0 +1,29 @@
+{
+  "index": 298,
+  "bar": [
+    1791101280,
+    85112.49,
+    85124.18,
+    85096.01,
+    85124.18,
+    40.62046
+  ],
+  "source_row": [
+    1791101280,
+    85124.18
+  ],
+  "browser_utc": "2026-10-04T08:10:44.259Z",
+  "title": "V7 corpus-duplicate-label-size-v1",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   08:08",
+  "visible_range": {
+    "_firstBar": 263,
+    "_lastBar": 301
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}

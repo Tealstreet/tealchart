@@ -1,0 +1,6 @@
+{
+  "artifact": "Context summary integrity v2",
+  "evidence_sha256": {
+    "captures/v7/evidence/compiler-corpus-context-summary-v1.json": "1c792b705008cbf5a3449599bf9b2d36b8eb8e4fe0613ca1f4598849f5a5cbed"
+  }
+}

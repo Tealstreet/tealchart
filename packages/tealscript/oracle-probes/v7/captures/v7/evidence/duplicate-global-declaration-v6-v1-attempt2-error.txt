@@ -1,0 +1,42 @@
+"x" is already defined
+{
+  "error": "\"{variableName}\" is already defined",
+  "editorError": {
+    "code": "CE10095",
+    "ctx": {
+      "variableName": "x"
+    },
+    "end": {
+      "column": 5,
+      "line": 4
+    },
+    "message": "\"{variableName}\" is already defined",
+    "start": {
+      "column": 1,
+      "line": 4
+    },
+    "id": "USER;64eb9fe01ecd4728859be8cb120fa590"
+  },
+  "title": "Compilation error",
+  "compiler_markers": [
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///e4129b39-2c2c-4ecb-b446-660313c060c0.pine?placement%3Ddialog",
+        "path": "/e4129b39-2c2c-4ecb-b446-660313c060c0.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "code": "CE10095",
+      "severity": 8,
+      "message": "\"x\" is already defined",
+      "startLineNumber": 4,
+      "startColumn": 1,
+      "endLineNumber": 4,
+      "endColumn": 6
+    }
+  ],
+  "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\nC\n85,124.15\n+8.15 (+0.01%)\n85,124.14\nSELL\n0.01\n85,124.15\nBUY\nUSDT\nOracle na holes crosses v1\nDate Range\n08:04:35 UTC\n99+\nObject tree\nData window\nDate\nSun 04 Oct '26\nTime\n08:04\nBTCUSDT · 2 · Binance\nOpen\n85,115.99\nHigh\n85,124.15\nLow\n85,115.99\nClose\n85,124.15\nChange\n+8.15 (+0.01%)\nVol\n2.18\nLast day change\n+370.59 (+0.44%)\nOracle na holes crosses v1\nPine Editor\nUntitled script\nPublish script\n1\n2\n3\n4\n5\n6\n//@version=6\nindicator(\"V7 duplicate-global-declaration-v6-v1\")\nx = 1\nx = 2\nplot(x,\"TARGET\")\n1 of 1 problem\n\"x\" is already defined(CE10095)\nLine 4, Col 1\nPine Script® v6\nCompilation error: CE10095\n\n\"x\" is already defined\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+  "context_substituted_message": "\"x\" is already defined"
+}

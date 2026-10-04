@@ -1,0 +1,54 @@
+Undeclared identifier 'error_log_level'
+{
+  "error": "Undeclared identifier 'error_log_level'",
+  "editorError": {
+    "end": {
+      "column": 20,
+      "line": 3
+    },
+    "message": "Undeclared identifier 'error_log_level'",
+    "start": {
+      "column": 6,
+      "line": 3
+    },
+    "id": "USER;64eb9fe01ecd4728859be8cb120fa590"
+  },
+  "title": "Compilation error",
+  "compiler_markers": [
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///b53c92b2-0658-49ad-9cda-4150f7d05e52.pine?placement%3Ddialog",
+        "path": "/b53c92b2-0658-49ad-9cda-4150f7d05e52.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "code": "PINE_VERSION_OUTDATED",
+      "severity": 4,
+      "message": "Version 5 of Pine Script® is outdated. We recommend using the current version, which is 6.",
+      "startLineNumber": 1,
+      "startColumn": 4,
+      "endLineNumber": 1,
+      "endColumn": 13
+    },
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///b53c92b2-0658-49ad-9cda-4150f7d05e52.pine?placement%3Ddialog",
+        "path": "/b53c92b2-0658-49ad-9cda-4150f7d05e52.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "severity": 8,
+      "message": "Undeclared identifier 'error_log_level'",
+      "startLineNumber": 3,
+      "startColumn": 6,
+      "endLineNumber": 3,
+      "endColumn": 21
+    }
+  ],
+  "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\nC\n85,174.45\n+14.45 (+0.02%)\n85,174.44\nSELL\n0.01\n85,174.45\nBUY\nUSDT\nOracle na holes crosses v1\nDate Range\n08:13:37 UTC\n99+\nObject tree\nData window\nDate\nSun 04 Oct '26\nTime\n08:12\nBTCUSDT · 2 · Binance\nOpen\n85,160.00\nHigh\n85,174.45\nLow\n85,160.00\nClose\n85,174.45\nChange\n+14.45 (+0.02%)\nVol\n3.43\nLast day change\n+420.89 (+0.50%)\nOracle na holes crosses v1\nPine Editor\nUntitled script\nPublish script\n1\n2\n3\n4\n// @version=5\nindicator(\"V7 malformed directive error_log_level\")\nplot(error_log_level,\"TARGET\")\n1 of 2 problems\nUndeclared identifier 'error_log_level'\nLine 3, Col 6\nPine Script® v5\nCompilation error\n\nUndeclared identifier 'error_log_level'\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+  "context_substituted_message": "Undeclared identifier 'error_log_level'"
+}

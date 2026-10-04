@@ -1,0 +1,54 @@
+The 'label.new' function does not have an argument with the name 'bgcolor'
+{
+  "error": "The 'label.new' function does not have an argument with the name 'bgcolor'",
+  "editorError": {
+    "end": {
+      "column": 37,
+      "line": 3
+    },
+    "message": "The 'label.new' function does not have an argument with the name 'bgcolor'",
+    "start": {
+      "column": 31,
+      "line": 3
+    },
+    "id": "USER;27c888be4d394b70aaeb8171714b760c"
+  },
+  "title": "Compilation error",
+  "compiler_markers": [
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///3b369edc-88f0-48c8-a22a-d57cd507ea5b.pine?placement%3Ddialog",
+        "path": "/3b369edc-88f0-48c8-a22a-d57cd507ea5b.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "code": "PINE_VERSION_OUTDATED",
+      "severity": 4,
+      "message": "Version 5 of Pine Script® is outdated. We recommend using the current version, which is 6.",
+      "startLineNumber": 1,
+      "startColumn": 3,
+      "endLineNumber": 1,
+      "endColumn": 12
+    },
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///3b369edc-88f0-48c8-a22a-d57cd507ea5b.pine?placement%3Ddialog",
+        "path": "/3b369edc-88f0-48c8-a22a-d57cd507ea5b.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "severity": 8,
+      "message": "The 'label.new' function does not have an argument with the name 'bgcolor'",
+      "startLineNumber": 3,
+      "startColumn": 31,
+      "endLineNumber": 3,
+      "endColumn": 38
+    }
+  ],
+  "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\nC\n85,136.01\n0.00 (0.00%)\n85,136.00\nSELL\n0.01\n85,136.01\nBUY\nUSDT\ncorpus-label-bgcolor-v1.pine\nDate Range\n08:06:03 UTC\n99+\nObject tree\nData window\nDate\nSun 04 Oct '26\nTime\n08:06\nBTCUSDT · 2 · Binance\nOpen\n85,136.00\nHigh\n85,136.01\nLow\n85,136.00\nClose\n85,136.01\nChange\n0.00 (0.00%)\nVol\n0.02\nLast day change\n+382.45 (+0.45%)\ncorpus-label-bgcolor-v1.pine\nPine Editor\ncorpus-label-bgcolor-v1.pine\nPublish script\n1\n2\n3\n4\n5\n//@version=5\nindicator(\"V7 corpus-label-bgcolor-v1\")\nlabel.new(bar_index,close,\"X\",bgcolor= color.red)\nplot(close)\n1 of 2 problems\nThe 'label.new' function does not have an argument with the name 'bgcolor'\n1 ∙ Today, 16:05\nLine 3, Col 31\nPine Script® v5\nCompilation error\n\nThe 'label.new' function does not have an argument with the name 'bgcolor'\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+  "context_substituted_message": "The 'label.new' function does not have an argument with the name 'bgcolor'"
+}
