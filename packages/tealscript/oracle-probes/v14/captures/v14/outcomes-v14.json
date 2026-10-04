@@ -1,0 +1,2445 @@
+[
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T19:04:25.993Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "arm",
+        "bitness": "64",
+        "brands": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156"
+          }
+        ],
+        "fullVersionList": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8.0.0.0"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156.0.8075.0"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156.0.8075.0"
+          }
+        ],
+        "mobile": false,
+        "platform": "macOS",
+        "platformVersion": "27.2.0"
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v14 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "const-quotient-precision-context-v14-v1.pine",
+    "attempt": 1,
+    "source_sha256": "bcaf8c8a1915760011eb5b7acaaf2f1dd3da50ba5d0406ee7c0a48ede7898401",
+    "indicator_title": "Constant quotient precision context v14 v1",
+    "status": "RUNS",
+    "csv_file": "captures/v14/const-quotient-precision-context-v14-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-05T030425.240.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "minmove": 1,
+      "pricescale": 100,
+      "pointvalue": 1,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [
+        {
+          "id": "in_0",
+          "name": "Numerator",
+          "value": 2,
+          "default": 2
+        },
+        {
+          "id": "in_1",
+          "name": "Denominator",
+          "value": 15,
+          "default": 15
+        }
+      ],
+      "observed_indicator_title": "Constant quotient precision context v14 v1",
+      "dataset_start_utc": "2026-09-07T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -19713,
+        "value": [
+          1788739200,
+          80341.83,
+          80356,
+          80230.29,
+          80293.23,
+          37.66955
+        ]
+      },
+      "chart_bars": 20013,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T19:04:17.501Z",
+    "live_candle_open_utc": "2026-10-04T19:04:00.000Z",
+    "export_utc": "2026-10-04T19:04:25.595Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v14/evidence/const-quotient-precision-context-v14-v1-attempt1-setup.png",
+      "captures/v14/evidence/const-quotient-precision-context-v14-v1-attempt1-export.png",
+      "captures/v14/evidence/const-quotient-precision-context-v14-v1-attempt1-logs.txt",
+      "captures/v14/evidence/const-quotient-precision-context-v14-v1-attempt1-logs-v1.json",
+      "captures/v14/evidence/const-quotient-precision-context-v14-v1-attempt1-logs.png",
+      "captures/v14/evidence/const-quotient-precision-context-v14-v1-attempt1-inputs.png",
+      "captures/v14/evidence/const-quotient-precision-context-v14-v1-attempt1-visual.png",
+      "captures/v14/evidence/const-quotient-precision-context-v14-v1-attempt1-data-window-v1.png",
+      "captures/v14/evidence/const-quotient-precision-context-v14-v1-attempt1-data-window-v1.json",
+      "captures/v14/evidence/const-quotient-precision-context-v14-v1-attempt1-data-window-v1.txt",
+      "captures/v14/evidence/const-quotient-precision-context-v14-v1-attempt1-authority-object-geometry-v1.json",
+      "captures/v14/evidence/const-quotient-precision-context-v14-v1-attempt1-authority-object-geometry-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T19:04:18.329Z",
+        "bars": 2556,
+        "end": false,
+        "first": {
+          "index": -2256,
+          "value": [
+            1790834040,
+            84333.33,
+            84368,
+            84316,
+            84316.01,
+            11.27216
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791140640,
+            85360.54,
+            85374.01,
+            85360.54,
+            85374.01,
+            0.8791
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Constant quotient precision context v14 v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2556,
+            "first": {
+              "index": -2256,
+              "value": [
+                1790834040,
+                17457,
+                1790834040000,
+                84316.01,
+                2,
+                15,
+                2,
+                3,
+                0.1333333333333333,
+                0.8666666666666667,
+                0.1428571428571428,
+                0.0666666666666667,
+                3.3333333333333335,
+                33.333333333333336,
+                3.3333333333333335e-11,
+                3333333333.3333335,
+                0.1333333333333333,
+                0.1333333333333333,
+                0.1333333333333333,
+                0.13333333333333333,
+                0.13333333333333333,
+                0.2,
+                0.1333333333333333,
+                0.13333333333333333,
+                0.13333333333333333,
+                0.2,
+                -27.755575615628914,
+                0,
+                27.755575615628914,
+                27.755575615628914,
+                3333333333.3333335,
+                84316.01,
+                84279.4648076896,
+                84279.4648076896,
+                84279.46480768961,
+                84279.46480768961,
+                84279.46480768961,
+                84279.46480768961,
+                84279.4648076896,
+                84279.4648076896,
+                84279.4648076896,
+                84279.4648076896,
+                84276.5974184923,
+                84276.5974184923
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791140640,
+                20012,
+                1791140640000,
+                85374.01,
+                2,
+                15,
+                2,
+                2,
+                0.1333333333333333,
+                0.8666666666666667,
+                0.1428571428571428,
+                0.0666666666666667,
+                3.3333333333333335,
+                33.333333333333336,
+                3.3333333333333335e-11,
+                3333333333.3333335,
+                0.1333333333333333,
+                0.1333333333333333,
+                0.1333333333333333,
+                0.13333333333333333,
+                0.13333333333333333,
+                0.13333333333333333,
+                0.1333333333333333,
+                0.13333333333333333,
+                0.13333333333333333,
+                0.13333333333333333,
+                -27.755575615628914,
+                0,
+                27.755575615628914,
+                27.755575615628914,
+                3333333333.3333335,
+                85374.01,
+                85348.75141920678,
+                85348.75141920678,
+                85348.7514192068,
+                85348.7514192068,
+                85348.7514192068,
+                85348.7514192068,
+                85348.75141920678,
+                85348.75141920678,
+                85348.75141920678,
+                85348.75141920678,
+                85347.96230136818,
+                85347.96230136818
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T19:04:19.329Z",
+        "bars": 20013,
+        "end": true,
+        "first": {
+          "index": -19713,
+          "value": [
+            1788739200,
+            80341.83,
+            80356,
+            80230.29,
+            80293.23,
+            37.66955
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791140640,
+            85360.54,
+            85374.01,
+            85360.54,
+            85374.01,
+            0.89269
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Constant quotient precision context v14 v1",
+            "status": {
+              "type": 1,
+              "startTime": 1791140658727
+            },
+            "size": 2556,
+            "first": {
+              "index": -2256,
+              "value": [
+                1790834040,
+                17457,
+                1790834040000,
+                84316.01,
+                2,
+                15,
+                2,
+                3,
+                0.1333333333333333,
+                0.8666666666666667,
+                0.1428571428571428,
+                0.0666666666666667,
+                3.3333333333333335,
+                33.333333333333336,
+                3.3333333333333335e-11,
+                3333333333.3333335,
+                0.1333333333333333,
+                0.1333333333333333,
+                0.1333333333333333,
+                0.13333333333333333,
+                0.13333333333333333,
+                0.2,
+                0.1333333333333333,
+                0.13333333333333333,
+                0.13333333333333333,
+                0.2,
+                -27.755575615628914,
+                0,
+                27.755575615628914,
+                27.755575615628914,
+                3333333333.3333335,
+                84316.01,
+                84279.4648076896,
+                84279.4648076896,
+                84279.46480768961,
+                84279.46480768961,
+                84279.46480768961,
+                84279.46480768961,
+                84279.4648076896,
+                84279.4648076896,
+                84279.4648076896,
+                84279.4648076896,
+                84276.5974184923,
+                84276.5974184923
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791140640,
+                20012,
+                1791140640000,
+                85374.01,
+                2,
+                15,
+                2,
+                2,
+                0.1333333333333333,
+                0.8666666666666667,
+                0.1428571428571428,
+                0.0666666666666667,
+                3.3333333333333335,
+                33.333333333333336,
+                3.3333333333333335e-11,
+                3333333333.3333335,
+                0.1333333333333333,
+                0.1333333333333333,
+                0.1333333333333333,
+                0.13333333333333333,
+                0.13333333333333333,
+                0.13333333333333333,
+                0.1333333333333333,
+                0.13333333333333333,
+                0.13333333333333333,
+                0.13333333333333333,
+                -27.755575615628914,
+                0,
+                27.755575615628914,
+                27.755575615628914,
+                3333333333.3333335,
+                85374.01,
+                85348.75141920678,
+                85348.75141920678,
+                85348.7514192068,
+                85348.7514192068,
+                85348.7514192068,
+                85348.7514192068,
+                85348.75141920678,
+                85348.75141920678,
+                85348.75141920678,
+                85348.75141920678,
+                85347.96230136818,
+                85347.96230136818
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T19:04:20.010Z",
+        "bars": 20013,
+        "end": true,
+        "first": {
+          "index": -19713,
+          "value": [
+            1788739200,
+            80341.83,
+            80356,
+            80230.29,
+            80293.23,
+            37.66955
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791140640,
+            85360.54,
+            85374.01,
+            85360.54,
+            85374.01,
+            0.89943
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Constant quotient precision context v14 v1",
+            "status": {
+              "type": 2
+            },
+            "size": 20013,
+            "first": {
+              "index": -19713,
+              "value": [
+                1788739200,
+                0,
+                1788739200000,
+                80293.23,
+                2,
+                15,
+                2,
+                2,
+                0.1333333333333333,
+                0.8666666666666667,
+                0.1428571428571428,
+                0.0666666666666667,
+                3.3333333333333335,
+                33.333333333333336,
+                3.3333333333333335e-11,
+                3333333333.3333335,
+                0.1333333333333333,
+                0.1333333333333333,
+                0.1333333333333333,
+                0.13333333333333333,
+                0.13333333333333333,
+                0.13333333333333333,
+                0.1333333333333333,
+                0.13333333333333333,
+                0.13333333333333333,
+                0.13333333333333333,
+                -27.755575615628914,
+                0,
+                27.755575615628914,
+                27.755575615628914,
+                3333333333.3333335,
+                80293.23,
+                80293.23,
+                null,
+                80293.23,
+                null,
+                80293.23,
+                null,
+                80293.23,
+                null,
+                80293.23,
+                null,
+                80293.23,
+                null
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791140640,
+                20012,
+                1791140640000,
+                85374.01,
+                2,
+                15,
+                2,
+                2,
+                0.1333333333333333,
+                0.8666666666666667,
+                0.1428571428571428,
+                0.0666666666666667,
+                3.3333333333333335,
+                33.333333333333336,
+                3.3333333333333335e-11,
+                3333333333.3333335,
+                0.1333333333333333,
+                0.1333333333333333,
+                0.1333333333333333,
+                0.13333333333333333,
+                0.13333333333333333,
+                0.13333333333333333,
+                0.1333333333333333,
+                0.13333333333333333,
+                0.13333333333333333,
+                0.13333333333333333,
+                -27.755575615628914,
+                0,
+                27.755575615628914,
+                27.755575615628914,
+                3333333333.3333335,
+                85374.01,
+                85348.75141920678,
+                85348.75141920678,
+                85348.7514192068,
+                85348.7514192068,
+                85348.7514192068,
+                85348.7514192068,
+                85348.75141920678,
+                85348.75141920678,
+                85348.75141920678,
+                85348.75141920678,
+                85347.96230136818,
+                85347.96230136818
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   19:04",
+    "historical_compare_before_unix_seconds": 1791140640,
+    "pine_logs": {
+      "paths": [
+        "evidence/const-quotient-precision-context-v14-v1-attempt1-logs.txt",
+        "evidence/const-quotient-precision-context-v14-v1-attempt1-logs-v1.json",
+        "evidence/const-quotient-precision-context-v14-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "all_exported_column_occurrences": [
+      {
+        "title": "time",
+        "occurrence": 1,
+        "position": 0
+      },
+      {
+        "title": "open",
+        "occurrence": 1,
+        "position": 1
+      },
+      {
+        "title": "high",
+        "occurrence": 1,
+        "position": 2
+      },
+      {
+        "title": "low",
+        "occurrence": 1,
+        "position": 3
+      },
+      {
+        "title": "close",
+        "occurrence": 1,
+        "position": 4
+      },
+      {
+        "title": "INPUT_BAR_INDEX",
+        "occurrence": 1,
+        "position": 5
+      },
+      {
+        "title": "INPUT_TIME",
+        "occurrence": 1,
+        "position": 6
+      },
+      {
+        "title": "INPUT_CLOSE",
+        "occurrence": 1,
+        "position": 7
+      },
+      {
+        "title": "INPUT_NUMERATOR",
+        "occurrence": 1,
+        "position": 8
+      },
+      {
+        "title": "INPUT_DENOMINATOR",
+        "occurrence": 1,
+        "position": 9
+      },
+      {
+        "title": "INPUT_TIMEFRAME_MULTIPLIER",
+        "occurrence": 1,
+        "position": 10
+      },
+      {
+        "title": "INPUT_SERIES_NUMERATOR",
+        "occurrence": 1,
+        "position": 11
+      },
+      {
+        "title": "CONST_2_OVER_15",
+        "occurrence": 1,
+        "position": 12
+      },
+      {
+        "title": "CONST_13_OVER_15",
+        "occurrence": 1,
+        "position": 13
+      },
+      {
+        "title": "CONST_1_OVER_7",
+        "occurrence": 1,
+        "position": 14
+      },
+      {
+        "title": "CONST_1_OVER_15",
+        "occurrence": 1,
+        "position": 15
+      },
+      {
+        "title": "CONST_10_OVER_3",
+        "occurrence": 1,
+        "position": 16
+      },
+      {
+        "title": "CONST_100_OVER_3",
+        "occurrence": 1,
+        "position": 17
+      },
+      {
+        "title": "CONST_SMALL_OVER_3",
+        "occurrence": 1,
+        "position": 18
+      },
+      {
+        "title": "CONST_LARGE_OVER_3",
+        "occurrence": 1,
+        "position": 19
+      },
+      {
+        "title": "CONST_CHAIN_2_OVER_15",
+        "occurrence": 1,
+        "position": 20
+      },
+      {
+        "title": "LITERAL_17_DIGITS",
+        "occurrence": 1,
+        "position": 21
+      },
+      {
+        "title": "LITERAL_16_DIGITS",
+        "occurrence": 1,
+        "position": 22
+      },
+      {
+        "title": "INPUT_QUOTIENT",
+        "occurrence": 1,
+        "position": 23
+      },
+      {
+        "title": "SIMPLE_QUOTIENT",
+        "occurrence": 1,
+        "position": 24
+      },
+      {
+        "title": "SERIES_QUOTIENT",
+        "occurrence": 1,
+        "position": 25
+      },
+      {
+        "title": "UDF_CONST_ARGUMENTS",
+        "occurrence": 1,
+        "position": 26
+      },
+      {
+        "title": "UDF_INPUT_ARGUMENTS",
+        "occurrence": 1,
+        "position": 27
+      },
+      {
+        "title": "UDF_SIMPLE_ARGUMENTS",
+        "occurrence": 1,
+        "position": 28
+      },
+      {
+        "title": "UDF_SERIES_ARGUMENTS",
+        "occurrence": 1,
+        "position": 29
+      },
+      {
+        "title": "CONST_MINUS_INPUT_SCALED",
+        "occurrence": 1,
+        "position": 30
+      },
+      {
+        "title": "CONST_MINUS_LITERAL_17_SCALED",
+        "occurrence": 1,
+        "position": 31
+      },
+      {
+        "title": "CONST_MINUS_LITERAL_16_SCALED",
+        "occurrence": 1,
+        "position": 32
+      },
+      {
+        "title": "LITERAL_17_MINUS_16_SCALED",
+        "occurrence": 1,
+        "position": 33
+      },
+      {
+        "title": "SMALL_QUOTIENT_SCALED",
+        "occurrence": 1,
+        "position": 34
+      },
+      {
+        "title": "INPUT_HOLE_SOURCE",
+        "occurrence": 1,
+        "position": 35
+      },
+      {
+        "title": "EMA_FIRST_CONST",
+        "occurrence": 1,
+        "position": 36
+      },
+      {
+        "title": "EMA_SMA_CONST",
+        "occurrence": 1,
+        "position": 37
+      },
+      {
+        "title": "EMA_FIRST_INPUT",
+        "occurrence": 1,
+        "position": 38
+      },
+      {
+        "title": "EMA_SMA_INPUT",
+        "occurrence": 1,
+        "position": 39
+      },
+      {
+        "title": "EMA_FIRST_SIMPLE",
+        "occurrence": 1,
+        "position": 40
+      },
+      {
+        "title": "EMA_SMA_SIMPLE",
+        "occurrence": 1,
+        "position": 41
+      },
+      {
+        "title": "EMA_FIRST_LITERAL17",
+        "occurrence": 1,
+        "position": 42
+      },
+      {
+        "title": "EMA_SMA_LITERAL17",
+        "occurrence": 1,
+        "position": 43
+      },
+      {
+        "title": "EMA_FIRST_LITERAL16",
+        "occurrence": 1,
+        "position": 44
+      },
+      {
+        "title": "EMA_SMA_LITERAL16",
+        "occurrence": 1,
+        "position": 45
+      },
+      {
+        "title": "EMA_FIRST_EXACT_CONTROL",
+        "occurrence": 1,
+        "position": 46
+      },
+      {
+        "title": "EMA_SMA_EXACT_CONTROL",
+        "occurrence": 1,
+        "position": 47
+      }
+    ],
+    "declared_to_native_column_occurrences": [
+      {
+        "declared_title": "INPUT_BAR_INDEX",
+        "native_title": "INPUT_BAR_INDEX",
+        "occurrence": 1,
+        "position": 5
+      },
+      {
+        "declared_title": "INPUT_TIME",
+        "native_title": "INPUT_TIME",
+        "occurrence": 1,
+        "position": 6
+      },
+      {
+        "declared_title": "INPUT_CLOSE",
+        "native_title": "INPUT_CLOSE",
+        "occurrence": 1,
+        "position": 7
+      },
+      {
+        "declared_title": "INPUT_NUMERATOR",
+        "native_title": "INPUT_NUMERATOR",
+        "occurrence": 1,
+        "position": 8
+      },
+      {
+        "declared_title": "INPUT_DENOMINATOR",
+        "native_title": "INPUT_DENOMINATOR",
+        "occurrence": 1,
+        "position": 9
+      },
+      {
+        "declared_title": "INPUT_TIMEFRAME_MULTIPLIER",
+        "native_title": "INPUT_TIMEFRAME_MULTIPLIER",
+        "occurrence": 1,
+        "position": 10
+      },
+      {
+        "declared_title": "INPUT_SERIES_NUMERATOR",
+        "native_title": "INPUT_SERIES_NUMERATOR",
+        "occurrence": 1,
+        "position": 11
+      },
+      {
+        "declared_title": "CONST_2_OVER_15",
+        "native_title": "CONST_2_OVER_15",
+        "occurrence": 1,
+        "position": 12
+      },
+      {
+        "declared_title": "CONST_13_OVER_15",
+        "native_title": "CONST_13_OVER_15",
+        "occurrence": 1,
+        "position": 13
+      },
+      {
+        "declared_title": "CONST_1_OVER_7",
+        "native_title": "CONST_1_OVER_7",
+        "occurrence": 1,
+        "position": 14
+      },
+      {
+        "declared_title": "CONST_1_OVER_15",
+        "native_title": "CONST_1_OVER_15",
+        "occurrence": 1,
+        "position": 15
+      },
+      {
+        "declared_title": "CONST_10_OVER_3",
+        "native_title": "CONST_10_OVER_3",
+        "occurrence": 1,
+        "position": 16
+      },
+      {
+        "declared_title": "CONST_100_OVER_3",
+        "native_title": "CONST_100_OVER_3",
+        "occurrence": 1,
+        "position": 17
+      },
+      {
+        "declared_title": "CONST_SMALL_OVER_3",
+        "native_title": "CONST_SMALL_OVER_3",
+        "occurrence": 1,
+        "position": 18
+      },
+      {
+        "declared_title": "CONST_LARGE_OVER_3",
+        "native_title": "CONST_LARGE_OVER_3",
+        "occurrence": 1,
+        "position": 19
+      },
+      {
+        "declared_title": "CONST_CHAIN_2_OVER_15",
+        "native_title": "CONST_CHAIN_2_OVER_15",
+        "occurrence": 1,
+        "position": 20
+      },
+      {
+        "declared_title": "LITERAL_17_DIGITS",
+        "native_title": "LITERAL_17_DIGITS",
+        "occurrence": 1,
+        "position": 21
+      },
+      {
+        "declared_title": "LITERAL_16_DIGITS",
+        "native_title": "LITERAL_16_DIGITS",
+        "occurrence": 1,
+        "position": 22
+      },
+      {
+        "declared_title": "INPUT_QUOTIENT",
+        "native_title": "INPUT_QUOTIENT",
+        "occurrence": 1,
+        "position": 23
+      },
+      {
+        "declared_title": "SIMPLE_QUOTIENT",
+        "native_title": "SIMPLE_QUOTIENT",
+        "occurrence": 1,
+        "position": 24
+      },
+      {
+        "declared_title": "SERIES_QUOTIENT",
+        "native_title": "SERIES_QUOTIENT",
+        "occurrence": 1,
+        "position": 25
+      },
+      {
+        "declared_title": "UDF_CONST_ARGUMENTS",
+        "native_title": "UDF_CONST_ARGUMENTS",
+        "occurrence": 1,
+        "position": 26
+      },
+      {
+        "declared_title": "UDF_INPUT_ARGUMENTS",
+        "native_title": "UDF_INPUT_ARGUMENTS",
+        "occurrence": 1,
+        "position": 27
+      },
+      {
+        "declared_title": "UDF_SIMPLE_ARGUMENTS",
+        "native_title": "UDF_SIMPLE_ARGUMENTS",
+        "occurrence": 1,
+        "position": 28
+      },
+      {
+        "declared_title": "UDF_SERIES_ARGUMENTS",
+        "native_title": "UDF_SERIES_ARGUMENTS",
+        "occurrence": 1,
+        "position": 29
+      },
+      {
+        "declared_title": "CONST_MINUS_INPUT_SCALED",
+        "native_title": "CONST_MINUS_INPUT_SCALED",
+        "occurrence": 1,
+        "position": 30
+      },
+      {
+        "declared_title": "CONST_MINUS_LITERAL_17_SCALED",
+        "native_title": "CONST_MINUS_LITERAL_17_SCALED",
+        "occurrence": 1,
+        "position": 31
+      },
+      {
+        "declared_title": "CONST_MINUS_LITERAL_16_SCALED",
+        "native_title": "CONST_MINUS_LITERAL_16_SCALED",
+        "occurrence": 1,
+        "position": 32
+      },
+      {
+        "declared_title": "LITERAL_17_MINUS_16_SCALED",
+        "native_title": "LITERAL_17_MINUS_16_SCALED",
+        "occurrence": 1,
+        "position": 33
+      },
+      {
+        "declared_title": "SMALL_QUOTIENT_SCALED",
+        "native_title": "SMALL_QUOTIENT_SCALED",
+        "occurrence": 1,
+        "position": 34
+      },
+      {
+        "declared_title": "INPUT_HOLE_SOURCE",
+        "native_title": "INPUT_HOLE_SOURCE",
+        "occurrence": 1,
+        "position": 35
+      },
+      {
+        "declared_title": "EMA_FIRST_CONST",
+        "native_title": "EMA_FIRST_CONST",
+        "occurrence": 1,
+        "position": 36
+      },
+      {
+        "declared_title": "EMA_SMA_CONST",
+        "native_title": "EMA_SMA_CONST",
+        "occurrence": 1,
+        "position": 37
+      },
+      {
+        "declared_title": "EMA_FIRST_INPUT",
+        "native_title": "EMA_FIRST_INPUT",
+        "occurrence": 1,
+        "position": 38
+      },
+      {
+        "declared_title": "EMA_SMA_INPUT",
+        "native_title": "EMA_SMA_INPUT",
+        "occurrence": 1,
+        "position": 39
+      },
+      {
+        "declared_title": "EMA_FIRST_SIMPLE",
+        "native_title": "EMA_FIRST_SIMPLE",
+        "occurrence": 1,
+        "position": 40
+      },
+      {
+        "declared_title": "EMA_SMA_SIMPLE",
+        "native_title": "EMA_SMA_SIMPLE",
+        "occurrence": 1,
+        "position": 41
+      },
+      {
+        "declared_title": "EMA_FIRST_LITERAL17",
+        "native_title": "EMA_FIRST_LITERAL17",
+        "occurrence": 1,
+        "position": 42
+      },
+      {
+        "declared_title": "EMA_SMA_LITERAL17",
+        "native_title": "EMA_SMA_LITERAL17",
+        "occurrence": 1,
+        "position": 43
+      },
+      {
+        "declared_title": "EMA_FIRST_LITERAL16",
+        "native_title": "EMA_FIRST_LITERAL16",
+        "occurrence": 1,
+        "position": 44
+      },
+      {
+        "declared_title": "EMA_SMA_LITERAL16",
+        "native_title": "EMA_SMA_LITERAL16",
+        "occurrence": 1,
+        "position": 45
+      },
+      {
+        "declared_title": "EMA_FIRST_EXACT_CONTROL",
+        "native_title": "EMA_FIRST_EXACT_CONTROL",
+        "occurrence": 1,
+        "position": 46
+      },
+      {
+        "declared_title": "EMA_SMA_EXACT_CONTROL",
+        "native_title": "EMA_SMA_EXACT_CONTROL",
+        "occurrence": 1,
+        "position": 47
+      }
+    ],
+    "named_value_map_scope": "Legacy title maps show the first occurrence only; original positional cells and occurrence tables retain every duplicate without renaming.",
+    "csv_sha256": "e9b1639bd3c9727918d30ea294de5346cf395e1f6b52f53109b2132b73f1ce92",
+    "csv_bytes": 14381831,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "INPUT_BAR_INDEX",
+      "INPUT_TIME",
+      "INPUT_CLOSE",
+      "INPUT_NUMERATOR",
+      "INPUT_DENOMINATOR",
+      "INPUT_TIMEFRAME_MULTIPLIER",
+      "INPUT_SERIES_NUMERATOR",
+      "CONST_2_OVER_15",
+      "CONST_13_OVER_15",
+      "CONST_1_OVER_7",
+      "CONST_1_OVER_15",
+      "CONST_10_OVER_3",
+      "CONST_100_OVER_3",
+      "CONST_SMALL_OVER_3",
+      "CONST_LARGE_OVER_3",
+      "CONST_CHAIN_2_OVER_15",
+      "LITERAL_17_DIGITS",
+      "LITERAL_16_DIGITS",
+      "INPUT_QUOTIENT",
+      "SIMPLE_QUOTIENT",
+      "SERIES_QUOTIENT",
+      "UDF_CONST_ARGUMENTS",
+      "UDF_INPUT_ARGUMENTS",
+      "UDF_SIMPLE_ARGUMENTS",
+      "UDF_SERIES_ARGUMENTS",
+      "CONST_MINUS_INPUT_SCALED",
+      "CONST_MINUS_LITERAL_17_SCALED",
+      "CONST_MINUS_LITERAL_16_SCALED",
+      "LITERAL_17_MINUS_16_SCALED",
+      "SMALL_QUOTIENT_SCALED",
+      "INPUT_HOLE_SOURCE",
+      "EMA_FIRST_CONST",
+      "EMA_SMA_CONST",
+      "EMA_FIRST_INPUT",
+      "EMA_SMA_INPUT",
+      "EMA_FIRST_SIMPLE",
+      "EMA_SMA_SIMPLE",
+      "EMA_FIRST_LITERAL17",
+      "EMA_SMA_LITERAL17",
+      "EMA_FIRST_LITERAL16",
+      "EMA_SMA_LITERAL16",
+      "EMA_FIRST_EXACT_CONTROL",
+      "EMA_SMA_EXACT_CONTROL"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "INPUT_BAR_INDEX": 5,
+      "INPUT_TIME": 6,
+      "INPUT_CLOSE": 7,
+      "INPUT_NUMERATOR": 8,
+      "INPUT_DENOMINATOR": 9,
+      "INPUT_TIMEFRAME_MULTIPLIER": 10,
+      "INPUT_SERIES_NUMERATOR": 11,
+      "CONST_2_OVER_15": 12,
+      "CONST_13_OVER_15": 13,
+      "CONST_1_OVER_7": 14,
+      "CONST_1_OVER_15": 15,
+      "CONST_10_OVER_3": 16,
+      "CONST_100_OVER_3": 17,
+      "CONST_SMALL_OVER_3": 18,
+      "CONST_LARGE_OVER_3": 19,
+      "CONST_CHAIN_2_OVER_15": 20,
+      "LITERAL_17_DIGITS": 21,
+      "LITERAL_16_DIGITS": 22,
+      "INPUT_QUOTIENT": 23,
+      "SIMPLE_QUOTIENT": 24,
+      "SERIES_QUOTIENT": 25,
+      "UDF_CONST_ARGUMENTS": 26,
+      "UDF_INPUT_ARGUMENTS": 27,
+      "UDF_SIMPLE_ARGUMENTS": 28,
+      "UDF_SERIES_ARGUMENTS": 29,
+      "CONST_MINUS_INPUT_SCALED": 30,
+      "CONST_MINUS_LITERAL_17_SCALED": 31,
+      "CONST_MINUS_LITERAL_16_SCALED": 32,
+      "LITERAL_17_MINUS_16_SCALED": 33,
+      "SMALL_QUOTIENT_SCALED": 34,
+      "INPUT_HOLE_SOURCE": 35,
+      "EMA_FIRST_CONST": 36,
+      "EMA_SMA_CONST": 37,
+      "EMA_FIRST_INPUT": 38,
+      "EMA_SMA_INPUT": 39,
+      "EMA_FIRST_SIMPLE": 40,
+      "EMA_SMA_SIMPLE": 41,
+      "EMA_FIRST_LITERAL17": 42,
+      "EMA_SMA_LITERAL17": 43,
+      "EMA_FIRST_LITERAL16": 44,
+      "EMA_SMA_LITERAL16": 45,
+      "EMA_FIRST_EXACT_CONTROL": 46,
+      "EMA_SMA_EXACT_CONTROL": 47
+    },
+    "first_historical_cells": [
+      "1788739200",
+      "80341.83",
+      "80356",
+      "80230.29",
+      "80293.23",
+      "0",
+      "1788739200000",
+      "80293.23",
+      "2",
+      "15",
+      "2",
+      "2",
+      "0.1333333333333333",
+      "0.8666666666666667",
+      "0.1428571428571428",
+      "0.0666666666666667",
+      "3.3333333333333335",
+      "33.333333333333336",
+      "3.3333333333333335e-11",
+      "3333333333.3333335",
+      "0.1333333333333333",
+      "0.1333333333333333",
+      "0.1333333333333333",
+      "0.13333333333333333",
+      "0.13333333333333333",
+      "0.13333333333333333",
+      "0.1333333333333333",
+      "0.13333333333333333",
+      "0.13333333333333333",
+      "0.13333333333333333",
+      "-27.755575615628914",
+      "0",
+      "27.755575615628914",
+      "27.755575615628914",
+      "3333333333.3333335",
+      "80293.23",
+      "80293.23",
+      "",
+      "80293.23",
+      "",
+      "80293.23",
+      "",
+      "80293.23",
+      "",
+      "80293.23",
+      "",
+      "80293.23",
+      ""
+    ],
+    "last_historical_cells": [
+      "1791140520",
+      "85362.01",
+      "85362.01",
+      "85360",
+      "85360.53",
+      "20011",
+      "1791140520000",
+      "85360.53",
+      "2",
+      "15",
+      "2",
+      "3",
+      "0.1333333333333333",
+      "0.8666666666666667",
+      "0.1428571428571428",
+      "0.0666666666666667",
+      "3.3333333333333335",
+      "33.333333333333336",
+      "3.3333333333333335e-11",
+      "3333333333.3333335",
+      "0.1333333333333333",
+      "0.1333333333333333",
+      "0.1333333333333333",
+      "0.13333333333333333",
+      "0.13333333333333333",
+      "0.2",
+      "0.1333333333333333",
+      "0.13333333333333333",
+      "0.13333333333333333",
+      "0.2",
+      "-27.755575615628914",
+      "0",
+      "27.755575615628914",
+      "27.755575615628914",
+      "3333333333.3333335",
+      "85360.53",
+      "85344.86548370012",
+      "85344.86548370012",
+      "85344.86548370017",
+      "85344.86548370017",
+      "85344.86548370017",
+      "85344.86548370017",
+      "85344.86548370012",
+      "85344.86548370012",
+      "85344.86548370012",
+      "85344.86548370012",
+      "85344.24120156364",
+      "85344.24120156364"
+    ],
+    "declared_to_native_header_mapping": {
+      "INPUT_BAR_INDEX": "INPUT_BAR_INDEX",
+      "INPUT_TIME": "INPUT_TIME",
+      "INPUT_CLOSE": "INPUT_CLOSE",
+      "INPUT_NUMERATOR": "INPUT_NUMERATOR",
+      "INPUT_DENOMINATOR": "INPUT_DENOMINATOR",
+      "INPUT_TIMEFRAME_MULTIPLIER": "INPUT_TIMEFRAME_MULTIPLIER",
+      "INPUT_SERIES_NUMERATOR": "INPUT_SERIES_NUMERATOR",
+      "CONST_2_OVER_15": "CONST_2_OVER_15",
+      "CONST_13_OVER_15": "CONST_13_OVER_15",
+      "CONST_1_OVER_7": "CONST_1_OVER_7",
+      "CONST_1_OVER_15": "CONST_1_OVER_15",
+      "CONST_10_OVER_3": "CONST_10_OVER_3",
+      "CONST_100_OVER_3": "CONST_100_OVER_3",
+      "CONST_SMALL_OVER_3": "CONST_SMALL_OVER_3",
+      "CONST_LARGE_OVER_3": "CONST_LARGE_OVER_3",
+      "CONST_CHAIN_2_OVER_15": "CONST_CHAIN_2_OVER_15",
+      "LITERAL_17_DIGITS": "LITERAL_17_DIGITS",
+      "LITERAL_16_DIGITS": "LITERAL_16_DIGITS",
+      "INPUT_QUOTIENT": "INPUT_QUOTIENT",
+      "SIMPLE_QUOTIENT": "SIMPLE_QUOTIENT",
+      "SERIES_QUOTIENT": "SERIES_QUOTIENT",
+      "UDF_CONST_ARGUMENTS": "UDF_CONST_ARGUMENTS",
+      "UDF_INPUT_ARGUMENTS": "UDF_INPUT_ARGUMENTS",
+      "UDF_SIMPLE_ARGUMENTS": "UDF_SIMPLE_ARGUMENTS",
+      "UDF_SERIES_ARGUMENTS": "UDF_SERIES_ARGUMENTS",
+      "CONST_MINUS_INPUT_SCALED": "CONST_MINUS_INPUT_SCALED",
+      "CONST_MINUS_LITERAL_17_SCALED": "CONST_MINUS_LITERAL_17_SCALED",
+      "CONST_MINUS_LITERAL_16_SCALED": "CONST_MINUS_LITERAL_16_SCALED",
+      "LITERAL_17_MINUS_16_SCALED": "LITERAL_17_MINUS_16_SCALED",
+      "SMALL_QUOTIENT_SCALED": "SMALL_QUOTIENT_SCALED",
+      "INPUT_HOLE_SOURCE": "INPUT_HOLE_SOURCE",
+      "EMA_FIRST_CONST": "EMA_FIRST_CONST",
+      "EMA_SMA_CONST": "EMA_SMA_CONST",
+      "EMA_FIRST_INPUT": "EMA_FIRST_INPUT",
+      "EMA_SMA_INPUT": "EMA_SMA_INPUT",
+      "EMA_FIRST_SIMPLE": "EMA_FIRST_SIMPLE",
+      "EMA_SMA_SIMPLE": "EMA_SMA_SIMPLE",
+      "EMA_FIRST_LITERAL17": "EMA_FIRST_LITERAL17",
+      "EMA_SMA_LITERAL17": "EMA_SMA_LITERAL17",
+      "EMA_FIRST_LITERAL16": "EMA_FIRST_LITERAL16",
+      "EMA_SMA_LITERAL16": "EMA_SMA_LITERAL16",
+      "EMA_FIRST_EXACT_CONTROL": "EMA_FIRST_EXACT_CONTROL",
+      "EMA_SMA_EXACT_CONTROL": "EMA_SMA_EXACT_CONTROL"
+    },
+    "csv_rows": 20013,
+    "historical_rows": 20012,
+    "first_csv_timestamp_seconds": 1788739200,
+    "last_csv_timestamp_seconds": 1791140640,
+    "first_csv_time_raw": "1788739200",
+    "last_csv_time_raw": "1791140640",
+    "first_historical_values": {
+      "INPUT_BAR_INDEX": "0",
+      "INPUT_TIME": "1788739200000",
+      "INPUT_CLOSE": "80293.23",
+      "INPUT_NUMERATOR": "2",
+      "INPUT_DENOMINATOR": "15",
+      "INPUT_TIMEFRAME_MULTIPLIER": "2",
+      "INPUT_SERIES_NUMERATOR": "2",
+      "CONST_2_OVER_15": "0.1333333333333333",
+      "CONST_13_OVER_15": "0.8666666666666667",
+      "CONST_1_OVER_7": "0.1428571428571428",
+      "CONST_1_OVER_15": "0.0666666666666667",
+      "CONST_10_OVER_3": "3.3333333333333335",
+      "CONST_100_OVER_3": "33.333333333333336",
+      "CONST_SMALL_OVER_3": "3.3333333333333335e-11",
+      "CONST_LARGE_OVER_3": "3333333333.3333335",
+      "CONST_CHAIN_2_OVER_15": "0.1333333333333333",
+      "LITERAL_17_DIGITS": "0.1333333333333333",
+      "LITERAL_16_DIGITS": "0.1333333333333333",
+      "INPUT_QUOTIENT": "0.13333333333333333",
+      "SIMPLE_QUOTIENT": "0.13333333333333333",
+      "SERIES_QUOTIENT": "0.13333333333333333",
+      "UDF_CONST_ARGUMENTS": "0.1333333333333333",
+      "UDF_INPUT_ARGUMENTS": "0.13333333333333333",
+      "UDF_SIMPLE_ARGUMENTS": "0.13333333333333333",
+      "UDF_SERIES_ARGUMENTS": "0.13333333333333333",
+      "CONST_MINUS_INPUT_SCALED": "-27.755575615628914",
+      "CONST_MINUS_LITERAL_17_SCALED": "0",
+      "CONST_MINUS_LITERAL_16_SCALED": "27.755575615628914",
+      "LITERAL_17_MINUS_16_SCALED": "27.755575615628914",
+      "SMALL_QUOTIENT_SCALED": "3333333333.3333335",
+      "INPUT_HOLE_SOURCE": "80293.23",
+      "EMA_FIRST_CONST": "80293.23",
+      "EMA_SMA_CONST": "",
+      "EMA_FIRST_INPUT": "80293.23",
+      "EMA_SMA_INPUT": "",
+      "EMA_FIRST_SIMPLE": "80293.23",
+      "EMA_SMA_SIMPLE": "",
+      "EMA_FIRST_LITERAL17": "80293.23",
+      "EMA_SMA_LITERAL17": "",
+      "EMA_FIRST_LITERAL16": "80293.23",
+      "EMA_SMA_LITERAL16": "",
+      "EMA_FIRST_EXACT_CONTROL": "80293.23",
+      "EMA_SMA_EXACT_CONTROL": ""
+    },
+    "last_historical_values": {
+      "INPUT_BAR_INDEX": "20011",
+      "INPUT_TIME": "1791140520000",
+      "INPUT_CLOSE": "85360.53",
+      "INPUT_NUMERATOR": "2",
+      "INPUT_DENOMINATOR": "15",
+      "INPUT_TIMEFRAME_MULTIPLIER": "2",
+      "INPUT_SERIES_NUMERATOR": "3",
+      "CONST_2_OVER_15": "0.1333333333333333",
+      "CONST_13_OVER_15": "0.8666666666666667",
+      "CONST_1_OVER_7": "0.1428571428571428",
+      "CONST_1_OVER_15": "0.0666666666666667",
+      "CONST_10_OVER_3": "3.3333333333333335",
+      "CONST_100_OVER_3": "33.333333333333336",
+      "CONST_SMALL_OVER_3": "3.3333333333333335e-11",
+      "CONST_LARGE_OVER_3": "3333333333.3333335",
+      "CONST_CHAIN_2_OVER_15": "0.1333333333333333",
+      "LITERAL_17_DIGITS": "0.1333333333333333",
+      "LITERAL_16_DIGITS": "0.1333333333333333",
+      "INPUT_QUOTIENT": "0.13333333333333333",
+      "SIMPLE_QUOTIENT": "0.13333333333333333",
+      "SERIES_QUOTIENT": "0.2",
+      "UDF_CONST_ARGUMENTS": "0.1333333333333333",
+      "UDF_INPUT_ARGUMENTS": "0.13333333333333333",
+      "UDF_SIMPLE_ARGUMENTS": "0.13333333333333333",
+      "UDF_SERIES_ARGUMENTS": "0.2",
+      "CONST_MINUS_INPUT_SCALED": "-27.755575615628914",
+      "CONST_MINUS_LITERAL_17_SCALED": "0",
+      "CONST_MINUS_LITERAL_16_SCALED": "27.755575615628914",
+      "LITERAL_17_MINUS_16_SCALED": "27.755575615628914",
+      "SMALL_QUOTIENT_SCALED": "3333333333.3333335",
+      "INPUT_HOLE_SOURCE": "85360.53",
+      "EMA_FIRST_CONST": "85344.86548370012",
+      "EMA_SMA_CONST": "85344.86548370012",
+      "EMA_FIRST_INPUT": "85344.86548370017",
+      "EMA_SMA_INPUT": "85344.86548370017",
+      "EMA_FIRST_SIMPLE": "85344.86548370017",
+      "EMA_SMA_SIMPLE": "85344.86548370017",
+      "EMA_FIRST_LITERAL17": "85344.86548370012",
+      "EMA_SMA_LITERAL17": "85344.86548370012",
+      "EMA_FIRST_LITERAL16": "85344.86548370012",
+      "EMA_SMA_LITERAL16": "85344.86548370012",
+      "EMA_FIRST_EXACT_CONTROL": "85344.24120156364",
+      "EMA_SMA_EXACT_CONTROL": "85344.24120156364"
+    },
+    "declared_unexported_columns": [],
+    "data_window_witness": "captures/v14/evidence/const-quotient-precision-context-v14-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T19:04:59.036Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "arm",
+        "bitness": "64",
+        "brands": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156"
+          }
+        ],
+        "fullVersionList": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8.0.0.0"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156.0.8075.0"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156.0.8075.0"
+          }
+        ],
+        "mobile": false,
+        "platform": "macOS",
+        "platformVersion": "27.2.0"
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v14 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "map-signed-zero-key-identity-v14-v1.pine",
+    "attempt": 1,
+    "source_sha256": "dbe6b7de96a67f6dbabf2ebb7ef9656d04059e82a2fbc64301ae5f7cd332c15e",
+    "indicator_title": "map-signed-zero-key-identity v14 v1",
+    "status": "RUNS",
+    "csv_file": "captures/v14/map-signed-zero-key-identity-v14-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-05T030458.433.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "minmove": 1,
+      "pricescale": 100,
+      "pointvalue": 1,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "map-signed-zero-key-identity v14 v1",
+      "dataset_start_utc": "2026-09-07T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -19713,
+        "value": [
+          1788739200,
+          80341.83,
+          80356,
+          80230.29,
+          80293.23,
+          37.66955
+        ]
+      },
+      "chart_bars": 20013,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T19:04:51.238Z",
+    "live_candle_open_utc": "2026-10-04T19:04:00.000Z",
+    "export_utc": "2026-10-04T19:04:58.684Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v14/evidence/map-signed-zero-key-identity-v14-v1-attempt1-setup.png",
+      "captures/v14/evidence/map-signed-zero-key-identity-v14-v1-attempt1-export.png",
+      "captures/v14/evidence/map-signed-zero-key-identity-v14-v1-attempt1-logs.txt",
+      "captures/v14/evidence/map-signed-zero-key-identity-v14-v1-attempt1-logs-v1.json",
+      "captures/v14/evidence/map-signed-zero-key-identity-v14-v1-attempt1-logs.png",
+      "captures/v14/evidence/map-signed-zero-key-identity-v14-v1-attempt1-visual.png",
+      "captures/v14/evidence/map-signed-zero-key-identity-v14-v1-attempt1-data-window-v1.png",
+      "captures/v14/evidence/map-signed-zero-key-identity-v14-v1-attempt1-data-window-v1.json",
+      "captures/v14/evidence/map-signed-zero-key-identity-v14-v1-attempt1-data-window-v1.txt",
+      "captures/v14/evidence/map-signed-zero-key-identity-v14-v1-attempt1-authority-object-geometry-v1.json",
+      "captures/v14/evidence/map-signed-zero-key-identity-v14-v1-attempt1-authority-object-geometry-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T19:04:52.032Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790835480,
+            84366.01,
+            84366.01,
+            84324.37,
+            84324.38,
+            5.40534
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791140640,
+            85360.54,
+            85388,
+            85360.54,
+            85388,
+            2.57329
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "map-signed-zero-key-identity v14 v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790835480,
+                17469,
+                1,
+                1,
+                22,
+                22
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791140640,
+                20012,
+                1,
+                1,
+                22,
+                22
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T19:04:53.147Z",
+        "bars": 20013,
+        "end": true,
+        "first": {
+          "index": -19713,
+          "value": [
+            1788739200,
+            80341.83,
+            80356,
+            80230.29,
+            80293.23,
+            37.66955
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791140640,
+            85360.54,
+            85388,
+            85360.54,
+            85388,
+            2.5798
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "map-signed-zero-key-identity v14 v1",
+            "status": {
+              "type": 2
+            },
+            "size": 20013,
+            "first": {
+              "index": -19713,
+              "value": [
+                1788739200,
+                0,
+                1,
+                1,
+                22,
+                22
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791140640,
+                20012,
+                1,
+                1,
+                22,
+                22
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   19:04",
+    "historical_compare_before_unix_seconds": 1791140640,
+    "pine_logs": {
+      "paths": [
+        "evidence/map-signed-zero-key-identity-v14-v1-attempt1-logs.txt",
+        "evidence/map-signed-zero-key-identity-v14-v1-attempt1-logs-v1.json",
+        "evidence/map-signed-zero-key-identity-v14-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "all_exported_column_occurrences": [
+      {
+        "title": "time",
+        "occurrence": 1,
+        "position": 0
+      },
+      {
+        "title": "open",
+        "occurrence": 1,
+        "position": 1
+      },
+      {
+        "title": "high",
+        "occurrence": 1,
+        "position": 2
+      },
+      {
+        "title": "low",
+        "occurrence": 1,
+        "position": 3
+      },
+      {
+        "title": "close",
+        "occurrence": 1,
+        "position": 4
+      },
+      {
+        "title": "INPUT_BAR_INDEX",
+        "occurrence": 1,
+        "position": 5
+      },
+      {
+        "title": "SIZE_FIRST",
+        "occurrence": 1,
+        "position": 6
+      },
+      {
+        "title": "SIZE_SECOND",
+        "occurrence": 1,
+        "position": 7
+      },
+      {
+        "title": "POSITIVE_ZERO_VALUE",
+        "occurrence": 1,
+        "position": 8
+      },
+      {
+        "title": "NEGATIVE_ZERO_VALUE",
+        "occurrence": 1,
+        "position": 9
+      }
+    ],
+    "declared_to_native_column_occurrences": [
+      {
+        "declared_title": "INPUT_BAR_INDEX",
+        "native_title": "INPUT_BAR_INDEX",
+        "occurrence": 1,
+        "position": 5
+      },
+      {
+        "declared_title": "SIZE_FIRST",
+        "native_title": "SIZE_FIRST",
+        "occurrence": 1,
+        "position": 6
+      },
+      {
+        "declared_title": "SIZE_SECOND",
+        "native_title": "SIZE_SECOND",
+        "occurrence": 1,
+        "position": 7
+      },
+      {
+        "declared_title": "POSITIVE_ZERO_VALUE",
+        "native_title": "POSITIVE_ZERO_VALUE",
+        "occurrence": 1,
+        "position": 8
+      },
+      {
+        "declared_title": "NEGATIVE_ZERO_VALUE",
+        "native_title": "NEGATIVE_ZERO_VALUE",
+        "occurrence": 1,
+        "position": 9
+      }
+    ],
+    "named_value_map_scope": "Legacy title maps show the first occurrence only; original positional cells and occurrence tables retain every duplicate without renaming.",
+    "csv_sha256": "dc60a1dae948805d69acbc1f7d5660498423ac2323ed78fdba232b8e07a0bf91",
+    "csv_bytes": 1197159,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "INPUT_BAR_INDEX",
+      "SIZE_FIRST",
+      "SIZE_SECOND",
+      "POSITIVE_ZERO_VALUE",
+      "NEGATIVE_ZERO_VALUE"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "INPUT_BAR_INDEX": 5,
+      "SIZE_FIRST": 6,
+      "SIZE_SECOND": 7,
+      "POSITIVE_ZERO_VALUE": 8,
+      "NEGATIVE_ZERO_VALUE": 9
+    },
+    "first_historical_cells": [
+      "1788739200",
+      "80341.83",
+      "80356",
+      "80230.29",
+      "80293.23",
+      "0",
+      "1",
+      "1",
+      "22",
+      "22"
+    ],
+    "last_historical_cells": [
+      "1791140520",
+      "85362.01",
+      "85362.01",
+      "85360",
+      "85360.53",
+      "20011",
+      "1",
+      "1",
+      "22",
+      "22"
+    ],
+    "declared_to_native_header_mapping": {
+      "INPUT_BAR_INDEX": "INPUT_BAR_INDEX",
+      "SIZE_FIRST": "SIZE_FIRST",
+      "SIZE_SECOND": "SIZE_SECOND",
+      "POSITIVE_ZERO_VALUE": "POSITIVE_ZERO_VALUE",
+      "NEGATIVE_ZERO_VALUE": "NEGATIVE_ZERO_VALUE"
+    },
+    "csv_rows": 20013,
+    "historical_rows": 20012,
+    "first_csv_timestamp_seconds": 1788739200,
+    "last_csv_timestamp_seconds": 1791140640,
+    "first_csv_time_raw": "1788739200",
+    "last_csv_time_raw": "1791140640",
+    "first_historical_values": {
+      "INPUT_BAR_INDEX": "0",
+      "SIZE_FIRST": "1",
+      "SIZE_SECOND": "1",
+      "POSITIVE_ZERO_VALUE": "22",
+      "NEGATIVE_ZERO_VALUE": "22"
+    },
+    "last_historical_values": {
+      "INPUT_BAR_INDEX": "20011",
+      "SIZE_FIRST": "1",
+      "SIZE_SECOND": "1",
+      "POSITIVE_ZERO_VALUE": "22",
+      "NEGATIVE_ZERO_VALUE": "22"
+    },
+    "declared_unexported_columns": [],
+    "data_window_witness": "captures/v14/evidence/map-signed-zero-key-identity-v14-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T19:05:28.746Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "arm",
+        "bitness": "64",
+        "brands": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156"
+          }
+        ],
+        "fullVersionList": [
+          {
+            "brand": "Not:A-Brand",
+            "version": "8.0.0.0"
+          },
+          {
+            "brand": "Chromium",
+            "version": "156.0.8075.0"
+          },
+          {
+            "brand": "Google Chrome",
+            "version": "156.0.8075.0"
+          }
+        ],
+        "mobile": false,
+        "platform": "macOS",
+        "platformVersion": "27.2.0"
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v14 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "array-standardize-multihole-int-v14-v1.pine",
+    "attempt": 1,
+    "source_sha256": "7d64351f08a423e0fe86920020fde46493939db8549176810e8e04c169fac33a",
+    "indicator_title": "array-standardize-multihole-int v14 v1",
+    "status": "RUNS",
+    "csv_file": "captures/v14/array-standardize-multihole-int-v14-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-05T030527.994.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "minmove": 1,
+      "pricescale": 100,
+      "pointvalue": 1,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "array-standardize-multihole-int v14 v1",
+      "dataset_start_utc": "2026-09-07T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -19713,
+        "value": [
+          1788739200,
+          80341.83,
+          80356,
+          80230.29,
+          80293.23,
+          37.66955
+        ]
+      },
+      "chart_bars": 20013,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T19:05:21.253Z",
+    "live_candle_open_utc": "2026-10-04T19:04:00.000Z",
+    "export_utc": "2026-10-04T19:05:28.347Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v14/evidence/array-standardize-multihole-int-v14-v1-attempt1-setup.png",
+      "captures/v14/evidence/array-standardize-multihole-int-v14-v1-attempt1-export.png",
+      "captures/v14/evidence/array-standardize-multihole-int-v14-v1-attempt1-logs.txt",
+      "captures/v14/evidence/array-standardize-multihole-int-v14-v1-attempt1-logs-v1.json",
+      "captures/v14/evidence/array-standardize-multihole-int-v14-v1-attempt1-logs.png",
+      "captures/v14/evidence/array-standardize-multihole-int-v14-v1-attempt1-visual.png",
+      "captures/v14/evidence/array-standardize-multihole-int-v14-v1-attempt1-data-window-v1.png",
+      "captures/v14/evidence/array-standardize-multihole-int-v14-v1-attempt1-data-window-v1.json",
+      "captures/v14/evidence/array-standardize-multihole-int-v14-v1-attempt1-data-window-v1.txt",
+      "captures/v14/evidence/array-standardize-multihole-int-v14-v1-attempt1-authority-object-geometry-v1.json",
+      "captures/v14/evidence/array-standardize-multihole-int-v14-v1-attempt1-authority-object-geometry-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T19:05:21.968Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790835480,
+            84366.01,
+            84366.01,
+            84324.37,
+            84324.38,
+            5.40534
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791140640,
+            85360.54,
+            85388,
+            85360.54,
+            85388,
+            5.34497
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "array-standardize-multihole-int v14 v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790835480,
+                17469,
+                5,
+                5,
+                1,
+                null,
+                5,
+                null,
+                9,
+                -1.2247448713915892,
+                null,
+                0,
+                null,
+                1.2247448713915892
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791140640,
+                20012,
+                5,
+                5,
+                1,
+                null,
+                5,
+                null,
+                9,
+                -1.2247448713915892,
+                null,
+                0,
+                null,
+                1.2247448713915892
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T19:05:22.959Z",
+        "bars": 20013,
+        "end": true,
+        "first": {
+          "index": -19713,
+          "value": [
+            1788739200,
+            80341.83,
+            80356,
+            80230.29,
+            80293.23,
+            37.66955
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791140640,
+            85360.54,
+            85388,
+            85360.54,
+            85388,
+            5.35206
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "array-standardize-multihole-int v14 v1",
+            "status": {
+              "type": 2
+            },
+            "size": 20013,
+            "first": {
+              "index": -19713,
+              "value": [
+                1788739200,
+                0,
+                5,
+                5,
+                1,
+                null,
+                5,
+                null,
+                9,
+                -1.2247448713915892,
+                null,
+                0,
+                null,
+                1.2247448713915892
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791140640,
+                20012,
+                5,
+                5,
+                1,
+                null,
+                5,
+                null,
+                9,
+                -1.2247448713915892,
+                null,
+                0,
+                null,
+                1.2247448713915892
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   19:04",
+    "historical_compare_before_unix_seconds": 1791140640,
+    "pine_logs": {
+      "paths": [
+        "evidence/array-standardize-multihole-int-v14-v1-attempt1-logs.txt",
+        "evidence/array-standardize-multihole-int-v14-v1-attempt1-logs-v1.json",
+        "evidence/array-standardize-multihole-int-v14-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "all_exported_column_occurrences": [
+      {
+        "title": "time",
+        "occurrence": 1,
+        "position": 0
+      },
+      {
+        "title": "open",
+        "occurrence": 1,
+        "position": 1
+      },
+      {
+        "title": "high",
+        "occurrence": 1,
+        "position": 2
+      },
+      {
+        "title": "low",
+        "occurrence": 1,
+        "position": 3
+      },
+      {
+        "title": "close",
+        "occurrence": 1,
+        "position": 4
+      },
+      {
+        "title": "INPUT_BAR_INDEX",
+        "occurrence": 1,
+        "position": 5
+      },
+      {
+        "title": "SOURCE_SIZE",
+        "occurrence": 1,
+        "position": 6
+      },
+      {
+        "title": "RESULT_SIZE",
+        "occurrence": 1,
+        "position": 7
+      },
+      {
+        "title": "SOURCE_0",
+        "occurrence": 1,
+        "position": 8
+      },
+      {
+        "title": "SOURCE_1",
+        "occurrence": 1,
+        "position": 9
+      },
+      {
+        "title": "SOURCE_2",
+        "occurrence": 1,
+        "position": 10
+      },
+      {
+        "title": "SOURCE_3",
+        "occurrence": 1,
+        "position": 11
+      },
+      {
+        "title": "SOURCE_4",
+        "occurrence": 1,
+        "position": 12
+      },
+      {
+        "title": "RESULT_0",
+        "occurrence": 1,
+        "position": 13
+      },
+      {
+        "title": "RESULT_1",
+        "occurrence": 1,
+        "position": 14
+      },
+      {
+        "title": "RESULT_2",
+        "occurrence": 1,
+        "position": 15
+      },
+      {
+        "title": "RESULT_3",
+        "occurrence": 1,
+        "position": 16
+      },
+      {
+        "title": "RESULT_4",
+        "occurrence": 1,
+        "position": 17
+      }
+    ],
+    "declared_to_native_column_occurrences": [
+      {
+        "declared_title": "INPUT_BAR_INDEX",
+        "native_title": "INPUT_BAR_INDEX",
+        "occurrence": 1,
+        "position": 5
+      },
+      {
+        "declared_title": "SOURCE_SIZE",
+        "native_title": "SOURCE_SIZE",
+        "occurrence": 1,
+        "position": 6
+      },
+      {
+        "declared_title": "RESULT_SIZE",
+        "native_title": "RESULT_SIZE",
+        "occurrence": 1,
+        "position": 7
+      },
+      {
+        "declared_title": "SOURCE_0",
+        "native_title": "SOURCE_0",
+        "occurrence": 1,
+        "position": 8
+      },
+      {
+        "declared_title": "SOURCE_1",
+        "native_title": "SOURCE_1",
+        "occurrence": 1,
+        "position": 9
+      },
+      {
+        "declared_title": "SOURCE_2",
+        "native_title": "SOURCE_2",
+        "occurrence": 1,
+        "position": 10
+      },
+      {
+        "declared_title": "SOURCE_3",
+        "native_title": "SOURCE_3",
+        "occurrence": 1,
+        "position": 11
+      },
+      {
+        "declared_title": "SOURCE_4",
+        "native_title": "SOURCE_4",
+        "occurrence": 1,
+        "position": 12
+      },
+      {
+        "declared_title": "RESULT_0",
+        "native_title": "RESULT_0",
+        "occurrence": 1,
+        "position": 13
+      },
+      {
+        "declared_title": "RESULT_1",
+        "native_title": "RESULT_1",
+        "occurrence": 1,
+        "position": 14
+      },
+      {
+        "declared_title": "RESULT_2",
+        "native_title": "RESULT_2",
+        "occurrence": 1,
+        "position": 15
+      },
+      {
+        "declared_title": "RESULT_3",
+        "native_title": "RESULT_3",
+        "occurrence": 1,
+        "position": 16
+      },
+      {
+        "declared_title": "RESULT_4",
+        "native_title": "RESULT_4",
+        "occurrence": 1,
+        "position": 17
+      }
+    ],
+    "named_value_map_scope": "Legacy title maps show the first occurrence only; original positional cells and occurrence tables retain every duplicate without renaming.",
+    "csv_sha256": "9c97a312ed086dfee5276a05aa5ee8b975649e239d0c60e70dfc0d1dc7fd92f5",
+    "csv_bytes": 2097801,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "INPUT_BAR_INDEX",
+      "SOURCE_SIZE",
+      "RESULT_SIZE",
+      "SOURCE_0",
+      "SOURCE_1",
+      "SOURCE_2",
+      "SOURCE_3",
+      "SOURCE_4",
+      "RESULT_0",
+      "RESULT_1",
+      "RESULT_2",
+      "RESULT_3",
+      "RESULT_4"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "INPUT_BAR_INDEX": 5,
+      "SOURCE_SIZE": 6,
+      "RESULT_SIZE": 7,
+      "SOURCE_0": 8,
+      "SOURCE_1": 9,
+      "SOURCE_2": 10,
+      "SOURCE_3": 11,
+      "SOURCE_4": 12,
+      "RESULT_0": 13,
+      "RESULT_1": 14,
+      "RESULT_2": 15,
+      "RESULT_3": 16,
+      "RESULT_4": 17
+    },
+    "first_historical_cells": [
+      "1788739200",
+      "80341.83",
+      "80356",
+      "80230.29",
+      "80293.23",
+      "0",
+      "5",
+      "5",
+      "1",
+      "",
+      "5",
+      "",
+      "9",
+      "-1.2247448713915892",
+      "",
+      "0",
+      "",
+      "1.2247448713915892"
+    ],
+    "last_historical_cells": [
+      "1791140520",
+      "85362.01",
+      "85362.01",
+      "85360",
+      "85360.53",
+      "20011",
+      "5",
+      "5",
+      "1",
+      "",
+      "5",
+      "",
+      "9",
+      "-1.2247448713915892",
+      "",
+      "0",
+      "",
+      "1.2247448713915892"
+    ],
+    "declared_to_native_header_mapping": {
+      "INPUT_BAR_INDEX": "INPUT_BAR_INDEX",
+      "SOURCE_SIZE": "SOURCE_SIZE",
+      "RESULT_SIZE": "RESULT_SIZE",
+      "SOURCE_0": "SOURCE_0",
+      "SOURCE_1": "SOURCE_1",
+      "SOURCE_2": "SOURCE_2",
+      "SOURCE_3": "SOURCE_3",
+      "SOURCE_4": "SOURCE_4",
+      "RESULT_0": "RESULT_0",
+      "RESULT_1": "RESULT_1",
+      "RESULT_2": "RESULT_2",
+      "RESULT_3": "RESULT_3",
+      "RESULT_4": "RESULT_4"
+    },
+    "csv_rows": 20013,
+    "historical_rows": 20012,
+    "first_csv_timestamp_seconds": 1788739200,
+    "last_csv_timestamp_seconds": 1791140640,
+    "first_csv_time_raw": "1788739200",
+    "last_csv_time_raw": "1791140640",
+    "first_historical_values": {
+      "INPUT_BAR_INDEX": "0",
+      "SOURCE_SIZE": "5",
+      "RESULT_SIZE": "5",
+      "SOURCE_0": "1",
+      "SOURCE_1": "",
+      "SOURCE_2": "5",
+      "SOURCE_3": "",
+      "SOURCE_4": "9",
+      "RESULT_0": "-1.2247448713915892",
+      "RESULT_1": "",
+      "RESULT_2": "0",
+      "RESULT_3": "",
+      "RESULT_4": "1.2247448713915892"
+    },
+    "last_historical_values": {
+      "INPUT_BAR_INDEX": "20011",
+      "SOURCE_SIZE": "5",
+      "RESULT_SIZE": "5",
+      "SOURCE_0": "1",
+      "SOURCE_1": "",
+      "SOURCE_2": "5",
+      "SOURCE_3": "",
+      "SOURCE_4": "9",
+      "RESULT_0": "-1.2247448713915892",
+      "RESULT_1": "",
+      "RESULT_2": "0",
+      "RESULT_3": "",
+      "RESULT_4": "1.2247448713915892"
+    },
+    "declared_unexported_columns": [],
+    "data_window_witness": "captures/v14/evidence/array-standardize-multihole-int-v14-v1-attempt1-data-window-v1.json"
+  }
+]

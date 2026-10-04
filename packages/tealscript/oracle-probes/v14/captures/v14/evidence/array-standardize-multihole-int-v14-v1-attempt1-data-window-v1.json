@@ -1,0 +1,41 @@
+{
+  "index": 298,
+  "bar": [
+    1791140520,
+    85362.01,
+    85362.01,
+    85360,
+    85360.53,
+    12.5386
+  ],
+  "source_row": [
+    1791140520,
+    20011,
+    5,
+    5,
+    1,
+    null,
+    5,
+    null,
+    9,
+    -1.2247448713915892,
+    null,
+    0,
+    null,
+    1.2247448713915892
+  ],
+  "browser_utc": "2026-10-04T19:05:33.128Z",
+  "title": "array-standardize-multihole-int v14 v1",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   19:02",
+  "visible_range": {
+    "_firstBar": 263,
+    "_lastBar": 301
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}
