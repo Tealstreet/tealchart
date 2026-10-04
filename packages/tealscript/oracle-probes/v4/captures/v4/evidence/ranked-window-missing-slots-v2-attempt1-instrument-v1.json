@@ -1,0 +1,7 @@
+{
+  "artifact": "Capture instrument interruption v1",
+  "script": "ranked-window-missing-slots-v2.pine",
+  "observed_at_utc": "2026-10-04T01:49:51.615Z",
+  "failure": "Chrome MCP HTTP transport to 127.0.0.1:9223/mcp failed during reload-readiness evaluation",
+  "recovery": "Next native MCP list_pages and status call succeeded; no alternate tool path used."
+}

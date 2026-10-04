@@ -1,0 +1,8 @@
+[2026-08-31T00:00:00.000Z]: phase=0; source-na=false; scaled=0.9; previous-na=true
+[2026-08-31T00:02:00.000Z]: phase=1; source-na=false; scaled=1; previous-na=false
+[2026-08-31T00:04:00.000Z]: phase=2; source-na=false; scaled=1.1; previous-na=false
+[2026-08-31T00:06:00.000Z]: phase=3; source-na=false; scaled=-1.1; previous-na=false
+[2026-08-31T00:08:00.000Z]: phase=4; source-na=false; scaled=10; previous-na=false
+[2026-08-31T00:10:00.000Z]: phase=5; source-na=false; scaled=10,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000; previous-na=false
+[2026-08-31T00:12:00.000Z]: phase=6; source-na=false; scaled=100,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000; previous-na=false
+[2026-08-31T00:14:00.000Z]: phase=7; source-na=false; scaled=0; previous-na=false

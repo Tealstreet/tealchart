@@ -1,0 +1,1849 @@
+[
+  {
+    "script": "statistical-native-moments-order-v1.pine",
+    "attempt": 1,
+    "source_sha256": "eebafda38556e415a407420cab238e8520266bcfcd64c14af1a6aae448a9e899",
+    "indicator_title": "Statistical native moments order v1",
+    "status": "RUNS",
+    "csv_file": "captures/v4/statistical-native-moments-order-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T094357.874.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "Statistical native moments order v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24232,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24532,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T01:43:50.759Z",
+    "live_candle_open_utc": "2026-10-04T01:42:00.000Z",
+    "export_utc": "2026-10-04T01:43:58.288Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v4/evidence/statistical-native-moments-order-v1-attempt1-setup.png",
+      "captures/v4/evidence/statistical-native-moments-order-v1-attempt1-export.png",
+      "captures/v4/evidence/statistical-native-moments-order-v1-attempt1-logs.txt",
+      "captures/v4/evidence/statistical-native-moments-order-v1-attempt1-logs-v1.json",
+      "captures/v4/evidence/statistical-native-moments-order-v1-attempt1-logs.png",
+      "captures/v4/evidence/statistical-native-moments-order-v1-attempt1-visual.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "live_tooltip": "Sun 04 Oct '26   01:42",
+    "historical_compare_before_unix_seconds": 1791078120,
+    "pine_logs": {
+      "paths": [
+        "evidence/statistical-native-moments-order-v1-attempt1-logs.txt",
+        "evidence/statistical-native-moments-order-v1-attempt1-logs-v1.json",
+        "evidence/statistical-native-moments-order-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "39bd985557e41efd0b1b2235e8de2446188276b4ea0ab16f60fe08201bd9e790",
+    "csv_bytes": 23964719,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "input_time",
+      "input_bar_index",
+      "input_open",
+      "input_high",
+      "input_low",
+      "input_close",
+      "input_volume",
+      "input_wave",
+      "input_shifted",
+      "close_len2_mean",
+      "close_len2_square_mean",
+      "close_len2_sum",
+      "close_len2_square_sum",
+      "close_len2_stdev_population",
+      "close_len2_stdev_sample",
+      "close_len2_variance_population",
+      "close_len2_variance_sample",
+      "close_len3_mean",
+      "close_len3_square_mean",
+      "close_len3_sum",
+      "close_len3_square_sum",
+      "close_len3_stdev_population",
+      "close_len3_stdev_sample",
+      "close_len3_variance_population",
+      "close_len3_variance_sample",
+      "close_len7_mean",
+      "close_len7_square_mean",
+      "close_len7_sum",
+      "close_len7_square_sum",
+      "close_len7_stdev_population",
+      "close_len7_stdev_sample",
+      "close_len7_variance_population",
+      "close_len7_variance_sample",
+      "close_len14_mean",
+      "close_len14_square_mean",
+      "close_len14_sum",
+      "close_len14_square_sum",
+      "close_len14_stdev_population",
+      "close_len14_stdev_sample",
+      "close_len14_variance_population",
+      "close_len14_variance_sample",
+      "close_len31_mean",
+      "close_len31_square_mean",
+      "close_len31_sum",
+      "close_len31_square_sum",
+      "close_len31_stdev_population",
+      "close_len31_stdev_sample",
+      "close_len31_variance_population",
+      "close_len31_variance_sample",
+      "shifted_len14_mean",
+      "shifted_len14_square_mean",
+      "shifted_len14_sum",
+      "shifted_len14_square_sum",
+      "shifted_len14_stdev_population",
+      "shifted_len14_stdev_sample",
+      "shifted_len14_variance_population",
+      "shifted_len14_variance_sample",
+      "wave_len14_mean",
+      "wave_len14_square_mean",
+      "wave_len14_variance_population"
+    ],
+    "csv_rows": 24532,
+    "historical_rows": 24531,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791078120,
+    "first_historical_values": {
+      "input_time": "1788134400000",
+      "input_bar_index": "0",
+      "input_open": "77682",
+      "input_high": "77682.01",
+      "input_low": "77572",
+      "input_close": "77674.04",
+      "input_volume": "51.86295",
+      "input_wave": "50.125",
+      "input_shifted": "100000050.125",
+      "close_len2_mean": "",
+      "close_len2_square_mean": "",
+      "close_len2_sum": "",
+      "close_len2_square_sum": "",
+      "close_len2_stdev_population": "",
+      "close_len2_stdev_sample": "",
+      "close_len2_variance_population": "",
+      "close_len2_variance_sample": "",
+      "close_len3_mean": "",
+      "close_len3_square_mean": "",
+      "close_len3_sum": "",
+      "close_len3_square_sum": "",
+      "close_len3_stdev_population": "",
+      "close_len3_stdev_sample": "",
+      "close_len3_variance_population": "",
+      "close_len3_variance_sample": "",
+      "close_len7_mean": "",
+      "close_len7_square_mean": "",
+      "close_len7_sum": "",
+      "close_len7_square_sum": "",
+      "close_len7_stdev_population": "",
+      "close_len7_stdev_sample": "",
+      "close_len7_variance_population": "",
+      "close_len7_variance_sample": "",
+      "close_len14_mean": "",
+      "close_len14_square_mean": "",
+      "close_len14_sum": "",
+      "close_len14_square_sum": "",
+      "close_len14_stdev_population": "",
+      "close_len14_stdev_sample": "",
+      "close_len14_variance_population": "",
+      "close_len14_variance_sample": "",
+      "close_len31_mean": "",
+      "close_len31_square_mean": "",
+      "close_len31_sum": "",
+      "close_len31_square_sum": "",
+      "close_len31_stdev_population": "",
+      "close_len31_stdev_sample": "",
+      "close_len31_variance_population": "",
+      "close_len31_variance_sample": "",
+      "shifted_len14_mean": "",
+      "shifted_len14_square_mean": "",
+      "shifted_len14_sum": "",
+      "shifted_len14_square_sum": "",
+      "shifted_len14_stdev_population": "",
+      "shifted_len14_stdev_sample": "",
+      "shifted_len14_variance_population": "",
+      "shifted_len14_variance_sample": "",
+      "wave_len14_mean": "",
+      "wave_len14_square_mean": "",
+      "wave_len14_variance_population": ""
+    },
+    "last_historical_values": {
+      "input_time": "1791078000000",
+      "input_bar_index": "24530",
+      "input_open": "84774.86",
+      "input_high": "84774.86",
+      "input_low": "84774.85",
+      "input_close": "84774.85",
+      "input_volume": "0.82021",
+      "input_wave": "49.625",
+      "input_shifted": "100000049.625",
+      "close_len2_mean": "84774.85",
+      "close_len2_square_mean": "7186775192.522501",
+      "close_len2_sum": "169549.7",
+      "close_len2_square_sum": "14373550385.045002",
+      "close_len2_stdev_population": "0",
+      "close_len2_stdev_sample": "0",
+      "close_len2_variance_population": "0",
+      "close_len2_variance_sample": "0",
+      "close_len3_mean": "84777.50333333352",
+      "close_len3_square_mean": "7187225085.513698",
+      "close_len3_sum": "254332.51000000056",
+      "close_len3_square_sum": "21561675256.541092",
+      "close_len3_stdev_population": "3.752375549651847",
+      "close_len3_stdev_sample": "4.595702502456928",
+      "close_len3_variance_population": "14.080322265625",
+      "close_len3_variance_sample": "21.120481491088867",
+      "close_len7_mean": "84765.00285714319",
+      "close_len7_square_mean": "7185105945.748817",
+      "close_len7_sum": "593355.0200000023",
+      "close_len7_square_sum": "50295741620.24172",
+      "close_len7_stdev_population": "15.374567444461944",
+      "close_len7_stdev_sample": "16.606430811933173",
+      "close_len7_variance_population": "236.37732410430908",
+      "close_len7_variance_sample": "275.77354431152344",
+      "close_len14_mean": "84750.31285714268",
+      "close_len14_square_mean": "7182615918.178551",
+      "close_len14_sum": "1186504.3799999976",
+      "close_len14_square_sum": "100556622854.49971",
+      "close_len14_stdev_population": "19.717884945522265",
+      "close_len14_stdev_sample": "20.46221626192213",
+      "close_len14_variance_population": "388.7949867248535",
+      "close_len14_variance_sample": "418.7022943496704",
+      "close_len31_mean": "84776.1958064509",
+      "close_len31_square_mean": "7187004316.781248",
+      "close_len31_sum": "2628062.069999978",
+      "close_len31_square_sum": "222797133820.2187",
+      "close_len31_stdev_population": "30.68171354539285",
+      "close_len31_stdev_sample": "31.18888364180354",
+      "close_len31_variance_population": "941.367546081543",
+      "close_len31_variance_sample": "972.7464628219604",
+      "shifted_len14_mean": "100000051.08928572",
+      "shifted_len14_square_mean": "10000010217859758",
+      "shifted_len14_sum": "1400000715.25",
+      "shifted_len14_square_sum": "140000143050036620",
+      "shifted_len14_stdev_population": "2",
+      "shifted_len14_stdev_sample": "2.449489742783178",
+      "shifted_len14_variance_population": "4",
+      "shifted_len14_variance_sample": "6",
+      "wave_len14_mean": "51.089285714285715",
+      "wave_len14_square_mean": "2610.890625",
+      "wave_len14_variance_population": "0.7755102040814563"
+    }
+  },
+  {
+    "script": "ranked-window-missing-slots-v2.pine",
+    "attempt": 1,
+    "source_sha256": "82d45781f7b60f6615e3f3366a809a092f913fd2539550e83f7d00fed6ee3578",
+    "indicator_title": "Ranked window missing slots v2",
+    "status": "UNKNOWN",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "Ranked window missing slots v2",
+      "dataset_start_utc": "2026-09-30T14:26:00.000Z",
+      "first_chart_bar": {
+        "index": -2200,
+        "value": [
+          1790778360,
+          83957.07,
+          83999.39,
+          83735.18,
+          83758.56,
+          91.01672
+        ]
+      },
+      "chart_bars": 2502,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v4/evidence/ranked-window-missing-slots-v2-attempt1-instrument-v1.json"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index. MCP transport failed during reload readiness; target result unresolved in this attempt. Retrying as attempt2 using real MCP after successful reconnect.",
+    "source_identity_verified": true
+  },
+  {
+    "script": "ranked-window-missing-slots-v2.pine",
+    "attempt": 2,
+    "source_sha256": "82d45781f7b60f6615e3f3366a809a092f913fd2539550e83f7d00fed6ee3578",
+    "indicator_title": "Ranked window missing slots v2",
+    "status": "RUNS",
+    "csv_file": "captures/v4/ranked-window-missing-slots-v2-attempt2.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T095136.633.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "Ranked window missing slots v2",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24236,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24536,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T01:51:29.237Z",
+    "live_candle_open_utc": "2026-10-04T01:50:00.000Z",
+    "export_utc": "2026-10-04T01:51:36.991Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v4/evidence/ranked-window-missing-slots-v2-attempt2-setup.png",
+      "captures/v4/evidence/ranked-window-missing-slots-v2-attempt2-export.png",
+      "captures/v4/evidence/ranked-window-missing-slots-v2-attempt2-logs.txt",
+      "captures/v4/evidence/ranked-window-missing-slots-v2-attempt2-logs-v1.json",
+      "captures/v4/evidence/ranked-window-missing-slots-v2-attempt2-logs.png",
+      "captures/v4/evidence/ranked-window-missing-slots-v2-attempt2-visual.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index. Reload readiness exceeded initial15second wait. Real MCP healthcheck passed; resumed restoration of the saved current-probe state after readiness, without changing source. Increased subsequent readiness wait to60seconds.",
+    "source_identity_verified": true,
+    "live_tooltip": "Sun 04 Oct '26   01:50",
+    "historical_compare_before_unix_seconds": 1791078600,
+    "pine_logs": {
+      "paths": [
+        "evidence/ranked-window-missing-slots-v2-attempt2-logs.txt",
+        "evidence/ranked-window-missing-slots-v2-attempt2-logs-v1.json",
+        "evidence/ranked-window-missing-slots-v2-attempt2-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "7964e9e2c555593b74f5c3aaac947f5dad7b6b6d6ce642ae8da4af469ec1f864",
+    "csv_bytes": 8177849,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "input_bar_index",
+      "input_clean",
+      "nearest_rank_len4_pct25_clean",
+      "nearest_rank_len4_pct50_clean",
+      "nearest_rank_len4_pct75_clean",
+      "linear_interpolation_len4_pct25_clean",
+      "linear_interpolation_len4_pct50_clean",
+      "linear_interpolation_len4_pct75_clean",
+      "rci_len4_clean",
+      "nearest_rank_len14_pct25_clean",
+      "nearest_rank_len14_pct50_clean",
+      "nearest_rank_len14_pct75_clean",
+      "linear_interpolation_len14_pct25_clean",
+      "linear_interpolation_len14_pct50_clean",
+      "linear_interpolation_len14_pct75_clean",
+      "rci_len14_clean",
+      "input_hole20_21",
+      "nearest_rank_len4_pct25_hole20_21",
+      "nearest_rank_len4_pct50_hole20_21",
+      "nearest_rank_len4_pct75_hole20_21",
+      "linear_interpolation_len4_pct25_hole20_21",
+      "linear_interpolation_len4_pct50_hole20_21",
+      "linear_interpolation_len4_pct75_hole20_21",
+      "rci_len4_hole20_21",
+      "nearest_rank_len14_pct25_hole20_21",
+      "nearest_rank_len14_pct50_hole20_21",
+      "nearest_rank_len14_pct75_hole20_21",
+      "linear_interpolation_len14_pct25_hole20_21",
+      "linear_interpolation_len14_pct50_hole20_21",
+      "linear_interpolation_len14_pct75_hole20_21",
+      "rci_len14_hole20_21",
+      "input_lead0_4",
+      "nearest_rank_len4_pct25_lead0_4",
+      "nearest_rank_len4_pct50_lead0_4",
+      "nearest_rank_len4_pct75_lead0_4",
+      "linear_interpolation_len4_pct25_lead0_4",
+      "linear_interpolation_len4_pct50_lead0_4",
+      "linear_interpolation_len4_pct75_lead0_4",
+      "rci_len4_lead0_4",
+      "nearest_rank_len14_pct25_lead0_4",
+      "nearest_rank_len14_pct50_lead0_4",
+      "nearest_rank_len14_pct75_lead0_4",
+      "linear_interpolation_len14_pct25_lead0_4",
+      "linear_interpolation_len14_pct50_lead0_4",
+      "linear_interpolation_len14_pct75_lead0_4",
+      "rci_len14_lead0_4",
+      "array_nearest_rank_len14_pct50_clean",
+      "array_nearest_rank_len14_pct75_clean",
+      "array_linear_interpolation_len14_pct50_clean",
+      "array_linear_interpolation_len14_pct75_clean",
+      "array_nearest_rank_len14_pct50_hole20_21",
+      "array_nearest_rank_len14_pct75_hole20_21",
+      "array_linear_interpolation_len14_pct50_hole20_21",
+      "array_linear_interpolation_len14_pct75_hole20_21",
+      "array_nearest_rank_len14_pct50_lead0_4",
+      "array_nearest_rank_len14_pct75_lead0_4",
+      "array_linear_interpolation_len14_pct50_lead0_4",
+      "array_linear_interpolation_len14_pct75_lead0_4"
+    ],
+    "csv_rows": 24536,
+    "historical_rows": 24535,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791078600,
+    "first_historical_values": {
+      "input_bar_index": "0",
+      "input_clean": "10",
+      "nearest_rank_len4_pct25_clean": "",
+      "nearest_rank_len4_pct50_clean": "",
+      "nearest_rank_len4_pct75_clean": "",
+      "linear_interpolation_len4_pct25_clean": "",
+      "linear_interpolation_len4_pct50_clean": "",
+      "linear_interpolation_len4_pct75_clean": "",
+      "rci_len4_clean": "",
+      "nearest_rank_len14_pct25_clean": "",
+      "nearest_rank_len14_pct50_clean": "",
+      "nearest_rank_len14_pct75_clean": "",
+      "linear_interpolation_len14_pct25_clean": "",
+      "linear_interpolation_len14_pct50_clean": "",
+      "linear_interpolation_len14_pct75_clean": "",
+      "rci_len14_clean": "",
+      "input_hole20_21": "10",
+      "nearest_rank_len4_pct25_hole20_21": "",
+      "nearest_rank_len4_pct50_hole20_21": "",
+      "nearest_rank_len4_pct75_hole20_21": "",
+      "linear_interpolation_len4_pct25_hole20_21": "",
+      "linear_interpolation_len4_pct50_hole20_21": "",
+      "linear_interpolation_len4_pct75_hole20_21": "",
+      "rci_len4_hole20_21": "",
+      "nearest_rank_len14_pct25_hole20_21": "",
+      "nearest_rank_len14_pct50_hole20_21": "",
+      "nearest_rank_len14_pct75_hole20_21": "",
+      "linear_interpolation_len14_pct25_hole20_21": "",
+      "linear_interpolation_len14_pct50_hole20_21": "",
+      "linear_interpolation_len14_pct75_hole20_21": "",
+      "rci_len14_hole20_21": "",
+      "input_lead0_4": "",
+      "nearest_rank_len4_pct25_lead0_4": "",
+      "nearest_rank_len4_pct50_lead0_4": "",
+      "nearest_rank_len4_pct75_lead0_4": "",
+      "linear_interpolation_len4_pct25_lead0_4": "",
+      "linear_interpolation_len4_pct50_lead0_4": "",
+      "linear_interpolation_len4_pct75_lead0_4": "",
+      "rci_len4_lead0_4": "",
+      "nearest_rank_len14_pct25_lead0_4": "",
+      "nearest_rank_len14_pct50_lead0_4": "",
+      "nearest_rank_len14_pct75_lead0_4": "",
+      "linear_interpolation_len14_pct25_lead0_4": "",
+      "linear_interpolation_len14_pct50_lead0_4": "",
+      "linear_interpolation_len14_pct75_lead0_4": "",
+      "rci_len14_lead0_4": "",
+      "array_nearest_rank_len14_pct50_clean": "",
+      "array_nearest_rank_len14_pct75_clean": "",
+      "array_linear_interpolation_len14_pct50_clean": "",
+      "array_linear_interpolation_len14_pct75_clean": "",
+      "array_nearest_rank_len14_pct50_hole20_21": "",
+      "array_nearest_rank_len14_pct75_hole20_21": "",
+      "array_linear_interpolation_len14_pct50_hole20_21": "",
+      "array_linear_interpolation_len14_pct75_hole20_21": "",
+      "array_nearest_rank_len14_pct50_lead0_4": "",
+      "array_nearest_rank_len14_pct75_lead0_4": "",
+      "array_linear_interpolation_len14_pct50_lead0_4": "",
+      "array_linear_interpolation_len14_pct75_lead0_4": ""
+    },
+    "last_historical_values": {
+      "input_bar_index": "24534",
+      "input_clean": "11",
+      "nearest_rank_len4_pct25_clean": "10",
+      "nearest_rank_len4_pct50_clean": "11",
+      "nearest_rank_len4_pct75_clean": "15",
+      "linear_interpolation_len4_pct25_clean": "10.5",
+      "linear_interpolation_len4_pct50_clean": "13",
+      "linear_interpolation_len4_pct75_clean": "15.5",
+      "rci_len4_clean": "-59.99999999999999",
+      "nearest_rank_len14_pct25_clean": "11",
+      "nearest_rank_len14_pct50_clean": "13",
+      "nearest_rank_len14_pct75_clean": "15",
+      "linear_interpolation_len14_pct25_clean": "11",
+      "linear_interpolation_len14_pct50_clean": "13",
+      "linear_interpolation_len14_pct75_clean": "15",
+      "rci_len14_clean": "-12.403473458920846",
+      "input_hole20_21": "11",
+      "nearest_rank_len4_pct25_hole20_21": "11",
+      "nearest_rank_len4_pct50_hole20_21": "15",
+      "nearest_rank_len4_pct75_hole20_21": "",
+      "linear_interpolation_len4_pct25_hole20_21": "13",
+      "linear_interpolation_len4_pct50_hole20_21": "",
+      "linear_interpolation_len4_pct75_hole20_21": "",
+      "rci_len4_hole20_21": "-63.245553203367585",
+      "nearest_rank_len14_pct25_hole20_21": "12",
+      "nearest_rank_len14_pct50_hole20_21": "13",
+      "nearest_rank_len14_pct75_hole20_21": "15",
+      "linear_interpolation_len14_pct25_hole20_21": "12",
+      "linear_interpolation_len14_pct50_hole20_21": "13.5",
+      "linear_interpolation_len14_pct75_hole20_21": "15",
+      "rci_len14_hole20_21": "14.873106063951573",
+      "input_lead0_4": "11",
+      "nearest_rank_len4_pct25_lead0_4": "10",
+      "nearest_rank_len4_pct50_lead0_4": "11",
+      "nearest_rank_len4_pct75_lead0_4": "15",
+      "linear_interpolation_len4_pct25_lead0_4": "10.5",
+      "linear_interpolation_len4_pct50_lead0_4": "13",
+      "linear_interpolation_len4_pct75_lead0_4": "15.5",
+      "rci_len4_lead0_4": "-59.99999999999999",
+      "nearest_rank_len14_pct25_lead0_4": "11",
+      "nearest_rank_len14_pct50_lead0_4": "13",
+      "nearest_rank_len14_pct75_lead0_4": "15",
+      "linear_interpolation_len14_pct25_lead0_4": "11",
+      "linear_interpolation_len14_pct50_lead0_4": "13",
+      "linear_interpolation_len14_pct75_lead0_4": "15",
+      "rci_len14_lead0_4": "-12.403473458920846",
+      "array_nearest_rank_len14_pct50_clean": "13",
+      "array_nearest_rank_len14_pct75_clean": "15",
+      "array_linear_interpolation_len14_pct50_clean": "13",
+      "array_linear_interpolation_len14_pct75_clean": "15",
+      "array_nearest_rank_len14_pct50_hole20_21": "13",
+      "array_nearest_rank_len14_pct75_hole20_21": "15",
+      "array_linear_interpolation_len14_pct50_hole20_21": "",
+      "array_linear_interpolation_len14_pct75_hole20_21": "15",
+      "array_nearest_rank_len14_pct50_lead0_4": "13",
+      "array_nearest_rank_len14_pct75_lead0_4": "15",
+      "array_linear_interpolation_len14_pct50_lead0_4": "13",
+      "array_linear_interpolation_len14_pct75_lead0_4": "15"
+    }
+  },
+  {
+    "script": "v5-float-length-ema-v1.pine",
+    "attempt": 1,
+    "source_sha256": "38e8fe9eab820a5f49edda4b69748d9a97eb03d0dbd6330cd3c992176b6e59e3",
+    "indicator_title": "V5-FLOAT-LENGTH-EMA-V1",
+    "status": "COMPILE-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": "Cannot call 'ta.ema' with argument 'length'='7.5'. An argument of 'literal float' type was used but a 'simple int' is expected.",
+      "line": 3,
+      "column": 29,
+      "first_bar_index": null,
+      "first_bar_time_utc": null,
+      "native": {
+        "error": "Cannot call 'ta.ema' with argument 'length'='7.5'. An argument of 'literal float' type was used but a 'simple int' is expected.",
+        "editorError": {
+          "end": {
+            "column": 31,
+            "line": 3
+          },
+          "message": "Cannot call 'ta.ema' with argument 'length'='7.5'. An argument of 'literal float' type was used but a 'simple int' is expected.",
+          "start": {
+            "column": 29,
+            "line": 3
+          },
+          "id": "USER;64eb9fe01ecd4728859be8cb120fa590"
+        },
+        "title": "Compilation error",
+        "compiler_markers": [
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///09925a67-6843-4fac-8892-7aacf1643f90.pine?placement%3Ddialog",
+              "path": "/09925a67-6843-4fac-8892-7aacf1643f90.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "code": "PINE_VERSION_OUTDATED",
+            "severity": 4,
+            "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+            "startLineNumber": 1,
+            "startColumn": 3,
+            "endLineNumber": 1,
+            "endColumn": 12
+          },
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///09925a67-6843-4fac-8892-7aacf1643f90.pine?placement%3Ddialog",
+              "path": "/09925a67-6843-4fac-8892-7aacf1643f90.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "severity": 8,
+            "message": "Cannot call 'ta.ema' with argument 'length'='7.5'. An argument of 'literal float' type was used but a 'simple int' is expected.",
+            "startLineNumber": 3,
+            "startColumn": 29,
+            "endLineNumber": 3,
+            "endColumn": 32
+          }
+        ],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,782.46\nH\n84,782.46\nL\n84,782.45\nC\n84,782.46\n+0.01 (+0.00%)\n84,782.45\nSELL\n0.01\n84,782.46\nBUY\nUSDT\nOracle na holes crosses v1\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n01:52:03 UTC\n99+\nPine Editor\nv5-float-length-ema-v1.pine\nPublish script\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n//@version=5\nindicator(\"V5-FLOAT-LENGTH-EMA-V1\")\ntargetValue\u00a0=\u00a0ta.ema(close,\u00a07.5)\nfloorValue\u00a0=\u00a0ta.ema(close,\u00a07)\nceilValue\u00a0=\u00a0ta.ema(close,\u00a08)\nplot(targetValue,\u00a0title=\"OUTCOME\",\u00a0display=display.data_window)\nplot(floorValue,\u00a0title=\"FLOOR_CONTROL\",\u00a0display=display.data_window)\nplot(ceilValue,\u00a0title=\"CEIL_CONTROL\",\u00a0display=display.data_window)\nplot(close,\u00a0title=\"INPUT_CLOSE\",\u00a0display=display.data_window)\nplot(bar_index,\u00a0title=\"BAR_INDEX\",\u00a0display=display.data_window)\n2 of 2 problems\nVersion 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.(PINE_VERSION_OUTDATED)\n1 \u2219 Today, 09:52\nLine 1, Col 3\nPine Script\u00ae v5\nCompilation error\nCompilation error\n\nCannot call 'ta.ema' with argument 'length'='7.5'. An argument of 'literal float' type was used but a 'simple int' is expected.\n\nOpen in editor",
+        "context_substituted_message": "Cannot call 'ta.ema' with argument 'length'='7.5'. An argument of 'literal float' type was used but a 'simple int' is expected."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "Oracle na holes crosses v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24236,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24537,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v4/evidence/v5-float-length-ema-v1-attempt1-error.png",
+      "captures/v4/evidence/v5-float-length-ema-v1-attempt1-error.txt",
+      "captures/v4/evidence/v5-float-length-ema-v1-attempt1-logs.txt",
+      "captures/v4/evidence/v5-float-length-ema-v1-attempt1-logs-v1.json",
+      "captures/v4/evidence/v5-float-length-ema-v1-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "error_observed_utc": "2026-10-04T01:52:05.842Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/v5-float-length-ema-v1-attempt1-logs.txt",
+        "evidence/v5-float-length-ema-v1-attempt1-logs-v1.json",
+        "evidence/v5-float-length-ema-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "script": "v5-float-length-highest-v1.pine",
+    "attempt": 1,
+    "source_sha256": "0334f8d75fe02c908b52529c6cc47c039bf5393f122aacc5ac46c69245141f56",
+    "indicator_title": "V5-FLOAT-LENGTH-HIGHEST-V1",
+    "status": "COMPILE-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": "Cannot call 'ta.highest' with argument 'length'='7.5'. An argument of 'literal float' type was used but a 'simple int' is expected.",
+      "line": 3,
+      "column": 26,
+      "first_bar_index": null,
+      "first_bar_time_utc": null,
+      "native": {
+        "error": "Cannot call 'ta.highest' with argument 'length'='7.5'. An argument of 'literal float' type was used but a 'simple int' is expected.",
+        "editorError": {
+          "end": {
+            "column": 28,
+            "line": 3
+          },
+          "message": "Cannot call 'ta.highest' with argument 'length'='7.5'. An argument of 'literal float' type was used but a 'simple int' is expected.",
+          "start": {
+            "column": 26,
+            "line": 3
+          },
+          "id": "USER;b57c0f118bf04911abdac19406aaab3f"
+        },
+        "title": "Compilation error",
+        "compiler_markers": [
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///edc8a046-4b54-4699-b878-cfc47ea40fc1.pine?placement%3Ddialog",
+              "path": "/edc8a046-4b54-4699-b878-cfc47ea40fc1.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "code": "PINE_VERSION_OUTDATED",
+            "severity": 4,
+            "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+            "startLineNumber": 1,
+            "startColumn": 3,
+            "endLineNumber": 1,
+            "endColumn": 12
+          },
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///edc8a046-4b54-4699-b878-cfc47ea40fc1.pine?placement%3Ddialog",
+              "path": "/edc8a046-4b54-4699-b878-cfc47ea40fc1.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "severity": 8,
+            "message": "Cannot call 'ta.highest' with argument 'length'='7.5'. An argument of 'literal float' type was used but a 'simple int' is expected.",
+            "startLineNumber": 3,
+            "startColumn": 26,
+            "endLineNumber": 3,
+            "endColumn": 29
+          }
+        ],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,782.46\nH\n84,800.00\nL\n84,782.45\nC\n84,800.00\n+17.55 (+0.02%)\n84,799.99\nSELL\n0.01\n84,800.00\nBUY\nUSDT\nv5-float-length-highest-v1.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n01:52:15 UTC\n99+\nPine Editor\nv5-float-length-highest-v1.pine\nPublish script\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n//@version=5\nindicator(\"V5-FLOAT-LENGTH-HIGHEST-V1\")\ntargetValue\u00a0=\u00a0ta.highest(7.5)\nfloorValue\u00a0=\u00a0ta.highest(7)\nceilValue\u00a0=\u00a0ta.highest(8)\nplot(targetValue,\u00a0title=\"OUTCOME\",\u00a0display=display.data_window)\nplot(floorValue,\u00a0title=\"FLOOR_CONTROL\",\u00a0display=display.data_window)\nplot(ceilValue,\u00a0title=\"CEIL_CONTROL\",\u00a0display=display.data_window)\nplot(close,\u00a0title=\"INPUT_CLOSE\",\u00a0display=display.data_window)\nplot(bar_index,\u00a0title=\"BAR_INDEX\",\u00a0display=display.data_window)\n1 of 2 problems\nCannot call 'ta.highest' with argument 'length'='7.5'. An argument of 'literal float' type was used but a 'simple int' is expected.\n1 \u2219 Today, 09:52\nLine 3, Col 26\nPine Script\u00ae v5\nCompilation error\n\nCannot call 'ta.highest' with argument 'length'='7.5'. An argument of 'literal float' type was used but a 'simple int' is expected.\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+        "context_substituted_message": "Cannot call 'ta.highest' with argument 'length'='7.5'. An argument of 'literal float' type was used but a 'simple int' is expected."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "v5-float-length-highest-v1.pine",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24236,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24537,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v4/evidence/v5-float-length-highest-v1-attempt1-error.png",
+      "captures/v4/evidence/v5-float-length-highest-v1-attempt1-error.txt",
+      "captures/v4/evidence/v5-float-length-highest-v1-attempt1-logs.txt",
+      "captures/v4/evidence/v5-float-length-highest-v1-attempt1-logs-v1.json",
+      "captures/v4/evidence/v5-float-length-highest-v1-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "error_observed_utc": "2026-10-04T01:52:17.124Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/v5-float-length-highest-v1-attempt1-logs.txt",
+        "evidence/v5-float-length-highest-v1-attempt1-logs-v1.json",
+        "evidence/v5-float-length-highest-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "script": "v5-float-length-macd-fastlen-v1.pine",
+    "attempt": 1,
+    "source_sha256": "2841fdc125295ac8f4bce5a45dbfc698c0c67092a8878b864651543cdeae5034",
+    "indicator_title": "V5-FLOAT-LENGTH-MACD-FASTLEN-V1",
+    "status": "COMPILE-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": "Cannot call 'ta.macd' with argument 'fastlen'='1.5'. An argument of 'literal float' type was used but a 'simple int' is expected.",
+      "line": 3,
+      "column": 57,
+      "first_bar_index": null,
+      "first_bar_time_utc": null,
+      "native": {
+        "error": "Cannot call 'ta.macd' with argument 'fastlen'='1.5'. An argument of 'literal float' type was used but a 'simple int' is expected.",
+        "editorError": {
+          "end": {
+            "column": 59,
+            "line": 3
+          },
+          "message": "Cannot call 'ta.macd' with argument 'fastlen'='1.5'. An argument of 'literal float' type was used but a 'simple int' is expected.",
+          "start": {
+            "column": 57,
+            "line": 3
+          },
+          "id": "USER;ebf2db879ce64be28d3dce363b369825"
+        },
+        "title": "Compilation error",
+        "compiler_markers": [
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///67d7dc9b-eed7-4c51-8411-1358b5e99577.pine?placement%3Ddialog",
+              "path": "/67d7dc9b-eed7-4c51-8411-1358b5e99577.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "code": "PINE_VERSION_OUTDATED",
+            "severity": 4,
+            "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+            "startLineNumber": 1,
+            "startColumn": 3,
+            "endLineNumber": 1,
+            "endColumn": 12
+          },
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///67d7dc9b-eed7-4c51-8411-1358b5e99577.pine?placement%3Ddialog",
+              "path": "/67d7dc9b-eed7-4c51-8411-1358b5e99577.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "severity": 8,
+            "message": "Cannot call 'ta.macd' with argument 'fastlen'='1.5'. An argument of 'literal float' type was used but a 'simple int' is expected.",
+            "startLineNumber": 3,
+            "startColumn": 57,
+            "endLineNumber": 3,
+            "endColumn": 60
+          }
+        ],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,782.46\nH\n84,800.00\nL\n84,782.45\nC\n84,799.99\n+17.54 (+0.02%)\n84,799.99\nSELL\n0.01\n84,800.00\nBUY\nUSDT\nv5-float-length-macd-fastlen-v1.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n01:52:26 UTC\n99+\nPine Editor\nv5-float-length-macd-fastlen-v1.pine\nPublish script\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15\n16\n17\n//@version=5\nindicator(\"V5-FLOAT-LENGTH-MACD-FASTLEN-V1\")\n[targetMacd,\u00a0targetSignal,\u00a0targetHist]\u00a0=\u00a0ta.macd(close,\u00a01.5,\u00a026,\u00a09)\n[floorMacd,\u00a0floorSignal,\u00a0floorHist]\u00a0=\u00a0ta.macd(close,\u00a01,\u00a026,\u00a09)\n[ceilMacd,\u00a0ceilSignal,\u00a0ceilHist]\u00a0=\u00a0ta.macd(close,\u00a02,\u00a026,\u00a09)\nplot(targetMacd,\u00a0title=\"OUTCOME\",\u00a0display=display.data_window)\nplot(targetSignal,\u00a0title=\"TARGET_SIGNAL\",\u00a0display=display.data_window)\nplot(targetHist,\u00a0title=\"TARGET_HIST\",\u00a0display=display.data_window)\nplot(floorMacd,\u00a0title=\"FLOOR_MACD\",\u00a0display=display.data_window)\nplot(floorSignal,\u00a0title=\"FLOOR_SIGNAL\",\u00a0display=display.data_window)\nplot(floorHist,\u00a0title=\"FLOOR_HIST\",\u00a0display=display.data_window)\nplot(ceilMacd,\u00a0title=\"CEIL_MACD\",\u00a0display=display.data_window)\nplot(ceilSignal,\u00a0title=\"CEIL_SIGNAL\",\u00a0display=display.data_window)\nplot(ceilHist,\u00a0title=\"CEIL_HIST\",\u00a0display=display.data_window)\nplot(close,\u00a0title=\"INPUT_CLOSE\",\u00a0display=display.data_window)\nplot(bar_index,\u00a0title=\"BAR_INDEX\",\u00a0display=display.data_window)\n1 of 2 problems\nCannot call 'ta.macd' with argument 'fastlen'='1.5'. An argument of 'literal float' type was used but a 'simple int' is expected.\n1 \u2219 Today, 09:52\nLine 3, Col 57\nPine Script\u00ae v5\nCompilation error\n\nCannot call 'ta.macd' with argument 'fastlen'='1.5'. An argument of 'literal float' type was used but a 'simple int' is expected.\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+        "context_substituted_message": "Cannot call 'ta.macd' with argument 'fastlen'='1.5'. An argument of 'literal float' type was used but a 'simple int' is expected."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "v5-float-length-macd-fastlen-v1.pine",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24236,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24537,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v4/evidence/v5-float-length-macd-fastlen-v1-attempt1-error.png",
+      "captures/v4/evidence/v5-float-length-macd-fastlen-v1-attempt1-error.txt",
+      "captures/v4/evidence/v5-float-length-macd-fastlen-v1-attempt1-logs.txt",
+      "captures/v4/evidence/v5-float-length-macd-fastlen-v1-attempt1-logs-v1.json",
+      "captures/v4/evidence/v5-float-length-macd-fastlen-v1-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "error_observed_utc": "2026-10-04T01:52:28.966Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/v5-float-length-macd-fastlen-v1-attempt1-logs.txt",
+        "evidence/v5-float-length-macd-fastlen-v1-attempt1-logs-v1.json",
+        "evidence/v5-float-length-macd-fastlen-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "script": "v5-float-length-macd-siglen-v1.pine",
+    "attempt": 1,
+    "source_sha256": "6240d8ed6b7bdb744b5b319acfdc313df9fdd4560cce6429b233465cd27846f1",
+    "indicator_title": "V5-FLOAT-LENGTH-MACD-SIGLEN-V1",
+    "status": "COMPILE-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": "Cannot call 'ta.macd' with argument 'siglen'='9.5'. An argument of 'literal float' type was used but a 'simple int' is expected.",
+      "line": 3,
+      "column": 65,
+      "first_bar_index": null,
+      "first_bar_time_utc": null,
+      "native": {
+        "error": "Cannot call 'ta.macd' with argument 'siglen'='9.5'. An argument of 'literal float' type was used but a 'simple int' is expected.",
+        "editorError": {
+          "end": {
+            "column": 67,
+            "line": 3
+          },
+          "message": "Cannot call 'ta.macd' with argument 'siglen'='9.5'. An argument of 'literal float' type was used but a 'simple int' is expected.",
+          "start": {
+            "column": 65,
+            "line": 3
+          },
+          "id": "USER;05d03ebe5058490eb9c5ed8dc734d42c"
+        },
+        "title": "Compilation error",
+        "compiler_markers": [
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///d3ca8c54-4adf-41a1-9656-bb8385519aac.pine?placement%3Ddialog",
+              "path": "/d3ca8c54-4adf-41a1-9656-bb8385519aac.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "code": "PINE_VERSION_OUTDATED",
+            "severity": 4,
+            "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+            "startLineNumber": 1,
+            "startColumn": 3,
+            "endLineNumber": 1,
+            "endColumn": 12
+          },
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///d3ca8c54-4adf-41a1-9656-bb8385519aac.pine?placement%3Ddialog",
+              "path": "/d3ca8c54-4adf-41a1-9656-bb8385519aac.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "severity": 8,
+            "message": "Cannot call 'ta.macd' with argument 'siglen'='9.5'. An argument of 'literal float' type was used but a 'simple int' is expected.",
+            "startLineNumber": 3,
+            "startColumn": 65,
+            "endLineNumber": 3,
+            "endColumn": 68
+          }
+        ],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,782.46\nH\n84,800.00\nL\n84,782.45\nC\n84,799.99\n+17.54 (+0.02%)\n84,799.99\nSELL\n0.01\n84,800.00\nBUY\nUSDT\nv5-float-length-macd-siglen-v1.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n01:52:38 UTC\n99+\nPine Editor\nv5-float-length-macd-siglen-v1.pine\nPublish script\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15\n16\n17\n//@version=5\nindicator(\"V5-FLOAT-LENGTH-MACD-SIGLEN-V1\")\n[targetMacd,\u00a0targetSignal,\u00a0targetHist]\u00a0=\u00a0ta.macd(close,\u00a012,\u00a026,\u00a09.5)\n[floorMacd,\u00a0floorSignal,\u00a0floorHist]\u00a0=\u00a0ta.macd(close,\u00a012,\u00a026,\u00a09)\n[ceilMacd,\u00a0ceilSignal,\u00a0ceilHist]\u00a0=\u00a0ta.macd(close,\u00a012,\u00a026,\u00a010)\nplot(targetMacd,\u00a0title=\"OUTCOME\",\u00a0display=display.data_window)\nplot(targetSignal,\u00a0title=\"TARGET_SIGNAL\",\u00a0display=display.data_window)\nplot(targetHist,\u00a0title=\"TARGET_HIST\",\u00a0display=display.data_window)\nplot(floorMacd,\u00a0title=\"FLOOR_MACD\",\u00a0display=display.data_window)\nplot(floorSignal,\u00a0title=\"FLOOR_SIGNAL\",\u00a0display=display.data_window)\nplot(floorHist,\u00a0title=\"FLOOR_HIST\",\u00a0display=display.data_window)\nplot(ceilMacd,\u00a0title=\"CEIL_MACD\",\u00a0display=display.data_window)\nplot(ceilSignal,\u00a0title=\"CEIL_SIGNAL\",\u00a0display=display.data_window)\nplot(ceilHist,\u00a0title=\"CEIL_HIST\",\u00a0display=display.data_window)\nplot(close,\u00a0title=\"INPUT_CLOSE\",\u00a0display=display.data_window)\nplot(bar_index,\u00a0title=\"BAR_INDEX\",\u00a0display=display.data_window)\n2 of 2 problems\nVersion 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.(PINE_VERSION_OUTDATED)\n1 \u2219 Today, 09:52\nLine 1, Col 3\nPine Script\u00ae v5\nCompilation error\n\nCannot call 'ta.macd' with argument 'siglen'='9.5'. An argument of 'literal float' type was used but a 'simple int' is expected.\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+        "context_substituted_message": "Cannot call 'ta.macd' with argument 'siglen'='9.5'. An argument of 'literal float' type was used but a 'simple int' is expected."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "v5-float-length-macd-siglen-v1.pine",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24236,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24537,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v4/evidence/v5-float-length-macd-siglen-v1-attempt1-error.png",
+      "captures/v4/evidence/v5-float-length-macd-siglen-v1-attempt1-error.txt",
+      "captures/v4/evidence/v5-float-length-macd-siglen-v1-attempt1-logs.txt",
+      "captures/v4/evidence/v5-float-length-macd-siglen-v1-attempt1-logs-v1.json",
+      "captures/v4/evidence/v5-float-length-macd-siglen-v1-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "error_observed_utc": "2026-10-04T01:52:40.842Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/v5-float-length-macd-siglen-v1-attempt1-logs.txt",
+        "evidence/v5-float-length-macd-siglen-v1-attempt1-logs-v1.json",
+        "evidence/v5-float-length-macd-siglen-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "script": "v5-float-length-macd-slowlen-v1.pine",
+    "attempt": 1,
+    "source_sha256": "949808fb14996aec6c0fb52c3f84905d831bbe442e669e0b952746c80523937f",
+    "indicator_title": "V5-FLOAT-LENGTH-MACD-SLOWLEN-V1",
+    "status": "COMPILE-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": "Cannot call 'ta.macd' with argument 'slowlen'='26.5'. An argument of 'literal float' type was used but a 'simple int' is expected.",
+      "line": 3,
+      "column": 61,
+      "first_bar_index": null,
+      "first_bar_time_utc": null,
+      "native": {
+        "error": "Cannot call 'ta.macd' with argument 'slowlen'='26.5'. An argument of 'literal float' type was used but a 'simple int' is expected.",
+        "editorError": {
+          "end": {
+            "column": 64,
+            "line": 3
+          },
+          "message": "Cannot call 'ta.macd' with argument 'slowlen'='26.5'. An argument of 'literal float' type was used but a 'simple int' is expected.",
+          "start": {
+            "column": 61,
+            "line": 3
+          },
+          "id": "USER;be063c58f10b44f69808c1e6058ed3bc"
+        },
+        "title": "Compilation error",
+        "compiler_markers": [
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///85852479-beb8-4c93-b311-12644914c72a.pine?placement%3Ddialog",
+              "path": "/85852479-beb8-4c93-b311-12644914c72a.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "code": "PINE_VERSION_OUTDATED",
+            "severity": 4,
+            "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+            "startLineNumber": 1,
+            "startColumn": 3,
+            "endLineNumber": 1,
+            "endColumn": 12
+          },
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///85852479-beb8-4c93-b311-12644914c72a.pine?placement%3Ddialog",
+              "path": "/85852479-beb8-4c93-b311-12644914c72a.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "severity": 8,
+            "message": "Cannot call 'ta.macd' with argument 'slowlen'='26.5'. An argument of 'literal float' type was used but a 'simple int' is expected.",
+            "startLineNumber": 3,
+            "startColumn": 61,
+            "endLineNumber": 3,
+            "endColumn": 65
+          }
+        ],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,782.46\nH\n84,800.00\nL\n84,782.45\nC\n84,800.00\n+17.55 (+0.02%)\n84,799.99\nSELL\n0.01\n84,800.00\nBUY\nUSDT\nv5-float-length-macd-slowlen-v1.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n01:53:05 UTC\n99+\nPine Editor\nv5-float-length-macd-slowlen-v1.pine\nPublish script\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15\n16\n17\n//@version=5\nindicator(\"V5-FLOAT-LENGTH-MACD-SLOWLEN-V1\")\n[targetMacd,\u00a0targetSignal,\u00a0targetHist]\u00a0=\u00a0ta.macd(close,\u00a012,\u00a026.5,\u00a09)\n[floorMacd,\u00a0floorSignal,\u00a0floorHist]\u00a0=\u00a0ta.macd(close,\u00a012,\u00a026,\u00a09)\n[ceilMacd,\u00a0ceilSignal,\u00a0ceilHist]\u00a0=\u00a0ta.macd(close,\u00a012,\u00a027,\u00a09)\nplot(targetMacd,\u00a0title=\"OUTCOME\",\u00a0display=display.data_window)\nplot(targetSignal,\u00a0title=\"TARGET_SIGNAL\",\u00a0display=display.data_window)\nplot(targetHist,\u00a0title=\"TARGET_HIST\",\u00a0display=display.data_window)\nplot(floorMacd,\u00a0title=\"FLOOR_MACD\",\u00a0display=display.data_window)\nplot(floorSignal,\u00a0title=\"FLOOR_SIGNAL\",\u00a0display=display.data_window)\nplot(floorHist,\u00a0title=\"FLOOR_HIST\",\u00a0display=display.data_window)\nplot(ceilMacd,\u00a0title=\"CEIL_MACD\",\u00a0display=display.data_window)\nplot(ceilSignal,\u00a0title=\"CEIL_SIGNAL\",\u00a0display=display.data_window)\nplot(ceilHist,\u00a0title=\"CEIL_HIST\",\u00a0display=display.data_window)\nplot(close,\u00a0title=\"INPUT_CLOSE\",\u00a0display=display.data_window)\nplot(bar_index,\u00a0title=\"BAR_INDEX\",\u00a0display=display.data_window)\n1 of 2 problems\nCannot call 'ta.macd' with argument 'slowlen'='26.5'. An argument of 'literal float' type was used but a 'simple int' is expected.\n1 \u2219 Today, 09:53\nLine 3, Col 61\nPine Script\u00ae v5\nCompilation error\n\nCannot call 'ta.macd' with argument 'slowlen'='26.5'. An argument of 'literal float' type was used but a 'simple int' is expected.\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+        "context_substituted_message": "Cannot call 'ta.macd' with argument 'slowlen'='26.5'. An argument of 'literal float' type was used but a 'simple int' is expected."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "v5-float-length-macd-slowlen-v1.pine",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24236,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24537,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v4/evidence/v5-float-length-macd-slowlen-v1-attempt1-error.png",
+      "captures/v4/evidence/v5-float-length-macd-slowlen-v1-attempt1-error.txt",
+      "captures/v4/evidence/v5-float-length-macd-slowlen-v1-attempt1-logs.txt",
+      "captures/v4/evidence/v5-float-length-macd-slowlen-v1-attempt1-logs-v1.json",
+      "captures/v4/evidence/v5-float-length-macd-slowlen-v1-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///85852479-beb8-4c93-b311-12644914c72a.pine?placement%3Ddialog",
+          "path": "/85852479-beb8-4c93-b311-12644914c72a.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      },
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///85852479-beb8-4c93-b311-12644914c72a.pine?placement%3Ddialog",
+          "path": "/85852479-beb8-4c93-b311-12644914c72a.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "severity": 8,
+        "message": "Cannot call 'ta.macd' with argument 'slowlen'='26.5'. An argument of 'literal float' type was used but a 'simple int' is expected.",
+        "startLineNumber": 3,
+        "startColumn": 61,
+        "endLineNumber": 3,
+        "endColumn": 65
+      }
+    ],
+    "error_observed_utc": "2026-10-04T01:53:07.647Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/v5-float-length-macd-slowlen-v1-attempt1-logs.txt",
+        "evidence/v5-float-length-macd-slowlen-v1-attempt1-logs-v1.json",
+        "evidence/v5-float-length-macd-slowlen-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "script": "v5-float-length-percentile-linear-interpolation-v1.pine",
+    "attempt": 1,
+    "source_sha256": "190cc35c041f595de1381eafd272d88f2f0ee92116d637241fcbbb0934ebf311",
+    "indicator_title": "V5-FLOAT-LENGTH-PERCENTILE-LINEAR-INTERPOLATION-V1",
+    "status": "COMPILE-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": "Cannot call 'ta.percentile_linear_interpolation' with argument 'length'='2.5'. An argument of 'literal float' type was used but a 'series int' is expected.",
+      "line": 3,
+      "column": 57,
+      "first_bar_index": null,
+      "first_bar_time_utc": null,
+      "native": {
+        "error": "Cannot call 'ta.percentile_linear_interpolation' with argument 'length'='2.5'. An argument of 'literal float' type was used but a 'series int' is expected.",
+        "editorError": {
+          "end": {
+            "column": 59,
+            "line": 3
+          },
+          "message": "Cannot call 'ta.percentile_linear_interpolation' with argument 'length'='2.5'. An argument of 'literal float' type was used but a 'series int' is expected.",
+          "start": {
+            "column": 57,
+            "line": 3
+          },
+          "id": "USER;64eb9fe01ecd4728859be8cb120fa590"
+        },
+        "title": "Compilation error",
+        "compiler_markers": [
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///2076eb89-8533-4b29-8408-7f73beeee4fd.pine?placement%3Ddialog",
+              "path": "/2076eb89-8533-4b29-8408-7f73beeee4fd.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "code": "PINE_VERSION_OUTDATED",
+            "severity": 4,
+            "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+            "startLineNumber": 1,
+            "startColumn": 3,
+            "endLineNumber": 1,
+            "endColumn": 12
+          },
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///2076eb89-8533-4b29-8408-7f73beeee4fd.pine?placement%3Ddialog",
+              "path": "/2076eb89-8533-4b29-8408-7f73beeee4fd.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "severity": 8,
+            "message": "Cannot call 'ta.percentile_linear_interpolation' with argument 'length'='2.5'. An argument of 'literal float' type was used but a 'series int' is expected.",
+            "startLineNumber": 3,
+            "startColumn": 57,
+            "endLineNumber": 3,
+            "endColumn": 60
+          }
+        ],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,782.46\nH\n84,800.00\nL\n84,782.45\nC\n84,800.00\n+17.55 (+0.02%)\n84,799.99\nSELL\n0.01\n84,800.00\nBUY\nUSDT\nOracle na holes crosses v1\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n01:53:17 UTC\n99+\nPine Editor\nv5-float-length-percentile-linear-interpolation-v1.pine\nPublish script\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n//@version=5\nindicator(\"V5-FLOAT-LENGTH-PERCENTILE-LINEAR-INTERPOLATION-V1\")\ntargetValue\u00a0=\u00a0ta.percentile_linear_interpolation(close,\u00a02.5,\u00a050)\nfloorValue\u00a0=\u00a0ta.percentile_linear_interpolation(close,\u00a02,\u00a050)\nceilValue\u00a0=\u00a0ta.percentile_linear_interpolation(close,\u00a03,\u00a050)\nplot(targetValue,\u00a0title=\"OUTCOME\",\u00a0display=display.data_window)\nplot(floorValue,\u00a0title=\"FLOOR_CONTROL\",\u00a0display=display.data_window)\nplot(ceilValue,\u00a0title=\"CEIL_CONTROL\",\u00a0display=display.data_window)\nplot(close,\u00a0title=\"INPUT_CLOSE\",\u00a0display=display.data_window)\nplot(bar_index,\u00a0title=\"BAR_INDEX\",\u00a0display=display.data_window)\n2 of 2 problems\nVersion 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.(PINE_VERSION_OUTDATED)\n1 \u2219 Today, 09:53\nLine 1, Col 3\nPine Script\u00ae v5\nCompilation error\nCompilation error\n\nCannot call 'ta.percentile_linear_interpolation' with argument 'length'='2.5'. An argument of 'literal float' type was used but a 'series int' is expected.\n\nOpen in editor",
+        "context_substituted_message": "Cannot call 'ta.percentile_linear_interpolation' with argument 'length'='2.5'. An argument of 'literal float' type was used but a 'series int' is expected."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "Oracle na holes crosses v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24236,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24537,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v4/evidence/v5-float-length-percentile-linear-interpolation-v1-attempt1-error.png",
+      "captures/v4/evidence/v5-float-length-percentile-linear-interpolation-v1-attempt1-error.txt",
+      "captures/v4/evidence/v5-float-length-percentile-linear-interpolation-v1-attempt1-logs.txt",
+      "captures/v4/evidence/v5-float-length-percentile-linear-interpolation-v1-attempt1-logs-v1.json",
+      "captures/v4/evidence/v5-float-length-percentile-linear-interpolation-v1-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///2076eb89-8533-4b29-8408-7f73beeee4fd.pine?placement%3Ddialog",
+          "path": "/2076eb89-8533-4b29-8408-7f73beeee4fd.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      },
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///2076eb89-8533-4b29-8408-7f73beeee4fd.pine?placement%3Ddialog",
+          "path": "/2076eb89-8533-4b29-8408-7f73beeee4fd.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "severity": 8,
+        "message": "Cannot call 'ta.percentile_linear_interpolation' with argument 'length'='2.5'. An argument of 'literal float' type was used but a 'series int' is expected.",
+        "startLineNumber": 3,
+        "startColumn": 57,
+        "endLineNumber": 3,
+        "endColumn": 60
+      }
+    ],
+    "error_observed_utc": "2026-10-04T01:53:19.850Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/v5-float-length-percentile-linear-interpolation-v1-attempt1-logs.txt",
+        "evidence/v5-float-length-percentile-linear-interpolation-v1-attempt1-logs-v1.json",
+        "evidence/v5-float-length-percentile-linear-interpolation-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "script": "v5-float-length-sma-v1.pine",
+    "attempt": 1,
+    "source_sha256": "41f9bac020524cc448086b36650b140449132ba093ce84bf329105ab419a8fc4",
+    "indicator_title": "V5-FLOAT-LENGTH-SMA-V1",
+    "status": "COMPILE-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": "Cannot call 'ta.sma' with argument 'length'='7.5'. An argument of 'literal float' type was used but a 'series int' is expected.",
+      "line": 3,
+      "column": 29,
+      "first_bar_index": null,
+      "first_bar_time_utc": null,
+      "native": {
+        "error": "Cannot call 'ta.sma' with argument 'length'='7.5'. An argument of 'literal float' type was used but a 'series int' is expected.",
+        "editorError": {
+          "end": {
+            "column": 31,
+            "line": 3
+          },
+          "message": "Cannot call 'ta.sma' with argument 'length'='7.5'. An argument of 'literal float' type was used but a 'series int' is expected.",
+          "start": {
+            "column": 29,
+            "line": 3
+          },
+          "id": "USER;a9617e773c17488db7e2acfd7e74266e"
+        },
+        "title": "Compilation error",
+        "compiler_markers": [
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///25632b39-6992-4053-a6a1-2ba7c962b90f.pine?placement%3Ddialog",
+              "path": "/25632b39-6992-4053-a6a1-2ba7c962b90f.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "code": "PINE_VERSION_OUTDATED",
+            "severity": 4,
+            "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+            "startLineNumber": 1,
+            "startColumn": 3,
+            "endLineNumber": 1,
+            "endColumn": 12
+          },
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///25632b39-6992-4053-a6a1-2ba7c962b90f.pine?placement%3Ddialog",
+              "path": "/25632b39-6992-4053-a6a1-2ba7c962b90f.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "severity": 8,
+            "message": "Cannot call 'ta.sma' with argument 'length'='7.5'. An argument of 'literal float' type was used but a 'series int' is expected.",
+            "startLineNumber": 3,
+            "startColumn": 29,
+            "endLineNumber": 3,
+            "endColumn": 32
+          }
+        ],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,782.46\nH\n84,800.00\nL\n84,782.45\nC\n84,799.99\n+17.54 (+0.02%)\n84,799.99\nSELL\n0.01\n84,800.00\nBUY\nUSDT\nv5-float-length-sma-v1.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n01:53:29 UTC\n99+\nPine Editor\nv5-float-length-sma-v1.pine\nPublish script\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n//@version=5\nindicator(\"V5-FLOAT-LENGTH-SMA-V1\")\ntargetValue\u00a0=\u00a0ta.sma(close,\u00a07.5)\nfloorValue\u00a0=\u00a0ta.sma(close,\u00a07)\nceilValue\u00a0=\u00a0ta.sma(close,\u00a08)\nplot(targetValue,\u00a0title=\"OUTCOME\",\u00a0display=display.data_window)\nplot(floorValue,\u00a0title=\"FLOOR_CONTROL\",\u00a0display=display.data_window)\nplot(ceilValue,\u00a0title=\"CEIL_CONTROL\",\u00a0display=display.data_window)\nplot(close,\u00a0title=\"INPUT_CLOSE\",\u00a0display=display.data_window)\nplot(bar_index,\u00a0title=\"BAR_INDEX\",\u00a0display=display.data_window)\n2 of 2 problems\nVersion 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.(PINE_VERSION_OUTDATED)\n1 \u2219 Today, 09:53\nLine 1, Col 3\nPine Script\u00ae v5\nCompilation error\n\nCannot call 'ta.sma' with argument 'length'='7.5'. An argument of 'literal float' type was used but a 'series int' is expected.\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+        "context_substituted_message": "Cannot call 'ta.sma' with argument 'length'='7.5'. An argument of 'literal float' type was used but a 'series int' is expected."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "v5-float-length-sma-v1.pine",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24236,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24537,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v4/evidence/v5-float-length-sma-v1-attempt1-error.png",
+      "captures/v4/evidence/v5-float-length-sma-v1-attempt1-error.txt",
+      "captures/v4/evidence/v5-float-length-sma-v1-attempt1-logs.txt",
+      "captures/v4/evidence/v5-float-length-sma-v1-attempt1-logs-v1.json",
+      "captures/v4/evidence/v5-float-length-sma-v1-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///25632b39-6992-4053-a6a1-2ba7c962b90f.pine?placement%3Ddialog",
+          "path": "/25632b39-6992-4053-a6a1-2ba7c962b90f.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      },
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///25632b39-6992-4053-a6a1-2ba7c962b90f.pine?placement%3Ddialog",
+          "path": "/25632b39-6992-4053-a6a1-2ba7c962b90f.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "severity": 8,
+        "message": "Cannot call 'ta.sma' with argument 'length'='7.5'. An argument of 'literal float' type was used but a 'series int' is expected.",
+        "startLineNumber": 3,
+        "startColumn": 29,
+        "endLineNumber": 3,
+        "endColumn": 32
+      }
+    ],
+    "error_observed_utc": "2026-10-04T01:53:31.828Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/v5-float-length-sma-v1-attempt1-logs.txt",
+        "evidence/v5-float-length-sma-v1-attempt1-logs-v1.json",
+        "evidence/v5-float-length-sma-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "script": "v5-float-length-wma-v1.pine",
+    "attempt": 1,
+    "source_sha256": "ec12f1cbadc061f3793f8d7053376caadda714e44cb244421112f292ab73966f",
+    "indicator_title": "V5-FLOAT-LENGTH-WMA-V1",
+    "status": "COMPILE-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": "Cannot call 'ta.wma' with argument 'length'='7.5'. An argument of 'literal float' type was used but a 'series int' is expected.",
+      "line": 3,
+      "column": 29,
+      "first_bar_index": null,
+      "first_bar_time_utc": null,
+      "native": {
+        "error": "Cannot call 'ta.wma' with argument 'length'='7.5'. An argument of 'literal float' type was used but a 'series int' is expected.",
+        "editorError": {
+          "end": {
+            "column": 31,
+            "line": 3
+          },
+          "message": "Cannot call 'ta.wma' with argument 'length'='7.5'. An argument of 'literal float' type was used but a 'series int' is expected.",
+          "start": {
+            "column": 29,
+            "line": 3
+          },
+          "id": "USER;c9547bed24254b05a42ea4767b4ac37a"
+        },
+        "title": "Compilation error",
+        "compiler_markers": [
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///691f0db3-fc6b-4576-bb63-fa46213575de.pine?placement%3Ddialog",
+              "path": "/691f0db3-fc6b-4576-bb63-fa46213575de.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "code": "PINE_VERSION_OUTDATED",
+            "severity": 4,
+            "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+            "startLineNumber": 1,
+            "startColumn": 3,
+            "endLineNumber": 1,
+            "endColumn": 12
+          },
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///691f0db3-fc6b-4576-bb63-fa46213575de.pine?placement%3Ddialog",
+              "path": "/691f0db3-fc6b-4576-bb63-fa46213575de.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "severity": 8,
+            "message": "Cannot call 'ta.wma' with argument 'length'='7.5'. An argument of 'literal float' type was used but a 'series int' is expected.",
+            "startLineNumber": 3,
+            "startColumn": 29,
+            "endLineNumber": 3,
+            "endColumn": 32
+          }
+        ],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,782.46\nH\n84,800.00\nL\n84,782.45\nC\n84,799.99\n+17.54 (+0.02%)\n84,799.99\nSELL\n0.01\n84,800.00\nBUY\nUSDT\nv5-float-length-wma-v1.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n01:53:41 UTC\n99+\nPine Editor\nv5-float-length-wma-v1.pine\nPublish script\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n//@version=5\nindicator(\"V5-FLOAT-LENGTH-WMA-V1\")\ntargetValue\u00a0=\u00a0ta.wma(close,\u00a07.5)\nfloorValue\u00a0=\u00a0ta.wma(close,\u00a07)\nceilValue\u00a0=\u00a0ta.wma(close,\u00a08)\nplot(targetValue,\u00a0title=\"OUTCOME\",\u00a0display=display.data_window)\nplot(floorValue,\u00a0title=\"FLOOR_CONTROL\",\u00a0display=display.data_window)\nplot(ceilValue,\u00a0title=\"CEIL_CONTROL\",\u00a0display=display.data_window)\nplot(close,\u00a0title=\"INPUT_CLOSE\",\u00a0display=display.data_window)\nplot(bar_index,\u00a0title=\"BAR_INDEX\",\u00a0display=display.data_window)\n2 of 2 problems\nVersion 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.(PINE_VERSION_OUTDATED)\n1 \u2219 Today, 09:53\nLine 1, Col 3\nPine Script\u00ae v5\nCompilation error\n\nCannot call 'ta.wma' with argument 'length'='7.5'. An argument of 'literal float' type was used but a 'series int' is expected.\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+        "context_substituted_message": "Cannot call 'ta.wma' with argument 'length'='7.5'. An argument of 'literal float' type was used but a 'series int' is expected."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "v5-float-length-wma-v1.pine",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24236,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24537,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v4/evidence/v5-float-length-wma-v1-attempt1-error.png",
+      "captures/v4/evidence/v5-float-length-wma-v1-attempt1-error.txt",
+      "captures/v4/evidence/v5-float-length-wma-v1-attempt1-logs.txt",
+      "captures/v4/evidence/v5-float-length-wma-v1-attempt1-logs-v1.json",
+      "captures/v4/evidence/v5-float-length-wma-v1-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///691f0db3-fc6b-4576-bb63-fa46213575de.pine?placement%3Ddialog",
+          "path": "/691f0db3-fc6b-4576-bb63-fa46213575de.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      },
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///691f0db3-fc6b-4576-bb63-fa46213575de.pine?placement%3Ddialog",
+          "path": "/691f0db3-fc6b-4576-bb63-fa46213575de.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "severity": 8,
+        "message": "Cannot call 'ta.wma' with argument 'length'='7.5'. An argument of 'literal float' type was used but a 'series int' is expected.",
+        "startLineNumber": 3,
+        "startColumn": 29,
+        "endLineNumber": 3,
+        "endColumn": 32
+      }
+    ],
+    "error_observed_utc": "2026-10-04T01:53:43.447Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/v5-float-length-wma-v1-attempt1-logs.txt",
+        "evidence/v5-float-length-wma-v1-attempt1-logs-v1.json",
+        "evidence/v5-float-length-wma-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "script": "native-float-comparison-boundary-v1.pine",
+    "attempt": 1,
+    "source_sha256": "c16b04f7d8075253df69ef8dd27d9c4d8b7dfbe098246c3cf4510ffa58c85eb7",
+    "indicator_title": "V4-NATIVE-FLOAT-COMPARISON-BOUNDARY",
+    "status": "RUNS",
+    "csv_file": "captures/v4/native-float-comparison-boundary-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T095412.256.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V4-NATIVE-FLOAT-COMPARISON-BOUNDARY",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24238,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24538,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T01:54:06.047Z",
+    "live_candle_open_utc": "2026-10-04T01:54:00.000Z",
+    "export_utc": "2026-10-04T01:54:12.704Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v4/evidence/native-float-comparison-boundary-v1-attempt1-setup.png",
+      "captures/v4/evidence/native-float-comparison-boundary-v1-attempt1-export.png",
+      "captures/v4/evidence/native-float-comparison-boundary-v1-attempt1-logs.txt",
+      "captures/v4/evidence/native-float-comparison-boundary-v1-attempt1-logs-v1.json",
+      "captures/v4/evidence/native-float-comparison-boundary-v1-attempt1-logs.png",
+      "captures/v4/evidence/native-float-comparison-boundary-v1-attempt1-visual.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   01:54",
+    "historical_compare_before_unix_seconds": 1791078840,
+    "pine_logs": {
+      "paths": [
+        "evidence/native-float-comparison-boundary-v1-attempt1-logs.txt",
+        "evidence/native-float-comparison-boundary-v1-attempt1-logs-v1.json",
+        "evidence/native-float-comparison-boundary-v1-attempt1-logs.png"
+      ],
+      "entries": 12,
+      "last_message_time_ms": 1788135720000,
+      "last_bar_time_ms": 1788135720000
+    },
+    "csv_sha256": "72c6d99b4da780a206470426d09f4ec7b82bc9cce457c48dc05f633135214212",
+    "csv_bytes": 1159163,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "OUTCOME"
+    ],
+    "csv_rows": 24538,
+    "historical_rows": 24537,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791078840,
+    "first_historical_values": {
+      "OUTCOME": "49"
+    },
+    "last_historical_values": {
+      "OUTCOME": "42"
+    }
+  },
+  {
+    "script": "native-float-magnitude-output-v1.pine",
+    "attempt": 1,
+    "source_sha256": "3fabe6f76e9461c1ad1ec7d7cba3029c07be9f3e34b10cb8e840c8a87be5d5df",
+    "indicator_title": "V4-NATIVE-FLOAT-MAGNITUDE-OUTPUT",
+    "status": "RUNS",
+    "csv_file": "captures/v4/native-float-magnitude-output-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T095434.509.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V4-NATIVE-FLOAT-MAGNITUDE-OUTPUT",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24238,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24538,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T01:54:28.003Z",
+    "live_candle_open_utc": "2026-10-04T01:54:00.000Z",
+    "export_utc": "2026-10-04T01:54:34.695Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v4/evidence/native-float-magnitude-output-v1-attempt1-setup.png",
+      "captures/v4/evidence/native-float-magnitude-output-v1-attempt1-export.png",
+      "captures/v4/evidence/native-float-magnitude-output-v1-attempt1-logs.txt",
+      "captures/v4/evidence/native-float-magnitude-output-v1-attempt1-logs-v1.json",
+      "captures/v4/evidence/native-float-magnitude-output-v1-attempt1-logs.png",
+      "captures/v4/evidence/native-float-magnitude-output-v1-attempt1-visual.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   01:54",
+    "historical_compare_before_unix_seconds": 1791078840,
+    "pine_logs": {
+      "paths": [
+        "evidence/native-float-magnitude-output-v1-attempt1-logs.txt",
+        "evidence/native-float-magnitude-output-v1-attempt1-logs-v1.json",
+        "evidence/native-float-magnitude-output-v1-attempt1-logs.png"
+      ],
+      "entries": 8,
+      "last_message_time_ms": 1788135240000,
+      "last_bar_time_ms": 1788135240000
+    },
+    "csv_sha256": "f1f8f2badbef1b0d87f58d8f9f9484b3076a90b28605a68e24277443de81c796",
+    "csv_bytes": 1294162,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "OUTCOME",
+      "SOURCE_NA",
+      "SCALED_SOURCE",
+      "PREVIOUS_NA"
+    ],
+    "csv_rows": 24538,
+    "historical_rows": 24537,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791078840,
+    "first_historical_values": {
+      "OUTCOME": "9e+99",
+      "SOURCE_NA": "0",
+      "SCALED_SOURCE": "0.9",
+      "PREVIOUS_NA": "1"
+    },
+    "last_historical_values": {
+      "OUTCOME": "9e+99",
+      "SOURCE_NA": "0",
+      "SCALED_SOURCE": "0.9",
+      "PREVIOUS_NA": "0"
+    }
+  }
+]

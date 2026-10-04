@@ -1,0 +1,1632 @@
+{
+  "artifact": "Native capture execution plan v1",
+  "source_master": "74f113d7a4",
+  "batch_start_utc": "2026-10-04T01:42:53.166239+00:00",
+  "scripts": [
+    {
+      "script": "statistical-native-moments-order-v1.pine",
+      "sha256": "eebafda38556e415a407420cab238e8520266bcfcd64c14af1a6aae448a9e899",
+      "title": "Statistical native moments order v1",
+      "columns": [
+        "input_time",
+        "input_bar_index",
+        "input_open",
+        "input_high",
+        "input_low",
+        "input_close",
+        "input_volume",
+        "input_wave",
+        "input_shifted",
+        "close_len2_mean",
+        "close_len2_square_mean",
+        "close_len2_sum",
+        "close_len2_square_sum",
+        "close_len2_stdev_population",
+        "close_len2_stdev_sample",
+        "close_len2_variance_population",
+        "close_len2_variance_sample",
+        "close_len3_mean",
+        "close_len3_square_mean",
+        "close_len3_sum",
+        "close_len3_square_sum",
+        "close_len3_stdev_population",
+        "close_len3_stdev_sample",
+        "close_len3_variance_population",
+        "close_len3_variance_sample",
+        "close_len7_mean",
+        "close_len7_square_mean",
+        "close_len7_sum",
+        "close_len7_square_sum",
+        "close_len7_stdev_population",
+        "close_len7_stdev_sample",
+        "close_len7_variance_population",
+        "close_len7_variance_sample",
+        "close_len14_mean",
+        "close_len14_square_mean",
+        "close_len14_sum",
+        "close_len14_square_sum",
+        "close_len14_stdev_population",
+        "close_len14_stdev_sample",
+        "close_len14_variance_population",
+        "close_len14_variance_sample",
+        "close_len31_mean",
+        "close_len31_square_mean",
+        "close_len31_sum",
+        "close_len31_square_sum",
+        "close_len31_stdev_population",
+        "close_len31_stdev_sample",
+        "close_len31_variance_population",
+        "close_len31_variance_sample",
+        "shifted_len14_mean",
+        "shifted_len14_square_mean",
+        "shifted_len14_sum",
+        "shifted_len14_square_sum",
+        "shifted_len14_stdev_population",
+        "shifted_len14_stdev_sample",
+        "shifted_len14_variance_population",
+        "shifted_len14_variance_sample",
+        "wave_len14_mean",
+        "wave_len14_square_mean",
+        "wave_len14_variance_population"
+      ],
+      "minimumHistoryBars": 512,
+      "requiredFirstBarIndex": 0,
+      "supersededBy": null,
+      "captureKind": "NUMERIC-CSV",
+      "record": [
+        "Export all60 mapped indicator columns across the longest available chart history frombar0, including blanks and the last row.",
+        "Record chart setup/reset/export times and observed live cutoff; preserve original source and exact native diagnostic if refused."
+      ]
+    },
+    {
+      "script": "ranked-window-missing-slots-v2.pine",
+      "sha256": "82d45781f7b60f6615e3f3366a809a092f913fd2539550e83f7d00fed6ee3578",
+      "title": "Ranked window missing slots v2",
+      "columns": [
+        "input_bar_index",
+        "input_clean",
+        "nearest_rank_len4_pct25_clean",
+        "nearest_rank_len4_pct50_clean",
+        "nearest_rank_len4_pct75_clean",
+        "linear_interpolation_len4_pct25_clean",
+        "linear_interpolation_len4_pct50_clean",
+        "linear_interpolation_len4_pct75_clean",
+        "rci_len4_clean",
+        "nearest_rank_len14_pct25_clean",
+        "nearest_rank_len14_pct50_clean",
+        "nearest_rank_len14_pct75_clean",
+        "linear_interpolation_len14_pct25_clean",
+        "linear_interpolation_len14_pct50_clean",
+        "linear_interpolation_len14_pct75_clean",
+        "rci_len14_clean",
+        "input_hole20_21",
+        "nearest_rank_len4_pct25_hole20_21",
+        "nearest_rank_len4_pct50_hole20_21",
+        "nearest_rank_len4_pct75_hole20_21",
+        "linear_interpolation_len4_pct25_hole20_21",
+        "linear_interpolation_len4_pct50_hole20_21",
+        "linear_interpolation_len4_pct75_hole20_21",
+        "rci_len4_hole20_21",
+        "nearest_rank_len14_pct25_hole20_21",
+        "nearest_rank_len14_pct50_hole20_21",
+        "nearest_rank_len14_pct75_hole20_21",
+        "linear_interpolation_len14_pct25_hole20_21",
+        "linear_interpolation_len14_pct50_hole20_21",
+        "linear_interpolation_len14_pct75_hole20_21",
+        "rci_len14_hole20_21",
+        "input_lead0_4",
+        "nearest_rank_len4_pct25_lead0_4",
+        "nearest_rank_len4_pct50_lead0_4",
+        "nearest_rank_len4_pct75_lead0_4",
+        "linear_interpolation_len4_pct25_lead0_4",
+        "linear_interpolation_len4_pct50_lead0_4",
+        "linear_interpolation_len4_pct75_lead0_4",
+        "rci_len4_lead0_4",
+        "nearest_rank_len14_pct25_lead0_4",
+        "nearest_rank_len14_pct50_lead0_4",
+        "nearest_rank_len14_pct75_lead0_4",
+        "linear_interpolation_len14_pct25_lead0_4",
+        "linear_interpolation_len14_pct50_lead0_4",
+        "linear_interpolation_len14_pct75_lead0_4",
+        "rci_len14_lead0_4",
+        "array_nearest_rank_len14_pct50_clean",
+        "array_nearest_rank_len14_pct75_clean",
+        "array_linear_interpolation_len14_pct50_clean",
+        "array_linear_interpolation_len14_pct75_clean",
+        "array_nearest_rank_len14_pct50_hole20_21",
+        "array_nearest_rank_len14_pct75_hole20_21",
+        "array_linear_interpolation_len14_pct50_hole20_21",
+        "array_linear_interpolation_len14_pct75_hole20_21",
+        "array_nearest_rank_len14_pct50_lead0_4",
+        "array_nearest_rank_len14_pct75_lead0_4",
+        "array_linear_interpolation_len14_pct50_lead0_4",
+        "array_linear_interpolation_len14_pct75_lead0_4"
+      ],
+      "minimumHistoryBars": 256,
+      "requiredFirstBarIndex": 0,
+      "supersededBy": null,
+      "captureKind": "NUMERIC-CSV",
+      "record": [
+        "Full untouched CSV; exact diagnostics if refused; reset/export UTC and independently observed live cutoff.",
+        "Preserve all specified logs and column order."
+      ]
+    },
+    {
+      "script": "ranked-window-missing-slots-v1.pine",
+      "sha256": "fdea580363fe392ca07820cc58fb03d4d2ae074d9e0e9fae3786b89d4ad9b2f4",
+      "title": "Ranked window missing slots v1",
+      "columns": [
+        "input_bar_index",
+        "input_clean",
+        "nearest_rank_len4_pct25_clean",
+        "nearest_rank_len4_pct50_clean",
+        "nearest_rank_len4_pct75_clean",
+        "linear_interpolation_len4_pct25_clean",
+        "linear_interpolation_len4_pct50_clean",
+        "linear_interpolation_len4_pct75_clean",
+        "rci_len4_clean",
+        "nearest_rank_len14_pct25_clean",
+        "nearest_rank_len14_pct50_clean",
+        "nearest_rank_len14_pct75_clean",
+        "linear_interpolation_len14_pct25_clean",
+        "linear_interpolation_len14_pct50_clean",
+        "linear_interpolation_len14_pct75_clean",
+        "rci_len14_clean",
+        "input_hole20_21",
+        "nearest_rank_len4_pct25_hole20_21",
+        "nearest_rank_len4_pct50_hole20_21",
+        "nearest_rank_len4_pct75_hole20_21",
+        "linear_interpolation_len4_pct25_hole20_21",
+        "linear_interpolation_len4_pct50_hole20_21",
+        "linear_interpolation_len4_pct75_hole20_21",
+        "rci_len4_hole20_21",
+        "nearest_rank_len14_pct25_hole20_21",
+        "nearest_rank_len14_pct50_hole20_21",
+        "nearest_rank_len14_pct75_hole20_21",
+        "linear_interpolation_len14_pct25_hole20_21",
+        "linear_interpolation_len14_pct50_hole20_21",
+        "linear_interpolation_len14_pct75_hole20_21",
+        "rci_len14_hole20_21",
+        "input_lead0_4",
+        "nearest_rank_len4_pct25_lead0_4",
+        "nearest_rank_len4_pct50_lead0_4",
+        "nearest_rank_len4_pct75_lead0_4",
+        "linear_interpolation_len4_pct25_lead0_4",
+        "linear_interpolation_len4_pct50_lead0_4",
+        "linear_interpolation_len4_pct75_lead0_4",
+        "rci_len4_lead0_4",
+        "nearest_rank_len14_pct25_lead0_4",
+        "nearest_rank_len14_pct50_lead0_4",
+        "nearest_rank_len14_pct75_lead0_4",
+        "linear_interpolation_len14_pct25_lead0_4",
+        "linear_interpolation_len14_pct50_lead0_4",
+        "linear_interpolation_len14_pct75_lead0_4",
+        "rci_len14_lead0_4"
+      ],
+      "minimumHistoryBars": 256,
+      "requiredFirstBarIndex": 0,
+      "supersededBy": "ranked-window-missing-slots-v2.pine",
+      "captureKind": "NUMERIC-CSV",
+      "record": [
+        "Full untouched CSV; exact diagnostics if refused; reset/export UTC and independently observed live cutoff.",
+        "Preserve all specified logs and column order."
+      ]
+    },
+    {
+      "script": "v5-float-length-ema-v1.pine",
+      "sha256": "38e8fe9eab820a5f49edda4b69748d9a97eb03d0dbd6330cd3c992176b6e59e3",
+      "title": "V5-FLOAT-LENGTH-EMA-V1",
+      "columns": [
+        "OUTCOME",
+        "FLOOR_CONTROL",
+        "CEIL_CONTROL",
+        "INPUT_CLOSE",
+        "BAR_INDEX"
+      ],
+      "minimumHistoryBars": 500,
+      "requiredFirstBarIndex": null,
+      "supersededBy": null,
+      "captureKind": "NUMERIC-CSV",
+      "record": [
+        "Preserve exact observed compile/runtime phase and diagnostic with line/bar/time and screenshot.",
+        "If accepted, export all target/control/input columns including startup and missingness.",
+        "Do not alter source or infer native behavior from local engine results."
+      ]
+    },
+    {
+      "script": "v5-float-length-highest-v1.pine",
+      "sha256": "0334f8d75fe02c908b52529c6cc47c039bf5393f122aacc5ac46c69245141f56",
+      "title": "V5-FLOAT-LENGTH-HIGHEST-V1",
+      "columns": [
+        "OUTCOME",
+        "FLOOR_CONTROL",
+        "CEIL_CONTROL",
+        "INPUT_CLOSE",
+        "BAR_INDEX"
+      ],
+      "minimumHistoryBars": 500,
+      "requiredFirstBarIndex": null,
+      "supersededBy": null,
+      "captureKind": "NUMERIC-CSV",
+      "record": [
+        "Preserve exact observed compile/runtime phase and diagnostic with line/bar/time and screenshot.",
+        "If accepted, export all target/control/input columns including startup and missingness.",
+        "Do not alter source or infer native behavior from local engine results."
+      ]
+    },
+    {
+      "script": "v5-float-length-macd-fastlen-v1.pine",
+      "sha256": "2841fdc125295ac8f4bce5a45dbfc698c0c67092a8878b864651543cdeae5034",
+      "title": "V5-FLOAT-LENGTH-MACD-FASTLEN-V1",
+      "columns": [
+        "OUTCOME",
+        "TARGET_SIGNAL",
+        "TARGET_HIST",
+        "FLOOR_MACD",
+        "FLOOR_SIGNAL",
+        "FLOOR_HIST",
+        "CEIL_MACD",
+        "CEIL_SIGNAL",
+        "CEIL_HIST",
+        "INPUT_CLOSE",
+        "BAR_INDEX"
+      ],
+      "minimumHistoryBars": 500,
+      "requiredFirstBarIndex": null,
+      "supersededBy": null,
+      "captureKind": "NUMERIC-CSV",
+      "record": [
+        "Preserve exact observed compile/runtime phase and diagnostic with line/bar/time and screenshot.",
+        "If accepted, export all target/control/input columns including startup and missingness.",
+        "Do not alter source or infer native behavior from local engine results."
+      ]
+    },
+    {
+      "script": "v5-float-length-macd-siglen-v1.pine",
+      "sha256": "6240d8ed6b7bdb744b5b319acfdc313df9fdd4560cce6429b233465cd27846f1",
+      "title": "V5-FLOAT-LENGTH-MACD-SIGLEN-V1",
+      "columns": [
+        "OUTCOME",
+        "TARGET_SIGNAL",
+        "TARGET_HIST",
+        "FLOOR_MACD",
+        "FLOOR_SIGNAL",
+        "FLOOR_HIST",
+        "CEIL_MACD",
+        "CEIL_SIGNAL",
+        "CEIL_HIST",
+        "INPUT_CLOSE",
+        "BAR_INDEX"
+      ],
+      "minimumHistoryBars": 500,
+      "requiredFirstBarIndex": null,
+      "supersededBy": null,
+      "captureKind": "NUMERIC-CSV",
+      "record": [
+        "Preserve exact observed compile/runtime phase and diagnostic with line/bar/time and screenshot.",
+        "If accepted, export all target/control/input columns including startup and missingness.",
+        "Do not alter source or infer native behavior from local engine results."
+      ]
+    },
+    {
+      "script": "v5-float-length-macd-slowlen-v1.pine",
+      "sha256": "949808fb14996aec6c0fb52c3f84905d831bbe442e669e0b952746c80523937f",
+      "title": "V5-FLOAT-LENGTH-MACD-SLOWLEN-V1",
+      "columns": [
+        "OUTCOME",
+        "TARGET_SIGNAL",
+        "TARGET_HIST",
+        "FLOOR_MACD",
+        "FLOOR_SIGNAL",
+        "FLOOR_HIST",
+        "CEIL_MACD",
+        "CEIL_SIGNAL",
+        "CEIL_HIST",
+        "INPUT_CLOSE",
+        "BAR_INDEX"
+      ],
+      "minimumHistoryBars": 500,
+      "requiredFirstBarIndex": null,
+      "supersededBy": null,
+      "captureKind": "NUMERIC-CSV",
+      "record": [
+        "Preserve exact observed compile/runtime phase and diagnostic with line/bar/time and screenshot.",
+        "If accepted, export all target/control/input columns including startup and missingness.",
+        "Do not alter source or infer native behavior from local engine results."
+      ]
+    },
+    {
+      "script": "v5-float-length-percentile-linear-interpolation-v1.pine",
+      "sha256": "190cc35c041f595de1381eafd272d88f2f0ee92116d637241fcbbb0934ebf311",
+      "title": "V5-FLOAT-LENGTH-PERCENTILE-LINEAR-INTERPOLATION-V1",
+      "columns": [
+        "OUTCOME",
+        "FLOOR_CONTROL",
+        "CEIL_CONTROL",
+        "INPUT_CLOSE",
+        "BAR_INDEX"
+      ],
+      "minimumHistoryBars": 500,
+      "requiredFirstBarIndex": null,
+      "supersededBy": null,
+      "captureKind": "NUMERIC-CSV",
+      "record": [
+        "Preserve exact observed compile/runtime phase and diagnostic with line/bar/time and screenshot.",
+        "If accepted, export all target/control/input columns including startup and missingness.",
+        "Do not alter source or infer native behavior from local engine results."
+      ]
+    },
+    {
+      "script": "v5-float-length-sma-v1.pine",
+      "sha256": "41f9bac020524cc448086b36650b140449132ba093ce84bf329105ab419a8fc4",
+      "title": "V5-FLOAT-LENGTH-SMA-V1",
+      "columns": [
+        "OUTCOME",
+        "FLOOR_CONTROL",
+        "CEIL_CONTROL",
+        "INPUT_CLOSE",
+        "BAR_INDEX"
+      ],
+      "minimumHistoryBars": 500,
+      "requiredFirstBarIndex": null,
+      "supersededBy": null,
+      "captureKind": "NUMERIC-CSV",
+      "record": [
+        "Preserve exact observed compile/runtime phase and diagnostic with line/bar/time and screenshot.",
+        "If accepted, export all target/control/input columns including startup and missingness.",
+        "Do not alter source or infer native behavior from local engine results."
+      ]
+    },
+    {
+      "script": "v5-float-length-wma-v1.pine",
+      "sha256": "ec12f1cbadc061f3793f8d7053376caadda714e44cb244421112f292ab73966f",
+      "title": "V5-FLOAT-LENGTH-WMA-V1",
+      "columns": [
+        "OUTCOME",
+        "FLOOR_CONTROL",
+        "CEIL_CONTROL",
+        "INPUT_CLOSE",
+        "BAR_INDEX"
+      ],
+      "minimumHistoryBars": 500,
+      "requiredFirstBarIndex": null,
+      "supersededBy": null,
+      "captureKind": "NUMERIC-CSV",
+      "record": [
+        "Preserve exact observed compile/runtime phase and diagnostic with line/bar/time and screenshot.",
+        "If accepted, export all target/control/input columns including startup and missingness.",
+        "Do not alter source or infer native behavior from local engine results."
+      ]
+    },
+    {
+      "script": "native-float-comparison-boundary-v1.pine",
+      "sha256": "c16b04f7d8075253df69ef8dd27d9c4d8b7dfbe098246c3cf4510ffa58c85eb7",
+      "title": "V4-NATIVE-FLOAT-COMPARISON-BOUNDARY",
+      "columns": [
+        "OUTCOME"
+      ],
+      "minimumHistoryBars": 12,
+      "requiredFirstBarIndex": null,
+      "supersededBy": null,
+      "captureKind": "NUMERIC-CSV",
+      "record": [
+        "Full untouched CSV; exact diagnostics if refused; reset/export UTC and independently observed live cutoff.",
+        "Preserve all specified logs and column order."
+      ]
+    },
+    {
+      "script": "native-float-magnitude-output-v1.pine",
+      "sha256": "3fabe6f76e9461c1ad1ec7d7cba3029c07be9f3e34b10cb8e840c8a87be5d5df",
+      "title": "V4-NATIVE-FLOAT-MAGNITUDE-OUTPUT",
+      "columns": [
+        "OUTCOME",
+        "SOURCE_NA",
+        "SCALED_SOURCE",
+        "PREVIOUS_NA"
+      ],
+      "minimumHistoryBars": 8,
+      "requiredFirstBarIndex": null,
+      "supersededBy": null,
+      "captureKind": "NUMERIC-CSV",
+      "record": [
+        "Full untouched CSV; exact diagnostics if refused; reset/export UTC and independently observed live cutoff.",
+        "Preserve all specified logs and column order."
+      ]
+    },
+    {
+      "script": "trace-plotbar-inconsistent-ohlc-visual-v6.pine",
+      "sha256": "983e478662a5336ae6cfd7de04c34ced3b3a8b67135683e5a41395711590a253",
+      "title": "V4-PLOTBAR-RAW-OHLC-VISUAL",
+      "columns": [
+        "TARGET_RAW_OHLC (Open)",
+        "TARGET_RAW_OHLC (High)",
+        "TARGET_RAW_OHLC (Low)",
+        "TARGET_RAW_OHLC (Close)",
+        "CASE_index",
+        "CTRL_bar_index",
+        "CTRL_time",
+        "SUPPLIED_open",
+        "SUPPLIED_high",
+        "SUPPLIED_low",
+        "SUPPLIED_close",
+        "OUTCOME"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "supersededBy": null,
+      "captureKind": "SCREENSHOTS-AND-CSV",
+      "record": [
+        "On RUNS retain untouched CSV with target OHLC fields, supplied raw fields,CASE_index,bar_index/time, andOUTCOME. CSV alone does not settle geometry.",
+        "Save unobstructed full indicator-pane screenshot of latest18 bars, including case labelsC0\u2013C5 and90/130 axis guides; enlarge pane and zoom to wide individual bars.",
+        "For cases1\u20134 retain close-up screenshots with wick/stem endpoints, candle body or bar open/close ticks, axis values and case labels visible. Record whether target absent, normalized, raw, clipped, or another observed shape; no prediction is selected.",
+        "Record case5 visibility separately; do not infer missing-field geometry from case1\u20134.",
+        "If refused retain exact phase/diagnostic/code/line/bar/time and screenshot. Do not alter source to obtain success; missing screenshot means geometry remainsUNSETTLED."
+      ]
+    },
+    {
+      "script": "trace-plotcandle-inconsistent-ohlc-visual-v6.pine",
+      "sha256": "da452055cf03244da93a37c113e5032970fdb9cc8bfbf3ba6563c444117f4f84",
+      "title": "V4-PLOTCANDLE-RAW-OHLC-VISUAL",
+      "columns": [
+        "TARGET_RAW_OHLC (Open)",
+        "TARGET_RAW_OHLC (High)",
+        "TARGET_RAW_OHLC (Low)",
+        "TARGET_RAW_OHLC (Close)",
+        "CASE_index",
+        "CTRL_bar_index",
+        "CTRL_time",
+        "SUPPLIED_open",
+        "SUPPLIED_high",
+        "SUPPLIED_low",
+        "SUPPLIED_close",
+        "OUTCOME"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "supersededBy": null,
+      "captureKind": "SCREENSHOTS-AND-CSV",
+      "record": [
+        "On RUNS retain untouched CSV with target OHLC fields, supplied raw fields,CASE_index,bar_index/time, andOUTCOME. CSV alone does not settle geometry.",
+        "Save unobstructed full indicator-pane screenshot of latest18 bars, including case labelsC0\u2013C5 and90/130 axis guides; enlarge pane and zoom to wide individual bars.",
+        "For cases1\u20134 retain close-up screenshots with wick/stem endpoints, candle body or bar open/close ticks, axis values and case labels visible. Record whether target absent, normalized, raw, clipped, or another observed shape; no prediction is selected.",
+        "Record case5 visibility separately; do not infer missing-field geometry from case1\u20134.",
+        "If refused retain exact phase/diagnostic/code/line/bar/time and screenshot. Do not alter source to obtain success; missing screenshot means geometry remainsUNSETTLED."
+      ]
+    },
+    {
+      "script": "trace-bgcolor-offset-v3-series.pine",
+      "sha256": "605ab6938f7b6f0940c5300c11f9efe5c6ac710dd5c9d862e1bff02b60f557fe",
+      "title": "trace-bgcolor-offset-v3-series",
+      "columns": [
+        "BAR_INDEX",
+        "PHASE",
+        "SOURCE_CODE",
+        "SERIES_OFFSET"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "supersededBy": null,
+      "captureKind": "SCREENSHOTS-AND-CSV",
+      "record": [
+        "Untouched source/defaults, standard BINANCE:BTCUSDT 2-minute UTC.",
+        "Save exact native compile/runtime diagnostics, bar/time/line and warnings. Otherwise full CSV including na.",
+        "Predictions/local runs are not native observations. No source repair to obtain success."
+      ]
+    },
+    {
+      "script": "trace-bgcolor-offset-v3-zero-control.pine",
+      "sha256": "1be260a87df772d3d4e2bb92b0f7cfe4b24043a378b423bf7dfee999ac38ceec",
+      "title": "trace-bgcolor-offset-v3-zero-control",
+      "columns": [
+        "BAR_INDEX",
+        "PHASE",
+        "SOURCE_CODE",
+        "SERIES_OFFSET"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "supersededBy": null,
+      "captureKind": "SCREENSHOTS-AND-CSV",
+      "record": [
+        "Untouched source/defaults, standard BINANCE:BTCUSDT 2-minute UTC.",
+        "Save exact native compile/runtime diagnostics, bar/time/line and warnings. Otherwise full CSV including na.",
+        "Predictions/local runs are not native observations. No source repair to obtain success."
+      ]
+    },
+    {
+      "script": "trace-bgcolor-offset-v4-series.pine",
+      "sha256": "b3e3d6dd5800c42532c165795ab826df4910049806a27a83578ccb026d0c3244",
+      "title": "trace-bgcolor-offset-v4-series",
+      "columns": [
+        "BAR_INDEX",
+        "PHASE",
+        "SOURCE_CODE",
+        "SERIES_OFFSET"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "supersededBy": null,
+      "captureKind": "SCREENSHOTS-AND-CSV",
+      "record": [
+        "Untouched source/defaults, standard BINANCE:BTCUSDT 2-minute UTC.",
+        "Save exact native compile/runtime diagnostics, bar/time/line and warnings. Otherwise full CSV including na.",
+        "Predictions/local runs are not native observations. No source repair to obtain success."
+      ]
+    },
+    {
+      "script": "trace-bgcolor-offset-v4-zero-control.pine",
+      "sha256": "63ae14acdaf97440468c1d7afcfc483e391d0790e3696c80c765bd2d34ddae13",
+      "title": "trace-bgcolor-offset-v4-zero-control",
+      "columns": [
+        "BAR_INDEX",
+        "PHASE",
+        "SOURCE_CODE",
+        "SERIES_OFFSET"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "supersededBy": null,
+      "captureKind": "SCREENSHOTS-AND-CSV",
+      "record": [
+        "Untouched source/defaults, standard BINANCE:BTCUSDT 2-minute UTC.",
+        "Save exact native compile/runtime diagnostics, bar/time/line and warnings. Otherwise full CSV including na.",
+        "Predictions/local runs are not native observations. No source repair to obtain success."
+      ]
+    },
+    {
+      "script": "trace-bgcolor-offset-v5-series.pine",
+      "sha256": "8f7f59dfe6674c2d8ac0d5150b8541a6bd5744621392e9d069a33933d3756061",
+      "title": "trace-bgcolor-offset-v5-series",
+      "columns": [
+        "BAR_INDEX",
+        "PHASE",
+        "SOURCE_CODE",
+        "SERIES_OFFSET"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "supersededBy": null,
+      "captureKind": "SCREENSHOTS-AND-CSV",
+      "record": [
+        "Untouched source/defaults, standard BINANCE:BTCUSDT 2-minute UTC.",
+        "Save exact native compile/runtime diagnostics, bar/time/line and warnings. Otherwise full CSV including na.",
+        "Predictions/local runs are not native observations. No source repair to obtain success."
+      ]
+    },
+    {
+      "script": "trace-bgcolor-offset-v5-zero-control.pine",
+      "sha256": "73f1a64da230734afd8380b95b5008091ce12fe0c992c14e99c277d7da7a40a6",
+      "title": "trace-bgcolor-offset-v5-zero-control",
+      "columns": [
+        "BAR_INDEX",
+        "PHASE",
+        "SOURCE_CODE",
+        "SERIES_OFFSET"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "supersededBy": null,
+      "captureKind": "SCREENSHOTS-AND-CSV",
+      "record": [
+        "Untouched source/defaults, standard BINANCE:BTCUSDT 2-minute UTC.",
+        "Save exact native compile/runtime diagnostics, bar/time/line and warnings. Otherwise full CSV including na.",
+        "Predictions/local runs are not native observations. No source repair to obtain success."
+      ]
+    },
+    {
+      "script": "corpus1-matrix-sum-omitted-id2-namespace-float-v1.pine",
+      "sha256": "648a40f61bd4fa0dd8ad8fb77c9cf158334291e7258f658e79b790fccd836a79",
+      "title": "V4-MATRIX-SUM-OMITTED-ID2-NAMESPACE-FLOAT",
+      "columns": [
+        "OUTCOME"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "supersededBy": null,
+      "captureKind": null,
+      "record": [
+        "Keep unchanged v6 source and SHA256. Capture full native compile/runtime diagnostic, code if exposed, line/column, screenshot and first failing bar/time.",
+        "For RUNS, copy the complete first-bar RESULT= log message, including whitespace/newlines; save a table screenshot showing the exact result. Preserve matrix/string formatting as text, without forcing a numeric interpretation.",
+        "Export the complete OUTCOME CSV. OUTCOME=1 is an acceptance/execution sentinel; it is not the omitted-id2 result.",
+        "A str.tostring/log/table failure is an instrumentation result. Preserve it and the accepted target line if exposed; do not classify it as matrix.sum refusal or invent the masked value."
+      ]
+    },
+    {
+      "script": "corpus1-matrix-sum-omitted-id2-receiver-int-v1.pine",
+      "sha256": "7a9b43ead84e059ec1f2e1a9b5b1b124a02c6419ce2971ab2c0d2059207340e1",
+      "title": "V4-MATRIX-SUM-OMITTED-ID2-RECEIVER-INT",
+      "columns": [
+        "OUTCOME"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "supersededBy": null,
+      "captureKind": null,
+      "record": [
+        "Keep unchanged v6 source and SHA256. Capture full native compile/runtime diagnostic, code if exposed, line/column, screenshot and first failing bar/time.",
+        "For RUNS, copy the complete first-bar RESULT= log message, including whitespace/newlines; save a table screenshot showing the exact result. Preserve matrix/string formatting as text, without forcing a numeric interpretation.",
+        "Export the complete OUTCOME CSV. OUTCOME=1 is an acceptance/execution sentinel; it is not the omitted-id2 result.",
+        "A str.tostring/log/table failure is an instrumentation result. Preserve it and the accepted target line if exposed; do not classify it as matrix.sum refusal or invent the masked value."
+      ]
+    },
+    {
+      "script": "corpus1-matrix-sum-omitted-id2-returned-receiver-float-v1.pine",
+      "sha256": "0574e171678061e4cb07a809c988a101d326d55d4f7998e3016f2964f6bf3c1f",
+      "title": "V4-MATRIX-SUM-OMITTED-ID2-RETURNED-RECEIVER-FLOAT",
+      "columns": [
+        "OUTCOME"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "supersededBy": null,
+      "captureKind": null,
+      "record": [
+        "Keep unchanged v6 source and SHA256. Capture full native compile/runtime diagnostic, code if exposed, line/column, screenshot and first failing bar/time.",
+        "For RUNS, copy the complete first-bar RESULT= log message, including whitespace/newlines; save a table screenshot showing the exact result. Preserve matrix/string formatting as text, without forcing a numeric interpretation.",
+        "Export the complete OUTCOME CSV. OUTCOME=1 is an acceptance/execution sentinel; it is not the omitted-id2 result.",
+        "A str.tostring/log/table failure is an instrumentation result. Preserve it and the accepted target line if exposed; do not classify it as matrix.sum refusal or invent the masked value."
+      ]
+    },
+    {
+      "script": "corpus5-change-negative-v1.pine",
+      "sha256": "a78c744ea3a4a1a52ef03f15e4a499f2d5f48eb98cf9fc724481b2ec9162d1eb",
+      "title": "CORPUS5-CHANGE-NEGATIVE-V1",
+      "columns": [
+        "OUTCOME"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "supersededBy": null,
+      "captureKind": null,
+      "record": [
+        "Keep exact native compile/runtime stage, diagnostic, line/bar/time and evidence; otherwise export all OUTCOME values/na.",
+        "Never alter the source to obtain success. Local result is not native evidence."
+      ]
+    },
+    {
+      "script": "corpus5-change-zero-v1.pine",
+      "sha256": "0b125c6cf46664f2d8225a1995c2bbeffa3fa495d2ab0216615e39dca99068f3",
+      "title": "CORPUS5-CHANGE-ZERO-V1",
+      "columns": [
+        "OUTCOME"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "supersededBy": null,
+      "captureKind": null,
+      "record": [
+        "Keep exact native compile/runtime stage, diagnostic, line/bar/time and evidence; otherwise export all OUTCOME values/na.",
+        "Never alter the source to obtain success. Local result is not native evidence."
+      ]
+    },
+    {
+      "script": "corpus5-exp-price-overflow-v1.pine",
+      "sha256": "cc9441af5efc1be09308a9eb2db5c6b46c3a9485891fb86d08485cbacb7db436",
+      "title": "corpus5-exp-price-overflow-v1",
+      "columns": [
+        "OUTCOME"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "supersededBy": null,
+      "captureKind": null,
+      "record": [
+        "Record exact native phase/diagnostic/line/bar/time; otherwise export every OUTCOME value including na.",
+        "Documented prediction is not native observation."
+      ]
+    },
+    {
+      "script": "corpus5-matrix-negative-identity-power-v1.pine",
+      "sha256": "1b770d87ce52689dc5bf49b6dd23656f7de2310724af9fae996d5abe192063ec",
+      "title": "CORPUS5-MATRIX-NEGATIVE-IDENTITY-POWER-V1",
+      "columns": [
+        "OUTCOME"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "supersededBy": null,
+      "captureKind": null,
+      "record": [
+        "Keep exact native compile/runtime stage, diagnostic, line/bar/time and evidence; otherwise export all OUTCOME values/na.",
+        "Never alter the source to obtain success. Local result is not native evidence."
+      ]
+    },
+    {
+      "script": "corpus5-pivot-request-counter-v1.pine",
+      "sha256": "d91765c9517a779ff170b0b6632d4941fac93206a3c48be8015b4758e5d6cf20",
+      "title": "CORPUS5-PIVOT-REQUEST-COUNTER-V1",
+      "columns": [
+        "OUTCOME"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "supersededBy": null,
+      "captureKind": null,
+      "record": [
+        "Use at least1500 2-minute bars spanning two daily boundaries. Retain chart time and nativebar evidence.",
+        "Save exact native diagnostics or full OUTCOME CSV. No zero/nonzero inference from chart history length alone."
+      ]
+    },
+    {
+      "script": "corpus5-table-na-row-v1.pine",
+      "sha256": "e97d9e68935579c2ee635de221b9a45c8abd7430bbd059463256515da94b088a",
+      "title": "CORPUS5-TABLE-NA-ROW-V1",
+      "columns": [
+        "OUTCOME"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "supersededBy": null,
+      "captureKind": null,
+      "record": [
+        "Keep exact native compile/runtime stage, diagnostic, line/bar/time and evidence; otherwise export all OUTCOME values/na.",
+        "Never alter the source to obtain success. Local result is not native evidence."
+      ]
+    },
+    {
+      "script": "corpus5-v5-float-highest-length-v1.pine",
+      "sha256": "401208f49ef80df3471e0aa89814009651d0136fa21b6049c15b1c286b410d37",
+      "title": "corpus5-v5-float-highest-length-v1",
+      "columns": [
+        "OUTCOME"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "supersededBy": null,
+      "captureKind": null,
+      "record": [
+        "Record exact native phase/diagnostic/line/bar/time; otherwise export every OUTCOME value including na.",
+        "Documented prediction is not native observation."
+      ]
+    },
+    {
+      "script": "corpus5-v5-history-price-offset-v1.pine",
+      "sha256": "8ae4fc7a5addb3e81f781db818dd7b078499ffc73cb5910fe42e92782433fd13",
+      "title": "corpus5-v5-history-price-offset-v1",
+      "columns": [
+        "OUTCOME"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "supersededBy": null,
+      "captureKind": null,
+      "record": [
+        "Record exact native phase/diagnostic/line/bar/time; otherwise export every OUTCOME value including na.",
+        "Documented prediction is not native observation."
+      ]
+    },
+    {
+      "script": "corpus5-v5-local-request-v1.pine",
+      "sha256": "ec2610424aed269f904f9f513f97529f9e179bd508d1f42d9da8f6d2cbfcd159",
+      "title": "corpus5-v5-local-request-v1",
+      "columns": [
+        "OUTCOME"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "supersededBy": null,
+      "captureKind": null,
+      "record": [
+        "Record exact native phase/diagnostic/line/bar/time; otherwise export every OUTCOME value including na.",
+        "Documented prediction is not native observation."
+      ]
+    },
+    {
+      "script": "corpus5-v6-dynamic-history600-v1.pine",
+      "sha256": "956903d86530d739ae2ba5384f84b27b215bf13d3647d8b0355dd42f7497982a",
+      "title": "corpus5-v6-dynamic-history600-v1",
+      "columns": [
+        "OUTCOME"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "supersededBy": null,
+      "captureKind": null,
+      "record": [
+        "Record exact native phase/diagnostic/line/bar/time; otherwise export every OUTCOME value including na.",
+        "Documented prediction is not native observation."
+      ]
+    },
+    {
+      "script": "corpus5-v6-equal-lower-timeframe-v1.pine",
+      "sha256": "03534f71d4f1e41996b5f9beaf34845eb944a3e2b065a13708aeac2b1ace3eba",
+      "title": "corpus5-v6-equal-lower-timeframe-v1",
+      "columns": [
+        "OUTCOME"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "supersededBy": null,
+      "captureKind": null,
+      "record": [
+        "Record exact native phase/diagnostic/line/bar/time; otherwise export every OUTCOME value including na.",
+        "Documented prediction is not native observation."
+      ]
+    },
+    {
+      "script": "drawing-box-eq-v2.pine",
+      "sha256": "54da4ed5444cc206b2d76d4e7a9b7f5b8c4e5db275840cb43d4ee0172d683252",
+      "title": "V4-DRAWING-BOX-EQ",
+      "columns": [
+        "OUTCOME"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "supersededBy": null,
+      "captureKind": null,
+      "record": [
+        "Keep unmodified source/hash and exact native phase, code, text and line; if accepted export OUTCOME values/na.",
+        "Other family/operator probes are independent. Linefill CE10123 cannot settle this family. Never modify rejected source to obtain success.",
+        "Both drawing references persist via var; allocation stays at two objects and cannot mask accepted operator behavior with per-bar table/object resource exhaustion."
+      ]
+    },
+    {
+      "script": "drawing-box-ne-v2.pine",
+      "sha256": "e55abe016c37ba07d6a80e65800f5e02244cc7992f269ab0636e7ff313e68297",
+      "title": "V4-DRAWING-BOX-NE",
+      "columns": [
+        "OUTCOME"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "supersededBy": null,
+      "captureKind": null,
+      "record": [
+        "Keep unmodified source/hash and exact native phase, code, text and line; if accepted export OUTCOME values/na.",
+        "Other family/operator probes are independent. Linefill CE10123 cannot settle this family. Never modify rejected source to obtain success.",
+        "Both drawing references persist via var; allocation stays at two objects and cannot mask accepted operator behavior with per-bar table/object resource exhaustion."
+      ]
+    },
+    {
+      "script": "drawing-chart-point-eq-v2.pine",
+      "sha256": "122b8fa7d9a976210dbce9a45ca18c6312b1abbb222e0aebae61c1d554883eb3",
+      "title": "V4-DRAWING-CHART-POINT-EQ",
+      "columns": [
+        "OUTCOME"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "supersededBy": null,
+      "captureKind": null,
+      "record": [
+        "Keep unmodified source/hash and exact native phase, code, text and line; if accepted export OUTCOME values/na.",
+        "Other family/operator probes are independent. Linefill CE10123 cannot settle this family. Never modify rejected source to obtain success.",
+        "Both drawing references persist via var; allocation stays at two objects and cannot mask accepted operator behavior with per-bar table/object resource exhaustion."
+      ]
+    },
+    {
+      "script": "drawing-chart-point-ne-v2.pine",
+      "sha256": "4e3f806d4b9c6da217966e1467ed6912a94e4b3325b5daf57577ab0617793cfa",
+      "title": "V4-DRAWING-CHART-POINT-NE",
+      "columns": [
+        "OUTCOME"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "supersededBy": null,
+      "captureKind": null,
+      "record": [
+        "Keep unmodified source/hash and exact native phase, code, text and line; if accepted export OUTCOME values/na.",
+        "Other family/operator probes are independent. Linefill CE10123 cannot settle this family. Never modify rejected source to obtain success.",
+        "Both drawing references persist via var; allocation stays at two objects and cannot mask accepted operator behavior with per-bar table/object resource exhaustion."
+      ]
+    },
+    {
+      "script": "drawing-default-blue-v5-v1.pine",
+      "sha256": "9efce44b981125a099e8a27101a3711820006ee3f2bc40fc3989dbe85e9a2bae",
+      "title": "Drawing default blue v5 v1",
+      "columns": [
+        "OUTCOME"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "supersededBy": null,
+      "captureKind": null,
+      "record": [
+        "Retain unmodified source and exact compile/runtime outcome. Export OUTCOME close as anchor control.",
+        "Capture screenshot with all five rows and four columns visible: DEFAULT, color.blue, #2196F3, #2962FF. Do not derive drawing colors from OUTCOME; it is only an execution/price control.",
+        "Rows isolate coordinate/point box border and background defaults, plus polyline line_color. Record browser/theme/background and lossless screenshot. Exact pixel dimensions are not under test."
+      ]
+    },
+    {
+      "script": "drawing-default-blue-v6-v1.pine",
+      "sha256": "bf87c46a400bd2e62a0904f0d21bb99482fa01cf667c7e4d1b844f046e6726b4",
+      "title": "Drawing default blue v6 v1",
+      "columns": [
+        "OUTCOME"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "supersededBy": null,
+      "captureKind": null,
+      "record": [
+        "Retain unmodified source and exact compile/runtime outcome. Export OUTCOME close as anchor control.",
+        "Capture screenshot with all five rows and four columns visible: DEFAULT, color.blue, #2196F3, #2962FF. Do not derive drawing colors from OUTCOME; it is only an execution/price control.",
+        "Rows isolate coordinate/point box border and background defaults, plus polyline line_color. Record browser/theme/background and lossless screenshot. Exact pixel dimensions are not under test."
+      ]
+    },
+    {
+      "script": "drawing-polyline-eq-v2.pine",
+      "sha256": "060f2380d57b54ea8d2ae43bd05d5f1205049e79f03dc73ed0b6fa9b8de35aa7",
+      "title": "V4-DRAWING-POLYLINE-EQ",
+      "columns": [
+        "OUTCOME"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "supersededBy": null,
+      "captureKind": null,
+      "record": [
+        "Keep unmodified source/hash and exact native phase, code, text and line; if accepted export OUTCOME values/na.",
+        "Other family/operator probes are independent. Linefill CE10123 cannot settle this family. Never modify rejected source to obtain success.",
+        "Both drawing references persist via var; allocation stays at two objects and cannot mask accepted operator behavior with per-bar table/object resource exhaustion."
+      ]
+    },
+    {
+      "script": "drawing-polyline-ne-v2.pine",
+      "sha256": "e2a244f605c99e77deea62770e15cff9e71a105b3af83b70733666325a367b0c",
+      "title": "V4-DRAWING-POLYLINE-NE",
+      "columns": [
+        "OUTCOME"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "supersededBy": null,
+      "captureKind": null,
+      "record": [
+        "Keep unmodified source/hash and exact native phase, code, text and line; if accepted export OUTCOME values/na.",
+        "Other family/operator probes are independent. Linefill CE10123 cannot settle this family. Never modify rejected source to obtain success.",
+        "Both drawing references persist via var; allocation stays at two objects and cannot mask accepted operator behavior with per-bar table/object resource exhaustion."
+      ]
+    },
+    {
+      "script": "drawing-table-eq-v2.pine",
+      "sha256": "3139d9e4ed7f874fb8f920a0fc983044702b66fe00fe794ef5d0fcae24d96351",
+      "title": "V4-DRAWING-TABLE-EQ",
+      "columns": [
+        "OUTCOME"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "supersededBy": null,
+      "captureKind": null,
+      "record": [
+        "Keep unmodified source/hash and exact native phase, code, text and line; if accepted export OUTCOME values/na.",
+        "Other family/operator probes are independent. Linefill CE10123 cannot settle this family. Never modify rejected source to obtain success.",
+        "Both drawing references persist via var; allocation stays at two objects and cannot mask accepted operator behavior with per-bar table/object resource exhaustion."
+      ]
+    },
+    {
+      "script": "drawing-table-ne-v2.pine",
+      "sha256": "0e7d85757c0939956e1dc76edbccdda68dda9eb16510bd7a41c9f50051052dd7",
+      "title": "V4-DRAWING-TABLE-NE",
+      "columns": [
+        "OUTCOME"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "supersededBy": null,
+      "captureKind": null,
+      "record": [
+        "Keep unmodified source/hash and exact native phase, code, text and line; if accepted export OUTCOME values/na.",
+        "Other family/operator probes are independent. Linefill CE10123 cannot settle this family. Never modify rejected source to obtain success.",
+        "Both drawing references persist via var; allocation stays at two objects and cannot mask accepted operator behavior with per-bar table/object resource exhaustion."
+      ]
+    },
+    {
+      "script": "input-generic-computed-source-v1.pine",
+      "sha256": "3840cb602b73d6c19a612009e4a7087194038d484cd00812ed902726050ff369",
+      "title": "INPUT-GENERIC-SOURCE-DEFAULT-AUTHORITY",
+      "columns": [
+        "OUTCOME"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "supersededBy": null,
+      "captureKind": null,
+      "record": [
+        "Retain exact source, compile/runtime phase, diagnostic text and bar/time if rejected.",
+        "If accepted, export OUTCOME CSV and capture Inputs settings, status line and Data Window with labels visible.",
+        "Generic defval display description limits source-type builtins, whereas numeric overload allowed types include arbitrary series float. Record unmodified compile/runtime acceptance and input widget/default; no rejection or acceptance assumed."
+      ]
+    },
+    {
+      "script": "input-source-positional-order-v1.pine",
+      "sha256": "5645a58133d042bba67adce5963cd10bedce99162798abcdd98ab07be3205162",
+      "title": "INPUT-GENERIC-SOURCE-POSITIONAL-AUTHORITY",
+      "columns": [
+        "OUTCOME"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "supersededBy": null,
+      "captureKind": null,
+      "record": [
+        "Retain exact source, compile/runtime phase, diagnostic text and bar/time if rejected.",
+        "If accepted, export OUTCOME CSV and capture Inputs settings, status line and Data Window with labels visible.",
+        "Generic series-float signature orders inline/group/tooltip; argument metadata orders tooltip/inline/group. Record which SLOT string becomes tooltip/group/inline without assuming either order."
+      ]
+    },
+    {
+      "script": "input-textarea-default-display-v1.pine",
+      "sha256": "d2a029cd95e27fd996a9853c074d2bcf74dc8ea162b5a2c192682a6ee5d5066a",
+      "title": "INPUT-TEXTAREA-DISPLAY-AUTHORITY",
+      "columns": [
+        "OUTCOME"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "supersededBy": null,
+      "captureKind": null,
+      "record": [
+        "Retain exact source, compile/runtime phase, diagnostic text and bar/time if rejected.",
+        "If accepted, export OUTCOME CSV and capture Inputs settings, status line and Data Window with labels visible.",
+        "Compare default input information against explicit all/none in status line and Data Window; reference says none, manual says all."
+      ]
+    },
+    {
+      "script": "input-time-default-display-v1.pine",
+      "sha256": "8698446da2ae22b02a01ae2d68419fdaf13507d189d4dcc65043ad83e584c19c",
+      "title": "INPUT-TIME-DISPLAY-AUTHORITY",
+      "columns": [
+        "OUTCOME"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "supersededBy": null,
+      "captureKind": null,
+      "record": [
+        "Retain exact source, compile/runtime phase, diagnostic text and bar/time if rejected.",
+        "If accepted, export OUTCOME CSV and capture Inputs settings, status line and Data Window with labels visible.",
+        "Compare default input information against explicit all/none in status line and Data Window; reference says none, manual says all."
+      ]
+    },
+    {
+      "script": "input-time-marker-kind-v1.pine",
+      "sha256": "5203d8ca2e71427bebe7b71e77fbe3536888529a8863b2b57d177e3a40bccf10",
+      "title": "INPUT-TIME-MARKER-AUTHORITY",
+      "columns": [
+        "OUTCOME"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "supersededBy": null,
+      "captureKind": null,
+      "record": [
+        "Retain exact source, compile/runtime phase, diagnostic text and bar/time if rejected.",
+        "If accepted, export OUTCOME CSV and capture Inputs settings, status line and Data Window with labels visible.",
+        "Reference description mentions price/price line while remarks/manual describe time/vertical marker. Record actual confirmed placement interaction and marker orientation; no price-line expectation chosen."
+      ]
+    },
+    {
+      "script": "ledger-1091-matrix-columns-profile-v1.pine",
+      "sha256": "ff34f8cf9e8f363883bb08c85af8007b9e2752f5b945f69863312c7a3f8131e9",
+      "title": "Ledger1091 matrix columns profiling",
+      "columns": [
+        "OUTCOME"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "supersededBy": null,
+      "captureKind": null,
+      "record": [
+        "Export OUTCOME and capture Pine Profiler screenshot with full source/line execution counts.",
+        "Run all three scripts separately on identical symbol/timeframe/history and reload each; repeat five times, retaining every result including timer noise.",
+        "Record browser/device/session/history count. Uniform checksum is expected from constant data, but verify constructor/loop execution counts and matrix dimensions independently.",
+        "A missing/zero-resolution profiler measurement cannot establish an ordering; never infer relative speed from OUTCOME or timenow inside one execution.",
+        "This is a scoped benchmark, not a universal performance bound or semantic mismatch."
+      ]
+    },
+    {
+      "script": "ledger-1091-matrix-constructor-profile-v1.pine",
+      "sha256": "90e1b84f52c501be209ac9a9eb1dbda84a88ddd69b8547762bcd561f0a56afca",
+      "title": "Ledger1091 matrix constructor profiling",
+      "columns": [
+        "OUTCOME"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "supersededBy": null,
+      "captureKind": null,
+      "record": [
+        "Export OUTCOME and capture Pine Profiler screenshot with full source/line execution counts.",
+        "Run all three scripts separately on identical symbol/timeframe/history and reload each; repeat five times, retaining every result including timer noise.",
+        "Record browser/device/session/history count. Uniform checksum is expected from constant data, but verify constructor/loop execution counts and matrix dimensions independently.",
+        "A missing/zero-resolution profiler measurement cannot establish an ordering; never infer relative speed from OUTCOME or timenow inside one execution.",
+        "This is a scoped benchmark, not a universal performance bound or semantic mismatch."
+      ]
+    },
+    {
+      "script": "ledger-1091-matrix-rows-profile-v1.pine",
+      "sha256": "4a52e00a2c43a36a98ed02053edd7e645541516f3630a115274112bc49c07f64",
+      "title": "Ledger1091 matrix rows profiling",
+      "columns": [
+        "OUTCOME"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "supersededBy": null,
+      "captureKind": null,
+      "record": [
+        "Export OUTCOME and capture Pine Profiler screenshot with full source/line execution counts.",
+        "Run all three scripts separately on identical symbol/timeframe/history and reload each; repeat five times, retaining every result including timer noise.",
+        "Record browser/device/session/history count. Uniform checksum is expected from constant data, but verify constructor/loop execution counts and matrix dimensions independently.",
+        "A missing/zero-resolution profiler measurement cannot establish an ordering; never infer relative speed from OUTCOME or timenow inside one execution.",
+        "This is a scoped benchmark, not a universal performance bound or semantic mismatch."
+      ]
+    },
+    {
+      "script": "ledger-1094-asin-number-v5-v1.pine",
+      "sha256": "aaa71170f0a917987c7344904aab5c8c484b240cb1a7f2f9e320f0ae72161e32",
+      "title": "Ledger1094 asin number v5",
+      "columns": [
+        "OUTCOME"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "supersededBy": null,
+      "captureKind": null,
+      "record": [
+        "Preserve exact compile/runtime diagnostic, error code/text/line, or export all OUTCOME values.",
+        "Record source version separately; v5 migration text does not explicitly specify v6 admission."
+      ]
+    },
+    {
+      "script": "ledger-1094-asin-number-v6-v1.pine",
+      "sha256": "c4b5c58c2d65815da9f0b84c206fcc6ba680c9f69a0577269b0cd25732b781ce",
+      "title": "Ledger1094 asin number v6",
+      "columns": [
+        "OUTCOME"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "supersededBy": null,
+      "captureKind": null,
+      "record": [
+        "Preserve exact compile/runtime diagnostic, error code/text/line, or export all OUTCOME values.",
+        "Record source version separately; v5 migration text does not explicitly specify v6 admission."
+      ]
+    },
+    {
+      "script": "trace-698-timenow-observations-v1.pine",
+      "sha256": "d5051bbe11371d5578e164d6d5a0eebfe0acca7cf81856ae8ab2f13a2af7de62",
+      "title": "TRACE698 execution clock",
+      "columns": [
+        "OUTCOME"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "supersededBy": null,
+      "captureKind": null,
+      "record": [
+        "Export OUTCOME and exact Pine Logs for at least ten realtime updates spanning a new bar, plus reload.",
+        "Record contemporaneous browser UTC and an idle interval; no tick means no expected new execution.",
+        "Do not interpret timenow-time or browser-clock differences as provider latency. Provider latency remains unobservable here."
+      ]
+    },
+    {
+      "script": "trace-705-chart-fg-solid-background-v1.pine",
+      "sha256": "c84e011a62b9c0e4b52cb0d2b66f32fd860d550ef02d58000491884fa50d32a6",
+      "title": "TRACE705 chart foreground",
+      "columns": [
+        "OUTCOME"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "supersededBy": null,
+      "captureKind": null,
+      "record": [
+        "Use chart Appearance settings with SOLID background; bgcolor() does not set chart.bg_color.",
+        "Capture separately for #000000 and #FFFFFF controls, then #7F7F7F, #808080, #818181. Record exact configured background, theme, logs, OUTCOME and screenshot each time.",
+        "Repeat light-theme/dark-background and dark-theme/light-background to distinguish theme from background. A single uniform run cannot settle cutoff."
+      ]
+    },
+    {
+      "script": "trace-720-hma-mature-hole-length16-v1.pine",
+      "sha256": "cfb1c20fc53e802dcc3f190c1c58635e6498fddca3c96b575bfe875bc37171ec",
+      "title": "TRACE720 mature HMA hole",
+      "columns": [
+        "OUTCOME"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "supersededBy": null,
+      "captureKind": null,
+      "record": [
+        "Export all OUTCOME values/na with at least46 historical bars and source-pinned bar indices.",
+        "Preserve exact values at bars37-45, particularly39/40/41; do not round CSV values or infer a value from a green local test.",
+        "Record source hash, chart settings, historical/live cutoff and exact compiler/runtime diagnostics if any."
+      ]
+    },
+    {
+      "script": "trace-array-nearest-rank-float-boundaries-control-v6.pine",
+      "sha256": "0e78eb309302ed805cf6a16099963c366d199511bde0d9a656d539262e5b46ef",
+      "title": "trace-array-nearest-rank-float-boundaries-control-v6",
+      "columns": [
+        "BAR_INDEX",
+        "PERCENTAGE",
+        "OUTCOME"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "supersededBy": null,
+      "captureKind": null,
+      "record": [
+        "Untouched source/defaults, standard BINANCE:BTCUSDT 2-minute UTC.",
+        "Save exact native compile/runtime diagnostics, bar/time/line and warnings. Otherwise full CSV including na.",
+        "Predictions/local runs are not native observations. No source repair to obtain success."
+      ]
+    },
+    {
+      "script": "trace-array-nearest-rank-float-dynamic-high-v6.pine",
+      "sha256": "8aae401a2b9ef829e44ec19f96e1d9da96b9437f90d950fe185fc6d5e5072b2f",
+      "title": "trace-array-nearest-rank-float-dynamic-high-v6",
+      "columns": [
+        "BAR_INDEX",
+        "PERCENTAGE",
+        "OUTCOME"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "supersededBy": null,
+      "captureKind": null,
+      "record": [
+        "Untouched source/defaults, standard BINANCE:BTCUSDT 2-minute UTC.",
+        "Save exact native compile/runtime diagnostics, bar/time/line and warnings. Otherwise full CSV including na.",
+        "Predictions/local runs are not native observations. No source repair to obtain success."
+      ]
+    },
+    {
+      "script": "trace-array-nearest-rank-float-dynamic-low-v6.pine",
+      "sha256": "c6648656934e683f328a26b834750f337309a0ad5dae02596a502281ceb56755",
+      "title": "trace-array-nearest-rank-float-dynamic-low-v6",
+      "columns": [
+        "BAR_INDEX",
+        "PERCENTAGE",
+        "OUTCOME"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "supersededBy": null,
+      "captureKind": null,
+      "record": [
+        "Untouched source/defaults, standard BINANCE:BTCUSDT 2-minute UTC.",
+        "Save exact native compile/runtime diagnostics, bar/time/line and warnings. Otherwise full CSV including na.",
+        "Predictions/local runs are not native observations. No source repair to obtain success."
+      ]
+    },
+    {
+      "script": "trace-array-nearest-rank-float-dynamic-na-v6.pine",
+      "sha256": "55058730f5e525cfecc41034ca2e9e810aa27c758a53685e94e0fc2494505c6b",
+      "title": "trace-array-nearest-rank-float-dynamic-na-v6",
+      "columns": [
+        "BAR_INDEX",
+        "PERCENTAGE",
+        "OUTCOME"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "supersededBy": null,
+      "captureKind": null,
+      "record": [
+        "Untouched source/defaults, standard BINANCE:BTCUSDT 2-minute UTC.",
+        "Save exact native compile/runtime diagnostics, bar/time/line and warnings. Otherwise full CSV including na.",
+        "Predictions/local runs are not native observations. No source repair to obtain success."
+      ]
+    },
+    {
+      "script": "trace-array-nearest-rank-int-boundaries-control-v6.pine",
+      "sha256": "b6d75c63d1a2fd11bfe207544a5d819a6ccfc1e3e274beaf72f45443fb37f166",
+      "title": "trace-array-nearest-rank-int-boundaries-control-v6",
+      "columns": [
+        "BAR_INDEX",
+        "PERCENTAGE",
+        "OUTCOME"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "supersededBy": null,
+      "captureKind": null,
+      "record": [
+        "Untouched source/defaults, standard BINANCE:BTCUSDT 2-minute UTC.",
+        "Save exact native compile/runtime diagnostics, bar/time/line and warnings. Otherwise full CSV including na.",
+        "Predictions/local runs are not native observations. No source repair to obtain success."
+      ]
+    },
+    {
+      "script": "trace-array-nearest-rank-int-dynamic-high-v6.pine",
+      "sha256": "b02a1adeadef967cad0eafed932fdf776b694e93567ffe54fef8aa5558e50dab",
+      "title": "trace-array-nearest-rank-int-dynamic-high-v6",
+      "columns": [
+        "BAR_INDEX",
+        "PERCENTAGE",
+        "OUTCOME"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "supersededBy": null,
+      "captureKind": null,
+      "record": [
+        "Untouched source/defaults, standard BINANCE:BTCUSDT 2-minute UTC.",
+        "Save exact native compile/runtime diagnostics, bar/time/line and warnings. Otherwise full CSV including na.",
+        "Predictions/local runs are not native observations. No source repair to obtain success."
+      ]
+    },
+    {
+      "script": "trace-array-nearest-rank-int-dynamic-low-v6.pine",
+      "sha256": "dc78ca43f335849619b067500f76cce67c73512705bffc461252792dbc7eb6fe",
+      "title": "trace-array-nearest-rank-int-dynamic-low-v6",
+      "columns": [
+        "BAR_INDEX",
+        "PERCENTAGE",
+        "OUTCOME"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "supersededBy": null,
+      "captureKind": null,
+      "record": [
+        "Untouched source/defaults, standard BINANCE:BTCUSDT 2-minute UTC.",
+        "Save exact native compile/runtime diagnostics, bar/time/line and warnings. Otherwise full CSV including na.",
+        "Predictions/local runs are not native observations. No source repair to obtain success."
+      ]
+    },
+    {
+      "script": "trace-array-nearest-rank-int-dynamic-na-v6.pine",
+      "sha256": "35184058f0a22ba850fdd290fcb1af0d7f30959b5748f6dbd25be2b07b3ae84b",
+      "title": "trace-array-nearest-rank-int-dynamic-na-v6",
+      "columns": [
+        "BAR_INDEX",
+        "PERCENTAGE",
+        "OUTCOME"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "supersededBy": null,
+      "captureKind": null,
+      "record": [
+        "Untouched source/defaults, standard BINANCE:BTCUSDT 2-minute UTC.",
+        "Save exact native compile/runtime diagnostics, bar/time/line and warnings. Otherwise full CSV including na.",
+        "Predictions/local runs are not native observations. No source repair to obtain success."
+      ]
+    },
+    {
+      "script": "trace-array-string-every-namespace-v5.pine",
+      "sha256": "c0f15c335cbb00065cad68413236892171affb5d5186471612a07b3161fe2a91",
+      "title": "V4-ARRAY-STRING-EVERY-NAMESPACE-V5",
+      "columns": [
+        "OUTCOME"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "supersededBy": null,
+      "captureKind": null,
+      "record": [
+        "Capture exact native COMPILE-ERROR, RUNTIME-ERROR or RUNS, full diagnostic/code if exposed, line/column, screenshot and failing bar/time.",
+        "If accepted, export the complete OUTCOME CSV including missingness. Encoding is 1 for true, 0 for false and -1 when neither equality condition is true; preserve unexpected values unchanged.",
+        "Keep the complete source, title, version and SHA256. Do not replace string inputs with numeric or bool values to obtain success.",
+        "Treat target line4 and plot line5 separately: an output-instrument diagnostic does not prove the predicate was refused. Other versions/members/forms require their own captures."
+      ]
+    },
+    {
+      "script": "trace-array-string-every-namespace-v6.pine",
+      "sha256": "0554a7d9d5f457a978e780cb8dc7cbb2f2aad99e1882651819014bc29fc9ad2f",
+      "title": "V4-ARRAY-STRING-EVERY-NAMESPACE-V6",
+      "columns": [
+        "OUTCOME"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "supersededBy": null,
+      "captureKind": null,
+      "record": [
+        "Capture exact native COMPILE-ERROR, RUNTIME-ERROR or RUNS, full diagnostic/code if exposed, line/column, screenshot and failing bar/time.",
+        "If accepted, export the complete OUTCOME CSV including missingness. Encoding is 1 for true, 0 for false and -1 when neither equality condition is true; preserve unexpected values unchanged.",
+        "Keep the complete source, title, version and SHA256. Do not replace string inputs with numeric or bool values to obtain success.",
+        "Treat target line4 and plot line5 separately: an output-instrument diagnostic does not prove the predicate was refused. Other versions/members/forms require their own captures."
+      ]
+    },
+    {
+      "script": "trace-array-string-every-receiver-v5.pine",
+      "sha256": "0315a57585011d2d4dea5f84dbf8f1714b24b72f87cf51fa97c286338821eebb",
+      "title": "V4-ARRAY-STRING-EVERY-RECEIVER-V5",
+      "columns": [
+        "OUTCOME"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "supersededBy": null,
+      "captureKind": null,
+      "record": [
+        "Capture exact native COMPILE-ERROR, RUNTIME-ERROR or RUNS, full diagnostic/code if exposed, line/column, screenshot and failing bar/time.",
+        "If accepted, export the complete OUTCOME CSV including missingness. Encoding is 1 for true, 0 for false and -1 when neither equality condition is true; preserve unexpected values unchanged.",
+        "Keep the complete source, title, version and SHA256. Do not replace string inputs with numeric or bool values to obtain success.",
+        "Treat target line4 and plot line5 separately: an output-instrument diagnostic does not prove the predicate was refused. Other versions/members/forms require their own captures."
+      ]
+    },
+    {
+      "script": "trace-array-string-every-receiver-v6.pine",
+      "sha256": "52b733435c34698d0bffc8ba6be3203e754f1398cbf48e8c332dd4eb388baa20",
+      "title": "V4-ARRAY-STRING-EVERY-RECEIVER-V6",
+      "columns": [
+        "OUTCOME"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "supersededBy": null,
+      "captureKind": null,
+      "record": [
+        "Capture exact native COMPILE-ERROR, RUNTIME-ERROR or RUNS, full diagnostic/code if exposed, line/column, screenshot and failing bar/time.",
+        "If accepted, export the complete OUTCOME CSV including missingness. Encoding is 1 for true, 0 for false and -1 when neither equality condition is true; preserve unexpected values unchanged.",
+        "Keep the complete source, title, version and SHA256. Do not replace string inputs with numeric or bool values to obtain success.",
+        "Treat target line4 and plot line5 separately: an output-instrument diagnostic does not prove the predicate was refused. Other versions/members/forms require their own captures."
+      ]
+    },
+    {
+      "script": "trace-array-string-some-namespace-v5.pine",
+      "sha256": "f05311d1ae976076d790dd71b4bc74e8065217322cd0b2edfab5e9b826a71651",
+      "title": "V4-ARRAY-STRING-SOME-NAMESPACE-V5",
+      "columns": [
+        "OUTCOME"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "supersededBy": null,
+      "captureKind": null,
+      "record": [
+        "Capture exact native COMPILE-ERROR, RUNTIME-ERROR or RUNS, full diagnostic/code if exposed, line/column, screenshot and failing bar/time.",
+        "If accepted, export the complete OUTCOME CSV including missingness. Encoding is 1 for true, 0 for false and -1 when neither equality condition is true; preserve unexpected values unchanged.",
+        "Keep the complete source, title, version and SHA256. Do not replace string inputs with numeric or bool values to obtain success.",
+        "Treat target line4 and plot line5 separately: an output-instrument diagnostic does not prove the predicate was refused. Other versions/members/forms require their own captures."
+      ]
+    },
+    {
+      "script": "trace-array-string-some-namespace-v6.pine",
+      "sha256": "8f68f60685b971765d762b8f90a7852d5bab24423a767e67c74a1bb9ad6b49ef",
+      "title": "V4-ARRAY-STRING-SOME-NAMESPACE-V6",
+      "columns": [
+        "OUTCOME"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "supersededBy": null,
+      "captureKind": null,
+      "record": [
+        "Capture exact native COMPILE-ERROR, RUNTIME-ERROR or RUNS, full diagnostic/code if exposed, line/column, screenshot and failing bar/time.",
+        "If accepted, export the complete OUTCOME CSV including missingness. Encoding is 1 for true, 0 for false and -1 when neither equality condition is true; preserve unexpected values unchanged.",
+        "Keep the complete source, title, version and SHA256. Do not replace string inputs with numeric or bool values to obtain success.",
+        "Treat target line4 and plot line5 separately: an output-instrument diagnostic does not prove the predicate was refused. Other versions/members/forms require their own captures."
+      ]
+    },
+    {
+      "script": "trace-array-string-some-receiver-v5.pine",
+      "sha256": "0af919315b1604529f917d7662f9ae873b40068657aaf4fcd1af10f612502af2",
+      "title": "V4-ARRAY-STRING-SOME-RECEIVER-V5",
+      "columns": [
+        "OUTCOME"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "supersededBy": null,
+      "captureKind": null,
+      "record": [
+        "Capture exact native COMPILE-ERROR, RUNTIME-ERROR or RUNS, full diagnostic/code if exposed, line/column, screenshot and failing bar/time.",
+        "If accepted, export the complete OUTCOME CSV including missingness. Encoding is 1 for true, 0 for false and -1 when neither equality condition is true; preserve unexpected values unchanged.",
+        "Keep the complete source, title, version and SHA256. Do not replace string inputs with numeric or bool values to obtain success.",
+        "Treat target line4 and plot line5 separately: an output-instrument diagnostic does not prove the predicate was refused. Other versions/members/forms require their own captures."
+      ]
+    },
+    {
+      "script": "trace-array-string-some-receiver-v6.pine",
+      "sha256": "d9a28d74b2e0ac4961bc280d26165cb7d1f4a8d62e0b0e640bb11038d5240028",
+      "title": "V4-ARRAY-STRING-SOME-RECEIVER-V6",
+      "columns": [
+        "OUTCOME"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "supersededBy": null,
+      "captureKind": null,
+      "record": [
+        "Capture exact native COMPILE-ERROR, RUNTIME-ERROR or RUNS, full diagnostic/code if exposed, line/column, screenshot and failing bar/time.",
+        "If accepted, export the complete OUTCOME CSV including missingness. Encoding is 1 for true, 0 for false and -1 when neither equality condition is true; preserve unexpected values unchanged.",
+        "Keep the complete source, title, version and SHA256. Do not replace string inputs with numeric or bool values to obtain success.",
+        "Treat target line4 and plot line5 separately: an output-instrument diagnostic does not prove the predicate was refused. Other versions/members/forms require their own captures."
+      ]
+    },
+    {
+      "script": "trace-equal-key-sort-indices-v6.pine",
+      "sha256": "dba23eb8acb6f13ed1a0bbd7ad127d67c12df34017a1da9e35ec15fe01b8e37d",
+      "title": "trace-equal-key-sort-indices-v6",
+      "columns": [
+        "BAR_INDEX",
+        "SOURCE_KEY_0",
+        "SOURCE_KEY_1",
+        "SOURCE_KEY_2",
+        "SOURCE_KEY_3",
+        "SOURCE_KEY_4",
+        "SOURCE_KEY_5",
+        "ASC_INDEX_0",
+        "ASC_INDEX_1",
+        "ASC_INDEX_2",
+        "ASC_INDEX_3",
+        "ASC_INDEX_4",
+        "ASC_INDEX_5",
+        "DESC_INDEX_0",
+        "DESC_INDEX_1",
+        "DESC_INDEX_2",
+        "DESC_INDEX_3",
+        "DESC_INDEX_4",
+        "DESC_INDEX_5"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "supersededBy": null,
+      "captureKind": null,
+      "record": [
+        "Untouched source/defaults, standard BINANCE:BTCUSDT 2-minute UTC.",
+        "Save exact native compile/runtime diagnostics, bar/time/line and warnings. Otherwise full CSV including na.",
+        "Predictions/local runs are not native observations. No source repair to obtain success."
+      ]
+    },
+    {
+      "script": "trace-equal-key-udt-sort-v6.pine",
+      "sha256": "fc6fb85870f35d059597ff46872eab01584093290cc8ef18d4fa4ab5f8a95254",
+      "title": "trace-equal-key-udt-sort-v6",
+      "columns": [
+        "BAR_INDEX",
+        "SOURCE_KEY_0",
+        "SOURCE_KEY_1",
+        "SOURCE_KEY_2",
+        "SOURCE_KEY_3",
+        "SOURCE_KEY_4",
+        "SOURCE_KEY_5",
+        "SOURCE_TAG_0",
+        "SOURCE_TAG_1",
+        "SOURCE_TAG_2",
+        "SOURCE_TAG_3",
+        "SOURCE_TAG_4",
+        "SOURCE_TAG_5",
+        "ASC_KEY_0",
+        "ASC_KEY_1",
+        "ASC_KEY_2",
+        "ASC_KEY_3",
+        "ASC_KEY_4",
+        "ASC_KEY_5",
+        "ASC_TAG_0",
+        "ASC_TAG_1",
+        "ASC_TAG_2",
+        "ASC_TAG_3",
+        "ASC_TAG_4",
+        "ASC_TAG_5",
+        "DESC_KEY_0",
+        "DESC_KEY_1",
+        "DESC_KEY_2",
+        "DESC_KEY_3",
+        "DESC_KEY_4",
+        "DESC_KEY_5",
+        "DESC_TAG_0",
+        "DESC_TAG_1",
+        "DESC_TAG_2",
+        "DESC_TAG_3",
+        "DESC_TAG_4",
+        "DESC_TAG_5",
+        "EQUAL_TAG_0",
+        "EQUAL_TAG_1",
+        "EQUAL_TAG_2",
+        "EQUAL_TAG_3",
+        "EQUAL_TAG_4",
+        "EQUAL_TAG_5"
+      ],
+      "minimumHistoryBars": 100,
+      "requiredFirstBarIndex": null,
+      "supersededBy": null,
+      "captureKind": null,
+      "record": [
+        "Untouched source/defaults, standard BINANCE:BTCUSDT 2-minute UTC.",
+        "Save exact native compile/runtime diagnostics, bar/time/line and warnings. Otherwise full CSV including na.",
+        "Predictions/local runs are not native observations. No source repair to obtain success."
+      ]
+    }
+  ]
+}
