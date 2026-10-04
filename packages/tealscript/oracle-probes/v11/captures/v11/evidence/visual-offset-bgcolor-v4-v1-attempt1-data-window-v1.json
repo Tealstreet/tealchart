@@ -1,0 +1,32 @@
+{
+  "index": 298,
+  "bar": [
+    1791129120,
+    85342.62,
+    85342.62,
+    85340.58,
+    85340.59,
+    6.44259
+  ],
+  "source_row": [
+    1791129120,
+    24.956,
+    -2,
+    null,
+    null
+  ],
+  "browser_utc": "2026-10-04T15:55:35.800Z",
+  "title": "V11 isolated bgcolor offset v4",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   15:52",
+  "visible_range": {
+    "_firstBar": 263,
+    "_lastBar": 301
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}

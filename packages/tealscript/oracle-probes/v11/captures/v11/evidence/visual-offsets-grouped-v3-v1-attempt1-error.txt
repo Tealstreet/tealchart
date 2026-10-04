@@ -1,0 +1,527 @@
+Undeclared identifier `bar_index`;
+{
+  "error": "Undeclared identifier `bar_index`;",
+  "editorError": {
+    "message": "Undeclared identifier `bar_index`;",
+    "start": {
+      "line": 3,
+      "column": 0
+    },
+    "id": "USER;013eebc76ca14a1c8b21b0b0c8e30b4b"
+  },
+  "title": "Compilation error",
+  "compiler_markers": [
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///3f6ebaff-430f-49ba-a96b-c38e582d6424.pine?placement%3Ddialog",
+        "path": "/3f6ebaff-430f-49ba-a96b-c38e582d6424.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "code": "PINE_VERSION_OUTDATED",
+      "severity": 4,
+      "message": "Version 3 of Pine Script® is outdated. We recommend using the current version, which is 6.",
+      "startLineNumber": 1,
+      "startColumn": 3,
+      "endLineNumber": 1,
+      "endColumn": 12
+    },
+    {
+      "resource": {
+        "$mid": 1,
+        "fsPath": "/3f6ebaff-430f-49ba-a96b-c38e582d6424.pine",
+        "external": "file:///3f6ebaff-430f-49ba-a96b-c38e582d6424.pine?placement%3Ddialog",
+        "path": "/3f6ebaff-430f-49ba-a96b-c38e582d6424.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "owner",
+      "severity": 8,
+      "message": "Undeclared identifier `bar_index`;",
+      "startLineNumber": 3,
+      "startColumn": 1,
+      "endLineNumber": 3,
+      "endColumn": 1
+    },
+    {
+      "resource": {
+        "$mid": 1,
+        "fsPath": "/3f6ebaff-430f-49ba-a96b-c38e582d6424.pine",
+        "external": "file:///3f6ebaff-430f-49ba-a96b-c38e582d6424.pine?placement%3Ddialog",
+        "path": "/3f6ebaff-430f-49ba-a96b-c38e582d6424.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "owner",
+      "severity": 8,
+      "message": "Undeclared identifier `phase`;",
+      "startLineNumber": 4,
+      "startColumn": 1,
+      "endLineNumber": 4,
+      "endColumn": 1
+    },
+    {
+      "resource": {
+        "$mid": 1,
+        "fsPath": "/3f6ebaff-430f-49ba-a96b-c38e582d6424.pine",
+        "external": "file:///3f6ebaff-430f-49ba-a96b-c38e582d6424.pine?placement%3Ddialog",
+        "path": "/3f6ebaff-430f-49ba-a96b-c38e582d6424.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "owner",
+      "severity": 8,
+      "message": "Undeclared identifier `bar_index`;",
+      "startLineNumber": 5,
+      "startColumn": 1,
+      "endLineNumber": 5,
+      "endColumn": 1
+    },
+    {
+      "resource": {
+        "$mid": 1,
+        "fsPath": "/3f6ebaff-430f-49ba-a96b-c38e582d6424.pine",
+        "external": "file:///3f6ebaff-430f-49ba-a96b-c38e582d6424.pine?placement%3Ddialog",
+        "path": "/3f6ebaff-430f-49ba-a96b-c38e582d6424.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "owner",
+      "severity": 8,
+      "message": "Undeclared identifier `bar_index`;",
+      "startLineNumber": 6,
+      "startColumn": 1,
+      "endLineNumber": 6,
+      "endColumn": 1
+    },
+    {
+      "resource": {
+        "$mid": 1,
+        "fsPath": "/3f6ebaff-430f-49ba-a96b-c38e582d6424.pine",
+        "external": "file:///3f6ebaff-430f-49ba-a96b-c38e582d6424.pine?placement%3Ddialog",
+        "path": "/3f6ebaff-430f-49ba-a96b-c38e582d6424.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "owner",
+      "severity": 8,
+      "message": "Undeclared identifier `shift`;",
+      "startLineNumber": 7,
+      "startColumn": 1,
+      "endLineNumber": 7,
+      "endColumn": 1
+    },
+    {
+      "resource": {
+        "$mid": 1,
+        "fsPath": "/3f6ebaff-430f-49ba-a96b-c38e582d6424.pine",
+        "external": "file:///3f6ebaff-430f-49ba-a96b-c38e582d6424.pine?placement%3Ddialog",
+        "path": "/3f6ebaff-430f-49ba-a96b-c38e582d6424.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "owner",
+      "severity": 8,
+      "message": "Undeclared identifier `event`;",
+      "startLineNumber": 8,
+      "startColumn": 1,
+      "endLineNumber": 8,
+      "endColumn": 1
+    },
+    {
+      "resource": {
+        "$mid": 1,
+        "fsPath": "/3f6ebaff-430f-49ba-a96b-c38e582d6424.pine",
+        "external": "file:///3f6ebaff-430f-49ba-a96b-c38e582d6424.pine?placement%3Ddialog",
+        "path": "/3f6ebaff-430f-49ba-a96b-c38e582d6424.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "owner",
+      "severity": 8,
+      "message": "Undeclared identifier `bar_index`;",
+      "startLineNumber": 8,
+      "startColumn": 1,
+      "endLineNumber": 8,
+      "endColumn": 1
+    },
+    {
+      "resource": {
+        "$mid": 1,
+        "fsPath": "/3f6ebaff-430f-49ba-a96b-c38e582d6424.pine",
+        "external": "file:///3f6ebaff-430f-49ba-a96b-c38e582d6424.pine?placement%3Ddialog",
+        "path": "/3f6ebaff-430f-49ba-a96b-c38e582d6424.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "owner",
+      "severity": 8,
+      "message": "Undeclared identifier `phase`;",
+      "startLineNumber": 9,
+      "startColumn": 1,
+      "endLineNumber": 9,
+      "endColumn": 1
+    },
+    {
+      "resource": {
+        "$mid": 1,
+        "fsPath": "/3f6ebaff-430f-49ba-a96b-c38e582d6424.pine",
+        "external": "file:///3f6ebaff-430f-49ba-a96b-c38e582d6424.pine?placement%3Ddialog",
+        "path": "/3f6ebaff-430f-49ba-a96b-c38e582d6424.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "owner",
+      "severity": 8,
+      "message": "Undeclared identifier `shift`;",
+      "startLineNumber": 9,
+      "startColumn": 1,
+      "endLineNumber": 9,
+      "endColumn": 1
+    },
+    {
+      "resource": {
+        "$mid": 1,
+        "fsPath": "/3f6ebaff-430f-49ba-a96b-c38e582d6424.pine",
+        "external": "file:///3f6ebaff-430f-49ba-a96b-c38e582d6424.pine?placement%3Ddialog",
+        "path": "/3f6ebaff-430f-49ba-a96b-c38e582d6424.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "owner",
+      "severity": 8,
+      "message": "Undeclared identifier `phase`;",
+      "startLineNumber": 10,
+      "startColumn": 1,
+      "endLineNumber": 10,
+      "endColumn": 1
+    },
+    {
+      "resource": {
+        "$mid": 1,
+        "fsPath": "/3f6ebaff-430f-49ba-a96b-c38e582d6424.pine",
+        "external": "file:///3f6ebaff-430f-49ba-a96b-c38e582d6424.pine?placement%3Ddialog",
+        "path": "/3f6ebaff-430f-49ba-a96b-c38e582d6424.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "owner",
+      "severity": 8,
+      "message": "Undeclared identifier `event`;",
+      "startLineNumber": 11,
+      "startColumn": 1,
+      "endLineNumber": 11,
+      "endColumn": 1
+    },
+    {
+      "resource": {
+        "$mid": 1,
+        "fsPath": "/3f6ebaff-430f-49ba-a96b-c38e582d6424.pine",
+        "external": "file:///3f6ebaff-430f-49ba-a96b-c38e582d6424.pine?placement%3Ddialog",
+        "path": "/3f6ebaff-430f-49ba-a96b-c38e582d6424.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "owner",
+      "severity": 8,
+      "message": "Undeclared identifier `phase`;",
+      "startLineNumber": 11,
+      "startColumn": 1,
+      "endLineNumber": 11,
+      "endColumn": 1
+    },
+    {
+      "resource": {
+        "$mid": 1,
+        "fsPath": "/3f6ebaff-430f-49ba-a96b-c38e582d6424.pine",
+        "external": "file:///3f6ebaff-430f-49ba-a96b-c38e582d6424.pine?placement%3Ddialog",
+        "path": "/3f6ebaff-430f-49ba-a96b-c38e582d6424.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "owner",
+      "severity": 8,
+      "message": "Undeclared identifier `shift`;",
+      "startLineNumber": 11,
+      "startColumn": 1,
+      "endLineNumber": 11,
+      "endColumn": 1
+    },
+    {
+      "resource": {
+        "$mid": 1,
+        "fsPath": "/3f6ebaff-430f-49ba-a96b-c38e582d6424.pine",
+        "external": "file:///3f6ebaff-430f-49ba-a96b-c38e582d6424.pine?placement%3Ddialog",
+        "path": "/3f6ebaff-430f-49ba-a96b-c38e582d6424.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "owner",
+      "severity": 8,
+      "message": "Undeclared identifier `event`;",
+      "startLineNumber": 12,
+      "startColumn": 1,
+      "endLineNumber": 12,
+      "endColumn": 1
+    },
+    {
+      "resource": {
+        "$mid": 1,
+        "fsPath": "/3f6ebaff-430f-49ba-a96b-c38e582d6424.pine",
+        "external": "file:///3f6ebaff-430f-49ba-a96b-c38e582d6424.pine?placement%3Ddialog",
+        "path": "/3f6ebaff-430f-49ba-a96b-c38e582d6424.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "owner",
+      "severity": 8,
+      "message": "Undeclared identifier `phase`;",
+      "startLineNumber": 12,
+      "startColumn": 1,
+      "endLineNumber": 12,
+      "endColumn": 1
+    },
+    {
+      "resource": {
+        "$mid": 1,
+        "fsPath": "/3f6ebaff-430f-49ba-a96b-c38e582d6424.pine",
+        "external": "file:///3f6ebaff-430f-49ba-a96b-c38e582d6424.pine?placement%3Ddialog",
+        "path": "/3f6ebaff-430f-49ba-a96b-c38e582d6424.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "owner",
+      "severity": 8,
+      "message": "Undeclared identifier `event`;",
+      "startLineNumber": 13,
+      "startColumn": 1,
+      "endLineNumber": 13,
+      "endColumn": 1
+    },
+    {
+      "resource": {
+        "$mid": 1,
+        "fsPath": "/3f6ebaff-430f-49ba-a96b-c38e582d6424.pine",
+        "external": "file:///3f6ebaff-430f-49ba-a96b-c38e582d6424.pine?placement%3Ddialog",
+        "path": "/3f6ebaff-430f-49ba-a96b-c38e582d6424.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "owner",
+      "severity": 8,
+      "message": "Undeclared identifier `phase`;",
+      "startLineNumber": 13,
+      "startColumn": 1,
+      "endLineNumber": 13,
+      "endColumn": 1
+    },
+    {
+      "resource": {
+        "$mid": 1,
+        "fsPath": "/3f6ebaff-430f-49ba-a96b-c38e582d6424.pine",
+        "external": "file:///3f6ebaff-430f-49ba-a96b-c38e582d6424.pine?placement%3Ddialog",
+        "path": "/3f6ebaff-430f-49ba-a96b-c38e582d6424.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "owner",
+      "severity": 8,
+      "message": "Undeclared identifier `shift`;",
+      "startLineNumber": 13,
+      "startColumn": 1,
+      "endLineNumber": 13,
+      "endColumn": 1
+    },
+    {
+      "resource": {
+        "$mid": 1,
+        "fsPath": "/3f6ebaff-430f-49ba-a96b-c38e582d6424.pine",
+        "external": "file:///3f6ebaff-430f-49ba-a96b-c38e582d6424.pine?placement%3Ddialog",
+        "path": "/3f6ebaff-430f-49ba-a96b-c38e582d6424.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "owner",
+      "severity": 8,
+      "message": "Undeclared identifier `event`;",
+      "startLineNumber": 14,
+      "startColumn": 1,
+      "endLineNumber": 14,
+      "endColumn": 1
+    },
+    {
+      "resource": {
+        "$mid": 1,
+        "fsPath": "/3f6ebaff-430f-49ba-a96b-c38e582d6424.pine",
+        "external": "file:///3f6ebaff-430f-49ba-a96b-c38e582d6424.pine?placement%3Ddialog",
+        "path": "/3f6ebaff-430f-49ba-a96b-c38e582d6424.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "owner",
+      "severity": 8,
+      "message": "Undeclared identifier `phase`;",
+      "startLineNumber": 14,
+      "startColumn": 1,
+      "endLineNumber": 14,
+      "endColumn": 1
+    },
+    {
+      "resource": {
+        "$mid": 1,
+        "fsPath": "/3f6ebaff-430f-49ba-a96b-c38e582d6424.pine",
+        "external": "file:///3f6ebaff-430f-49ba-a96b-c38e582d6424.pine?placement%3Ddialog",
+        "path": "/3f6ebaff-430f-49ba-a96b-c38e582d6424.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "owner",
+      "severity": 8,
+      "message": "Undeclared identifier `event`;",
+      "startLineNumber": 15,
+      "startColumn": 1,
+      "endLineNumber": 15,
+      "endColumn": 1
+    },
+    {
+      "resource": {
+        "$mid": 1,
+        "fsPath": "/3f6ebaff-430f-49ba-a96b-c38e582d6424.pine",
+        "external": "file:///3f6ebaff-430f-49ba-a96b-c38e582d6424.pine?placement%3Ddialog",
+        "path": "/3f6ebaff-430f-49ba-a96b-c38e582d6424.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "owner",
+      "severity": 8,
+      "message": "Undeclared identifier `phase`;",
+      "startLineNumber": 15,
+      "startColumn": 1,
+      "endLineNumber": 15,
+      "endColumn": 1
+    },
+    {
+      "resource": {
+        "$mid": 1,
+        "fsPath": "/3f6ebaff-430f-49ba-a96b-c38e582d6424.pine",
+        "external": "file:///3f6ebaff-430f-49ba-a96b-c38e582d6424.pine?placement%3Ddialog",
+        "path": "/3f6ebaff-430f-49ba-a96b-c38e582d6424.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "owner",
+      "severity": 8,
+      "message": "Undeclared identifier `shift`;",
+      "startLineNumber": 15,
+      "startColumn": 1,
+      "endLineNumber": 15,
+      "endColumn": 1
+    },
+    {
+      "resource": {
+        "$mid": 1,
+        "fsPath": "/3f6ebaff-430f-49ba-a96b-c38e582d6424.pine",
+        "external": "file:///3f6ebaff-430f-49ba-a96b-c38e582d6424.pine?placement%3Ddialog",
+        "path": "/3f6ebaff-430f-49ba-a96b-c38e582d6424.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "owner",
+      "severity": 8,
+      "message": "Undeclared identifier `event`;",
+      "startLineNumber": 16,
+      "startColumn": 1,
+      "endLineNumber": 16,
+      "endColumn": 1
+    },
+    {
+      "resource": {
+        "$mid": 1,
+        "fsPath": "/3f6ebaff-430f-49ba-a96b-c38e582d6424.pine",
+        "external": "file:///3f6ebaff-430f-49ba-a96b-c38e582d6424.pine?placement%3Ddialog",
+        "path": "/3f6ebaff-430f-49ba-a96b-c38e582d6424.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "owner",
+      "severity": 8,
+      "message": "Undeclared identifier `phase`;",
+      "startLineNumber": 16,
+      "startColumn": 1,
+      "endLineNumber": 16,
+      "endColumn": 1
+    },
+    {
+      "resource": {
+        "$mid": 1,
+        "fsPath": "/3f6ebaff-430f-49ba-a96b-c38e582d6424.pine",
+        "external": "file:///3f6ebaff-430f-49ba-a96b-c38e582d6424.pine?placement%3Ddialog",
+        "path": "/3f6ebaff-430f-49ba-a96b-c38e582d6424.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "owner",
+      "severity": 8,
+      "message": "Undeclared identifier `event`;",
+      "startLineNumber": 17,
+      "startColumn": 1,
+      "endLineNumber": 17,
+      "endColumn": 1
+    },
+    {
+      "resource": {
+        "$mid": 1,
+        "fsPath": "/3f6ebaff-430f-49ba-a96b-c38e582d6424.pine",
+        "external": "file:///3f6ebaff-430f-49ba-a96b-c38e582d6424.pine?placement%3Ddialog",
+        "path": "/3f6ebaff-430f-49ba-a96b-c38e582d6424.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "owner",
+      "severity": 8,
+      "message": "Undeclared identifier `shift`;",
+      "startLineNumber": 17,
+      "startColumn": 1,
+      "endLineNumber": 17,
+      "endColumn": 1
+    },
+    {
+      "resource": {
+        "$mid": 1,
+        "fsPath": "/3f6ebaff-430f-49ba-a96b-c38e582d6424.pine",
+        "external": "file:///3f6ebaff-430f-49ba-a96b-c38e582d6424.pine?placement%3Ddialog",
+        "path": "/3f6ebaff-430f-49ba-a96b-c38e582d6424.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "owner",
+      "severity": 8,
+      "message": "Undeclared identifier `event`;",
+      "startLineNumber": 18,
+      "startColumn": 1,
+      "endLineNumber": 18,
+      "endColumn": 1
+    },
+    {
+      "resource": {
+        "$mid": 1,
+        "fsPath": "/3f6ebaff-430f-49ba-a96b-c38e582d6424.pine",
+        "external": "file:///3f6ebaff-430f-49ba-a96b-c38e582d6424.pine?placement%3Ddialog",
+        "path": "/3f6ebaff-430f-49ba-a96b-c38e582d6424.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "owner",
+      "severity": 8,
+      "message": "Undeclared identifier `shift`",
+      "startLineNumber": 18,
+      "startColumn": 1,
+      "endLineNumber": 18,
+      "endColumn": 1
+    }
+  ],
+  "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,399.42\nH\n85,402.01\nL\n85,382.00\nC\n85,382.00\n−17.43 (−0.02%)\n85,202.11\nSELL\n0.01\n85,202.12\nBUY\nUSDT\nvisual-offsets-grouped-v3-v1.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n16:03:50 UTC\n99+\nPine Editor\nvisual-offsets-grouped-v3-v1.pine\nPublish script\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15\n16\n17\n18\n19\n//@version=3\nstudy(\"V11 visual offsets v3\", overlay=false, precision=6)\nphase = bar_index % 7\nshift = phase < 2 ? -2 : phase < 5 ? 1 : 3\nevent = bar_index % 8 == 0\nplot(bar_index / 1000.0, title=\"SOURCE_INDEX_SCALED\", color=black)\nplot(shift, title=\"SOURCE_SHIFT\", color=black)\nplot(event ? bar_index / 1000.0 : na, title=\"EVENT_INDEX_SCALED\", color=black)\nplot(100 + phase, title=\"DYNAMIC_PLOT\", offset=shift, color=blue)\nplot(100 + phase, title=\"ZERO_PLOT\", color=red)\nplotshape(event ? 200 + phase : na, title=\"DYNAMIC_SHAPE\", style=shape.circle, location=location.absolute, offset=shift, color=blue)\nplotshape(event ? 200 + phase : na, title=\"ZERO_SHAPE\", style=shape.circle, location=location.absolute, color=red)\nplotchar(event ? 300 + phase : na, title=\"DYNAMIC_CHAR\", char=\"X\", location=location.absolute, offset=shift, color=blue)\nplotchar(event ? 300 + phase : na, title=\"ZERO_CHAR\", char=\"X\", location=location.absolute, color=red)\nplotarrow(event ? (phase % 2 == 0 ? 1 : -1) : 0, title=\"DYNAMIC_ARROW\", offset=shift, colorup=blue, colordown=blue, minheight=20, maxheight=20)\nplotarrow(event ? (phase % 2 == 0 ? 1 : -1) : 0, title=\"ZERO_ARROW\", colorup=red, colordown=red, minheight=10, maxheight=10)\nbgcolor(event ? blue : na, title=\"DYNAMIC_BACKGROUND\", offset=shift)\nbarcolor(event ? blue : na, title=\"DYNAMIC_BAR\", offset=shift)\n1 of 30 problems\nUndeclared identifier `bar_index`;\n1 ∙ Today, 00:03\nLine 3, Col 1\nPine Script® v3\nCompilation error\n\nUndeclared identifier `bar_index`;\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+  "context_substituted_message": "Undeclared identifier `bar_index`;"
+}

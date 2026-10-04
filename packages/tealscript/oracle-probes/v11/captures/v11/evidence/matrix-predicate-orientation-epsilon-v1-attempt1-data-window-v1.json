@@ -1,0 +1,35 @@
+{
+  "index": 299,
+  "bar": [
+    1791128880,
+    85342.78,
+    85398.33,
+    85342.61,
+    85342.62,
+    21.76518
+  ],
+  "source_row": [
+    1791128880,
+    1,
+    0,
+    1,
+    1,
+    1,
+    1,
+    1e-12
+  ],
+  "browser_utc": "2026-10-04T15:50:11.550Z",
+  "title": "V11 matrix-predicate-orientation-epsilon-v1",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   15:48",
+  "visible_range": {
+    "_firstBar": 264,
+    "_lastBar": 302
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}

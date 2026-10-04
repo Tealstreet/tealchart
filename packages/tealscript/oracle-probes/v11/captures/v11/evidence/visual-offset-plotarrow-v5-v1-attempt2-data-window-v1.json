@@ -1,0 +1,33 @@
+{
+  "index": 298,
+  "bar": [
+    1791129600,
+    85256.01,
+    85263.91,
+    85256,
+    85256.02,
+    6.06083
+  ],
+  "source_row": [
+    1791129600,
+    24.96,
+    3,
+    24.96,
+    -1,
+    -1
+  ],
+  "browser_utc": "2026-10-04T16:03:24.716Z",
+  "title": "V11 isolated plotarrow offset v5",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   16:00",
+  "visible_range": {
+    "_firstBar": 263,
+    "_lastBar": 301
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}

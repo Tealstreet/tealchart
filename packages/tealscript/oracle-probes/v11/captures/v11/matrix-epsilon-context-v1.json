@@ -1,0 +1,131 @@
+{
+  "artifact": "V11 matrix epsilon context v1",
+  "receipts": [
+    {
+      "attempt": 1,
+      "requested_and_observed_epsilon": 1e-12,
+      "native_input": [
+        {
+          "id": "in_0",
+          "name": "Epsilon",
+          "value": 1e-12,
+          "default": 1e-12
+        }
+      ],
+      "first_raw_values": {
+        "ROW_STOCHASTIC": "1",
+        "COLUMN_STOCHASTIC": "0",
+        "ZERO": "1",
+        "BINARY": "1",
+        "IDENTITY": "1",
+        "SYMMETRIC": "1",
+        "EPSILON": "1e-12"
+      },
+      "csv_file": "captures/v11/matrix-predicate-orientation-epsilon-v1-attempt1.csv",
+      "csv_sha256": "516d01735c5d19c632ddc799f1433796497545af4f28f79608c1fd1c4ecc5631",
+      "cutoff": 1791128880,
+      "pine_index0": "UNKNOWN: source has no index plot"
+    },
+    {
+      "attempt": 2,
+      "requested_and_observed_epsilon": 0,
+      "native_input": [
+        {
+          "id": "in_0",
+          "name": "Epsilon",
+          "value": 0,
+          "default": 1e-12
+        }
+      ],
+      "first_raw_values": {
+        "ROW_STOCHASTIC": "1",
+        "COLUMN_STOCHASTIC": "0",
+        "ZERO": "1",
+        "BINARY": "1",
+        "IDENTITY": "1",
+        "SYMMETRIC": "1",
+        "EPSILON": "0"
+      },
+      "csv_file": "captures/v11/matrix-predicate-orientation-epsilon-v1-attempt2.csv",
+      "csv_sha256": "e8495bc73b78437eddcfa39fb8523df2cc0093216f6081d7dec9e4db1f7d157d",
+      "cutoff": 1791129000,
+      "pine_index0": "UNKNOWN: source has no index plot"
+    },
+    {
+      "attempt": 3,
+      "requested_and_observed_epsilon": 1e-16,
+      "native_input": [
+        {
+          "id": "in_0",
+          "name": "Epsilon",
+          "value": 1e-16,
+          "default": 1e-12
+        }
+      ],
+      "first_raw_values": {
+        "ROW_STOCHASTIC": "1",
+        "COLUMN_STOCHASTIC": "0",
+        "ZERO": "1",
+        "BINARY": "1",
+        "IDENTITY": "1",
+        "SYMMETRIC": "1",
+        "EPSILON": "1e-16"
+      },
+      "csv_file": "captures/v11/matrix-predicate-orientation-epsilon-v1-attempt3.csv",
+      "csv_sha256": "0704b96561408408a154471978257c727974d2f539358760df96b80561b95aac",
+      "cutoff": 1791129120,
+      "pine_index0": "UNKNOWN: source has no index plot"
+    },
+    {
+      "attempt": 4,
+      "requested_and_observed_epsilon": 1e-08,
+      "native_input": [
+        {
+          "id": "in_0",
+          "name": "Epsilon",
+          "value": 1e-08,
+          "default": 1e-12
+        }
+      ],
+      "first_raw_values": {
+        "ROW_STOCHASTIC": "1",
+        "COLUMN_STOCHASTIC": "0",
+        "ZERO": "0",
+        "BINARY": "0",
+        "IDENTITY": "0",
+        "SYMMETRIC": "0",
+        "EPSILON": "1e-8"
+      },
+      "csv_file": "captures/v11/matrix-predicate-orientation-epsilon-v1-attempt4.csv",
+      "csv_sha256": "d0b63965d5e34217889bf2acd42f76e88529a410f40b358eac1d03c2e19fc020",
+      "cutoff": 1791129120,
+      "pine_index0": "UNKNOWN: source has no index plot"
+    },
+    {
+      "attempt": 5,
+      "requested_and_observed_epsilon": 0.0001,
+      "native_input": [
+        {
+          "id": "in_0",
+          "name": "Epsilon",
+          "value": 0.0001,
+          "default": 1e-12
+        }
+      ],
+      "first_raw_values": {
+        "ROW_STOCHASTIC": "1",
+        "COLUMN_STOCHASTIC": "0",
+        "ZERO": "0",
+        "BINARY": "0",
+        "IDENTITY": "0",
+        "SYMMETRIC": "0",
+        "EPSILON": "0.0001"
+      },
+      "csv_file": "captures/v11/matrix-predicate-orientation-epsilon-v1-attempt5.csv",
+      "csv_sha256": "c2e3bf924feaf4503afa5130db4e633a70106f6bc6f7c7a0dc0cef1efc044c8e",
+      "cutoff": 1791129120,
+      "pine_index0": "UNKNOWN: source has no index plot"
+    }
+  ],
+  "limits": "Five selected inputs only; no universal predicate tolerance, sorting algorithm, rounding rule or engine agreement inferred."
+}
