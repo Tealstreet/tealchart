@@ -1,0 +1,10 @@
+//@version=6
+indicator("Collection24 sum fractional probe v1", overlay=false)
+left = matrix.new<int>(1, 1, 1)
+positive = matrix.sum(left, 0.5)
+negative = left.sum(-0.5)
+control = matrix.sum(matrix.new<float>(1, 1, 1.0), 0.5)
+plot(matrix.get(positive, 0, 0), "INT_PLUS_POSITIVE_FLOAT")
+plot(matrix.get(negative, 0, 0), "INT_PLUS_NEGATIVE_FLOAT")
+plot(matrix.get(control, 0, 0), "FLOAT_CONTROL")
+plot(matrix.get(left, 0, 0), "UNCHANGED_INT_SOURCE")

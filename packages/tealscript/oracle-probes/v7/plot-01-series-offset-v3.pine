@@ -1,0 +1,4 @@
+//@version=3
+study("V3-PLOT-SERIES-OFFSET-PINE3")
+o = close > open ? 1 : -1
+plot(close, "OUTCOME", offset=o)

@@ -1,0 +1,4 @@
+//@version=6
+indicator("V7 label count",overlay=true,max_labels_count=2)
+label.new(bar_index,close,str.tostring(bar_index))
+plot(array.size(label.all),"COUNT")

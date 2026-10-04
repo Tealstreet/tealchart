@@ -1,0 +1,8 @@
+//@version=6
+indicator("Collection08 historical slice set")
+values = array.from(bar_index, bar_index + 10, bar_index + 20)
+previous = values[1]
+if bar_index > 0
+    target = previous.slice(0, 2)
+    target.set(0, 99)
+plot(values.get(0), "current_first")

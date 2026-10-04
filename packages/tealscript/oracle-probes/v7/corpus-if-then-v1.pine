@@ -1,0 +1,5 @@
+//@version=5
+indicator("V7 corpus-if-then-v1")
+if close > open then
+    x = 1
+plot(close)

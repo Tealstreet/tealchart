@@ -1,0 +1,9 @@
+//@version=6
+indicator("V7 ta-cmo-leading-interior-holes-v6-v1")
+phase = bar_index % 16
+clean = 10.0 + phase
+s = phase < 3 or phase == 8 or phase == 9 ? na : clean
+plot(s, "SOURCE")
+plot(clean, "CLEAN")
+plot(ta.cmo(s, 4), "TARGET")
+plot(ta.cmo(clean, 4), "CONTROL")

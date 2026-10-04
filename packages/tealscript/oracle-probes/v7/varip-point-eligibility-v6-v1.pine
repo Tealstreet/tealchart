@@ -1,0 +1,4 @@
+//@version=6
+indicator("V7 varip-point-eligibility-v6-v1")
+varip chart.point x = chart.point.now(close)
+plot(x.price,"PRICE")

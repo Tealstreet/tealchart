@@ -1,0 +1,8 @@
+//@version=6
+indicator("V7 table-cell-height-negative-v6-v1")
+var t = table.new(position.top_right,1,1)
+if barstate.isfirst
+    table.cell(t,0,0,"WIDE TEXT")
+x = bar_index % 8 == 3 ? -1.0 : 0.0
+table.cell_set_height(t,0,0,x)
+plot(x,"DIMENSION")

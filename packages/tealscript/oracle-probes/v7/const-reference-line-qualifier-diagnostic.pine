@@ -1,0 +1,4 @@
+//@version=6
+indicator("V3-CONST-REF-LINE-QUALIFIER-DIAGNOSTIC")
+const line value = line.new(bar_index, close, bar_index + 1, close)
+plot(value, "OUTCOME")

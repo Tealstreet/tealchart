@@ -1,0 +1,7 @@
+//@version=6
+indicator("V7 global-function-value-same-name-v6-v1")
+f() =>
+    1
+f = 2
+plot(f(),"CALL")
+plot(f,"VALUE")

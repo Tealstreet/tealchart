@@ -1,0 +1,4 @@
+//@version=5
+indicator("corpus-v5-color-get-literal-na-receiver-v1")
+colors = array.from(color.red, color.green, color.blue)
+plot(na(colors.get(na)) ? 1 : 0, "OUTCOME")

@@ -1,0 +1,8 @@
+//@version=6
+indicator("V7 chart-context-lifecycle-v6-v1")
+var int count = 0
+count += 1
+plot(count,"EXEC_COUNT")
+plot(timenow,"WALL_CLOCK")
+plot(chart.left_visible_bar_time,"LEFT_VISIBLE")
+plot(chart.right_visible_bar_time,"RIGHT_VISIBLE")

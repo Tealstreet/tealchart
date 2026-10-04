@@ -1,0 +1,7 @@
+//@version=5
+indicator("V7 const-dead-switch-length-v5-v1")
+int length = 4
+switch "selected"
+    "dead" => length := bar_index
+    "selected" => length := 4
+plot(ta.ema(close,length),"TARGET")

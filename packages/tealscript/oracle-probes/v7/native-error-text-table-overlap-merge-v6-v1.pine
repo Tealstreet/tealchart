@@ -1,0 +1,7 @@
+//@version=6
+indicator("V7 native-error-text-table-overlap-merge-v6-v1")
+var t = table.new(position.top_right,2,2)
+if barstate.isfirst
+    table.merge_cells(t,0,0,1,1)
+    table.merge_cells(t,0,0,1,1)
+plot(close)

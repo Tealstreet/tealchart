@@ -1,0 +1,5 @@
+//@version=6
+indicator("V7 polyline count",overlay=true,max_polylines_count=2)
+points = array.from(chart.point.from_index(bar_index,close),chart.point.from_index(bar_index+1,close+1))
+polyline.new(points)
+plot(array.size(polyline.all),"COUNT")

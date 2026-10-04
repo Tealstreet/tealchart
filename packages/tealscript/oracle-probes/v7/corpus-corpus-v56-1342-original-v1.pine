@@ -1,0 +1,3 @@
+// @version=5
+indicator("V7 malformed directive error_log_level")
+plot(error_log_level,"TARGET")

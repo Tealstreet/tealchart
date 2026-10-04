@@ -1,0 +1,4 @@
+//@version=3
+study("V7 plot-series-offset-v3-v1")
+o = close > open ? 1 : -1
+plot(close + 100, title="TARGET", offset=o)

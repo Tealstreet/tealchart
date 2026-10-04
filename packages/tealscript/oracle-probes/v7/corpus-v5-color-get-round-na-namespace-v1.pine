@@ -1,0 +1,4 @@
+//@version=5
+indicator("corpus-v5-color-get-round-na-namespace-v1")
+colors = array.from(color.red, color.green, color.blue)
+plot(na(array.get(colors, math.round(na))) ? 1 : 0, "OUTCOME")

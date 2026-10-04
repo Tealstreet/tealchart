@@ -1,0 +1,8 @@
+//@version=6
+indicator("V7 label-arrow-outline-metrics-v6-v1")
+if barstate.islastconfirmedhistory
+    label.new(bar_index-8,1,"UP",style=label.style_arrowup)
+    label.new(bar_index-6,1,"DOWN",style=label.style_arrowdown)
+    label.new(bar_index-4,1,"TRI",style=label.style_triangleup)
+    label.new(bar_index-2,1,"Outline Wim",style=label.style_text_outline,textcolor=color.red)
+plot(1,"SCALE")

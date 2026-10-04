@@ -1,0 +1,6 @@
+//@version=6
+indicator("V7 array-percentrank-index-missing-v6-v1")
+a = array.from(1.0,2.0,4.0)
+x = bar_index % 8 == 3 ? int(na) : 1
+plot(x,"INDEX")
+plot(array.percentrank(a,x),"TARGET")

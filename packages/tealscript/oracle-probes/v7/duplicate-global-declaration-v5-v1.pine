@@ -1,0 +1,5 @@
+//@version=5
+indicator("V7 duplicate-global-declaration-v5-v1")
+x = 1
+x = 2
+plot(x,"TARGET")

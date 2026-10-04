@@ -1,0 +1,5 @@
+//@version=6
+indicator("V7 history-buffer-late-jump-v6-v1")
+o = bar_index < 300 ? 1 : 299
+plot(close[o], "TARGET")
+plot(o, "OFFSET")

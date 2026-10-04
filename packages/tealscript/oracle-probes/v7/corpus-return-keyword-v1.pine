@@ -1,0 +1,5 @@
+//@version=5
+indicator("V7 corpus-return-keyword-v1")
+f() =>
+    return close
+plot(f())

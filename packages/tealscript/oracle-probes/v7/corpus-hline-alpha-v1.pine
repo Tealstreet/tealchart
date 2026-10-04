@@ -1,0 +1,3 @@
+//@version=6
+indicator("V7 corpus-hline-alpha-v1")
+hline(1,alpha=50)

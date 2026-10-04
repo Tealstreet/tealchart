@@ -1,0 +1,4 @@
+//@version=5
+indicator("V7 corpus-array-map-unparameterized-v1")
+x = array.new<map>()
+plot(array.size(x))

@@ -1,0 +1,8 @@
+//@version=6
+indicator("V7 map-float-key-missing-v6-v1")
+var m = map.new<float,int>()
+x = float(na)
+map.put(m,x,7)
+plot(x,"KEY")
+plot(map.size(m),"SIZE")
+plot(map.get(m,x),"VALUE")

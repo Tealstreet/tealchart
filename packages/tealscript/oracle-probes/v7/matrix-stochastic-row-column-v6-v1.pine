@@ -1,0 +1,10 @@
+//@version=6
+indicator("V7 matrix-stochastic-row-column-v6-v1")
+a = matrix.new<float>(2,2,0)
+matrix.set(a,0,0,0.2)
+matrix.set(a,0,1,0.8)
+matrix.set(a,1,0,0.4)
+matrix.set(a,1,1,0.6)
+b = matrix.transpose(a)
+plot(matrix.is_stochastic(a) ? 1 : 0,"ROW_ONLY")
+plot(matrix.is_stochastic(b) ? 1 : 0,"COLUMN_ONLY")

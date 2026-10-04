@@ -1,0 +1,10 @@
+//@version=6
+indicator("V7 nonstandard-history-ticks-v6-v1")
+varip int updates = 0
+if barstate.isnew
+    updates := 0
+updates += 1
+plot(updates,"UPDATES")
+plot(close,"CURRENT")
+plot(close[1],"PREVIOUS")
+plot(barstate.isconfirmed ? 1 : 0,"CONFIRMED")

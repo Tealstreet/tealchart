@@ -1,0 +1,3 @@
+//@version=3
+study("V7 plotshape-zero-offset-v3-control-v1")
+plotshape(close > open,title="CONTROL",offset=0)

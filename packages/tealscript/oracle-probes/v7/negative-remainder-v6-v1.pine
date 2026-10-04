@@ -1,0 +1,10 @@
+//@version=6
+indicator("V7 negative-remainder-v6-v1")
+a = -5
+b = 3
+c = a
+c %= b
+plot(a % b,"NEGATIVE_DIVIDEND")
+plot(5 % -3,"NEGATIVE_DIVISOR")
+plot(-5 % -3,"BOTH_NEGATIVE")
+plot(c,"COMPOUND")

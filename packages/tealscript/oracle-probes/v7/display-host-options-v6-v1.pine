@@ -1,0 +1,4 @@
+//@version=6
+indicator("V7 display-host-options-v6-v1")
+plot(close,"ALL",display=display.all)
+plot(close+1,"STATUS_ONLY",display=display.status_line)

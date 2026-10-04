@@ -1,0 +1,6 @@
+//@version=6
+indicator("V7 varip-enum-eligibility-v6-v1")
+enum Direction
+    up
+varip Direction x = Direction.up
+plot(x == Direction.up ? 1 : 0,"VALUE")

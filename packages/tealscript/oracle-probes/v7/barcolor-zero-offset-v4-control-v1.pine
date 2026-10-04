@@ -1,0 +1,4 @@
+//@version=4
+study("V7 barcolor-zero-offset-v4-control-v1")
+o = close > open ? 1 : -1
+barcolor(color.red, offset=0)

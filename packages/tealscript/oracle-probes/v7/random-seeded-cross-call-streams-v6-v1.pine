@@ -1,0 +1,6 @@
+//@version=6
+indicator("V7 random-seeded-cross-call-streams-v6-v1")
+plot(math.random(0.0,1.0,7),"SEED7_A")
+plot(math.random(0.0,1.0,7),"SEED7_B")
+plot(math.random(0.0,1.0,8),"SEED8")
+plot(math.random(0.0,1.0),"UNSEEDED")

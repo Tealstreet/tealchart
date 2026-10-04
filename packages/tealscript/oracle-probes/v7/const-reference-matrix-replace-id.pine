@@ -1,0 +1,5 @@
+//@version=6
+indicator("V3-CONST-REF-MATRIX-REPLACE-ID")
+const matrix<float> value = matrix.new<float>(1, 1, close)
+value := matrix.new<float>(1, 1, close)
+plot(matrix.get(value, 0, 0), "OUTCOME")

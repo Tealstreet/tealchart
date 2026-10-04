@@ -1,0 +1,9 @@
+//@version=6
+indicator("V7 binary-search-bounded-duplicate-controls-v6-v1")
+a = array.from(1,2,2,2,5)
+b = array.from(1.0,2.0,2.0,2.0,5.0)
+plot(array.binary_search(a,2),"INT_NAMESPACE")
+plot(a.binary_search(2),"INT_METHOD")
+plot(array.binary_search(b,2.0),"FLOAT_NAMESPACE")
+plot(b.binary_search(2.0),"FLOAT_METHOD")
+plot(array.binary_search(a,3),"MISSING")
