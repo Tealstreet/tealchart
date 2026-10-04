@@ -1,0 +1,34 @@
+{
+  "index": 298,
+  "bar": [
+    1791116160,
+    85236.42,
+    85236.43,
+    85175.99,
+    85206.02,
+    19.94799
+  ],
+  "source_row": [
+    1791116160,
+    85300.7147762895,
+    15.5,
+    85300.7147762895,
+    85300.35743609199,
+    85206.02,
+    24848
+  ],
+  "browser_utc": "2026-10-04T12:19:03.590Z",
+  "title": "Input float EMA half length v1",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   12:16",
+  "visible_range": {
+    "_firstBar": 263,
+    "_lastBar": 301
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}

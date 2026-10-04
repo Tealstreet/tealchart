@@ -18877,5 +18877,3294 @@
       "Plot": "2"
     },
     "data_window_witness": "captures/v8/evidence/authority-framework-reference-na-factorization-v5-v1-attempt2-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T12:08:16.889Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v8 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "corpus-input-float-sma-dminutes-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "5719a03e43f47fc4200fbdf495f8bf3b338cd05665b4e392cab0bb0260f90007",
+    "indicator_title": "Input float SMA dminutes v1",
+    "status": "RUNS",
+    "csv_file": "captures/v8/corpus-input-float-sma-dminutes-v6-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T200815.638.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [
+        {
+          "id": "in_0",
+          "name": "Open: Hours a Day",
+          "value": 6.5,
+          "default": 6.5
+        }
+      ],
+      "observed_indicator_title": "Input float SMA dminutes v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24545,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24845,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T12:08:01.721Z",
+    "live_candle_open_utc": "2026-10-04T12:08:00.000Z",
+    "export_utc": "2026-10-04T12:08:16.039Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v8/evidence/corpus-input-float-sma-dminutes-v6-v1-attempt1-setup.png",
+      "captures/v8/evidence/corpus-input-float-sma-dminutes-v6-v1-attempt1-export.png",
+      "captures/v8/evidence/corpus-input-float-sma-dminutes-v6-v1-attempt1-logs.txt",
+      "captures/v8/evidence/corpus-input-float-sma-dminutes-v6-v1-attempt1-logs-v1.json",
+      "captures/v8/evidence/corpus-input-float-sma-dminutes-v6-v1-attempt1-logs.png",
+      "captures/v8/evidence/corpus-input-float-sma-dminutes-v6-v1-attempt1-inputs.png",
+      "captures/v8/evidence/corpus-input-float-sma-dminutes-v6-v1-attempt1-visual.png",
+      "captures/v8/evidence/corpus-input-float-sma-dminutes-v6-v1-attempt1-data-window-v1.png",
+      "captures/v8/evidence/corpus-input-float-sma-dminutes-v6-v1-attempt1-data-window-v1.json",
+      "captures/v8/evidence/corpus-input-float-sma-dminutes-v6-v1-attempt1-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T12:08:02.577Z",
+        "bars": 300,
+        "end": false,
+        "first": {
+          "index": 0,
+          "value": [
+            1791079800,
+            84819.49,
+            84834.01,
+            84805.29,
+            84834,
+            11.45793
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791115680,
+            85370.38,
+            85370.38,
+            85370.38,
+            85370.38,
+            0
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Input float SMA dminutes v1",
+            "status": {
+              "type": 1,
+              "startTime": 1791115681763
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T12:08:03.329Z",
+        "bars": 300,
+        "end": false,
+        "first": {
+          "index": 0,
+          "value": [
+            1791079800,
+            84819.49,
+            84834.01,
+            84805.29,
+            84834,
+            11.45793
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791115680,
+            85370.38,
+            85370.38,
+            85370.38,
+            85370.38,
+            0
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Input float SMA dminutes v1",
+            "status": {
+              "type": 1,
+              "startTime": 1791115681763
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T12:08:04.011Z",
+        "bars": 300,
+        "end": false,
+        "first": {
+          "index": 0,
+          "value": [
+            1791079800,
+            84819.49,
+            84834.01,
+            84805.29,
+            84834,
+            11.45793
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791115680,
+            85370.38,
+            85370.38,
+            85370.38,
+            85370.38,
+            0
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Input float SMA dminutes v1",
+            "status": {
+              "type": 1,
+              "startTime": 1791115681763
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T12:08:04.759Z",
+        "bars": 300,
+        "end": false,
+        "first": {
+          "index": 0,
+          "value": [
+            1791079800,
+            84819.49,
+            84834.01,
+            84805.29,
+            84834,
+            11.45793
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791115680,
+            85370.38,
+            85370.38,
+            85370.38,
+            85370.38,
+            0
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Input float SMA dminutes v1",
+            "status": {
+              "type": 1,
+              "startTime": 1791115681763
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T12:08:05.473Z",
+        "bars": 300,
+        "end": false,
+        "first": {
+          "index": 0,
+          "value": [
+            1791079800,
+            84819.49,
+            84834.01,
+            84805.29,
+            84834,
+            11.45793
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791115680,
+            85370.38,
+            85370.38,
+            85370.38,
+            85370.38,
+            0
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Input float SMA dminutes v1",
+            "status": {
+              "type": 1,
+              "startTime": 1791115681763
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T12:08:06.193Z",
+        "bars": 2500,
+        "end": false,
+        "first": {
+          "index": -2200,
+          "value": [
+            1790815800,
+            83537.84,
+            83541.88,
+            83487.63,
+            83521.41,
+            13.58983
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791115680,
+            85370.38,
+            85370.38,
+            85370.37,
+            85370.37,
+            0.00752
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Input float SMA dminutes v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2500,
+            "first": {
+              "index": -2200,
+              "value": [
+                1790815800,
+                83665.32782564146,
+                975,
+                83665.32782564146,
+                83665.32782564146,
+                83521.41,
+                22345
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791115680,
+                84835.08915897505,
+                975,
+                84835.08915897505,
+                84835.08915897505,
+                85370.37,
+                24844
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T12:08:06.953Z",
+        "bars": 2500,
+        "end": false,
+        "first": {
+          "index": -2200,
+          "value": [
+            1790815800,
+            83537.84,
+            83541.88,
+            83487.63,
+            83521.41,
+            13.58983
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791115680,
+            85370.38,
+            85370.38,
+            85370.37,
+            85370.37,
+            0.05311
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Input float SMA dminutes v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2500,
+            "first": {
+              "index": -2200,
+              "value": [
+                1790815800,
+                83665.32782564146,
+                975,
+                83665.32782564146,
+                83665.32782564146,
+                83521.41,
+                22345
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791115680,
+                84835.08915897505,
+                975,
+                84835.08915897505,
+                84835.08915897505,
+                85370.37,
+                24844
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T12:08:07.661Z",
+        "bars": 2500,
+        "end": false,
+        "first": {
+          "index": -2200,
+          "value": [
+            1790815800,
+            83537.84,
+            83541.88,
+            83487.63,
+            83521.41,
+            13.58983
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791115680,
+            85370.38,
+            85370.38,
+            85370.37,
+            85370.37,
+            0.054
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Input float SMA dminutes v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2500,
+            "first": {
+              "index": -2200,
+              "value": [
+                1790815800,
+                83665.32782564146,
+                975,
+                83665.32782564146,
+                83665.32782564146,
+                83521.41,
+                22345
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791115680,
+                84835.08915897505,
+                975,
+                84835.08915897505,
+                84835.08915897505,
+                85370.37,
+                24844
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T12:08:08.465Z",
+        "bars": 2500,
+        "end": false,
+        "first": {
+          "index": -2200,
+          "value": [
+            1790815800,
+            83537.84,
+            83541.88,
+            83487.63,
+            83521.41,
+            13.58983
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791115680,
+            85370.38,
+            85370.38,
+            85370.37,
+            85370.37,
+            0.054
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Input float SMA dminutes v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2500,
+            "first": {
+              "index": -2200,
+              "value": [
+                1790815800,
+                83665.32782564146,
+                975,
+                83665.32782564146,
+                83665.32782564146,
+                83521.41,
+                22345
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791115680,
+                84835.08915897505,
+                975,
+                84835.08915897505,
+                84835.08915897505,
+                85370.37,
+                24844
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T12:08:09.551Z",
+        "bars": 24845,
+        "end": true,
+        "first": {
+          "index": -24545,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791115680,
+            85370.38,
+            85370.38,
+            85370.37,
+            85370.37,
+            0.054
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Input float SMA dminutes v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24845,
+            "first": {
+              "index": -24545,
+              "value": [
+                1788134400,
+                null,
+                975,
+                null,
+                null,
+                77674.04,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791115680,
+                84835.08915897505,
+                975,
+                84835.08915897505,
+                84835.08915897505,
+                85370.37,
+                24844
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   12:08",
+    "historical_compare_before_unix_seconds": 1791115680,
+    "pine_logs": {
+      "paths": [
+        "evidence/corpus-input-float-sma-dminutes-v6-v1-attempt1-logs.txt",
+        "evidence/corpus-input-float-sma-dminutes-v6-v1-attempt1-logs-v1.json",
+        "evidence/corpus-input-float-sma-dminutes-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "c2955b692a38e905f564e542c48c7b2a07c3a051cadb580baa1662f45931a07b",
+    "csv_bytes": 2825315,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "OUTCOME",
+      "INPUT_LENGTH",
+      "FLOOR_CONTROL",
+      "CEIL_CONTROL",
+      "INPUT_CLOSE",
+      "BAR_INDEX"
+    ],
+    "declared_to_native_header_mapping": {
+      "OUTCOME": "OUTCOME",
+      "INPUT_LENGTH": "INPUT_LENGTH",
+      "FLOOR_CONTROL": "FLOOR_CONTROL",
+      "CEIL_CONTROL": "CEIL_CONTROL",
+      "INPUT_CLOSE": "INPUT_CLOSE",
+      "BAR_INDEX": "BAR_INDEX"
+    },
+    "csv_rows": 24845,
+    "historical_rows": 24844,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791115680,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791115680",
+    "first_historical_values": {
+      "OUTCOME": "",
+      "INPUT_LENGTH": "975",
+      "FLOOR_CONTROL": "",
+      "CEIL_CONTROL": "",
+      "INPUT_CLOSE": "77674.04",
+      "BAR_INDEX": "0"
+    },
+    "last_historical_values": {
+      "OUTCOME": "84834.32547692378",
+      "INPUT_LENGTH": "975",
+      "FLOOR_CONTROL": "84834.32547692378",
+      "CEIL_CONTROL": "84834.32547692378",
+      "INPUT_CLOSE": "85370.37",
+      "BAR_INDEX": "24843"
+    },
+    "data_window_witness": "captures/v8/evidence/corpus-input-float-sma-dminutes-v6-v1-attempt1-data-window-v1.json",
+    "pine_index_plot_observation": {
+      "column": "BAR_INDEX",
+      "first_raw": "0",
+      "observed_start_is_zero": true,
+      "basis": "Literal exported plot, independent of native chart indices"
+    }
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T12:08:55.872Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v8 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "corpus-input-float-sma-dminutes-v6-v1.pine",
+    "attempt": 2,
+    "source_sha256": "5719a03e43f47fc4200fbdf495f8bf3b338cd05665b4e392cab0bb0260f90007",
+    "indicator_title": "Input float SMA dminutes v1",
+    "status": "RUNS",
+    "csv_file": "captures/v8/corpus-input-float-sma-dminutes-v6-v1-attempt2.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T200854.936.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [
+        {
+          "id": "in_0",
+          "name": "Open: Hours a Day",
+          "value": 6.5,
+          "default": 6.5
+        }
+      ],
+      "observed_indicator_title": "Input float SMA dminutes v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24545,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24845,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T12:08:46.337Z",
+    "live_candle_open_utc": "2026-10-04T12:08:00.000Z",
+    "export_utc": "2026-10-04T12:08:55.460Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v8/evidence/corpus-input-float-sma-dminutes-v6-v1-attempt2-setup.png",
+      "captures/v8/evidence/corpus-input-float-sma-dminutes-v6-v1-attempt2-export.png",
+      "captures/v8/evidence/corpus-input-float-sma-dminutes-v6-v1-attempt2-logs.txt",
+      "captures/v8/evidence/corpus-input-float-sma-dminutes-v6-v1-attempt2-logs-v1.json",
+      "captures/v8/evidence/corpus-input-float-sma-dminutes-v6-v1-attempt2-logs.png",
+      "captures/v8/evidence/corpus-input-float-sma-dminutes-v6-v1-attempt2-inputs.png",
+      "captures/v8/evidence/corpus-input-float-sma-dminutes-v6-v1-attempt2-visual.png",
+      "captures/v8/evidence/corpus-input-float-sma-dminutes-v6-v1-attempt2-data-window-v1.png",
+      "captures/v8/evidence/corpus-input-float-sma-dminutes-v6-v1-attempt2-data-window-v1.json",
+      "captures/v8/evidence/corpus-input-float-sma-dminutes-v6-v1-attempt2-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": "2026-10-04T12:08:29.475Z",
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T12:08:47.168Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790810520,
+            83756.01,
+            83766.01,
+            83743.14,
+            83766,
+            4.89313
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791115680,
+            85370.38,
+            85370.38,
+            85370.37,
+            85370.38,
+            0.68867
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Input float SMA dminutes v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790810520,
+                83651.32829743632,
+                975,
+                83651.32829743632,
+                83651.32829743632,
+                83766,
+                22301
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791115680,
+                84835.08916923148,
+                975,
+                84835.08916923148,
+                84835.08916923148,
+                85370.38,
+                24844
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T12:08:48.306Z",
+        "bars": 24845,
+        "end": true,
+        "first": {
+          "index": -24545,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791115680,
+            85370.38,
+            85370.38,
+            85370.37,
+            85370.38,
+            0.69169
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Input float SMA dminutes v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24845,
+            "first": {
+              "index": -24545,
+              "value": [
+                1788134400,
+                null,
+                975,
+                null,
+                null,
+                77674.04,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791115680,
+                84835.08916923148,
+                975,
+                84835.08916923148,
+                84835.08916923148,
+                85370.38,
+                24844
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   12:08",
+    "historical_compare_before_unix_seconds": 1791115680,
+    "pine_logs": {
+      "paths": [
+        "evidence/corpus-input-float-sma-dminutes-v6-v1-attempt2-logs.txt",
+        "evidence/corpus-input-float-sma-dminutes-v6-v1-attempt2-logs-v1.json",
+        "evidence/corpus-input-float-sma-dminutes-v6-v1-attempt2-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "a8070a9dfb47f60be706a6eda7773de03b56461d5b17fbe6beeece2dd9f307ee",
+    "csv_bytes": 2825315,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "OUTCOME",
+      "INPUT_LENGTH",
+      "FLOOR_CONTROL",
+      "CEIL_CONTROL",
+      "INPUT_CLOSE",
+      "BAR_INDEX"
+    ],
+    "declared_to_native_header_mapping": {
+      "OUTCOME": "OUTCOME",
+      "INPUT_LENGTH": "INPUT_LENGTH",
+      "FLOOR_CONTROL": "FLOOR_CONTROL",
+      "CEIL_CONTROL": "CEIL_CONTROL",
+      "INPUT_CLOSE": "INPUT_CLOSE",
+      "BAR_INDEX": "BAR_INDEX"
+    },
+    "csv_rows": 24845,
+    "historical_rows": 24844,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791115680,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791115680",
+    "first_historical_values": {
+      "OUTCOME": "",
+      "INPUT_LENGTH": "975",
+      "FLOOR_CONTROL": "",
+      "CEIL_CONTROL": "",
+      "INPUT_CLOSE": "77674.04",
+      "BAR_INDEX": "0"
+    },
+    "last_historical_values": {
+      "OUTCOME": "84834.32547692378",
+      "INPUT_LENGTH": "975",
+      "FLOOR_CONTROL": "84834.32547692378",
+      "CEIL_CONTROL": "84834.32547692378",
+      "INPUT_CLOSE": "85370.37",
+      "BAR_INDEX": "24843"
+    },
+    "data_window_witness": "captures/v8/evidence/corpus-input-float-sma-dminutes-v6-v1-attempt2-data-window-v1.json",
+    "pine_index_plot_observation": {
+      "column": "BAR_INDEX",
+      "first_raw": "0",
+      "observed_start_is_zero": true,
+      "basis": "Literal exported plot, independent of native chart indices"
+    }
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T12:14:53.257Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v8 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "corpus-input-float-sma-dminutes-v6-v1.pine",
+    "attempt": 3,
+    "source_sha256": "5719a03e43f47fc4200fbdf495f8bf3b338cd05665b4e392cab0bb0260f90007",
+    "indicator_title": "Input float SMA dminutes v1",
+    "status": "RUNS",
+    "csv_file": "captures/v8/corpus-input-float-sma-dminutes-v6-v1-attempt3.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T201452.350.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": false,
+      "native_user_inputs": [
+        {
+          "id": "in_0",
+          "name": "Open: Hours a Day",
+          "value": 1,
+          "default": 6.5
+        }
+      ],
+      "observed_indicator_title": "Input float SMA dminutes v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24548,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24848,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T12:14:42.273Z",
+    "live_candle_open_utc": "2026-10-04T12:14:00.000Z",
+    "export_utc": "2026-10-04T12:14:52.623Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v8/evidence/corpus-input-float-sma-dminutes-v6-v1-attempt3-setup.png",
+      "captures/v8/evidence/corpus-input-float-sma-dminutes-v6-v1-attempt3-export.png",
+      "captures/v8/evidence/corpus-input-float-sma-dminutes-v6-v1-attempt3-logs.txt",
+      "captures/v8/evidence/corpus-input-float-sma-dminutes-v6-v1-attempt3-logs-v1.json",
+      "captures/v8/evidence/corpus-input-float-sma-dminutes-v6-v1-attempt3-logs.png",
+      "captures/v8/evidence/corpus-input-float-sma-dminutes-v6-v1-attempt3-inputs.png",
+      "captures/v8/evidence/corpus-input-float-sma-dminutes-v6-v1-attempt3-visual.png",
+      "captures/v8/evidence/corpus-input-float-sma-dminutes-v6-v1-attempt3-data-window-v1.png",
+      "captures/v8/evidence/corpus-input-float-sma-dminutes-v6-v1-attempt3-data-window-v1.json",
+      "captures/v8/evidence/corpus-input-float-sma-dminutes-v6-v1-attempt3-data-window-v1.txt"
+    ],
+    "notes": "Exact frozen source unchanged. UI fill requested 6.51, but native setup and exported INPUT_LENGTH show Open: Hours a Day = 1. This UI-mismatch attempt is retained and does not fulfill the requested 6.51 parameter capture.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T12:14:43.179Z",
+        "bars": 1942,
+        "end": false,
+        "first": {
+          "index": -1642,
+          "value": [
+            1790883120,
+            84724.01,
+            84766,
+            84718.86,
+            84746.78,
+            12.04171
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791116040,
+            85288.01,
+            85288.01,
+            85254,
+            85254.4,
+            4.3157
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Input float SMA dminutes v1",
+            "status": {
+              "type": 2
+            },
+            "size": 1942,
+            "first": {
+              "index": -1642,
+              "value": [
+                1790883120,
+                84485.72773333403,
+                150,
+                84485.72773333403,
+                84485.72773333403,
+                84746.78,
+                22906
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791116040,
+                85200.52600000087,
+                150,
+                85200.52600000087,
+                85200.52600000087,
+                85254.4,
+                24847
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T12:14:44.470Z",
+        "bars": 1942,
+        "end": false,
+        "first": {
+          "index": -1642,
+          "value": [
+            1790883120,
+            84724.01,
+            84766,
+            84718.86,
+            84746.78,
+            12.04171
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791116040,
+            85288.01,
+            85288.01,
+            85247.21,
+            85247.21,
+            4.79667
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Input float SMA dminutes v1",
+            "status": {
+              "type": 1,
+              "startTime": 1791116083866
+            },
+            "size": 1942,
+            "first": {
+              "index": -1642,
+              "value": [
+                1790883120,
+                84485.72773333403,
+                150,
+                84485.72773333403,
+                84485.72773333403,
+                84746.78,
+                22906
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791116040,
+                85200.47806666754,
+                150,
+                85200.47806666754,
+                85200.47806666754,
+                85247.21,
+                24847
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T12:14:45.208Z",
+        "bars": 24848,
+        "end": true,
+        "first": {
+          "index": -24548,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791116040,
+            85288.01,
+            85288.01,
+            85240,
+            85240.01,
+            5.61904
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Input float SMA dminutes v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24848,
+            "first": {
+              "index": -24548,
+              "value": [
+                1788134400,
+                null,
+                150,
+                null,
+                null,
+                77674.04,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791116040,
+                85200.43006666754,
+                150,
+                85200.43006666754,
+                85200.43006666754,
+                85240.01,
+                24847
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   12:14",
+    "historical_compare_before_unix_seconds": 1791116040,
+    "pine_logs": {
+      "paths": [
+        "evidence/corpus-input-float-sma-dminutes-v6-v1-attempt3-logs.txt",
+        "evidence/corpus-input-float-sma-dminutes-v6-v1-attempt3-logs-v1.json",
+        "evidence/corpus-input-float-sma-dminutes-v6-v1-attempt3-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "2509698a0bed24106319364df3f1c311e340867260279fede1f48f9e8e690cd3",
+    "csv_bytes": 2868590,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "OUTCOME",
+      "INPUT_LENGTH",
+      "FLOOR_CONTROL",
+      "CEIL_CONTROL",
+      "INPUT_CLOSE",
+      "BAR_INDEX"
+    ],
+    "declared_to_native_header_mapping": {
+      "OUTCOME": "OUTCOME",
+      "INPUT_LENGTH": "INPUT_LENGTH",
+      "FLOOR_CONTROL": "FLOOR_CONTROL",
+      "CEIL_CONTROL": "CEIL_CONTROL",
+      "INPUT_CLOSE": "INPUT_CLOSE",
+      "BAR_INDEX": "BAR_INDEX"
+    },
+    "csv_rows": 24848,
+    "historical_rows": 24847,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791116040,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791116040",
+    "first_historical_values": {
+      "OUTCOME": "",
+      "INPUT_LENGTH": "150",
+      "FLOOR_CONTROL": "",
+      "CEIL_CONTROL": "",
+      "INPUT_CLOSE": "77674.04",
+      "BAR_INDEX": "0"
+    },
+    "last_historical_values": {
+      "OUTCOME": "85198.64333333421",
+      "INPUT_LENGTH": "150",
+      "FLOOR_CONTROL": "85198.64333333421",
+      "CEIL_CONTROL": "85198.64333333421",
+      "INPUT_CLOSE": "85288",
+      "BAR_INDEX": "24846"
+    },
+    "data_window_witness": "captures/v8/evidence/corpus-input-float-sma-dminutes-v6-v1-attempt3-data-window-v1.json",
+    "capture_context": "UI mismatch: Open: Hours a Day = 1",
+    "pine_index_plot_observation": {
+      "column": "BAR_INDEX",
+      "first_raw": "0",
+      "observed_start_is_zero": true,
+      "basis": "Literal exported plot, independent of native chart indices"
+    }
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T12:15:43.429Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v8 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "corpus-input-float-ema-half-length-v5-v1.pine",
+    "attempt": 1,
+    "source_sha256": "21aa41a9c9c8eebab7a37d4b0a0cc9cd5e7d5c28e5246ca9d69829fc38286ab1",
+    "indicator_title": "Input float EMA half length v1",
+    "status": "RUNS",
+    "csv_file": "captures/v8/corpus-input-float-ema-half-length-v5-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T201542.323.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [
+        {
+          "id": "in_0",
+          "name": "Length",
+          "value": 30,
+          "default": 30
+        }
+      ],
+      "observed_indicator_title": "Input float EMA half length v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24548,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24848,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T12:15:33.255Z",
+    "live_candle_open_utc": "2026-10-04T12:14:00.000Z",
+    "export_utc": "2026-10-04T12:15:42.719Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v8/evidence/corpus-input-float-ema-half-length-v5-v1-attempt1-setup.png",
+      "captures/v8/evidence/corpus-input-float-ema-half-length-v5-v1-attempt1-export.png",
+      "captures/v8/evidence/corpus-input-float-ema-half-length-v5-v1-attempt1-logs.txt",
+      "captures/v8/evidence/corpus-input-float-ema-half-length-v5-v1-attempt1-logs-v1.json",
+      "captures/v8/evidence/corpus-input-float-ema-half-length-v5-v1-attempt1-logs.png",
+      "captures/v8/evidence/corpus-input-float-ema-half-length-v5-v1-attempt1-inputs.png",
+      "captures/v8/evidence/corpus-input-float-ema-half-length-v5-v1-attempt1-visual.png",
+      "captures/v8/evidence/corpus-input-float-ema-half-length-v5-v1-attempt1-data-window-v1.png",
+      "captures/v8/evidence/corpus-input-float-ema-half-length-v5-v1-attempt1-data-window-v1.json",
+      "captures/v8/evidence/corpus-input-float-ema-half-length-v5-v1-attempt1-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T12:15:34.082Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790810880,
+            83762,
+            83762.01,
+            83661.22,
+            83662.01,
+            123.60888
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791116040,
+            85288.01,
+            85288.01,
+            85236.42,
+            85236.43,
+            10.31815
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Input float EMA half length v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790810880,
+                83739.0211132704,
+                15,
+                83739.0211132704,
+                83739.0211132704,
+                83662.01,
+                22304
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791116040,
+                85301.1400716345,
+                15,
+                85301.1400716345,
+                85301.1400716345,
+                85236.43,
+                24847
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T12:15:35.411Z",
+        "bars": 24848,
+        "end": true,
+        "first": {
+          "index": -24548,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791116040,
+            85288.01,
+            85288.01,
+            85236.42,
+            85236.42,
+            10.31815
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Input float EMA half length v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24848,
+            "first": {
+              "index": -24548,
+              "value": [
+                1788134400,
+                null,
+                15,
+                null,
+                null,
+                77674.04,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791116040,
+                85301.13999098934,
+                15,
+                85301.13999098934,
+                85301.13999098934,
+                85236.42,
+                24847
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///9c4b43de-1646-4e23-9ecd-92ad04a4bfb6.pine?placement%3Ddialog",
+          "path": "/9c4b43de-1646-4e23-9ecd-92ad04a4bfb6.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "live_tooltip": "Sun 04 Oct '26   12:14",
+    "historical_compare_before_unix_seconds": 1791116040,
+    "pine_logs": {
+      "paths": [
+        "evidence/corpus-input-float-ema-half-length-v5-v1-attempt1-logs.txt",
+        "evidence/corpus-input-float-ema-half-length-v5-v1-attempt1-logs-v1.json",
+        "evidence/corpus-input-float-ema-half-length-v5-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "f45dd797f145de575187c038101f4548616aaf10c9c2e96dad6389c00b63e64f",
+    "csv_bytes": 2848860,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "OUTCOME",
+      "INPUT_LENGTH",
+      "FLOOR_CONTROL",
+      "CEIL_CONTROL",
+      "INPUT_CLOSE",
+      "BAR_INDEX"
+    ],
+    "declared_to_native_header_mapping": {
+      "OUTCOME": "OUTCOME",
+      "INPUT_LENGTH": "INPUT_LENGTH",
+      "FLOOR_CONTROL": "FLOOR_CONTROL",
+      "CEIL_CONTROL": "CEIL_CONTROL",
+      "INPUT_CLOSE": "INPUT_CLOSE",
+      "BAR_INDEX": "BAR_INDEX"
+    },
+    "csv_rows": 24848,
+    "historical_rows": 24847,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791116040,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791116040",
+    "first_historical_values": {
+      "OUTCOME": "",
+      "INPUT_LENGTH": "15",
+      "FLOOR_CONTROL": "",
+      "CEIL_CONTROL": "",
+      "INPUT_CLOSE": "77674.04",
+      "BAR_INDEX": "0"
+    },
+    "last_historical_values": {
+      "OUTCOME": "85300.30887448699",
+      "INPUT_LENGTH": "15",
+      "FLOOR_CONTROL": "85300.30887448699",
+      "CEIL_CONTROL": "85300.30887448699",
+      "INPUT_CLOSE": "85288",
+      "BAR_INDEX": "24846"
+    },
+    "data_window_witness": "captures/v8/evidence/corpus-input-float-ema-half-length-v5-v1-attempt1-data-window-v1.json",
+    "pine_index_plot_observation": {
+      "column": "BAR_INDEX",
+      "first_raw": "0",
+      "observed_start_is_zero": true,
+      "basis": "Literal exported plot, independent of native chart indices"
+    }
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T12:16:35.423Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v8 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "corpus-input-float-ema-half-length-v5-v1.pine",
+    "attempt": 2,
+    "source_sha256": "21aa41a9c9c8eebab7a37d4b0a0cc9cd5e7d5c28e5246ca9d69829fc38286ab1",
+    "indicator_title": "Input float EMA half length v1",
+    "status": "RUNS",
+    "csv_file": "captures/v8/corpus-input-float-ema-half-length-v5-v1-attempt2.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T201633.862.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [
+        {
+          "id": "in_0",
+          "name": "Length",
+          "value": 30,
+          "default": 30
+        }
+      ],
+      "observed_indicator_title": "Input float EMA half length v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24549,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24849,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T12:16:23.220Z",
+    "live_candle_open_utc": "2026-10-04T12:16:00.000Z",
+    "export_utc": "2026-10-04T12:16:34.557Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v8/evidence/corpus-input-float-ema-half-length-v5-v1-attempt2-setup.png",
+      "captures/v8/evidence/corpus-input-float-ema-half-length-v5-v1-attempt2-export.png",
+      "captures/v8/evidence/corpus-input-float-ema-half-length-v5-v1-attempt2-logs.txt",
+      "captures/v8/evidence/corpus-input-float-ema-half-length-v5-v1-attempt2-logs-v1.json",
+      "captures/v8/evidence/corpus-input-float-ema-half-length-v5-v1-attempt2-logs.png",
+      "captures/v8/evidence/corpus-input-float-ema-half-length-v5-v1-attempt2-inputs.png",
+      "captures/v8/evidence/corpus-input-float-ema-half-length-v5-v1-attempt2-visual.png",
+      "captures/v8/evidence/corpus-input-float-ema-half-length-v5-v1-attempt2-data-window-v1.png",
+      "captures/v8/evidence/corpus-input-float-ema-half-length-v5-v1-attempt2-data-window-v1.json",
+      "captures/v8/evidence/corpus-input-float-ema-half-length-v5-v1-attempt2-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": "2026-10-04T12:16:07.178Z",
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T12:16:24.098Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790811000,
+            83662,
+            83684.51,
+            83640,
+            83640,
+            16.86185
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791116160,
+            85236.42,
+            85236.43,
+            85229.19,
+            85229.2,
+            1.02632
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Input float EMA half length v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790811000,
+                83737.44041811406,
+                15,
+                83737.44041811406,
+                83737.44041811406,
+                83640,
+                22305
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791116160,
+                85301.24013884416,
+                15,
+                85301.24013884416,
+                85301.24013884416,
+                85229.2,
+                24848
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T12:16:25.257Z",
+        "bars": 24849,
+        "end": true,
+        "first": {
+          "index": -24549,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791116160,
+            85236.42,
+            85236.43,
+            85229.19,
+            85229.19,
+            1.02658
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Input float EMA half length v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24849,
+            "first": {
+              "index": -24549,
+              "value": [
+                1788134400,
+                null,
+                15,
+                null,
+                null,
+                77674.04,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791116160,
+                85301.24005819901,
+                15,
+                85301.24005819901,
+                85301.24005819901,
+                85229.19,
+                24848
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///6c254560-6f98-460e-adf3-f44d9e19c605.pine?placement%3Ddialog",
+          "path": "/6c254560-6f98-460e-adf3-f44d9e19c605.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "live_tooltip": "Sun 04 Oct '26   12:16",
+    "historical_compare_before_unix_seconds": 1791116160,
+    "pine_logs": {
+      "paths": [
+        "evidence/corpus-input-float-ema-half-length-v5-v1-attempt2-logs.txt",
+        "evidence/corpus-input-float-ema-half-length-v5-v1-attempt2-logs-v1.json",
+        "evidence/corpus-input-float-ema-half-length-v5-v1-attempt2-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "331f813531ad9919d7d137e7bb132eb79fd2877575580e3fa5675785985f24f3",
+    "csv_bytes": 2848976,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "OUTCOME",
+      "INPUT_LENGTH",
+      "FLOOR_CONTROL",
+      "CEIL_CONTROL",
+      "INPUT_CLOSE",
+      "BAR_INDEX"
+    ],
+    "declared_to_native_header_mapping": {
+      "OUTCOME": "OUTCOME",
+      "INPUT_LENGTH": "INPUT_LENGTH",
+      "FLOOR_CONTROL": "FLOOR_CONTROL",
+      "CEIL_CONTROL": "CEIL_CONTROL",
+      "INPUT_CLOSE": "INPUT_CLOSE",
+      "BAR_INDEX": "BAR_INDEX"
+    },
+    "csv_rows": 24849,
+    "historical_rows": 24848,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791116160,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791116160",
+    "first_historical_values": {
+      "OUTCOME": "",
+      "INPUT_LENGTH": "15",
+      "FLOOR_CONTROL": "",
+      "CEIL_CONTROL": "",
+      "INPUT_CLOSE": "77674.04",
+      "BAR_INDEX": "0"
+    },
+    "last_historical_values": {
+      "OUTCOME": "85301.13999098934",
+      "INPUT_LENGTH": "15",
+      "FLOOR_CONTROL": "85301.13999098934",
+      "CEIL_CONTROL": "85301.13999098934",
+      "INPUT_CLOSE": "85236.42",
+      "BAR_INDEX": "24847"
+    },
+    "data_window_witness": "captures/v8/evidence/corpus-input-float-ema-half-length-v5-v1-attempt2-data-window-v1.json",
+    "pine_index_plot_observation": {
+      "column": "BAR_INDEX",
+      "first_raw": "0",
+      "observed_start_is_zero": true,
+      "basis": "Literal exported plot, independent of native chart indices"
+    }
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T12:18:55.624Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v8 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "corpus-input-float-ema-half-length-v5-v1.pine",
+    "attempt": 3,
+    "source_sha256": "21aa41a9c9c8eebab7a37d4b0a0cc9cd5e7d5c28e5246ca9d69829fc38286ab1",
+    "indicator_title": "Input float EMA half length v1",
+    "status": "RUNS",
+    "csv_file": "captures/v8/corpus-input-float-ema-half-length-v5-v1-attempt3.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T201854.560.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": false,
+      "native_user_inputs": [
+        {
+          "id": "in_0",
+          "name": "Length",
+          "value": 31,
+          "default": 30
+        }
+      ],
+      "observed_indicator_title": "Input float EMA half length v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24550,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24850,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T12:18:45.527Z",
+    "live_candle_open_utc": "2026-10-04T12:18:00.000Z",
+    "export_utc": "2026-10-04T12:18:54.953Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v8/evidence/corpus-input-float-ema-half-length-v5-v1-attempt3-setup.png",
+      "captures/v8/evidence/corpus-input-float-ema-half-length-v5-v1-attempt3-export.png",
+      "captures/v8/evidence/corpus-input-float-ema-half-length-v5-v1-attempt3-logs.txt",
+      "captures/v8/evidence/corpus-input-float-ema-half-length-v5-v1-attempt3-logs-v1.json",
+      "captures/v8/evidence/corpus-input-float-ema-half-length-v5-v1-attempt3-logs.png",
+      "captures/v8/evidence/corpus-input-float-ema-half-length-v5-v1-attempt3-inputs.png",
+      "captures/v8/evidence/corpus-input-float-ema-half-length-v5-v1-attempt3-visual.png",
+      "captures/v8/evidence/corpus-input-float-ema-half-length-v5-v1-attempt3-data-window-v1.png",
+      "captures/v8/evidence/corpus-input-float-ema-half-length-v5-v1-attempt3-data-window-v1.json",
+      "captures/v8/evidence/corpus-input-float-ema-half-length-v5-v1-attempt3-data-window-v1.txt"
+    ],
+    "notes": "Exact frozen source unchanged. Native Inputs: Length changed to 31 after two default captures; this verified parameter capture is separate. Pine execution index is taken only from the literal BAR_INDEX column.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T12:18:46.413Z",
+        "bars": 1942,
+        "end": false,
+        "first": {
+          "index": -1642,
+          "value": [
+            1790883360,
+            84714.78,
+            84721.89,
+            84632,
+            84632,
+            13.64386
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791116280,
+            85206.02,
+            85260.99,
+            85206.02,
+            85260.99,
+            3.17782
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Input float EMA half length v1",
+            "status": {
+              "type": 2
+            },
+            "size": 1942,
+            "first": {
+              "index": -1642,
+              "value": [
+                1790883360,
+                84801.13716734631,
+                15.5,
+                84801.13716734631,
+                84802.77905527991,
+                84632,
+                22908
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791116280,
+                85300.35411432746,
+                15.5,
+                85300.35411432746,
+                85300.06002956271,
+                85260.99,
+                24849
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T12:18:47.642Z",
+        "bars": 24850,
+        "end": true,
+        "first": {
+          "index": -24550,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791116280,
+            85206.02,
+            85267.74,
+            85206.02,
+            85267.73,
+            3.37301
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Input float EMA half length v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24850,
+            "first": {
+              "index": -24550,
+              "value": [
+                1788134400,
+                null,
+                15.5,
+                null,
+                null,
+                77674.04,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791116280,
+                85300.40677057745,
+                15.5,
+                85300.40677057745,
+                85300.10958838624,
+                85267.73,
+                24849
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///6c254560-6f98-460e-adf3-f44d9e19c605.pine?placement%3Ddialog",
+          "path": "/6c254560-6f98-460e-adf3-f44d9e19c605.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "live_tooltip": "Sun 04 Oct '26   12:18",
+    "historical_compare_before_unix_seconds": 1791116280,
+    "pine_logs": {
+      "paths": [
+        "evidence/corpus-input-float-ema-half-length-v5-v1-attempt3-logs.txt",
+        "evidence/corpus-input-float-ema-half-length-v5-v1-attempt3-logs-v1.json",
+        "evidence/corpus-input-float-ema-half-length-v5-v1-attempt3-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "1d7dad70747236778d3cb3f1359c4f54e5af93eeee24d900d9c1a304b7bf9b5a",
+    "csv_bytes": 2898485,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "OUTCOME",
+      "INPUT_LENGTH",
+      "FLOOR_CONTROL",
+      "CEIL_CONTROL",
+      "INPUT_CLOSE",
+      "BAR_INDEX"
+    ],
+    "declared_to_native_header_mapping": {
+      "OUTCOME": "OUTCOME",
+      "INPUT_LENGTH": "INPUT_LENGTH",
+      "FLOOR_CONTROL": "FLOOR_CONTROL",
+      "CEIL_CONTROL": "CEIL_CONTROL",
+      "INPUT_CLOSE": "INPUT_CLOSE",
+      "BAR_INDEX": "BAR_INDEX"
+    },
+    "csv_rows": 24850,
+    "historical_rows": 24849,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791116280,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791116280",
+    "first_historical_values": {
+      "OUTCOME": "",
+      "INPUT_LENGTH": "15.5",
+      "FLOOR_CONTROL": "",
+      "CEIL_CONTROL": "",
+      "INPUT_CLOSE": "77674.04",
+      "BAR_INDEX": "0"
+    },
+    "last_historical_values": {
+      "OUTCOME": "85300.7147762895",
+      "INPUT_LENGTH": "15.5",
+      "FLOOR_CONTROL": "85300.7147762895",
+      "CEIL_CONTROL": "85300.35743609199",
+      "INPUT_CLOSE": "85206.02",
+      "BAR_INDEX": "24848"
+    },
+    "data_window_witness": "captures/v8/evidence/corpus-input-float-ema-half-length-v5-v1-attempt3-data-window-v1.json",
+    "capture_context": "parameter: Length = 31",
+    "pine_index_plot_observation": {
+      "column": "BAR_INDEX",
+      "first_raw": "0",
+      "observed_start_is_zero": true,
+      "basis": "Literal exported plot, independent of native chart indices"
+    }
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T12:20:12.263Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v8 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "corpus-input-float-sma-dminutes-v6-v1.pine",
+    "attempt": 4,
+    "source_sha256": "5719a03e43f47fc4200fbdf495f8bf3b338cd05665b4e392cab0bb0260f90007",
+    "indicator_title": "Input float SMA dminutes v1",
+    "status": "RUNS",
+    "csv_file": "captures/v8/corpus-input-float-sma-dminutes-v6-v1-attempt4.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T202011.101.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": false,
+      "native_user_inputs": [
+        {
+          "id": "in_0",
+          "name": "Open: Hours a Day",
+          "value": 6.51,
+          "default": 6.5
+        }
+      ],
+      "observed_indicator_title": "Input float SMA dminutes v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24551,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24851,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T12:20:02.458Z",
+    "live_candle_open_utc": "2026-10-04T12:20:00.000Z",
+    "export_utc": "2026-10-04T12:20:11.753Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v8/evidence/corpus-input-float-sma-dminutes-v6-v1-attempt4-setup.png",
+      "captures/v8/evidence/corpus-input-float-sma-dminutes-v6-v1-attempt4-export.png",
+      "captures/v8/evidence/corpus-input-float-sma-dminutes-v6-v1-attempt4-logs.txt",
+      "captures/v8/evidence/corpus-input-float-sma-dminutes-v6-v1-attempt4-logs-v1.json",
+      "captures/v8/evidence/corpus-input-float-sma-dminutes-v6-v1-attempt4-logs.png",
+      "captures/v8/evidence/corpus-input-float-sma-dminutes-v6-v1-attempt4-inputs.png",
+      "captures/v8/evidence/corpus-input-float-sma-dminutes-v6-v1-attempt4-visual.png",
+      "captures/v8/evidence/corpus-input-float-sma-dminutes-v6-v1-attempt4-data-window-v1.png",
+      "captures/v8/evidence/corpus-input-float-sma-dminutes-v6-v1-attempt4-data-window-v1.json",
+      "captures/v8/evidence/corpus-input-float-sma-dminutes-v6-v1-attempt4-data-window-v1.txt"
+    ],
+    "notes": "Exact frozen source unchanged. Native Inputs: Open: Hours a Day changed to verified 6.51 after default captures; this parameter capture is separate. Pine execution index is taken only from literal BAR_INDEX.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T12:20:03.402Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790811240,
+            83562.67,
+            83625.08,
+            83562.67,
+            83608,
+            13.38961
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791116400,
+            85246.01,
+            85246.01,
+            85246,
+            85246,
+            0.00158
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Input float SMA dminutes v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790811240,
+                83650.8516376663,
+                977.5,
+                83650.8516376663,
+                83650.8845092027,
+                83608,
+                22307
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791116400,
+                84838.48967246657,
+                977.5,
+                84838.48967246657,
+                84838.31079754652,
+                85246,
+                24850
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T12:20:04.461Z",
+        "bars": 24851,
+        "end": true,
+        "first": {
+          "index": -24551,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791116400,
+            85246.01,
+            85246.01,
+            85246,
+            85246,
+            0.00953
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Input float SMA dminutes v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24851,
+            "first": {
+              "index": -24551,
+              "value": [
+                1788134400,
+                null,
+                977.5,
+                null,
+                null,
+                77674.04,
+                0
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791116400,
+                84838.48967246657,
+                977.5,
+                84838.48967246657,
+                84838.31079754652,
+                85246,
+                24850
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   12:20",
+    "historical_compare_before_unix_seconds": 1791116400,
+    "pine_logs": {
+      "paths": [
+        "evidence/corpus-input-float-sma-dminutes-v6-v1-attempt4-logs.txt",
+        "evidence/corpus-input-float-sma-dminutes-v6-v1-attempt4-logs-v1.json",
+        "evidence/corpus-input-float-sma-dminutes-v6-v1-attempt4-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "e4567ad8a9fcba92d88fb90a3626d63ff3adccd488482608c09aef6c0072df2d",
+    "csv_bytes": 2876145,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "OUTCOME",
+      "INPUT_LENGTH",
+      "FLOOR_CONTROL",
+      "CEIL_CONTROL",
+      "INPUT_CLOSE",
+      "BAR_INDEX"
+    ],
+    "declared_to_native_header_mapping": {
+      "OUTCOME": "OUTCOME",
+      "INPUT_LENGTH": "INPUT_LENGTH",
+      "FLOOR_CONTROL": "FLOOR_CONTROL",
+      "CEIL_CONTROL": "CEIL_CONTROL",
+      "INPUT_CLOSE": "INPUT_CLOSE",
+      "BAR_INDEX": "BAR_INDEX"
+    },
+    "csv_rows": 24851,
+    "historical_rows": 24850,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791116400,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791116400",
+    "first_historical_values": {
+      "OUTCOME": "",
+      "INPUT_LENGTH": "977.5",
+      "FLOOR_CONTROL": "",
+      "CEIL_CONTROL": "",
+      "INPUT_CLOSE": "77674.04",
+      "BAR_INDEX": "0"
+    },
+    "last_historical_values": {
+      "OUTCOME": "84837.89351074705",
+      "INPUT_LENGTH": "977.5",
+      "FLOOR_CONTROL": "84837.89351074705",
+      "CEIL_CONTROL": "84837.70691206596",
+      "INPUT_CLOSE": "85246",
+      "BAR_INDEX": "24849"
+    },
+    "data_window_witness": "captures/v8/evidence/corpus-input-float-sma-dminutes-v6-v1-attempt4-data-window-v1.json",
+    "capture_context": "parameter: Open: Hours a Day = 6.51",
+    "pine_index_plot_observation": {
+      "column": "BAR_INDEX",
+      "first_raw": "0",
+      "observed_start_is_zero": true,
+      "basis": "Literal exported plot, independent of native chart indices"
+    }
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T12:21:03.303Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v8 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "cmo-ready-zero-sum-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "5b551d82c1880427cbc4155de0729c499b53ccc215dd52177cc1e3d021bf0497",
+    "indicator_title": "CMO ready zero sum v1",
+    "status": "RUNS",
+    "csv_file": "captures/v8/cmo-ready-zero-sum-v6-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T202102.113.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "CMO ready zero sum v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24551,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24851,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T12:20:52.605Z",
+    "live_candle_open_utc": "2026-10-04T12:20:00.000Z",
+    "export_utc": "2026-10-04T12:21:02.807Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v8/evidence/cmo-ready-zero-sum-v6-v1-attempt1-setup.png",
+      "captures/v8/evidence/cmo-ready-zero-sum-v6-v1-attempt1-export.png",
+      "captures/v8/evidence/cmo-ready-zero-sum-v6-v1-attempt1-logs.txt",
+      "captures/v8/evidence/cmo-ready-zero-sum-v6-v1-attempt1-logs-v1.json",
+      "captures/v8/evidence/cmo-ready-zero-sum-v6-v1-attempt1-logs.png",
+      "captures/v8/evidence/cmo-ready-zero-sum-v6-v1-attempt1-visual.png",
+      "captures/v8/evidence/cmo-ready-zero-sum-v6-v1-attempt1-data-window-v1.png",
+      "captures/v8/evidence/cmo-ready-zero-sum-v6-v1-attempt1-data-window-v1.json",
+      "captures/v8/evidence/cmo-ready-zero-sum-v6-v1-attempt1-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T12:20:53.342Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790811240,
+            83562.67,
+            83625.08,
+            83562.67,
+            83608,
+            13.38961
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791116400,
+            85246.01,
+            85246.01,
+            85246,
+            85246.01,
+            0.70302
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "CMO ready zero sum v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790811240,
+                3,
+                0,
+                0,
+                1,
+                null,
+                null,
+                1,
+                1,
+                100
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791116400,
+                3,
+                0,
+                0,
+                1,
+                null,
+                null,
+                1,
+                1,
+                100
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T12:20:54.667Z",
+        "bars": 24851,
+        "end": true,
+        "first": {
+          "index": -24551,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791116400,
+            85246.01,
+            85246.01,
+            85246,
+            85246,
+            0.70478
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "CMO ready zero sum v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24851,
+            "first": {
+              "index": -24551,
+              "value": [
+                1788134400,
+                0,
+                null,
+                null,
+                0,
+                null,
+                null,
+                null,
+                null,
+                null
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791116400,
+                3,
+                0,
+                0,
+                1,
+                null,
+                null,
+                1,
+                1,
+                100
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   12:20",
+    "historical_compare_before_unix_seconds": 1791116400,
+    "pine_logs": {
+      "paths": [
+        "evidence/cmo-ready-zero-sum-v6-v1-attempt1-logs.txt",
+        "evidence/cmo-ready-zero-sum-v6-v1-attempt1-logs-v1.json",
+        "evidence/cmo-ready-zero-sum-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "50633c98e661062525e03cc221742cc0e3318812039f6b9aa48d96ebfa6de61f",
+    "csv_bytes": 1547030,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "Source",
+      "Gains",
+      "Losses",
+      "Ready",
+      "Builtin",
+      "Formula",
+      "Ready builtin is NA",
+      "Ready formula is NA",
+      "Moving control"
+    ],
+    "declared_to_native_header_mapping": {
+      "Source": "Source",
+      "Gains": "Gains",
+      "Losses": "Losses",
+      "Ready": "Ready",
+      "Builtin": "Builtin",
+      "Formula": "Formula",
+      "Ready builtin is NA": "Ready builtin is NA",
+      "Ready formula is NA": "Ready formula is NA",
+      "Moving control": "Moving control"
+    },
+    "csv_rows": 24851,
+    "historical_rows": 24850,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791116400,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791116400",
+    "first_historical_values": {
+      "Source": "0",
+      "Gains": "",
+      "Losses": "",
+      "Ready": "0",
+      "Builtin": "",
+      "Formula": "",
+      "Ready builtin is NA": "",
+      "Ready formula is NA": "",
+      "Moving control": ""
+    },
+    "last_historical_values": {
+      "Source": "3",
+      "Gains": "0",
+      "Losses": "0",
+      "Ready": "1",
+      "Builtin": "",
+      "Formula": "",
+      "Ready builtin is NA": "1",
+      "Ready formula is NA": "1",
+      "Moving control": "100"
+    },
+    "data_window_witness": "captures/v8/evidence/cmo-ready-zero-sum-v6-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T12:21:52.398Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v8 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "cmo-ready-zero-sum-v6-v1.pine",
+    "attempt": 2,
+    "source_sha256": "5b551d82c1880427cbc4155de0729c499b53ccc215dd52177cc1e3d021bf0497",
+    "indicator_title": "CMO ready zero sum v1",
+    "status": "RUNS",
+    "csv_file": "captures/v8/cmo-ready-zero-sum-v6-v1-attempt2.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T202151.306.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "CMO ready zero sum v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24551,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24851,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T12:21:42.030Z",
+    "live_candle_open_utc": "2026-10-04T12:20:00.000Z",
+    "export_utc": "2026-10-04T12:21:51.897Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v8/evidence/cmo-ready-zero-sum-v6-v1-attempt2-setup.png",
+      "captures/v8/evidence/cmo-ready-zero-sum-v6-v1-attempt2-export.png",
+      "captures/v8/evidence/cmo-ready-zero-sum-v6-v1-attempt2-logs.txt",
+      "captures/v8/evidence/cmo-ready-zero-sum-v6-v1-attempt2-logs-v1.json",
+      "captures/v8/evidence/cmo-ready-zero-sum-v6-v1-attempt2-logs.png",
+      "captures/v8/evidence/cmo-ready-zero-sum-v6-v1-attempt2-visual.png",
+      "captures/v8/evidence/cmo-ready-zero-sum-v6-v1-attempt2-data-window-v1.png",
+      "captures/v8/evidence/cmo-ready-zero-sum-v6-v1-attempt2-data-window-v1.json",
+      "captures/v8/evidence/cmo-ready-zero-sum-v6-v1-attempt2-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": "2026-10-04T12:21:25.643Z",
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T12:21:43.033Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790811240,
+            83562.67,
+            83625.08,
+            83562.67,
+            83608,
+            13.38961
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791116400,
+            85246.01,
+            85266.01,
+            85246,
+            85266,
+            2.35988
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "CMO ready zero sum v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790811240,
+                3,
+                0,
+                0,
+                1,
+                null,
+                null,
+                1,
+                1,
+                100
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791116400,
+                3,
+                0,
+                0,
+                1,
+                null,
+                null,
+                1,
+                1,
+                100
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T12:21:44.135Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790811240,
+            83562.67,
+            83625.08,
+            83562.67,
+            83608,
+            13.38961
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791116400,
+            85246.01,
+            85266.01,
+            85246,
+            85266,
+            2.35988
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "CMO ready zero sum v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24851,
+            "first": {
+              "index": -1022307,
+              "value": [
+                1788134400,
+                0,
+                null,
+                null,
+                0,
+                null,
+                null,
+                null,
+                null,
+                null
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791116400,
+                3,
+                0,
+                0,
+                1,
+                null,
+                null,
+                1,
+                1,
+                100
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T12:21:44.957Z",
+        "bars": 24851,
+        "end": true,
+        "first": {
+          "index": -24551,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791116400,
+            85246.01,
+            85266.01,
+            85246,
+            85266.01,
+            2.38796
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "CMO ready zero sum v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24851,
+            "first": {
+              "index": -24551,
+              "value": [
+                1788134400,
+                0,
+                null,
+                null,
+                0,
+                null,
+                null,
+                null,
+                null,
+                null
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791116400,
+                3,
+                0,
+                0,
+                1,
+                null,
+                null,
+                1,
+                1,
+                100
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   12:20",
+    "historical_compare_before_unix_seconds": 1791116400,
+    "pine_logs": {
+      "paths": [
+        "evidence/cmo-ready-zero-sum-v6-v1-attempt2-logs.txt",
+        "evidence/cmo-ready-zero-sum-v6-v1-attempt2-logs-v1.json",
+        "evidence/cmo-ready-zero-sum-v6-v1-attempt2-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "12a9c779bcc3094fe89f10742d63dbb64181cd84ff237af1d9696fae780ea4c0",
+    "csv_bytes": 1547030,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "Source",
+      "Gains",
+      "Losses",
+      "Ready",
+      "Builtin",
+      "Formula",
+      "Ready builtin is NA",
+      "Ready formula is NA",
+      "Moving control"
+    ],
+    "declared_to_native_header_mapping": {
+      "Source": "Source",
+      "Gains": "Gains",
+      "Losses": "Losses",
+      "Ready": "Ready",
+      "Builtin": "Builtin",
+      "Formula": "Formula",
+      "Ready builtin is NA": "Ready builtin is NA",
+      "Ready formula is NA": "Ready formula is NA",
+      "Moving control": "Moving control"
+    },
+    "csv_rows": 24851,
+    "historical_rows": 24850,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791116400,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791116400",
+    "first_historical_values": {
+      "Source": "0",
+      "Gains": "",
+      "Losses": "",
+      "Ready": "0",
+      "Builtin": "",
+      "Formula": "",
+      "Ready builtin is NA": "",
+      "Ready formula is NA": "",
+      "Moving control": ""
+    },
+    "last_historical_values": {
+      "Source": "3",
+      "Gains": "0",
+      "Losses": "0",
+      "Ready": "1",
+      "Builtin": "",
+      "Formula": "",
+      "Ready builtin is NA": "1",
+      "Ready formula is NA": "1",
+      "Moving control": "100"
+    },
+    "data_window_witness": "captures/v8/evidence/cmo-ready-zero-sum-v6-v1-attempt2-data-window-v1.json"
   }
 ]

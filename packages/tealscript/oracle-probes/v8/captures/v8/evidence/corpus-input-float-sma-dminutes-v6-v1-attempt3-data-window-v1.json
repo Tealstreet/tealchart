@@ -1,0 +1,34 @@
+{
+  "index": 298,
+  "bar": [
+    1791115920,
+    85369.39,
+    85369.39,
+    85287.99,
+    85288,
+    95.92548
+  ],
+  "source_row": [
+    1791115920,
+    85198.64333333421,
+    150,
+    85198.64333333421,
+    85198.64333333421,
+    85288,
+    24846
+  ],
+  "browser_utc": "2026-10-04T12:15:01.715Z",
+  "title": "Input float SMA dminutes v1",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   12:12",
+  "visible_range": {
+    "_firstBar": 263,
+    "_lastBar": 301
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}
