@@ -1461,5 +1461,1993 @@
       "OUTCOME": "1"
     },
     "data_window_witness": "captures/v7/evidence/corpus-v5-color-get-round-na-receiver-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "script": "plot-series-offset-v3-v1.pine",
+    "attempt": 1,
+    "source_sha256": "cc24a27e48273fdcc11279b02e91e5af6ed4c9efabf8fbdd8084f2ef4712c2fa",
+    "indicator_title": "V7 plot-series-offset-v3-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/plot-series-offset-v3-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T131441.451.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 plot-series-offset-v3-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24338,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24638,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T05:14:34.406Z",
+    "live_candle_open_utc": "2026-10-04T05:14:00.000Z",
+    "export_utc": "2026-10-04T05:14:41.722Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/plot-series-offset-v3-v1-attempt1-setup.png",
+      "captures/v7/evidence/plot-series-offset-v3-v1-attempt1-export.png",
+      "captures/v7/evidence/plot-series-offset-v3-v1-attempt1-logs.txt",
+      "captures/v7/evidence/plot-series-offset-v3-v1-attempt1-logs-v1.json",
+      "captures/v7/evidence/plot-series-offset-v3-v1-attempt1-logs.png",
+      "captures/v7/evidence/plot-series-offset-v3-v1-attempt1-visual.png",
+      "captures/v7/evidence/plot-series-offset-v3-v1-attempt1-data-window-v1.png",
+      "captures/v7/evidence/plot-series-offset-v3-v1-attempt1-data-window-v1.json",
+      "captures/v7/evidence/plot-series-offset-v3-v1-attempt1-data-window-v1.txt",
+      "captures/v7/evidence/plot-series-offset-v3-v1-attempt1-offset-source-v1.json",
+      "captures/v7/evidence/plot-series-offset-v3-v1-attempt1-offset-source-v1.png",
+      "captures/v7/evidence/plot-series-offset-v3-v1-attempt1-offset-destination-v1.json",
+      "captures/v7/evidence/plot-series-offset-v3-v1-attempt1-offset-destination-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///02067fe4-b867-4eec-bf8f-ce296d7daba3.pine?placement%3Ddialog",
+          "path": "/02067fe4-b867-4eec-bf8f-ce296d7daba3.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 3 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "live_tooltip": "Sun 04 Oct '26   05:14",
+    "historical_compare_before_unix_seconds": 1791090840,
+    "pine_logs": {
+      "paths": [
+        "evidence/plot-series-offset-v3-v1-attempt1-logs.txt",
+        "evidence/plot-series-offset-v3-v1-attempt1-logs-v1.json",
+        "evidence/plot-series-offset-v3-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "48ce862a9165013e9ff669bb8795a1235664c8a69ef3a1022b870011dd44dff4",
+    "csv_bytes": 1297188,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "TARGET"
+    ],
+    "declared_to_native_header_mapping": {
+      "TARGET": "TARGET"
+    },
+    "csv_rows": 24638,
+    "historical_rows": 24637,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791090840,
+    "first_historical_values": {
+      "TARGET": "77858.24"
+    },
+    "last_historical_values": {
+      "TARGET": "84934.01"
+    },
+    "data_window_witness": "captures/v7/evidence/plot-series-offset-v3-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "script": "plot-zero-offset-v3-control-v1.pine",
+    "attempt": 1,
+    "source_sha256": "a9481b730bba331a67f3f9c6e226e2d753e324edcf0a37c5ea804d59fa03c95b",
+    "indicator_title": "V7 plot-zero-offset-v3-control-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/plot-zero-offset-v3-control-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T131629.078.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 plot-zero-offset-v3-control-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24339,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24639,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T05:16:21.418Z",
+    "live_candle_open_utc": "2026-10-04T05:16:00.000Z",
+    "export_utc": "2026-10-04T05:16:29.326Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/plot-zero-offset-v3-control-v1-attempt1-setup.png",
+      "captures/v7/evidence/plot-zero-offset-v3-control-v1-attempt1-export.png",
+      "captures/v7/evidence/plot-zero-offset-v3-control-v1-attempt1-logs.txt",
+      "captures/v7/evidence/plot-zero-offset-v3-control-v1-attempt1-logs-v1.json",
+      "captures/v7/evidence/plot-zero-offset-v3-control-v1-attempt1-logs.png",
+      "captures/v7/evidence/plot-zero-offset-v3-control-v1-attempt1-visual.png",
+      "captures/v7/evidence/plot-zero-offset-v3-control-v1-attempt1-data-window-v1.png",
+      "captures/v7/evidence/plot-zero-offset-v3-control-v1-attempt1-data-window-v1.json",
+      "captures/v7/evidence/plot-zero-offset-v3-control-v1-attempt1-data-window-v1.txt",
+      "captures/v7/evidence/plot-zero-offset-v3-control-v1-attempt1-offset-source-v1.json",
+      "captures/v7/evidence/plot-zero-offset-v3-control-v1-attempt1-offset-source-v1.png",
+      "captures/v7/evidence/plot-zero-offset-v3-control-v1-attempt1-offset-destination-v1.json",
+      "captures/v7/evidence/plot-zero-offset-v3-control-v1-attempt1-offset-destination-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///ecfa8919-9457-490d-b351-78ae21d3cde2.pine?placement%3Ddialog",
+          "path": "/ecfa8919-9457-490d-b351-78ae21d3cde2.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 3 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "live_tooltip": "Sun 04 Oct '26   05:16",
+    "historical_compare_before_unix_seconds": 1791090960,
+    "pine_logs": {
+      "paths": [
+        "evidence/plot-zero-offset-v3-control-v1-attempt1-logs.txt",
+        "evidence/plot-zero-offset-v3-control-v1-attempt1-logs-v1.json",
+        "evidence/plot-zero-offset-v3-control-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "acf2e5a505a24248ac6bae271e0724f9072fa182dc92ca97eb18930e9b9f70ec",
+    "csv_bytes": 1297255,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "TARGET"
+    ],
+    "declared_to_native_header_mapping": {
+      "TARGET": "TARGET"
+    },
+    "csv_rows": 24639,
+    "historical_rows": 24638,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791090960,
+    "first_historical_values": {
+      "TARGET": "77774.04"
+    },
+    "last_historical_values": {
+      "TARGET": "84931.39"
+    },
+    "data_window_witness": "captures/v7/evidence/plot-zero-offset-v3-control-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "script": "plot-zero-offset-v3-control-v1.pine",
+    "attempt": 2,
+    "source_sha256": "a9481b730bba331a67f3f9c6e226e2d753e324edcf0a37c5ea804d59fa03c95b",
+    "indicator_title": "V7 plot-zero-offset-v3-control-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/plot-zero-offset-v3-control-v1-attempt2.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T131701.249.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 plot-zero-offset-v3-control-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24339,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24639,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T05:16:53.955Z",
+    "live_candle_open_utc": "2026-10-04T05:16:00.000Z",
+    "export_utc": "2026-10-04T05:17:01.670Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/plot-zero-offset-v3-control-v1-attempt2-setup.png",
+      "captures/v7/evidence/plot-zero-offset-v3-control-v1-attempt2-export.png",
+      "captures/v7/evidence/plot-zero-offset-v3-control-v1-attempt2-logs.txt",
+      "captures/v7/evidence/plot-zero-offset-v3-control-v1-attempt2-logs-v1.json",
+      "captures/v7/evidence/plot-zero-offset-v3-control-v1-attempt2-logs.png",
+      "captures/v7/evidence/plot-zero-offset-v3-control-v1-attempt2-visual.png",
+      "captures/v7/evidence/plot-zero-offset-v3-control-v1-attempt2-data-window-v1.png",
+      "captures/v7/evidence/plot-zero-offset-v3-control-v1-attempt2-data-window-v1.json",
+      "captures/v7/evidence/plot-zero-offset-v3-control-v1-attempt2-data-window-v1.txt",
+      "captures/v7/evidence/plot-zero-offset-v3-control-v1-attempt2-offset-source-v1.json",
+      "captures/v7/evidence/plot-zero-offset-v3-control-v1-attempt2-offset-source-v1.png",
+      "captures/v7/evidence/plot-zero-offset-v3-control-v1-attempt2-offset-destination-v1.json",
+      "captures/v7/evidence/plot-zero-offset-v3-control-v1-attempt2-offset-destination-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///57d95b07-f829-47ca-ba0e-c5bb0fc67a1b.pine?placement%3Ddialog",
+          "path": "/57d95b07-f829-47ca-ba0e-c5bb0fc67a1b.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 3 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "live_tooltip": "Sun 04 Oct '26   05:16",
+    "historical_compare_before_unix_seconds": 1791090960,
+    "pine_logs": {
+      "paths": [
+        "evidence/plot-zero-offset-v3-control-v1-attempt2-logs.txt",
+        "evidence/plot-zero-offset-v3-control-v1-attempt2-logs-v1.json",
+        "evidence/plot-zero-offset-v3-control-v1-attempt2-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "2dc3af38cad7888d0ec6feb01167a93e95d9987400e2ae44099117c2d558fee5",
+    "csv_bytes": 1297255,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "TARGET"
+    ],
+    "declared_to_native_header_mapping": {
+      "TARGET": "TARGET"
+    },
+    "csv_rows": 24639,
+    "historical_rows": 24638,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791090960,
+    "first_historical_values": {
+      "TARGET": "77774.04"
+    },
+    "last_historical_values": {
+      "TARGET": "84931.39"
+    },
+    "data_window_witness": "captures/v7/evidence/plot-zero-offset-v3-control-v1-attempt2-data-window-v1.json"
+  },
+  {
+    "script": "plot-series-offset-v4-v1.pine",
+    "attempt": 1,
+    "source_sha256": "520f0f9bc2c6b774c93a73739c4203d625e4990f79b36041582fd022760d2c9e",
+    "indicator_title": "V7 plot-series-offset-v4-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/plot-series-offset-v4-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T131733.685.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 plot-series-offset-v4-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24339,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24639,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T05:17:26.246Z",
+    "live_candle_open_utc": "2026-10-04T05:16:00.000Z",
+    "export_utc": "2026-10-04T05:17:34.082Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/plot-series-offset-v4-v1-attempt1-setup.png",
+      "captures/v7/evidence/plot-series-offset-v4-v1-attempt1-export.png",
+      "captures/v7/evidence/plot-series-offset-v4-v1-attempt1-logs.txt",
+      "captures/v7/evidence/plot-series-offset-v4-v1-attempt1-logs-v1.json",
+      "captures/v7/evidence/plot-series-offset-v4-v1-attempt1-logs.png",
+      "captures/v7/evidence/plot-series-offset-v4-v1-attempt1-visual.png",
+      "captures/v7/evidence/plot-series-offset-v4-v1-attempt1-data-window-v1.png",
+      "captures/v7/evidence/plot-series-offset-v4-v1-attempt1-data-window-v1.json",
+      "captures/v7/evidence/plot-series-offset-v4-v1-attempt1-data-window-v1.txt",
+      "captures/v7/evidence/plot-series-offset-v4-v1-attempt1-offset-source-v1.json",
+      "captures/v7/evidence/plot-series-offset-v4-v1-attempt1-offset-source-v1.png",
+      "captures/v7/evidence/plot-series-offset-v4-v1-attempt1-offset-destination-v1.json",
+      "captures/v7/evidence/plot-series-offset-v4-v1-attempt1-offset-destination-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///ad52b4b6-1e8c-41b0-a14f-3c19a84ca95e.pine?placement%3Ddialog",
+          "path": "/ad52b4b6-1e8c-41b0-a14f-3c19a84ca95e.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 4 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "live_tooltip": "Sun 04 Oct '26   05:16",
+    "historical_compare_before_unix_seconds": 1791090960,
+    "pine_logs": {
+      "paths": [
+        "evidence/plot-series-offset-v4-v1-attempt1-logs.txt",
+        "evidence/plot-series-offset-v4-v1-attempt1-logs-v1.json",
+        "evidence/plot-series-offset-v4-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "73aac6d9e25e8fa2df5b814537213bca74dcfa933d92e22b5f75ba52650834fc",
+    "csv_bytes": 1297247,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "TARGET"
+    ],
+    "declared_to_native_header_mapping": {
+      "TARGET": "TARGET"
+    },
+    "csv_rows": 24639,
+    "historical_rows": 24638,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791090960,
+    "first_historical_values": {
+      "TARGET": "77858.24"
+    },
+    "last_historical_values": {
+      "TARGET": "84931.38"
+    },
+    "data_window_witness": "captures/v7/evidence/plot-series-offset-v4-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "script": "plot-zero-offset-v4-control-v1.pine",
+    "attempt": 1,
+    "source_sha256": "2b9995dce8d396315067cad685cc0fccd50ed7100201077548c9155e41798155",
+    "indicator_title": "V7 plot-zero-offset-v4-control-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/plot-zero-offset-v4-control-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T131806.378.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 plot-zero-offset-v4-control-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24339,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24640,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T05:17:58.672Z",
+    "live_candle_open_utc": "2026-10-04T05:18:00.000Z",
+    "export_utc": "2026-10-04T05:18:06.764Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/plot-zero-offset-v4-control-v1-attempt1-setup.png",
+      "captures/v7/evidence/plot-zero-offset-v4-control-v1-attempt1-export.png",
+      "captures/v7/evidence/plot-zero-offset-v4-control-v1-attempt1-logs.txt",
+      "captures/v7/evidence/plot-zero-offset-v4-control-v1-attempt1-logs-v1.json",
+      "captures/v7/evidence/plot-zero-offset-v4-control-v1-attempt1-logs.png",
+      "captures/v7/evidence/plot-zero-offset-v4-control-v1-attempt1-visual.png",
+      "captures/v7/evidence/plot-zero-offset-v4-control-v1-attempt1-data-window-v1.png",
+      "captures/v7/evidence/plot-zero-offset-v4-control-v1-attempt1-data-window-v1.json",
+      "captures/v7/evidence/plot-zero-offset-v4-control-v1-attempt1-data-window-v1.txt",
+      "captures/v7/evidence/plot-zero-offset-v4-control-v1-attempt1-offset-source-v1.json",
+      "captures/v7/evidence/plot-zero-offset-v4-control-v1-attempt1-offset-source-v1.png",
+      "captures/v7/evidence/plot-zero-offset-v4-control-v1-attempt1-offset-destination-v1.json",
+      "captures/v7/evidence/plot-zero-offset-v4-control-v1-attempt1-offset-destination-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///b6c20e3a-7f1a-480b-bacb-0a139b5be46e.pine?placement%3Ddialog",
+          "path": "/b6c20e3a-7f1a-480b-bacb-0a139b5be46e.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 4 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "live_tooltip": "Sun 04 Oct '26   05:18",
+    "historical_compare_before_unix_seconds": 1791091080,
+    "pine_logs": {
+      "paths": [
+        "evidence/plot-zero-offset-v4-control-v1-attempt1-logs.txt",
+        "evidence/plot-zero-offset-v4-control-v1-attempt1-logs-v1.json",
+        "evidence/plot-zero-offset-v4-control-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "c9728d130785d2c926a6ceb9ad660f95f20d6ccaffc80fafbf1ac69ba3fda009",
+    "csv_bytes": 1297311,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "TARGET"
+    ],
+    "declared_to_native_header_mapping": {
+      "TARGET": "TARGET"
+    },
+    "csv_rows": 24640,
+    "historical_rows": 24639,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791091080,
+    "first_historical_values": {
+      "TARGET": "77774.04"
+    },
+    "last_historical_values": {
+      "TARGET": "84931.39"
+    },
+    "data_window_witness": "captures/v7/evidence/plot-zero-offset-v4-control-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "script": "plot-zero-offset-v4-control-v1.pine",
+    "attempt": 2,
+    "source_sha256": "2b9995dce8d396315067cad685cc0fccd50ed7100201077548c9155e41798155",
+    "indicator_title": "V7 plot-zero-offset-v4-control-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/plot-zero-offset-v4-control-v1-attempt2.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T131839.184.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 plot-zero-offset-v4-control-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24340,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24640,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T05:18:31.345Z",
+    "live_candle_open_utc": "2026-10-04T05:18:00.000Z",
+    "export_utc": "2026-10-04T05:18:39.604Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/plot-zero-offset-v4-control-v1-attempt2-setup.png",
+      "captures/v7/evidence/plot-zero-offset-v4-control-v1-attempt2-export.png",
+      "captures/v7/evidence/plot-zero-offset-v4-control-v1-attempt2-logs.txt",
+      "captures/v7/evidence/plot-zero-offset-v4-control-v1-attempt2-logs-v1.json",
+      "captures/v7/evidence/plot-zero-offset-v4-control-v1-attempt2-logs.png",
+      "captures/v7/evidence/plot-zero-offset-v4-control-v1-attempt2-visual.png",
+      "captures/v7/evidence/plot-zero-offset-v4-control-v1-attempt2-data-window-v1.png",
+      "captures/v7/evidence/plot-zero-offset-v4-control-v1-attempt2-data-window-v1.json",
+      "captures/v7/evidence/plot-zero-offset-v4-control-v1-attempt2-data-window-v1.txt",
+      "captures/v7/evidence/plot-zero-offset-v4-control-v1-attempt2-offset-source-v1.json",
+      "captures/v7/evidence/plot-zero-offset-v4-control-v1-attempt2-offset-source-v1.png",
+      "captures/v7/evidence/plot-zero-offset-v4-control-v1-attempt2-offset-destination-v1.json",
+      "captures/v7/evidence/plot-zero-offset-v4-control-v1-attempt2-offset-destination-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///6ac16e5c-fb25-4f5e-b181-b982b72db9b7.pine?placement%3Ddialog",
+          "path": "/6ac16e5c-fb25-4f5e-b181-b982b72db9b7.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 4 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "live_tooltip": "Sun 04 Oct '26   05:18",
+    "historical_compare_before_unix_seconds": 1791091080,
+    "pine_logs": {
+      "paths": [
+        "evidence/plot-zero-offset-v4-control-v1-attempt2-logs.txt",
+        "evidence/plot-zero-offset-v4-control-v1-attempt2-logs-v1.json",
+        "evidence/plot-zero-offset-v4-control-v1-attempt2-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "c9728d130785d2c926a6ceb9ad660f95f20d6ccaffc80fafbf1ac69ba3fda009",
+    "csv_bytes": 1297311,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "TARGET"
+    ],
+    "declared_to_native_header_mapping": {
+      "TARGET": "TARGET"
+    },
+    "csv_rows": 24640,
+    "historical_rows": 24639,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791091080,
+    "first_historical_values": {
+      "TARGET": "77774.04"
+    },
+    "last_historical_values": {
+      "TARGET": "84931.39"
+    },
+    "data_window_witness": "captures/v7/evidence/plot-zero-offset-v4-control-v1-attempt2-data-window-v1.json"
+  },
+  {
+    "script": "plotchar-series-offset-v3-v1.pine",
+    "attempt": 1,
+    "source_sha256": "84736e570fdde78458f0dcef64e279637412c2d4fb36ae4846b70719a170b3d4",
+    "indicator_title": "V7 plotchar-series-offset-v3-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/plotchar-series-offset-v3-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T131922.594.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 plotchar-series-offset-v3-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24340,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24640,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T05:19:14.988Z",
+    "live_candle_open_utc": "2026-10-04T05:18:00.000Z",
+    "export_utc": "2026-10-04T05:19:23.093Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/plotchar-series-offset-v3-v1-attempt1-setup.png",
+      "captures/v7/evidence/plotchar-series-offset-v3-v1-attempt1-export.png",
+      "captures/v7/evidence/plotchar-series-offset-v3-v1-attempt1-logs.txt",
+      "captures/v7/evidence/plotchar-series-offset-v3-v1-attempt1-logs-v1.json",
+      "captures/v7/evidence/plotchar-series-offset-v3-v1-attempt1-logs.png",
+      "captures/v7/evidence/plotchar-series-offset-v3-v1-attempt1-visual.png",
+      "captures/v7/evidence/plotchar-series-offset-v3-v1-attempt1-data-window-v1.png",
+      "captures/v7/evidence/plotchar-series-offset-v3-v1-attempt1-data-window-v1.json",
+      "captures/v7/evidence/plotchar-series-offset-v3-v1-attempt1-data-window-v1.txt",
+      "captures/v7/evidence/plotchar-series-offset-v3-v1-attempt1-offset-source-v1.json",
+      "captures/v7/evidence/plotchar-series-offset-v3-v1-attempt1-offset-source-v1.png",
+      "captures/v7/evidence/plotchar-series-offset-v3-v1-attempt1-offset-destination-v1.json",
+      "captures/v7/evidence/plotchar-series-offset-v3-v1-attempt1-offset-destination-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///e2d2c7db-b3ed-430d-a678-665b398ba314.pine?placement%3Ddialog",
+          "path": "/e2d2c7db-b3ed-430d-a678-665b398ba314.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 3 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "live_tooltip": "Sun 04 Oct '26   05:18",
+    "historical_compare_before_unix_seconds": 1791091080,
+    "pine_logs": {
+      "paths": [
+        "evidence/plotchar-series-offset-v3-v1-attempt1-logs.txt",
+        "evidence/plotchar-series-offset-v3-v1-attempt1-logs-v1.json",
+        "evidence/plotchar-series-offset-v3-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "4018356259ac040ac95bd94b06e82a2121ff982e6c4198b66496401d5aae0933",
+    "csv_bytes": 1139409,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "TARGET"
+    ],
+    "declared_to_native_header_mapping": {
+      "TARGET": "TARGET"
+    },
+    "csv_rows": 24640,
+    "historical_rows": 24639,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791091080,
+    "first_historical_values": {
+      "TARGET": ""
+    },
+    "last_historical_values": {
+      "TARGET": "0"
+    },
+    "data_window_witness": "captures/v7/evidence/plotchar-series-offset-v3-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "script": "plotchar-zero-offset-v3-control-v1.pine",
+    "attempt": 1,
+    "source_sha256": "a17814c3bbb34f6f6bff472e80a5f2dda577e60c33efe045ed0ea9cffab88522",
+    "indicator_title": "V7 plotchar-zero-offset-v3-control-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/plotchar-zero-offset-v3-control-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T131954.378.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 plotchar-zero-offset-v3-control-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24340,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24640,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T05:19:46.868Z",
+    "live_candle_open_utc": "2026-10-04T05:18:00.000Z",
+    "export_utc": "2026-10-04T05:19:54.540Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/plotchar-zero-offset-v3-control-v1-attempt1-setup.png",
+      "captures/v7/evidence/plotchar-zero-offset-v3-control-v1-attempt1-export.png",
+      "captures/v7/evidence/plotchar-zero-offset-v3-control-v1-attempt1-logs.txt",
+      "captures/v7/evidence/plotchar-zero-offset-v3-control-v1-attempt1-logs-v1.json",
+      "captures/v7/evidence/plotchar-zero-offset-v3-control-v1-attempt1-logs.png",
+      "captures/v7/evidence/plotchar-zero-offset-v3-control-v1-attempt1-visual.png",
+      "captures/v7/evidence/plotchar-zero-offset-v3-control-v1-attempt1-data-window-v1.png",
+      "captures/v7/evidence/plotchar-zero-offset-v3-control-v1-attempt1-data-window-v1.json",
+      "captures/v7/evidence/plotchar-zero-offset-v3-control-v1-attempt1-data-window-v1.txt",
+      "captures/v7/evidence/plotchar-zero-offset-v3-control-v1-attempt1-offset-source-v1.json",
+      "captures/v7/evidence/plotchar-zero-offset-v3-control-v1-attempt1-offset-source-v1.png",
+      "captures/v7/evidence/plotchar-zero-offset-v3-control-v1-attempt1-offset-destination-v1.json",
+      "captures/v7/evidence/plotchar-zero-offset-v3-control-v1-attempt1-offset-destination-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///88025c54-492b-4dff-a3e5-6ae05224a968.pine?placement%3Ddialog",
+          "path": "/88025c54-492b-4dff-a3e5-6ae05224a968.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 3 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "live_tooltip": "Sun 04 Oct '26   05:18",
+    "historical_compare_before_unix_seconds": 1791091080,
+    "pine_logs": {
+      "paths": [
+        "evidence/plotchar-zero-offset-v3-control-v1-attempt1-logs.txt",
+        "evidence/plotchar-zero-offset-v3-control-v1-attempt1-logs-v1.json",
+        "evidence/plotchar-zero-offset-v3-control-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "de44bd6c5ef23d5afc40bc0f5114b9f14a2e10d7169d922ed16b4840e3fc2568",
+    "csv_bytes": 1139410,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "TARGET"
+    ],
+    "declared_to_native_header_mapping": {
+      "TARGET": "TARGET"
+    },
+    "csv_rows": 24640,
+    "historical_rows": 24639,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791091080,
+    "first_historical_values": {
+      "TARGET": "0"
+    },
+    "last_historical_values": {
+      "TARGET": "0"
+    },
+    "data_window_witness": "captures/v7/evidence/plotchar-zero-offset-v3-control-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "script": "plotchar-zero-offset-v3-control-v1.pine",
+    "attempt": 2,
+    "source_sha256": "a17814c3bbb34f6f6bff472e80a5f2dda577e60c33efe045ed0ea9cffab88522",
+    "indicator_title": "V7 plotchar-zero-offset-v3-control-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/plotchar-zero-offset-v3-control-v1-attempt2.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T132027.070.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 plotchar-zero-offset-v3-control-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24341,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24641,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T05:20:19.220Z",
+    "live_candle_open_utc": "2026-10-04T05:20:00.000Z",
+    "export_utc": "2026-10-04T05:20:27.250Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/plotchar-zero-offset-v3-control-v1-attempt2-setup.png",
+      "captures/v7/evidence/plotchar-zero-offset-v3-control-v1-attempt2-export.png",
+      "captures/v7/evidence/plotchar-zero-offset-v3-control-v1-attempt2-logs.txt",
+      "captures/v7/evidence/plotchar-zero-offset-v3-control-v1-attempt2-logs-v1.json",
+      "captures/v7/evidence/plotchar-zero-offset-v3-control-v1-attempt2-logs.png",
+      "captures/v7/evidence/plotchar-zero-offset-v3-control-v1-attempt2-visual.png",
+      "captures/v7/evidence/plotchar-zero-offset-v3-control-v1-attempt2-data-window-v1.png",
+      "captures/v7/evidence/plotchar-zero-offset-v3-control-v1-attempt2-data-window-v1.json",
+      "captures/v7/evidence/plotchar-zero-offset-v3-control-v1-attempt2-data-window-v1.txt",
+      "captures/v7/evidence/plotchar-zero-offset-v3-control-v1-attempt2-offset-source-v1.json",
+      "captures/v7/evidence/plotchar-zero-offset-v3-control-v1-attempt2-offset-source-v1.png",
+      "captures/v7/evidence/plotchar-zero-offset-v3-control-v1-attempt2-offset-destination-v1.json",
+      "captures/v7/evidence/plotchar-zero-offset-v3-control-v1-attempt2-offset-destination-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///d772e0cd-e340-4ddc-a413-7c139594cd3c.pine?placement%3Ddialog",
+          "path": "/d772e0cd-e340-4ddc-a413-7c139594cd3c.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 3 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "live_tooltip": "Sun 04 Oct '26   05:20",
+    "historical_compare_before_unix_seconds": 1791091200,
+    "pine_logs": {
+      "paths": [
+        "evidence/plotchar-zero-offset-v3-control-v1-attempt2-logs.txt",
+        "evidence/plotchar-zero-offset-v3-control-v1-attempt2-logs-v1.json",
+        "evidence/plotchar-zero-offset-v3-control-v1-attempt2-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "886980cb8f326242e4aa33934b55e8ead8e46623e435060eb6375b10ad980eb0",
+    "csv_bytes": 1139459,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "TARGET"
+    ],
+    "declared_to_native_header_mapping": {
+      "TARGET": "TARGET"
+    },
+    "csv_rows": 24641,
+    "historical_rows": 24640,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791091200,
+    "first_historical_values": {
+      "TARGET": "0"
+    },
+    "last_historical_values": {
+      "TARGET": "1"
+    },
+    "data_window_witness": "captures/v7/evidence/plotchar-zero-offset-v3-control-v1-attempt2-data-window-v1.json"
+  },
+  {
+    "script": "plotchar-series-offset-v4-v1.pine",
+    "attempt": 1,
+    "source_sha256": "7e866415f36a532ec9ea3681ed7deeb20bcc61835ce8717efde8c5da643fe63b",
+    "indicator_title": "V7 plotchar-series-offset-v4-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/plotchar-series-offset-v4-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T132106.762.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 plotchar-series-offset-v4-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24341,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24641,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T05:20:52.320Z",
+    "live_candle_open_utc": "2026-10-04T05:20:00.000Z",
+    "export_utc": "2026-10-04T05:21:07.022Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/plotchar-series-offset-v4-v1-attempt1-setup.png",
+      "captures/v7/evidence/plotchar-series-offset-v4-v1-attempt1-export.png",
+      "captures/v7/evidence/plotchar-series-offset-v4-v1-attempt1-logs.txt",
+      "captures/v7/evidence/plotchar-series-offset-v4-v1-attempt1-logs-v1.json",
+      "captures/v7/evidence/plotchar-series-offset-v4-v1-attempt1-logs.png",
+      "captures/v7/evidence/plotchar-series-offset-v4-v1-attempt1-visual.png",
+      "captures/v7/evidence/plotchar-series-offset-v4-v1-attempt1-data-window-v1.png",
+      "captures/v7/evidence/plotchar-series-offset-v4-v1-attempt1-data-window-v1.json",
+      "captures/v7/evidence/plotchar-series-offset-v4-v1-attempt1-data-window-v1.txt",
+      "captures/v7/evidence/plotchar-series-offset-v4-v1-attempt1-offset-source-v1.json",
+      "captures/v7/evidence/plotchar-series-offset-v4-v1-attempt1-offset-source-v1.png",
+      "captures/v7/evidence/plotchar-series-offset-v4-v1-attempt1-offset-destination-v1.json",
+      "captures/v7/evidence/plotchar-series-offset-v4-v1-attempt1-offset-destination-v1.png",
+      "captures/v7/evidence/plotchar-series-offset-v4-v1-attempt1-offset-active-source-v1.json",
+      "captures/v7/evidence/plotchar-series-offset-v4-v1-attempt1-offset-active-source-v1.png",
+      "captures/v7/evidence/plotchar-series-offset-v4-v1-attempt1-offset-active-destination-v1.json",
+      "captures/v7/evidence/plotchar-series-offset-v4-v1-attempt1-offset-active-destination-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///1ed1aa8c-ea0e-4072-a5ba-54b7426844f5.pine?placement%3Ddialog",
+          "path": "/1ed1aa8c-ea0e-4072-a5ba-54b7426844f5.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 4 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "live_tooltip": "Sun 04 Oct '26   05:20",
+    "historical_compare_before_unix_seconds": 1791091200,
+    "pine_logs": {
+      "paths": [
+        "evidence/plotchar-series-offset-v4-v1-attempt1-logs.txt",
+        "evidence/plotchar-series-offset-v4-v1-attempt1-logs-v1.json",
+        "evidence/plotchar-series-offset-v4-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "14a7329a54e42a457a42a8a661e8c26c7a30e0c7ff77ea20af6d3bc301db4197",
+    "csv_bytes": 1139458,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "TARGET"
+    ],
+    "declared_to_native_header_mapping": {
+      "TARGET": "TARGET"
+    },
+    "csv_rows": 24641,
+    "historical_rows": 24640,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791091200,
+    "first_historical_values": {
+      "TARGET": "1"
+    },
+    "last_historical_values": {
+      "TARGET": "0"
+    },
+    "data_window_witness": "captures/v7/evidence/plotchar-series-offset-v4-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "script": "plotchar-series-offset-v3-v1.pine",
+    "attempt": 2,
+    "source_sha256": "84736e570fdde78458f0dcef64e279637412c2d4fb36ae4846b70719a170b3d4",
+    "indicator_title": "V7 plotchar-series-offset-v3-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/plotchar-series-offset-v3-v1-attempt2.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T132241.319.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 plotchar-series-offset-v3-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24342,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24642,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T05:22:34.108Z",
+    "live_candle_open_utc": "2026-10-04T05:22:00.000Z",
+    "export_utc": "2026-10-04T05:22:41.564Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/plotchar-series-offset-v3-v1-attempt2-setup.png",
+      "captures/v7/evidence/plotchar-series-offset-v3-v1-attempt2-export.png",
+      "captures/v7/evidence/plotchar-series-offset-v3-v1-attempt2-logs.txt",
+      "captures/v7/evidence/plotchar-series-offset-v3-v1-attempt2-logs-v1.json",
+      "captures/v7/evidence/plotchar-series-offset-v3-v1-attempt2-logs.png",
+      "captures/v7/evidence/plotchar-series-offset-v3-v1-attempt2-visual.png",
+      "captures/v7/evidence/plotchar-series-offset-v3-v1-attempt2-data-window-v1.png",
+      "captures/v7/evidence/plotchar-series-offset-v3-v1-attempt2-data-window-v1.json",
+      "captures/v7/evidence/plotchar-series-offset-v3-v1-attempt2-data-window-v1.txt",
+      "captures/v7/evidence/plotchar-series-offset-v3-v1-attempt2-offset-source-v1.json",
+      "captures/v7/evidence/plotchar-series-offset-v3-v1-attempt2-offset-source-v1.png",
+      "captures/v7/evidence/plotchar-series-offset-v3-v1-attempt2-offset-destination-v1.json",
+      "captures/v7/evidence/plotchar-series-offset-v3-v1-attempt2-offset-destination-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///b1d1970b-a608-4c6f-aa01-e3dcd1b58e4f.pine?placement%3Ddialog",
+          "path": "/b1d1970b-a608-4c6f-aa01-e3dcd1b58e4f.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 3 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "live_tooltip": "Sun 04 Oct '26   05:22",
+    "historical_compare_before_unix_seconds": 1791091320,
+    "pine_logs": {
+      "paths": [
+        "evidence/plotchar-series-offset-v3-v1-attempt2-logs.txt",
+        "evidence/plotchar-series-offset-v3-v1-attempt2-logs-v1.json",
+        "evidence/plotchar-series-offset-v3-v1-attempt2-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "5aea55740ca1795f6eb7bb572ed88f409e641c4ae032215a98d241f6fc561a84",
+    "csv_bytes": 1139507,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "TARGET"
+    ],
+    "declared_to_native_header_mapping": {
+      "TARGET": "TARGET"
+    },
+    "csv_rows": 24642,
+    "historical_rows": 24641,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791091320,
+    "first_historical_values": {
+      "TARGET": ""
+    },
+    "last_historical_values": {
+      "TARGET": "1"
+    },
+    "data_window_witness": "captures/v7/evidence/plotchar-series-offset-v3-v1-attempt2-data-window-v1.json"
+  },
+  {
+    "script": "plotchar-zero-offset-v4-control-v1.pine",
+    "attempt": 1,
+    "source_sha256": "774c974c9110bcffb269450f16c97d7bce373b0257318499f4419e821bed59e8",
+    "indicator_title": "V7 plotchar-zero-offset-v4-control-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/plotchar-zero-offset-v4-control-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T132314.130.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 plotchar-zero-offset-v4-control-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24342,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24642,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T05:23:06.364Z",
+    "live_candle_open_utc": "2026-10-04T05:22:00.000Z",
+    "export_utc": "2026-10-04T05:23:14.517Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/plotchar-zero-offset-v4-control-v1-attempt1-setup.png",
+      "captures/v7/evidence/plotchar-zero-offset-v4-control-v1-attempt1-export.png",
+      "captures/v7/evidence/plotchar-zero-offset-v4-control-v1-attempt1-logs.txt",
+      "captures/v7/evidence/plotchar-zero-offset-v4-control-v1-attempt1-logs-v1.json",
+      "captures/v7/evidence/plotchar-zero-offset-v4-control-v1-attempt1-logs.png",
+      "captures/v7/evidence/plotchar-zero-offset-v4-control-v1-attempt1-visual.png",
+      "captures/v7/evidence/plotchar-zero-offset-v4-control-v1-attempt1-data-window-v1.png",
+      "captures/v7/evidence/plotchar-zero-offset-v4-control-v1-attempt1-data-window-v1.json",
+      "captures/v7/evidence/plotchar-zero-offset-v4-control-v1-attempt1-data-window-v1.txt",
+      "captures/v7/evidence/plotchar-zero-offset-v4-control-v1-attempt1-offset-source-v1.json",
+      "captures/v7/evidence/plotchar-zero-offset-v4-control-v1-attempt1-offset-source-v1.png",
+      "captures/v7/evidence/plotchar-zero-offset-v4-control-v1-attempt1-offset-destination-v1.json",
+      "captures/v7/evidence/plotchar-zero-offset-v4-control-v1-attempt1-offset-destination-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///d1f023f4-dbc8-4da6-b971-dd377f6d8d60.pine?placement%3Ddialog",
+          "path": "/d1f023f4-dbc8-4da6-b971-dd377f6d8d60.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 4 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "live_tooltip": "Sun 04 Oct '26   05:22",
+    "historical_compare_before_unix_seconds": 1791091320,
+    "pine_logs": {
+      "paths": [
+        "evidence/plotchar-zero-offset-v4-control-v1-attempt1-logs.txt",
+        "evidence/plotchar-zero-offset-v4-control-v1-attempt1-logs-v1.json",
+        "evidence/plotchar-zero-offset-v4-control-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "ad285c23bf601823afc8e9eef453b0616c7f440309a833870a133d56a9b29d08",
+    "csv_bytes": 1139508,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "TARGET"
+    ],
+    "declared_to_native_header_mapping": {
+      "TARGET": "TARGET"
+    },
+    "csv_rows": 24642,
+    "historical_rows": 24641,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791091320,
+    "first_historical_values": {
+      "TARGET": "0"
+    },
+    "last_historical_values": {
+      "TARGET": "1"
+    },
+    "data_window_witness": "captures/v7/evidence/plotchar-zero-offset-v4-control-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "script": "plotchar-zero-offset-v4-control-v1.pine",
+    "attempt": 2,
+    "source_sha256": "774c974c9110bcffb269450f16c97d7bce373b0257318499f4419e821bed59e8",
+    "indicator_title": "V7 plotchar-zero-offset-v4-control-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/plotchar-zero-offset-v4-control-v1-attempt2.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T132345.759.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 plotchar-zero-offset-v4-control-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24342,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24642,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T05:23:38.324Z",
+    "live_candle_open_utc": "2026-10-04T05:22:00.000Z",
+    "export_utc": "2026-10-04T05:23:46.163Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/plotchar-zero-offset-v4-control-v1-attempt2-setup.png",
+      "captures/v7/evidence/plotchar-zero-offset-v4-control-v1-attempt2-export.png",
+      "captures/v7/evidence/plotchar-zero-offset-v4-control-v1-attempt2-logs.txt",
+      "captures/v7/evidence/plotchar-zero-offset-v4-control-v1-attempt2-logs-v1.json",
+      "captures/v7/evidence/plotchar-zero-offset-v4-control-v1-attempt2-logs.png",
+      "captures/v7/evidence/plotchar-zero-offset-v4-control-v1-attempt2-visual.png",
+      "captures/v7/evidence/plotchar-zero-offset-v4-control-v1-attempt2-data-window-v1.png",
+      "captures/v7/evidence/plotchar-zero-offset-v4-control-v1-attempt2-data-window-v1.json",
+      "captures/v7/evidence/plotchar-zero-offset-v4-control-v1-attempt2-data-window-v1.txt",
+      "captures/v7/evidence/plotchar-zero-offset-v4-control-v1-attempt2-offset-source-v1.json",
+      "captures/v7/evidence/plotchar-zero-offset-v4-control-v1-attempt2-offset-source-v1.png",
+      "captures/v7/evidence/plotchar-zero-offset-v4-control-v1-attempt2-offset-destination-v1.json",
+      "captures/v7/evidence/plotchar-zero-offset-v4-control-v1-attempt2-offset-destination-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///c8b29a8e-1829-4167-96dd-4fcf358014d3.pine?placement%3Ddialog",
+          "path": "/c8b29a8e-1829-4167-96dd-4fcf358014d3.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 4 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "live_tooltip": "Sun 04 Oct '26   05:22",
+    "historical_compare_before_unix_seconds": 1791091320,
+    "pine_logs": {
+      "paths": [
+        "evidence/plotchar-zero-offset-v4-control-v1-attempt2-logs.txt",
+        "evidence/plotchar-zero-offset-v4-control-v1-attempt2-logs-v1.json",
+        "evidence/plotchar-zero-offset-v4-control-v1-attempt2-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "006841a8d6bd3732af27ec6d14b4c469e26d7ba55779f0c3d8cb473938464613",
+    "csv_bytes": 1139508,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "TARGET"
+    ],
+    "declared_to_native_header_mapping": {
+      "TARGET": "TARGET"
+    },
+    "csv_rows": 24642,
+    "historical_rows": 24641,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791091320,
+    "first_historical_values": {
+      "TARGET": "0"
+    },
+    "last_historical_values": {
+      "TARGET": "1"
+    },
+    "data_window_witness": "captures/v7/evidence/plotchar-zero-offset-v4-control-v1-attempt2-data-window-v1.json"
+  },
+  {
+    "script": "plotchar-series-offset-v5-v1.pine",
+    "attempt": 1,
+    "source_sha256": "182c65a7ceb54bb1d990f49da1bf7df18fe5c834767bf52a529ab7999961a52a",
+    "indicator_title": "V7 plotchar-series-offset-v5-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/plotchar-series-offset-v5-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T132418.422.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 plotchar-series-offset-v5-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24343,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24643,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T05:24:11.000Z",
+    "live_candle_open_utc": "2026-10-04T05:24:00.000Z",
+    "export_utc": "2026-10-04T05:24:18.626Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/plotchar-series-offset-v5-v1-attempt1-setup.png",
+      "captures/v7/evidence/plotchar-series-offset-v5-v1-attempt1-export.png",
+      "captures/v7/evidence/plotchar-series-offset-v5-v1-attempt1-logs.txt",
+      "captures/v7/evidence/plotchar-series-offset-v5-v1-attempt1-logs-v1.json",
+      "captures/v7/evidence/plotchar-series-offset-v5-v1-attempt1-logs.png",
+      "captures/v7/evidence/plotchar-series-offset-v5-v1-attempt1-visual.png",
+      "captures/v7/evidence/plotchar-series-offset-v5-v1-attempt1-data-window-v1.png",
+      "captures/v7/evidence/plotchar-series-offset-v5-v1-attempt1-data-window-v1.json",
+      "captures/v7/evidence/plotchar-series-offset-v5-v1-attempt1-data-window-v1.txt",
+      "captures/v7/evidence/plotchar-series-offset-v5-v1-attempt1-offset-source-v1.json",
+      "captures/v7/evidence/plotchar-series-offset-v5-v1-attempt1-offset-source-v1.png",
+      "captures/v7/evidence/plotchar-series-offset-v5-v1-attempt1-offset-destination-v1.json",
+      "captures/v7/evidence/plotchar-series-offset-v5-v1-attempt1-offset-destination-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///0165e2b1-5c5e-40a5-bbd4-201b98ade862.pine?placement%3Ddialog",
+          "path": "/0165e2b1-5c5e-40a5-bbd4-201b98ade862.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      },
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///0165e2b1-5c5e-40a5-bbd4-201b98ade862.pine?placement%3Ddialog",
+          "path": "/0165e2b1-5c5e-40a5-bbd4-201b98ade862.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "severity": 4,
+        "message": "A `series int` argument was used with `offset` in the `plotchar()` function, but only its last calculated value is taken into account. The parameter will only support `simple int` arguments in the future; consider eliminating `series int` use for `offset` arguments in your scripts.",
+        "startLineNumber": 4,
+        "startColumn": 1,
+        "endLineNumber": 4,
+        "endColumn": 59
+      }
+    ],
+    "live_tooltip": "Sun 04 Oct '26   05:24",
+    "historical_compare_before_unix_seconds": 1791091440,
+    "pine_logs": {
+      "paths": [
+        "evidence/plotchar-series-offset-v5-v1-attempt1-logs.txt",
+        "evidence/plotchar-series-offset-v5-v1-attempt1-logs-v1.json",
+        "evidence/plotchar-series-offset-v5-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "3ed3675310cb11e2e3dd80fcafa8852f8d2ee6961ba92666267cf61ae609e55d",
+    "csv_bytes": 1139550,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "TARGET"
+    ],
+    "declared_to_native_header_mapping": {
+      "TARGET": "TARGET"
+    },
+    "csv_rows": 24643,
+    "historical_rows": 24642,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791091440,
+    "first_historical_values": {
+      "TARGET": "1"
+    },
+    "last_historical_values": {
+      "TARGET": "1"
+    },
+    "data_window_witness": "captures/v7/evidence/plotchar-series-offset-v5-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "script": "plotchar-zero-offset-v5-control-v1.pine",
+    "attempt": 1,
+    "source_sha256": "2720891b529d06733796087cd9c32e6319fe0f039702c99e65baf2c269ed652c",
+    "indicator_title": "V7 plotchar-zero-offset-v5-control-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/plotchar-zero-offset-v5-control-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T132450.604.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 plotchar-zero-offset-v5-control-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24343,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24643,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T05:24:43.207Z",
+    "live_candle_open_utc": "2026-10-04T05:24:00.000Z",
+    "export_utc": "2026-10-04T05:24:50.846Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/plotchar-zero-offset-v5-control-v1-attempt1-setup.png",
+      "captures/v7/evidence/plotchar-zero-offset-v5-control-v1-attempt1-export.png",
+      "captures/v7/evidence/plotchar-zero-offset-v5-control-v1-attempt1-logs.txt",
+      "captures/v7/evidence/plotchar-zero-offset-v5-control-v1-attempt1-logs-v1.json",
+      "captures/v7/evidence/plotchar-zero-offset-v5-control-v1-attempt1-logs.png",
+      "captures/v7/evidence/plotchar-zero-offset-v5-control-v1-attempt1-visual.png",
+      "captures/v7/evidence/plotchar-zero-offset-v5-control-v1-attempt1-data-window-v1.png",
+      "captures/v7/evidence/plotchar-zero-offset-v5-control-v1-attempt1-data-window-v1.json",
+      "captures/v7/evidence/plotchar-zero-offset-v5-control-v1-attempt1-data-window-v1.txt",
+      "captures/v7/evidence/plotchar-zero-offset-v5-control-v1-attempt1-offset-source-v1.json",
+      "captures/v7/evidence/plotchar-zero-offset-v5-control-v1-attempt1-offset-source-v1.png",
+      "captures/v7/evidence/plotchar-zero-offset-v5-control-v1-attempt1-offset-destination-v1.json",
+      "captures/v7/evidence/plotchar-zero-offset-v5-control-v1-attempt1-offset-destination-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///ebe4c2a7-8098-4b80-936a-f347485bbdd9.pine?placement%3Ddialog",
+          "path": "/ebe4c2a7-8098-4b80-936a-f347485bbdd9.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "live_tooltip": "Sun 04 Oct '26   05:24",
+    "historical_compare_before_unix_seconds": 1791091440,
+    "pine_logs": {
+      "paths": [
+        "evidence/plotchar-zero-offset-v5-control-v1-attempt1-logs.txt",
+        "evidence/plotchar-zero-offset-v5-control-v1-attempt1-logs-v1.json",
+        "evidence/plotchar-zero-offset-v5-control-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "56813f7d2af7d937e897dba12f211c26bdacf1094ee7bd81e61b8a78ae41750c",
+    "csv_bytes": 1139557,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "TARGET"
+    ],
+    "declared_to_native_header_mapping": {
+      "TARGET": "TARGET"
+    },
+    "csv_rows": 24643,
+    "historical_rows": 24642,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791091440,
+    "first_historical_values": {
+      "TARGET": "0"
+    },
+    "last_historical_values": {
+      "TARGET": "1"
+    },
+    "data_window_witness": "captures/v7/evidence/plotchar-zero-offset-v5-control-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "script": "plotchar-zero-offset-v5-control-v1.pine",
+    "attempt": 2,
+    "source_sha256": "2720891b529d06733796087cd9c32e6319fe0f039702c99e65baf2c269ed652c",
+    "indicator_title": "V7 plotchar-zero-offset-v5-control-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/plotchar-zero-offset-v5-control-v1-attempt2.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T132523.649.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 plotchar-zero-offset-v5-control-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24343,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24643,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T05:25:16.307Z",
+    "live_candle_open_utc": "2026-10-04T05:24:00.000Z",
+    "export_utc": "2026-10-04T05:25:24.064Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/plotchar-zero-offset-v5-control-v1-attempt2-setup.png",
+      "captures/v7/evidence/plotchar-zero-offset-v5-control-v1-attempt2-export.png",
+      "captures/v7/evidence/plotchar-zero-offset-v5-control-v1-attempt2-logs.txt",
+      "captures/v7/evidence/plotchar-zero-offset-v5-control-v1-attempt2-logs-v1.json",
+      "captures/v7/evidence/plotchar-zero-offset-v5-control-v1-attempt2-logs.png",
+      "captures/v7/evidence/plotchar-zero-offset-v5-control-v1-attempt2-visual.png",
+      "captures/v7/evidence/plotchar-zero-offset-v5-control-v1-attempt2-data-window-v1.png",
+      "captures/v7/evidence/plotchar-zero-offset-v5-control-v1-attempt2-data-window-v1.json",
+      "captures/v7/evidence/plotchar-zero-offset-v5-control-v1-attempt2-data-window-v1.txt",
+      "captures/v7/evidence/plotchar-zero-offset-v5-control-v1-attempt2-offset-source-v1.json",
+      "captures/v7/evidence/plotchar-zero-offset-v5-control-v1-attempt2-offset-source-v1.png",
+      "captures/v7/evidence/plotchar-zero-offset-v5-control-v1-attempt2-offset-destination-v1.json",
+      "captures/v7/evidence/plotchar-zero-offset-v5-control-v1-attempt2-offset-destination-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///cf519fb5-1068-4a85-b3f8-1926898303b5.pine?placement%3Ddialog",
+          "path": "/cf519fb5-1068-4a85-b3f8-1926898303b5.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "live_tooltip": "Sun 04 Oct '26   05:24",
+    "historical_compare_before_unix_seconds": 1791091440,
+    "pine_logs": {
+      "paths": [
+        "evidence/plotchar-zero-offset-v5-control-v1-attempt2-logs.txt",
+        "evidence/plotchar-zero-offset-v5-control-v1-attempt2-logs-v1.json",
+        "evidence/plotchar-zero-offset-v5-control-v1-attempt2-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "56813f7d2af7d937e897dba12f211c26bdacf1094ee7bd81e61b8a78ae41750c",
+    "csv_bytes": 1139557,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "TARGET"
+    ],
+    "declared_to_native_header_mapping": {
+      "TARGET": "TARGET"
+    },
+    "csv_rows": 24643,
+    "historical_rows": 24642,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791091440,
+    "first_historical_values": {
+      "TARGET": "0"
+    },
+    "last_historical_values": {
+      "TARGET": "1"
+    },
+    "data_window_witness": "captures/v7/evidence/plotchar-zero-offset-v5-control-v1-attempt2-data-window-v1.json"
   }
 ]

@@ -1,0 +1,29 @@
+{
+  "index": 298,
+  "bar": [
+    1791091080,
+    84831.39,
+    84861.48,
+    84830.67,
+    84833.99,
+    56.45319
+  ],
+  "source_row": [
+    1791091080,
+    1
+  ],
+  "browser_utc": "2026-10-04T05:21:11.798Z",
+  "title": "V7 plotchar-series-offset-v4-v1",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   05:18",
+  "visible_range": {
+    "_firstBar": 263,
+    "_lastBar": 301
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}
