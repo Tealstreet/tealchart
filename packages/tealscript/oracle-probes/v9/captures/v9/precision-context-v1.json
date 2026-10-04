@@ -1,0 +1,383 @@
+{
+  "artifact": "Precision capture context v1",
+  "observations": [
+    {
+      "source": "w8-precision-dmi-dmi-plus-di5-adx5-chart-clean-v6-v1.pine",
+      "sha256": "e2d8bcc7733f1fb59d63df8e47ecb8860d8165e2b4fad014e807ee3711d31f02",
+      "attempt": 1,
+      "csv": "captures/v9/w8-precision-dmi-dmi-plus-di5-adx5-chart-clean-v6-v1-attempt1.csv",
+      "completed_rows": 24886,
+      "first_pine_index": "0",
+      "last_completed_pine_index": "24885",
+      "first_time": "1788134400",
+      "last_time": "1791120600",
+      "target_na_flag_counts": {
+        "1": 5,
+        "0": 24881
+      },
+      "matching_predicate_rows": {
+        "V9_MATCH_0": [
+          {
+            "time": "1788135360",
+            "pine_index": "8",
+            "match": "1",
+            "eq": "1",
+            "residual": "-0.0007105427357601002"
+          }
+        ],
+        "V9_MATCH_1": [
+          {
+            "time": "1788135600",
+            "pine_index": "10",
+            "match": "1",
+            "eq": "1",
+            "residual": "0.0007105427357601002"
+          }
+        ],
+        "V9_MATCH_2": [
+          {
+            "time": "1788136440",
+            "pine_index": "17",
+            "match": "1",
+            "eq": "1",
+            "residual": "0.0007105427357601002"
+          }
+        ],
+        "V9_MATCH_3": [
+          {
+            "time": "1788136560",
+            "pine_index": "18",
+            "match": "1",
+            "eq": "1",
+            "residual": "-0.0007105427357601002"
+          }
+        ],
+        "V9_MATCH_4": [
+          {
+            "time": "1788137760",
+            "pine_index": "28",
+            "match": "1",
+            "eq": "1",
+            "residual": "0.0003552713678800501"
+          }
+        ]
+      },
+      "interpretation": "MATCH flags certify only the predicates in the frozen probe. Compare echoed OHLCV, warmup and source context with archived fixture before engine parity. Empty matching sets are INCONCLUSIVE; no rounding or binary64 policy inferred."
+    },
+    {
+      "source": "w8-precision-dmi-dmi-minus-di5-adx5-chart-clean-v6-v1.pine",
+      "sha256": "e6c31a5a0b416c4c7b47b19355f566c8f337d11818b3e72aabe6b8d44c63ec7a",
+      "attempt": 1,
+      "csv": "captures/v9/w8-precision-dmi-dmi-minus-di5-adx5-chart-clean-v6-v1-attempt1.csv",
+      "completed_rows": 24886,
+      "first_pine_index": "0",
+      "last_completed_pine_index": "24885",
+      "first_time": "1788134400",
+      "last_time": "1791120600",
+      "target_na_flag_counts": {
+        "1": 5,
+        "0": 24881
+      },
+      "matching_predicate_rows": {
+        "V9_MATCH_0": [
+          {
+            "time": "1788135480",
+            "pine_index": "9",
+            "match": "1",
+            "eq": "1",
+            "residual": "-0.0003552713678800501"
+          }
+        ],
+        "V9_MATCH_1": [
+          {
+            "time": "1788135840",
+            "pine_index": "12",
+            "match": "1",
+            "eq": "1",
+            "residual": "-0.00017763568394002505"
+          }
+        ],
+        "V9_MATCH_2": [
+          {
+            "time": "1788136800",
+            "pine_index": "20",
+            "match": "1",
+            "eq": "1",
+            "residual": "0.00017763568394002505"
+          }
+        ],
+        "V9_MATCH_3": [
+          {
+            "time": "1788136920",
+            "pine_index": "21",
+            "match": "1",
+            "eq": "1",
+            "residual": "-0.00017763568394002505"
+          }
+        ],
+        "V9_MATCH_4": [
+          {
+            "time": "1788137400",
+            "pine_index": "25",
+            "match": "1",
+            "eq": "1",
+            "residual": "0.0003552713678800501"
+          }
+        ]
+      },
+      "interpretation": "MATCH flags certify only the predicates in the frozen probe. Compare echoed OHLCV, warmup and source context with archived fixture before engine parity. Empty matching sets are INCONCLUSIVE; no rounding or binary64 policy inferred."
+    },
+    {
+      "source": "w8-precision-dmi-dmi-adx-di5-adx5-chart-clean-v6-v1.pine",
+      "sha256": "772dab579dbae6daafb1f115c5eee24ec6f0158779ce9fcd3c688b8c73f14a0d",
+      "attempt": 1,
+      "csv": "captures/v9/w8-precision-dmi-dmi-adx-di5-adx5-chart-clean-v6-v1-attempt1.csv",
+      "completed_rows": 24887,
+      "first_pine_index": "0",
+      "last_completed_pine_index": "24886",
+      "first_time": "1788134400",
+      "last_time": "1791120720",
+      "target_na_flag_counts": {
+        "1": 9,
+        "0": 24878
+      },
+      "matching_predicate_rows": {
+        "V9_MATCH_0": [
+          {
+            "time": "1788135480",
+            "pine_index": "9",
+            "match": "1",
+            "eq": "1",
+            "residual": "-0.0007105427357601002"
+          }
+        ],
+        "V9_MATCH_1": [
+          {
+            "time": "1788135600",
+            "pine_index": "10",
+            "match": "1",
+            "eq": "1",
+            "residual": "-0.0003552713678800501"
+          }
+        ],
+        "V9_MATCH_2": [
+          {
+            "time": "1788135720",
+            "pine_index": "11",
+            "match": "1",
+            "eq": "1",
+            "residual": "-0.0007105427357601002"
+          }
+        ],
+        "V9_MATCH_3": [
+          {
+            "time": "1788136080",
+            "pine_index": "14",
+            "match": "1",
+            "eq": "1",
+            "residual": "-0.0007105427357601002"
+          }
+        ],
+        "V9_MATCH_4": [
+          {
+            "time": "1788136200",
+            "pine_index": "15",
+            "match": "1",
+            "eq": "1",
+            "residual": "-0.0007105427357601002"
+          }
+        ]
+      },
+      "interpretation": "MATCH flags certify only the predicates in the frozen probe. Compare echoed OHLCV, warmup and source context with archived fixture before engine parity. Empty matching sets are INCONCLUSIVE; no rounding or binary64 policy inferred."
+    },
+    {
+      "source": "w8-precision-dmi-dmi-plus-di14-adx14-chart-clean-v6-v1.pine",
+      "sha256": "a463235d3a3afbbf373fff59a16b23e0e0896eff1220d093d25c1fad5ba33a65",
+      "attempt": 1,
+      "csv": "captures/v9/w8-precision-dmi-dmi-plus-di14-adx14-chart-clean-v6-v1-attempt1.csv",
+      "completed_rows": 24887,
+      "first_pine_index": "0",
+      "last_completed_pine_index": "24886",
+      "first_time": "1788134400",
+      "last_time": "1791120720",
+      "target_na_flag_counts": {
+        "1": 14,
+        "0": 24873
+      },
+      "matching_predicate_rows": {
+        "V9_MATCH_0": [
+          {
+            "time": "1788136440",
+            "pine_index": "17",
+            "match": "1",
+            "eq": "1",
+            "residual": "0.0007105427357601002"
+          }
+        ],
+        "V9_MATCH_1": [
+          {
+            "time": "1788136680",
+            "pine_index": "19",
+            "match": "1",
+            "eq": "1",
+            "residual": "0.0007105427357601002"
+          }
+        ],
+        "V9_MATCH_2": [
+          {
+            "time": "1788137280",
+            "pine_index": "24",
+            "match": "1",
+            "eq": "1",
+            "residual": "0.0007105427357601002"
+          }
+        ],
+        "V9_MATCH_3": [
+          {
+            "time": "1788137880",
+            "pine_index": "29",
+            "match": "1",
+            "eq": "1",
+            "residual": "-0.0007105427357601002"
+          }
+        ],
+        "V9_MATCH_4": [
+          {
+            "time": "1788138120",
+            "pine_index": "31",
+            "match": "1",
+            "eq": "1",
+            "residual": "0.0007105427357601002"
+          }
+        ]
+      },
+      "interpretation": "MATCH flags certify only the predicates in the frozen probe. Compare echoed OHLCV, warmup and source context with archived fixture before engine parity. Empty matching sets are INCONCLUSIVE; no rounding or binary64 policy inferred."
+    },
+    {
+      "source": "w8-precision-dmi-dmi-minus-di14-adx14-chart-clean-v6-v1.pine",
+      "sha256": "a199e733808bad8ab4f25ba4e99fccbd5b374b0ddd214e415ae4dcb976513c55",
+      "attempt": 1,
+      "csv": "captures/v9/w8-precision-dmi-dmi-minus-di14-adx14-chart-clean-v6-v1-attempt1.csv",
+      "completed_rows": 24887,
+      "first_pine_index": "0",
+      "last_completed_pine_index": "24886",
+      "first_time": "1788134400",
+      "last_time": "1791120720",
+      "target_na_flag_counts": {
+        "1": 14,
+        "0": 24873
+      },
+      "matching_predicate_rows": {
+        "V9_MATCH_0": [
+          {
+            "time": "1788136320",
+            "pine_index": "16",
+            "match": "1",
+            "eq": "1",
+            "residual": "0.0003552713678800501"
+          }
+        ],
+        "V9_MATCH_1": [
+          {
+            "time": "1788136440",
+            "pine_index": "17",
+            "match": "1",
+            "eq": "1",
+            "residual": "-0.0003552713678800501"
+          }
+        ],
+        "V9_MATCH_2": [
+          {
+            "time": "1788136680",
+            "pine_index": "19",
+            "match": "1",
+            "eq": "1",
+            "residual": "-0.0003552713678800501"
+          }
+        ],
+        "V9_MATCH_3": [
+          {
+            "time": "1788136800",
+            "pine_index": "20",
+            "match": "1",
+            "eq": "1",
+            "residual": "-0.0003552713678800501"
+          }
+        ],
+        "V9_MATCH_4": [
+          {
+            "time": "1788136920",
+            "pine_index": "21",
+            "match": "1",
+            "eq": "1",
+            "residual": "0.0003552713678800501"
+          }
+        ]
+      },
+      "interpretation": "MATCH flags certify only the predicates in the frozen probe. Compare echoed OHLCV, warmup and source context with archived fixture before engine parity. Empty matching sets are INCONCLUSIVE; no rounding or binary64 policy inferred."
+    },
+    {
+      "source": "w8-precision-dmi-dmi-adx-di14-adx14-chart-clean-v6-v1.pine",
+      "sha256": "6532b18a8d2059753c996947db2d845a6ad6358fc1a99330069b873ccbfd7453",
+      "attempt": 1,
+      "csv": "captures/v9/w8-precision-dmi-dmi-adx-di14-adx14-chart-clean-v6-v1-attempt1.csv",
+      "completed_rows": 24887,
+      "first_pine_index": "0",
+      "last_completed_pine_index": "24886",
+      "first_time": "1788134400",
+      "last_time": "1791120720",
+      "target_na_flag_counts": {
+        "1": 27,
+        "0": 24860
+      },
+      "matching_predicate_rows": {
+        "V9_MATCH_0": [
+          {
+            "time": "1788137640",
+            "pine_index": "27",
+            "match": "1",
+            "eq": "1",
+            "residual": "0.0007105427357601002"
+          }
+        ],
+        "V9_MATCH_1": [
+          {
+            "time": "1788137760",
+            "pine_index": "28",
+            "match": "1",
+            "eq": "1",
+            "residual": "0.0007105427357601002"
+          }
+        ],
+        "V9_MATCH_2": [
+          {
+            "time": "1788137880",
+            "pine_index": "29",
+            "match": "1",
+            "eq": "1",
+            "residual": "0.0003552713678800501"
+          }
+        ],
+        "V9_MATCH_3": [
+          {
+            "time": "1788138000",
+            "pine_index": "30",
+            "match": "1",
+            "eq": "1",
+            "residual": "0.0010658141036401503"
+          }
+        ],
+        "V9_MATCH_4": [
+          {
+            "time": "1788138120",
+            "pine_index": "31",
+            "match": "1",
+            "eq": "1",
+            "residual": "0.0007105427357601002"
+          }
+        ]
+      },
+      "interpretation": "MATCH flags certify only the predicates in the frozen probe. Compare echoed OHLCV, warmup and source context with archived fixture before engine parity. Empty matching sets are INCONCLUSIVE; no rounding or binary64 policy inferred."
+    }
+  ]
+}
