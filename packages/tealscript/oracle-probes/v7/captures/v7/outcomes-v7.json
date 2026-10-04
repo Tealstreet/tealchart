@@ -35476,5 +35476,5125 @@
       "REQUESTED_CONFIRMED": "1"
     },
     "data_window_witness": "captures/v7/evidence/barstate-security-confirmed-v6-v1-attempt3-data-window-v1.json"
+  },
+  {
+    "script": "session-lastbar-missing-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "71e333d475fc8540e0e5e1c5c2dff4b629991f0100b2f4230031ea4a78204db8",
+    "indicator_title": "V7 session-lastbar-missing-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/session-lastbar-missing-v6-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T150305.991.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 session-lastbar-missing-v6-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24392,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24692,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T07:02:58.906Z",
+    "live_candle_open_utc": "2026-10-04T07:02:00.000Z",
+    "export_utc": "2026-10-04T07:03:06.540Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/session-lastbar-missing-v6-v1-attempt1-setup.png",
+      "captures/v7/evidence/session-lastbar-missing-v6-v1-attempt1-export.png",
+      "captures/v7/evidence/session-lastbar-missing-v6-v1-attempt1-logs.txt",
+      "captures/v7/evidence/session-lastbar-missing-v6-v1-attempt1-logs-v1.json",
+      "captures/v7/evidence/session-lastbar-missing-v6-v1-attempt1-logs.png",
+      "captures/v7/evidence/session-lastbar-missing-v6-v1-attempt1-visual.png",
+      "captures/v7/evidence/session-lastbar-missing-v6-v1-attempt1-data-window-v1.png",
+      "captures/v7/evidence/session-lastbar-missing-v6-v1-attempt1-data-window-v1.json",
+      "captures/v7/evidence/session-lastbar-missing-v6-v1-attempt1-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T07:02:59.783Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790792160,
+            84000,
+            84020.46,
+            83978,
+            83978.01,
+            8.50788
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791097320,
+            85026.02,
+            85026.02,
+            85022,
+            85022.01,
+            1.53261
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 session-lastbar-missing-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2544,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790792160,
+                0,
+                1790792160000
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791097320,
+                0,
+                1791097320000
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:03:00.757Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790792160,
+            84000,
+            84020.46,
+            83978,
+            83978.01,
+            8.50788
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791097320,
+            85026.02,
+            85026.02,
+            85022,
+            85022.01,
+            1.53261
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 session-lastbar-missing-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24692,
+            "first": {
+              "index": -1022148,
+              "value": [
+                1788134400,
+                0,
+                1788134400000
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791097320,
+                0,
+                1791097320000
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:03:01.445Z",
+        "bars": 24692,
+        "end": true,
+        "first": {
+          "index": -24392,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791097320,
+            85026.02,
+            85026.02,
+            85022,
+            85022,
+            1.64395
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 session-lastbar-missing-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 24692,
+            "first": {
+              "index": -24392,
+              "value": [
+                1788134400,
+                0,
+                1788134400000
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791097320,
+                0,
+                1791097320000
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   07:02",
+    "historical_compare_before_unix_seconds": 1791097320,
+    "pine_logs": {
+      "paths": [
+        "evidence/session-lastbar-missing-v6-v1-attempt1-logs.txt",
+        "evidence/session-lastbar-missing-v6-v1-attempt1-logs-v1.json",
+        "evidence/session-lastbar-missing-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "f8277c0a536c25856f2eb27123cc14cb7a19e904e27e80ee4b0148ab28d1be06",
+    "csv_bytes": 1487559,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "LASTBAR",
+      "TIME"
+    ],
+    "declared_to_native_header_mapping": {
+      "LASTBAR": "LASTBAR",
+      "TIME": "TIME"
+    },
+    "csv_rows": 24692,
+    "historical_rows": 24691,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791097320,
+    "first_historical_values": {
+      "LASTBAR": "0",
+      "TIME": "1788134400000"
+    },
+    "last_historical_values": {
+      "LASTBAR": "0",
+      "TIME": "1791097200000"
+    },
+    "data_window_witness": "captures/v7/evidence/session-lastbar-missing-v6-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "script": "session-lastbar-missing-v6-v1.pine",
+    "attempt": 2,
+    "source_sha256": "71e333d475fc8540e0e5e1c5c2dff4b629991f0100b2f4230031ea4a78204db8",
+    "indicator_title": "V7 session-lastbar-missing-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/session-lastbar-missing-v6-v1-attempt2.csv",
+    "original_download_filename": "BATS_BRK.A, 2.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BATS:BRK.A",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 session-lastbar-missing-v6-v1",
+      "dataset_start_utc": "2026-06-25T18:40:00.000Z",
+      "first_chart_bar": {
+        "index": -2256,
+        "value": [
+          1782412800,
+          732964.81,
+          732964.81,
+          732964.81,
+          732964.81,
+          2
+        ]
+      },
+      "chart_bars": 2556,
+      "subscription": "pro_premium",
+      "native_end_of_data": false,
+      "exchange_timezone": "America/New_York",
+      "exchange_session": "0930-1600",
+      "currency": "USD",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T07:03:57.870Z",
+    "live_candle_open_utc": "2026-10-02T19:58:00.000Z",
+    "export_utc": "2026-10-04T07:04:05.902Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/session-lastbar-missing-v6-v1-attempt2-setup.png",
+      "captures/v7/evidence/session-lastbar-missing-v6-v1-attempt2-export.png",
+      "captures/v7/evidence/session-lastbar-missing-v6-v1-attempt2-logs.txt",
+      "captures/v7/evidence/session-lastbar-missing-v6-v1-attempt2-logs-v1.json",
+      "captures/v7/evidence/session-lastbar-missing-v6-v1-attempt2-logs.png",
+      "captures/v7/evidence/session-lastbar-missing-v6-v1-attempt2-visual.png",
+      "captures/v7/evidence/session-lastbar-missing-v6-v1-attempt2-data-window-v1.png",
+      "captures/v7/evidence/session-lastbar-missing-v6-v1-attempt2-data-window-v1.json",
+      "captures/v7/evidence/session-lastbar-missing-v6-v1-attempt2-data-window-v1.txt",
+      "captures/v7/evidence/session-lastbar-missing-v6-v1-attempt2-session-missing-Oct1-v1.json",
+      "captures/v7/evidence/session-lastbar-missing-v6-v1-attempt2-session-missing-Oct1-v1.png",
+      "captures/v7/evidence/session-lastbar-missing-v6-v1-attempt2-session-control-Sep30-v1.json",
+      "captures/v7/evidence/session-lastbar-missing-v6-v1-attempt2-session-control-Sep30-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T07:03:58.783Z",
+        "bars": 300,
+        "end": false,
+        "first": {
+          "index": 0,
+          "value": [
+            1790101080,
+            755395.65,
+            755395.65,
+            755395.65,
+            755395.65,
+            1
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1790971080,
+            754580,
+            754850.08,
+            754580,
+            754724,
+            3
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 session-lastbar-missing-v6-v1",
+            "status": {
+              "type": 1,
+              "startTime": 1791097437910
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:03:59.465Z",
+        "bars": 300,
+        "end": false,
+        "first": {
+          "index": 0,
+          "value": [
+            1790101080,
+            755395.65,
+            755395.65,
+            755395.65,
+            755395.65,
+            1
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1790971080,
+            754580,
+            754850.08,
+            754580,
+            754724,
+            3
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 session-lastbar-missing-v6-v1",
+            "status": {
+              "type": 1,
+              "startTime": 1791097437910
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:04:00.147Z",
+        "bars": 300,
+        "end": false,
+        "first": {
+          "index": 0,
+          "value": [
+            1790101080,
+            755395.65,
+            755395.65,
+            755395.65,
+            755395.65,
+            1
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1790971080,
+            754580,
+            754850.08,
+            754580,
+            754724,
+            3
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 session-lastbar-missing-v6-v1",
+            "status": {
+              "type": 1,
+              "startTime": 1791097437910
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:04:00.923Z",
+        "bars": 2556,
+        "end": false,
+        "first": {
+          "index": -2256,
+          "value": [
+            1782412800,
+            732964.81,
+            732964.81,
+            732964.81,
+            732964.81,
+            2
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1790971080,
+            754580,
+            754850.08,
+            754580,
+            754724,
+            3
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 session-lastbar-missing-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 2556,
+            "first": {
+              "index": -2256,
+              "value": [
+                1782412800,
+                0,
+                1782412800000
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1790971080,
+                1,
+                1790971080000
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Fri 02 Oct '26   19:58",
+    "historical_compare_before_unix_seconds": 1790971080,
+    "pine_logs": {
+      "paths": [
+        "evidence/session-lastbar-missing-v6-v1-attempt2-logs.txt",
+        "evidence/session-lastbar-missing-v6-v1-attempt2-logs-v1.json",
+        "evidence/session-lastbar-missing-v6-v1-attempt2-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "f5e7c0bc8f79058ee64d8d1a44ca43357f67f97af19dfdb6b992b50fb14c6e10",
+    "csv_bytes": 163690,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "LASTBAR",
+      "TIME"
+    ],
+    "declared_to_native_header_mapping": {
+      "LASTBAR": "LASTBAR",
+      "TIME": "TIME"
+    },
+    "csv_rows": 2556,
+    "historical_rows": 2555,
+    "first_csv_timestamp_seconds": 1782412800,
+    "last_csv_timestamp_seconds": 1790971080,
+    "first_historical_values": {
+      "LASTBAR": "0",
+      "TIME": "1782412800000"
+    },
+    "last_historical_values": {
+      "LASTBAR": "0",
+      "TIME": "1790970840000"
+    },
+    "data_window_witness": "captures/v7/evidence/session-lastbar-missing-v6-v1-attempt2-data-window-v1.json"
+  },
+  {
+    "script": "analyst-target-availability-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "422e8f79569faac57bcccee64f907f7de606c8d1179c443b9d526e7611caba55",
+    "indicator_title": "V7 analyst-target-availability-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/analyst-target-availability-v6-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T150832.640.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 analyst-target-availability-v6-v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24394,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24695,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": "2026-10-04T07:08:00.000Z",
+    "export_utc": "2026-10-04T07:08:33.004Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/analyst-target-availability-v6-v1-attempt1-setup.png",
+      "captures/v7/evidence/analyst-target-availability-v6-v1-attempt1-export.png",
+      "captures/v7/evidence/analyst-target-availability-v6-v1-attempt1-logs.txt",
+      "captures/v7/evidence/analyst-target-availability-v6-v1-attempt1-logs-v1.json",
+      "captures/v7/evidence/analyst-target-availability-v6-v1-attempt1-logs.png",
+      "captures/v7/evidence/analyst-target-availability-v6-v1-attempt1-visual.png",
+      "captures/v7/evidence/analyst-target-availability-v6-v1-attempt1-data-window-v1.png",
+      "captures/v7/evidence/analyst-target-availability-v6-v1-attempt1-data-window-v1.json",
+      "captures/v7/evidence/analyst-target-availability-v6-v1-attempt1-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T07:06:20.177Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790792400,
+            83982.16,
+            83998.01,
+            83939.04,
+            83946.02,
+            12.92004
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791097560,
+            85016.08,
+            85016.08,
+            85016.07,
+            85016.08,
+            0.60658
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:06:21.223Z",
+        "bars": 24694,
+        "end": true,
+        "first": {
+          "index": -24394,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791097560,
+            85016.08,
+            85016.08,
+            85016.07,
+            85016.08,
+            0.6237
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:06:21.939Z",
+        "bars": 24694,
+        "end": true,
+        "first": {
+          "index": -24394,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791097560,
+            85016.08,
+            85016.08,
+            85016.07,
+            85016.07,
+            0.62743
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:06:22.629Z",
+        "bars": 24694,
+        "end": true,
+        "first": {
+          "index": -24394,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791097560,
+            85016.08,
+            85016.08,
+            85016.07,
+            85016.08,
+            0.63303
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:06:23.287Z",
+        "bars": 24694,
+        "end": true,
+        "first": {
+          "index": -24394,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791097560,
+            85016.08,
+            85016.08,
+            85016.07,
+            85016.08,
+            0.63303
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:06:24.139Z",
+        "bars": 24694,
+        "end": true,
+        "first": {
+          "index": -24394,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791097560,
+            85016.08,
+            85016.08,
+            85016.07,
+            85016.07,
+            0.6408
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:06:24.799Z",
+        "bars": 24694,
+        "end": true,
+        "first": {
+          "index": -24394,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791097560,
+            85016.08,
+            85016.08,
+            85016.07,
+            85016.08,
+            0.65831
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:06:25.458Z",
+        "bars": 24694,
+        "end": true,
+        "first": {
+          "index": -24394,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791097560,
+            85016.08,
+            85016.08,
+            85016.07,
+            85016.08,
+            0.65831
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:06:26.207Z",
+        "bars": 24694,
+        "end": true,
+        "first": {
+          "index": -24394,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791097560,
+            85016.08,
+            85016.08,
+            85016.07,
+            85016.07,
+            0.67229
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:06:26.874Z",
+        "bars": 24694,
+        "end": true,
+        "first": {
+          "index": -24394,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791097560,
+            85016.08,
+            85016.08,
+            85016.07,
+            85016.08,
+            0.67428
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:06:27.633Z",
+        "bars": 24694,
+        "end": true,
+        "first": {
+          "index": -24394,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791097560,
+            85016.08,
+            85016.08,
+            85016.07,
+            85016.08,
+            0.67428
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:06:28.305Z",
+        "bars": 24694,
+        "end": true,
+        "first": {
+          "index": -24394,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791097560,
+            85016.08,
+            85016.08,
+            85016.07,
+            85016.08,
+            0.684
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:06:28.963Z",
+        "bars": 24694,
+        "end": true,
+        "first": {
+          "index": -24394,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791097560,
+            85016.08,
+            85016.08,
+            85016.07,
+            85016.08,
+            0.71989
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:06:29.625Z",
+        "bars": 24694,
+        "end": true,
+        "first": {
+          "index": -24394,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791097560,
+            85016.08,
+            85016.08,
+            85016.07,
+            85016.08,
+            0.71989
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:06:30.288Z",
+        "bars": 24694,
+        "end": true,
+        "first": {
+          "index": -24394,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791097560,
+            85016.08,
+            85016.08,
+            85016.07,
+            85016.08,
+            0.71989
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:06:30.954Z",
+        "bars": 24694,
+        "end": true,
+        "first": {
+          "index": -24394,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791097560,
+            85016.08,
+            85016.08,
+            85016.07,
+            85016.07,
+            0.73082
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:06:31.639Z",
+        "bars": 24694,
+        "end": true,
+        "first": {
+          "index": -24394,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791097560,
+            85016.08,
+            85016.08,
+            85016.07,
+            85016.07,
+            0.73082
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:06:32.302Z",
+        "bars": 24694,
+        "end": true,
+        "first": {
+          "index": -24394,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791097560,
+            85016.08,
+            85016.08,
+            85016.07,
+            85016.07,
+            0.73353
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:06:32.976Z",
+        "bars": 24694,
+        "end": true,
+        "first": {
+          "index": -24394,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791097560,
+            85016.08,
+            85016.08,
+            85016.07,
+            85016.07,
+            0.74246
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:06:33.640Z",
+        "bars": 24694,
+        "end": true,
+        "first": {
+          "index": -24394,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791097560,
+            85016.08,
+            85016.08,
+            85016.07,
+            85016.07,
+            0.74246
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:06:34.316Z",
+        "bars": 24694,
+        "end": true,
+        "first": {
+          "index": -24394,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791097560,
+            85016.08,
+            85016.08,
+            85016.07,
+            85016.07,
+            0.7463
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:06:35.155Z",
+        "bars": 24694,
+        "end": true,
+        "first": {
+          "index": -24394,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791097560,
+            85016.08,
+            85016.08,
+            85016.07,
+            85016.08,
+            0.75799
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:06:35.819Z",
+        "bars": 24694,
+        "end": true,
+        "first": {
+          "index": -24394,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791097560,
+            85016.08,
+            85016.08,
+            85016.07,
+            85016.07,
+            0.75964
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:06:36.480Z",
+        "bars": 24694,
+        "end": true,
+        "first": {
+          "index": -24394,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791097560,
+            85016.08,
+            85016.08,
+            85016.07,
+            85016.07,
+            0.75964
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:06:37.140Z",
+        "bars": 24694,
+        "end": true,
+        "first": {
+          "index": -24394,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791097560,
+            85016.08,
+            85016.08,
+            85016.07,
+            85016.07,
+            0.77469
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:06:37.803Z",
+        "bars": 24694,
+        "end": true,
+        "first": {
+          "index": -24394,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791097560,
+            85016.08,
+            85016.08,
+            85016.07,
+            85016.08,
+            0.77676
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:06:38.474Z",
+        "bars": 24694,
+        "end": true,
+        "first": {
+          "index": -24394,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791097560,
+            85016.08,
+            85016.08,
+            85016.07,
+            85016.08,
+            0.77676
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:06:39.138Z",
+        "bars": 24694,
+        "end": true,
+        "first": {
+          "index": -24394,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791097560,
+            85016.08,
+            85016.08,
+            85016.07,
+            85016.07,
+            0.78458
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:06:39.813Z",
+        "bars": 24694,
+        "end": true,
+        "first": {
+          "index": -24394,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791097560,
+            85016.08,
+            85016.08,
+            85016.07,
+            85016.07,
+            0.79324
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:06:40.480Z",
+        "bars": 24694,
+        "end": true,
+        "first": {
+          "index": -24394,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791097560,
+            85016.08,
+            85016.08,
+            85016.07,
+            85016.07,
+            0.79324
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:06:41.141Z",
+        "bars": 24694,
+        "end": true,
+        "first": {
+          "index": -24394,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791097560,
+            85016.08,
+            85016.08,
+            85016.07,
+            85016.08,
+            0.79853
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:06:41.807Z",
+        "bars": 24694,
+        "end": true,
+        "first": {
+          "index": -24394,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791097560,
+            85016.08,
+            85016.08,
+            85016.07,
+            85016.08,
+            0.80144
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:06:42.473Z",
+        "bars": 24694,
+        "end": true,
+        "first": {
+          "index": -24394,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791097560,
+            85016.08,
+            85016.08,
+            85016.07,
+            85016.08,
+            0.80144
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:06:43.225Z",
+        "bars": 24694,
+        "end": true,
+        "first": {
+          "index": -24394,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791097560,
+            85016.08,
+            85016.08,
+            85016.07,
+            85016.07,
+            0.80316
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:06:43.889Z",
+        "bars": 24694,
+        "end": true,
+        "first": {
+          "index": -24394,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791097560,
+            85016.08,
+            85016.08,
+            85016.07,
+            85016.07,
+            0.8091
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:06:44.627Z",
+        "bars": 24694,
+        "end": true,
+        "first": {
+          "index": -24394,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791097560,
+            85016.08,
+            85016.08,
+            85016.07,
+            85016.07,
+            0.8091
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:06:45.341Z",
+        "bars": 24694,
+        "end": true,
+        "first": {
+          "index": -24394,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791097560,
+            85016.08,
+            85016.08,
+            85016.07,
+            85016.08,
+            0.8323
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:06:46.004Z",
+        "bars": 24694,
+        "end": true,
+        "first": {
+          "index": -24394,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791097560,
+            85016.08,
+            85016.08,
+            85016.07,
+            85016.08,
+            0.83431
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:06:46.670Z",
+        "bars": 24694,
+        "end": true,
+        "first": {
+          "index": -24394,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791097560,
+            85016.08,
+            85016.08,
+            85016.07,
+            85016.08,
+            0.83431
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:06:47.437Z",
+        "bars": 24694,
+        "end": true,
+        "first": {
+          "index": -24394,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791097560,
+            85016.08,
+            85016.08,
+            85016.07,
+            85016.08,
+            0.84085
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   07:08",
+    "historical_compare_before_unix_seconds": 1791097680,
+    "pine_logs": {
+      "paths": [
+        "evidence/analyst-target-availability-v6-v1-attempt1-logs.txt",
+        "evidence/analyst-target-availability-v6-v1-attempt1-logs-v1.json",
+        "evidence/analyst-target-availability-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "d5ce8deeba32e64e7d2568bf08fbd06ca18d0aca66bbcbf2f6e073b8280ba7d7",
+    "csv_bytes": 1240824,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "HIGH",
+      "LOW",
+      "MEDIAN",
+      "AVERAGE",
+      "DATE",
+      "ESTIMATES"
+    ],
+    "declared_to_native_header_mapping": {
+      "HIGH": "HIGH",
+      "LOW": "LOW",
+      "MEDIAN": "MEDIAN",
+      "AVERAGE": "AVERAGE",
+      "DATE": "DATE",
+      "ESTIMATES": "ESTIMATES"
+    },
+    "csv_rows": 24695,
+    "historical_rows": 24694,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791097680,
+    "first_historical_values": {
+      "HIGH": "",
+      "LOW": "",
+      "MEDIAN": "",
+      "AVERAGE": "",
+      "DATE": "",
+      "ESTIMATES": ""
+    },
+    "last_historical_values": {
+      "HIGH": "",
+      "LOW": "",
+      "MEDIAN": "",
+      "AVERAGE": "",
+      "DATE": "",
+      "ESTIMATES": ""
+    },
+    "data_window_witness": "captures/v7/evidence/analyst-target-availability-v6-v1-attempt1-data-window-v1.json",
+    "readiness_instrument_note": "Native accepted status2 with zero study cache rows after full BTC history. Initial capture helper timed out expecting populated rows; native timeline is retained. Direct capture/export confirmed RUNS with all six declared columns blank on every CSV row. Exact resetUTC was not retained through the helper timeout; resetUTC=null is intentional. Readiness now admits accepted zero-cache sources after>=5 native polls with unchanged host/source/history guards."
+  },
+  {
+    "script": "analyst-target-availability-v6-v1.pine",
+    "attempt": 2,
+    "source_sha256": "422e8f79569faac57bcccee64f907f7de606c8d1179c443b9d526e7611caba55",
+    "indicator_title": "V7 analyst-target-availability-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/analyst-target-availability-v6-v1-attempt2.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 1D.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "1D",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 analyst-target-availability-v6-v1",
+      "dataset_start_utc": "2017-08-17T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -3036,
+        "value": [
+          1502928000,
+          4261.48,
+          4485.39,
+          4200.74,
+          4285.08,
+          795.150377
+        ]
+      },
+      "chart_bars": 3336,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T07:09:36.542Z",
+    "live_candle_open_utc": "2026-10-04T00:00:00.000Z",
+    "export_utc": "2026-10-04T07:09:45.467Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/analyst-target-availability-v6-v1-attempt2-setup.png",
+      "captures/v7/evidence/analyst-target-availability-v6-v1-attempt2-export.png",
+      "captures/v7/evidence/analyst-target-availability-v6-v1-attempt2-logs.txt",
+      "captures/v7/evidence/analyst-target-availability-v6-v1-attempt2-logs-v1.json",
+      "captures/v7/evidence/analyst-target-availability-v6-v1-attempt2-logs.png",
+      "captures/v7/evidence/analyst-target-availability-v6-v1-attempt2-visual.png",
+      "captures/v7/evidence/analyst-target-availability-v6-v1-attempt2-data-window-v1.png",
+      "captures/v7/evidence/analyst-target-availability-v6-v1-attempt2-data-window-v1.json",
+      "captures/v7/evidence/analyst-target-availability-v6-v1-attempt2-data-window-v1.txt"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T07:09:37.481Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1571356800,
+            8070.71,
+            8115,
+            7816.01,
+            7947.01,
+            31353.181416
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791072000,
+            84753.57,
+            85072.54,
+            84719.99,
+            85016.08,
+            1694.10111
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:09:38.479Z",
+        "bars": 3336,
+        "end": true,
+        "first": {
+          "index": -3036,
+          "value": [
+            1502928000,
+            4261.48,
+            4485.39,
+            4200.74,
+            4285.08,
+            795.150377
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791072000,
+            84753.57,
+            85072.54,
+            84719.99,
+            85016.08,
+            1694.10111
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:09:39.180Z",
+        "bars": 3336,
+        "end": true,
+        "first": {
+          "index": -3036,
+          "value": [
+            1502928000,
+            4261.48,
+            4485.39,
+            4200.74,
+            4285.08,
+            795.150377
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791072000,
+            84753.57,
+            85072.54,
+            84719.99,
+            85016.07,
+            1694.12264
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:09:39.846Z",
+        "bars": 3336,
+        "end": true,
+        "first": {
+          "index": -3036,
+          "value": [
+            1502928000,
+            4261.48,
+            4485.39,
+            4200.74,
+            4285.08,
+            795.150377
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791072000,
+            84753.57,
+            85072.54,
+            84719.99,
+            85016.07,
+            1694.12264
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:09:40.508Z",
+        "bars": 3336,
+        "end": true,
+        "first": {
+          "index": -3036,
+          "value": [
+            1502928000,
+            4261.48,
+            4485.39,
+            4200.74,
+            4285.08,
+            795.150377
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791072000,
+            84753.57,
+            85072.54,
+            84719.99,
+            85016.07,
+            1694.12264
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26",
+    "historical_compare_before_unix_seconds": 1791072000,
+    "pine_logs": {
+      "paths": [
+        "evidence/analyst-target-availability-v6-v1-attempt2-logs.txt",
+        "evidence/analyst-target-availability-v6-v1-attempt2-logs-v1.json",
+        "evidence/analyst-target-availability-v6-v1-attempt2-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "d8dbe1862416a97e68fb1fae24fdb331df638f75420f2f0a6df0b8e5c5c35cdb",
+    "csv_bytes": 163492,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "HIGH",
+      "LOW",
+      "MEDIAN",
+      "AVERAGE",
+      "DATE",
+      "ESTIMATES"
+    ],
+    "declared_to_native_header_mapping": {
+      "HIGH": "HIGH",
+      "LOW": "LOW",
+      "MEDIAN": "MEDIAN",
+      "AVERAGE": "AVERAGE",
+      "DATE": "DATE",
+      "ESTIMATES": "ESTIMATES"
+    },
+    "csv_rows": 3336,
+    "historical_rows": 3335,
+    "first_csv_timestamp_seconds": 1502928000,
+    "last_csv_timestamp_seconds": 1791072000,
+    "first_historical_values": {
+      "HIGH": "",
+      "LOW": "",
+      "MEDIAN": "",
+      "AVERAGE": "",
+      "DATE": "",
+      "ESTIMATES": ""
+    },
+    "last_historical_values": {
+      "HIGH": "",
+      "LOW": "",
+      "MEDIAN": "",
+      "AVERAGE": "",
+      "DATE": "",
+      "ESTIMATES": ""
+    },
+    "data_window_witness": "captures/v7/evidence/analyst-target-availability-v6-v1-attempt2-data-window-v1.json"
+  },
+  {
+    "script": "analyst-target-availability-v6-v1.pine",
+    "attempt": 3,
+    "source_sha256": "422e8f79569faac57bcccee64f907f7de606c8d1179c443b9d526e7611caba55",
+    "indicator_title": "V7 analyst-target-availability-v6-v1",
+    "status": "RUNS",
+    "csv_file": "captures/v7/analyst-target-availability-v6-v1-attempt3.csv",
+    "original_download_filename": "BATS_AAPL, 1D.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BATS:AAPL",
+      "timeframe": "1D",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V7 analyst-target-availability-v6-v1",
+      "dataset_start_utc": "1980-12-12T14:30:00.000Z",
+      "first_chart_bar": {
+        "index": -11238,
+        "value": [
+          345479400,
+          0.128348,
+          0.128348,
+          0.128348,
+          0.128348,
+          469034068
+        ]
+      },
+      "chart_bars": 11538,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "America/New_York",
+      "exchange_session": "0930-1600",
+      "currency": "USD",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": "2026-10-02T13:30:00.000Z",
+    "export_utc": "2026-10-04T07:12:39.623Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v7/evidence/analyst-target-availability-v6-v1-attempt3-setup.png",
+      "captures/v7/evidence/analyst-target-availability-v6-v1-attempt3-export.png",
+      "captures/v7/evidence/analyst-target-availability-v6-v1-attempt3-logs.txt",
+      "captures/v7/evidence/analyst-target-availability-v6-v1-attempt3-logs-v1.json",
+      "captures/v7/evidence/analyst-target-availability-v6-v1-attempt3-logs.png",
+      "captures/v7/evidence/analyst-target-availability-v6-v1-attempt3-visual.png",
+      "captures/v7/evidence/analyst-target-availability-v6-v1-attempt3-data-window-v1.png",
+      "captures/v7/evidence/analyst-target-availability-v6-v1-attempt3-data-window-v1.json",
+      "captures/v7/evidence/analyst-target-availability-v6-v1-attempt3-data-window-v1.txt",
+      "captures/v7/evidence/analyst-target-availability-v6-v1-attempt3-analyst-lastbar-v1.json",
+      "captures/v7/evidence/analyst-target-availability-v6-v1-attempt3-analyst-lastbar-v1.png",
+      "captures/v7/evidence/analyst-target-availability-v6-v1-attempt3-analyst-forecast-v1.json",
+      "captures/v7/evidence/analyst-target-availability-v6-v1-attempt3-analyst-forecast-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T07:10:52.269Z",
+        "bars": 2556,
+        "end": false,
+        "first": {
+          "index": -2256,
+          "value": [
+            1470231000,
+            26.2025,
+            26.46,
+            26.1925,
+            26.4475,
+            120810564
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1790947800,
+            333.26,
+            334.54,
+            330.61,
+            333.69,
+            33278552
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 1,
+            "first": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:10:53.408Z",
+        "bars": 11538,
+        "end": true,
+        "first": {
+          "index": -11238,
+          "value": [
+            345479400,
+            0.128348,
+            0.128348,
+            0.128348,
+            0.128348,
+            469034068
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1790947800,
+            333.26,
+            334.54,
+            330.61,
+            333.69,
+            33278552
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 1,
+            "first": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:10:54.128Z",
+        "bars": 11538,
+        "end": true,
+        "first": {
+          "index": -11238,
+          "value": [
+            345479400,
+            0.128348,
+            0.128348,
+            0.128348,
+            0.128348,
+            469034068
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1790947800,
+            333.26,
+            334.54,
+            330.61,
+            333.69,
+            33278552
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 1,
+            "first": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:10:54.796Z",
+        "bars": 11538,
+        "end": true,
+        "first": {
+          "index": -11238,
+          "value": [
+            345479400,
+            0.128348,
+            0.128348,
+            0.128348,
+            0.128348,
+            469034068
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1790947800,
+            333.26,
+            334.54,
+            330.61,
+            333.69,
+            33278552
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 1,
+            "first": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:10:55.476Z",
+        "bars": 11538,
+        "end": true,
+        "first": {
+          "index": -11238,
+          "value": [
+            345479400,
+            0.128348,
+            0.128348,
+            0.128348,
+            0.128348,
+            469034068
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1790947800,
+            333.26,
+            334.54,
+            330.61,
+            333.69,
+            33278552
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 1,
+            "first": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:10:56.144Z",
+        "bars": 11538,
+        "end": true,
+        "first": {
+          "index": -11238,
+          "value": [
+            345479400,
+            0.128348,
+            0.128348,
+            0.128348,
+            0.128348,
+            469034068
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1790947800,
+            333.26,
+            334.54,
+            330.61,
+            333.69,
+            33278552
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 1,
+            "first": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:10:56.805Z",
+        "bars": 11538,
+        "end": true,
+        "first": {
+          "index": -11238,
+          "value": [
+            345479400,
+            0.128348,
+            0.128348,
+            0.128348,
+            0.128348,
+            469034068
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1790947800,
+            333.26,
+            334.54,
+            330.61,
+            333.69,
+            33278552
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 1,
+            "first": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:10:57.462Z",
+        "bars": 11538,
+        "end": true,
+        "first": {
+          "index": -11238,
+          "value": [
+            345479400,
+            0.128348,
+            0.128348,
+            0.128348,
+            0.128348,
+            469034068
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1790947800,
+            333.26,
+            334.54,
+            330.61,
+            333.69,
+            33278552
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 1,
+            "first": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:10:58.124Z",
+        "bars": 11538,
+        "end": true,
+        "first": {
+          "index": -11238,
+          "value": [
+            345479400,
+            0.128348,
+            0.128348,
+            0.128348,
+            0.128348,
+            469034068
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1790947800,
+            333.26,
+            334.54,
+            330.61,
+            333.69,
+            33278552
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 1,
+            "first": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:10:58.785Z",
+        "bars": 11538,
+        "end": true,
+        "first": {
+          "index": -11238,
+          "value": [
+            345479400,
+            0.128348,
+            0.128348,
+            0.128348,
+            0.128348,
+            469034068
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1790947800,
+            333.26,
+            334.54,
+            330.61,
+            333.69,
+            33278552
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 1,
+            "first": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:10:59.447Z",
+        "bars": 11538,
+        "end": true,
+        "first": {
+          "index": -11238,
+          "value": [
+            345479400,
+            0.128348,
+            0.128348,
+            0.128348,
+            0.128348,
+            469034068
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1790947800,
+            333.26,
+            334.54,
+            330.61,
+            333.69,
+            33278552
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 1,
+            "first": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:11:00.119Z",
+        "bars": 11538,
+        "end": true,
+        "first": {
+          "index": -11238,
+          "value": [
+            345479400,
+            0.128348,
+            0.128348,
+            0.128348,
+            0.128348,
+            469034068
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1790947800,
+            333.26,
+            334.54,
+            330.61,
+            333.69,
+            33278552
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 1,
+            "first": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:11:00.784Z",
+        "bars": 11538,
+        "end": true,
+        "first": {
+          "index": -11238,
+          "value": [
+            345479400,
+            0.128348,
+            0.128348,
+            0.128348,
+            0.128348,
+            469034068
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1790947800,
+            333.26,
+            334.54,
+            330.61,
+            333.69,
+            33278552
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 1,
+            "first": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:11:01.443Z",
+        "bars": 11538,
+        "end": true,
+        "first": {
+          "index": -11238,
+          "value": [
+            345479400,
+            0.128348,
+            0.128348,
+            0.128348,
+            0.128348,
+            469034068
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1790947800,
+            333.26,
+            334.54,
+            330.61,
+            333.69,
+            33278552
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 1,
+            "first": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:11:02.107Z",
+        "bars": 11538,
+        "end": true,
+        "first": {
+          "index": -11238,
+          "value": [
+            345479400,
+            0.128348,
+            0.128348,
+            0.128348,
+            0.128348,
+            469034068
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1790947800,
+            333.26,
+            334.54,
+            330.61,
+            333.69,
+            33278552
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 1,
+            "first": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:11:02.778Z",
+        "bars": 11538,
+        "end": true,
+        "first": {
+          "index": -11238,
+          "value": [
+            345479400,
+            0.128348,
+            0.128348,
+            0.128348,
+            0.128348,
+            469034068
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1790947800,
+            333.26,
+            334.54,
+            330.61,
+            333.69,
+            33278552
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 1,
+            "first": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:11:03.457Z",
+        "bars": 11538,
+        "end": true,
+        "first": {
+          "index": -11238,
+          "value": [
+            345479400,
+            0.128348,
+            0.128348,
+            0.128348,
+            0.128348,
+            469034068
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1790947800,
+            333.26,
+            334.54,
+            330.61,
+            333.69,
+            33278552
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 1,
+            "first": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:11:04.122Z",
+        "bars": 11538,
+        "end": true,
+        "first": {
+          "index": -11238,
+          "value": [
+            345479400,
+            0.128348,
+            0.128348,
+            0.128348,
+            0.128348,
+            469034068
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1790947800,
+            333.26,
+            334.54,
+            330.61,
+            333.69,
+            33278552
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 1,
+            "first": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:11:04.790Z",
+        "bars": 11538,
+        "end": true,
+        "first": {
+          "index": -11238,
+          "value": [
+            345479400,
+            0.128348,
+            0.128348,
+            0.128348,
+            0.128348,
+            469034068
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1790947800,
+            333.26,
+            334.54,
+            330.61,
+            333.69,
+            33278552
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 1,
+            "first": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:11:05.461Z",
+        "bars": 11538,
+        "end": true,
+        "first": {
+          "index": -11238,
+          "value": [
+            345479400,
+            0.128348,
+            0.128348,
+            0.128348,
+            0.128348,
+            469034068
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1790947800,
+            333.26,
+            334.54,
+            330.61,
+            333.69,
+            33278552
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 1,
+            "first": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:11:06.167Z",
+        "bars": 11538,
+        "end": true,
+        "first": {
+          "index": -11238,
+          "value": [
+            345479400,
+            0.128348,
+            0.128348,
+            0.128348,
+            0.128348,
+            469034068
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1790947800,
+            333.26,
+            334.54,
+            330.61,
+            333.69,
+            33278552
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 1,
+            "first": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:11:06.827Z",
+        "bars": 11538,
+        "end": true,
+        "first": {
+          "index": -11238,
+          "value": [
+            345479400,
+            0.128348,
+            0.128348,
+            0.128348,
+            0.128348,
+            469034068
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1790947800,
+            333.26,
+            334.54,
+            330.61,
+            333.69,
+            33278552
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 1,
+            "first": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:11:07.491Z",
+        "bars": 11538,
+        "end": true,
+        "first": {
+          "index": -11238,
+          "value": [
+            345479400,
+            0.128348,
+            0.128348,
+            0.128348,
+            0.128348,
+            469034068
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1790947800,
+            333.26,
+            334.54,
+            330.61,
+            333.69,
+            33278552
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 1,
+            "first": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:11:08.176Z",
+        "bars": 11538,
+        "end": true,
+        "first": {
+          "index": -11238,
+          "value": [
+            345479400,
+            0.128348,
+            0.128348,
+            0.128348,
+            0.128348,
+            469034068
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1790947800,
+            333.26,
+            334.54,
+            330.61,
+            333.69,
+            33278552
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 1,
+            "first": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:11:08.859Z",
+        "bars": 11538,
+        "end": true,
+        "first": {
+          "index": -11238,
+          "value": [
+            345479400,
+            0.128348,
+            0.128348,
+            0.128348,
+            0.128348,
+            469034068
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1790947800,
+            333.26,
+            334.54,
+            330.61,
+            333.69,
+            33278552
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 1,
+            "first": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:11:09.529Z",
+        "bars": 11538,
+        "end": true,
+        "first": {
+          "index": -11238,
+          "value": [
+            345479400,
+            0.128348,
+            0.128348,
+            0.128348,
+            0.128348,
+            469034068
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1790947800,
+            333.26,
+            334.54,
+            330.61,
+            333.69,
+            33278552
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 1,
+            "first": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:11:10.197Z",
+        "bars": 11538,
+        "end": true,
+        "first": {
+          "index": -11238,
+          "value": [
+            345479400,
+            0.128348,
+            0.128348,
+            0.128348,
+            0.128348,
+            469034068
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1790947800,
+            333.26,
+            334.54,
+            330.61,
+            333.69,
+            33278552
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 1,
+            "first": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:11:10.863Z",
+        "bars": 11538,
+        "end": true,
+        "first": {
+          "index": -11238,
+          "value": [
+            345479400,
+            0.128348,
+            0.128348,
+            0.128348,
+            0.128348,
+            469034068
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1790947800,
+            333.26,
+            334.54,
+            330.61,
+            333.69,
+            33278552
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 1,
+            "first": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:11:11.527Z",
+        "bars": 11538,
+        "end": true,
+        "first": {
+          "index": -11238,
+          "value": [
+            345479400,
+            0.128348,
+            0.128348,
+            0.128348,
+            0.128348,
+            469034068
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1790947800,
+            333.26,
+            334.54,
+            330.61,
+            333.69,
+            33278552
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 1,
+            "first": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:11:12.192Z",
+        "bars": 11538,
+        "end": true,
+        "first": {
+          "index": -11238,
+          "value": [
+            345479400,
+            0.128348,
+            0.128348,
+            0.128348,
+            0.128348,
+            469034068
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1790947800,
+            333.26,
+            334.54,
+            330.61,
+            333.69,
+            33278552
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 1,
+            "first": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:11:12.858Z",
+        "bars": 11538,
+        "end": true,
+        "first": {
+          "index": -11238,
+          "value": [
+            345479400,
+            0.128348,
+            0.128348,
+            0.128348,
+            0.128348,
+            469034068
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1790947800,
+            333.26,
+            334.54,
+            330.61,
+            333.69,
+            33278552
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 1,
+            "first": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:11:13.523Z",
+        "bars": 11538,
+        "end": true,
+        "first": {
+          "index": -11238,
+          "value": [
+            345479400,
+            0.128348,
+            0.128348,
+            0.128348,
+            0.128348,
+            469034068
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1790947800,
+            333.26,
+            334.54,
+            330.61,
+            333.69,
+            33278552
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 1,
+            "first": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:11:14.188Z",
+        "bars": 11538,
+        "end": true,
+        "first": {
+          "index": -11238,
+          "value": [
+            345479400,
+            0.128348,
+            0.128348,
+            0.128348,
+            0.128348,
+            469034068
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1790947800,
+            333.26,
+            334.54,
+            330.61,
+            333.69,
+            33278552
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 1,
+            "first": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:11:14.860Z",
+        "bars": 11538,
+        "end": true,
+        "first": {
+          "index": -11238,
+          "value": [
+            345479400,
+            0.128348,
+            0.128348,
+            0.128348,
+            0.128348,
+            469034068
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1790947800,
+            333.26,
+            334.54,
+            330.61,
+            333.69,
+            33278552
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 1,
+            "first": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:11:15.527Z",
+        "bars": 11538,
+        "end": true,
+        "first": {
+          "index": -11238,
+          "value": [
+            345479400,
+            0.128348,
+            0.128348,
+            0.128348,
+            0.128348,
+            469034068
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1790947800,
+            333.26,
+            334.54,
+            330.61,
+            333.69,
+            33278552
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 1,
+            "first": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:11:16.461Z",
+        "bars": 11538,
+        "end": true,
+        "first": {
+          "index": -11238,
+          "value": [
+            345479400,
+            0.128348,
+            0.128348,
+            0.128348,
+            0.128348,
+            469034068
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1790947800,
+            333.26,
+            334.54,
+            330.61,
+            333.69,
+            33278552
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 1,
+            "first": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:11:17.126Z",
+        "bars": 11538,
+        "end": true,
+        "first": {
+          "index": -11238,
+          "value": [
+            345479400,
+            0.128348,
+            0.128348,
+            0.128348,
+            0.128348,
+            469034068
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1790947800,
+            333.26,
+            334.54,
+            330.61,
+            333.69,
+            33278552
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 1,
+            "first": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:11:17.793Z",
+        "bars": 11538,
+        "end": true,
+        "first": {
+          "index": -11238,
+          "value": [
+            345479400,
+            0.128348,
+            0.128348,
+            0.128348,
+            0.128348,
+            469034068
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1790947800,
+            333.26,
+            334.54,
+            330.61,
+            333.69,
+            33278552
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 1,
+            "first": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:11:18.494Z",
+        "bars": 11538,
+        "end": true,
+        "first": {
+          "index": -11238,
+          "value": [
+            345479400,
+            0.128348,
+            0.128348,
+            0.128348,
+            0.128348,
+            469034068
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1790947800,
+            333.26,
+            334.54,
+            330.61,
+            333.69,
+            33278552
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 1,
+            "first": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T07:11:19.158Z",
+        "bars": 11538,
+        "end": true,
+        "first": {
+          "index": -11238,
+          "value": [
+            345479400,
+            0.128348,
+            0.128348,
+            0.128348,
+            0.128348,
+            469034068
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1790947800,
+            333.26,
+            334.54,
+            330.61,
+            333.69,
+            33278552
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "V7 analyst-target-availability-v6-v1",
+            "status": {
+              "type": 2
+            },
+            "size": 1,
+            "first": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1790947800,
+                405,
+                245,
+                340,
+                335.751907,
+                1790899200000,
+                35
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Fri 02 Oct '26",
+    "historical_compare_before_unix_seconds": 1790947800,
+    "pine_logs": {
+      "paths": [
+        "evidence/analyst-target-availability-v6-v1-attempt3-logs.txt",
+        "evidence/analyst-target-availability-v6-v1-attempt3-logs-v1.json",
+        "evidence/analyst-target-availability-v6-v1-attempt3-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "9b25625436714283645911385b38b47136f478c9994fdc573cb45ab27f3ef5b9",
+    "csv_bytes": 581724,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "HIGH",
+      "LOW",
+      "MEDIAN",
+      "AVERAGE",
+      "DATE",
+      "ESTIMATES"
+    ],
+    "declared_to_native_header_mapping": {
+      "HIGH": "HIGH",
+      "LOW": "LOW",
+      "MEDIAN": "MEDIAN",
+      "AVERAGE": "AVERAGE",
+      "DATE": "DATE",
+      "ESTIMATES": "ESTIMATES"
+    },
+    "csv_rows": 11538,
+    "historical_rows": 11537,
+    "first_csv_timestamp_seconds": 345479400,
+    "last_csv_timestamp_seconds": 1790947800,
+    "first_historical_values": {
+      "HIGH": "",
+      "LOW": "",
+      "MEDIAN": "",
+      "AVERAGE": "",
+      "DATE": "",
+      "ESTIMATES": ""
+    },
+    "last_historical_values": {
+      "HIGH": "",
+      "LOW": "",
+      "MEDIAN": "",
+      "AVERAGE": "",
+      "DATE": "",
+      "ESTIMATES": ""
+    },
+    "data_window_witness": "captures/v7/evidence/analyst-target-availability-v6-v1-attempt3-data-window-v1.json",
+    "readiness_instrument_note": "Native accepted status2 with one last-bar-only row of analyst fields after full daily AAPL history. Initial helper incorrectly expected>=600 study cache rows; direct raw CSV and native Data Window capture confirm RUNS. Exact resetUTC was not retained after helper timeout; resetUTC=null is intentional. Host/history/source and CSV minimum checks remain required. Native primary/pro_name NASDAQ:AAPL, actual selected/resolved OHLC feed BATS:AAPL/Cboe One. This does not claim NASDAQ OHLC capture."
   }
 ]

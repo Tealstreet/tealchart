@@ -1,0 +1,893 @@
+{
+  "artifact": "Session boundary and analyst feed observations v1",
+  "session_tickerid": "BATS:BRK.A",
+  "requested_session_symbol": "NYSE:BRK.A",
+  "session_setup": "regular0930-1600 America/New_York,2m,chartUTC",
+  "session_csv": "captures/v7/session-lastbar-missing-v6-v1-attempt2.csv",
+  "session_native_end_of_data": false,
+  "published_sessions": [
+    {
+      "date_new_york": "2026-06-25",
+      "published_bars": 14,
+      "first_published_bar_new_york": "2026-06-25T14:40:00-04:00",
+      "last_published_bar_new_york": "2026-06-25T15:58:00-04:00",
+      "has_1558_slot": true,
+      "lastbar_true_times": [
+        "2026-06-25T15:58:00-04:00"
+      ],
+      "last_published_LASTBAR": "1"
+    },
+    {
+      "date_new_york": "2026-06-26",
+      "published_bars": 46,
+      "first_published_bar_new_york": "2026-06-26T09:44:00-04:00",
+      "last_published_bar_new_york": "2026-06-26T15:56:00-04:00",
+      "has_1558_slot": false,
+      "lastbar_true_times": [],
+      "last_published_LASTBAR": "0"
+    },
+    {
+      "date_new_york": "2026-06-29",
+      "published_bars": 36,
+      "first_published_bar_new_york": "2026-06-29T09:34:00-04:00",
+      "last_published_bar_new_york": "2026-06-29T15:58:00-04:00",
+      "has_1558_slot": true,
+      "lastbar_true_times": [
+        "2026-06-29T15:58:00-04:00"
+      ],
+      "last_published_LASTBAR": "1"
+    },
+    {
+      "date_new_york": "2026-06-30",
+      "published_bars": 82,
+      "first_published_bar_new_york": "2026-06-30T09:34:00-04:00",
+      "last_published_bar_new_york": "2026-06-30T15:58:00-04:00",
+      "has_1558_slot": true,
+      "lastbar_true_times": [
+        "2026-06-30T15:58:00-04:00"
+      ],
+      "last_published_LASTBAR": "1"
+    },
+    {
+      "date_new_york": "2026-07-01",
+      "published_bars": 55,
+      "first_published_bar_new_york": "2026-07-01T09:30:00-04:00",
+      "last_published_bar_new_york": "2026-07-01T15:54:00-04:00",
+      "has_1558_slot": false,
+      "lastbar_true_times": [],
+      "last_published_LASTBAR": "0"
+    },
+    {
+      "date_new_york": "2026-07-02",
+      "published_bars": 43,
+      "first_published_bar_new_york": "2026-07-02T09:38:00-04:00",
+      "last_published_bar_new_york": "2026-07-02T15:58:00-04:00",
+      "has_1558_slot": true,
+      "lastbar_true_times": [
+        "2026-07-02T15:58:00-04:00"
+      ],
+      "last_published_LASTBAR": "1"
+    },
+    {
+      "date_new_york": "2026-07-06",
+      "published_bars": 77,
+      "first_published_bar_new_york": "2026-07-06T09:30:00-04:00",
+      "last_published_bar_new_york": "2026-07-06T15:58:00-04:00",
+      "has_1558_slot": true,
+      "lastbar_true_times": [
+        "2026-07-06T15:58:00-04:00"
+      ],
+      "last_published_LASTBAR": "1"
+    },
+    {
+      "date_new_york": "2026-07-07",
+      "published_bars": 32,
+      "first_published_bar_new_york": "2026-07-07T09:38:00-04:00",
+      "last_published_bar_new_york": "2026-07-07T15:58:00-04:00",
+      "has_1558_slot": true,
+      "lastbar_true_times": [
+        "2026-07-07T15:58:00-04:00"
+      ],
+      "last_published_LASTBAR": "1"
+    },
+    {
+      "date_new_york": "2026-07-08",
+      "published_bars": 40,
+      "first_published_bar_new_york": "2026-07-08T09:42:00-04:00",
+      "last_published_bar_new_york": "2026-07-08T15:58:00-04:00",
+      "has_1558_slot": true,
+      "lastbar_true_times": [
+        "2026-07-08T15:58:00-04:00"
+      ],
+      "last_published_LASTBAR": "1"
+    },
+    {
+      "date_new_york": "2026-07-09",
+      "published_bars": 25,
+      "first_published_bar_new_york": "2026-07-09T09:40:00-04:00",
+      "last_published_bar_new_york": "2026-07-09T15:56:00-04:00",
+      "has_1558_slot": false,
+      "lastbar_true_times": [],
+      "last_published_LASTBAR": "0"
+    },
+    {
+      "date_new_york": "2026-07-10",
+      "published_bars": 35,
+      "first_published_bar_new_york": "2026-07-10T09:30:00-04:00",
+      "last_published_bar_new_york": "2026-07-10T15:58:00-04:00",
+      "has_1558_slot": true,
+      "lastbar_true_times": [
+        "2026-07-10T15:58:00-04:00"
+      ],
+      "last_published_LASTBAR": "1"
+    },
+    {
+      "date_new_york": "2026-07-13",
+      "published_bars": 25,
+      "first_published_bar_new_york": "2026-07-13T09:30:00-04:00",
+      "last_published_bar_new_york": "2026-07-13T15:58:00-04:00",
+      "has_1558_slot": true,
+      "lastbar_true_times": [
+        "2026-07-13T15:58:00-04:00"
+      ],
+      "last_published_LASTBAR": "1"
+    },
+    {
+      "date_new_york": "2026-07-14",
+      "published_bars": 25,
+      "first_published_bar_new_york": "2026-07-14T10:04:00-04:00",
+      "last_published_bar_new_york": "2026-07-14T15:58:00-04:00",
+      "has_1558_slot": true,
+      "lastbar_true_times": [
+        "2026-07-14T15:58:00-04:00"
+      ],
+      "last_published_LASTBAR": "1"
+    },
+    {
+      "date_new_york": "2026-07-15",
+      "published_bars": 30,
+      "first_published_bar_new_york": "2026-07-15T10:06:00-04:00",
+      "last_published_bar_new_york": "2026-07-15T15:58:00-04:00",
+      "has_1558_slot": true,
+      "lastbar_true_times": [
+        "2026-07-15T15:58:00-04:00"
+      ],
+      "last_published_LASTBAR": "1"
+    },
+    {
+      "date_new_york": "2026-07-16",
+      "published_bars": 26,
+      "first_published_bar_new_york": "2026-07-16T09:30:00-04:00",
+      "last_published_bar_new_york": "2026-07-16T15:58:00-04:00",
+      "has_1558_slot": true,
+      "lastbar_true_times": [
+        "2026-07-16T15:58:00-04:00"
+      ],
+      "last_published_LASTBAR": "1"
+    },
+    {
+      "date_new_york": "2026-07-17",
+      "published_bars": 77,
+      "first_published_bar_new_york": "2026-07-17T09:30:00-04:00",
+      "last_published_bar_new_york": "2026-07-17T15:58:00-04:00",
+      "has_1558_slot": true,
+      "lastbar_true_times": [
+        "2026-07-17T15:58:00-04:00"
+      ],
+      "last_published_LASTBAR": "1"
+    },
+    {
+      "date_new_york": "2026-07-20",
+      "published_bars": 26,
+      "first_published_bar_new_york": "2026-07-20T09:38:00-04:00",
+      "last_published_bar_new_york": "2026-07-20T15:58:00-04:00",
+      "has_1558_slot": true,
+      "lastbar_true_times": [
+        "2026-07-20T15:58:00-04:00"
+      ],
+      "last_published_LASTBAR": "1"
+    },
+    {
+      "date_new_york": "2026-07-21",
+      "published_bars": 31,
+      "first_published_bar_new_york": "2026-07-21T09:36:00-04:00",
+      "last_published_bar_new_york": "2026-07-21T15:56:00-04:00",
+      "has_1558_slot": false,
+      "lastbar_true_times": [],
+      "last_published_LASTBAR": "0"
+    },
+    {
+      "date_new_york": "2026-07-22",
+      "published_bars": 17,
+      "first_published_bar_new_york": "2026-07-22T09:40:00-04:00",
+      "last_published_bar_new_york": "2026-07-22T15:58:00-04:00",
+      "has_1558_slot": true,
+      "lastbar_true_times": [
+        "2026-07-22T15:58:00-04:00"
+      ],
+      "last_published_LASTBAR": "1"
+    },
+    {
+      "date_new_york": "2026-07-23",
+      "published_bars": 34,
+      "first_published_bar_new_york": "2026-07-23T09:44:00-04:00",
+      "last_published_bar_new_york": "2026-07-23T15:58:00-04:00",
+      "has_1558_slot": true,
+      "lastbar_true_times": [
+        "2026-07-23T15:58:00-04:00"
+      ],
+      "last_published_LASTBAR": "1"
+    },
+    {
+      "date_new_york": "2026-07-24",
+      "published_bars": 22,
+      "first_published_bar_new_york": "2026-07-24T09:32:00-04:00",
+      "last_published_bar_new_york": "2026-07-24T15:58:00-04:00",
+      "has_1558_slot": true,
+      "lastbar_true_times": [
+        "2026-07-24T15:58:00-04:00"
+      ],
+      "last_published_LASTBAR": "1"
+    },
+    {
+      "date_new_york": "2026-07-27",
+      "published_bars": 19,
+      "first_published_bar_new_york": "2026-07-27T09:30:00-04:00",
+      "last_published_bar_new_york": "2026-07-27T15:58:00-04:00",
+      "has_1558_slot": true,
+      "lastbar_true_times": [
+        "2026-07-27T15:58:00-04:00"
+      ],
+      "last_published_LASTBAR": "1"
+    },
+    {
+      "date_new_york": "2026-07-28",
+      "published_bars": 60,
+      "first_published_bar_new_york": "2026-07-28T09:34:00-04:00",
+      "last_published_bar_new_york": "2026-07-28T15:58:00-04:00",
+      "has_1558_slot": true,
+      "lastbar_true_times": [
+        "2026-07-28T15:58:00-04:00"
+      ],
+      "last_published_LASTBAR": "1"
+    },
+    {
+      "date_new_york": "2026-07-29",
+      "published_bars": 22,
+      "first_published_bar_new_york": "2026-07-29T09:34:00-04:00",
+      "last_published_bar_new_york": "2026-07-29T15:28:00-04:00",
+      "has_1558_slot": false,
+      "lastbar_true_times": [],
+      "last_published_LASTBAR": "0"
+    },
+    {
+      "date_new_york": "2026-07-30",
+      "published_bars": 19,
+      "first_published_bar_new_york": "2026-07-30T09:34:00-04:00",
+      "last_published_bar_new_york": "2026-07-30T15:46:00-04:00",
+      "has_1558_slot": false,
+      "lastbar_true_times": [],
+      "last_published_LASTBAR": "0"
+    },
+    {
+      "date_new_york": "2026-07-31",
+      "published_bars": 25,
+      "first_published_bar_new_york": "2026-07-31T09:32:00-04:00",
+      "last_published_bar_new_york": "2026-07-31T15:58:00-04:00",
+      "has_1558_slot": true,
+      "lastbar_true_times": [
+        "2026-07-31T15:58:00-04:00"
+      ],
+      "last_published_LASTBAR": "1"
+    },
+    {
+      "date_new_york": "2026-08-03",
+      "published_bars": 38,
+      "first_published_bar_new_york": "2026-08-03T09:30:00-04:00",
+      "last_published_bar_new_york": "2026-08-03T15:58:00-04:00",
+      "has_1558_slot": true,
+      "lastbar_true_times": [
+        "2026-08-03T15:58:00-04:00"
+      ],
+      "last_published_LASTBAR": "1"
+    },
+    {
+      "date_new_york": "2026-08-04",
+      "published_bars": 46,
+      "first_published_bar_new_york": "2026-08-04T09:34:00-04:00",
+      "last_published_bar_new_york": "2026-08-04T15:58:00-04:00",
+      "has_1558_slot": true,
+      "lastbar_true_times": [
+        "2026-08-04T15:58:00-04:00"
+      ],
+      "last_published_LASTBAR": "1"
+    },
+    {
+      "date_new_york": "2026-08-05",
+      "published_bars": 25,
+      "first_published_bar_new_york": "2026-08-05T09:30:00-04:00",
+      "last_published_bar_new_york": "2026-08-05T15:58:00-04:00",
+      "has_1558_slot": true,
+      "lastbar_true_times": [
+        "2026-08-05T15:58:00-04:00"
+      ],
+      "last_published_LASTBAR": "1"
+    },
+    {
+      "date_new_york": "2026-08-06",
+      "published_bars": 30,
+      "first_published_bar_new_york": "2026-08-06T10:04:00-04:00",
+      "last_published_bar_new_york": "2026-08-06T15:58:00-04:00",
+      "has_1558_slot": true,
+      "lastbar_true_times": [
+        "2026-08-06T15:58:00-04:00"
+      ],
+      "last_published_LASTBAR": "1"
+    },
+    {
+      "date_new_york": "2026-08-07",
+      "published_bars": 16,
+      "first_published_bar_new_york": "2026-08-07T09:32:00-04:00",
+      "last_published_bar_new_york": "2026-08-07T15:58:00-04:00",
+      "has_1558_slot": true,
+      "lastbar_true_times": [
+        "2026-08-07T15:58:00-04:00"
+      ],
+      "last_published_LASTBAR": "1"
+    },
+    {
+      "date_new_york": "2026-08-10",
+      "published_bars": 53,
+      "first_published_bar_new_york": "2026-08-10T09:30:00-04:00",
+      "last_published_bar_new_york": "2026-08-10T15:58:00-04:00",
+      "has_1558_slot": true,
+      "lastbar_true_times": [
+        "2026-08-10T15:58:00-04:00"
+      ],
+      "last_published_LASTBAR": "1"
+    },
+    {
+      "date_new_york": "2026-08-11",
+      "published_bars": 27,
+      "first_published_bar_new_york": "2026-08-11T09:50:00-04:00",
+      "last_published_bar_new_york": "2026-08-11T15:58:00-04:00",
+      "has_1558_slot": true,
+      "lastbar_true_times": [
+        "2026-08-11T15:58:00-04:00"
+      ],
+      "last_published_LASTBAR": "1"
+    },
+    {
+      "date_new_york": "2026-08-12",
+      "published_bars": 42,
+      "first_published_bar_new_york": "2026-08-12T09:34:00-04:00",
+      "last_published_bar_new_york": "2026-08-12T15:58:00-04:00",
+      "has_1558_slot": true,
+      "lastbar_true_times": [
+        "2026-08-12T15:58:00-04:00"
+      ],
+      "last_published_LASTBAR": "1"
+    },
+    {
+      "date_new_york": "2026-08-13",
+      "published_bars": 29,
+      "first_published_bar_new_york": "2026-08-13T09:34:00-04:00",
+      "last_published_bar_new_york": "2026-08-13T15:58:00-04:00",
+      "has_1558_slot": true,
+      "lastbar_true_times": [
+        "2026-08-13T15:58:00-04:00"
+      ],
+      "last_published_LASTBAR": "1"
+    },
+    {
+      "date_new_york": "2026-08-14",
+      "published_bars": 17,
+      "first_published_bar_new_york": "2026-08-14T09:32:00-04:00",
+      "last_published_bar_new_york": "2026-08-14T15:58:00-04:00",
+      "has_1558_slot": true,
+      "lastbar_true_times": [
+        "2026-08-14T15:58:00-04:00"
+      ],
+      "last_published_LASTBAR": "1"
+    },
+    {
+      "date_new_york": "2026-08-17",
+      "published_bars": 33,
+      "first_published_bar_new_york": "2026-08-17T09:34:00-04:00",
+      "last_published_bar_new_york": "2026-08-17T15:56:00-04:00",
+      "has_1558_slot": false,
+      "lastbar_true_times": [],
+      "last_published_LASTBAR": "0"
+    },
+    {
+      "date_new_york": "2026-08-18",
+      "published_bars": 24,
+      "first_published_bar_new_york": "2026-08-18T09:36:00-04:00",
+      "last_published_bar_new_york": "2026-08-18T15:58:00-04:00",
+      "has_1558_slot": true,
+      "lastbar_true_times": [
+        "2026-08-18T15:58:00-04:00"
+      ],
+      "last_published_LASTBAR": "1"
+    },
+    {
+      "date_new_york": "2026-08-19",
+      "published_bars": 26,
+      "first_published_bar_new_york": "2026-08-19T09:34:00-04:00",
+      "last_published_bar_new_york": "2026-08-19T15:58:00-04:00",
+      "has_1558_slot": true,
+      "lastbar_true_times": [
+        "2026-08-19T15:58:00-04:00"
+      ],
+      "last_published_LASTBAR": "1"
+    },
+    {
+      "date_new_york": "2026-08-20",
+      "published_bars": 18,
+      "first_published_bar_new_york": "2026-08-20T09:36:00-04:00",
+      "last_published_bar_new_york": "2026-08-20T15:48:00-04:00",
+      "has_1558_slot": false,
+      "lastbar_true_times": [],
+      "last_published_LASTBAR": "0"
+    },
+    {
+      "date_new_york": "2026-08-21",
+      "published_bars": 61,
+      "first_published_bar_new_york": "2026-08-21T10:04:00-04:00",
+      "last_published_bar_new_york": "2026-08-21T15:58:00-04:00",
+      "has_1558_slot": true,
+      "lastbar_true_times": [
+        "2026-08-21T15:58:00-04:00"
+      ],
+      "last_published_LASTBAR": "1"
+    },
+    {
+      "date_new_york": "2026-08-24",
+      "published_bars": 44,
+      "first_published_bar_new_york": "2026-08-24T09:36:00-04:00",
+      "last_published_bar_new_york": "2026-08-24T15:52:00-04:00",
+      "has_1558_slot": false,
+      "lastbar_true_times": [],
+      "last_published_LASTBAR": "0"
+    },
+    {
+      "date_new_york": "2026-08-25",
+      "published_bars": 17,
+      "first_published_bar_new_york": "2026-08-25T09:44:00-04:00",
+      "last_published_bar_new_york": "2026-08-25T15:58:00-04:00",
+      "has_1558_slot": true,
+      "lastbar_true_times": [
+        "2026-08-25T15:58:00-04:00"
+      ],
+      "last_published_LASTBAR": "1"
+    },
+    {
+      "date_new_york": "2026-08-26",
+      "published_bars": 24,
+      "first_published_bar_new_york": "2026-08-26T10:06:00-04:00",
+      "last_published_bar_new_york": "2026-08-26T15:58:00-04:00",
+      "has_1558_slot": true,
+      "lastbar_true_times": [
+        "2026-08-26T15:58:00-04:00"
+      ],
+      "last_published_LASTBAR": "1"
+    },
+    {
+      "date_new_york": "2026-08-27",
+      "published_bars": 45,
+      "first_published_bar_new_york": "2026-08-27T09:32:00-04:00",
+      "last_published_bar_new_york": "2026-08-27T15:58:00-04:00",
+      "has_1558_slot": true,
+      "lastbar_true_times": [
+        "2026-08-27T15:58:00-04:00"
+      ],
+      "last_published_LASTBAR": "1"
+    },
+    {
+      "date_new_york": "2026-08-28",
+      "published_bars": 43,
+      "first_published_bar_new_york": "2026-08-28T09:30:00-04:00",
+      "last_published_bar_new_york": "2026-08-28T15:58:00-04:00",
+      "has_1558_slot": true,
+      "lastbar_true_times": [
+        "2026-08-28T15:58:00-04:00"
+      ],
+      "last_published_LASTBAR": "1"
+    },
+    {
+      "date_new_york": "2026-08-31",
+      "published_bars": 49,
+      "first_published_bar_new_york": "2026-08-31T09:30:00-04:00",
+      "last_published_bar_new_york": "2026-08-31T15:58:00-04:00",
+      "has_1558_slot": true,
+      "lastbar_true_times": [
+        "2026-08-31T15:58:00-04:00"
+      ],
+      "last_published_LASTBAR": "1"
+    },
+    {
+      "date_new_york": "2026-09-01",
+      "published_bars": 38,
+      "first_published_bar_new_york": "2026-09-01T09:32:00-04:00",
+      "last_published_bar_new_york": "2026-09-01T15:58:00-04:00",
+      "has_1558_slot": true,
+      "lastbar_true_times": [
+        "2026-09-01T15:58:00-04:00"
+      ],
+      "last_published_LASTBAR": "1"
+    },
+    {
+      "date_new_york": "2026-09-02",
+      "published_bars": 37,
+      "first_published_bar_new_york": "2026-09-02T09:30:00-04:00",
+      "last_published_bar_new_york": "2026-09-02T15:58:00-04:00",
+      "has_1558_slot": true,
+      "lastbar_true_times": [
+        "2026-09-02T15:58:00-04:00"
+      ],
+      "last_published_LASTBAR": "1"
+    },
+    {
+      "date_new_york": "2026-09-03",
+      "published_bars": 30,
+      "first_published_bar_new_york": "2026-09-03T09:32:00-04:00",
+      "last_published_bar_new_york": "2026-09-03T15:58:00-04:00",
+      "has_1558_slot": true,
+      "lastbar_true_times": [
+        "2026-09-03T15:58:00-04:00"
+      ],
+      "last_published_LASTBAR": "1"
+    },
+    {
+      "date_new_york": "2026-09-04",
+      "published_bars": 27,
+      "first_published_bar_new_york": "2026-09-04T09:30:00-04:00",
+      "last_published_bar_new_york": "2026-09-04T15:58:00-04:00",
+      "has_1558_slot": true,
+      "lastbar_true_times": [
+        "2026-09-04T15:58:00-04:00"
+      ],
+      "last_published_LASTBAR": "1"
+    },
+    {
+      "date_new_york": "2026-09-08",
+      "published_bars": 40,
+      "first_published_bar_new_york": "2026-09-08T09:30:00-04:00",
+      "last_published_bar_new_york": "2026-09-08T15:58:00-04:00",
+      "has_1558_slot": true,
+      "lastbar_true_times": [
+        "2026-09-08T15:58:00-04:00"
+      ],
+      "last_published_LASTBAR": "1"
+    },
+    {
+      "date_new_york": "2026-09-09",
+      "published_bars": 42,
+      "first_published_bar_new_york": "2026-09-09T09:36:00-04:00",
+      "last_published_bar_new_york": "2026-09-09T15:58:00-04:00",
+      "has_1558_slot": true,
+      "lastbar_true_times": [
+        "2026-09-09T15:58:00-04:00"
+      ],
+      "last_published_LASTBAR": "1"
+    },
+    {
+      "date_new_york": "2026-09-10",
+      "published_bars": 41,
+      "first_published_bar_new_york": "2026-09-10T09:30:00-04:00",
+      "last_published_bar_new_york": "2026-09-10T15:58:00-04:00",
+      "has_1558_slot": true,
+      "lastbar_true_times": [
+        "2026-09-10T15:58:00-04:00"
+      ],
+      "last_published_LASTBAR": "1"
+    },
+    {
+      "date_new_york": "2026-09-11",
+      "published_bars": 34,
+      "first_published_bar_new_york": "2026-09-11T09:34:00-04:00",
+      "last_published_bar_new_york": "2026-09-11T15:58:00-04:00",
+      "has_1558_slot": true,
+      "lastbar_true_times": [
+        "2026-09-11T15:58:00-04:00"
+      ],
+      "last_published_LASTBAR": "1"
+    },
+    {
+      "date_new_york": "2026-09-14",
+      "published_bars": 50,
+      "first_published_bar_new_york": "2026-09-14T09:30:00-04:00",
+      "last_published_bar_new_york": "2026-09-14T15:58:00-04:00",
+      "has_1558_slot": true,
+      "lastbar_true_times": [
+        "2026-09-14T15:58:00-04:00"
+      ],
+      "last_published_LASTBAR": "1"
+    },
+    {
+      "date_new_york": "2026-09-15",
+      "published_bars": 42,
+      "first_published_bar_new_york": "2026-09-15T09:32:00-04:00",
+      "last_published_bar_new_york": "2026-09-15T15:58:00-04:00",
+      "has_1558_slot": true,
+      "lastbar_true_times": [
+        "2026-09-15T15:58:00-04:00"
+      ],
+      "last_published_LASTBAR": "1"
+    },
+    {
+      "date_new_york": "2026-09-16",
+      "published_bars": 55,
+      "first_published_bar_new_york": "2026-09-16T09:30:00-04:00",
+      "last_published_bar_new_york": "2026-09-16T15:58:00-04:00",
+      "has_1558_slot": true,
+      "lastbar_true_times": [
+        "2026-09-16T15:58:00-04:00"
+      ],
+      "last_published_LASTBAR": "1"
+    },
+    {
+      "date_new_york": "2026-09-17",
+      "published_bars": 40,
+      "first_published_bar_new_york": "2026-09-17T09:38:00-04:00",
+      "last_published_bar_new_york": "2026-09-17T15:58:00-04:00",
+      "has_1558_slot": true,
+      "lastbar_true_times": [
+        "2026-09-17T15:58:00-04:00"
+      ],
+      "last_published_LASTBAR": "1"
+    },
+    {
+      "date_new_york": "2026-09-18",
+      "published_bars": 53,
+      "first_published_bar_new_york": "2026-09-18T09:32:00-04:00",
+      "last_published_bar_new_york": "2026-09-18T15:58:00-04:00",
+      "has_1558_slot": true,
+      "lastbar_true_times": [
+        "2026-09-18T15:58:00-04:00"
+      ],
+      "last_published_LASTBAR": "1"
+    },
+    {
+      "date_new_york": "2026-09-21",
+      "published_bars": 46,
+      "first_published_bar_new_york": "2026-09-21T09:38:00-04:00",
+      "last_published_bar_new_york": "2026-09-21T15:58:00-04:00",
+      "has_1558_slot": true,
+      "lastbar_true_times": [
+        "2026-09-21T15:58:00-04:00"
+      ],
+      "last_published_LASTBAR": "1"
+    },
+    {
+      "date_new_york": "2026-09-22",
+      "published_bars": 44,
+      "first_published_bar_new_york": "2026-09-22T09:38:00-04:00",
+      "last_published_bar_new_york": "2026-09-22T15:58:00-04:00",
+      "has_1558_slot": true,
+      "lastbar_true_times": [
+        "2026-09-22T15:58:00-04:00"
+      ],
+      "last_published_LASTBAR": "1"
+    },
+    {
+      "date_new_york": "2026-09-23",
+      "published_bars": 37,
+      "first_published_bar_new_york": "2026-09-23T09:30:00-04:00",
+      "last_published_bar_new_york": "2026-09-23T15:58:00-04:00",
+      "has_1558_slot": true,
+      "lastbar_true_times": [
+        "2026-09-23T15:58:00-04:00"
+      ],
+      "last_published_LASTBAR": "1"
+    },
+    {
+      "date_new_york": "2026-09-24",
+      "published_bars": 36,
+      "first_published_bar_new_york": "2026-09-24T09:38:00-04:00",
+      "last_published_bar_new_york": "2026-09-24T15:58:00-04:00",
+      "has_1558_slot": true,
+      "lastbar_true_times": [
+        "2026-09-24T15:58:00-04:00"
+      ],
+      "last_published_LASTBAR": "1"
+    },
+    {
+      "date_new_york": "2026-09-25",
+      "published_bars": 32,
+      "first_published_bar_new_york": "2026-09-25T09:40:00-04:00",
+      "last_published_bar_new_york": "2026-09-25T15:56:00-04:00",
+      "has_1558_slot": false,
+      "lastbar_true_times": [],
+      "last_published_LASTBAR": "0"
+    },
+    {
+      "date_new_york": "2026-09-28",
+      "published_bars": 42,
+      "first_published_bar_new_york": "2026-09-28T09:30:00-04:00",
+      "last_published_bar_new_york": "2026-09-28T15:58:00-04:00",
+      "has_1558_slot": true,
+      "lastbar_true_times": [
+        "2026-09-28T15:58:00-04:00"
+      ],
+      "last_published_LASTBAR": "1"
+    },
+    {
+      "date_new_york": "2026-09-29",
+      "published_bars": 40,
+      "first_published_bar_new_york": "2026-09-29T09:36:00-04:00",
+      "last_published_bar_new_york": "2026-09-29T15:58:00-04:00",
+      "has_1558_slot": true,
+      "lastbar_true_times": [
+        "2026-09-29T15:58:00-04:00"
+      ],
+      "last_published_LASTBAR": "1"
+    },
+    {
+      "date_new_york": "2026-09-30",
+      "published_bars": 53,
+      "first_published_bar_new_york": "2026-09-30T09:32:00-04:00",
+      "last_published_bar_new_york": "2026-09-30T15:58:00-04:00",
+      "has_1558_slot": true,
+      "lastbar_true_times": [
+        "2026-09-30T15:58:00-04:00"
+      ],
+      "last_published_LASTBAR": "1"
+    },
+    {
+      "date_new_york": "2026-10-01",
+      "published_bars": 21,
+      "first_published_bar_new_york": "2026-10-01T09:36:00-04:00",
+      "last_published_bar_new_york": "2026-10-01T15:54:00-04:00",
+      "has_1558_slot": false,
+      "lastbar_true_times": [],
+      "last_published_LASTBAR": "0"
+    },
+    {
+      "date_new_york": "2026-10-02",
+      "published_bars": 26,
+      "first_published_bar_new_york": "2026-10-02T09:32:00-04:00",
+      "last_published_bar_new_york": "2026-10-02T15:58:00-04:00",
+      "has_1558_slot": true,
+      "lastbar_true_times": [
+        "2026-10-02T15:58:00-04:00"
+      ],
+      "last_published_LASTBAR": "1"
+    }
+  ],
+  "exercised_witness_date": "2026-10-01",
+  "native_no_holiday_or_session_override_on_witness_date": true,
+  "session_limits": "Evidence of no final published feed slot, not proof of no trades on another exchange or of full dataset start. Other dates are raw candidates; this report does not classify their exchange calendar. First dataset session may be truncated. Last loaded closed-market row is conservatively excluded from normal historical comparison.",
+  "analyst_attempts": [
+    {
+      "attempt": 1,
+      "setup": {
+        "tickerid": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chart_type": "standard candles",
+        "timezone": "Etc/UTC",
+        "bar_replay": false,
+        "mintick": 0.01,
+        "defaults_confirmed": true,
+        "native_user_inputs": [],
+        "observed_indicator_title": "V7 analyst-target-availability-v6-v1",
+        "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+        "first_chart_bar": {
+          "index": -24394,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "chart_bars": 24695,
+        "subscription": "pro_premium",
+        "native_end_of_data": true,
+        "exchange_timezone": "Etc/UTC",
+        "exchange_session": "24x7",
+        "currency": "USDT",
+        "chart_session": "regular",
+        "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+      },
+      "csv_file": "captures/v7/analyst-target-availability-v6-v1-attempt1.csv",
+      "csv_sha256": "d5ce8deeba32e64e7d2568bf08fbd06ca18d0aca66bbcbf2f6e073b8280ba7d7",
+      "rows": 24695,
+      "rows_with_any_analyst_field": 0,
+      "observed_field_rows": []
+    },
+    {
+      "attempt": 2,
+      "setup": {
+        "tickerid": "BINANCE:BTCUSDT",
+        "timeframe": "1D",
+        "chart_type": "standard candles",
+        "timezone": "Etc/UTC",
+        "bar_replay": false,
+        "mintick": 0.01,
+        "defaults_confirmed": true,
+        "native_user_inputs": [],
+        "observed_indicator_title": "V7 analyst-target-availability-v6-v1",
+        "dataset_start_utc": "2017-08-17T00:00:00.000Z",
+        "first_chart_bar": {
+          "index": -3036,
+          "value": [
+            1502928000,
+            4261.48,
+            4485.39,
+            4200.74,
+            4285.08,
+            795.150377
+          ]
+        },
+        "chart_bars": 3336,
+        "subscription": "pro_premium",
+        "native_end_of_data": true,
+        "exchange_timezone": "Etc/UTC",
+        "exchange_session": "24x7",
+        "currency": "USDT",
+        "chart_session": "regular",
+        "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+      },
+      "csv_file": "captures/v7/analyst-target-availability-v6-v1-attempt2.csv",
+      "csv_sha256": "d8dbe1862416a97e68fb1fae24fdb331df638f75420f2f0a6df0b8e5c5c35cdb",
+      "rows": 3336,
+      "rows_with_any_analyst_field": 0,
+      "observed_field_rows": []
+    },
+    {
+      "attempt": 3,
+      "setup": {
+        "tickerid": "BATS:AAPL",
+        "timeframe": "1D",
+        "chart_type": "standard candles",
+        "timezone": "Etc/UTC",
+        "bar_replay": false,
+        "mintick": 0.01,
+        "defaults_confirmed": true,
+        "native_user_inputs": [],
+        "observed_indicator_title": "V7 analyst-target-availability-v6-v1",
+        "dataset_start_utc": "1980-12-12T14:30:00.000Z",
+        "first_chart_bar": {
+          "index": -11238,
+          "value": [
+            345479400,
+            0.128348,
+            0.128348,
+            0.128348,
+            0.128348,
+            469034068
+          ]
+        },
+        "chart_bars": 11538,
+        "subscription": "pro_premium",
+        "native_end_of_data": true,
+        "exchange_timezone": "America/New_York",
+        "exchange_session": "0930-1600",
+        "currency": "USD",
+        "chart_session": "regular",
+        "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+      },
+      "csv_file": "captures/v7/analyst-target-availability-v6-v1-attempt3.csv",
+      "csv_sha256": "9b25625436714283645911385b38b47136f478c9994fdc573cb45ab27f3ef5b9",
+      "rows": 11538,
+      "rows_with_any_analyst_field": 1,
+      "observed_field_rows": [
+        {
+          "time": "1790947800",
+          "values": {
+            "HIGH": "405",
+            "LOW": "245",
+            "MEDIAN": "340",
+            "AVERAGE": "335.751907",
+            "DATE": "1790899200000",
+            "ESTIMATES": "35"
+          }
+        }
+      ]
+    }
+  ],
+  "analyst_limits": "NASDAQ-listed AAPL identity; resolved OHLC feed BATS/Cboe One. Native fields available only on last daily bar; snapshot unavailable on older bars. Forecast panel confirms rounded average335.75,high405,low245,35forecasters; median/date not independently shown."
+}
