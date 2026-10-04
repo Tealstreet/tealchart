@@ -1,0 +1,42 @@
+Syntax error at input "end of line without line continuation"
+{
+  "error": "Syntax error at input {value}",
+  "editorError": {
+    "code": "CE10156",
+    "ctx": {
+      "value": "\"end of line without line continuation\""
+    },
+    "end": {
+      "column": 29,
+      "line": 17
+    },
+    "message": "Syntax error at input {value}",
+    "start": {
+      "column": 29,
+      "line": 17
+    },
+    "id": "USER;0e4dd86f13bf4ae18a40c8c0faa080e1"
+  },
+  "title": "Compilation error",
+  "compiler_markers": [
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///d848389b-bc56-4b93-bb78-11ab4559120e.pine?placement%3Ddialog",
+        "path": "/d848389b-bc56-4b93-bb78-11ab4559120e.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "code": "CE10156",
+      "severity": 8,
+      "message": "Syntax error at input \"end of line without line continuation\"",
+      "startLineNumber": 17,
+      "startColumn": 29,
+      "endLineNumber": 17,
+      "endColumn": 30
+    }
+  ],
+  "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\nC\n85,284.17\n−10.50 (−0.01%)\n85,276.00\nSELL\n0.01\n85,276.01\nBUY\nUSDT\ncorpus-v7-99-continuation-v1.pine\nDate Range\n12:30:38 UTC\n99+\nObject tree\nData window\nDate\nSun 04 Oct '26\nTime\n12:26\nBTCUSDT · 2 · Binance\nOpen\n85,294.67\nHigh\n85,294.67\nLow\n85,284.16\nClose\n85,284.17\nChange\n−10.50 (−0.01%)\nVol\n8.51\nLast day change\n+522.44 (+0.62%)\ncorpus-v7-99-continuation-v1.pine\nPlot\n∅\nPine Editor\ncorpus-v7-99-continuation-v1.pine\nPublish script\n8\n9\n10\n11\n12\n13\n14\n15\n16\n17\n18\n19\n20\n21\n22\n23\n24\n25\n26\n27\n28\n29\n30\n31\n32\n33\n34\n35\n36\n37\n38\n39\n40\n41\npead_score = 0.0\nsue_dir = 0\nbars_to_earn = 1\nbars_to_div = 1\ngolden_cross = false\ndeath_cross = false\ndonch_break_up = false\ndonch_break_down = false\nmake_payload(sig, kind) =>\n    '{\"secret\":\"' + secret +\n    '\",\"symbol\":\"' + syminfo.ticker +\n    '\",\"pillar\":\"catalyst' +\n    '\",\"score\":'      + str.tostring(catalyst_score, \"#.####\") +\n    ',\"confidence\":'  + str.tostring(confidence,     \"#.####\") +\n    ',\"signal\":\"'     + sig +\n    '\",\"price\":'      + str.tostring(close,          \"#.####\") +\n    ',\"timeframe\":\"'  + timeframe.period +\n    '\",\"timestamp\":'  + str.tostring(time) +\n    ',\"details\":{' +\n        '\"kind\":\"'                       + kind +\n        '\",\"catalyst_window_active\":\"'   + catalyst_window_active +\n        '\",\"event_risk_score\":'          + str.tostring(event_risk_score, \"#.###\") +\n        ',\"pead_score\":'                 + str.tostring(pead_score,       \"#.###\") +\n        ',\"sue_dir\":'                    + str.tostring(sue_dir) +\n        ',\"bars_to_earnings\":'           + (na(bars_to_earn) ? \"null\" : str.tostring(bars_to_earn)) +\n        ',\"bars_to_dividend\":'           + (na(bars_to_div)  ? \"null\" : str.tostring(bars_to_div)) +\n        ',\"golden_cross\":'               + (golden_cross     ? \"true\" : \"false\") +\n        ',\"death_cross\":'                + (death_cross      ? \"true\" : \"false\") +\n        ',\"donch_break_up\":'             + (donch_break_up   ? \"true\" : \"false\") +\n        ',\"donch_break_down\":'           + (donch_break_down ? \"true\" : \"false\") +\n    \"}}\"\noutputValue = make_payload(\"CONTROL\", \"EVENT\")\nplot(str.length(outputValue), \"OUTCOME\")\n1 of 1 problem\nSyntax error at input \"end of line without line continuation\"(CE10156)\n1 ∙ Today, 20:30\nLine 17, Col 29\nPine Script® v6\nCompilation error: CE10156\n\nSyntax error at input \"end of line without line continuation\"\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+  "context_substituted_message": "Syntax error at input \"end of line without line continuation\""
+}

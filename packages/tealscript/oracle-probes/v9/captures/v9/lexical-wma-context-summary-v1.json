@@ -1,0 +1,1210 @@
+{
+  "artifact": "v9 lexical and WMA context v1",
+  "attempts": [
+    {
+      "script": "fullwidth-prefix-v5-probe-v1.pine",
+      "attempt": 1,
+      "status": "RUNS",
+      "source_sha256": "bc2927b80c1159932fcf1c87f5ce34e91371e8980691024552c7e695d1e624b7",
+      "csv_file": "captures/v9/fullwidth-prefix-v5-probe-v1-attempt1.csv",
+      "csv_sha256": "e28a368c2a5e8b2206722e691c697dc6b227d1892beb142c18b085722dc97d4e",
+      "setup": {
+        "tickerid": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chart_type": "standard candles",
+        "native_style": 1,
+        "timezone": "Etc/UTC",
+        "bar_replay": false,
+        "mintick": 0.01,
+        "defaults_confirmed": true,
+        "native_user_inputs": [],
+        "observed_indicator_title": "Full-width comment prefix",
+        "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+        "first_chart_bar": {
+          "index": -24554,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "chart_bars": 24854,
+        "subscription": "pro_premium",
+        "native_end_of_data": true,
+        "exchange_timezone": "Etc/UTC",
+        "exchange_session": "24x7",
+        "currency": "USDT",
+        "chart_session": "regular",
+        "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+      },
+      "live_boundary_confirmed_unchanged": true,
+      "native_environment": {
+        "browser_utc": "2026-10-04T12:27:05.207Z",
+        "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+        "platform": "MacIntel",
+        "user_agent_data": {
+          "architecture": "",
+          "bitness": "",
+          "brands": [],
+          "fullVersionList": [],
+          "mobile": false,
+          "platform": "",
+          "platformVersion": ""
+        },
+        "device_pixel_ratio": 2,
+        "viewport": {
+          "width": 1440,
+          "height": 900,
+          "visual_viewport_scale": 1
+        },
+        "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v9 batch; visualViewport scale recorded independently.",
+        "tradingview_build": null,
+        "tradingview_script_urls": [
+          "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+          "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+          "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+          "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+          "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+          "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+          "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+          "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+          "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+          "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+          "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+          "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+        ],
+        "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+      },
+      "diagnostic": {
+        "code": null,
+        "text": null,
+        "line": null,
+        "column": null,
+        "first_bar_index": null,
+        "first_bar_time_utc": null
+      },
+      "first_8_rows": [
+        {
+          "time": "1788134400",
+          "open": "77682",
+          "high": "77682.01",
+          "low": "77572",
+          "close": "77674.04",
+          "Plot": "1"
+        },
+        {
+          "time": "1788134520",
+          "open": "77674.5",
+          "high": "77780.34",
+          "low": "77646",
+          "close": "77758.24",
+          "Plot": "1"
+        },
+        {
+          "time": "1788134640",
+          "open": "77758.24",
+          "high": "77827.99",
+          "low": "77724",
+          "close": "77740.01",
+          "Plot": "1"
+        },
+        {
+          "time": "1788134760",
+          "open": "77740.01",
+          "high": "77751.37",
+          "low": "77490",
+          "close": "77508.86",
+          "Plot": "1"
+        },
+        {
+          "time": "1788134880",
+          "open": "77508.86",
+          "high": "77525.28",
+          "low": "77436.4",
+          "close": "77437.58",
+          "Plot": "1"
+        },
+        {
+          "time": "1788135000",
+          "open": "77437.57",
+          "high": "77636",
+          "low": "77436.41",
+          "close": "77636",
+          "Plot": "1"
+        },
+        {
+          "time": "1788135120",
+          "open": "77635.99",
+          "high": "77726",
+          "low": "77576",
+          "close": "77725.99",
+          "Plot": "1"
+        },
+        {
+          "time": "1788135240",
+          "open": "77726",
+          "high": "77797.91",
+          "low": "77720.88",
+          "close": "77797.91",
+          "Plot": "1"
+        }
+      ]
+    },
+    {
+      "script": "fullwidth-prefix-v6-probe-v1.pine",
+      "attempt": 1,
+      "status": "RUNS",
+      "source_sha256": "beaa71ce96d4cfe88edbed4ae060e4508b660bcb4e921260306bdb868671f709",
+      "csv_file": "captures/v9/fullwidth-prefix-v6-probe-v1-attempt1.csv",
+      "csv_sha256": "7c8e165389693c2f43004533a9d7b7908a79febe6324ab55d18ab46184cde07b",
+      "setup": {
+        "tickerid": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chart_type": "standard candles",
+        "native_style": 1,
+        "timezone": "Etc/UTC",
+        "bar_replay": false,
+        "mintick": 0.01,
+        "defaults_confirmed": true,
+        "native_user_inputs": [],
+        "observed_indicator_title": "Full-width comment prefix",
+        "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+        "first_chart_bar": {
+          "index": -24555,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "chart_bars": 24855,
+        "subscription": "pro_premium",
+        "native_end_of_data": true,
+        "exchange_timezone": "Etc/UTC",
+        "exchange_session": "24x7",
+        "currency": "USDT",
+        "chart_session": "regular",
+        "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+      },
+      "live_boundary_confirmed_unchanged": true,
+      "native_environment": {
+        "browser_utc": "2026-10-04T12:28:17.566Z",
+        "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+        "platform": "MacIntel",
+        "user_agent_data": {
+          "architecture": "",
+          "bitness": "",
+          "brands": [],
+          "fullVersionList": [],
+          "mobile": false,
+          "platform": "",
+          "platformVersion": ""
+        },
+        "device_pixel_ratio": 2,
+        "viewport": {
+          "width": 1440,
+          "height": 900,
+          "visual_viewport_scale": 1
+        },
+        "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v9 batch; visualViewport scale recorded independently.",
+        "tradingview_build": null,
+        "tradingview_script_urls": [
+          "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+          "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+          "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+          "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+          "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+          "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+          "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+          "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+          "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+          "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+          "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+          "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+        ],
+        "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+      },
+      "diagnostic": {
+        "code": null,
+        "text": null,
+        "line": null,
+        "column": null,
+        "first_bar_index": null,
+        "first_bar_time_utc": null
+      },
+      "first_8_rows": [
+        {
+          "time": "1788134400",
+          "open": "77682",
+          "high": "77682.01",
+          "low": "77572",
+          "close": "77674.04",
+          "Plot": "1"
+        },
+        {
+          "time": "1788134520",
+          "open": "77674.5",
+          "high": "77780.34",
+          "low": "77646",
+          "close": "77758.24",
+          "Plot": "1"
+        },
+        {
+          "time": "1788134640",
+          "open": "77758.24",
+          "high": "77827.99",
+          "low": "77724",
+          "close": "77740.01",
+          "Plot": "1"
+        },
+        {
+          "time": "1788134760",
+          "open": "77740.01",
+          "high": "77751.37",
+          "low": "77490",
+          "close": "77508.86",
+          "Plot": "1"
+        },
+        {
+          "time": "1788134880",
+          "open": "77508.86",
+          "high": "77525.28",
+          "low": "77436.4",
+          "close": "77437.58",
+          "Plot": "1"
+        },
+        {
+          "time": "1788135000",
+          "open": "77437.57",
+          "high": "77636",
+          "low": "77436.41",
+          "close": "77636",
+          "Plot": "1"
+        },
+        {
+          "time": "1788135120",
+          "open": "77635.99",
+          "high": "77726",
+          "low": "77576",
+          "close": "77725.99",
+          "Plot": "1"
+        },
+        {
+          "time": "1788135240",
+          "open": "77726",
+          "high": "77797.91",
+          "low": "77720.88",
+          "close": "77797.91",
+          "Plot": "1"
+        }
+      ]
+    },
+    {
+      "script": "unary-plus-string-v5-probe-v1.pine",
+      "attempt": 1,
+      "status": "COMPILE-ERROR",
+      "source_sha256": "6acabd0f7b32658899c24b4e685047d822b5746f4061cabd986b47eec96d46c6",
+      "csv_file": null,
+      "csv_sha256": null,
+      "setup": {
+        "tickerid": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chart_type": "standard candles",
+        "native_style": 1,
+        "timezone": "Etc/UTC",
+        "bar_replay": false,
+        "mintick": 0.01,
+        "defaults_confirmed": true,
+        "native_user_inputs": [],
+        "observed_indicator_title": "unary-plus-string-v5-probe-v1.pine",
+        "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+        "first_chart_bar": {
+          "index": -24555,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "chart_bars": 24855,
+        "subscription": "pro_premium",
+        "native_end_of_data": true,
+        "exchange_timezone": "Etc/UTC",
+        "exchange_session": "24x7",
+        "currency": "USDT",
+        "chart_session": "regular",
+        "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+      },
+      "live_boundary_confirmed_unchanged": null,
+      "native_environment": {
+        "browser_utc": "2026-10-04T12:28:36.868Z",
+        "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+        "platform": "MacIntel",
+        "user_agent_data": {
+          "architecture": "",
+          "bitness": "",
+          "brands": [],
+          "fullVersionList": [],
+          "mobile": false,
+          "platform": "",
+          "platformVersion": ""
+        },
+        "device_pixel_ratio": 2,
+        "viewport": {
+          "width": 1440,
+          "height": 900,
+          "visual_viewport_scale": 1
+        },
+        "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v9 batch; visualViewport scale recorded independently.",
+        "tradingview_build": null,
+        "tradingview_script_urls": [
+          "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+          "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+          "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+          "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+          "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+          "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+          "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+          "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+          "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+          "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+          "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+          "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+        ],
+        "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+      },
+      "diagnostic": {
+        "code": null,
+        "text": "Cannot call 'operator +' with argument 'expr0'='call 'valueText' (literal string)'. An argument of 'literal string' type was used but a 'simple int' is expected.",
+        "line": 4,
+        "column": 41,
+        "first_bar_index": null,
+        "first_bar_time_utc": null
+      }
+    },
+    {
+      "script": "wma-length-v5-derived-be-v1.pine",
+      "attempt": 1,
+      "status": "RUNS",
+      "source_sha256": "bd445eb244ddd77fc0844fd31b87bb3e69aaae1ca5246e95e91ecd4ce102ef50",
+      "csv_file": "captures/v9/wma-length-v5-derived-be-v1-attempt1.csv",
+      "csv_sha256": "beec2fe7b07cfb8db7a06d780edb9c5ea6f512100c289e5c214c60253506fc55",
+      "setup": {
+        "tickerid": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chart_type": "standard candles",
+        "native_style": 1,
+        "timezone": "Etc/UTC",
+        "bar_replay": false,
+        "mintick": 0.01,
+        "defaults_confirmed": true,
+        "native_user_inputs": [
+          {
+            "id": "in_0",
+            "name": "n",
+            "value": 9,
+            "default": 9
+          }
+        ],
+        "observed_indicator_title": "derived",
+        "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+        "first_chart_bar": {
+          "index": -24555,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "chart_bars": 24855,
+        "subscription": "pro_premium",
+        "native_end_of_data": true,
+        "exchange_timezone": "Etc/UTC",
+        "exchange_session": "24x7",
+        "currency": "USDT",
+        "chart_session": "regular",
+        "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+      },
+      "live_boundary_confirmed_unchanged": true,
+      "native_environment": {
+        "browser_utc": "2026-10-04T12:29:09.769Z",
+        "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+        "platform": "MacIntel",
+        "user_agent_data": {
+          "architecture": "",
+          "bitness": "",
+          "brands": [],
+          "fullVersionList": [],
+          "mobile": false,
+          "platform": "",
+          "platformVersion": ""
+        },
+        "device_pixel_ratio": 2,
+        "viewport": {
+          "width": 1440,
+          "height": 900,
+          "visual_viewport_scale": 1
+        },
+        "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v9 batch; visualViewport scale recorded independently.",
+        "tradingview_build": null,
+        "tradingview_script_urls": [
+          "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+          "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+          "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+          "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+          "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+          "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+          "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+          "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+          "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+          "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+          "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+          "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+        ],
+        "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+      },
+      "diagnostic": {
+        "code": null,
+        "text": null,
+        "line": null,
+        "column": null,
+        "first_bar_index": null,
+        "first_bar_time_utc": null
+      },
+      "first_8_rows": [
+        {
+          "time": "1788134400",
+          "open": "77682",
+          "high": "77682.01",
+          "low": "77572",
+          "close": "77674.04",
+          "Plot": ""
+        },
+        {
+          "time": "1788134520",
+          "open": "77674.5",
+          "high": "77780.34",
+          "low": "77646",
+          "close": "77758.24",
+          "Plot": ""
+        },
+        {
+          "time": "1788134640",
+          "open": "77758.24",
+          "high": "77827.99",
+          "low": "77724",
+          "close": "77740.01",
+          "Plot": ""
+        },
+        {
+          "time": "1788134760",
+          "open": "77740.01",
+          "high": "77751.37",
+          "low": "77490",
+          "close": "77508.86",
+          "Plot": "77644.599"
+        },
+        {
+          "time": "1788134880",
+          "open": "77508.86",
+          "high": "77525.28",
+          "low": "77436.4",
+          "close": "77437.58",
+          "Plot": "77551.516"
+        },
+        {
+          "time": "1788135000",
+          "open": "77437.57",
+          "high": "77636",
+          "low": "77436.41",
+          "close": "77636",
+          "Plot": "77561.447"
+        },
+        {
+          "time": "1788135120",
+          "open": "77635.99",
+          "high": "77726",
+          "low": "77576",
+          "close": "77725.99",
+          "Plot": "77619.598"
+        },
+        {
+          "time": "1788135240",
+          "open": "77726",
+          "high": "77797.91",
+          "low": "77720.88",
+          "close": "77797.91",
+          "Plot": "77707.91900000001"
+        }
+      ]
+    },
+    {
+      "script": "wma-length-v6-untyped-be-v1.pine",
+      "attempt": 1,
+      "status": "RUNS",
+      "source_sha256": "1befb1471ecc1ddef60b1a7c62f080458baaa40bcee82e4934d75b5fbeaeceac",
+      "csv_file": "captures/v9/wma-length-v6-untyped-be-v1-attempt1.csv",
+      "csv_sha256": "4eea35313866aca9bca1c27de9845cfd088f299817ae561cc6c3a1a203427729",
+      "setup": {
+        "tickerid": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chart_type": "standard candles",
+        "native_style": 1,
+        "timezone": "Etc/UTC",
+        "bar_replay": false,
+        "mintick": 0.01,
+        "defaults_confirmed": true,
+        "native_user_inputs": [
+          {
+            "id": "in_0",
+            "name": "untitled",
+            "value": 9,
+            "default": 9
+          }
+        ],
+        "observed_indicator_title": "untyped",
+        "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+        "first_chart_bar": {
+          "index": -24555,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "chart_bars": 24855,
+        "subscription": "pro_premium",
+        "native_end_of_data": true,
+        "exchange_timezone": "Etc/UTC",
+        "exchange_session": "24x7",
+        "currency": "USDT",
+        "chart_session": "regular",
+        "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+      },
+      "live_boundary_confirmed_unchanged": true,
+      "native_environment": {
+        "browser_utc": "2026-10-04T12:29:49.078Z",
+        "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+        "platform": "MacIntel",
+        "user_agent_data": {
+          "architecture": "",
+          "bitness": "",
+          "brands": [],
+          "fullVersionList": [],
+          "mobile": false,
+          "platform": "",
+          "platformVersion": ""
+        },
+        "device_pixel_ratio": 2,
+        "viewport": {
+          "width": 1440,
+          "height": 900,
+          "visual_viewport_scale": 1
+        },
+        "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v9 batch; visualViewport scale recorded independently.",
+        "tradingview_build": null,
+        "tradingview_script_urls": [
+          "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+          "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+          "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+          "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+          "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+          "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+          "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+          "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+          "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+          "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+          "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+          "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+        ],
+        "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+      },
+      "diagnostic": {
+        "code": null,
+        "text": null,
+        "line": null,
+        "column": null,
+        "first_bar_index": null,
+        "first_bar_time_utc": null
+      },
+      "first_8_rows": [
+        {
+          "time": "1788134400",
+          "open": "77682",
+          "high": "77682.01",
+          "low": "77572",
+          "close": "77674.04",
+          "Plot": ""
+        },
+        {
+          "time": "1788134520",
+          "open": "77674.5",
+          "high": "77780.34",
+          "low": "77646",
+          "close": "77758.24",
+          "Plot": ""
+        },
+        {
+          "time": "1788134640",
+          "open": "77758.24",
+          "high": "77827.99",
+          "low": "77724",
+          "close": "77740.01",
+          "Plot": ""
+        },
+        {
+          "time": "1788134760",
+          "open": "77740.01",
+          "high": "77751.37",
+          "low": "77490",
+          "close": "77508.86",
+          "Plot": "77644.599"
+        },
+        {
+          "time": "1788134880",
+          "open": "77508.86",
+          "high": "77525.28",
+          "low": "77436.4",
+          "close": "77437.58",
+          "Plot": "77551.516"
+        },
+        {
+          "time": "1788135000",
+          "open": "77437.57",
+          "high": "77636",
+          "low": "77436.41",
+          "close": "77636",
+          "Plot": "77561.447"
+        },
+        {
+          "time": "1788135120",
+          "open": "77635.99",
+          "high": "77726",
+          "low": "77576",
+          "close": "77725.99",
+          "Plot": "77619.598"
+        },
+        {
+          "time": "1788135240",
+          "open": "77726",
+          "high": "77797.91",
+          "low": "77720.88",
+          "close": "77797.91",
+          "Plot": "77707.91900000001"
+        }
+      ]
+    },
+    {
+      "script": "corpus-v7-99-continuation-v1.pine",
+      "attempt": 1,
+      "status": "COMPILE-ERROR",
+      "source_sha256": "63726afc29fa6a9b42cc2da46f46a999ddc2e7f2fed682f4466ceaebd996cd30",
+      "csv_file": null,
+      "csv_sha256": null,
+      "setup": {
+        "tickerid": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chart_type": "standard candles",
+        "native_style": 1,
+        "timezone": "Etc/UTC",
+        "bar_replay": false,
+        "mintick": 0.01,
+        "defaults_confirmed": true,
+        "native_user_inputs": [],
+        "observed_indicator_title": "corpus-v7-99-continuation-v1.pine",
+        "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+        "first_chart_bar": {
+          "index": -24555,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "chart_bars": 24856,
+        "subscription": "pro_premium",
+        "native_end_of_data": true,
+        "exchange_timezone": "Etc/UTC",
+        "exchange_session": "24x7",
+        "currency": "USDT",
+        "chart_session": "regular",
+        "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+      },
+      "live_boundary_confirmed_unchanged": null,
+      "native_environment": {
+        "browser_utc": "2026-10-04T12:30:36.405Z",
+        "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+        "platform": "MacIntel",
+        "user_agent_data": {
+          "architecture": "",
+          "bitness": "",
+          "brands": [],
+          "fullVersionList": [],
+          "mobile": false,
+          "platform": "",
+          "platformVersion": ""
+        },
+        "device_pixel_ratio": 2,
+        "viewport": {
+          "width": 1440,
+          "height": 900,
+          "visual_viewport_scale": 1
+        },
+        "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v9 batch; visualViewport scale recorded independently.",
+        "tradingview_build": null,
+        "tradingview_script_urls": [
+          "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+          "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+          "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+          "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+          "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+          "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+          "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+          "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+          "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+          "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+          "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+          "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+        ],
+        "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+      },
+      "diagnostic": {
+        "code": "CE10156",
+        "text": "Syntax error at input \"end of line without line continuation\"",
+        "line": 17,
+        "column": 29,
+        "first_bar_index": null,
+        "first_bar_time_utc": null
+      }
+    },
+    {
+      "script": "corpus-v7-392-continuation-v1.pine",
+      "attempt": 1,
+      "status": "COMPILE-ERROR",
+      "source_sha256": "a1ead6c0bc7718375f219f8b8b3b70782423ba0c7a15b7dcc232da4d3468969b",
+      "csv_file": null,
+      "csv_sha256": null,
+      "setup": {
+        "tickerid": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chart_type": "standard candles",
+        "native_style": 1,
+        "timezone": "Etc/UTC",
+        "bar_replay": false,
+        "mintick": 0.01,
+        "defaults_confirmed": true,
+        "native_user_inputs": [],
+        "observed_indicator_title": "corpus-v7-392-continuation-v1.pine",
+        "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+        "first_chart_bar": {
+          "index": -24555,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "chart_bars": 24856,
+        "subscription": "pro_premium",
+        "native_end_of_data": true,
+        "exchange_timezone": "Etc/UTC",
+        "exchange_session": "24x7",
+        "currency": "USDT",
+        "chart_session": "regular",
+        "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+      },
+      "live_boundary_confirmed_unchanged": null,
+      "native_environment": {
+        "browser_utc": "2026-10-04T12:30:52.493Z",
+        "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+        "platform": "MacIntel",
+        "user_agent_data": {
+          "architecture": "",
+          "bitness": "",
+          "brands": [],
+          "fullVersionList": [],
+          "mobile": false,
+          "platform": "",
+          "platformVersion": ""
+        },
+        "device_pixel_ratio": 2,
+        "viewport": {
+          "width": 1440,
+          "height": 900,
+          "visual_viewport_scale": 1
+        },
+        "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v9 batch; visualViewport scale recorded independently.",
+        "tradingview_build": null,
+        "tradingview_script_urls": [
+          "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+          "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+          "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+          "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+          "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+          "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+          "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+          "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+          "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+          "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+          "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+          "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+        ],
+        "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+      },
+      "diagnostic": {
+        "code": "CE10156",
+        "text": "Syntax error at input \"end of line without line continuation\"",
+        "line": 7,
+        "column": 79,
+        "first_bar_index": null,
+        "first_bar_time_utc": null
+      }
+    },
+    {
+      "script": "bare-4-continuation-v6-probe-v1.pine",
+      "attempt": 1,
+      "status": "COMPILE-ERROR",
+      "source_sha256": "7b5b74703e3d7184c6d8764cee6d9089a6f460db744bc96cbf13cffa53c844a2",
+      "csv_file": null,
+      "csv_sha256": null,
+      "setup": {
+        "tickerid": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chart_type": "standard candles",
+        "native_style": 1,
+        "timezone": "Etc/UTC",
+        "bar_replay": false,
+        "mintick": 0.01,
+        "defaults_confirmed": true,
+        "native_user_inputs": [],
+        "observed_indicator_title": "bare-4-continuation-v6-probe-v1.pine",
+        "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+        "first_chart_bar": {
+          "index": -24555,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "chart_bars": 24856,
+        "subscription": "pro_premium",
+        "native_end_of_data": true,
+        "exchange_timezone": "Etc/UTC",
+        "exchange_session": "24x7",
+        "currency": "USDT",
+        "chart_session": "regular",
+        "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+      },
+      "live_boundary_confirmed_unchanged": null,
+      "native_environment": {
+        "browser_utc": "2026-10-04T12:31:08.994Z",
+        "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+        "platform": "MacIntel",
+        "user_agent_data": {
+          "architecture": "",
+          "bitness": "",
+          "brands": [],
+          "fullVersionList": [],
+          "mobile": false,
+          "platform": "",
+          "platformVersion": ""
+        },
+        "device_pixel_ratio": 2,
+        "viewport": {
+          "width": 1440,
+          "height": 900,
+          "visual_viewport_scale": 1
+        },
+        "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v9 batch; visualViewport scale recorded independently.",
+        "tradingview_build": null,
+        "tradingview_script_urls": [
+          "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+          "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+          "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+          "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+          "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+          "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+          "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+          "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+          "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+          "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+          "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+          "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+        ],
+        "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+      },
+      "diagnostic": {
+        "code": "CE10156",
+        "text": "Syntax error at input \"end of line without line continuation\"",
+        "line": 3,
+        "column": 22,
+        "first_bar_index": null,
+        "first_bar_time_utc": null
+      }
+    },
+    {
+      "script": "bare-8-continuation-v6-probe-v1.pine",
+      "attempt": 1,
+      "status": "COMPILE-ERROR",
+      "source_sha256": "cbc99a63ab25b19271d140b261740ae7ec7e1e0db7241ecaf9a24dc39c1a808a",
+      "csv_file": null,
+      "csv_sha256": null,
+      "setup": {
+        "tickerid": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chart_type": "standard candles",
+        "native_style": 1,
+        "timezone": "Etc/UTC",
+        "bar_replay": false,
+        "mintick": 0.01,
+        "defaults_confirmed": true,
+        "native_user_inputs": [],
+        "observed_indicator_title": "bare-8-continuation-v6-probe-v1.pine",
+        "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+        "first_chart_bar": {
+          "index": -24555,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "chart_bars": 24856,
+        "subscription": "pro_premium",
+        "native_end_of_data": true,
+        "exchange_timezone": "Etc/UTC",
+        "exchange_session": "24x7",
+        "currency": "USDT",
+        "chart_session": "regular",
+        "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+      },
+      "live_boundary_confirmed_unchanged": null,
+      "native_environment": {
+        "browser_utc": "2026-10-04T12:31:25.611Z",
+        "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+        "platform": "MacIntel",
+        "user_agent_data": {
+          "architecture": "",
+          "bitness": "",
+          "brands": [],
+          "fullVersionList": [],
+          "mobile": false,
+          "platform": "",
+          "platformVersion": ""
+        },
+        "device_pixel_ratio": 2,
+        "viewport": {
+          "width": 1440,
+          "height": 900,
+          "visual_viewport_scale": 1
+        },
+        "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v9 batch; visualViewport scale recorded independently.",
+        "tradingview_build": null,
+        "tradingview_script_urls": [
+          "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+          "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+          "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+          "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+          "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+          "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+          "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+          "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+          "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+          "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+          "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+          "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+        ],
+        "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+      },
+      "diagnostic": {
+        "code": "CE10156",
+        "text": "Syntax error at input \"end of line without line continuation\"",
+        "line": 3,
+        "column": 22,
+        "first_bar_index": null,
+        "first_bar_time_utc": null
+      }
+    },
+    {
+      "script": "fullwidth-prefix-v6-probe-v1.pine",
+      "attempt": 2,
+      "status": "RUNS",
+      "source_sha256": "beaa71ce96d4cfe88edbed4ae060e4508b660bcb4e921260306bdb868671f709",
+      "csv_file": "captures/v9/fullwidth-prefix-v6-probe-v1-attempt2.csv",
+      "csv_sha256": "65567b3bea44cc73be717eb53798ffd11f6c3b767f95223b9bb4758c7e1b994a",
+      "setup": {
+        "tickerid": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chart_type": "standard candles",
+        "native_style": 1,
+        "timezone": "Etc/UTC",
+        "bar_replay": false,
+        "mintick": 0.01,
+        "defaults_confirmed": true,
+        "native_user_inputs": [],
+        "observed_indicator_title": "Full-width comment prefix",
+        "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+        "first_chart_bar": {
+          "index": -24557,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "chart_bars": 24857,
+        "subscription": "pro_premium",
+        "native_end_of_data": true,
+        "exchange_timezone": "Etc/UTC",
+        "exchange_session": "24x7",
+        "currency": "USDT",
+        "chart_session": "regular",
+        "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+      },
+      "live_boundary_confirmed_unchanged": true,
+      "native_environment": {
+        "browser_utc": "2026-10-04T12:32:12.980Z",
+        "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+        "platform": "MacIntel",
+        "user_agent_data": {
+          "architecture": "",
+          "bitness": "",
+          "brands": [],
+          "fullVersionList": [],
+          "mobile": false,
+          "platform": "",
+          "platformVersion": ""
+        },
+        "device_pixel_ratio": 2,
+        "viewport": {
+          "width": 1440,
+          "height": 900,
+          "visual_viewport_scale": 1
+        },
+        "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v9 batch; visualViewport scale recorded independently.",
+        "tradingview_build": null,
+        "tradingview_script_urls": [
+          "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+          "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+          "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+          "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+          "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+          "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+          "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+          "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+          "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+          "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+          "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+          "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+        ],
+        "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+      },
+      "diagnostic": {
+        "code": null,
+        "text": null,
+        "line": null,
+        "column": null,
+        "first_bar_index": null,
+        "first_bar_time_utc": null
+      },
+      "first_8_rows": [
+        {
+          "time": "1788134400",
+          "open": "77682",
+          "high": "77682.01",
+          "low": "77572",
+          "close": "77674.04",
+          "Plot": "1"
+        },
+        {
+          "time": "1788134520",
+          "open": "77674.5",
+          "high": "77780.34",
+          "low": "77646",
+          "close": "77758.24",
+          "Plot": "1"
+        },
+        {
+          "time": "1788134640",
+          "open": "77758.24",
+          "high": "77827.99",
+          "low": "77724",
+          "close": "77740.01",
+          "Plot": "1"
+        },
+        {
+          "time": "1788134760",
+          "open": "77740.01",
+          "high": "77751.37",
+          "low": "77490",
+          "close": "77508.86",
+          "Plot": "1"
+        },
+        {
+          "time": "1788134880",
+          "open": "77508.86",
+          "high": "77525.28",
+          "low": "77436.4",
+          "close": "77437.58",
+          "Plot": "1"
+        },
+        {
+          "time": "1788135000",
+          "open": "77437.57",
+          "high": "77636",
+          "low": "77436.41",
+          "close": "77636",
+          "Plot": "1"
+        },
+        {
+          "time": "1788135120",
+          "open": "77635.99",
+          "high": "77726",
+          "low": "77576",
+          "close": "77725.99",
+          "Plot": "1"
+        },
+        {
+          "time": "1788135240",
+          "open": "77726",
+          "high": "77797.91",
+          "low": "77720.88",
+          "close": "77797.91",
+          "Plot": "1"
+        }
+      ]
+    }
+  ],
+  "limits": "Full-width prefix accepted in exact independent v5/v6 sources; editor buffer/codepoint evidence retained. Unary-string and continuation refusals preserve exact native text/location; diagnostic code remains null if not exposed. WMA exact-source admission does not establish universal float rounding or full corpus validity. No source repaired."
+}

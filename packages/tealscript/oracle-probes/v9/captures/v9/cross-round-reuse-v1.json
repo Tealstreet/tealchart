@@ -1,0 +1,106 @@
+{
+  "artifact": "v9 exact-source cross-round reuse v1",
+  "verified_sources": [
+    {
+      "v9_source": "partial-g-bool-input-numeric-return-v1.pine",
+      "sha256": "e6b2a9795136bf32f3478e90b3f1d9c8f2c6af19248acbbb1957fe4b8b893ec6",
+      "v8_source": "partial-g-bool-input-numeric-return-v1.pine",
+      "original_attempts": [
+        1,
+        2,
+        3
+      ],
+      "required_history": 64,
+      "original_histories": [
+        24824,
+        24824,
+        24825
+      ]
+    },
+    {
+      "v9_source": "partial-g-bool-simple-numeric-return-v1.pine",
+      "sha256": "fd48b21f627fb764e79c43f8cd0f70155189637e3ee76d9f2428c33298c7c085",
+      "v8_source": "partial-g-bool-simple-numeric-return-v1.pine",
+      "original_attempts": [
+        1,
+        2
+      ],
+      "required_history": 64,
+      "original_histories": [
+        24825,
+        24825
+      ]
+    },
+    {
+      "v9_source": "partial-g-bool-const-numeric-control-v1.pine",
+      "sha256": "8e37504db3b4bd4cd30bb80c77776ecbce5f3818aa4c0b1cbd46c30025f2c82f",
+      "v8_source": "partial-g-bool-const-numeric-control-v1.pine",
+      "original_attempts": [
+        1,
+        2
+      ],
+      "required_history": 64,
+      "original_histories": [
+        24826,
+        24826
+      ]
+    },
+    {
+      "v9_source": "partial-g-label-eviction-count-v1.pine",
+      "sha256": "8f4a4bb4fd83770f7083bfdafa27d225606ffca5b686e7392acbbffc39736608",
+      "v8_source": "partial-g-label-eviction-count-v1.pine",
+      "original_attempts": [
+        1,
+        2
+      ],
+      "required_history": 64,
+      "original_histories": [
+        24827,
+        24827
+      ]
+    },
+    {
+      "v9_source": "partial-g-line-eviction-count-v1.pine",
+      "sha256": "d3143277dce507237ab1a262356e80de2ca83dd035aa33ee3723ab1c8f76e671",
+      "v8_source": "partial-g-line-eviction-count-v1.pine",
+      "original_attempts": [
+        1,
+        2
+      ],
+      "required_history": 64,
+      "original_histories": [
+        24828,
+        24828
+      ]
+    },
+    {
+      "v9_source": "partial-g-const-table-series-v1.pine",
+      "sha256": "9964cca3bec5cea718734a769a0be79994d24d02c610e9cdee0934f3e7bf7fe8",
+      "v8_source": "partial-g-const-table-series-v1.pine",
+      "original_attempts": [
+        1,
+        2
+      ],
+      "required_history": 64,
+      "original_histories": [
+        24829,
+        24829
+      ]
+    },
+    {
+      "v9_source": "linear-percentile-missing-current-len3-v1.pine",
+      "sha256": "3ae7a91b7e41c7515c571b14d5ff3ec10dc6ad561ff7fbaa75f1c9dc66527f30",
+      "v8_source": "linear-percentile-missing-current-len3-v1.pine",
+      "original_attempts": [
+        1,
+        2
+      ],
+      "required_history": 64,
+      "original_histories": [
+        24830,
+        24831
+      ]
+    }
+  ],
+  "limits": "Original CSV, evidence, inputs, source hash, timestamp and historical extent checked. Seven sources add no new acquisition or native verdict."
+}
