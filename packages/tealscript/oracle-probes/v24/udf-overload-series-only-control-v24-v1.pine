@@ -1,0 +1,12 @@
+//@version=6
+indicator("udf-overload-series-only-control-v24-v1", overlay=false)
+pick(series int n) => float(n) + 200
+result = pick(3)
+plot(bar_index, title="CHART_INDEX")
+plot(time, title="CHART_TIME_MS")
+plot(result, title="RESULT")
+plot(na(result) ? 1 : 0, title="RESULT_IS_NA")
+plot(result == 103 ? 1 : 0, title="SIMPLE_BRANCH_MATCH")
+plot(result == 203 ? 1 : 0, title="SERIES_BRANCH_MATCH")
+plot(result == 303 ? 1 : 0, title="CONST_BRANCH_MATCH")
+plot(1, title="SCRIPT_CONTROL")

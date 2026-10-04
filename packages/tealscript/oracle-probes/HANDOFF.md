@@ -58,6 +58,11 @@
 > inferred-ID control, and requested `barstate.isconfirmed` timing (needs live intrabar
 > observation on 2m with a 10m request, plus pre/post-reload CSV). Reply at `v23/captures/v23/RESPONSE-v23.md`.
 
+> **Then round v24.** After v23, do [`v24/HANDOFF-v24-v2.md`](v24/HANDOFF-v24-v2.md) — 5 probes: tuple
+> accounting (two DIFFERENT 64-element UDFs in two requests, plus the shared-UDF control) and UDF
+> overload selection with a const argument (const vs simple+series, const-only, series-only control).
+> Run each overload script separately. Reply at `v24/captures/v24/RESPONSE-v24.md`.
+
 Agent exchange: [capture response v1](RESPONSE-v1.md). The next reply belongs in
 `RESPONSE-v2.md` beside this handoff; commit responses so both machines can read them.
 

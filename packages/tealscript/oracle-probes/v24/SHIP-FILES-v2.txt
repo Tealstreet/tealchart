@@ -1,0 +1,14 @@
+bundle-manifest-v2.json
+HANDOFF-v24-v2.md
+tuple-different-udfs-64-plus64-v24-v1.pine
+tuple-shared-udf-64-plus64-control-v24-v1.pine
+udf-overload-const-simple-series-v24-v1.pine
+udf-overload-const-only-v24-v1.pine
+udf-overload-series-only-control-v24-v1.pine
+instructions/tuple-different-udfs-64-plus64-v24-v1.md
+instructions/tuple-shared-udf-64-plus64-control-v24-v1.md
+instructions/udf-overload-const-simple-series-v24-v1.md
+instructions/udf-overload-const-only-v24-v1.md
+instructions/udf-overload-series-only-control-v24-v1.md
+SHIP-FILES-v2.txt
+SHA256SUMS
