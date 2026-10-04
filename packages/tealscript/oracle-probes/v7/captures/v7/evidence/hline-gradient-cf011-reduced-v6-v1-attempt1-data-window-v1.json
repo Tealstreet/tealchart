@@ -1,0 +1,26 @@
+{
+  "index": 298,
+  "bar": [
+    1791105960,
+    85212.58,
+    85250.99,
+    85201.72,
+    85237.46,
+    13.56316
+  ],
+  "source_row": null,
+  "browser_utc": "2026-10-04T09:29:14.706Z",
+  "title": "V7 hline-gradient-cf011-reduced-v6-v1",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   09:26",
+  "visible_range": {
+    "_firstBar": 263,
+    "_lastBar": 301
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}

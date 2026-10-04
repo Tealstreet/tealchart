@@ -1,0 +1,29 @@
+{
+  "index": 298,
+  "bar": [
+    1791106320,
+    85257.66,
+    85269.79,
+    85234,
+    85234,
+    12.59313
+  ],
+  "source_row": [
+    1791106320,
+    85234
+  ],
+  "browser_utc": "2026-10-04T09:34:50.681Z",
+  "title": "V3-PLOT-SERIES-OFFSET-PINE4",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   09:32",
+  "visible_range": {
+    "_firstBar": 263,
+    "_lastBar": 301
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}
