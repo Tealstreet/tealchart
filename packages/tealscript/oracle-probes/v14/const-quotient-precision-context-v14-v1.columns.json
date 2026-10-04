@@ -1,0 +1,227 @@
+{
+  "version": 1,
+  "probe": "const-quotient-precision-context-v14-v1.pine",
+  "sourceSha256": "bcaf8c8a1915760011eb5b7acaaf2f1dd3da50ba5d0406ee7c0a48ede7898401",
+  "nativeStatus": "UNOBSERVED",
+  "expectedOutcome": {
+    "phase": "UNSPECIFIED",
+    "values": "UNSPECIFIED"
+  },
+  "columns": [
+    {
+      "index": 0,
+      "title": "INPUT_BAR_INDEX",
+      "expression": "bar_index"
+    },
+    {
+      "index": 1,
+      "title": "INPUT_TIME",
+      "expression": "time"
+    },
+    {
+      "index": 2,
+      "title": "INPUT_CLOSE",
+      "expression": "close"
+    },
+    {
+      "index": 3,
+      "title": "INPUT_NUMERATOR",
+      "expression": "input_numerator"
+    },
+    {
+      "index": 4,
+      "title": "INPUT_DENOMINATOR",
+      "expression": "input_denominator"
+    },
+    {
+      "index": 5,
+      "title": "INPUT_TIMEFRAME_MULTIPLIER",
+      "expression": "timeframe.multiplier"
+    },
+    {
+      "index": 6,
+      "title": "INPUT_SERIES_NUMERATOR",
+      "expression": "series_numerator"
+    },
+    {
+      "index": 7,
+      "title": "CONST_2_OVER_15",
+      "expression": "const_q"
+    },
+    {
+      "index": 8,
+      "title": "CONST_13_OVER_15",
+      "expression": "const_b"
+    },
+    {
+      "index": 9,
+      "title": "CONST_1_OVER_7",
+      "expression": "1.0 / 7"
+    },
+    {
+      "index": 10,
+      "title": "CONST_1_OVER_15",
+      "expression": "1.0 / 15"
+    },
+    {
+      "index": 11,
+      "title": "CONST_10_OVER_3",
+      "expression": "10.0 / 3"
+    },
+    {
+      "index": 12,
+      "title": "CONST_100_OVER_3",
+      "expression": "100.0 / 3"
+    },
+    {
+      "index": 13,
+      "title": "CONST_SMALL_OVER_3",
+      "expression": "0.0000000001 / 3"
+    },
+    {
+      "index": 14,
+      "title": "CONST_LARGE_OVER_3",
+      "expression": "10000000000.0 / 3"
+    },
+    {
+      "index": 15,
+      "title": "CONST_CHAIN_2_OVER_15",
+      "expression": "(1.0 / 15) * 2"
+    },
+    {
+      "index": 16,
+      "title": "LITERAL_17_DIGITS",
+      "expression": "0.13333333333333333"
+    },
+    {
+      "index": 17,
+      "title": "LITERAL_16_DIGITS",
+      "expression": "0.1333333333333333"
+    },
+    {
+      "index": 18,
+      "title": "INPUT_QUOTIENT",
+      "expression": "input_q"
+    },
+    {
+      "index": 19,
+      "title": "SIMPLE_QUOTIENT",
+      "expression": "simple_q"
+    },
+    {
+      "index": 20,
+      "title": "SERIES_QUOTIENT",
+      "expression": "series_q"
+    },
+    {
+      "index": 21,
+      "title": "UDF_CONST_ARGUMENTS",
+      "expression": "quotient(2.0, 15.0)"
+    },
+    {
+      "index": 22,
+      "title": "UDF_INPUT_ARGUMENTS",
+      "expression": "quotient(input_numerator, input_denominator)"
+    },
+    {
+      "index": 23,
+      "title": "UDF_SIMPLE_ARGUMENTS",
+      "expression": "simple_quotient(timeframe.multiplier, 15.0)"
+    },
+    {
+      "index": 24,
+      "title": "UDF_SERIES_ARGUMENTS",
+      "expression": "series_quotient(series_numerator, 15.0)"
+    },
+    {
+      "index": 25,
+      "title": "CONST_MINUS_INPUT_SCALED",
+      "expression": "(const_q - input_q) * 1000000000000000000.0"
+    },
+    {
+      "index": 26,
+      "title": "CONST_MINUS_LITERAL_17_SCALED",
+      "expression": "(const_q - 0.13333333333333333) * 1000000000000000000.0"
+    },
+    {
+      "index": 27,
+      "title": "CONST_MINUS_LITERAL_16_SCALED",
+      "expression": "(const_q - 0.1333333333333333) * 1000000000000000000.0"
+    },
+    {
+      "index": 28,
+      "title": "LITERAL_17_MINUS_16_SCALED",
+      "expression": "(0.13333333333333333 - 0.1333333333333333) * 1000000000000000000.0"
+    },
+    {
+      "index": 29,
+      "title": "SMALL_QUOTIENT_SCALED",
+      "expression": "(0.0000000001 / 3) * 100000000000000000000.0"
+    },
+    {
+      "index": 30,
+      "title": "INPUT_HOLE_SOURCE",
+      "expression": "hole_source"
+    },
+    {
+      "index": 31,
+      "title": "EMA_FIRST_CONST",
+      "expression": "na(hole_source) ? float(na) : const_hold"
+    },
+    {
+      "index": 32,
+      "title": "EMA_SMA_CONST",
+      "expression": "na(hole_source) ? float(na) : const_sma"
+    },
+    {
+      "index": 33,
+      "title": "EMA_FIRST_INPUT",
+      "expression": "na(hole_source) ? float(na) : input_hold"
+    },
+    {
+      "index": 34,
+      "title": "EMA_SMA_INPUT",
+      "expression": "na(hole_source) ? float(na) : input_sma"
+    },
+    {
+      "index": 35,
+      "title": "EMA_FIRST_SIMPLE",
+      "expression": "na(hole_source) ? float(na) : simple_hold"
+    },
+    {
+      "index": 36,
+      "title": "EMA_SMA_SIMPLE",
+      "expression": "na(hole_source) ? float(na) : simple_sma"
+    },
+    {
+      "index": 37,
+      "title": "EMA_FIRST_LITERAL17",
+      "expression": "na(hole_source) ? float(na) : literal17_hold"
+    },
+    {
+      "index": 38,
+      "title": "EMA_SMA_LITERAL17",
+      "expression": "na(hole_source) ? float(na) : literal17_sma"
+    },
+    {
+      "index": 39,
+      "title": "EMA_FIRST_LITERAL16",
+      "expression": "na(hole_source) ? float(na) : literal16_hold"
+    },
+    {
+      "index": 40,
+      "title": "EMA_SMA_LITERAL16",
+      "expression": "na(hole_source) ? float(na) : literal16_sma"
+    },
+    {
+      "index": 41,
+      "title": "EMA_FIRST_EXACT_CONTROL",
+      "expression": "na(hole_source) ? float(na) : exact_control_hold"
+    },
+    {
+      "index": 42,
+      "title": "EMA_SMA_EXACT_CONTROL",
+      "expression": "na(hole_source) ? float(na) : exact_control_sma"
+    }
+  ]
+}

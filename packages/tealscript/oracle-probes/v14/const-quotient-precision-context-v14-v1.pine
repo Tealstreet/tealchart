@@ -1,0 +1,135 @@
+//@version=6
+indicator("Constant quotient precision context v14 v1", overlay=false, precision=16)
+input_numerator = input.float(2.0, "Numerator")
+input_denominator = input.float(15.0, "Denominator")
+const float const_q = 2.0 / 15
+const float const_b = 13.0 / 15
+input_q = input_numerator / input_denominator
+simple_q = timeframe.multiplier / 15.0
+series_numerator = bar_index % 2 == 0 ? 2.0 : 3.0
+series_q = series_numerator / 15.0
+quotient(float numerator, float denominator) => numerator / denominator
+simple_quotient(simple float numerator, simple float denominator) => numerator / denominator
+series_quotient(series float numerator, series float denominator) => numerator / denominator
+plot(bar_index, title="INPUT_BAR_INDEX", display=display.data_window)
+plot(time, title="INPUT_TIME", display=display.data_window)
+plot(close, title="INPUT_CLOSE", display=display.data_window)
+plot(input_numerator, title="INPUT_NUMERATOR", display=display.data_window)
+plot(input_denominator, title="INPUT_DENOMINATOR", display=display.data_window)
+plot(timeframe.multiplier, title="INPUT_TIMEFRAME_MULTIPLIER", display=display.data_window)
+plot(series_numerator, title="INPUT_SERIES_NUMERATOR", display=display.data_window)
+plot(const_q, title="CONST_2_OVER_15", display=display.data_window)
+plot(const_b, title="CONST_13_OVER_15", display=display.data_window)
+plot(1.0 / 7, title="CONST_1_OVER_7", display=display.data_window)
+plot(1.0 / 15, title="CONST_1_OVER_15", display=display.data_window)
+plot(10.0 / 3, title="CONST_10_OVER_3", display=display.data_window)
+plot(100.0 / 3, title="CONST_100_OVER_3", display=display.data_window)
+plot(0.0000000001 / 3, title="CONST_SMALL_OVER_3", display=display.data_window)
+plot(10000000000.0 / 3, title="CONST_LARGE_OVER_3", display=display.data_window)
+plot((1.0 / 15) * 2, title="CONST_CHAIN_2_OVER_15", display=display.data_window)
+plot(0.13333333333333333, title="LITERAL_17_DIGITS", display=display.data_window)
+plot(0.1333333333333333, title="LITERAL_16_DIGITS", display=display.data_window)
+plot(input_q, title="INPUT_QUOTIENT", display=display.data_window)
+plot(simple_q, title="SIMPLE_QUOTIENT", display=display.data_window)
+plot(series_q, title="SERIES_QUOTIENT", display=display.data_window)
+plot(quotient(2.0, 15.0), title="UDF_CONST_ARGUMENTS", display=display.data_window)
+plot(quotient(input_numerator, input_denominator), title="UDF_INPUT_ARGUMENTS", display=display.data_window)
+plot(simple_quotient(timeframe.multiplier, 15.0), title="UDF_SIMPLE_ARGUMENTS", display=display.data_window)
+plot(series_quotient(series_numerator, 15.0), title="UDF_SERIES_ARGUMENTS", display=display.data_window)
+plot((const_q - input_q) * 1000000000000000000.0, title="CONST_MINUS_INPUT_SCALED", display=display.data_window)
+plot((const_q - 0.13333333333333333) * 1000000000000000000.0, title="CONST_MINUS_LITERAL_17_SCALED", display=display.data_window)
+plot((const_q - 0.1333333333333333) * 1000000000000000000.0, title="CONST_MINUS_LITERAL_16_SCALED", display=display.data_window)
+plot((0.13333333333333333 - 0.1333333333333333) * 1000000000000000000.0, title="LITERAL_17_MINUS_16_SCALED", display=display.data_window)
+plot((0.0000000001 / 3) * 100000000000000000000.0, title="SMALL_QUOTIENT_SCALED", display=display.data_window)
+hole_source = bar_index == 40 or bar_index == 41 ? float(na) : close
+plot(hole_source, title="INPUT_HOLE_SOURCE", display=display.data_window)
+var float const_hold = na
+var float const_sma = na
+var float const_sum = 0.0
+var int const_count = 0
+if not na(hole_source)
+    const_hold := na(const_hold) ? hole_source : const_q * hole_source + const_b * const_hold
+    if const_count < 14
+        const_count := const_count + 1
+        const_sum := const_sum + hole_source
+        if const_count == 14
+            const_sma := const_sum / 14
+    else
+        const_sma := const_q * hole_source + const_b * const_sma
+plot(na(hole_source) ? float(na) : const_hold, title="EMA_FIRST_CONST", display=display.data_window)
+plot(na(hole_source) ? float(na) : const_sma, title="EMA_SMA_CONST", display=display.data_window)
+var float input_hold = na
+var float input_sma = na
+var float input_sum = 0.0
+var int input_count = 0
+if not na(hole_source)
+    input_hold := na(input_hold) ? hole_source : input_q * hole_source + (input_denominator - input_numerator) / input_denominator * input_hold
+    if input_count < 14
+        input_count := input_count + 1
+        input_sum := input_sum + hole_source
+        if input_count == 14
+            input_sma := input_sum / 14
+    else
+        input_sma := input_q * hole_source + (input_denominator - input_numerator) / input_denominator * input_sma
+plot(na(hole_source) ? float(na) : input_hold, title="EMA_FIRST_INPUT", display=display.data_window)
+plot(na(hole_source) ? float(na) : input_sma, title="EMA_SMA_INPUT", display=display.data_window)
+var float simple_hold = na
+var float simple_sma = na
+var float simple_sum = 0.0
+var int simple_count = 0
+if not na(hole_source)
+    simple_hold := na(simple_hold) ? hole_source : simple_q * hole_source + (15.0 - timeframe.multiplier) / 15.0 * simple_hold
+    if simple_count < 14
+        simple_count := simple_count + 1
+        simple_sum := simple_sum + hole_source
+        if simple_count == 14
+            simple_sma := simple_sum / 14
+    else
+        simple_sma := simple_q * hole_source + (15.0 - timeframe.multiplier) / 15.0 * simple_sma
+plot(na(hole_source) ? float(na) : simple_hold, title="EMA_FIRST_SIMPLE", display=display.data_window)
+plot(na(hole_source) ? float(na) : simple_sma, title="EMA_SMA_SIMPLE", display=display.data_window)
+var float literal17_hold = na
+var float literal17_sma = na
+var float literal17_sum = 0.0
+var int literal17_count = 0
+if not na(hole_source)
+    literal17_hold := na(literal17_hold) ? hole_source : 0.13333333333333333 * hole_source + 0.8666666666666667 * literal17_hold
+    if literal17_count < 14
+        literal17_count := literal17_count + 1
+        literal17_sum := literal17_sum + hole_source
+        if literal17_count == 14
+            literal17_sma := literal17_sum / 14
+    else
+        literal17_sma := 0.13333333333333333 * hole_source + 0.8666666666666667 * literal17_sma
+plot(na(hole_source) ? float(na) : literal17_hold, title="EMA_FIRST_LITERAL17", display=display.data_window)
+plot(na(hole_source) ? float(na) : literal17_sma, title="EMA_SMA_LITERAL17", display=display.data_window)
+var float literal16_hold = na
+var float literal16_sma = na
+var float literal16_sum = 0.0
+var int literal16_count = 0
+if not na(hole_source)
+    literal16_hold := na(literal16_hold) ? hole_source : 0.1333333333333333 * hole_source + 0.8666666666666667 * literal16_hold
+    if literal16_count < 14
+        literal16_count := literal16_count + 1
+        literal16_sum := literal16_sum + hole_source
+        if literal16_count == 14
+            literal16_sma := literal16_sum / 14
+    else
+        literal16_sma := 0.1333333333333333 * hole_source + 0.8666666666666667 * literal16_sma
+plot(na(hole_source) ? float(na) : literal16_hold, title="EMA_FIRST_LITERAL16", display=display.data_window)
+plot(na(hole_source) ? float(na) : literal16_sma, title="EMA_SMA_LITERAL16", display=display.data_window)
+var float exact_control_hold = na
+var float exact_control_sma = na
+var float exact_control_sum = 0.0
+var int exact_control_count = 0
+if not na(hole_source)
+    exact_control_hold := na(exact_control_hold) ? hole_source : 0.125 * hole_source + 0.875 * exact_control_hold
+    if exact_control_count < 14
+        exact_control_count := exact_control_count + 1
+        exact_control_sum := exact_control_sum + hole_source
+        if exact_control_count == 14
+            exact_control_sma := exact_control_sum / 14
+    else
+        exact_control_sma := 0.125 * hole_source + 0.875 * exact_control_sma
+plot(na(hole_source) ? float(na) : exact_control_hold, title="EMA_FIRST_EXACT_CONTROL", display=display.data_window)
+plot(na(hole_source) ? float(na) : exact_control_sma, title="EMA_SMA_EXACT_CONTROL", display=display.data_window)

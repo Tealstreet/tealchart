@@ -1,0 +1,17 @@
+//@version=6
+indicator("matrix-zero-binary-epsilon-boundary v14 v1", precision=16)
+k = bar_index % 6
+e = k == 0 ? 0.0 : k == 1 ? 1e-15 : k == 2 ? 9.999999999999999e-11 : k == 3 ? 1e-10 : k == 4 ? 1.0000000000000002e-10 : 1e-9
+z = matrix.new<float>(2, 2, 0.0)
+z.set(0, 1, e)
+b = matrix.new<float>(2, 2, 0.0)
+b.set(0, 0, 1.0 + e)
+b.set(1, 1, 1.0 - e)
+plot(bar_index, "INPUT_BAR_INDEX", display=display.data_window)
+plot(k, "CASE", display=display.data_window)
+plot(e, "EPSILON", display=display.data_window)
+plot(z.get(0, 1), "ACTUAL_ZERO_ENTRY", display=display.data_window)
+plot(b.get(0, 0), "ACTUAL_BINARY_PLUS", display=display.data_window)
+plot(b.get(1, 1), "ACTUAL_BINARY_MINUS", display=display.data_window)
+plot(z.is_zero() ? 1 : 0, "IS_ZERO", display=display.data_window)
+plot(b.is_binary() ? 1 : 0, "IS_BINARY", display=display.data_window)
