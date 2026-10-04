@@ -1,0 +1,356 @@
+{
+  "artifact": "Native paired input single-drag observation v1",
+  "before": {
+    "utc": "2026-10-04T18:14:40.056Z",
+    "user_inputs": [
+      {
+        "info": {
+          "active": true,
+          "confirm": true,
+          "defval": 1700000000000,
+          "display": 0,
+          "group": "Anchor",
+          "id": "in_0",
+          "inline": "point",
+          "isFake": true,
+          "name": "Time",
+          "type": "time"
+        },
+        "value": 1791134760000,
+        "default": 1700000000000
+      },
+      {
+        "info": {
+          "active": true,
+          "confirm": true,
+          "defval": 100,
+          "display": 4294967295,
+          "group": "Anchor",
+          "id": "in_1",
+          "inline": "point",
+          "isFake": true,
+          "name": "Price",
+          "type": "price"
+        },
+        "value": 85371.13,
+        "default": 100
+      }
+    ],
+    "source_last": {
+      "index": 305,
+      "value": [
+        1791137640,
+        1791134760000,
+        85371.13,
+        null
+      ]
+    },
+    "price_scale": {
+      "range": {
+        "_minValue": 85301.67,
+        "_maxValue": 85454.01
+      },
+      "mode": {
+        "autoScale": true,
+        "lockScale": false,
+        "percentage": false,
+        "indexedTo100": false,
+        "log": false
+      },
+      "methods": [
+        "priceRange",
+        "setPriceRange",
+        "setMinPriceRange",
+        "setMaxPriceRange",
+        "recalculatePriceRangeOnce",
+        "priceRangeShouldBeRecalculatedOnce",
+        "priceRangeChanged",
+        "mode",
+        "setMode",
+        "modeChanged",
+        "hasCalculatedPriceRange",
+        "priceToLogical",
+        "logicalToPrice",
+        "positionPercentToCoordinate",
+        "priceToCoordinate",
+        "coordinateToPrice",
+        "priceToCoordinateFn",
+        "pricesArrayToCoordinates",
+        "fillYCoordinates",
+        "barPricesToCoordinates",
+        "formatPrice",
+        "formatPriceAbsolute",
+        "formatPricePercentage",
+        "formatPriceIndexedTo100",
+        "priceDataSources",
+        "priceRangeInPrice",
+        "setPriceRangeInPrice",
+        "recalculatePriceRange",
+        "clearPriceRange",
+        "_setPriceRangeConvertedToPrices",
+        "_recalculatePriceRangeImpl",
+        "_coordinateToLogical",
+        "_logicalToCoordinate",
+        "_convertPriceRangeFromLog",
+        "_convertPriceRangeToLog",
+        "_canConvertPriceRangeFromLog",
+        "_invertedCoordinate",
+        "_priceToPercentOrIndexedTo100IfNeeded"
+      ]
+    },
+    "range_methods": [
+      "constructor",
+      "equals",
+      "clone",
+      "minValue",
+      "setMinValue",
+      "maxValue",
+      "setMaxValue",
+      "length",
+      "isEmpty",
+      "serialize",
+      "state",
+      "merge",
+      "apply",
+      "set",
+      "scaleAroundCenter",
+      "shift",
+      "containsStrictly",
+      "containPrice",
+      "intersection"
+    ],
+    "time_scale_methods": [
+      "width",
+      "setWidth",
+      "rightOffsetForTimePoint",
+      "scrollToOffsetAnimated",
+      "defaultRightOffset",
+      "rightOffsetDefaultValue",
+      "defaultRightOffsetPercentage",
+      "usePercentageRightOffset",
+      "rightOffset",
+      "rightOffsetChanged",
+      "minRightOffset",
+      "geometricMaxRightOffset",
+      "maxRightOffset",
+      "maxRightOffsetChanged",
+      "zoom",
+      "zoomToBarsRange",
+      "canZoomIn",
+      "canZoomOut",
+      "resetRightOffset",
+      "setRightOffset",
+      "correctOffset",
+      "targetDefaultRightOffset",
+      "_maxRightOffsetOnChanged",
+      "_updateRightOffset",
+      "_defaultRightOffsetOptionsUpdated"
+    ],
+    "source_input_keys": [
+      "_resolvedSymbolsByInput",
+      "_currencyInputProperty",
+      "_unitInputProperty",
+      "_currencySourceSymbolInputProperty",
+      "_inputsAnchorsPaneView",
+      "_inputsLinesPaneView",
+      "_inputsTimeAxisPaneViews",
+      "_inputsPriceAxisPaneViews",
+      "_inputsInPartsCache",
+      "_startMovingPoint",
+      "_visibleTimeRangeInputs",
+      "_inputs",
+      "_oldStudyInputs"
+    ],
+    "source_input_methods": [
+      "inputs",
+      "inputsInParts",
+      "hasSymbolInputs",
+      "inputsForAlertState",
+      "parentSourceForInput",
+      "_allInputsAreValid",
+      "_changeInputsImpl",
+      "_getCurrencyInputProperty",
+      "_getUnitInputProperty",
+      "_titleInputs",
+      "_titleInputsOptions",
+      "_apiInputs",
+      "_tryChangeInputs",
+      "_skippedTitleInputs",
+      "_getMTFResolutionInputTitle",
+      "_prepareInputs",
+      "_prepareInputValue",
+      "_onSourceInputChanged",
+      "_buildInputs",
+      "_prepareInput",
+      "_createExtendedInput",
+      "_updateInputValue",
+      "_initializeStudyInputsPaneViews",
+      "_areStudyInputsModified",
+      "_onVisibleTimeRangeInputsChanged",
+      "_updateVisibleTimeRangeInputs",
+      "_inputSymbols"
+    ]
+  },
+  "after": {
+    "utc": "2026-10-04T18:19:29.663Z",
+    "user_inputs": [
+      {
+        "info": {
+          "active": true,
+          "confirm": true,
+          "defval": 1700000000000,
+          "display": 0,
+          "group": "Anchor",
+          "id": "in_0",
+          "inline": "point",
+          "isFake": true,
+          "name": "Time",
+          "type": "time"
+        },
+        "value": 1791134520000,
+        "default": 1700000000000
+      },
+      {
+        "info": {
+          "active": true,
+          "confirm": true,
+          "defval": 100,
+          "display": 4294967295,
+          "group": "Anchor",
+          "id": "in_1",
+          "inline": "point",
+          "isFake": true,
+          "name": "Price",
+          "type": "price"
+        },
+        "value": 85454.01267811372,
+        "default": 100
+      }
+    ],
+    "anchor_points": [
+      {
+        "point": {
+          "x": 566.280487804878,
+          "y": 15.999999999990905
+        },
+        "pointIndex": 0,
+        "cursorType": 0,
+        "square": false,
+        "hitTarget": 3,
+        "activeItem": [
+          {
+            "active": true,
+            "confirm": true,
+            "defval": 1700000000000,
+            "display": 0,
+            "group": "Anchor",
+            "id": "in_0",
+            "inline": "point",
+            "isFake": true,
+            "name": "Time",
+            "type": "time"
+          },
+          {
+            "active": true,
+            "confirm": true,
+            "defval": 100,
+            "display": 4294967295,
+            "group": "Anchor",
+            "id": "in_1",
+            "inline": "point",
+            "isFake": true,
+            "name": "Price",
+            "type": "price"
+          }
+        ],
+        "possibleMovingDirections": 0
+      }
+    ],
+    "anchor_renderers": [
+      {
+        "points": [
+          {
+            "point": {
+              "x": 566.280487804878,
+              "y": 15.999999999990905
+            },
+            "pointIndex": 0,
+            "cursorType": 0,
+            "square": false,
+            "hitTarget": 3,
+            "activeItem": [
+              {
+                "active": true,
+                "confirm": true,
+                "defval": 1700000000000,
+                "display": 0,
+                "group": "Anchor",
+                "id": "in_0",
+                "inline": "point",
+                "isFake": true,
+                "name": "Time",
+                "type": "time"
+              },
+              {
+                "active": true,
+                "confirm": true,
+                "defval": 100,
+                "display": 4294967295,
+                "group": "Anchor",
+                "id": "in_1",
+                "inline": "point",
+                "isFake": true,
+                "name": "Price",
+                "type": "price"
+              }
+            ],
+            "possibleMovingDirections": 0
+          }
+        ],
+        "color": "#1E53E5",
+        "backgroundColors": [
+          "rgba(15, 15, 15, 1)"
+        ],
+        "hoveredPointIndex": 0,
+        "linePointBeingEdited": null,
+        "radius": 6,
+        "strokeWidth": 1,
+        "selected": true,
+        "selectedStrokeWidth": 3,
+        "visible": true
+      }
+    ],
+    "source_last": {
+      "index": 307,
+      "value": [
+        1791137880,
+        1791134520000,
+        85454.01267811372,
+        null
+      ]
+    },
+    "price_range": {
+      "_minValue": 85298.79165837992,
+      "_maxValue": 85440.23165837993
+    },
+    "price_mode": {
+      "autoScale": false,
+      "lockScale": false,
+      "percentage": false,
+      "indexedTo100": false,
+      "log": false
+    },
+    "status": {
+      "type": 2
+    }
+  },
+  "first_after_drag_observed_utc": "2026-10-04T18:18:06.867Z",
+  "gesture": {
+    "tool": "chrome-devtools drag",
+    "from_uid": "9149_98",
+    "to_uid": "9149_90",
+    "target": "Existing main C legend element within the native chart Canvas",
+    "manual_input_edits": false
+  },
+  "limits": "Actual unchanged paired inline/group source admitted. Viewport and manual price scale centering were native chart properties, not input edits. CSV/Inputs panel and marker geometry retained before/after; autoscale restored."
+}

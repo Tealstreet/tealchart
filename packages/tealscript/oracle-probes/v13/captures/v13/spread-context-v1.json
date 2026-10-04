@@ -1,0 +1,203 @@
+{
+  "artifact": "Spread source exact reuse context v1",
+  "source": "lower-tf-spread-symbol-v6-v1.pine",
+  "source_sha256": "0bff67fc1b5fe2aae7632d04c0f664b4bf9e957a542e5898cb24ec16ef9c99fa",
+  "attempts": [
+    {
+      "attempt": 1,
+      "csv": "../v7/captures/v7/lower-tf-spread-symbol-v6-v1-attempt1.csv",
+      "setup": {
+        "tickerid": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chart_type": "standard candles",
+        "native_style": 1,
+        "timezone": "Etc/UTC",
+        "bar_replay": false,
+        "mintick": 0.01,
+        "defaults_confirmed": true,
+        "native_user_inputs": [
+          {
+            "id": "in_0",
+            "name": "Spread",
+            "value": "BINANCE:BTCUSDT-BINANCE:ETHUSDT",
+            "default": "BINANCE:BTCUSDT-BINANCE:ETHUSDT"
+          }
+        ],
+        "observed_indicator_title": "V7 lower-tf-spread-symbol-v6-v1",
+        "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+        "first_chart_bar": {
+          "index": -24479,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "chart_bars": 24779,
+        "subscription": "pro_premium",
+        "native_end_of_data": true,
+        "exchange_timezone": "Etc/UTC",
+        "exchange_session": "24x7",
+        "currency": "USDT",
+        "chart_session": "regular",
+        "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+      },
+      "reset_utc": "2026-10-04T09:56:14.446Z",
+      "export_utc": "2026-10-04T09:56:23.856Z",
+      "first": {
+        "time": "1788134400",
+        "open": "77682",
+        "high": "77682.01",
+        "low": "77572",
+        "close": "77674.04",
+        "INTRABARS": "0",
+        "FIRST": "",
+        "LAST": ""
+      },
+      "last": {
+        "time": "1791107760",
+        "open": "85261.67",
+        "high": "85261.67",
+        "low": "85261.66",
+        "close": "85261.67",
+        "INTRABARS": "1",
+        "FIRST": "82558.83",
+        "LAST": "82558.83"
+      },
+      "first_nonempty_spread_rows": {
+        "time": "1789344000",
+        "open": "76842.01",
+        "high": "76892.01",
+        "low": "76842",
+        "close": "76858.01",
+        "INTRABARS": "2",
+        "FIRST": "74365.66",
+        "LAST": "74380.26999999999"
+      },
+      "evidence": [
+        "../v7/captures/v7/evidence/lower-tf-spread-symbol-v6-v1-attempt1-setup.png",
+        "../v7/captures/v7/evidence/lower-tf-spread-symbol-v6-v1-attempt1-export.png",
+        "../v7/captures/v7/evidence/lower-tf-spread-symbol-v6-v1-attempt1-logs.txt",
+        "../v7/captures/v7/evidence/lower-tf-spread-symbol-v6-v1-attempt1-logs-v1.json",
+        "../v7/captures/v7/evidence/lower-tf-spread-symbol-v6-v1-attempt1-logs.png",
+        "../v7/captures/v7/evidence/lower-tf-spread-symbol-v6-v1-attempt1-inputs.png",
+        "../v7/captures/v7/evidence/lower-tf-spread-symbol-v6-v1-attempt1-visual.png",
+        "../v7/captures/v7/evidence/lower-tf-spread-symbol-v6-v1-attempt1-data-window-v1.png",
+        "../v7/captures/v7/evidence/lower-tf-spread-symbol-v6-v1-attempt1-data-window-v1.json",
+        "../v7/captures/v7/evidence/lower-tf-spread-symbol-v6-v1-attempt1-data-window-v1.txt",
+        "../v7/captures/v7/evidence/lower-tf-spread-symbol-v6-v1-attempt1-resolved-spread-restored-v1.json",
+        "../v7/captures/v7/evidence/lower-tf-spread-symbol-v6-v1-attempt1-resolved-spread-restored-v1.png",
+        "../v7/captures/v7/evidence/lower-tf-spread-symbol-v6-v1-attempt1-eth-leg-native-identity-v1.json",
+        "../v7/captures/v7/evidence/lower-tf-spread-symbol-v6-v1-attempt1-eth-leg-native-identity-v1.png"
+      ]
+    },
+    {
+      "attempt": 2,
+      "csv": "../v7/captures/v7/lower-tf-spread-symbol-v6-v1-attempt2.csv",
+      "setup": {
+        "tickerid": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chart_type": "standard candles",
+        "native_style": 1,
+        "timezone": "Etc/UTC",
+        "bar_replay": false,
+        "mintick": 0.01,
+        "defaults_confirmed": false,
+        "native_user_inputs": [
+          {
+            "id": "in_0",
+            "name": "Spread",
+            "value": "BINANCE:BTCUSDT",
+            "default": "BINANCE:BTCUSDT-BINANCE:ETHUSDT"
+          }
+        ],
+        "observed_indicator_title": "V7 lower-tf-spread-symbol-v6-v1",
+        "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+        "first_chart_bar": {
+          "index": -24479,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "chart_bars": 24780,
+        "subscription": "pro_premium",
+        "native_end_of_data": true,
+        "exchange_timezone": "Etc/UTC",
+        "exchange_session": "24x7",
+        "currency": "USDT",
+        "chart_session": "regular",
+        "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+      },
+      "reset_utc": "2026-10-04T09:57:58.457Z",
+      "export_utc": "2026-10-04T09:58:09.413Z",
+      "first": {
+        "time": "1788134400",
+        "open": "77682",
+        "high": "77682.01",
+        "low": "77572",
+        "close": "77674.04",
+        "INTRABARS": "2",
+        "FIRST": "77625.93",
+        "LAST": "77674.04"
+      },
+      "last": {
+        "time": "1791107880",
+        "open": "85233.84",
+        "high": "85233.84",
+        "low": "85233.83",
+        "close": "85233.83",
+        "INTRABARS": "1",
+        "FIRST": "85233.84",
+        "LAST": "85233.84"
+      },
+      "first_nonempty_spread_rows": {
+        "time": "1788134400",
+        "open": "77682",
+        "high": "77682.01",
+        "low": "77572",
+        "close": "77674.04",
+        "INTRABARS": "2",
+        "FIRST": "77625.93",
+        "LAST": "77674.04"
+      },
+      "evidence": [
+        "../v7/captures/v7/evidence/lower-tf-spread-symbol-v6-v1-attempt2-setup.png",
+        "../v7/captures/v7/evidence/lower-tf-spread-symbol-v6-v1-attempt2-export.png",
+        "../v7/captures/v7/evidence/lower-tf-spread-symbol-v6-v1-attempt2-logs.txt",
+        "../v7/captures/v7/evidence/lower-tf-spread-symbol-v6-v1-attempt2-logs-v1.json",
+        "../v7/captures/v7/evidence/lower-tf-spread-symbol-v6-v1-attempt2-logs.png",
+        "../v7/captures/v7/evidence/lower-tf-spread-symbol-v6-v1-attempt2-inputs.png",
+        "../v7/captures/v7/evidence/lower-tf-spread-symbol-v6-v1-attempt2-visual.png",
+        "../v7/captures/v7/evidence/lower-tf-spread-symbol-v6-v1-attempt2-data-window-v1.png",
+        "../v7/captures/v7/evidence/lower-tf-spread-symbol-v6-v1-attempt2-data-window-v1.json",
+        "../v7/captures/v7/evidence/lower-tf-spread-symbol-v6-v1-attempt2-data-window-v1.txt",
+        "../v7/captures/v7/evidence/lower-tf-spread-symbol-v6-v1-attempt2-single-symbol-control-v1.json",
+        "../v7/captures/v7/evidence/lower-tf-spread-symbol-v6-v1-attempt2-single-symbol-control-v1.png",
+        "../v7/captures/v7/evidence/lower-tf-spread-symbol-v6-v1-attempt2-resolved-single-symbol-control-v1.json",
+        "../v7/captures/v7/evidence/lower-tf-spread-symbol-v6-v1-attempt2-resolved-single-symbol-control-v1.png"
+      ]
+    }
+  ],
+  "observations": [
+    "Default spread and BTC control already acquired in v7. Preserve original native phases, warnings/editor/log/UI receipts and acquisition clocks.",
+    "Separate later resolved-spread receipt has actual native type spread and BTC/ETH legs; its source_last intrabar fields are not relabelled as original export readings.",
+    "ETH leg native identity receipt records interval2 and provider/subscription. BTC actual host2m and requested1m are recorded."
+  ],
+  "required_unobserved": [
+    "Independent raw native BTC/ETH1m leg feeds were not contemporaneously exported in the original v7 acquisition.",
+    "Unexposed requested execution prefix/origin and any unobserved native advisories remain unobserved."
+  ],
+  "limits": [
+    "No warning absence inferred from documented hypotheses; original visible receipts only.",
+    "Provider availability or sampled values do not certify a universal reliability or compiler policy.",
+    "Later independent leg exports can support only their observed bounded history; do not reconstruct earlier developing ticks."
+  ]
+}
