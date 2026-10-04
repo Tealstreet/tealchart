@@ -36,6 +36,9 @@
 >
 > **Then round v17.** After v16, do [`v17/HANDOFF-v17.md`](v17/HANDOFF-v17.md) — 15 scripts (plus 9 v13 reuse references in
 > `v17/V13-REUSE-REFERENCES-v1.json`); per-script steps in `v17/instructions/`. Reply at `v17/captures/v17/RESPONSE-v17.md`.
+>
+> **Then round v18.** After v17, do [`v18/HANDOFF-v18.md`](v18/HANDOFF-v18.md) — 6 drawing-cadence scripts; per-script steps
+> and predicted counts in `v18/instructions/`. Reply at `v18/captures/v18/RESPONSE-v18.md`.
 
 Agent exchange: [capture response v1](RESPONSE-v1.md). The next reply belongs in
 `RESPONSE-v2.md` beside this handoff; commit responses so both machines can read them.

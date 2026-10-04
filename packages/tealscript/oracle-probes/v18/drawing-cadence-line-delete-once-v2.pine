@@ -1,0 +1,20 @@
+//@version=6
+indicator("Cadence line delete-once discriminator v2", max_lines_count=3)
+var int afterEight = na
+var int afterNine = na
+int creations = bar_index == 20 ? 9 : bar_index >= 24 and bar_index < 28 ? 0 : 1
+if creations > 0
+    for i = 0 to creations - 1
+        line.new(bar_index, 1, bar_index + 1, 2)
+        if i == 7
+            afterEight := array.size(line.all)
+        if i == 8
+            afterNine := array.size(line.all)
+if bar_index == 22 or bar_index == 2
+    if array.size(line.all) > 0
+        line.delete(array.get(line.all, 0))
+plot(bar_index, "BAR_INDEX", display=display.data_window)
+plot(array.size(line.all), "VISIBLE_COUNT", display=display.data_window)
+plot(array.size(line.all) > 0 ? line.get_x1(array.get(line.all, 0)) : na, "OLDEST_INDEX", display=display.data_window)
+plot(afterEight, "AFTER_EIGHT", display=display.data_window)
+plot(afterNine, "AFTER_NINE", display=display.data_window)
