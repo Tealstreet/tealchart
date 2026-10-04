@@ -1,0 +1,46 @@
+{
+  "index": 298,
+  "bar": [
+    1791147480,
+    85815.46,
+    85838.87,
+    85815.46,
+    85824.44,
+    5.40365
+  ],
+  "source_row": [
+    1791147480,
+    2,
+    0,
+    1,
+    211,
+    149,
+    67,
+    80,
+    0,
+    17,
+    43,
+    91,
+    20,
+    211,
+    149,
+    67,
+    80,
+    20069,
+    1791147480000
+  ],
+  "browser_utc": "2026-10-04T21:01:17.043Z",
+  "title": "Color gradient clamp TRACE v1",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   20:58",
+  "visible_range": {
+    "_firstBar": 263,
+    "_lastBar": 301
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}

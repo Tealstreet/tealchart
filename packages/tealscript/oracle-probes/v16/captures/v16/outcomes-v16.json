@@ -1789,7 +1789,12 @@
       "captures/v16/evidence/native-requested-6m-raw-v1-attempt1-native-v1.json",
       "captures/v16/native-requested-6m-raw-v1-attempt1-receipt-v1.json",
       "captures/v16/evidence/native-requested-6m-raw-v1-attempt1-setup-v1.png",
-      "captures/v16/evidence/native-requested-6m-raw-v1-attempt1-export-v1.png"
+      "captures/v16/evidence/native-requested-6m-raw-v1-attempt1-export-v1.png",
+      "captures/v16/native-requested-6m-raw-v1-attempt2.csv",
+      "captures/v16/native-requested-6m-raw-v1-attempt2-receipt-v1.json",
+      "captures/v16/evidence/native-requested-6m-raw-v1-attempt2-native-v1.json",
+      "captures/v16/evidence/native-requested-6m-raw-v1-attempt2-setup-v1.png",
+      "captures/v16/evidence/native-requested-6m-raw-v1-attempt2-export-v1.png"
     ],
     "notes": "Fresh v16 HTF context using recovered original BINANCE:BTCUSDT standard2m/UTC identity. Original ticker modifiers, adjustment/currency/entitlement history are not fully exposed, so old46cells are not retroactively cleared. All33plots and actual contexts, developing native cutoff, literal chart/request indices, exact source/defaults and logs retained. Paired native requested-TF feeds and later closed/reloaded snapshots remain separate.",
     "independent_page_reload_utc": null,
@@ -2953,7 +2958,12 @@
       "captures/v16/evidence/native-requested-10m-raw-v1-attempt1-native-v1.json",
       "captures/v16/native-requested-10m-raw-v1-attempt1-receipt-v1.json",
       "captures/v16/evidence/native-requested-10m-raw-v1-attempt1-setup-v1.png",
-      "captures/v16/evidence/native-requested-10m-raw-v1-attempt1-export-v1.png"
+      "captures/v16/evidence/native-requested-10m-raw-v1-attempt1-export-v1.png",
+      "captures/v16/native-requested-10m-raw-v1-attempt2.csv",
+      "captures/v16/native-requested-10m-raw-v1-attempt2-receipt-v1.json",
+      "captures/v16/evidence/native-requested-10m-raw-v1-attempt2-native-v1.json",
+      "captures/v16/evidence/native-requested-10m-raw-v1-attempt2-setup-v1.png",
+      "captures/v16/evidence/native-requested-10m-raw-v1-attempt2-export-v1.png"
     ],
     "notes": "Fresh v16 HTF context using recovered original BINANCE:BTCUSDT standard2m/UTC identity. Original ticker modifiers, adjustment/currency/entitlement history are not fully exposed, so old46cells are not retroactively cleared. All33plots and actual contexts, developing native cutoff, literal chart/request indices, exact source/defaults and logs retained. Paired native requested-TF feeds and later closed/reloaded snapshots remain separate.",
     "independent_page_reload_utc": null,
@@ -4117,7 +4127,12 @@
       "captures/v16/evidence/native-requested-30m-raw-v1-attempt1-native-v1.json",
       "captures/v16/native-requested-30m-raw-v1-attempt1-receipt-v1.json",
       "captures/v16/evidence/native-requested-30m-raw-v1-attempt1-setup-v1.png",
-      "captures/v16/evidence/native-requested-30m-raw-v1-attempt1-export-v1.png"
+      "captures/v16/evidence/native-requested-30m-raw-v1-attempt1-export-v1.png",
+      "captures/v16/native-requested-30m-raw-v1-attempt2.csv",
+      "captures/v16/native-requested-30m-raw-v1-attempt2-receipt-v1.json",
+      "captures/v16/evidence/native-requested-30m-raw-v1-attempt2-native-v1.json",
+      "captures/v16/evidence/native-requested-30m-raw-v1-attempt2-setup-v1.png",
+      "captures/v16/evidence/native-requested-30m-raw-v1-attempt2-export-v1.png"
     ],
     "notes": "Fresh v16 HTF context using recovered original BINANCE:BTCUSDT standard2m/UTC identity. Original ticker modifiers, adjustment/currency/entitlement history are not fully exposed, so old46cells are not retroactively cleared. All33plots and actual contexts, developing native cutoff, literal chart/request indices, exact source/defaults and logs retained. Paired native requested-TF feeds and later closed/reloaded snapshots remain separate.",
     "independent_page_reload_utc": null,
@@ -5701,7 +5716,12 @@
       "captures/v16/evidence/native-requested-6m-raw-v1-attempt1-native-v1.json",
       "captures/v16/native-requested-6m-raw-v1-attempt1-receipt-v1.json",
       "captures/v16/evidence/native-requested-6m-raw-v1-attempt1-setup-v1.png",
-      "captures/v16/evidence/native-requested-6m-raw-v1-attempt1-export-v1.png"
+      "captures/v16/evidence/native-requested-6m-raw-v1-attempt1-export-v1.png",
+      "captures/v16/native-requested-6m-raw-v1-attempt2.csv",
+      "captures/v16/native-requested-6m-raw-v1-attempt2-receipt-v1.json",
+      "captures/v16/evidence/native-requested-6m-raw-v1-attempt2-native-v1.json",
+      "captures/v16/evidence/native-requested-6m-raw-v1-attempt2-setup-v1.png",
+      "captures/v16/evidence/native-requested-6m-raw-v1-attempt2-export-v1.png"
     ],
     "notes": "Fresh v16 HTF closed-period capture without reload or source/input change since developing attempt1. Original requested period and one following2-minute bar have closed. Later developing buckets remain separately cut off; no original2026-10-03 tick reconstructed.",
     "independent_page_reload_utc": null,
@@ -6863,7 +6883,12 @@
       "captures/v16/evidence/native-requested-6m-raw-v1-attempt1-native-v1.json",
       "captures/v16/native-requested-6m-raw-v1-attempt1-receipt-v1.json",
       "captures/v16/evidence/native-requested-6m-raw-v1-attempt1-setup-v1.png",
-      "captures/v16/evidence/native-requested-6m-raw-v1-attempt1-export-v1.png"
+      "captures/v16/evidence/native-requested-6m-raw-v1-attempt1-export-v1.png",
+      "captures/v16/native-requested-6m-raw-v1-attempt2.csv",
+      "captures/v16/native-requested-6m-raw-v1-attempt2-receipt-v1.json",
+      "captures/v16/evidence/native-requested-6m-raw-v1-attempt2-native-v1.json",
+      "captures/v16/evidence/native-requested-6m-raw-v1-attempt2-setup-v1.png",
+      "captures/v16/evidence/native-requested-6m-raw-v1-attempt2-export-v1.png"
     ],
     "notes": "Fresh v16 HTF historical reload after original requested period and one subsequent2-minute confirmation. Exact source/defaults retained. Not reconstruction of old live tick; request indices and all gap/lookahead outputs kept distinct.",
     "independent_page_reload_utc": null,
@@ -8025,7 +8050,12 @@
       "captures/v16/evidence/native-requested-10m-raw-v1-attempt1-native-v1.json",
       "captures/v16/native-requested-10m-raw-v1-attempt1-receipt-v1.json",
       "captures/v16/evidence/native-requested-10m-raw-v1-attempt1-setup-v1.png",
-      "captures/v16/evidence/native-requested-10m-raw-v1-attempt1-export-v1.png"
+      "captures/v16/evidence/native-requested-10m-raw-v1-attempt1-export-v1.png",
+      "captures/v16/native-requested-10m-raw-v1-attempt2.csv",
+      "captures/v16/native-requested-10m-raw-v1-attempt2-receipt-v1.json",
+      "captures/v16/evidence/native-requested-10m-raw-v1-attempt2-native-v1.json",
+      "captures/v16/evidence/native-requested-10m-raw-v1-attempt2-setup-v1.png",
+      "captures/v16/evidence/native-requested-10m-raw-v1-attempt2-export-v1.png"
     ],
     "notes": "Fresh v16 HTF closed-period capture without reload or source/input change since developing attempt1. Original requested period and one following2-minute bar have closed. Later developing buckets remain separately cut off; no original2026-10-03 tick reconstructed.",
     "independent_page_reload_utc": null,
@@ -9187,7 +9217,12 @@
       "captures/v16/evidence/native-requested-10m-raw-v1-attempt1-native-v1.json",
       "captures/v16/native-requested-10m-raw-v1-attempt1-receipt-v1.json",
       "captures/v16/evidence/native-requested-10m-raw-v1-attempt1-setup-v1.png",
-      "captures/v16/evidence/native-requested-10m-raw-v1-attempt1-export-v1.png"
+      "captures/v16/evidence/native-requested-10m-raw-v1-attempt1-export-v1.png",
+      "captures/v16/native-requested-10m-raw-v1-attempt2.csv",
+      "captures/v16/native-requested-10m-raw-v1-attempt2-receipt-v1.json",
+      "captures/v16/evidence/native-requested-10m-raw-v1-attempt2-native-v1.json",
+      "captures/v16/evidence/native-requested-10m-raw-v1-attempt2-setup-v1.png",
+      "captures/v16/evidence/native-requested-10m-raw-v1-attempt2-export-v1.png"
     ],
     "notes": "Fresh v16 HTF historical reload after original requested period and one subsequent2-minute confirmation. Exact source/defaults retained. Not reconstruction of old live tick; request indices and all gap/lookahead outputs kept distinct.",
     "independent_page_reload_utc": null,
@@ -10233,7 +10268,12 @@
       "captures/v16/evidence/native-requested-30m-raw-v1-attempt1-native-v1.json",
       "captures/v16/native-requested-30m-raw-v1-attempt1-receipt-v1.json",
       "captures/v16/evidence/native-requested-30m-raw-v1-attempt1-setup-v1.png",
-      "captures/v16/evidence/native-requested-30m-raw-v1-attempt1-export-v1.png"
+      "captures/v16/evidence/native-requested-30m-raw-v1-attempt1-export-v1.png",
+      "captures/v16/native-requested-30m-raw-v1-attempt2.csv",
+      "captures/v16/native-requested-30m-raw-v1-attempt2-receipt-v1.json",
+      "captures/v16/evidence/native-requested-30m-raw-v1-attempt2-native-v1.json",
+      "captures/v16/evidence/native-requested-30m-raw-v1-attempt2-setup-v1.png",
+      "captures/v16/evidence/native-requested-30m-raw-v1-attempt2-export-v1.png"
     ],
     "notes": "Fresh v16 HTF closed-period capture without reload or source/input change since developing attempt1. Original requested period and one following2-minute bar have closed. Later developing buckets remain separately cut off; no original2026-10-03 tick reconstructed.",
     "independent_page_reload_utc": null,
@@ -11395,7 +11435,12 @@
       "captures/v16/evidence/native-requested-30m-raw-v1-attempt1-native-v1.json",
       "captures/v16/native-requested-30m-raw-v1-attempt1-receipt-v1.json",
       "captures/v16/evidence/native-requested-30m-raw-v1-attempt1-setup-v1.png",
-      "captures/v16/evidence/native-requested-30m-raw-v1-attempt1-export-v1.png"
+      "captures/v16/evidence/native-requested-30m-raw-v1-attempt1-export-v1.png",
+      "captures/v16/native-requested-30m-raw-v1-attempt2.csv",
+      "captures/v16/native-requested-30m-raw-v1-attempt2-receipt-v1.json",
+      "captures/v16/evidence/native-requested-30m-raw-v1-attempt2-native-v1.json",
+      "captures/v16/evidence/native-requested-30m-raw-v1-attempt2-setup-v1.png",
+      "captures/v16/evidence/native-requested-30m-raw-v1-attempt2-export-v1.png"
     ],
     "notes": "Fresh v16 HTF historical reload after original requested period and one subsequent2-minute confirmation. Exact source/defaults retained. Not reconstruction of old live tick; request indices and all gap/lookahead outputs kept distinct.",
     "independent_page_reload_utc": null,

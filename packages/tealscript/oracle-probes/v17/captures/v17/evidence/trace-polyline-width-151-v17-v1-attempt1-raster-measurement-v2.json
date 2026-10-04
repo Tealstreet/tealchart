@@ -1,0 +1,47 @@
+{
+  "artifact": "Original PNG stroke raster measurements v2",
+  "image_width": 2880,
+  "image_height": 1800,
+  "scale_x": 2,
+  "scale_y": 2,
+  "scans": [
+    {
+      "axis": "vertical",
+      "kind": "blue",
+      "fixed": 690.656862745098,
+      "start": 42,
+      "end": 833,
+      "reason": "Straight horizontal segment midpoint away from endpoints.",
+      "image_fixed": 1381,
+      "runs": [
+        {
+          "start": 1178,
+          "end": 1378,
+          "device_pixels": 201,
+          "css_pixels": 100.5
+        }
+      ]
+    },
+    {
+      "axis": "vertical",
+      "kind": "red",
+      "fixed": 690.656862745098,
+      "start": 42,
+      "end": 833,
+      "reason": "Straight horizontal segment midpoint away from endpoints.",
+      "image_fixed": 1381,
+      "runs": [
+        {
+          "start": 350,
+          "end": 652,
+          "device_pixels": 303,
+          "css_pixels": 151.5
+        }
+      ]
+    }
+  ],
+  "source": "trace-polyline-width-151-v17-v1.pine",
+  "png": "captures/v17/evidence/trace-polyline-width-151-v17-v1-attempt1-fixed-pane-width-rendering-v1.png",
+  "geometry": "captures/v17/evidence/trace-polyline-width-151-v17-v1-attempt1-fixed-pane-width-rendering-v1.json",
+  "method": "Original untouched PNG decoded through native browser Image and OffscreenCanvas; maximal consecutive red/blue dominant runs at stated CSS scans, predicate channel>30 and>1.6 times both other channels; divide by independently observed PNG/viewport scale. No image alteration."
+}

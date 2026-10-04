@@ -1,0 +1,47 @@
+{
+  "artifact": "Original PNG stroke raster measurements v1",
+  "image_width": 2880,
+  "image_height": 1800,
+  "scale_x": 2,
+  "scale_y": 2,
+  "scans": [
+    {
+      "axis": "vertical",
+      "kind": "blue",
+      "fixed": 690.656862745098,
+      "start": 42,
+      "end": 833,
+      "reason": "Straight horizontal segment midpoint away from endpoints.",
+      "image_fixed": 1381,
+      "runs": [
+        {
+          "start": 1178,
+          "end": 1377,
+          "device_pixels": 200,
+          "css_pixels": 100
+        }
+      ]
+    },
+    {
+      "axis": "vertical",
+      "kind": "red",
+      "fixed": 690.656862745098,
+      "start": 42,
+      "end": 833,
+      "reason": "Straight horizontal segment midpoint away from endpoints.",
+      "image_fixed": 1381,
+      "runs": [
+        {
+          "start": 500,
+          "end": 501,
+          "device_pixels": 2,
+          "css_pixels": 1
+        }
+      ]
+    }
+  ],
+  "source": "trace-line-width-0-v17-v1.pine",
+  "png": "captures/v17/evidence/trace-line-width-0-v17-v1-attempt1-fixed-pane-width-rendering-v1.png",
+  "geometry": "captures/v17/evidence/trace-line-width-0-v17-v1-attempt1-fixed-pane-width-rendering-v1.json",
+  "method": "Original untouched PNG decoded through native browser Image and OffscreenCanvas; maximal consecutive red/blue dominant runs at stated CSS scans, predicate channel>170 and>1.6 times both other channels; divide by independently observed PNG/viewport scale. No image alteration."
+}

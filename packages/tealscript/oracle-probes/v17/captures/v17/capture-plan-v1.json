@@ -1,0 +1,293 @@
+{
+  "scripts": [
+    {
+      "script": "log10-reference-literal-precision-v6-v1.pine",
+      "sha256": "4905cbfd5045cc89069d044605a772680b622f5e9e3ec8720090a7ded0989578",
+      "title": "Log10 reference literal precision v1",
+      "shorttitle": null,
+      "columns": [
+        "REFERENCE_LITERAL",
+        "REFERENCE_SHORT",
+        "LOG10_VALUE",
+        "LOG10_RESIDUAL",
+        "LITERAL_MINUS_SHORT_X1E18",
+        "LITERAL_A",
+        "A_MINUS_SHORT_X1E18",
+        "LITERAL_B",
+        "B_X1E18",
+        "B_SCI_X1E18",
+        "LOG_REFERENCE_LITERAL",
+        "LOG_RESIDUAL",
+        "BAR_INDEX",
+        "TIME_MS"
+      ],
+      "minimumHistoryBars": 100,
+      "manifestMinimumHistoryBars": 100,
+      "instructions": "instructions/log10-reference-literal-precision-v6-v1.md",
+      "pineVersion": 6,
+      "captureKind": "CSV+inputs screenshot"
+    },
+    {
+      "script": "corpus-v56-150-self-declaration-exact-v1.pine",
+      "sha256": "513261eac91c41c1ca9ce2c8f9e47026fa86f15299ca46cad6079e4a3f69e70a",
+      "title": "SAM: Smoothed Adaptive Momentum",
+      "shorttitle": "SAM",
+      "columns": [
+        "SAM"
+      ],
+      "minimumHistoryBars": 32,
+      "manifestMinimumHistoryBars": 32,
+      "instructions": "instructions/corpus-v56-150-self-declaration-exact-v1.md",
+      "pineVersion": 6,
+      "captureKind": "compile-and-csv-if-admitted"
+    },
+    {
+      "script": "corpus-v56-1042-self-declaration-exact-v1.pine",
+      "sha256": "44f66f1845e73da3d75783df1a41d9e0f7205e5e51a295750f0bac95f0075857",
+      "title": "SAM: Smoothed Adaptive Momentum",
+      "shorttitle": "SAM",
+      "columns": [
+        "SAM"
+      ],
+      "minimumHistoryBars": 32,
+      "manifestMinimumHistoryBars": 32,
+      "instructions": "instructions/corpus-v56-1042-self-declaration-exact-v1.md",
+      "pineVersion": 6,
+      "captureKind": "compile-and-csv-if-admitted"
+    },
+    {
+      "script": "self-reference-own-declaration-minimal-v6-v1.pine",
+      "sha256": "93d07c23bd797d46e6ae1257f4795739eb3872e6a83130e645f3748d8eb20c80",
+      "title": "Self reference own declaration v1",
+      "shorttitle": null,
+      "columns": [],
+      "minimumHistoryBars": 32,
+      "manifestMinimumHistoryBars": 32,
+      "instructions": "instructions/self-reference-own-declaration-minimal-v6-v1.md",
+      "pineVersion": 6,
+      "captureKind": "compile-and-csv-if-admitted"
+    },
+    {
+      "script": "trace-line-width-0-v17-v1.pine",
+      "sha256": "ec40c002a80deaa408e15afee2c441b378d5728a36ffbac2fd18f77183cbfb77",
+      "title": "line width 0 trace v17 v1",
+      "shorttitle": null,
+      "columns": [
+        "SCALE_MIN",
+        "SCALE_MAX",
+        "INPUT_BAR_INDEX",
+        "REQUESTED_WIDTH",
+        "CREATION_REACHED"
+      ],
+      "minimumHistoryBars": 100,
+      "manifestMinimumHistoryBars": 100,
+      "instructions": "instructions/trace-line-width-0-v17-v1.md",
+      "pineVersion": 6,
+      "captureKind": "compile/runtime outcome + CSV + measured screenshot"
+    },
+    {
+      "script": "trace-line-width-151-v17-v1.pine",
+      "sha256": "5902fbb1072ce56856d0d48bb467dda5007b8691275cc1be2fb2dfd46aaa4227",
+      "title": "line width 151 trace v17 v1",
+      "shorttitle": null,
+      "columns": [
+        "SCALE_MIN",
+        "SCALE_MAX",
+        "INPUT_BAR_INDEX",
+        "REQUESTED_WIDTH",
+        "CREATION_REACHED"
+      ],
+      "minimumHistoryBars": 100,
+      "manifestMinimumHistoryBars": 100,
+      "instructions": "instructions/trace-line-width-151-v17-v1.md",
+      "pineVersion": 6,
+      "captureKind": "compile/runtime outcome + CSV + measured screenshot"
+    },
+    {
+      "script": "trace-box-width-151-v17-v1.pine",
+      "sha256": "ebfb9c0bbce9dd1c620cd5756523292e548c3615482c77069fb8a1022b2224b7",
+      "title": "box width 151 trace v17 v1",
+      "shorttitle": null,
+      "columns": [
+        "SCALE_MIN",
+        "SCALE_MAX",
+        "INPUT_BAR_INDEX",
+        "REQUESTED_WIDTH",
+        "CREATION_REACHED"
+      ],
+      "minimumHistoryBars": 100,
+      "manifestMinimumHistoryBars": 100,
+      "instructions": "instructions/trace-box-width-151-v17-v1.md",
+      "pineVersion": 6,
+      "captureKind": "compile/runtime outcome + CSV + measured screenshot"
+    },
+    {
+      "script": "trace-polyline-width-151-v17-v1.pine",
+      "sha256": "df0923894291ad1cc3a62618f9749054f900eb889a1a6c06d8d4484dffece9cf",
+      "title": "polyline width 151 trace v17 v1",
+      "shorttitle": null,
+      "columns": [
+        "SCALE_MIN",
+        "SCALE_MAX",
+        "INPUT_BAR_INDEX",
+        "REQUESTED_WIDTH",
+        "CREATION_REACHED"
+      ],
+      "minimumHistoryBars": 100,
+      "manifestMinimumHistoryBars": 100,
+      "instructions": "instructions/trace-polyline-width-151-v17-v1.md",
+      "pineVersion": 6,
+      "captureKind": "compile/runtime outcome + CSV + measured screenshot"
+    },
+    {
+      "script": "trace-table-border-width-negative1-v17-v1.pine",
+      "sha256": "0e7c105edc9e7c9291807c7591ed25c7c7b777c55307835ecc4f34c5a83cf9a7",
+      "title": "Table border width -1 trace v17 v1",
+      "shorttitle": null,
+      "columns": [
+        "INPUT_BAR_INDEX",
+        "REQUESTED_WIDTH",
+        "CELL_WRITES_REACHED"
+      ],
+      "minimumHistoryBars": 100,
+      "manifestMinimumHistoryBars": 100,
+      "instructions": "instructions/trace-table-border-width-negative1-v17-v1.md",
+      "pineVersion": 6,
+      "captureKind": "compile/runtime outcome + CSV + measured screenshot"
+    },
+    {
+      "script": "trace-table-border-width-151-v17-v1.pine",
+      "sha256": "1bdb3e08808f40ccd69611d2e0151bfd26f42c83cab5cb163bfea77e49029839",
+      "title": "Table border width 151 trace v17 v1",
+      "shorttitle": null,
+      "columns": [
+        "INPUT_BAR_INDEX",
+        "REQUESTED_WIDTH",
+        "CELL_WRITES_REACHED"
+      ],
+      "minimumHistoryBars": 100,
+      "manifestMinimumHistoryBars": 100,
+      "instructions": "instructions/trace-table-border-width-151-v17-v1.md",
+      "pineVersion": 6,
+      "captureKind": "compile/runtime outcome + CSV + measured screenshot"
+    },
+    {
+      "script": "trace-table-frame-width-negative1-v17-v1.pine",
+      "sha256": "da0220ccccb4c230693e6a8c1f6c905dc4420d5ecfda785f31cbb890477716c2",
+      "title": "Table frame width -1 trace v17 v1",
+      "shorttitle": null,
+      "columns": [
+        "INPUT_BAR_INDEX",
+        "REQUESTED_WIDTH",
+        "CELL_WRITES_REACHED"
+      ],
+      "minimumHistoryBars": 100,
+      "manifestMinimumHistoryBars": 100,
+      "instructions": "instructions/trace-table-frame-width-negative1-v17-v1.md",
+      "pineVersion": 6,
+      "captureKind": "compile/runtime outcome + CSV + measured screenshot"
+    },
+    {
+      "script": "trace-table-frame-width-151-v17-v1.pine",
+      "sha256": "a96e03bf8f82a7d244fd117df56eab7ff1753f3cfa9c155a1ed6d847ea10d59f",
+      "title": "Table frame width 151 trace v17 v1",
+      "shorttitle": null,
+      "columns": [
+        "INPUT_BAR_INDEX",
+        "REQUESTED_WIDTH",
+        "CELL_WRITES_REACHED"
+      ],
+      "minimumHistoryBars": 100,
+      "manifestMinimumHistoryBars": 100,
+      "instructions": "instructions/trace-table-frame-width-151-v17-v1.md",
+      "pineVersion": 6,
+      "captureKind": "compile/runtime outcome + CSV + measured screenshot"
+    },
+    {
+      "script": "trace-eigen-complex-placeholder-v17-v1.pine",
+      "sha256": "d2a0605f2c67e9b4135921d4815c11b8d0bd7beddb23a2721e8fe823cbf75ba5",
+      "title": "Eigen complex placeholder trace v17 v1",
+      "shorttitle": null,
+      "columns": [
+        "INPUT_BAR_INDEX",
+        "RESULT_SIZE",
+        "EIGEN0",
+        "EIGEN1",
+        "EIGEN2"
+      ],
+      "minimumHistoryBars": 3,
+      "manifestMinimumHistoryBars": 3,
+      "instructions": "instructions/trace-eigen-complex-placeholder-v17-v1.md",
+      "pineVersion": 6,
+      "captureKind": "compile/runtime outcome + CSV"
+    },
+    {
+      "script": "roc-toradians-reference-literals-v6-v1.pine",
+      "sha256": "812c72d1d0aae1ab3896171a19ed96c7db5e173216a939c95837851ba24f1847",
+      "title": "ROC and radians reference literals v1",
+      "shorttitle": null,
+      "columns": [
+        "ROC_LITERAL_MINUS_SHORT",
+        "ROC_LITERAL_MINUS_CONSTRUCTED",
+        "ROC_BUILTIN_MINUS_LITERAL",
+        "ROC_BUILTIN_MINUS_CONSTRUCTED",
+        "ROC_MULTIPLY_THEN_DIVIDE",
+        "ROC_DIVIDE_THEN_MULTIPLY",
+        "RADIANS_LITERAL_MINUS_SHORT",
+        "RADIANS_LITERAL_MINUS_CONSTRUCTED",
+        "RADIANS_BUILTIN_MINUS_LITERAL",
+        "RADIANS_BUILTIN_MINUS_CONSTRUCTED",
+        "RADIANS_MULTIPLY_THEN_DIVIDE",
+        "RADIANS_DIVIDE_CONSTANT_FIRST",
+        "ROC_SECOND_LITERAL_SHIFT",
+        "ROC_THIRD_LITERAL_SHIFT",
+        "RADIANS_HALF_LITERAL_SHIFT",
+        "TINY_DECIMAL_RUNTIME",
+        "TINY_SCI_RUNTIME",
+        "BAR_INDEX",
+        "TIME_MS"
+      ],
+      "minimumHistoryBars": 100,
+      "manifestMinimumHistoryBars": 100,
+      "instructions": "instructions/roc-toradians-reference-literals-v6-v1.md",
+      "pineVersion": 6,
+      "captureKind": "CSV+context"
+    },
+    {
+      "script": "color-gradient-clamp-trace-v6-v1.pine",
+      "sha256": "dbda2b91ca882d4d9d79bfb6fc0a02542c143307913419814df45cc3970b9802",
+      "title": "Color gradient clamp TRACE v1",
+      "shorttitle": null,
+      "columns": [
+        "VALUE",
+        "BOTTOM",
+        "TOP",
+        "RESULT_R",
+        "RESULT_G",
+        "RESULT_B",
+        "RESULT_T",
+        "RESULT_NA",
+        "LOWER_R",
+        "LOWER_G",
+        "LOWER_B",
+        "LOWER_T",
+        "UPPER_R",
+        "UPPER_G",
+        "UPPER_B",
+        "UPPER_T",
+        "PINE_INDEX",
+        "TIME_MS"
+      ],
+      "minimumHistoryBars": 32,
+      "manifestMinimumHistoryBars": 32,
+      "instructions": "instructions/color-gradient-clamp-trace-v6-v1.md",
+      "pineVersion": 6,
+      "captureKind": "CSV+inputs screenshot+outcome"
+    }
+  ],
+  "artifact": "v17 source-pinned capture plan v1",
+  "batch_start_utc": "2026-10-04T20:45:31.895Z",
+  "manifest": "bundle-manifest-v8.json",
+  "source_commit": "ca291fdcf4",
+  "batch_start_scope": "Earliest actual native environment receipt; separately preserved install/export clocks remain authoritative."
+}

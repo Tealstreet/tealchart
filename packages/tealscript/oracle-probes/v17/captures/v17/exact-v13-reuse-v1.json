@@ -1,0 +1,2589 @@
+{
+  "artifact": "v17 exact v13 source reuse receipts v1",
+  "references": [
+    {
+      "source": "packages/tealscript/oracle-probes/v13/trace-drawing-count-501-v13-v1.pine",
+      "sha256": "6108502c887215d5646b68eb8bb0fef1e0d011dd6ae994c01f77f02d4b69de3c",
+      "paste_again": false,
+      "reuse_identity": "Exact frozen source bytes; original observed clock/context preserved, no new v17 execution inferred. Manifest probes/ aliases are reference-only, not duplicated local sources.",
+      "original_attempt": {
+        "native_environment": {
+          "browser_utc": "2026-10-04T18:55:54.073Z",
+          "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+          "platform": "MacIntel",
+          "user_agent_data": {
+            "architecture": "arm",
+            "bitness": "64",
+            "brands": [
+              {
+                "brand": "Not:A-Brand",
+                "version": "8"
+              },
+              {
+                "brand": "Chromium",
+                "version": "156"
+              },
+              {
+                "brand": "Google Chrome",
+                "version": "156"
+              }
+            ],
+            "fullVersionList": [
+              {
+                "brand": "Not:A-Brand",
+                "version": "8.0.0.0"
+              },
+              {
+                "brand": "Chromium",
+                "version": "156.0.8075.0"
+              },
+              {
+                "brand": "Google Chrome",
+                "version": "156.0.8075.0"
+              }
+            ],
+            "mobile": false,
+            "platform": "macOS",
+            "platformVersion": "27.2.0"
+          },
+          "device_pixel_ratio": 2,
+          "viewport": {
+            "width": 1440,
+            "height": 900,
+            "visual_viewport_scale": 1
+          },
+          "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v13 batch; visualViewport scale recorded independently.",
+          "tradingview_build": null,
+          "tradingview_script_urls": [
+            "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+            "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+            "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+            "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+            "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+            "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+            "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+            "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+            "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+            "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+            "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+            "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+          ],
+          "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+        },
+        "script": "trace-drawing-count-501-v13-v1.pine",
+        "attempt": 1,
+        "source_sha256": "6108502c887215d5646b68eb8bb0fef1e0d011dd6ae994c01f77f02d4b69de3c",
+        "indicator_title": "Silent audit drawing count501 v13 v1",
+        "status": "COMPILE-ERROR",
+        "csv_file": null,
+        "original_download_filename": null,
+        "partial_csv_file": null,
+        "diagnostic": {
+          "code": "CE10178",
+          "text": "The script max_lines_count value (501) is greater than the maximum possible value (500)",
+          "line": 2,
+          "column": 66,
+          "first_bar_index": null,
+          "first_bar_time_utc": null,
+          "native": {
+            "error": "The script {drwName} value ({value}) is greater than the maximum possible value ({MAX_DRAWINGS_COUNT})",
+            "editorError": {
+              "code": "CE10178",
+              "ctx": {
+                "MAX_DRAWINGS_COUNT": 500,
+                "drwName": "max_lines_count",
+                "value": 501
+              },
+              "end": {
+                "column": 68,
+                "line": 2
+              },
+              "message": "The script {drwName} value ({value}) is greater than the maximum possible value ({MAX_DRAWINGS_COUNT})",
+              "start": {
+                "column": 66,
+                "line": 2
+              },
+              "id": "USER;cd390a1332464d7582191a4c30c43f49"
+            },
+            "title": "Compilation error",
+            "compiler_markers": [],
+            "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,319.33\nH\n85,326.78\nL\n85,319.33\nC\n85,326.78\n+7.45 (+0.01%)\n85,353.75\nSELL\n0.01\n85,353.76\nBUY\nUSDT\ntrace-drawing-count-501-v13-v1.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n18:55:56 UTC\n99+\nPine Editor\ntrace-drawing-count-501-v13-v1.pine\nPublish script\n1\n2\n3\n4\n5\n6\n7\n8\n//@version=6\nindicator(\"Silent\u00a0audit\u00a0drawing\u00a0count501\u00a0v13\u00a0v1\",max_lines_count=501)\nif\u00a0barstate.isfirst\n\u00a0\u00a0\u00a0\u00a0for\u00a0i=0\u00a0to\u00a0500\n\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0line.new(0,1,1,1)\nplot(bar_index,\"INPUT_BAR_INDEX\",display=display.data_window)\nplot(array.size(line.all),\"OUTCOME\",display=display.data_window)\n1 \u2219 Today, 02:55\nLine 2, Col 66\nPine Script\u00ae v6\nCompilation error: CE10178\n\nThe script max_lines_count value (501) is greater than the maximum possible value (500)\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+            "context_substituted_message": "The script max_lines_count value (501) is greater than the maximum possible value (500)"
+          }
+        },
+        "setup": {
+          "tickerid": "BINANCE:BTCUSDT",
+          "timeframe": "2",
+          "chart_type": "standard candles",
+          "native_style": 1,
+          "timezone": "Etc/UTC",
+          "bar_replay": false,
+          "minmove": 1,
+          "pricescale": 100,
+          "pointvalue": 1,
+          "mintick": 0.01,
+          "defaults_confirmed": true,
+          "native_user_inputs": [],
+          "observed_indicator_title": "trace-drawing-count-501-v13-v1.pine",
+          "dataset_start_utc": "2026-09-07T00:00:00.000Z",
+          "first_chart_bar": {
+            "index": -19708,
+            "value": [
+              1788739200,
+              80341.83,
+              80356,
+              80230.29,
+              80293.23,
+              37.66955
+            ]
+          },
+          "chart_bars": 20008,
+          "subscription": "pro_premium",
+          "native_end_of_data": true,
+          "exchange_timezone": "Etc/UTC",
+          "exchange_session": "24x7",
+          "currency": "USDT",
+          "chart_session": "regular",
+          "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+        },
+        "reset_utc": null,
+        "live_candle_open_utc": null,
+        "export_utc": null,
+        "live_boundary_confirmed_unchanged": null,
+        "evidence_files": [
+          "captures/v13/evidence/trace-drawing-count-501-v13-v1-attempt1-error.png",
+          "captures/v13/evidence/trace-drawing-count-501-v13-v1-attempt1-error.txt",
+          "captures/v13/evidence/trace-drawing-count-501-v13-v1-attempt1-logs.txt",
+          "captures/v13/evidence/trace-drawing-count-501-v13-v1-attempt1-logs-v1.json",
+          "captures/v13/evidence/trace-drawing-count-501-v13-v1-attempt1-logs.png"
+        ],
+        "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+        "independent_page_reload_utc": null,
+        "source_identity_verified": true,
+        "reset_native_observations": null,
+        "native_editor_markers": [],
+        "error_observed_utc": "2026-10-04T18:55:58.070Z",
+        "pine_logs": {
+          "paths": [
+            "evidence/trace-drawing-count-501-v13-v1-attempt1-logs.txt",
+            "evidence/trace-drawing-count-501-v13-v1-attempt1-logs-v1.json",
+            "evidence/trace-drawing-count-501-v13-v1-attempt1-logs.png"
+          ],
+          "entries": 0
+        }
+      },
+      "original_file_sha256": {
+        "packages/tealscript/oracle-probes/v13/captures/v13/evidence/trace-drawing-count-501-v13-v1-attempt1-error.png": "81cf7b23c64e3d60e10836dbad82bdf3b045e2e3695718212b218e108d761b08",
+        "packages/tealscript/oracle-probes/v13/captures/v13/evidence/trace-drawing-count-501-v13-v1-attempt1-error.txt": "7b66fac4c0139dde5fb2405ed5d281d911bfa43e8bc968c409d4c149f7bef2b4",
+        "packages/tealscript/oracle-probes/v13/captures/v13/evidence/trace-drawing-count-501-v13-v1-attempt1-logs.txt": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+        "packages/tealscript/oracle-probes/v13/captures/v13/evidence/trace-drawing-count-501-v13-v1-attempt1-logs-v1.json": "43ca61bd401e33375db369586e828df9d543d2394427cc93a08233ec20a77b12",
+        "packages/tealscript/oracle-probes/v13/captures/v13/evidence/trace-drawing-count-501-v13-v1-attempt1-logs.png": "bf24b944831bb8aa212196bdccae8ee12493a3b83910adb1339b429ca295770b"
+      }
+    },
+    {
+      "source": "packages/tealscript/oracle-probes/v13/trace-time-offset-negative501-v13-v1.pine",
+      "sha256": "4f8abc03efaae4a1a8055b59effeea12a3c80b9e74f5aa0f0ce24d877d828546",
+      "paste_again": false,
+      "reuse_identity": "Exact frozen source bytes; original observed clock/context preserved, no new v17 execution inferred. Manifest probes/ aliases are reference-only, not duplicated local sources.",
+      "original_attempt": {
+        "native_environment": {
+          "browser_utc": "2026-10-04T18:56:45.130Z",
+          "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+          "platform": "MacIntel",
+          "user_agent_data": {
+            "architecture": "arm",
+            "bitness": "64",
+            "brands": [
+              {
+                "brand": "Not:A-Brand",
+                "version": "8"
+              },
+              {
+                "brand": "Chromium",
+                "version": "156"
+              },
+              {
+                "brand": "Google Chrome",
+                "version": "156"
+              }
+            ],
+            "fullVersionList": [
+              {
+                "brand": "Not:A-Brand",
+                "version": "8.0.0.0"
+              },
+              {
+                "brand": "Chromium",
+                "version": "156.0.8075.0"
+              },
+              {
+                "brand": "Google Chrome",
+                "version": "156.0.8075.0"
+              }
+            ],
+            "mobile": false,
+            "platform": "macOS",
+            "platformVersion": "27.2.0"
+          },
+          "device_pixel_ratio": 2,
+          "viewport": {
+            "width": 1440,
+            "height": 900,
+            "visual_viewport_scale": 1
+          },
+          "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v13 batch; visualViewport scale recorded independently.",
+          "tradingview_build": null,
+          "tradingview_script_urls": [
+            "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+            "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+            "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+            "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+            "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+            "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+            "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+            "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+            "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+            "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+            "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+            "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+          ],
+          "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+        },
+        "script": "trace-time-offset-negative501-v13-v1.pine",
+        "attempt": 1,
+        "source_sha256": "4f8abc03efaae4a1a8055b59effeea12a3c80b9e74f5aa0f0ce24d877d828546",
+        "indicator_title": "Silent audit time-offset-negative501 v13 v1",
+        "status": "COMPILE-ERROR",
+        "csv_file": null,
+        "original_download_filename": null,
+        "partial_csv_file": null,
+        "diagnostic": {
+          "code": "CE10041",
+          "text": "Invalid value \"-501\" for \"bars_back\" parameter of the \"time()\" function. It must be between -500 and 5000",
+          "line": 5,
+          "column": 24,
+          "first_bar_index": null,
+          "first_bar_time_utc": null,
+          "native": {
+            "error": "Invalid value \"{value}\" for \"{argument_name}\" parameter of the \"{funId}()\" function. It must be between {min_value} and {max_value}",
+            "editorError": {
+              "code": "CE10041",
+              "ctx": {
+                "argument_name": "bars_back",
+                "funId": "time",
+                "max_value": 5000,
+                "min_value": -500,
+                "value": -501
+              },
+              "end": {
+                "column": 27,
+                "line": 5
+              },
+              "message": "Invalid value \"{value}\" for \"{argument_name}\" parameter of the \"{funId}()\" function. It must be between {min_value} and {max_value}",
+              "start": {
+                "column": 24,
+                "line": 5
+              },
+              "id": "USER;64eb9fe01ecd4728859be8cb120fa590"
+            },
+            "title": "Compilation error",
+            "compiler_markers": [],
+            "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n1m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n1\nBinance\nO\n85,353.76\nH\n85,356.17\nL\n85,353.75\nC\n85,354.00\n+0.24 (+0.00%)\n85,353.99\nSELL\n0.01\n85,354.00\nBUY\nUSDT\nOracle na holes crosses v1\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n18:56:47 UTC\n99+\nPine Editor\ntrace-time-offset-negative501-v13-v1.pine\nPublish script\n1\n2\n3\n4\n5\n6\n//@version=6\nindicator(\"Silent\u00a0audit\u00a0time-offset-negative501\u00a0v13\u00a0v1\",\u00a0overlay=false,\u00a0precision=16)\nplot(bar_index,\"INPUT_BAR_INDEX\",display=display.data_window)\nplot(time,\"INPUT_TIME\",display=display.data_window)\nplot(time(\"\",bars_back=-501),\"OUTCOME\",display=display.data_window)\n1 \u2219 Today, 02:56\nLine 5, Col 24\nPine Script\u00ae v6\nCompilation error: CE10041\nCompilation error: CE10041\n\nInvalid value \"-501\" for \"bars_back\" parameter of the \"time()\" function. It must be between -500 and 5000\n\nOpen in editor",
+            "context_substituted_message": "Invalid value \"-501\" for \"bars_back\" parameter of the \"time()\" function. It must be between -500 and 5000"
+          }
+        },
+        "setup": {
+          "tickerid": "BINANCE:BTCUSDT",
+          "timeframe": "1",
+          "chart_type": "standard candles",
+          "native_style": 1,
+          "timezone": "Etc/UTC",
+          "bar_replay": false,
+          "minmove": 1,
+          "pricescale": 100,
+          "pointvalue": 1,
+          "mintick": 0.01,
+          "defaults_confirmed": true,
+          "native_user_inputs": [],
+          "observed_indicator_title": "Oracle na holes crosses v1",
+          "dataset_start_utc": "2026-10-04T13:57:00.000Z",
+          "first_chart_bar": {
+            "index": 0,
+            "value": [
+              1791122220,
+              85252.28,
+              85252.29,
+              85248.5,
+              85248.5,
+              2.04548
+            ]
+          },
+          "chart_bars": 300,
+          "subscription": "pro_premium",
+          "native_end_of_data": false,
+          "exchange_timezone": "Etc/UTC",
+          "exchange_session": "24x7",
+          "currency": "USDT",
+          "chart_session": "regular",
+          "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+        },
+        "reset_utc": null,
+        "live_candle_open_utc": null,
+        "export_utc": null,
+        "live_boundary_confirmed_unchanged": null,
+        "evidence_files": [
+          "captures/v13/evidence/trace-time-offset-negative501-v13-v1-attempt1-error.png",
+          "captures/v13/evidence/trace-time-offset-negative501-v13-v1-attempt1-error.txt",
+          "captures/v13/evidence/trace-time-offset-negative501-v13-v1-attempt1-logs.txt",
+          "captures/v13/evidence/trace-time-offset-negative501-v13-v1-attempt1-logs-v1.json",
+          "captures/v13/evidence/trace-time-offset-negative501-v13-v1-attempt1-logs.png"
+        ],
+        "notes": "Frozen offset probe on required standard native 1-minute chart; actual execution history and literal index outputs determine sufficient prefix.",
+        "independent_page_reload_utc": null,
+        "source_identity_verified": true,
+        "reset_native_observations": null,
+        "native_editor_markers": [],
+        "error_observed_utc": "2026-10-04T18:56:48.774Z",
+        "pine_logs": {
+          "paths": [
+            "evidence/trace-time-offset-negative501-v13-v1-attempt1-logs.txt",
+            "evidence/trace-time-offset-negative501-v13-v1-attempt1-logs-v1.json",
+            "evidence/trace-time-offset-negative501-v13-v1-attempt1-logs.png"
+          ],
+          "entries": 0
+        }
+      },
+      "original_file_sha256": {
+        "packages/tealscript/oracle-probes/v13/captures/v13/evidence/trace-time-offset-negative501-v13-v1-attempt1-error.png": "08c73b471b8a33bc4b6575bda3d2915fd528e8d486ab0b473565e6ef7e9ce9b9",
+        "packages/tealscript/oracle-probes/v13/captures/v13/evidence/trace-time-offset-negative501-v13-v1-attempt1-error.txt": "a862e6afdbdeacae05dc3bda93e3c31e2d8ceb4b3917c3f5d898508f3ee5ab76",
+        "packages/tealscript/oracle-probes/v13/captures/v13/evidence/trace-time-offset-negative501-v13-v1-attempt1-logs.txt": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+        "packages/tealscript/oracle-probes/v13/captures/v13/evidence/trace-time-offset-negative501-v13-v1-attempt1-logs-v1.json": "c012c48a2dc64db84286055b68b28fb6899d1a89ed824513cd636668cea05aab",
+        "packages/tealscript/oracle-probes/v13/captures/v13/evidence/trace-time-offset-negative501-v13-v1-attempt1-logs.png": "d343a00ca197b1172c3cfdbafc6052e6f387acc06b484ff859f75937fc7cf9d0"
+      }
+    },
+    {
+      "source": "packages/tealscript/oracle-probes/v13/trace-time-offset-5001-v13-v1.pine",
+      "sha256": "bb0646c2dcfb4142e86f73da82ac246f37aa64dd92f8d27c680c866587312909",
+      "paste_again": false,
+      "reuse_identity": "Exact frozen source bytes; original observed clock/context preserved, no new v17 execution inferred. Manifest probes/ aliases are reference-only, not duplicated local sources.",
+      "original_attempt": {
+        "native_environment": {
+          "browser_utc": "2026-10-04T18:56:57.795Z",
+          "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+          "platform": "MacIntel",
+          "user_agent_data": {
+            "architecture": "arm",
+            "bitness": "64",
+            "brands": [
+              {
+                "brand": "Not:A-Brand",
+                "version": "8"
+              },
+              {
+                "brand": "Chromium",
+                "version": "156"
+              },
+              {
+                "brand": "Google Chrome",
+                "version": "156"
+              }
+            ],
+            "fullVersionList": [
+              {
+                "brand": "Not:A-Brand",
+                "version": "8.0.0.0"
+              },
+              {
+                "brand": "Chromium",
+                "version": "156.0.8075.0"
+              },
+              {
+                "brand": "Google Chrome",
+                "version": "156.0.8075.0"
+              }
+            ],
+            "mobile": false,
+            "platform": "macOS",
+            "platformVersion": "27.2.0"
+          },
+          "device_pixel_ratio": 2,
+          "viewport": {
+            "width": 1440,
+            "height": 900,
+            "visual_viewport_scale": 1
+          },
+          "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v13 batch; visualViewport scale recorded independently.",
+          "tradingview_build": null,
+          "tradingview_script_urls": [
+            "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+            "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+            "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+            "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+            "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+            "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+            "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+            "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+            "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+            "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+            "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+            "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+          ],
+          "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+        },
+        "script": "trace-time-offset-5001-v13-v1.pine",
+        "attempt": 1,
+        "source_sha256": "bb0646c2dcfb4142e86f73da82ac246f37aa64dd92f8d27c680c866587312909",
+        "indicator_title": "Silent audit time-offset-5001 v13 v1",
+        "status": "COMPILE-ERROR",
+        "csv_file": null,
+        "original_download_filename": null,
+        "partial_csv_file": null,
+        "diagnostic": {
+          "code": "CE10041",
+          "text": "Invalid value \"5001\" for \"bars_back\" parameter of the \"time()\" function. It must be between -500 and 5000",
+          "line": 5,
+          "column": 24,
+          "first_bar_index": null,
+          "first_bar_time_utc": null,
+          "native": {
+            "error": "Invalid value \"{value}\" for \"{argument_name}\" parameter of the \"{funId}()\" function. It must be between {min_value} and {max_value}",
+            "editorError": {
+              "code": "CE10041",
+              "ctx": {
+                "argument_name": "bars_back",
+                "funId": "time",
+                "max_value": 5000,
+                "min_value": -500,
+                "value": 5001
+              },
+              "end": {
+                "column": 27,
+                "line": 5
+              },
+              "message": "Invalid value \"{value}\" for \"{argument_name}\" parameter of the \"{funId}()\" function. It must be between {min_value} and {max_value}",
+              "start": {
+                "column": 24,
+                "line": 5
+              },
+              "id": "USER;64eb9fe01ecd4728859be8cb120fa590"
+            },
+            "title": "Compilation error",
+            "compiler_markers": [
+              {
+                "resource": {
+                  "$mid": 1,
+                  "external": "file:///087a8d09-949c-4169-a6e3-090b79590ea4.pine?placement%3Ddialog",
+                  "path": "/087a8d09-949c-4169-a6e3-090b79590ea4.pine",
+                  "scheme": "file",
+                  "query": "placement=dialog"
+                },
+                "owner": "_generated_diagnostic_collection_name_#0",
+                "code": "CE10041",
+                "severity": 8,
+                "message": "Invalid value \"5001\" for \"bars_back\" parameter of the \"time()\" function. It must be between -500 and 5000",
+                "startLineNumber": 5,
+                "startColumn": 24,
+                "endLineNumber": 5,
+                "endColumn": 28
+              }
+            ],
+            "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n1m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n1\nBinance\nO\n85,353.76\nH\n85,356.17\nL\n85,353.75\nC\n85,353.99\n+0.23 (+0.00%)\n85,353.99\nSELL\n0.01\n85,354.00\nBUY\nUSDT\nOracle na holes crosses v1\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n18:56:59 UTC\n99+\nPine Editor\ntrace-time-offset-5001-v13-v1.pine\nPublish script\n1\n2\n3\n4\n5\n6\n7\n//@version=6\nindicator(\"Silent\u00a0audit\u00a0time-offset-5001\u00a0v13\u00a0v1\",\u00a0overlay=false,\u00a0precision=16)\nplot(bar_index,\"INPUT_BAR_INDEX\",display=display.data_window)\nplot(time,\"INPUT_TIME\",display=display.data_window)\nplot(time(\"\",bars_back=5001),\"OUTCOME\",display=display.data_window)\nplot(time[5001],\"DIRECT_HISTORY_CONTROL\",display=display.data_window)\n1 of 1 problem\nInvalid value \"5001\" for \"bars_back\" parameter of the \"time()\" function. It must be between -500 and 5000(CE10041)\n1 \u2219 Today, 02:56\nLine 5, Col 24\nPine Script\u00ae v6\nCompilation error: CE10041\nCompilation error: CE10041\n\nInvalid value \"5001\" for \"bars_back\" parameter of the \"time()\" function. It must be between -500 and 5000\n\nOpen in editor",
+            "context_substituted_message": "Invalid value \"5001\" for \"bars_back\" parameter of the \"time()\" function. It must be between -500 and 5000"
+          }
+        },
+        "setup": {
+          "tickerid": "BINANCE:BTCUSDT",
+          "timeframe": "1",
+          "chart_type": "standard candles",
+          "native_style": 1,
+          "timezone": "Etc/UTC",
+          "bar_replay": false,
+          "minmove": 1,
+          "pricescale": 100,
+          "pointvalue": 1,
+          "mintick": 0.01,
+          "defaults_confirmed": true,
+          "native_user_inputs": [],
+          "observed_indicator_title": "Oracle na holes crosses v1",
+          "dataset_start_utc": "2026-10-04T13:57:00.000Z",
+          "first_chart_bar": {
+            "index": 0,
+            "value": [
+              1791122220,
+              85252.28,
+              85252.29,
+              85248.5,
+              85248.5,
+              2.04548
+            ]
+          },
+          "chart_bars": 300,
+          "subscription": "pro_premium",
+          "native_end_of_data": false,
+          "exchange_timezone": "Etc/UTC",
+          "exchange_session": "24x7",
+          "currency": "USDT",
+          "chart_session": "regular",
+          "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+        },
+        "reset_utc": null,
+        "live_candle_open_utc": null,
+        "export_utc": null,
+        "live_boundary_confirmed_unchanged": null,
+        "evidence_files": [
+          "captures/v13/evidence/trace-time-offset-5001-v13-v1-attempt1-error.png",
+          "captures/v13/evidence/trace-time-offset-5001-v13-v1-attempt1-error.txt",
+          "captures/v13/evidence/trace-time-offset-5001-v13-v1-attempt1-logs.txt",
+          "captures/v13/evidence/trace-time-offset-5001-v13-v1-attempt1-logs-v1.json",
+          "captures/v13/evidence/trace-time-offset-5001-v13-v1-attempt1-logs.png"
+        ],
+        "notes": "Frozen offset probe on required standard native 1-minute chart; actual execution history and literal index outputs determine sufficient prefix.",
+        "independent_page_reload_utc": null,
+        "source_identity_verified": true,
+        "reset_native_observations": null,
+        "native_editor_markers": [
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///087a8d09-949c-4169-a6e3-090b79590ea4.pine?placement%3Ddialog",
+              "path": "/087a8d09-949c-4169-a6e3-090b79590ea4.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "code": "CE10041",
+            "severity": 8,
+            "message": "Invalid value \"5001\" for \"bars_back\" parameter of the \"time()\" function. It must be between -500 and 5000",
+            "startLineNumber": 5,
+            "startColumn": 24,
+            "endLineNumber": 5,
+            "endColumn": 28
+          }
+        ],
+        "error_observed_utc": "2026-10-04T18:57:01.464Z",
+        "pine_logs": {
+          "paths": [
+            "evidence/trace-time-offset-5001-v13-v1-attempt1-logs.txt",
+            "evidence/trace-time-offset-5001-v13-v1-attempt1-logs-v1.json",
+            "evidence/trace-time-offset-5001-v13-v1-attempt1-logs.png"
+          ],
+          "entries": 0
+        }
+      },
+      "original_file_sha256": {
+        "packages/tealscript/oracle-probes/v13/captures/v13/evidence/trace-time-offset-5001-v13-v1-attempt1-error.png": "995eb190df59a1217c7e689960b50bafd62f8766bf698531b84c23bda12e57f3",
+        "packages/tealscript/oracle-probes/v13/captures/v13/evidence/trace-time-offset-5001-v13-v1-attempt1-error.txt": "5fcbdd8641efb6bfc6a9ac9885f3fde0de4a2ea8977fe2e38fe96b796e4ca143",
+        "packages/tealscript/oracle-probes/v13/captures/v13/evidence/trace-time-offset-5001-v13-v1-attempt1-logs.txt": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+        "packages/tealscript/oracle-probes/v13/captures/v13/evidence/trace-time-offset-5001-v13-v1-attempt1-logs-v1.json": "8602ef8407efd27df4a2f6bc7d6739bda113101fc456df73ef5c5d2effd7db3c",
+        "packages/tealscript/oracle-probes/v13/captures/v13/evidence/trace-time-offset-5001-v13-v1-attempt1-logs.png": "b025cec81e89b1d3d6d78ba58e940d395b77b5e0c5fd0b05aaa59dab3a3de129"
+      }
+    },
+    {
+      "source": "packages/tealscript/oracle-probes/v13/trace-pivot-pivothigh-negative1-v13-v1.pine",
+      "sha256": "4716a69c970f15d86b117987f4786d7d083f8934f05b41ccccea86798ca1fa17",
+      "paste_again": false,
+      "reuse_identity": "Exact frozen source bytes; original observed clock/context preserved, no new v17 execution inferred. Manifest probes/ aliases are reference-only, not duplicated local sources.",
+      "original_attempt": {
+        "native_environment": {
+          "browser_utc": "2026-10-04T18:58:16.895Z",
+          "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+          "platform": "MacIntel",
+          "user_agent_data": {
+            "architecture": "arm",
+            "bitness": "64",
+            "brands": [
+              {
+                "brand": "Not:A-Brand",
+                "version": "8"
+              },
+              {
+                "brand": "Chromium",
+                "version": "156"
+              },
+              {
+                "brand": "Google Chrome",
+                "version": "156"
+              }
+            ],
+            "fullVersionList": [
+              {
+                "brand": "Not:A-Brand",
+                "version": "8.0.0.0"
+              },
+              {
+                "brand": "Chromium",
+                "version": "156.0.8075.0"
+              },
+              {
+                "brand": "Google Chrome",
+                "version": "156.0.8075.0"
+              }
+            ],
+            "mobile": false,
+            "platform": "macOS",
+            "platformVersion": "27.2.0"
+          },
+          "device_pixel_ratio": 2,
+          "viewport": {
+            "width": 1440,
+            "height": 900,
+            "visual_viewport_scale": 1
+          },
+          "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v13 batch; visualViewport scale recorded independently.",
+          "tradingview_build": null,
+          "tradingview_script_urls": [
+            "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+            "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+            "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+            "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+            "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+            "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+            "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+            "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+            "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+            "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+            "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+            "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+          ],
+          "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+        },
+        "script": "trace-pivot-pivothigh-negative1-v13-v1.pine",
+        "attempt": 1,
+        "source_sha256": "4716a69c970f15d86b117987f4786d7d083f8934f05b41ccccea86798ca1fa17",
+        "indicator_title": "Silent audit pivot-pivothigh-negative1 v13 v1",
+        "status": "RUNTIME-ERROR",
+        "csv_file": null,
+        "original_download_filename": null,
+        "partial_csv_file": null,
+        "diagnostic": {
+          "code": "RE10001",
+          "text": "Error on bar 0: Invalid value of the 'leftbars' argument (-1) in the 'pivothigh' function. It must be >= 0.",
+          "line": 6,
+          "column": null,
+          "first_bar_index": 0,
+          "first_bar_time_utc": null,
+          "native": {
+            "ctx": {
+              "op": ">=",
+              "code": "RE10001",
+              "argName": "leftbars",
+              "bar_index": 0,
+              "value": -1,
+              "funName": "pivothigh"
+            },
+            "error": "Error on bar {bar_index}: Invalid value of the '{argName}' argument ({value}) in the '{funName}' function. It must be {op} 0.",
+            "stack_trace": [
+              {
+                "n": "#main",
+                "p": 6
+              }
+            ],
+            "title": "Runtime error",
+            "showReportItButton": false,
+            "studyAccessBlocked": false,
+            "compiler_markers": [],
+            "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,354.00\nH\n85,354.00\nL\n85,353.99\nC\n85,354.00\n0.00 (0.00%)\n85,353.99\nSELL\n0.01\n85,354.00\nBUY\nUSDT\nSilent audit pivot-pivothigh-negative1 v13 v1\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n18:58:18 UTC\n99+\nRuntime error: RE10001\nRuntime error: RE10001\nError on bar 0: Invalid value of the 'leftbars' argument (-1) in the 'pivothigh' function. It must be >= 0.\nat #main():6\nOpen in editor",
+            "context_substituted_message": "Error on bar 0: Invalid value of the 'leftbars' argument (-1) in the 'pivothigh' function. It must be >= 0."
+          }
+        },
+        "setup": {
+          "tickerid": "BINANCE:BTCUSDT",
+          "timeframe": "2",
+          "chart_type": "standard candles",
+          "native_style": 1,
+          "timezone": "Etc/UTC",
+          "bar_replay": false,
+          "minmove": 1,
+          "pricescale": 100,
+          "pointvalue": 1,
+          "mintick": 0.01,
+          "defaults_confirmed": true,
+          "native_user_inputs": [],
+          "observed_indicator_title": "Silent audit pivot-pivothigh-negative1 v13 v1",
+          "dataset_start_utc": "2026-09-07T00:00:00.000Z",
+          "first_chart_bar": {
+            "index": -19710,
+            "value": [
+              1788739200,
+              80341.83,
+              80356,
+              80230.29,
+              80293.23,
+              37.66955
+            ]
+          },
+          "chart_bars": 20010,
+          "subscription": "pro_premium",
+          "native_end_of_data": true,
+          "exchange_timezone": "Etc/UTC",
+          "exchange_session": "24x7",
+          "currency": "USDT",
+          "chart_session": "regular",
+          "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+        },
+        "reset_utc": "2026-10-04T18:58:14.464Z",
+        "live_candle_open_utc": null,
+        "export_utc": null,
+        "live_boundary_confirmed_unchanged": null,
+        "evidence_files": [
+          "captures/v13/evidence/trace-pivot-pivothigh-negative1-v13-v1-attempt1-error.png",
+          "captures/v13/evidence/trace-pivot-pivothigh-negative1-v13-v1-attempt1-error.txt",
+          "captures/v13/evidence/trace-pivot-pivothigh-negative1-v13-v1-attempt1-logs.txt",
+          "captures/v13/evidence/trace-pivot-pivothigh-negative1-v13-v1-attempt1-logs-v1.json",
+          "captures/v13/evidence/trace-pivot-pivothigh-negative1-v13-v1-attempt1-logs.png"
+        ],
+        "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+        "independent_page_reload_utc": null,
+        "source_identity_verified": true,
+        "reset_native_observations": [
+          {
+            "browser_utc": "2026-10-04T18:58:15.509Z",
+            "bars": 2544,
+            "end": false,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790835120,
+                84341.63,
+                84402.21,
+                84341.62,
+                84399.99,
+                44.75114
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791140280,
+                85354,
+                85354,
+                85353.99,
+                85353.99,
+                0.07348
+              ]
+            },
+            "timezone": "Etc/UTC",
+            "studies": [
+              {
+                "name": "Silent audit pivot-pivothigh-negative1 v13 v1",
+                "status": {
+                  "type": 3,
+                  "errorDescription": {
+                    "ctx": {
+                      "op": ">=",
+                      "code": "RE10001",
+                      "argName": "leftbars",
+                      "bar_index": 0,
+                      "value": -1,
+                      "funName": "pivothigh"
+                    },
+                    "error": "Error on bar {bar_index}: Invalid value of the '{argName}' argument ({value}) in the '{funName}' function. It must be {op} 0.",
+                    "stack_trace": [
+                      {
+                        "n": "#main",
+                        "p": 6
+                      }
+                    ],
+                    "title": "Runtime error",
+                    "showReportItButton": false,
+                    "studyAccessBlocked": false
+                  }
+                },
+                "size": 0,
+                "first": null,
+                "last": null
+              }
+            ]
+          },
+          {
+            "browser_utc": "2026-10-04T18:58:16.592Z",
+            "bars": 20010,
+            "end": true,
+            "first": {
+              "index": -19710,
+              "value": [
+                1788739200,
+                80341.83,
+                80356,
+                80230.29,
+                80293.23,
+                37.66955
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791140280,
+                85354,
+                85354,
+                85353.99,
+                85354,
+                0.08302
+              ]
+            },
+            "timezone": "Etc/UTC",
+            "studies": [
+              {
+                "name": "Silent audit pivot-pivothigh-negative1 v13 v1",
+                "status": {
+                  "type": 3,
+                  "errorDescription": {
+                    "ctx": {
+                      "op": ">=",
+                      "code": "RE10001",
+                      "argName": "leftbars",
+                      "bar_index": 0,
+                      "value": -1,
+                      "funName": "pivothigh"
+                    },
+                    "error": "Error on bar {bar_index}: Invalid value of the '{argName}' argument ({value}) in the '{funName}' function. It must be {op} 0.",
+                    "stack_trace": [
+                      {
+                        "n": "#main",
+                        "p": 6
+                      }
+                    ],
+                    "title": "Runtime error",
+                    "showReportItButton": false,
+                    "studyAccessBlocked": false
+                  }
+                },
+                "size": 0,
+                "first": null,
+                "last": null
+              }
+            ]
+          }
+        ],
+        "native_editor_markers": [],
+        "error_observed_utc": "2026-10-04T18:58:20.438Z",
+        "pine_logs": {
+          "paths": [
+            "evidence/trace-pivot-pivothigh-negative1-v13-v1-attempt1-logs.txt",
+            "evidence/trace-pivot-pivothigh-negative1-v13-v1-attempt1-logs-v1.json",
+            "evidence/trace-pivot-pivothigh-negative1-v13-v1-attempt1-logs.png"
+          ],
+          "entries": 0
+        }
+      },
+      "original_file_sha256": {
+        "packages/tealscript/oracle-probes/v13/captures/v13/evidence/trace-pivot-pivothigh-negative1-v13-v1-attempt1-error.png": "dc28e090a314e0b9d8bd38bf8d09defde0a79f63f34e2fe44fc3147197359285",
+        "packages/tealscript/oracle-probes/v13/captures/v13/evidence/trace-pivot-pivothigh-negative1-v13-v1-attempt1-error.txt": "2b9e8b4843f3211246c308aac56eff845f84fb82c038f141d80baca07aa7a98f",
+        "packages/tealscript/oracle-probes/v13/captures/v13/evidence/trace-pivot-pivothigh-negative1-v13-v1-attempt1-logs.txt": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+        "packages/tealscript/oracle-probes/v13/captures/v13/evidence/trace-pivot-pivothigh-negative1-v13-v1-attempt1-logs-v1.json": "ddf3ab6a4ecc0904a019bab3797b3e307e357a06ab76ee0e398a933c37e20690",
+        "packages/tealscript/oracle-probes/v13/captures/v13/evidence/trace-pivot-pivothigh-negative1-v13-v1-attempt1-logs.png": "7b141bcf85fc3e72cc3818d8b52a029a4f5539feeb02bd5383ef97108e6948e9"
+      }
+    },
+    {
+      "source": "packages/tealscript/oracle-probes/v13/trace-pivot-pivotlow-negative1-v13-v1.pine",
+      "sha256": "fb70417390bc80611a3c26fd3a18f19077b5e3965f401c22adde1cfbc0902129",
+      "paste_again": false,
+      "reuse_identity": "Exact frozen source bytes; original observed clock/context preserved, no new v17 execution inferred. Manifest probes/ aliases are reference-only, not duplicated local sources.",
+      "original_attempt": {
+        "native_environment": {
+          "browser_utc": "2026-10-04T18:58:36.899Z",
+          "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+          "platform": "MacIntel",
+          "user_agent_data": {
+            "architecture": "arm",
+            "bitness": "64",
+            "brands": [
+              {
+                "brand": "Not:A-Brand",
+                "version": "8"
+              },
+              {
+                "brand": "Chromium",
+                "version": "156"
+              },
+              {
+                "brand": "Google Chrome",
+                "version": "156"
+              }
+            ],
+            "fullVersionList": [
+              {
+                "brand": "Not:A-Brand",
+                "version": "8.0.0.0"
+              },
+              {
+                "brand": "Chromium",
+                "version": "156.0.8075.0"
+              },
+              {
+                "brand": "Google Chrome",
+                "version": "156.0.8075.0"
+              }
+            ],
+            "mobile": false,
+            "platform": "macOS",
+            "platformVersion": "27.2.0"
+          },
+          "device_pixel_ratio": 2,
+          "viewport": {
+            "width": 1440,
+            "height": 900,
+            "visual_viewport_scale": 1
+          },
+          "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v13 batch; visualViewport scale recorded independently.",
+          "tradingview_build": null,
+          "tradingview_script_urls": [
+            "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+            "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+            "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+            "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+            "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+            "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+            "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+            "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+            "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+            "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+            "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+            "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+          ],
+          "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+        },
+        "script": "trace-pivot-pivotlow-negative1-v13-v1.pine",
+        "attempt": 1,
+        "source_sha256": "fb70417390bc80611a3c26fd3a18f19077b5e3965f401c22adde1cfbc0902129",
+        "indicator_title": "Silent audit pivot-pivotlow-negative1 v13 v1",
+        "status": "RUNTIME-ERROR",
+        "csv_file": null,
+        "original_download_filename": null,
+        "partial_csv_file": null,
+        "diagnostic": {
+          "code": "RE10001",
+          "text": "Error on bar 0: Invalid value of the 'leftbars' argument (-1) in the 'pivotlow' function. It must be >= 0.",
+          "line": 6,
+          "column": null,
+          "first_bar_index": 0,
+          "first_bar_time_utc": null,
+          "native": {
+            "ctx": {
+              "op": ">=",
+              "code": "RE10001",
+              "argName": "leftbars",
+              "bar_index": 0,
+              "value": -1,
+              "funName": "pivotlow"
+            },
+            "error": "Error on bar {bar_index}: Invalid value of the '{argName}' argument ({value}) in the '{funName}' function. It must be {op} 0.",
+            "stack_trace": [
+              {
+                "n": "#main",
+                "p": 6
+              }
+            ],
+            "title": "Runtime error",
+            "showReportItButton": false,
+            "studyAccessBlocked": false,
+            "compiler_markers": [],
+            "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,354.00\nH\n85,354.00\nL\n85,353.99\nC\n85,354.00\n0.00 (0.00%)\n85,353.99\nSELL\n0.01\n85,354.00\nBUY\nUSDT\nSilent audit pivot-pivotlow-negative1 v13 v1\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n18:58:38 UTC\n99+\nRuntime error: RE10001\nRuntime error: RE10001\nError on bar 0: Invalid value of the 'leftbars' argument (-1) in the 'pivotlow' function. It must be >= 0.\nat #main():6\nOpen in editor",
+            "context_substituted_message": "Error on bar 0: Invalid value of the 'leftbars' argument (-1) in the 'pivotlow' function. It must be >= 0."
+          }
+        },
+        "setup": {
+          "tickerid": "BINANCE:BTCUSDT",
+          "timeframe": "2",
+          "chart_type": "standard candles",
+          "native_style": 1,
+          "timezone": "Etc/UTC",
+          "bar_replay": false,
+          "minmove": 1,
+          "pricescale": 100,
+          "pointvalue": 1,
+          "mintick": 0.01,
+          "defaults_confirmed": true,
+          "native_user_inputs": [],
+          "observed_indicator_title": "Silent audit pivot-pivotlow-negative1 v13 v1",
+          "dataset_start_utc": "2026-09-07T00:00:00.000Z",
+          "first_chart_bar": {
+            "index": -19710,
+            "value": [
+              1788739200,
+              80341.83,
+              80356,
+              80230.29,
+              80293.23,
+              37.66955
+            ]
+          },
+          "chart_bars": 20010,
+          "subscription": "pro_premium",
+          "native_end_of_data": true,
+          "exchange_timezone": "Etc/UTC",
+          "exchange_session": "24x7",
+          "currency": "USDT",
+          "chart_session": "regular",
+          "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+        },
+        "reset_utc": "2026-10-04T18:58:34.580Z",
+        "live_candle_open_utc": null,
+        "export_utc": null,
+        "live_boundary_confirmed_unchanged": null,
+        "evidence_files": [
+          "captures/v13/evidence/trace-pivot-pivotlow-negative1-v13-v1-attempt1-error.png",
+          "captures/v13/evidence/trace-pivot-pivotlow-negative1-v13-v1-attempt1-error.txt",
+          "captures/v13/evidence/trace-pivot-pivotlow-negative1-v13-v1-attempt1-logs.txt",
+          "captures/v13/evidence/trace-pivot-pivotlow-negative1-v13-v1-attempt1-logs-v1.json",
+          "captures/v13/evidence/trace-pivot-pivotlow-negative1-v13-v1-attempt1-logs.png"
+        ],
+        "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+        "independent_page_reload_utc": null,
+        "source_identity_verified": true,
+        "reset_native_observations": [
+          {
+            "browser_utc": "2026-10-04T18:58:35.317Z",
+            "bars": 2544,
+            "end": false,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790835120,
+                84341.63,
+                84402.21,
+                84341.62,
+                84399.99,
+                44.75114
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791140280,
+                85354,
+                85354,
+                85353.99,
+                85353.99,
+                0.20534
+              ]
+            },
+            "timezone": "Etc/UTC",
+            "studies": [
+              {
+                "name": "Silent audit pivot-pivotlow-negative1 v13 v1",
+                "status": {
+                  "type": 3,
+                  "errorDescription": {
+                    "ctx": {
+                      "op": ">=",
+                      "code": "RE10001",
+                      "argName": "leftbars",
+                      "bar_index": 0,
+                      "value": -1,
+                      "funName": "pivotlow"
+                    },
+                    "error": "Error on bar {bar_index}: Invalid value of the '{argName}' argument ({value}) in the '{funName}' function. It must be {op} 0.",
+                    "stack_trace": [
+                      {
+                        "n": "#main",
+                        "p": 6
+                      }
+                    ],
+                    "title": "Runtime error",
+                    "showReportItButton": false,
+                    "studyAccessBlocked": false
+                  }
+                },
+                "size": 0,
+                "first": null,
+                "last": null
+              }
+            ]
+          },
+          {
+            "browser_utc": "2026-10-04T18:58:36.594Z",
+            "bars": 20010,
+            "end": true,
+            "first": {
+              "index": -19710,
+              "value": [
+                1788739200,
+                80341.83,
+                80356,
+                80230.29,
+                80293.23,
+                37.66955
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791140280,
+                85354,
+                85354,
+                85353.99,
+                85354,
+                0.21328
+              ]
+            },
+            "timezone": "Etc/UTC",
+            "studies": [
+              {
+                "name": "Silent audit pivot-pivotlow-negative1 v13 v1",
+                "status": {
+                  "type": 3,
+                  "errorDescription": {
+                    "ctx": {
+                      "op": ">=",
+                      "code": "RE10001",
+                      "argName": "leftbars",
+                      "bar_index": 0,
+                      "value": -1,
+                      "funName": "pivotlow"
+                    },
+                    "error": "Error on bar {bar_index}: Invalid value of the '{argName}' argument ({value}) in the '{funName}' function. It must be {op} 0.",
+                    "stack_trace": [
+                      {
+                        "n": "#main",
+                        "p": 6
+                      }
+                    ],
+                    "title": "Runtime error",
+                    "showReportItButton": false,
+                    "studyAccessBlocked": false
+                  }
+                },
+                "size": 0,
+                "first": null,
+                "last": null
+              }
+            ]
+          }
+        ],
+        "native_editor_markers": [],
+        "error_observed_utc": "2026-10-04T18:58:40.579Z",
+        "pine_logs": {
+          "paths": [
+            "evidence/trace-pivot-pivotlow-negative1-v13-v1-attempt1-logs.txt",
+            "evidence/trace-pivot-pivotlow-negative1-v13-v1-attempt1-logs-v1.json",
+            "evidence/trace-pivot-pivotlow-negative1-v13-v1-attempt1-logs.png"
+          ],
+          "entries": 0
+        }
+      },
+      "original_file_sha256": {
+        "packages/tealscript/oracle-probes/v13/captures/v13/evidence/trace-pivot-pivotlow-negative1-v13-v1-attempt1-error.png": "5bf068f61b19af865f8136601b3c2b4b33e90f346d3cacd855af83d587a3c3df",
+        "packages/tealscript/oracle-probes/v13/captures/v13/evidence/trace-pivot-pivotlow-negative1-v13-v1-attempt1-error.txt": "73cfba93d0061a4b428264518e67bc94a1d7aee4ec13d612d9c93f71e9385e66",
+        "packages/tealscript/oracle-probes/v13/captures/v13/evidence/trace-pivot-pivotlow-negative1-v13-v1-attempt1-logs.txt": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+        "packages/tealscript/oracle-probes/v13/captures/v13/evidence/trace-pivot-pivotlow-negative1-v13-v1-attempt1-logs-v1.json": "78a87698675b98894a42a3e868d52f88309c6ff7b9bc584edc9876b41e7070ba",
+        "packages/tealscript/oracle-probes/v13/captures/v13/evidence/trace-pivot-pivotlow-negative1-v13-v1-attempt1-logs.png": "9f8af59bae4ce9ed773d5228c1b92dd151b0e095ba4f0c8987bb5b8fc4d1ae86"
+      }
+    },
+    {
+      "source": "packages/tealscript/oracle-probes/v13/trace-eigen-tiny-cleanup-v13-v1.pine",
+      "sha256": "25cd9a5db6e19c2996754ce108ee741c54f971a14231ac25d6b00b0285a444a4",
+      "paste_again": false,
+      "reuse_identity": "Exact frozen source bytes; original observed clock/context preserved, no new v17 execution inferred. Manifest probes/ aliases are reference-only, not duplicated local sources.",
+      "original_attempt": {
+        "native_environment": {
+          "browser_utc": "2026-10-04T18:59:03.988Z",
+          "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+          "platform": "MacIntel",
+          "user_agent_data": {
+            "architecture": "arm",
+            "bitness": "64",
+            "brands": [
+              {
+                "brand": "Not:A-Brand",
+                "version": "8"
+              },
+              {
+                "brand": "Chromium",
+                "version": "156"
+              },
+              {
+                "brand": "Google Chrome",
+                "version": "156"
+              }
+            ],
+            "fullVersionList": [
+              {
+                "brand": "Not:A-Brand",
+                "version": "8.0.0.0"
+              },
+              {
+                "brand": "Chromium",
+                "version": "156.0.8075.0"
+              },
+              {
+                "brand": "Google Chrome",
+                "version": "156.0.8075.0"
+              }
+            ],
+            "mobile": false,
+            "platform": "macOS",
+            "platformVersion": "27.2.0"
+          },
+          "device_pixel_ratio": 2,
+          "viewport": {
+            "width": 1440,
+            "height": 900,
+            "visual_viewport_scale": 1
+          },
+          "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v13 batch; visualViewport scale recorded independently.",
+          "tradingview_build": null,
+          "tradingview_script_urls": [
+            "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+            "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+            "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+            "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+            "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+            "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+            "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+            "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+            "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+            "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+            "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+            "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+          ],
+          "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+        },
+        "script": "trace-eigen-tiny-cleanup-v13-v1.pine",
+        "attempt": 1,
+        "source_sha256": "25cd9a5db6e19c2996754ce108ee741c54f971a14231ac25d6b00b0285a444a4",
+        "indicator_title": "Silent audit eigen-tiny-cleanup v13 v1",
+        "status": "RUNS",
+        "csv_file": "captures/v13/trace-eigen-tiny-cleanup-v13-v1-attempt1.csv",
+        "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-05T025903.396.csv",
+        "partial_csv_file": null,
+        "diagnostic": {
+          "code": null,
+          "text": null,
+          "line": null,
+          "column": null,
+          "first_bar_index": null,
+          "first_bar_time_utc": null
+        },
+        "setup": {
+          "tickerid": "BINANCE:BTCUSDT",
+          "timeframe": "2",
+          "chart_type": "standard candles",
+          "native_style": 1,
+          "timezone": "Etc/UTC",
+          "bar_replay": false,
+          "minmove": 1,
+          "pricescale": 100,
+          "pointvalue": 1,
+          "mintick": 0.01,
+          "defaults_confirmed": true,
+          "native_user_inputs": [],
+          "observed_indicator_title": "Silent audit eigen-tiny-cleanup v13 v1",
+          "dataset_start_utc": "2026-09-07T00:00:00.000Z",
+          "first_chart_bar": {
+            "index": -19710,
+            "value": [
+              1788739200,
+              80341.83,
+              80356,
+              80230.29,
+              80293.23,
+              37.66955
+            ]
+          },
+          "chart_bars": 20010,
+          "subscription": "pro_premium",
+          "native_end_of_data": true,
+          "exchange_timezone": "Etc/UTC",
+          "exchange_session": "24x7",
+          "currency": "USDT",
+          "chart_session": "regular",
+          "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+        },
+        "reset_utc": "2026-10-04T18:58:55.474Z",
+        "live_candle_open_utc": "2026-10-04T18:58:00.000Z",
+        "export_utc": "2026-10-04T18:59:03.634Z",
+        "live_boundary_confirmed_unchanged": true,
+        "evidence_files": [
+          "captures/v13/evidence/trace-eigen-tiny-cleanup-v13-v1-attempt1-setup.png",
+          "captures/v13/evidence/trace-eigen-tiny-cleanup-v13-v1-attempt1-export.png",
+          "captures/v13/evidence/trace-eigen-tiny-cleanup-v13-v1-attempt1-logs.txt",
+          "captures/v13/evidence/trace-eigen-tiny-cleanup-v13-v1-attempt1-logs-v1.json",
+          "captures/v13/evidence/trace-eigen-tiny-cleanup-v13-v1-attempt1-logs.png",
+          "captures/v13/evidence/trace-eigen-tiny-cleanup-v13-v1-attempt1-visual.png",
+          "captures/v13/evidence/trace-eigen-tiny-cleanup-v13-v1-attempt1-data-window-v1.png",
+          "captures/v13/evidence/trace-eigen-tiny-cleanup-v13-v1-attempt1-data-window-v1.json",
+          "captures/v13/evidence/trace-eigen-tiny-cleanup-v13-v1-attempt1-data-window-v1.txt",
+          "captures/v13/evidence/trace-eigen-tiny-cleanup-v13-v1-attempt1-authority-object-geometry-v1.json",
+          "captures/v13/evidence/trace-eigen-tiny-cleanup-v13-v1-attempt1-authority-object-geometry-v1.png"
+        ],
+        "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+        "independent_page_reload_utc": null,
+        "source_identity_verified": true,
+        "reset_native_observations": [
+          {
+            "browser_utc": "2026-10-04T18:58:56.310Z",
+            "bars": 2544,
+            "end": false,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790835120,
+                84341.63,
+                84402.21,
+                84341.62,
+                84399.99,
+                44.75114
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791140280,
+                85354,
+                85354,
+                85353.99,
+                85353.99,
+                0.45571
+              ]
+            },
+            "timezone": "Etc/UTC",
+            "studies": [
+              {
+                "name": "Silent audit eigen-tiny-cleanup v13 v1",
+                "status": {
+                  "type": 2
+                },
+                "size": 2544,
+                "first": {
+                  "index": -2244,
+                  "value": [
+                    1790835120,
+                    17466,
+                    1e-09,
+                    2e-09,
+                    1e-09,
+                    2000.0000000000002,
+                    1000.0000000000001
+                  ]
+                },
+                "last": {
+                  "index": 299,
+                  "value": [
+                    1791140280,
+                    20009,
+                    1e-10,
+                    2e-10,
+                    1e-10,
+                    200,
+                    100
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "browser_utc": "2026-10-04T18:58:57.292Z",
+            "bars": 2544,
+            "end": false,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790835120,
+                84341.63,
+                84402.21,
+                84341.62,
+                84399.99,
+                44.75114
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791140280,
+                85354,
+                85354,
+                85353.99,
+                85353.99,
+                0.45571
+              ]
+            },
+            "timezone": "Etc/UTC",
+            "studies": [
+              {
+                "name": "Silent audit eigen-tiny-cleanup v13 v1",
+                "status": {
+                  "type": 2
+                },
+                "size": 20010,
+                "first": {
+                  "index": -1017466,
+                  "value": [
+                    1788739200,
+                    0,
+                    1e-12,
+                    2e-12,
+                    1e-12,
+                    2,
+                    1
+                  ]
+                },
+                "last": {
+                  "index": 299,
+                  "value": [
+                    1791140280,
+                    20009,
+                    1e-10,
+                    2e-10,
+                    1e-10,
+                    200,
+                    100
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "browser_utc": "2026-10-04T18:58:58.097Z",
+            "bars": 20010,
+            "end": true,
+            "first": {
+              "index": -19710,
+              "value": [
+                1788739200,
+                80341.83,
+                80356,
+                80230.29,
+                80293.23,
+                37.66955
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791140280,
+                85354,
+                85354,
+                85353.99,
+                85354,
+                0.47006
+              ]
+            },
+            "timezone": "Etc/UTC",
+            "studies": [
+              {
+                "name": "Silent audit eigen-tiny-cleanup v13 v1",
+                "status": {
+                  "type": 2
+                },
+                "size": 20010,
+                "first": {
+                  "index": -19710,
+                  "value": [
+                    1788739200,
+                    0,
+                    1e-12,
+                    2e-12,
+                    1e-12,
+                    2,
+                    1
+                  ]
+                },
+                "last": {
+                  "index": 299,
+                  "value": [
+                    1791140280,
+                    20009,
+                    1e-10,
+                    2e-10,
+                    1e-10,
+                    200,
+                    100
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "native_editor_markers": [],
+        "live_tooltip": "Sun 04 Oct '26   18:58",
+        "historical_compare_before_unix_seconds": 1791140280,
+        "pine_logs": {
+          "paths": [
+            "evidence/trace-eigen-tiny-cleanup-v13-v1-attempt1-logs.txt",
+            "evidence/trace-eigen-tiny-cleanup-v13-v1-attempt1-logs-v1.json",
+            "evidence/trace-eigen-tiny-cleanup-v13-v1-attempt1-logs.png"
+          ],
+          "entries": 0
+        },
+        "all_exported_column_occurrences": [
+          {
+            "title": "time",
+            "occurrence": 1,
+            "position": 0
+          },
+          {
+            "title": "open",
+            "occurrence": 1,
+            "position": 1
+          },
+          {
+            "title": "high",
+            "occurrence": 1,
+            "position": 2
+          },
+          {
+            "title": "low",
+            "occurrence": 1,
+            "position": 3
+          },
+          {
+            "title": "close",
+            "occurrence": 1,
+            "position": 4
+          },
+          {
+            "title": "INPUT_BAR_INDEX",
+            "occurrence": 1,
+            "position": 5
+          },
+          {
+            "title": "INPUT_EPSILON",
+            "occurrence": 1,
+            "position": 6
+          },
+          {
+            "title": "EIGEN0",
+            "occurrence": 1,
+            "position": 7
+          },
+          {
+            "title": "EIGEN1",
+            "occurrence": 1,
+            "position": 8
+          },
+          {
+            "title": "SCALED_EIGEN0",
+            "occurrence": 1,
+            "position": 9
+          },
+          {
+            "title": "SCALED_EIGEN1",
+            "occurrence": 1,
+            "position": 10
+          }
+        ],
+        "declared_to_native_column_occurrences": [
+          {
+            "declared_title": "INPUT_BAR_INDEX",
+            "native_title": "INPUT_BAR_INDEX",
+            "occurrence": 1,
+            "position": 5
+          },
+          {
+            "declared_title": "INPUT_EPSILON",
+            "native_title": "INPUT_EPSILON",
+            "occurrence": 1,
+            "position": 6
+          },
+          {
+            "declared_title": "EIGEN0",
+            "native_title": "EIGEN0",
+            "occurrence": 1,
+            "position": 7
+          },
+          {
+            "declared_title": "EIGEN1",
+            "native_title": "EIGEN1",
+            "occurrence": 1,
+            "position": 8
+          },
+          {
+            "declared_title": "SCALED_EIGEN0",
+            "native_title": "SCALED_EIGEN0",
+            "occurrence": 1,
+            "position": 9
+          },
+          {
+            "declared_title": "SCALED_EIGEN1",
+            "native_title": "SCALED_EIGEN1",
+            "occurrence": 1,
+            "position": 10
+          }
+        ],
+        "named_value_map_scope": "Legacy title maps show the first occurrence only; original positional cells and occurrence tables retain every duplicate without renaming.",
+        "csv_sha256": "e7c8f3b4db049bf7b89a5c644f58e695eca719a53d2935180324a16a571fd2a7",
+        "csv_bytes": 1672193,
+        "csv_headers": [
+          "time",
+          "open",
+          "high",
+          "low",
+          "close",
+          "INPUT_BAR_INDEX",
+          "INPUT_EPSILON",
+          "EIGEN0",
+          "EIGEN1",
+          "SCALED_EIGEN0",
+          "SCALED_EIGEN1"
+        ],
+        "duplicate_headers_preserved": false,
+        "declared_to_native_column_positions": {
+          "INPUT_BAR_INDEX": 5,
+          "INPUT_EPSILON": 6,
+          "EIGEN0": 7,
+          "EIGEN1": 8,
+          "SCALED_EIGEN0": 9,
+          "SCALED_EIGEN1": 10
+        },
+        "first_historical_cells": [
+          "1788739200",
+          "80341.83",
+          "80356",
+          "80230.29",
+          "80293.23",
+          "0",
+          "1e-12",
+          "2e-12",
+          "1e-12",
+          "2",
+          "1"
+        ],
+        "last_historical_cells": [
+          "1791140160",
+          "85353.76",
+          "85356.17",
+          "85353.75",
+          "85354",
+          "20008",
+          "1e-12",
+          "2e-12",
+          "1e-12",
+          "2",
+          "1"
+        ],
+        "declared_to_native_header_mapping": {
+          "INPUT_BAR_INDEX": "INPUT_BAR_INDEX",
+          "INPUT_EPSILON": "INPUT_EPSILON",
+          "EIGEN0": "EIGEN0",
+          "EIGEN1": "EIGEN1",
+          "SCALED_EIGEN0": "SCALED_EIGEN0",
+          "SCALED_EIGEN1": "SCALED_EIGEN1"
+        },
+        "csv_rows": 20010,
+        "historical_rows": 20009,
+        "first_csv_timestamp_seconds": 1788739200,
+        "last_csv_timestamp_seconds": 1791140280,
+        "first_csv_time_raw": "1788739200",
+        "last_csv_time_raw": "1791140280",
+        "first_historical_values": {
+          "INPUT_BAR_INDEX": "0",
+          "INPUT_EPSILON": "1e-12",
+          "EIGEN0": "2e-12",
+          "EIGEN1": "1e-12",
+          "SCALED_EIGEN0": "2",
+          "SCALED_EIGEN1": "1"
+        },
+        "last_historical_values": {
+          "INPUT_BAR_INDEX": "20008",
+          "INPUT_EPSILON": "1e-12",
+          "EIGEN0": "2e-12",
+          "EIGEN1": "1e-12",
+          "SCALED_EIGEN0": "2",
+          "SCALED_EIGEN1": "1"
+        },
+        "declared_unexported_columns": [],
+        "data_window_witness": "captures/v13/evidence/trace-eigen-tiny-cleanup-v13-v1-attempt1-data-window-v1.json"
+      },
+      "original_file_sha256": {
+        "packages/tealscript/oracle-probes/v13/captures/v13/evidence/trace-eigen-tiny-cleanup-v13-v1-attempt1-setup.png": "2e536b908929dfb5b7a47a7a843bf0a187c61f0552a11904967c0bd3dca4b80f",
+        "packages/tealscript/oracle-probes/v13/captures/v13/evidence/trace-eigen-tiny-cleanup-v13-v1-attempt1-export.png": "7b079122638adb57fabf31537d583a27ff65aae632895498c374eb14e9412634",
+        "packages/tealscript/oracle-probes/v13/captures/v13/evidence/trace-eigen-tiny-cleanup-v13-v1-attempt1-logs.txt": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+        "packages/tealscript/oracle-probes/v13/captures/v13/evidence/trace-eigen-tiny-cleanup-v13-v1-attempt1-logs-v1.json": "6cc9286f8196c4e2a5c196b0ae5e7ce875783bda50584ac41e4594df9dd52605",
+        "packages/tealscript/oracle-probes/v13/captures/v13/evidence/trace-eigen-tiny-cleanup-v13-v1-attempt1-logs.png": "3a125af92352b78dfb67cdab3c1aa9147855652beea015c7b4bc9fe6be5162e4",
+        "packages/tealscript/oracle-probes/v13/captures/v13/evidence/trace-eigen-tiny-cleanup-v13-v1-attempt1-visual.png": "3c22ef8df489f6a010c3adee0b23e6b029d7ae9cdfbc9b1f8d3742b66abaeeb6",
+        "packages/tealscript/oracle-probes/v13/captures/v13/evidence/trace-eigen-tiny-cleanup-v13-v1-attempt1-data-window-v1.png": "3a0e7ddc39a616a1fc9b7f84171e170e6722f0ef2463dd832fa52c3fe48c4a1c",
+        "packages/tealscript/oracle-probes/v13/captures/v13/evidence/trace-eigen-tiny-cleanup-v13-v1-attempt1-data-window-v1.json": "831b7f7b92d99274ab96f161f9ac06fcb4a689000b3e90372130ab20f81e3655",
+        "packages/tealscript/oracle-probes/v13/captures/v13/evidence/trace-eigen-tiny-cleanup-v13-v1-attempt1-data-window-v1.txt": "c84d9290fccb26e319ac63a80a5477558b54515e51ddcdbfda562d3b2e271e04",
+        "packages/tealscript/oracle-probes/v13/captures/v13/evidence/trace-eigen-tiny-cleanup-v13-v1-attempt1-authority-object-geometry-v1.json": "23ac330358ba65bc23c4fc77f989db4d6cbecb179c1b72e04419c1418da1c4f8",
+        "packages/tealscript/oracle-probes/v13/captures/v13/evidence/trace-eigen-tiny-cleanup-v13-v1-attempt1-authority-object-geometry-v1.png": "c19162841e3a12b5fd80efca7459a50bdea65056032c010d02a4861ce3b3736f",
+        "packages/tealscript/oracle-probes/v13/captures/v13/trace-eigen-tiny-cleanup-v13-v1-attempt1.csv": "e7c8f3b4db049bf7b89a5c644f58e695eca719a53d2935180324a16a571fd2a7"
+      }
+    },
+    {
+      "source": "packages/tealscript/oracle-probes/v13/trace-merge-reversed-corners-v13-v1.pine",
+      "sha256": "cc865950749413d86ed64d19aab07352aac9af92f2be83344e209e0b8b8c546b",
+      "paste_again": false,
+      "reuse_identity": "Exact frozen source bytes; original observed clock/context preserved, no new v17 execution inferred. Manifest probes/ aliases are reference-only, not duplicated local sources.",
+      "original_attempt": {
+        "native_environment": {
+          "browser_utc": "2026-10-04T18:59:30.073Z",
+          "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+          "platform": "MacIntel",
+          "user_agent_data": {
+            "architecture": "arm",
+            "bitness": "64",
+            "brands": [
+              {
+                "brand": "Not:A-Brand",
+                "version": "8"
+              },
+              {
+                "brand": "Chromium",
+                "version": "156"
+              },
+              {
+                "brand": "Google Chrome",
+                "version": "156"
+              }
+            ],
+            "fullVersionList": [
+              {
+                "brand": "Not:A-Brand",
+                "version": "8.0.0.0"
+              },
+              {
+                "brand": "Chromium",
+                "version": "156.0.8075.0"
+              },
+              {
+                "brand": "Google Chrome",
+                "version": "156.0.8075.0"
+              }
+            ],
+            "mobile": false,
+            "platform": "macOS",
+            "platformVersion": "27.2.0"
+          },
+          "device_pixel_ratio": 2,
+          "viewport": {
+            "width": 1440,
+            "height": 900,
+            "visual_viewport_scale": 1
+          },
+          "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v13 batch; visualViewport scale recorded independently.",
+          "tradingview_build": null,
+          "tradingview_script_urls": [
+            "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+            "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+            "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+            "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+            "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+            "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+            "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+            "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+            "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+            "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+            "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+            "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+          ],
+          "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+        },
+        "script": "trace-merge-reversed-corners-v13-v1.pine",
+        "attempt": 1,
+        "source_sha256": "cc865950749413d86ed64d19aab07352aac9af92f2be83344e209e0b8b8c546b",
+        "indicator_title": "Silent audit merge-reversed-corners v13 v1",
+        "status": "RUNTIME-ERROR",
+        "csv_file": null,
+        "original_download_filename": null,
+        "partial_csv_file": null,
+        "diagnostic": {
+          "code": "RE10127",
+          "text": "Error on bar 0: Start cell in [1, 1] cannot be below or to the right of the end cell [0, 0].",
+          "line": 7,
+          "column": null,
+          "first_bar_index": 0,
+          "first_bar_time_utc": null,
+          "native": {
+            "ctx": {
+              "endR": 0,
+              "startCol": 1,
+              "endCol": 0,
+              "code": "RE10127",
+              "bar_index": 0,
+              "startR": 1
+            },
+            "error": "Error on bar {bar_index}: Start cell in [{startCol}, {startR}] cannot be below or to the right of the end cell [{endCol}, {endR}].",
+            "stack_trace": [
+              {
+                "n": "#main",
+                "p": 7
+              }
+            ],
+            "title": "Runtime error",
+            "showReportItButton": false,
+            "studyAccessBlocked": false,
+            "compiler_markers": [],
+            "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,354.00\nH\n85,361.99\nL\n85,336.00\nC\n85,338.84\n\u221215.16 (\u22120.02%)\n85,338.83\nSELL\n0.01\n85,338.84\nBUY\nSilent audit merge-reversed-corners v13 v1\nUSDT\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n18:59:31 UTC\n99+\nRuntime error: RE10127\nRuntime error: RE10127\nError on bar 0: Start cell in [1, 1] cannot be below or to the right of the end cell [0, 0].\nat #main():7\nOpen in editor",
+            "context_substituted_message": "Error on bar 0: Start cell in [1, 1] cannot be below or to the right of the end cell [0, 0]."
+          }
+        },
+        "setup": {
+          "tickerid": "BINANCE:BTCUSDT",
+          "timeframe": "2",
+          "chart_type": "standard candles",
+          "native_style": 1,
+          "timezone": "Etc/UTC",
+          "bar_replay": false,
+          "minmove": 1,
+          "pricescale": 100,
+          "pointvalue": 1,
+          "mintick": 0.01,
+          "defaults_confirmed": true,
+          "native_user_inputs": [],
+          "observed_indicator_title": "Silent audit merge-reversed-corners v13 v1",
+          "dataset_start_utc": "2026-09-07T00:00:00.000Z",
+          "first_chart_bar": {
+            "index": -19710,
+            "value": [
+              1788739200,
+              80341.83,
+              80356,
+              80230.29,
+              80293.23,
+              37.66955
+            ]
+          },
+          "chart_bars": 20010,
+          "subscription": "pro_premium",
+          "native_end_of_data": true,
+          "exchange_timezone": "Etc/UTC",
+          "exchange_session": "24x7",
+          "currency": "USDT",
+          "chart_session": "regular",
+          "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+        },
+        "reset_utc": "2026-10-04T18:59:27.796Z",
+        "live_candle_open_utc": null,
+        "export_utc": null,
+        "live_boundary_confirmed_unchanged": null,
+        "evidence_files": [
+          "captures/v13/evidence/trace-merge-reversed-corners-v13-v1-attempt1-error.png",
+          "captures/v13/evidence/trace-merge-reversed-corners-v13-v1-attempt1-error.txt",
+          "captures/v13/evidence/trace-merge-reversed-corners-v13-v1-attempt1-logs.txt",
+          "captures/v13/evidence/trace-merge-reversed-corners-v13-v1-attempt1-logs-v1.json",
+          "captures/v13/evidence/trace-merge-reversed-corners-v13-v1-attempt1-logs.png"
+        ],
+        "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+        "independent_page_reload_utc": null,
+        "source_identity_verified": true,
+        "reset_native_observations": [
+          {
+            "browser_utc": "2026-10-04T18:59:28.686Z",
+            "bars": 2544,
+            "end": false,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790835120,
+                84341.63,
+                84402.21,
+                84341.62,
+                84399.99,
+                44.75114
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791140280,
+                85354,
+                85361.99,
+                85336,
+                85338.84,
+                7.75027
+              ]
+            },
+            "timezone": "Etc/UTC",
+            "studies": [
+              {
+                "name": "Silent audit merge-reversed-corners v13 v1",
+                "status": {
+                  "type": 3,
+                  "errorDescription": {
+                    "ctx": {
+                      "endR": 0,
+                      "startCol": 1,
+                      "endCol": 0,
+                      "code": "RE10127",
+                      "bar_index": 0,
+                      "startR": 1
+                    },
+                    "error": "Error on bar {bar_index}: Start cell in [{startCol}, {startR}] cannot be below or to the right of the end cell [{endCol}, {endR}].",
+                    "stack_trace": [
+                      {
+                        "n": "#main",
+                        "p": 7
+                      }
+                    ],
+                    "title": "Runtime error",
+                    "showReportItButton": false,
+                    "studyAccessBlocked": false
+                  }
+                },
+                "size": 0,
+                "first": null,
+                "last": null
+              }
+            ]
+          },
+          {
+            "browser_utc": "2026-10-04T18:59:29.740Z",
+            "bars": 20010,
+            "end": true,
+            "first": {
+              "index": -19710,
+              "value": [
+                1788739200,
+                80341.83,
+                80356,
+                80230.29,
+                80293.23,
+                37.66955
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791140280,
+                85354,
+                85361.99,
+                85336,
+                85338.84,
+                7.75786
+              ]
+            },
+            "timezone": "Etc/UTC",
+            "studies": [
+              {
+                "name": "Silent audit merge-reversed-corners v13 v1",
+                "status": {
+                  "type": 3,
+                  "errorDescription": {
+                    "ctx": {
+                      "endR": 0,
+                      "startCol": 1,
+                      "endCol": 0,
+                      "code": "RE10127",
+                      "bar_index": 0,
+                      "startR": 1
+                    },
+                    "error": "Error on bar {bar_index}: Start cell in [{startCol}, {startR}] cannot be below or to the right of the end cell [{endCol}, {endR}].",
+                    "stack_trace": [
+                      {
+                        "n": "#main",
+                        "p": 7
+                      }
+                    ],
+                    "title": "Runtime error",
+                    "showReportItButton": false,
+                    "studyAccessBlocked": false
+                  }
+                },
+                "size": 0,
+                "first": null,
+                "last": null
+              }
+            ]
+          }
+        ],
+        "native_editor_markers": [],
+        "error_observed_utc": "2026-10-04T18:59:33.778Z",
+        "pine_logs": {
+          "paths": [
+            "evidence/trace-merge-reversed-corners-v13-v1-attempt1-logs.txt",
+            "evidence/trace-merge-reversed-corners-v13-v1-attempt1-logs-v1.json",
+            "evidence/trace-merge-reversed-corners-v13-v1-attempt1-logs.png"
+          ],
+          "entries": 0
+        }
+      },
+      "original_file_sha256": {
+        "packages/tealscript/oracle-probes/v13/captures/v13/evidence/trace-merge-reversed-corners-v13-v1-attempt1-error.png": "482a30b882e2bfe92667c48b7e9b548173a15bb8464e77ff5026f8e02aba5826",
+        "packages/tealscript/oracle-probes/v13/captures/v13/evidence/trace-merge-reversed-corners-v13-v1-attempt1-error.txt": "f054719ed5a1edde41130d0408a9836a4c034d423feb3620119541538fb9f28b",
+        "packages/tealscript/oracle-probes/v13/captures/v13/evidence/trace-merge-reversed-corners-v13-v1-attempt1-logs.txt": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+        "packages/tealscript/oracle-probes/v13/captures/v13/evidence/trace-merge-reversed-corners-v13-v1-attempt1-logs-v1.json": "3efd014ae8a4690540828456fe95f2640746e07b90edd21d13e223b66de524bd",
+        "packages/tealscript/oracle-probes/v13/captures/v13/evidence/trace-merge-reversed-corners-v13-v1-attempt1-logs.png": "966ac4033fbe3ff19a40b979b456a6bd0e55b8be34ad5e74c50b0b480313192c"
+      }
+    },
+    {
+      "source": "packages/tealscript/oracle-probes/v13/trace-array-linear-percentile101-v13-v1.pine",
+      "sha256": "fdc07926b4aec4ecea32371c3341a449620af1ce6aed63cf5c5d31b68730245b",
+      "paste_again": false,
+      "reuse_identity": "Exact frozen source bytes; original observed clock/context preserved, no new v17 execution inferred. Manifest probes/ aliases are reference-only, not duplicated local sources.",
+      "original_attempt": {
+        "native_environment": {
+          "browser_utc": "2026-10-04T19:00:22.884Z",
+          "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+          "platform": "MacIntel",
+          "user_agent_data": {
+            "architecture": "arm",
+            "bitness": "64",
+            "brands": [
+              {
+                "brand": "Not:A-Brand",
+                "version": "8"
+              },
+              {
+                "brand": "Chromium",
+                "version": "156"
+              },
+              {
+                "brand": "Google Chrome",
+                "version": "156"
+              }
+            ],
+            "fullVersionList": [
+              {
+                "brand": "Not:A-Brand",
+                "version": "8.0.0.0"
+              },
+              {
+                "brand": "Chromium",
+                "version": "156.0.8075.0"
+              },
+              {
+                "brand": "Google Chrome",
+                "version": "156.0.8075.0"
+              }
+            ],
+            "mobile": false,
+            "platform": "macOS",
+            "platformVersion": "27.2.0"
+          },
+          "device_pixel_ratio": 2,
+          "viewport": {
+            "width": 1440,
+            "height": 900,
+            "visual_viewport_scale": 1
+          },
+          "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v13 batch; visualViewport scale recorded independently.",
+          "tradingview_build": null,
+          "tradingview_script_urls": [
+            "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+            "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+            "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+            "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+            "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+            "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+            "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+            "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+            "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+            "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+            "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+            "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+          ],
+          "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+        },
+        "script": "trace-array-linear-percentile101-v13-v1.pine",
+        "attempt": 1,
+        "source_sha256": "fdc07926b4aec4ecea32371c3341a449620af1ce6aed63cf5c5d31b68730245b",
+        "indicator_title": "Silent audit array-linear-percentile101 v13 v1",
+        "status": "RUNTIME-ERROR",
+        "csv_file": null,
+        "original_download_filename": null,
+        "partial_csv_file": null,
+        "diagnostic": {
+          "code": "RE10002",
+          "text": "Error on bar 1: Invalid value of the 'percentage' argument (101) in the 'array.percentile_linear_interpolation' function. It must be in the range [0..100].",
+          "line": 7,
+          "column": null,
+          "first_bar_index": 1,
+          "first_bar_time_utc": null,
+          "native": {
+            "ctx": {
+              "min": 0,
+              "code": "RE10002",
+              "argName": "percentage",
+              "bar_index": 1,
+              "max": 100,
+              "value": 101,
+              "funName": "array.percentile_linear_interpolation"
+            },
+            "error": "Error on bar {bar_index}: Invalid value of the '{argName}' argument ({value}) in the '{funName}' function. It must be in the range [{min}..{max}].",
+            "stack_trace": [
+              {
+                "n": "#main",
+                "p": 7
+              }
+            ],
+            "title": "Runtime error",
+            "showReportItButton": false,
+            "studyAccessBlocked": false,
+            "compiler_markers": [],
+            "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,338.84\nH\n85,338.84\nL\n85,338.83\nC\n85,338.84\n0.00 (0.00%)\n85,338.83\nSELL\n0.01\n85,338.84\nBUY\nUSDT\nSilent audit array-linear-percentile101 v13 v1\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n19:00:24 UTC\n99+\nRuntime error: RE10002\nRuntime error: RE10002\nError on bar 1: Invalid value of the 'percentage' argument (101) in the 'array.percentile_linear_interpolation' function. It must be in the range [0..100].\nat #main():7\nOpen in editor",
+            "context_substituted_message": "Error on bar 1: Invalid value of the 'percentage' argument (101) in the 'array.percentile_linear_interpolation' function. It must be in the range [0..100]."
+          }
+        },
+        "setup": {
+          "tickerid": "BINANCE:BTCUSDT",
+          "timeframe": "2",
+          "chart_type": "standard candles",
+          "native_style": 1,
+          "timezone": "Etc/UTC",
+          "bar_replay": false,
+          "minmove": 1,
+          "pricescale": 100,
+          "pointvalue": 1,
+          "mintick": 0.01,
+          "defaults_confirmed": true,
+          "native_user_inputs": [],
+          "observed_indicator_title": "Silent audit array-linear-percentile101 v13 v1",
+          "dataset_start_utc": "2026-09-07T00:00:00.000Z",
+          "first_chart_bar": {
+            "index": -19711,
+            "value": [
+              1788739200,
+              80341.83,
+              80356,
+              80230.29,
+              80293.23,
+              37.66955
+            ]
+          },
+          "chart_bars": 20011,
+          "subscription": "pro_premium",
+          "native_end_of_data": true,
+          "exchange_timezone": "Etc/UTC",
+          "exchange_session": "24x7",
+          "currency": "USDT",
+          "chart_session": "regular",
+          "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+        },
+        "reset_utc": "2026-10-04T19:00:20.696Z",
+        "live_candle_open_utc": null,
+        "export_utc": null,
+        "live_boundary_confirmed_unchanged": null,
+        "evidence_files": [
+          "captures/v13/evidence/trace-array-linear-percentile101-v13-v1-attempt1-error.png",
+          "captures/v13/evidence/trace-array-linear-percentile101-v13-v1-attempt1-error.txt",
+          "captures/v13/evidence/trace-array-linear-percentile101-v13-v1-attempt1-logs.txt",
+          "captures/v13/evidence/trace-array-linear-percentile101-v13-v1-attempt1-logs-v1.json",
+          "captures/v13/evidence/trace-array-linear-percentile101-v13-v1-attempt1-logs.png"
+        ],
+        "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+        "independent_page_reload_utc": null,
+        "source_identity_verified": true,
+        "reset_native_observations": [
+          {
+            "browser_utc": "2026-10-04T19:00:21.545Z",
+            "bars": 2544,
+            "end": false,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790835240,
+                84400,
+                84419.69,
+                84368.56,
+                84375.81,
+                12.25009
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791140400,
+                85338.84,
+                85338.84,
+                85338.83,
+                85338.84,
+                0.16901
+              ]
+            },
+            "timezone": "Etc/UTC",
+            "studies": [
+              {
+                "name": "Silent audit array-linear-percentile101 v13 v1",
+                "status": {
+                  "type": 3,
+                  "errorDescription": {
+                    "ctx": {
+                      "min": 0,
+                      "code": "RE10002",
+                      "argName": "percentage",
+                      "bar_index": 1,
+                      "max": 100,
+                      "value": 101,
+                      "funName": "array.percentile_linear_interpolation"
+                    },
+                    "error": "Error on bar {bar_index}: Invalid value of the '{argName}' argument ({value}) in the '{funName}' function. It must be in the range [{min}..{max}].",
+                    "stack_trace": [
+                      {
+                        "n": "#main",
+                        "p": 7
+                      }
+                    ],
+                    "title": "Runtime error",
+                    "showReportItButton": false,
+                    "studyAccessBlocked": false
+                  }
+                },
+                "size": 0,
+                "first": null,
+                "last": null
+              }
+            ]
+          },
+          {
+            "browser_utc": "2026-10-04T19:00:22.552Z",
+            "bars": 20011,
+            "end": true,
+            "first": {
+              "index": -19711,
+              "value": [
+                1788739200,
+                80341.83,
+                80356,
+                80230.29,
+                80293.23,
+                37.66955
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791140400,
+                85338.84,
+                85338.84,
+                85338.83,
+                85338.83,
+                0.16901
+              ]
+            },
+            "timezone": "Etc/UTC",
+            "studies": [
+              {
+                "name": "Silent audit array-linear-percentile101 v13 v1",
+                "status": {
+                  "type": 3,
+                  "errorDescription": {
+                    "ctx": {
+                      "min": 0,
+                      "code": "RE10002",
+                      "argName": "percentage",
+                      "bar_index": 1,
+                      "max": 100,
+                      "value": 101,
+                      "funName": "array.percentile_linear_interpolation"
+                    },
+                    "error": "Error on bar {bar_index}: Invalid value of the '{argName}' argument ({value}) in the '{funName}' function. It must be in the range [{min}..{max}].",
+                    "stack_trace": [
+                      {
+                        "n": "#main",
+                        "p": 7
+                      }
+                    ],
+                    "title": "Runtime error",
+                    "showReportItButton": false,
+                    "studyAccessBlocked": false
+                  }
+                },
+                "size": 0,
+                "first": null,
+                "last": null
+              }
+            ]
+          }
+        ],
+        "native_editor_markers": [],
+        "error_observed_utc": "2026-10-04T19:00:26.608Z",
+        "pine_logs": {
+          "paths": [
+            "evidence/trace-array-linear-percentile101-v13-v1-attempt1-logs.txt",
+            "evidence/trace-array-linear-percentile101-v13-v1-attempt1-logs-v1.json",
+            "evidence/trace-array-linear-percentile101-v13-v1-attempt1-logs.png"
+          ],
+          "entries": 0
+        }
+      },
+      "original_file_sha256": {
+        "packages/tealscript/oracle-probes/v13/captures/v13/evidence/trace-array-linear-percentile101-v13-v1-attempt1-error.png": "f87e9dcc716a8e72e0f02950210746bd2b53efaaef775354297abcc715282463",
+        "packages/tealscript/oracle-probes/v13/captures/v13/evidence/trace-array-linear-percentile101-v13-v1-attempt1-error.txt": "beab1c2a8f948297b49025982c3c8e6ad4b82ab50ca611c8dbf77d9e57adb8e3",
+        "packages/tealscript/oracle-probes/v13/captures/v13/evidence/trace-array-linear-percentile101-v13-v1-attempt1-logs.txt": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+        "packages/tealscript/oracle-probes/v13/captures/v13/evidence/trace-array-linear-percentile101-v13-v1-attempt1-logs-v1.json": "5c28e3c649a69ff5f5ea6e33baefa7bbf225cade55b6d564dd21871a1e5bdb6c",
+        "packages/tealscript/oracle-probes/v13/captures/v13/evidence/trace-array-linear-percentile101-v13-v1-attempt1-logs.png": "f241d4783b98f5c97698853386573a0c60b706aa01dfcfd772277d628ee2e233"
+      }
+    },
+    {
+      "source": "packages/tealscript/oracle-probes/v13/trace-table-zero-columns-v13-v1.pine",
+      "sha256": "b6cc8bec9e5efab9bdbc8b0dc210ec1119bbb06186e56b12bbc63f2ea3102a5e",
+      "paste_again": false,
+      "reuse_identity": "Exact frozen source bytes; original observed clock/context preserved, no new v17 execution inferred. Manifest probes/ aliases are reference-only, not duplicated local sources.",
+      "original_attempt": {
+        "native_environment": {
+          "browser_utc": "2026-10-04T19:00:42.815Z",
+          "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+          "platform": "MacIntel",
+          "user_agent_data": {
+            "architecture": "arm",
+            "bitness": "64",
+            "brands": [
+              {
+                "brand": "Not:A-Brand",
+                "version": "8"
+              },
+              {
+                "brand": "Chromium",
+                "version": "156"
+              },
+              {
+                "brand": "Google Chrome",
+                "version": "156"
+              }
+            ],
+            "fullVersionList": [
+              {
+                "brand": "Not:A-Brand",
+                "version": "8.0.0.0"
+              },
+              {
+                "brand": "Chromium",
+                "version": "156.0.8075.0"
+              },
+              {
+                "brand": "Google Chrome",
+                "version": "156.0.8075.0"
+              }
+            ],
+            "mobile": false,
+            "platform": "macOS",
+            "platformVersion": "27.2.0"
+          },
+          "device_pixel_ratio": 2,
+          "viewport": {
+            "width": 1440,
+            "height": 900,
+            "visual_viewport_scale": 1
+          },
+          "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v13 batch; visualViewport scale recorded independently.",
+          "tradingview_build": null,
+          "tradingview_script_urls": [
+            "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+            "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+            "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+            "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+            "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+            "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+            "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+            "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+            "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+            "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+            "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+            "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+          ],
+          "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+        },
+        "script": "trace-table-zero-columns-v13-v1.pine",
+        "attempt": 1,
+        "source_sha256": "b6cc8bec9e5efab9bdbc8b0dc210ec1119bbb06186e56b12bbc63f2ea3102a5e",
+        "indicator_title": "Silent audit table-zero-columns v13 v1",
+        "status": "RUNTIME-ERROR",
+        "csv_file": null,
+        "original_download_filename": null,
+        "partial_csv_file": null,
+        "diagnostic": {
+          "code": "RE10039",
+          "text": "Error on bar 0: Column 0 is out of table bounds, number of columns is 0.",
+          "line": 5,
+          "column": null,
+          "first_bar_index": 0,
+          "first_bar_time_utc": null,
+          "native": {
+            "ctx": {
+              "col": 0,
+              "code": "RE10039",
+              "bar_index": 0,
+              "cols": 0
+            },
+            "error": "Error on bar {bar_index}: Column {col} is out of table bounds, number of columns is {cols}.",
+            "stack_trace": [
+              {
+                "n": "#main",
+                "p": 5
+              }
+            ],
+            "title": "Runtime error",
+            "showReportItButton": false,
+            "studyAccessBlocked": false,
+            "compiler_markers": [],
+            "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,338.84\nH\n85,338.84\nL\n85,338.83\nC\n85,338.84\n0.00 (0.00%)\n85,338.83\nSELL\n0.01\n85,338.84\nBUY\nSilent audit table-zero-columns v13 v1\nUSDT\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n19:00:44 UTC\n99+\nRuntime error: RE10039\nRuntime error: RE10039\nError on bar 0: Column 0 is out of table bounds, number of columns is 0.\nat #main():5\nOpen in editor",
+            "context_substituted_message": "Error on bar 0: Column 0 is out of table bounds, number of columns is 0."
+          }
+        },
+        "setup": {
+          "tickerid": "BINANCE:BTCUSDT",
+          "timeframe": "2",
+          "chart_type": "standard candles",
+          "native_style": 1,
+          "timezone": "Etc/UTC",
+          "bar_replay": false,
+          "minmove": 1,
+          "pricescale": 100,
+          "pointvalue": 1,
+          "mintick": 0.01,
+          "defaults_confirmed": true,
+          "native_user_inputs": [],
+          "observed_indicator_title": "Silent audit table-zero-columns v13 v1",
+          "dataset_start_utc": "2026-09-07T00:00:00.000Z",
+          "first_chart_bar": {
+            "index": -19711,
+            "value": [
+              1788739200,
+              80341.83,
+              80356,
+              80230.29,
+              80293.23,
+              37.66955
+            ]
+          },
+          "chart_bars": 20011,
+          "subscription": "pro_premium",
+          "native_end_of_data": true,
+          "exchange_timezone": "Etc/UTC",
+          "exchange_session": "24x7",
+          "currency": "USDT",
+          "chart_session": "regular",
+          "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+        },
+        "reset_utc": "2026-10-04T19:00:40.531Z",
+        "live_candle_open_utc": null,
+        "export_utc": null,
+        "live_boundary_confirmed_unchanged": null,
+        "evidence_files": [
+          "captures/v13/evidence/trace-table-zero-columns-v13-v1-attempt1-error.png",
+          "captures/v13/evidence/trace-table-zero-columns-v13-v1-attempt1-error.txt",
+          "captures/v13/evidence/trace-table-zero-columns-v13-v1-attempt1-logs.txt",
+          "captures/v13/evidence/trace-table-zero-columns-v13-v1-attempt1-logs-v1.json",
+          "captures/v13/evidence/trace-table-zero-columns-v13-v1-attempt1-logs.png"
+        ],
+        "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+        "independent_page_reload_utc": null,
+        "source_identity_verified": true,
+        "reset_native_observations": [
+          {
+            "browser_utc": "2026-10-04T19:00:41.427Z",
+            "bars": 2544,
+            "end": false,
+            "first": {
+              "index": -2244,
+              "value": [
+                1790835240,
+                84400,
+                84419.69,
+                84368.56,
+                84375.81,
+                12.25009
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791140400,
+                85338.84,
+                85338.84,
+                85338.83,
+                85338.84,
+                6.14527
+              ]
+            },
+            "timezone": "Etc/UTC",
+            "studies": [
+              {
+                "name": "Silent audit table-zero-columns v13 v1",
+                "status": {
+                  "type": 3,
+                  "errorDescription": {
+                    "ctx": {
+                      "col": 0,
+                      "code": "RE10039",
+                      "bar_index": 0,
+                      "cols": 0
+                    },
+                    "error": "Error on bar {bar_index}: Column {col} is out of table bounds, number of columns is {cols}.",
+                    "stack_trace": [
+                      {
+                        "n": "#main",
+                        "p": 5
+                      }
+                    ],
+                    "title": "Runtime error",
+                    "showReportItButton": false,
+                    "studyAccessBlocked": false
+                  }
+                },
+                "size": 0,
+                "first": null,
+                "last": null
+              }
+            ]
+          },
+          {
+            "browser_utc": "2026-10-04T19:00:42.397Z",
+            "bars": 20011,
+            "end": true,
+            "first": {
+              "index": -19711,
+              "value": [
+                1788739200,
+                80341.83,
+                80356,
+                80230.29,
+                80293.23,
+                37.66955
+              ]
+            },
+            "last": {
+              "index": 299,
+              "value": [
+                1791140400,
+                85338.84,
+                85338.84,
+                85338.83,
+                85338.83,
+                6.1538
+              ]
+            },
+            "timezone": "Etc/UTC",
+            "studies": [
+              {
+                "name": "Silent audit table-zero-columns v13 v1",
+                "status": {
+                  "type": 3,
+                  "errorDescription": {
+                    "ctx": {
+                      "col": 0,
+                      "code": "RE10039",
+                      "bar_index": 0,
+                      "cols": 0
+                    },
+                    "error": "Error on bar {bar_index}: Column {col} is out of table bounds, number of columns is {cols}.",
+                    "stack_trace": [
+                      {
+                        "n": "#main",
+                        "p": 5
+                      }
+                    ],
+                    "title": "Runtime error",
+                    "showReportItButton": false,
+                    "studyAccessBlocked": false
+                  }
+                },
+                "size": 0,
+                "first": null,
+                "last": null
+              }
+            ]
+          }
+        ],
+        "native_editor_markers": [],
+        "error_observed_utc": "2026-10-04T19:00:46.586Z",
+        "pine_logs": {
+          "paths": [
+            "evidence/trace-table-zero-columns-v13-v1-attempt1-logs.txt",
+            "evidence/trace-table-zero-columns-v13-v1-attempt1-logs-v1.json",
+            "evidence/trace-table-zero-columns-v13-v1-attempt1-logs.png"
+          ],
+          "entries": 0
+        }
+      },
+      "original_file_sha256": {
+        "packages/tealscript/oracle-probes/v13/captures/v13/evidence/trace-table-zero-columns-v13-v1-attempt1-error.png": "8ee232b6df5c20bd88fde10fe21c236cfd2a80d46aab9388fd8eb583334b7aa3",
+        "packages/tealscript/oracle-probes/v13/captures/v13/evidence/trace-table-zero-columns-v13-v1-attempt1-error.txt": "2bf7c2b4dda291b8dc5f899d9f724b40720aa3ef7e99f4389a60f1796a269ff4",
+        "packages/tealscript/oracle-probes/v13/captures/v13/evidence/trace-table-zero-columns-v13-v1-attempt1-logs.txt": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+        "packages/tealscript/oracle-probes/v13/captures/v13/evidence/trace-table-zero-columns-v13-v1-attempt1-logs-v1.json": "0b693d209dbf93846a321f8e6e698d9ff833b310c512ce7bb459245181324aad",
+        "packages/tealscript/oracle-probes/v13/captures/v13/evidence/trace-table-zero-columns-v13-v1-attempt1-logs.png": "a84ceb34a109d76f6296f5cbc06367c56eba209f164878fba429afe638ee609f"
+      }
+    }
+  ]
+}

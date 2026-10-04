@@ -1,0 +1,59 @@
+{
+  "artifact": "Original PNG stroke raster measurements v1",
+  "image_width": 2880,
+  "image_height": 1800,
+  "scale_x": 2,
+  "scale_y": 2,
+  "scans": [
+    {
+      "axis": "vertical",
+      "kind": "blue",
+      "fixed": 448.33333333333337,
+      "start": 42,
+      "end": 833,
+      "reason": "Center of horizontal box edge away from corners.",
+      "image_fixed": 897,
+      "runs": [
+        {
+          "start": 401,
+          "end": 600,
+          "device_pixels": 200,
+          "css_pixels": 100
+        },
+        {
+          "start": 1178,
+          "end": 1377,
+          "device_pixels": 200,
+          "css_pixels": 100
+        }
+      ]
+    },
+    {
+      "axis": "vertical",
+      "kind": "red",
+      "fixed": 956.0588235294117,
+      "start": 42,
+      "end": 833,
+      "reason": "Center of horizontal box edge away from corners.",
+      "image_fixed": 1912,
+      "runs": [
+        {
+          "start": 350,
+          "end": 651,
+          "device_pixels": 302,
+          "css_pixels": 151
+        },
+        {
+          "start": 1127,
+          "end": 1428,
+          "device_pixels": 302,
+          "css_pixels": 151
+        }
+      ]
+    }
+  ],
+  "source": "trace-box-width-151-v17-v1.pine",
+  "png": "captures/v17/evidence/trace-box-width-151-v17-v1-attempt1-fixed-pane-width-rendering-v1.png",
+  "geometry": "captures/v17/evidence/trace-box-width-151-v17-v1-attempt1-fixed-pane-width-rendering-v1.json",
+  "method": "Original untouched PNG decoded through native browser Image and OffscreenCanvas; maximal consecutive red/blue dominant runs at stated CSS scans, predicate channel>170 and>1.6 times both other channels; divide by independently observed PNG/viewport scale. No image alteration."
+}

@@ -1,0 +1,940 @@
+{
+  "artifact": "v17 raw closed numeric observations v1",
+  "observations": [
+    {
+      "script": "log10-reference-literal-precision-v6-v1.pine",
+      "attempt": 1,
+      "csv": "captures/v17/log10-reference-literal-precision-v6-v1-attempt1.csv",
+      "sha256": "517c250f29b561ad6dec272eff51da64b9d469bded188ff6d6bd09fd773a02d7",
+      "historical_rows": 20062,
+      "live_cutoff": 1791146640,
+      "boundary_unchanged": true,
+      "observed_inputs": [
+        {
+          "id": "in_0",
+          "name": "Argument",
+          "value": 1.75,
+          "default": 1.75
+        }
+      ],
+      "ordered_raw_value_counts": {
+        "REFERENCE_LITERAL": {
+          "0.2430380486862944": 20062
+        },
+        "REFERENCE_SHORT": {
+          "0.2430380486862944": 20062
+        },
+        "LOG10_VALUE": {
+          "0.24303804868629444": 20062
+        },
+        "LOG10_RESIDUAL": {
+          "0.000005551115123125783": 20062
+        },
+        "LITERAL_MINUS_SHORT_X1E18": {
+          "27.755575615628914": 20062
+        },
+        "LITERAL_A": {
+          "0.1234567890123457": 20062
+        },
+        "A_MINUS_SHORT_X1E18": {
+          "69.38893903907228": 20062
+        },
+        "LITERAL_B": {
+          "1.7e-16": 20062
+        },
+        "B_X1E18": {
+          "170": 20062
+        },
+        "B_SCI_X1E18": {
+          "170": 20062
+        },
+        "LOG_REFERENCE_LITERAL": {
+          "1.0986122886681096": 20062
+        },
+        "LOG_RESIDUAL": {
+          "0.00002220446049250313": 20062
+        }
+      }
+    },
+    {
+      "script": "trace-eigen-complex-placeholder-v17-v1.pine",
+      "attempt": 1,
+      "csv": "captures/v17/trace-eigen-complex-placeholder-v17-v1-attempt1.csv",
+      "sha256": "6e8808ddfb57ea60dc801cb83c681708b130dab04f77e5130e84b8e3b7ca0b28",
+      "historical_rows": 20063,
+      "live_cutoff": 1791146760,
+      "boundary_unchanged": true,
+      "observed_inputs": [],
+      "ordered_raw_value_counts": {
+        "RESULT_SIZE": {
+          "3": 20063
+        },
+        "EIGEN0": {
+          "0": 20063
+        },
+        "EIGEN1": {
+          "0": 20063
+        },
+        "EIGEN2": {
+          "1": 20063
+        }
+      }
+    },
+    {
+      "script": "roc-toradians-reference-literals-v6-v1.pine",
+      "attempt": 1,
+      "csv": "captures/v17/roc-toradians-reference-literals-v6-v1-attempt1.csv",
+      "sha256": "885e1b5d157f3a8ce17302bda03848c7e7b4b8850cecb640b4a72e9f9d97d962",
+      "historical_rows": 20063,
+      "live_cutoff": 1791146760,
+      "boundary_unchanged": true,
+      "observed_inputs": [],
+      "ordered_raw_value_counts": {
+        "ROC_LITERAL_MINUS_SHORT": {
+          "55.51115123125783": 20063
+        },
+        "ROC_LITERAL_MINUS_CONSTRUCTED": {
+          "-55.51115123125783": 20063
+        },
+        "ROC_BUILTIN_MINUS_LITERAL": {
+          "": 18726,
+          "0.000008326672684688674": 1337
+        },
+        "ROC_BUILTIN_MINUS_CONSTRUCTED": {
+          "": 18726,
+          "0.0000027755575615628914": 1337
+        },
+        "ROC_MULTIPLY_THEN_DIVIDE": {
+          "0.000008326672684688674": 20063
+        },
+        "ROC_DIVIDE_THEN_MULTIPLY": {
+          "0.000005551115123125783": 20063
+        },
+        "RADIANS_LITERAL_MINUS_SHORT": {
+          "45.102810375396984": 20063
+        },
+        "RADIANS_LITERAL_MINUS_CONSTRUCTED": {
+          "-45.102810375396984": 20063
+        },
+        "RADIANS_BUILTIN_MINUS_LITERAL": {
+          "0.000004163336342344337": 20063
+        },
+        "RADIANS_BUILTIN_MINUS_CONSTRUCTED": {
+          "-3.469446951953614e-7": 20063
+        },
+        "RADIANS_MULTIPLY_THEN_DIVIDE": {
+          "-3.469446951953614e-7": 20063
+        },
+        "RADIANS_DIVIDE_CONSTANT_FIRST": {
+          "3.469446951953614e-7": 20063
+        },
+        "ROC_SECOND_LITERAL_SHIFT": {
+          "-27.755575615628914": 20063
+        },
+        "ROC_THIRD_LITERAL_SHIFT": {
+          "-13.877787807814457": 20063
+        },
+        "RADIANS_HALF_LITERAL_SHIFT": {
+          "-27.755575615628914": 20063
+        },
+        "TINY_DECIMAL_RUNTIME": {
+          "170": 20063
+        },
+        "TINY_SCI_RUNTIME": {
+          "170": 20063
+        }
+      }
+    },
+    {
+      "script": "color-gradient-clamp-trace-v6-v1.pine",
+      "attempt": 1,
+      "csv": "captures/v17/color-gradient-clamp-trace-v6-v1-attempt1.csv",
+      "sha256": "42b67ed337d7717a30e86f2a3f9076077d1b954a01a3755d917f35638b3a226f",
+      "historical_rows": 20067,
+      "live_cutoff": 1791147240,
+      "boundary_unchanged": true,
+      "observed_inputs": [
+        {
+          "id": "in_0",
+          "name": "Value",
+          "value": -1,
+          "default": -1
+        },
+        {
+          "id": "in_1",
+          "name": "Bottom",
+          "value": 0,
+          "default": 0
+        },
+        {
+          "id": "in_2",
+          "name": "Top",
+          "value": 1,
+          "default": 1
+        }
+      ],
+      "ordered_raw_value_counts": {
+        "VALUE": {
+          "-1": 20067
+        },
+        "BOTTOM": {
+          "0": 20067
+        },
+        "TOP": {
+          "1": 20067
+        },
+        "RESULT_R": {
+          "17": 20067
+        },
+        "RESULT_G": {
+          "42": 20067
+        },
+        "RESULT_B": {
+          "90": 20067
+        },
+        "RESULT_T": {
+          "20": 20067
+        },
+        "RESULT_NA": {
+          "0": 20067
+        },
+        "LOWER_R": {
+          "17": 20067
+        },
+        "LOWER_G": {
+          "43": 20067
+        },
+        "LOWER_B": {
+          "91": 20067
+        },
+        "LOWER_T": {
+          "20": 20067
+        },
+        "UPPER_R": {
+          "211": 20067
+        },
+        "UPPER_G": {
+          "149": 20067
+        },
+        "UPPER_B": {
+          "67": 20067
+        },
+        "UPPER_T": {
+          "80": 20067
+        }
+      }
+    },
+    {
+      "script": "color-gradient-clamp-trace-v6-v1.pine",
+      "attempt": 9,
+      "csv": "captures/v17/color-gradient-clamp-trace-v6-v1-attempt9.csv",
+      "sha256": "353de0d749ac43db560a90ba94e500f82ee9687817262918e5a62a2bc95d59a7",
+      "historical_rows": 20069,
+      "live_cutoff": 1791147480,
+      "boundary_unchanged": true,
+      "observed_inputs": [
+        {
+          "id": "in_0",
+          "name": "Value",
+          "value": 0,
+          "default": -1
+        },
+        {
+          "id": "in_1",
+          "name": "Bottom",
+          "value": 0,
+          "default": 0
+        },
+        {
+          "id": "in_2",
+          "name": "Top",
+          "value": 1,
+          "default": 1
+        }
+      ],
+      "ordered_raw_value_counts": {
+        "VALUE": {
+          "0": 20069
+        },
+        "BOTTOM": {
+          "0": 20069
+        },
+        "TOP": {
+          "1": 20069
+        },
+        "RESULT_R": {
+          "17": 20069
+        },
+        "RESULT_G": {
+          "42": 20069
+        },
+        "RESULT_B": {
+          "90": 20069
+        },
+        "RESULT_T": {
+          "20": 20069
+        },
+        "RESULT_NA": {
+          "0": 20069
+        },
+        "LOWER_R": {
+          "17": 20069
+        },
+        "LOWER_G": {
+          "43": 20069
+        },
+        "LOWER_B": {
+          "91": 20069
+        },
+        "LOWER_T": {
+          "20": 20069
+        },
+        "UPPER_R": {
+          "211": 20069
+        },
+        "UPPER_G": {
+          "149": 20069
+        },
+        "UPPER_B": {
+          "67": 20069
+        },
+        "UPPER_T": {
+          "80": 20069
+        }
+      }
+    },
+    {
+      "script": "color-gradient-clamp-trace-v6-v1.pine",
+      "attempt": 10,
+      "csv": "captures/v17/color-gradient-clamp-trace-v6-v1-attempt10.csv",
+      "sha256": "97503772a9be8453c614c8896a9e6e49ca7bac087d9a5ef9dca23de374642b7e",
+      "historical_rows": 20069,
+      "live_cutoff": 1791147480,
+      "boundary_unchanged": false,
+      "observed_inputs": [
+        {
+          "id": "in_0",
+          "name": "Value",
+          "value": 0.5,
+          "default": -1
+        },
+        {
+          "id": "in_1",
+          "name": "Bottom",
+          "value": 0,
+          "default": 0
+        },
+        {
+          "id": "in_2",
+          "name": "Top",
+          "value": 1,
+          "default": 1
+        }
+      ],
+      "ordered_raw_value_counts": {
+        "VALUE": {
+          "0.5": 20069
+        },
+        "BOTTOM": {
+          "0": 20069
+        },
+        "TOP": {
+          "1": 20069
+        },
+        "RESULT_R": {
+          "55": 20069
+        },
+        "RESULT_G": {
+          "64": 20069
+        },
+        "RESULT_B": {
+          "86": 20069
+        },
+        "RESULT_T": {
+          "50": 20069
+        },
+        "RESULT_NA": {
+          "0": 20069
+        },
+        "LOWER_R": {
+          "17": 20069
+        },
+        "LOWER_G": {
+          "43": 20069
+        },
+        "LOWER_B": {
+          "91": 20069
+        },
+        "LOWER_T": {
+          "20": 20069
+        },
+        "UPPER_R": {
+          "211": 20069
+        },
+        "UPPER_G": {
+          "149": 20069
+        },
+        "UPPER_B": {
+          "67": 20069
+        },
+        "UPPER_T": {
+          "80": 20069
+        }
+      }
+    },
+    {
+      "script": "color-gradient-clamp-trace-v6-v1.pine",
+      "attempt": 11,
+      "csv": "captures/v17/color-gradient-clamp-trace-v6-v1-attempt11.csv",
+      "sha256": "27cfa0cb8007eba04f79685ec1a651fdb2fa0a23a86aa7a89382a79413dd20d6",
+      "historical_rows": 20070,
+      "live_cutoff": 1791147600,
+      "boundary_unchanged": true,
+      "observed_inputs": [
+        {
+          "id": "in_0",
+          "name": "Value",
+          "value": 0.5,
+          "default": -1
+        },
+        {
+          "id": "in_1",
+          "name": "Bottom",
+          "value": 0,
+          "default": 0
+        },
+        {
+          "id": "in_2",
+          "name": "Top",
+          "value": 1,
+          "default": 1
+        }
+      ],
+      "ordered_raw_value_counts": {
+        "VALUE": {
+          "0.5": 20070
+        },
+        "BOTTOM": {
+          "0": 20070
+        },
+        "TOP": {
+          "1": 20070
+        },
+        "RESULT_R": {
+          "55": 20070
+        },
+        "RESULT_G": {
+          "64": 20070
+        },
+        "RESULT_B": {
+          "86": 20070
+        },
+        "RESULT_T": {
+          "50": 20070
+        },
+        "RESULT_NA": {
+          "0": 20070
+        },
+        "LOWER_R": {
+          "17": 20070
+        },
+        "LOWER_G": {
+          "43": 20070
+        },
+        "LOWER_B": {
+          "91": 20070
+        },
+        "LOWER_T": {
+          "20": 20070
+        },
+        "UPPER_R": {
+          "211": 20070
+        },
+        "UPPER_G": {
+          "149": 20070
+        },
+        "UPPER_B": {
+          "67": 20070
+        },
+        "UPPER_T": {
+          "80": 20070
+        }
+      }
+    },
+    {
+      "script": "color-gradient-clamp-trace-v6-v1.pine",
+      "attempt": 12,
+      "csv": "captures/v17/color-gradient-clamp-trace-v6-v1-attempt12.csv",
+      "sha256": "fa9e10d4a4b3b6e37dacc68e7855e3c7905cc92b6f68e857dc602cd590ffd1b3",
+      "historical_rows": 20070,
+      "live_cutoff": 1791147600,
+      "boundary_unchanged": true,
+      "observed_inputs": [
+        {
+          "id": "in_0",
+          "name": "Value",
+          "value": 1,
+          "default": -1
+        },
+        {
+          "id": "in_1",
+          "name": "Bottom",
+          "value": 0,
+          "default": 0
+        },
+        {
+          "id": "in_2",
+          "name": "Top",
+          "value": 1,
+          "default": 1
+        }
+      ],
+      "ordered_raw_value_counts": {
+        "VALUE": {
+          "1": 20070
+        },
+        "BOTTOM": {
+          "0": 20070
+        },
+        "TOP": {
+          "1": 20070
+        },
+        "RESULT_R": {
+          "211": 20070
+        },
+        "RESULT_G": {
+          "149": 20070
+        },
+        "RESULT_B": {
+          "67": 20070
+        },
+        "RESULT_T": {
+          "80": 20070
+        },
+        "RESULT_NA": {
+          "0": 20070
+        },
+        "LOWER_R": {
+          "17": 20070
+        },
+        "LOWER_G": {
+          "43": 20070
+        },
+        "LOWER_B": {
+          "91": 20070
+        },
+        "LOWER_T": {
+          "20": 20070
+        },
+        "UPPER_R": {
+          "211": 20070
+        },
+        "UPPER_G": {
+          "149": 20070
+        },
+        "UPPER_B": {
+          "67": 20070
+        },
+        "UPPER_T": {
+          "80": 20070
+        }
+      }
+    },
+    {
+      "script": "color-gradient-clamp-trace-v6-v1.pine",
+      "attempt": 13,
+      "csv": "captures/v17/color-gradient-clamp-trace-v6-v1-attempt13.csv",
+      "sha256": "52220c06c34072f6b71796c4c2820b779509169e0c35df692cab6072ac0eea10",
+      "historical_rows": 20070,
+      "live_cutoff": 1791147600,
+      "boundary_unchanged": true,
+      "observed_inputs": [
+        {
+          "id": "in_0",
+          "name": "Value",
+          "value": 2,
+          "default": -1
+        },
+        {
+          "id": "in_1",
+          "name": "Bottom",
+          "value": 0,
+          "default": 0
+        },
+        {
+          "id": "in_2",
+          "name": "Top",
+          "value": 1,
+          "default": 1
+        }
+      ],
+      "ordered_raw_value_counts": {
+        "VALUE": {
+          "2": 20070
+        },
+        "BOTTOM": {
+          "0": 20070
+        },
+        "TOP": {
+          "1": 20070
+        },
+        "RESULT_R": {
+          "211": 20070
+        },
+        "RESULT_G": {
+          "149": 20070
+        },
+        "RESULT_B": {
+          "67": 20070
+        },
+        "RESULT_T": {
+          "80": 20070
+        },
+        "RESULT_NA": {
+          "0": 20070
+        },
+        "LOWER_R": {
+          "17": 20070
+        },
+        "LOWER_G": {
+          "43": 20070
+        },
+        "LOWER_B": {
+          "91": 20070
+        },
+        "LOWER_T": {
+          "20": 20070
+        },
+        "UPPER_R": {
+          "211": 20070
+        },
+        "UPPER_G": {
+          "149": 20070
+        },
+        "UPPER_B": {
+          "67": 20070
+        },
+        "UPPER_T": {
+          "80": 20070
+        }
+      }
+    },
+    {
+      "script": "color-gradient-clamp-trace-v6-v1.pine",
+      "attempt": 14,
+      "csv": "captures/v17/color-gradient-clamp-trace-v6-v1-attempt14.csv",
+      "sha256": "015bdd18efca325ddd1235ac7ee6714e03c36f536bd07df592f1235643e8f63c",
+      "historical_rows": 20070,
+      "live_cutoff": 1791147600,
+      "boundary_unchanged": true,
+      "observed_inputs": [
+        {
+          "id": "in_0",
+          "name": "Value",
+          "value": 0,
+          "default": -1
+        },
+        {
+          "id": "in_1",
+          "name": "Bottom",
+          "value": 1,
+          "default": 0
+        },
+        {
+          "id": "in_2",
+          "name": "Top",
+          "value": 1,
+          "default": 1
+        }
+      ],
+      "ordered_raw_value_counts": {
+        "VALUE": {
+          "0": 20070
+        },
+        "BOTTOM": {
+          "1": 20070
+        },
+        "TOP": {
+          "1": 20070
+        },
+        "RESULT_R": {
+          "0": 20070
+        },
+        "RESULT_G": {
+          "0": 20070
+        },
+        "RESULT_B": {
+          "0": 20070
+        },
+        "RESULT_T": {
+          "100": 20070
+        },
+        "RESULT_NA": {
+          "0": 20070
+        },
+        "LOWER_R": {
+          "17": 20070
+        },
+        "LOWER_G": {
+          "43": 20070
+        },
+        "LOWER_B": {
+          "91": 20070
+        },
+        "LOWER_T": {
+          "20": 20070
+        },
+        "UPPER_R": {
+          "211": 20070
+        },
+        "UPPER_G": {
+          "149": 20070
+        },
+        "UPPER_B": {
+          "67": 20070
+        },
+        "UPPER_T": {
+          "80": 20070
+        }
+      }
+    },
+    {
+      "script": "color-gradient-clamp-trace-v6-v1.pine",
+      "attempt": 15,
+      "csv": "captures/v17/color-gradient-clamp-trace-v6-v1-attempt15.csv",
+      "sha256": "f5a70042b8440d25842225c066368f0edf673d1ad941281fb6e103836fd4cd33",
+      "historical_rows": 20070,
+      "live_cutoff": 1791147600,
+      "boundary_unchanged": false,
+      "observed_inputs": [
+        {
+          "id": "in_0",
+          "name": "Value",
+          "value": 1,
+          "default": -1
+        },
+        {
+          "id": "in_1",
+          "name": "Bottom",
+          "value": 1,
+          "default": 0
+        },
+        {
+          "id": "in_2",
+          "name": "Top",
+          "value": 1,
+          "default": 1
+        }
+      ],
+      "ordered_raw_value_counts": {
+        "VALUE": {
+          "1": 20070
+        },
+        "BOTTOM": {
+          "1": 20070
+        },
+        "TOP": {
+          "1": 20070
+        },
+        "RESULT_R": {
+          "0": 20070
+        },
+        "RESULT_G": {
+          "0": 20070
+        },
+        "RESULT_B": {
+          "0": 20070
+        },
+        "RESULT_T": {
+          "100": 20070
+        },
+        "RESULT_NA": {
+          "0": 20070
+        },
+        "LOWER_R": {
+          "17": 20070
+        },
+        "LOWER_G": {
+          "43": 20070
+        },
+        "LOWER_B": {
+          "91": 20070
+        },
+        "LOWER_T": {
+          "20": 20070
+        },
+        "UPPER_R": {
+          "211": 20070
+        },
+        "UPPER_G": {
+          "149": 20070
+        },
+        "UPPER_B": {
+          "67": 20070
+        },
+        "UPPER_T": {
+          "80": 20070
+        }
+      }
+    },
+    {
+      "script": "color-gradient-clamp-trace-v6-v1.pine",
+      "attempt": 16,
+      "csv": "captures/v17/color-gradient-clamp-trace-v6-v1-attempt16.csv",
+      "sha256": "f850fa57dd1d7b838f70a186e5bd98cff81b3f39d375bade2de0346735e3e089",
+      "historical_rows": 20071,
+      "live_cutoff": 1791147720,
+      "boundary_unchanged": true,
+      "observed_inputs": [
+        {
+          "id": "in_0",
+          "name": "Value",
+          "value": 1,
+          "default": -1
+        },
+        {
+          "id": "in_1",
+          "name": "Bottom",
+          "value": 1,
+          "default": 0
+        },
+        {
+          "id": "in_2",
+          "name": "Top",
+          "value": 1,
+          "default": 1
+        }
+      ],
+      "ordered_raw_value_counts": {
+        "VALUE": {
+          "1": 20071
+        },
+        "BOTTOM": {
+          "1": 20071
+        },
+        "TOP": {
+          "1": 20071
+        },
+        "RESULT_R": {
+          "0": 20071
+        },
+        "RESULT_G": {
+          "0": 20071
+        },
+        "RESULT_B": {
+          "0": 20071
+        },
+        "RESULT_T": {
+          "100": 20071
+        },
+        "RESULT_NA": {
+          "0": 20071
+        },
+        "LOWER_R": {
+          "17": 20071
+        },
+        "LOWER_G": {
+          "43": 20071
+        },
+        "LOWER_B": {
+          "91": 20071
+        },
+        "LOWER_T": {
+          "20": 20071
+        },
+        "UPPER_R": {
+          "211": 20071
+        },
+        "UPPER_G": {
+          "149": 20071
+        },
+        "UPPER_B": {
+          "67": 20071
+        },
+        "UPPER_T": {
+          "80": 20071
+        }
+      }
+    },
+    {
+      "script": "color-gradient-clamp-trace-v6-v1.pine",
+      "attempt": 17,
+      "csv": "captures/v17/color-gradient-clamp-trace-v6-v1-attempt17.csv",
+      "sha256": "662613fd44f9754d58d37ecfb361726fcda7228abb0c2089c56ad392d0358aaa",
+      "historical_rows": 20071,
+      "live_cutoff": 1791147720,
+      "boundary_unchanged": true,
+      "observed_inputs": [
+        {
+          "id": "in_0",
+          "name": "Value",
+          "value": 2,
+          "default": -1
+        },
+        {
+          "id": "in_1",
+          "name": "Bottom",
+          "value": 1,
+          "default": 0
+        },
+        {
+          "id": "in_2",
+          "name": "Top",
+          "value": 1,
+          "default": 1
+        }
+      ],
+      "ordered_raw_value_counts": {
+        "VALUE": {
+          "2": 20071
+        },
+        "BOTTOM": {
+          "1": 20071
+        },
+        "TOP": {
+          "1": 20071
+        },
+        "RESULT_R": {
+          "0": 20071
+        },
+        "RESULT_G": {
+          "0": 20071
+        },
+        "RESULT_B": {
+          "0": 20071
+        },
+        "RESULT_T": {
+          "100": 20071
+        },
+        "RESULT_NA": {
+          "0": 20071
+        },
+        "LOWER_R": {
+          "17": 20071
+        },
+        "LOWER_G": {
+          "43": 20071
+        },
+        "LOWER_B": {
+          "91": 20071
+        },
+        "LOWER_T": {
+          "20": 20071
+        },
+        "UPPER_R": {
+          "211": 20071
+        },
+        "UPPER_G": {
+          "149": 20071
+        },
+        "UPPER_B": {
+          "67": 20071
+        },
+        "UPPER_T": {
+          "80": 20071
+        }
+      }
+    }
+  ],
+  "limits": "CSV positional strings/counts only. No inferred parsing policy, internal arithmetic identity, eigen iteration limit, or engine replay."
+}
