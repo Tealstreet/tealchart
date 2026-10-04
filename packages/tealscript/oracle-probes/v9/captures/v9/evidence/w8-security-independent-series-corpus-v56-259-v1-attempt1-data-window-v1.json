@@ -1,0 +1,26 @@
+{
+  "index": 299,
+  "bar": [
+    1791123600,
+    85164.25,
+    85164.26,
+    85138,
+    85138.14,
+    6.82888
+  ],
+  "source_row": null,
+  "browser_utc": "2026-10-04T14:22:18.143Z",
+  "title": "Granger Causality Test (GRANGER)",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   14:20",
+  "visible_range": {
+    "_firstBar": 264,
+    "_lastBar": 302
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}

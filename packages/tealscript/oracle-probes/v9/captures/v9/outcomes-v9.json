@@ -57422,5 +57422,2241 @@
       "V9_BAR_INDEX": "24905"
     },
     "data_window_witness": "captures/v9/evidence/w8-precision-toradians-toradians-warm0-7-v6-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T14:22:07.647Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v9 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "w8-security-independent-series-corpus-v56-259-v1.pine",
+    "attempt": 1,
+    "source_sha256": "18e13cd98d2f7ceccb2c00d799e61a3187c9287ec04145375474b913ba43e2e3",
+    "indicator_title": "Granger Causality Test (GRANGER)",
+    "status": "RUNS",
+    "csv_file": "captures/v9/w8-security-independent-series-corpus-v56-259-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T222206.806.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [
+        {
+          "id": "in_0",
+          "name": "Source 1",
+          "value": "close",
+          "default": "close"
+        },
+        {
+          "id": "in_1",
+          "name": "Source 2 Ticker (e.g., SPY, AAPL)",
+          "value": "SPY",
+          "default": "SPY"
+        },
+        {
+          "id": "in_2",
+          "name": "Period",
+          "value": 20,
+          "default": 20
+        }
+      ],
+      "observed_indicator_title": "Granger Causality Test (GRANGER)",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24611,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24912,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T14:20:59.249Z",
+    "live_candle_open_utc": "2026-10-04T14:22:00.000Z",
+    "export_utc": "2026-10-04T14:22:07.231Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v9/evidence/w8-security-independent-series-corpus-v56-259-v1-attempt1-setup.png",
+      "captures/v9/evidence/w8-security-independent-series-corpus-v56-259-v1-attempt1-export.png",
+      "captures/v9/evidence/w8-security-independent-series-corpus-v56-259-v1-attempt1-logs.txt",
+      "captures/v9/evidence/w8-security-independent-series-corpus-v56-259-v1-attempt1-logs-v1.json",
+      "captures/v9/evidence/w8-security-independent-series-corpus-v56-259-v1-attempt1-logs.png",
+      "captures/v9/evidence/w8-security-independent-series-corpus-v56-259-v1-attempt1-inputs.png",
+      "captures/v9/evidence/w8-security-independent-series-corpus-v56-259-v1-attempt1-visual.png",
+      "captures/v9/evidence/w8-security-independent-series-corpus-v56-259-v1-attempt1-data-window-v1.png",
+      "captures/v9/evidence/w8-security-independent-series-corpus-v56-259-v1-attempt1-data-window-v1.json",
+      "captures/v9/evidence/w8-security-independent-series-corpus-v56-259-v1-attempt1-data-window-v1.txt",
+      "captures/v9/evidence/w8-security-independent-series-corpus-v56-259-v1-attempt1-authority-object-geometry-v1.json",
+      "captures/v9/evidence/w8-security-independent-series-corpus-v56-259-v1-attempt1-authority-object-geometry-v1.png",
+      "captures/v9/granger-host-context-v1.json",
+      "captures/v9/evidence/w8-security-independent-series-corpus-v56-259-v1-companion-btc-spy-attempt1-receipt-v1.json",
+      "captures/v9/evidence/w8-security-independent-series-corpus-v56-259-v1-companion-spy-2-attempt1-receipt-v1.json",
+      "captures/v9/w8-security-independent-series-corpus-v56-259-v1-companion-btc-spy-attempt1.csv",
+      "captures/v9/w8-security-independent-series-corpus-v56-259-v1-companion-spy-2-attempt1.csv",
+      "captures/v9/evidence/w8-security-independent-series-corpus-v56-259-v1-companion-btc-spy-attempt1-setup-v1.png",
+      "captures/v9/evidence/w8-security-independent-series-corpus-v56-259-v1-companion-btc-spy-attempt1-export-v1.png",
+      "captures/v9/evidence/w8-security-independent-series-corpus-v56-259-v1-companion-spy-2-attempt1-setup-v1.png",
+      "captures/v9/evidence/w8-security-independent-series-corpus-v56-259-v1-companion-spy-2-attempt1-export-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T14:20:59.249Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790818440,
+            83560.75,
+            83574.01,
+            83516.73,
+            83517.14,
+            7.36642
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791123600,
+            85164.25,
+            85164.26,
+            85164.25,
+            85164.26,
+            0.59536
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Granger Causality Test (GRANGER)",
+            "status": {
+              "type": 2
+            },
+            "size": 2244,
+            "first": {
+              "index": -1001780,
+              "value": [
+                1790006640,
+                22.587134945065813
+              ]
+            },
+            "last": {
+              "index": -934,
+              "value": [
+                1790975640,
+                21.464235652914276
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T14:21:00.304Z",
+        "bars": 24911,
+        "end": true,
+        "first": {
+          "index": -24611,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791123600,
+            85164.25,
+            85164.26,
+            85164.25,
+            85164.25,
+            0.61435
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Granger Causality Test (GRANGER)",
+            "status": {
+              "type": 2
+            },
+            "size": 5568,
+            "first": {
+              "index": -24205,
+              "value": [
+                1788183120,
+                5533.740793881624
+              ]
+            },
+            "last": {
+              "index": -934,
+              "value": [
+                1790975640,
+                21.464235652914276
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T14:21:01.056Z",
+        "bars": 24911,
+        "end": true,
+        "first": {
+          "index": -24611,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791123600,
+            85164.25,
+            85164.26,
+            85164.25,
+            85164.26,
+            0.62714
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Granger Causality Test (GRANGER)",
+            "status": {
+              "type": 2
+            },
+            "size": 5568,
+            "first": {
+              "index": -24205,
+              "value": [
+                1788183120,
+                5533.740793881624
+              ]
+            },
+            "last": {
+              "index": -934,
+              "value": [
+                1790975640,
+                21.464235652914276
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T14:21:01.729Z",
+        "bars": 24911,
+        "end": true,
+        "first": {
+          "index": -24611,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791123600,
+            85164.25,
+            85164.26,
+            85138,
+            85138.13,
+            4.12584
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Granger Causality Test (GRANGER)",
+            "status": {
+              "type": 2
+            },
+            "size": 5568,
+            "first": {
+              "index": -24205,
+              "value": [
+                1788183120,
+                5533.740793881624
+              ]
+            },
+            "last": {
+              "index": -934,
+              "value": [
+                1790975640,
+                21.464235652914276
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T14:21:02.486Z",
+        "bars": 24911,
+        "end": true,
+        "first": {
+          "index": -24611,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791123600,
+            85164.25,
+            85164.26,
+            85138,
+            85138.13,
+            4.12584
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Granger Causality Test (GRANGER)",
+            "status": {
+              "type": 2
+            },
+            "size": 5568,
+            "first": {
+              "index": -24205,
+              "value": [
+                1788183120,
+                5533.740793881624
+              ]
+            },
+            "last": {
+              "index": -934,
+              "value": [
+                1790975640,
+                21.464235652914276
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T14:21:03.154Z",
+        "bars": 24911,
+        "end": true,
+        "first": {
+          "index": -24611,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791123600,
+            85164.25,
+            85164.26,
+            85138,
+            85138.13,
+            4.13684
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Granger Causality Test (GRANGER)",
+            "status": {
+              "type": 2
+            },
+            "size": 5568,
+            "first": {
+              "index": -24205,
+              "value": [
+                1788183120,
+                5533.740793881624
+              ]
+            },
+            "last": {
+              "index": -934,
+              "value": [
+                1790975640,
+                21.464235652914276
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T14:21:03.834Z",
+        "bars": 24911,
+        "end": true,
+        "first": {
+          "index": -24611,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791123600,
+            85164.25,
+            85164.26,
+            85138,
+            85138.14,
+            4.20605
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Granger Causality Test (GRANGER)",
+            "status": {
+              "type": 2
+            },
+            "size": 5568,
+            "first": {
+              "index": -24205,
+              "value": [
+                1788183120,
+                5533.740793881624
+              ]
+            },
+            "last": {
+              "index": -934,
+              "value": [
+                1790975640,
+                21.464235652914276
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T14:21:04.519Z",
+        "bars": 24911,
+        "end": true,
+        "first": {
+          "index": -24611,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791123600,
+            85164.25,
+            85164.26,
+            85138,
+            85138.14,
+            4.28776
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Granger Causality Test (GRANGER)",
+            "status": {
+              "type": 2
+            },
+            "size": 5568,
+            "first": {
+              "index": -24205,
+              "value": [
+                1788183120,
+                5533.740793881624
+              ]
+            },
+            "last": {
+              "index": -934,
+              "value": [
+                1790975640,
+                21.464235652914276
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T14:21:05.179Z",
+        "bars": 24911,
+        "end": true,
+        "first": {
+          "index": -24611,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791123600,
+            85164.25,
+            85164.26,
+            85138,
+            85138.13,
+            4.28776
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Granger Causality Test (GRANGER)",
+            "status": {
+              "type": 2
+            },
+            "size": 5568,
+            "first": {
+              "index": -24205,
+              "value": [
+                1788183120,
+                5533.740793881624
+              ]
+            },
+            "last": {
+              "index": -934,
+              "value": [
+                1790975640,
+                21.464235652914276
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T14:21:05.945Z",
+        "bars": 24911,
+        "end": true,
+        "first": {
+          "index": -24611,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791123600,
+            85164.25,
+            85164.26,
+            85138,
+            85138.13,
+            4.29876
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Granger Causality Test (GRANGER)",
+            "status": {
+              "type": 2
+            },
+            "size": 5568,
+            "first": {
+              "index": -24205,
+              "value": [
+                1788183120,
+                5533.740793881624
+              ]
+            },
+            "last": {
+              "index": -934,
+              "value": [
+                1790975640,
+                21.464235652914276
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T14:21:06.628Z",
+        "bars": 24911,
+        "end": true,
+        "first": {
+          "index": -24611,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791123600,
+            85164.25,
+            85164.26,
+            85138,
+            85138.13,
+            4.29876
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Granger Causality Test (GRANGER)",
+            "status": {
+              "type": 2
+            },
+            "size": 5568,
+            "first": {
+              "index": -24205,
+              "value": [
+                1788183120,
+                5533.740793881624
+              ]
+            },
+            "last": {
+              "index": -934,
+              "value": [
+                1790975640,
+                21.464235652914276
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T14:21:07.297Z",
+        "bars": 24911,
+        "end": true,
+        "first": {
+          "index": -24611,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791123600,
+            85164.25,
+            85164.26,
+            85138,
+            85138.14,
+            4.31165
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Granger Causality Test (GRANGER)",
+            "status": {
+              "type": 2
+            },
+            "size": 5568,
+            "first": {
+              "index": -24205,
+              "value": [
+                1788183120,
+                5533.740793881624
+              ]
+            },
+            "last": {
+              "index": -934,
+              "value": [
+                1790975640,
+                21.464235652914276
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T14:21:07.988Z",
+        "bars": 24911,
+        "end": true,
+        "first": {
+          "index": -24611,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791123600,
+            85164.25,
+            85164.26,
+            85138,
+            85138.13,
+            4.32226
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Granger Causality Test (GRANGER)",
+            "status": {
+              "type": 2
+            },
+            "size": 5568,
+            "first": {
+              "index": -24205,
+              "value": [
+                1788183120,
+                5533.740793881624
+              ]
+            },
+            "last": {
+              "index": -934,
+              "value": [
+                1790975640,
+                21.464235652914276
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T14:21:08.660Z",
+        "bars": 24911,
+        "end": true,
+        "first": {
+          "index": -24611,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791123600,
+            85164.25,
+            85164.26,
+            85138,
+            85138.14,
+            4.32686
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Granger Causality Test (GRANGER)",
+            "status": {
+              "type": 2
+            },
+            "size": 5568,
+            "first": {
+              "index": -24205,
+              "value": [
+                1788183120,
+                5533.740793881624
+              ]
+            },
+            "last": {
+              "index": -934,
+              "value": [
+                1790975640,
+                21.464235652914276
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T14:21:09.498Z",
+        "bars": 24911,
+        "end": true,
+        "first": {
+          "index": -24611,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791123600,
+            85164.25,
+            85164.26,
+            85138,
+            85138.14,
+            4.34676
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Granger Causality Test (GRANGER)",
+            "status": {
+              "type": 2
+            },
+            "size": 5568,
+            "first": {
+              "index": -24205,
+              "value": [
+                1788183120,
+                5533.740793881624
+              ]
+            },
+            "last": {
+              "index": -934,
+              "value": [
+                1790975640,
+                21.464235652914276
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T14:21:10.187Z",
+        "bars": 24911,
+        "end": true,
+        "first": {
+          "index": -24611,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791123600,
+            85164.25,
+            85164.26,
+            85138,
+            85138.14,
+            4.34676
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Granger Causality Test (GRANGER)",
+            "status": {
+              "type": 2
+            },
+            "size": 5568,
+            "first": {
+              "index": -24205,
+              "value": [
+                1788183120,
+                5533.740793881624
+              ]
+            },
+            "last": {
+              "index": -934,
+              "value": [
+                1790975640,
+                21.464235652914276
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T14:21:10.963Z",
+        "bars": 24911,
+        "end": true,
+        "first": {
+          "index": -24611,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791123600,
+            85164.25,
+            85164.26,
+            85138,
+            85138.14,
+            4.36193
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Granger Causality Test (GRANGER)",
+            "status": {
+              "type": 2
+            },
+            "size": 5568,
+            "first": {
+              "index": -24205,
+              "value": [
+                1788183120,
+                5533.740793881624
+              ]
+            },
+            "last": {
+              "index": -934,
+              "value": [
+                1790975640,
+                21.464235652914276
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T14:21:11.627Z",
+        "bars": 24911,
+        "end": true,
+        "first": {
+          "index": -24611,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791123600,
+            85164.25,
+            85164.26,
+            85138,
+            85138.14,
+            4.36193
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Granger Causality Test (GRANGER)",
+            "status": {
+              "type": 2
+            },
+            "size": 5568,
+            "first": {
+              "index": -24205,
+              "value": [
+                1788183120,
+                5533.740793881624
+              ]
+            },
+            "last": {
+              "index": -934,
+              "value": [
+                1790975640,
+                21.464235652914276
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T14:21:12.438Z",
+        "bars": 24911,
+        "end": true,
+        "first": {
+          "index": -24611,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791123600,
+            85164.25,
+            85164.26,
+            85138,
+            85138.13,
+            4.38114
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Granger Causality Test (GRANGER)",
+            "status": {
+              "type": 2
+            },
+            "size": 5568,
+            "first": {
+              "index": -24205,
+              "value": [
+                1788183120,
+                5533.740793881624
+              ]
+            },
+            "last": {
+              "index": -934,
+              "value": [
+                1790975640,
+                21.464235652914276
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T14:21:13.106Z",
+        "bars": 24911,
+        "end": true,
+        "first": {
+          "index": -24611,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791123600,
+            85164.25,
+            85164.26,
+            85138,
+            85138.14,
+            4.38114
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Granger Causality Test (GRANGER)",
+            "status": {
+              "type": 2
+            },
+            "size": 5568,
+            "first": {
+              "index": -24205,
+              "value": [
+                1788183120,
+                5533.740793881624
+              ]
+            },
+            "last": {
+              "index": -934,
+              "value": [
+                1790975640,
+                21.464235652914276
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T14:21:13.772Z",
+        "bars": 24911,
+        "end": true,
+        "first": {
+          "index": -24611,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791123600,
+            85164.25,
+            85164.26,
+            85138,
+            85138.13,
+            4.3917
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Granger Causality Test (GRANGER)",
+            "status": {
+              "type": 2
+            },
+            "size": 5568,
+            "first": {
+              "index": -24205,
+              "value": [
+                1788183120,
+                5533.740793881624
+              ]
+            },
+            "last": {
+              "index": -934,
+              "value": [
+                1790975640,
+                21.464235652914276
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T14:21:14.443Z",
+        "bars": 24911,
+        "end": true,
+        "first": {
+          "index": -24611,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791123600,
+            85164.25,
+            85164.26,
+            85138,
+            85138.13,
+            4.39745
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Granger Causality Test (GRANGER)",
+            "status": {
+              "type": 2
+            },
+            "size": 5568,
+            "first": {
+              "index": -24205,
+              "value": [
+                1788183120,
+                5533.740793881624
+              ]
+            },
+            "last": {
+              "index": -934,
+              "value": [
+                1790975640,
+                21.464235652914276
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T14:21:15.148Z",
+        "bars": 24911,
+        "end": true,
+        "first": {
+          "index": -24611,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791123600,
+            85164.25,
+            85164.26,
+            85138,
+            85138.14,
+            4.39745
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Granger Causality Test (GRANGER)",
+            "status": {
+              "type": 2
+            },
+            "size": 5568,
+            "first": {
+              "index": -24205,
+              "value": [
+                1788183120,
+                5533.740793881624
+              ]
+            },
+            "last": {
+              "index": -934,
+              "value": [
+                1790975640,
+                21.464235652914276
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T14:21:15.843Z",
+        "bars": 24911,
+        "end": true,
+        "first": {
+          "index": -24611,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791123600,
+            85164.25,
+            85164.26,
+            85138,
+            85138.14,
+            4.40525
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Granger Causality Test (GRANGER)",
+            "status": {
+              "type": 2
+            },
+            "size": 5568,
+            "first": {
+              "index": -24205,
+              "value": [
+                1788183120,
+                5533.740793881624
+              ]
+            },
+            "last": {
+              "index": -934,
+              "value": [
+                1790975640,
+                21.464235652914276
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T14:21:16.509Z",
+        "bars": 24911,
+        "end": true,
+        "first": {
+          "index": -24611,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791123600,
+            85164.25,
+            85164.26,
+            85138,
+            85138.14,
+            4.40525
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Granger Causality Test (GRANGER)",
+            "status": {
+              "type": 2
+            },
+            "size": 5568,
+            "first": {
+              "index": -24205,
+              "value": [
+                1788183120,
+                5533.740793881624
+              ]
+            },
+            "last": {
+              "index": -934,
+              "value": [
+                1790975640,
+                21.464235652914276
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T14:21:17.191Z",
+        "bars": 24911,
+        "end": true,
+        "first": {
+          "index": -24611,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791123600,
+            85164.25,
+            85164.26,
+            85138,
+            85138.14,
+            4.41165
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Granger Causality Test (GRANGER)",
+            "status": {
+              "type": 2
+            },
+            "size": 5568,
+            "first": {
+              "index": -24205,
+              "value": [
+                1788183120,
+                5533.740793881624
+              ]
+            },
+            "last": {
+              "index": -934,
+              "value": [
+                1790975640,
+                21.464235652914276
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T14:21:17.942Z",
+        "bars": 24911,
+        "end": true,
+        "first": {
+          "index": -24611,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791123600,
+            85164.25,
+            85164.26,
+            85138,
+            85138.13,
+            5.1924
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Granger Causality Test (GRANGER)",
+            "status": {
+              "type": 2
+            },
+            "size": 5568,
+            "first": {
+              "index": -24205,
+              "value": [
+                1788183120,
+                5533.740793881624
+              ]
+            },
+            "last": {
+              "index": -934,
+              "value": [
+                1790975640,
+                21.464235652914276
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T14:21:18.606Z",
+        "bars": 24911,
+        "end": true,
+        "first": {
+          "index": -24611,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791123600,
+            85164.25,
+            85164.26,
+            85138,
+            85138.13,
+            5.1924
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Granger Causality Test (GRANGER)",
+            "status": {
+              "type": 2
+            },
+            "size": 5568,
+            "first": {
+              "index": -24205,
+              "value": [
+                1788183120,
+                5533.740793881624
+              ]
+            },
+            "last": {
+              "index": -934,
+              "value": [
+                1790975640,
+                21.464235652914276
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T14:21:19.293Z",
+        "bars": 24911,
+        "end": true,
+        "first": {
+          "index": -24611,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791123600,
+            85164.25,
+            85164.26,
+            85138,
+            85138.13,
+            5.19905
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Granger Causality Test (GRANGER)",
+            "status": {
+              "type": 2
+            },
+            "size": 5568,
+            "first": {
+              "index": -24205,
+              "value": [
+                1788183120,
+                5533.740793881624
+              ]
+            },
+            "last": {
+              "index": -934,
+              "value": [
+                1790975640,
+                21.464235652914276
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T14:21:19.976Z",
+        "bars": 24911,
+        "end": true,
+        "first": {
+          "index": -24611,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791123600,
+            85164.25,
+            85164.26,
+            85138,
+            85138.13,
+            5.20981
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Granger Causality Test (GRANGER)",
+            "status": {
+              "type": 2
+            },
+            "size": 5568,
+            "first": {
+              "index": -24205,
+              "value": [
+                1788183120,
+                5533.740793881624
+              ]
+            },
+            "last": {
+              "index": -934,
+              "value": [
+                1790975640,
+                21.464235652914276
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T14:21:20.657Z",
+        "bars": 24911,
+        "end": true,
+        "first": {
+          "index": -24611,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791123600,
+            85164.25,
+            85164.26,
+            85138,
+            85138.13,
+            5.20981
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Granger Causality Test (GRANGER)",
+            "status": {
+              "type": 2
+            },
+            "size": 5568,
+            "first": {
+              "index": -24205,
+              "value": [
+                1788183120,
+                5533.740793881624
+              ]
+            },
+            "last": {
+              "index": -934,
+              "value": [
+                1790975640,
+                21.464235652914276
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T14:21:21.438Z",
+        "bars": 24911,
+        "end": true,
+        "first": {
+          "index": -24611,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791123600,
+            85164.25,
+            85164.26,
+            85138,
+            85138.13,
+            5.22559
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Granger Causality Test (GRANGER)",
+            "status": {
+              "type": 2
+            },
+            "size": 5568,
+            "first": {
+              "index": -24205,
+              "value": [
+                1788183120,
+                5533.740793881624
+              ]
+            },
+            "last": {
+              "index": -934,
+              "value": [
+                1790975640,
+                21.464235652914276
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T14:21:22.107Z",
+        "bars": 24911,
+        "end": true,
+        "first": {
+          "index": -24611,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791123600,
+            85164.25,
+            85164.26,
+            85138,
+            85138.13,
+            5.22559
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Granger Causality Test (GRANGER)",
+            "status": {
+              "type": 2
+            },
+            "size": 5568,
+            "first": {
+              "index": -24205,
+              "value": [
+                1788183120,
+                5533.740793881624
+              ]
+            },
+            "last": {
+              "index": -934,
+              "value": [
+                1790975640,
+                21.464235652914276
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T14:21:22.774Z",
+        "bars": 24911,
+        "end": true,
+        "first": {
+          "index": -24611,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791123600,
+            85164.25,
+            85164.26,
+            85138,
+            85138.14,
+            5.23495
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Granger Causality Test (GRANGER)",
+            "status": {
+              "type": 2
+            },
+            "size": 5568,
+            "first": {
+              "index": -24205,
+              "value": [
+                1788183120,
+                5533.740793881624
+              ]
+            },
+            "last": {
+              "index": -934,
+              "value": [
+                1790975640,
+                21.464235652914276
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T14:21:23.463Z",
+        "bars": 24911,
+        "end": true,
+        "first": {
+          "index": -24611,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791123600,
+            85164.25,
+            85164.26,
+            85138,
+            85138.14,
+            5.23495
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Granger Causality Test (GRANGER)",
+            "status": {
+              "type": 2
+            },
+            "size": 5568,
+            "first": {
+              "index": -24205,
+              "value": [
+                1788183120,
+                5533.740793881624
+              ]
+            },
+            "last": {
+              "index": -934,
+              "value": [
+                1790975640,
+                21.464235652914276
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T14:21:24.120Z",
+        "bars": 24911,
+        "end": true,
+        "first": {
+          "index": -24611,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791123600,
+            85164.25,
+            85164.26,
+            85138,
+            85138.13,
+            5.24703
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Granger Causality Test (GRANGER)",
+            "status": {
+              "type": 2
+            },
+            "size": 5568,
+            "first": {
+              "index": -24205,
+              "value": [
+                1788183120,
+                5533.740793881624
+              ]
+            },
+            "last": {
+              "index": -934,
+              "value": [
+                1790975640,
+                21.464235652914276
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T14:21:24.792Z",
+        "bars": 24911,
+        "end": true,
+        "first": {
+          "index": -24611,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791123600,
+            85164.25,
+            85164.26,
+            85138,
+            85138.14,
+            5.26305
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Granger Causality Test (GRANGER)",
+            "status": {
+              "type": 2
+            },
+            "size": 5568,
+            "first": {
+              "index": -24205,
+              "value": [
+                1788183120,
+                5533.740793881624
+              ]
+            },
+            "last": {
+              "index": -934,
+              "value": [
+                1790975640,
+                21.464235652914276
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T14:21:25.454Z",
+        "bars": 24911,
+        "end": true,
+        "first": {
+          "index": -24611,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791123600,
+            85164.25,
+            85164.26,
+            85138,
+            85138.13,
+            5.27625
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Granger Causality Test (GRANGER)",
+            "status": {
+              "type": 2
+            },
+            "size": 5568,
+            "first": {
+              "index": -24205,
+              "value": [
+                1788183120,
+                5533.740793881624
+              ]
+            },
+            "last": {
+              "index": -934,
+              "value": [
+                1790975640,
+                21.464235652914276
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T14:21:26.222Z",
+        "bars": 24911,
+        "end": true,
+        "first": {
+          "index": -24611,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791123600,
+            85164.25,
+            85164.26,
+            85138,
+            85138.13,
+            5.27625
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Granger Causality Test (GRANGER)",
+            "status": {
+              "type": 2
+            },
+            "size": 5568,
+            "first": {
+              "index": -24205,
+              "value": [
+                1788183120,
+                5533.740793881624
+              ]
+            },
+            "last": {
+              "index": -934,
+              "value": [
+                1790975640,
+                21.464235652914276
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T14:21:27.165Z",
+        "bars": 24911,
+        "end": true,
+        "first": {
+          "index": -24611,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791123600,
+            85164.25,
+            85164.26,
+            85138,
+            85138.13,
+            5.31657
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Granger Causality Test (GRANGER)",
+            "status": {
+              "type": 2
+            },
+            "size": 5568,
+            "first": {
+              "index": -24205,
+              "value": [
+                1788183120,
+                5533.740793881624
+              ]
+            },
+            "last": {
+              "index": -934,
+              "value": [
+                1790975640,
+                21.464235652914276
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [],
+    "live_tooltip": "Sun 04 Oct '26   14:22",
+    "historical_compare_before_unix_seconds": 1791123720,
+    "pine_logs": {
+      "paths": [
+        "evidence/w8-security-independent-series-corpus-v56-259-v1-attempt1-logs.txt",
+        "evidence/w8-security-independent-series-corpus-v56-259-v1-attempt1-logs-v1.json",
+        "evidence/w8-security-independent-series-corpus-v56-259-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "903fd07c9fb804cfa111ba79f890ebd8faba02f79bbfe6476a4b80ba5c962cd4",
+    "csv_bytes": 1225204,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "F-Stat (X Granger-causes Y, color=color.yellow, linewidth=2)"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {
+      "F-Stat (X Granger-causes Y, color=color.yellow, linewidth=2)": 5
+    },
+    "first_historical_cells": [
+      "1788134400",
+      "77682",
+      "77682.01",
+      "77572",
+      "77674.04",
+      ""
+    ],
+    "last_historical_cells": [
+      "1791123600",
+      "85164.25",
+      "85164.26",
+      "85138",
+      "85138.14",
+      ""
+    ],
+    "declared_to_native_header_mapping": {
+      "F-Stat (X Granger-causes Y, color=color.yellow, linewidth=2)": "F-Stat (X Granger-causes Y, color=color.yellow, linewidth=2)"
+    },
+    "csv_rows": 24912,
+    "historical_rows": 24911,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791123720,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791123720",
+    "first_historical_values": {
+      "F-Stat (X Granger-causes Y, color=color.yellow, linewidth=2)": ""
+    },
+    "last_historical_values": {
+      "F-Stat (X Granger-causes Y, color=color.yellow, linewidth=2)": ""
+    },
+    "data_window_witness": "captures/v9/evidence/w8-security-independent-series-corpus-v56-259-v1-attempt1-data-window-v1.json",
+    "host_companion_limit": "See granger-host-context-v1.json; post-merge SPY and denominator are unexposed, native companion equivalence unverified."
   }
 ]

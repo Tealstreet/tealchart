@@ -1,0 +1,2461 @@
+{
+  "artifact": "Granger host context v1",
+  "parent_source": "w8-security-independent-series-corpus-v56-259-v1.pine",
+  "source_sha256": "18e13cd98d2f7ceccb2c00d799e61a3187c9287ec04145375474b913ba43e2e3",
+  "attempt": 1,
+  "source_default_inputs": [
+    {
+      "id": "in_0",
+      "name": "Source 1",
+      "value": "close",
+      "default": "close"
+    },
+    {
+      "id": "in_1",
+      "name": "Source 2 Ticker (e.g., SPY, AAPL)",
+      "value": "SPY",
+      "default": "SPY"
+    },
+    {
+      "id": "in_2",
+      "name": "Period",
+      "value": 20,
+      "default": 20
+    }
+  ],
+  "source_request": {
+    "symbol_literal": "SPY",
+    "timeframe": "timeframe.period / 2",
+    "expression": "close",
+    "lookahead": "barmerge.lookahead_off",
+    "gaps_argument": "omitted; original default retained",
+    "explicit_session_override": "none",
+    "post_merge_series": "UNEXPOSED: unchanged source plots only final F-stat",
+    "denominator": "UNEXPOSED: unchanged source has no denominator plot or log",
+    "internal_request_provider_identity": "UNEXPOSED"
+  },
+  "native_outcome": "RUNS; retained raw final F-stat and BTC OHLC",
+  "numeric_rows": 5568,
+  "last_numeric_cells": [
+    "1790975640",
+    "84498.08",
+    "84500.84",
+    "84496",
+    "84500.84",
+    "21.464235652914276"
+  ],
+  "blank_F_stat_rows": 19344,
+  "native_probe_data_status_last": {
+    "name": "Granger Causality Test (GRANGER)",
+    "status": {
+      "type": 2
+    },
+    "size": 5568,
+    "first": {
+      "index": -24205,
+      "value": [
+        1788183120,
+        5533.740793881624
+      ]
+    },
+    "last": {
+      "index": -934,
+      "value": [
+        1790975640,
+        21.464235652914276
+      ]
+    }
+  },
+  "collector_observation": "Initial collector settling check expected study data at the current BTC timestamp. Native study was RUNS, with its last numeric value before the live cutoff. Export was taken after status/size/endpoints remained stable across repeated reads; collector timeout was not recorded as a TradingView refusal.",
+  "native_compare_provider": "BATS:SPY (Cboe One); raw export header labels AMEX",
+  "companions": [
+    {
+      "artifact": "Granger chart comparison companion v1",
+      "parent_source": "w8-security-independent-series-corpus-v56-259-v1.pine",
+      "parent_source_sha256": "18e13cd98d2f7ceccb2c00d799e61a3187c9287ec04145375474b913ba43e2e3",
+      "parent_attempt": 1,
+      "setup": {
+        "captured_utc": "2026-10-04T14:24:10.428Z",
+        "main": {
+          "symbol": {
+            "source2": {
+              "country": "MT",
+              "description": "Binance",
+              "exchange-type": "exchange",
+              "id": "BINANCE",
+              "name": "Binance",
+              "url": "https://www.binance.com/en"
+            },
+            "currency_code": "USDT",
+            "source_id": "BINANCE",
+            "subsession_id": "regular",
+            "provider_id": "binance",
+            "base_currency_id": "XTVCBTC",
+            "base_currency": "BTC",
+            "currency_id": "XTVCUSDT",
+            "format": "price",
+            "formatter": "price",
+            "pro_perm": "",
+            "volume_type": "base",
+            "measure": "price",
+            "allowed_adjustment": "none",
+            "short_description": "Bitcoin / TetherUS",
+            "variable_tick_size": "",
+            "name": "BTCUSDT",
+            "full_name": "BINANCE:BTCUSDT",
+            "pro_name": "BINANCE:BTCUSDT",
+            "base_name": [
+              "BINANCE:BTCUSDT"
+            ],
+            "description": "Bitcoin / TetherUS",
+            "exchange": "Binance",
+            "pricescale": 100,
+            "pointvalue": 1,
+            "minmov": 1,
+            "session": "24x7",
+            "session_display": "24x7",
+            "subsessions": [
+              {
+                "description": "Regular Trading Hours",
+                "id": "regular",
+                "private": false,
+                "session": "24x7",
+                "session-display": "24x7"
+              }
+            ],
+            "type": "spot",
+            "typespecs": [
+              "crypto",
+              "defi"
+            ],
+            "has_intraday": true,
+            "fractional": false,
+            "listed_exchange": "BINANCE",
+            "legs": [
+              "BINANCE:BTCUSDT"
+            ],
+            "is_tradable": true,
+            "minmove2": 0,
+            "timezone": "Etc/UTC",
+            "aliases": [],
+            "alternatives": [],
+            "is_replayable": true,
+            "has_adjustment": false,
+            "has_extended_hours": false,
+            "bar_source": "trade",
+            "bar_transform": "none",
+            "bar_fillgaps": false,
+            "visible_plots_set": "ohlcv",
+            "is-tickbars-available": true,
+            "exchange_listed_name": "Binance"
+          },
+          "properties": {
+            "style": 1,
+            "esdShowDividends": true,
+            "esdShowSplits": true,
+            "esdShowEarnings": true,
+            "esdShowBreaks": false,
+            "showContinuousContractSwitches": true,
+            "showContinuousContractSwitchesBreaks": false,
+            "showFuturesContractExpiration": true,
+            "showLastNews": true,
+            "showCountdown": true,
+            "visible": true,
+            "showPriceLine": true,
+            "priceLineWidth": 1,
+            "showPrevClosePriceLine": false,
+            "prevClosePriceLineWidth": 1,
+            "minTick": "default",
+            "dividendsAdjustment": false,
+            "backAdjustment": false,
+            "settlementAsClose": true,
+            "sessionId": "regular",
+            "bidAsk": {
+              "visible": false,
+              "lineStyle": 1,
+              "lineWidth": 1,
+              "bidLineColor": "#2962FF",
+              "askLineColor": "#F7525F"
+            },
+            "prePostMarket": {
+              "visible": true,
+              "lineStyle": 1,
+              "lineWidth": 1,
+              "preMarketColor": "#FB8C00",
+              "postMarketColor": "#2962FF",
+              "overnightMarketColor": "#8e24aa"
+            },
+            "highLowAvgPrice": {
+              "highLowPriceLinesVisible": false,
+              "highLowPriceLabelsVisible": false,
+              "averageClosePriceLineVisible": false,
+              "averageClosePriceLabelVisible": false,
+              "highLowPriceLinesWidth": 1,
+              "averagePriceLineWidth": 1,
+              "highLowPriceLinesColor": "",
+              "averagePriceLineColor": ""
+            },
+            "statusViewStyle": {
+              "fontSize": 16,
+              "showExchange": true,
+              "showInterval": true,
+              "symbolTextSource": "description"
+            },
+            "lineStyle": {
+              "linestyle": 0,
+              "linewidth": 2,
+              "priceSource": "close",
+              "colorType": "gradient",
+              "color": "#2962FF",
+              "gradientStartColor": "#D500F9",
+              "gradientEndColor": "#00BCE5"
+            },
+            "lineWithMarkersStyle": {
+              "linestyle": 0,
+              "linewidth": 2,
+              "priceSource": "close",
+              "colorType": "gradient",
+              "color": "#2962FF",
+              "gradientStartColor": "#D500F9",
+              "gradientEndColor": "#00BCE5"
+            },
+            "steplineStyle": {
+              "linestyle": 0,
+              "linewidth": 2,
+              "priceSource": "close",
+              "colorType": "gradient",
+              "color": "#2962FF",
+              "gradientStartColor": "#D500F9",
+              "gradientEndColor": "#00BCE5"
+            },
+            "baselineStyle": {
+              "topLineWidth": 2,
+              "bottomLineWidth": 2,
+              "topLineStyle": 0,
+              "bottomLineStyle": 0,
+              "priceSource": "close",
+              "transparency": 50,
+              "baseLevelPercentage": 50,
+              "baselineColor": "#8C8C8C",
+              "topFillColor1": "rgba(8, 153, 129, 0.28)",
+              "topFillColor2": "rgba(8, 153, 129, 0.05)",
+              "bottomFillColor1": "rgba(242, 54, 69, 0.05)",
+              "bottomFillColor2": "rgba(242, 54, 69, 0.28)",
+              "topLineColor": "#089981",
+              "bottomLineColor": "#F23645"
+            },
+            "areaStyle": {
+              "linestyle": 0,
+              "linewidth": 2,
+              "priceSource": "close",
+              "transparency": 100,
+              "color1": "rgba(41, 98, 255, 0.28)",
+              "color2": "#2962FF",
+              "linecolor": "#2962FF"
+            },
+            "hlcAreaStyle": {
+              "highLineVisible": true,
+              "highLineStyle": 0,
+              "highLineWidth": 2,
+              "lowLineVisible": true,
+              "lowLineStyle": 0,
+              "lowLineWidth": 2,
+              "closeLineStyle": 0,
+              "closeLineWidth": 2,
+              "highLineColor": "#00bcd4",
+              "lowLineColor": "#e91e63",
+              "closeLineColor": "#2962FF",
+              "highCloseFillColor": "rgba(0, 188, 212, 0.25)",
+              "closeLowFillColor": "rgba(233, 30, 99, 0.25)"
+            },
+            "barStyle": {
+              "barColorsOnPrevClose": false,
+              "dontDrawOpen": false,
+              "thinBars": true,
+              "downColor": "#F23645",
+              "upColor": "#089981"
+            },
+            "hlcBarsStyle": {
+              "thinBars": true,
+              "color": "#2962FF"
+            },
+            "candleStyle": {
+              "drawWick": true,
+              "drawBorder": true,
+              "barColorsOnPrevClose": false,
+              "drawBody": true,
+              "borderColor": "#378658",
+              "upColor": "#089981",
+              "wickColor": "#737375",
+              "wickUpColor": "#089981",
+              "wickDownColor": "#F23645",
+              "downColor": "#F23645",
+              "borderUpColor": "#089981",
+              "borderDownColor": "#F23645"
+            },
+            "volCandlesStyle": {
+              "drawWick": true,
+              "drawBorder": true,
+              "barColorsOnPrevClose": false,
+              "drawBody": true,
+              "borderColor": "#378658",
+              "upColor": "#089981",
+              "wickColor": "#737375",
+              "wickUpColor": "#089981",
+              "wickDownColor": "#F23645",
+              "downColor": "#F23645",
+              "borderUpColor": "#089981",
+              "borderDownColor": "#F23645"
+            },
+            "hollowCandleStyle": {
+              "drawWick": true,
+              "drawBorder": true,
+              "drawBody": true,
+              "upColor": "#089981",
+              "downColor": "#F23645",
+              "borderColor": "#378658",
+              "borderUpColor": "#089981",
+              "borderDownColor": "#F23645",
+              "wickColor": "#737375",
+              "wickUpColor": "#089981",
+              "wickDownColor": "#F23645"
+            },
+            "haStyle": {
+              "drawWick": true,
+              "drawBorder": true,
+              "showRealLastPrice": false,
+              "barColorsOnPrevClose": false,
+              "inputs": {},
+              "inputInfo": {},
+              "drawBody": true,
+              "borderColor": "#378658",
+              "upColor": "#089981",
+              "wickColor": "#737375",
+              "wickUpColor": "#089981",
+              "wickDownColor": "#F23645",
+              "downColor": "#F23645",
+              "borderUpColor": "#089981",
+              "borderDownColor": "#F23645"
+            },
+            "hiloStyle": {
+              "showBorders": true,
+              "showLabels": true,
+              "drawBody": true,
+              "color": "#2962FF",
+              "borderColor": "#2962FF",
+              "labelColor": "#2962FF"
+            },
+            "columnStyle": {
+              "barColorsOnPrevClose": true,
+              "priceSource": "close",
+              "baselinePosition": "bottom",
+              "upColor": "rgba(8, 153, 129, 0.5)",
+              "downColor": "rgba(242, 54, 69, 0.5)"
+            },
+            "renkoStyle": {
+              "inputs": {
+                "source": "close",
+                "sources": "Close",
+                "boxSize": 3,
+                "style": "ATR",
+                "atrLength": 14,
+                "percentageLTP": 1,
+                "wicks": true
+              },
+              "inputInfo": {
+                "source": {
+                  "name": "Source"
+                },
+                "sources": {
+                  "name": "Source"
+                },
+                "boxSize": {
+                  "name": "Box size"
+                },
+                "style": {
+                  "name": "Style"
+                },
+                "atrLength": {
+                  "name": "ATR length"
+                },
+                "percentageLTP": {
+                  "name": "Percentage"
+                },
+                "wicks": {
+                  "name": "Wicks"
+                }
+              },
+              "upColor": "#089981",
+              "downColor": "#F23645",
+              "borderUpColor": "#089981",
+              "borderDownColor": "#F23645",
+              "upColorProjection": "#336854",
+              "downColorProjection": "#7f323f",
+              "borderUpColorProjection": "#336854",
+              "borderDownColorProjection": "#7f323f",
+              "wickUpColor": "#089981",
+              "wickDownColor": "#F23645"
+            },
+            "pbStyle": {
+              "inputs": {
+                "lb": 3
+              },
+              "inputInfo": {
+                "lb": {
+                  "name": "Number of line"
+                }
+              },
+              "upColor": "#089981",
+              "downColor": "#F23645",
+              "borderUpColor": "#089981",
+              "borderDownColor": "#F23645",
+              "upColorProjection": "#336854",
+              "downColorProjection": "#7f323f",
+              "borderUpColorProjection": "#336854",
+              "borderDownColorProjection": "#7f323f"
+            },
+            "kagiStyle": {
+              "inputs": {
+                "style": "ATR",
+                "atrLength": 14,
+                "percentageLTP": 1,
+                "reversalAmount": 1
+              },
+              "inputInfo": {
+                "style": {
+                  "name": "Style"
+                },
+                "atrLength": {
+                  "name": "ATR length"
+                },
+                "percentageLTP": {
+                  "name": "Percentage"
+                },
+                "reversalAmount": {
+                  "name": "Reversal amount"
+                }
+              },
+              "downColor": "#F23645",
+              "upColor": "#089981",
+              "upColorProjection": "#336854",
+              "downColorProjection": "#7f323f"
+            },
+            "pnfStyle": {
+              "inputs": {
+                "sources": "Close",
+                "reversalAmount": 3,
+                "boxSize": 1,
+                "style": "ATR",
+                "atrLength": 14,
+                "percentageLTP": 1,
+                "oneStepBackBuilding": false
+              },
+              "inputInfo": {
+                "sources": {
+                  "name": "Source"
+                },
+                "boxSize": {
+                  "name": "Box size"
+                },
+                "reversalAmount": {
+                  "name": "Reversal amount"
+                },
+                "style": {
+                  "name": "Style"
+                },
+                "atrLength": {
+                  "name": "ATR length"
+                },
+                "percentageLTP": {
+                  "name": "Percentage"
+                },
+                "oneStepBackBuilding": {
+                  "name": "One step back building"
+                }
+              },
+              "downColor": "#F23645",
+              "upColor": "#089981",
+              "upColorProjection": "#336854",
+              "downColorProjection": "#7f323f"
+            },
+            "rangeStyle": {
+              "barStyle": 0,
+              "thinBars": true,
+              "inputs": {
+                "range": 10,
+                "phantomBars": false
+              },
+              "inputInfo": {
+                "range": {
+                  "name": "Range"
+                },
+                "phantomBars": {
+                  "name": "Phantom bars"
+                }
+              },
+              "upColor": "#089981",
+              "downColor": "#F23645",
+              "upColorProjection": "#336854",
+              "downColorProjection": "#7f323f",
+              "candlesUpColor": "#089981",
+              "candlesDownColor": "#F23645",
+              "candlesBorderUpColor": "#089981",
+              "candlesBorderDownColor": "#F23645",
+              "candlesWickUpColor": "#089981",
+              "candlesWickDownColor": "#F23645"
+            },
+            "tpoStyle": {
+              "color": "#2962FF",
+              "linestyle": 0,
+              "linewidth": 2,
+              "styles": {
+                "splitByBlocks": false,
+                "splitByBlocksMode": 0
+              },
+              "inputs": {
+                "period": "Day",
+                "periodsNum": 1,
+                "profilesSessions": "All",
+                "customSession": "0930-1600",
+                "customSession2": "",
+                "customSession3": "",
+                "customSession4": "",
+                "customSession5": "",
+                "rowSize": "Auto",
+                "ticksPerRow": 10,
+                "vaPercent": 70,
+                "blockSize": "30m",
+                "mergePoints": "[]",
+                "extendPoorHigh": false,
+                "extendPoorLow": false,
+                "extendPOC": false,
+                "extendTpoVah": false,
+                "extendTpoVal": false,
+                "extendVolumePoc": false,
+                "extendVolumeVah": false,
+                "extendVolumeVal": false,
+                "extendSingleprints": false
+              },
+              "tpo": {
+                "colors": {
+                  "gradientColors": [
+                    "#e91e63",
+                    "#00c853",
+                    "#00bcd4",
+                    "#651FFF"
+                  ]
+                },
+                "showBlocks": true,
+                "showLetters": true,
+                "nonVaOpacity": 30
+              },
+              "levels": {
+                "showPOC": true,
+                "pocColor": "#DBDBDB",
+                "showPoorHigh": false,
+                "poorHighColor": "#7C4DFF",
+                "showPoorLow": false,
+                "poorLowColor": "#7C4DFF",
+                "showSingleprints": false,
+                "singleprintsColor": "rgba(224, 64, 251, 0.15)",
+                "showVAH": true,
+                "vahColor": "#DBDBDB",
+                "showVAL": true,
+                "valColor": "#DBDBDB",
+                "showMidpoint": false,
+                "showOpenPrice": false,
+                "showClosePrice": false,
+                "initialBalanceRange": {
+                  "levels": 2,
+                  "visible": true
+                }
+              },
+              "volumeProfile": {
+                "visible": true,
+                "valuesColor": "#DBDBDB",
+                "showValues": true,
+                "vah": {
+                  "visible": false,
+                  "color": "#DBDBDB",
+                  "linestyle": 2,
+                  "linewidth": 2
+                },
+                "val": {
+                  "visible": false,
+                  "color": "#DBDBDB",
+                  "linestyle": 2,
+                  "linewidth": 2
+                },
+                "poc": {
+                  "visible": false,
+                  "color": "#DBDBDB",
+                  "linestyle": 0,
+                  "linewidth": 2
+                },
+                "volumeColor": "rgba(38, 198, 218, 0.5)",
+                "valueAreaColor": "rgba(38, 198, 218, 0.75)",
+                "placement": "left_to_right"
+              },
+              "summary": {
+                "visible": false,
+                "belowSeries": true,
+                "infoBlocks": {
+                  "hlRange": {
+                    "visible": false
+                  },
+                  "pocPrice": {
+                    "visible": true
+                  },
+                  "rotationFactor": {
+                    "visible": false
+                  },
+                  "totalVolume": {
+                    "visible": false
+                  },
+                  "tpoCountAbovePoc": {
+                    "visible": false
+                  },
+                  "tpoCountBelowPoc": {
+                    "visible": false
+                  },
+                  "tpoCountTotal": {
+                    "visible": false
+                  },
+                  "vaRange": {
+                    "visible": false
+                  },
+                  "vahPrice": {
+                    "visible": true
+                  },
+                  "valPrice": {
+                    "visible": true
+                  },
+                  "initialBalanceHigh": {
+                    "visible": true
+                  },
+                  "initialBalanceLow": {
+                    "visible": true
+                  },
+                  "initialBalanceRange": {
+                    "visible": true
+                  }
+                }
+              },
+              "priceSource": "close"
+            },
+            "svpStyle": {
+              "inputs": {
+                "profilesSessions": "All",
+                "customSession": "0930-1600",
+                "customSessionTZ": "Exchange",
+                "volume": "Up/Down",
+                "vaVolume": 70,
+                "extendPocRight": false,
+                "extendVAHRight": false,
+                "extendVALRight": false,
+                "rowsLayout": "Number Of Rows",
+                "rows": 24
+              },
+              "volumeProfile": {
+                "visible": true,
+                "valuesColor": "#DBDBDB",
+                "showValues": false,
+                "volumeColorUp": "rgba(38, 198, 218, 0.5)",
+                "volumeColorDown": "rgba(236, 64, 122, 0.5)",
+                "valueAreaColorUp": "rgba(38, 198, 218, 0.75)",
+                "valueAreaColorDown": "rgba(236, 64, 122, 0.75)",
+                "histogramBoxColor": "rgba(38, 198, 218, 0.05)",
+                "placement": "left_to_right",
+                "percentWidth": 100
+              },
+              "vah": {
+                "visible": false,
+                "color": "#DBDBDB",
+                "linestyle": 2,
+                "linewidth": 2
+              },
+              "val": {
+                "visible": false,
+                "color": "#DBDBDB",
+                "linestyle": 2,
+                "linewidth": 2
+              },
+              "poc": {
+                "visible": true,
+                "color": "#DBDBDB",
+                "linestyle": 0,
+                "linewidth": 2
+              },
+              "developingPoc": {
+                "visible": false,
+                "color": "#DBDBDB",
+                "linestyle": 0,
+                "linewidth": 1
+              },
+              "developingVA": {
+                "visible": false,
+                "color": "#00bcd4",
+                "linestyle": 0,
+                "linewidth": 1
+              }
+            },
+            "volFootprintStyle": {
+              "drawWick": true,
+              "drawBorder": true,
+              "barColorsOnPrevClose": false,
+              "drawBody": true,
+              "upColor": "#089981",
+              "downColor": "#F23645",
+              "borderColor": "#378658",
+              "borderUpColor": "#089981",
+              "borderDownColor": "#F23645",
+              "wickColor": "#737375",
+              "wickUpColor": "#089981",
+              "wickDownColor": "#F23645",
+              "deltaAdjust": true,
+              "showSummary": true,
+              "summaryMode": 0,
+              "extendedSummary": {
+                "belowSeries": true,
+                "blockInfo": {
+                  "volume": {
+                    "visible": true
+                  },
+                  "volumePercentage": {
+                    "visible": false
+                  },
+                  "buyVolume": {
+                    "visible": false
+                  },
+                  "buyVolumePercentage": {
+                    "visible": false
+                  },
+                  "sellVolume": {
+                    "visible": false
+                  },
+                  "sellVolumePercentage": {
+                    "visible": false
+                  },
+                  "delta": {
+                    "visible": true
+                  },
+                  "deltaPercentage": {
+                    "visible": false
+                  },
+                  "minDelta": {
+                    "visible": false
+                  },
+                  "maxDelta": {
+                    "visible": false
+                  },
+                  "sessionCVD": {
+                    "visible": true
+                  },
+                  "pocPrice": {
+                    "visible": true
+                  },
+                  "hlRange": {
+                    "visible": false
+                  }
+                },
+                "openInterestBlockInfo": {
+                  "openInterest": {
+                    "visible": false
+                  }
+                },
+                "extendedOpenInterestBlockInfo": {
+                  "openInterestHigh": {
+                    "visible": false
+                  },
+                  "openInterestLow": {
+                    "visible": false
+                  }
+                }
+              },
+              "type": "Buy and sell",
+              "displayMode": 0,
+              "pointOfControl": true,
+              "bgColors": {
+                "adjBuyBgColors": [
+                  "#082621",
+                  "#004D40",
+                  "#06806B",
+                  "#22AB94"
+                ],
+                "adjSellBgColors": [
+                  "#331F20",
+                  "#991F29",
+                  "#CC2F3C",
+                  "#F7525F"
+                ],
+                "adjTotalBgColors": [
+                  "#142E61",
+                  "#143EB2",
+                  "#1E53E5",
+                  "#3179F5"
+                ],
+                "buyBgColor": "#004D40",
+                "sellBgColor": "#991F29",
+                "totalBgColor": "#143EB2",
+                "pocColor": "#DBDBDB"
+              },
+              "imbalanceHighlight": {
+                "buyColor": "#089981",
+                "sellColor": "#F23645",
+                "visible": true
+              },
+              "unfinishedAuction": {
+                "highColor": "#D500F9",
+                "lowColor": "#00e5ff"
+              },
+              "inputs": {
+                "rowSize": "Auto",
+                "atrLength": 14,
+                "imbalancePercent": 300,
+                "ticksPerRow": 100,
+                "showVA": true,
+                "vaPercent": 70,
+                "calcStackedImbalance": false,
+                "showUnfinishedAuction": false,
+                "stackedImbalanceCount": 3,
+                "ignore_zero_volume_for_imbalance_calc": false,
+                "minimal_imbalance_volume": 0
+              }
+            },
+            "baseLineColor": "#636363",
+            "prevClosePriceLineColor": "#555555",
+            "priceLineColor": "",
+            "timeframe": "",
+            "shortName": "BTCUSDT",
+            "currencyId": "XTVCUSDT",
+            "unitId": null,
+            "metricId": null,
+            "symbol": "BINANCE:BTCUSDT",
+            "interval": "2",
+            "showSessions": false,
+            "priceAxisProperties": {
+              "autoScale": true,
+              "autoScaleDisabled": true,
+              "lockScale": false,
+              "percentage": true,
+              "percentageDisabled": false,
+              "log": false,
+              "logDisabled": false,
+              "alignLabels": true,
+              "isInverted": false,
+              "indexedTo100": false
+            }
+          },
+          "first": {
+            "index": -24611,
+            "value": [
+              1788134400,
+              77682,
+              77682.01,
+              77572,
+              77674.04,
+              51.86295
+            ]
+          },
+          "last": {
+            "index": 301,
+            "value": [
+              1791123840,
+              85161.61,
+              85161.61,
+              85161.6,
+              85161.6,
+              0.06715
+            ]
+          },
+          "bars": 24913
+        },
+        "timezone": "Etc/UTC",
+        "replay": false,
+        "studies": [
+          {
+            "name": "Overlay",
+            "id": "Overlay@tv-basicstudies",
+            "properties": {
+              "inputs": {
+                "symbol": "BATS:SPY"
+              },
+              "styles": {
+                "open": {
+                  "display": 4294967295,
+                  "color": "#FF0000",
+                  "linestyle": 0,
+                  "linewidth": 1,
+                  "plottype": 0,
+                  "histogramBase": 0,
+                  "trackPrice": false,
+                  "transparency": 0,
+                  "visible": true,
+                  "title": "open"
+                },
+                "high": {
+                  "display": 4294967295,
+                  "color": "#FF0000",
+                  "linestyle": 0,
+                  "linewidth": 1,
+                  "plottype": 0,
+                  "histogramBase": 0,
+                  "trackPrice": false,
+                  "transparency": 0,
+                  "visible": true,
+                  "title": "high"
+                },
+                "low": {
+                  "display": 4294967295,
+                  "color": "#FF0000",
+                  "linestyle": 0,
+                  "linewidth": 1,
+                  "plottype": 0,
+                  "histogramBase": 0,
+                  "trackPrice": false,
+                  "transparency": 0,
+                  "visible": true,
+                  "title": "low"
+                },
+                "close": {
+                  "display": 4294967295,
+                  "color": "#FF0000",
+                  "linestyle": 0,
+                  "linewidth": 1,
+                  "plottype": 0,
+                  "histogramBase": 0,
+                  "trackPrice": false,
+                  "transparency": 0,
+                  "visible": true,
+                  "title": "close"
+                },
+                "volume": {
+                  "display": 4294967295,
+                  "color": "#FF0000",
+                  "linestyle": 0,
+                  "linewidth": 1,
+                  "plottype": 0,
+                  "histogramBase": 0
+                },
+                "xVolume": {
+                  "display": 4294967295,
+                  "linestyle": 0,
+                  "linewidth": 1,
+                  "plottype": 0,
+                  "trackPrice": false,
+                  "transparency": 0,
+                  "visible": true,
+                  "color": "#2962FF",
+                  "title": "xVolume"
+                }
+              },
+              "bands": {},
+              "graphics": {},
+              "ohlcPlots": {},
+              "palettes": {},
+              "filledAreasStyle": {},
+              "filledAreas": {},
+              "visible": true,
+              "showLegendValues": true,
+              "showLegendInputs": true,
+              "showLabelsOnPriceScale": true,
+              "precision": "default",
+              "style": 2,
+              "allowExtendTimeScale": false,
+              "showPriceLine": false,
+              "minTick": "default",
+              "candleStyle": {
+                "upColor": "#22AB94",
+                "downColor": "#ec407a",
+                "drawWick": true,
+                "drawBorder": true,
+                "drawBody": true,
+                "borderColor": "#378658",
+                "borderUpColor": "#22AB94",
+                "borderDownColor": "#ec407a",
+                "wickColor": "#737375",
+                "wickUpColor": "#22AB94",
+                "wickDownColor": "#ec407a",
+                "barColorsOnPrevClose": false
+              },
+              "hollowCandleStyle": {
+                "upColor": "#22AB94",
+                "downColor": "#ec407a",
+                "drawWick": true,
+                "drawBorder": true,
+                "drawBody": true,
+                "borderColor": "#378658",
+                "borderUpColor": "#22AB94",
+                "borderDownColor": "#ec407a",
+                "wickColor": "#737375",
+                "wickUpColor": "#22AB94",
+                "wickDownColor": "#ec407a",
+                "barColorsOnPrevClose": false
+              },
+              "barStyle": {
+                "upColor": "#22AB94",
+                "downColor": "#ec407a",
+                "barColorsOnPrevClose": false,
+                "dontDrawOpen": false,
+                "thinBars": true
+              },
+              "lineStyle": {
+                "color": "rgba(49, 121, 245, 1)",
+                "linestyle": 0,
+                "linewidth": 2,
+                "priceSource": "close"
+              },
+              "lineWithMarkersStyle": {
+                "color": "#F57C00",
+                "linestyle": 0,
+                "linewidth": 2,
+                "priceSource": "close"
+              },
+              "steplineStyle": {
+                "color": "#F57C00",
+                "linestyle": 0,
+                "linewidth": 2,
+                "priceSource": "close"
+              },
+              "areaStyle": {
+                "color1": "#2962FF",
+                "color2": "#2962FF",
+                "linecolor": "#2962FF",
+                "linestyle": 0,
+                "linewidth": 2,
+                "priceSource": "close",
+                "transparency": 95
+              },
+              "baselineStyle": {
+                "baselineColor": "#8C8C8C",
+                "topFillColor1": "rgba(66, 189, 127, 0.05)",
+                "topFillColor2": "rgba(66, 189, 127, 0.05)",
+                "bottomFillColor1": "rgba(247, 82, 95, 0.05)",
+                "bottomFillColor2": "rgba(247, 82, 95, 0.05)",
+                "topLineColor": "#42BD7F",
+                "bottomLineColor": "#F7525F",
+                "topLineWidth": 2,
+                "bottomLineWidth": 2,
+                "topLineStyle": 0,
+                "bottomLineStyle": 2,
+                "priceSource": "close",
+                "transparency": 50,
+                "baseLevelPercentage": 50
+              },
+              "hiloStyle": {
+                "color": "#2962FF",
+                "showBorders": true,
+                "borderColor": "#2962FF",
+                "showLabels": true,
+                "labelColor": "#2962FF",
+                "drawBody": true
+              },
+              "columnStyle": {
+                "upColor": "rgba(8, 153, 129, 0.5)",
+                "downColor": "rgba(242, 54, 69, 0.5)",
+                "barColorsOnPrevClose": true,
+                "priceSource": "close",
+                "baselinePosition": "bottom"
+              },
+              "hlcAreaStyle": {
+                "highLineVisible": true,
+                "highLineColor": "#00bcd4",
+                "highLineStyle": 0,
+                "highLineWidth": 2,
+                "lowLineVisible": true,
+                "lowLineColor": "#e91e63",
+                "lowLineStyle": 0,
+                "lowLineWidth": 2,
+                "closeLineColor": "#2962FF",
+                "closeLineStyle": 0,
+                "closeLineWidth": 2,
+                "highCloseFillColor": "rgba(0, 188, 212, 0.25)",
+                "closeLowFillColor": "rgba(233, 30, 99, 0.25)"
+              },
+              "hlcBarsStyle": {
+                "color": "#2962FF",
+                "barColorsOnPrevClose": false,
+                "thinBars": true
+              },
+              "currencyId": "USD",
+              "unitId": null,
+              "parentSources": [],
+              "metricId": null
+            },
+            "symbol_info": {
+              "exchange_traded_night_name": "BOATS",
+              "exchange_traded_night": "BOATS",
+              "night_symbol": "BOATS_LS:SPY",
+              "source2": {
+                "country": "US",
+                "description": "Cboe One",
+                "exchange-type": "exchange",
+                "id": "BATS",
+                "name": "Cboe One",
+                "url": "https://markets.cboe.com/us/equities/overview/"
+              },
+              "currency_code": "USD",
+              "source_id": "BATS",
+              "session_holidays": "20000117,20000221,20000421,20000529,20000704,20000904,20001123,20001225,20010101,20010115,20010219,20010413,20010528,20010704,20010903,20011122,20011225,20020101,20020121,20020218,20020329,20020527,20020704,20020902,20021128,20021225,20030101,20030120,20030217,20030418,20030526,20030704,20030901,20031127,20031225,20040101,20040119,20040216,20040409,20040531,20040611,20040705,20040906,20041125,20041224,20050117,20050221,20050325,20050530,20050704,20050905,20051124,20051226,20060102,20060116,20060220,20060414,20060529,20060704,20060904,20061123,20061225,20070101,20070102,20070115,20070219,20070406,20070528,20070704,20070903,20071122,20071225,20080101,20080121,20080218,20080321,20080526,20080704,20080901,20081127,20081225,20090101,20090119,20090216,20090410,20090525,20090703,20090907,20091126,20091225,20100101,20100118,20100215,20100402,20100531,20100705,20100906,20101125,20101224,20110117,20110221,20110422,20110530,20110704,20110905,20111124,20111226,20120102,20120116,20120220,20120406,20120528,20120704,20120903,20121122,20121225,20130101,20130121,20130218,20130329,20130527,20130704,20130902,20131128,20131225,20140101,20140120,20140217,20140418,20140526,20140704,20140901,20141127,20141225,20150101,20150119,20150216,20150403,20150525,20150703,20150907,20151126,20151225,20160101,20160118,20160215,20160325,20160530,20160704,20160905,20161124,20161226,20170102,20170116,20170220,20170414,20170529,20170704,20170904,20171123,20171225,20180101,20180115,20180219,20180330,20180528,20180704,20180903,20181122,20181225,20190101,20190121,20190218,20190419,20190527,20190704,20190902,20191128,20191225,20200101,20200120,20200217,20200410,20200525,20200703,20200907,20201126,20201225,20210101,20210118,20210215,20210402,20210531,20210705,20210906,20211125,20211224,20220117,20220221,20220415,20220530,20220620,20220704,20220905,20221124,20221226,20230102,20230116,20230220,20230407,20230529,20230619,20230704,20230904,20231123,20231225,20240101,20240115,20240219,20240329,20240527,20240619,20240704,20240902,20241128,20241225,20250101,20250120,20250217,20250418,20250526,20250619,20250704,20250901,20251127,20251225,20260101,20260119,20260216,20260403,20260525,20260619,20260703,20260907,20261126,20261225,20270101,20270118,20270215,20270326,20270531,20270618,20270705,20270906,20271125,20271224",
+              "subsession_id": "regular",
+              "provider_id": "ice",
+              "currency_id": "USD",
+              "country": "US",
+              "pro_perm": "amex",
+              "measure": "price",
+              "allowed_adjustment": "any",
+              "short_description": "SPDR S&P 500 ETF TRUST",
+              "variable_tick_size": "0.0001 1 0.01",
+              "cusip": "78462F103",
+              "isin": "US78462F1030",
+              "language": "en",
+              "local_description": "SPDR S&P 500 ETF TRUST",
+              "name": "SPY",
+              "full_name": "BATS:SPY",
+              "pro_name": "AMEX:SPY",
+              "base_name": [
+                "AMEX:SPY"
+              ],
+              "description": "State Street SPDR S&P 500 ETF",
+              "exchange": "Cboe One",
+              "pricescale": 100,
+              "pointvalue": 1,
+              "minmov": 1,
+              "session": "0930-1600",
+              "session_display": "0930-1600",
+              "subsessions": [
+                {
+                  "description": "Night",
+                  "id": "night",
+                  "private": true,
+                  "session": "2000-0400",
+                  "session-display": "2000-0400"
+                },
+                {
+                  "description": "24h",
+                  "id": "24h",
+                  "private": false,
+                  "session": "2000-2000",
+                  "session-display": "2000-2000"
+                },
+                {
+                  "description": "Premarket",
+                  "id": "premarket",
+                  "private": true,
+                  "session": "0400-0930",
+                  "session-display": "0400-0930"
+                },
+                {
+                  "description": "Regular Trading Hours",
+                  "id": "regular",
+                  "private": false,
+                  "session": "0930-1600",
+                  "session-correction": "0930-1300:20190703,20191129,20191224,20211126,20221125,20230703,20231124,20240703,20241129,20241224,20250703,20251128,20251224,20261127,20261224,20271126,20271223;dayoff:20250109",
+                  "session-display": "0930-1600"
+                },
+                {
+                  "description": "Postmarket",
+                  "id": "postmarket",
+                  "private": true,
+                  "session": "1600-2000",
+                  "session-correction": "1300-1700:20190703,20191129,20191224,20211126,20221125,20230703,20231124,20240703,20241129,20241224,20250703,20251128,20251224,20261127,20261224,20271126,20271223;dayoff:20250109",
+                  "session-display": "1600-2000"
+                },
+                {
+                  "description": "Extended Trading Hours",
+                  "id": "extended",
+                  "private": false,
+                  "session": "0400-2000",
+                  "session-correction": "0400-1700:20190703,20191129,20191224,20211126,20221125,20230703,20231124,20240703,20241129,20241224,20250703,20251128,20251224,20261127,20261224,20271126,20271223;dayoff:20250109",
+                  "session-display": "0400-2000"
+                }
+              ],
+              "type": "fund",
+              "typespecs": [
+                "etf"
+              ],
+              "has_intraday": true,
+              "fractional": false,
+              "listed_exchange": "AMEX",
+              "legs": [
+                "BATS:SPY"
+              ],
+              "is_tradable": true,
+              "minmove2": 0,
+              "timezone": "America/New_York",
+              "aliases": [],
+              "alternatives": [
+                "BATS_DLY:SPY"
+              ],
+              "is_replayable": true,
+              "has_adjustment": true,
+              "has_extended_hours": true,
+              "bar_source": "trade",
+              "bar_transform": "none",
+              "bar_fillgaps": false,
+              "visible_plots_set": "ohlcv",
+              "is-tickbars-available": true,
+              "exchange_listed_name": "AMEX",
+              "isin-displayed": "US78462F1030",
+              "figi": {
+                "country-composite": "BBG000BDTBL9",
+                "exchange-level": "BBG000BDTBL9"
+              },
+              "corrections": "0930-1300:20190703,20191129,20191224,20211126,20221125,20230703,20231124,20240703,20241129,20241224,20250703,20251128,20251224,20261127,20261224,20271126,20271223;dayoff:20250109"
+            },
+            "status": {
+              "type": 2
+            },
+            "first": {
+              "index": -24611,
+              "value": [
+                1788134400,
+                769.78,
+                769.82,
+                769.07,
+                769.38,
+                278460
+              ]
+            },
+            "last": {
+              "index": -972,
+              "value": [
+                1790971080,
+                769.67,
+                769.73,
+                769.17,
+                769.615,
+                299935
+              ]
+            },
+            "rows": 4681
+          },
+          {
+            "name": "Volume",
+            "id": "Volume@tv-basicstudies",
+            "properties": {
+              "inputs": {
+                "col_prev_close": false,
+                "length": 20
+              },
+              "styles": {
+                "vol": {
+                  "display": 4294967295,
+                  "linestyle": 0,
+                  "linewidth": 1,
+                  "plottype": 5,
+                  "trackPrice": false,
+                  "transparency": 50,
+                  "visible": true,
+                  "color": "#2962ff",
+                  "title": "vol"
+                },
+                "vol_ma": {
+                  "color": "#2962ff",
+                  "display": 0,
+                  "linestyle": 0,
+                  "linewidth": 1,
+                  "plottype": 0,
+                  "trackPrice": false,
+                  "transparency": 0,
+                  "visible": false,
+                  "title": "vol_ma"
+                }
+              },
+              "bands": {},
+              "graphics": {},
+              "ohlcPlots": {},
+              "palettes": {
+                "volumePalette": {
+                  "colors": {
+                    "0": {
+                      "color": "#26a69a",
+                      "style": 0,
+                      "width": 1
+                    },
+                    "1": {
+                      "color": "#ef5350",
+                      "style": 0,
+                      "width": 1
+                    }
+                  }
+                }
+              },
+              "filledAreasStyle": {},
+              "filledAreas": {},
+              "visible": true,
+              "showLegendValues": true,
+              "showLegendInputs": true,
+              "showLabelsOnPriceScale": true,
+              "precision": "default",
+              "parentSources": []
+            },
+            "status": {
+              "type": 2
+            },
+            "first": {
+              "index": -24611,
+              "value": [
+                1788134400,
+                51.86295,
+                1,
+                null
+              ]
+            },
+            "last": {
+              "index": 301,
+              "value": [
+                1791123840,
+                0.06715,
+                1,
+                6.129327499999775
+              ]
+            },
+            "rows": 24913
+          }
+        ]
+      },
+      "native_environment": {
+        "browser_utc": "2026-10-04T14:24:55.093Z",
+        "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+        "platform": "MacIntel",
+        "user_agent_data": {
+          "architecture": "",
+          "bitness": "",
+          "brands": [],
+          "fullVersionList": [],
+          "mobile": false,
+          "platform": "",
+          "platformVersion": ""
+        },
+        "device_pixel_ratio": 2,
+        "viewport": {
+          "width": 1440,
+          "height": 900,
+          "visual_viewport_scale": 1
+        },
+        "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v9 batch; visualViewport scale recorded independently.",
+        "tradingview_build": null,
+        "tradingview_script_urls": [
+          "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+          "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+          "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+          "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+          "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+          "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+          "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+          "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+          "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+          "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+          "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+          "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+        ],
+        "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+      },
+      "observation": {
+        "time": 1791123840,
+        "index": 301,
+        "label": "Sun 04 Oct '26   14:24",
+        "observed": "2026-10-04T14:24:51.876Z"
+      },
+      "export_utc": "2026-10-04T14:24:55.351Z",
+      "historical_compare_before_unix_seconds": 1791123840,
+      "live_boundary_confirmed_unchanged": true,
+      "limits": "Native BATS:SPY compare and BTC Volume added through actual UI after the unchanged source receipt. Compare output is not the original request.security post-merge series; native provider equivalence, request gaps and denominator are UNVERIFIED/UNEXPOSED. Original source has one final F-stat plot only.",
+      "csv_file": "captures/v9/w8-security-independent-series-corpus-v56-259-v1-companion-btc-spy-attempt1.csv",
+      "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T222454.381.csv",
+      "csv_sha256": "80234ca9af06fa120f33209a03a301a6688d50bc8d3daff1368657fa3f1e6575",
+      "csv_headers": [
+        "time",
+        "open",
+        "high",
+        "low",
+        "close",
+        "Volume",
+        "SPDR S&P 500 ETF TRUST \u00b7 AMEX: close",
+        "F-Stat (X Granger-causes Y, color=color.yellow, linewidth=2)"
+      ],
+      "csv_rows": 24913,
+      "first_cells": [
+        "1788134400",
+        "77682",
+        "77682.01",
+        "77572",
+        "77674.04",
+        "51.86295",
+        "769.38",
+        ""
+      ],
+      "last_cells": [
+        "1791123840",
+        "85161.61",
+        "85161.61",
+        "85161.6",
+        "85161.6",
+        "0.6502",
+        "",
+        ""
+      ],
+      "evidence_files": [
+        "captures/v9/evidence/w8-security-independent-series-corpus-v56-259-v1-companion-btc-spy-attempt1-setup-v1.png",
+        "captures/v9/evidence/w8-security-independent-series-corpus-v56-259-v1-companion-btc-spy-attempt1-export-v1.png"
+      ]
+    },
+    {
+      "artifact": "Granger native SPY feed companion v1",
+      "parent_source": "w8-security-independent-series-corpus-v56-259-v1.pine",
+      "parent_source_sha256": "18e13cd98d2f7ceccb2c00d799e61a3187c9287ec04145375474b913ba43e2e3",
+      "parent_attempt": 1,
+      "companion_interval": "2",
+      "attempt": 1,
+      "setup": {
+        "browser_utc": "2026-10-04T14:26:11.007Z",
+        "ticker": "BATS:SPY",
+        "interval": "2",
+        "style": 1,
+        "timezone": "Etc/UTC",
+        "replay": false,
+        "symbol_info": {
+          "exchange_traded_night_name": "BOATS",
+          "exchange_traded_night": "BOATS",
+          "night_symbol": "BOATS_LS:SPY",
+          "source2": {
+            "country": "US",
+            "description": "Cboe One",
+            "exchange-type": "exchange",
+            "id": "BATS",
+            "name": "Cboe One",
+            "url": "https://markets.cboe.com/us/equities/overview/"
+          },
+          "currency_code": "USD",
+          "source_id": "BATS",
+          "session_holidays": "20000117,20000221,20000421,20000529,20000704,20000904,20001123,20001225,20010101,20010115,20010219,20010413,20010528,20010704,20010903,20011122,20011225,20020101,20020121,20020218,20020329,20020527,20020704,20020902,20021128,20021225,20030101,20030120,20030217,20030418,20030526,20030704,20030901,20031127,20031225,20040101,20040119,20040216,20040409,20040531,20040611,20040705,20040906,20041125,20041224,20050117,20050221,20050325,20050530,20050704,20050905,20051124,20051226,20060102,20060116,20060220,20060414,20060529,20060704,20060904,20061123,20061225,20070101,20070102,20070115,20070219,20070406,20070528,20070704,20070903,20071122,20071225,20080101,20080121,20080218,20080321,20080526,20080704,20080901,20081127,20081225,20090101,20090119,20090216,20090410,20090525,20090703,20090907,20091126,20091225,20100101,20100118,20100215,20100402,20100531,20100705,20100906,20101125,20101224,20110117,20110221,20110422,20110530,20110704,20110905,20111124,20111226,20120102,20120116,20120220,20120406,20120528,20120704,20120903,20121122,20121225,20130101,20130121,20130218,20130329,20130527,20130704,20130902,20131128,20131225,20140101,20140120,20140217,20140418,20140526,20140704,20140901,20141127,20141225,20150101,20150119,20150216,20150403,20150525,20150703,20150907,20151126,20151225,20160101,20160118,20160215,20160325,20160530,20160704,20160905,20161124,20161226,20170102,20170116,20170220,20170414,20170529,20170704,20170904,20171123,20171225,20180101,20180115,20180219,20180330,20180528,20180704,20180903,20181122,20181225,20190101,20190121,20190218,20190419,20190527,20190704,20190902,20191128,20191225,20200101,20200120,20200217,20200410,20200525,20200703,20200907,20201126,20201225,20210101,20210118,20210215,20210402,20210531,20210705,20210906,20211125,20211224,20220117,20220221,20220415,20220530,20220620,20220704,20220905,20221124,20221226,20230102,20230116,20230220,20230407,20230529,20230619,20230704,20230904,20231123,20231225,20240101,20240115,20240219,20240329,20240527,20240619,20240704,20240902,20241128,20241225,20250101,20250120,20250217,20250418,20250526,20250619,20250704,20250901,20251127,20251225,20260101,20260119,20260216,20260403,20260525,20260619,20260703,20260907,20261126,20261225,20270101,20270118,20270215,20270326,20270531,20270618,20270705,20270906,20271125,20271224",
+          "subsession_id": "regular",
+          "provider_id": "ice",
+          "currency_id": "USD",
+          "country": "US",
+          "pro_perm": "amex",
+          "measure": "price",
+          "allowed_adjustment": "any",
+          "short_description": "SPDR S&P 500 ETF TRUST",
+          "variable_tick_size": "0.0001 1 0.01",
+          "cusip": "78462F103",
+          "isin": "US78462F1030",
+          "language": "en",
+          "local_description": "SPDR S&P 500 ETF TRUST",
+          "name": "SPY",
+          "full_name": "BATS:SPY",
+          "pro_name": "AMEX:SPY",
+          "base_name": [
+            "AMEX:SPY"
+          ],
+          "description": "State Street SPDR S&P 500 ETF",
+          "exchange": "Cboe One",
+          "pricescale": 100,
+          "pointvalue": 1,
+          "minmov": 1,
+          "session": "0930-1600",
+          "session_display": "0930-1600",
+          "subsessions": [
+            {
+              "description": "Night",
+              "id": "night",
+              "private": true,
+              "session": "2000-0400",
+              "session-display": "2000-0400"
+            },
+            {
+              "description": "24h",
+              "id": "24h",
+              "private": false,
+              "session": "2000-2000",
+              "session-display": "2000-2000"
+            },
+            {
+              "description": "Premarket",
+              "id": "premarket",
+              "private": true,
+              "session": "0400-0930",
+              "session-display": "0400-0930"
+            },
+            {
+              "description": "Regular Trading Hours",
+              "id": "regular",
+              "private": false,
+              "session": "0930-1600",
+              "session-correction": "0930-1300:20190703,20191129,20191224,20211126,20221125,20230703,20231124,20240703,20241129,20241224,20250703,20251128,20251224,20261127,20261224,20271126,20271223;dayoff:20250109",
+              "session-display": "0930-1600"
+            },
+            {
+              "description": "Postmarket",
+              "id": "postmarket",
+              "private": true,
+              "session": "1600-2000",
+              "session-correction": "1300-1700:20190703,20191129,20191224,20211126,20221125,20230703,20231124,20240703,20241129,20241224,20250703,20251128,20251224,20261127,20261224,20271126,20271223;dayoff:20250109",
+              "session-display": "1600-2000"
+            },
+            {
+              "description": "Extended Trading Hours",
+              "id": "extended",
+              "private": false,
+              "session": "0400-2000",
+              "session-correction": "0400-1700:20190703,20191129,20191224,20211126,20221125,20230703,20231124,20240703,20241129,20241224,20250703,20251128,20251224,20261127,20261224,20271126,20271223;dayoff:20250109",
+              "session-display": "0400-2000"
+            }
+          ],
+          "type": "fund",
+          "typespecs": [
+            "etf"
+          ],
+          "has_intraday": true,
+          "fractional": false,
+          "listed_exchange": "AMEX",
+          "legs": [
+            "BATS:SPY"
+          ],
+          "is_tradable": true,
+          "minmove2": 0,
+          "timezone": "America/New_York",
+          "aliases": [],
+          "alternatives": [
+            "BATS_DLY:SPY"
+          ],
+          "is_replayable": true,
+          "has_adjustment": true,
+          "has_extended_hours": true,
+          "bar_source": "trade",
+          "bar_transform": "none",
+          "bar_fillgaps": false,
+          "visible_plots_set": "ohlcv",
+          "is-tickbars-available": true,
+          "exchange_listed_name": "AMEX",
+          "isin-displayed": "US78462F1030",
+          "figi": {
+            "country-composite": "BBG000BDTBL9",
+            "exchange-level": "BBG000BDTBL9"
+          },
+          "corrections": "0930-1300:20190703,20191129,20191224,20211126,20221125,20230703,20231124,20240703,20241129,20241224,20250703,20251128,20251224,20261127,20261224,20271126,20271223;dayoff:20250109"
+        },
+        "main_properties": {
+          "style": 1,
+          "esdShowDividends": true,
+          "esdShowSplits": true,
+          "esdShowEarnings": true,
+          "esdShowBreaks": false,
+          "showContinuousContractSwitches": true,
+          "showContinuousContractSwitchesBreaks": false,
+          "showFuturesContractExpiration": true,
+          "showLastNews": true,
+          "showCountdown": true,
+          "visible": true,
+          "showPriceLine": true,
+          "priceLineWidth": 1,
+          "showPrevClosePriceLine": false,
+          "prevClosePriceLineWidth": 1,
+          "minTick": "default",
+          "dividendsAdjustment": false,
+          "backAdjustment": false,
+          "settlementAsClose": true,
+          "sessionId": "regular",
+          "bidAsk": {
+            "visible": false,
+            "lineStyle": 1,
+            "lineWidth": 1,
+            "bidLineColor": "#2962FF",
+            "askLineColor": "#F7525F"
+          },
+          "prePostMarket": {
+            "visible": true,
+            "lineStyle": 1,
+            "lineWidth": 1,
+            "preMarketColor": "#FB8C00",
+            "postMarketColor": "#2962FF",
+            "overnightMarketColor": "#8e24aa"
+          },
+          "highLowAvgPrice": {
+            "highLowPriceLinesVisible": false,
+            "highLowPriceLabelsVisible": false,
+            "averageClosePriceLineVisible": false,
+            "averageClosePriceLabelVisible": false,
+            "highLowPriceLinesWidth": 1,
+            "averagePriceLineWidth": 1,
+            "highLowPriceLinesColor": "",
+            "averagePriceLineColor": ""
+          },
+          "statusViewStyle": {
+            "fontSize": 16,
+            "showExchange": true,
+            "showInterval": true,
+            "symbolTextSource": "description"
+          },
+          "lineStyle": {
+            "linestyle": 0,
+            "linewidth": 2,
+            "priceSource": "close",
+            "colorType": "gradient",
+            "color": "#2962FF",
+            "gradientStartColor": "#D500F9",
+            "gradientEndColor": "#00BCE5"
+          },
+          "lineWithMarkersStyle": {
+            "linestyle": 0,
+            "linewidth": 2,
+            "priceSource": "close",
+            "colorType": "gradient",
+            "color": "#2962FF",
+            "gradientStartColor": "#D500F9",
+            "gradientEndColor": "#00BCE5"
+          },
+          "steplineStyle": {
+            "linestyle": 0,
+            "linewidth": 2,
+            "priceSource": "close",
+            "colorType": "gradient",
+            "color": "#2962FF",
+            "gradientStartColor": "#D500F9",
+            "gradientEndColor": "#00BCE5"
+          },
+          "baselineStyle": {
+            "topLineWidth": 2,
+            "bottomLineWidth": 2,
+            "topLineStyle": 0,
+            "bottomLineStyle": 0,
+            "priceSource": "close",
+            "transparency": 50,
+            "baseLevelPercentage": 50,
+            "baselineColor": "#8C8C8C",
+            "topFillColor1": "rgba(8, 153, 129, 0.28)",
+            "topFillColor2": "rgba(8, 153, 129, 0.05)",
+            "bottomFillColor1": "rgba(242, 54, 69, 0.05)",
+            "bottomFillColor2": "rgba(242, 54, 69, 0.28)",
+            "topLineColor": "#089981",
+            "bottomLineColor": "#F23645"
+          },
+          "areaStyle": {
+            "linestyle": 0,
+            "linewidth": 2,
+            "priceSource": "close",
+            "transparency": 100,
+            "color1": "rgba(41, 98, 255, 0.28)",
+            "color2": "#2962FF",
+            "linecolor": "#2962FF"
+          },
+          "hlcAreaStyle": {
+            "highLineVisible": true,
+            "highLineStyle": 0,
+            "highLineWidth": 2,
+            "lowLineVisible": true,
+            "lowLineStyle": 0,
+            "lowLineWidth": 2,
+            "closeLineStyle": 0,
+            "closeLineWidth": 2,
+            "highLineColor": "#00bcd4",
+            "lowLineColor": "#e91e63",
+            "closeLineColor": "#2962FF",
+            "highCloseFillColor": "rgba(0, 188, 212, 0.25)",
+            "closeLowFillColor": "rgba(233, 30, 99, 0.25)"
+          },
+          "barStyle": {
+            "barColorsOnPrevClose": false,
+            "dontDrawOpen": false,
+            "thinBars": true,
+            "downColor": "#F23645",
+            "upColor": "#089981"
+          },
+          "hlcBarsStyle": {
+            "thinBars": true,
+            "color": "#2962FF"
+          },
+          "candleStyle": {
+            "drawWick": true,
+            "drawBorder": true,
+            "barColorsOnPrevClose": false,
+            "drawBody": true,
+            "borderColor": "#378658",
+            "upColor": "#089981",
+            "wickColor": "#737375",
+            "wickUpColor": "#089981",
+            "wickDownColor": "#F23645",
+            "downColor": "#F23645",
+            "borderUpColor": "#089981",
+            "borderDownColor": "#F23645"
+          },
+          "volCandlesStyle": {
+            "drawWick": true,
+            "drawBorder": true,
+            "barColorsOnPrevClose": false,
+            "drawBody": true,
+            "borderColor": "#378658",
+            "upColor": "#089981",
+            "wickColor": "#737375",
+            "wickUpColor": "#089981",
+            "wickDownColor": "#F23645",
+            "downColor": "#F23645",
+            "borderUpColor": "#089981",
+            "borderDownColor": "#F23645"
+          },
+          "hollowCandleStyle": {
+            "drawWick": true,
+            "drawBorder": true,
+            "drawBody": true,
+            "upColor": "#089981",
+            "downColor": "#F23645",
+            "borderColor": "#378658",
+            "borderUpColor": "#089981",
+            "borderDownColor": "#F23645",
+            "wickColor": "#737375",
+            "wickUpColor": "#089981",
+            "wickDownColor": "#F23645"
+          },
+          "haStyle": {
+            "drawWick": true,
+            "drawBorder": true,
+            "showRealLastPrice": false,
+            "barColorsOnPrevClose": false,
+            "inputs": {},
+            "inputInfo": {},
+            "drawBody": true,
+            "borderColor": "#378658",
+            "upColor": "#089981",
+            "wickColor": "#737375",
+            "wickUpColor": "#089981",
+            "wickDownColor": "#F23645",
+            "downColor": "#F23645",
+            "borderUpColor": "#089981",
+            "borderDownColor": "#F23645"
+          },
+          "hiloStyle": {
+            "showBorders": true,
+            "showLabels": true,
+            "drawBody": true,
+            "color": "#2962FF",
+            "borderColor": "#2962FF",
+            "labelColor": "#2962FF"
+          },
+          "columnStyle": {
+            "barColorsOnPrevClose": true,
+            "priceSource": "close",
+            "baselinePosition": "bottom",
+            "upColor": "rgba(8, 153, 129, 0.5)",
+            "downColor": "rgba(242, 54, 69, 0.5)"
+          },
+          "renkoStyle": {
+            "inputs": {
+              "source": "close",
+              "sources": "Close",
+              "boxSize": 3,
+              "style": "ATR",
+              "atrLength": 14,
+              "percentageLTP": 1,
+              "wicks": true
+            },
+            "inputInfo": {
+              "source": {
+                "name": "Source"
+              },
+              "sources": {
+                "name": "Source"
+              },
+              "boxSize": {
+                "name": "Box size"
+              },
+              "style": {
+                "name": "Style"
+              },
+              "atrLength": {
+                "name": "ATR length"
+              },
+              "percentageLTP": {
+                "name": "Percentage"
+              },
+              "wicks": {
+                "name": "Wicks"
+              }
+            },
+            "upColor": "#089981",
+            "downColor": "#F23645",
+            "borderUpColor": "#089981",
+            "borderDownColor": "#F23645",
+            "upColorProjection": "#336854",
+            "downColorProjection": "#7f323f",
+            "borderUpColorProjection": "#336854",
+            "borderDownColorProjection": "#7f323f",
+            "wickUpColor": "#089981",
+            "wickDownColor": "#F23645"
+          },
+          "pbStyle": {
+            "inputs": {
+              "lb": 3
+            },
+            "inputInfo": {
+              "lb": {
+                "name": "Number of line"
+              }
+            },
+            "upColor": "#089981",
+            "downColor": "#F23645",
+            "borderUpColor": "#089981",
+            "borderDownColor": "#F23645",
+            "upColorProjection": "#336854",
+            "downColorProjection": "#7f323f",
+            "borderUpColorProjection": "#336854",
+            "borderDownColorProjection": "#7f323f"
+          },
+          "kagiStyle": {
+            "inputs": {
+              "style": "ATR",
+              "atrLength": 14,
+              "percentageLTP": 1,
+              "reversalAmount": 1
+            },
+            "inputInfo": {
+              "style": {
+                "name": "Style"
+              },
+              "atrLength": {
+                "name": "ATR length"
+              },
+              "percentageLTP": {
+                "name": "Percentage"
+              },
+              "reversalAmount": {
+                "name": "Reversal amount"
+              }
+            },
+            "downColor": "#F23645",
+            "upColor": "#089981",
+            "upColorProjection": "#336854",
+            "downColorProjection": "#7f323f"
+          },
+          "pnfStyle": {
+            "inputs": {
+              "sources": "Close",
+              "reversalAmount": 3,
+              "boxSize": 1,
+              "style": "ATR",
+              "atrLength": 14,
+              "percentageLTP": 1,
+              "oneStepBackBuilding": false
+            },
+            "inputInfo": {
+              "sources": {
+                "name": "Source"
+              },
+              "boxSize": {
+                "name": "Box size"
+              },
+              "reversalAmount": {
+                "name": "Reversal amount"
+              },
+              "style": {
+                "name": "Style"
+              },
+              "atrLength": {
+                "name": "ATR length"
+              },
+              "percentageLTP": {
+                "name": "Percentage"
+              },
+              "oneStepBackBuilding": {
+                "name": "One step back building"
+              }
+            },
+            "downColor": "#F23645",
+            "upColor": "#089981",
+            "upColorProjection": "#336854",
+            "downColorProjection": "#7f323f"
+          },
+          "rangeStyle": {
+            "barStyle": 0,
+            "thinBars": true,
+            "inputs": {
+              "range": 10,
+              "phantomBars": false
+            },
+            "inputInfo": {
+              "range": {
+                "name": "Range"
+              },
+              "phantomBars": {
+                "name": "Phantom bars"
+              }
+            },
+            "upColor": "#089981",
+            "downColor": "#F23645",
+            "upColorProjection": "#336854",
+            "downColorProjection": "#7f323f",
+            "candlesUpColor": "#089981",
+            "candlesDownColor": "#F23645",
+            "candlesBorderUpColor": "#089981",
+            "candlesBorderDownColor": "#F23645",
+            "candlesWickUpColor": "#089981",
+            "candlesWickDownColor": "#F23645"
+          },
+          "tpoStyle": {
+            "color": "#2962FF",
+            "linestyle": 0,
+            "linewidth": 2,
+            "styles": {
+              "splitByBlocks": false,
+              "splitByBlocksMode": 0
+            },
+            "inputs": {
+              "period": "Day",
+              "periodsNum": 1,
+              "profilesSessions": "All",
+              "customSession": "0930-1600",
+              "customSession2": "",
+              "customSession3": "",
+              "customSession4": "",
+              "customSession5": "",
+              "rowSize": "Auto",
+              "ticksPerRow": 10,
+              "vaPercent": 70,
+              "blockSize": "30m",
+              "mergePoints": "[]",
+              "extendPoorHigh": false,
+              "extendPoorLow": false,
+              "extendPOC": false,
+              "extendTpoVah": false,
+              "extendTpoVal": false,
+              "extendVolumePoc": false,
+              "extendVolumeVah": false,
+              "extendVolumeVal": false,
+              "extendSingleprints": false
+            },
+            "tpo": {
+              "colors": {
+                "gradientColors": [
+                  "#e91e63",
+                  "#00c853",
+                  "#00bcd4",
+                  "#651FFF"
+                ]
+              },
+              "showBlocks": true,
+              "showLetters": true,
+              "nonVaOpacity": 30
+            },
+            "levels": {
+              "showPOC": true,
+              "pocColor": "#DBDBDB",
+              "showPoorHigh": false,
+              "poorHighColor": "#7C4DFF",
+              "showPoorLow": false,
+              "poorLowColor": "#7C4DFF",
+              "showSingleprints": false,
+              "singleprintsColor": "rgba(224, 64, 251, 0.15)",
+              "showVAH": true,
+              "vahColor": "#DBDBDB",
+              "showVAL": true,
+              "valColor": "#DBDBDB",
+              "showMidpoint": false,
+              "showOpenPrice": false,
+              "showClosePrice": false,
+              "initialBalanceRange": {
+                "levels": 2,
+                "visible": true
+              }
+            },
+            "volumeProfile": {
+              "visible": true,
+              "valuesColor": "#DBDBDB",
+              "showValues": true,
+              "vah": {
+                "visible": false,
+                "color": "#DBDBDB",
+                "linestyle": 2,
+                "linewidth": 2
+              },
+              "val": {
+                "visible": false,
+                "color": "#DBDBDB",
+                "linestyle": 2,
+                "linewidth": 2
+              },
+              "poc": {
+                "visible": false,
+                "color": "#DBDBDB",
+                "linestyle": 0,
+                "linewidth": 2
+              },
+              "volumeColor": "rgba(38, 198, 218, 0.5)",
+              "valueAreaColor": "rgba(38, 198, 218, 0.75)",
+              "placement": "left_to_right"
+            },
+            "summary": {
+              "visible": false,
+              "belowSeries": true,
+              "infoBlocks": {
+                "hlRange": {
+                  "visible": false
+                },
+                "pocPrice": {
+                  "visible": true
+                },
+                "rotationFactor": {
+                  "visible": false
+                },
+                "totalVolume": {
+                  "visible": false
+                },
+                "tpoCountAbovePoc": {
+                  "visible": false
+                },
+                "tpoCountBelowPoc": {
+                  "visible": false
+                },
+                "tpoCountTotal": {
+                  "visible": false
+                },
+                "vaRange": {
+                  "visible": false
+                },
+                "vahPrice": {
+                  "visible": true
+                },
+                "valPrice": {
+                  "visible": true
+                },
+                "initialBalanceHigh": {
+                  "visible": true
+                },
+                "initialBalanceLow": {
+                  "visible": true
+                },
+                "initialBalanceRange": {
+                  "visible": true
+                }
+              }
+            },
+            "priceSource": "close"
+          },
+          "svpStyle": {
+            "inputs": {
+              "profilesSessions": "All",
+              "customSession": "0930-1600",
+              "customSessionTZ": "Exchange",
+              "volume": "Up/Down",
+              "vaVolume": 70,
+              "extendPocRight": false,
+              "extendVAHRight": false,
+              "extendVALRight": false,
+              "rowsLayout": "Number Of Rows",
+              "rows": 24
+            },
+            "volumeProfile": {
+              "visible": true,
+              "valuesColor": "#DBDBDB",
+              "showValues": false,
+              "volumeColorUp": "rgba(38, 198, 218, 0.5)",
+              "volumeColorDown": "rgba(236, 64, 122, 0.5)",
+              "valueAreaColorUp": "rgba(38, 198, 218, 0.75)",
+              "valueAreaColorDown": "rgba(236, 64, 122, 0.75)",
+              "histogramBoxColor": "rgba(38, 198, 218, 0.05)",
+              "placement": "left_to_right",
+              "percentWidth": 100
+            },
+            "vah": {
+              "visible": false,
+              "color": "#DBDBDB",
+              "linestyle": 2,
+              "linewidth": 2
+            },
+            "val": {
+              "visible": false,
+              "color": "#DBDBDB",
+              "linestyle": 2,
+              "linewidth": 2
+            },
+            "poc": {
+              "visible": true,
+              "color": "#DBDBDB",
+              "linestyle": 0,
+              "linewidth": 2
+            },
+            "developingPoc": {
+              "visible": false,
+              "color": "#DBDBDB",
+              "linestyle": 0,
+              "linewidth": 1
+            },
+            "developingVA": {
+              "visible": false,
+              "color": "#00bcd4",
+              "linestyle": 0,
+              "linewidth": 1
+            }
+          },
+          "volFootprintStyle": {
+            "drawWick": true,
+            "drawBorder": true,
+            "barColorsOnPrevClose": false,
+            "drawBody": true,
+            "upColor": "#089981",
+            "downColor": "#F23645",
+            "borderColor": "#378658",
+            "borderUpColor": "#089981",
+            "borderDownColor": "#F23645",
+            "wickColor": "#737375",
+            "wickUpColor": "#089981",
+            "wickDownColor": "#F23645",
+            "deltaAdjust": true,
+            "showSummary": true,
+            "summaryMode": 0,
+            "extendedSummary": {
+              "belowSeries": true,
+              "blockInfo": {
+                "volume": {
+                  "visible": true
+                },
+                "volumePercentage": {
+                  "visible": false
+                },
+                "buyVolume": {
+                  "visible": false
+                },
+                "buyVolumePercentage": {
+                  "visible": false
+                },
+                "sellVolume": {
+                  "visible": false
+                },
+                "sellVolumePercentage": {
+                  "visible": false
+                },
+                "delta": {
+                  "visible": true
+                },
+                "deltaPercentage": {
+                  "visible": false
+                },
+                "minDelta": {
+                  "visible": false
+                },
+                "maxDelta": {
+                  "visible": false
+                },
+                "sessionCVD": {
+                  "visible": true
+                },
+                "pocPrice": {
+                  "visible": true
+                },
+                "hlRange": {
+                  "visible": false
+                }
+              },
+              "openInterestBlockInfo": {
+                "openInterest": {
+                  "visible": false
+                }
+              },
+              "extendedOpenInterestBlockInfo": {
+                "openInterestHigh": {
+                  "visible": false
+                },
+                "openInterestLow": {
+                  "visible": false
+                }
+              }
+            },
+            "type": "Buy and sell",
+            "displayMode": 0,
+            "pointOfControl": true,
+            "bgColors": {
+              "adjBuyBgColors": [
+                "#082621",
+                "#004D40",
+                "#06806B",
+                "#22AB94"
+              ],
+              "adjSellBgColors": [
+                "#331F20",
+                "#991F29",
+                "#CC2F3C",
+                "#F7525F"
+              ],
+              "adjTotalBgColors": [
+                "#142E61",
+                "#143EB2",
+                "#1E53E5",
+                "#3179F5"
+              ],
+              "buyBgColor": "#004D40",
+              "sellBgColor": "#991F29",
+              "totalBgColor": "#143EB2",
+              "pocColor": "#DBDBDB"
+            },
+            "imbalanceHighlight": {
+              "buyColor": "#089981",
+              "sellColor": "#F23645",
+              "visible": true
+            },
+            "unfinishedAuction": {
+              "highColor": "#D500F9",
+              "lowColor": "#00e5ff"
+            },
+            "inputs": {
+              "rowSize": "Auto",
+              "atrLength": 14,
+              "imbalancePercent": 300,
+              "ticksPerRow": 100,
+              "showVA": true,
+              "vaPercent": 70,
+              "calcStackedImbalance": false,
+              "showUnfinishedAuction": false,
+              "stackedImbalanceCount": 3,
+              "ignore_zero_volume_for_imbalance_calc": false,
+              "minimal_imbalance_volume": 0
+            }
+          },
+          "baseLineColor": "#636363",
+          "prevClosePriceLineColor": "#555555",
+          "priceLineColor": "",
+          "timeframe": "",
+          "shortName": "SPY",
+          "currencyId": "USD",
+          "unitId": null,
+          "metricId": null,
+          "symbol": "BATS:SPY",
+          "interval": "2",
+          "showSessions": false,
+          "priceAxisProperties": {
+            "autoScale": true,
+            "autoScaleDisabled": false,
+            "lockScale": false,
+            "percentage": false,
+            "percentageDisabled": false,
+            "log": false,
+            "logDisabled": false,
+            "alignLabels": true,
+            "isInverted": false,
+            "indexedTo100": false
+          }
+        },
+        "first": {
+          "index": -20370,
+          "value": [
+            1777901400,
+            720.07,
+            720.25,
+            719.25,
+            719.72,
+            128084
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1790971080,
+            769.67,
+            769.73,
+            769.17,
+            769.615,
+            299935
+          ]
+        },
+        "bars": 20670,
+        "native_end_of_data": true,
+        "volume": {
+          "id": "Volume@tv-basicstudies",
+          "status": {
+            "type": 2
+          },
+          "plots": [
+            {
+              "id": "vol",
+              "type": "line"
+            },
+            {
+              "id": "vol_color",
+              "palette": "volumePalette",
+              "target": "vol",
+              "type": "colorer"
+            },
+            {
+              "id": "vol_ma",
+              "type": "line"
+            }
+          ],
+          "styles": {
+            "vol": {
+              "histogramBase": 0,
+              "title": "Volume"
+            },
+            "vol_ma": {
+              "histogramBase": 0,
+              "title": "Volume MA"
+            }
+          },
+          "properties": {
+            "inputs": {
+              "col_prev_close": false,
+              "length": 20
+            },
+            "styles": {
+              "vol": {
+                "display": 4294967295,
+                "linestyle": 0,
+                "linewidth": 1,
+                "plottype": 5,
+                "trackPrice": false,
+                "transparency": 50,
+                "visible": true,
+                "color": "#2962ff",
+                "title": "vol"
+              },
+              "vol_ma": {
+                "color": "#2962ff",
+                "display": 0,
+                "linestyle": 0,
+                "linewidth": 1,
+                "plottype": 0,
+                "trackPrice": false,
+                "transparency": 0,
+                "visible": false,
+                "title": "vol_ma"
+              }
+            },
+            "bands": {},
+            "graphics": {},
+            "ohlcPlots": {},
+            "palettes": {
+              "volumePalette": {
+                "colors": {
+                  "0": {
+                    "color": "#26a69a",
+                    "style": 0,
+                    "width": 1
+                  },
+                  "1": {
+                    "color": "#ef5350",
+                    "style": 0,
+                    "width": 1
+                  }
+                }
+              }
+            },
+            "filledAreasStyle": {},
+            "filledAreas": {},
+            "visible": true,
+            "showLegendValues": true,
+            "showLegendInputs": true,
+            "showLabelsOnPriceScale": true,
+            "precision": "default",
+            "parentSources": []
+          },
+          "first": {
+            "index": -20370,
+            "value": [
+              1777901400,
+              128084,
+              1,
+              null
+            ]
+          },
+          "last": {
+            "index": 299,
+            "value": [
+              1790971080,
+              299935,
+              1,
+              63143.85
+            ]
+          }
+        },
+        "viewport": {
+          "width": 1440,
+          "height": 900,
+          "dpr": 2
+        }
+      },
+      "native_environment": {
+        "browser_utc": "2026-10-04T14:26:14.800Z",
+        "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+        "platform": "MacIntel",
+        "user_agent_data": {
+          "architecture": "",
+          "bitness": "",
+          "brands": [],
+          "fullVersionList": [],
+          "mobile": false,
+          "platform": "",
+          "platformVersion": ""
+        },
+        "device_pixel_ratio": 2,
+        "viewport": {
+          "width": 1440,
+          "height": 900,
+          "visual_viewport_scale": 1
+        },
+        "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v9 batch; visualViewport scale recorded independently.",
+        "tradingview_build": null,
+        "tradingview_script_urls": [
+          "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+          "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+          "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+          "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+          "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+          "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+          "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+          "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+          "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+          "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+          "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+          "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+        ],
+        "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+      },
+      "observation": {
+        "time": 1790971080,
+        "index": 299,
+        "label": "Fri 02 Oct '26   19:58",
+        "observed": "2026-10-04T14:26:11.861Z"
+      },
+      "capture_utc": "2026-10-04T14:26:14.438Z",
+      "live_boundary_confirmed_unchanged": true,
+      "historical_compare_before_unix_seconds": 1790971080,
+      "limits": "Native chart feed with built-in Volume; original frozen Pine source was removed for this separate companion export. Feed bar origin is recorded, but internal request.security warmup/origin and expression values are unexposed. Do not label this a captured Pine request result or infer Pine index0.",
+      "csv_file": "captures/v9/w8-security-independent-series-corpus-v56-259-v1-companion-spy-2-attempt1.csv",
+      "original_download_filename": "BATS_SPY, 2.csv",
+      "csv_sha256": "7accda00c4cc401ba1261507282b445fb06020f49bd760c53ec093ba97d1b059",
+      "csv_headers": [
+        "time",
+        "open",
+        "high",
+        "low",
+        "close",
+        "Volume"
+      ],
+      "csv_rows": 20670,
+      "historical_rows": 20669,
+      "first_cells": [
+        "1777901400",
+        "720.07",
+        "720.25",
+        "719.25",
+        "719.72",
+        "128084"
+      ],
+      "last_cells": [
+        "1790971080",
+        "769.67",
+        "769.73",
+        "769.17",
+        "769.615",
+        "299935"
+      ],
+      "volume_column_position": 5
+    }
+  ],
+  "paired_completed_BTC_OHLC_and_F_stat_rows_exact": 24911,
+  "comparison_scope": "Completed original rows only; original live row excluded. BTC companion adds native Volume. Separate SPY chart provides native OHLCV/time/session/history. Native compare has regular-session SPY values; the final F-stat continues beyond the compare endpoint. These are separate observations and not proof of original request mapping.",
+  "host_complete_fixture": "NO: original merged SPY series, request provider execution origin and denominator remain unexposed; no source modification or invented series performed. Finite TV output alone is not engine numerical parity.",
+  "files_sha256": {
+    "captures/v9/evidence/w8-security-independent-series-corpus-v56-259-v1-companion-btc-spy-attempt1-receipt-v1.json": "c980fea770eca73cb081025fe0e141d55621539755ed36eedd7adea23cdae014",
+    "captures/v9/evidence/w8-security-independent-series-corpus-v56-259-v1-companion-spy-2-attempt1-receipt-v1.json": "e2dd25b6702565a3f32a170020b10270460c2ed0b9cace690ad2df39e470022b",
+    "captures/v9/w8-security-independent-series-corpus-v56-259-v1-companion-btc-spy-attempt1.csv": "80234ca9af06fa120f33209a03a301a6688d50bc8d3daff1368657fa3f1e6575",
+    "captures/v9/w8-security-independent-series-corpus-v56-259-v1-companion-spy-2-attempt1.csv": "7accda00c4cc401ba1261507282b445fb06020f49bd760c53ec093ba97d1b059"
+  }
+}
