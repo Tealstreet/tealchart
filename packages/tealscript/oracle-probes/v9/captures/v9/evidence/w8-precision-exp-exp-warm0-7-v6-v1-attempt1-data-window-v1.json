@@ -1,0 +1,54 @@
+{
+  "index": 298,
+  "bar": [
+    1791121320,
+    85216.01,
+    85240.01,
+    85204.95,
+    85230.01,
+    11.12454
+  ],
+  "source_row": [
+    1791121320,
+    85216.01,
+    85240.01,
+    85204.95,
+    85230.01,
+    11.12454,
+    1791121320000,
+    24891,
+    0.7316156289466418,
+    0,
+    0,
+    null,
+    null,
+    0,
+    null,
+    null,
+    0,
+    null,
+    null,
+    0,
+    null,
+    null,
+    0,
+    null,
+    null,
+    1791121320000,
+    24891
+  ],
+  "browser_utc": "2026-10-04T13:45:04.594Z",
+  "title": "coverage-math-1-v1 — BTCUSDT 2m",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   13:42",
+  "visible_range": {
+    "_firstBar": 263,
+    "_lastBar": 301
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}
