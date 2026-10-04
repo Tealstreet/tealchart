@@ -1,0 +1,364 @@
+{
+  "browser_utc": "2026-10-04T07:33:30.673Z",
+  "tickerid": "BINANCE:BTCUSDT",
+  "timeframe": "2",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "title": "V7 polyline-curved-asymmetric-v6-v1",
+  "native_status": {
+    "type": 2
+  },
+  "native_graphics": [
+    {
+      "name": "polylines",
+      "collections": [
+        {
+          "key": false,
+          "raw": [
+            [
+              1,
+              {
+                "id": 1,
+                "points": [
+                  {
+                    "x": 0,
+                    "y": 1
+                  },
+                  {
+                    "x": 1,
+                    "y": 4
+                  },
+                  {
+                    "x": 2,
+                    "y": -2
+                  },
+                  {
+                    "x": 3,
+                    "y": 2
+                  }
+                ],
+                "w": 1,
+                "crv": true,
+                "cls": false,
+                "c": 0,
+                "fc": null,
+                "st": "sol"
+              }
+            ],
+            [
+              2,
+              {
+                "id": 2,
+                "points": [
+                  {
+                    "x": 0,
+                    "y": 1
+                  },
+                  {
+                    "x": 1,
+                    "y": 4
+                  },
+                  {
+                    "x": 2,
+                    "y": -2
+                  },
+                  {
+                    "x": 3,
+                    "y": 2
+                  }
+                ],
+                "w": 1,
+                "crv": false,
+                "cls": false,
+                "c": 1,
+                "fc": null,
+                "st": "sol"
+              }
+            ]
+          ],
+          "materialized": [
+            {
+              "id": 1,
+              "points": [
+                {
+                  "x": 290,
+                  "y": 1
+                },
+                {
+                  "x": 292,
+                  "y": 4
+                },
+                {
+                  "x": 295,
+                  "y": -2
+                },
+                {
+                  "x": 298,
+                  "y": 2
+                }
+              ],
+              "width": 1,
+              "curved": true,
+              "closed": false,
+              "color": 0,
+              "fillColor": null,
+              "style": "sol"
+            },
+            {
+              "id": 2,
+              "points": [
+                {
+                  "x": 290,
+                  "y": 1
+                },
+                {
+                  "x": 292,
+                  "y": 4
+                },
+                {
+                  "x": 295,
+                  "y": -2
+                },
+                {
+                  "x": 298,
+                  "y": 2
+                }
+              ],
+              "width": 1,
+              "curved": false,
+              "closed": false,
+              "color": 1,
+              "fillColor": null,
+              "style": "sol"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "graphics_index_map": [
+    290,
+    292,
+    295,
+    298
+  ],
+  "properties": {
+    "inputs": {
+      "__fast_calc": false,
+      "__profile": false,
+      "pineFeatures": "{\"indicator\":1,\"array\":1,\"polyline\":1}",
+      "pineId": "",
+      "pineVersion": "",
+      "text": "bmI9Ks46_MGDE+ZgnF+GKQvKtrzV++A==_sa96FOIwaiycz3sj5KVjkUQ/csFiycXlKc72hiTwHVUfO3C7tlBh/UbnbskLUoi9WQbyGmrqf1ygJtDHU0vkPTyn3yutiosIvUz+XdaB8uwIsPDoaenxX/hiJ+gZs4nng2p41EJld8B/rO2KIcOy6cH04uQJ5aYZcjMQ8ktkVUr7ECNFOBPVFUiINV6JuEeU10e2VfujS41TZlln9tMpii0upH1hxb3ynuwsaQHEYuoNdUwwf9WHnK7T+qX6rg3ey6KKafT00TSaz5Ctu28IRJ2R2dIxG1JYtKzo1VadbCJpo6LgMQ9x43Vr7EkGkbLFYpOLdE2kdVFuYxXkyo4E6fG8CHbusltyzg/3l5mftn3ecPaxZTnMooChrMntlR9Kuw9qWc2XFo1Pz5s2rILi4lkDMbJkD/9cIgJc1NL9kDptuICyCaK2vAhZWeomhEOJlSR2IDkiOMFKGiJK7UjiTJ4TZnM0xbiUMhMfA+IhSjCF4vNmqkbtXmhX9+imKFfERNnNjvilE8DWPUEH1fTZ5Uv4A3AIDWeBQvCrwqk4ezDygIkTVchfA0rqXHvpwcgTr3rxylyxTLQ27bCaar2XXCcuLRx8N7LGsSGtp4ZNa+/4eMapNujrMSXRSJg4BIqp+pazP46wRaHqDKPzFYnP/BfKZZuVEBdem/iYtl50HbofyxSi3e9I43pNIjVdC7j3tRTsBeoup9LM6bEt3UviU+8pmhnYTw53K3jA5zIbjRmnpV9VoteitRQXC4n8ev/YLpukUh3Lct4pHnac415Xuehiw51+91RQHzdS5FxnWDi/SEXDk2RDYMXThv0N+39r5FAedkWtfyCWUZMz62uOU/flZLU6BroGrteXc4kRZtbrnvHw3FD2rZ1qfZEa4jqsE8xYzogpkBDYZlgHVHwnSyzDAx0qsBmN6KC2WXOCkQp8GggNEexYWJSKCtEqG4DNLHgAItwtjAjU23pHbk01L/aSlzU/MgKB9he5FQ=="
+    },
+    "styles": {},
+    "bands": {},
+    "graphics": {
+      "dwgpolylines": {
+        "polylines": {
+          "visible": true
+        }
+      }
+    },
+    "ohlcPlots": {},
+    "palettes": {
+      "palette_common": {
+        "colors": {
+          "0": {
+            "color": "rgba(242,54,69,1)"
+          },
+          "1": {
+            "color": "rgba(41,98,255,1)"
+          }
+        }
+      }
+    },
+    "filledAreasStyle": {},
+    "filledAreas": {},
+    "visible": true,
+    "showLegendValues": true,
+    "showLegendInputs": true,
+    "showLabelsOnPriceScale": true,
+    "precision": "default",
+    "parentSources": []
+  },
+  "vertices": [
+    {
+      "native_index": 290,
+      "price": 1,
+      "x_css_in_plot": 222.60000000000002,
+      "y_css_in_plot": 133.885,
+      "host_bar": [
+        1791098040,
+        84992.97,
+        84992.98,
+        84970.03,
+        84972,
+        9.21328
+      ]
+    },
+    {
+      "native_index": 292,
+      "price": 4,
+      "x_css_in_plot": 349.79999999999995,
+      "y_css_in_plot": 26.349999999999966,
+      "host_bar": [
+        1791098280,
+        84948.77,
+        84948.78,
+        84934,
+        84934,
+        4.9814
+      ]
+    },
+    {
+      "native_index": 295,
+      "price": -2,
+      "x_css_in_plot": 540.5999999999999,
+      "y_css_in_plot": 241.42,
+      "host_bar": [
+        1791098640,
+        84988,
+        85001.79,
+        84987.99,
+        84996.01,
+        13.88509
+      ]
+    },
+    {
+      "native_index": 298,
+      "price": 2,
+      "x_css_in_plot": 731.4,
+      "y_css_in_plot": 98.03999999999999,
+      "host_bar": [
+        1791099000,
+        84972.73,
+        84972.74,
+        84936.41,
+        84944.81,
+        12.29636
+      ]
+    }
+  ],
+  "plot_area_css": {
+    "width": 954,
+    "height": 263.5
+  },
+  "plot_area_device_pixels": {
+    "width": 1908,
+    "height": 527
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  },
+  "time_scale": {
+    "spacing": 63.6,
+    "visible": {
+      "_firstBar": 287,
+      "_lastBar": 301
+    }
+  },
+  "price_scale": {
+    "range": {
+      "_minValue": -2,
+      "_maxValue": 4
+    },
+    "mode": {
+      "autoScale": true,
+      "lockScale": false,
+      "percentage": false,
+      "indexedTo100": false,
+      "log": false
+    }
+  },
+  "canvas_rects": [
+    {
+      "device_width": 1908,
+      "device_height": 1053,
+      "css_rect": {
+        "x": 56,
+        "y": 42,
+        "width": 954,
+        "height": 526.5,
+        "top": 42,
+        "right": 1010,
+        "bottom": 568.5,
+        "left": 56
+      }
+    },
+    {
+      "device_width": 1908,
+      "device_height": 1053,
+      "css_rect": {
+        "x": 56,
+        "y": 42,
+        "width": 954,
+        "height": 526.5,
+        "top": 42,
+        "right": 1010,
+        "bottom": 568.5,
+        "left": 56
+      }
+    },
+    {
+      "device_width": 1908,
+      "device_height": 527,
+      "css_rect": {
+        "x": 56,
+        "y": 569.5,
+        "width": 954,
+        "height": 263.5,
+        "top": 569.5,
+        "right": 1010,
+        "bottom": 833,
+        "left": 56
+      }
+    },
+    {
+      "device_width": 1908,
+      "device_height": 527,
+      "css_rect": {
+        "x": 56,
+        "y": 569.5,
+        "width": 954,
+        "height": 263.5,
+        "top": 569.5,
+        "right": 1010,
+        "bottom": 833,
+        "left": 56
+      }
+    },
+    {
+      "device_width": 1908,
+      "device_height": 56,
+      "css_rect": {
+        "x": 56,
+        "y": 833,
+        "width": 954,
+        "height": 28,
+        "top": 833,
+        "right": 1010,
+        "bottom": 861,
+        "left": 56
+      }
+    },
+    {
+      "device_width": 1908,
+      "device_height": 56,
+      "css_rect": {
+        "x": 56,
+        "y": 833,
+        "width": 954,
+        "height": 28,
+        "top": 833,
+        "right": 1010,
+        "bottom": 861,
+        "left": 56
+      }
+    }
+  ],
+  "limits": "Native points, scale transformation and screenshot distinguish red curved vs blue straight stimulus. This does not certify any internal interpolation kernel.",
+  "ui_snapshot": "## Latest page snapshot\nuid=399_0 RootWebArea \"BTCUSDT 84,926.71 ▲ +0.2% basic\" url=\"https://www.tradingview.com/chart/xlvYwHdH/?symbol=BINANCE%3ABTCUSDT&interval=2\"\n  uid=399_1 button \"Logged in as sours-lat Active layout: basic\" haspopup=\"menu\"\n  uid=399_2 StaticText \"11\"\n  uid=399_3 button \"BTCUSDT\" description=\"Symbol search\"\n  uid=399_4 button \"Switch data type\"\n  uid=399_5 button \"Compare symbols\" haspopup=\"dialog\"\n  uid=399_6 radio \"3 minutes\"\n  uid=399_7 radio \"5 minutes\"\n  uid=399_8 radio \"15 minutes\"\n  uid=399_9 radio \"30 minutes\"\n  uid=399_10 radio \"45 minutes\"\n  uid=399_11 radio \"1 hour\"\n  uid=399_12 radio \"2 hours\"\n  uid=399_13 radio \"3 hours\"\n  uid=399_14 radio \"4 hours\"\n  uid=399_15 radio \"8 hours\"\n  uid=399_16 radio \"10 hours\"\n  uid=399_17 radio \"12 hours\"\n  uid=399_18 radio \"1 day\"\n  uid=399_19 radio \"3 days\"\n  uid=399_20 radio \"10 days\"\n  uid=399_21 radio \"1 week\"\n  uid=399_22 radio \"1 month\"\n  uid=399_23 radio \"2 minutes\" checked\n  uid=399_24 button \"Chart interval\" haspopup=\"menu\"\n  uid=399_25 radio \"Candles\" checked\n  uid=399_26 radio \"Line\"\n  uid=399_27 radio \"High-low\"\n  uid=399_28 button \"Bar's style\" haspopup=\"menu\"\n  uid=399_29 button \"Indicators, metrics, and strategies\"\n  uid=399_30 button \"Favorite indicators\" haspopup=\"menu\"\n  uid=399_31 button \"Indicator templates\" haspopup=\"menu\"\n  uid=399_32 button \"Create alert\"\n  uid=399_33 button \"Bar replay\"\n  uid=399_34 button disableable disabled\n  uid=399_35 button disableable disabled\n  uid=399_36 button \"Layout setup\" haspopup=\"menu\"\n  uid=399_37 button \"All changes saved\" disableable disabled\n  uid=399_38 button \"Manage layouts\" haspopup=\"menu\"\n  uid=399_39 button \"Quick search\"\n  uid=399_40 button \"Settings\"\n  uid=399_41 button \"Fullscreen mode\"\n  uid=399_42 button \"Take a snapshot\" haspopup=\"menu\"\n  uid=399_43 button \"Share your idea with the trade community\" haspopup=\"menu\"\n  uid=399_44 button \"Trade\"\n  uid=399_45 button \"Cross\"\n  uid=399_46 button \"Cursors\" pressed\n  uid=399_47 button \"Trendline\"\n  uid=399_48 button \"Trend tools\"\n  uid=399_49 button \"Fib retracement\"\n  uid=399_50 button \"Gann and Fibonacci tools\"\n  uid=399_51 button \"XABCD pattern\"\n  uid=399_52 button \"Patterns\"\n  uid=399_53 button \"Long position\"\n  uid=399_54 button \"Forecasting and measurement tools\"\n  uid=399_55 button \"Brush\"\n  uid=399_56 button \"Geometric shapes\"\n  uid=399_57 button \"Text\"\n  uid=399_58 button \"Annotation tools\"\n  uid=399_59 button \"Icon\"\n  uid=399_60 button \"Icons\"\n  uid=399_61 button \"Measure\"\n  uid=399_62 button \"Zoom in\"\n  uid=399_63 button \"Magnet mode snaps drawings placed near price bars to the closest OHLC value\" pressed\n  uid=399_64 button \"Magnets\" pressed\n  uid=399_65 button \"Keep drawing\"\n  uid=399_66 button \"Lock drawings and indicators\"\n  uid=399_67 button \"Lock options\"\n  uid=399_68 button \"Hide all drawings, indicators, positions, and orders\"\n  uid=399_69 button \"Hide options\"\n  uid=399_70 button \"New drawings will not be synced\"\n  uid=399_71 button \"Sync drawings options\"\n  uid=399_72 button \"Remove objects\"\n  uid=399_73 button \"Remove options\"\n  uid=399_74 button \"Show Favorite Drawing Tools Toolbar\"\n  uid=399_75 region \"Chart #1\"\n    uid=399_76 StaticText \"B\"\n    uid=399_77 button \"Change symbol\"\n    uid=399_78 StaticText \"·\"\n    uid=399_79 button \"Change interval\"\n    uid=399_78 StaticText \"·\"\n    uid=399_80 StaticText \"Binance\"\n    uid=399_81 button \"Unflag symbol\"\n    uid=399_82 button \"More\" description=\"More\"\n    uid=399_83 button \"Market open\"\n    uid=399_84 StaticText \"O\"\n    uid=399_85 StaticText \"84,972.73\"\n    uid=399_86 StaticText \"H\"\n    uid=399_87 StaticText \"84,972.74\"\n    uid=399_88 StaticText \"L\"\n    uid=399_89 StaticText \"84,936.41\"\n    uid=399_90 StaticText \"C\"\n    uid=399_91 StaticText \"84,944.81\"\n    uid=399_92 StaticText \"−27.93 (−0.03%)\"\n    uid=399_93 StaticText \"84,926.70\"\n    uid=407_0 StaticText \"SELL\"\n    uid=399_95 StaticText \"0.01\"\n    uid=399_96 StaticText \"84,926.71\"\n    uid=407_1 StaticText \"BUY\"\n    uid=399_98 Canvas \"Chart for BINANCE:BTCUSDT, 2 minutes\"\n    uid=399_99 StaticText \"V7 polyline-curved-asymmetric-v6-v1\"\n    uid=399_100 button \"Hide\" description=\"Hide\"\n    uid=399_101 button \"Settings\" description=\"Settings\"\n    uid=399_102 button \"Remove\" description=\"Remove\"\n    uid=399_103 button \"More\" description=\"More\"\n  uid=399_104 button \"1 day in 1 minute intervals\"\n  uid=399_105 button \"5 days in 5 minutes intervals\"\n  uid=399_106 button \"1 month in 30 minutes intervals\"\n  uid=399_107 button \"3 months in 1 hour intervals\"\n  uid=399_108 button \"6 months in 2 hours intervals\"\n  uid=399_109 button \"Year to day in 1 day intervals\"\n  uid=399_110 button \"1 year in 1 day intervals\"\n  uid=399_111 button \"5 years in 1 week intervals\"\n  uid=399_112 button \"All data in 1 month intervals\"\n  uid=399_113 button \"Go to\"\n  uid=399_114 button \"Timezone\"\n  uid=399_115 button \"Watchlist, details, and news\"\n  uid=399_116 button \"Alerts\"\n  uid=399_117 button \"Object tree and data window\" pressed\n  uid=399_118 button \"AI Copilot\"\n  uid=399_119 button \"Screeners\"\n  uid=399_120 button \"Pine\"\n  uid=399_121 button \"Calendars\"\n  uid=399_122 button \"Community\"\n  uid=399_123 button \"Notifications\"\n  uid=399_124 button \"Chats\"\n  uid=399_125 button \"Products\" haspopup=\"menu\"\n  uid=399_126 button \"Help Center\"\n  uid=405_0 tab \"Object tree\" selectable\n  uid=405_1 tab \"Data window\" selectable selected\n  uid=405_2 generic disableable disabled\n    uid=405_3 StaticText \"Date\"\n    uid=405_4 StaticText \"Sun 04 Oct '26\"\n    uid=405_5 StaticText \"Time\"\n    uid=405_6 StaticText \"07:30\"\n  uid=405_7 row \"BTCUSDT · 2 · Binance Open 84,972.73 High 84,972.74 Low 84,936.41 Close 84,944.81 Change −27.93 (−0.03%) Vol 12.3 Last day change +173.15 (+0.20%)\"\n    uid=405_8 StaticText \"BTCUSDT · 2 · Binance\"\n    uid=405_9 button \"Hide data\"\n    uid=405_10 StaticText \"Open\"\n    uid=405_11 StaticText \"84,972.73\"\n    uid=405_12 StaticText \"High\"\n    uid=405_13 StaticText \"84,972.74\"\n    uid=405_14 StaticText \"Low\"\n    uid=405_15 StaticText \"84,936.41\"\n    uid=405_16 StaticText \"Close\"\n    uid=405_17 StaticText \"84,944.81\"\n    uid=405_18 StaticText \"Change\"\n    uid=405_19 StaticText \"−27.93 (−0.03%)\"\n    uid=405_20 StaticText \"Vol\"\n    uid=405_21 StaticText \"12.3\"\n    uid=405_22 StaticText \"Last day change\"\n    uid=405_23 StaticText \"+173.15 (+0.20%)\"\n  uid=399_127 generic \"Trading panel\"\n    uid=399_128 generic\n  uid=399_129 generic live=\"polite\" relevant=\"additions\"\n  uid=399_130 generic live=\"polite\" relevant=\"additions\"\n  uid=399_131 generic live=\"assertive\" relevant=\"additions\"\n  uid=399_132 generic live=\"assertive\" relevant=\"additions\"\n  uid=399_133 generic live=\"polite\" relevant=\"additions text\"\n  uid=399_134 log live=\"polite\" relevant=\"additions text\"\n  uid=399_135 log live=\"polite\" relevant=\"additions text\"\n  uid=399_136 log live=\"polite\" relevant=\"additions text\"\n  uid=399_137 log live=\"polite\" relevant=\"additions text\"\n  uid=399_138 log live=\"polite\" relevant=\"additions text\"\n  uid=399_139 log live=\"polite\" relevant=\"additions text\"\n  uid=399_140 log live=\"polite\" relevant=\"additions text\"\n  uid=399_141 log live=\"polite\" relevant=\"additions text\"\n  uid=399_142 log live=\"polite\" relevant=\"additions text\"\n  uid=399_143 log live=\"polite\" relevant=\"additions text\"\n  uid=399_144 log live=\"polite\" relevant=\"additions text\"\n  uid=399_145 log live=\"polite\" relevant=\"additions text\"\n  uid=399_146 log live=\"polite\" relevant=\"additions text\"\n  uid=399_147 log live=\"polite\" relevant=\"additions text\"\n  uid=399_148 log live=\"polite\" relevant=\"additions text\"\n  uid=399_149 log live=\"polite\" relevant=\"additions text\"\n  uid=399_150 log live=\"polite\" relevant=\"additions text\"\n  uid=399_151 log live=\"polite\" relevant=\"additions text\"\n  uid=399_152 log live=\"polite\" relevant=\"additions text\"\n  uid=399_153 log live=\"polite\" relevant=\"additions text\"\n  uid=399_154 log live=\"polite\" relevant=\"additions text\"\n"
+}
