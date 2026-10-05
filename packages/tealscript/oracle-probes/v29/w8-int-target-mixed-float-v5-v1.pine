@@ -1,0 +1,10 @@
+//@version=5
+indicator("w8-int-target-mixed-float-v5-v1", overlay=false, max_labels_count=10)
+n = input.int(9, "Numerator", minval=1)
+d = input.int(2, "Divisor", minval=1)
+f = input.float(9.0, "Float numerator")
+int target = f / d
+plot(bar_index,"CHART_INDEX")
+plot(f / d,"RAW_QUOTIENT")
+plot(target,"INT_TARGET")
+plot(int(f / d),"EXPLICIT_INT_CONTROL")

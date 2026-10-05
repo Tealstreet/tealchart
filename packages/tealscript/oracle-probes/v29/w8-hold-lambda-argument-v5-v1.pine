@@ -1,0 +1,4 @@
+//@version=5
+indicator("w8-hold-lambda-argument-v5-v1",overlay=false)
+values = array.new_string(10, (i) => str.tostring(i))
+plot(array.size(values),"SIZE")

@@ -1,0 +1,5 @@
+//@version=6
+indicator("w8-hold-size-renamed-control-v6-v1",overlay=false)
+scalarSize = array.size(array.from(close))
+plotshape(true,title="SHAPE",size=size.tiny)
+plot(scalarSize,"SCALAR_SIZE")

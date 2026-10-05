@@ -1,0 +1,3638 @@
+{
+  "schemaVersion": 1,
+  "bundle": "v29",
+  "version": 4,
+  "status": "SHIP-REVIEW",
+  "frozen": true,
+  "scripts": [
+    {
+      "probe": "zero-division-observability-j-v1.pine",
+      "path": "zero-division-observability-j-v1.pine",
+      "owner": "codex-9tqhik",
+      "sourceSha256": "af89301ddef75cef1adf641f9a166a153182a0ac48c173f914e60421135b4943",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "columns": [
+        "INPUT_CLOSE",
+        "INPUT_BAR_INDEX",
+        "POS_RAW",
+        "POS_IS_NA",
+        "POS_NZ42",
+        "NEG_RAW",
+        "NEG_IS_NA",
+        "NEG_NZ42",
+        "ZERO_RAW",
+        "ZERO_IS_NA",
+        "ZERO_NZ42",
+        "POS_ASSIGNED_COMPOSITE",
+        "POS_INLINE_COMPOSITE",
+        "NEG_ASSIGNED_COMPOSITE",
+        "NEG_INLINE_COMPOSITE",
+        "ZERO_ASSIGNED_COMPOSITE",
+        "ZERO_INLINE_COMPOSITE",
+        "POS_DIRECT_IS_NA",
+        "POS_DIRECT_NZ42",
+        "FINITE_CONTROL"
+      ],
+      "captureKind": "compile-outcome+runtime-outcome+raw-csv+context+snapshot",
+      "ledgerRanks": [
+        1851
+      ],
+      "instructionsPath": "instructions/zero-division-observability-j-v1-instructions-v2.md",
+      "instructionsSha256": "90479314bb0501774d0485f89496649e1e349b65f03f49407a66ac28c1b94fc3",
+      "questions": [
+        "Does positive/negative finite numerator divided by dynamic zero satisfy na(), and does nz(...,42) replace it?",
+        "Does zero/zero differ from positive/negative numerator zero division?",
+        "Do inline and assigned zero ratios preserve finite100 in the composite100-100/(1+ratio)?",
+        "Do direct-expression na/nz observations differ from observing an assigned ratio?"
+      ],
+      "nativeStatus": "UNOBSERVED",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC",
+        "chartType": "STANDARD-CANDLES",
+        "minimumHistoricalBars": 100
+      }
+    },
+    {
+      "probe": "w8-int-target-direct-v5-v1.pine",
+      "path": "w8-int-target-direct-v5-v1.pine",
+      "owner": "codex-w8oe9i",
+      "sourceSha256": "0ba2b797b28c7981a814f31e8c75522e51b65c4595d86b824c9f25b1de1670c2",
+      "pineVersion": 5,
+      "indicatorOnly": true,
+      "columns": [
+        "CHART_INDEX",
+        "RAW_QUOTIENT",
+        "INT_TARGET",
+        "EXPLICIT_INT_CONTROL"
+      ],
+      "captureKind": "compile-outcome+runtime-outcome+raw-csv+context+snapshot",
+      "question": "Does the exact shape compile? If RUNS, compare target with raw quotient and explicit int control. Mixed-float is isolated so a refusal cannot hide accepted shapes.",
+      "root": "integer-division-int-target",
+      "shape": "direct",
+      "comparisonIds": [
+        "v7:381",
+        "v7:389",
+        "v56:164",
+        "v56:279",
+        "v56:282",
+        "v56:303",
+        "v56:485",
+        "v56:486",
+        "v56:500",
+        "v56:513",
+        "v56:514",
+        "v56:732",
+        "v56:782",
+        "v56:996",
+        "v56:1242",
+        "v56:1287",
+        "v56:1417"
+      ],
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC"
+      },
+      "instructionsPath": "instructions/w8-int-target-direct-v5-v1-capture-instructions-v3.md",
+      "instructionsSha256": "4ac5ea8cbc951bbd278740a149824e7601332b6e2338ef37caa2fbd9de84cc49",
+      "columnsSha256": "dc08c6f88f91f2f5ae5c83575c256e8d8d4d40dbc2594377292b5941f1a7ca1c",
+      "stagedColumnsPath": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v29-staged/w8-int-target-direct-v5-v1.columns-v1.json",
+      "nativeStatus": "UNOBSERVED",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      }
+    },
+    {
+      "probe": "w8-int-target-nested-v5-v1.pine",
+      "path": "w8-int-target-nested-v5-v1.pine",
+      "owner": "codex-w8oe9i",
+      "sourceSha256": "98f644d8894234b7597bdc7bc11897c5abdcd3f5ce16f569ced87c50995d984d",
+      "pineVersion": 5,
+      "indicatorOnly": true,
+      "columns": [
+        "CHART_INDEX",
+        "RAW_QUOTIENT",
+        "INT_TARGET",
+        "EXPLICIT_INT_CONTROL"
+      ],
+      "captureKind": "compile-outcome+runtime-outcome+raw-csv+context+snapshot",
+      "question": "Does the exact shape compile? If RUNS, compare target with raw quotient and explicit int control. Mixed-float is isolated so a refusal cannot hide accepted shapes.",
+      "root": "integer-division-int-target",
+      "shape": "nested",
+      "comparisonIds": [
+        "v7:381",
+        "v7:389",
+        "v56:164",
+        "v56:279",
+        "v56:282",
+        "v56:303",
+        "v56:485",
+        "v56:486",
+        "v56:500",
+        "v56:513",
+        "v56:514",
+        "v56:732",
+        "v56:782",
+        "v56:996",
+        "v56:1242",
+        "v56:1287",
+        "v56:1417"
+      ],
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC"
+      },
+      "instructionsPath": "instructions/w8-int-target-nested-v5-v1-capture-instructions-v3.md",
+      "instructionsSha256": "4ac5ea8cbc951bbd278740a149824e7601332b6e2338ef37caa2fbd9de84cc49",
+      "columnsSha256": "51718c1b23c926115017441c4f1f0f165255c594276d48c3f1e094dfe8aa3c48",
+      "stagedColumnsPath": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v29-staged/w8-int-target-nested-v5-v1.columns-v1.json",
+      "nativeStatus": "UNOBSERVED",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      }
+    },
+    {
+      "probe": "w8-int-target-reassigned-v5-v1.pine",
+      "path": "w8-int-target-reassigned-v5-v1.pine",
+      "owner": "codex-w8oe9i",
+      "sourceSha256": "50be2db1fe3cc1a8d6cf1c201143d7a0f7d5ded39cc8f4fc55c453f881e159b9",
+      "pineVersion": 5,
+      "indicatorOnly": true,
+      "columns": [
+        "CHART_INDEX",
+        "RAW_QUOTIENT",
+        "INT_TARGET",
+        "EXPLICIT_INT_CONTROL"
+      ],
+      "captureKind": "compile-outcome+runtime-outcome+raw-csv+context+snapshot",
+      "question": "Does the exact shape compile? If RUNS, compare target with raw quotient and explicit int control. Mixed-float is isolated so a refusal cannot hide accepted shapes.",
+      "root": "integer-division-int-target",
+      "shape": "reassigned",
+      "comparisonIds": [
+        "v7:381",
+        "v7:389",
+        "v56:164",
+        "v56:279",
+        "v56:282",
+        "v56:303",
+        "v56:485",
+        "v56:486",
+        "v56:500",
+        "v56:513",
+        "v56:514",
+        "v56:732",
+        "v56:782",
+        "v56:996",
+        "v56:1242",
+        "v56:1287",
+        "v56:1417"
+      ],
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC"
+      },
+      "instructionsPath": "instructions/w8-int-target-reassigned-v5-v1-capture-instructions-v3.md",
+      "instructionsSha256": "4ac5ea8cbc951bbd278740a149824e7601332b6e2338ef37caa2fbd9de84cc49",
+      "columnsSha256": "b58e04687f14c89b80632781216f69f01c29336cbbf54da39f18b680f640f3e5",
+      "stagedColumnsPath": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v29-staged/w8-int-target-reassigned-v5-v1.columns-v1.json",
+      "nativeStatus": "UNOBSERVED",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      }
+    },
+    {
+      "probe": "w8-int-target-compound-v5-v1.pine",
+      "path": "w8-int-target-compound-v5-v1.pine",
+      "owner": "codex-w8oe9i",
+      "sourceSha256": "53abc50809e5ccf29e474b49464c624d986718660f3cf927e190bb316258f7b4",
+      "pineVersion": 5,
+      "indicatorOnly": true,
+      "columns": [
+        "CHART_INDEX",
+        "RAW_QUOTIENT",
+        "INT_TARGET",
+        "EXPLICIT_INT_CONTROL"
+      ],
+      "captureKind": "compile-outcome+runtime-outcome+raw-csv+context+snapshot",
+      "question": "Does the exact shape compile? If RUNS, compare target with raw quotient and explicit int control. Mixed-float is isolated so a refusal cannot hide accepted shapes.",
+      "root": "integer-division-int-target",
+      "shape": "compound",
+      "comparisonIds": [
+        "v7:381",
+        "v7:389",
+        "v56:164",
+        "v56:279",
+        "v56:282",
+        "v56:303",
+        "v56:485",
+        "v56:486",
+        "v56:500",
+        "v56:513",
+        "v56:514",
+        "v56:732",
+        "v56:782",
+        "v56:996",
+        "v56:1242",
+        "v56:1287",
+        "v56:1417"
+      ],
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC"
+      },
+      "instructionsPath": "instructions/w8-int-target-compound-v5-v1-capture-instructions-v3.md",
+      "instructionsSha256": "4ac5ea8cbc951bbd278740a149824e7601332b6e2338ef37caa2fbd9de84cc49",
+      "columnsSha256": "4a9b6eef2a0377b9fcc2f0d31e764e8442b8058f1fc6066cf65628da626ec7a4",
+      "stagedColumnsPath": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v29-staged/w8-int-target-compound-v5-v1.columns-v1.json",
+      "nativeStatus": "UNOBSERVED",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      }
+    },
+    {
+      "probe": "w8-int-target-ternary-v5-v1.pine",
+      "path": "w8-int-target-ternary-v5-v1.pine",
+      "owner": "codex-w8oe9i",
+      "sourceSha256": "f25a6ed473c50d1fd4077c2431d21e21eb8464a0f3ade9bb677eb25c201a9ac4",
+      "pineVersion": 5,
+      "indicatorOnly": true,
+      "columns": [
+        "CHART_INDEX",
+        "RAW_QUOTIENT",
+        "INT_TARGET",
+        "EXPLICIT_INT_CONTROL"
+      ],
+      "captureKind": "compile-outcome+runtime-outcome+raw-csv+context+snapshot",
+      "question": "Does the exact shape compile? If RUNS, compare target with raw quotient and explicit int control. Mixed-float is isolated so a refusal cannot hide accepted shapes.",
+      "root": "integer-division-int-target",
+      "shape": "ternary",
+      "comparisonIds": [
+        "v7:381",
+        "v7:389",
+        "v56:164",
+        "v56:279",
+        "v56:282",
+        "v56:303",
+        "v56:485",
+        "v56:486",
+        "v56:500",
+        "v56:513",
+        "v56:514",
+        "v56:732",
+        "v56:782",
+        "v56:996",
+        "v56:1242",
+        "v56:1287",
+        "v56:1417"
+      ],
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC"
+      },
+      "instructionsPath": "instructions/w8-int-target-ternary-v5-v1-capture-instructions-v3.md",
+      "instructionsSha256": "4ac5ea8cbc951bbd278740a149824e7601332b6e2338ef37caa2fbd9de84cc49",
+      "columnsSha256": "6d0162ab028d7d05b3dc93de2c00943909e9e6245bb7a66f6dba812c7843eb54",
+      "stagedColumnsPath": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v29-staged/w8-int-target-ternary-v5-v1.columns-v1.json",
+      "nativeStatus": "UNOBSERVED",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      }
+    },
+    {
+      "probe": "w8-int-target-explicit-int-v5-v1.pine",
+      "path": "w8-int-target-explicit-int-v5-v1.pine",
+      "owner": "codex-w8oe9i",
+      "sourceSha256": "cc76582fa70cdad7d2a8f6106f102e98b5e0e862d04345c77790a88b2c56c878",
+      "pineVersion": 5,
+      "indicatorOnly": true,
+      "columns": [
+        "CHART_INDEX",
+        "RAW_QUOTIENT",
+        "INT_TARGET",
+        "EXPLICIT_INT_CONTROL"
+      ],
+      "captureKind": "compile-outcome+runtime-outcome+raw-csv+context+snapshot",
+      "question": "Does the exact shape compile? If RUNS, compare target with raw quotient and explicit int control. Mixed-float is isolated so a refusal cannot hide accepted shapes.",
+      "root": "integer-division-int-target",
+      "shape": "explicit-int",
+      "comparisonIds": [
+        "v7:381",
+        "v7:389",
+        "v56:164",
+        "v56:279",
+        "v56:282",
+        "v56:303",
+        "v56:485",
+        "v56:486",
+        "v56:500",
+        "v56:513",
+        "v56:514",
+        "v56:732",
+        "v56:782",
+        "v56:996",
+        "v56:1242",
+        "v56:1287",
+        "v56:1417"
+      ],
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC"
+      },
+      "instructionsPath": "instructions/w8-int-target-explicit-int-v5-v1-capture-instructions-v3.md",
+      "instructionsSha256": "4ac5ea8cbc951bbd278740a149824e7601332b6e2338ef37caa2fbd9de84cc49",
+      "columnsSha256": "8b55101854c4efb27d14e258d2561f58af312dbbb4a5022d4752f177c2148e1e",
+      "stagedColumnsPath": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v29-staged/w8-int-target-explicit-int-v5-v1.columns-v1.json",
+      "nativeStatus": "UNOBSERVED",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      }
+    },
+    {
+      "probe": "w8-int-target-mixed-float-v5-v1.pine",
+      "path": "w8-int-target-mixed-float-v5-v1.pine",
+      "owner": "codex-w8oe9i",
+      "sourceSha256": "6bf402328e13819867d72c565e1e605c58b60aa8992efa5e560e6511e10261d9",
+      "pineVersion": 5,
+      "indicatorOnly": true,
+      "columns": [
+        "CHART_INDEX",
+        "RAW_QUOTIENT",
+        "INT_TARGET",
+        "EXPLICIT_INT_CONTROL"
+      ],
+      "captureKind": "compile-outcome+runtime-outcome+raw-csv+context+snapshot",
+      "question": "Does the exact shape compile? If RUNS, compare target with raw quotient and explicit int control. Mixed-float is isolated so a refusal cannot hide accepted shapes.",
+      "root": "integer-division-int-target",
+      "shape": "mixed-float",
+      "comparisonIds": [
+        "v7:381",
+        "v7:389",
+        "v56:164",
+        "v56:279",
+        "v56:282",
+        "v56:303",
+        "v56:485",
+        "v56:486",
+        "v56:500",
+        "v56:513",
+        "v56:514",
+        "v56:732",
+        "v56:782",
+        "v56:996",
+        "v56:1242",
+        "v56:1287",
+        "v56:1417"
+      ],
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC"
+      },
+      "instructionsPath": "instructions/w8-int-target-mixed-float-v5-v1-capture-instructions-v3.md",
+      "instructionsSha256": "4ac5ea8cbc951bbd278740a149824e7601332b6e2338ef37caa2fbd9de84cc49",
+      "columnsSha256": "780404d554cad101dd81da6490d1a02b14365657ea7065b44389a4a62b52c16a",
+      "stagedColumnsPath": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v29-staged/w8-int-target-mixed-float-v5-v1.columns-v1.json",
+      "nativeStatus": "UNOBSERVED",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      }
+    },
+    {
+      "probe": "w8-int-target-direct-v6-v1.pine",
+      "path": "w8-int-target-direct-v6-v1.pine",
+      "owner": "codex-w8oe9i",
+      "sourceSha256": "cbc0fc9564f575535d1c0c2f4b594107435afdf0ebd1eafc6f27a2ae01a76204",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "columns": [
+        "CHART_INDEX",
+        "RAW_QUOTIENT",
+        "INT_TARGET",
+        "EXPLICIT_INT_CONTROL"
+      ],
+      "captureKind": "compile-outcome+runtime-outcome+raw-csv+context+snapshot",
+      "question": "Does the exact shape compile? If RUNS, compare target with raw quotient and explicit int control. Mixed-float is isolated so a refusal cannot hide accepted shapes.",
+      "root": "integer-division-int-target",
+      "shape": "direct",
+      "comparisonIds": [
+        "v7:381",
+        "v7:389",
+        "v56:164",
+        "v56:279",
+        "v56:282",
+        "v56:303",
+        "v56:485",
+        "v56:486",
+        "v56:500",
+        "v56:513",
+        "v56:514",
+        "v56:732",
+        "v56:782",
+        "v56:996",
+        "v56:1242",
+        "v56:1287",
+        "v56:1417"
+      ],
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC"
+      },
+      "instructionsPath": "instructions/w8-int-target-direct-v6-v1-capture-instructions-v3.md",
+      "instructionsSha256": "4ac5ea8cbc951bbd278740a149824e7601332b6e2338ef37caa2fbd9de84cc49",
+      "columnsSha256": "0b0a6294b86c8d73a33f2feef5579ce56970e578784e9c611de7756a1d2176a2",
+      "stagedColumnsPath": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v29-staged/w8-int-target-direct-v6-v1.columns-v1.json",
+      "nativeStatus": "UNOBSERVED",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      }
+    },
+    {
+      "probe": "w8-int-target-nested-v6-v1.pine",
+      "path": "w8-int-target-nested-v6-v1.pine",
+      "owner": "codex-w8oe9i",
+      "sourceSha256": "12b465d81d94497004c9f1559c746e4302d5fddc91956da41ce88b2c0afdbecd",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "columns": [
+        "CHART_INDEX",
+        "RAW_QUOTIENT",
+        "INT_TARGET",
+        "EXPLICIT_INT_CONTROL"
+      ],
+      "captureKind": "compile-outcome+runtime-outcome+raw-csv+context+snapshot",
+      "question": "Does the exact shape compile? If RUNS, compare target with raw quotient and explicit int control. Mixed-float is isolated so a refusal cannot hide accepted shapes.",
+      "root": "integer-division-int-target",
+      "shape": "nested",
+      "comparisonIds": [
+        "v7:381",
+        "v7:389",
+        "v56:164",
+        "v56:279",
+        "v56:282",
+        "v56:303",
+        "v56:485",
+        "v56:486",
+        "v56:500",
+        "v56:513",
+        "v56:514",
+        "v56:732",
+        "v56:782",
+        "v56:996",
+        "v56:1242",
+        "v56:1287",
+        "v56:1417"
+      ],
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC"
+      },
+      "instructionsPath": "instructions/w8-int-target-nested-v6-v1-capture-instructions-v3.md",
+      "instructionsSha256": "4ac5ea8cbc951bbd278740a149824e7601332b6e2338ef37caa2fbd9de84cc49",
+      "columnsSha256": "c85bd1bcec3cd79619658f649a85f3c9411512d3fee9c4e23b00dbc283eb0ed6",
+      "stagedColumnsPath": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v29-staged/w8-int-target-nested-v6-v1.columns-v1.json",
+      "nativeStatus": "UNOBSERVED",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      }
+    },
+    {
+      "probe": "w8-int-target-reassigned-v6-v1.pine",
+      "path": "w8-int-target-reassigned-v6-v1.pine",
+      "owner": "codex-w8oe9i",
+      "sourceSha256": "12b0003a0307dd2cae1285873304be8c353af67a81e633f7f995586205f1ca65",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "columns": [
+        "CHART_INDEX",
+        "RAW_QUOTIENT",
+        "INT_TARGET",
+        "EXPLICIT_INT_CONTROL"
+      ],
+      "captureKind": "compile-outcome+runtime-outcome+raw-csv+context+snapshot",
+      "question": "Does the exact shape compile? If RUNS, compare target with raw quotient and explicit int control. Mixed-float is isolated so a refusal cannot hide accepted shapes.",
+      "root": "integer-division-int-target",
+      "shape": "reassigned",
+      "comparisonIds": [
+        "v7:381",
+        "v7:389",
+        "v56:164",
+        "v56:279",
+        "v56:282",
+        "v56:303",
+        "v56:485",
+        "v56:486",
+        "v56:500",
+        "v56:513",
+        "v56:514",
+        "v56:732",
+        "v56:782",
+        "v56:996",
+        "v56:1242",
+        "v56:1287",
+        "v56:1417"
+      ],
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC"
+      },
+      "instructionsPath": "instructions/w8-int-target-reassigned-v6-v1-capture-instructions-v3.md",
+      "instructionsSha256": "4ac5ea8cbc951bbd278740a149824e7601332b6e2338ef37caa2fbd9de84cc49",
+      "columnsSha256": "207dd87ed018e2e2b70de9cbf7f545f8505b85a2518a13e0adf7f3a1b22c8e6b",
+      "stagedColumnsPath": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v29-staged/w8-int-target-reassigned-v6-v1.columns-v1.json",
+      "nativeStatus": "UNOBSERVED",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      }
+    },
+    {
+      "probe": "w8-int-target-compound-v6-v1.pine",
+      "path": "w8-int-target-compound-v6-v1.pine",
+      "owner": "codex-w8oe9i",
+      "sourceSha256": "1991978de9723fd9ca0dd950d37cec1b01bd73e2b1f1961199b37d4ea11bff98",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "columns": [
+        "CHART_INDEX",
+        "RAW_QUOTIENT",
+        "INT_TARGET",
+        "EXPLICIT_INT_CONTROL"
+      ],
+      "captureKind": "compile-outcome+runtime-outcome+raw-csv+context+snapshot",
+      "question": "Does the exact shape compile? If RUNS, compare target with raw quotient and explicit int control. Mixed-float is isolated so a refusal cannot hide accepted shapes.",
+      "root": "integer-division-int-target",
+      "shape": "compound",
+      "comparisonIds": [
+        "v7:381",
+        "v7:389",
+        "v56:164",
+        "v56:279",
+        "v56:282",
+        "v56:303",
+        "v56:485",
+        "v56:486",
+        "v56:500",
+        "v56:513",
+        "v56:514",
+        "v56:732",
+        "v56:782",
+        "v56:996",
+        "v56:1242",
+        "v56:1287",
+        "v56:1417"
+      ],
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC"
+      },
+      "instructionsPath": "instructions/w8-int-target-compound-v6-v1-capture-instructions-v3.md",
+      "instructionsSha256": "4ac5ea8cbc951bbd278740a149824e7601332b6e2338ef37caa2fbd9de84cc49",
+      "columnsSha256": "e0779b5596f9ad931d93690e4fe99202ce74ed5666114a7c8f5ebbbd765610d9",
+      "stagedColumnsPath": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v29-staged/w8-int-target-compound-v6-v1.columns-v1.json",
+      "nativeStatus": "UNOBSERVED",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      }
+    },
+    {
+      "probe": "w8-int-target-ternary-v6-v1.pine",
+      "path": "w8-int-target-ternary-v6-v1.pine",
+      "owner": "codex-w8oe9i",
+      "sourceSha256": "2424d121696d84f3e5a946507dd2103b3965dde756defe68e2c647fa2a59b05e",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "columns": [
+        "CHART_INDEX",
+        "RAW_QUOTIENT",
+        "INT_TARGET",
+        "EXPLICIT_INT_CONTROL"
+      ],
+      "captureKind": "compile-outcome+runtime-outcome+raw-csv+context+snapshot",
+      "question": "Does the exact shape compile? If RUNS, compare target with raw quotient and explicit int control. Mixed-float is isolated so a refusal cannot hide accepted shapes.",
+      "root": "integer-division-int-target",
+      "shape": "ternary",
+      "comparisonIds": [
+        "v7:381",
+        "v7:389",
+        "v56:164",
+        "v56:279",
+        "v56:282",
+        "v56:303",
+        "v56:485",
+        "v56:486",
+        "v56:500",
+        "v56:513",
+        "v56:514",
+        "v56:732",
+        "v56:782",
+        "v56:996",
+        "v56:1242",
+        "v56:1287",
+        "v56:1417"
+      ],
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC"
+      },
+      "instructionsPath": "instructions/w8-int-target-ternary-v6-v1-capture-instructions-v3.md",
+      "instructionsSha256": "4ac5ea8cbc951bbd278740a149824e7601332b6e2338ef37caa2fbd9de84cc49",
+      "columnsSha256": "0e23895a8495a64e822c5c5f385e960f8e304642c8a5c3b7b0b1e944d471c61f",
+      "stagedColumnsPath": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v29-staged/w8-int-target-ternary-v6-v1.columns-v1.json",
+      "nativeStatus": "UNOBSERVED",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      }
+    },
+    {
+      "probe": "w8-int-target-explicit-int-v6-v1.pine",
+      "path": "w8-int-target-explicit-int-v6-v1.pine",
+      "owner": "codex-w8oe9i",
+      "sourceSha256": "0b0d53b2fde96665ea0c2346b124b026df1316c3d8bb292d571e9f298e0f3e6e",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "columns": [
+        "CHART_INDEX",
+        "RAW_QUOTIENT",
+        "INT_TARGET",
+        "EXPLICIT_INT_CONTROL"
+      ],
+      "captureKind": "compile-outcome+runtime-outcome+raw-csv+context+snapshot",
+      "question": "Does the exact shape compile? If RUNS, compare target with raw quotient and explicit int control. Mixed-float is isolated so a refusal cannot hide accepted shapes.",
+      "root": "integer-division-int-target",
+      "shape": "explicit-int",
+      "comparisonIds": [
+        "v7:381",
+        "v7:389",
+        "v56:164",
+        "v56:279",
+        "v56:282",
+        "v56:303",
+        "v56:485",
+        "v56:486",
+        "v56:500",
+        "v56:513",
+        "v56:514",
+        "v56:732",
+        "v56:782",
+        "v56:996",
+        "v56:1242",
+        "v56:1287",
+        "v56:1417"
+      ],
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC"
+      },
+      "instructionsPath": "instructions/w8-int-target-explicit-int-v6-v1-capture-instructions-v3.md",
+      "instructionsSha256": "4ac5ea8cbc951bbd278740a149824e7601332b6e2338ef37caa2fbd9de84cc49",
+      "columnsSha256": "a70f5feb15fa6c0bed1f20814aa813faff5857287abcc0fb70c16cbb41c4ec19",
+      "stagedColumnsPath": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v29-staged/w8-int-target-explicit-int-v6-v1.columns-v1.json",
+      "nativeStatus": "UNOBSERVED",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      }
+    },
+    {
+      "probe": "w8-int-target-mixed-float-v6-v1.pine",
+      "path": "w8-int-target-mixed-float-v6-v1.pine",
+      "owner": "codex-w8oe9i",
+      "sourceSha256": "19d31194cf1ad33945091775f4e9bd525343ae9345a788e4e1a74c2618087c11",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "columns": [
+        "CHART_INDEX",
+        "RAW_QUOTIENT",
+        "INT_TARGET",
+        "EXPLICIT_INT_CONTROL"
+      ],
+      "captureKind": "compile-outcome+runtime-outcome+raw-csv+context+snapshot",
+      "question": "Does the exact shape compile? If RUNS, compare target with raw quotient and explicit int control. Mixed-float is isolated so a refusal cannot hide accepted shapes.",
+      "root": "integer-division-int-target",
+      "shape": "mixed-float",
+      "comparisonIds": [
+        "v7:381",
+        "v7:389",
+        "v56:164",
+        "v56:279",
+        "v56:282",
+        "v56:303",
+        "v56:485",
+        "v56:486",
+        "v56:500",
+        "v56:513",
+        "v56:514",
+        "v56:732",
+        "v56:782",
+        "v56:996",
+        "v56:1242",
+        "v56:1287",
+        "v56:1417"
+      ],
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC"
+      },
+      "instructionsPath": "instructions/w8-int-target-mixed-float-v6-v1-capture-instructions-v3.md",
+      "instructionsSha256": "4ac5ea8cbc951bbd278740a149824e7601332b6e2338ef37caa2fbd9de84cc49",
+      "columnsSha256": "c25fefb00fc11b134806d236ce950c6f19b5eb2b64a5238a654d27110bbca394",
+      "stagedColumnsPath": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v29-staged/w8-int-target-mixed-float-v6-v1.columns-v1.json",
+      "nativeStatus": "UNOBSERVED",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      }
+    },
+    {
+      "probe": "w8-derived-rsi-length-v5-v1.pine",
+      "path": "w8-derived-rsi-length-v5-v1.pine",
+      "owner": "codex-w8oe9i",
+      "sourceSha256": "322378d9ff904d3fc20bc53eeed36bf273a1f08a34b1130a39d0678c6fb0f3a6",
+      "pineVersion": 5,
+      "indicatorOnly": true,
+      "columns": [
+        "CHART_INDEX",
+        "RAW_LENGTH",
+        "EXPLICIT_INT_LENGTH",
+        "DERIVED_RSI",
+        "EXPLICIT_INT_RSI"
+      ],
+      "captureKind": "compile-outcome+runtime-outcome+raw-csv+context+snapshot",
+      "question": "Does input-int arithmetic with nonintegral length 12.5 compile, and does RSI match explicit int length12? v5/v6 are separate.",
+      "root": "derived-rsi-length",
+      "shape": "alias-arithmetic",
+      "comparisonIds": [
+        "v56:837"
+      ],
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC"
+      },
+      "instructionsPath": "instructions/w8-derived-rsi-length-v5-v1-capture-instructions-v3.md",
+      "instructionsSha256": "bfb95fdd5f316c7ba8f0ce11a6a33300ccf55098d19b7382495636f8f3c451a2",
+      "columnsSha256": "8897227ad6f094848a13a50b58d2b0b0d475de4ca5e43c78d2d44594cf554f5f",
+      "stagedColumnsPath": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v29-staged/w8-derived-rsi-length-v5-v1.columns-v1.json",
+      "nativeStatus": "UNOBSERVED",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      }
+    },
+    {
+      "probe": "w8-derived-rsi-length-v6-v1.pine",
+      "path": "w8-derived-rsi-length-v6-v1.pine",
+      "owner": "codex-w8oe9i",
+      "sourceSha256": "2c29ca0207df7c0ab8bdb939f1db2aedbd27f63ecf094c1320cf165c901d19d8",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "columns": [
+        "CHART_INDEX",
+        "RAW_LENGTH",
+        "EXPLICIT_INT_LENGTH",
+        "DERIVED_RSI",
+        "EXPLICIT_INT_RSI"
+      ],
+      "captureKind": "compile-outcome+runtime-outcome+raw-csv+context+snapshot",
+      "question": "Does input-int arithmetic with nonintegral length 12.5 compile, and does RSI match explicit int length12? v5/v6 are separate.",
+      "root": "derived-rsi-length",
+      "shape": "alias-arithmetic",
+      "comparisonIds": [
+        "v56:837"
+      ],
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC"
+      },
+      "instructionsPath": "instructions/w8-derived-rsi-length-v6-v1-capture-instructions-v3.md",
+      "instructionsSha256": "bfb95fdd5f316c7ba8f0ce11a6a33300ccf55098d19b7382495636f8f3c451a2",
+      "columnsSha256": "c958d0b43d6243efc6a470db3d1b67f9a15041d476653b6de2bfdde6bb343fda",
+      "stagedColumnsPath": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v29-staged/w8-derived-rsi-length-v6-v1.columns-v1.json",
+      "nativeStatus": "UNOBSERVED",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      }
+    },
+    {
+      "probe": "w8-size-scalar-namespace-v5-v1.pine",
+      "path": "w8-size-scalar-namespace-v5-v1.pine",
+      "owner": "codex-w8oe9i",
+      "sourceSha256": "6124b6b8185dc6301acb3aec6fc7d79c3af37ca80c9f6c35df861a1d534a3d60",
+      "pineVersion": 5,
+      "indicatorOnly": true,
+      "columns": [
+        "CHART_INDEX",
+        "SCALAR_SIZE"
+      ],
+      "captureKind": "compile-outcome+runtime-outcome+raw-csv+context+snapshot",
+      "question": "Can scalar size coexist with builtin size.normal? Label concatenation and size argument both demand the builtin string, while plotted scalar stays numeric.",
+      "root": "scalar-name-versus-builtin-namespace",
+      "shape": "scalar-and-namespace",
+      "comparisonIds": [
+        "v7:252"
+      ],
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC"
+      },
+      "instructionsPath": "instructions/w8-size-scalar-namespace-v5-v1-capture-instructions-v3.md",
+      "instructionsSha256": "ef371f0712dfe60f84b8837706a19861f4be80f1e98bb21d278a58597e4dd67d",
+      "columnsSha256": "12267c3ed3e8336425a958ce222b1c3449e994559e8d10636beb3c4df0050e2a",
+      "stagedColumnsPath": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v29-staged/w8-size-scalar-namespace-v5-v1.columns-v1.json",
+      "nativeStatus": "UNOBSERVED",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      }
+    },
+    {
+      "probe": "w8-size-udt-parameter-control-v5-v1.pine",
+      "path": "w8-size-udt-parameter-control-v5-v1.pine",
+      "owner": "codex-w8oe9i",
+      "sourceSha256": "5daab7739635b1dd15778d09f1d3f10b9571e75b096babbc2edc24720010d7ed",
+      "pineVersion": 5,
+      "indicatorOnly": true,
+      "columns": [
+        "CHART_INDEX",
+        "PARAMETER_NORMAL_FIELD"
+      ],
+      "captureKind": "compile-outcome+runtime-outcome+raw-csv+context+snapshot",
+      "question": "Does parameter Font size resolve size.normal to its numeric field0.75 rather than builtin normal? This is a compiling shadow control, independent from scalar namespace source.",
+      "root": "scalar-name-versus-builtin-namespace",
+      "shape": "udt-parameter-control",
+      "comparisonIds": [
+        "v7:252"
+      ],
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC"
+      },
+      "instructionsPath": "instructions/w8-size-udt-parameter-control-v5-v1-capture-instructions-v3.md",
+      "instructionsSha256": "7c390d4932801bf443cf7ea8e7f2b6d1b7a7df3df1f01733fbe834b9df546fe9",
+      "columnsSha256": "f4cfe0ced003cb52ef3d2ddbea1a4ba3af345c344ea21b654ce4e34dd9da39c4",
+      "stagedColumnsPath": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v29-staged/w8-size-udt-parameter-control-v5-v1.columns-v1.json",
+      "nativeStatus": "UNOBSERVED",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      }
+    },
+    {
+      "probe": "w8-seconds-derived-v6-v1.pine",
+      "path": "w8-seconds-derived-v6-v1.pine",
+      "owner": "codex-w8oe9i",
+      "sourceSha256": "69474c1805253ac81f3e2752981f6d229893bf13791247e27eaca4eeff86a64d",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "columns": [
+        "CHART_INDEX",
+        "SECONDS_ARGUMENT",
+        "RESOLVED_SECONDS",
+        "EXPLICIT_INT_SECONDS"
+      ],
+      "captureKind": "compile-outcome+runtime-outcome+raw-csv+context+snapshot",
+      "question": "Does from_seconds admit this shape? Derived requires chart2m context:120/7 is fractional. The literal17.5 refusal and explicit-int control are independent sources. Capture resolved timeframe label plus numeric seconds.",
+      "root": "derived-seconds-int-boundary",
+      "shape": "derived",
+      "comparisonIds": [
+        "v7:122"
+      ],
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC"
+      },
+      "instructionsPath": "instructions/w8-seconds-derived-v6-v1-capture-instructions-v3.md",
+      "instructionsSha256": "5039c14e15ff13ac579ef296e4a8708fda372e5a3567276115b670d5a5e5a86a",
+      "columnsSha256": "7f37c7b09f35e8432f32a53d47719bde7bda0b5699137484d9f96856baa50513",
+      "stagedColumnsPath": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v29-staged/w8-seconds-derived-v6-v1.columns-v1.json",
+      "nativeStatus": "UNOBSERVED",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      }
+    },
+    {
+      "probe": "w8-seconds-literal-v6-v1.pine",
+      "path": "w8-seconds-literal-v6-v1.pine",
+      "owner": "codex-w8oe9i",
+      "sourceSha256": "5422a5c3bfb1d3b5622d9912a1b751c0c49c42fbde5afc111b85f6714c7c8836",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "columns": [
+        "CHART_INDEX",
+        "SECONDS_ARGUMENT",
+        "RESOLVED_SECONDS",
+        "EXPLICIT_INT_SECONDS"
+      ],
+      "captureKind": "compile-outcome+runtime-outcome+raw-csv+context+snapshot",
+      "question": "Does from_seconds admit this shape? Derived requires chart2m context:120/7 is fractional. The literal17.5 refusal and explicit-int control are independent sources. Capture resolved timeframe label plus numeric seconds.",
+      "root": "derived-seconds-int-boundary",
+      "shape": "literal",
+      "comparisonIds": [
+        "v7:122"
+      ],
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC"
+      },
+      "instructionsPath": "instructions/w8-seconds-literal-v6-v1-capture-instructions-v3.md",
+      "instructionsSha256": "5039c14e15ff13ac579ef296e4a8708fda372e5a3567276115b670d5a5e5a86a",
+      "columnsSha256": "d9e4f770bb6ff32217f379e9b827a05917545c0346d203892e1a385c8ecd5d3b",
+      "stagedColumnsPath": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v29-staged/w8-seconds-literal-v6-v1.columns-v1.json",
+      "nativeStatus": "UNOBSERVED",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      }
+    },
+    {
+      "probe": "w8-seconds-explicit-int-v6-v1.pine",
+      "path": "w8-seconds-explicit-int-v6-v1.pine",
+      "owner": "codex-w8oe9i",
+      "sourceSha256": "2cfca6427b329ad308390232947f5b5bf2f042cd06c24311eced1246eb00867d",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "columns": [
+        "CHART_INDEX",
+        "SECONDS_ARGUMENT",
+        "RESOLVED_SECONDS",
+        "EXPLICIT_INT_SECONDS"
+      ],
+      "captureKind": "compile-outcome+runtime-outcome+raw-csv+context+snapshot",
+      "question": "Does from_seconds admit this shape? Derived requires chart2m context:120/7 is fractional. The literal17.5 refusal and explicit-int control are independent sources. Capture resolved timeframe label plus numeric seconds.",
+      "root": "derived-seconds-int-boundary",
+      "shape": "explicit-int",
+      "comparisonIds": [
+        "v7:122"
+      ],
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC"
+      },
+      "instructionsPath": "instructions/w8-seconds-explicit-int-v6-v1-capture-instructions-v3.md",
+      "instructionsSha256": "5039c14e15ff13ac579ef296e4a8708fda372e5a3567276115b670d5a5e5a86a",
+      "columnsSha256": "ee3c1a94aa7f5274d573c4d98518e31cca746f817800b1603f5aab19bd8f437b",
+      "stagedColumnsPath": "/home/sam/cs/docs/tealscript-parity-archive/oracle-probes/v29-staged/w8-seconds-explicit-int-v6-v1.columns-v1.json",
+      "nativeStatus": "UNOBSERVED",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      }
+    },
+    {
+      "probe": "array-fill-reversed-after20-bbi-v1.pine",
+      "path": "array-fill-reversed-after20-bbi-v1.pine",
+      "owner": "codex-bbi6nl",
+      "sourceSha256": "7968e639aa51ceff586ab5e4251105f901924d3a6e0a926a8e6ffb2fb5b563a9",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "compile-outcome+runtime-outcome+raw-csv+context+snapshot",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "columns": [
+        "BAR_INDEX",
+        "START",
+        "END_EXCLUSIVE",
+        "VALUE_0",
+        "VALUE_1",
+        "VALUE_2",
+        "VALUE_3"
+      ],
+      "question": "Does the isolated invalid fill range refuse, clamp or leave the array untouched?",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC"
+      },
+      "instructions": [
+        "Use isolated source; retain exact diagnostic phase/bar and export any available complete or partial output without assuming atomicity."
+      ],
+      "instructionsPath": "instructions/array-fill-reversed-after20-bbi-v1.md",
+      "instructionsSha256": "bfb07a9220ea22246c48c9c4b9f2af84afdba59a16f8ba72c50760256242c9b8",
+      "ledgerRanks": [
+        1001
+      ],
+      "authority": [
+        "https://www.tradingview.com/pine-script-docs/language/arrays/"
+      ],
+      "limits": "Each failure mode isolated. If native refuses, mutation atomicity cannot be inferred from outputs after the failing call."
+    },
+    {
+      "probe": "array-fill-overflow-after20-bbi-v1.pine",
+      "path": "array-fill-overflow-after20-bbi-v1.pine",
+      "owner": "codex-bbi6nl",
+      "sourceSha256": "2ac198b7c7798c06b3ecf94d34741cb3519120e44ba542ab597dd7d1eba056e4",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "compile-outcome+runtime-outcome+raw-csv+context+snapshot",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "columns": [
+        "BAR_INDEX",
+        "START",
+        "END_EXCLUSIVE",
+        "VALUE_0",
+        "VALUE_1",
+        "VALUE_2",
+        "VALUE_3"
+      ],
+      "question": "Does the isolated invalid fill range refuse, clamp or leave the array untouched?",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC"
+      },
+      "instructions": [
+        "Use isolated source; retain exact diagnostic phase/bar and export any available complete or partial output without assuming atomicity."
+      ],
+      "instructionsPath": "instructions/array-fill-overflow-after20-bbi-v1.md",
+      "instructionsSha256": "8ba142dc5a630b9e69f1b555998ac6633c9bff1eb43de8aa4c5953b704fefe8e",
+      "ledgerRanks": [
+        1001
+      ],
+      "authority": [
+        "https://www.tradingview.com/pine-script-docs/language/arrays/"
+      ],
+      "limits": "Each failure mode isolated. If native refuses, mutation atomicity cannot be inferred from outputs after the failing call."
+    },
+    {
+      "probe": "array-covariance-right-long-after20-bbi-v1.pine",
+      "path": "array-covariance-right-long-after20-bbi-v1.pine",
+      "owner": "codex-bbi6nl",
+      "sourceSha256": "f11e967cedaaa0776211e5d20b48b46483fb95a7955fb75cd7b5149f194f4e38",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "compile-outcome+runtime-outcome+raw-csv+context+snapshot",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "columns": [
+        "BAR_INDEX",
+        "LONG_SIZE",
+        "SHORT_SIZE",
+        "ALIGNED_TWO_CONTROL",
+        "UNEQUAL_BIASED_TARGET"
+      ],
+      "question": "Does unequal-size covariance refuse, truncate, pad NA or produce another result; is argument order material?",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC"
+      },
+      "instructions": [
+        "Use isolated source; retain exact diagnostic phase/bar and export any available complete or partial output without assuming atomicity."
+      ],
+      "instructionsPath": "instructions/array-covariance-right-long-after20-bbi-v1.md",
+      "instructionsSha256": "ecd1e4e2cc11e27473f0f523e83887ade0f2c8f0f2c9fe629a53dfa0122916ba",
+      "ledgerRanks": [
+        1227
+      ],
+      "authority": [
+        "https://www.tradingview.com/pine-script-docs/language/arrays/"
+      ],
+      "limits": "Biased true only; sample/other mismatched lengths remain unobserved. Argument directions separated to avoid one error hiding the other."
+    },
+    {
+      "probe": "array-percentrank-upper-after20-bbi-v1.pine",
+      "path": "array-percentrank-upper-after20-bbi-v1.pine",
+      "owner": "codex-bbi6nl",
+      "sourceSha256": "ea3b8057ea3b7e80dde1b86ee0f1f27d67ccc6c2cdca1740c9d06ced77b97b5c",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "compile-outcome+runtime-outcome+raw-csv+context+snapshot",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "columns": [
+        "BAR_INDEX",
+        "INDEX",
+        "INDEX_ZERO_CONTROL",
+        "INDEX_THREE_CONTROL",
+        "UPPER_BOUND_TARGET"
+      ],
+      "question": "Does an index equal to length refuse or return a fallback at dynamic activation?",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC"
+      },
+      "instructions": [
+        "Use isolated source; retain exact diagnostic phase/bar and export any available complete or partial output without assuming atomicity."
+      ],
+      "instructionsPath": "instructions/array-percentrank-upper-after20-bbi-v1.md",
+      "instructionsSha256": "a60c1ef7f2093b22e99d998b0934edbb310717ef210e7eee31257350377ca26c",
+      "ledgerRanks": [
+        1228
+      ],
+      "authority": [
+        "https://www.tradingview.com/pine-script-docs/language/arrays/"
+      ],
+      "limits": "Upper boundary size4/index4 only; negative indices have separate version rules and are not inferred."
+    },
+    {
+      "probe": "visual-bgcolor-empty-last-offset-v5-v27-v1.pine",
+      "path": "visual-bgcolor-empty-last-offset-v5-v27-v1.pine",
+      "owner": "codex-uk9554",
+      "sourceSha256": "11c12c3e066716d5a771cbe45f8edf32fc15c88d9f1f88562e74bfe7081457af",
+      "pineVersion": 5,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "compile-runtime-outcome+raw-csv+paired-visual+context",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "columns": [
+        "bgcolor",
+        "bgcolor",
+        "bgcolor",
+        "bgcolor",
+        "BAR_INDEX",
+        "SOURCE_INDEX_MOD64",
+        "SOURCE_OFFSET",
+        "DYNAMIC_OFFSET",
+        "EDGE_INPUT",
+        "DYNAMIC_EVENT",
+        "ZERO_EVENT",
+        "PLUS_EVENT",
+        "MINUS_EVENT",
+        "PANE_FLOOR",
+        "PANE_CEILING"
+      ],
+      "question": "Does bgcolor in v5 apply the last series offset when that bar has no visible source, and do older events move after changing only that offset?",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC",
+        "chartType": "STANDARD-CANDLES",
+        "requiredMarketState": "FROZEN-BAR-REPLAY-CUTOFF-FOR-INPUT-COMPARISON"
+      },
+      "minimumHistoryBars": 192,
+      "instructionsPath": "instructions/visual-bgcolor-empty-last-offset-v5-v27-v1-instructions-v2.md",
+      "instructionsSha256": "fe6951182f40f509df910e59d9ec28e7d9a985915747b8466bce3a4051ecb7e0",
+      "instructions": [
+        "Follow instructions/visual-bgcolor-empty-last-offset-v5-v27-v1-instructions-v2.md for UI capture; internal renderer/study/provider fields remain UNAVAILABLE-VIA-UI."
+      ],
+      "ledgerRanks": [
+        198
+      ],
+      "authority": [
+        "https://www.tradingview.com/pine-script-docs/migration-guides/to-pine-version-6/",
+        "https://www.tradingview.com/pine-script-docs/v5/concepts/backgrounds/",
+        "https://www.tradingview.com/pine-script-reference/v5/#fun_bgcolor"
+      ],
+      "priorCaptureDelta": "Sparse empty-last source; frozen-dataset edge-only reloads distinguish source-local offsets from a latest-offset historical shift. Fixed controls use noncolliding event residues.",
+      "limits": "No CSV-only geometry claim, no other-version extrapolation, no native acceptance predicted from local compilation."
+    },
+    {
+      "probe": "visual-plotshape-empty-last-offset-v5-v27-v1.pine",
+      "path": "visual-plotshape-empty-last-offset-v5-v27-v1.pine",
+      "owner": "codex-uk9554",
+      "sourceSha256": "a6bf8592fab852e574bb64e70fa74d57b8a1763766a6707a0a67bef596f0fe9c",
+      "pineVersion": 5,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "compile-runtime-outcome+raw-csv+paired-visual+context",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "columns": [
+        "DYNAMIC_TARGET",
+        "ZERO_CONTROL",
+        "PLUS2_CONTROL",
+        "MINUS2_CONTROL",
+        "BAR_INDEX",
+        "SOURCE_INDEX_MOD64",
+        "SOURCE_OFFSET",
+        "DYNAMIC_OFFSET",
+        "EDGE_INPUT",
+        "DYNAMIC_EVENT",
+        "ZERO_EVENT",
+        "PLUS_EVENT",
+        "MINUS_EVENT"
+      ],
+      "question": "Does plotshape in v5 apply the last series offset when that bar has no visible source, and do older events move after changing only that offset?",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC",
+        "chartType": "STANDARD-CANDLES",
+        "requiredMarketState": "FROZEN-BAR-REPLAY-CUTOFF-FOR-INPUT-COMPARISON"
+      },
+      "minimumHistoryBars": 192,
+      "instructionsPath": "instructions/visual-plotshape-empty-last-offset-v5-v27-v1-instructions-v2.md",
+      "instructionsSha256": "49f7a8679a6eb8f14b64915e7ad498d2b497eb35dd6f283b0146be5d2ca299f9",
+      "instructions": [
+        "Follow instructions/visual-plotshape-empty-last-offset-v5-v27-v1-instructions-v2.md for UI capture; internal renderer/study/provider fields remain UNAVAILABLE-VIA-UI."
+      ],
+      "ledgerRanks": [
+        265
+      ],
+      "authority": [
+        "https://www.tradingview.com/pine-script-reference/v5/#fun_plotshape"
+      ],
+      "priorCaptureDelta": "Sparse empty-last source; frozen-dataset edge-only reloads distinguish source-local offsets from a latest-offset historical shift. Fixed controls use noncolliding event residues.",
+      "limits": "No CSV-only geometry claim, no other-version extrapolation, no native acceptance predicted from local compilation."
+    },
+    {
+      "probe": "visual-barcolor-empty-last-offset-v5-v27-v1.pine",
+      "path": "visual-barcolor-empty-last-offset-v5-v27-v1.pine",
+      "owner": "codex-uk9554",
+      "sourceSha256": "4ba16e25bdc400ebeef63862de47d2b42fe211d098f671ef6678a0642f3126ee",
+      "pineVersion": 5,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "compile-runtime-outcome+raw-csv+paired-visual+context",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "columns": [
+        "barcolor_0",
+        "barcolor_1",
+        "barcolor_2",
+        "barcolor_3",
+        "BAR_INDEX",
+        "SOURCE_INDEX_MOD64",
+        "SOURCE_OFFSET",
+        "DYNAMIC_OFFSET",
+        "EDGE_INPUT",
+        "DYNAMIC_EVENT",
+        "ZERO_EVENT",
+        "PLUS_EVENT",
+        "MINUS_EVENT"
+      ],
+      "question": "Does barcolor in v5 apply the last series offset when that bar has no visible source, and do older events move after changing only that offset?",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC",
+        "chartType": "STANDARD-CANDLES",
+        "requiredMarketState": "FROZEN-BAR-REPLAY-CUTOFF-FOR-INPUT-COMPARISON"
+      },
+      "minimumHistoryBars": 192,
+      "instructionsPath": "instructions/visual-barcolor-empty-last-offset-v5-v27-v1-instructions-v2.md",
+      "instructionsSha256": "00b960e681af9e3955b63aa6595faf73dce65003009c5ee9805968796fa7a4ba",
+      "instructions": [
+        "Follow instructions/visual-barcolor-empty-last-offset-v5-v27-v1-instructions-v2.md for UI capture; internal renderer/study/provider fields remain UNAVAILABLE-VIA-UI."
+      ],
+      "ledgerRanks": [
+        512
+      ],
+      "authority": [
+        "https://www.tradingview.com/pine-script-reference/v5/#fun_barcolor"
+      ],
+      "priorCaptureDelta": "Sparse empty-last source; frozen-dataset edge-only reloads distinguish source-local offsets from a latest-offset historical shift. Fixed controls use noncolliding event residues.",
+      "limits": "No CSV-only geometry claim, no other-version extrapolation, no native acceptance predicted from local compilation."
+    },
+    {
+      "probe": "visual-barcolor-empty-last-offset-v3-v27-v2.pine",
+      "path": "visual-barcolor-empty-last-offset-v3-v27-v2.pine",
+      "owner": "codex-uk9554",
+      "sourceSha256": "1e62ede9aa6cfff89848f0a8a7c44b64bdb59b7cb8b25c82813fd9455fe25fd3",
+      "pineVersion": 3,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "compile-runtime-outcome+raw-csv+paired-visual+context",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "columns": [
+        "BAR_INDEX",
+        "SOURCE_INDEX_MOD64",
+        "SOURCE_OFFSET",
+        "DYNAMIC_OFFSET",
+        "EDGE_INPUT",
+        "DYNAMIC_EVENT",
+        "ZERO_EVENT",
+        "PLUS_EVENT",
+        "MINUS_EVENT"
+      ],
+      "question": "Does barcolor in v3 apply the last series offset when that bar has no visible source, and do older events move after changing only that offset?",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC",
+        "chartType": "STANDARD-CANDLES",
+        "requiredMarketState": "FROZEN-BAR-REPLAY-CUTOFF-FOR-INPUT-COMPARISON"
+      },
+      "minimumHistoryBars": 192,
+      "instructionsPath": "instructions/visual-barcolor-empty-last-offset-v3-v27-v2-instructions-v2.md",
+      "instructionsSha256": "a2183206da3f4f2853e9cf9476e3a34b5f531ac322f2b9cebb029d0b2beb8b37",
+      "instructions": [
+        "Follow instructions/visual-barcolor-empty-last-offset-v3-v27-v2-instructions-v2.md for UI capture; internal renderer/study/provider fields remain UNAVAILABLE-VIA-UI."
+      ],
+      "ledgerRanks": [
+        513
+      ],
+      "authority": [
+        "https://www.tradingview.com/pine-script-reference/v3/#fun_barcolor",
+        "https://www.tradingview.com/pine-script-docs/migration-guides/to-pine-version-4/"
+      ],
+      "priorCaptureDelta": "Sparse empty-last source; frozen-dataset edge-only reloads distinguish source-local offsets from a latest-offset historical shift. Fixed controls use noncolliding event residues.",
+      "limits": "No CSV-only geometry claim, no other-version extrapolation, no native acceptance predicted from local compilation.",
+      "supersedesForCaptureOnly": "visual-barcolor-empty-last-offset-v3-v27-v1.pine",
+      "sourceCorrection": "Two executable bar_index identifiers changed to canonical v3 n; no schedule, offset or column change. D owns preflight; author ran none.",
+      "supersedesSourceSha256": "750298a3790452f2813b1d5d583c93d3e684da73819776fb95c2f785648e0984"
+    },
+    {
+      "probe": "visual-barcolor-empty-last-offset-v4-v27-v1.pine",
+      "path": "visual-barcolor-empty-last-offset-v4-v27-v1.pine",
+      "owner": "codex-uk9554",
+      "sourceSha256": "d1277108549c0bf1acc7fd280b0f51da993a94dd99fd09fbc3686eeb6275996a",
+      "pineVersion": 4,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "compile-runtime-outcome+raw-csv+paired-visual+context",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "columns": [
+        "barcolor_0",
+        "barcolor_1",
+        "barcolor_2",
+        "barcolor_3",
+        "BAR_INDEX",
+        "SOURCE_INDEX_MOD64",
+        "SOURCE_OFFSET",
+        "DYNAMIC_OFFSET",
+        "EDGE_INPUT",
+        "DYNAMIC_EVENT",
+        "ZERO_EVENT",
+        "PLUS_EVENT",
+        "MINUS_EVENT"
+      ],
+      "question": "Does barcolor in v4 apply the last series offset when that bar has no visible source, and do older events move after changing only that offset?",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC",
+        "chartType": "STANDARD-CANDLES",
+        "requiredMarketState": "FROZEN-BAR-REPLAY-CUTOFF-FOR-INPUT-COMPARISON"
+      },
+      "minimumHistoryBars": 192,
+      "instructionsPath": "instructions/visual-barcolor-empty-last-offset-v4-v27-v1-instructions-v2.md",
+      "instructionsSha256": "6c94278eb2bf4dca1dbdb1a4d6d9c9a8fc94f02550d0011a4fd4868dd589e094",
+      "instructions": [
+        "Follow instructions/visual-barcolor-empty-last-offset-v4-v27-v1-instructions-v2.md for UI capture; internal renderer/study/provider fields remain UNAVAILABLE-VIA-UI."
+      ],
+      "ledgerRanks": [
+        514
+      ],
+      "authority": [
+        "https://www.tradingview.com/pine-script-reference/v4/#fun_barcolor"
+      ],
+      "priorCaptureDelta": "Sparse empty-last source; frozen-dataset edge-only reloads distinguish source-local offsets from a latest-offset historical shift. Fixed controls use noncolliding event residues.",
+      "limits": "No CSV-only geometry claim, no other-version extrapolation, no native acceptance predicted from local compilation."
+    },
+    {
+      "probe": "visual-plotchar-empty-last-offset-v5-v27-v1.pine",
+      "path": "visual-plotchar-empty-last-offset-v5-v27-v1.pine",
+      "owner": "codex-uk9554",
+      "sourceSha256": "c2ce0ed4ac3df8c136c41f285314bb1c8c611a46b6750e87df64d136075d99d3",
+      "pineVersion": 5,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "compile-runtime-outcome+raw-csv+paired-visual+context",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "columns": [
+        "DYNAMIC_TARGET",
+        "ZERO_CONTROL",
+        "PLUS2_CONTROL",
+        "MINUS2_CONTROL",
+        "BAR_INDEX",
+        "SOURCE_INDEX_MOD64",
+        "SOURCE_OFFSET",
+        "DYNAMIC_OFFSET",
+        "EDGE_INPUT",
+        "DYNAMIC_EVENT",
+        "ZERO_EVENT",
+        "PLUS_EVENT",
+        "MINUS_EVENT"
+      ],
+      "question": "Does plotchar in v5 apply the last series offset when that bar has no visible source, and do older events move after changing only that offset?",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC",
+        "chartType": "STANDARD-CANDLES",
+        "requiredMarketState": "FROZEN-BAR-REPLAY-CUTOFF-FOR-INPUT-COMPARISON"
+      },
+      "minimumHistoryBars": 192,
+      "instructionsPath": "instructions/visual-plotchar-empty-last-offset-v5-v27-v1-instructions-v2.md",
+      "instructionsSha256": "9492eca53860ed161460b04542d4a6b35b9ae61cf51f4b77483c8ccb9ee6ed84",
+      "instructions": [
+        "Follow instructions/visual-plotchar-empty-last-offset-v5-v27-v1-instructions-v2.md for UI capture; internal renderer/study/provider fields remain UNAVAILABLE-VIA-UI."
+      ],
+      "ledgerRanks": [
+        735
+      ],
+      "authority": [
+        "https://www.tradingview.com/pine-script-reference/v5/#fun_plotchar"
+      ],
+      "priorCaptureDelta": "Sparse empty-last source; frozen-dataset edge-only reloads distinguish source-local offsets from a latest-offset historical shift. Fixed controls use noncolliding event residues.",
+      "limits": "No CSV-only geometry claim, no other-version extrapolation, no native acceptance predicted from local compilation."
+    },
+    {
+      "probe": "visual-plotarrow-empty-last-offset-v5-v27-v1.pine",
+      "path": "visual-plotarrow-empty-last-offset-v5-v27-v1.pine",
+      "owner": "codex-uk9554",
+      "sourceSha256": "c764706f0a9a9df9ca38e93d8acfa4fa2a8d6f0cf252201d0b31e9a9535ffee6",
+      "pineVersion": 5,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "compile-runtime-outcome+raw-csv+paired-visual+context",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "columns": [
+        "DYNAMIC_TARGET",
+        "ZERO_CONTROL",
+        "PLUS2_CONTROL",
+        "MINUS2_CONTROL",
+        "BAR_INDEX",
+        "SOURCE_INDEX_MOD64",
+        "SOURCE_OFFSET",
+        "DYNAMIC_OFFSET",
+        "EDGE_INPUT",
+        "DYNAMIC_EVENT",
+        "ZERO_EVENT",
+        "PLUS_EVENT",
+        "MINUS_EVENT",
+        "ARROW_SOURCE"
+      ],
+      "question": "Does plotarrow in v5 apply the last series offset when that bar has no visible source, and do older events move after changing only that offset?",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC",
+        "chartType": "STANDARD-CANDLES",
+        "requiredMarketState": "FROZEN-BAR-REPLAY-CUTOFF-FOR-INPUT-COMPARISON"
+      },
+      "minimumHistoryBars": 192,
+      "instructionsPath": "instructions/visual-plotarrow-empty-last-offset-v5-v27-v1-instructions-v2.md",
+      "instructionsSha256": "694a3ef0f9b56174b6d1d1b386530a7c00f405425b98b1e4bab3c74b08431031",
+      "instructions": [
+        "Follow instructions/visual-plotarrow-empty-last-offset-v5-v27-v1-instructions-v2.md for UI capture; internal renderer/study/provider fields remain UNAVAILABLE-VIA-UI."
+      ],
+      "ledgerRanks": [
+        1369
+      ],
+      "authority": [
+        "https://www.tradingview.com/pine-script-reference/v5/#fun_plotarrow"
+      ],
+      "priorCaptureDelta": "Sparse empty-last source; frozen-dataset edge-only reloads distinguish source-local offsets from a latest-offset historical shift. Fixed controls use noncolliding event residues.",
+      "limits": "No CSV-only geometry claim, no other-version extrapolation, no native acceptance predicted from local compilation."
+    },
+    {
+      "probe": "visual-plotarrow-signed-domain-v6-v27-v1.pine",
+      "path": "visual-plotarrow-signed-domain-v6-v27-v1.pine",
+      "owner": "codex-uk9554",
+      "sourceSha256": "226d13f287c95cefcd617dd1cd07cd2c220b5894b18e2bc748d2cbea0a6fe947",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "compile-runtime-outcome+raw-csv+paired-visual+context",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "columns": [
+        "BASE",
+        "SCALED",
+        "SIGN_FLIPPED",
+        "SHOW_LAST32",
+        "BAR_INDEX",
+        "SOURCE_INDEX_MOD64",
+        "SOURCE",
+        "SOURCE_NA",
+        "SCALED_SOURCE",
+        "SIGN_FLIPPED_SOURCE",
+        "MINHEIGHT",
+        "MAXHEIGHT"
+      ],
+      "question": "How do unequal sign groups, scale-equivalent calls and show_last compose with the native visible-item plotarrow normalization domain?",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC",
+        "chartType": "STANDARD-CANDLES",
+        "requiredMarketState": "FROZEN-BAR-REPLAY-CUTOFF-FOR-INPUT-COMPARISON"
+      },
+      "minimumHistoryBars": 192,
+      "instructionsPath": "instructions/visual-plotarrow-signed-domain-v6-v27-v1-instructions-v2.md",
+      "instructionsSha256": "9561d90361a0169a959fbe1e65758105896328ad13aabe678d56e6fe2d3aea08",
+      "instructions": [
+        "Follow instructions/visual-plotarrow-signed-domain-v6-v27-v1-instructions-v2.md for UI capture; internal renderer/study/provider fields remain UNAVAILABLE-VIA-UI."
+      ],
+      "ledgerRanks": [
+        1372
+      ],
+      "authority": [
+        "https://www.tradingview.com/pine-script-docs/visuals/text-and-shapes/#plotarrow",
+        "https://www.tradingview.com/pine-script-reference/v6/#fun_plotarrow"
+      ],
+      "priorCaptureDelta": "Extends existing single-call symmetric-sign viewport capture to unequal signs, independent scaled/sign-flipped calls and a per-call show_last window.",
+      "limits": "No CSV-only geometry claim, no other-version extrapolation, no native acceptance predicted from local compilation.",
+      "unavailableViaUI": [
+        "native renderer offsets/items",
+        "height/origHeight",
+        "padded renderer-visible items"
+      ]
+    },
+    {
+      "probe": "table-constructor-dimensions-v27-v1.pine",
+      "path": "table-constructor-dimensions-v27-v1.pine",
+      "owner": "codex-bk7nqp",
+      "sourceSha256": "5c0dfc6898dd487076ba14a1e0c9e625997a1f466f8af7be490fb6f1a3ece380",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "compile-outcome+runtime-outcome+raw-csv+diagnostic+visual-screenshot+context",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "columns": [
+        "PineIndex",
+        "CaseId",
+        "AxisId",
+        "Columns",
+        "Rows",
+        "ConstructorReturned",
+        "CountIsNa",
+        "PositivePlotControl"
+      ],
+      "question": "Do series column/row counts negative, zero and na admit, clamp or raise at the delayed table.new call?",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 96
+      },
+      "instructions": [
+        "Run each Case/Axis pair independently on the unchanged source.",
+        "Capture full diagnostics or every numeric column plus mandatory table/control/settings screenshots."
+      ],
+      "instructionsPath": "instructions/table-constructor-dimensions-v27-v1.md",
+      "instructionsSha256": "9eaf486d5ca5bbe3c32cc61a096a10048b127d19a543e7b6641ecc0c120f93e8",
+      "ledgerRanks": [
+        271
+      ],
+      "attempts": [
+        {
+          "Case": 0,
+          "Axis": "Columns"
+        },
+        {
+          "Case": 1,
+          "Axis": "Columns"
+        },
+        {
+          "Case": 2,
+          "Axis": "Columns"
+        },
+        {
+          "Case": 3,
+          "Axis": "Columns"
+        },
+        {
+          "Case": 0,
+          "Axis": "Rows"
+        },
+        {
+          "Case": 1,
+          "Axis": "Rows"
+        },
+        {
+          "Case": 2,
+          "Axis": "Rows"
+        },
+        {
+          "Case": 3,
+          "Axis": "Rows"
+        }
+      ],
+      "authority": [
+        "https://www.tradingview.com/pine-script-reference/v6/#fun_table.new",
+        "https://www.tradingview.com/pine-script-docs/visuals/tables/"
+      ],
+      "limits": "No table.cell call is made on the tested table: constructor consequence remains separate from cell-coordinate failures. Prior v7 negative/zero probes only initialize var table on the first loaded bar; this probe delays actual construction until PineIndex8, independently varies rows versus columns and adds a typed-missing count. The float-kind refusal already returned in v7 is not recaptured."
+    },
+    {
+      "probe": "table-cell-dimensions-v27-v1.pine",
+      "path": "table-cell-dimensions-v27-v1.pine",
+      "owner": "codex-bk7nqp",
+      "sourceSha256": "ad0c6560b8cf53aab0a77ed6186c90bbee5cb9def4b710e7b231e7e62684210a",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "compile-outcome+runtime-outcome+raw-csv+diagnostic+visual-screenshot+context",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "columns": [
+        "PineIndex",
+        "CaseId",
+        "AxisId",
+        "Dimension",
+        "DimensionIsNa",
+        "CellReturned",
+        "PositivePlotControl"
+      ],
+      "question": "What runtime and rendered sizing follows negative, zero, missing and overflowed series percentage widths/heights in table.cell?",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 96
+      },
+      "instructions": [
+        "Run each Case/Axis pair independently on the unchanged source.",
+        "Capture full diagnostics or every numeric column plus mandatory table/control/settings screenshots."
+      ],
+      "instructionsPath": "instructions/table-cell-dimensions-v27-v1.md",
+      "instructionsSha256": "bb5c384e85a9ea488a0f4e72d711845394daa59ec0745be3666aa1bc71216c36",
+      "ledgerRanks": [
+        321
+      ],
+      "attempts": [
+        {
+          "Case": 0,
+          "Axis": "Width"
+        },
+        {
+          "Case": 1,
+          "Axis": "Width"
+        },
+        {
+          "Case": 2,
+          "Axis": "Width"
+        },
+        {
+          "Case": 3,
+          "Axis": "Width"
+        },
+        {
+          "Case": 4,
+          "Axis": "Width"
+        },
+        {
+          "Case": 0,
+          "Axis": "Height"
+        },
+        {
+          "Case": 1,
+          "Axis": "Height"
+        },
+        {
+          "Case": 2,
+          "Axis": "Height"
+        },
+        {
+          "Case": 3,
+          "Axis": "Height"
+        },
+        {
+          "Case": 4,
+          "Axis": "Height"
+        }
+      ],
+      "authority": [
+        "https://www.tradingview.com/pine-script-reference/v6/#fun_table.cell",
+        "https://www.tradingview.com/pine-script-docs/visuals/tables/"
+      ],
+      "limits": "Constructor remains fixed2x1 with an independently valid CONTROL cell. Width and height are isolated in separate attempts. Overflow expression is an observational discriminator; its native missingness/value is not predicted. A returned call alone does not establish actual pixel sizing: screenshots and viewport metadata are mandatory. The prior v7 float table.new rejection concerns integer counts and does not settle table.cell float percentages."
+    },
+    {
+      "probe": "plot-string-argument-v6-v1.pine",
+      "path": "plot-string-argument-v6-v1.pine",
+      "owner": "codex-tkxtd0",
+      "bundle": "v29",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "sourceSha256": "88f5440981a13710f9bb068e855e572587248dcdb279bdf47c2c4c54ff69592d",
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "compile-outcome+runtime-outcome+raw-csv-if-runs",
+      "minimumHistoryBars": 8,
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "question": "Does plot accept a literal string as its series argument?",
+      "instructionsPath": "instructions/plot-string-argument-v6-v1-instructions-v2.md",
+      "instructionsSha256": "b9638b0fad3f768630707ca596f8713d38949b23faa583a24ddc4c039308406f",
+      "authority": [
+        "https://www.tradingview.com/pine-script-docs/visuals/plots/#plot-parameters",
+        "https://www.tradingview.com/pine-script-reference/v6/#fun_plot"
+      ],
+      "limits": "Exact v6 source only; no other plot argument or type-family claim. No native expected result selected.",
+      "columns": [
+        "Plot 1"
+      ],
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC",
+        "chartType": "STANDARD-CANDLES",
+        "minimumHistoricalBars": 100
+      }
+    },
+    {
+      "probe": "plot-numeric-argument-v6-control-v1.pine",
+      "path": "plot-numeric-argument-v6-control-v1.pine",
+      "owner": "codex-tkxtd0",
+      "bundle": "v29",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "sourceSha256": "13296a3e99317ea7ecb068f68f4c70c346333acd4c8b1d1a309ef9b59a6786ee",
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "compile-outcome+runtime-outcome+raw-csv-if-runs",
+      "minimumHistoryBars": 8,
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "question": "Does the neighboring numeric series source compile and run?",
+      "instructionsPath": "instructions/plot-numeric-argument-v6-control-v1-instructions-v2.md",
+      "instructionsSha256": "02765ff98dd4c2e5c502575d1b088aa8249c69e27e992b65f871382a90e151d5",
+      "authority": [
+        "https://www.tradingview.com/pine-script-docs/visuals/plots/#plot-parameters",
+        "https://www.tradingview.com/pine-script-reference/v6/#fun_plot"
+      ],
+      "limits": "Exact v6 source only; no other plot argument or type-family claim. No native expected result selected.",
+      "columns": [
+        "Plot 1"
+      ],
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC",
+        "chartType": "STANDARD-CANDLES",
+        "minimumHistoricalBars": 100
+      }
+    },
+    {
+      "probe": "wad-cancellation-discriminator-v1.pine",
+      "path": "wad-cancellation-discriminator-v1.pine",
+      "owner": "codex-bbi6nl",
+      "sourceSha256": "16d382e91260c10927118c957f7f08aebe530c1395fbd87c93f41730c1fca327",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "compile-outcome+runtime-outcome+raw-csv+context+snapshot",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "columns": [
+        "ACTUAL_OPEN",
+        "ACTUAL_HIGH",
+        "ACTUAL_LOW",
+        "ACTUAL_CLOSE",
+        "ACTUAL_VOLUME",
+        "WAD",
+        "EXPLICIT_RAW",
+        "RESET_1E13",
+        "RESET_1E10",
+        "DELTA"
+      ],
+      "ledgerRanks": [
+        1617
+      ],
+      "question": "Does native WAD retain cancellation residuals or normalize near zero? Distinguish raw cumulative flow from 1e-13 and 1e-10 reset hypotheses.",
+      "chartContext": {
+        "symbol": "TVC:DXY",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC"
+      },
+      "instructionsPath": "instructions/wad-cancellation-discriminator-v1-instructions-v2.md",
+      "instructionsSha256": "b9ba86188f6619849b0e55399b9ccac30dbed87c51d2636903473a152758326a",
+      "limits": "Reset thresholds are competing hypotheses, not expected native values. If reset columns coincide, normalization threshold remains HELD."
+    },
+    {
+      "probe": "V29-MapOverflowQualifierIdentity-v1.pine",
+      "path": "V29-MapOverflowQualifierIdentity-v1.pine",
+      "owner": "codex-p4250m",
+      "sourceSha256": "a747f0cdf9c111ef5f128b6bd13a81cf77dd2f0ace8fca0a23f177c999cb11c1",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "compile-outcome+runtime-outcome+raw-csv+context+snapshot",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "columns": [
+        "PineIndex",
+        "InputExponent",
+        "ConstMissingNa",
+        "ConstPositiveNa",
+        "ConstNegativeNa",
+        "ConstPositiveSelfEqual",
+        "ConstNegativeSelfEqual",
+        "ConstMissingEqualsPositive",
+        "ConstPositiveEqualsNegative",
+        "ConstSizeMissing",
+        "ConstSizePositive",
+        "ConstSizeNegative",
+        "ConstMissingValue",
+        "ConstPositiveValue",
+        "ConstNegativeValue",
+        "ConstRecomputedValue",
+        "ConstRepeatedPrevious",
+        "ConstSizeRepeated",
+        "ConstContainsMissing",
+        "ConstContainsPositive",
+        "ConstContainsNegative",
+        "InputMissingNa",
+        "InputPositiveNa",
+        "InputNegativeNa",
+        "InputPositiveSelfEqual",
+        "InputNegativeSelfEqual",
+        "InputMissingEqualsPositive",
+        "InputPositiveEqualsNegative",
+        "InputSizeMissing",
+        "InputSizePositive",
+        "InputSizeNegative",
+        "InputMissingValue",
+        "InputPositiveValue",
+        "InputNegativeValue",
+        "InputRecomputedValue",
+        "InputRepeatedPrevious",
+        "InputSizeRepeated",
+        "InputContainsMissing",
+        "InputContainsPositive",
+        "InputContainsNegative",
+        "SeriesMissingNa",
+        "SeriesPositiveNa",
+        "SeriesNegativeNa",
+        "SeriesPositiveSelfEqual",
+        "SeriesNegativeSelfEqual",
+        "SeriesMissingEqualsPositive",
+        "SeriesPositiveEqualsNegative",
+        "SeriesSizeMissing",
+        "SeriesSizePositive",
+        "SeriesSizeNegative",
+        "SeriesMissingValue",
+        "SeriesPositiveValue",
+        "SeriesNegativeValue",
+        "SeriesRecomputedValue",
+        "SeriesRepeatedPrevious",
+        "SeriesSizeRepeated",
+        "SeriesContainsMissing",
+        "SeriesContainsPositive",
+        "SeriesContainsNegative"
+      ],
+      "question": "Does literal const exp overflow retain a distinct map key while input/series exp overflow is missing, and do repeated expressions match or create keys?",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 96
+      },
+      "inputAttempts": [
+        {
+          "Exponent": 1000
+        },
+        {
+          "Exponent": 710
+        },
+        {
+          "Exponent": 709
+        }
+      ],
+      "instructionsPath": "instructions/V29-MapOverflowQualifierIdentity-v1.md",
+      "instructionsSha256": "e97abe773113df53646012f71d11d8635ac8c308d3a997bd8739c9f47e6bbbd7",
+      "ledgerRanks": [
+        932
+      ],
+      "limits": "Numeric qualifier/provenance distinction for captured exp-derived float keys only; no universal Infinity/NA law or native hidden representation assumption.",
+      "novelDiscriminator": "Side-by-side const/input/series groups plus independent NA/equality flags and repeated key insert/get; existing V13 omitted those observations and V9 series NA flags do not settle const map identity."
+    },
+    {
+      "probe": "silent-s6-tiny-eigenvectors-v29-v1.pine",
+      "path": "silent-s6-tiny-eigenvectors-v29-v1.pine",
+      "owner": "codex-g6qooy",
+      "sourceSha256": "825bdc87003e072cffe09f1a620d27843fa3d3f43e7fe9818592383ffa0ee506",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "compile-outcome+runtime-outcome+raw-csv+context+snapshot",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "columns": [
+        "CHART_INDEX",
+        "CHART_TIME_MS",
+        "CHART_CLOSE",
+        "COUPLING",
+        "VECTOR_00_RAW",
+        "VECTOR_01_RAW",
+        "VECTOR_10_RAW",
+        "VECTOR_11_RAW",
+        "COLUMN_0_SMALL_ABS",
+        "COLUMN_1_SMALL_ABS",
+        "COLUMN_0_SMALL_OVER_COUPLING",
+        "COLUMN_1_SMALL_OVER_COUPLING",
+        "VECTOR_NA_COUNT"
+      ],
+      "question": "Are small nonzero components preserved, zeroed, missing, or refused in the captured distinct-eigenvalue 2x2 symmetric matrix? Raw components retain sign/order; small absolute components offer order/sign-independent comparison.",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "1",
+        "chartDisplayTimezone": "Etc/UTC"
+      },
+      "instructionsPath": "instructions/silent-s6-tiny-eigenvectors-v29-v1-capture-instructions-v3.md",
+      "instructionsSha256": "742ffc19ce71aa4da82f4feed6176af15ff02d564db70255b59c3a1b23b0d07e",
+      "silentTruncationFamilies": [
+        "S6"
+      ],
+      "authority": [
+        "https://www.tradingview.com/pine-script-reference/v6/#fun_matrix.eigenvectors"
+      ],
+      "limits": "Only these matrices/settings. No universal eigenvector basis, order, sign, normalization, bit identity or cleanup threshold claim. v20 tiny eigenvalues do not answer tiny eigenvector components.",
+      "inputAttempts": [
+        {
+          "Off-diagonal coupling": 1e-12
+        },
+        {
+          "Off-diagonal coupling": 1e-06
+        }
+      ],
+      "refusalIsolation": "One family and one target calculation per script; attempt settings separate."
+    },
+    {
+      "probe": "silent-p1-dense-clustered-eigen-v29-v1.pine",
+      "path": "silent-p1-dense-clustered-eigen-v29-v1.pine",
+      "owner": "codex-g6qooy",
+      "sourceSha256": "f12fbd0ff14063099250c3accab4a7792f4aafba8a142e6329e57109906d2def",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "compile-outcome+runtime-outcome+raw-csv+context+snapshot",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "columns": [
+        "CHART_INDEX",
+        "CHART_TIME_MS",
+        "CHART_CLOSE",
+        "PERTURBATION",
+        "MATRIX_01",
+        "EIGEN_COUNT",
+        "EIGEN_NA_COUNT",
+        "MATRIX_TRACE",
+        "EIGEN_SUM",
+        "EIGEN_0_RAW",
+        "EIGEN_1_RAW",
+        "EIGEN_2_RAW",
+        "EIGEN_3_RAW",
+        "EIGEN_4_RAW",
+        "EIGEN_5_RAW",
+        "EIGEN_6_RAW",
+        "EIGEN_7_RAW",
+        "EIGEN_0_CENTERED_OVER_PERTURBATION",
+        "EIGEN_1_CENTERED_OVER_PERTURBATION",
+        "EIGEN_2_CENTERED_OVER_PERTURBATION",
+        "EIGEN_3_CENTERED_OVER_PERTURBATION",
+        "EIGEN_4_CENTERED_OVER_PERTURBATION",
+        "EIGEN_5_CENTERED_OVER_PERTURBATION",
+        "EIGEN_6_CENTERED_OVER_PERTURBATION",
+        "EIGEN_7_CENTERED_OVER_PERTURBATION"
+      ],
+      "question": "Does a finite dense symmetric clustered spectrum return eight finite eigenvalues, NA placeholders, or a visible refusal? Contrast small dense perturbation with unit perturbation.",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "1",
+        "chartDisplayTimezone": "Etc/UTC"
+      },
+      "instructionsPath": "instructions/silent-p1-dense-clustered-eigen-v29-v1-capture-instructions-v3.md",
+      "instructionsSha256": "9d6a6a79bbbb73961186cab16b8f77fd169bc4c6359f981a15e7511c27839085",
+      "silentTruncationFamilies": [
+        "P1"
+      ],
+      "authority": [
+        "https://www.tradingview.com/pine-script-reference/v6/#fun_matrix.eigenvalues"
+      ],
+      "limits": "Observable convergence/publication only, not the identity of QL or an internal 128*n iteration cap. A result does not diagnose cap exhaustion by itself. v20 tridiagonal n16/n32 and scaled stress do not certify this dense clustered fixture.",
+      "inputAttempts": [
+        {
+          "Dense perturbation": 1e-12
+        },
+        {
+          "Dense perturbation": 1.0
+        }
+      ],
+      "refusalIsolation": "One family and one target calculation per script; attempt settings separate."
+    },
+    {
+      "probe": "trace-library-inferred-const-globals-v29-v1.pine",
+      "path": "trace-library-inferred-const-globals-v29-v1.pine",
+      "sourceSha256": "3694cccb836af020bdc9fff9cc2ddf4d8211e444f8c92cf7149184b0977199b4",
+      "rowIds": [
+        "library-global-qualifier-inference",
+        "v56:1210"
+      ],
+      "question": "Do exported v5 library functions admit unmodified global var literal and math.log(const) initializers without explicit const annotations?",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "instructionsPath": "instructions/trace-library-inferred-const-globals-v29-v1-capture-instructions-v3.md",
+      "instructionsSha256": "f2ba8086700b781416eaf4e240ab087a37bfbc0b52f668debdf114d8ff1c15fd",
+      "owner": "codex-vmp8l6",
+      "pineVersion": 5,
+      "indicatorOnly": false,
+      "scriptKind": "library",
+      "columns": [
+        "literal_var_global",
+        "const_math_global"
+      ],
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC",
+        "chartType": "STANDARD-CANDLES",
+        "minimumHistoricalBars": 100
+      }
+    },
+    {
+      "probe": "s1-line-width-negative-v29-v1.pine",
+      "path": "s1-line-width-negative-v29-v1.pine",
+      "owner": "codex-bbi6nl",
+      "sourceSha256": "520c57e31587ee427ddff09068c365ec83b05c0f6bd430a162313a5d50d64435",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "compile-outcome+runtime-outcome+raw-csv+context+snapshot",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "family": "S1",
+      "question": "Distinguish refusal, omitted stroke and normalization for line width -1; constructor only, setters stay separately held.",
+      "instructionsPath": "instructions/s1-line-width-negative-v29-v1-instructions-v2.md",
+      "instructionsSha256": "48c3ec25447595c876aac14b563d434274b65c6b140774429dde6e8911f7d8f8",
+      "limits": "Bounded facet only. No universal normalization or native credit before capture.",
+      "columns": [
+        "CALL_COMPLETED",
+        "REQUESTED_WIDTH",
+        "CHART_INDEX"
+      ],
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC",
+        "chartType": "STANDARD-CANDLES",
+        "minimumHistoricalBars": 100
+      }
+    },
+    {
+      "probe": "s1-line-width-missing-v29-v1.pine",
+      "path": "s1-line-width-missing-v29-v1.pine",
+      "owner": "codex-bbi6nl",
+      "sourceSha256": "c50ad260203476ed7d06d3804125f984a382fd501c1f9560a21f7ed4bf946219",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "compile-outcome+runtime-outcome+raw-csv+context+snapshot",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "family": "S1",
+      "question": "Distinguish refusal, omitted stroke and normalization for line width int(na); constructor only, setters stay separately held.",
+      "instructionsPath": "instructions/s1-line-width-missing-v29-v1-instructions-v2.md",
+      "instructionsSha256": "2e5dc6267eeb5a246bd4478976e2425344732598474247dad0f6d6f33f08325f",
+      "limits": "Bounded facet only. No universal normalization or native credit before capture.",
+      "columns": [
+        "CALL_COMPLETED",
+        "REQUESTED_WIDTH",
+        "CHART_INDEX"
+      ],
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC",
+        "chartType": "STANDARD-CANDLES",
+        "minimumHistoricalBars": 100
+      }
+    },
+    {
+      "probe": "s1-box-width-negative-v29-v1.pine",
+      "path": "s1-box-width-negative-v29-v1.pine",
+      "owner": "codex-bbi6nl",
+      "sourceSha256": "71372ac32117145b9daf4f27a61016212e08c0ee2411f885fa2000fee0b97ddd",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "compile-outcome+runtime-outcome+raw-csv+context+snapshot",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "family": "S1",
+      "question": "Distinguish refusal, omitted stroke and normalization for box width -1; constructor only, setters stay separately held.",
+      "instructionsPath": "instructions/s1-box-width-negative-v29-v1-instructions-v2.md",
+      "instructionsSha256": "e2af7bf0e10a0bf24ff9ec0c3f022f4004f02334546a7b4980e372fb8ab3b70a",
+      "limits": "Bounded facet only. No universal normalization or native credit before capture.",
+      "columns": [
+        "CALL_COMPLETED",
+        "REQUESTED_WIDTH",
+        "CHART_INDEX"
+      ],
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC",
+        "chartType": "STANDARD-CANDLES",
+        "minimumHistoricalBars": 100
+      }
+    },
+    {
+      "probe": "s1-box-width-missing-v29-v1.pine",
+      "path": "s1-box-width-missing-v29-v1.pine",
+      "owner": "codex-bbi6nl",
+      "sourceSha256": "0846b217a854c5cb9098a2eb322ecdf9f78b24b3e18b7a0d1ee0b1cbcc8540d0",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "compile-outcome+runtime-outcome+raw-csv+context+snapshot",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "family": "S1",
+      "question": "Distinguish refusal, omitted stroke and normalization for box width int(na); constructor only, setters stay separately held.",
+      "instructionsPath": "instructions/s1-box-width-missing-v29-v1-instructions-v2.md",
+      "instructionsSha256": "be5aa44bd5499921818aeabb0fb7447046765f3da5e937048af402109fb369b0",
+      "limits": "Bounded facet only. No universal normalization or native credit before capture.",
+      "columns": [
+        "CALL_COMPLETED",
+        "REQUESTED_WIDTH",
+        "CHART_INDEX"
+      ],
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC",
+        "chartType": "STANDARD-CANDLES",
+        "minimumHistoricalBars": 100
+      }
+    },
+    {
+      "probe": "s2-table-width-missing-v29-v1.pine",
+      "path": "s2-table-width-missing-v29-v1.pine",
+      "owner": "codex-bbi6nl",
+      "sourceSha256": "935323b2c4b1f96c9455674ebaf9bf18e81bc7566371d3cb7b80784152bc3298",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "compile-outcome+runtime-outcome+raw-csv+context+snapshot",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "family": "S2",
+      "question": "Does missing table border width refuse or render with a default? No frame-width inference.",
+      "instructionsPath": "instructions/s2-table-width-missing-v29-v1-instructions-v2.md",
+      "instructionsSha256": "a37367ddfc1360ec120d4fb63cf82597f444ea9798f69ade1eef0a424688e298",
+      "limits": "Bounded facet only. No universal normalization or native credit before capture.",
+      "columns": [
+        "CALL_COMPLETED",
+        "CHART_INDEX"
+      ],
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC",
+        "chartType": "STANDARD-CANDLES",
+        "minimumHistoricalBars": 100
+      }
+    },
+    {
+      "probe": "s4-time-close-positive-overflow-dynamic-v29-v1.pine",
+      "path": "s4-time-close-positive-overflow-dynamic-v29-v1.pine",
+      "owner": "codex-bbi6nl",
+      "sourceSha256": "76f5de11c407254f69dd520a108813d5c3c632fe082607392094513fe105089a",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "compile-outcome+runtime-outcome+raw-csv+context",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "family": "S4",
+      "question": "Distinguish dynamic time_close out-of-range refusal from missing output, including first failing bar; time() evidence cannot settle this overload.",
+      "instructionsPath": "instructions/s4-time-close-positive-overflow-dynamic-v29-v1-instructions-v2.md",
+      "instructionsSha256": "3af4c5a208eda5bb8713a76c1b521d46382ca22be6842d01bbd452837f94ff9a",
+      "limits": "Bounded facet only. No universal normalization or native credit before capture.",
+      "columns": [
+        "REQUESTED_OFFSET",
+        "TIME_CLOSE_RESULT",
+        "CHART_INDEX"
+      ],
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC",
+        "chartType": "STANDARD-CANDLES",
+        "minimumHistoricalBars": 100
+      }
+    },
+    {
+      "probe": "s4-time-close-negative-overflow-dynamic-v29-v1.pine",
+      "path": "s4-time-close-negative-overflow-dynamic-v29-v1.pine",
+      "owner": "codex-bbi6nl",
+      "sourceSha256": "5c77acb9feb964bf8e84fc15b43f9a36ec2c15e9d54b8fad109354a6af238ba2",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "compile-outcome+runtime-outcome+raw-csv+context",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "family": "S4",
+      "question": "Distinguish dynamic time_close out-of-range refusal from missing output, including first failing bar; time() evidence cannot settle this overload.",
+      "instructionsPath": "instructions/s4-time-close-negative-overflow-dynamic-v29-v1-instructions-v2.md",
+      "instructionsSha256": "3af4c5a208eda5bb8713a76c1b521d46382ca22be6842d01bbd452837f94ff9a",
+      "limits": "Bounded facet only. No universal normalization or native credit before capture.",
+      "columns": [
+        "REQUESTED_OFFSET",
+        "TIME_CLOSE_RESULT",
+        "CHART_INDEX"
+      ],
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC",
+        "chartType": "STANDARD-CANDLES",
+        "minimumHistoricalBars": 100
+      }
+    },
+    {
+      "probe": "s4-time-close-endpoints-v29-v1.pine",
+      "path": "s4-time-close-endpoints-v29-v1.pine",
+      "owner": "codex-bbi6nl",
+      "sourceSha256": "e70c5b3d43d4f78e59c8b840282851d24d76fa691e3cd9acf3bf3e8121972faa",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "compile-outcome+runtime-outcome+raw-csv+context",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "family": "S4",
+      "question": "Observe valid time_close endpoints under 1-minute chart context; insufficient history must not count as range refusal.",
+      "instructionsPath": "instructions/s4-time-close-endpoints-v29-v1-instructions-v2.md",
+      "instructionsSha256": "74c2271213dd89fe1751494fa6b53f59fea502dfb8bd0f1461eb9f00708ab9b4",
+      "limits": "Bounded facet only. No universal normalization or native credit before capture.",
+      "columns": [
+        "PAST_5000",
+        "FUTURE_500",
+        "CHART_INDEX"
+      ],
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "1",
+        "chartDisplayTimezone": "Etc/UTC",
+        "chartType": "STANDARD-CANDLES",
+        "minimumHistoricalBars": 5001
+      }
+    },
+    {
+      "probe": "nested-dynamic-request-v6-v1.pine",
+      "path": "nested-dynamic-request-v6-v1.pine",
+      "owner": "codex-v7y3ux",
+      "sourceSha256": "9300df9f3791932fe0ad1eab4795293a6a00ec749d7643abdd7dd8b57c24bfa5",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "context+raw-csv+live-update-evidence",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "columns": [
+        "INNER",
+        "OUTER",
+        "15"
+      ],
+      "question": "Exact requested5m/15m OHLC/time datasets and nested transport missing. Chart2m OHLC and native INNER/OUTER/DIRECT alone cannot construct the requested feed.",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC",
+        "requiredMarketState": "ACTIVE-REALTIME"
+      },
+      "instructions": [
+        "Export unchanged source on BTCUSDT2m, then5m and15m across the same interval. Preserve raw time/OHLC, dataset starts, chart settings, sourceSHA and historical cutoff for each. Capture requested5m/15m history covering every evaluated2m bar. Never synthesize requested prices from chart2m. Record exact symbol/session/adjustments. Preserve errors verbatim. Companion data establishes only this recorded context."
+      ],
+      "instructionsPath": "instructions/nested-dynamic-request-v6-v1.md",
+      "instructionsSha256": "bcf4e2c8037e8b4dbdc18359a99341ead70491144de7f3cfdb0c2ddc8b42b48e",
+      "ledgerRanks": [
+        1744
+      ],
+      "limits": [
+        "Exact-byte existing source reuse; supplemental context acquisition only",
+        "Host transport must be explicit, no synthesized requested prices"
+      ],
+      "acquisitionScope": "SUPPLEMENTAL-CONTEXT"
+    },
+    {
+      "probe": "history-inference-realtime-jump-bk-v13-v1.pine",
+      "path": "history-inference-realtime-jump-bk-v13-v1.pine",
+      "owner": "codex-v7y3ux",
+      "sourceSha256": "28694a720ceeddf21a39f4606d3bc2c970eb3f4c2b119ded91431c85c3556c53",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "context+raw-csv+live-update-evidence",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "columns": [
+        "TARGET",
+        "OFFSET",
+        "REALTIME",
+        "BAR_INDEX",
+        "CLOSE_CONTROL"
+      ],
+      "question": "Full historical execution prefix and realtime-transition OHLC/update metadata missing; native bar20001 requested151 beyond buffer101 refusal is already observed.",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC",
+        "requiredMarketState": "ACTIVE-REALTIME"
+      },
+      "instructions": [
+        "Use unchanged source on BTCUSDT2m with fixed dataset. Export complete historical time/OHLC before applying and record dataset start/end/count. Retain exact error, line/bar/time and first realtime transition. Record attach-before-opening or midbar. Obtain matching bar_index/time/close/history/realtime prefix controls using a separate hash-bound auxiliary control if needed. A screenshot alone is insufficient. Do not change max_bars_back or offset."
+      ],
+      "instructionsPath": "instructions/history-inference-realtime-jump-bk-v13-v1.md",
+      "instructionsSha256": "ec9af2ac8e1e673fd02a1a99df86c1e5b78d0c1c908fb47ebe5ad8853bb5cffc",
+      "ledgerRanks": [
+        1787
+      ],
+      "limits": [
+        "Exact-byte existing source reuse; supplemental context acquisition only",
+        "Host transport must be explicit, no synthesized requested prices"
+      ],
+      "acquisitionScope": "SUPPLEMENTAL-CONTEXT"
+    },
+    {
+      "probe": "requested-confirmation-timing-v23-v1.pine",
+      "path": "requested-confirmation-timing-v23-v1.pine",
+      "owner": "codex-v7y3ux",
+      "sourceSha256": "9d29236961ade80dab2f9ca73458e70c7400a13f3a3810ee4e280140a0c637db",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "context+raw-csv+live-update-evidence",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "columns": [
+        "CHART_INDEX",
+        "CHART_TIME_MS",
+        "CHART_CLOSE_TIME_MS",
+        "CHART_TIMENOW_MS",
+        "CHART_UPDATE_COUNT",
+        "CHART_CONFIRMED",
+        "CHART_HISTORY",
+        "CHART_REALTIME",
+        "CHART_NEW",
+        "SAME_TIME_MS",
+        "SAME_CLOSE_TIME_MS",
+        "SAME_CONFIRMED",
+        "SAME_HISTORY",
+        "SAME_REALTIME",
+        "SAME_NEW",
+        "HTF_TIME_MS",
+        "HTF_CLOSE_TIME_MS",
+        "HTF_CONFIRMED",
+        "HTF_HISTORY",
+        "HTF_REALTIME",
+        "HTF_NEW"
+      ],
+      "question": "Seven observed live state/time tuples and20150 historical rows already settled by verified B. Exact first tick at aligned10m boundary and full synchronized opening/intermediate/closing transport remain missing.",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC",
+        "requiredMarketState": "ACTIVE-REALTIME"
+      },
+      "instructions": [
+        "Follow instructions/requested-confirmation-timing-v23-v1-instructions-v2.md for UI capture; internal renderer/study/provider fields remain UNAVAILABLE-VIA-UI."
+      ],
+      "instructionsPath": "instructions/requested-confirmation-timing-v23-v1-instructions-v2.md",
+      "instructionsSha256": "2e19bc420653ccccebd4a068297b56ffb699fde0c7319d9af09cd5b45b53708e",
+      "ledgerRanks": [
+        312,
+        396,
+        397
+      ],
+      "limits": [
+        "Exact-byte existing source reuse; supplemental context acquisition only",
+        "Host transport must be explicit, no synthesized requested prices"
+      ],
+      "acquisitionScope": "SUPPLEMENTAL-CONTEXT",
+      "unavailableViaUI": [
+        "raw current/previous study arrays",
+        "provider/update IDs",
+        "unsampled first-tick/cadence transport"
+      ]
+    },
+    {
+      "probe": "history-prefix-control-v29-v1.pine",
+      "path": "history-prefix-control-v29-v1.pine",
+      "owner": "codex-v7y3ux",
+      "sourceSha256": "c353c96e9cf734a230367bc33ee81a929a7bb6270c12da857595b9246359820d",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "columns": [
+        "BAR_INDEX",
+        "TIME_MS",
+        "CLOSE_CONTROL",
+        "HISTORY",
+        "REALTIME"
+      ],
+      "question": "Acquire exact historical prefix and realtime transition context for1787 refusing source.",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC",
+        "requiredMarketState": "ACTIVE-REALTIME"
+      },
+      "instructionsPath": "instructions/history-prefix-control-v29-v1.md",
+      "instructionsSha256": "4d9aa92a269af1a2646b82578ec0ab1b195e9256e9d1ab4508e4fa388d7706de",
+      "ledgerRanks": [
+        1787
+      ],
+      "limits": [
+        "Separate source control; requires authenticated identical dataset origin and prefix",
+        "Does not itself prove automatic buffer policy"
+      ],
+      "acquisitionScope": "NEW-CONTROL"
+    },
+    {
+      "probe": "w8-hold-lambda-argument-v5-v1.pine",
+      "path": "w8-hold-lambda-argument-v5-v1.pine",
+      "sourceSha256": "869582d7a7e12ece3e2d0ff2ba85a77c7257d442208ca2353ac2a795400f170e",
+      "owner": "codex-w8oe9i",
+      "question": "Does callback/lambda syntax in array.new_string compile? This preserves the invalid-looking source construct; no globals.get/import dependency.",
+      "corpusIds": [
+        "v7:32"
+      ],
+      "columns": [],
+      "instructionsPath": "instructions/w8-hold-lambda-argument-v5-v1-capture-instructions-v3.md",
+      "instructionsSha256": "1446c1ae563ae41ad981d6ffebf39e0e649ba6a380c156d27ff766e37d3ce858",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED"
+    },
+    {
+      "probe": "w8-hold-ellipsis-argument-v5-v1.pine",
+      "path": "w8-hold-ellipsis-argument-v5-v1.pine",
+      "sourceSha256": "723b7efd706d5533c17d0a2815f607183cedc66bd1ea316e8beb6bfb02df48b1",
+      "owner": "codex-w8oe9i",
+      "question": "Does literal ellipsis as a function argument compile? Original Display_SnD_Zones(...) contains this token; no assumed placeholder repair.",
+      "corpusIds": [
+        "v7:77"
+      ],
+      "columns": [],
+      "instructionsPath": "instructions/w8-hold-ellipsis-argument-v5-v1-capture-instructions-v3.md",
+      "instructionsSha256": "1dc2f9daba33ebfed5fc0a4a25aef3afd425d90f20b2a701209b3cbe4c5aa986",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED"
+    },
+    {
+      "probe": "w8-hold-wrapped-four-indent-v6-v1.pine",
+      "path": "w8-hold-wrapped-four-indent-v6-v1.pine",
+      "sourceSha256": "98edd14570ec53a3180000efeeda00c90a0c0caba5969ed5841c630550d4a435",
+      "owner": "codex-w8oe9i",
+      "question": "Does four-space continuation inside call parentheses compile? Bare-expression continuation capture is not authority for this wrapped form.",
+      "corpusIds": [
+        "v56:489"
+      ],
+      "columns": [],
+      "instructionsPath": "instructions/w8-hold-wrapped-four-indent-v6-v1-capture-instructions-v3.md",
+      "instructionsSha256": "4990f0679124bc297dc7908d931cd56be8a595ccfe8930abf77382f8f6c0a93d",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED"
+    },
+    {
+      "probe": "w8-hold-spaced-version-comment-v1.pine",
+      "path": "w8-hold-spaced-version-comment-v1.pine",
+      "sourceSha256": "10f8986bf7eb83477dea6d414f821e5d126a61d49e4b3fe52aef3c96498e99d2",
+      "owner": "codex-w8oe9i",
+      "question": "Does original spaced version comment select v6, or does the legacy default refuse modern indicator()? No proper pragma added.",
+      "corpusIds": [
+        "v56:1076"
+      ],
+      "columns": [],
+      "instructionsPath": "instructions/w8-hold-spaced-version-comment-v1-capture-instructions-v3.md",
+      "instructionsSha256": "36081252400ffc8f02fd50530c4137751e803acd95f02643e54b131f2ecaf2d1",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED"
+    },
+    {
+      "probe": "w8-hold-simple-input-loop-counter-v6-v1.pine",
+      "path": "w8-hold-simple-input-loop-counter-v6-v1.pine",
+      "sourceSha256": "cf5018e864c97a09a9a4f69a2a05f1c56002244dbe06001cef430ef674bc5e1e",
+      "owner": "codex-w8oe9i",
+      "question": "Can an input-bound loop counter enter a simple UDF? Capture qualifier refusal or sum6 at default3.",
+      "corpusIds": [
+        "v56:156"
+      ],
+      "columns": [],
+      "instructionsPath": "instructions/w8-hold-simple-input-loop-counter-v6-v1-capture-instructions-v3.md",
+      "instructionsSha256": "16b93c7776f79fe3a096661d142f3a324f2d7089000ac3c205a6b76034bae68a",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED"
+    },
+    {
+      "probe": "w8-hold-simple-udf-loop-counter-v6-v1.pine",
+      "path": "w8-hold-simple-udf-loop-counter-v6-v1.pine",
+      "sourceSha256": "60ffb18bfa9bffd537d3037d6ffe8e36b4f08739e0a0384e9c98d8092c22a1d7",
+      "owner": "codex-w8oe9i",
+      "question": "Does explicitly simple enclosing-UDF bound change loop counter qualifier? Mirrors binomCdf simple n/k.",
+      "corpusIds": [
+        "v56:156"
+      ],
+      "columns": [],
+      "instructionsPath": "instructions/w8-hold-simple-udf-loop-counter-v6-v1-capture-instructions-v3.md",
+      "instructionsSha256": "647375565c18d8d1fd0fe8d1dee5e65fc10b7a48161e542a1facdb5094964ea8",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED"
+    },
+    {
+      "probe": "w8-hold-series-loop-counter-control-v6-v1.pine",
+      "path": "w8-hold-series-loop-counter-control-v6-v1.pine",
+      "sourceSha256": "20d7aab5815f6f79cba7102a155db0487784349c622dc84e36082da1450ed3e8",
+      "owner": "codex-w8oe9i",
+      "question": "Series-bound negative control, separate from possible accepted simple/input loops.",
+      "corpusIds": [
+        "v56:156"
+      ],
+      "columns": [],
+      "instructionsPath": "instructions/w8-hold-series-loop-counter-control-v6-v1-capture-instructions-v3.md",
+      "instructionsSha256": "cffddba7235669480de6235b1948629cb8c18f307cb52f55060af2720cf6c7cd",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED"
+    },
+    {
+      "probe": "w8-hold-const-dead-switch-exact-v6-v1.pine",
+      "path": "w8-hold-const-dead-switch-exact-v6-v1.pine",
+      "sourceSha256": "d77b47b3ce7dc2c5ff91367b9d8fc8814f2ebdf90d4a0c95c35093c7385a29a6",
+      "owner": "codex-w8oe9i",
+      "question": "Exact eight-line original v6 dead switch fixture. Native v5 related refusal does not settle v6/input/literal-live shape.",
+      "corpusIds": [
+        "v56:1169"
+      ],
+      "columns": [],
+      "instructionsPath": "instructions/w8-hold-const-dead-switch-exact-v6-v1-capture-instructions-v3.md",
+      "instructionsSha256": "d3995cb68e00043b080734809cdb9b4617c2767a1c1e5cb4f16dc02678b1ba1a",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED"
+    },
+    {
+      "probe": "w8-hold-size-scalar-plotshape-v6-v1.pine",
+      "path": "w8-hold-size-scalar-plotshape-v6-v1.pine",
+      "sourceSha256": "b962382d6994efcb1e48214293670444b1fa27b689c6c6747a0c88ab16fb6642",
+      "owner": "codex-w8oe9i",
+      "question": "Can scalar series-int size coexist with const builtin size.tiny in plotshape? Admit-only visual witness; no pixel-size claim.",
+      "corpusIds": [
+        "v7:130"
+      ],
+      "columns": [],
+      "instructionsPath": "instructions/w8-hold-size-scalar-plotshape-v6-v1-capture-instructions-v3.md",
+      "instructionsSha256": "9d32b3a7a28b1c90723764cecb127da1515f328ce7485b154a59abf2964c1614",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED"
+    },
+    {
+      "probe": "w8-hold-size-renamed-control-v6-v1.pine",
+      "path": "w8-hold-size-renamed-control-v6-v1.pine",
+      "sourceSha256": "8588ffe20e0800445dc0261a82b99dfc66113a1baad56cdaea482948ce765f21",
+      "owner": "codex-w8oe9i",
+      "question": "Renamed scalar compiling neighbor; no import dependency or visual precision claim.",
+      "corpusIds": [
+        "v7:130"
+      ],
+      "columns": [],
+      "instructionsPath": "instructions/w8-hold-size-renamed-control-v6-v1-capture-instructions-v3.md",
+      "instructionsSha256": "0243c0a5a2738821b6b9d55225683e190790fd5244a1f197b55c455cbc10de16",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED"
+    },
+    {
+      "probe": "array-percentrank-negative-v29-v1.pine",
+      "path": "array-percentrank-negative-v29-v1.pine",
+      "owner": "codex-v6aeqx",
+      "sourceSha256": "b6ec9399b8d8ac7f632dc71f488618845a7daeaa99a06e36ca67110f6e73eecb",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "compile-outcome+runtime-outcome+raw-csv+context+snapshot",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "columns": [
+        "CASE",
+        "INPUT_BAR_INDEX",
+        "INPUT_TIME_MS",
+        "SIZE",
+        "SOURCE_0",
+        "SOURCE_1",
+        "SOURCE_2",
+        "SOURCE_3",
+        "SOURCE_4",
+        "RANK_NAMESPACE_0",
+        "RANK_NAMESPACE_1",
+        "RANK_NAMESPACE_2",
+        "RANK_NAMESPACE_3",
+        "RANK_NAMESPACE_4",
+        "RANK_METHOD_0",
+        "RANK_METHOD_1",
+        "RANK_METHOD_2",
+        "RANK_METHOD_3",
+        "RANK_METHOD_4"
+      ],
+      "question": "Does each negative/signed-zero input use the same rank convention as the captured nonnegative inputs?",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC"
+      },
+      "instructionsPath": "instructions/array-percentrank-negative-v29-v1.md",
+      "instructionsSha256": "0b698a82c494efe940328dc424c9a030f5b29cc1141be33a9f5657b68244dc9a",
+      "ledgerRanks": [
+        1228
+      ],
+      "authority": [
+        "https://www.tradingview.com/pine-script-reference/v6/#fun_array.percentrank"
+      ],
+      "limits": "Exact selected settings only; no universal algorithm/version/tolerance credit. Unobserved held paths retain T behavior.",
+      "inputAttempts": [
+        {
+          "CASE": 0,
+          "label": "mixed-sign"
+        },
+        {
+          "CASE": 1,
+          "label": "all-negative"
+        },
+        {
+          "CASE": 2,
+          "label": "mixed-sign-middle-tie"
+        },
+        {
+          "CASE": 3,
+          "label": "signed-zero"
+        }
+      ],
+      "refusalIsolation": "One CASE per independent capture attempt; empty and all-NA are isolated, with index0 deliberately invoked.",
+      "priorEvidence": [
+        {
+          "version": 7,
+          "sourceSha256": "b46487f3392c8e56d37befb4d61a487a80fc276b4a9a8dbd1d7adefe05bad04d",
+          "question": "positive midpoint plus missing index"
+        },
+        {
+          "version": 14,
+          "sourceSha256": "900f389c262c4f7faf2863885084396194d888ae29ea556a46026e3c0a6dea26",
+          "question": "positive minimum plus four-slot middle tie"
+        }
+      ]
+    },
+    {
+      "probe": "array-percentrank-size-and-ties-v29-v1.pine",
+      "path": "array-percentrank-size-and-ties-v29-v1.pine",
+      "owner": "codex-v6aeqx",
+      "sourceSha256": "cf958d9418af0c93f9b8ade67b000b5b6e168d59abce3544d86243b349731525",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "compile-outcome+runtime-outcome+raw-csv+context+snapshot",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "columns": [
+        "CASE",
+        "INPUT_BAR_INDEX",
+        "INPUT_TIME_MS",
+        "SIZE",
+        "SOURCE_0",
+        "SOURCE_1",
+        "SOURCE_2",
+        "SOURCE_3",
+        "SOURCE_4",
+        "RANK_NAMESPACE_0",
+        "RANK_NAMESPACE_1",
+        "RANK_NAMESPACE_2",
+        "RANK_NAMESPACE_3",
+        "RANK_NAMESPACE_4",
+        "RANK_METHOD_0",
+        "RANK_METHOD_1",
+        "RANK_METHOD_2",
+        "RANK_METHOD_3",
+        "RANK_METHOD_4"
+      ],
+      "question": "What are the ranks or outcomes for singleton/pair arrays and further duplicate shapes, including untied references in a tied array?",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC"
+      },
+      "instructionsPath": "instructions/array-percentrank-size-and-ties-v29-v1.md",
+      "instructionsSha256": "9e8c05078b9625b6f22ef512a872f8244043e9496b980d20845241b060dc6be4",
+      "ledgerRanks": [
+        1228
+      ],
+      "authority": [
+        "https://www.tradingview.com/pine-script-reference/v6/#fun_array.percentrank"
+      ],
+      "limits": "Exact selected settings only; no universal algorithm/version/tolerance credit. Unobserved held paths retain T behavior.",
+      "inputAttempts": [
+        {
+          "CASE": 0,
+          "label": "singleton"
+        },
+        {
+          "CASE": 1,
+          "label": "unequal-pair"
+        },
+        {
+          "CASE": 2,
+          "label": "equal-pair"
+        },
+        {
+          "CASE": 3,
+          "label": "all-equal-triple"
+        },
+        {
+          "CASE": 4,
+          "label": "two-tie-groups"
+        },
+        {
+          "CASE": 5,
+          "label": "captured-middle-tie-all-indices"
+        }
+      ],
+      "refusalIsolation": "One CASE per independent capture attempt; empty and all-NA are isolated, with index0 deliberately invoked.",
+      "priorEvidence": [
+        {
+          "version": 7,
+          "sourceSha256": "b46487f3392c8e56d37befb4d61a487a80fc276b4a9a8dbd1d7adefe05bad04d",
+          "question": "positive midpoint plus missing index"
+        },
+        {
+          "version": 14,
+          "sourceSha256": "900f389c262c4f7faf2863885084396194d888ae29ea556a46026e3c0a6dea26",
+          "question": "positive minimum plus four-slot middle tie"
+        }
+      ]
+    },
+    {
+      "probe": "array-percentrank-holes-v29-v1.pine",
+      "path": "array-percentrank-holes-v29-v1.pine",
+      "owner": "codex-v6aeqx",
+      "sourceSha256": "b474f1fbd5db38b2af29f3167a6fe737638420784720605bf3f890945445bd35",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "compile-outcome+runtime-outcome+raw-csv+context+snapshot",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "columns": [
+        "CASE",
+        "INPUT_BAR_INDEX",
+        "INPUT_TIME_MS",
+        "SIZE",
+        "SOURCE_0",
+        "SOURCE_1",
+        "SOURCE_2",
+        "SOURCE_3",
+        "SOURCE_4",
+        "RANK_NAMESPACE_0",
+        "RANK_NAMESPACE_1",
+        "RANK_NAMESPACE_2",
+        "RANK_NAMESPACE_3",
+        "RANK_NAMESPACE_4",
+        "RANK_METHOD_0",
+        "RANK_METHOD_1",
+        "RANK_METHOD_2",
+        "RANK_METHOD_3",
+        "RANK_METHOD_4"
+      ],
+      "question": "For NA elements, does rank use full size or finite count, and what is the missing-reference outcome? Observe empty/all-NA outcomes in isolated attempts.",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC"
+      },
+      "instructionsPath": "instructions/array-percentrank-holes-v29-v1.md",
+      "instructionsSha256": "07db1536957337380eef7a3d3eabf8a15d1cfb7a9d539a6553f01908227cdcf8",
+      "ledgerRanks": [
+        1228
+      ],
+      "authority": [
+        "https://www.tradingview.com/pine-script-reference/v6/#fun_array.percentrank"
+      ],
+      "limits": "Exact selected settings only; no universal algorithm/version/tolerance credit. Unobserved held paths retain T behavior.",
+      "inputAttempts": [
+        {
+          "CASE": 0,
+          "label": "empty"
+        },
+        {
+          "CASE": 1,
+          "label": "all-na"
+        },
+        {
+          "CASE": 2,
+          "label": "leading-na"
+        },
+        {
+          "CASE": 3,
+          "label": "middle-na"
+        },
+        {
+          "CASE": 4,
+          "label": "mostly-na"
+        },
+        {
+          "CASE": 5,
+          "label": "positive-control"
+        }
+      ],
+      "refusalIsolation": "One CASE per independent capture attempt; empty and all-NA are isolated, with index0 deliberately invoked.",
+      "priorEvidence": [
+        {
+          "version": 7,
+          "sourceSha256": "b46487f3392c8e56d37befb4d61a487a80fc276b4a9a8dbd1d7adefe05bad04d",
+          "question": "positive midpoint plus missing index"
+        },
+        {
+          "version": 14,
+          "sourceSha256": "900f389c262c4f7faf2863885084396194d888ae29ea556a46026e3c0a6dea26",
+          "question": "positive minimum plus four-slot middle tie"
+        }
+      ]
+    },
+    {
+      "probe": "marker-pixel-anchors-r268-v29-v1.pine",
+      "path": "marker-pixel-anchors-r268-v29-v1.pine",
+      "owner": "codex-9tqhik",
+      "sourceSha256": "a2ca14ab79fc18c8b4d7df21b6548bfe79e502447a85e2a729deaf2b4d56f7f2",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "raw-csv+calibrated-full-screenshots+context",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "ledgerRanks": [
+        268
+      ],
+      "columns": [
+        "Y_ANCHOR",
+        "PHASE",
+        "CHART_INDEX",
+        "CHART_TIME_MS"
+      ],
+      "question": "Native marker anchor, glyph bounding box and size changes for three plotshape configurations and plotchar A at a known y=100/bar-index anchor.",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC",
+        "chartType": "STANDARD-CANDLES"
+      },
+      "instructionsPath": "instructions/marker-pixel-anchors-r268-v29-v1.md",
+      "instructionsSha256": "1e9337212d55ce44dc26eee7fb00fd13291ca482107dfd8964dc782831f95b33",
+      "authority": [
+        "https://www.tradingview.com/pine-script-docs/visuals/text-and-shapes/",
+        "https://www.tradingview.com/pine-script-reference/v6/#fun_plotchar",
+        "https://www.tradingview.com/pine-script-reference/v6/#fun_plotshape"
+      ],
+      "limits": "CSV certifies anchor inputs only. Screenshots can establish bounded viewport/platform metrics; no universal glyph dimensions or alternate-platform pixel law.",
+      "refusalIsolation": "No deliberate invalid shape in this source."
+    },
+    {
+      "probe": "atr-actual-input-holes-r282-v29-v1.pine",
+      "path": "atr-actual-input-holes-r282-v29-v1.pine",
+      "owner": "codex-9tqhik",
+      "sourceSha256": "a42631776e1409abec5565111d7e24ee5e6f80d1696dbb8b70bfa6c8fc14fba2",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "compile-outcome+runtime-outcome+raw-csv+context+snapshot",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "ledgerRanks": [
+        282
+      ],
+      "columns": [
+        "CHART_INDEX",
+        "CHART_TIME_MS",
+        "INPUT_HIGH",
+        "INPUT_LOW",
+        "INPUT_CLOSE",
+        "INPUT_PRIOR_CLOSE",
+        "INPUT_OHLC_NA",
+        "PRIOR_CLOSE_NA",
+        "TR_HANDLE_TRUE",
+        "TR_HANDLE_FALSE",
+        "ATR_LEN3",
+        "RMA_TRUE_TR_CONTROL",
+        "RMA_FALSE_TR_CANDIDATE",
+        "ATR_NA"
+      ],
+      "question": "ATR len3 seeding when the prior close is missing, and publication/state recovery through an actually missing native true-range input if the dataset supplies one.",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC",
+        "chartType": "STANDARD-CANDLES"
+      },
+      "instructionsPath": "instructions/atr-actual-input-holes-r282-v29-v1.md",
+      "instructionsSha256": "ecd8c03348fa1e95462a98def202b8fd7614d67498d8328feac1d70a1192949d",
+      "authority": [
+        "https://www.tradingview.com/pine-script-reference/v6/#fun_ta.atr"
+      ],
+      "limits": "ta.atr has no source argument. A source-hole RMA experiment cannot establish ATR missing-OHLC behavior. Ordinary finite OHLC or first-bar close[1] NA does not close every later-hole facet.",
+      "refusalIsolation": "No deliberate invalid shape in this source."
+    },
+    {
+      "probe": "timenow-clock-sampling-r698-v29-v1.pine",
+      "path": "timenow-clock-sampling-r698-v29-v1.pine",
+      "owner": "codex-9tqhik",
+      "sourceSha256": "d06e409fd106afa9ae4b5cecedccdb232d497440b9f069462ad81de0e55b8295",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "live-data-window+PineLogs+external-clock-bounds+context",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "ledgerRanks": [
+        698
+      ],
+      "columns": [
+        "BAR_OPEN_MS",
+        "BAR_CLOSE_MS",
+        "CHART_INDEX",
+        "SAMPLED_TIMENOW_MS",
+        "SAME_BAR_CLOCK_DELTA_MS",
+        "SAME_BAR_UPDATES",
+        "IS_REALTIME",
+        "IS_CONFIRMED",
+        "INPUT_CLOSE"
+      ],
+      "question": "Observed timenow clock sampling and successive-update resolution, separated from the unobserved provider event timestamp and causal transport latency.",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC",
+        "chartType": "STANDARD-CANDLES"
+      },
+      "instructionsPath": "instructions/timenow-clock-sampling-r698-v29-v1.md",
+      "instructionsSha256": "0212179553612ea7b5c27f89472b2ed353eaf14a0d39807cc0d8da1093fbc8c7",
+      "authority": [
+        "https://www.tradingview.com/pine-script-docs/concepts/time/#timenow"
+      ],
+      "limits": "This source exposes the native sampled clock. Operator wall-clock brackets give observation bounds only. Instrumentation and log costs are present; no latency constant, provider clock identity or universal millisecond accuracy claim.",
+      "refusalIsolation": "No deliberate invalid shape in this source."
+    },
+    {
+      "probe": "chart-foreground-background-r705-v29-v1.pine",
+      "path": "chart-foreground-background-r705-v29-v1.pine",
+      "owner": "codex-9tqhik",
+      "sourceSha256": "3277592dad7d25d4c4d6d8b351c6fc8b24713e07575f671af3eb1bd8935583ed",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "raw-csv+chart-settings+screenshots+context",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "ledgerRanks": [
+        705
+      ],
+      "columns": [
+        "BACKGROUND_R",
+        "BACKGROUND_G",
+        "BACKGROUND_B",
+        "BACKGROUND_T",
+        "FOREGROUND_R",
+        "FOREGROUND_G",
+        "FOREGROUND_B",
+        "FOREGROUND_T",
+        "VISIBLE_FG_SAMPLE"
+      ],
+      "question": "Native chart.fg_color choice as chart settings vary the solid background around a grayscale transition; gradient behavior is a separate sampled control.",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC",
+        "chartType": "STANDARD-CANDLES"
+      },
+      "instructionsPath": "instructions/chart-foreground-background-r705-v29-v1.md",
+      "instructionsSha256": "c97465a187d57f5e354036983e000b4a9b4c5a528c80d281be75cd565ee16d69",
+      "authority": [
+        "https://www.tradingview.com/pine-script-docs/concepts/chart-information/#chart-type"
+      ],
+      "limits": "These settings can bracket an observed threshold for this build/theme. Grayscale does not settle arbitrary RGB luminance, transparency or universal theme policy.",
+      "refusalIsolation": "No deliberate invalid shape in this source."
+    },
+    {
+      "probe": "polyline-asymmetric-curve-r856-v29-v1.pine",
+      "path": "polyline-asymmetric-curve-r856-v29-v1.pine",
+      "owner": "codex-9tqhik",
+      "sourceSha256": "f5c939bfa133dcf284573737d511c2411c38089fdebadd08840c64634d935cce",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "calibrated-full-screenshots+PineLogs+data-window+context",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "ledgerRanks": [
+        856
+      ],
+      "columns": [
+        "POINT0_INDEX",
+        "CHART_INDEX",
+        "LOW_AXIS_CONTROL",
+        "HIGH_AXIS_CONTROL"
+      ],
+      "question": "Curved versus straight open polyline path between five asymmetric, nonuniformly spaced native points, including overshoot and inter-point path shape.",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC",
+        "chartType": "STANDARD-CANDLES"
+      },
+      "instructionsPath": "instructions/polyline-asymmetric-curve-r856-v29-v1.md",
+      "instructionsSha256": "628f44a47d2e622e901c7f6e932b71a29f89f9a1257ed93fbbf4ccc7b108a81f",
+      "authority": [
+        "https://www.tradingview.com/pine-script-docs/visuals/lines-and-boxes/#curved-drawings",
+        "https://www.tradingview.com/pine-script-reference/v6/#fun_polyline.new"
+      ],
+      "limits": "Polyline exposes no get_price sampler. Pixels certify a bounded rendered path, not an internal spline basis or arbitrary-point formula. If curve sampling cannot distinguish candidate kernels at the recorded resolution, the kernel facet stays HELD.",
+      "refusalIsolation": "No deliberate invalid shape in this source."
+    },
+    {
+      "probe": "map-put-all-overflow-r1520-v29-v1.pine",
+      "path": "map-put-all-overflow-r1520-v29-v1.pine",
+      "owner": "codex-9tqhik",
+      "sourceSha256": "b9d504bc3c0d9cbcb0706615746f406e3e8c3d50983a2929e8e1663667d5f199",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "compile-outcome+runtime-outcome+raw-csv+context+snapshot",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "ledgerRanks": [
+        1520
+      ],
+      "columns": [
+        "CHART_INDEX",
+        "PRE_SIZE",
+        "PRE_KEY0",
+        "POST_SIZE",
+        "POST_KEY0",
+        "POST_FIRST_NEW_KEY",
+        "POST_SECOND_NEW_KEY",
+        "COMPLETED_PUT_ALL"
+      ],
+      "question": "Capacity failure phase and observable write atomicity for one existing-key overwrite followed by two new keys in insertion order; compare fitting50000 and overflowing50001 final pair counts.",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC",
+        "chartType": "STANDARD-CANDLES"
+      },
+      "instructionsPath": "instructions/map-put-all-overflow-r1520-v29-v1.md",
+      "instructionsSha256": "0e7fe90a35eb0786bb8d6658a29f1101a1be0050b8a0250c606ad5ee3c85c59e",
+      "authority": [
+        "https://www.tradingview.com/pine-script-docs/language/maps/#combining-maps"
+      ],
+      "limits": "Pine has no catch block. If fatal put_all refusal prevents every post-call observation, partial mutation versus rollback is not observable from this script and must stay TRACE. BEFORE logs and fitting controls do not establish overflow atomicity.",
+      "refusalIsolation": "Overflow source contains only put_all capacity invalidity; fitting control is a separate source."
+    },
+    {
+      "probe": "map-put-all-fits-control-r1520-v29-v1.pine",
+      "path": "map-put-all-fits-control-r1520-v29-v1.pine",
+      "owner": "codex-9tqhik",
+      "sourceSha256": "6d5ffdd3071a8908a024257d3742bb2aa8a4a124b81c620d809bf2caa8c6dd2e",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "compile-outcome+runtime-outcome+raw-csv+context+snapshot",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "ledgerRanks": [
+        1520
+      ],
+      "columns": [
+        "CHART_INDEX",
+        "PRE_SIZE",
+        "PRE_KEY0",
+        "POST_SIZE",
+        "POST_KEY0",
+        "POST_FIRST_NEW_KEY",
+        "POST_SECOND_NEW_KEY",
+        "COMPLETED_PUT_ALL"
+      ],
+      "question": "Capacity failure phase and observable write atomicity for one existing-key overwrite followed by two new keys in insertion order; compare fitting50000 and overflowing50001 final pair counts.",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC",
+        "chartType": "STANDARD-CANDLES"
+      },
+      "instructionsPath": "instructions/map-put-all-fits-control-r1520-v29-v1.md",
+      "instructionsSha256": "7e9fdebf6795badf28836998d4a6f867b9301e3fb93f84cf1eb3564b69f0f5b9",
+      "authority": [
+        "https://www.tradingview.com/pine-script-docs/language/maps/#combining-maps"
+      ],
+      "limits": "Pine has no catch block. If fatal put_all refusal prevents every post-call observation, partial mutation versus rollback is not observable from this script and must stay TRACE. BEFORE logs and fitting controls do not establish overflow atomicity.",
+      "refusalIsolation": "Overflow source contains only put_all capacity invalidity; fitting control is a separate source."
+    },
+    {
+      "probe": "analyst-unavailable-instrument-r1542-v29-v1.pine",
+      "path": "analyst-unavailable-instrument-r1542-v29-v1.pine",
+      "owner": "codex-9tqhik",
+      "sourceSha256": "4ea40b1e0869dcde951cfb098c0a401d761816ca474c27aa658aa4a61001355e",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "raw-csv+analyst-availability-UI+PineLogs+context",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "ledgerRanks": [
+        1542
+      ],
+      "columns": [
+        "CHART_TIME_MS",
+        "INPUT_CLOSE",
+        "TARGET_AVERAGE",
+        "TARGET_MEDIAN",
+        "TARGET_HIGH",
+        "TARGET_LOW",
+        "TARGET_DATE_MS",
+        "TARGET_ESTIMATES",
+        "AVERAGE_NA",
+        "MEDIAN_NA",
+        "HIGH_NA",
+        "LOW_NA",
+        "DATE_NA",
+        "ESTIMATES_NA"
+      ],
+      "question": "Missing versus zero/finite native defaults on an instrument verified to have no analyst targets, separated from market-closed and account-data absence.",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC",
+        "chartType": "STANDARD-CANDLES"
+      },
+      "instructionsPath": "instructions/analyst-unavailable-instrument-r1542-v29-v1.md",
+      "instructionsSha256": "c9fe0b5b5e20daa34b1c1a7463fed595cf7df36e43ab7284cf45440a9f61f631",
+      "authority": [
+        "https://www.tradingview.com/pine-script-reference/v6/#var_syminfo.target_price_average"
+      ],
+      "limits": "A missing target on a closed covered market does not certify this facet. Crypto type alone is a candidate, not proof of the provider analyst catalog. Results bind the observed instrument/account/build.",
+      "refusalIsolation": "No deliberate invalid shape in this source."
+    },
+    {
+      "probe": "chart-execution-lifecycle-r1770-1775-revision1-v29-v1.pine",
+      "path": "chart-execution-lifecycle-r1770-1775-revision1-v29-v1.pine",
+      "owner": "codex-9tqhik",
+      "sourceSha256": "d5f5475d2d6be0b7f08d1ca7fa7692e9ce654e88a8b793ed66eb907da1051189",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "paired-UI-actions+raw-csv+PineLogs+Profiler-screenshots+context",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "ledgerRanks": [
+        1770,
+        1771,
+        1772,
+        1774,
+        1775
+      ],
+      "columns": [
+        "SOURCE_REVISION",
+        "CONFIGURATION_ID",
+        "INITIALIZED_WALL_MS",
+        "DATASET_ORIGIN_MS",
+        "COMMITTED_BARS",
+        "CLOSED_PREFIX_CHECKSUM",
+        "CHART_TIME_MS",
+        "INPUT_CLOSE"
+      ],
+      "question": "Observable reinitialization/re-execution or prior output reuse after dataset changes, Logs/Profiler toggles, input roundtrip, refresh and source update.",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC",
+        "chartType": "STANDARD-CANDLES"
+      },
+      "instructionsPath": "instructions/chart-execution-lifecycle-r1770-1775-revision1-v29-v1.md",
+      "instructionsSha256": "de34bd84a4ff7a18051c9f91b813204fd0311d908c81fb621c7ffa0b360953c3",
+      "authority": [
+        "https://www.tradingview.com/pine-script-docs/language/execution-model/#caching",
+        "https://www.tradingview.com/pine-script-docs/language/execution-model/#events-that-trigger-script-executions"
+      ],
+      "limits": "Init stamps, logs and fingerprints can discriminate fresh execution from prior observed output reuse on a frozen dataset. Equal outputs alone do not prove an internal cache hit, lifetime or storage policy. Cache internal mechanics remain HELD when no native UI evidence exposes them. Each UI action requires its own paired observation.",
+      "refusalIsolation": "No deliberate invalid shape in this source."
+    },
+    {
+      "probe": "chart-execution-lifecycle-r1770-1775-revision2-v29-v1.pine",
+      "path": "chart-execution-lifecycle-r1770-1775-revision2-v29-v1.pine",
+      "owner": "codex-9tqhik",
+      "sourceSha256": "fbb6b2b1db65b67e199ca46fa64e7d4c078127b5b3ca6852c653d4b7689fa7a6",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "paired-UI-actions+raw-csv+PineLogs+Profiler-screenshots+context",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "ledgerRanks": [
+        1770,
+        1771,
+        1772,
+        1774,
+        1775
+      ],
+      "columns": [
+        "SOURCE_REVISION",
+        "CONFIGURATION_ID",
+        "INITIALIZED_WALL_MS",
+        "DATASET_ORIGIN_MS",
+        "COMMITTED_BARS",
+        "CLOSED_PREFIX_CHECKSUM",
+        "CHART_TIME_MS",
+        "INPUT_CLOSE"
+      ],
+      "question": "Observable reinitialization/re-execution or prior output reuse after dataset changes, Logs/Profiler toggles, input roundtrip, refresh and source update.",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC",
+        "chartType": "STANDARD-CANDLES"
+      },
+      "instructionsPath": "instructions/chart-execution-lifecycle-r1770-1775-revision2-v29-v1.md",
+      "instructionsSha256": "ba5e76374ba79452e231a9d930d8420f623600208adaade51bfb97ba235953f3",
+      "authority": [
+        "https://www.tradingview.com/pine-script-docs/language/execution-model/#caching",
+        "https://www.tradingview.com/pine-script-docs/language/execution-model/#events-that-trigger-script-executions"
+      ],
+      "limits": "Init stamps, logs and fingerprints can discriminate fresh execution from prior observed output reuse on a frozen dataset. Equal outputs alone do not prove an internal cache hit, lifetime or storage policy. Cache internal mechanics remain HELD when no native UI evidence exposes them. Each UI action requires its own paired observation.",
+      "refusalIsolation": "No deliberate invalid shape in this source."
+    },
+    {
+      "probe": "pine-screener-dataset-r1773-v29-v1.pine",
+      "path": "pine-screener-dataset-r1773-v29-v1.pine",
+      "owner": "codex-9tqhik",
+      "sourceSha256": "fe7e2d84a30684675fec4a238d42cdd74c336f2f7748f7ae6e2a6b1e969e9f45",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "PineScreener-UI+per-symbol-chart-companions+context",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "ledgerRanks": [
+        1773
+      ],
+      "columns": [
+        "DATASET_CLOSE",
+        "DATASET_TIME_MS",
+        "DATASET_ORIGIN_MS",
+        "INITIALIZED_WALL_MS",
+        "DATASET_LAST_INDEX"
+      ],
+      "question": "Pine Screener actually evaluates the selected symbol/timeframe datasets and its bounded history/origin, rather than reusing one chart dataset for all rows.",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC",
+        "chartType": "STANDARD-CANDLES"
+      },
+      "instructionsPath": "instructions/pine-screener-dataset-r1773-v29-v1.md",
+      "instructionsSha256": "47cea8ab3d88b9ecbe4e9a9cd47d634161c9a54e396a0b12e0ca4aeb82bf8e58",
+      "authority": [
+        "https://www.tradingview.com/pine-script-docs/language/execution-model/#events-that-trigger-script-executions"
+      ],
+      "limits": "Chart execution is only an input companion, not proof a scan occurred. Screener history limits and live asof differences must be retained. No scan-wide cache or generic account tier claim.",
+      "refusalIsolation": "No deliberate invalid shape in this source."
+    },
+    {
+      "probe": "legacy-barsince-rename-v4-guide-spelling-r1908-v29-v1.pine",
+      "path": "legacy-barsince-rename-v4-guide-spelling-r1908-v29-v1.pine",
+      "owner": "codex-9tqhik",
+      "sourceSha256": "3e46cd93aedb85d0a011f42b92756b331c511c76bc41fdd796b1f62e08be525b",
+      "pineVersion": 4,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "compile-outcome+runtime-outcome+raw-csv+context+snapshot",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "ledgerRanks": [
+        1908
+      ],
+      "columns": [
+        "CHART_INDEX",
+        "EVENT",
+        "TARGET",
+        "TARGET_NA"
+      ],
+      "question": "Native admission of the guide spelling barsince/ta.barsince versus documented canonical barssince/ta.barssince across v4 and v5, plus bounded namespace migration behavior.",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC",
+        "chartType": "STANDARD-CANDLES"
+      },
+      "instructionsPath": "instructions/legacy-barsince-rename-v4-guide-spelling-r1908-v29-v1.md",
+      "instructionsSha256": "0cac1094853aa73b33aa9f1eb129be3547e4c4ee2e2bbfb1c80621d6eb82c39a",
+      "authority": [
+        "https://www.tradingview.com/pine-script-docs/migration-guides/to-pine-version-5/#ta-namespace-for-technical-analysis-functions-and-variables"
+      ],
+      "limits": "The worklist spells barsince with one s; the local v6 reference lists ta.barssince with two. All spellings are isolated so a typo cannot block the canonical migration control. Exact diagnostic and arithmetic remain capture-specific.",
+      "refusalIsolation": "Each possibly unknown name is in its own source; no mixed function spelling source."
+    },
+    {
+      "probe": "legacy-barsince-rename-v4-canonical-control-r1908-v29-v1.pine",
+      "path": "legacy-barsince-rename-v4-canonical-control-r1908-v29-v1.pine",
+      "owner": "codex-9tqhik",
+      "sourceSha256": "d18830010cb42b217386d4ad0eea7b60392754e7fa04a97ee71d52a9ad1bbabb",
+      "pineVersion": 4,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "compile-outcome+runtime-outcome+raw-csv+context+snapshot",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "ledgerRanks": [
+        1908
+      ],
+      "columns": [
+        "CHART_INDEX",
+        "EVENT",
+        "TARGET",
+        "TARGET_NA"
+      ],
+      "question": "Native admission of the guide spelling barsince/ta.barsince versus documented canonical barssince/ta.barssince across v4 and v5, plus bounded namespace migration behavior.",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC",
+        "chartType": "STANDARD-CANDLES"
+      },
+      "instructionsPath": "instructions/legacy-barsince-rename-v4-canonical-control-r1908-v29-v1.md",
+      "instructionsSha256": "3ad034d7a07cacaacf25f5b54e2c89ebb28cf255796ded92e78b616b1a4bc401",
+      "authority": [
+        "https://www.tradingview.com/pine-script-docs/migration-guides/to-pine-version-5/#ta-namespace-for-technical-analysis-functions-and-variables"
+      ],
+      "limits": "The worklist spells barsince with one s; the local v6 reference lists ta.barssince with two. All spellings are isolated so a typo cannot block the canonical migration control. Exact diagnostic and arithmetic remain capture-specific.",
+      "refusalIsolation": "Each possibly unknown name is in its own source; no mixed function spelling source."
+    },
+    {
+      "probe": "legacy-barsince-rename-v5-bare-canonical-r1908-v29-v1.pine",
+      "path": "legacy-barsince-rename-v5-bare-canonical-r1908-v29-v1.pine",
+      "owner": "codex-9tqhik",
+      "sourceSha256": "ecb2b4d06a9e2e72abf64c065c16243f19ab28dfb165682b94c792281046fdc2",
+      "pineVersion": 5,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "compile-outcome+runtime-outcome+raw-csv+context+snapshot",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "ledgerRanks": [
+        1908
+      ],
+      "columns": [
+        "CHART_INDEX",
+        "EVENT",
+        "TARGET",
+        "TARGET_NA"
+      ],
+      "question": "Native admission of the guide spelling barsince/ta.barsince versus documented canonical barssince/ta.barssince across v4 and v5, plus bounded namespace migration behavior.",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC",
+        "chartType": "STANDARD-CANDLES"
+      },
+      "instructionsPath": "instructions/legacy-barsince-rename-v5-bare-canonical-r1908-v29-v1.md",
+      "instructionsSha256": "80758d23378183ae1880c3a917dbdc147989a27956aa16976da3335e433f23ea",
+      "authority": [
+        "https://www.tradingview.com/pine-script-docs/migration-guides/to-pine-version-5/#ta-namespace-for-technical-analysis-functions-and-variables"
+      ],
+      "limits": "The worklist spells barsince with one s; the local v6 reference lists ta.barssince with two. All spellings are isolated so a typo cannot block the canonical migration control. Exact diagnostic and arithmetic remain capture-specific.",
+      "refusalIsolation": "Each possibly unknown name is in its own source; no mixed function spelling source."
+    },
+    {
+      "probe": "legacy-barsince-rename-v5-namespace-control-r1908-v29-v1.pine",
+      "path": "legacy-barsince-rename-v5-namespace-control-r1908-v29-v1.pine",
+      "owner": "codex-9tqhik",
+      "sourceSha256": "468dc9105db2632c77bba55b5323e46fdf296e0870f78a458e4f42358d1dd460",
+      "pineVersion": 5,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "compile-outcome+runtime-outcome+raw-csv+context+snapshot",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "ledgerRanks": [
+        1908
+      ],
+      "columns": [
+        "CHART_INDEX",
+        "EVENT",
+        "TARGET",
+        "TARGET_NA"
+      ],
+      "question": "Native admission of the guide spelling barsince/ta.barsince versus documented canonical barssince/ta.barssince across v4 and v5, plus bounded namespace migration behavior.",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC",
+        "chartType": "STANDARD-CANDLES"
+      },
+      "instructionsPath": "instructions/legacy-barsince-rename-v5-namespace-control-r1908-v29-v1.md",
+      "instructionsSha256": "dcceb9a1b85c1c845cf9e8bc50ca78a0083128bf41336712057dde54a77eb6ed",
+      "authority": [
+        "https://www.tradingview.com/pine-script-docs/migration-guides/to-pine-version-5/#ta-namespace-for-technical-analysis-functions-and-variables"
+      ],
+      "limits": "The worklist spells barsince with one s; the local v6 reference lists ta.barssince with two. All spellings are isolated so a typo cannot block the canonical migration control. Exact diagnostic and arithmetic remain capture-specific.",
+      "refusalIsolation": "Each possibly unknown name is in its own source; no mixed function spelling source."
+    },
+    {
+      "probe": "legacy-barsince-rename-v5-guide-namespace-spelling-r1908-v29-v1.pine",
+      "path": "legacy-barsince-rename-v5-guide-namespace-spelling-r1908-v29-v1.pine",
+      "owner": "codex-9tqhik",
+      "sourceSha256": "fef3fec7a259f6fac59e6d600331506e040605ccb02b068959594ea785e3b98f",
+      "pineVersion": 5,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "compile-outcome+runtime-outcome+raw-csv+context+snapshot",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "ledgerRanks": [
+        1908
+      ],
+      "columns": [
+        "CHART_INDEX",
+        "EVENT",
+        "TARGET",
+        "TARGET_NA"
+      ],
+      "question": "Native admission of the guide spelling barsince/ta.barsince versus documented canonical barssince/ta.barssince across v4 and v5, plus bounded namespace migration behavior.",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC",
+        "chartType": "STANDARD-CANDLES"
+      },
+      "instructionsPath": "instructions/legacy-barsince-rename-v5-guide-namespace-spelling-r1908-v29-v1.md",
+      "instructionsSha256": "fa65f97fb20a400e1649b920d7a1e5f50e035a214a535e96d966b9389df77be0",
+      "authority": [
+        "https://www.tradingview.com/pine-script-docs/migration-guides/to-pine-version-5/#ta-namespace-for-technical-analysis-functions-and-variables"
+      ],
+      "limits": "The worklist spells barsince with one s; the local v6 reference lists ta.barssince with two. All spellings are isolated so a typo cannot block the canonical migration control. Exact diagnostic and arithmetic remain capture-specific.",
+      "refusalIsolation": "Each possibly unknown name is in its own source; no mixed function spelling source."
+    }
+  ]
+}

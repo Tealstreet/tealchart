@@ -1,0 +1,9 @@
+//@version=5
+indicator("w8-int-target-direct-v5-v1", overlay=false, max_labels_count=10)
+n = input.int(9, "Numerator", minval=1)
+d = input.int(2, "Divisor", minval=1)
+int target = n / d
+plot(bar_index,"CHART_INDEX")
+plot(n / d,"RAW_QUOTIENT")
+plot(target,"INT_TARGET")
+plot(int(n / d),"EXPLICIT_INT_CONTROL")

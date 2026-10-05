@@ -1,0 +1,8 @@
+//@version=4
+study("V29 barsince rename v4-canonical-control J v1")
+bool event = bar_index % 5 == 2
+value = barssince(event)
+plot(bar_index, "CHART_INDEX")
+plot(event ? 1 : 0, "EVENT")
+plot(value, "TARGET")
+plot(na(value) ? 1 : 0, "TARGET_NA")

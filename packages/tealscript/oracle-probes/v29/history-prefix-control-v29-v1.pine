@@ -1,0 +1,7 @@
+//@version=6
+indicator("V29 history prefix control v1")
+plot(bar_index,"BAR_INDEX",display=display.data_window)
+plot(time,"TIME_MS",display=display.data_window)
+plot(close,"CLOSE_CONTROL",display=display.data_window)
+plot(barstate.ishistory ? 1 : 0,"HISTORY",display=display.data_window)
+plot(barstate.isrealtime ? 1 : 0,"REALTIME",display=display.data_window)

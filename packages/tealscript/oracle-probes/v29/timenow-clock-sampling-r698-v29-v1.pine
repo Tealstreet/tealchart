@@ -1,0 +1,22 @@
+//@version=6
+indicator("V29 timenow clock sampling J v1", precision=16)
+varip int previousNow = na
+varip int updateCount = 0
+if barstate.isnew
+    previousNow := na
+    updateCount := 0
+updateCount += 1
+int sampledNow = timenow
+int delta = na(previousNow) ? na : sampledNow - previousNow
+previousNow := sampledNow
+plot(time, "BAR_OPEN_MS")
+plot(time_close, "BAR_CLOSE_MS")
+plot(bar_index, "CHART_INDEX")
+plot(sampledNow, "SAMPLED_TIMENOW_MS")
+plot(delta, "SAME_BAR_CLOCK_DELTA_MS")
+plot(updateCount, "SAME_BAR_UPDATES")
+plot(barstate.isrealtime ? 1 : 0, "IS_REALTIME")
+plot(barstate.isconfirmed ? 1 : 0, "IS_CONFIRMED")
+plot(close, "INPUT_CLOSE")
+if barstate.isrealtime and updateCount <= 8
+    log.info("CLOCK index={0} update={1} sampled_ms={2} delta_ms={3} close={4}", bar_index, updateCount, sampledNow, delta, close)

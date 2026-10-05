@@ -82,6 +82,11 @@
 > ranks): batched numeric/TA state holes, legacy-version member isolation, sort/percentile/covariance.
 > Run each separately; follow each instructions file. Reply under `v28/captures/v28/`.
 
+> **Then round v29.** After v28, do [`v29/HANDOFF-v29-v4.md`](v29/HANDOFF-v29-v4.md) — 84 isolated sources covering zero
+> division, versioned type/admission questions, collection edge cases, visual/layout observations and requested/live
+> context. Follow every per-source input attempt and screenshot/live instruction; record refusals verbatim.
+> Reply under `v29/captures/v29/`.
+
 Agent exchange: [capture response v1](RESPONSE-v1.md). The next reply belongs in
 `RESPONSE-v2.md` beside this handoff; commit responses so both machines can read them.
 

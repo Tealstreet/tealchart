@@ -1,0 +1,3 @@
+// @version=6
+indicator("w8-hold-spaced-version-comment-v1")
+plot(close,"TARGET")

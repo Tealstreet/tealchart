@@ -1,0 +1,24 @@
+//@version=6
+indicator("V27-TableConstructorDimensions-v1", max_bars_back=256)
+caseId = input.int(0, "Case", options=[0, 1, 2, 3])
+axis = input.string("Columns", "Axis", options=["Columns", "Rows"])
+count = caseId == 0 ? 1 : caseId == 1 ? -1 : caseId == 2 ? 0 : int(na)
+dynamicCount = bar_index < 8 ? 1 : count
+columns = axis == "Columns" ? dynamicCount : 1
+rows = axis == "Rows" ? dynamicCount : 1
+var table control = table.new(position.bottom_left, 1, 1)
+var table tested = na
+var bool returned = false
+if barstate.isfirst
+    table.cell(control, 0, 0, "CONTROL", bgcolor=color.gray)
+if bar_index == 8
+    tested := table.new(position.top_right, columns, rows)
+    returned := true
+plot(bar_index, "PineIndex")
+plot(caseId, "CaseId")
+plot(axis == "Columns" ? 0 : 1, "AxisId")
+plot(columns, "Columns")
+plot(rows, "Rows")
+plot(returned ? 1 : 0, "ConstructorReturned")
+plot(na(dynamicCount) ? 1 : 0, "CountIsNa")
+plot(1, "PositivePlotControl")

@@ -1,0 +1,12 @@
+//@version=6
+indicator("s2-table-width-missing-v29-v1", precision=16)
+var table t=table.new(position.top_right,2,2,border_width=int(na),border_color=color.red)
+var int completed=0
+if barstate.islastconfirmedhistory
+    table.cell(t,0,0,"A")
+    table.cell(t,1,0,"B")
+    table.cell(t,0,1,"C")
+    table.cell(t,1,1,"D")
+    completed:=1
+plot(completed,"CALL_COMPLETED")
+plot(bar_index,"CHART_INDEX")

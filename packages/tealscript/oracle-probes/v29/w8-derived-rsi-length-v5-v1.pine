@@ -1,0 +1,13 @@
+//@version=5
+indicator("w8-derived-rsi-length-v5-v1", overlay=false, max_labels_count=10)
+lo = input.int(2, "Low length", minval=1)
+hi = input.int(23, "High length", minval=2)
+step = input.int(5, "Step", minval=0, maxval=10)
+lengthAlias = lo + step * (hi - lo) / 10
+value = ta.rsi(close, lengthAlias)
+control = ta.rsi(close, int(lengthAlias))
+plot(bar_index,"CHART_INDEX")
+plot(lengthAlias,"RAW_LENGTH")
+plot(int(lengthAlias),"EXPLICIT_INT_LENGTH")
+plot(value,"DERIVED_RSI")
+plot(control,"EXPLICIT_INT_RSI")

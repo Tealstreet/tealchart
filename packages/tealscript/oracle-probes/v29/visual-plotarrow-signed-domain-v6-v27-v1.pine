@@ -1,0 +1,16 @@
+//@version=6
+indicator("V27 plotarrow signed domain", overlay=true)
+m = bar_index % 64
+source = m == 4 ? 2.0 : m == 12 ? 8.0 : m == 20 ? -3.0 : m == 28 ? -30.0 : m == 36 ? na : m == 60 ? 500.0 : 0.0
+plotarrow(source, title="BASE", colorup=color.lime, colordown=color.red, minheight=10, maxheight=80)
+plotarrow(source * 7, title="SCALED", colorup=color.aqua, colordown=color.orange, offset=1, minheight=10, maxheight=80)
+plotarrow(-source, title="SIGN_FLIPPED", colorup=color.yellow, colordown=color.fuchsia, offset=2, minheight=10, maxheight=80)
+plotarrow(source, title="SHOW_LAST32", colorup=color.white, colordown=color.blue, offset=3, minheight=10, maxheight=80, show_last=32)
+plot(bar_index, "BAR_INDEX", display=display.data_window)
+plot(m, "SOURCE_INDEX_MOD64", display=display.data_window)
+plot(source, "SOURCE", display=display.data_window)
+plot(na(source) ? 1 : 0, "SOURCE_NA", display=display.data_window)
+plot(source * 7, "SCALED_SOURCE", display=display.data_window)
+plot(-source, "SIGN_FLIPPED_SOURCE", display=display.data_window)
+plot(10, "MINHEIGHT", display=display.data_window)
+plot(80, "MAXHEIGHT", display=display.data_window)

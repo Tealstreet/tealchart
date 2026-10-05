@@ -1,0 +1,21 @@
+//@version=6
+indicator("WAD cancellation discriminator v1")
+plot(open,"ACTUAL_OPEN")
+plot(high,"ACTUAL_HIGH")
+plot(low,"ACTUAL_LOW")
+plot(close,"ACTUAL_CLOSE")
+plot(volume,"ACTUAL_VOLUME")
+float delta=close>close[1]?close-math.min(low,close[1]):close<close[1]?close-math.max(high,close[1]):0
+var float raw=0
+var float resetTiny=0
+var float resetTolerance=0
+raw+=delta
+resetTiny+=delta
+resetTolerance+=delta
+resetTiny:=math.abs(resetTiny)<=1e-13?0:resetTiny
+resetTolerance:=math.abs(resetTolerance)<=1e-10?0:resetTolerance
+plot(ta.wad,"WAD")
+plot(raw,"EXPLICIT_RAW")
+plot(resetTiny,"RESET_1E13")
+plot(resetTolerance,"RESET_1E10")
+plot(delta,"DELTA")

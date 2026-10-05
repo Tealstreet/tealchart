@@ -1,0 +1,13 @@
+//@version=6
+indicator("array-fill-overflow-after20-bbi-v1")
+a = array.from(10.0, 20.0, 30.0, 40.0)
+int start = bar_index < 20 ? 1 : 1
+int end = bar_index < 20 ? 3 : 5
+plot(bar_index, "BAR_INDEX")
+plot(start, "START")
+plot(end, "END_EXCLUSIVE")
+array.fill(a, 99.0, start, end)
+plot(array.get(a, 0), "VALUE_0")
+plot(array.get(a, 1), "VALUE_1")
+plot(array.get(a, 2), "VALUE_2")
+plot(array.get(a, 3), "VALUE_3")

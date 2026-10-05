@@ -1,0 +1,4 @@
+//@version=5
+indicator("w8-hold-ellipsis-argument-v5-v1",overlay=false)
+f(float x) => x
+plot(f(...),"TARGET")

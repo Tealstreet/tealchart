@@ -1,0 +1,22 @@
+//@version=6
+indicator("V27-TableCellDimensions-v1", max_bars_back=256)
+caseId = input.int(0, "Case", options=[0, 1, 2, 3, 4])
+axis = input.string("Width", "Axis", options=["Width", "Height"])
+overflow = 1e200 * (bar_index >= 0 ? 1e200 : 1.0)
+dimension = caseId == 0 ? 10.0 : caseId == 1 ? -5.0 : caseId == 2 ? 0.0 : caseId == 3 ? float(na) : overflow
+width = axis == "Width" ? dimension : 10.0
+height = axis == "Height" ? dimension : 5.0
+var table tested = table.new(position.top_right, 2, 1)
+var bool returned = false
+if barstate.isfirst
+    table.cell(tested, 0, 0, "CONTROL", width=10, height=5, bgcolor=color.gray)
+if bar_index == 8
+    table.cell(tested, 1, 0, "TEST", width=width, height=height, bgcolor=color.orange)
+    returned := true
+plot(bar_index, "PineIndex")
+plot(caseId, "CaseId")
+plot(axis == "Width" ? 0 : 1, "AxisId")
+plot(dimension, "Dimension")
+plot(na(dimension) ? 1 : 0, "DimensionIsNa")
+plot(returned ? 1 : 0, "CellReturned")
+plot(1, "PositivePlotControl")

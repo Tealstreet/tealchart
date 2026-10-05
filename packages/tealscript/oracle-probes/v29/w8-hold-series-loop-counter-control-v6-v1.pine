@@ -1,0 +1,8 @@
+//@version=6
+indicator("w8-hold-series-loop-counter-control-v6-v1",overlay=false)
+f(simple int x) => x
+limit = bar_index % 4
+float total = 0
+for i = 0 to limit
+    total += f(i)
+plot(total,"SUM")

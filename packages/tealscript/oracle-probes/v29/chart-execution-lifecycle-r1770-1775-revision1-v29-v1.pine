@@ -1,0 +1,23 @@
+//@version=6
+indicator("V29 execution lifecycle J v1", precision=16)
+int configuration = input.int(1, "Configuration identity", minval=1, maxval=2)
+int sourceRevision = 1
+var int initializedAt = timenow
+var int firstBarTime = time
+var int committedBars = 0
+var float checksum = 0.0
+if barstate.isconfirmed
+    committedBars += 1
+    checksum += close * configuration
+if barstate.isfirst
+    log.info("INIT revision={0} configuration={1} wall={2} origin={3} ticker={4} tf={5}", sourceRevision, configuration, initializedAt, firstBarTime, syminfo.tickerid, timeframe.period)
+if barstate.islastconfirmedhistory
+    log.info("PREFIX revision={0} configuration={1} bars={2} checksum={3} initialized={4}", sourceRevision, configuration, committedBars, checksum, initializedAt)
+plot(sourceRevision, "SOURCE_REVISION")
+plot(configuration, "CONFIGURATION_ID")
+plot(initializedAt, "INITIALIZED_WALL_MS")
+plot(firstBarTime, "DATASET_ORIGIN_MS")
+plot(committedBars, "COMMITTED_BARS")
+plot(checksum, "CLOSED_PREFIX_CHECKSUM")
+plot(time, "CHART_TIME_MS")
+plot(close, "INPUT_CLOSE")

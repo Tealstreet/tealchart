@@ -1,0 +1,9 @@
+//@version=5
+indicator("w8-size-udt-parameter-control-v5-v1", overlay=false, max_labels_count=10)
+type Font
+    float normal
+show(Font size) =>
+    size.normal
+localSize = Font.new(0.75)
+plot(bar_index,"CHART_INDEX")
+plot(show(localSize),"PARAMETER_NORMAL_FIELD")

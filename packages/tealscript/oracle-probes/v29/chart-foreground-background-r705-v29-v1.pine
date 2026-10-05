@@ -1,0 +1,11 @@
+//@version=6
+indicator("V29 chart foreground background J v1", precision=0)
+plot(color.r(chart.bg_color), "BACKGROUND_R")
+plot(color.g(chart.bg_color), "BACKGROUND_G")
+plot(color.b(chart.bg_color), "BACKGROUND_B")
+plot(color.t(chart.bg_color), "BACKGROUND_T")
+plot(color.r(chart.fg_color), "FOREGROUND_R")
+plot(color.g(chart.fg_color), "FOREGROUND_G")
+plot(color.b(chart.fg_color), "FOREGROUND_B")
+plot(color.t(chart.fg_color), "FOREGROUND_T")
+plot(1, "VISIBLE_FG_SAMPLE", color=chart.fg_color, linewidth=4)

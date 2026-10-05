@@ -1,0 +1,7 @@
+//@version=5
+indicator("w8-size-scalar-namespace-v5-v1", overlay=false, max_labels_count=10)
+size = close
+plot(bar_index,"CHART_INDEX")
+plot(size,"SCALAR_SIZE")
+if barstate.islastconfirmedhistory
+    label.new(bar_index,close,"scalar="+str.tostring(size)+"; namespace="+size.normal,size=size.normal)

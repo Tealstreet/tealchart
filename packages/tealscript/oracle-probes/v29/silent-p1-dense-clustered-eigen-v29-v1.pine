@@ -1,0 +1,41 @@
+//@version=6
+indicator("P1 dense clustered eigen convergence v29 v1", precision=16)
+float perturbation = input.float(1e-12, "Dense perturbation")
+var matrix<float> target = matrix.new<float>(8, 8, 0.0)
+if barstate.isfirst
+    for row = 0 to 7
+        for column = 0 to 7
+            float base = row == column ? 1.0 : 0.0
+            matrix.set(target, row, column, base + perturbation / float(row + column + 1))
+var array<float> values = matrix.eigenvalues(target)
+int missing = 0
+float trace = 0.0
+for index = 0 to 7
+    trace += matrix.get(target, index, index)
+    if na(array.get(values, index))
+        missing += 1
+plot(bar_index, "CHART_INDEX")
+plot(time, "CHART_TIME_MS")
+plot(close, "CHART_CLOSE")
+plot(perturbation, "PERTURBATION")
+plot(matrix.get(target, 0, 1), "MATRIX_01")
+plot(array.size(values), "EIGEN_COUNT")
+plot(missing, "EIGEN_NA_COUNT")
+plot(trace, "MATRIX_TRACE")
+plot(array.sum(values), "EIGEN_SUM")
+plot(array.get(values, 0), "EIGEN_0_RAW")
+plot(array.get(values, 1), "EIGEN_1_RAW")
+plot(array.get(values, 2), "EIGEN_2_RAW")
+plot(array.get(values, 3), "EIGEN_3_RAW")
+plot(array.get(values, 4), "EIGEN_4_RAW")
+plot(array.get(values, 5), "EIGEN_5_RAW")
+plot(array.get(values, 6), "EIGEN_6_RAW")
+plot(array.get(values, 7), "EIGEN_7_RAW")
+plot((array.get(values, 0) - 1.0) / perturbation, "EIGEN_0_CENTERED_OVER_PERTURBATION")
+plot((array.get(values, 1) - 1.0) / perturbation, "EIGEN_1_CENTERED_OVER_PERTURBATION")
+plot((array.get(values, 2) - 1.0) / perturbation, "EIGEN_2_CENTERED_OVER_PERTURBATION")
+plot((array.get(values, 3) - 1.0) / perturbation, "EIGEN_3_CENTERED_OVER_PERTURBATION")
+plot((array.get(values, 4) - 1.0) / perturbation, "EIGEN_4_CENTERED_OVER_PERTURBATION")
+plot((array.get(values, 5) - 1.0) / perturbation, "EIGEN_5_CENTERED_OVER_PERTURBATION")
+plot((array.get(values, 6) - 1.0) / perturbation, "EIGEN_6_CENTERED_OVER_PERTURBATION")
+plot((array.get(values, 7) - 1.0) / perturbation, "EIGEN_7_CENTERED_OVER_PERTURBATION")

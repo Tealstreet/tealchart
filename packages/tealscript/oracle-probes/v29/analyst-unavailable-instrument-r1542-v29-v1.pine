@@ -1,0 +1,18 @@
+//@version=6
+indicator("V29 analyst unavailable instrument J v1", precision=16)
+plot(time, "CHART_TIME_MS")
+plot(close, "INPUT_CLOSE")
+plot(syminfo.target_price_average, "TARGET_AVERAGE")
+plot(syminfo.target_price_median, "TARGET_MEDIAN")
+plot(syminfo.target_price_high, "TARGET_HIGH")
+plot(syminfo.target_price_low, "TARGET_LOW")
+plot(syminfo.target_price_date, "TARGET_DATE_MS")
+plot(syminfo.target_price_estimates, "TARGET_ESTIMATES")
+plot(na(syminfo.target_price_average) ? 1 : 0, "AVERAGE_NA")
+plot(na(syminfo.target_price_median) ? 1 : 0, "MEDIAN_NA")
+plot(na(syminfo.target_price_high) ? 1 : 0, "HIGH_NA")
+plot(na(syminfo.target_price_low) ? 1 : 0, "LOW_NA")
+plot(na(syminfo.target_price_date) ? 1 : 0, "DATE_NA")
+plot(na(syminfo.target_price_estimates) ? 1 : 0, "ESTIMATES_NA")
+if barstate.islastconfirmedhistory
+    log.info("ANALYST ticker={0} type={1} timeframe={2} now={3}", syminfo.tickerid, syminfo.type, timeframe.period, timenow)
