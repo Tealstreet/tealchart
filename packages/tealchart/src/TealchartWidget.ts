@@ -61,6 +61,7 @@ import type { ChartSettings, ChartStore, IndicatorInstance, PlotStyleOverride } 
 import type { ChartThemeInput } from './theme';
 import type { ResolutionInput } from './utils/normalizeResolution';
 import type { ITealchartWebWidget, SaveChartErrorInfo, SaveChartToServerOptions } from './widgetContract';
+import type { CustomIndicatorEditorActions } from './ui/IndicatorsModal';
 
 import { LOADING_OPACITY } from './constants';
 import {
@@ -313,6 +314,7 @@ export class TealchartWidget implements ITealchartWebWidget {
   private _indicatorConfigMap = new Map<string, BuiltinIndicator>();
   private _indicatorDeclarationMap = new Map<string, IndicatorDeclarationMetadata>();
   private _customTealscriptIndicators: BuiltinIndicator[];
+  private _customIndicatorEditor?: CustomIndicatorEditorActions;
   // Auto-save timer ID
   private _autoSaveTimer: ReturnType<typeof setTimeout> | null = null;
   // Throttled crosshair emission (50ms matches the chart session's crosshair throttle)
@@ -1335,6 +1337,9 @@ export class TealchartWidget implements ITealchartWebWidget {
               this._chartApi.toggleStudyVisibility(studyId);
               this._tealScriptManager?.toggleScriptVisibility(studyId);
             }
+            if (builtinIndicator.sourceKind === 'custom_tealchart_study') {
+              this.setCustomTealscriptIndicators(this._customTealscriptIndicators);
+            }
             this._scheduler.markDirty(DIRTY.FULL);
           }
         })
@@ -1419,6 +1424,7 @@ export class TealchartWidget implements ITealchartWebWidget {
       renderOptions: this._renderOptions,
       availableIndicators: this._getAvailableIndicators(),
       additionalIndicatorCategories: this._getAdditionalIndicatorCategories(),
+      customIndicatorEditor: this._customIndicatorEditor,
       onSymbolClick: this._options.onSymbolClick,
       chartSettingsContext: this._createChartSettingsContext(),
       onIntervalChange: (interval) => {
@@ -1861,9 +1867,78 @@ export class TealchartWidget implements ITealchartWebWidget {
   }
 
   setCustomTealscriptIndicators(indicators: BuiltinIndicator[]): void {
+    if (this._disposed) return;
+    const previous = this._customTealscriptIndicators;
     this._customTealscriptIndicators = this._normalizeCustomTealscriptIndicators(indicators);
     this._ui?.setAvailableIndicators(this._getAvailableIndicators());
     this._ui?.setAdditionalIndicatorCategories?.(this._getAdditionalIndicatorCategories());
+    if (!this._chartStore) return;
+
+    let changed = false;
+    const instances = this._chartStore.settings.get().indicators.map((instance) => {
+      if (instance.sourceKind === 'builtin') return instance;
+      if (instance.sourceKind !== 'custom_tealchart_study' && !previous.some((entry) => entry.id === instance.builtinId))
+        return instance;
+      const definition = this._customTealscriptIndicators.find((entry) =>
+        instance.sourceId ? entry.sourceId === instance.sourceId : entry.id === instance.builtinId,
+      );
+      if (!definition) return instance;
+
+      const studyId = this._indicatorStudyMap.get(instance.id);
+      const config = studyId ? this._indicatorConfigMap.get(studyId) : undefined;
+      if (studyId && config) {
+        const study = this._chartApi.getStudies().get(studyId);
+        if (study) {
+          study.name = definition.name;
+          study.isOverlay = definition.overlay;
+        }
+        this._indicatorConfigMap.set(studyId, definition);
+        if (config.overlay !== definition.overlay) {
+          this._paneManager.removeIndicator(studyId);
+          this._paneManager.addIndicator({
+            indicatorId: studyId,
+            overlay: definition.overlay,
+            yAxisRange: definition.yAxisRange,
+          });
+          changed = true;
+        }
+        if (config.code !== definition.code && this._tealScriptManager) {
+          const inputs = this._chartApi.getStudyById(studyId)?.getInputs() ?? instance.inputs;
+          this._indicatorDeclarationMap.delete(studyId);
+          void this._tealScriptManager.addScript(studyId, definition.code, inputs).catch((error) => {
+            if (this._disposed || this._indicatorConfigMap.get(studyId)?.code !== definition.code) return;
+            console.error(`Failed to update indicator ${definition.name}`, error);
+          });
+          this._tealScriptManager.setScriptVisibility(studyId, instance.isVisible);
+          changed = true;
+        }
+      }
+
+      if (
+        instance.name === definition.name && instance.builtinId === definition.id &&
+        instance.sourceKind === definition.sourceKind && instance.sourceId === definition.sourceId &&
+        instance.sourceHash === definition.sourceHash
+      ) return instance;
+      changed = true;
+      return {
+        ...instance,
+        name: definition.name,
+        builtinId: definition.id,
+        sourceKind: definition.sourceKind,
+        sourceId: definition.sourceId,
+        sourceHash: definition.sourceHash,
+      };
+    });
+    if (changed) {
+      this._chartStore.settings.setKey('indicators', instances);
+      this._markDirty();
+      this._scheduler.markDirty(DIRTY.FULL);
+    }
+  }
+
+  setCustomIndicatorEditor(actions: CustomIndicatorEditorActions | undefined): void {
+    this._customIndicatorEditor = actions;
+    this._ui?.setCustomIndicatorEditor(actions);
   }
 
   /**
@@ -1916,6 +1991,7 @@ export class TealchartWidget implements ITealchartWebWidget {
 
     // Generate a persistent instance ID
     const instanceId = generateIndicatorId(indicator.id);
+    const restoreGeneration = this._indicatorRestoreGeneration;
 
     // Create a study using the indicator's Tealscript code
     this._chartApi
@@ -1930,6 +2006,10 @@ export class TealchartWidget implements ITealchartWebWidget {
       .then((studyApi) => {
         if (studyApi) {
           const studyId = studyApi.getId();
+          if (this._disposed || restoreGeneration !== this._indicatorRestoreGeneration) {
+            this._chartApi.removeStudy(studyId);
+            return;
+          }
 
           // Track the mapping from instance ID to study ID
           this._indicatorStudyMap.set(instanceId, studyId);
@@ -1942,6 +2022,9 @@ export class TealchartWidget implements ITealchartWebWidget {
 
           // Persist to settings
           this._persistAddIndicator(instanceId, indicator);
+          if (indicator.sourceKind === 'custom_tealchart_study') {
+            this.setCustomTealscriptIndicators(this._customTealscriptIndicators);
+          }
 
           // Trigger immediate re-render to update chart layout for the new pane
           this._scheduler.markDirty(DIRTY.FULL);
@@ -2901,6 +2984,7 @@ export class TealchartWidget implements ITealchartWebWidget {
     // Dispose vanilla UI — preserve DOM so the new widget can show old
     // content until its first paint with bars (prevents blank flash).
     // The new widget's cleanupStaleSiblings() handles removal.
+    this._customIndicatorEditor = undefined;
     if (this._ui) {
       this._ui.dispose(true);
       this._ui = null;

@@ -15,10 +15,6 @@ Programmatic drag cancellation restores geometry without submitting callbacks.
 - **Konva.js**: Interactive trading geometry on web — order/position lines with draggable labels and controls
 - **DOM / React Native overlays**: Menus, buttons, chrome controls, and toolbars that do not require per-frame chart projection
 
-External native-axis last-trade labels render the price 2px larger than secondary
-countdown text, retaining the host font family, tag dimensions and line centers.
-Prices that would overflow the axis retain their native font size.
-Other external-axis labels keep their host font unchanged.
 
 `ui/LayoutSelector` is the shared saved-layout list and action modal. Hosts can
 open/close it through a native header without adding a second menu. Optional
@@ -130,6 +126,14 @@ hosts may pass `customTealscriptIndicators` plus `additionalIndicatorCategories`
 for user-authored or host-specific catalogs. Keep those categories neutral:
 Tealchart renders them only when matching indicators are available and must not
 hardcode Tealstreet-only buckets into `builtinIndicators.ts`.
+Hosts can register New Indicator and custom-source Edit actions through
+`setCustomIndicatorEditor`. The shared picker closes before invoking those
+callbacks; editing does not also add an indicator. Source storage and the
+editor remain host-owned, and hosts must clear callbacks on unmount.
+Custom-source catalog edits recompile existing study IDs in place, retaining
+inputs, styles, visibility and panes. Explicit overlay changes move the existing
+indicator; delayed adds and restores reconcile with the newest source only
+while their widget and layout generation still own the pending study.
 
 **TealScript drawing outputs on native:** `MobileIndicatorManager` stores
 TealScript `DrawingOutput` objects so hosts can observe them, but the native Skia
@@ -633,6 +637,9 @@ in place before `PriceLineManager.update`, so presentation and hit tests agree.
 Anonymous OEMS bounds retain the collision cache's positional fallback; never
 fabricate a shared empty ID, which aliases distinct tags on cache hits and makes
 unchanged order stacks jump between cached and fresh passes.
+Collision stacking preserves projected Y order, including inverted scales, through
+fixed-tag eviction. Ordering passes scale with the label count, and the quantized
+cache key includes label rank so subpixel crossings cannot reuse a reversed stack.
 `computeExternalIndicatorAxisLabels` reuses existing Tealscript tag eligibility,
 formatting, grow-only measured width, font and plot-color border with the host's
 value converter; these tags join the same pass. `renderExternalIndicatorAxisGuides`
@@ -1104,3 +1111,7 @@ property assignments with save/restore semantics while retaining its bounded
 ContextMenu accepts `openDirection: 'left'` to place the measured menu width
 left of its anchor, still clamped to the viewport. Existing callers keep the
 default rightward opening; Hosted uses left at its right-axis plus button.
+
+Hosted last-trade external axis labels match web Konva text placement: shared
+11px sizing, two-row centers 11px apart, and alphabetic glyph metrics measured
+with an alphabetic baseline. Ordinary external tags retain native middle alignment.

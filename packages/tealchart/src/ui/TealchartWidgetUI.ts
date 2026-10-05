@@ -77,6 +77,7 @@ import { IndicatorSettingsModal } from './IndicatorSettingsModal';
 import type { IndicatorCategory } from '../indicators/builtinIndicators';
 
 import { IndicatorsModal } from './IndicatorsModal';
+import type { CustomIndicatorEditorActions } from './IndicatorsModal';
 
 function resolveUserDrawingTextDecorationLine(style: { textUnderline?: boolean; textLineThrough?: boolean }): string {
   if (style.textUnderline && style.textLineThrough) return 'underline line-through';
@@ -131,6 +132,7 @@ export interface TealchartWidgetUIOptions {
   availableIndicators?: BuiltinIndicator[];
   /** Host-supplied categories for available custom indicators */
   additionalIndicatorCategories?: IndicatorCategory[];
+  customIndicatorEditor?: CustomIndicatorEditorActions;
   /** Callback when indicator visibility is toggled */
   onToggleIndicator?: (indicatorId: string) => void;
   /** Callback when indicator settings are requested */
@@ -480,6 +482,7 @@ export class TealchartWidgetUI {
     this.indicatorsModal = new IndicatorsModal({
       indicators: options.availableIndicators,
       additionalCategories: options.additionalIndicatorCategories,
+      customIndicatorEditor: options.customIndicatorEditor,
       onSelectIndicator: (indicator) => {
         options.onAddIndicator?.(indicator);
       },
@@ -958,6 +961,11 @@ export class TealchartWidgetUI {
   setAvailableIndicators(indicators: BuiltinIndicator[]): void {
     this.options.availableIndicators = indicators;
     this.indicatorsModal?.setIndicators(indicators);
+  }
+
+  setCustomIndicatorEditor(actions: CustomIndicatorEditorActions | undefined): void {
+    this.options.customIndicatorEditor = actions;
+    this.indicatorsModal?.setCustomIndicatorEditor(actions);
   }
 
   setAdditionalIndicatorCategories(categories: IndicatorCategory[]): void {

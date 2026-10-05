@@ -14,6 +14,11 @@ import { Modal } from './Modal';
 // Types
 // ============================================================================
 
+export interface CustomIndicatorEditorActions {
+  onNew: () => void;
+  onEdit: (indicator: BuiltinIndicator) => void;
+}
+
 export interface IndicatorsModalOptions {
   /** Callback when an indicator is selected */
   onSelectIndicator: (indicator: BuiltinIndicator) => void;
@@ -21,6 +26,7 @@ export interface IndicatorsModalOptions {
   indicators?: BuiltinIndicator[];
   /** Categories available beyond the built-in Tealchart catalog */
   additionalCategories?: IndicatorCategory[];
+  customIndicatorEditor?: CustomIndicatorEditorActions;
   /** Get currently active indicator IDs */
   getActiveIndicatorIds?: () => string[];
   /** Translation strings */
@@ -212,6 +218,19 @@ export class IndicatorsModal extends Modal {
   private renderList(): void {
     this.contentEl.innerHTML = '';
 
+    if (this.indicatorOptions.customIndicatorEditor) {
+      const create = this.createElement('button', {
+        textContent: 'New Indicator',
+        style: { ...contentStyles.listItem, width: '100%', textAlign: 'left', border: '0', background: 'transparent' },
+        onClick: () => {
+          this.close();
+          this.indicatorOptions.customIndicatorEditor?.onNew();
+        },
+      });
+      create.type = 'button';
+      this.contentEl.appendChild(create);
+    }
+
     const query = this.searchQuery.trim();
     const indicators = query ? this.searchIndicators(query) : this.getAvailableIndicators();
 
@@ -262,6 +281,24 @@ export class IndicatorsModal extends Modal {
           textContent: indicator.name,
           onClick: () => this.handleIndicatorClick(indicator),
         });
+
+        if (this.indicatorOptions.customIndicatorEditor && indicator.sourceKind === 'custom_tealchart_study' && indicator.sourceId) {
+          item.style.display = 'flex';
+          item.style.alignItems = 'center';
+          item.style.justifyContent = 'space-between';
+          const edit = this.createElement('button', {
+            textContent: 'Edit',
+            style: { color: 'inherit', background: 'transparent', border: '0', cursor: 'pointer' },
+          });
+          edit.type = 'button';
+          edit.setAttribute('aria-label', `Edit ${indicator.name}`);
+          edit.addEventListener('click', (event) => {
+            event.stopPropagation();
+            this.close();
+            this.indicatorOptions.customIndicatorEditor?.onEdit(indicator);
+          });
+          item.appendChild(edit);
+        }
 
         // Apply hover styles directly to avoid full re-render which destroys
         // the element before the click event can fire
@@ -340,6 +377,11 @@ export class IndicatorsModal extends Modal {
     if (this.state.isOpen) {
       this.renderList();
     }
+  }
+
+  setCustomIndicatorEditor(actions: CustomIndicatorEditorActions | undefined): void {
+    this.indicatorOptions.customIndicatorEditor = actions;
+    if (this.state.isOpen) this.renderList();
   }
 
   setAdditionalCategories(categories: IndicatorCategory[]): void {

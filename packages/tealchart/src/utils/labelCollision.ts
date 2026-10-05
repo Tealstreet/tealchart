@@ -53,10 +53,15 @@ function getCacheKey(labels: LabelBounds[]): string {
   });
   // Only sort when all labels have IDs — otherwise keep positional order
   // so index-based fallback in collision resolution stays consistent.
-  if (labels.every((l) => l.id)) {
+  const allHaveIds = labels.every((l) => l.id);
+  if (allHaveIds) {
     segments.sort();
   }
-  return segments.join('|');
+  const ordering = labels
+    .map((label, index) => ({ label, index }))
+    .sort((a, b) => a.label.originalY - b.label.originalY)
+    .map(({ label, index }) => (allHaveIds ? label.id : index));
+  return `${segments.join('|')}#${JSON.stringify(ordering)}`;
 }
 
 /**
@@ -229,7 +234,7 @@ function enforceOrdering<T extends LabelBounds>(labels: T[]): void {
   const sorted = [...labels].sort((a, b) => a.originalY - b.originalY);
 
   // Find inversions and fix by re-stacking downward
-  for (let iter = 0; iter < 5; iter++) {
+  for (let iter = 0; iter < labels.length; iter++) {
     let fixed = false;
 
     for (let i = 1; i < sorted.length; i++) {
@@ -290,10 +295,10 @@ function evictOverlapsWithFixed<T extends LabelBounds>(labels: T[]): void {
   for (const anchor of anchors) {
     const above = movable
       .filter((label) => label.originalY < anchor.originalY)
-      .sort((a, b) => b.adjustedY - a.adjustedY);
+      .sort((a, b) => b.originalY - a.originalY);
     const below = movable
       .filter((label) => label.originalY >= anchor.originalY)
-      .sort((a, b) => a.adjustedY - b.adjustedY);
+      .sort((a, b) => a.originalY - b.originalY);
 
     let ceiling = anchor.adjustedY - anchor.height / 2;
     for (const label of above) {

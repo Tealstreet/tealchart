@@ -322,6 +322,46 @@ describe('resolveLabelCollisionsWithinBounds', () => {
     clearCollisionCache();
   });
 
+  it('preserves price ordering while evicting a crowded stack from the last-trade tag', () => {
+    const labels = [
+      { ...label(76, 50, 50), id: 'high' },
+      { ...label(77, 36), id: 'middle' },
+      { ...label(105, 36, 50), id: 'low' },
+      { ...label(180, 26, 100), id: 'last-trade', fixed: true },
+    ];
+    resolveLabelCollisionsWithinBounds(labels, 0, 200);
+    assertOrdering(labels);
+    assertNoOverlaps(labels);
+    expect(labels[3].adjustedY).toBe(180);
+  });
+
+  it('finishes ordering a mixed-height stack larger than five labels without a fixed anchor', () => {
+    const labels = [
+      [71, 50, 50], [36, 36, 90], [318, 36, 50], [45, 50, 0],
+      [115, 36, 0], [129, 18, 90], [297, 50, 0], [139, 18, 0],
+      [184, 12, 50], [106, 36, 50], [55, 36, 50],
+    ].map(([y, height, priority], index) => ({ ...label(y, height, priority), id: `order-${index}` }));
+    resolveLabelCollisionsWithinBounds(labels, 0, 400);
+    assertOrdering(labels);
+    assertNoOverlaps(labels);
+  });
+
+  it.each([true, false])('does not reuse cached ordering after subpixel crossings (IDs: %s)', (withIds) => {
+    const create = (a: number, b: number) => [
+      { ...label(a), ...(withIds ? { id: 'a' } : {}) },
+      { ...label(b), ...(withIds ? { id: 'b' } : {}) },
+    ];
+    resolveLabelCollisionsWithinBounds(create(100.01, 100.02), 0, 200);
+    const crossed = create(100.02, 100.01);
+    resolveLabelCollisionsWithinBounds(crossed, 0, 200);
+    assertOrdering(crossed);
+    assertNoOverlaps(crossed);
+    clearCollisionCache();
+    const cold = create(100.02, 100.01);
+    resolveLabelCollisionsWithinBounds(cold, 0, 200);
+    expect(crossed.map((item) => item.adjustedY)).toEqual(cold.map((item) => item.adjustedY));
+  });
+
   it('moves a bottom-crowded stack into bounds without collapsing labels onto the floor', () => {
     const labels = [
       { ...label(178, 20), id: 'a' },

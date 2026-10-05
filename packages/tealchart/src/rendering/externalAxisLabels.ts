@@ -131,16 +131,18 @@ export function renderExternalAxisLabels(ctx: CanvasContext, labels: readonly Ex
         ctx.stroke();
       }
       ctx.fillStyle = label.color;
-      const lineHeight = label.fontSize + 2;
+      ctx.textBaseline = 'alphabetic';
+      const metrics = label.layer === 'last-trade' ? ctx.measureText('M') : undefined;
+      const ascent = metrics?.fontBoundingBoxAscent ?? metrics?.actualBoundingBoxAscent;
+      const descent = metrics?.fontBoundingBoxDescent ?? metrics?.actualBoundingBoxDescent;
+      const baselineOffset = Number.isFinite(ascent) && Number.isFinite(descent) ? (ascent! - descent!) / 2 : 0;
+      ctx.textBaseline = Number.isFinite(ascent) && Number.isFinite(descent) ? 'alphabetic' : 'middle';
+      const lineHeight =
+        label.layer === 'last-trade' && label.textLines.length === 2 ? label.height / 2 - 2 : label.fontSize + 2;
       const firstY = label.y - ((label.textLines.length - 1) * lineHeight) / 2;
-      const priceFont =
-        label.layer === 'last-trade' ? label.font.replace(/\d+(?:\.\d+)?px/, `${label.fontSize + 2}px`) : label.font;
       label.textLines.forEach((text, index) => {
-        ctx.font = index === 0 ? priceFont : label.font;
-        if (index === 0 && priceFont !== label.font && ctx.measureText(text).width > label.width - 4)
-          ctx.font = label.font;
         ctx.fillStyle = label.textColors?.[index] ?? label.color;
-        ctx.fillText(text, label.x + label.width / 2, firstY + index * lineHeight);
+        ctx.fillText(text, label.x + label.width / 2, firstY + index * lineHeight + baselineOffset);
       });
     }
   } finally {

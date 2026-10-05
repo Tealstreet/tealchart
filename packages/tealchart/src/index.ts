@@ -754,6 +754,7 @@ export {
   searchIndicators,
 } from './indicators';
 export type { BuiltinIndicator, BuiltinIndicatorCategoryId, IndicatorCategory, IndicatorCategoryId } from './indicators';
+export type { CustomIndicatorEditorActions } from './ui/IndicatorsModal';
 
 // Pane management (for multi-pane indicator rendering)
 export { PaneManager } from './rendering/PaneManager';

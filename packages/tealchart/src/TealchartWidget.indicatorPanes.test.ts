@@ -1,4 +1,5 @@
 import type { ChartPane, ResolutionString, TealchartWidgetOptions } from './types';
+import type { CustomIndicatorEditorActions } from './ui/IndicatorsModal';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -6,15 +7,16 @@ import { getIndicatorById } from './indicators/builtinIndicators';
 import { clearChartStoreCache, DEFAULT_CHART_SETTINGS, type ChartSettings } from './state/chartState';
 import { TealchartWidget } from './TealchartWidget';
 
-const addIndicatorOptions: { onAddIndicator?: (indicator: unknown) => void } = {};
+const addIndicatorOptions: { onAddIndicator?: (indicator: unknown) => void; customIndicatorEditor?: CustomIndicatorEditorActions } = {};
 const addedScripts: Array<{ studyId: string; code: string }> = [];
 
 // The widget calls a wide surface on its UI; this test cares about none of it,
 // so every method is a no-op and only onAddIndicator is captured.
 vi.mock('./ui/TealchartWidgetUI', () => ({
   TealchartWidgetUI: class {
-    constructor(options: { onAddIndicator?: (indicator: unknown) => void }) {
+    constructor(options: { onAddIndicator?: (indicator: unknown) => void; customIndicatorEditor?: CustomIndicatorEditorActions }) {
       addIndicatorOptions.onAddIndicator = options.onAddIndicator;
+      addIndicatorOptions.customIndicatorEditor = options.customIndicatorEditor;
       return new Proxy(this, {
         get: (target, prop) => (prop in target ? Reflect.get(target, prop) : () => undefined),
       });
@@ -95,6 +97,21 @@ describe('TealchartWidget indicator panes', () => {
   // Both the study-create callback and the createStudy().then() used to register
   // a pane, so every non-overlay indicator arrived as two identical panes and
   // had to be removed twice. Native never did this — it registers once.
+  it('retains editor actions while UI creation is pending', () => {
+    const widget = createWidget();
+    const pending = widget as unknown as { _ui: unknown; _ensureUI: () => void };
+    pending._ui = null;
+    const actions = { onNew: vi.fn(), onEdit: vi.fn() };
+    widget.setCustomIndicatorEditor(actions);
+    pending._ensureUI();
+    expect(addIndicatorOptions.customIndicatorEditor).toBe(actions);
+    widget.setCustomIndicatorEditor(undefined);
+    pending._ui = null;
+    pending._ensureUI();
+    expect(addIndicatorOptions.customIndicatorEditor).toBeUndefined();
+    widget.remove();
+  });
+
   it('gives a non-overlay indicator exactly one pane', async () => {
     const widget = createWidget();
     const macd = getIndicatorById('macd');

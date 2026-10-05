@@ -33,6 +33,7 @@ export type { Bar, RenderOptions, Viewport, UnifiedPaneLayout, TealscriptRequest
 export { createTealscriptTimeframeInfo } from '../tealscript/timeframeInfo';
 
 export { IndicatorsModal } from '../ui/IndicatorsModal';
+export type { CustomIndicatorEditorActions } from '../ui/IndicatorsModal';
 export { LayoutSelector } from '../ui/LayoutSelector';
 export type { LayoutSelectorCallbacks } from '../ui/LayoutSelector';
 export type { LayoutMetadata } from '../transformer/saveLoadIntegration';
