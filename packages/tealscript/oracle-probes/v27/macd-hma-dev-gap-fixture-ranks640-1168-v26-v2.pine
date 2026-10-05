@@ -1,0 +1,94 @@
+//@version=6
+indicator("V26 macd-hma-dev G6 v2", precision=10, max_bars_back=64)
+phase = bar_index % 32
+source = phase < 3 ? na : phase <= 6 ? float(phase + 7) : phase >= 7 and phase <= 10 ? na : phase == 11 ? 13.0 : phase == 12 ? 12.0 : phase == 13 ? 13.0 : phase == 14 or phase == 15 ? 14.0 : phase == 16 ? na : phase >= 17 and phase <= 20 ? float(phase - 2) : phase >= 21 and phase <= 25 ? float(39 - phase) : phase >= 26 and phase <= 29 ? na : 11.0
+[macdLine, signalLine, histogram] = ta.macd(source, 2, 5, 3)
+var float fastHold = na
+var float slowHold = na
+var float signalHold = na
+var float fastReset = na
+var float slowReset = na
+var float signalReset = na
+if not na(source)
+    fastHold := na(fastHold) ? source : 2.0 / 3.0 * source + 1.0 / 3.0 * fastHold
+    slowHold := na(slowHold) ? source : 1.0 / 3.0 * source + 2.0 / 3.0 * slowHold
+    signalHold := na(signalHold) ? fastHold - slowHold : 0.5 * (fastHold - slowHold) + 0.5 * signalHold
+    fastReset := na(fastReset) ? source : 2.0 / 3.0 * source + 1.0 / 3.0 * fastReset
+    slowReset := na(slowReset) ? source : 1.0 / 3.0 * source + 2.0 / 3.0 * slowReset
+    signalReset := na(signalReset) ? fastReset - slowReset : 0.5 * (fastReset - slowReset) + 0.5 * signalReset
+else
+    fastReset := na
+    slowReset := na
+    signalReset := na
+float rawSum = 0.0
+float validSum = 0.0
+int rawCount = 0
+int validCount = 0
+for age = 0 to 63
+    value = source[age]
+    if not na(value)
+        if age < 3
+            rawSum += value
+            rawCount += 1
+        if validCount < 3
+            validSum += value
+            validCount += 1
+float rawDeviation = 0.0
+float validDeviation = 0.0
+int validAgeCount = 0
+for age = 0 to 63
+    value = source[age]
+    if not na(value)
+        if age < 3
+            rawDeviation += math.abs(value - rawSum / rawCount)
+        if validAgeCount < 3
+            validDeviation += math.abs(value - validSum / validCount)
+            validAgeCount += 1
+plot(macdLine, "R0640_MACD_HOLD_NA_OR_RESET")
+plot((na(macdLine) ? 0 : 1) + (na(signalLine) ? 0 : 2) + (na(histogram) ? 0 : 4), "R0641_MACD_STAGE_IMMEDIATE_OR_COUNTED_SEED")
+plot(ta.hma(source, 9), "R0720_HMA_RAW_OR_NONNA_WINDOW")
+plot(ta.dev(source, 3), "R1168_DEV_RAW_HOLE_OR_NONNA_COUNT")
+plot(signalLine, "MODEL_ACTUAL_SIGNAL")
+plot(histogram, "MODEL_ACTUAL_HISTOGRAM")
+plot(fastHold - slowHold, "MODEL_MACD_SKIP_HOLD")
+plot(fastReset - slowReset, "MODEL_MACD_RESET_ON_HOLE")
+plot(signalHold, "MODEL_SIGNAL_SKIP_HOLD")
+plot(signalReset, "MODEL_SIGNAL_RESET_ON_HOLE")
+plot(rawCount == 3 ? rawDeviation / 3.0 : na, "MODEL_DEV_STRICT_RAW3")
+plot(rawCount > 0 ? rawDeviation / rawCount : na, "MODEL_DEV_SKIP_WITHIN_RAW3")
+plot(validCount == 3 ? validDeviation / 3.0 : na, "MODEL_DEV_LAST3_VALID")
+plot(float(rawCount), "MODEL_RAW3_COUNT")
+plot(float(validCount), "MODEL_VALID3_COUNT")
+plot(ta.hma(float(phase + 7), 9), "CONTROL_HMA_CLEAN9")
+strictWma(float x, int length) =>
+    float sum = 0.0
+    bool complete = true
+    for age = 0 to length - 1
+        value = x[age]
+        if na(value)
+            complete := false
+        else
+            sum += value * (length - age)
+    complete ? sum / (length * (length + 1) / 2.0) : na
+validWma(float x, int length) =>
+    float sum = 0.0
+    int count = 0
+    for age = 0 to 63
+        value = x[age]
+        if not na(value) and count < length
+            sum += value * (length - count)
+            count += 1
+    count == length ? sum / (length * (length + 1) / 2.0) : na
+rawInner = 2.0 * strictWma(source, 4) - strictWma(source, 9)
+validInner = not na(source) ? 2.0 * validWma(source, 4) - validWma(source, 9) : na
+var int sourceCount = 0
+if not na(source)
+    sourceCount += 1
+plot(strictWma(rawInner, 3), "MODEL_HMA_RAW_4_9_3")
+plot(validWma(validInner, 3), "MODEL_HMA_COMPACT_4_9_3")
+plot(sourceCount >= 3 ? 7 : sourceCount >= 1 ? 1 : 0, "MODEL_MACD_IMMEDIATE_SIGNAL_COUNT3_MASK")
+plot(sourceCount >= 7 ? 7 : sourceCount >= 5 ? 1 : 0, "MODEL_MACD_SMA5_THEN_SIGNAL3_MASK")
+plot(float(bar_index), "INPUT_BAR_INDEX")
+plot(float(phase), "INPUT_PHASE32")
+plot(source, "INPUT_SOURCE")
+plot(na(source) ? 1 : 0, "INPUT_SOURCE_NA")

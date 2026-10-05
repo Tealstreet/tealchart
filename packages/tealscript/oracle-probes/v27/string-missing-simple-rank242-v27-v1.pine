@@ -1,0 +1,10 @@
+//@version=6
+indicator("V26 string discriminator v1", precision=12)
+simple string missing = string(na)
+simple string copied = string(missing)
+plot(na(missing) ? 1 : 0, "SOURCE_NA")
+plot(na(copied) ? 1 : 0, "CAST_NA")
+plot(na(missing) ? -1 : missing == "" ? 0 : 1, "SOURCE_KIND_NA_EMPTY_DEFINED")
+plot(na(copied) ? -1 : copied == "" ? 0 : 1, "CAST_KIND_NA_EMPTY_DEFINED")
+plot(str.length(copied), "CAST_LENGTH")
+plot(1, "EXECUTION_CONTROL")

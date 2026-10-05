@@ -73,6 +73,11 @@
 > long-gap/hole recovery batches, analyst/futures session context. Run each separately; follow each
 > instructions file. Reply under `v26/captures/v26/` with a versioned RESPONSE document.
 
+> **Then round v27.** After v26, do [`v27/HANDOFF-v27-v1.md`](v27/HANDOFF-v27-v1.md) — 12 probes (188 columns,
+> 24 ledger ranks): cross/change long-gap recovery, isolated qualifier/string-cast controls, batched
+> dynamic/string/history defaults, TA-hole recovery. Run each separately; follow each instructions file.
+> Reply under `v27/captures/v27/` with a versioned RESPONSE document.
+
 Agent exchange: [capture response v1](RESPONSE-v1.md). The next reply belongs in
 `RESPONSE-v2.md` beside this handoff; commit responses so both machines can read them.
 
