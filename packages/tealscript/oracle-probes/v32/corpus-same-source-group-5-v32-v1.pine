@@ -1,0 +1,104 @@
+//@version=6
+indicator("Standard Deviations", overlay=true)
+
+// Time control: check if it's a new day
+t = time('D')
+is_new_day = ta.change(time('D')) != 0
+
+// Switch to daily timeframe data
+[prev_high, prev_low] = request.security(syminfo.tickerid, 'D', [high[1], low[1]], lookahead=barmerge.lookahead_off)
+
+// Calculate daily range
+daily_range = prev_high - prev_low
+
+// Calculate average range for different periods
+avg_range_128 = ta.sma(daily_range, 128)
+avg_range_64 = ta.sma(daily_range, 64)
+avg_range_32 = ta.sma(daily_range, 32)
+avg_range_16 = ta.sma(daily_range, 16)
+avg_range_8 = ta.sma(daily_range, 8)
+avg_range_4 = ta.sma(daily_range, 4)
+avg_range_2 = ta.sma(daily_range, 2)
+
+// Calculate previous day's midpoint
+prev_midpoint = prev_low + (prev_high - prev_low) / 2
+
+// Clear and redraw lines
+var line curr_line = na
+var line[] range_lines = array.new_line()
+
+var current_day_start = 0
+var current_day_end = 0
+
+// When a new daily candle forms, create the lines
+if is_new_day
+    current_day_start := time('D')
+    current_day_end := current_day_start + 24 * 60 * 60 * 1000  // 24 hours
+    
+    // Calculate how many bars remain until the end of the day
+    var int bars_until_end = math.round((24 * 60) / timeframe.multiplier)
+    
+    // Previous day's midpoint line
+    curr_line := line.new(bar_index, prev_midpoint, bar_index + bars_until_end, prev_midpoint, color=color.blue, style=line.style_solid, width=2)
+    
+    // Previous day's high and low lines
+    array.push(range_lines, line.new(bar_index, prev_high, bar_index + bars_until_end, prev_high, color=color.new(color.blue, 0), style=line.style_dashed))
+    array.push(range_lines, line.new(bar_index, prev_low, bar_index + bars_until_end, prev_low, color=color.new(color.blue, 0), style=line.style_dashed))
+    
+    // Range lines based on different periods
+    
+    // 128 bar average
+    array.push(range_lines, line.new(bar_index, prev_midpoint + avg_range_128/2, bar_index + bars_until_end, prev_midpoint + avg_range_128/2, color=color.green, style=line.style_dotted))
+    array.push(range_lines, line.new(bar_index, prev_midpoint - avg_range_128/2, bar_index + bars_until_end, prev_midpoint - avg_range_128/2, color=color.green, style=line.style_dotted))
+    array.push(range_lines, line.new(bar_index, prev_midpoint + avg_range_128, bar_index + bars_until_end, prev_midpoint + avg_range_128, color=color.yellow, style=line.style_dashed))
+    array.push(range_lines, line.new(bar_index, prev_midpoint - avg_range_128, bar_index + bars_until_end, prev_midpoint - avg_range_128, color=color.yellow, style=line.style_dashed))
+    array.push(range_lines, line.new(bar_index, prev_midpoint + avg_range_128 * 1.5, bar_index + bars_until_end, prev_midpoint + avg_range_128 * 1.5, color=color.red, style=line.style_solid))
+    array.push(range_lines, line.new(bar_index, prev_midpoint - avg_range_128 * 1.5, bar_index + bars_until_end, prev_midpoint - avg_range_128 * 1.5, color=color.red, style=line.style_solid))
+
+    // 64 bar average
+    array.push(range_lines, line.new(bar_index, prev_midpoint + avg_range_64/2, bar_index + bars_until_end, prev_midpoint + avg_range_64/2, color=color.green, style=line.style_dotted))
+    array.push(range_lines, line.new(bar_index, prev_midpoint - avg_range_64/2, bar_index + bars_until_end, prev_midpoint - avg_range_64/2, color=color.green, style=line.style_dotted))
+    array.push(range_lines, line.new(bar_index, prev_midpoint + avg_range_64, bar_index + bars_until_end, prev_midpoint + avg_range_64, color=color.yellow, style=line.style_dashed))
+    array.push(range_lines, line.new(bar_index, prev_midpoint - avg_range_64, bar_index + bars_until_end, prev_midpoint - avg_range_64, color=color.yellow, style=line.style_dashed))
+    array.push(range_lines, line.new(bar_index, prev_midpoint + avg_range_64 * 1.5, bar_index + bars_until_end, prev_midpoint + avg_range_64 * 1.5, color=color.red, style=line.style_solid))
+    array.push(range_lines, line.new(bar_index, prev_midpoint - avg_range_64 * 1.5, bar_index + bars_until_end, prev_midpoint - avg_range_64 * 1.5, color=color.red, style=line.style_solid))
+
+    // 32 bar average
+    array.push(range_lines, line.new(bar_index, prev_midpoint + avg_range_32/2, bar_index + bars_until_end, prev_midpoint + avg_range_32/2, color=color.green, style=line.style_dotted))
+    array.push(range_lines, line.new(bar_index, prev_midpoint - avg_range_32/2, bar_index + bars_until_end, prev_midpoint - avg_range_32/2, color=color.green, style=line.style_dotted))
+    array.push(range_lines, line.new(bar_index, prev_midpoint + avg_range_32, bar_index + bars_until_end, prev_midpoint + avg_range_32, color=color.yellow, style=line.style_dashed))
+    array.push(range_lines, line.new(bar_index, prev_midpoint - avg_range_32, bar_index + bars_until_end, prev_midpoint - avg_range_32, color=color.yellow, style=line.style_dashed))
+    array.push(range_lines, line.new(bar_index, prev_midpoint + avg_range_32 * 1.5, bar_index + bars_until_end, prev_midpoint + avg_range_32 * 1.5, color=color.red, style=line.style_solid))
+    array.push(range_lines, line.new(bar_index, prev_midpoint - avg_range_32 * 1.5, bar_index + bars_until_end, prev_midpoint - avg_range_32 * 1.5, color=color.red, style=line.style_solid))
+
+    // 16 bar average
+    array.push(range_lines, line.new(bar_index, prev_midpoint + avg_range_16/2, bar_index + bars_until_end, prev_midpoint + avg_range_16/2, color=color.green, style=line.style_dotted))
+    array.push(range_lines, line.new(bar_index, prev_midpoint - avg_range_16/2, bar_index + bars_until_end, prev_midpoint - avg_range_16/2, color=color.green, style=line.style_dotted))
+    array.push(range_lines, line.new(bar_index, prev_midpoint + avg_range_16, bar_index + bars_until_end, prev_midpoint + avg_range_16, color=color.yellow, style=line.style_dashed))
+    array.push(range_lines, line.new(bar_index, prev_midpoint - avg_range_16, bar_index + bars_until_end, prev_midpoint - avg_range_16, color=color.yellow, style=line.style_dashed))
+    array.push(range_lines, line.new(bar_index, prev_midpoint + avg_range_16 * 1.5, bar_index + bars_until_end, prev_midpoint + avg_range_16 * 1.5, color=color.red, style=line.style_solid))
+    array.push(range_lines, line.new(bar_index, prev_midpoint - avg_range_16 * 1.5, bar_index + bars_until_end, prev_midpoint - avg_range_16 * 1.5, color=color.red, style=line.style_solid))
+
+    // 8 bar average
+    array.push(range_lines, line.new(bar_index, prev_midpoint + avg_range_8/2, bar_index + bars_until_end, prev_midpoint + avg_range_8/2, color=color.green, style=line.style_dotted))
+    array.push(range_lines, line.new(bar_index, prev_midpoint - avg_range_8/2, bar_index + bars_until_end, prev_midpoint - avg_range_8/2, color=color.green, style=line.style_dotted))
+    array.push(range_lines, line.new(bar_index, prev_midpoint + avg_range_8, bar_index + bars_until_end, prev_midpoint + avg_range_8, color=color.yellow, style=line.style_dashed))
+    array.push(range_lines, line.new(bar_index, prev_midpoint - avg_range_8, bar_index + bars_until_end, prev_midpoint - avg_range_8, color=color.yellow, style=line.style_dashed))
+    array.push(range_lines, line.new(bar_index, prev_midpoint + avg_range_8 * 1.5, bar_index + bars_until_end, prev_midpoint + avg_range_8 * 1.5, color=color.red, style=line.style_solid))
+    array.push(range_lines, line.new(bar_index, prev_midpoint - avg_range_8 * 1.5, bar_index + bars_until_end, prev_midpoint - avg_range_8 * 1.5, color=color.red, style=line.style_solid))
+
+    // 4 bar average
+    array.push(range_lines, line.new(bar_index, prev_midpoint + avg_range_4/2, bar_index + bars_until_end, prev_midpoint + avg_range_4/2, color=color.green, style=line.style_dotted))
+    array.push(range_lines, line.new(bar_index, prev_midpoint - avg_range_4/2, bar_index + bars_until_end, prev_midpoint - avg_range_4/2, color=color.green, style=line.style_dotted))
+    array.push(range_lines, line.new(bar_index, prev_midpoint + avg_range_4, bar_index + bars_until_end, prev_midpoint + avg_range_4, color=color.yellow, style=line.style_dashed))
+    array.push(range_lines, line.new(bar_index, prev_midpoint - avg_range_4, bar_index + bars_until_end, prev_midpoint - avg_range_4, color=color.yellow, style=line.style_dashed))
+    array.push(range_lines, line.new(bar_index, prev_midpoint + avg_range_4 * 1.5, bar_index + bars_until_end, prev_midpoint + avg_range_4 * 1.5, color=color.red, style=line.style_solid))
+    array.push(range_lines, line.new(bar_index, prev_midpoint - avg_range_4 * 1.5, bar_index + bars_until_end, prev_midpoint - avg_range_4 * 1.5, color=color.red, style=line.style_solid))
+
+    // 2 bar average
+    array.push(range_lines, line.new(bar_index, prev_midpoint + avg_range_2/2, bar_index + bars_until_end, prev_midpoint + avg_range_2/2, color=color.green, style=line.style_dotted))
+    array.push(range_lines, line.new(bar_index, prev_midpoint - avg_range_2/2, bar_index + bars_until_end, prev_midpoint - avg_range_2/2, color=color.green, style=line.style_dotted))
+    array.push(range_lines, line.new(bar_index, prev_midpoint + avg_range_2, bar_index + bars_until_end, prev_midpoint + avg_range_2, color=color.yellow, style=line.style_dashed))
+    array.push(range_lines, line.new(bar_index, prev_midpoint - avg_range_2, bar_index + bars_until_end, prev_midpoint - avg_range_2, color=color.yellow, style=line.style_dashed))
+    array.push(range_lines, line.new(bar_index, prev_midpoint + avg_range_2 * 1.5, bar_index + bars_until_end, prev_midpoint + avg_range_2 * 1.5, color=color.red, style=line.style_solid))
+    array.push(range_lines, line.new(bar_index, prev_midpoint - avg_range_2 * 1.5, bar_index + bars_until_end, prev_midpoint - avg_range_2 * 1.5, color=color.red, style=line.style_solid))

@@ -1,0 +1,9 @@
+//@version=5
+indicator("Unsupported dynamic history while result")
+
+i = 0
+offset = while i < 1
+    i := i + 1
+    close
+
+plot(close[offset])

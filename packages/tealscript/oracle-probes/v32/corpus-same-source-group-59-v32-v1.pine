@@ -1,0 +1,1297 @@
+// This source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © KioseffTrading
+
+
+//@version=5
+
+//  ________________________________________________
+// |                                               |  
+// |       ---------------------------------       | 
+// |      | K̲ i̲ o̲ s̲ e̲ f̲ f̲     T̲ r̲ a̲ d̲ i̲ n̲ g |      | 
+// |      |                                 |      |  
+// |      | ƃ u ᴉ p ɐ ɹ ꓕ     ⅎ ⅎ ǝ s o ᴉ ꓘ |      |  
+// |       --------------------------------        |  
+// |                                               | 
+// |_______________________________________________|
+
+
+indicator(title = "Portfolio Laboratory [Kioseff Trading]", overlay = true, precision = 2, max_labels_count = 500, max_lines_count = 500)
+
+import TradingView/ta/1 as ta
+
+
+lin                                            = input.string(defval = "Yes", title = "Show Percentage Line Performance? ", options = ["Yes", "No"])
+tab                                            = input.string(defval = "Yes", title = "Show Table? ", options = ["Yes", "No"])
+col                                            = input.string(defval = "No", title = "Color Table Cells on Better Performer?", options = ["Yes", "No"])
+dex                                            = input.string(defval = "SPX", title = "Index Measured Against", options = ["SPX", "NASDAQ", "RUT", "NIFTY", "FTSE", "NIKKEI", "HSI", "DAX", "TSX", "IBOV"])
+plo                                            = input.string(defval = "Yes", title = "Plot Index Return?", options = ["Yes", "No"])
+
+
+
+// _______________________________________________________
+//
+// Portoflio Asset Selection 
+// _______________________________________________________  
+
+
+asset1                                         = input.symbol(title="", group = "Asset 1", defval="AAPL", inline="1")
+wX1                                            = input.float(title="Return Weight", defval = 10, minval = 0.0, step = 0.1, maxval = 100.0, inline="1") 
+ls1                                            = input.string(title = "Direction (Long/Short)", defval = "Long", options = ["Long", "Short"], inline="1")             
+                               
+asset2                                         = input.symbol(title="", group = "Asset 2", defval="MSFT", inline="2")
+wX2                                            = input.float(title="Return Weight", defval = 10, minval = 0.0, step = 0.1, maxval = 100.0, inline="2") 
+ls2                                            = input.string(title = "Direction (Long/Short)", defval = "Long", options = ["Long", "Short"], inline="2")             
+                               
+asset3                                         = input.symbol(title="", group = "Asset 3", defval="GOOG", inline="3")
+wX3                                            = input.float(title="Return Weight", defval = 10, minval = 0.0, step = 0.1, maxval = 100.0, inline="3") 
+ls3                                            = input.string(title = "Direction (Long/Short)", defval = "Long", options = ["Long", "Short"], inline="3")             
+                               
+asset4                                         = input.symbol(title="", group = "Asset 4", defval="AMZN", inline="4")
+wX4                                            = input.float(title="Return Weight", defval = 10, minval = 0.0, step = 0.1, maxval = 100.0, inline="4") 
+ls4                                            = input.string(title = "Direction (Long/Short)", defval = "Long", options = ["Long", "Short"], inline="4")             
+                               
+asset5                                         = input.symbol(title="", group = "Asset 5", defval="META", inline="5")
+wX5                                            = input.float(title="Return Weight", defval = 10, minval = 0.0, step = 0.1, maxval = 100.0, inline="5") 
+ls5                                            = input.string(title = "Direction (Long/Short)", defval = "Long", options = ["Long", "Short"], inline="5")             
+                               
+asset6                                         = input.symbol(title="", group = "Asset 6", defval="T", inline="6")
+wX6                                            = input.float(title="Return Weight", defval = 10, minval = 0.0, step = 0.1, maxval = 100.0, inline="6") 
+ls6                                            = input.string(title = "Direction (Long/Short)", defval = "Long", options = ["Long", "Short"], inline="6")             
+                           
+asset7                                         = input.symbol(title="", group = "Asset 7", defval="V", inline="7")
+wX7                                            = input.float(title="Return Weight", defval = 10, minval = 0.0, step = 0.1, maxval = 100.0, inline="7") 
+ls7                                            = input.string(title = "Direction (Long/Short)", defval = "Long", options = ["Long", "Short"], inline="7")             
+                               
+asset8                                         = input.symbol(title="", group = "Asset 8", defval="MA", inline="8")
+wX8                                            = input.float(title="Return Weight", defval = 10, minval = 0.0, step = 0.1, maxval = 100.0, inline="8") 
+ls8                                            = input.string(title = "Direction (Long/Short)", defval = "Long", options = ["Long", "Short"], inline="8")             
+                           
+asset9                                         = input.symbol(title="", group = "Asset 9", defval="TSLA", inline="9")
+wX9                                            = input.float(title="Return Weight", defval = 10, minval = 0.0, step = 0.1, maxval = 100.0, inline="9") 
+ls9                                            = input.string(title = "Direction (Long/Short)", defval = "Long", options = ["Long", "Short"], inline="9")             
+                               
+asset10                                        = input.symbol(title="", group = "Asset 10", defval="X", inline="10")
+wX10                                           = input.float(title="Return Weight", defval = 10, minval = 0.0, step = 0.1, maxval = 100.0, inline="10") 
+ls10                                           = input.string(title = "Direction (Long/Short)", defval = "Long", options = ["Long", "Short"], inline="10")             
+
+
+// _______________________________________________________
+//
+// Identifiers                   
+// _______________________________________________________  
+
+var float    [] d                               = array.new_float()
+var float    [] x                               = array.new_float(10)
+var float    [] x1                              = array.new_float()
+var float    [] test                            = array.new_float(1)
+var float    [] currentR                        = array.new_float()
+var float    [] min                             = array.new_float(250)
+var float    [] es                              = array.new_float()
+var float    [] benMin                          = array.new_float(250)
+var float    [] benEs                           = array.new_float()
+var float    [] weight                          = array.new_float(10)
+var float    [] sH                              = array.new_float()
+var float    [] avg                             = array.new_float()
+var float    [] sHigh                           = array.new_float()
+var float    [] SsH                             = array.new_float()
+var float    [] Savg                            = array.new_float()
+var float    [] SsHigh                          = array.new_float()
+var float    [] dd                              = array.new_float()
+var float    [] sDD                             = array.new_float()
+var float    [] w_Eight                         = array.new_float(10)
+var float    [] w_Eight1                        = array.new_float(10)
+var label    [] port                            = array.new_label(1)
+var label    [] asset                           = array.new_label(1)
+var label    [] assetDiff                       = array.new_label(1)
+var label    [] mon                             = array.new_label()
+var label    [] mon1                            = array.new_label()
+var label    [] mon2                            = array.new_label()
+var label    [] startDate                       = array.new_label()
+var label    [] inL                             = array.new_label(1)
+var line     [] pX                              = array.new_line(1)
+var line     [] pX1                             = array.new_line(1)
+var line     [] pX2                             = array.new_line(1)
+var line     [] pX3                             = array.new_line(1)
+var line     [] pX4                             = array.new_line(1)
+var line     [] inLI                            = array.new_line(1)
+var linefill [] pXL                             = array.new_linefill()
+var linefill [] pXL1                            = array.new_linefill()
+var string   [] strin                           = array.new_string(10)
+
+
+
+var float w1                                    = wX1  
+var float w2                                    = wX2
+var float w3                                    = wX3
+var float w4                                    = wX4
+var float w5                                    = wX5
+var float w6                                    = wX6
+var float w7                                    = wX7
+var float w8                                    = wX8
+var float w9                                    = wX9
+var float w10                                   = wX10  
+var float xY                                    = 0.0
+var bool cond2                                  = false 
+
+
+matS                                            = ""
+matX                                            = ""
+
+
+// _______________________________________________________
+//
+// Percentage Gain/Loss Calculation                   
+// _______________________________________________________  
+
+PnLz(x, y) => 
+    ((x / y) - 1)
+
+PnL(x, y) => 
+    ((x / y[1]) - 1)
+
+// _______________________________________________________
+//
+// Time Window()
+// _______________________________________________________  
+
+sYear                                           = input.int(defval = 2018, title = "Calculation Start Year")
+sMonth                                          = input.int(defval = 01, title = "Calculation Start Month", maxval = 12, minval = 1)
+sDay                                            = input.int(defval = 02, title = "Calculation Start Day", maxval = 31, minval = 1)
+eYear                                           = input.int(defval = 2080, title = "Calculation End Year")
+eMonth                                          = input.int(defval = 01, title = "Calculation End Month", maxval = 12, minval = 1)
+eDay                                            = input.int(defval = 02, title = "Calculation End Day", maxval = 31, minval = 1)
+start()                                         => time >= timestamp(sYear, sMonth, sDay, 00, 00) and time <= timestamp(eYear, eMonth, eDay, 23, 59)
+z                                               = ta.valuewhen(start()[1] == false and start() == true, close, 0)
+zZ                                              = ta.valuewhen(year(time) == sYear and month(time) == sMonth and dayofmonth(time) == sDay, close, 0)
+
+
+// _______________________________________________________
+//
+// Tuples                    
+// _______________________________________________________
+
+
+tuple(x, y) => 
+    
+    First   = x == "Long" ? nz(PnLz(close, z), -100) : nz(PnLz(close, z), -100) * -1 
+    Second  = x == "Long" ? PnL(close, close) * y : PnL(close, close) * y * -1, 
+    Third   = x == "Long" ? ((close / close[252]) - 1) * y : ((close / close[252]) - 1) * y * -1
+    Fourth  = close
+    Fifth   = syminfo.type
+    Sixth   = ta.cagr(timestamp(sYear, sMonth, sDay), zZ, time <= timestamp(eYear, eMonth, eDay) ? time : timestamp(eYear, eMonth, eDay), close) * (y / 100)
+    var int [] count   = array.new_int()
+
+    if year(time) >= sYear and month(time) != month(time[1])
+        array.push(count, 1)
+    
+    Seventh = (math.pow((close / zZ), 1 / (array.sum(count) - 1)) - 1) 
+    
+    [First, Second, Third, Fourth, Fifth, Sixth, Seventh]
+
+request()  => tuple(ls1, wX1)
+request1() => tuple(ls2, wX2)
+request2() => tuple(ls3, wX3)
+request3() => tuple(ls4, wX4)
+request4() => tuple(ls5, wX5)
+request5() => tuple(ls6, wX6)
+request6() => tuple(ls7, wX7)
+request7() => tuple(ls8, wX8)
+request8() => tuple(ls9, wX9)
+request9() => tuple(ls10, wX10)
+
+// _______________________________________________________
+//
+// Data Requests()                    
+// _______________________________________________________
+
+
+[symcalc01x, f , annual ,  c,  type,  cagr, cmgr ]                   =  request.security(asset1, timeframe.period, request() ) 
+[symcalc02x, f1, annual1, c1, type1, cagr1, cmgr1]                   =  request.security(asset2, timeframe.period, request1()) 
+[symcalc03x, f2, annual2, c2, type2, cagr2, cmgr2]                   =  request.security(asset3, timeframe.period, request2()) 
+[symcalc04x, f3, annual3, c3, type3, cagr3, cmgr3]                   =  request.security(asset4, timeframe.period, request3()) 
+[symcalc05x, f4, annual4, c4, type4, cagr4, cmgr4]                   =  request.security(asset5, timeframe.period, request4()) 
+[symcalc06x, f5, annual5, c5, type5, cagr5, cmgr5]                   =  request.security(asset6, timeframe.period, request5()) 
+[symcalc07x, f6, annual6, c6, type6, cagr6, cmgr6]                   =  request.security(asset7, timeframe.period, request6()) 
+[symcalc08x, f7, annual7, c7, type7, cagr7, cmgr7]                   =  request.security(asset8, timeframe.period, request7()) 
+[symcalc09x, f8, annual8, c8, type8, cagr8, cmgr8]                   =  request.security(asset9, timeframe.period, request8()) 
+[symcalc10x, f9, annual9, c9, type9, cagr9, cmgr9]                   =  request.security(asset10,timeframe.period, request9()) 
+
+
+
+// _______________________________________________________
+//
+// Switch                    
+// _______________________________________________________
+
+
+mult1                                                  = switch ls1
+    "Long"  =>                         1 
+    "Short" =>                         0
+mult2                                                  = switch ls2
+    "Long"  =>                         1 
+    "Short" =>                         0
+mult3                                                  = switch ls3
+    "Long"  =>                         1 
+    "Short" =>                         0
+mult4                                                  = switch ls4
+    "Long"  =>                         1 
+    "Short" =>                         0
+mult5                                                  = switch ls5
+    "Long"  =>                         1 
+    "Short" =>                         0
+mult6                                                  = switch ls6
+    "Long"  =>                         1 
+    "Short" =>                         0
+mult7                                                  = switch ls7
+    "Long"  =>                         1 
+    "Short" =>                         0
+mult8                                                  = switch ls8
+    "Long"  =>                         1 
+    "Short" =>                         0
+mult9                                                  = switch ls9
+    "Long"  =>                         1 
+    "Short" =>                         0
+mult10                                                 = switch ls10
+    "Long"  =>                         1 
+    "Short" =>                         0 
+ 
+// _______________________________________________________
+//
+// Dividends                    
+// _______________________________________________________
+ 
+ 
+div1                                                   =  (request.financial(asset1 ,"DIVIDENDS_YIELD" ,"FQ", ignore_invalid_symbol = true) / 100) * wX1  * mult1    
+div2                                                   =  (request.financial(asset2 ,"DIVIDENDS_YIELD" ,"FQ", ignore_invalid_symbol = true) / 100) * wX2  * mult2  
+div3                                                   =  (request.financial(asset3 ,"DIVIDENDS_YIELD" ,"FQ", ignore_invalid_symbol = true) / 100) * wX3  * mult3  
+div4                                                   =  (request.financial(asset4 ,"DIVIDENDS_YIELD" ,"FQ", ignore_invalid_symbol = true) / 100) * wX4  * mult4  
+div5                                                   =  (request.financial(asset5 ,"DIVIDENDS_YIELD" ,"FQ", ignore_invalid_symbol = true) / 100) * wX5  * mult5  
+div6                                                   =  (request.financial(asset6 ,"DIVIDENDS_YIELD" ,"FQ", ignore_invalid_symbol = true) / 100) * wX6  * mult6  
+div7                                                   =  (request.financial(asset7 ,"DIVIDENDS_YIELD" ,"FQ", ignore_invalid_symbol = true) / 100) * wX7  * mult7  
+div8                                                   =  (request.financial(asset8 ,"DIVIDENDS_YIELD" ,"FQ", ignore_invalid_symbol = true) / 100) * wX8  * mult8  
+div9                                                   =  (request.financial(asset9 ,"DIVIDENDS_YIELD" ,"FQ", ignore_invalid_symbol = true) / 100) * wX9  * mult9  
+div10                                                  =  (request.financial(asset10,"DIVIDENDS_YIELD" ,"FQ", ignore_invalid_symbol = true) / 100) * wX10 * mult10  
+
+
+
+
+
+
+// _______________________________________________________
+//
+// Indices                   
+// _______________________________________________________
+
+requestIndex()                                         => [(PnL(close, close) * 100), nz(PnLz(close, z) * 100, 0), close]
+
+[SPX1,SPXx   ,  spClose]                               = request.security("SPX",       timeframe.period,     requestIndex())  
+[ND1, NASDAQx, ndClose]                                = request.security("NDX",       timeframe.period,     requestIndex())  
+[RT1, RUTx   , rtClose]                                = request.security("RUT",       timeframe.period,     requestIndex())  
+[NY1, NIFTYx , nyClose]                                = request.security("NIFTY",     timeframe.period,     requestIndex()) 
+[FT1, FTSEx  , ftClose]                                = request.security("UKX",       timeframe.period,     requestIndex())  
+[HA1, HANGx  , haClose]                                = request.security("HSI",       timeframe.period,     requestIndex())   
+[NI1, NIKKEIx, niClose]                                = request.security("NI225",     timeframe.period,     requestIndex()) 
+[DE1, DEx    , deClose]                                = request.security("DAX",       timeframe.period,     requestIndex())   
+[CA1, TSXx   , caClose]                                = request.security("TSX",       timeframe.period,     requestIndex())   
+[IN1, IBOVx  , ibClose]                                = request.security("IBOV",      timeframe.period,     requestIndex())  
+
+
+
+symcalc01                                              = symcalc01x > -100 ? symcalc01x : -100, SPX    = SPXx       > -100 ? SPXx       : -100 
+symcalc02                                              = symcalc02x > -100 ? symcalc02x : -100, NASDAQ = NASDAQx    > -100 ? NASDAQx    : -100 
+symcalc03                                              = symcalc03x > -100 ? symcalc03x : -100, RUT    = RUTx       > -100 ? RUTx       : -100
+symcalc04                                              = symcalc04x > -100 ? symcalc04x : -100, NIFTY  = NIFTYx     > -100 ? NIFTYx     : -100 
+symcalc05                                              = symcalc05x > -100 ? symcalc05x : -100, FTSE   = FTSEx      > -100 ? FTSEx      : -100
+symcalc06                                              = symcalc06x > -100 ? symcalc06x : -100, HANG   = HANGx      > -100 ? HANGx      : -100
+symcalc07                                              = symcalc07x > -100 ? symcalc07x : -100, NIKKEI = NIKKEIx    > -100 ? NIKKEIx    : -100 
+symcalc08                                              = symcalc08x > -100 ? symcalc08x : -100, DE     = DEx        > -100 ? DEx        : -100 
+symcalc09                                              = symcalc09x > -100 ? symcalc09x : -100, TSX    = TSXx       > -100 ? TSXx       : -100
+symcalc10                                              = symcalc10x > -100 ? symcalc10x : -100, IBOV   = IBOVx      > -100 ? IBOVx      : -100 
+
+// _______________________________________________________
+//
+// User-Defined Identifiers                    
+// _______________________________________________________
+
+
+comb() =>
+    
+    symcalc01x * wX1 +
+         symcalc02x * wX2 +
+         symcalc03x * wX3 +
+         symcalc04x * wX4 +
+         symcalc05x * wX5 +
+         symcalc06x * wX6 +
+         symcalc07x * wX7 +
+         symcalc08x * wX8 +
+         symcalc09x * wX9 +
+         symcalc10x * wX10
+
+
+World() => 
+   
+    "SPX "        + 
+      "\nNDX "    + 
+      "\nRUT "    + 
+      "\nNIFTY "  + 
+      "\nFTSE "   + 
+      "\nHSI "    +
+      "\nNIKKEI " +
+      "\nDAX "    +
+      "\nTSX "    +
+      "\nIBOV "  
+
+WorldP() =>
+   
+    str.tostring (SPX,    format.percent) +    "\n" +
+     str.tostring(NASDAQ, format.percent) +    "\n" +
+     str.tostring(RUT,    format.percent) +    "\n" +
+     str.tostring(NIFTY,  format.percent) +    "\n" +
+     str.tostring(FTSE,   format.percent) +    "\n" +
+     str.tostring(HANG,   format.percent) +    "\n" +
+     str.tostring(NIKKEI, format.percent) +    "\n" +
+     str.tostring(DE,     format.percent) +    "\n" +
+     str.tostring(TSX,    format.percent) +    "\n" +
+     str.tostring(IBOV,   format.percent)       
+
+cond() => 
+   
+    symcalc01      == -100 or symcalc02 == -100 
+      or symcalc03 == -100 or symcalc04 == -100 
+      or symcalc05 == -100 or symcalc06 == -100 
+      or symcalc07 == -100 or symcalc08 == -100 
+      or symcalc09 == -100 or symcalc10 == -100 
+
+
+change(x) =>
+    x != x[1] and not cond() 
+
+if 
+  change(div1)
+    array.push(d,  div1)    
+if 
+   change(div2)
+    array.push(d, div2)
+if 
+   change(div3)
+    array.push(d, div3)
+if 
+   change(div4)
+    array.push(d, div4)
+if 
+   change(div5)
+    array.push(d, div5)
+if 
+   change(div6)
+    array.push(d, div6)
+if 
+   change(div7)
+    array.push(d, div7)
+if 
+   change(div8)
+    array.push(d, div8)
+if 
+   change(div9)
+    array.push(d, div9)
+
+finDiv()                                                   => array.sum(d)
+
+// _______________________________________________________
+//
+// Arrays                     
+// _______________________________________________________  
+
+
+array.set(strin, 0, asset1), array.set(strin, 1, asset2)
+array.set(strin, 2, asset3), array.set(strin, 3, asset4)
+array.set(strin, 4, asset5), array.set(strin, 5, asset6)
+array.set(strin, 6, asset7), array.set(strin, 7, asset8)
+array.set(strin, 8, asset9), array.set(strin, 9, asset10)
+
+sort(x, x1) =>
+    
+    s  = array.new_string(array.size(x))
+    s1 = array.copy(x1)
+    if array.size(x) == array.size(x1)
+        array.sort(s1, order.descending)
+        for i = 0 to array.size(x) - 1
+            s3 = array.get(x, math.max(0, array.indexof(x1, array.get(s1, i))))
+            array.set(s, i, s3)
+    
+    [s, s1]
+
+
+// _______________________________________________________
+//
+// Array Fills                     
+// _______________________________________________________  
+
+
+   
+array.push(x1, symcalc01x * wX1 +
+     
+     symcalc02x * wX2 +
+     symcalc03x * wX3 +
+     symcalc04x * wX4 +
+     symcalc05x * wX5 +
+     symcalc06x * wX6 +
+     symcalc07x * wX7 +
+     symcalc08x * wX8 +
+     symcalc09x * wX9 +
+     symcalc10x * wX10)
+array.push(currentR, symcalc01x * wX1 +
+     
+     symcalc02x * wX2 +
+     symcalc03x * wX3 +
+     symcalc04x * wX4 +
+     symcalc05x * wX5 +
+     symcalc06x * wX6 +
+     symcalc07x * wX7 +
+     symcalc08x * wX8 +
+     symcalc09x * wX9 +
+     symcalc10x * wX10)
+
+array.set(x,0, symcalc01x * wX1)
+array.set(x,1, symcalc02x * wX2)
+array.set(x,2, symcalc03x * wX3)
+array.set(x,3, symcalc04x * wX4)
+array.set(x,4, symcalc05x * wX5)
+array.set(x,5, symcalc06x * wX6)
+array.set(x,6, symcalc07x * wX7)
+array.set(x,7, symcalc08x * wX8)
+array.set(x,8, symcalc09x * wX9)
+array.set(x,9, symcalc10x * wX10)
+array.push(test, PnLz(close, z))
+
+
+[xSort, xSort1]                                 = sort(strin, x)
+
+
+
+// _______________________________________________________
+//
+// Data for Plots                     
+// _______________________________________________________  
+
+
+
+xY := cond() == true ? 0 : 
+        
+         z +
+         symcalc01 * wX1 +
+         symcalc02 * wX2 +
+         symcalc03 * wX3 +
+         symcalc04 * wX4 +
+         symcalc05 * wX5 +
+         symcalc06 * wX6 +
+         symcalc07 * wX7 +
+         symcalc08 * wX8 +
+         symcalc09 * wX9 +
+         symcalc10 * wX10
+         
+
+         
+array.set(weight, 0, wX1), array.set(weight, 1, wX2), array.set(weight, 2, wX3)
+array.set(weight, 3, wX4), array.set(weight, 4, wX5), array.set(weight, 5, wX6)
+array.set(weight, 6, wX7), array.set(weight, 7, wX8), array.set(weight, 8, wX9)
+array.set(weight, 9, wX10)
+
+
+
+
+wString                                       = array.sum(weight) == 100.00 ? na : "\n(Summed Weight Should Equal 100%)"
+
+for i = 0 to array.size(xSort) - 1
+    matS                                      := matS + array.get(xSort, i) + "\n" 
+    matX                                      := matX + str.tostring(array.get(xSort1, i), format.percent) + "\n"
+
+// _______________________________________________________
+//
+// Beta                    
+// _______________________________________________________  
+
+
+ind() => 
+    switch dex
+        "SPX"       => SPX1
+        "NASDAQ"    => ND1 
+        "RUT"       => RT1
+        "NIFTY"     => NY1
+        "FTSE"      => FT1
+        "HSI"       => HA1
+        "NIKKEI"    => NI1
+        "DAX"       => DE1
+        "TSX"       => CA1
+        "IBOV"      => IN1
+
+clo() => 
+    switch dex
+        "SPX"       => spClose
+        "NASDAQ"    => ndClose
+        "RUT"       => rtClose
+        "NIFTY"     => nyClose
+        "FTSE"      => ftClose
+        "HSI"       => haClose
+        "NIKKEI"    => niClose
+        "DAX"       => deClose
+        "TSX"       => caClose
+        "IBOV"      => ibClose
+
+ret() => 
+    switch dex
+        "SPX"       => SPXx   
+        "NASDAQ"    => NASDAQx
+        "RUT"       => RUTx   
+        "NIFTY"     => NIFTYx 
+        "FTSE"      => FTSEx  
+        "HSI"       => HANGx  
+        "NIKKEI"    => NIKKEIx
+        "DAX"       => DEx    
+        "TSX"       => TSXx   
+        "IBOV"      => IBOVx  
+
+combX() =>
+  
+    nz(f)  + 
+     nz(f1) + 
+     nz(f2) + 
+     nz(f3) + 
+     nz(f4) + 
+     nz(f5) + 
+     nz(f6) + 
+     nz(f7) + 
+     nz(f8) + 
+     nz(f9)
+
+cagrCalc() =>
+    
+    math.avg(
+    
+     cagr, 
+     cagr1, 
+     cagr2, 
+     cagr3, 
+     cagr4, 
+     cagr5, 
+     cagr6, 
+     cagr7, 
+     cagr8, 
+     cagr9
+    
+     )
+     
+     * (
+     
+     w1 +
+                 w2 +
+                 w3 +
+                 w4 +
+                 w5 +
+                 w6 +
+                 w7 +
+                 w8 +
+                 w9 +
+                 w10
+                 
+                 ) 
+                 
+                 / 10
+    
+cmgrCalc() =>
+    
+    math.avg(
+    
+     cmgr, 
+     cmgr1, 
+     cmgr2, 
+     cmgr3, 
+     cmgr4, 
+     cmgr5, 
+     cmgr6, 
+     cmgr7, 
+     cmgr8, 
+     cmgr9
+    
+     )
+     
+     * (
+     
+     w1 +
+                 w2 +
+                 w3 +
+                 w4 +
+                 w5 +
+                 w6 +
+                 w7 +
+                 w8 +
+                 w9 +
+                 w10
+                 
+                 ) 
+                 
+                  
+
+
+
+beta() =>
+    correlation                               = ta.correlation(combX(), ind(), 252)
+    correlationFin                            = correlation * (ta.stdev(combX(), 252) / ta.stdev(ind(), 252))
+    correlationFin
+
+
+finCAGR                                          = fixnan(cagrCalc())
+finCMGR                                          = fixnan(cmgrCalc())
+beta                                          = str.tostring(beta(), format.mintick)
+
+// _______________________________________________________
+//
+// VaR & CVaR            
+// _______________________________________________________  
+
+
+if change(bar_index)
+   
+    array.push(min, combX())
+    array.push(benMin, (ind()))
+   
+    if array.size(min) > 250
+        array.shift(min)
+   
+    if array.size(benMin) > 250
+        array.shift(benMin)
+
+fin                                          = array.percentile_nearest_rank(min, 5)
+finBen                                       = array.percentile_nearest_rank(benMin, 5)
+
+if 
+   combX() < fin
+    array.push(es, combX())
+
+if 
+   ind() < finBen
+    array.push(benEs, ind())
+
+
+if 
+   change(year(time))
+    
+    if 
+      array.size(es) > 0
+        array.shift(es)
+    
+    if 
+      array.size(benEs) > 0 
+        array.shift(benEs)
+
+// _______________________________________________________
+//
+// Sharpe and Classic Correlation            
+// _______________________________________________________  
+
+
+rf                                                      = request.security("DGS10", "D", ((close / 252)))
+
+if 
+  change(bar_index)
+
+    array.push(sH, combX() - rf)
+    array.push(avg, array.avg(sH))
+    array.push(SsH, (ind()) - rf)
+    array.push(Savg, array.avg(SsH))
+    array.push(dd, combX())
+    array.push(sDD, SPXx)
+    
+    if 
+      array.size(sH) > 30
+    
+        array.push(sHigh, (array.avg(sH)) / array.stdev(avg))
+        array.push(SsHigh, (array.avg(SsH)) / array.stdev(Savg))
+        
+    if 
+      array.size(sH) > 252
+        
+        array.shift(sH)
+        array.shift(avg)
+        array.shift(SsH)
+        array.shift(Savg)
+
+sharpe                                                     = (array.avg(sH)) / array.stdev(avg)
+Ssharpe                                                    = (array.avg(SsH)) / array.stdev(Savg)
+
+pE                                                         = request.quandl("MULTPL/SP500_PE_RATIO_MONTH")
+
+// _______________________________________________________
+//
+// Drawdown & Correlation & R-Squared 
+// _______________________________________________________  
+
+corr                                                       = ta.correlation(combX(), ind(), 252)
+maxDD                                                      = array.min(currentR)
+maxSDD                                                     = array.min(sDD)
+
+R2() =>
+    math.pow(ta.correlation(combX(), ind(), 252), 2) 
+
+Rx2 = R2() * 100
+
+
+spDraw                                                      = .0
+spDrawDown                                                  = .0
+spMaxDrawDown                                               = .0 
+
+if 
+  array.size(x1) > 0
+    spDraw                                                  := spDraw[1] > clo() ? spDraw[1] : clo()
+    spDrawDown                                              := clo() / spDraw - 1
+    spMaxDrawDown                                           := spMaxDrawDown[1] < spDrawDown ? spMaxDrawDown[1] : spDrawDown
+
+
+
+// _______________________________________________________
+//
+// Table                    
+// _______________________________________________________  
+
+merge(v, w, x, y, z) =>
+    table.merge_cells(v, w, x, y, z)
+
+y = array.new_table(
+    
+     1, 
+     table.new(
+     position.bottom_right, 
+     6, 
+     12, 
+     bgcolor = na, 
+     frame_width = 1, 
+     border_width = 1, 
+     border_color = color.white, 
+     frame_color = color.white)
+     
+     )
+
+if 
+  
+  tab == "Yes"
+
+    if 
+      
+      barstate.islast
+          
+        if 
+          
+          array.size(x1) > 0
+            log.info("DASDA")
+        
+            table.cell(array.get(y, 0), 2, 0, 
+            
+             text = "Total Return\n" + str.tostring(array.get(x1, array.size(x1) - 1) + nz(finDiv()), format.percent) ,
+             bgcolor = array.get(x1, array.size(x1) - 1) > (((close / z) - 1) * 100) ? color.new(color.green, 90) : color.new(color.red, 90), 
+             text_color = color.white)
+        
+            table.cell(array.get(y, 0), 1, 1, 
+            
+             text = "Constituents",
+             bgcolor = array.get(x1, array.size(x1) - 1) > (((close / z) - 1) * 100) ? color.new(color.green, 90) : color.new(color.red, 90), 
+             text_color = color.white)
+        
+            table.cell(array.get(y, 0), 2, 1, 
+            
+             text = "Component Returns",
+             bgcolor = array.get(x1, array.size(x1) - 1) > (((close / z) - 1) * 100) ? color.new(color.green, 90) : color.new(color.red, 90), 
+             text_color = color.white)
+        
+             
+             
+            table.cell(array.get(y, 0), 1, 2, 
+            
+             text =  matS + "\n",
+             bgcolor = array.get(x1, array.size(x1) - 1) > (((close / z) - 1) * 100) ? color.new(color.green, 90) : color.new(color.red, 90), 
+             text_color = color.white)
+            
+            table.cell(array.get(y, 0), 2, 2, 
+            
+             text =  "\n" + matX + "\nDividend Yield: " + str.tostring(nz(finDiv()), format.percent),
+             bgcolor = array.get(x1, array.size(x1) - 1) > (((close / z) - 1) * 100) ? color.new(color.green, 90) : color.new(color.red, 90), 
+             text_color = color.white)
+             
+             
+            table.cell(array.get(y, 0), 1, 4, 
+             text =  "Portfolio Beta: " + beta,
+             bgcolor = color.new(color.blue, 90), 
+             text_color = color.white)
+             
+            table.cell(array.get(y, 0), 3, 4, 
+             text =  str.tostring(dex) + " Beta: 1.00" ,
+             bgcolor = color.new(color.blue, 90), 
+             text_color = color.white)
+                  
+            table.cell(array.get(y, 0), 1, 5, 
+                
+             text =  "Portfolio VaR: " + str.tostring(fin, format.percent),
+             bgcolor = col == "Yes" and fin > finBen ? color.new(color.green, 90) : col == "Yes" and fin < finBen ? color.new(color.red, 90) : 
+             array.get(x1, array.size(x1) - 1) > (((close / z) - 1) * 100) ? color.new(color.green, 90) : color.new(color.red, 90), 
+             text_color = color.white)
+            
+            table.cell(array.get(y, 0), 1, 6, 
+                
+             text =  "Portfolio CVaR: " + str.tostring(array.avg(es), format.percent),
+             bgcolor = col == "Yes" and array.avg(es) > array.avg(benEs) ? color.new(color.green, 90) : col == "Yes" and array.avg(es) < array.avg(benEs) ? color.new(color.red, 90) :
+             array.get(x1, array.size(x1) - 1) > (((close / z) - 1) * 100) ? color.new(color.green, 90) : color.new(color.red, 90), 
+             text_color = color.white)
+            
+            table.cell(array.get(y, 0), 3, 5, 
+                
+             text =  str.tostring(dex) + " VaR: " + str.tostring(finBen, format.percent),
+             bgcolor = col == "Yes" and fin > finBen ? color.new(color.red, 90) : col == "Yes" and fin < finBen ? color.new(color.green, 90) :
+             array.get(x1, array.size(x1) - 1) < (((close / z) - 1) * 100) ? color.new(color.green, 90) : color.new(color.red, 90), 
+             text_color = color.white)
+            
+            table.cell(array.get(y, 0), 3, 6, 
+                
+             text =  str.tostring(dex) + " CVaR: " + str.tostring(array.avg(benEs), format.percent),
+             bgcolor = col == "Yes" and array.avg(es) > array.avg(benEs) ? color.new(color.red, 90) : col == "Yes" and array.avg(es) < array.avg(benEs) ? color.new(color.green, 90) :
+             array.get(x1, array.size(x1) - 1) < (((close / z) - 1) * 100) ? color.new(color.green, 90) : color.new(color.red, 90), 
+             text_color = color.white)
+            
+            table.cell(array.get(y, 0), 1, 7, 
+                
+             text =  "Portfolio Sharpe Ratio: " + str.tostring(sharpe, format.mintick) + " (Highest: " + str.tostring(array.max(sHigh), format.mintick) + ")",
+             bgcolor = col == "Yes" and sharpe > Ssharpe ? color.new(color.green, 90) : col == "Yes" and sharpe < Ssharpe ? color.new(color.red, 90) :
+             array.get(x1, array.size(x1) - 1) > (((close / z) - 1) * 100) ? color.new(color.green, 90) : color.new(color.red, 90), 
+             text_color = color.white)
+            table.cell(array.get(y, 0), 3, 7, 
+                
+             text =  str.tostring(dex) + " Sharpe Ratio: "  + str.tostring(Ssharpe, format.mintick),
+             bgcolor =col == "Yes" and sharpe < Ssharpe ? color.new(color.green, 90) : col == "Yes" and sharpe > Ssharpe ? color.new(color.red, 90) :
+             array.get(x1, array.size(x1) - 1) < (((close / z) - 1) * 100) ? color.new(color.green, 90) : color.new(color.red, 90),
+             text_color = color.white)
+            
+            table.cell(array.get(y, 0), 1, 10, 
+                
+             text =  "Portfolio Correlation to " + str.tostring(dex) + ": " + str.tostring(corr * 100, format.percent),
+             bgcolor = col == "Yes" ? color.from_gradient(corr, 0.0, 1.0, color.new(color.green, 90) , color.new(color.red, 90)) : 
+             array.get(x1, array.size(x1) - 1) > (((close / z) - 1) * 100) ? color.new(color.green, 90) : color.new(color.red, 90), 
+             text_color = color.white)
+            table.cell(array.get(y, 0), 1, 8, 
+                
+             text =  "Max % Loss on Initial Investment: " + str.tostring(maxDD, format.percent) + "\n(When Holding Since Start Date)",
+             bgcolor = col == "Yes" and maxDD > maxSDD ? color.new(color.green, 90) : col == "Yes" and maxDD < maxSDD ? color.new(color.red, 90) :
+             array.get(x1, array.size(x1) - 1) > (((close / z) - 1) * 100) ? color.new(color.green, 90) : color.new(color.red, 90), 
+             text_color = color.white)
+        
+            table.cell(array.get(y, 0), 1, 11, 
+                
+             text =  "Portfolio R²: " + str.tostring(Rx2, format.percent),
+             bgcolor = col == "Yes" ? color.from_gradient(Rx2, 0, 100, color.new(color.red, 90), color.new(color.green, 90)) : 
+             array.get(x1, array.size(x1) - 1) > (((close / z) - 1) * 100) ? color.new(color.green, 90) : color.new(color.red, 90), 
+             text_color = color.white)    
+    
+            table.cell(array.get(y, 0), 1, 9, 
+                
+             text =  "CAGR: " + str.tostring(finCAGR, format.percent) + "\n" + "\nCMGR: " + str.tostring(finCMGR, "#0.0000") + "%",
+             bgcolor = array.get(x1, array.size(x1) - 1) > (((close / z) - 1) * 100) ? color.new(color.green, 90) : color.new(color.red, 90), 
+             text_color = color.white)    
+        
+            table.cell(array.get(y, 0), 3, 9, 
+                
+             text =  str.tostring(dex) + " Max Drawdown : " + str.tostring(spMaxDrawDown * 100, format.percent) + "\n(Highest Close to Lowest Close)",
+             bgcolor = array.get(x1, array.size(x1) - 1) < (((close / z) - 1) * 100) ? color.new(color.green, 90) : color.new(color.red, 90),  
+             text_color = color.white)    
+            
+        
+            table.cell(array.get(y, 0), 3, 10, 
+                
+             text =  "Risk-Free Rate: " + str.tostring(rf * 252, format.percent),
+             bgcolor = col == "Yes" ? color.new(color.white, 90) : array.get(x1, array.size(x1) - 1) < (((close / z) - 1) * 100) ? color.new(color.green, 90) : color.new(color.red, 90), 
+             text_color = color.white)
+        
+            table.cell(array.get(y, 0), 3, 8, 
+                
+             text =  str.tostring(dex) + " Max % Loss on Initial Investment: " + str.tostring(maxSDD, format.percent) + "\n(When Holding Since Start Date)",
+             bgcolor = col == "Yes" and maxDD < maxSDD ? color.new(color.green, 90) : col == "Yes" and maxDD < maxSDD ? color.new(color.red, 90) :
+             array.get(x1, array.size(x1) - 1) < (((close / z) - 1) * 100) ? color.new(color.green, 90) : color.new(color.red, 90), 
+             text_color = color.white)
+             
+        
+            table.cell(array.get(y, 0), 3, 11, 
+                
+             text =  "S&P 500 P/E: " + str.tostring(pE, format.mintick),
+             bgcolor = col == "Yes" ? color.new(color.blue, 90) : array.get(x1, array.size(x1) - 1) < (((close / z) - 1) * 100) ? color.new(color.green, 90) : color.new(color.red, 90), 
+             text_color = color.white)
+    
+    
+         
+            table.cell(array.get(y, 0), 1, 0, 
+        
+                 text = 
+                 w1 +
+                 w2 +
+                 w3 +
+                 w4 +
+                 w5 +
+                 w6 +
+                 w7 +
+                 w8 +
+                 w9 +
+                 w10 == 100.0 ?  
+                 str.tostring(
+                 w1 +
+                 w2 +
+                 w3 +
+                 w4 +
+                 w5 +
+                 w6 +
+                 w7 +
+                 w8 +
+                 w9 +
+                 w10 , format.percent) + " Weight " + 
+                 wString + "\n\n" :
+                 str.tostring(
+                 w1 +
+                 w2 +
+                 w3 +
+                 w4 +
+                 w5 +
+                 w6 +
+                 w7 +
+                 w8 +
+                 w9 +
+                 w10 , format.percent) + "Weight " + "\n"+ wString + "\n",
+                 bgcolor = color.new(color.white, 90)  , 
+                 text_color = color.white)
+    
+
+        
+            table.cell(array.get(y, 0), 3, 0, 
+                
+                 text =  "Asset Total Return\n" + str.tostring((((close / z) - 1) * 100), format.percent),
+                 bgcolor = array.get(x1, array.size(x1) - 1) < (((close / z) - 1) * 100) ? color.new(color.green, 90) : color.new(color.red, 90), 
+                 text_color = color.white)
+
+        
+            table.cell(array.get(y, 0), 3, 1, 
+                
+                 text =  "Indices",
+                 bgcolor = array.get(x1, array.size(x1) - 1) < (((close / z) - 1) * 100) ? color.new(color.green, 90) : color.new(color.red, 90), 
+                 text_color = color.white)    
+            
+            table.cell(array.get(y, 0), 3, 2, 
+                
+                 text =  World(),
+                 bgcolor = array.get(x1, array.size(x1) - 1) < (((close / z) - 1) * 100) ? color.new(color.green, 90) : color.new(color.red, 90), 
+                 text_color = color.white)
+           
+            table.cell(array.get(y, 0), 4, 2, 
+                
+                 text =  WorldP(),
+                 bgcolor = array.get(x1, array.size(x1) - 1) < (((close / z) - 1) * 100) ? color.new(color.green, 90) : color.new(color.red, 90), 
+                 text_color = color.white)
+           
+            table.cell(array.get(y, 0), 4, 1, 
+                
+                 text =  "Index Returns",
+                 bgcolor = array.get(x1, array.size(x1) - 1) < (((close / z) - 1) * 100) ? color.new(color.green, 90) : color.new(color.red, 90), 
+                 text_color = color.white)
+           
+           
+            merge(array.get(y, 0), 3, 4, 4,  4 )
+            merge(array.get(y, 0), 3, 5, 4,  5 )  
+            merge(array.get(y, 0), 3, 6, 4,  6 )
+            merge(array.get(y, 0), 1, 5, 2,  5 )
+            merge(array.get(y, 0), 1, 6, 2,  6 )
+            merge(array.get(y, 0), 1, 7, 2,  7 ) 
+            merge(array.get(y, 0), 1, 4, 2,  4 )
+            merge(array.get(y, 0), 3, 7, 4,  7 )  
+            merge(array.get(y, 0), 1, 8, 2,  8 )
+            merge(array.get(y, 0), 1, 9, 2,  9 ) 
+            merge(array.get(y, 0), 3, 9, 4,  9 )
+            merge(array.get(y, 0), 3, 8, 4,  8 )     
+            merge(array.get(y, 0), 1, 10, 2, 10)
+            merge(array.get(y, 0), 3, 10, 4, 10)
+            merge(array.get(y, 0), 3, 11, 4, 11)
+            merge(array.get(y, 0), 1, 11, 2, 11)    
+            merge(array.get(y, 0), 3, 0, 4, 0)     
+
+    
+/// _______________________________________________________
+//
+// Plots                     
+// _______________________________________________________  
+
+t                                                        = plot(lin == "Yes" and cond() == false ? xY : na)
+t1                                                       = plot(lin == "Yes" ? z + (((close / z) - 1) *  100) : na, color = color.red)
+t2                                                       = plot(plo == "Yes" ? z + ret() : na, color = color.green)
+
+fill(
+
+     t, 
+     t1, 
+     color = xY > z + (((close / z) - 1) *  100) and lin == "Yes" ? color.new(color.blue, 97) :
+     xY < z + (((close / z) - 1) *  100) and lin == "Yes" ? color.new(color.red, 97) :
+     na
+     
+     )
+
+Q1                                                        = month(time) != month(time[1]) and month(time) == 01
+Q2                                                        = month(time) != month(time[1]) and month(time) == 04
+Q3                                                        = month(time) != month(time[1]) and month(time) == 07
+Q4                                                        = month(time) != month(time[1]) and month(time) == 10
+
+
+if 
+  cond() == false 
+     and array.size(x1) > 0
+    
+    if 
+      
+      lin == "Yes"
+                                
+        if Q1
+            
+            array.push(mon, label.new(bar_index, xY, style = label.style_circle, size = size.auto, color = color.white))
+            array.push(mon1, label.new(bar_index, z + (((close / z) - 1) *  100), style = label.style_circle, color = color.white, size = size.auto))
+            
+            if 
+            
+              plo == "Yes"
+                
+                array.push(mon2, label.new(bar_index, z + ret(), style = label.style_circle, size = size.auto, color = color.white)) 
+        if Q2 
+            
+            array.push(mon, label.new(bar_index, xY, style = label.style_circle, size = size.auto, color = color.white))
+            array.push(mon1, label.new(bar_index, z + (((close / z) - 1) *  100), style = label.style_circle, color = color.white, size = size.auto))
+            
+            if 
+            
+              plo == "Yes"
+              
+                array.push(mon2, label.new(bar_index, z + ret(), style = label.style_circle, size = size.auto, color = color.white)) 
+
+        if Q3 
+            
+            array.push(mon, label.new(bar_index, xY, style = label.style_circle, size = size.auto, color = color.white)) 
+            array.push(mon1, label.new(bar_index, z + (((close / z) - 1) *  100), style = label.style_circle, color = color.white, size = size.auto))
+            
+            if 
+            
+              plo == "Yes"
+                
+                array.push(mon2, label.new(bar_index, z + ret(), style = label.style_circle, size = size.auto, color = color.white)) 
+        if Q4
+            
+            array.push(mon, label.new(bar_index, xY, style = label.style_circle, size = size.auto, color = color.white))
+            array.push(mon1, label.new(bar_index, z + (((close / z) - 1) *  100), style = label.style_circle, color = color.white, size = size.auto))
+            
+            if 
+            
+              plo == "Yes"
+               
+                array.push(mon2, label.new(bar_index, z + ret(), style = label.style_circle, size = size.auto, color = color.white))
+
+        if 
+          
+          barstate.islast
+            
+            array.push(
+            
+             port, label.new(
+             x = bar_index + 50, 
+             y = xY > z + (((close / z) - 1) *  100) ? xY * 1.01 : xY * .99, 
+             text = "Portfolio Return: " + str.tostring(array.get(x1, array.size(x1) - 1) + nz(finDiv()), format.percent), 
+             style = xY > z + (((close / z) - 1) *  100) ? label.style_label_down : label.style_label_up, 
+             color = color.new(color.blue, 50), 
+             textcolor = color.white)
+             
+             )
+             
+             
+            array.push(
+            
+             asset, label.new(
+             x = bar_index + 50, 
+             y = xY > z + (((close / z) - 1) *  100) ? z + (((close / z) - 1) *  100) * .99 : z + (((close / z) - 1) *  100) * 1.01, 
+             text = "Asset Return: " + str.tostring((((close / z) - 1) * 100), format.percent), 
+             color = color.new(color.red, 50), 
+             style = z + (((close / z) - 1) *  100) < xY ? label.style_label_up : label.style_label_down, 
+             textcolor = color.white)
+             
+             )
+            
+            array.push(
+             pX, line.new(
+             x1 = bar_index, 
+             y1 = xY, 
+             x2= bar_index + 50, 
+             y2 = xY, 
+             color = color.blue)
+            
+             )
+            
+            
+            array.push(
+            
+             pX1, line.new(
+             x1 = bar_index,  
+             y1 = z + (((close / z) - 1) *  100), 
+             x2 = bar_index + 50,  
+             y2 = z + (((close / z) - 1) *  100), 
+             color = color.red)
+            
+             )
+            
+            array.push(
+            
+             pX2, line.new(
+             x1 = 
+             bar_index + 50,  
+             y1 = xY, 
+             x2 = bar_index + 50,  
+             y2 = math.avg(z + (((close / z) - 1) *  100), xY), 
+             color = color.blue)
+            
+             )
+            
+            
+            array.push(
+            
+             pX3, line.new(
+             x1 = bar_index + 50,  
+             y1 = z + (((close / z) - 1) *  100), 
+             x2 = bar_index + 50,  
+             y2= math.avg(z + (((close / z) - 1) *  100), xY), 
+             color = color.red)
+            
+             )
+            
+            
+            array.push(
+            
+             pX4, line.new(
+             x1 = bar_index,  
+             y1 = math.avg(z + (((close / z) - 1) *  100), xY), 
+             x2 = bar_index + 50,  
+             y2 = math.avg(z + (((close / z) - 1) *  100), xY), 
+             color = na)
+            
+             )
+            
+
+
+
+        if 
+          
+          plo == "Yes"
+        
+            array.push(
+            
+             inLI, line.new(
+             x1 = bar_index, 
+             y1 = z + ret(), 
+             x2= bar_index + 50, 
+             y2 = z + ret(), 
+             color = color.green)
+             
+             )
+            
+            array.push(
+        
+             inL, label.new(
+             x = bar_index + 50, 
+             y = z + ret(), 
+             text = str.tostring(dex) +" Return: " + str.tostring(ret(), format.percent), 
+             color = color.new(color.green, 50), 
+             style = label.style_label_left, 
+             textcolor = color.white)
+                 
+                 )
+
+// _______________________________________________________
+//
+// Lines & Labels                    
+// _______________________________________________________
+
+    
+        if 
+          
+          array.size(pX) > 0
+        
+            array.push(
+            
+             pXL, linefill.new(
+             line1 = array.get(pX, array.size(pX) - 1), 
+             line2 = array.get(pX4, array.size(pX4) - 1), 
+             color = color.new(color.blue, 92))
+             
+             )
+            
+            array.push(
+            
+             pXL1, linefill.new(
+             line1 = array.get(pX1, array.size(pX1) - 1), 
+             line2 = array.get(pX4, array.size(pX4) - 1), 
+             color = color.new(color.red, 92))
+              
+             )
+
+
+            if 
+              
+              array.size(port) > 1
+   
+                label.delete(array.shift(port))
+                label.delete(array.shift(asset))
+                line.delete (array.shift(pX))
+                line.delete (array.shift(pX1))
+                line.delete (array.shift(pX2))
+                line.delete (array.shift(pX3))
+                line.delete (array.shift(pX4))
+           
+            if 
+              
+              array.size(inLI) > 0
+           
+                line.delete (array.shift(inLI))
+                label.delete(array.shift(inL))
+
+
+// _______________________________________________________
+//
+// Time Start Marker                    
+// _______________________________________________________
+
+
+if
+ 
+  c  > 0 
+  
+     and c1 > 0 
+     and c2 > 0
+     and c3 > 0
+     and c4 > 0
+     and c5 > 0
+     and c6 > 0
+     and c7 > 0
+     and c8 > 0
+     and c9 > 0
+    
+    cond2 :=  true
+
+if 
+  cond2[1] == false 
+    if 
+      cond2 == true 
+        
+        array.push(
+        
+         startDate, label.new(
+         
+         x =bar_index, 
+         y =high * 1.20, 
+         text = "All Assets Started \nTrading by This Session\n" + str.tostring(year(time)) + "/" + str.tostring(month(time)) + "/" + str.tostring(dayofmonth(time)),
+         textcolor = color.black, color = color.new(color.white, 50), 
+         style = label.style_label_right)
+         
+         )
+
+bgcolor(cond2[1] == false and cond2 == true ? color.white : cond2 == true ? color.new(color.white, 99) : na)

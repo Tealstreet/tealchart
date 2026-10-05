@@ -1,0 +1,22 @@
+//@version=5
+indicator("BB edge cases")
+missing_source = bar_index == 1 ? na : close
+flat_source = close - close + 3
+[zero_basis, zero_upper, zero_lower] = ta.bb(close, 0, 2)
+[negative_basis, negative_upper, negative_lower] = ta.bb(close, -1, 2)
+[missing_basis, missing_upper, missing_lower] = ta.bb(missing_source, 2, 2)
+[flat_basis, flat_upper, flat_lower] = ta.bb(flat_source, 3, 2)
+[zero_mult_basis, zero_mult_upper, zero_mult_lower] = ta.bb(close, 3, 0)
+[missing_mult_basis, missing_mult_upper, missing_mult_lower] = ta.bb(close, 3, na)
+plot(na(zero_basis) and na(zero_upper) and na(zero_lower) ? 1 : 0)
+plot(na(negative_basis) and na(negative_upper) and na(negative_lower) ? 1 : 0)
+plot(missing_basis)
+plot(missing_upper)
+plot(missing_lower)
+plot(flat_basis)
+plot(flat_upper)
+plot(flat_lower)
+plot(zero_mult_basis)
+plot(zero_mult_upper)
+plot(zero_mult_lower)
+plot(na(missing_mult_basis) and na(missing_mult_upper) and na(missing_mult_lower) ? 1 : 0)

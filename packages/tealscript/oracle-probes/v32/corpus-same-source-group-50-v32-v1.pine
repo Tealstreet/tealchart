@@ -1,0 +1,25 @@
+// @test regression/coverage-misc-uncovered
+// @description #52 coverage build-out: uncovered ticker.* constructors (kagi/linebreak/pointfigure/renko, each fed through request.security), ta.bbw/ta.kcw, request.economic, request.quandl (deprecated in v6 but still accepted), and the linefill line getters.
+// @expects parse: success
+// @expects no-errors
+
+//@version=6
+indicator("coverage misc uncovered")
+tk = ticker.kagi(syminfo.tickerid, 3)
+tl = ticker.linebreak(syminfo.tickerid, 3)
+tp = ticker.pointfigure(syminfo.tickerid, "hl", "ATR", 14, 3)
+trk = ticker.renko(syminfo.tickerid, "ATR", 14)
+k = request.security(tk, timeframe.period, close)
+l = request.security(tl, timeframe.period, close)
+p = request.security(tp, timeframe.period, close)
+r = request.security(trk, timeframe.period, close)
+bbw = ta.bbw(close, 20, 2)
+kcw = ta.kcw(close, 20, 2)
+gdp = request.economic("US", "GDP")
+q = request.quandl("CFTC/SB_FO_ALL")
+lf = linefill.new(line.new(bar_index - 1, low, bar_index, high), line.new(bar_index - 1, high, bar_index, low), color.new(color.blue, 80))
+l1 = linefill.get_line1(lf)
+l2 = linefill.get_line2(lf)
+line.set_width(l1, 2)
+line.set_width(l2, 2)
+plot(k + l + p + r + bbw + kcw + gdp + q)

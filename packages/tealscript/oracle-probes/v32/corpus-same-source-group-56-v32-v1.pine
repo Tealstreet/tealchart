@@ -1,0 +1,7 @@
+//@version=6
+indicator("Unsupported for-in array.abs result negative history")
+source = array.from(-2.0, 1.0)
+values = array.abs(source)
+length = for value in values
+    -1
+plot(close[length])

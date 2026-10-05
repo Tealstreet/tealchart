@@ -1,0 +1,437 @@
+//@version=5
+indicator("Array statistics fixture")
+ints = array.new_int()
+array.push(ints, 2)
+array.push(ints, 5)
+array.push(ints, 1)
+plot(array.min(ints))
+plot(array.max(ints))
+plot(array.sum(ints))
+plot(array.avg(ints))
+plot(array.range(ints))
+plot(array.median(ints))
+plot(array.percentile_nearest_rank(ints, 50))
+plot(array.percentile_nearest_rank(ints, 0))
+plot(array.percentile_nearest_rank(ints, 100))
+plot(array.percentile_linear_interpolation(ints, 0))
+plot(ints.percentile_linear_interpolation(75))
+plot(array.percentile_linear_interpolation(ints, 100))
+plot(array.percentrank(ints, 0))
+plot(array.percentrank(ints, 1))
+plot(array.variance(ints))
+plot(array.variance(ints, false))
+mode_ints = array.from(1, 3, 3, 2, 2)
+plot(mode_ints.mode())
+mode_floats = array.from(1.5, na, 1.5, 2.5)
+plot(array.mode(mode_floats))
+
+floats = array.new_float()
+floats.push(close)
+floats.push(high)
+floats.push(na)
+plot(floats.min())
+plot(floats.max())
+plot(floats.sum())
+plot(floats.avg())
+plot(floats.range())
+plot(floats.median())
+plot(floats.percentile_nearest_rank(50))
+plot(array.percentile_linear_interpolation(floats, 50))
+plot(floats.percentrank(1))
+plot(array.variance(floats))
+plot(array.stdev(floats))
+plot(floats.stdev(false))
+
+signs = array.from(-2, 0, 3)
+absolutes = signs.abs()
+plot(absolutes.get(0) + absolutes.get(1) + absolutes.get(2))
+plot(signs.get(0))
+float_signs = array.new_float()
+float_signs.push(-close)
+float_signs.push(na)
+float_abs = array.abs(float_signs)
+plot(float_abs.get(0))
+plot(na(float_abs.get(1)) ? 1 : 0)
+
+branch_abs_score = bar_index * 0.0
+if bar_index % 2 == 0
+    branch_abs_ints = array.from(-1, 2, -3)
+    branch_abs_values = array.abs(branch_abs_ints)
+    branch_abs_score := branch_abs_values.get(0) * 100 + branch_abs_values.get(1) * 10 + branch_abs_values.get(2) + (branch_abs_ints.get(0) == -1 ? 1000 : 0)
+else
+    branch_abs_floats = array.from(-4.0, na, 5.0)
+    branch_abs_float_values = branch_abs_floats.abs()
+    branch_abs_score := (branch_abs_float_values.get(0) + branch_abs_float_values.get(2)) * 10 + (na(branch_abs_float_values.get(1)) ? 1 : 0)
+plot(branch_abs_score)
+
+loop_abs_results = array.new_float()
+for i = 0 to 1
+    if i == 0
+        loop_abs_ints = array.from(-2, -4)
+        loop_abs_values = array.abs(loop_abs_ints)
+        loop_abs_results.push(loop_abs_values.get(0) + loop_abs_values.get(1) + (loop_abs_ints.get(0) == -2 ? 1 : 0))
+    else
+        loop_abs_floats = array.from(-1.5, na, 2.5)
+        loop_abs_float_values = loop_abs_floats.abs()
+        loop_abs_results.push(loop_abs_float_values.get(0) + loop_abs_float_values.get(2) + (na(loop_abs_float_values.get(1)) ? 1 : 0))
+plot(loop_abs_results.get(0) * 10 + loop_abs_results.get(1))
+
+independent_abs_ints = array.from(-3, na, 4)
+independent_abs_floats = array.from(-2.0, na, 5.0)
+independent_abs_score = bar_index * 0.0
+independent_abs_i = 0
+while independent_abs_i < 1
+    independent_abs_values = array.abs(independent_abs_ints)
+    independent_abs_float_values = independent_abs_floats.abs()
+    independent_abs_score := independent_abs_values.get(0) * 100 + independent_abs_values.get(2) * 10 + (na(independent_abs_values.get(1)) ? 10 : 0) + (independent_abs_ints.get(0) == -3 ? 1 : 0) + independent_abs_float_values.get(0) + independent_abs_float_values.get(2) + (na(independent_abs_float_values.get(1)) ? 1000 : 0)
+    independent_abs_i := independent_abs_i + 1
+plot(independent_abs_score)
+
+standard_values = array.from(2, 4, 4, 4, 5, 5, 7, 9)
+standardized = standard_values.standardize()
+plot(standardized.get(0))
+plot(standardized.get(7))
+plot(standard_values.get(0))
+standard_with_na = array.from(close, na, high)
+standardized_with_na = array.standardize(standard_with_na)
+plot(standardized_with_na.size())
+plot(na(standardized_with_na.get(1)) ? 1 : 0)
+plot(standardized_with_na.get(0) + standardized_with_na.get(2))
+
+covariance_x = array.from(1, 2, 3)
+covariance_y = array.from(1, 5, 7)
+plot(array.covariance(covariance_x, covariance_y))
+plot(covariance_x.covariance(covariance_y, false))
+covariance_with_na_x = array.from(close, na, high)
+covariance_with_na_y = array.from(open, close, na)
+plot(array.covariance(covariance_with_na_x, covariance_with_na_y))
+plot(na(covariance_with_na_x.covariance(covariance_with_na_y, false)) ? 1 : 0)
+mismatched_covariance = array.from(1, 2)
+plot(na(array.covariance(covariance_x, mismatched_covariance)) ? 1 : 0)
+
+empty = array.new_float()
+only_na = array.new_int(2)
+empty_abs = empty.abs()
+plot(empty_abs.size())
+empty_standardized = array.standardize(empty)
+only_na_standardized = only_na.standardize()
+plot(na(array.min(empty)) and na(array.min(only_na)) and na(array.max(empty)) and na(array.max(only_na)) and na(array.sum(empty)) and na(array.sum(only_na)) and na(array.avg(empty)) and na(array.avg(only_na)) and na(array.range(empty)) and na(array.range(only_na)) and na(array.median(empty)) and na(array.median(only_na)) and na(array.mode(empty)) and na(array.mode(only_na)) and na(array.mode(ints)) and na(array.percentile_nearest_rank(empty, 50)) and na(array.percentile_nearest_rank(only_na, 50)) and na(array.percentile_nearest_rank(ints, 150)) and na(array.percentile_linear_interpolation(empty, 50)) and na(array.percentile_linear_interpolation(only_na, 50)) and na(array.percentile_linear_interpolation(ints, -1)) and na(array.percentile_linear_interpolation(ints, 150)) and na(array.percentrank(empty, 0)) and na(array.percentrank(only_na, 0)) and na(array.percentrank(floats, 2)) and na(array.percentrank(ints, -1)) and na(array.percentrank(ints, 3)) and empty_standardized.size() == 0 and only_na_standardized.size() == 0 and na(array.covariance(empty, empty)) and na(array.covariance(only_na, only_na)) and na(array.variance(empty)) and na(array.variance(only_na)) and na(array.variance(array.from(1), false)) and na(array.stdev(empty)) and na(array.stdev(only_na)) and na(array.stdev(array.from(1), false)) ? 1 : 0)
+
+branch_minmax_source = array.from(4, 1, 7)
+branch_minmax_results = array.new_int()
+if bar_index % 2 == 0
+    branch_minmax_results.push(array.min(branch_minmax_source) + branch_minmax_source.max())
+else
+    branch_minmax_results.push(branch_minmax_source.min() * 10 + array.max(branch_minmax_source))
+plot(branch_minmax_results.get(0))
+
+loop_minmax_source = array.from(6, 2, 9)
+loop_minmax_results = array.new_int()
+for i = 0 to 1
+    if i == 0
+        loop_minmax_results.push(array.min(loop_minmax_source))
+    else
+        loop_minmax_results.push(loop_minmax_source.max())
+plot(loop_minmax_results.get(0) * 10 + loop_minmax_results.get(1))
+
+independent_min_ints = array.from(6, -2, 4)
+independent_min_floats = array.from(na, -1.5, 3.0)
+independent_min_score = bar_index * 0.0
+independent_min_i = 0
+while independent_min_i < 1
+    independent_min_int = array.min(independent_min_ints)
+    independent_min_float = independent_min_floats.min()
+    independent_min_score := independent_min_int * 10 + independent_min_float + independent_min_ints.size() + independent_min_floats.size()
+    independent_min_i := independent_min_i + 1
+plot(independent_min_score)
+
+independent_max_ints = array.from(6, -2, 4)
+independent_max_floats = array.from(na, -1.5, 3.0)
+independent_max_score = bar_index * 0.0
+independent_max_i = 0
+while independent_max_i < 1
+    independent_max_int = array.max(independent_max_ints)
+    independent_max_float = independent_max_floats.max()
+    independent_max_score := independent_max_int * 10 + independent_max_float + independent_max_ints.size() + independent_max_floats.size()
+    independent_max_i := independent_max_i + 1
+plot(independent_max_score)
+
+branch_sumavg_source = array.from(2, 4, 6)
+branch_sumavg_results = array.new_float()
+if bar_index % 2 == 0
+    branch_sumavg_results.push(array.sum(branch_sumavg_source) + branch_sumavg_source.avg())
+else
+    branch_sumavg_results.push(branch_sumavg_source.range() + array.avg(branch_sumavg_source))
+plot(branch_sumavg_results.get(0))
+
+loop_sumavg_source = array.from(3, 6, 9)
+loop_sumavg_results = array.new_float()
+for i = 0 to 1
+    if i == 0
+        loop_sumavg_results.push(array.sum(loop_sumavg_source))
+    else
+        loop_sumavg_results.push(loop_sumavg_source.avg() + array.range(loop_sumavg_source))
+plot(loop_sumavg_results.get(0) + loop_sumavg_results.get(1))
+
+independent_sum_ints = array.from(2, na, 5)
+independent_sum_floats = array.from(na, 1.5, 2.5)
+independent_sum_score = bar_index * 0.0
+independent_sum_i = 0
+while independent_sum_i < 1
+    independent_sum_int = array.sum(independent_sum_ints)
+    independent_sum_float = independent_sum_floats.sum()
+    independent_sum_score := independent_sum_int * 10 + independent_sum_float + independent_sum_ints.size() + independent_sum_floats.size()
+    independent_sum_i := independent_sum_i + 1
+plot(independent_sum_score)
+
+independent_avg_ints = array.from(2, na, 8)
+independent_avg_floats = array.from(na, 1.5, 2.5)
+independent_avg_score = bar_index * 0.0
+independent_avg_i = 0
+while independent_avg_i < 1
+    independent_avg_int = array.avg(independent_avg_ints)
+    independent_avg_float = independent_avg_floats.avg()
+    independent_avg_score := independent_avg_int * 10 + independent_avg_float + independent_avg_ints.size() + independent_avg_floats.size()
+    independent_avg_i := independent_avg_i + 1
+plot(independent_avg_score)
+
+independent_range_ints = array.from(2, na, 8)
+independent_range_floats = array.from(na, 1.5, 4.5)
+independent_range_score = bar_index * 0.0
+independent_range_i = 0
+while independent_range_i < 1
+    independent_range_int = array.range(independent_range_ints)
+    independent_range_float = independent_range_floats.range()
+    independent_range_score := independent_range_int * 10 + independent_range_float + independent_range_ints.size() + independent_range_floats.size()
+    independent_range_i := independent_range_i + 1
+plot(independent_range_score)
+
+branch_median_mode_source = array.from(1, 2, 2, 4)
+branch_median_mode_results = array.new_float()
+if bar_index % 2 == 0
+    branch_median_mode_results.push(array.median(branch_median_mode_source) + branch_median_mode_source.mode())
+else
+    branch_median_mode_results.push(branch_median_mode_source.median() * 10 + array.mode(branch_median_mode_source))
+plot(branch_median_mode_results.get(0))
+
+loop_median_mode_source = array.from(3.0, 3.0, 6.0, 9.0)
+loop_median_mode_results = array.new_float()
+for i = 0 to 1
+    if i == 0
+        loop_median_mode_results.push(array.median(loop_median_mode_source))
+    else
+        loop_median_mode_results.push(loop_median_mode_source.mode())
+plot(loop_median_mode_results.get(0) * 10 + loop_median_mode_results.get(1))
+
+independent_median_ints = array.from(5, 1, na, 3)
+independent_median_floats = array.from(na, 2.0, 4.0, 8.0, 10.0)
+independent_median_score = bar_index * 0.0
+independent_median_i = 0
+while independent_median_i < 1
+    independent_median_int = array.median(independent_median_ints)
+    independent_median_float = independent_median_floats.median()
+    independent_median_score := independent_median_int * 10 + independent_median_float + independent_median_ints.size() - independent_median_floats.size()
+    independent_median_i := independent_median_i + 1
+plot(independent_median_score)
+
+independent_mode_ints = array.from(3, 1, 3, 1)
+independent_mode_floats = array.from(na, 2.5, 2.5, 4.5)
+independent_mode_score = bar_index * 0.0
+independent_mode_i = 0
+while independent_mode_i < 1
+    independent_mode_int = array.mode(independent_mode_ints)
+    independent_mode_float = independent_mode_floats.mode()
+    independent_mode_score := independent_mode_int * 10 + independent_mode_float + independent_mode_ints.size() - independent_mode_floats.size()
+    independent_mode_i := independent_mode_i + 1
+plot(independent_mode_score)
+
+independent_percentile_nearest_ints = array.from(na, 9, 1, 5, 7)
+independent_percentile_nearest_floats = array.from(2.0, na, 4.0, 10.0)
+independent_percentile_nearest_score = bar_index * 0.0
+independent_percentile_nearest_i = 0
+while independent_percentile_nearest_i < 1
+    independent_percentile_nearest_int = array.percentile_nearest_rank(independent_percentile_nearest_ints, 50)
+    independent_percentile_nearest_float = independent_percentile_nearest_floats.percentile_nearest_rank(75)
+    independent_percentile_nearest_score := independent_percentile_nearest_int * 10 + independent_percentile_nearest_float + independent_percentile_nearest_ints.size() - independent_percentile_nearest_floats.size()
+    independent_percentile_nearest_i := independent_percentile_nearest_i + 1
+plot(independent_percentile_nearest_score)
+
+independent_percentile_linear_ints = array.from(na, 9, 1, 5, 7)
+independent_percentile_linear_floats = array.from(2.0, na, 4.0, 10.0)
+independent_percentile_linear_score = bar_index * 0.0
+independent_percentile_linear_i = 0
+while independent_percentile_linear_i < 1
+    independent_percentile_linear_int = array.percentile_linear_interpolation(independent_percentile_linear_ints, 50)
+    independent_percentile_linear_float = independent_percentile_linear_floats.percentile_linear_interpolation(75)
+    independent_percentile_linear_score := independent_percentile_linear_int * 10 + independent_percentile_linear_float + independent_percentile_linear_ints.size() - independent_percentile_linear_floats.size()
+    independent_percentile_linear_i := independent_percentile_linear_i + 1
+plot(independent_percentile_linear_score)
+
+branch_percentile_source = array.from(1, 3, 5, 7)
+branch_percentile_results = array.new_float()
+if bar_index % 2 == 0
+    branch_percentile_results.push(array.percentile_nearest_rank(branch_percentile_source, 50) + branch_percentile_source.percentile_linear_interpolation(50))
+else
+    branch_percentile_results.push(branch_percentile_source.percentile_nearest_rank(75) * 10 + array.percentile_linear_interpolation(branch_percentile_source, 25))
+plot(branch_percentile_results.get(0))
+
+loop_percentile_source = array.from(2.0, 4.0, 8.0, 10.0)
+loop_percentile_results = array.new_float()
+for i = 0 to 1
+    if i == 0
+        loop_percentile_results.push(array.percentile_nearest_rank(loop_percentile_source, 75))
+    else
+        loop_percentile_results.push(loop_percentile_source.percentile_linear_interpolation(25))
+plot(loop_percentile_results.get(0) * 10 + loop_percentile_results.get(1))
+
+branch_percentrank_source = array.from(1, 3, 5, 7)
+branch_percentrank_results = array.new_float()
+if bar_index % 2 == 0
+    branch_percentrank_results.push(array.percentrank(branch_percentrank_source, 1) + branch_percentrank_source.percentrank(2))
+else
+    branch_percentrank_results.push(branch_percentrank_source.percentrank(0) * 10 + array.percentrank(branch_percentrank_source, 3))
+plot(branch_percentrank_results.get(0))
+
+loop_percentrank_source = array.from(2.0, 4.0, na, 8.0)
+loop_percentrank_results = array.new_float()
+for i = 0 to 1
+    if i == 0
+        loop_percentrank_results.push(array.percentrank(loop_percentrank_source, 1))
+    else
+        loop_percentrank_results.push(loop_percentrank_source.percentrank(3))
+plot(loop_percentrank_results.get(0) + loop_percentrank_results.get(1))
+
+independent_percentrank_ints = array.from(na, 2, 4, 4, 8)
+independent_percentrank_floats = array.from(1.5, na, 3.5, 7.5)
+independent_percentrank_score = bar_index * 0.0
+independent_percentrank_i = 0
+while independent_percentrank_i < 1
+    independent_percentrank_int = array.percentrank(independent_percentrank_ints, 2)
+    independent_percentrank_float = independent_percentrank_floats.percentrank(3)
+    independent_percentrank_score := independent_percentrank_int + independent_percentrank_float + independent_percentrank_ints.size() - independent_percentrank_floats.size()
+    independent_percentrank_i := independent_percentrank_i + 1
+plot(independent_percentrank_score)
+
+branch_covariance_x = array.from(1, 2, 3)
+branch_covariance_y = array.from(2, 4, 8)
+branch_covariance_results = array.new_float()
+if bar_index % 2 == 0
+    branch_covariance_results.push(array.covariance(branch_covariance_x, branch_covariance_y) + branch_covariance_x.covariance(branch_covariance_y, false))
+else
+    branch_covariance_results.push(branch_covariance_x.covariance(branch_covariance_y) * 10 + array.covariance(branch_covariance_x, branch_covariance_y, false))
+plot(branch_covariance_results.get(0))
+
+loop_covariance_x = array.from(1.0, 2.0, 3.0)
+loop_covariance_y = array.from(1.0, 2.0, 3.0)
+loop_covariance_results = array.new_float()
+for i = 0 to 1
+    if i == 0
+        loop_covariance_results.push(array.covariance(loop_covariance_x, loop_covariance_y))
+    else
+        loop_covariance_results.push(loop_covariance_x.covariance(loop_covariance_y, false))
+plot(loop_covariance_results.get(0) * 10 + loop_covariance_results.get(1))
+
+independent_covariance_x = array.from(1, 2, 3, na)
+independent_covariance_y = array.from(2, 4, 8, 10)
+independent_covariance_score = bar_index * 0.0
+independent_covariance_i = 0
+while independent_covariance_i < 1
+    independent_covariance_biased = array.covariance(independent_covariance_x, independent_covariance_y)
+    independent_covariance_unbiased = independent_covariance_x.covariance(independent_covariance_y, false)
+    independent_covariance_score := independent_covariance_biased * 10 + independent_covariance_unbiased + independent_covariance_x.size() - independent_covariance_y.size()
+    independent_covariance_i := independent_covariance_i + 1
+plot(independent_covariance_score)
+
+branch_standardize_source = array.from(2, 4, 6)
+branch_standardize_results = array.new_float()
+if bar_index % 2 == 0
+    branch_standardized_namespace = array.standardize(branch_standardize_source)
+    branch_standardized_method = branch_standardize_source.standardize()
+    branch_standardize_results.push(branch_standardized_namespace.get(2) - branch_standardized_method.get(0))
+else
+    branch_standardized_method_alt = branch_standardize_source.standardize()
+    branch_standardized_namespace_alt = array.standardize(branch_standardize_source)
+    branch_standardize_results.push(branch_standardized_method_alt.get(2) * 10 + branch_standardized_namespace_alt.get(0))
+plot(branch_standardize_results.get(0))
+
+loop_standardize_source = array.from(1.0, 2.0, 3.0)
+loop_standardize_results = array.new_float()
+for i = 0 to 1
+    if i == 0
+        loop_standardized_namespace = array.standardize(loop_standardize_source)
+        loop_standardize_results.push(loop_standardized_namespace.get(2))
+    else
+        loop_standardized_method = loop_standardize_source.standardize()
+        loop_standardize_results.push(loop_standardized_method.get(0))
+plot(loop_standardize_results.get(0) * 10 + loop_standardize_results.get(1))
+
+independent_standardize_source = array.from(0, 10, na)
+independent_standardize_score = bar_index * 0.0
+independent_standardize_i = 0
+while independent_standardize_i < 1
+    independent_standardized_namespace = array.standardize(independent_standardize_source)
+    independent_standardized_method = independent_standardize_source.standardize()
+    independent_standardize_score := -independent_standardized_namespace.get(0) * 10 + independent_standardized_method.get(1) * 20 + (na(independent_standardized_namespace.get(2)) ? 100 : 0) + independent_standardize_source.get(1) + independent_standardized_namespace.size() - independent_standardize_source.size()
+    independent_standardize_i := independent_standardize_i + 1
+plot(independent_standardize_score)
+
+branch_variance_stdev_source = array.from(2, 4, 6)
+branch_variance_stdev_results = array.new_float()
+if bar_index % 2 == 0
+    branch_variance_stdev_results.push(array.variance(branch_variance_stdev_source) + branch_variance_stdev_source.stdev(false))
+else
+    branch_variance_stdev_results.push(branch_variance_stdev_source.variance(false) * 10 + array.stdev(branch_variance_stdev_source))
+plot(branch_variance_stdev_results.get(0))
+
+loop_variance_stdev_source = array.from(1.0, 2.0, 3.0)
+loop_variance_stdev_results = array.new_float()
+for i = 0 to 1
+    if i == 0
+        loop_variance_stdev_results.push(array.variance(loop_variance_stdev_source) + array.stdev(loop_variance_stdev_source))
+    else
+        loop_variance_stdev_results.push(loop_variance_stdev_source.variance(false) + loop_variance_stdev_source.stdev(false))
+plot(loop_variance_stdev_results.get(0) + loop_variance_stdev_results.get(1))
+
+independent_variance_source = array.from(2, 4, 6, na)
+independent_variance_score = bar_index * 0.0
+independent_variance_i = 0
+while independent_variance_i < 1
+    independent_variance_biased = array.variance(independent_variance_source)
+    independent_variance_unbiased = independent_variance_source.variance(false)
+    independent_variance_score := independent_variance_biased * 10 + independent_variance_unbiased + independent_variance_source.size()
+    independent_variance_i := independent_variance_i + 1
+plot(independent_variance_score)
+
+independent_stdev_source = array.from(2, 4, 6, na)
+independent_stdev_score = bar_index * 0.0
+independent_stdev_i = 0
+while independent_stdev_i < 1
+    independent_stdev_biased = array.stdev(independent_stdev_source)
+    independent_stdev_unbiased = independent_stdev_source.stdev(false)
+    independent_stdev_score := independent_stdev_biased * 10 + independent_stdev_unbiased + independent_stdev_source.size()
+    independent_stdev_i := independent_stdev_i + 1
+plot(independent_stdev_score)
+
+nth_ints = array.from(na, 4, 1, 4, 2)
+nth_floats = array.from(na, 3.5, -1.5, 3.5, 2.0)
+
+// `nth` is zero-based after filtering `na`; duplicate values occupy separate ranks.
+plot(array.min(nth_ints, 0))
+plot(nth_ints.min(1))
+plot(array.min(nth=2, id=nth_ints))
+plot(nth_ints.min(nth=3))
+plot(array.max(nth=0, id=nth_ints))
+plot(nth_ints.max(1))
+plot(array.max(id=nth_ints, nth=2))
+plot(nth_ints.max(nth=3))
+plot(array.min(nth_floats, 1))
+plot(nth_floats.max(nth=1))
+
+dynamic_nth = bar_index % 4
+plot(array.min(id=nth_ints, nth=dynamic_nth))
+plot(nth_ints.max(dynamic_nth))
+
+plot(na(array.min(empty, 1)) and na(empty.max(nth=0)) and na(array.min(only_na, 0)) and na(only_na.max(1)) ? 1 : 0)
+plot(na(array.min(nth_ints, na)) and na(nth_ints.max(nth=na)) ? 1 : 0)
+plot(na(array.min(nth_ints, -1)) and na(nth_ints.max(nth=-1)) ? 1 : 0)
+plot(na(array.min(nth_ints, 4)) and na(nth_ints.max(nth=4)) ? 1 : 0)

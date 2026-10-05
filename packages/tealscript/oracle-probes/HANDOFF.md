@@ -99,6 +99,12 @@
 > file; keep published library versions and every early-refusal/alias/alternation limit. The 752 source is an
 > explicit v13 RECAPTURE for the missing isolated ZOMATO/UNIONBANK contexts only. Reply under `v31/captures/v31/`.
 
+> **Then round v32.** After v31, do [`v32/HANDOFF-v32-v1.md`](v32/HANDOFF-v32-v1.md) — 59 isolated sources covering
+> corpus runtime outcomes no earlier round shipped. Run each separately in manifest rank order with its instruction
+> file; keep defaults and exact provider/library revisions, and record loaded history, cutoff, live/date/viewport
+> masks and exact refusal text and site. Keep changed-context attempts separate. Fourteen extension candidates are
+> excluded. Reply under `v32/captures/v32/`.
+
 Agent exchange: [capture response v1](RESPONSE-v1.md). The next reply belongs in
 `RESPONSE-v2.md` beside this handoff; commit responses so both machines can read them.
 

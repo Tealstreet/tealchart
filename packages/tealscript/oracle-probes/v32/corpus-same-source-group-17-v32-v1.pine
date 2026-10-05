@@ -1,0 +1,146 @@
+// This source code is subject to the terms of the Mozilla Public License 2. at https://mozilla.org/MPL/2./
+// © loxx
+
+//@version=5
+indicator("Fourier Extrapolator of Price w/ Projection Forecast [Loxx]", shorttitle = "FEPFP [Loxx]", overlay = true, max_lines_count = 500)
+
+greencolor = #2DD204
+redcolor = #D2042D 
+
+src = input.source(open, "Source", group = "Basic Settings")
+npast = input.int(300, "Caculation Bars", maxval = 500, group = "Fourier Extrapolator Settings")
+nharm = input.int(20, "Harmonic Period", minval = 1, group = "Fourier Extrapolator Settings")
+frqtol = input.float(0.0001, "Frequency Tolerance", group = "Fourier Extrapolator Settings")
+nfut = input.int(100, "Forecast Bars", group = "Fourier Extrapolator Settings")
+backbars = input.int(100, "Bars back to start forecast", group = "Fourier Extrapolator Settings", minval = 0)
+
+allcolorbars = input.bool(false, "Mute all bar colors?", group = "UI Options")
+fcolorbars = input.bool(false, "Mute forecast bar colors?", group = "UI Options")
+
+plinewidth = input.int(5, "Past Line width", group = "UI Options")
+flinewidth = input.int(5, "Forecast Line width", group = "UI Options")
+
+x = array.new<float>(npast, 0.)
+xm = array.new<float>(npast, 0.)
+ym = array.new<float>(nfut + 1, 0.)
+
+if npast + nfut > 500 
+    runtime.error("You must adjust nfut and npast so that they add up to 500 or less") 
+    
+var pvlines = array.new_line(0)
+var fvlines = array.new_line(0)
+
+if barstate.isfirst
+    for i = 0 to npast - 2 
+        array.push(pvlines, line.new(na, na, na, na))
+    for i = 0 to nfut - 2 
+        array.push(fvlines, line.new(na, na, na, na))
+
+if barstate.islast
+    av = 0.
+    for i = 0 to npast - 1 
+        array.set(x, i, nz(src[i + backbars])) 
+        av += array.get(x, i)
+    av /= npast
+    
+    //--- initialize model outputs
+    for i = 0 to npast - 1
+        array.set(xm, i, av)
+        if (i <= nfut) 
+            array.set(ym, i,  av)
+            
+    beta = 0.
+    alpha = 0.
+    w = 0., m= 0., a= 0., b= 0.
+    z = array.new<float>(npast, 0.)
+    
+    array.set(z, 0, array.get(x, 0))
+    //--- fit trigonometric model and calculate predictions
+    for harm = 1 to nharm
+        //+------------------------------------------------------------------+
+        //| Quinn and Fernandes algorithm for finding frequency              |
+        //+------------------------------------------------------------------+
+        alpha := 0.
+        beta := 2.
+        array.set(z, 0, array.get(x, 0) - array.get(xm, 0))
+        while math.abs(alpha - beta) > frqtol  
+            alpha := beta
+            array.set(z, 1, array.get(x, 1) - array.get(xm, 1) + alpha * array.get(z, 0))
+            num = array.get(z, 0) * array.get(z, 1)
+            den = array.get(z, 0) * array.get(z, 0)
+            for i = 2 to npast - 1
+                array.set(z, i, array.get(x, i) - array.get(xm, i) + alpha * array.get(z, i - 1) - array.get(z, i - 2))
+                num += array.get(z, i - 1) * (array.get(z, i) + array.get(z, i - 2))
+                den += array.get(z, i - 1) * array.get(z, i - 1)
+            beta := num / den
+        w := math.acos(math.min(math.max(beta / 2.0, -1), 1))
+    
+        //+------------------------------------------------------------------+
+        //| Least-squares fitting of trigonometric series                    |
+        //+------------------------------------------------------------------+
+        Sc = 0.,  Ss = 0., Scc = 0.
+        Sss = 0., Scs = 0., Sx = 0.
+        Sxc = 0., Sxs = 0., den = 0.
+        n = npast
+        for i = 0 to npast - 1
+            c = math.cos(w * i)
+            s = math.sin(w * i)
+            dx = array.get(x, i) - array.get(xm, i)
+            Sc += c
+            Ss += s
+            Scc += c * c
+            Sss += s * s
+            Scs += c * s
+            Sx += dx
+            Sxc += dx * c
+            Sxs += dx * s
+        Sc /= n
+        Ss /= n
+        Scc /= n
+        Sss /= n
+        Scs /= n
+        Sx /= n
+        Sxc /= n
+        Sxs /= n
+        if (w == 0.) 
+            m := Sx
+            a := 0.
+            b := 0.
+        else 
+            den := math.pow(Scs - Sc * Ss, 2) - (Scc - Sc * Sc) * (Sss - Ss * Ss)
+            a := ((Sxs - Sx * Ss) * (Scs - Sc * Ss) - (Sxc - Sx * Sc) * (Sss - Ss * Ss)) / den
+            b := ((Sxc - Sx * Sc) * (Scs - Sc * Ss) - (Sxs - Sx * Ss) * (Scc - Sc * Sc)) / den
+            m := Sx - a * Sc - b * Ss
+        
+        for i = 0 to  npast - 1
+            array.set(xm, i, array.get(xm, i) + m + a * math.cos(w * i) + b * math.sin(w * i))
+            if (i <= nfut) 
+                array.set(ym, nfut - i, array.get(ym, nfut - i) + m + a * math.cos(w * i) - b * math.sin(w * i))
+
+    //+------------------------------------------------------------------+
+    //| Draw lines           |
+    //+------------------------------------------------------------------+
+ 
+    for i = 0 to npast - 2 
+        pvline = array.get(pvlines, i)
+        colorout = i < array.size(xm) - 2 ? array.get(xm, i) > array.get(xm, i + 1) ? greencolor : redcolor : na
+        line.set_xy1(pvline, bar_index - i - 1 - backbars, array.get(xm, i + 1))
+        line.set_xy2(pvline, bar_index - i - backbars, array.get(xm, i))
+        line.set_color(pvline, colorout)
+        line.set_style(pvline, line.style_solid)
+        line.set_width(pvline, plinewidth)
+
+    array.reverse(ym)
+    for i = 0 to nfut - 2 
+        fvline = array.get(fvlines, i)
+        colorout = i < array.size(ym) - 2 ? array.get(ym, i) > array.get(ym, i + 1) ? color.fuchsia : color.yellow : na
+        line.set_xy1(fvline, bar_index + i - backbars, array.get(ym, i))
+        line.set_xy2(fvline, bar_index + i + 1 - backbars, array.get(ym, i + 1))
+        line.set_color(fvline, colorout)
+        line.set_style(fvline, line.style_dotted)
+        line.set_width(fvline, flinewidth)
+
+
+forecastbars = last_bar_index - bar_index < backbars and fcolorbars
+
+barcolor(allcolorbars ? color.gray : forecastbars ? color.gray : na)

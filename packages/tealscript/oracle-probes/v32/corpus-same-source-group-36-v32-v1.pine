@@ -1,0 +1,39 @@
+//@version=5
+indicator("Divergence Detector", overlay=true)
+
+// Input for RSI period
+rsiPeriod = input(14, title="RSI Period")
+
+// Calculate RSI
+rsi = ta.rsi(close, rsiPeriod)
+
+// Finding peaks and troughs
+priceHigh = ta.highest(high, 14)
+priceLow = ta.lowest(low, 14)
+rsiHigh = ta.highest(rsi, 14)
+rsiLow = ta.lowest(rsi, 14)
+
+var float lastPriceHigh = na
+var float lastPriceLow = na
+var float lastRsiHigh = na
+var float lastRsiLow = na
+
+if high == priceHigh
+    lastPriceHigh := high
+
+if low == priceLow
+    lastPriceLow := low
+
+if rsi == rsiHigh
+    lastRsiHigh := rsi
+
+if rsi == rsiLow
+    lastRsiLow := rsi
+
+// Detect Bullish Divergence
+bullishDiv = (low < lastPriceLow) and (rsi > lastRsiLow)
+plotshape(bullishDiv, style=shape.labelup, location=location.belowbar, color=color.green, text="Bullish Div")
+
+// Detect Bearish Divergence
+bearishDiv = (high > lastPriceHigh) and (rsi < lastRsiHigh)
+plotshape(bearishDiv, style=shape.labeldown, location=location.abovebar, color=color.red, text="Bearish Div")

@@ -1,0 +1,7 @@
+//@version=6
+indicator("Unsupported for-in matrix.pinv named result negative history")
+source = matrix.new<float>(0, 3, 0)
+values = matrix.pinv(id = source)
+length = for row in values
+    -1
+plot(close[length])

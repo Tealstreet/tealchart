@@ -1,0 +1,5 @@
+//@version=5
+indicator("Table merge coordinate bounds")
+table_id = table.new(position.top_left, 2, 1)
+table.merge_cells(table_id, 0, 0, 2, 0)
+plot(close)

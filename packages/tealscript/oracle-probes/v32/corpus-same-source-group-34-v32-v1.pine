@@ -1,0 +1,823 @@
+//  /$$$$$$   /$$                                                         /$$                                            
+// /$$__  $$ | $$                                                        | $$                                            
+//| $$  \__//$$$$$$    /$$$$$$  /$$    /$$ /$$$$$$   /$$$$$$   /$$$$$$$ /$$$$$$    /$$$$$$  /$$    /$$ /$$$$$$   /$$$$$$$
+//|  $$$$$$|_  $$_/   /$$__  $$|  $$  /$$//$$__  $$ /$$__  $$ /$$_____/|_  $$_/   /$$__  $$|  $$  /$$//$$__  $$ /$$_____/
+// \____  $$ | $$    | $$$$$$$$ \  $$/$$/| $$$$$$$$| $$  \__/|  $$$$$$   | $$    | $$$$$$$$ \  $$/$$/| $$$$$$$$|  $$$$$$ 
+// /$$  \ $$ | $$ /$$| $$_____/  \  $$$/ | $$_____/| $$       \____  $$  | $$ /$$| $$_____/  \  $$$/ | $$_____/ \____  $$
+//|  $$$$$$/ |  $$$$/|  $$$$$$$   \  $/  |  $$$$$$$| $$       /$$$$$$$/  |  $$$$/|  $$$$$$$   \  $/  |  $$$$$$$ /$$$$$$$/
+// \______/   \___/   \_______/    \_/    \_______/|__/      |_______/    \___/   \_______/    \_/    \_______/|_______/ 
+
+//       ___________________
+//      /                   \
+//     /  _____        _____ \
+//    /  /     \      /     \  \
+// __/__/       \____/       \__\_____
+//|           ___________           ____|
+// \_________/           \_________/
+//            \  /////// /
+//             \/////////
+// © Steversteves
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///                                                           Information                                                                               ///
+///                                                                                                                                                     ///
+///Modern Portfolio Theory (MPT) is an investment framework that was developed by Harry Markowitz in the 1950s.                                         ///
+//It is based on the idea that an investor can optimize their investment                                                                                ///
+//portfolio by considering the trade-off between risk and return.                                                                                       ///
+//MPT emphasizes diversification and holds that the risk of an individual asset should be assessed in the                                               ///
+//context of its contribution to the overall portfolio's risk.                                                                                          ///
+//The theory suggests that by diversifying investments across different asset classes with varying levels of risk, an investor                          ///
+//context of its contribution to the overall portfolio's risk.                                                                                          ///
+//The theory suggests that by diversifying investments across different asset classes with varying levels of risk, an investor                          ///
+//frontier, which represents the set of portfolios that offer the highest expected return for a given level of risk.                                    ///
+/// MPT has been widely adopted and used by investors, financial advisors, and portfolio managers to construct and manage portfolios.                    ///
+///                                                                                                                                                     ///
+///                                                     How This indicator Helps?                                                                       ///
+/// The MPT indicator helps investors view past performance of specific equities, funds, futures, cfds and cryptos.                                     ///
+/// It provides funcitonality to view fundamental performance of companies as well as simple forecasting methods to project rates of return             ///
+/// based on past performance. It provides a breakdown of expected P&L over a user defined period of time and provides the ability to forecast          ///
+/// future P&L at various points in the future based on past performance. The indicator also provides correlation information that can provide          ///
+/// insight into the diversification of the planned portfolio (i.e. tickers that are all correlated with each-other show little diversificaiton).       ///
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//@version=5
+indicator("Modern Portfolio Management Indicator", shorttitle="MPT Indicator", overlay=true, max_bars_back = 500)
+
+start_time = input.time(timestamp("20 Jul 2022 00:00 +000"), title = "Start time", confirm = true)
+end_time = input.time(timestamp("21 Jul 2022 00:00 +000"), title = "End time", confirm = true)
+// Groups 
+t1g = "Ticker 1" 
+t2g = "Ticker 2" 
+t3g = "Ticker 3" 
+t4g = "Ticker 4"
+t5g = "Ticker 5"
+u = "Utilities"  
+
+// User inputs 
+timeframe = input.timeframe("1W", "Timeframe", group=u)  
+corlen = input.int(14, "Correlation Length", group=u) 
+chartpick = input.string("Portfolio", "Chart Display", ["Portfolio", "Forecast", "Fundamentals"], group=u)
+showallo = input.bool(true, "Show Portfolio Allocation", group=u)
+
+
+ticker1 = input.symbol("AMEX:SPY", "Ticker One", group=t1g)
+t1shares = input.float(5, "Ticker 1 Shares", group=t1g) 
+ticker2 = input.symbol("BATS:QQQ", "Ticker Two", group=t2g)
+t2shares = input.float(5, "Ticker 2 Shares", group=t2g) 
+ticker3 = input.symbol("BATS:AAPL", "Ticker Three", group=t3g)
+t3shares = input.float(5, "Ticker 3 Shares", group=t3g)
+ticker4 = input.symbol("BATS:IRDM", "Ticker 4", group=t4g)
+t4shares = input.float(5, "Ticker 4 Shares", group=t4g) 
+ticker5 = input.symbol("BATS:BA", "Ticker 5", group=t5g) 
+t5shares = input.float(5, "Ticker 5 Shares", group=t5g) 
+
+
+// Colours 
+
+color black =       color.rgb(0, 0, 0) 
+color white =       color.white 
+color red =         color.red 
+color greenfill =   color.new(color.lime, 85) 
+color redfill =     color.new(color.red, 85) 
+color green =       color.lime 
+color purple =      color.purple 
+color background =  color.new(color.aqua, 85) 
+color gray =        color.gray 
+
+// Basic Functions 
+f_req_sec(ticker) => 
+    request.security(ticker, timeframe, close) 
+
+f_entry(ticker) => 
+    request.security(ticker, timeframe, math.avg(high, low))
+
+f_class(ticker) => 
+    request.security(ticker, timeframe, syminfo.type) 
+
+f_cor(t1, t2) => 
+    ta.correlation(t1, t2, corlen) 
+
+f_market_cap(ticker, cl) =>
+    totalSharesOutstanding = request.financial(ticker, "TOTAL_SHARES_OUTSTANDING", "FQ", ignore_invalid_symbol = true)
+    marketCap = totalSharesOutstanding * cl
+
+f_earnings_yield(ticker, cl) =>
+    earningsPerShare = request.financial(ticker, "EARNINGS_PER_SHARE", "TTM", ignore_invalid_symbol = true)
+    earningsYield = (earningsPerShare / cl) * 100
+
+f_price_book_ratio(ticker, cl) =>
+    bookValuePerShare = request.financial(ticker, "BOOK_VALUE_PER_SHARE", "FQ", ignore_invalid_symbol = true)
+    priceBookRatio = cl / bookValuePerShare
+
+f_price_earnings_ratio(ticker, cl) =>
+    earningsPerShare = request.financial(ticker, "EARNINGS_PER_SHARE", "TTM", ignore_invalid_symbol = true)
+    priceEarningsRatio = cl / earningsPerShare
+
+f_prise_sales_ratio(ticker, cl) =>
+    totalSharesOutstanding = request.financial(ticker, "TOTAL_SHARES_OUTSTANDING", "FQ", ignore_invalid_symbol = true)
+    mktCap = totalSharesOutstanding * cl
+    totalRevenue = request.financial(ticker, "TOTAL_REVENUE", "TTM", ignore_invalid_symbol = true)
+    priseSalesRatio = mktCap / totalRevenue
+
+f_earnings(ticker) => 
+    request.earnings(ticker, ignore_invalid_symbol = true) 
+
+f_dividends(ticker) => 
+    request.dividends(ticker, ignore_invalid_symbol = true) 
+// Index Legend // 
+// t = ticker  //
+// e = entry  // 
+
+t1 = f_req_sec(ticker1) 
+t2 = f_req_sec(ticker2) 
+t3 = f_req_sec(ticker3) 
+t4 = f_req_sec(ticker4) 
+t5 = f_req_sec(ticker5) 
+
+e1 = f_entry(ticker1) 
+e2 = f_entry(ticker2) 
+e3 = f_entry(ticker3) 
+e4 = f_entry(ticker4) 
+e5 = f_entry(ticker5) 
+
+// Ticker Arrays
+t1_array = array.new_float() 
+t2_array = array.new_float() 
+t3_array = array.new_float() 
+t4_array = array.new_float() 
+t5_array = array.new_float() 
+
+// Share Arrays 
+t1share_array = array.new_float() 
+t2share_array = array.new_float() 
+t3share_array = array.new_float() 
+t4share_array = array.new_float() 
+t5share_array = array.new_float()
+
+for i = 0 to bar_index 
+    if time[i] >= start_time and time[i] <= end_time
+        array.push(t1_array, e1[i] * t1shares) 
+        array.push(t2_array, t2[i] * t2shares) 
+        array.push(t3_array, t3[i] * t3shares) 
+        array.push(t4_array, t4[i] * t4shares) 
+        array.push(t5_array, t5[i] * t5shares) 
+        array.push(t1share_array, t1shares) 
+        array.push(t2share_array, t2shares) 
+        array.push(t3share_array, t3shares) 
+        array.push(t4share_array, t4shares) 
+        array.push(t5share_array, t5shares) 
+
+
+// Ticker 1 Data 
+t1_sum =            array.sum(t1_array) 
+t1share_sum =       array.sum(t1share_array)
+t1_cb =             t1_sum / t1share_sum  
+t1_pl =             (t1 * t1share_sum) - (t1_sum) 
+t1_return =         ((t1 * t1share_sum) - t1_sum) / t1_sum * 100 
+t1t2_cor =          f_cor(t1, t2)
+t1t3_cor =          f_cor(t1, t3) 
+t1t4_cor =          f_cor(t1, t4) 
+t1t5_cor =          f_cor(t1, t5) 
+t1_max_drawdown =   ta.lowest(t1_pl, 500) 
+t1_max_profit =     ta.highest(t1_pl, 500)
+t1_class =          f_class(ticker1) 
+t1_ongoing =        (t1 * t1shares) 
+t1_mkt_cap =        f_market_cap(ticker1, t1) 
+t1_ern_yld =        f_earnings_yield(ticker1, t1) 
+t1_book_ratio =     f_price_book_ratio(ticker1, t1) 
+t1_p_ern_ratio =    f_price_earnings_ratio(ticker1, t1) 
+t1_psr =            f_prise_sales_ratio(ticker1, t1) 
+t1_div =            f_dividends(ticker1) 
+t1_earnings =       f_earnings(ticker1) 
+
+
+// Ticker 2 Data 
+t2_sum =            array.sum(t2_array) 
+t2share_sum =       array.sum(t2share_array)
+t2_cb =             t2_sum / t2share_sum 
+t2_pl =             (t2 * t2share_sum) - (t2_sum) 
+t2_return =         ((t2 * t2share_sum) - t2_sum) / t2_sum * 100 
+t2t1_cor =          f_cor(t2, t1)  
+t2t3_cor =          f_cor(t2, t3) 
+t2t4_cor =          f_cor(t2, t4) 
+t2t5_cor =          f_cor(t2, t5) 
+t2_max_drawdown =   ta.lowest(t2_pl, 500) 
+t2_max_profit =     ta.highest(t2_pl, 500) 
+t2_class =          f_class(ticker2) 
+t2_ongoing =        (t2 * t2shares)
+t2_mkt_cap =        f_market_cap(ticker2, t2) 
+t2_ern_yld =        f_earnings_yield(ticker2, t2) 
+t2_p_ern_ratio =    f_price_earnings_ratio(ticker2, t2) 
+t2_psr =            f_prise_sales_ratio(ticker2, t2) 
+t2_div =            f_dividends(ticker2) 
+t2_earnings =       f_earnings(ticker2) 
+
+// Ticker 3 Data 
+t3_sum =            array.sum(t3_array) 
+t3share_sum =       array.sum(t3share_array)
+t3_cb =             t3_sum / t3share_sum 
+t3_pl =             (t3 * t3share_sum) - (t3_sum) 
+t3_return =         ((t3 * t3share_sum) - t3_sum) / t3_sum * 100 
+t3t1_cor =          f_cor(t3, t1)  
+t3t2_cor =          f_cor(t3, t2) 
+t3t4_cor =          f_cor(t3, t4) 
+t3t5_cor =          f_cor(t3, t5) 
+t3_max_drawdown =   ta.lowest(t3_pl, 500) 
+t3_max_profit =     ta.highest(t3_pl, 500) 
+t3_class =          f_class(ticker3) 
+t3_ongoing =        (t3 * t3shares) 
+t3_mkt_cap =        f_market_cap(ticker3, t3) 
+t3_ern_yld =        f_earnings_yield(ticker3, t3) 
+t3_p_ern_ratio =    f_price_earnings_ratio(ticker3, t3) 
+t3_psr =            f_prise_sales_ratio(ticker3, t3) 
+t3_div =            f_dividends(ticker3) 
+t3_earnings =       f_earnings(ticker3) 
+
+
+// Ticker 4 Data 
+t4_sum =            array.sum(t4_array) 
+t4share_sum =       array.sum(t4share_array)
+t4_cb =             t4_sum / t4share_sum 
+t4_pl =             (t4 * t4share_sum) - (t4_sum) 
+t4_return =         ((t4 * t4share_sum) - t4_sum) / t4_sum * 100 
+t4t1_cor =          f_cor(t4, t1)  
+t4t2_cor =          f_cor(t4, t2) 
+t4t3_cor =          f_cor(t4, t3) 
+t4t5_cor =          f_cor(t4, t5) 
+t4_max_drawdown =   ta.lowest(t4_pl, 500) 
+t4_max_profit =     ta.highest(t4_pl, 500) 
+t4_class =          f_class(ticker4) 
+t4_ongoing =        (t4 * t4shares) 
+t4_mkt_cap =        f_market_cap(ticker4, t4) 
+t4_ern_yld =        f_earnings_yield(ticker4, t4)  
+t4_p_ern_ratio =    f_price_earnings_ratio(ticker4, t4) 
+t4_psr =            f_prise_sales_ratio(ticker4, t4) 
+t4_div =            f_dividends(ticker4) 
+t4_earnings =       f_earnings(ticker4) 
+
+// Ticker 5 Data 
+t5_sum =            array.sum(t5_array) 
+t5share_sum =       array.sum(t5share_array)
+t5_cb =             t5_sum / t5share_sum 
+t5_pl =             (t5 * t5share_sum) - (t5_sum) 
+t5_return =         ((t5 * t5share_sum) - t5_sum) / t5_sum * 100 
+t5t1_cor =          f_cor(t5, t1)  
+t5t2_cor =          f_cor(t5, t2) 
+t5t3_cor =          f_cor(t5, t3) 
+t5t4_cor =          f_cor(t5, t4) 
+t5_max_drawdown =   ta.lowest(t5_pl, 500) 
+t5_max_profit =     ta.highest(t5_pl, 500) 
+t5_class =          f_class(ticker5) 
+t5_ongoing =        (t5 * t5shares) 
+t5_mkt_cap =        f_market_cap(ticker5, t5) 
+t5_ern_yld =        f_earnings_yield(ticker5, t5) 
+t5_p_ern_ratio =    f_price_earnings_ratio(ticker5, t5) 
+t5_psr =            f_prise_sales_ratio(ticker5, t5) 
+t5_div =            f_dividends(ticker5) 
+t5_earnings =       f_earnings(ticker5) 
+
+// Portfolio Breakdown and Performance 
+
+total_shares = (t1share_sum + t2share_sum + t3share_sum + t4share_sum + t5share_sum)
+total_capital = (t1_sum + t2_sum + t3_sum + t4_sum + t5_sum) 
+max_performer = math.max(t1_return, t2_return, t3_return, t4_return, t5_return) 
+min_performer = math.min(t1_return, t2_return, t3_return, t4_return, t5_return) 
+total_pl = (t1_pl + t2_pl + t3_pl + t4_pl + t5_pl) 
+total_drawdown = (t1_max_drawdown + t2_max_drawdown + t3_max_drawdown + t4_max_drawdown + t5_max_drawdown)
+total_max_profit = (t1_max_profit + t2_max_profit + t3_max_profit + t4_max_profit + t5_max_profit)
+total_return = (total_pl / total_capital) * 100 
+ongoing_cont = (t1shares * t1) + (t2shares * t2) + (t3shares * t3) + (t4shares * t4) + (t5shares * t5) 
+ongoing_return = (t1_pl + t2_pl + t3_pl + t4_pl + t5_pl)
+
+// Fundamental Sorting 
+
+max_div = math.max(t1_div, t2_div, t3_div, t4_div, t5_div) 
+min_div = math.min(t1_div, t2_div, t3_div, t4_div, t5_div) 
+max_mkt_cap = math.max(t1_mkt_cap, t2_mkt_cap, t3_mkt_cap, t4_mkt_cap, t5_mkt_cap)
+min_mkt_cap = math.min(t1_mkt_cap, t2_mkt_cap, t3_mkt_cap, t4_mkt_cap, t5_mkt_cap)
+max_ern_yld = math.max(t1_ern_yld, t2_ern_yld, t3_ern_yld, t4_ern_yld, t5_ern_yld) 
+min_ern_yld = math.max(t1_ern_yld, t2_ern_yld, t3_ern_yld, t4_ern_yld, t5_ern_yld) 
+max_ern_rto = math.max(t5_p_ern_ratio, t4_p_ern_ratio, t3_p_ern_ratio, t2_p_ern_ratio, t1_p_ern_ratio) 
+min_ern_rto = math.min(t5_p_ern_ratio, t4_p_ern_ratio, t3_p_ern_ratio, t2_p_ern_ratio, t1_p_ern_ratio) 
+max_psr = math.max(t1_psr, t2_psr, t3_psr, t4_psr, t5_psr) 
+min_psr = math.min(t1_psr, t2_psr, t3_psr, t4_psr, t5_psr) 
+max_earn = math.max(t1_earnings, t2_earnings, t3_earnings, t4_earnings, t5_earnings)
+min_earn = math.max(t1_earnings, t2_earnings, t3_earnings, t4_earnings, t5_earnings)
+
+
+
+
+    
+    
+// Forecasting 
+
+var int barcount = 0 
+
+for i = 0 to bar_index 
+    if time[i] >= start_time and time[i] <= end_time and barstate.islast
+        barcount := barcount + 1 
+
+f_forecast(ticker, duration) => // ticker = return for the stock 
+    f1 = ticker / barcount 
+    f2 = f1 * duration 
+
+f_for_profit(ticker, shares, duration) => // ticker = return pl for stock 
+    f1 = ticker / barcount 
+    f2 = (f1 * shares) * duration 
+
+return_per_tf = (ongoing_return / barcount) 
+
+// T1 Forecast 
+t1_for_10 = f_forecast(t1_return, 10)
+t1_for_20 = f_forecast(t1_return, 20)
+t1_for_30 = f_forecast(t1_return, 30)
+t1_for_40 = f_forecast(t1_return, 40)
+t1_for_50 = f_forecast(t1_return, 50)
+t1_prof_10 = f_for_profit(t1_pl, t1shares, 10) 
+t1_prof_20 = f_for_profit(t1_pl, t1shares, 20) 
+t1_prof_30 = f_for_profit(t1_pl, t1shares, 30) 
+t1_prof_40 = f_for_profit(t1_pl, t1shares, 40) 
+t1_prof_50 = f_for_profit(t1_pl, t1shares, 50) 
+
+// T2 Forecast
+t2_for_10 = f_forecast(t2_return, 10)
+t2_for_20 = f_forecast(t2_return, 20)
+t2_for_30 = f_forecast(t2_return, 30)
+t2_for_40 = f_forecast(t2_return, 40)
+t2_for_50 = f_forecast(t2_return, 50)
+t2_prof_10 = f_for_profit(t2_pl, t1shares, 10) 
+t2_prof_20 = f_for_profit(t2_pl, t1shares, 20) 
+t2_prof_30 = f_for_profit(t2_pl, t1shares, 30) 
+t2_prof_40 = f_for_profit(t2_pl, t1shares, 40) 
+t2_prof_50 = f_for_profit(t2_pl, t1shares, 50) 
+
+// T3 Forecast
+t3_for_10 = f_forecast(t3_return, 10)
+t3_for_20 = f_forecast(t3_return, 20)
+t3_for_30 = f_forecast(t3_return, 30)
+t3_for_40 = f_forecast(t3_return, 40)
+t3_for_50 = f_forecast(t3_return, 50)
+t3_prof_10 = f_for_profit(t3_pl, t1shares, 10) 
+t3_prof_20 = f_for_profit(t3_pl, t1shares, 20) 
+t3_prof_30 = f_for_profit(t3_pl, t1shares, 30) 
+t3_prof_40 = f_for_profit(t3_pl, t1shares, 40) 
+t3_prof_50 = f_for_profit(t3_pl, t1shares, 50) 
+
+// T4 Forecast 
+t4_for_10 = f_forecast(t4_return, 10)
+t4_for_20 = f_forecast(t4_return, 20)
+t4_for_30 = f_forecast(t4_return, 30)
+t4_for_40 = f_forecast(t4_return, 40)
+t4_for_50 = f_forecast(t4_return, 50)
+t4_prof_10 = f_for_profit(t4_pl, t1shares, 10) 
+t4_prof_20 = f_for_profit(t4_pl, t1shares, 20) 
+t4_prof_30 = f_for_profit(t4_pl, t1shares, 30) 
+t4_prof_40 = f_for_profit(t4_pl, t1shares, 40) 
+t4_prof_50 = f_for_profit(t4_pl, t1shares, 50) 
+
+// T5 Forecast 
+t5_for_10 = f_forecast(t5_return, 10)
+t5_for_20 = f_forecast(t5_return, 20)
+t5_for_30 = f_forecast(t5_return, 30)
+t5_for_40 = f_forecast(t5_return, 40)
+t5_for_50 = f_forecast(t5_return, 50)
+t5_prof_10 = f_for_profit(t5_pl, t1shares, 10) 
+t5_prof_20 = f_for_profit(t5_pl, t1shares, 20) 
+t5_prof_30 = f_for_profit(t5_pl, t1shares, 30) 
+t5_prof_40 = f_for_profit(t5_pl, t1shares, 40) 
+t5_prof_50 = f_for_profit(t5_pl, t1shares, 50) 
+
+var forecasttable = table.new(position.middle_left, 7, 8, bgcolor = black, frame_color = white, frame_width = 1) 
+
+if chartpick == "Forecast" 
+    table.cell(forecasttable, 1, 1, text = "Ticker", bgcolor = black, text_color = white)
+    table.cell(forecasttable, 2, 1, text = str.tostring(ticker1), bgcolor = black, text_color = white)
+    table.cell(forecasttable, 3, 1, text = str.tostring(ticker2), bgcolor = black, text_color = white)
+    table.cell(forecasttable, 4, 1, text = str.tostring(ticker3), bgcolor = black, text_color = white)
+    table.cell(forecasttable, 5, 1, text = str.tostring(ticker4), bgcolor = black, text_color = white)
+    table.cell(forecasttable, 6, 1, text = str.tostring(ticker5), bgcolor = black, text_color = white)
+    table.cell(forecasttable, 1, 2, text = "10 x " + str.tostring(timeframe), bgcolor = black, text_color = white)
+    table.cell(forecasttable, 1, 3, text = "20 x " + str.tostring(timeframe), bgcolor = black, text_color = white)
+    table.cell(forecasttable, 1, 4, text = "30 x " + str.tostring(timeframe), bgcolor = black, text_color = white)
+    table.cell(forecasttable, 1, 5, text = "40 x " + str.tostring(timeframe), bgcolor = black, text_color = white)
+    table.cell(forecasttable, 1, 6, text = "50 x " + str.tostring(timeframe), bgcolor = black, text_color = white)
+    table.cell(forecasttable, 1, 7, text = "Ongoing Cost \n per " + str.tostring(timeframe), bgcolor = gray, text_color = white)
+
+    // T1 
+    table.cell(forecasttable, 2, 2, text = "% Return: " + str.tostring(math.round(t1_for_10,2)) + "% \n P&L: $" + str.tostring(math.round(t1_prof_10,2)), bgcolor = black, text_color = white)
+    table.cell(forecasttable, 2, 3, text = "% Return: " + str.tostring(math.round(t1_for_20,2)) + "% \n P&L: $" + str.tostring(math.round(t1_prof_20)), bgcolor = black, text_color = white)
+    table.cell(forecasttable, 2, 4, text = "% Return: " + str.tostring(math.round(t1_for_30,2)) + "% \n P&L: $" + str.tostring(math.round(t1_prof_30)), bgcolor = black, text_color = white)
+    table.cell(forecasttable, 2, 5, text = "% Return: " + str.tostring(math.round(t1_for_40,2)) + "% \n P&L: $" + str.tostring(math.round(t1_prof_40)), bgcolor = black, text_color = white)
+    table.cell(forecasttable, 2, 6, text = "% Return: " + str.tostring(math.round(t1_for_50,2)) + "% \n P&L: $" + str.tostring(math.round(t1_prof_50)), bgcolor = black, text_color = white)
+    table.cell(forecasttable, 2, 7, text = "$" + str.tostring(math.round(t1_ongoing,2)), bgcolor = gray, text_color = white)
+
+    // T2
+    table.cell(forecasttable, 3, 2, text = "% Return: " + str.tostring(math.round(t2_for_10,2)) + "% \n P&L: $" + str.tostring(math.round(t2_prof_10,2)), bgcolor = black, text_color = white)
+    table.cell(forecasttable, 3, 3, text = "% Return: " + str.tostring(math.round(t2_for_20,2)) + "% \n P&L: $" + str.tostring(math.round(t2_prof_20)), bgcolor = black, text_color = white)
+    table.cell(forecasttable, 3, 4, text = "% Return: " + str.tostring(math.round(t2_for_30,2)) + "% \n P&L: $" + str.tostring(math.round(t2_prof_30)), bgcolor = black, text_color = white)
+    table.cell(forecasttable, 3, 5, text = "% Return: " + str.tostring(math.round(t2_for_40,2)) + "% \n P&L: $" + str.tostring(math.round(t2_prof_40)), bgcolor = black, text_color = white)
+    table.cell(forecasttable, 3, 6, text = "% Return: " + str.tostring(math.round(t2_for_50,2)) + "% \n P&L: $" + str.tostring(math.round(t2_prof_50)), bgcolor = black, text_color = white)
+    table.cell(forecasttable, 3, 7, text = "$" + str.tostring(math.round(t2_ongoing,2)), bgcolor = gray, text_color = white)
+    // T3
+    table.cell(forecasttable, 4, 2, text = "% Return: " + str.tostring(math.round(t3_for_10,2)) + "% \n P&L: $" + str.tostring(math.round(t3_prof_10,2)), bgcolor = black, text_color = white)
+    table.cell(forecasttable, 4, 3, text = "% Return: " + str.tostring(math.round(t3_for_20,2)) + "% \n P&L: $" + str.tostring(math.round(t3_prof_20)), bgcolor = black, text_color = white)
+    table.cell(forecasttable, 4, 4, text = "% Return: " + str.tostring(math.round(t3_for_30,2)) + "% \n P&L: $" + str.tostring(math.round(t3_prof_30)), bgcolor = black, text_color = white)
+    table.cell(forecasttable, 4, 5, text = "% Return: " + str.tostring(math.round(t3_for_40,2)) + "% \n P&L: $" + str.tostring(math.round(t3_prof_40)), bgcolor = black, text_color = white)
+    table.cell(forecasttable, 4, 6, text = "% Return: " + str.tostring(math.round(t3_for_50,2)) + "% \n P&L: $" + str.tostring(math.round(t3_prof_50)), bgcolor = black, text_color = white)
+    table.cell(forecasttable, 4, 7, text = "$" + str.tostring(math.round(t3_ongoing,2)), bgcolor = gray, text_color = white)
+    // T4
+    table.cell(forecasttable, 5, 2, text = "% Return: " + str.tostring(math.round(t4_for_10,2)) + "% \n P&L: $" + str.tostring(math.round(t4_prof_10,2)), bgcolor = black, text_color = white)
+    table.cell(forecasttable, 5, 3, text = "% Return: " + str.tostring(math.round(t4_for_20,2)) + "% \n P&L: $" + str.tostring(math.round(t4_prof_20)), bgcolor = black, text_color = white)
+    table.cell(forecasttable, 5, 4, text = "% Return: " + str.tostring(math.round(t4_for_30,2)) + "% \n P&L: $" + str.tostring(math.round(t4_prof_30)), bgcolor = black, text_color = white)
+    table.cell(forecasttable, 5, 5, text = "% Return: " + str.tostring(math.round(t4_for_40,2)) + "% \n P&L: $" + str.tostring(math.round(t4_prof_40)), bgcolor = black, text_color = white)
+    table.cell(forecasttable, 5, 6, text = "% Return: " + str.tostring(math.round(t4_for_50,2)) + "% \n P&L: $" + str.tostring(math.round(t4_prof_50)), bgcolor = black, text_color = white)
+    table.cell(forecasttable, 5, 7, text = "$" + str.tostring(math.round(t4_ongoing,2)), bgcolor = gray, text_color = white)    
+    // T5
+    table.cell(forecasttable, 6, 2, text = "% Return: " + str.tostring(math.round(t5_for_10,2)) + "% \n P&L: $" + str.tostring(math.round(t5_prof_10,2)), bgcolor = black, text_color = white)
+    table.cell(forecasttable, 6, 3, text = "% Return: " + str.tostring(math.round(t5_for_20,2)) + "% \n P&L: $" + str.tostring(math.round(t5_prof_20)), bgcolor = black, text_color = white)
+    table.cell(forecasttable, 6, 4, text = "% Return: " + str.tostring(math.round(t5_for_30,2)) + "% \n P&L: $" + str.tostring(math.round(t5_prof_30)), bgcolor = black, text_color = white)
+    table.cell(forecasttable, 6, 5, text = "% Return: " + str.tostring(math.round(t5_for_40,2)) + "% \n P&L: $" + str.tostring(math.round(t5_prof_40)), bgcolor = black, text_color = white)
+    table.cell(forecasttable, 6, 6, text = "% Return: " + str.tostring(math.round(t5_for_50,2)) + "% \n P&L: $" + str.tostring(math.round(t5_prof_50)), bgcolor = black, text_color = white)
+    table.cell(forecasttable, 6, 7, text = "$" + str.tostring(math.round(t5_ongoing,2)), bgcolor = gray, text_color = white)    
+
+f_colour_assign(assigned) => 
+    max_performer == assigned ? greenfill : min_performer == assigned ? redfill : black 
+
+// Asset allocation 
+var float futures = 0
+var float futures_cap = 0 
+var float futures_pl = 0 
+
+var float cfd = 0  
+var float cfd_cap = 0 
+var float cfd_pl = 0 
+
+var float index = 0 
+var float index_cap = 0 
+var float index_pl = 0 
+
+var float stock = 0  
+var float stock_cap = 0 
+var float stock_pl = 0 
+
+var float fund = 0 
+var float fund_cap = 0 
+var float fund_pl = 0 
+
+var float crypto = 0
+var float crypto_cap = 0 
+var float crypto_pl = 0 
+
+// T1 
+if t1_class == "futures" and barstate.islast 
+    futures += t1share_sum
+    futures_cap += t1_sum
+    futures_pl += t1_pl
+if t1_class == "cfd" and barstate.islast 
+    cfd += t1share_sum
+    cfd_cap += t1_sum
+    cfd_pl += t1_pl 
+if t1_class == "index" and barstate.islast 
+    index += t1share_sum
+    index_cap += t1_sum
+    index_pl += t1_pl 
+if t1_class == "stock" and barstate.islast 
+    stock += t1share_sum
+    stock_cap += t1_sum
+    stock_pl+= t1_pl 
+if t1_class == "fund" and barstate.islast 
+    fund += t1share_sum
+    fund_cap += t1_sum
+    fund_pl += t1_pl 
+if t1_class == "crypto" and barstate.islast 
+    crypto += t1share_sum
+    crypto_cap += t1_sum
+    crypto_pl += t1_pl 
+
+
+// T2
+if t2_class == "futures"  and barstate.islast 
+    futures += t2share_sum 
+    futures_cap += t2_sum
+    futures_pl += t2_pl 
+if t2_class == "cfd" and barstate.islast 
+    cfd += t2share_sum 
+    cfd_cap += t2_sum 
+    cfd_pl += t2_pl 
+if t2_class == "index" and barstate.islast 
+    index += t2share_sum 
+    index_cap += t2_sum
+    index_pl += t2_pl 
+if t2_class == "stock" and barstate.islast 
+    stock += t2share_sum 
+    stock_cap += t2_sum
+    stock_pl += t2_pl 
+if t2_class == "fund" and barstate.islast 
+    fund += t2share_sum 
+    fund_cap += t2_sum
+    fund_pl += t2_pl 
+if t2_class == "crypto" and barstate.islast 
+    crypto += t2share_sum 
+    crypto_cap += t2_sum
+    crypto_pl += t2_pl 
+
+// T3
+if t3_class == "futures" and barstate.islast 
+    futures += t3share_sum 
+    futures_cap += t3_sum
+    futures_pl += t3_pl 
+if t3_class == "cfd" and barstate.islast 
+    cfd += t3share_sum 
+    cfd_cap += t3_sum
+    cfd_pl += t3_pl 
+if t3_class == "index" and barstate.islast 
+    index += t3share_sum  
+    index_cap += t3_sum
+    index_pl += t3_pl 
+if t3_class == "stock" and barstate.islast 
+    stock += t3share_sum 
+    stock_cap += t3_sum
+    stock_pl += t3_pl 
+if t3_class == "fund" and barstate.islast 
+    fund += t3share_sum 
+    fund_cap += t3_sum
+    fund_pl += t3_pl 
+if t3_class == "crypto" and barstate.islast 
+    crypto += t3share_sum 
+    crypto_cap += t3_sum
+    crypto_pl += t3_pl 
+
+// T4
+if t4_class == "futures" and barstate.islast 
+    futures += t4share_sum 
+    futures_cap += t4_sum 
+    futures_pl += t4_pl 
+if t4_class == "cfd" and barstate.islast 
+    cfd += t4share_sum 
+    cfd_cap += t4_sum 
+    cfd_pl += t4_pl 
+if t4_class == "index" and barstate.islast 
+    index += t4share_sum  
+    index_cap += t4_sum 
+    index_pl += t4_pl 
+if t4_class == "stock" and barstate.islast 
+    stock += t4share_sum 
+    stock_cap += t4_sum 
+    stock_pl += t4_pl 
+if t4_class == "fund" and barstate.islast 
+    fund += t4share_sum 
+    fund_cap += t4_sum 
+    fund_pl += t4_pl 
+if t4_class == "crypto" and barstate.islast 
+    crypto += t4share_sum 
+    crypto_cap += t4_sum 
+    crypto_pl += t4_pl 
+
+// T5
+if t5_class == "futures" and barstate.islast 
+    futures += t5share_sum 
+    futures_cap += t5_sum
+    futures_pl += t5_pl 
+if t5_class == "cfd" and barstate.islast 
+    cfd += t5share_sum 
+    cfd_cap  += t5_sum
+    cfd_pl += t5_pl 
+if t5_class == "index" and barstate.islast 
+    index += t5share_sum  
+    index_cap += t5_sum
+    index_pl += t5_pl 
+if t5_class == "stock" and barstate.islast 
+    stock += t5share_sum 
+    stock_cap += t5_sum
+    stock_pl += t5_pl 
+if t5_class == "fund" and barstate.islast 
+    fund += t5share_sum 
+    fund_cap += t5_sum
+    fund_pl += t5_pl 
+if t5_class == "crypto" and barstate.islast 
+    crypto += t5share_sum 
+    crypto_cap += t5_sum
+    crypto_pl += t5_pl 
+
+futures_comp =      (futures_cap / total_capital) * 100 
+cfd_comp =          (cfd_cap / total_capital) * 100 
+index_comp =        (index_cap / total_capital) * 100 
+stock_comp =        (stock_cap / total_capital) * 100 
+fund_comp =         (fund_cap / total_capital) * 100 
+crypto_comp =       (crypto_cap / total_capital) * 100 
+futures_return =    (futures_pl / total_pl) * 100 
+cfd_return =        (cfd_pl / total_pl) * 100 
+index_return =      (index_pl / total_pl) * 100 
+stock_return =      (stock_pl / total_pl) * 100 
+fund_return =       (fund_pl / total_pl) * 100 
+crypto_return =     (crypto_pl / total_pl) * 100 
+futures_perform =   (futures_pl / futures) 
+cfd_perform =       (cfd_pl / cfd) 
+index_perform =     (index_pl / index) 
+stock_perform =     (stock_pl / stock) 
+fund_perform =      (fund_pl / fund) 
+crypto_perform =    (crypto_pl / crypto) 
+max_perform =       math.max(futures_pl, cfd_pl, crypto_pl, fund_pl, stock_pl, index_pl)
+min_perform =       math.max(futures_pl, cfd_pl, crypto_pl, fund_pl, stock_pl, index_pl)
+
+f_allo_color(allo) =>
+    max_perform == allo ? greenfill : min_perform == allo ? redfill : black 
+
+var resulttable = table.new(position.middle_center, 11, 10, bgcolor = black, frame_color = white, frame_width = 1)
+
+// Labels
+if chartpick == "Portfolio"
+    table.cell(resulttable, 1, 1, text = "Ticker", bgcolor=black, text_color=white) 
+    table.cell(resulttable, 2, 1, text = "Total Shares Bought", bgcolor=black, text_color=white) 
+    table.cell(resulttable, 3, 1, text = "Total Capital Invested", bgcolor=black, text_color=white) 
+    table.cell(resulttable, 4, 1, text = "Correlations", bgcolor=black, text_color=white) 
+    table.cell(resulttable, 5, 1, text = "Max Drawdown", bgcolor=black, text_color=white) 
+    table.cell(resulttable, 6, 1, text = "Max Profit", bgcolor=black, text_color=white) 
+    table.cell(resulttable, 7, 1, text = "Current P&L", bgcolor=black, text_color=white) 
+    table.cell(resulttable, 8, 1, text = "Current % Return", bgcolor=black, text_color=white) 
+    table.cell(resulttable, 9, 1, text = "Cost Basis (per share)", bgcolor=black, text_color=white) 
+    table.cell(resulttable, 10, 1, text = "Ticker Class", bgcolor=black, text_color=white) 
+
+// Ticker 1 Chart 
+    table.cell(resulttable, 1, 2, text = str.tostring(ticker1), bgcolor=f_colour_assign(t1_return), text_color=white) 
+    table.cell(resulttable, 2, 2, text = str.tostring(t1share_sum), bgcolor=f_colour_assign(t1_return), text_color=white) 
+    table.cell(resulttable, 3, 2, text = "$" + str.tostring(math.round(t1_sum,2)), bgcolor=f_colour_assign(t1_return), text_color=white) 
+    table.cell(resulttable, 4, 2, text = "Correlation to " + str.tostring(ticker2) + " = " + str.tostring(math.round(t1t2_cor,2)) + "\n Correlation to " + str.tostring(ticker3) + " = " + str.tostring(math.round(t1t3_cor,2)) + "\n Correlation to " + str.tostring(ticker4) + " = " + str.tostring(math.round(t1t4_cor, 2)) + "\n Correlation to " + str.tostring(ticker5) + "= " + str.tostring(math.round(t1t5_cor, 2)), bgcolor=f_colour_assign(t1_return), text_color=white) 
+    table.cell(resulttable, 5, 2, text = str.tostring(math.round(t1_max_drawdown,2)), bgcolor=f_colour_assign(t1_return), text_color=white) 
+    table.cell(resulttable, 6, 2, text = str.tostring(math.round(t1_max_profit,2)), bgcolor=f_colour_assign(t1_return), text_color=white) 
+    table.cell(resulttable, 7, 2, text = "$" + str.tostring(math.round(t1_pl,2)), bgcolor=f_colour_assign(t1_return), text_color=t1_pl > 0 ? green : red) 
+    table.cell(resulttable, 8, 2, text = str.tostring(math.round(t1_return,2)) + "%", bgcolor=f_colour_assign(t1_return), text_color=t1_return > 0 ? green : red) 
+    table.cell(resulttable, 9, 2, text = str.tostring(math.round(t1_cb,2)), bgcolor=f_colour_assign(t1_return), text_color=white) 
+    table.cell(resulttable, 10, 2, text = str.tostring(t1_class), bgcolor=f_colour_assign(t1_return), text_color=white) 
+
+// Ticker 2 Chart 
+    table.cell(resulttable, 1, 3, text = str.tostring(ticker2), bgcolor=f_colour_assign(t2_return), text_color=white) 
+    table.cell(resulttable, 2, 3, text = str.tostring(t2share_sum), bgcolor=f_colour_assign(t2_return), text_color=white) 
+    table.cell(resulttable, 3, 3, text = "$" + str.tostring(math.round(t2_sum,2)), bgcolor=f_colour_assign(t2_return), text_color=white) 
+    table.cell(resulttable, 4, 3, text = "Correlation to " + str.tostring(ticker1) + " = " + str.tostring(math.round(t2t1_cor,2)) + "\n Correlation to " + str.tostring(ticker3) + " = " + str.tostring(math.round(t2t3_cor,2)) + "\n Correlation to " + str.tostring(ticker4) + " = " + str.tostring(math.round(t2t4_cor, 2)) + "\n Correlation to " + str.tostring(ticker5) + "= " + str.tostring(math.round(t2t5_cor, 2)), bgcolor=f_colour_assign(t2_return), text_color=white) 
+    table.cell(resulttable, 5, 3, text = str.tostring(math.round(t2_max_drawdown,2)), bgcolor=f_colour_assign(t2_return), text_color=white) 
+    table.cell(resulttable, 6, 3, text = str.tostring(math.round(t2_max_profit,2)), bgcolor=f_colour_assign(t2_return), text_color=white) 
+    table.cell(resulttable, 7, 3, text = "S" + str.tostring(math.round(t2_pl,2)), bgcolor=f_colour_assign(t2_return), text_color= t2_pl > 0 ? green : red) 
+    table.cell(resulttable, 8, 3, text = str.tostring(math.round(t2_return,2)) + "%", bgcolor=f_colour_assign(t2_return), text_color=t2_return > 0 ? green : red)  
+    table.cell(resulttable, 9, 3, text = str.tostring(math.round(t2_cb,2)), bgcolor=f_colour_assign(t2_return), text_color=white) 
+    table.cell(resulttable, 10, 3, text = str.tostring(t2_class), bgcolor=f_colour_assign(t2_return), text_color=white) 
+
+// Ticker 3 Chart 
+    table.cell(resulttable, 1, 4, text = str.tostring(ticker3), bgcolor=f_colour_assign(t3_return), text_color=white) 
+    table.cell(resulttable, 2, 4, text = str.tostring(t3share_sum), bgcolor=f_colour_assign(t3_return), text_color=white) 
+    table.cell(resulttable, 3, 4, text = "$" + str.tostring(math.round(t3_sum,2)), bgcolor=f_colour_assign(t3_return), text_color=white) 
+    table.cell(resulttable, 4, 4, text = "Correlation to " + str.tostring(ticker1) + " = " + str.tostring(math.round(t3t1_cor,2)) + "\n Correlation to " + str.tostring(ticker2) + " = " + str.tostring(math.round(t3t2_cor,2)) + "\n Correlation to " + str.tostring(ticker4) + " = " + str.tostring(math.round(t3t4_cor, 2)) + "\n Correlation to " + str.tostring(ticker5) + "= " + str.tostring(math.round(t3t5_cor, 2)), bgcolor=f_colour_assign(t3_return), text_color=white) 
+    table.cell(resulttable, 5, 4, text = str.tostring(math.round(t3_max_drawdown,2)), bgcolor=f_colour_assign(t3_return), text_color=white) 
+    table.cell(resulttable, 6, 4, text = str.tostring(math.round(t3_max_profit,2)), bgcolor=f_colour_assign(t3_return), text_color=white) 
+    table.cell(resulttable, 7, 4, text = "$" + str.tostring(math.round(t3_pl,2)), bgcolor=f_colour_assign(t3_return), text_color=t3_pl > 0 ? green : red) 
+    table.cell(resulttable, 8, 4, text = str.tostring(math.round(t3_return,2)) + "%", bgcolor=f_colour_assign(t3_return), text_color=t3_return > 0 ? green : red) 
+    table.cell(resulttable, 9, 4, text = str.tostring(math.round(t3_cb,2)), bgcolor=f_colour_assign(t3_return), text_color=white) 
+    table.cell(resulttable, 10, 4, text = str.tostring(t3_class), bgcolor=f_colour_assign(t3_return), text_color=white) 
+
+// Ticker 4 Chart 
+    table.cell(resulttable, 1, 5, text = str.tostring(ticker4), bgcolor=f_colour_assign(t4_return), text_color=white) 
+    table.cell(resulttable, 2, 5, text = str.tostring(t4share_sum), bgcolor=f_colour_assign(t4_return), text_color=white) 
+    table.cell(resulttable, 3, 5, text = "$" + str.tostring(math.round(t4_sum,2)), bgcolor=f_colour_assign(t4_return), text_color=white) 
+    table.cell(resulttable, 4, 5, text = "Correlation to " + str.tostring(ticker1) + " = " + str.tostring(math.round(t4t1_cor,2)) + "\n Correlation to " + str.tostring(ticker2) + " = " + str.tostring(math.round(t4t2_cor,2)) + "\n Correlation to " + str.tostring(ticker3) + " = " + str.tostring(math.round(t4t3_cor, 2)) + "\n Correlation to " + str.tostring(ticker5) + "= " + str.tostring(math.round(t4t5_cor, 2)), bgcolor=f_colour_assign(t4_return), text_color=white) 
+    table.cell(resulttable, 5, 5, text = str.tostring(math.round(t4_max_drawdown,2)), bgcolor=f_colour_assign(t4_return), text_color=white) 
+    table.cell(resulttable, 6, 5, text = str.tostring(math.round(t4_max_profit,2)), bgcolor=f_colour_assign(t4_return), text_color=white) 
+    table.cell(resulttable, 7, 5, text = "$" + str.tostring(math.round(t4_pl,2)), bgcolor=f_colour_assign(t4_return), text_color=t4_pl > 0 ? green : red) 
+    table.cell(resulttable, 8, 5, text = str.tostring(math.round(t4_return,2)) + "%", bgcolor=f_colour_assign(t4_return), text_color= t4_return > 0 ? green : red) 
+    table.cell(resulttable, 9, 5, text = str.tostring(math.round(t4_cb,2)), bgcolor=f_colour_assign(t4_return), text_color=white) 
+    table.cell(resulttable, 10, 5, text = str.tostring(t4_class), bgcolor=f_colour_assign(t4_return), text_color=white) 
+
+// Ticker 5 Chart 
+    table.cell(resulttable, 1, 6, text = str.tostring(ticker5), bgcolor=f_colour_assign(t5_return), text_color=white) 
+    table.cell(resulttable, 2, 6, text = str.tostring(t5share_sum), bgcolor=f_colour_assign(t5_return), text_color=white) 
+    table.cell(resulttable, 3, 6, text = "$" + str.tostring(math.round(t5_sum,2)), bgcolor=f_colour_assign(t5_return), text_color=white) 
+    table.cell(resulttable, 4, 6, text = "Correlation to " + str.tostring(ticker1) + " = " + str.tostring(math.round(t5t1_cor,2)) + "\n Correlation to " + str.tostring(ticker2) + " = " + str.tostring(math.round(t5t2_cor,2)) + "\n Correlation to " + str.tostring(ticker3) + " = " + str.tostring(math.round(t5t3_cor, 2)) + "\n Correlation to " + str.tostring(ticker4) + "= " + str.tostring(math.round(t5t4_cor, 2)), bgcolor=f_colour_assign(t5_return), text_color=white) 
+    table.cell(resulttable, 5, 6, text = str.tostring(math.round(t5_max_drawdown,2)), bgcolor=f_colour_assign(t5_return), text_color=white) 
+    table.cell(resulttable, 6, 6, text = str.tostring(math.round(t5_max_profit,2)), bgcolor=f_colour_assign(t5_return), text_color=white) 
+    table.cell(resulttable, 7, 6, text = "$" + str.tostring(math.round(t5_pl,2)), bgcolor=f_colour_assign(t5_return), text_color=t5_pl > 0 ? green : red) 
+    table.cell(resulttable, 8, 6, text = str.tostring(math.round(t5_return,2)) + "%", bgcolor=f_colour_assign(t5_return), text_color= t5_return > 0 ? green : red) 
+    table.cell(resulttable, 9, 6, text = str.tostring(math.round(t5_cb,2)), bgcolor=f_colour_assign(t5_return), text_color=white) 
+    table.cell(resulttable, 10, 6, text = str.tostring(t5_class), bgcolor=f_colour_assign(t5_return), text_color=white) 
+
+// Averages and Cumulatives 
+
+    table.cell(resulttable, 1, 7, text = "Average", bgcolor=black, text_color=white) 
+    table.cell(resulttable, 2, 7, text = str.tostring(total_shares), bgcolor=black, text_color=white) 
+    table.cell(resulttable, 3, 7, text = "$" + str.tostring(math.round(total_capital,2)), bgcolor=black, text_color=white) 
+    table.cell(resulttable, 4, 7, text = "", bgcolor=black, text_color=white) 
+    table.cell(resulttable, 5, 7, text = str.tostring(math.round(total_drawdown,2)), bgcolor=black, text_color=white) 
+    table.cell(resulttable, 6, 7, text = str.tostring(math.round(total_max_profit,2)), bgcolor=black, text_color=white)
+    table.cell(resulttable, 7, 7, text = "$" + str.tostring(math.round(total_pl,2)), bgcolor=black, text_color=total_pl > 0 ? green : red) 
+    table.cell(resulttable, 8, 7, text = str.tostring(math.round(total_return,2)) + "%", bgcolor=black, text_color=total_return > 0 ? green : red)
+
+var demographics = table.new(position.bottom_right, 3, 5, bgcolor = black, frame_color = white, frame_width = 1) 
+
+table.cell(demographics, 1, 1, text = "Current Timeframe: " + str.tostring(timeframe), bgcolor = black, text_color=white) 
+table.cell(demographics, 1, 2, text = "Length of Period: " + str.tostring(barcount), bgcolor = black, text_color=white) 
+table.cell(demographics, 1, 3, text = "Cost of ongoing contributions: $" + str.tostring(math.round(ongoing_cont,2)) + "per " + str.tostring(timeframe), bgcolor = black, text_color=white) 
+table.cell(demographics, 1, 4, text = "Estimated P&L per " + str.tostring(timeframe) + " = $" + str.tostring(math.round(return_per_tf,2)), bgcolor = black, text_color=return_per_tf > 0 ? green : red) 
+// Asset Allocation Table
+
+var assetallo = table.new(position.bottom_center, 7, 9, bgcolor=black, frame_color = white, frame_width=1) 
+
+
+if showallo
+    // Headings 
+    table.cell(assetallo, 1, 1, text = "Class", bgcolor = black, text_color=white) 
+    table.cell(assetallo, 2, 1, text = "Total Shares/Contracts", bgcolor = black, text_color=white) 
+    table.cell(assetallo, 3, 1, text = "Total Invested Capital", bgcolor = black, text_color=white) 
+    table.cell(assetallo, 4, 1, text = "% of $ Invested", bgcolor = black, text_color=white) 
+    table.cell(assetallo, 5, 1, text = "% of PL", bgcolor = black, text_color=white) 
+
+    //# of Shares/contracts
+    if futures > 0 
+        table.cell(assetallo, 1, 2, text = "Futures", bgcolor=f_allo_color(futures_pl), text_color=white)
+        table.cell(assetallo, 2, 2, text=str.tostring(futures), bgcolor = f_allo_color(futures_pl), text_color=white)
+        table.cell(assetallo, 3, 2, text=str.tostring(math.round(futures_cap,2)), bgcolor = f_allo_color(futures_pl), text_color=white) 
+        table.cell(assetallo, 4, 2, text=str.tostring(math.round(futures_comp,2)) + "%", bgcolor = f_allo_color(futures_pl), text_color=white) 
+        table.cell(assetallo, 5, 2, text=str.tostring(math.round(futures_return,2)) + "%", bgcolor = f_allo_color(futures_pl), text_color=white)
+    if cfd > 0  
+        table.cell(assetallo, 1, 3, text = "CFD", bgcolor=f_allo_color(cfd_pl), text_color=white) 
+        table.cell(assetallo, 2, 3, text=str.tostring(cfd), bgcolor = f_allo_color(cfd_pl), text_color=white)
+        table.cell(assetallo, 3, 3, text=str.tostring(math.round(cfd_cap,2)), bgcolor = f_allo_color(cfd_pl), text_color=white) 
+        table.cell(assetallo, 4, 3, text=str.tostring(math.round(cfd_comp,2)) + "%", bgcolor = f_allo_color(cfd_pl), text_color=white)
+        table.cell(assetallo, 5, 3, text=str.tostring(math.round(cfd_return,2)) + "%", bgcolor = f_allo_color(cfd_pl), text_color=white) 
+    if index > 0 
+        table.cell(assetallo, 1, 4, text = "Index", bgcolor=f_allo_color(index_pl), text_color=white)
+        table.cell(assetallo, 2, 4, text=str.tostring(index), bgcolor = f_allo_color(index_pl), text_color=white)
+        table.cell(assetallo, 3, 4, text=str.tostring(math.round(index_cap,2)), bgcolor = f_allo_color(index_pl), text_color=white)
+        table.cell(assetallo, 4, 4, text=str.tostring(math.round(index_comp,2)) + "%", bgcolor = f_allo_color(index_pl), text_color=white)
+        table.cell(assetallo, 5, 4, text=str.tostring(math.round(index_return,2)) + "%", bgcolor = f_allo_color(index_pl), text_color=white)
+    if stock > 0  
+        table.cell(assetallo, 1, 5, text = "Stock", bgcolor=f_allo_color(stock_pl), text_color=white)
+        table.cell(assetallo, 2, 5, text=str.tostring(stock), bgcolor = f_allo_color(stock_pl), text_color=white)
+        table.cell(assetallo, 3, 5, text=str.tostring(math.round(stock_cap,2)), bgcolor = f_allo_color(stock_pl), text_color=white)
+        table.cell(assetallo, 4, 5, text=str.tostring(math.round(stock_comp,2)) + "%", bgcolor = f_allo_color(stock_pl), text_color=white) 
+        table.cell(assetallo, 5, 5, text=str.tostring(math.round(stock_return,2)) + "%", bgcolor = f_allo_color(stock_pl), text_color=white) 
+    if fund > 0 
+        table.cell(assetallo, 1, 6, text = "Fund", bgcolor=f_allo_color(fund_pl), text_color=white) 
+        table.cell(assetallo, 2, 6, text=str.tostring(fund), bgcolor = f_allo_color(fund_pl), text_color=white)
+        table.cell(assetallo, 3, 6, text=str.tostring(math.round(fund_cap,2)), bgcolor = f_allo_color(fund_pl), text_color=white) 
+        table.cell(assetallo, 4, 6, text=str.tostring(math.round(fund_comp,2)) + "%", bgcolor = f_allo_color(fund_pl), text_color=white)
+        table.cell(assetallo, 5, 6, text=str.tostring(math.round(fund_return,2)) + "%", bgcolor = f_allo_color(fund_pl), text_color=white)
+    if crypto > 0 
+        table.cell(assetallo, 1, 7, text = "Crypto", bgcolor=f_allo_color(crypto_pl), text_color=white) 
+        table.cell(assetallo, 2, 7, text=str.tostring(crypto), bgcolor = f_allo_color(crypto_pl), text_color=white) 
+        table.cell(assetallo, 3, 7, text=str.tostring(math.round(crypto_cap,2)), bgcolor = f_allo_color(crypto_pl), text_color=white) 
+        table.cell(assetallo, 4, 7, text=str.tostring(math.round(crypto_comp,2)) + "%", bgcolor = f_allo_color(crypto_pl), text_color=white)
+        table.cell(assetallo, 5, 7, text=str.tostring(math.round(crypto_return,2)) + "%", bgcolor = f_allo_color(crypto_pl), text_color=white)
+
+var fundamental = table.new(position.middle_right, 9, 7, bgcolor = black, frame_color = gray, frame_width =1) 
+
+if chartpick == "Fundamentals" 
+    table.cell(fundamental, 1, 1, text = "Ticker", bgcolor = black, text_color=white) 
+    table.cell(fundamental, 1, 2, text = str.tostring(ticker1), bgcolor = black, text_color=white) 
+    table.cell(fundamental, 1, 3, text = str.tostring(ticker2), bgcolor = black, text_color=white) 
+    table.cell(fundamental, 1, 4, text = str.tostring(ticker3), bgcolor = black, text_color=white) 
+    table.cell(fundamental, 1, 5, text = str.tostring(ticker4), bgcolor = black, text_color=white)
+    table.cell(fundamental, 1, 6, text = str.tostring(ticker5), bgcolor = black, text_color=white) 
+    table.cell(fundamental, 2, 1, text = "Dividends", bgcolor = black, text_color=white) 
+    table.cell(fundamental, 3, 1, text = "Earnings", bgcolor = black, text_color=white) 
+    table.cell(fundamental, 4, 1, text = "Market Cap", bgcolor = black, text_color=white) 
+    table.cell(fundamental, 5, 1, text = "Earnings \n Yield", bgcolor = black, text_color=white) 
+    table.cell(fundamental, 6, 1, text = "Price Earnings \n Ratio", bgcolor = black, text_color=white) 
+    table.cell(fundamental, 7, 1, text = "Price Sales \ Ratio", bgcolor = black, text_color=white) 
+    // T1 
+    table.cell(fundamental, 2, 2, text = str.tostring(math.round(t1_div)), bgcolor = black, text_color=white) 
+    table.cell(fundamental, 3, 2, text = str.tostring(t1_earnings), bgcolor = black, text_color=t1_earnings > 0 ? green : red) 
+    table.cell(fundamental, 4, 2, text = str.tostring(t1_mkt_cap), bgcolor = black, text_color=white) 
+    table.cell(fundamental, 5, 2, text = str.tostring(t1_ern_yld), bgcolor = black, text_color=t1_ern_yld > 0 ? green : red)
+    table.cell(fundamental, 6, 2, text = str.tostring(t1_p_ern_ratio), bgcolor = black, text_color=t1_p_ern_ratio > 0 ? green : red) 
+    table.cell(fundamental, 7, 2, text = str.tostring(t1_psr), bgcolor = black, text_color=t1_psr > 0 ? green : red)  
+    //T2
+    table.cell(fundamental, 2, 3, text = str.tostring(math.round(t2_div,2)), bgcolor = black, text_color=white) 
+    table.cell(fundamental, 3, 3, text = str.tostring(math.round(t2_earnings,2)), bgcolor = black, text_color=t2_earnings > 0 ? green : red) 
+    table.cell(fundamental, 4, 3, text = str.tostring(math.round(t2_mkt_cap,2)), bgcolor = black, text_color=white) 
+    table.cell(fundamental, 5, 3, text = str.tostring(math.round(t2_ern_yld,2)), bgcolor = black, text_color=t2_ern_yld > 0 ? green : red)
+    table.cell(fundamental, 6, 3, text = str.tostring(math.round(t2_p_ern_ratio,2)), bgcolor = black, text_color=t2_p_ern_ratio > 0 ? green : red) 
+    table.cell(fundamental, 7, 3, text = str.tostring(math.round(t2_psr,2)), bgcolor = black, text_color=t2_psr >0 ? green : red) 
+    // T3
+    table.cell(fundamental, 2, 4, text = str.tostring(math.round(t3_div,2)), bgcolor = black, text_color=white) 
+    table.cell(fundamental, 3, 4, text = str.tostring(math.round(t3_earnings,2)), bgcolor = black, text_color=t3_earnings > 0 ? green : red) 
+    table.cell(fundamental, 4, 4, text = str.tostring(math.round(t3_mkt_cap,2)), bgcolor = black, text_color=white) 
+    table.cell(fundamental, 5, 4, text = str.tostring(math.round(t3_ern_yld,2)), bgcolor = black, text_color=t3_ern_yld > 0 ? green : red)
+    table.cell(fundamental, 6, 4, text = str.tostring(math.round(t3_p_ern_ratio,2)), bgcolor = black, text_color= t3_p_ern_ratio > 0 ? green : red) 
+    table.cell(fundamental, 7, 4, text = str.tostring(math.round(t3_psr,2)), bgcolor = black, text_color= t3_p_ern_ratio > 0 ? green : red)
+    // T4
+    table.cell(fundamental, 2, 5, text = str.tostring(math.round(t4_div,2)), bgcolor = black, text_color=white) 
+    table.cell(fundamental, 3, 5, text = str.tostring(math.round(t4_earnings,2)), bgcolor = black, text_color=t4_earnings > 0 ? green : red) 
+    table.cell(fundamental, 4, 5, text = str.tostring(math.round(t4_mkt_cap,2)), bgcolor = black, text_color=white) 
+    table.cell(fundamental, 5, 5, text = str.tostring(math.round(t4_ern_yld,2)), bgcolor = black, text_color=t4_ern_yld > 0 ? green : red)
+    table.cell(fundamental, 6, 5, text = str.tostring(math.round(t4_p_ern_ratio,2)), bgcolor = black, text_color=t4_p_ern_ratio > 0 ? green : red) 
+    table.cell(fundamental, 7, 5, text = str.tostring(math.round(t4_psr,2)), bgcolor = black, text_color=t4_psr > 0 ? green : red)  
+    // T5
+    table.cell(fundamental, 2, 6, text = str.tostring(math.round(t5_div,2)), bgcolor = black, text_color=white) 
+    table.cell(fundamental, 3, 6, text = str.tostring(math.round(t5_earnings,2)), bgcolor = black, text_color=t5_earnings > 0 ? green : red) 
+    table.cell(fundamental, 4, 6, text = str.tostring(math.round(t5_mkt_cap,2)), bgcolor = black, text_color=white) 
+    table.cell(fundamental, 5, 6, text = str.tostring(math.round(t5_ern_yld,2)), bgcolor = black, text_color=t5_ern_yld > 0 ? green : red)
+    table.cell(fundamental, 6, 6, text = str.tostring(math.round(t5_p_ern_ratio,2)), bgcolor = black, text_color=t5_p_ern_ratio > 0 ? green : red) 
+    table.cell(fundamental, 7, 6, text = str.tostring(math.round(t5_psr,2)), bgcolor = black, text_color= t5_psr > 0 ? green : red) 
+
+
+
+// Background Colour 
+
+bgcolor(time >= start_time and time <= end_time ? background : na)

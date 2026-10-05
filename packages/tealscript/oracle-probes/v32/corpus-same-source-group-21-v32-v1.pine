@@ -1,0 +1,351 @@
+//@version=5
+indicator("Smart Market Structure [Updated Version]", overlay=true, max_boxes_count=500, max_labels_count=500, max_lines_count=500)
+
+// === Inputs === //
+left        = input.int(6, "Swing Left", minval=1)
+right       = input.int(6, "Swing Right", minval=1)
+rayLength   = input.int(2, "Ray Length (for swing rays)", minval=1)
+// rsiLength     = input.int(9,   title='RSI Length (QQE)')
+// rsiSmoothing  = input.int(1,   title='RSI Smoothing (QQE)')
+// qqeFactor     = input.float(4.238, title='Fast QQE Factor')
+// threshold     = input.int(10,  title="Threshold")
+rsiLength     = 9
+rsiSmoothing  = 1
+qqeFactor     = 4.238
+threshold     = 10
+rsiL   = input.int(14, "RSI Length")
+dashboardPos = input.string("Top-Right", "Dashboard Position", options=["Top-Left", "Top-Right", "Bottom-Left", "Bottom-Right"])
+showSwings  = input.bool(false, "Show Swing High/Low Lines")
+colorCandle = input.bool(false, "Color Candles by MSS")
+showOB      = input.bool(true, "Show Order Blocks")
+keepAllOBs  = input.bool(true, "Keep All OBs until Invalidation")
+showDashboard = input.bool(true, "Show Dashboard")
+showSignals = input.bool(false, "Show Arrow Signals (candle close at OB 50% level)")
+showBOS = input.bool(false, "Show BOS")
+showMSS = input.bool(false, "Show MSS")
+obLevel     = 70
+osLevel     = 30
+showRSI     = input.bool(false, "Show RSI Signals")
+
+swingHigh = ta.pivothigh(high, left, right)
+swingLow  = ta.pivotlow(low, left, right)
+
+var swingHighLines = array.new_line()
+var swingLowLines  = array.new_line()
+
+if showSwings
+    if not na(swingHigh)
+        l = line.new(x1=bar_index - right, y1=swingHigh,
+                     x2=bar_index - right + rayLength, y2=swingHigh,
+                     color=color.rgb(255, 255, 255), width=2, extend=extend.none)
+        array.push(swingHighLines, l)
+
+    if not na(swingLow)
+        l = line.new(x1=bar_index - right, y1=swingLow,
+                     x2=bar_index - right + rayLength, y2=swingLow,
+                     color=color.rgb(255, 255, 255), width=2, extend=extend.none)
+        array.push(swingLowLines, l)
+
+var float lastSwingHigh = na
+var float lastSwingLow  = na
+var int   lastHighBar   = na
+var int   lastLowBar    = na
+
+if not na(swingHigh)
+    lastSwingHigh := swingHigh
+    lastHighBar   := bar_index - right
+
+if not na(swingLow)
+    lastSwingLow := swingLow
+    lastLowBar   := bar_index - right
+
+var int lastBOSHighBar = na
+var int lastBOSLowBar  = na
+var string lastBOSDir  = "none"
+
+bosBull = not na(lastSwingHigh) and ta.crossover(close, lastSwingHigh) and (na(lastBOSHighBar) or lastHighBar != lastBOSHighBar)
+bosBear = not na(lastSwingLow)  and ta.crossunder(close, lastSwingLow) and (na(lastBOSLowBar) or lastLowBar  != lastBOSLowBar)
+
+mssBull = (lastBOSDir == "bear") and bosBull
+mssBear = (lastBOSDir == "bull") and bosBear
+
+centerX(_x1, _x2) =>
+    int(math.round((_x1 + _x2) / 2.0))
+
+var obBullRects = array.new_box()
+var obBearRects = array.new_box()
+
+var float bullMid = na
+var float bearMid = na
+
+createOB(isBull) =>
+    if isBull
+        box.new(bar_index - 1, high[1], bar_index, low[1],border_color=color.new(#4caf4f, 100),bgcolor=color.new(color.green, 85), extend=extend.right)
+    else
+        box.new(bar_index - 1, high[1], bar_index, low[1],border_color=color.new(#ff5252, 100),bgcolor=color.new(color.red, 85), extend=extend.right)
+
+if bosBull
+    lastBOSHighBar := lastHighBar
+    lastBOSDir := "bull"
+
+    if showBOS or (showMSS and mssBull)
+        x1 = lastHighBar
+        y  = lastSwingHigh
+        caption = mssBull ? "MSS" : "BOS"
+        _ = line.new(x1=x1, y1=y, x2=bar_index, y2=y,
+                     color=color.new(color.green, 0), width=1,
+                     style=line.style_dashed, extend=extend.none)
+        if (mssBull and showMSS) or (not mssBull and showBOS)
+            label.new(centerX(x1, bar_index), y, caption,
+                      style=label.style_label_down, textcolor=color.green,
+                      color=color.new(#00ff08,100), size=size.small)
+
+    if showOB and close > lastSwingHigh
+        ob = createOB(true)
+        array.push(obBullRects, ob)
+        if not keepAllOBs and array.size(obBullRects) > 1
+            old = array.shift(obBullRects)
+            box.delete(old)
+
+if bosBear
+    lastBOSLowBar := lastLowBar
+    lastBOSDir := "bear"
+    
+    if showBOS or (showMSS and mssBear)
+        x1 = lastLowBar
+        y  = lastSwingLow
+        caption = mssBear ? "MSS" : "BOS"
+        _ = line.new(x1=x1, y1=y, x2=bar_index, y2=y,
+                     color=color.new(color.red, 0), width=1,
+                     style=line.style_dashed, extend=extend.none)
+        if (mssBear and showMSS) or (not mssBear and showBOS)
+            label.new(centerX(x1, bar_index), y, caption,
+                      style=label.style_label_up, textcolor=color.red,
+                      color=color.new(#ff0000,100), size=size.small)
+
+    if showOB and close < lastSwingLow
+        ob = createOB(false)
+        array.push(obBearRects, ob)
+        if not keepAllOBs and array.size(obBearRects) > 1
+            old = array.shift(obBearRects)
+            box.delete(old)
+
+invalidateOBs(rectArray, isBull) =>
+    sz = array.size(rectArray)
+    if sz > 0
+        i = sz - 1
+        while i >= 0
+            r = array.get(rectArray, i)
+            top = box.get_top(r)
+            bot = box.get_bottom(r)
+            if not na(top) and not na(bot)
+                if isBull and close < bot
+                    box.delete(r)
+                    array.remove(rectArray, i)
+                else if not isBull and close > top
+                    box.delete(r)
+                    array.remove(rectArray, i)
+            i := i - 1
+
+if showOB
+    invalidateOBs(obBullRects, true)
+    invalidateOBs(obBearRects, false)
+
+if array.size(obBullRects) > 0
+    lastBullOB = array.get(obBullRects, array.size(obBullRects)-1)
+    bullMid := (box.get_top(lastBullOB) + box.get_bottom(lastBullOB)) / 2
+
+if array.size(obBearRects) > 0
+    lastBearOB = array.get(obBearRects, array.size(obBearRects)-1)
+    bearMid := (box.get_top(lastBearOB) + box.get_bottom(lastBearOB)) / 2
+
+var label sigLabel = na
+
+if showSignals
+    if not na(bullMid) and ta.cross(close, bullMid)
+        label.new(bar_index, bullMid, "", style=label.style_arrowup, color=color.new(#008000, 0), textcolor=#26ff00, yloc=yloc.belowbar, size=size.tiny)
+        alert("BUY Signal: Price tapped 50% of Bullish OB", alert.freq_once_per_bar)
+
+    if not na(bearMid) and ta.cross(close, bearMid)
+        label.new(bar_index, bearMid, "", style=label.style_arrowdown, color=#ff0000, textcolor=color.red, yloc=yloc.abovebar, size=size.tiny)
+        alert("SELL Signal: Price tapped 50% of Bearish OB", alert.freq_once_per_bar)
+
+var string structureTrend = "none"
+var float bullSwings = 0.0
+var float bearSwings = 0.0
+
+if lastBOSDir != "none"
+    structureTrend := lastBOSDir
+if mssBull
+    structureTrend := "bull"
+if mssBear
+    structureTrend := "bear"
+    
+strengthPeriod = 8
+if bosBull
+    bullSwings += 1
+else if bosBear
+    bearSwings += 1
+
+if bullSwings + bearSwings > strengthPeriod
+    bullSwings := bullSwings * 0.8
+    bearSwings := bearSwings * 0.8
+
+bullSwings := math.max(bullSwings, 0)
+bearSwings := math.max(bearSwings, 0)
+
+var color candleColor = na
+if colorCandle
+    if structureTrend == "bull"
+        candleColor := color.new(color.green, 0)
+    else if structureTrend == "bear"
+        candleColor := color.new(color.red, 0)
+    else
+        candleColor := na
+else
+    candleColor := na
+barcolor(candleColor)
+
+rsi = ta.rsi(close, rsiL)
+
+rsiBuy  = ta.crossunder(rsi, osLevel)
+rsiSell = ta.crossover(rsi, obLevel)
+
+plotshape(showRSI and rsiBuy,  
+     title="RSI Buy", style=shape.triangleup, location=location.belowbar, 
+     color=color.lime, size=size.tiny, text="RSI", textcolor=color.white)
+
+plotshape(showRSI and rsiSell, 
+     title="RSI Sell", style=shape.triangledown, location=location.abovebar, 
+     color=color.red, size=size.tiny, text="RSI", textcolor=color.white)
+
+// ====================
+// QQE SIGNALS INTEGRATION (REFERENCES TO https://www.tradingview.com/script/7R6ZxyZu-QQE-signals/ )
+// ====================
+
+showQQELong   = input.bool(false,  "Show QQE Long Signals")
+showQQEShort  = input.bool(false,  "Show QQE Short Signals")
+
+src = close
+wildersPeriod = rsiLength * 2 - 1
+
+rsiValue     = ta.rsi(src, rsiLength)
+smoothedRsi  = ta.ema(rsiValue, rsiSmoothing)
+rsiDelta     = math.abs(smoothedRsi[1] - smoothedRsi)
+avgRsiDelta  = ta.ema(rsiDelta, wildersPeriod)
+atrOnRsi     = ta.ema(avgRsiDelta, wildersPeriod) * qqeFactor
+
+var float supportBand    = na
+var float resistanceBand = na
+var int   trendDirection = 0
+
+rsiLine      = smoothedRsi
+newResBand   = rsiLine + atrOnRsi
+newSupBand   = rsiLine - atrOnRsi
+
+supportBand    := rsiLine[1] > supportBand[1] and rsiLine > supportBand[1] ? math.max(supportBand[1], newSupBand) : newSupBand
+resistanceBand := rsiLine[1] < resistanceBand[1] and rsiLine < resistanceBand[1] ? math.min(resistanceBand[1], newResBand) : newResBand
+
+crossDown = ta.cross(supportBand[1], rsiLine)
+trendDirection := ta.cross(rsiLine, resistanceBand[1]) ? 1 : crossDown ? -1 : nz(trendDirection[1], 1)
+
+qqeTrail = trendDirection == 1 ? supportBand : resistanceBand
+
+var int longCounter  = 0
+var int shortCounter = 0
+
+longCounter  := qqeTrail < rsiLine ? longCounter + 1 : 0
+shortCounter := qqeTrail > rsiLine ? shortCounter + 1 : 0
+
+longSignal  = longCounter == 1 ? qqeTrail[1] - 50 : na
+shortSignal = shortCounter == 1 ? qqeTrail[1] - 50 : na
+
+plotshape(showQQELong  and not na(longSignal),  
+          title="QQE Long", text="Long", textcolor=color.new(color.lime, 0),
+          style=shape.triangleup,   location=location.belowbar, color=color.green, size=size.tiny)
+
+plotshape(showQQEShort and not na(shortSignal), 
+          title="QQE Short", text="Short", textcolor=color.new(color.red, 0),
+          style=shape.triangledown, location=location.abovebar, color=color.red, size=size.tiny)
+
+// === Dashboard === //
+var table dash = na
+var string lastQQESignal = "None"
+var int    lastQQEBar    = na
+
+
+if showDashboard
+    if na(dash)
+        pos = switch dashboardPos
+            "Top-Left"     => position.top_left
+            "Top-Right"    => position.top_right
+            "Bottom-Left"  => position.bottom_left
+            "Bottom-Right" => position.bottom_right
+        dash := table.new(pos, 2, 8, frame_color=color.new(color.gray, 90), frame_width=1, border_width=1)
+
+    bosText  = lastBOSDir == "bull" ? "Bullish" : lastBOSDir == "bear" ? "Bearish" : "None"
+    bosColor = lastBOSDir == "bull" ? color.green : lastBOSDir == "bear" ? color.red : color.gray
+
+    mssText  = (structureTrend == "bull" and mssBull) ? "Bullish" : (structureTrend == "bear" and mssBear) ? "Bearish" : "None"
+    mssColor = (structureTrend == "bull" and mssBull) ? color.green : (structureTrend == "bear" and mssBear) ? color.red : color.gray
+
+    trendText  = structureTrend == "bull" ? "Bullish" : structureTrend == "bear" ? "Bearish" : "Neutral"
+    trendColor = structureTrend == "bull" ? color.green : structureTrend == "bear" ? color.red : color.gray
+
+    // swingsSinceMSS = na(lastBOSHighBar) and na(lastBOSLowBar) ? 0 : bar_index - (structureTrend == "bull" ? lastBOSHighBar : lastBOSLowBar)
+    swingsSinceMSS = (structureTrend == "bull" and not na(lastBOSHighBar)) ? bar_index - lastBOSHighBar :
+                     (structureTrend == "bear" and not na(lastBOSLowBar)) ? bar_index - lastBOSLowBar : 0
+    swingsText = str.tostring(swingsSinceMSS)
+    swingsColor = color.gray
+
+    bullOBcount = array.size(obBullRects)
+    bearOBcount = array.size(obBearRects)
+    obText  = "Bull: " + str.tostring(bullOBcount) + " / Bear: " + str.tostring(bearOBcount)
+    obColor = bullOBcount > bearOBcount ? color.green : bearOBcount > bullOBcount ? color.red : color.gray
+
+    if not na(longSignal)
+        lastQQESignal := "Long"
+        lastQQEBar := bar_index
+    else if not na(shortSignal)
+        lastQQESignal := "Short"
+        lastQQEBar := bar_index
+    totalSwings = bullSwings + bearSwings
+    strengthRatio = totalSwings == 0 ? 0.5 : bullSwings / totalSwings
+    strengthText  = strengthRatio > 0.65 ? "Strong Bull" : strengthRatio < 0.35 ? "Strong Bear" : "Neutral"
+    strengthColor = strengthRatio > 0.65 ? color.green : strengthRatio < 0.35 ? color.red : color.gray
+    qqeColor = lastQQESignal == "Long" ? color.green : lastQQESignal == "Short" ? color.red : color.gray
+
+    var string lastRSISignal = "None"
+    var int    lastRSIBar    = na
+
+    if rsiBuy
+        lastRSISignal := "Buy"
+        lastRSIBar := bar_index
+    else if rsiSell
+        lastRSISignal := "Sell"
+        lastRSIBar := bar_index
+
+    table.cell(dash, 0, 0, "Last BOS",  text_color=color.white, bgcolor=color.new(color.black, 0))
+    table.cell(dash, 1, 0, bosText,     text_color=color.white, bgcolor=bosColor)
+
+    table.cell(dash, 0, 1, "Last MSS",  text_color=color.white, bgcolor=color.new(color.black, 0))
+    table.cell(dash, 1, 1, mssText,     text_color=color.white, bgcolor=mssColor)
+
+    table.cell(dash, 0, 2, "Trend",     text_color=color.white, bgcolor=color.new(color.black, 0))
+    table.cell(dash, 1, 2, trendText,   text_color=color.white, bgcolor=trendColor)
+
+    table.cell(dash, 0, 3, "Swings since MSS", text_color=color.white, bgcolor=color.new(color.black, 0))
+    table.cell(dash, 1, 3, swingsText,         text_color=color.white, bgcolor=swingsColor)
+
+    table.cell(dash, 0, 4, "Active OBs", text_color=color.white, bgcolor=color.new(color.black, 0))
+    table.cell(dash, 1, 4, obText,       text_color=color.white, bgcolor=obColor)
+
+    table.cell(dash, 0, 5, "Trend Strength", text_color=color.white, bgcolor=color.new(color.black, 0))
+    table.cell(dash, 1, 5, strengthText,     text_color=color.white, bgcolor=strengthColor)
+
+    table.cell(dash, 0, 6, "Last QQE", text_color=color.white, bgcolor=color.new(color.black, 0))
+    table.cell(dash, 1, 6, lastQQESignal + (not na(lastQQEBar) ? " (" + str.tostring(bar_index - lastQQEBar) + " bars)" : ""), text_color=color.white, bgcolor=qqeColor)
+    rsiColor = lastRSISignal == "Buy" ? color.green : lastRSISignal == "Sell" ? color.red : color.gray
+    table.cell(dash, 0, 7, "Last RSI", text_color=color.white, bgcolor=color.new(color.black, 0)) 
+    table.cell(dash, 1, 7, lastRSISignal + (not na(lastRSIBar) ? " (" + str.tostring(bar_index - lastRSIBar) + " bars)" : ""), text_color=color.white, bgcolor=rsiColor)
+    table.cell(dash, 1, 7, lastRSISignal + (not na(lastRSIBar) ? " (" + str.tostring(bar_index - lastRSIBar) + " bars)" : ""), text_color=color.white, bgcolor=rsiColor)

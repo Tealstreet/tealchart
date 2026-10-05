@@ -1,0 +1,44 @@
+//@version=6
+indicator("Impulse Candles", shorttitle="Impulse Candles", overlay=true)
+
+//=========================
+// Inputs
+//=========================
+reversalsOnly   = input.bool(true,  "Reversals Only")
+candleSizeRatio = input.float(5.0,  "Candle Size Ratio", minval=1, step=0.1)
+atrLength       = input.int(200,    "ATR Length", minval=1)
+
+// Visuals
+paintBars       = input.bool(true,  "Paint Candles")
+maxBarAlpha     = input.int(10,     "Max candle transparency (0=strong)", minval=0, maxval=90)
+
+// Colors
+bullColor = input.color(color.lime, "Bull Impulse Color")
+bearColor = input.color(color.red,  "Bear Impulse Color")
+
+//=========================
+// ATR
+//=========================
+atrValue = ta.sma(ta.tr(true), atrLength)
+
+//=========================
+// Impulse Logic
+//=========================
+bearCandles = close[1] < open[1] and close[2] < open[2]
+bullCandles = close[1] > open[1] and close[2] > open[2]
+
+bullImpulseRaw = close > open and (close - open) > candleSizeRatio * atrValue
+bearImpulseRaw = close < open and (open - close) > candleSizeRatio * atrValue
+
+bullImpulse = reversalsOnly ? (bearCandles and bullImpulseRaw) : bullImpulseRaw
+bearImpulse = reversalsOnly ? (bullCandles and bearImpulseRaw) : bearImpulseRaw
+
+//=========================
+// Coloring (native candles)
+//=========================
+barCol =
+     paintBars and bullImpulse ? color.new(bullColor, maxBarAlpha) :
+     paintBars and bearImpulse ? color.new(bearColor, maxBarAlpha) :
+     na
+
+barcolor(barCol)

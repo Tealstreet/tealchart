@@ -1,0 +1,77 @@
+// Versión: v1.1.4
+// Fecha: 2025-05-30
+// Hora: 13:45 (GMT-4)
+// Este indicador está diseñado para generar señales de compra y venta en gráficos de 1 minuto 
+// usando la pendiente de MACD en 5 minutos para determinar si entrar en short o long y usa
+// Cruces de EMA, precios de cierre y ADX para determinar entrada.
+
+//@version=6
+indicator("Señales Scalping BTC M1/M5 - EMA + ADX", overlay=true)
+
+// === PARÁMETROS DE CONFIGURACIÓN ===
+emaFastLen     = input.int(9, title="EMA Rápida")
+emaSlowLen     = input.int(21, title="EMA Lenta")
+dmiLength      = input.int(14, title="DMI Periodo")
+dmiSmoothing   = input.int(14, title="Suavizado ADX")
+atrPeriod      = input.int(14, title="ATR Periodo")
+adxThreshold   = input.float(20, title="Umbral mínimo ADX", step=0.1)
+showFastEMA    = input.bool(false, title="Mostrar EMA Rápida")
+showSlowEMA    = input.bool(false, title="Mostrar EMA Lenta")
+macdFast       = input.int(12, title="MACD Línea Rápida")
+macdSlow       = input.int(26, title="MACD Línea Lenta")
+macdSignal     = input.int(9, title="MACD Señal")
+macdTimeframe  = input.timeframe("5", title="MACD Timeframe", options=["1", "3", "5", "15", "30", "45", "60", "120", "180", "240", "D", "W"])
+
+// === CÁLCULO DE INDICADORES ===
+emaFast        = ta.ema(close, emaFastLen)
+emaSlow        = ta.ema(close, emaSlowLen)
+atr            = ta.atr(atrPeriod)
+[plusDI, minusDI, adx] = ta.dmi(dmiLength, dmiSmoothing)
+
+// Cálculo del MACD en timeframe configurable
+[macdLine, signalLine, _] = request.security(syminfo.tickerid, macdTimeframe, ta.macd(close, macdFast, macdSlow, macdSignal))
+macdSlope = request.security(syminfo.tickerid, macdTimeframe, macdLine - macdLine[1])
+
+// === CONDICIONES DE SEÑAL ===
+rawBuySignal  = emaFast > emaSlow and close > high[1] and close > emaFast and adx > adxThreshold and macdSlope > 0  // Pendiente positiva para compras
+rawSellSignal = (emaFast < emaSlow or close < emaFast or adx < adxThreshold) and close < low[1] and macdSlope < 0  // Pendiente negativa para ventas
+
+// === ESTADO PERSISTENTE SEPARADO ===
+var bool inBuyPosition = false
+var bool inSellPosition = false
+
+// === FLAGS TEMPORALES SEPARADOS ===
+buyEntry = rawBuySignal and not inBuyPosition and not inSellPosition
+buyExit = (emaFast < emaSlow or close < emaFast) and inBuyPosition
+
+sellEntry = rawSellSignal and not inSellPosition and not inBuyPosition
+sellExit = (emaFast > emaSlow or close > emaFast) and inSellPosition
+
+// === GESTIÓN DE SEÑALES SEPARADAS ===
+if buyEntry
+    label.new(bar_index, low - atr * 1, "Buy\nMACD Slope:\n" + str.tostring(macdSlope, "#.####"), style=label.style_label_up, color=color.green, textcolor=color.white, size=size.small)
+    inBuyPosition := true
+    inSellPosition := false
+
+if buyExit
+    label.new(bar_index, high + atr * 1, "Exit\n Buy", style=label.style_label_down, color=color.yellow, textcolor=color.black, size=size.small)
+    inBuyPosition := false
+
+if sellEntry
+    label.new(bar_index, high + atr * 1, "Sell\nMACD Slope:\n" + str.tostring(macdSlope, "#.####"), style=label.style_label_down, color=color.red, textcolor=color.white, size=size.small)
+    inSellPosition := true
+    inBuyPosition := false
+
+if sellExit
+    label.new(bar_index, low - atr * 1, "Exit\n Sell", style=label.style_label_up, color=color.yellow, textcolor=color.black, size=size.small)
+    inSellPosition := false
+
+// === ALERTAS SEPARADAS ===
+alertcondition(buyEntry, title="Entrada Compra", message="📈 Señal de Entrada Compra")
+alertcondition(buyExit, title="Salida Compra", message="🔄 Señal de Salida Compra")
+alertcondition(sellEntry, title="Entrada Venta", message="📉 Señal de Entrada Venta")
+alertcondition(sellExit, title="Salida Venta", message="🔄 Señal de Salida Venta")
+
+// === VISUALIZACIÓN OPCIONAL DE EMAs ===
+plot(showFastEMA ? emaFast : na, color=color.orange, title="EMA Rápida")
+plot(showSlowEMA ? emaSlow : na, color=color.blue, title="EMA Lenta")

@@ -1,0 +1,254 @@
+// @version=5
+
+////////////////
+indicator("Market Structure & Price Action Engine", "MSE", overlay=true)
+
+// —————————————————————————————————————————————————————————————————————————————————————————————————————————————
+// [1] INPUTS
+// —————————————————————————————————————————————————————————————————————————————————————————————————————————————
+
+g_structure = "Market Structure (Swing Points & Breaks)"
+i_swing_lookback = input.int(10, "Swing Point Lookback", minval=2, group=g_structure)
+i_show_swing_points = input.bool(true, "Show Swing Highs/Lows", group=g_structure, inline="s1")
+i_show_bos = input.bool(true, "Show Break of Structure (BOS)", group=g_structure, inline="s2")
+i_show_choch = input.bool(true, "Show Change of Character (CHoCH)", group=g_structure, inline="s2")
+i_structure_line_width = input.int(1, "Line Width", group=g_structure)
+
+g_ob = "Order Blocks (OB)"
+i_ob_enabled = input.bool(true, "Enable Order Block Detection", group=g_ob)
+i_ob_lookback = input.int(5, "Momentum Lookback", group=g_ob, tooltip="How many bars to check for a strong move after the OB candle.")
+i_ob_mitigation_check = input.bool(true, "Hide Mitigated Blocks", group=g_ob)
+i_ob_extend_boxes = input.bool(true, "Extend Unmitigated Boxes", group=g_ob)
+i_ob_bull_color = input.color(color.new(color.green, 80), "Bullish OB Color", group=g_ob, inline="obc")
+i_ob_bear_color = input.color(color.new(color.red, 80), "Bearish OB Color", group=g_ob, inline="obc")
+
+g_fvg = "Fair Value Gaps (FVG) / Imbalances"
+i_fvg_enabled = input.bool(true, "Enable FVG Detection", group=g_fvg)
+i_fvg_threshold = input.float(0.0, "Minimum FVG Size (in ATRs)", minval=0.0, group=g_fvg, tooltip="0 = detect all FVGs. A higher value filters out smaller gaps.")
+i_fvg_mitigation_check = input.bool(true, "Hide Filled Gaps", group=g_fvg)
+i_fvg_extend_boxes = input.bool(true, "Extend Unfilled Gaps", group=g_fvg)
+i_fvg_bull_color = input.color(color.new(color.blue, 85), "Bullish FVG Color", group=g_fvg, inline="fvc")
+i_fvg_bear_color = input.color(color.new(color.purple, 85), "Bearish FVG Color", group=g_fvg, inline="fvc")
+
+g_liquidity = "Liquidity Levels"
+i_show_daily_hl = input.bool(true, "Show Previous Day H/L", group=g_liquidity, inline="l1")
+i_show_weekly_hl = input.bool(true, "Show Previous Week H/L", group=g_liquidity, inline="l2")
+i_show_monthly_hl = input.bool(true, "Show Previous Month H/L", group=g_liquidity, inline="l3")
+i_liquidity_line_style = input.string("Dashed", "Line Style", options=["Solid", "Dashed", "Dotted"], group=g_liquidity)
+
+// —————————————————————————————————————————————————————————————————————————————————————————————————————————————
+// [2] CORE LOGIC & CALCULATIONS
+// —————————————————————————————————————————————————————————————————————————————————————————————————————————————
+
+// --- Swing Points & Structure Breaks ---
+pivot_high_price = ta.pivothigh(high, i_swing_lookback, i_swing_lookback)
+pivot_low_price = ta.pivotlow(low, i_swing_lookback, i_swing_lookback)
+
+var float last_swing_high = na
+var float last_swing_low = na
+var int last_swing_high_time = na
+var int last_swing_low_time = na
+
+if not na(pivot_high_price)
+    last_swing_high := pivot_high_price
+    last_swing_high_time := time[i_swing_lookback]
+if not na(pivot_low_price)
+    last_swing_low := pivot_low_price
+    last_swing_low_time := time[i_swing_lookback]
+
+var float confirmed_high = na
+var float confirmed_low = na
+var int confirmed_high_time = na
+var int confirmed_low_time = na
+var string market_trend = "Undetermined"
+
+is_bos = false
+is_choch = false
+
+if ta.cross(high, last_swing_high) and market_trend != "Bullish"
+    is_choch := true
+    market_trend := "Bullish"
+    confirmed_low := last_swing_low
+    confirmed_low_time := last_swing_low_time
+else if ta.cross(high, last_swing_high) and market_trend == "Bullish"
+    is_bos := true
+    confirmed_low := last_swing_low
+    confirmed_low_time := last_swing_low_time
+
+if ta.cross(low, last_swing_low) and market_trend != "Bearish"
+    is_choch := true
+    market_trend := "Bearish"
+    confirmed_high := last_swing_high
+    confirmed_high_time := last_swing_high_time
+else if ta.cross(low, last_swing_low) and market_trend == "Bearish"
+    is_bos := true
+    confirmed_high := last_swing_high
+    confirmed_high_time := last_swing_high_time
+
+// --- Order Blocks ---
+type ob_box
+    box b
+    bool mitigated
+
+var array<ob_box> bull_ob_boxes = array.new<ob_box>()
+var array<ob_box> bear_ob_boxes = array.new<ob_box>()
+
+is_bull_momentum = close > ta.ema(close, i_ob_lookback) and close > open
+is_bear_momentum = close < ta.ema(close, i_ob_lookback) and close < open
+
+if i_ob_enabled
+    // Bullish OB: Last down candle before strong up move
+    if is_bull_momentum and not is_bull_momentum[1] and close[1] < open[1]
+        b = box.new(time[1], high[1], time, low[1], border_color=na, bgcolor=i_ob_bull_color)
+        array.push(bull_ob_boxes, ob_box.new(b, false))
+    // Bearish OB: Last up candle before strong down move
+    if is_bear_momentum and not is_bear_momentum[1] and close[1] > open[1]
+        b = box.new(time[1], high[1], time, low[1], border_color=na, bgcolor=i_ob_bear_color)
+        array.push(bear_ob_boxes, ob_box.new(b, false))
+
+// --- Fair Value Gaps ---
+type fvg_box
+    box b
+    bool filled
+
+var array<fvg_box> bull_fvg_boxes = array.new<fvg_box>()
+var array<fvg_box> bear_fvg_boxes = array.new<fvg_box>()
+
+min_fvg_size = ta.atr(14) * i_fvg_threshold
+
+if i_fvg_enabled
+    // Bullish FVG: Gap between high[2] and low[0]
+    is_bull_fvg = high[2] < low and (low - high[2]) >= min_fvg_size
+    if is_bull_fvg
+        b = box.new(time[2], high[2], time, low, border_color=na, bgcolor=i_fvg_bull_color)
+        array.push(bull_fvg_boxes, fvg_box.new(b, false))
+    // Bearish FVG: Gap between low[2] and high[0]
+    is_bear_fvg = low[2] > high and (low[2] - high) >= min_fvg_size
+    if is_bear_fvg
+        b = box.new(time[2], low[2], time, high, border_color=na, bgcolor=i_fvg_bear_color)
+        array.push(bear_fvg_boxes, fvg_box.new(b, false))
+
+// --- Mitigation & Filling Logic ---
+if i_ob_mitigation_check and array.size(bull_ob_boxes) > 0
+    for i = array.size(bull_ob_boxes) - 1 to 0
+        ob = array.get(bull_ob_boxes, i)
+        if not ob.mitigated and low < box.get_top(ob.b)
+            ob.mitigated := true
+            if not i_ob_extend_boxes
+                box.set_right(ob.b, time)
+
+if i_ob_mitigation_check and array.size(bear_ob_boxes) > 0
+    for i = array.size(bear_ob_boxes) - 1 to 0
+        ob = array.get(bear_ob_boxes, i)
+        if not ob.mitigated and high > box.get_bottom(ob.b)
+            ob.mitigated := true
+            if not i_ob_extend_boxes
+                box.set_right(ob.b, time)
+
+if i_fvg_mitigation_check and array.size(bull_fvg_boxes) > 0
+    for i = array.size(bull_fvg_boxes) - 1 to 0
+        fvg = array.get(bull_fvg_boxes, i)
+        if not fvg.filled and low < box.get_top(fvg.b)
+            fvg.filled := true
+            if not i_fvg_extend_boxes
+                box.set_right(fvg.b, time)
+
+if i_fvg_mitigation_check and array.size(bear_fvg_boxes) > 0
+    for i = array.size(bear_fvg_boxes) - 1 to 0
+        fvg = array.get(bear_fvg_boxes, i)
+        if not fvg.filled and high > box.get_bottom(fvg.b)
+            fvg.filled := true
+            if not i_fvg_extend_boxes
+                box.set_right(fvg.b, time)
+
+// --- Liquidity Levels ---
+f_get_line_style(style_str) =>
+    switch style_str
+        "Solid" => line.style_solid
+        "Dashed" => line.style_dashed
+        "Dotted" => line.style_dotted
+        => line.style_solid
+
+line_style = f_get_line_style(i_liquidity_line_style)
+
+[daily_high, daily_low] = request.security(syminfo.tickerid, "D", [high[1], low[1]], lookahead=barmerge.lookahead_on)
+[weekly_high, weekly_low] = request.security(syminfo.tickerid, "W", [high[1], low[1]], lookahead=barmerge.lookahead_on)
+[monthly_high, monthly_low] = request.security(syminfo.tickerid, "M", [high[1], low[1]], lookahead=barmerge.lookahead_on)
+
+var line pdh_line = na
+var line pdl_line = na
+var line pwh_line = na
+var line pwl_line = na
+var line pmh_line = na
+var line pml_line = na
+
+if i_show_daily_hl and ta.change(time("D"))
+    line.delete(pdh_line)
+    line.delete(pdl_line)
+    pdh_line := line.new(time, daily_high, time + 86400000 * 2, daily_high, color=color.new(color.red, 50), style=line_style, width=1)
+    pdl_line := line.new(time, daily_low, time + 86400000 * 2, daily_low, color=color.new(color.green, 50), style=line_style, width=1)
+    line.set_extend(pdh_line, extend.right)
+    line.set_extend(pdl_line, extend.right)
+
+if i_show_weekly_hl and ta.change(time("W"))
+    line.delete(pwh_line)
+    line.delete(pwl_line)
+    pwh_line := line.new(time, weekly_high, time + 86400000 * 7, weekly_high, color=color.new(color.orange, 30), style=line_style, width=2)
+    pwl_line := line.new(time, weekly_low, time + 86400000 * 7, weekly_low, color=color.new(color.blue, 30), style=line_style, width=2)
+    line.set_extend(pwh_line, extend.right)
+    line.set_extend(pwl_line, extend.right)
+
+if i_show_monthly_hl and ta.change(time("M"))
+    line.delete(pmh_line)
+    line.delete(pml_line)
+    pmh_line := line.new(time, monthly_high, time + 86400000 * 30, monthly_high, color=color.new(color.purple, 20), style=line_style, width=3)
+    pml_line := line.new(time, monthly_low, time + 86400000 * 30, monthly_low, color=color.new(color.yellow, 20), style=line_style, width=3)
+    line.set_extend(pmh_line, extend.right)
+    line.set_extend(pml_line, extend.right)
+
+// —————————————————————————————————————————————————————————————————————————————————————————————————————————————
+// [3] PLOTTING & VISUALIZATION
+// —————————————————————————————————————————————————————————————————————————————————————————————————————————————
+
+// Plot Swing Points
+plotshape(i_show_swing_points ? pivot_high_price : na, "Swing High", shape.triangledown, location.abovebar, color.red, size=size.tiny)
+plotshape(i_show_swing_points ? pivot_low_price : na, "Swing Low", shape.triangleup, location.belowbar, color.green, size=size.tiny)
+
+// Plot Structure Breaks
+if i_show_bos and is_bos
+    label.new(time, high, "BOS", color=color.new(color.white, 100), textcolor=color.black, style=label.style_label_down)
+if i_show_choch and is_choch
+    label.new(time, high, "CHoCH", color=color.new(color.yellow, 100), textcolor=color.black, style=label.style_label_down)
+
+// Extend unmitigated boxes
+if barstate.islast
+    if i_ob_extend_boxes
+        for i = 0 to math.max(0, array.size(bull_ob_boxes) - 1)
+            ob = array.get(bull_ob_boxes, i)
+            if not ob.mitigated
+                box.set_right(ob.b, time + 86400000 * 10)
+        for i = 0 to math.max(0, array.size(bear_ob_boxes) - 1)
+            ob = array.get(bear_ob_boxes, i)
+            if not ob.mitigated
+                box.set_right(ob.b, time + 86400000 * 10)
+    if i_fvg_extend_boxes
+        for i = 0 to math.max(0, array.size(bull_fvg_boxes) - 1)
+            fvg = array.get(bull_fvg_boxes, i)
+            if not fvg.filled
+                box.set_right(fvg.b, time + 86400000 * 10)
+        for i = 0 to math.max(0, array.size(bear_fvg_boxes) - 1)
+            fvg = array.get(bear_fvg_boxes, i)
+            if not fvg.filled
+                box.set_right(fvg.b, time + 86400000 * 10)
+
+// —————————————————————————————————————————————————————————————————————————————————————————————————————————————
+// [4] ALERTS
+// —————————————————————————————————————————————————————————————————————————————————————————————————————————————
+alertcondition(is_bos, "Break of Structure (BOS)", "BOS detected on {{ticker}}.")
+alertcondition(is_choch, "Change of Character (CHoCH)", "CHoCH detected on {{ticker}}.")
+alertcondition(i_ob_enabled and is_bull_momentum and not is_bull_momentum[1] and close[1] < open[1], "Bullish Order Block Formed", "New Bullish OB formed on {{ticker}}.")
+alertcondition(i_ob_enabled and is_bear_momentum and not is_bear_momentum[1] and close[1] > open[1], "Bearish Order Block Formed", "New Bearish OB formed on {{ticker}}.")
+alertcondition(i_fvg_enabled and high[2] < low, "Bullish FVG Formed", "New Bullish FVG (Imbalance) formed on {{ticker}}.")
+alertcondition(i_fvg_enabled and low[2] > high, "Bearish FVG Formed", "New Bearish FVG (Imbalance) formed on {{ticker}}.")
+alertcondition(ta.cross(close, daily_high), "Price crossed Previous Day High", "Price crossed PDH on {{ticker}}.")
+alertcondition(ta.cross(close, daily_low), "Price crossed Previous Day Low", "Price crossed PDL on {{ticker}}.")

@@ -1,0 +1,8 @@
+//@version=5
+indicator("Stoch")
+k = ta.stoch(close, high, low, 3)
+flat = ta.stoch(close, 1 + close * 0, 1 + close * 0, 2)
+invalid = ta.stoch(close, high, low, 0)
+plot(k)
+plot(na(flat) ? 1 : 0)
+plot(na(invalid) ? 1 : 0)

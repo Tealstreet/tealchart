@@ -1,0 +1,6 @@
+//@version=6
+indicator("Unsupported for-in ta.pivot_point_levels result negative history")
+values = ta.pivot_point_levels(type = "Unknown", anchor = bar_index == 2)
+length = for value in values
+    -1
+plot(close[length])
