@@ -1,7 +1,9 @@
-import type { SkPath } from '@shopify/react-native-skia';
+import type { SkPath, SkPicture } from '@shopify/react-native-skia';
 import type { PlotLineStyle, PlotOutput, PlotStyle } from '@tealstreet/tealscript';
 import type { SharedValue } from 'react-native-reanimated';
+import type { Bar } from '../../types';
 import type { NativeChartFrame, NativePaneFrame } from './nativeChartFrame';
+import type { NativeFillPaint } from './nativeFillPaints';
 import type { NativePaneRangeOverrides } from './nativePaneRangeOverride';
 import type { NativePrimitiveClip } from './nativePrimitiveClip';
 import type { NativeChartProjection } from './nativeProjection';
@@ -10,11 +12,18 @@ import type { NativeVisibleBar } from './nativeVisibleBars';
 
 import { memo, useMemo } from 'react';
 
-import { DashPathEffect, Group, Rect, Skia, Path as SkiaPath } from '@shopify/react-native-skia';
+import { DashPathEffect, Group, LinearGradient, Picture, Skia, Path as SkiaPath } from '@shopify/react-native-skia';
 import { useDerivedValue } from 'react-native-reanimated';
 
+import { appendPlotFillQuad, getPlotFillSample, plotFillGradientKey } from '../../rendering/plotFillGeometry';
+import { appendPlotAreaBaseline } from '../../rendering/plotGeometry';
+import { plotArrowHeight, plotMarkerSize, plotMarkerTextLineOffset } from '../../rendering/plotMarkerGeometry';
+import { getNativeFillPaints } from './nativeFillPaints';
+import { getNativeFillTargetBars } from './nativeFillTargetBars';
+import { getNativeOffsetPlotBars } from './nativeOffsetPlotBars';
+import { appendNativePlotMarker } from './nativePlotMarkerGeometry';
 import { sharedTimeToNativeX } from './nativeSharedViewport';
-import { NativeAnimatedSkiaText } from './nativeSkiaText';
+import { createNativeSkiaFont, NativeAnimatedSkiaText } from './nativeSkiaText';
 
 export interface NativeIndicatorPlotPoint {
   interval: number;
@@ -38,6 +47,7 @@ interface NativeIndicatorMarkerPoint {
 
 export interface NativeIndicatorPaneInfo {
   overlay: boolean;
+  explicitPlotZOrder?: boolean;
   paneId?: string;
   format?: string;
   precision?: number;
@@ -53,6 +63,7 @@ function shouldRenderNativeIndicatorPlotBar(
   totalBarCount: number,
   sourceIndex: number,
 ): boolean {
+  'worklet';
   if (plot.showLast === undefined) return true;
   if (plot.showLast <= 0) return false;
   return sourceIndex >= Math.max(0, totalBarCount - plot.showLast);
@@ -113,12 +124,7 @@ function getNativeIndicatorColorSet(color: string | (string | null)[] | undefine
 
 function nativeIndicatorMarkerSize(size: PlotOutput['size']): number {
   'worklet';
-  if (size === 'tiny') return 4;
-  if (size === 'normal') return 8;
-  if (size === 'large') return 12;
-  if (size === 'huge') return 16;
-  if (size === 'auto') return 8;
-  return 6;
+  return plotMarkerSize(size);
 }
 
 function nativeIndicatorAreaFillColor(color: string): string {
@@ -141,20 +147,12 @@ function getNativeIndicatorOptionalColorSet(
 }
 
 function getNativeIndicatorPlotArrowColors(color: PlotOutput['color']): string[] {
-  if (Array.isArray(color)) {
-    const colors = new Set<string>();
-    for (const value of color) {
-      if (value) colors.add(value);
-    }
-    return colors.size > 0 ? Array.from(colors) : ['#4CAF50', '#F23645'];
-  }
-  return color ? [color] : ['#4CAF50', '#F23645'];
+  return getNativeIndicatorColorSet(color, '#2196F3');
 }
 
-function getNativeIndicatorPlotArrowColorAt(plot: PlotOutput, sourceIndex: number, value: number): string | null {
+function getNativeIndicatorPlotArrowColorAt(plot: PlotOutput, sourceIndex: number): string | null {
   'worklet';
-  if (Array.isArray(plot.color)) return plot.color[sourceIndex] || (value > 0 ? '#4CAF50' : '#F23645');
-  return plot.color || (value > 0 ? '#4CAF50' : '#F23645');
+  return getNativeIndicatorColorAt(plot.color, sourceIndex);
 }
 
 function isNativeFinitePlotValue(value: number | null | undefined): value is number {
@@ -400,8 +398,7 @@ function getNativeIndicatorHistogramPath({
     if (point.color === null || (colorFilter !== undefined && point.color !== colorFilter)) continue;
 
     const slotWidth = timeRange > 0 ? (point.interval * frame.contentWidth) / timeRange : 0;
-    const barWidth =
-      style === 'columns' ? Math.max(1, slotWidth * 0.6) : Math.max(1, Math.min(slotWidth, linewidth * 3));
+    const barWidth = style === 'columns' ? Math.max(1, slotWidth * 0.6) : Math.max(1, linewidth);
     const x = nativeIndicatorPointX({ frame, point, projection, sharedViewport });
     const y = projection
       ? nativeIndicatorYToPathValue({ frame, pane, projection, value: point.value })
@@ -465,17 +462,29 @@ function getNativeIndicatorAreaFillPath({
   for (let index = 0; index < points.length; index += 1) {
     const point = points[index];
     if (point.time < startTime || point.time > endTime) {
+      if (started) {
+        appendPlotAreaBaseline(path, firstX, lastX, baselineY);
+        path.close();
+      }
       started = false;
       previous = null;
       continue;
     }
     if (point.color === null) {
+      if (started) {
+        appendPlotAreaBaseline(path, firstX, lastX, baselineY);
+        path.close();
+      }
       started = false;
       previous = null;
       continue;
     }
     if (typeof point.value !== 'number' || !Number.isFinite(point.value)) {
       if (breaksOnNa) {
+        if (started) {
+          appendPlotAreaBaseline(path, firstX, lastX, baselineY);
+          path.close();
+        }
         started = false;
         previous = null;
       }
@@ -517,8 +526,7 @@ function getNativeIndicatorAreaFillPath({
   }
 
   if (started) {
-    path.lineTo(lastX, baselineY);
-    path.lineTo(firstX, baselineY);
+    appendPlotAreaBaseline(path, firstX, lastX, baselineY);
     path.close();
   }
 
@@ -543,89 +551,19 @@ function appendNativeIndicatorArrowPath(
   direction: 'up' | 'down',
 ): void {
   'worklet';
-  const height = Math.max(1, size);
-  const headHalfWidth = Math.max(2, height * 0.28);
-  const stemHalfWidth = Math.max(1, height * 0.09);
-  const tipY = direction === 'up' ? y - height / 2 : y + height / 2;
-  const tailY = direction === 'up' ? y + height / 2 : y - height / 2;
-  const headBaseY = direction === 'up' ? y - height / 8 : y + height / 8;
-
-  path.moveTo(x, tipY);
-  path.lineTo(x + headHalfWidth, headBaseY);
-  path.lineTo(x + stemHalfWidth, headBaseY);
-  path.lineTo(x + stemHalfWidth, tailY);
-  path.lineTo(x - stemHalfWidth, tailY);
-  path.lineTo(x - stemHalfWidth, headBaseY);
-  path.lineTo(x - headHalfWidth, headBaseY);
-  path.close();
+  appendNativePlotMarker(path, x, y, direction === 'up' ? 'arrowup' : 'arrowdown', size);
 }
 
-function appendNativeIndicatorShapePath(path: SkPath, x: number, y: number, shape: string, size: number): void {
+function appendNativeIndicatorShapePath(
+  path: SkPath,
+  x: number,
+  y: number,
+  shape: string,
+  size: number,
+  part: 'fill' | 'stroke' = 'fill',
+): void {
   'worklet';
-  const half = size / 2;
-
-  if (shape === 'square') {
-    path.addRect(Skia.XYWHRect(x - half, y - half, size, size));
-    return;
-  }
-  if (shape === 'diamond') {
-    path.moveTo(x, y - half);
-    path.lineTo(x + half, y);
-    path.lineTo(x, y + half);
-    path.lineTo(x - half, y);
-    path.close();
-    return;
-  }
-  if (shape === 'triangleup' || shape === 'arrowup') {
-    path.moveTo(x, y - half);
-    path.lineTo(x + half, y + half);
-    path.lineTo(x - half, y + half);
-    path.close();
-    return;
-  }
-  if (shape === 'triangledown' || shape === 'arrowdown') {
-    path.moveTo(x, y + half);
-    path.lineTo(x + half, y - half);
-    path.lineTo(x - half, y - half);
-    path.close();
-    return;
-  }
-  if (shape === 'cross') {
-    path.moveTo(x - half, y);
-    path.lineTo(x + half, y);
-    path.moveTo(x, y - half);
-    path.lineTo(x, y + half);
-    return;
-  }
-  if (shape === 'xcross') {
-    path.moveTo(x - half, y - half);
-    path.lineTo(x + half, y + half);
-    path.moveTo(x + half, y - half);
-    path.lineTo(x - half, y + half);
-    return;
-  }
-  if (shape === 'flag') {
-    path.moveTo(x - size / 3, y + half);
-    path.lineTo(x - size / 3, y - half);
-    path.addRect(Skia.XYWHRect(x - size / 3, y - half, size * 0.8, size * 0.45));
-    return;
-  }
-  if (shape === 'labelup' || shape === 'labeldown') {
-    path.addRect(Skia.XYWHRect(x - size * 0.7, y - size * 0.45, size * 1.4, size * 0.9));
-    if (shape === 'labelup') {
-      path.moveTo(x, y + size * 0.65);
-      path.lineTo(x - size * 0.25, y + size * 0.25);
-      path.lineTo(x + size * 0.25, y + size * 0.25);
-    } else {
-      path.moveTo(x, y - size * 0.65);
-      path.lineTo(x - size * 0.25, y - size * 0.25);
-      path.lineTo(x + size * 0.25, y - size * 0.25);
-    }
-    path.close();
-    return;
-  }
-
-  path.addCircle(x, y, half);
+  appendNativePlotMarker(path, x, y, shape, size, part);
 }
 
 function appendNativeIndicatorPointMarkerPath(
@@ -782,6 +720,7 @@ function nativeIndicatorMarkerY({
 
 function getNativeIndicatorMarkerShapePath({
   colorFilter,
+  part,
   frame,
   markerPoints,
   markerSize,
@@ -793,6 +732,7 @@ function getNativeIndicatorMarkerShapePath({
   visibleBars,
 }: {
   colorFilter: string;
+  part: 'fill' | 'stroke';
   frame: NativeChartFrame;
   markerPoints: readonly NativeIndicatorMarkerPoint[];
   markerSize: number;
@@ -828,25 +768,10 @@ function getNativeIndicatorMarkerShapePath({
       sharedViewport,
       value: point.value,
     });
-    appendNativeIndicatorShapePath(path, x, y, shape, markerSize);
+    appendNativeIndicatorShapePath(path, x, y, shape, markerSize, part);
   }
 
   return path;
-}
-
-function getNativeIndicatorPlotArrowSize(
-  plot: PlotOutput,
-  magnitude: number,
-  maxMagnitude: number,
-  fallbackSize: number,
-): number {
-  'worklet';
-  const minHeight = Number.isFinite(plot.minHeight) ? Math.max(1, plot.minHeight!) : fallbackSize;
-  const maxHeight = Number.isFinite(plot.maxHeight)
-    ? Math.max(minHeight, plot.maxHeight!)
-    : Math.max(minHeight, fallbackSize);
-  if (maxMagnitude <= 0 || maxHeight === minHeight) return minHeight;
-  return minHeight + (magnitude / maxMagnitude) * (maxHeight - minHeight);
 }
 
 function getNativeVisiblePlotArrowMaxMagnitude({
@@ -872,6 +797,7 @@ function getNativeVisiblePlotArrowMaxMagnitude({
     if (!shouldRenderNativeIndicatorPlotBar(plot, totalBarCount, bar.sourceIndex)) continue;
     const plotTime = bar.time + (plot.offset ?? 0) * bar.interval;
     if (plotTime < startTime || plotTime > endTime) continue;
+    if (getNativeIndicatorPlotArrowColorAt(plot, bar.sourceIndex) === null) continue;
     const value = plot.values[bar.sourceIndex];
     if (isNativeFinitePlotValue(value) && value !== 0) {
       maxMagnitude = Math.max(maxMagnitude, Math.abs(value));
@@ -950,12 +876,15 @@ function getNativeIndicatorOhlcPath({
     const openY = projection
       ? nativeIndicatorYToPathValue({ frame, pane, projection, value: open })
       : nativeSharedIndicatorYToPathValue({ frame, pane, paneRangeOverrides, sharedViewport, value: open });
+    // Preserve the geometry formerly supplied by the producer; the packet stays raw.
+    const drawHigh = Math.max(open, high, low, close);
+    const drawLow = Math.min(open, high, low, close);
     const highY = projection
-      ? nativeIndicatorYToPathValue({ frame, pane, projection, value: high })
-      : nativeSharedIndicatorYToPathValue({ frame, pane, paneRangeOverrides, sharedViewport, value: high });
+      ? nativeIndicatorYToPathValue({ frame, pane, projection, value: drawHigh })
+      : nativeSharedIndicatorYToPathValue({ frame, pane, paneRangeOverrides, sharedViewport, value: drawHigh });
     const lowY = projection
-      ? nativeIndicatorYToPathValue({ frame, pane, projection, value: low })
-      : nativeSharedIndicatorYToPathValue({ frame, pane, paneRangeOverrides, sharedViewport, value: low });
+      ? nativeIndicatorYToPathValue({ frame, pane, projection, value: drawLow })
+      : nativeSharedIndicatorYToPathValue({ frame, pane, paneRangeOverrides, sharedViewport, value: drawLow });
     const closeY = projection
       ? nativeIndicatorYToPathValue({ frame, pane, projection, value: close })
       : nativeSharedIndicatorYToPathValue({ frame, pane, paneRangeOverrides, sharedViewport, value: close });
@@ -1031,10 +960,10 @@ function getNativeIndicatorPlotArrowPath({
     const plotTime = bar.time + (plot.offset ?? 0) * bar.interval;
     if (plotTime < startTime || plotTime > endTime) continue;
 
-    const color = getNativeIndicatorPlotArrowColorAt(plot, bar.sourceIndex, value);
+    const color = getNativeIndicatorPlotArrowColorAt(plot, bar.sourceIndex);
     if (color !== colorFilter) continue;
 
-    const markerSize = getNativeIndicatorPlotArrowSize(plot, Math.abs(value), maxMagnitude, fallbackSize);
+    const markerSize = plotArrowHeight(plot, Math.abs(value), maxMagnitude, fallbackSize);
     const x = projection ? projection.timeToX(plotTime) : sharedTimeToNativeX(plotTime, sharedViewport, frame);
     const anchorValue = value > 0 ? bar.low : bar.high;
     const anchorY = projection
@@ -1047,18 +976,10 @@ function getNativeIndicatorPlotArrowPath({
   return path;
 }
 
-function getNativeIndicatorFillValue(plot: PlotOutput, sourceIndex: number): number | null {
-  'worklet';
-  if (plot.type === 'hline') {
-    return typeof plot.price === 'number' && Number.isFinite(plot.price) ? plot.price : null;
-  }
-  const value = plot.values[sourceIndex];
-  return typeof value === 'number' && Number.isFinite(value) ? value : null;
-}
-
 function getNativeIndicatorFillPath({
-  colorFilter,
+  paintKey,
   fill,
+  totalBarCount,
   frame,
   pane,
   paneRangeOverrides,
@@ -1068,7 +989,8 @@ function getNativeIndicatorFillPath({
   sharedViewport,
   visibleBars,
 }: {
-  colorFilter?: string;
+  paintKey: string;
+  totalBarCount: number;
   fill: PlotOutput;
   frame: NativeChartFrame;
   pane: NativePaneFrame;
@@ -1085,7 +1007,7 @@ function getNativeIndicatorFillPath({
 
   const startTime = projection?.viewport.startTime ?? sharedViewport?.startTime.value ?? 0;
   const endTime = projection?.viewport.endTime ?? sharedViewport?.endTime.value ?? 0;
-  const fillgaps = fill.fillgaps ?? true;
+  const fillgaps = fill.fillgaps ?? false;
   let previous: { x: number; y1: number; y2: number } | null = null;
 
   for (let index = 0; index < visibleBars.length; index += 1) {
@@ -1094,21 +1016,17 @@ function getNativeIndicatorFillPath({
       previous = null;
       continue;
     }
-    const value1 = getNativeIndicatorFillValue(plot1, bar.sourceIndex);
-    const value2 = getNativeIndicatorFillValue(plot2, bar.sourceIndex);
-    const color = getNativeIndicatorColorAt(fill.color, bar.sourceIndex, '#2196F333');
-    if (colorFilter !== undefined && color !== colorFilter) {
+    const sample = getPlotFillSample(fill, plot1, plot2, bar.sourceIndex, totalBarCount);
+    if (sample.kind === 'break') {
       previous = null;
       continue;
     }
-    if (color === null) {
-      previous = null;
-      continue;
-    }
-    if (value1 === null || value2 === null) {
+    if (sample.kind === 'gap') {
       if (!fillgaps) previous = null;
       continue;
     }
+    const { value1, value2 } = sample;
+    const key = sample.gradient ? plotFillGradientKey(sample.gradient) : `color|${sample.color}`;
     const current = {
       x: nativeIndicatorPointX({
         frame,
@@ -1135,58 +1053,14 @@ function getNativeIndicatorFillPath({
             value: value2,
           }),
     };
-    if (previous) {
-      path.moveTo(previous.x, previous.y1);
-      path.lineTo(current.x, current.y1);
-      path.lineTo(current.x, current.y2);
-      path.lineTo(previous.x, previous.y2);
+    if (previous && key === paintKey) {
+      appendPlotFillQuad(path, previous, current);
       path.close();
     }
     previous = current;
   }
 
   return path;
-}
-
-function getNativeFillColors(fill: PlotOutput): string[] {
-  if (!Array.isArray(fill.color)) return [getNativeIndicatorColor(fill.color)];
-  const colors = new Set<string>();
-  for (const color of fill.color) {
-    if (color) colors.add(color);
-  }
-  return Array.from(colors);
-}
-
-function getNativeIndicatorBgRects({
-  frame,
-  plot,
-  projection,
-  sharedViewport,
-  visibleBars,
-}: {
-  frame: NativeChartFrame;
-  plot: PlotOutput;
-  projection?: NativeChartProjection | null;
-  sharedViewport: NativeViewportSharedValues;
-  visibleBars: readonly NativeVisibleBar[];
-}): Array<{ color: string; height: number; width: number; x: number; y: number }> {
-  const pane = nativeIndicatorPlotPane(frame, plot, undefined);
-  const startTime = projection?.viewport.startTime ?? sharedViewport.startTime.value;
-  const endTime = projection?.viewport.endTime ?? sharedViewport.endTime.value;
-  const timeRange = Math.max(1, endTime - startTime);
-  const rects: Array<{ color: string; height: number; width: number; x: number; y: number }> = [];
-
-  for (const bar of visibleBars) {
-    const value = plot.values[bar.sourceIndex];
-    if (bar.time < startTime || bar.time > endTime || value === null || value === undefined) continue;
-    const color = getNativeIndicatorColorAt(plot.color, bar.sourceIndex, 'rgba(33, 150, 243, 0.2)');
-    if (!color) continue;
-    const x = projection ? projection.timeToX(bar.time) : sharedTimeToNativeX(bar.time, sharedViewport, frame);
-    const width = Math.max(1, (bar.interval * frame.contentWidth) / timeRange);
-    rects.push({ color, height: pane.height, width, x: x - width / 2, y: pane.top });
-  }
-
-  return rects;
 }
 
 export function getNativeIndicatorPlotPoints({
@@ -1243,9 +1117,7 @@ function getNativeIndicatorColoredPlotPoints({
 }
 
 function getNativeIndicatorMarkerTextColor(plot: PlotOutput, sourceIndex: number): string {
-  const fallback = Array.isArray(plot.textColor)
-    ? (plot.textColor.find((value): value is string => Boolean(value)) ?? '#FFFFFF')
-    : plot.textColor || '#FFFFFF';
+  const fallback = Array.isArray(plot.textColor) ? plot.textColor[0] || '#FFFFFF' : plot.textColor || '#FFFFFF';
   if (Array.isArray(plot.textColor)) return plot.textColor[sourceIndex] || fallback;
   return fallback;
 }
@@ -1341,7 +1213,7 @@ function NativeLiveIndicatorPlotPath({
           paneRangeOverrides: overrides,
           points,
           sharedViewport,
-          style,
+          style: isPointMarker ? 'linebr' : style,
         });
   });
   const areaPath = useDerivedValue(() =>
@@ -1383,7 +1255,7 @@ function NativeLiveIndicatorPlotPath({
   if (isHistogram) {
     return (
       <Group clip={clip} opacity={opacity}>
-        <SkiaPath path={linePath} color={color} opacity={0.75} />
+        <SkiaPath path={linePath} color={color} />
       </Group>
     );
   }
@@ -1398,7 +1270,7 @@ function NativeLiveIndicatorPlotPath({
           strokeWidth={strokeWidth}
         />
         {join && (
-          <SkiaPath path={linePath} color={color} style="stroke" strokeWidth={strokeWidth}>
+          <SkiaPath path={linePath} color={color} style="stroke" strokeWidth={1} strokeCap="round" strokeJoin="round">
             {dash && <DashPathEffect intervals={dash} />}
           </SkiaPath>
         )}
@@ -1409,7 +1281,14 @@ function NativeLiveIndicatorPlotPath({
   return (
     <Group clip={clip} opacity={opacity}>
       {isArea && <SkiaPath path={areaPath} color={nativeIndicatorAreaFillColor(color)} />}
-      <SkiaPath path={linePath} color={color} style="stroke" strokeWidth={strokeWidth}>
+      <SkiaPath
+        path={linePath}
+        color={color}
+        style="stroke"
+        strokeWidth={strokeWidth}
+        strokeCap="round"
+        strokeJoin="round"
+      >
         {dash && <DashPathEffect intervals={dash} />}
       </SkiaPath>
       {style === 'stepline_diamond' && <SkiaPath path={diamondPath} color={color} />}
@@ -1465,8 +1344,15 @@ function NativeProjectedIndicatorPlotPath({
             projection,
             style,
           })
-        : getNativeIndicatorLinePath({ colorFilter, frame, pane, points, projection, style }),
-    [colorFilter, frame, histbase, isHistogram, pane, points, projection, strokeWidth, style],
+        : getNativeIndicatorLinePath({
+            colorFilter,
+            frame,
+            pane,
+            points,
+            projection,
+            style: isPointMarker ? 'linebr' : style,
+          }),
+    [colorFilter, frame, histbase, isHistogram, isPointMarker, pane, points, projection, strokeWidth, style],
   );
   const areaPath = useMemo(
     () =>
@@ -1510,7 +1396,7 @@ function NativeProjectedIndicatorPlotPath({
   if (isHistogram) {
     return (
       <Group clip={clip} opacity={opacity}>
-        <SkiaPath path={linePath} color={color} opacity={0.75} />
+        <SkiaPath path={linePath} color={color} />
       </Group>
     );
   }
@@ -1525,7 +1411,7 @@ function NativeProjectedIndicatorPlotPath({
           strokeWidth={strokeWidth}
         />
         {join && (
-          <SkiaPath path={linePath} color={color} style="stroke" strokeWidth={strokeWidth}>
+          <SkiaPath path={linePath} color={color} style="stroke" strokeWidth={1} strokeCap="round" strokeJoin="round">
             {dash && <DashPathEffect intervals={dash} />}
           </SkiaPath>
         )}
@@ -1536,7 +1422,14 @@ function NativeProjectedIndicatorPlotPath({
   return (
     <Group clip={clip} opacity={opacity}>
       {isArea && <SkiaPath path={areaPath} color={nativeIndicatorAreaFillColor(color)} />}
-      <SkiaPath path={linePath} color={color} style="stroke" strokeWidth={strokeWidth}>
+      <SkiaPath
+        path={linePath}
+        color={color}
+        style="stroke"
+        strokeWidth={strokeWidth}
+        strokeCap="round"
+        strokeJoin="round"
+      >
         {dash && <DashPathEffect intervals={dash} />}
       </SkiaPath>
       {style === 'stepline_diamond' && <SkiaPath path={diamondPath} color={color} />}
@@ -1546,6 +1439,7 @@ function NativeProjectedIndicatorPlotPath({
 
 function NativeIndicatorMarkerText({
   bar,
+  baseline,
   frame,
   location,
   markerSize,
@@ -1559,6 +1453,7 @@ function NativeIndicatorMarkerText({
   textFont,
   yOffset,
 }: {
+  baseline: 'top' | 'middle' | 'bottom';
   bar: NativeVisibleBar;
   frame: NativeChartFrame;
   location: PlotOutput['location'];
@@ -1573,7 +1468,15 @@ function NativeIndicatorMarkerText({
   textFont: ReturnType<typeof Skia.Font>;
   yOffset: number;
 }) {
-  const staticX = projection ? projection.timeToX(point.time) : undefined;
+  const textWidth = textFont.measureText(text).width;
+  const metrics = textFont.getMetrics();
+  const baselineOffset =
+    baseline === 'top'
+      ? -metrics.ascent
+      : baseline === 'bottom'
+        ? -metrics.descent
+        : (-metrics.ascent - metrics.descent) / 2;
+  const staticX = projection ? projection.timeToX(point.time) - textWidth / 2 : undefined;
   const staticY = projection
     ? nativeIndicatorMarkerY({
         bar,
@@ -1584,9 +1487,11 @@ function NativeIndicatorMarkerText({
         projection,
         sharedViewport,
         value: point.value,
-      }) + yOffset
+      }) +
+      yOffset +
+      baselineOffset
     : undefined;
-  const liveX = useDerivedValue(() => sharedTimeToNativeX(point.time, sharedViewport, frame));
+  const liveX = useDerivedValue(() => sharedTimeToNativeX(point.time, sharedViewport, frame) - textWidth / 2);
   const liveY = useDerivedValue(
     () =>
       nativeIndicatorMarkerY({
@@ -1599,23 +1504,38 @@ function NativeIndicatorMarkerText({
         projection,
         sharedViewport,
         value: point.value,
-      }) + yOffset,
+      }) +
+      yOffset +
+      baselineOffset,
   );
 
+  const opacity = useDerivedValue(() =>
+    point.time >= sharedViewport.startTime.value && point.time <= sharedViewport.endTime.value && pane.height > 0
+      ? 1
+      : 0,
+  );
+  if (
+    projection &&
+    (point.time < projection.viewport.startTime || point.time > projection.viewport.endTime || pane.height <= 0)
+  )
+    return null;
   return (
-    <NativeAnimatedSkiaText
-      x={projection ? staticX! : liveX}
-      y={projection ? staticY! : liveY}
-      text={text}
-      color={textColor}
-      font={textFont}
-    />
+    <Group opacity={projection ? 1 : opacity}>
+      <NativeAnimatedSkiaText
+        x={projection ? staticX! : liveX}
+        y={projection ? staticY! : liveY}
+        text={text}
+        color={textColor}
+        font={textFont}
+      />
+    </Group>
   );
 }
 
 function NativeIndicatorShapeMarkerPath({
   clip,
   color,
+  part,
   frame,
   markerPoints,
   markerSize,
@@ -1628,6 +1548,7 @@ function NativeIndicatorShapeMarkerPath({
 }: {
   clip: NativePrimitiveClip | SharedValue<NativePrimitiveClip>;
   color: string;
+  part: 'fill' | 'stroke';
   frame: NativeChartFrame;
   markerPoints: readonly NativeIndicatorMarkerPoint[];
   markerSize: number;
@@ -1641,6 +1562,7 @@ function NativeIndicatorShapeMarkerPath({
   const staticPath = useMemo(
     () =>
       getNativeIndicatorMarkerShapePath({
+        part,
         colorFilter: color,
         frame,
         markerPoints,
@@ -1651,10 +1573,11 @@ function NativeIndicatorShapeMarkerPath({
         sharedViewport,
         visibleBars,
       }),
-    [color, frame, markerPoints, markerSize, pane, plot, projection, sharedViewport, visibleBars],
+    [color, part, frame, markerPoints, markerSize, pane, plot, projection, sharedViewport, visibleBars],
   );
   const livePath = useDerivedValue(() =>
     getNativeIndicatorMarkerShapePath({
+      part,
       colorFilter: color,
       frame,
       markerPoints,
@@ -1670,7 +1593,12 @@ function NativeIndicatorShapeMarkerPath({
 
   return (
     <Group clip={clip}>
-      <SkiaPath path={projection ? staticPath : livePath} color={color} style="fill" />
+      <SkiaPath
+        path={projection ? staticPath : livePath}
+        color={color}
+        style={part}
+        strokeWidth={plot.shape === 'flag' ? Math.max(1, markerSize / 8) : 2}
+      />
     </Group>
   );
 }
@@ -1682,7 +1610,6 @@ function NativeIndicatorShapeMarker({
   plot,
   projection,
   sharedViewport,
-  textFont,
   totalBarCount,
   visibleBars,
 }: {
@@ -1692,7 +1619,6 @@ function NativeIndicatorShapeMarker({
   plot: PlotOutput;
   projection?: NativeChartProjection | null;
   sharedViewport: NativeViewportSharedValues;
-  textFont: ReturnType<typeof Skia.Font>;
   totalBarCount: number;
   visibleBars: readonly NativeVisibleBar[];
 }) {
@@ -1701,6 +1627,8 @@ function NativeIndicatorShapeMarker({
   const colors = useMemo(() => getNativeIndicatorColorSet(plot.color, fallbackColor), [fallbackColor, plot.color]);
   const markerSize = nativeIndicatorMarkerSize(plot.size);
   const location = plot.location ?? 'abovebar';
+  const charFont = useMemo(() => createNativeSkiaFont(Math.max(10, markerSize * 2)), [markerSize]);
+  const markerTextFont = useMemo(() => createNativeSkiaFont(Math.max(10, markerSize * 1.5)), [markerSize]);
   const markerPoints = useMemo(
     () => getNativeIndicatorMarkerPoints({ fallbackColor, plot, totalBarCount, visibleBars }),
     [fallbackColor, plot, totalBarCount, visibleBars],
@@ -1715,34 +1643,44 @@ function NativeIndicatorShapeMarker({
   }));
 
   return (
-    <Group opacity={opacity}>
+    <Group opacity={opacity} clip={projection ? staticClip : clip}>
       {plot.type === 'plotshape' &&
-        colors.map((color) => (
-          <NativeIndicatorShapeMarkerPath
-            key={color}
-            clip={projection ? staticClip : clip}
-            color={color}
-            frame={frame}
-            markerPoints={markerPoints}
-            markerSize={markerSize}
-            pane={pane}
-            paneRangeOverrides={paneRangeOverrides}
-            plot={plot}
-            projection={projection}
-            sharedViewport={sharedViewport}
-            visibleBars={visibleBars}
-          />
-        ))}
+        colors.flatMap((color) => {
+          const parts: ('fill' | 'stroke')[] =
+            plot.shape === 'flag'
+              ? ['fill', 'stroke']
+              : plot.shape === 'cross' || plot.shape === 'xcross'
+                ? ['stroke']
+                : ['fill'];
+          return parts.map((part) => (
+            <NativeIndicatorShapeMarkerPath
+              key={`${color}-${part}`}
+              part={part}
+              clip={projection ? staticClip : clip}
+              color={color}
+              frame={frame}
+              markerPoints={markerPoints}
+              markerSize={markerSize}
+              pane={pane}
+              paneRangeOverrides={paneRangeOverrides}
+              plot={plot}
+              projection={projection}
+              sharedViewport={sharedViewport}
+              visibleBars={visibleBars}
+            />
+          ));
+        })}
       {markerPoints.map((point) => {
         const bar = visibleBars.find((candidate) => candidate.sourceIndex === point.sourceIndex);
         if (!bar) return null;
-        const charText = plot.type === 'plotchar' && point.color !== null ? plot.char || '\u25CF' : undefined;
+        const charText = plot.type === 'plotchar' && point.color !== null ? (plot.char ?? '\u25CF') : undefined;
         const markerTexts = point.markerText ? point.markerText.split(/\r?\n/) : [];
         const textOffset = location === 'belowbar' ? markerSize : location === 'bottom' ? -markerSize : -markerSize;
         return (
           <Group key={`${plot.id}-${point.sourceIndex}-text`}>
             {charText ? (
               <NativeIndicatorMarkerText
+                baseline="middle"
                 bar={bar}
                 frame={frame}
                 location={location}
@@ -1754,13 +1692,14 @@ function NativeIndicatorShapeMarker({
                 sharedViewport={sharedViewport}
                 text={charText}
                 textColor={point.color ?? fallbackColor}
-                textFont={textFont}
+                textFont={charFont}
                 yOffset={0}
               />
             ) : null}
             {markerTexts.map((line, lineIndex) => (
               <NativeIndicatorMarkerText
                 key={`${plot.id}-${point.sourceIndex}-label-${lineIndex}`}
+                baseline={location === 'belowbar' ? 'top' : 'bottom'}
                 bar={bar}
                 frame={frame}
                 location={location}
@@ -1772,8 +1711,8 @@ function NativeIndicatorShapeMarker({
                 sharedViewport={sharedViewport}
                 text={line}
                 textColor={point.textColor}
-                textFont={textFont}
-                yOffset={textOffset + lineIndex * Math.max(10, markerSize * 1.5)}
+                textFont={markerTextFont}
+                yOffset={textOffset + plotMarkerTextLineOffset(location, markerSize, lineIndex, markerTexts.length)}
               />
             ))}
           </Group>
@@ -1800,25 +1739,47 @@ function NativeIndicatorHlinePath({
 }) {
   const pane = nativeIndicatorPlotPane(frame, plot, indicatorPaneInfo);
   const price = typeof plot.price === 'number' && Number.isFinite(plot.price) ? plot.price : null;
-  const color = getNativeIndicatorColor(plot.color);
-  const strokeWidth = plot.linewidth ?? 1;
-  const dash = nativeIndicatorLineDash(plot.lineStyle);
-  const opacity = isNativeIndicatorPlotVisible(plot) && price !== null ? 1 : 0;
-  const path = useDerivedValue(() => {
+  const color = getNativeIndicatorColorAt(plot.color, 0, '#787B86');
+  const strokeWidth = plot.linewidth || 1;
+  const dash = nativeIndicatorLineDash(plot.lineStyle ?? 'dashed');
+  const opacity = isNativeIndicatorPlotVisible(plot) && price !== null && color !== null ? 1 : 0;
+  const clip = useDerivedValue(() => ({
+    x: frame.contentLeft,
+    y: pane.top,
+    width: frame.priceAxisLeft - frame.contentLeft,
+    height: pane.height,
+  }));
+  const buildPath = () => {
+    'worklet';
     const built = Skia.Path.Make();
-    if (price === null || pane.height <= 0) return built;
+    if (price === null || color === null || pane.height <= 0) return built;
     const overrides = paneRangeOverrides?.value;
     const y = projection
       ? nativeIndicatorYToPathValue({ frame, pane, projection, value: price })
       : nativeSharedIndicatorYToPathValue({ frame, pane, paneRangeOverrides: overrides, sharedViewport, value: price });
+    if (y < pane.top || y > pane.bottom) return built;
     built.moveTo(frame.contentLeft, y);
     built.lineTo(frame.priceAxisLeft, y);
     return built;
-  });
+  };
+  const livePath = useDerivedValue(() => buildPath());
+  const staticPath = useMemo(() => (projection ? buildPath() : null), [projection, frame, pane, price]);
 
   return (
-    <Group opacity={opacity}>
-      <SkiaPath path={path} color={color} style="stroke" strokeWidth={strokeWidth}>
+    <Group
+      opacity={opacity}
+      clip={
+        projection
+          ? { x: frame.contentLeft, y: pane.top, width: frame.priceAxisLeft - frame.contentLeft, height: pane.height }
+          : clip
+      }
+    >
+      <SkiaPath
+        path={projection ? staticPath! : livePath}
+        color={color ?? '#787B86'}
+        style="stroke"
+        strokeWidth={strokeWidth}
+      >
         {dash && <DashPathEffect intervals={dash} />}
       </SkiaPath>
     </Group>
@@ -1826,6 +1787,7 @@ function NativeIndicatorHlinePath({
 }
 
 function NativeIndicatorFillPath({
+  bars,
   fill,
   frame,
   indicatorPaneInfo,
@@ -1833,8 +1795,10 @@ function NativeIndicatorFillPath({
   plots,
   projection,
   sharedViewport,
+  totalBarCount,
   visibleBars,
 }: {
+  bars?: readonly Bar[];
   fill: PlotOutput;
   frame: NativeChartFrame;
   indicatorPaneInfo?: NativeIndicatorPaneInfo;
@@ -1842,19 +1806,49 @@ function NativeIndicatorFillPath({
   plots: readonly PlotOutput[];
   projection?: NativeChartProjection | null;
   sharedViewport: NativeViewportSharedValues;
+  totalBarCount: number;
   visibleBars: readonly NativeVisibleBar[];
 }) {
-  const plot1 = plots.find((plot) => plot.id === fill.plot1Id);
-  const plot2 = plots.find((plot) => plot.id === fill.plot2Id);
-  const pane = nativeIndicatorPlotPane(frame, plot1 ?? fill, indicatorPaneInfo);
-  const colors = useMemo(() => getNativeFillColors(fill), [fill]);
-
+  const plot1 = plots.find((plot) => plot.scriptId === fill.scriptId && plot.id === fill.plot1Id);
+  const plot2 = plots.find((plot) => plot.scriptId === fill.scriptId && plot.id === fill.plot2Id);
+  const pane = nativeIndicatorPlotPane(frame, fill, indicatorPaneInfo);
+  const targetBars = useMemo(
+    () =>
+      plot1 && plot2
+        ? getNativeFillTargetBars(
+            bars,
+            visibleBars,
+            plot1,
+            plot2,
+            projection?.viewport.startTime ?? sharedViewport.startTime.value,
+            projection?.viewport.endTime ?? sharedViewport.endTime.value,
+          )
+        : [],
+    [bars, visibleBars, plot1, plot2, projection, sharedViewport],
+  );
+  const paints = useMemo(
+    () => (plot1 && plot2 ? getNativeFillPaints(fill, plot1, plot2, targetBars, totalBarCount) : []),
+    [fill, plot1, plot2, targetBars, totalBarCount],
+  );
+  const staticClip = {
+    x: frame.contentLeft,
+    y: pane.top,
+    width: frame.priceAxisLeft - frame.contentLeft,
+    height: pane.height,
+  };
+  const liveClip = useDerivedValue(() => ({
+    x: frame.contentLeft,
+    y: pane.top,
+    width: frame.priceAxisLeft - frame.contentLeft,
+    height: pane.height,
+  }));
+  if (!plot1 || !plot2) return null;
   return (
-    <Group opacity={isNativeIndicatorPlotVisible(fill) ? 1 : 0}>
-      {colors.map((color) => (
+    <Group clip={projection ? staticClip : liveClip} opacity={isNativeIndicatorPlotVisible(fill) ? 1 : 0}>
+      {paints.map((paint) => (
         <NativeIndicatorFillColorPath
-          key={color}
-          color={color}
+          key={paint.key}
+          paint={paint}
           fill={fill}
           frame={frame}
           pane={pane}
@@ -1863,7 +1857,8 @@ function NativeIndicatorFillPath({
           plot2={plot2}
           projection={projection}
           sharedViewport={sharedViewport}
-          visibleBars={visibleBars}
+          totalBarCount={totalBarCount}
+          visibleBars={targetBars}
         />
       ))}
     </Group>
@@ -1871,7 +1866,7 @@ function NativeIndicatorFillPath({
 }
 
 function NativeIndicatorFillColorPath({
-  color,
+  paint,
   fill,
   frame,
   pane,
@@ -1880,70 +1875,216 @@ function NativeIndicatorFillColorPath({
   plot2,
   projection,
   sharedViewport,
+  totalBarCount,
   visibleBars,
 }: {
-  color: string;
+  paint: NativeFillPaint;
   fill: PlotOutput;
   frame: NativeChartFrame;
   pane: NativePaneFrame;
   paneRangeOverrides?: SharedValue<NativePaneRangeOverrides>;
-  plot1?: PlotOutput;
-  plot2?: PlotOutput;
+  plot1: PlotOutput;
+  plot2: PlotOutput;
   projection?: NativeChartProjection | null;
   sharedViewport: NativeViewportSharedValues;
+  totalBarCount: number;
   visibleBars: readonly NativeVisibleBar[];
 }) {
-  const path = useDerivedValue(() => {
-    if (!plot1 || !plot2) return Skia.Path.Make();
-    const overrides = paneRangeOverrides?.value;
-    return getNativeIndicatorFillPath({
-      colorFilter: Array.isArray(fill.color) ? color : undefined,
+  const livePath = useDerivedValue(() =>
+    getNativeIndicatorFillPath({
+      paintKey: paint.key,
       fill,
       frame,
       pane,
-      paneRangeOverrides: overrides,
+      paneRangeOverrides: paneRangeOverrides?.value,
       plot1,
       plot2,
-      projection,
       sharedViewport,
+      totalBarCount,
       visibleBars,
-    });
-  });
+    }),
+  );
+  const staticPath = useMemo(
+    () =>
+      projection
+        ? getNativeIndicatorFillPath({
+            paintKey: paint.key,
+            fill,
+            frame,
+            pane,
+            plot1,
+            plot2,
+            projection,
+            totalBarCount,
+            visibleBars,
+          })
+        : null,
+    [paint.key, fill, frame, pane, plot1, plot2, projection, totalBarCount, visibleBars],
+  );
+  const topValue = paint.gradient?.topValue ?? 0;
+  const bottomValue = paint.gradient?.bottomValue ?? 0;
+  const liveStart = useDerivedValue(() => ({
+    x: 0,
+    y: nativeSharedIndicatorYToPathValue({
+      frame,
+      pane,
+      paneRangeOverrides: paneRangeOverrides?.value,
+      sharedViewport,
+      value: topValue,
+    }),
+  }));
+  const liveEnd = useDerivedValue(() => ({
+    x: 0,
+    y: nativeSharedIndicatorYToPathValue({
+      frame,
+      pane,
+      paneRangeOverrides: paneRangeOverrides?.value,
+      sharedViewport,
+      value: bottomValue,
+    }),
+  }));
+  return (
+    <SkiaPath
+      path={projection ? staticPath! : livePath}
+      color={paint.color ?? 'white'}
+      opacity={paint.gradient && topValue === bottomValue ? 0 : 1}
+    >
+      {paint.gradient && (
+        <LinearGradient
+          start={
+            projection
+              ? { x: 0, y: nativeIndicatorYToPathValue({ frame, pane, projection, value: topValue }) }
+              : liveStart
+          }
+          end={
+            projection
+              ? { x: 0, y: nativeIndicatorYToPathValue({ frame, pane, projection, value: bottomValue }) }
+              : liveEnd
+          }
+          colors={[paint.gradient.topColor, paint.gradient.bottomColor]}
+          positions={[0, 1]}
+        />
+      )}
+    </SkiaPath>
+  );
+}
 
-  return <SkiaPath path={path} color={color} />;
+interface NativeBackgroundStripe {
+  time: number;
+  interval: number;
+  color: string;
+}
+
+function getNativeBackgroundPicture(
+  stripes: readonly NativeBackgroundStripe[],
+  frame: NativeChartFrame,
+  pane: NativePaneFrame,
+  startTime: number,
+  endTime: number,
+): SkPicture {
+  'worklet';
+  const recorder = Skia.PictureRecorder();
+  const canvas = recorder.beginRecording(Skia.XYWHRect(frame.contentLeft, pane.top, frame.contentWidth, pane.height));
+  const paint = Skia.Paint();
+  paint.setAntiAlias(true);
+  const scale = frame.contentWidth / Math.max(1, endTime - startTime);
+  try {
+    for (const stripe of stripes) {
+      if (stripe.time < startTime || stripe.time > endTime) continue;
+      const width = Math.max(1, stripe.interval * scale);
+      const range = endTime - startTime;
+      const center = frame.contentLeft + (range === 0 ? 0.5 : (stripe.time - startTime) / range) * frame.contentWidth;
+      paint.setColor(Skia.Color(stripe.color));
+      canvas.drawRect(Skia.XYWHRect(center - width / 2, pane.top, width, pane.height), paint);
+    }
+    return recorder.finishRecordingAsPicture();
+  } finally {
+    recorder.dispose();
+  }
+}
+
+function NativeLiveBackgroundPicture({
+  stripes,
+  frame,
+  pane,
+  sharedViewport,
+}: {
+  stripes: readonly NativeBackgroundStripe[];
+  frame: NativeChartFrame;
+  pane: NativePaneFrame;
+  sharedViewport: NativeViewportSharedValues;
+}) {
+  const picture = useDerivedValue(() =>
+    getNativeBackgroundPicture(stripes, frame, pane, sharedViewport.startTime.value, sharedViewport.endTime.value),
+  );
+  return <Picture picture={picture} />;
+}
+
+function NativeProjectedBackgroundPicture({
+  stripes,
+  frame,
+  pane,
+  projection,
+}: {
+  stripes: readonly NativeBackgroundStripe[];
+  frame: NativeChartFrame;
+  pane: NativePaneFrame;
+  projection: NativeChartProjection;
+}) {
+  const picture = useMemo(
+    () => getNativeBackgroundPicture(stripes, frame, pane, projection.viewport.startTime, projection.viewport.endTime),
+    [stripes, frame, pane, projection],
+  );
+  return <Picture picture={picture} />;
 }
 
 function NativeIndicatorBgcolorRects({
   frame,
+  indicatorPaneInfo,
   plot,
   projection,
   sharedViewport,
+  totalBarCount,
   visibleBars,
 }: {
   frame: NativeChartFrame;
+  indicatorPaneInfo?: NativeIndicatorPaneInfo;
   plot: PlotOutput;
   projection?: NativeChartProjection | null;
   sharedViewport: NativeViewportSharedValues;
+  totalBarCount: number;
   visibleBars: readonly NativeVisibleBar[];
 }) {
-  const rects = useMemo(
-    () => getNativeIndicatorBgRects({ frame, plot, projection, sharedViewport, visibleBars }),
-    [frame, plot, projection, sharedViewport, visibleBars],
-  );
-
+  const pane = nativeIndicatorPlotPane(frame, plot, indicatorPaneInfo);
+  const stripes = useMemo(() => {
+    const result: NativeBackgroundStripe[] = [];
+    for (const bar of visibleBars) {
+      if (
+        !shouldRenderNativeIndicatorPlotBar(plot, totalBarCount, bar.sourceIndex) ||
+        plot.values[bar.sourceIndex] == null
+      )
+        continue;
+      const color = getNativeIndicatorColorAt(plot.color, bar.sourceIndex, 'rgba(33, 150, 243, 0.2)');
+      if (color) result.push({ time: bar.time, interval: bar.interval, color });
+    }
+    return result;
+  }, [plot, totalBarCount, visibleBars]);
+  const clip = useDerivedValue(() => ({
+    x: frame.contentLeft,
+    y: pane.top,
+    width: frame.priceAxisLeft - frame.contentLeft,
+    height: pane.height,
+  }));
   if (!isNativeIndicatorPlotVisible(plot)) return null;
   return (
-    <Group>
-      {rects.map((rect, index) => (
-        <Rect
-          key={`${plot.id}-${index}`}
-          x={rect.x}
-          y={rect.y}
-          width={rect.width}
-          height={rect.height}
-          color={rect.color}
-        />
-      ))}
+    <Group
+      clip={projection ? { x: frame.contentLeft, y: pane.top, width: frame.priceAxisLeft - frame.contentLeft, height: pane.height } : clip}
+    >
+      {projection ? (
+        <NativeProjectedBackgroundPicture stripes={stripes} frame={frame} pane={pane} projection={projection} />
+      ) : (
+        <NativeLiveBackgroundPicture stripes={stripes} frame={frame} pane={pane} sharedViewport={sharedViewport} />
+      )}
     </Group>
   );
 }
@@ -2103,13 +2244,15 @@ function NativeIndicatorPlotArrowPath({
   const pane = nativeIndicatorPlotPane(frame, plot, indicatorPaneInfo);
   const colors = useMemo(() => getNativeIndicatorPlotArrowColors(plot.color), [plot.color]);
   const opacity = isNativeIndicatorPlotVisible(plot) ? 1 : 0;
-  const maxMagnitude = getNativeVisiblePlotArrowMaxMagnitude({
-    plot,
-    projection,
-    sharedViewport,
-    totalBarCount,
-    visibleBars,
-  });
+  const maxMagnitude = useDerivedValue(() =>
+    getNativeVisiblePlotArrowMaxMagnitude({
+      plot,
+      projection,
+      sharedViewport,
+      totalBarCount,
+      visibleBars,
+    }),
+  );
   const staticClip = { x: frame.contentLeft, y: pane.top, width: frame.contentWidth, height: pane.height };
   const clip = useDerivedValue<NativePrimitiveClip>(() => ({
     x: frame.contentLeft,
@@ -2126,7 +2269,11 @@ function NativeIndicatorPlotArrowPath({
           clip={projection ? staticClip : clip}
           color={color}
           frame={frame}
-          maxMagnitude={maxMagnitude}
+          maxMagnitude={
+            projection
+              ? getNativeVisiblePlotArrowMaxMagnitude({ plot, projection, sharedViewport, totalBarCount, visibleBars })
+              : maxMagnitude
+          }
           pane={pane}
           paneRangeOverrides={paneRangeOverrides}
           plot={plot}
@@ -2156,7 +2303,7 @@ function NativeIndicatorPlotArrowColorPath({
   clip: NativePrimitiveClip | SharedValue<NativePrimitiveClip>;
   color: string;
   frame: NativeChartFrame;
-  maxMagnitude: number;
+  maxMagnitude: number | SharedValue<number>;
   pane: NativePaneFrame;
   paneRangeOverrides?: SharedValue<NativePaneRangeOverrides>;
   plot: PlotOutput;
@@ -2170,7 +2317,7 @@ function NativeIndicatorPlotArrowColorPath({
       getNativeIndicatorPlotArrowPath({
         colorFilter: color,
         frame,
-        maxMagnitude,
+        maxMagnitude: typeof maxMagnitude === 'number' ? maxMagnitude : maxMagnitude.value,
         pane,
         plot,
         projection,
@@ -2184,7 +2331,7 @@ function NativeIndicatorPlotArrowColorPath({
     getNativeIndicatorPlotArrowPath({
       colorFilter: color,
       frame,
-      maxMagnitude,
+      maxMagnitude: typeof maxMagnitude === 'number' ? maxMagnitude : maxMagnitude.value,
       pane,
       paneRangeOverrides: paneRangeOverrides?.value,
       plot,
@@ -2304,17 +2451,88 @@ function NativeIndicatorPlotPath({
   );
 }
 
+function NativeIndicatorTrackPrice({
+  frame,
+  pane,
+  paneRangeOverrides,
+  plot,
+  totalBarCount,
+  projection,
+  sharedViewport,
+}: {
+  frame: NativeChartFrame;
+  pane: NativePaneFrame;
+  paneRangeOverrides?: SharedValue<NativePaneRangeOverrides>;
+  plot: PlotOutput;
+  totalBarCount: number;
+  projection?: NativeChartProjection | null;
+  sharedViewport: NativeViewportSharedValues;
+}) {
+  const colors = getNativeIndicatorColorSet(plot.color, '#2196F3');
+  const latest = useDerivedValue(() => {
+    for (let i = Math.min(totalBarCount, plot.values.length) - 1; i >= 0; i--) {
+      if (!shouldRenderNativeIndicatorPlotBar(plot, totalBarCount, i)) continue;
+      const value = plot.values[i];
+      if (!isNativeFinitePlotValue(value)) continue;
+      const color = getNativeIndicatorColorAt(plot.color, i);
+      const y = projection
+        ? nativeIndicatorYToPathValue({ frame, pane, projection, value })
+        : nativeSharedIndicatorYToPathValue({
+            frame,
+            pane,
+            paneRangeOverrides: paneRangeOverrides?.value,
+            sharedViewport,
+            value,
+          });
+      return color !== null && pane.height > 0 && y >= pane.top && y <= pane.bottom ? { y, color } : null;
+    }
+    return null;
+  });
+  return (
+    <Group>
+      {colors.map((color) => (
+        <NativeIndicatorTrackPriceColor key={color} color={color} latest={latest} frame={frame} />
+      ))}
+    </Group>
+  );
+}
+
+function NativeIndicatorTrackPriceColor({
+  color,
+  latest,
+  frame,
+}: {
+  color: string;
+  latest: SharedValue<{ y: number; color: string } | null>;
+  frame: NativeChartFrame;
+}) {
+  const path = useDerivedValue(() => {
+    const path = Skia.Path.Make();
+    if (latest.value?.color === color) {
+      path.moveTo(frame.contentLeft, latest.value.y);
+      path.lineTo(frame.priceAxisLeft, latest.value.y);
+    }
+    return path;
+  });
+  return (
+    <SkiaPath path={path} color={color} style="stroke" strokeWidth={1}>
+      <DashPathEffect intervals={[2, 3]} />
+    </SkiaPath>
+  );
+}
+
 export function NativeIndicatorPlotLayerImpl({
+  bars,
   frame,
   indicatorPaneInfo,
   paneRangeOverrides,
   plots,
   sharedViewport,
   staticProjection,
-  textFont,
   totalBarCount,
   visibleBars,
 }: {
+  bars?: readonly Bar[];
   frame: NativeChartFrame;
   indicatorPaneInfo: Readonly<Record<string, NativeIndicatorPaneInfo>>;
   paneRangeOverrides?: SharedValue<NativePaneRangeOverrides>;
@@ -2325,7 +2543,25 @@ export function NativeIndicatorPlotLayerImpl({
   totalBarCount: number;
   visibleBars: readonly NativeVisibleBar[];
 }) {
-  if (plots.length === 0 || visibleBars.length === 0) return null;
+  const startTime = staticProjection?.viewport.startTime ?? sharedViewport.startTime.value;
+  const endTime = staticProjection?.viewport.endTime ?? sharedViewport.endTime.value;
+  const offsetProjections = useMemo(() => {
+    const result = new Map<PlotOutput, { plot: PlotOutput; bars: readonly NativeVisibleBar[] }>();
+    const windows = new Map<number, readonly NativeVisibleBar[]>();
+    for (const plot of plots) {
+      const shiftsBars = ['plot', 'plotshape', 'plotchar', 'plotarrow', 'bgcolor'].includes(plot.type);
+      const offset = plot.offset ?? 0;
+      if (!shiftsBars || offset === 0 || !bars?.length) continue;
+      let window = windows.get(offset);
+      if (!window) {
+        window = getNativeOffsetPlotBars(bars, visibleBars, offset, startTime, endTime);
+        windows.set(offset, window);
+      }
+      result.set(plot, { plot: { ...plot, offset: 0 }, bars: window });
+    }
+    return result;
+  }, [bars, visibleBars, plots, startTime, endTime]);
+  if (plots.length === 0 || (visibleBars.length === 0 && !bars?.length)) return null;
   const renderablePlots = plots.filter(
     (plot) =>
       plot.type === 'plot' ||
@@ -2340,9 +2576,25 @@ export function NativeIndicatorPlotLayerImpl({
   );
   if (renderablePlots.length === 0) return null;
 
+  const scriptGroups = new Map<string, PlotOutput[]>();
+  for (const plot of renderablePlots) {
+    const scriptId = plot.scriptId ?? 'unknown';
+    const group = scriptGroups.get(scriptId) ?? [];
+    group.push(plot);
+    scriptGroups.set(scriptId, group);
+  }
+  const orderedPlots = [...scriptGroups].flatMap(([scriptId, group]) =>
+    indicatorPaneInfo[scriptId]?.explicitPlotZOrder
+      ? [...group].sort((a, b) => (a.zOrder ?? 0) - (b.zOrder ?? 0))
+      : [...group.filter((p) => p.type === 'fill'), ...group.filter((p) => p.type !== 'fill')],
+  );
+
   return (
     <Group>
-      {renderablePlots.map((plot) => {
+      {orderedPlots.map((sourcePlot) => {
+        const shifted = offsetProjections.get(sourcePlot);
+        const plot = shifted?.plot ?? sourcePlot;
+        const plotBars = shifted?.bars ?? visibleBars;
         const key = `${plot.scriptId ?? 'unknown'}-${plot.id}`;
         const info = plot.scriptId ? indicatorPaneInfo[plot.scriptId] : undefined;
         if (plot.type === 'hline') {
@@ -2363,13 +2615,15 @@ export function NativeIndicatorPlotLayerImpl({
             <NativeIndicatorFillPath
               key={key}
               fill={plot}
+              bars={bars}
+              totalBarCount={totalBarCount}
               frame={frame}
               indicatorPaneInfo={info}
               paneRangeOverrides={paneRangeOverrides}
               plots={plots}
               projection={staticProjection}
               sharedViewport={sharedViewport}
-              visibleBars={visibleBars}
+              visibleBars={plotBars}
             />
           );
         }
@@ -2377,11 +2631,13 @@ export function NativeIndicatorPlotLayerImpl({
           return (
             <NativeIndicatorBgcolorRects
               key={key}
+              indicatorPaneInfo={info}
+              totalBarCount={totalBarCount}
               frame={frame}
               plot={plot}
               projection={staticProjection}
               sharedViewport={sharedViewport}
-              visibleBars={visibleBars}
+              visibleBars={plotBars}
             />
           );
         }
@@ -2396,7 +2652,7 @@ export function NativeIndicatorPlotLayerImpl({
               projection={staticProjection}
               sharedViewport={sharedViewport}
               totalBarCount={totalBarCount}
-              visibleBars={visibleBars}
+              visibleBars={plotBars}
             />
           );
         }
@@ -2411,7 +2667,7 @@ export function NativeIndicatorPlotLayerImpl({
               projection={staticProjection}
               sharedViewport={sharedViewport}
               totalBarCount={totalBarCount}
-              visibleBars={visibleBars}
+              visibleBars={plotBars}
             />
           );
         }
@@ -2425,24 +2681,35 @@ export function NativeIndicatorPlotLayerImpl({
               plot={plot}
               projection={staticProjection}
               sharedViewport={sharedViewport}
-              textFont={textFont}
               totalBarCount={totalBarCount}
-              visibleBars={visibleBars}
+              visibleBars={plotBars}
             />
           );
         }
         return (
-          <NativeIndicatorPlotPath
-            key={key}
-            frame={frame}
-            indicatorPaneInfo={info}
-            paneRangeOverrides={paneRangeOverrides}
-            plot={plot}
-            projection={staticProjection}
-            sharedViewport={sharedViewport}
-            totalBarCount={totalBarCount}
-            visibleBars={visibleBars}
-          />
+          <Group key={key} opacity={isNativeIndicatorPlotVisible(plot) ? 1 : 0}>
+            <NativeIndicatorPlotPath
+              frame={frame}
+              indicatorPaneInfo={info}
+              paneRangeOverrides={paneRangeOverrides}
+              plot={plot}
+              projection={staticProjection}
+              sharedViewport={sharedViewport}
+              totalBarCount={totalBarCount}
+              visibleBars={plotBars}
+            />
+            {plot.trackprice && (
+              <NativeIndicatorTrackPrice
+                frame={frame}
+                pane={nativeIndicatorPlotPane(frame, plot, info)}
+                paneRangeOverrides={paneRangeOverrides}
+                plot={plot}
+                totalBarCount={totalBarCount}
+                projection={staticProjection}
+                sharedViewport={sharedViewport}
+              />
+            )}
+          </Group>
         );
       })}
     </Group>

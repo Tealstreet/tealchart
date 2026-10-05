@@ -31,6 +31,8 @@ export interface IndicatorSettingsModalOptions {
     close?: string;
     cancel?: string;
     apply?: string;
+    defaults?: string;
+    resetSettings?: string;
     noConfigurableInputs?: string;
     noStyleOptions?: string;
     toggleVisibility?: string;
@@ -267,6 +269,7 @@ export class IndicatorSettingsModal extends Modal {
   private indicator: ActiveIndicator | null = null;
   private inputDefinitions: InputDefinition[] = [];
   private plots: PlotOutput[] = [];
+  private externalSourceOptions: { value: string; label: string }[] = [];
   private onSaveCallback: ((inputs: Record<string, unknown>, styleOverrides?: PlotStyleOverride[]) => void) | null =
     null;
 
@@ -300,6 +303,20 @@ export class IndicatorSettingsModal extends Modal {
     super(modalOptions);
 
     this.settingsOptions = options;
+    const defaults = document.createElement('select');
+    defaults.setAttribute('aria-label', options.translations?.defaults || 'Defaults');
+    defaults.style.marginRight = 'auto';
+    defaults.add(new Option(options.translations?.defaults || 'Defaults', ''));
+    defaults.add(new Option(options.translations?.resetSettings || 'Reset settings', 'reset'));
+    defaults.addEventListener('change', () => {
+      if (defaults.value !== 'reset') return;
+      this.values = Object.fromEntries(this.inputDefinitions.map((definition) => [definition.id, definition.defval]));
+      this.styleOverrides = [];
+      this.openPopoverId = null;
+      defaults.value = '';
+      this.renderBody();
+    });
+    this.footerEl?.prepend(defaults);
 
     // Set modal width constraints
     this.modalEl.style.minWidth = '320px';
@@ -324,12 +341,14 @@ export class IndicatorSettingsModal extends Modal {
     plots: PlotOutput[],
     styleOverrides: PlotStyleOverride[] | undefined,
     onSave: (inputs: Record<string, unknown>, styleOverrides?: PlotStyleOverride[]) => void,
+    externalSourceOptions: { value: string; label: string }[] = [],
   ): void {
     if (this.state.isOpen) return;
 
     this.indicator = indicator;
     this.inputDefinitions = inputDefinitions;
     this.plots = plots || [];
+    this.externalSourceOptions = externalSourceOptions;
     this.onSaveCallback = onSave;
 
     // Initialize values from indicator inputs
@@ -341,9 +360,9 @@ export class IndicatorSettingsModal extends Modal {
 
     // Initialize style overrides
     if (styleOverrides && styleOverrides.length > 0) {
-      this.styleOverrides = [...styleOverrides];
+      this.styleOverrides = styleOverrides.filter((override) => plots.find((plot) => plot.id === override.plotId)?.editable !== false);
     } else if (plots) {
-      this.styleOverrides = plots.map((plot) => {
+      this.styleOverrides = plots.filter((plot) => plot.editable !== false).map((plot) => {
         let color: string | undefined;
         if (typeof plot.color === 'string') {
           color = plot.color;
@@ -408,8 +427,7 @@ export class IndicatorSettingsModal extends Modal {
 
   protected handleApply(): void {
     if (this.onSaveCallback) {
-      const overrides = this.styleOverrides.length > 0 ? this.styleOverrides : undefined;
-      this.onSaveCallback(this.values, overrides);
+      this.onSaveCallback(this.values, this.styleOverrides);
     }
     this.close();
   }
@@ -671,7 +689,7 @@ export class IndicatorSettingsModal extends Modal {
         Object.assign(select.style, contentStyles.select);
         this.applyDisabledState(select, active);
         const selectedValue = typeof currentValue === 'string' ? currentValue : this.sourceNameFromDefault(def.defval);
-        for (const opt of SOURCE_OPTIONS) {
+        for (const opt of [...SOURCE_OPTIONS, ...this.externalSourceOptions]) {
           const option = document.createElement('option');
           option.value = opt.value;
           option.textContent = opt.label;
@@ -737,7 +755,8 @@ export class IndicatorSettingsModal extends Modal {
   }
 
   private renderStyleTab(): void {
-    if (!this.plots || this.plots.length === 0) {
+    const editablePlots = this.plots?.filter((plot) => plot.editable !== false) ?? [];
+    if (editablePlots.length === 0) {
       const empty = this.createElement('div', {
         style: contentStyles.emptyState,
         textContent: this.getTranslation('noStyleOptions', 'No style options available'),
@@ -746,9 +765,9 @@ export class IndicatorSettingsModal extends Modal {
       return;
     }
 
-    for (let i = 0; i < this.plots.length; i++) {
-      const plot = this.plots[i];
-      const isLast = i === this.plots.length - 1;
+    for (let i = 0; i < editablePlots.length; i++) {
+      const plot = editablePlots[i];
+      const isLast = i === editablePlots.length - 1;
       const row = this.renderPlotStyleRow(plot, isLast);
       this.contentEl.appendChild(row);
     }
@@ -782,8 +801,10 @@ export class IndicatorSettingsModal extends Modal {
     const checkbox = document.createElement('input');
     checkbox.type = 'checkbox';
     Object.assign(checkbox.style, contentStyles.plotCheckbox);
-    checkbox.checked = true;
-    checkbox.readOnly = true;
+    checkbox.checked = ((override?.display ?? plot.display ?? 31) & 1) !== 0;
+    checkbox.addEventListener('change', () => {
+      this.updateStyleOverride(plot.id, 'display', checkbox.checked ? 31 : 0);
+    });
     checkbox.title = this.getTranslation('toggleVisibility', 'Toggle visibility');
     row.appendChild(checkbox);
 
@@ -983,6 +1004,7 @@ export class IndicatorSettingsModal extends Modal {
   }
 
   private updateStyleOverride(plotId: string, key: keyof PlotStyleOverride, value: string | number | LineStyle): void {
+    if (this.plots?.find((plot) => plot.id === plotId)?.editable === false) return;
     const existing = this.styleOverrides.find((o) => o.plotId === plotId);
     if (existing) {
       this.styleOverrides = this.styleOverrides.map((o) => (o.plotId === plotId ? { ...o, [key]: value } : o));

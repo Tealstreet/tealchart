@@ -4,12 +4,14 @@ import type { Scope } from '../scope';
 /**
  * Built-in function signature used by TealScript runtime namespaces.
  */
-export type BuiltinFunction = (
+export type BuiltinFunction = ((
   args: unknown[],
   namedArgs: Map<string, unknown>,
   ctx: ExecutionContext,
   scope: Scope,
   callId: string,
-) => unknown;
+) => unknown) & {
+  positionalSingleArgument?: (value: unknown, ctx: ExecutionContext) => unknown;
+};
 
 export type BuiltinRegistry = Map<string, BuiltinFunction>;

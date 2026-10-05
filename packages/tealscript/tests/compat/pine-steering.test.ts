@@ -172,6 +172,7 @@ plot(close)
       diagnostics: [expect.objectContaining({ code: 'unknown-function', message: 'Unknown function: ta.mystery' })],
     });
 
+    // 8b77e698a1 binds footprint's first argument to integer ticks_per_row, not a symbol.
     expect(createPineParseSemanticStageOutcomes(`
 indicator("Planned Gap")
 request.footprint(syminfo.tickerid)
@@ -181,7 +182,7 @@ plot(close)
       status: 'failed',
       failureClass: 'semantic_gap',
       diagnostics: expect.arrayContaining([
-        expect.objectContaining({ code: 'argument-count', message: 'request.footprint() expects at least 2 arguments' }),
+        expect.objectContaining({ code: 'type-mismatch', message: 'request.footprint ticks_per_row must be an integer, got string' }),
       ]),
     });
   });

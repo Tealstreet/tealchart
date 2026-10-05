@@ -4,12 +4,11 @@ import { fileURLToPath } from 'node:url';
 import { parse } from '../../src/parser';
 import { executeScript } from '../../src/runtime';
 import type { StrategyTrade } from '../../src/runtime/strategy';
-import { generateDeterministicBars } from './generate-bars';
+import { generateDeterministicBars, SYNTHETIC_STRATEGY_BAR_COUNT } from './generate-bars';
 
 const CORPUS_DIR = path.join(path.dirname(fileURLToPath(import.meta.url)), 'corpus');
-const BAR_COUNT = 200;
 
-function tradesToTvCsv(trades: StrategyTrade[]): string {
+function tradesToEngineBaselineCsv(trades: StrategyTrade[]): string {
   const header = 'Trade #,Type,Signal,Date/Time,Price,Contracts,Profit,Cum. Profit';
   const rows: string[] = [header];
   let cumProfit = 0;
@@ -45,14 +44,19 @@ function bootstrap(): void {
     if (!fs.existsSync(pinePath)) continue;
 
     const barsPath = path.join(entryDir, 'bars.json');
-    const csvPath = path.join(entryDir, 'tv_trades.csv');
+    const csvPath = path.join(entryDir, 'engine_baseline_trades.csv');
     const metaPath = path.join(entryDir, 'meta.json');
+
+    const existingMeta = fs.existsSync(metaPath)
+      ? JSON.parse(fs.readFileSync(metaPath, 'utf-8'))
+      : undefined;
+    if (existingMeta?.source === 'tradingview') continue;
 
     const pineSource = fs.readFileSync(pinePath, 'utf-8');
 
     let bars;
     if (!fs.existsSync(barsPath)) {
-      bars = generateDeterministicBars(BAR_COUNT);
+      bars = generateDeterministicBars(SYNTHETIC_STRATEGY_BAR_COUNT);
       fs.writeFileSync(barsPath, JSON.stringify(bars, null, 2) + '\n');
       console.log(`  Generated ${barsPath}`);
     } else {
@@ -74,7 +78,7 @@ function bootstrap(): void {
       }
 
       if (!fs.existsSync(csvPath)) {
-        const csv = tradesToTvCsv(result.strategy.closedTrades);
+        const csv = tradesToEngineBaselineCsv(result.strategy.closedTrades);
         fs.writeFileSync(csvPath, csv);
         console.log(`  Generated ${csvPath} (${result.strategy.closedTrades.length} closed trades)`);
       }

@@ -10,33 +10,7 @@ export interface PineV6ManualAuditReasonGroup {
   names: readonly string[];
 }
 
-export const PINE_V6_REFERENCE_MANUAL_UNRESOLVED_BUILTIN_GROUPS = {
-  providerFutureFields: {
-    reason:
-      'Future corporate-action fields are in the v6 manual, but the provider seam currently implements historical/current request fields only and has no forecast freshness contract.',
-    names: [
-      'dividends.future_amount',
-      'dividends.future_ex_date',
-      'dividends.future_pay_date',
-      'earnings.future_eps',
-      'earnings.future_period_end_time',
-      'earnings.future_revenue',
-      'earnings.future_time',
-    ],
-  },
-  providerRecommendationSeries: {
-    reason:
-      'Reference manual exposes provider-tail recommendation series not currently available through the host metadata seam.',
-    names: [
-      'syminfo.recommendations_buy',
-      'syminfo.recommendations_buy_strong',
-      'syminfo.recommendations_hold',
-      'syminfo.recommendations_sell',
-      'syminfo.recommendations_sell_strong',
-      'syminfo.recommendations_total',
-    ],
-  },
-} as const satisfies Record<string, PineV6ManualAuditReasonGroup>;
+export const PINE_V6_REFERENCE_MANUAL_UNRESOLVED_BUILTIN_GROUPS: Record<string, PineV6ManualAuditReasonGroup> = {};
 
 export const PINE_V6_REFERENCE_MANUAL_LOCAL_EXTENSION_GROUPS = {
   localAliasesOrExtensions: {

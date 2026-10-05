@@ -373,11 +373,11 @@ export async function measureRealtimeReentryParity(
     workerByScript.set(measurement.scriptId, measurements);
   }
   const freshWorkerCases = cases.flatMap((testCase) => (
-    liveUpdateBarsForCase(testCase).map((bar, updateIndex) => ({
+    liveUpdateBarsForCase(testCase).map((_, updateIndex) => ({
       ...testCase,
       scriptId: reentryCaseId(testCase.scriptId, updateIndex),
       bars: cloneBars(testCase.bars),
-      liveUpdateBars: [{ ...bar }],
+      liveUpdateBars: liveUpdateBarsForCase(testCase).slice(0, updateIndex + 1).map((bar) => ({ ...bar })),
     }))
   ));
   const freshWorkerSession = await measureProductionWorkerSessions(freshWorkerCases, {

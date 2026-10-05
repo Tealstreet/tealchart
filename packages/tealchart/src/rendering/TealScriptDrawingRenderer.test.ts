@@ -11,8 +11,8 @@ import type { CanvasContext } from './CanvasContext';
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { DEFAULT_MARGINS, DEFAULT_RENDER_OPTIONS } from '../types';
 import { clearChartStoreCache } from '../state/chartState';
+import { DEFAULT_MARGINS, DEFAULT_RENDER_OPTIONS } from '../types';
 import { partitionTealScriptDrawings } from './TealScriptDrawingPartition';
 import { TealScriptDrawingRenderer } from './TealScriptDrawingRenderer';
 
@@ -239,7 +239,9 @@ function makeTable(overrides: Partial<TableDrawingOutput> = {}): TableDrawingOut
 describe('TealScriptDrawingRenderer', () => {
   it('renders linefills, boxes, lines, then labels in pane-clipped order', () => {
     const events: string[] = [];
-    const getTextWidth = vi.fn((activeCtx: CanvasContext, text: string, font: string) => activeCtx.measureText(text).width);
+    const getTextWidth = vi.fn(
+      (activeCtx: CanvasContext, text: string, font: string) => activeCtx.measureText(text).width,
+    );
     const { ctx, renderer } = createDrawingRenderer(events, { getTextWidth });
 
     const drawings = partitionTealScriptDrawings([
@@ -250,12 +252,7 @@ describe('TealScriptDrawingRenderer', () => {
       makeLine('line-2', { y1: 8, y2: 18 }),
     ]);
 
-    renderer.render(
-      drawings,
-      bars,
-      { startTime: 1_000, endTime: 3_000, priceMin: 0, priceMax: 20 },
-      pane,
-    );
+    renderer.render(drawings, bars, { startTime: 1_000, endTime: 3_000, priceMin: 0, priceMax: 20 }, pane);
 
     const firstFillIndex = events.indexOf('fill');
     const boxIndex = events.findIndex((event) => event.startsWith('strokeRect:'));
@@ -268,7 +265,7 @@ describe('TealScriptDrawingRenderer', () => {
     expect(firstStrokeAfterBox).toBeGreaterThan(boxIndex);
     expect(labelTextIndex).toBeGreaterThan(firstStrokeAfterBox);
     expect(clipCount).toBe(3);
-    expect(getTextWidth).toHaveBeenCalledWith(ctx, 'Label', '14px sans-serif');
+    expect(getTextWidth).toHaveBeenCalledWith(ctx, 'Label', '18px sans-serif');
   });
 
   it('renders Pine line arrow styles with endpoint arrowheads', () => {
@@ -276,9 +273,7 @@ describe('TealScriptDrawingRenderer', () => {
     const { renderer } = createDrawingRenderer(events);
 
     renderer.render(
-      partitionTealScriptDrawings([
-        makeLine('line-1', { style: 'arrow_both', width: 2 }),
-      ]),
+      partitionTealScriptDrawings([makeLine('line-1', { style: 'arrow_both', width: 2 })]),
       bars,
       { startTime: 1_000, endTime: 3_000, priceMin: 0, priceMax: 20 },
       pane,
@@ -312,14 +307,28 @@ describe('TealScriptDrawingRenderer', () => {
     expect(events).toContain('fillText:Box:114,124');
   });
 
+  // Pine v6 reference: label sizes differ from box/table text sizes.
+  it.each([
+    ['tiny', 7, 8], ['small', 10, 10], ['normal', 12, 14],
+    ['large', 18, 20], ['huge', 24, 36], ['23', 23, 23],
+  ])('uses family-specific font pixels for %s', (size, labelPixels, textPixels) => {
+    const events: string[] = [];
+    const { renderer } = createDrawingRenderer(events);
+    renderer.render(partitionTealScriptDrawings([
+      makeLabel({ size }), makeBox({ text: 'Box', textSize: size }),
+      makeTable({ cells: [{ ...makeTable().cells[0]!, textSize: size, textFontFamily: 'default', textFormatting: 'none' }] }),
+    ]), bars, { startTime: 1_000, endTime: 3_000, priceMin: 0, priceMax: 20 }, pane);
+    expect(events.filter((event) => event.startsWith('font:'))).toEqual([
+      `font:${textPixels}px sans-serif`, `font:${labelPixels}px sans-serif`, `font:${textPixels}px sans-serif`,
+    ]);
+  });
+
   it('renders numeric Pine box text sizes as canvas font pixels', () => {
     const events: string[] = [];
     const { renderer } = createDrawingRenderer(events);
 
     renderer.render(
-      partitionTealScriptDrawings([
-        makeBox({ text: 'Box', textSize: '18' }),
-      ]),
+      partitionTealScriptDrawings([makeBox({ text: 'Box', textSize: '18' })]),
       bars,
       { startTime: 1_000, endTime: 3_000, priceMin: 0, priceMax: 20 },
       pane,
@@ -334,9 +343,7 @@ describe('TealScriptDrawingRenderer', () => {
     const { renderer } = createDrawingRenderer(events);
 
     renderer.render(
-      partitionTealScriptDrawings([
-        makeBox({ text: 'Box' }),
-      ]),
+      partitionTealScriptDrawings([makeBox({ text: 'Box' })]),
       bars,
       { startTime: 1_000, endTime: 3_000, priceMin: 0, priceMax: 20 },
       pane,
@@ -364,7 +371,7 @@ describe('TealScriptDrawingRenderer', () => {
     );
 
     expect(events).toContain('fillTextStyle:right,bottom');
-    expect(events).toContain('fillText:Box:114,109');
+    expect(events).toContain('fillText:Box:114,106');
     expect(events).toContain('fillText:Text:114,124');
   });
 
@@ -389,7 +396,7 @@ describe('TealScriptDrawingRenderer', () => {
       pane,
     );
 
-    expect(events).toContain('font:italic bold 12px monospace');
+    expect(events).toContain('font:italic bold 14px monospace');
     expect(events).toContain('fillTextStyle:center,top');
     expect(events.some((event) => event.startsWith('fillText:Alpha:'))).toBe(true);
     expect(events.some((event) => event.startsWith('fillText:Beta:'))).toBe(true);
@@ -401,9 +408,7 @@ describe('TealScriptDrawingRenderer', () => {
     const { renderer } = createDrawingRenderer(events);
 
     renderer.render(
-      partitionTealScriptDrawings([
-        makePolyline({ closed: true, fillColor: 'rgba(41, 98, 255, 0.18)' }),
-      ]),
+      partitionTealScriptDrawings([makePolyline({ closed: true, fillColor: 'rgba(41, 98, 255, 0.18)' })]),
       bars,
       { startTime: 1_000, endTime: 3_000, priceMin: 0, priceMax: 20 },
       pane,
@@ -422,9 +427,7 @@ describe('TealScriptDrawingRenderer', () => {
     const { renderer } = createDrawingRenderer(events);
 
     renderer.render(
-      partitionTealScriptDrawings([
-        makePolyline({ lineStyle: 'arrow_both', lineWidth: 2 }),
-      ]),
+      partitionTealScriptDrawings([makePolyline({ lineStyle: 'arrow_both', lineWidth: 2 })]),
       bars,
       { startTime: 1_000, endTime: 3_000, priceMin: 0, priceMax: 20 },
       pane,
@@ -438,7 +441,7 @@ describe('TealScriptDrawingRenderer', () => {
     expect(events.filter((event) => event === 'closePath')).toHaveLength(2);
   });
 
-  it('renders curved polyline paths with quadratic segments', () => {
+  it('passes curved polyline segments through every supplied point', () => {
     const events: string[] = [];
     const { renderer } = createDrawingRenderer(events);
 
@@ -453,7 +456,9 @@ describe('TealScriptDrawingRenderer', () => {
     );
 
     expect(events).toContain('moveTo:0,110');
-    expect(events).toContain('quadraticCurveTo:60,60,120,90');
+    const ends = events.filter((event) => event.startsWith('bezierCurveTo:')).map((event) => event.split(',').slice(-2).join(','));
+    expect(ends).toEqual(['60,60', '120,90', '60,60', '120,90', '0,110']);
+    expect(events.some((event) => event.startsWith('quadraticCurveTo:'))).toBe(false);
     expect(events).not.toContain('lineTo:60,60');
     expect(events).toContain('closePath');
     expect(events).toContain('fill');
@@ -504,9 +509,7 @@ describe('TealScriptDrawingRenderer', () => {
     const { renderer } = createDrawingRenderer(events);
 
     renderer.render(
-      partitionTealScriptDrawings([
-        makeLabel({ color: null, text: 'Hidden', textColor: null }),
-      ]),
+      partitionTealScriptDrawings([makeLabel({ color: null, text: 'Hidden', textColor: null })]),
       bars,
       { startTime: 1_000, endTime: 3_000, priceMin: 0, priceMax: 20 },
       pane,
@@ -534,7 +537,7 @@ describe('TealScriptDrawingRenderer', () => {
 
     expect(events.filter((event) => event.startsWith('roundRect:'))).toHaveLength(4);
     expect(events.filter((event) => event === 'closePath')).toHaveLength(3);
-    expect(events).toContain('moveTo:82,34');
+    expect(events.filter((event) => event.startsWith('moveTo:'))).toHaveLength(3);
     expect(events.some((event) => event.startsWith('fillText:Up:'))).toBe(true);
     expect(events.some((event) => event.startsWith('fillText:Right:'))).toBe(true);
     expect(events.some((event) => event.startsWith('fillText:Upper:'))).toBe(true);
@@ -547,7 +550,13 @@ describe('TealScriptDrawingRenderer', () => {
 
     renderer.render(
       partitionTealScriptDrawings([
-        makeLabel({ style: 'label_left', text: 'Align', textAlign: 'right', textFontFamily: 'monospace', textFormatting: 'bolditalic' }),
+        makeLabel({
+          style: 'label_left',
+          text: 'Align',
+          textAlign: 'right',
+          textFontFamily: 'monospace',
+          textFormatting: 'bolditalic',
+        }),
         makeLabel({ id: 'label-2', style: 'none', text: 'Bare', textAlign: 'left' }),
       ]),
       bars,
@@ -557,7 +566,7 @@ describe('TealScriptDrawingRenderer', () => {
 
     expect(events).toContain('fillTextStyle:right,middle');
     expect(events).toContain('font:italic bold 12px monospace');
-    expect(events).toContain('fillText:Align:108,40');
+    expect(events).toContain('fillText:Align:112,40');
     expect(events).toContain('fillTextStyle:left,middle');
     expect(events).toContain('fillText:Bare:60,40');
   });
@@ -577,10 +586,10 @@ describe('TealScriptDrawingRenderer', () => {
       pane,
     );
 
-    expect(events).toContain('roundRect:60,21,56,38');
+    expect(events).toContain('roundRect:64,21,56,38');
     expect(events).toContain('fillTextStyle:center,middle');
-    expect(events).toContain('fillText:Entry:88,32.5');
-    expect(events).toContain('fillText:Stop:88,47.5');
+    expect(events).toContain('fillText:Entry:92,32.5');
+    expect(events).toContain('fillText:Stop:92,47.5');
     expect(events.filter((event) => event === 'fillText:Bare:60,32.5')).toHaveLength(1);
     expect(events.filter((event) => event === 'fillText:Text:60,47.5')).toHaveLength(1);
     expect(events).toContain('rect:49,29,22,22');
@@ -592,16 +601,14 @@ describe('TealScriptDrawingRenderer', () => {
     const { renderer } = createDrawingRenderer(events, { options: { width: 300 } });
 
     renderer.render(
-      partitionTealScriptDrawings([
-        makeLabel({ style: 'label_left', x: 3, y: 12, text: 'Future' }),
-      ]),
+      partitionTealScriptDrawings([makeLabel({ style: 'label_left', x: 3, y: 12, text: 'Future' })]),
       bars,
       { startTime: 1_000, endTime: 5_000, priceMin: 0, priceMax: 20 },
       pane,
     );
 
-    expect(events).toContain('roundRect:225,79,64,22');
-    expect(events).toContain('fillText:Future:257,90');
+    expect(events).toContain('roundRect:231,79,64,22');
+    expect(events).toContain('fillText:Future:263,90');
   });
 
   it('renders bar_time abovebar labels at their timestamp candle anchor', () => {
@@ -624,8 +631,8 @@ describe('TealScriptDrawingRenderer', () => {
       pane,
     );
 
-    expect(events).toContain('roundRect:0,43,96,22');
-    expect(events).toContain('fillText:Historical:48,54');
+    expect(events).toContain('roundRect:6,43,96,22');
+    expect(events).toContain('fillText:Historical:54,54');
   });
 
   it('renders Pine symbol label styles and keeps style_none text-only', () => {
@@ -653,6 +660,102 @@ describe('TealScriptDrawingRenderer', () => {
     expect(events).toContain('fillText:Text:60,40');
   });
 
+  it('uses the leading cell tooltip over a merged span', () => {
+    const events: string[] = [];
+    const { ctx, renderer } = createDrawingRenderer(events);
+    renderer.render(partitionTealScriptDrawings([
+      makeTable({ position: 'top_left', columns: 2, cells: [
+        { ...makeTable().cells[0]!, tooltip: 'Leading cell' },
+        { ...makeTable().cells[0]!, column: 1, tooltip: 'Hidden cell' },
+      ], mergedCells: [{ startColumn: 0, startRow: 0, endColumn: 1, endRow: 0 }] }),
+    ]), bars, { startTime: 1_000, endTime: 3_000, priceMin: 0, priceMax: 20 }, pane);
+    events.length = 0;
+    expect(renderer.renderTooltip(ctx, 90, 29)).toBe(true);
+    expect(events.some((event) => event.startsWith('fillText:Leading cell:'))).toBe(true);
+    expect(events.some((event) => event.startsWith('fillText:Hidden cell:'))).toBe(false);
+  });
+
+  it('includes symbol label text in the hover bounds and clips hits to the pane', () => {
+    const events: string[] = [];
+    const { ctx, renderer } = createDrawingRenderer(events);
+    renderer.render(partitionTealScriptDrawings([
+      makeLabel({ style: 'flag', text: 'Text', tooltip: 'Symbol details' }),
+    ]), bars, { startTime: 1_000, endTime: 3_000, priceMin: 0, priceMax: 20 }, pane);
+    events.length = 0;
+    expect(renderer.renderTooltip(ctx, 100, 40)).toBe(true);
+    expect(events.some((event) => event.startsWith('fillText:Symbol details:'))).toBe(true);
+    expect(renderer.renderTooltip(ctx, 100, pane.bottom + 1)).toBe(false);
+    expect(renderer.renderTooltip(ctx, 121, 40)).toBe(false);
+  });
+
+  it('uses painted label and table bounds for hover tooltips', () => {
+    const events: string[] = [];
+    const { ctx, renderer } = createDrawingRenderer(events);
+    const draw = () => renderer.render(partitionTealScriptDrawings([
+      makeLabel({ tooltip: 'Label details' }),
+      makeTable({ cells: [{ ...makeTable().cells[0]!, tooltip: 'Cell details' }] }),
+    ]), bars, { startTime: 1_000, endTime: 3_000, priceMin: 0, priceMax: 20 }, pane);
+    draw();
+    const labelBody = events.find((event) => event.startsWith('roundRect:'))!;
+    const [x, y, width, height] = labelBody.slice('roundRect:'.length).split(',').map(Number);
+    events.length = 0;
+    expect(renderer.renderTooltip(ctx, x! + width! / 2, y! + height! / 2)).toBe(true);
+    expect(events.some((event) => event.startsWith('fillText:Label details:'))).toBe(true);
+    events.length = 0;
+    expect(renderer.renderTooltip(ctx, 88, 29)).toBe(true);
+    expect(events.some((event) => event.startsWith('fillText:Cell details:'))).toBe(true);
+    events.length = 0;
+    expect(renderer.renderTooltip(ctx, 2, 200)).toBe(false);
+    expect(events).toEqual([]);
+    renderer.render(partitionTealScriptDrawings([]), bars,
+      { startTime: 1_000, endTime: 3_000, priceMin: 0, priceMax: 20 }, pane);
+    expect(renderer.renderTooltip(ctx, 88, 29)).toBe(false);
+  });
+
+  it('distinguishes arrow label geometry from triangular labels', () => {
+    const paint = (style: string) => {
+      const events: string[] = [];
+      createDrawingRenderer(events).renderer.render(partitionTealScriptDrawings([
+        makeLabel({ style, text: '' }),
+      ]), bars, { startTime: 1_000, endTime: 3_000, priceMin: 0, priceMax: 20 }, pane);
+      return events.filter((event) => event.startsWith('lineTo:'));
+    };
+    expect(paint('arrowup').length).toBeGreaterThan(paint('triangleup').length);
+    expect(paint('arrowdown').length).toBeGreaterThan(paint('triangledown').length);
+  });
+
+  it('outlines label text in the label color without painting a label body', () => {
+    const events: string[] = [];
+    const { ctx, renderer } = createDrawingRenderer(events);
+    ctx.strokeText = vi.fn();
+    renderer.render(partitionTealScriptDrawings([
+      makeLabel({ style: 'text_outline', text: 'Outlined', color: '#123456' }),
+    ]), bars, { startTime: 1_000, endTime: 3_000, priceMin: 0, priceMax: 20 }, pane);
+    expect(ctx.strokeText).toHaveBeenCalledWith('Outlined', expect.any(Number), expect.any(Number));
+    expect(ctx.strokeStyle).toBe('#123456');
+    expect(events.some((event) => event.startsWith('roundRect:'))).toBe(false);
+    expect(events.some((event) => event.startsWith('fillText:Outlined:'))).toBe(true);
+  });
+
+  // Ledger visual-output-v1#609: table.new has no visible output until a cell exists.
+  // An empty string is still a populated cell and must display its background/frame.
+  it('draws a styled table only after population, including a cell with empty text', () => {
+    const events: string[] = [];
+    const { renderer } = createDrawingRenderer(events);
+    const table = makeTable({ bgcolor: '#2196F3', cells: [] });
+    const viewport = { startTime: 1_000, endTime: 3_000, priceMin: 0, priceMax: 20 };
+
+    renderer.render(partitionTealScriptDrawings([table]), bars, viewport, pane);
+    expect(events.filter((event) => /^(fillRect|strokeRect|fillText):/.test(event))).toEqual([]);
+
+    events.length = 0;
+    table.cells = [{ ...makeTable().cells[0]!, text: '' }];
+    renderer.render(partitionTealScriptDrawings([table]), bars, viewport, pane);
+    expect(events.some((event) => event.startsWith('fillRect:'))).toBe(true);
+    expect(events.some((event) => event.startsWith('strokeRect:'))).toBe(true);
+    expect(events.some((event) => event.startsWith('fillText:'))).toBe(false);
+  });
+
   it('renders fixed-position table cells above chart drawings', () => {
     const events: string[] = [];
     const { renderer } = createDrawingRenderer(events);
@@ -666,7 +769,7 @@ describe('TealScriptDrawingRenderer', () => {
 
     expect(events).toContain('fillRect:64,18,48,22');
     expect(events).toContain('strokeRect:64,18,48,22');
-    expect(events).toContain('font:italic bold 12px monospace');
+    expect(events).toContain('font:italic bold 14px monospace');
     expect(events).toContain('fillTextStyle:center,middle');
     expect(events).toContain('fillText:ATR:88,29');
   });
@@ -752,11 +855,27 @@ describe('TealScriptDrawingRenderer', () => {
       pane,
     );
 
-    expect(events).toContain('fillRect:64,18,48,42');
-    expect(events).toContain('strokeRect:64,18,48,42');
+    expect(events).toContain('fillRect:64,18,48,48');
+    expect(events).toContain('strokeRect:64,18,48,48');
     expect(events).toContain('fillTextStyle:center,middle');
-    expect(events).toContain('fillText:High:88,31.5');
-    expect(events).toContain('fillText:Low:88,46.5');
+    expect(events).toContain('fillText:High:88,33');
+    expect(events).toContain('fillText:Low:88,51');
+  });
+
+  it('uses automatic table measurements for explicit zero dimensions', () => {
+    const events: string[] = [];
+    const { renderer } = createDrawingRenderer(events);
+    const draw = (width?: number, height?: number) => {
+      renderer.render(partitionTealScriptDrawings([
+        makeTable({ cells: [{ ...makeTable().cells[0]!, text: 'Long header\nSecond line', width, height }] }),
+      ]), bars, { startTime: 1_000, endTime: 3_000, priceMin: 0, priceMax: 20 }, pane);
+      return events.splice(0);
+    };
+    const auto = draw();
+    expect(draw(0, 0)).toEqual(auto);
+    expect(draw(0)).toEqual(auto);
+    expect(draw(undefined, 0)).toEqual(auto);
+    expect(auto).toContain('fillRect:12,18,100,48');
   });
 
   it('interprets explicit table cell sizes as pane percentages', () => {
@@ -805,7 +924,7 @@ describe('TealScriptDrawingRenderer', () => {
       partitionTealScriptDrawings([
         makeTable({
           columns: 2,
-          rows: 1,
+          rows: 2,
           cells: [
             {
               column: 0,
@@ -826,6 +945,28 @@ describe('TealScriptDrawingRenderer', () => {
               textHalign: 'center',
               textValign: 'middle',
               bgcolor: '#1f2937',
+            },
+            {
+              column: 0,
+              row: 1,
+              text: '',
+              width: 50,
+              textColor: null,
+              textSize: 'normal',
+              textHalign: 'center',
+              textValign: 'center',
+              bgcolor: null,
+            },
+            {
+              column: 1,
+              row: 1,
+              text: '',
+              width: 40,
+              textColor: null,
+              textSize: 'normal',
+              textHalign: 'center',
+              textValign: 'center',
+              bgcolor: null,
             },
           ],
           mergedCells: [
@@ -877,7 +1018,270 @@ describe('TealScriptDrawingRenderer', () => {
       pane,
     );
 
-    expect(events).toContain('font:12px monospace');
-    expect(events).not.toContain('font:italic bold 12px monospace');
+    expect(events).toContain('font:14px monospace');
+    expect(events).not.toContain('font:italic bold 14px monospace');
+  });
+});
+
+// Authority: Pine v6 table.cell remark 3 and table.new remark 2 (2026-10-03).
+describe('Documented table display replacement', () => {
+  it('displays the newest table per location within each script', () => {
+    const events: string[] = [];
+    const { renderer } = createDrawingRenderer(events);
+    const cell = (text: string) => [
+      {
+        column: 0,
+        row: 0,
+        text,
+        textColor: '#ffffff',
+        textSize: 'normal',
+        textHalign: 'center',
+        textValign: 'center',
+        bgcolor: null,
+      },
+    ];
+    renderer.render(
+      partitionTealScriptDrawings([
+        makeTable({ id: 'old', scriptId: 'one', cells: cell('obsolete') }),
+        makeTable({ id: 'control', scriptId: 'two', cells: cell('other script') }),
+        makeTable({ id: 'new', scriptId: 'one', cells: cell('replacement') }),
+        makeTable({ id: 'other-location', scriptId: 'one', position: 'bottom_left', cells: cell('other location') }),
+      ]),
+      bars,
+      { startTime: 1_000, endTime: 3_000, priceMin: 0, priceMax: 20 },
+      pane,
+    );
+    const texts = events.filter((event) => event.startsWith('fillText:')).map((event) => event.split(':')[1]);
+    expect(texts.sort()).toEqual(['other location', 'other script', 'replacement']);
+  });
+
+  it('does not reveal an older table when the newest table is empty', () => {
+    const events: string[] = [];
+    const { renderer } = createDrawingRenderer(events);
+    renderer.render(
+      partitionTealScriptDrawings([makeTable({ id: 'old' }), makeTable({ id: 'new', cells: [] })]),
+      bars,
+      { startTime: 1_000, endTime: 3_000, priceMin: 0, priceMax: 20 },
+      pane,
+    );
+    expect(events.filter((event) => event.startsWith('fillText:') || event.startsWith('strokeRect:'))).toEqual([]);
+  });
+
+  it('displays only the newest table from a call site after its position changes', () => {
+    const events: string[] = [];
+    const { renderer } = createDrawingRenderer(events);
+    const cell = (text: string) => [
+      {
+        column: 0,
+        row: 0,
+        text,
+        textColor: '#ffffff',
+        textSize: 'normal',
+        textHalign: 'center',
+        textValign: 'center',
+        bgcolor: null,
+      },
+    ];
+    renderer.render(
+      partitionTealScriptDrawings([
+        makeTable({ id: 'old-site', creationSite: 'a', position: 'top_left', cells: cell('obsolete') }),
+        makeTable({ id: 'control-site', creationSite: 'b', position: 'middle_left', cells: cell('control') }),
+        makeTable({ id: 'new-site', creationSite: 'a', position: 'bottom_right', cells: cell('replacement') }),
+      ]),
+      bars,
+      { startTime: 1_000, endTime: 3_000, priceMin: 0, priceMax: 20 },
+      pane,
+    );
+    const texts = events.filter((event) => event.startsWith('fillText:')).map((event) => event.split(':')[1]);
+    expect(texts.sort()).toEqual(['control', 'replacement']);
+  });
+});
+
+// Authority: Pine v6 table.merge_cells remark 2: merged dimensions come from
+// neighboring cells; attributes come from the start cell, not covered cells.
+describe('Documented merged table dimensions', () => {
+  it('ignores sizes and text inside a merged span when measuring neighboring rows and columns', () => {
+    const events: string[] = [];
+    const { renderer } = createDrawingRenderer(events);
+    const cell = {
+      textColor: '#ffffff',
+      textSize: 'normal',
+      textHalign: 'center',
+      textValign: 'center',
+      bgcolor: '#123456',
+    };
+    renderer.render(
+      partitionTealScriptDrawings([
+        makeTable({
+          position: 'top_left',
+          columns: 3,
+          rows: 3,
+          frameWidth: 0,
+          cells: [
+            { ...cell, column: 0, row: 0, text: 'start', width: 95, height: 95 },
+            { ...cell, column: 1, row: 1, text: 'hidden\ncovered\ntext', width: 75, height: 75 },
+            { ...cell, column: 0, row: 2, text: '', width: 10 },
+            { ...cell, column: 1, row: 2, text: '', width: 25 },
+            { ...cell, column: 2, row: 0, text: '', height: 10 },
+            { ...cell, column: 2, row: 1, text: '', height: 15 },
+          ],
+          mergedCells: [{ startColumn: 0, startRow: 0, endColumn: 1, endRow: 1 }],
+        }),
+      ]),
+      bars,
+      { startTime: 1_000, endTime: 3_000, priceMin: 0, priceMax: 20 },
+      pane,
+    );
+    expect(events).toContain('strokeRect:8,18,42,50');
+    expect(events).toContain('fillRect:8,18,42,50');
+    expect(events).toContain('fillText:start:29,43');
+    expect(events.some((event) => event.includes('hidden') || event.includes('covered'))).toBe(false);
+  });
+});
+
+// Authority: Pine v6 line.style_arrow_* endpoints and linefill.new remarks 1-2.
+function filledVertices(events: string[]): string[][] {
+  let vertices: string[] = [];
+  const fills: string[][] = [];
+  for (const event of events) {
+    if (event === 'beginPath') vertices = [];
+    else if (event.startsWith('moveTo:') || event.startsWith('lineTo:')) vertices.push(event);
+    else if (event === 'fill') fills.push([...vertices]);
+  }
+  return fills;
+}
+
+describe('Documented line arrows and linefill parents', () => {
+  for (const reverse of [false, true]) {
+    for (const [style, endpoints] of [
+      ['arrow_left', ['first']],
+      ['arrow_right', ['second']],
+      ['arrow_both', ['first', 'second']],
+    ] as const) {
+      it(`${style} attaches to named endpoints when reversed=${reverse}`, () => {
+        const events: string[] = [];
+        const { renderer } = createDrawingRenderer(events);
+        renderer.render(
+          partitionTealScriptDrawings([
+            makeLine('line-1', { style, ...(reverse ? { x1: 2, y1: 20, x2: 0, y2: 10 } : {}) }),
+          ]),
+          bars,
+          { startTime: 1000, endTime: 3000, priceMin: 0, priceMax: 20 },
+          pane,
+        );
+        const first = reverse ? '120,10' : '0,110';
+        const second = reverse ? '0,110' : '120,10';
+        expect(filledVertices(events).map((vertices) => vertices[0])).toEqual(
+          endpoints.map((end) => `moveTo:${end === 'first' ? first : second}`),
+        );
+        expect(events.filter((event) => event === 'setLineDash:').length).toBeGreaterThan(0);
+      });
+    }
+  }
+  it('linefill follows moved parent coordinates on the next render', () => {
+    const events: string[] = [];
+    const { renderer } = createDrawingRenderer(events);
+    const first = makeLine('line-1', { y1: 10, y2: 10 });
+    const second = makeLine('line-2', { y1: 4, y2: 4 });
+    const viewport = { startTime: 1000, endTime: 3000, priceMin: 0, priceMax: 20 };
+    renderer.render(partitionTealScriptDrawings([first, second, makeLinefill()]), bars, viewport, pane);
+    expect(filledVertices(events)).toEqual([['moveTo:0,110', 'lineTo:120,110', 'lineTo:120,170', 'lineTo:0,170']]);
+    Object.assign(first, { x1: 1, y1: 13, x2: 2, y2: 15 });
+    Object.assign(second, { x1: 0, y1: 8, x2: 1, y2: 7 });
+    events.length = 0;
+    renderer.render(partitionTealScriptDrawings([first, second, makeLinefill()]), bars, viewport, pane);
+    expect(filledVertices(events)).toEqual([['moveTo:60,80', 'lineTo:120,60', 'lineTo:60,140', 'lineTo:0,130']]);
+  });
+  for (const [extend, start, end] of [
+    ['left', 0, 90],
+    ['right', 30, 120],
+    ['both', 0, 120],
+  ] as const) {
+    it(`linefill includes both parent extend.${extend} regions`, () => {
+      const events: string[] = [];
+      const { renderer } = createDrawingRenderer(events);
+      renderer.render(
+        partitionTealScriptDrawings([
+          makeLine('line-1', { extend, y1: 10, y2: 10 }),
+          makeLine('line-2', { extend, y1: 4, y2: 4 }),
+          makeLinefill(),
+        ]),
+        bars,
+        { startTime: 0, endTime: 4000, priceMin: 0, priceMax: 20 },
+        pane,
+      );
+      expect(filledVertices(events)).toEqual([
+        [`moveTo:${start},110`, `lineTo:${end},110`, `lineTo:${end},170`, `lineTo:${start},170`],
+      ]);
+    });
+  }
+});
+
+// Authority: line.style_* broad stroke styles and Tables manual cell maxima.
+describe('Documented drawing stroke and table sizing', () => {
+  for (const style of ['solid', 'dotted', 'dashed'] as const) {
+    it(`documented stroke ${style} selects its broad dash pattern`, () => {
+      const events: string[] = [];
+      const { renderer } = createDrawingRenderer(events);
+      renderer.render(
+        partitionTealScriptDrawings([makeLine('line', { style })]),
+        bars,
+        { startTime: 1000, endTime: 3000, priceMin: 0, priceMax: 20 },
+        pane,
+      );
+      expect(events).toContain('stroke');
+      const beforeStroke = events.slice(0, events.indexOf('stroke'));
+      const pattern = beforeStroke
+        .filter((e) => e.startsWith('setLineDash:'))
+        .at(-1)
+        ?.slice('setLineDash:'.length);
+      expect(pattern).toBeDefined();
+      if (style === 'solid') expect(pattern).toBe('');
+      else {
+        const [paint, gap] = pattern!.split(',').map(Number);
+        expect(paint).toBeGreaterThan(0);
+        expect(gap).toBeGreaterThan(0);
+        expect(style === 'dotted' ? paint! < gap! : paint! > gap!).toBe(true);
+      }
+    });
+  }
+  it('documented table sizing uses the maximum across each column and row', () => {
+    const events: string[] = [];
+    const { renderer } = createDrawingRenderer(events, { options: { width: 200 }, margins: { left: 20, right: 20 } });
+    const cell = {
+      text: '',
+      textColor: '#ffffff',
+      textSize: 'normal',
+      textHalign: 'center',
+      textValign: 'middle',
+      bgcolor: '#123456',
+    };
+    renderer.render(
+      partitionTealScriptDrawings([
+        makeTable({
+          position: 'top_left',
+          columns: 2,
+          rows: 2,
+          frameWidth: 0,
+          borderWidth: 0,
+          bgcolor: null,
+          cells: [
+            { ...cell, column: 0, row: 0, width: 30, height: 15 },
+            { ...cell, column: 1, row: 0, width: 20, height: 25 },
+            { ...cell, column: 0, row: 1, width: 10, height: 10 },
+            { ...cell, column: 1, row: 1, width: 5, height: 5 },
+          ],
+        }),
+      ]),
+      bars,
+      { startTime: 1000, endTime: 3000, priceMin: 0, priceMax: 20 },
+      pane,
+    );
+    expect(events.filter((e) => e.startsWith('fillRect:'))).toEqual([
+      'fillRect:28,18,48,50',
+      'fillRect:76,18,32,50',
+      'fillRect:28,68,48,20',
+      'fillRect:76,68,32,20',
+    ]);
   });
 });

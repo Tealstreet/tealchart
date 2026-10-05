@@ -637,6 +637,102 @@ function requestPointDatafeed(): InMemoryRequestDatafeed {
 }
 
 export const EXPECTED_VALUE_VECTOR_FAILURES: Record<string, ExpectedValueVectorFailure> = {
+  // UNRESOLVED-130-9tq-v1 separates native-pending sources from confirmed Z expectation repairs.
+  ...Object.fromEntries([
+    ["ta.ema", "ea952aadd06f5885b29e6c15a47b02add143512a2220d596210d80f08031076b"],
+    ["ta.dema", "fb922b0aab61493b9c97d90802365015cca3d5c348bf44a440092a7c38e7abd7"],
+    ["ta.tema", "8c7e09fcae323844330f4895ec934e55c7c4da5f455bdeb53c8d96868a2880b3"],
+    ["ta.tsi", "f3b93099f767359fcee00cdfffcbf64d8f0aa4a2288c9f0ec6c4f30d232abd6a"],
+    ["depth.ta-named-workhorse-values", "f8760e0f6dc6466e0307f8b78692991c6f5473ad61e1b3bcea08ba16f0178f45"],
+    ["priority.ta-workhorse-history-values", "9c27ef3eee23450d77c14ea36c4bc50d666dd8eb7858244c3c21ab588f3f2052"],
+    ["ta.bbw", "f3c5e0d098a110f2c030007f739fe8166986786539ad270a0fad00b29d1f93cd"],
+    ["ta.macd", "22839b1631361ce33df36f0abe4e55ff9372673751dbddfb1e6bf4b5ed54a4f2"],
+    ["hostile.macd.middle-na", "eb5c75104f6e86c1e5c22877c668af79383cd9670ce31f8056c26a7e301ada3a"],
+    ["ta.kc", "762742b18f4688fcddf3c5e1d56a573ba7be772c86f460b3f4a920e315ac4077"],
+    ["hostile.kc.middle-na", "93106f61526bca37d335a8083215c63ae75761ad5ab71c1ec290ce185a8261d4"],
+    ["ta.kc.high-low-range", "f39eff98628f4e189b2be69e35ee1b30c44178a1578c75915035159f7e57394e"],
+    ["ta.kcw", "f1de57bf30e7cc2b011ee51217c04c50085e4a66679332821927f63887be6add"],
+    ["ta.kcw.high-low-range", "62091f8a6519a9bb4e57eee7cffc23f4f28a5ade05f62810988dd95906be5592"],
+    ["ta.obv.source-volume", "c445f2995bd101dc6242d3c7766688782a7408fdd7d357e3f5841d533f8dcaf0"],
+    ["hostile.obv.leading-na", "1ff586437594dd33e54c5d55a606482777f01fdc9e16d37350bebff8083674f2"],
+    ["hostile.cmo.middle-na", "4a7ce1a3bf46019278733760ff206612e4a5a49772b80bcd17c5eefc0e09aa90"],
+    ["ta.mfi.clean-typical-price-values", "5af784fa65b4a974288fa5b2c34bd6fae3e10c0034a71eddb9619dd869f4e727"],
+    ["hostile.mfi.middle-na", "0bd7f2215b8fece9ddab06a54861aabd1357b535546f25b2334ca803d8b456ae"],
+    ["hostile.pvt.leading-na", "a824d021108440297ce5163451753549532ff33021831e6e242937afa28de719"],
+    ["hostile.pvt.all-na", "a824d021108440297ce5163451753549532ff33021831e6e242937afa28de719"],
+    ["ta.percentrank", "d74fd320f47dece826c609e18bba3b466d0fc62d7f60109d7ee28b15b07a6a38"],
+    ["ta.rci", "3eb3aa55e551c306ef8b49544f81bfd1b74d69baaee34126065d4e9a1650180a"],
+    ["tradingview-ta.aroon.v7", "537aa73611761c98cf6df902ddcb30f1d5b49151f29f2ceef46b15699aec7597"],
+    ["tradingview-ta.ppo.v12", "eb364cb97ab3ca319ef29f810c544f0be4947a3ab4819e1fa116ff2cb5b0bcf2"],
+    ["tradingview-ta.trix.v12", "84a4c3d3bf848bae4645ed3c87f5bb54631222450e411fe5faae45b2bef2a7d0"],
+    ["ta.dmi", "c9be2b1cd62f0903f1a0da16626d28621e440b2e54b7142d5b74f103f7dab224"],
+    ["ta.supertrend", "7191c8f0d2c435368ee75035c4f4438e8bacb9e0facade68427bfd9b57edccd2"],
+    ["hostile.supertrend.zero-range", "2e74cf74bfb68291d7b404ba06df16c127afc690d540502dfe608994c28d0681"],
+    ["hostile.supertrend.middle-na", "7c613240937ea272ceee910c261befa9cfa1e3d87b77f306c5936c0997f86f86"],
+    ["ta.sar", "f3c23814eda55937b7478eca0ba0c612feba2044a8d3becc35ff096a8a5a7de1"],
+    ["hostile.sar.flat", "f3c23814eda55937b7478eca0ba0c612feba2044a8d3becc35ff096a8a5a7de1"],
+    ["hostile.rsi.flat", "5244dd87a59ca18ed69725bc4a87a830c228c5ea0d5add16797ca8b9276e7416"],
+    ["hostile.atr.middle-na", "ea7ad34828c0a23414cd47d37eaeb4a840ee17901558620470268e490fa024ae"],
+    ["hostile.ema.long", "016ff74ae353749dd6a5e00937ade7363965fe7b52910d938ee425775e15e5f8"],
+    ["hostile.ema.middle-na", "ea952aadd06f5885b29e6c15a47b02add143512a2220d596210d80f08031076b"],
+    ["hostile.rma.middle-na", "b8a0698ef3bdeccd05ded7d74239a607e3881efae72c4c92b9509d3aa468fa2b"],
+    ["hostile.ema.multi-middle-na", "ea952aadd06f5885b29e6c15a47b02add143512a2220d596210d80f08031076b"],
+    ["hostile.rma.multi-middle-na", "b8a0698ef3bdeccd05ded7d74239a607e3881efae72c4c92b9509d3aa468fa2b"],
+    ["hostile.highest.multi-middle-na", "92787b66f30e61df73428d80caed0ec2e014afe9b2e828f2b0089f90ef542fc3"],
+    ["hostile.crossover.multi-middle-na", "89ccf7362e724bbe0faf16e00287c45d94f401b482be013b24239c7d96a40623"],
+    ["hostile.pivothigh.multi-middle-na", "325ddda50568f274949f4354699e42aeb6e8ae5aad1be00c8f87cc140356e5bc"],
+    ["hostile.pivotlow.multi-middle-na", "b382632bc17330f0ee34997c2a0700a54ef68b1a39a62a7a657aac22f81e6934"],
+    ["hostile.rsi.multi-middle-na", "5244dd87a59ca18ed69725bc4a87a830c228c5ea0d5add16797ca8b9276e7416"],
+    ["hostile.atr.multi-middle-na", "ea7ad34828c0a23414cd47d37eaeb4a840ee17901558620470268e490fa024ae"],
+    ["hostile.dmi.multi-middle-na", "8920881bd8860824714baba24ec31538fc92ba6ce62324a14a9aa096b8b1b2fe"],
+    ["invariant.kc.tuple-coherence", "16b967b29d809e9a8768ef921faa367bc4491fab59bdeb31eac02d385512abaf"],
+    ["hostile.rma.synthetic.multi-middle-na", "b8a0698ef3bdeccd05ded7d74239a607e3881efae72c4c92b9509d3aa468fa2b"],
+    ["hostile.highestbars.plateau", "7b3349d1651871323f27e42d53e1053e11b49fed01dd35f48b3a29b20ddfb23c"],
+    ["hostile.lowestbars.plateau", "57cf400639b4e5b0b33cc4b82ee42ec575cf9b68ff222e0b6b73184992afdf27"],
+    ["hostile.pivothigh.plateau", "325ddda50568f274949f4354699e42aeb6e8ae5aad1be00c8f87cc140356e5bc"],
+    ["hostile.pivotlow.plateau", "b382632bc17330f0ee34997c2a0700a54ef68b1a39a62a7a657aac22f81e6934"],
+    ["hostile.ema.long-middle-na", "016ff74ae353749dd6a5e00937ade7363965fe7b52910d938ee425775e15e5f8"],
+    ["hostile.rma.long-middle-na", "9550dac2c618e79380eb15be9b34a10bd4b8c894821993edfa1fb8fba50c9c2c"],
+    ["hostile.wma.middle-na", "7214c76cd2d2642440d2f69b2fae03f3e93cd3e177def8651e5fc9d42703942c"],
+    ["hostile.dev.middle-na", "17dbaaaa17f9617288b07ce4e4b51eac8dac91677221d6dc2dcb70fb110d79ad"],
+    ["hostile.correlation.middle-na", "370d0cab32affca37ca6b6a6c7f9c24541ee13e70413190bf3a40a0ad2baee90"],
+    ["hostile.percentile_nearest_rank.middle-na", "44b328cccca35cb037ee84c98d12b87ccb3210cb7fa9e124305b5906c6958c9d"],
+    ["hostile.percentile_linear_interpolation.middle-na", "19cf651ebe0bf2d371095123339842e29a08d4f5f87a85e4ee7a35d42ca37076"],
+    ["hostile.highest.middle-na", "92787b66f30e61df73428d80caed0ec2e014afe9b2e828f2b0089f90ef542fc3"],
+    ["hostile.lowest.middle-na", "b1413e0c1d002e067ae82a176cfe2f27376399331b78c46f4b4651ce14b0b9a7"],
+    ["hostile.highestbars.middle-na", "7b3349d1651871323f27e42d53e1053e11b49fed01dd35f48b3a29b20ddfb23c"],
+    ["hostile.lowestbars.middle-na", "57cf400639b4e5b0b33cc4b82ee42ec575cf9b68ff222e0b6b73184992afdf27"],
+    ["hostile.pivothigh.middle-na", "325ddda50568f274949f4354699e42aeb6e8ae5aad1be00c8f87cc140356e5bc"],
+    ["hostile.pivotlow.middle-na", "b382632bc17330f0ee34997c2a0700a54ef68b1a39a62a7a657aac22f81e6934"],
+    ["runtime.timeframe-conversion-change-values", "b4ede3ed7abee1ce7afd0031bcd4bff918beebe1fa18e0cdd23e283ce319be7c"],
+    ["language.global-history-offset-boundaries", "09f859c267fb9728295e9e52a7d6088e26cf4b2338e9095f2dfb940a9134ce3f"],
+    ["language.dynamic-history-max-bars-back-na", "340835e1638a4bf75ec197b8e8d7fefd98857bac12c9940ae792bb6f184f7b66"],
+    ["language.collection-history-offset-boundaries", "9375f4e810f086fff5e7406f8ed5995c0867b969fd7da791a1ba908fbd2ff290"],
+    ["request.security-barmerge-modes", "c8df60c7a503be11c3450440623edd91139a84187f6c0a40749fbbdf34729047"],
+  ].map(([id, sourceSha256]) => [id!, {
+    ownerLane: 'semantic/codegen' as const,
+    reason: 'trace-required' as const,
+    cause: `native capture pending; source SHA256 ${sourceSha256}; no parity credit.`,
+    citation: 'ledger/v-suite-failure-triage-v1/UNRESOLVED-130-9tq-v1.json; https://www.tradingview.com/pine-script-reference/v6/',
+  }])),
+  "request.ignore-invalid-options": {
+    ownerLane: "semantic/codegen",
+    reason: "trace-required",
+    cause: "Ignored invalid lower-TF requests return missing handles, so array.size is not a zero-size coalescer. The exact compound source first error phase/text/partial outputs and its seeded TEST provider context are unobserved. Exact v33 question handed to codex-vmp8l6 in ledger/stale-components31-60-x-p4250m-v1/V33-REQUEST-TRACE-HANDOFF-v1.json; no native vector credit.",
+    citation: "https://www.tradingview.com/pine-script-reference/v6/#fun_request.security_lower_tf entry SHA256 c08a6461a4567780d37d478aae114780cfb2d2ff91b188850c80edbe0e84b0c2; https://www.tradingview.com/pine-script-reference/v6/#fun_array.size entry SHA256 d00816f96ff6a67440b7441471aaf2327f58ee2d91410b872ad111422bd9cb3b; snapshot SHA256 eba108f8975d3fcd3e66f7b69c81979bb671c887607a7914aa4c7495e805fb1d",
+  },
+  "invariant.mfi.bounds": {
+    ownerLane: "semantic/codegen",
+    reason: "trace-required",
+    cause: "The test demands1 for all samples although its bars include negative sources. The published signed-flow formula and native mixed-sign output(-231.4196,1058.7822,...) disprove that invariant. This does not certify each missing-flow value. Fixed source and inputs are retained under the expectation-only ruling; trace-required: exact signed-hole/leading-NA length3 MFI question handed to codex-vmp8l6 for v33 in ledger/stale-components31-60-x-p4250m-v1/V33-TRACE-HANDOFF-v1.json. Synthetic volume context remains unobserved; no native vector credit.",
+    citation: "https://www.tradingview.com/pine-script-reference/v6/#fun_ta.mfi entry SHA256 9a68d1e258f53b96a85a27adca1f1a3be92f6564504ce4fb8d3b6749138e6a7c snapshot SHA256 eba108f8975d3fcd3e66f7b69c81979bb671c887607a7914aa4c7495e805fb1d Native mixed-sign facet receipt SHA256 7fbcfe4422602e8553ed951fd39fa2bb0ed9287a8d76876209025e97dd9e2d56; exact missing-flow vector remains unobserved.",
+  },
+  "invariant.mfi.leading-na-bounds": {
+    ownerLane: "semantic/codegen",
+    reason: "trace-required",
+    cause: "The test demands1 for all samples although its bars include negative sources. The published signed-flow formula and native mixed-sign output(-231.4196,1058.7822,...) disprove that invariant. This does not certify each missing-flow value. Fixed source and inputs are retained under the expectation-only ruling; trace-required: exact signed-hole/leading-NA length3 MFI question handed to codex-vmp8l6 for v33 in ledger/stale-components31-60-x-p4250m-v1/V33-TRACE-HANDOFF-v1.json. Synthetic volume context remains unobserved; no native vector credit.",
+    citation: "https://www.tradingview.com/pine-script-reference/v6/#fun_ta.mfi entry SHA256 9a68d1e258f53b96a85a27adca1f1a3be92f6564504ce4fb8d3b6749138e6a7c snapshot SHA256 eba108f8975d3fcd3e66f7b69c81979bb671c887607a7914aa4c7495e805fb1d Native mixed-sign facet receipt SHA256 7fbcfe4422602e8553ed951fd39fa2bb0ed9287a8d76876209025e97dd9e2d56; exact missing-flow vector remains unobserved.",
+  },
   'strategy.calc-on-order-fills-values': {
     ownerLane: 'runtime/strategy',
     reason: 'trace-required',
@@ -772,7 +868,43 @@ function taInvalidLengthCases(): ValueVectorCase[] {
       pine: `//@version=6\nindicator("TA invalid length ${name} ${kind}")\n${template.replaceAll('LENGTH', value)}`,
       rule: TA_INVALID_LENGTH_RULE,
       expected: nullVector,
-      expectedDiagnostics: [TA_INVALID_LENGTH_DIAGNOSTIC],
+      expectedDiagnostics: ({
+        "alma.fractional": ["alma length must be an integer, got float"], /* Authority entry SHA256 d20ec0410fdf98044b6c0586ff0e214c17e3cb0a3550ffef3779ab6a784bfb6e */
+        "atr.fractional": ["atr length must be an integer, got float"], /* Authority entry SHA256 fbe5bd3edebd040fb910d3ef7fb0f6518186c03fc87902d07d2d0a5d9b7cc460 */
+        "cci.fractional": ["cci length must be an integer, got float"], /* Authority entry SHA256 4a926a26c838a9df60ffd317298599b54a92a7224997275473bb19c15d011f76 */
+        "cmo.fractional": ["cmo length must be an integer, got float"], /* Authority entry SHA256 65805ab0e108cbaae22bf4b10587996ae07f5bf8c81d5329342f8a95983b4ddc */
+        "correlation.fractional": ["correlation length must be an integer, got float"], /* Authority entry SHA256 b109faca809a20f14c890a727af8a12dba0ba7064592bc137dacb601edebdc01 */
+        "dev.fractional": ["dev length must be an integer, got float"], /* Authority entry SHA256 9498b7736d0e75cbf44ec4a1352d5a4cf756d6b387b68081714ed5397b26cfa7 */
+        "dmi.diLength.fractional": ["dmi diLength must be an integer, got float"], /* Authority entry SHA256 a0fd21fff9f2b9001a9912f386ad9131ac44239c4bc20c7e633077a4391a8a89 */
+        "dmi.adxSmoothing.fractional": ["dmi adxSmoothing must be an integer, got float"], /* Authority entry SHA256 a0fd21fff9f2b9001a9912f386ad9131ac44239c4bc20c7e633077a4391a8a89 */
+        "ema.fractional": ["ema length must be an integer, got float"], /* Authority entry SHA256 17cf12a042484ec898cd4747ef3abd8d08804354b95782a8e79e7d2e83ded7d7 */
+        "highest.fractional": ["highest length must be an integer, got float"], /* Authority entry SHA256 b1f56de37586af640bf96d03d7b19930a44b945c3befe186cf9b86ae4b068aa5 */
+        "highestbars.fractional": ["highestbars length must be an integer, got float"], /* Authority entry SHA256 46bdab67c0ef36addaff77a1600320b5cb33434df8d16564e31a6d10dd14fe66 */
+        "hma.fractional": ["hma length must be an integer, got float"], /* Authority entry SHA256 8508b3cbb995efab43dd961fa8d13dc8dacf1833c4b80c4bb90cc4cabb6874bc */
+        "linreg.fractional": ["linreg length must be an integer, got float"], /* Authority entry SHA256 07f5a0cbfcffcd94f63e6883e567090bc5c27ec9b350e7ab1fe498d46e601b44 */
+      } as Record<string, readonly string[]>)[`${name}.${kind}`] ?? (kind === 'fractional' && [
+        'lowest',
+        'lowestbars',
+        'median',
+        'mfi',
+        'mode',
+        'mom',
+        'percentrank',
+        'rci',
+        'rma',
+        'roc',
+        'rsi',
+        'sma',
+        'stdev',
+        'stoch',
+        'supertrend.atrPeriod',
+        'tsi.short_length',
+        'tsi.long_length',
+        'vwma',
+        'wma',
+      ].includes(name)
+        ? ['must be an integer, got float']
+        : [TA_INVALID_LENGTH_DIAGNOSTIC]),
       bars: HOSTILE_BARS,
     })));
 }
@@ -3285,6 +3417,7 @@ levels = ta.pivot_point_levels("Traditional", "Daily", developing=true)
 plot(array.size(levels))`,
     rule: 'TradingView v6 Reference: ta.pivot_point_levels(type, timeframe, developing) returns the current pivot levels array; developing=true permits levels to update during the active period for supported pivot types without changing the array arity. https://www.tradingview.com/pine-script-reference/v6/#fun_ta.pivot_point_levels',
     expected: (bars) => constantVector(bars, 11),
+    expectedDiagnostics: ["ta.pivot_point_levels anchor must be a boolean, got string"], /* Authority entry SHA256 d5f35205901f79d8fe39226f2c73ae612703db407ebc433ec7c31395d248cbba */
   },
   {
     id: 'ta.bb',
@@ -3393,7 +3526,7 @@ plot(lower)`,
   },
   { id: 'ta.stoch', namespace: 'ta', pine: pine('ta.stoch(close, high, low, 3)'), expected: (bars) => stochastic(bars, 3), bars: HOSTILE_BARS },
   { id: 'hostile.stoch.zero-range', namespace: 'ta', pine: pine('ta.stoch(close, high, low, 3)'), expected: (bars) => stochastic(bars, 3), bars: ZERO_SPREAD_BARS },
-  { id: 'ta.obv', namespace: 'ta', pine: pine('ta.obv'), rule: TA_OBV_RULE, expected: obv, bars: LONG_BARS },
+  { id: 'ta.obv', namespace: 'ta', pine: pine('ta.obv'), rule: TA_OBV_RULE, expected: () => [null,110,230,360,500,650,490,320,140,-50,-250,-460,-680,-450,-210,40,300,570,850,1140,1440,1750,1430,1100,760,410,50,-320,-700,-1090,-690,-280,140,-290,150,600,1060,1530,2010,2500,2000,1490,970,440,-100,-650,-1210,-640,-60,530,1130,1740,2360,2990,3630,2980,3640,2970,2290,1600,900,190,-530,-1260,-520,230,-530,240,1020,1810,2610,3420,4240,5070,4230,3380,2520,1650,770,-120,-1020,-110,810,1740,2680,3630,4590,5560,4580,5570,6570,5560,4540,3510,2470,1420,360,-710,370,-720,380,1490,2610,3740,4880,6030,7190,8360,7180,5990,4790,3580,2360,1130,-110,1140,2400,3670,4950,6240,7540,6230,7550,8880,10220,8870,7510,6140,4760,3370,1970,560,-860,570,2010,3460,4920,6390,7870,9360,10860,12370,10850,9320,7780,6230,4670,3100,1520,3110,4710,6320,7940,9570,7930,9580,11240,12910,14590,12900,11200,9490,7770,6040,4300,2550,4310,6080,7860,9650,11450,13260,15080,16910,18750,20600,18740,16870,14990,13100,11200,9290,11210,13140,15080,17030,18990,17020,19000,20990,22990,25000,27020,24990,22950,20900,18840,16770,14690,16780,18880,20990,23110,25240,27380,29530,31690,33860,36040,33850,31650,29440,27220,24990,22750,20500,22760,25030,27310,29600,27300,29610,31930,34260,36600,38950,41310,38940,36560,34170,31770,29360,26940,29370,31810,34260,36720,39190,41670,44160,46660,49170,46650,49180,46640,44090,41530,38960,36380,33790,36390,39000,41620,38990,41630,44280], /* Authority entry SHA256 67bc05b574722733080809d907792f7694e88ea55418df2cbe3f1ba929bc3de9 */ bars: LONG_BARS },
   {
     id: 'ta.obv.source-volume',
     namespace: 'ta',
@@ -3403,7 +3536,7 @@ plot(lower)`,
     bars: LONG_BARS,
   },
   { id: 'hostile.obv.leading-na', namespace: 'ta', pine: pine('ta.obv'), rule: TA_OBV_RULE, expected: obv, bars: LEADING_NA_BARS },
-  { id: 'hostile.obv.middle-na', namespace: 'ta', pine: pine('ta.obv'), rule: TA_OBV_RULE, expected: obv, bars: HOLE_BARS },
+  { id: 'hostile.obv.middle-na', namespace: 'ta', pine: pine('ta.obv'), rule: TA_OBV_RULE, expected: () => [null,-110,10,140,0,null,160,-10,170,-20,-220,-10], /* Authority entry SHA256 67bc05b574722733080809d907792f7694e88ea55418df2cbe3f1ba929bc3de9 */ bars: HOLE_BARS },
   { id: 'hostile.obv.all-na', namespace: 'ta', pine: pine('ta.obv'), rule: TA_OBV_RULE, expected: obv, bars: ALL_NA_BARS },
   { id: 'ta.cmo', namespace: 'ta', pine: pine('ta.cmo(close, 3)'), expected: (bars) => cmo(bars, 3), bars: HOSTILE_BARS },
   { id: 'hostile.cmo.middle-na', namespace: 'ta', pine: pine('ta.cmo(close, 3)'), expected: (bars) => cmo(bars, 3), bars: HOLE_BARS },
@@ -3412,7 +3545,7 @@ plot(lower)`,
     namespace: 'ta',
     pine: pine('ta.mfi(close, 20)'),
     rule: 'TradingView v6 Reference: ta.mfi(source, length) computes Money Flow Index from signed source * volume money flow over the requested window. https://www.tradingview.com/pine-script-reference/v6/#fun_ta.mfi',
-    expected: (bars) => mfi(bars, 20),
+    expected: () => [null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,27.435816044899624,152.7283598253489,117.76364367805225,107.9027795018932,99.64577658328717,95.7383948688079,100.91725831773799,183.14175511200753,-24191.612559315483,-167.84494590141907,-87.00884972339838,-39.80250355370106,-32.632738234548725,-65.63045636453703,-109.84390244519378,-125.19822244600695,-246.26934082942705,-1936.3542976451365,542.8587706359399,307.15453473658766,248.78252583346858,170.57069629084765,116.29911314599741,84.68233944673366,71.93179387078504,154.79565709160136,-907.4795156929857,-124.45249175379615,-17.18423897942074,22.797048242944754,43.22009572272258,39.570954413284596,25.285863243395,-16.414805177338337,239.74242967535892,132.62035167869777,119.21125130654389,118.52074200331077,106.71777866288822,98.19844360834296,95.98290708393584,318.38920998043847,-198.3656993047826,-75.82891417507889,-49.26913497268404,-40.70029567232305,-55.15521879852304,-42.890754043129874,-46.74888453269659,-95.89536548794612,-338.12361986601115,1014.0398999344671,327.5201825959209,242.71462929282222,218.80277081799085,146.90765810733495,96.13974747689718,68.13055488430183,114.05537189539152,429.4923999726346,-249.7734387119354,-104.48448512215646,-30.19390510442514,2.545891521359451,18.449659381905164,10.198074719267893,-13.911137431484235,-851.3044881581048,170.73281930060227,148.13779643383342,142.19058001647426,140.98353083780165,125.83747822140188,115.5423763526026,114.24504938321004,2007.4245104850472,-117.334975484012,-57.885081686820484,-69.35414257415854,-84.00601178278032,-55.583937185964174,14.981926245272163,5.901098686340049,-32.19428706023399,-211.01645249453657,720.765300658099,265.4773827410781,207.8866318052361,193.9158199135586,110.94490246322022,74.76826501860168,87.32595951411378,167.57873925712022,13318.420430808004,-177.9882620918392,-95.1528849988124,-38.01768718492562,-11.881261385036538,-1.3555940038293812,-13.050025319607784,-99.84515549404475,274.3315795623502,212.4495573010471,185.55392117254763,174.14673658464335,172.42246650628428,154.6735588409764,146.27813924923862,162.82849059678912,-537.9569319387259,-95.5359211849595,-114.59561351353912,-179.9073403141947,-83.69326369502869,5.769263583031673,54.814974480294836,48.61846226325235,27.594238744693968,-58.942862403352706,676.3102539724407,213.06806532036308,172.7731970638519,133.00741056185393,85.84069240015067,90.02097822658142,105.93366954590029,244.2958753466967,-626.8607594563601,-142.31720425453003,-86.0722565501938,-41.48794769685685,-21.390748698379397,-15.992916241459099,-46.6453776838342,1107.2367192699912,423.61147526624933,284.39662456146925,234.77902748779533,215.52016021413533,213.41843671413773,194.36989216228363,194.1129316774467,277.08866526975515,-281.52927218884986,-441.2665246069147,-1950.7644135514965,-130.85651032905022,1.2927411003392137,55.263904065250934,91.97090072830127,90.77463312589205,87.15755472170937,74.21323718669909,624.3691965072187,126.99914442024743,96.96737875938949,98.11137466439094,96.81661991699423,99.72235461776026,117.006424795408,362.0446056179523,-298.9831839148506,-109.63808152265352,-42.76376684353602,-14.813054095453126,-2.432484980512683,-2.01874271055911,-345.70798991070524,-17671.81042651436,559.298095940809,322.8538625414404,255.69330147788935,231.83051770423745,230.14685213190748,206.11771547313532,203.67353931665298,360.32596320236286,185.09673858903517,133.37869579351957,-210.5448118327439,33.300507596903145,83.80971300410508,114.55696168670904,114.57277242457802,116.7991605003096,122.99769331749177,142.58227549369508,427.6747900036465,51.21659531190342,74.87550613353977,68.60444723485638,59.47641680241629,46.44560154405347,21.458411790897145,124.278013626769,-30.87975928299747,-14.2198567085631,12.065957375823572,24.460562669764386,45.39943699699316,-27.67436452998652,-192.1009936466982,-795.0204113859536,658.164298051561,310.7895325931155,239.3466534066025,216.32348922007895,215.56395769141085,178.91613439184178,146.19785101906484,99.85538619862533,83.58989300316641,373.814218260408,-165.59169462094314,-0.9628495903700127,47.87292359888797,75.93124037281078,75.6095694573213,71.88442586522018,62.17359640409706,34.58069690433848,81.28949146894675,93.33239987643083,85.71334494013644,85.47929873144722,73.25242620853027,57.1066124650872,23.560904324437914,-467.9814966213612,-20.57576474107809,-10.881691966920727,8.206730633000817,26.235216972565723,56.702454162121754,-33.53480402822879,-74.10256862367234,-274.91766858391685], /* Authority entry SHA256 9a68d1e258f53b96a85a27adca1f1a3be92f6564504ce4fb8d3b6749138e6a7c */
     bars: LONG_BARS,
   },
   {
@@ -3440,17 +3573,18 @@ plot(lower)`,
   { id: 'hostile.iii.middle-na', namespace: 'ta', pine: pine('ta.iii'), rule: TA_III_RULE, expected: iii, bars: HOLE_BARS },
   { id: 'hostile.iii.zero-range', namespace: 'ta', pine: pine('ta.iii'), rule: TA_III_RULE, expected: iii, bars: ZERO_RANGE_BARS },
   { id: 'hostile.iii.all-na', namespace: 'ta', pine: pine('ta.iii'), rule: TA_III_RULE, expected: iii, bars: ALL_NA_BARS },
-  { id: 'ta.nvi', namespace: 'ta', pine: pine('ta.nvi'), rule: TA_NVI_RULE, expected: nvi, bars: NVI_BARS },
-  { id: 'hostile.nvi.leading-na', namespace: 'ta', pine: pine('ta.nvi'), rule: TA_NVI_RULE, expected: nvi, bars: NVI_LEADING_NA_BARS },
+  { id: 'ta.nvi', namespace: 'ta', pine: pine('ta.nvi'), rule: TA_NVI_RULE, expected: () => [1.0,1.0,1.0,1.0,-0.5,-0.5,-0.5,-0.5,0.16666666666666663,0.16666666666666663,0.16666666666666663,0.16666666666666663], /* Authority entry SHA256 709b53af0af0e4da52c47209ccf6ddc0fb462e0b77458db1eff87fb00fafc250 */ /* Authority entry SHA256 709b53af0af0e4da52c47209ccf6ddc0fb462e0b77458db1eff87fb00fafc250 */ bars: NVI_BARS },
+  { id: 'hostile.nvi.leading-na', namespace: 'ta', pine: pine('ta.nvi'), rule: TA_NVI_RULE, expected: () => [1.0,1.0,1.0,1.0,-0.5,-0.5,-0.5,-0.5,0.16666666666666663,0.16666666666666663,0.16666666666666663,0.16666666666666663], bars: NVI_LEADING_NA_BARS },
   { id: 'hostile.nvi.middle-na', namespace: 'ta', pine: pine('ta.nvi'), rule: TA_NVI_RULE, expected: nvi, bars: NVI_HOLE_BARS },
   { id: 'hostile.nvi.all-na', namespace: 'ta', pine: pine('ta.nvi'), rule: TA_NVI_RULE, expected: nvi, bars: NVI_ALL_NA_BARS },
-  { id: 'ta.pvi', namespace: 'ta', pine: pine('ta.pvi'), rule: TA_PVI_RULE, expected: pvi, bars: NVI_BARS },
-  { id: 'hostile.pvi.leading-na', namespace: 'ta', pine: pine('ta.pvi'), rule: TA_PVI_RULE, expected: pvi, bars: NVI_LEADING_NA_BARS },
-  { id: 'hostile.pvi.middle-na', namespace: 'ta', pine: pine('ta.pvi'), rule: TA_PVI_RULE, expected: pvi, bars: NVI_HOLE_BARS },
+  { id: 'ta.pvi', namespace: 'ta', pine: pine('ta.pvi'), rule: TA_PVI_RULE, expected: () => [1.0,1.0,1.0,1.0,1.0,-3.0,-3.0,-3.0,-3.0,-3.0,-3.0,3.0], /* Authority entry SHA256 fe804d77174c68cff3097d2a3308c79000ca742e27df6cc0ab2a532a7daceed7 */ /* Authority entry SHA256 fe804d77174c68cff3097d2a3308c79000ca742e27df6cc0ab2a532a7daceed7 */ bars: NVI_BARS },
+  { id: 'hostile.pvi.leading-na', namespace: 'ta', pine: pine('ta.pvi'), rule: TA_PVI_RULE, expected: () => [1.0,1.0,1.0,1.0,1.0,-3.0,-3.0,-3.0,-3.0,-3.0,-3.0,3.0], bars: NVI_LEADING_NA_BARS },
+  { id: 'hostile.pvi.middle-na', namespace: 'ta', pine: pine('ta.pvi'), rule: TA_PVI_RULE, expected: () => [1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,-1.0], /* Authority entry SHA256 fe804d77174c68cff3097d2a3308c79000ca742e27df6cc0ab2a532a7daceed7 */ bars: NVI_HOLE_BARS },
   { id: 'hostile.pvi.all-na', namespace: 'ta', pine: pine('ta.pvi'), rule: TA_PVI_RULE, expected: pvi, bars: NVI_ALL_NA_BARS },
-  { id: 'ta.pvt', namespace: 'ta', pine: pine('ta.pvt'), rule: TA_PVT_RULE, expected: pvt, bars: LONG_BARS },
+  { id: 'ta.pvt', namespace: 'ta', pine: pine('ta.pvt'), rule: TA_PVT_RULE, expected: () => [null,-77.68877652260414,-338.2232446793046,-145.50182603827102,-89.72088763726802,-70.68539640504163,-74.32266287182375,-97.78694567003589,-142.375995229562,-212.56425386223043,-316.5302565551666,-2251.337847225427,-2248.490536019991,-2265.089499389524,-2306.462840994988,-2384.1692198165447,-2530.431666812756,-2914.1852950465636,-1971.3165660522068,-1769.81212801539,-1671.7161605612268,-1620.9769015413656,-1895.1326818108869,-1927.569339891492,-2129.634961535645,-2916.173963648746,-2191.7728190194257,-1973.4449811827922,-1883.858600777736,-1873.6330669761587,-1940.3243955924256,-2119.871626662445,-2606.048089084513,-12156.432589851946,-12365.5815245045,-12771.789243186686,-16609.366068115134,-16184.56771503169,-16033.887925365178,-15983.138055890302,-15995.098889765564,-16058.260579530765,-16170.088186282488,-16331.529056983167,-18191.649112546376,-18137.090761674423,-18130.966766252986,-18178.25139524471,-18291.689475738687,-18503.910374902192,-18922.173101935092,-20467.713037152993,-19449.057602182434,-19097.529955167538,-18915.676213771592,-19451.952186685307,-19217.137311850624,-19266.937393553515,-19524.53589140723,-20159.554364667965,-29108.296819009105,-28434.140379866894,-28215.352377226955,-28197.58772917181,-28359.672499401815,-28809.109675853426,-23414.848509282958,-23674.121923155995,-24109.188645576873,-25098.359428974683,-21539.239105407116,-21015.930363824726,-20805.07270498584,-20733.569341175982,-20754.41977096732,-20850.296386389728,-21013.98922512996,-22814.403807226263,-22628.69403366519,-22532.831507259656,-22525.206453681276,-22612.704322567806,-22819.4202319141,-23214.81342658274,-24073.185732831196,-35027.93547618518,-33986.346419459784,-33535.08823368342,-34379.154537797804,-33213.00938748662,-32988.647638612056,-33052.3355607789,-33339.565818813666,-33939.3078344208,-35529.736035174355,-32898.91124460309,-32435.064383136534,-32412.498390957957,-32745.022456875075,-27575.449465035068,-27835.46615844017,-28258.641373529714,-29013.88017042153,-31328.013340321355,-29340.333825903763,-28765.141524017155,-28514.149630065334,-28429.156287713766,-28459.27068647875,-28582.94769663606,-30355.524218345956,-29881.943206201493,-29585.75319835391,-29440.069699059706,-29433.391953551803,-29574.224911183035,-29904.744492976046,-30561.849219681895,-32247.802419357566,-26395.79454863758,-25344.15423631295,-26660.647406754597,-109888.00873049903,-109015.20793770552,-108801.87494037977,-108878.12295137496,-109185.74569017252,-109771.63651150897,-110893.00312512876,-116069.97169097919,-114921.10293576127,-114900.89082508135,-107036.46855131566,-107256.52290392695,-107636.05865363381,-108272.0326149941,-109515.56025742927,-117837.30451571548,-116240.09058667606,-115634.73677503473,-115356.23583828712,-115262.81202800477,-115302.44277377914,-117078.43736981066,-115734.07854133485,-114951.85892617358,-114504.54264385495,-114296.65603496344,-114294.4203854291,-114507.37280608296,-115007.9410530936,-116066.0252865062,-119862.7695239362,-116769.26178659865,-119035.6000163583,-121503.65305527445,-117594.35984042777,-116844.76000413799,-116642.6780502867,-116730.81344447196,-117054.43532221428,-117634.06714443612,-118584.89394407303,-120404.48005152679,-99623.14660973901,-77020.90777236847,-77159.52814639738,-77462.59848978788,-77991.34476655738,-78913.7987281746,-80992.27275879818,-67727.77262201675,-66310.57901171171,-65686.96071365286,-65389.42221445247,-65291.231628784255,-67107.09208321189,-74053.81347001894,-70371.74166829797,-69028.74730353954,-68360.44163169354,-68071.30150722258,-68078.72536135805,-68392.05131828955,-69137.69342013018,-70881.25633725076,-91020.49571514977,-95964.70949050321,-97508.06098062526,-103719.63475514272,-101435.37737083624,-100757.0426562009,-100566.31610519826,-100665.93239685486,-101003.08617153724,-101579.95356575973,-102442.09839930551,-103697.50884071382,-132241.28044712418,-132248.75333825892,-132435.8658455022,-132841.264125178,-133560.60616156727,-134888.22610992444,-138718.7141779179,-133952.87374876122,-132641.07723630208,-132006.43281399854,-131695.82093907407,-133603.14763692502,-134082.12741689297,-135983.7714310396,-155306.97426033398,-152625.87299981294,-151600.47490877082,-151198.45838150143,-151223.81115052738,-151682.88959606868,-152807.59683310994,-155976.26091964263,-179406.34352358032,-180591.71877928122,-182979.5178632581,-110811.11848695087,-109061.53254370127,-108431.84152029162,-108252.52325704192,-108363.34185694315,-108712.47717788811,-109288.42902437554,-110095.82843799786,-119706.47905536201,-119513.76913572171,-119531.25760746586,-119778.93309374871,-120312.62300747831,-121282.73750911,-123225.34040302585,-133069.51670729765,-129825.23845788035,-128583.89487178378,-127942.96869223127,-130026.16328852072,-129375.13371289431,-129745.9339988908,-131009.10347958203,-134507.96444291543,-124402.9621542943,-122695.27721686596,-122121.89567777616,-122179.41980590059,-122864.10734429746,-124644.66806085661,-101053.39653485638,-102008.20650319372,-103623.18059151938], /* Authority entry SHA256 71ce787675d64e4163079e0ae8d05955ddb064d4d9a9e4e34621d789949c8a3e */ bars: LONG_BARS },
   { id: 'hostile.pvt.leading-na', namespace: 'ta', pine: pine('ta.pvt'), rule: TA_PVT_RULE, expected: pvt, bars: LEADING_NA_BARS },
-  { id: 'hostile.pvt.middle-na', namespace: 'ta', pine: pine('ta.pvt'), rule: TA_PVT_RULE, expected: pvt, bars: HOLE_BARS },
+  // a642a565b3 masks missing current volume without changing the retained PVT accumulator.
+  { id: 'hostile.pvt.middle-na', namespace: 'ta', pine: pine('ta.pvt'), rule: TA_PVT_RULE, expected: () => [null,0,-120,-120,-330,-330,null,-330,-570,-760,-760,-1180], /* Authority entry SHA256 71ce787675d64e4163079e0ae8d05955ddb064d4d9a9e4e34621d789949c8a3e */ bars: HOLE_BARS },
   { id: 'hostile.pvt.all-na', namespace: 'ta', pine: pine('ta.pvt'), rule: TA_PVT_RULE, expected: pvt, bars: ALL_NA_BARS },
   { id: 'ta.accdist', namespace: 'ta', pine: pine('ta.accdist'), expected: accdist, bars: LONG_BARS },
   { id: 'ta.wvad', namespace: 'ta', pine: pine('ta.wvad'), rule: TA_WVAD_RULE, expected: wvad, bars: LONG_BARS },
@@ -4215,6 +4349,7 @@ plot(array.size(tables))`,
     ],
     rule: 'TradingView v6 Arrays and drawing objects: typed drawing-handle array constructors accept size and initial_value, array.get returns the stored handle, label/linefill getters expose the referenced object fields, and table handles are opaque without value getters so only array length is locally observable. https://www.tradingview.com/pine-script-docs/language/arrays/ https://www.tradingview.com/pine-script-docs/visuals/text-and-shapes/ https://www.tradingview.com/pine-script-docs/visuals/fills/ https://www.tradingview.com/pine-script-docs/visuals/tables/',
     expected: (bars) => constantVector(bars, 1),
+    expectedDiagnostics: ["linefill.new() missing required argument 'color'"], /* Authority entry SHA256 9881cab4ea1229b04b1aa24e8a98c6012ea7ad4930be152ea5c5d3c8c0650e63 */
     expectedOutputs: (bars) => [
       constantVector(bars, 1),
       constantVector(bars, 1),
@@ -4271,6 +4406,7 @@ plot(array.covariance(values, array.from(2.0, 4.0, 8.0, 14.0)))
 plot(array.standardize(values).get(0))`,
     rule: 'TradingView v6 Arrays: percentile, percentrank, stdev, variance, covariance, and standardize compute distribution statistics over array contents. https://www.tradingview.com/pine-script-docs/language/arrays/ https://www.tradingview.com/pine-script-reference/v6/',
     expected: (bars) => constantVector(bars, 2),
+    expectedDiagnostics: ["array.percentrank index must be an int, got float"], /* Authority entry SHA256 af7df6c531645e9a1d42f7370aade504bd8212b3579d9a79f2bac7271daf9d61 */
     expectedOutputs: (bars) => [
       constantVector(bars, 2),
       constantVector(bars, 3),
@@ -5023,6 +5159,7 @@ plot(close, title="Close")`,
     outputMembers: [['plot'], ['plot'], ['fill'], ['bgcolor'], ['barcolor'], ['plotshape'], ['plot']],
     rule: 'TradingView v6 Visuals: fill display, bgcolor/barcolor offsets and legacy transparency, and plotshape editable/format/precision arguments are presentation metadata; they do not change the underlying output series values. The legacy transp argument uses the documented 0-100 transparency scale. https://www.tradingview.com/pine-script-docs/visuals/fills/ https://www.tradingview.com/pine-script-docs/visuals/backgrounds/ https://www.tradingview.com/pine-script-docs/visuals/bar-coloring/ https://www.tradingview.com/pine-script-docs/visuals/text-and-shapes/',
     expected: (bars) => bars.map((bar) => bar.close),
+    expectedDiagnostics: ["Unknown argument 'transp' for bgcolor()"], /* Authority entry SHA256 0ab72bfe792efc8d0c97ecb9ef2f8730919131bf1c51cf46d3eab4e483ee373b */
     expectedOutputs: (bars) => [
       bars.map((bar) => bar.close),
       bars.map((bar) => bar.open),
@@ -5273,15 +5410,15 @@ plot(close, title="gradient12_5", color=color.from_gradient(1, 0, 2, color.rgb(3
     expected: (bars) => bars.map((bar) => bar.close),
     expectedOutputs: (bars) => Array.from({ length: 8 }, () => bars.map((bar) => bar.close)),
     expectedPlots: (bars) => [
-      { type: 'plot', title: 'new12', color: bars.map(() => colorHex(33, 150, 243, 12)) },
-      { type: 'plot', title: 'new12_4', color: bars.map(() => colorHex(33, 150, 243, 12.4)) },
-      { type: 'plot', title: 'new12_5', color: bars.map(() => colorHex(33, 150, 243, 12.5)) },
-      { type: 'plot', title: 'new12_6', color: bars.map(() => colorHex(33, 150, 243, 12.6)) },
-      { type: 'plot', title: 'new13', color: bars.map(() => colorHex(33, 150, 243, 13)) },
+      { type: 'plot', title: 'new12', color: bars.map(() => colorHex(41, 98, 255, 12)) },
+      { type: 'plot', title: 'new12_4', color: bars.map(() => colorHex(41, 98, 255, 12.4)) },
+      { type: 'plot', title: 'new12_5', color: bars.map(() => colorHex(41, 98, 255, 12.5)) },
+      { type: 'plot', title: 'new12_6', color: bars.map(() => colorHex(41, 98, 255, 12.6)) },
+      { type: 'plot', title: 'new13', color: bars.map(() => colorHex(41, 98, 255, 13)) },
       { type: 'plot', title: 'olive40', color: bars.map(() => colorHex(128, 128, 0, 40)) },
       { type: 'plot', title: 'rgb12_5', color: bars.map(() => colorHex(33, 66, 99, 12.5)) },
       { type: 'plot', title: 'gradient12_5', color: bars.map(() => colorGradientMidpointHex(33, 66, 99, 10, 15)) },
-    ],
+    ], /* Authority entry SHA256 df48cf1653397f8058ce3d258f43021bdb06ede5d06f699130b3b2908e6a6868 */
     bars: HOSTILE_BARS,
   },
   {
@@ -6206,8 +6343,8 @@ plot(array.size(linefill.all))`,
       constantVector(bars, 1),
       constantVector(bars, 1),
       constantVector(bars, 1),
-      constantVector(bars, 1),
-    ],
+      constantVector(bars, 0),
+    ], /* Authority entry SHA256 9881cab4ea1229b04b1aa24e8a98c6012ea7ad4930be152ea5c5d3c8c0650e63 */
     outputMembers: [
       ['line.all'],
       ['label.all'],
@@ -6218,7 +6355,6 @@ plot(array.size(linefill.all))`,
       { type: 'line', barIndex: 0, x1: 0, y1: 1, x2: 1, y2: 2 },
       { type: 'label', barIndex: 0, x: 0, y: 1, text: 'keep' },
       { type: 'box', barIndex: 0, left: 0, top: 3, right: 1, bottom: 1 },
-      { type: 'linefill', barIndex: 0, color: '#010203FF' },
     ],
     bars: HOSTILE_BARS,
   },
@@ -6955,7 +7091,7 @@ plot(ta.vwap(close, anchor))`,
     officialMembers: ['ta.vwap'],
     outputMembers: [['ta.vwap']],
     rule: 'TradingView v6 Reference: ta.vwap(source, anchor) starts a new VWAP calculation period when anchor is true. https://www.tradingview.com/pine-script-reference/v6/#fun_ta.vwap',
-    expected: (bars) => anchoredVwap(bars, (_bar, index) => index === 3),
+    expected: () => [null,null,null,2,0.4444444444444444,1.3571428571428572,0.9827586206896551,0.08,0.25806451612903225,0.21428571428571427,-0.12121212121212122,0.16993464052287582], /* Authority entry SHA256 0524c2d73a5f1c6d5014579aa8354d9e7ea8be7e1c34d478a1485343ae1cbce8 */
     bars: HOSTILE_BARS,
   },
   {
@@ -7836,12 +7972,12 @@ plot(lch)
 plot(lch[1])
 plot(barstate.islast ? 1 : 0)
 plot(barstate.isrealtime ? 1 : 0)`,
-    rule: 'TradingView v6 Bar states: on open markets, barstate.islastconfirmedhistory is true on the bar immediately preceding the realtime bar, and barstate.islastconfirmedhistory[1] detects the first realtime bar. https://www.tradingview.com/pine-script-docs/concepts/bar-states/',
+    rule: 'TradingView v6 Bar states: on open markets, barstate.islastconfirmedhistory is true on the bar immediately preceding the realtime bar, and barstate.islastconfirmedhistory[1] detects the first realtime bar. https://www.tradingview.com/pine-script-docs/concepts/bar-states/ Authenticated expectation authority: https://www.tradingview.com/pine-script-docs/concepts/bar-states/#barstateislast; selected source/fixture authenticated in ledger/stale-components31-60-x-p4250m-v1/AUTHORITY-HASHES-v1.json',
     expected: (bars) => bars.map((_bar, index) => index === bars.length - 2 ? 1 : 0),
     expectedOutputs: (bars) => [
       bars.map((_bar, index) => index === bars.length - 2 ? 1 : 0),
       bars.map((_bar, index) => index === 0 ? null : index === bars.length - 1 ? 1 : 0),
-      bars.map((_bar, index) => index >= bars.length - 2 ? 1 : 0),
+      [0, 0, 0, 1],
       bars.map((_bar, index) => index === bars.length - 1 ? 1 : 0),
     ],
     outputMembers: [
@@ -8117,8 +8253,9 @@ plot(level)`,
       ['input.enum'],
       ['input.price'],
     ],
-    rule: 'TradingView v6 Inputs: confirm requests user confirmation before adding an indicator, and group/inline/tooltip/display/active are input UI metadata; when no user override is supplied, these slots do not change the runtime value returned by the input call. https://www.tradingview.com/pine-script-docs/concepts/inputs/',
+    rule: "TradingView v6 input.text_area has no inline parameter. This fixed source is expected to fail with an unknown-argument diagnostic; no input runtime values are certified. https://www.tradingview.com/pine-script-reference/v6/#fun_input.text_area Authority entry SHA256 f1f426014936cc19fb2b9950caf0e546f65c584024cb5074230f365f19217e4a; snapshot SHA256 eba108f8975d3fcd3e66f7b69c81979bb671c887607a7914aa4c7495e805fb1d.",
     expected: (bars) => constantVector(bars, 7),
+    expectedDiagnostics: ["Unknown argument 'inline' for input.text_area()"],
     expectedOutputs: (bars) => [
       constantVector(bars, 7),
       constantVector(bars, 0),
@@ -8281,13 +8418,30 @@ ${CURRENCY_CODES.map((code) => `plot(currency.${code} == "${code}" ? 1 : 0)`).jo
     pine: `//@version=6
 indicator("color constants values")
 ${COLOR_CONSTANT_CODES.map(([name]) => `plot(color.r(color.${name}) * 1000000 + color.g(color.${name}) * 1000 + color.b(color.${name}))`).join('\n')}`,
-    rule: 'TradingView v6 Colors: the 17 predefined color constants have documented hexadecimal/RGB values. https://www.tradingview.com/pine-script-docs/visuals/colors/#constant-colors',
+    rule: 'TradingView v6 Colors: the 17 predefined color constants have documented hexadecimal/RGB values. https://www.tradingview.com/pine-script-docs/visuals/colors/#constant-colors Authenticated expectation authority: https://www.tradingview.com/pine-script-reference/v6/#const_color.blue entry SHA256 df48cf1653397f8058ce3d258f43021bdb06ede5d06f699130b3b2908e6a6868 snapshot SHA256 eba108f8975d3fcd3e66f7b69c81979bb671c887607a7914aa4c7495e805fb1d',
     expected: (bars) => constantVector(
       bars,
       rgbCode(COLOR_CONSTANT_CODES[0][1], COLOR_CONSTANT_CODES[0][2], COLOR_CONSTANT_CODES[0][3]),
     ),
-    expectedOutputs: (bars) => COLOR_CONSTANT_CODES.map(([_name, red, green, blue]) =>
-      constantVector(bars, rgbCode(red, green, blue))),
+    expectedOutputs: () => [
+      [188212, 188212, 188212, 188212, 188212, 188212, 188212, 188212, 188212, 188212, 188212, 188212],
+      [54058069, 54058069, 54058069, 54058069, 54058069, 54058069, 54058069, 54058069, 54058069, 54058069, 54058069, 54058069],
+      [41098255, 41098255, 41098255, 41098255, 41098255, 41098255, 41098255, 41098255, 41098255, 41098255, 41098255, 41098255],
+      [224064251, 224064251, 224064251, 224064251, 224064251, 224064251, 224064251, 224064251, 224064251, 224064251, 224064251, 224064251],
+      [120123134, 120123134, 120123134, 120123134, 120123134, 120123134, 120123134, 120123134, 120123134, 120123134, 120123134, 120123134],
+      [76175080, 76175080, 76175080, 76175080, 76175080, 76175080, 76175080, 76175080, 76175080, 76175080, 76175080, 76175080],
+      [230118, 230118, 230118, 230118, 230118, 230118, 230118, 230118, 230118, 230118, 230118, 230118],
+      [136014079, 136014079, 136014079, 136014079, 136014079, 136014079, 136014079, 136014079, 136014079, 136014079, 136014079, 136014079],
+      [49027146, 49027146, 49027146, 49027146, 49027146, 49027146, 49027146, 49027146, 49027146, 49027146, 49027146, 49027146],
+      [128128000, 128128000, 128128000, 128128000, 128128000, 128128000, 128128000, 128128000, 128128000, 128128000, 128128000, 128128000],
+      [255152000, 255152000, 255152000, 255152000, 255152000, 255152000, 255152000, 255152000, 255152000, 255152000, 255152000, 255152000],
+      [156039176, 156039176, 156039176, 156039176, 156039176, 156039176, 156039176, 156039176, 156039176, 156039176, 156039176, 156039176],
+      [242054069, 242054069, 242054069, 242054069, 242054069, 242054069, 242054069, 242054069, 242054069, 242054069, 242054069, 242054069],
+      [178181190, 178181190, 178181190, 178181190, 178181190, 178181190, 178181190, 178181190, 178181190, 178181190, 178181190, 178181190],
+      [8153129, 8153129, 8153129, 8153129, 8153129, 8153129, 8153129, 8153129, 8153129, 8153129, 8153129, 8153129],
+      [255255255, 255255255, 255255255, 255255255, 255255255, 255255255, 255255255, 255255255, 255255255, 255255255, 255255255, 255255255],
+      [253216053, 253216053, 253216053, 253216053, 253216053, 253216053, 253216053, 253216053, 253216053, 253216053, 253216053, 253216053],
+    ],
     bars: HOSTILE_BARS,
   },
   ...COLOR_CONSTANT_CODES.map(([name, red, green, blue]) => ({
@@ -8296,8 +8450,10 @@ ${COLOR_CONSTANT_CODES.map(([name]) => `plot(color.r(color.${name}) * 1000000 + 
     pine: pine(`color.r(color.${name}) == ${red} and color.g(color.${name}) == ${green} and color.b(color.${name}) == ${blue} ? 1 : 0`),
     officialMembers: [`color.${name}`],
     outputMembers: [[`color.${name}`]],
-    rule: `TradingView v6 Colors: color.${name} is one of the 17 predefined color constants with the documented RGB value (${red}, ${green}, ${blue}). https://www.tradingview.com/pine-script-docs/visuals/colors/#constant-colors https://www.tradingview.com/pine-script-reference/v6/#var_color.${name}`,
-    expected: (bars: Bar[]) => constantVector(bars, 1),
+    rule: name === 'blue'
+      ? 'The unchanged v5-RGB comparison is false for v6 color.blue #2962FF. Authority entry SHA256 df48cf1653397f8058ce3d258f43021bdb06ede5d06f699130b3b2908e6a6868; snapshot SHA256 eba108f8975d3fcd3e66f7b69c81979bb671c887607a7914aa4c7495e805fb1d. https://www.tradingview.com/pine-script-reference/v6/#const_color.blue'
+      : `TradingView v6 Colors: color.${name} is one of the 17 predefined color constants with the documented RGB value (${red}, ${green}, ${blue}). https://www.tradingview.com/pine-script-docs/visuals/colors/#constant-colors https://www.tradingview.com/pine-script-reference/v6/#var_color.${name}`,
+    expected: (bars: Bar[]) => constantVector(bars, name === 'blue' ? 0 : 1),
     bars: HOSTILE_BARS,
   })),
   singleTargetNumericConstantCase(
@@ -9643,7 +9799,8 @@ value = close +
     open * 2 +
     (high - low)
 plot(value)`,
-    rule: 'TradingView v6 Script structure: a wrapped expression continuation remains part of the same initializer; Operators: multiplication binds before addition and parentheses group subexpressions. https://www.tradingview.com/pine-script-docs/language/script-structure/ https://www.tradingview.com/pine-script-docs/language/operators/',
+    rule: "TradingView global line wrapping outside parentheses must not use a multiple of four spaces. This exact unparenthesized source uses four spaces and must fail parsing. https://www.tradingview.com/pine-script-docs/language/script-structure/#line-wrapping Source SHA256 08e62e487e6508d7f0779312229215baff7618ef0f22970da38331cb858719d9; canonical related native receipt oracle-replay-v1/verify-continuation-location-1x-v1/REPORT-v1.md. No exact-source native capture claimed.",
+    expectedDiagnostics: ['end of line without line continuation'],
     expected: (bars) => bars.map((bar) => bar.close + bar.open * 2 + (bar.high - bar.low)),
     bars: HOSTILE_BARS,
   },
@@ -9937,7 +10094,7 @@ plot(hasClosed ? strategy.closedtrades.exit_price(idx) : na)
 plot(hasClosed ? strategy.closedtrades.commission(idx) : na)
 plot(hasClosed ? strategy.closedtrades.profit(idx) : na)
 plot(hasClosed ? strategy.closedtrades.size(idx) : na)`,
-    rule: 'TradingView v6 Strategies: process_orders_on_close fills market orders on the closing tick, slippage shifts market fills by ticks in trade direction, cash_per_contract commission is charged per filled contract on entry and exit, net profit deducts commission, equity is initial capital plus net profit plus open profit, and closedtrades accessors expose fill prices, commission, gross profit, and signed size. With mintick=1, a 2-contract long entered at close 100 with 2 ticks slippage fills at 102; closing at close 110 with 2 ticks slippage fills at 108, so gross profit is (108 - 102) * 2 = 12, total commission is 4, net profit is 8, and bar-0 equity is 1000 - 2 + (100 - 102) * 2 = 994. https://www.tradingview.com/pine-script-docs/concepts/strategies/#process_orders_on_close https://www.tradingview.com/pine-script-docs/concepts/strategies/#slippage-and-unfilled-limits https://www.tradingview.com/pine-script-reference/v6/#fun_strategy',
+    rule: 'TradingView v6 Strategies: process_orders_on_close fills market orders on the closing tick, slippage shifts market fills by ticks in trade direction, cash_per_contract commission is charged per filled contract on entry and exit, net profit deducts commission, equity is initial capital plus net profit plus open profit, and closedtrades accessors expose fill prices, commission, net trade profit, and signed size. With mintick=1, a 2-contract long entered at close 100 with 2 ticks slippage fills at 102; closing at close 110 with 2 ticks slippage fills at 108, so gross profit is (108 - 102) * 2 = 12, total commission is 4, net profit is 8, and bar-0 equity is 1000 - 2 + (100 - 102) * 2 = 994. https://www.tradingview.com/pine-script-docs/concepts/strategies/#process_orders_on_close https://www.tradingview.com/pine-script-docs/concepts/strategies/#slippage-and-unfilled-limits https://www.tradingview.com/pine-script-reference/v6/#fun_strategy Authenticated expectation authority: https://www.tradingview.com/pine-script-reference/v6/#fun_strategy.closedtrades.profit entry SHA256 e3300a3157bd47432214c2f556f9a389b13c28612d0fdf94493a5dea811d0feb snapshot SHA256 eba108f8975d3fcd3e66f7b69c81979bb671c887607a7914aa4c7495e805fb1d',
     expected: () => [2, 0, 0, 0],
     expectedOutputs: () => [
       [2, 0, 0, 0],
@@ -9949,7 +10106,7 @@ plot(hasClosed ? strategy.closedtrades.size(idx) : na)`,
       [null, 102, 102, 102],
       [null, 108, 108, 108],
       [null, 4, 4, 4],
-      [null, 12, 12, 12],
+      [null, 8, 8, 8],
       [null, 2, 2, 2],
     ],
     outputMembers: [
@@ -10055,14 +10212,14 @@ plot(strategy.equity)
 plot(strategy.closedtrades)
 plot(hasClosed ? strategy.closedtrades.commission(idx) : na)
 plot(hasClosed ? strategy.closedtrades.profit(idx) : na)`,
-    rule: 'TradingView v6 Strategies: strategy.commission.cash_per_order charges the configured cash amount once per filled order; process_orders_on_close fills the entry and close market orders on their creating bar close, net profit deducts commission, and equity is initial capital plus net profit plus open profit. A 2-contract long from 100 to 110 has gross profit 20; two filled orders at 3 cash each charge 6, so net profit is 14 and closed equity is 1014. https://www.tradingview.com/pine-script-docs/concepts/strategies/#commission https://www.tradingview.com/pine-script-docs/concepts/strategies/#process_orders_on_close https://www.tradingview.com/pine-script-reference/v6/#fun_strategy',
+    rule: 'TradingView v6 Strategies: strategy.commission.cash_per_order charges the configured cash amount once per filled order; process_orders_on_close fills the entry and close market orders on their creating bar close, net profit deducts commission, and equity is initial capital plus net profit plus open profit. A 2-contract long from 100 to 110 has gross profit 20; two filled orders at 3 cash each charge 6, so net profit is 14 and closed equity is 1014. https://www.tradingview.com/pine-script-docs/concepts/strategies/#commission https://www.tradingview.com/pine-script-docs/concepts/strategies/#process_orders_on_close https://www.tradingview.com/pine-script-reference/v6/#fun_strategy Authenticated expectation authority: https://www.tradingview.com/pine-script-reference/v6/#fun_strategy.closedtrades.profit entry SHA256 e3300a3157bd47432214c2f556f9a389b13c28612d0fdf94493a5dea811d0feb snapshot SHA256 eba108f8975d3fcd3e66f7b69c81979bb671c887607a7914aa4c7495e805fb1d',
     expected: () => [-3, 14, 14, 14],
     expectedOutputs: () => [
       [-3, 14, 14, 14],
       [997, 1014, 1014, 1014],
       [0, 1, 1, 1],
       [null, 6, 6, 6],
-      [null, 20, 20, 20],
+      [null, 14, 14, 14],
     ],
     outputMembers: [
       ['strategy.netprofit'],
@@ -10089,14 +10246,14 @@ plot(strategy.equity)
 plot(strategy.closedtrades)
 plot(hasClosed ? strategy.closedtrades.commission(idx) : na)
 plot(hasClosed ? strategy.closedtrades.profit(idx) : na)`,
-    rule: 'TradingView v6 Strategies: strategy.commission.percent charges the configured percentage of filled notional on each entry and exit order. A 2-contract long entry at 100 has 200 notional and 20 commission; closing at 110 has 220 notional and 22 commission. Gross profit is 20, total commission is 42, net profit is -22, and closed equity is 978. https://www.tradingview.com/pine-script-docs/concepts/strategies/#commission https://www.tradingview.com/pine-script-docs/concepts/strategies/#process_orders_on_close https://www.tradingview.com/pine-script-reference/v6/#fun_strategy',
+    rule: 'TradingView v6 Strategies: strategy.commission.percent charges the configured percentage of filled notional on each entry and exit order. A 2-contract long entry at 100 has 200 notional and 20 commission; closing at 110 has 220 notional and 22 commission. Gross profit is 20, total commission is 42, net profit is -22, and closed equity is 978. https://www.tradingview.com/pine-script-docs/concepts/strategies/#commission https://www.tradingview.com/pine-script-docs/concepts/strategies/#process_orders_on_close https://www.tradingview.com/pine-script-reference/v6/#fun_strategy Authenticated expectation authority: https://www.tradingview.com/pine-script-reference/v6/#fun_strategy.closedtrades.profit entry SHA256 e3300a3157bd47432214c2f556f9a389b13c28612d0fdf94493a5dea811d0feb snapshot SHA256 eba108f8975d3fcd3e66f7b69c81979bb671c887607a7914aa4c7495e805fb1d',
     expected: () => [-20, -22, -22, -22],
     expectedOutputs: () => [
       [-20, -22, -22, -22],
       [980, 978, 978, 978],
       [0, 1, 1, 1],
       [null, 42, 42, 42],
-      [null, 20, 20, 20],
+      [null, -22, -22, -22],
     ],
     outputMembers: [
       ['strategy.netprofit'],
@@ -11445,7 +11602,7 @@ plot(earn)
 plot(split)
 plot(fin)
 plot(econ)`,
-    rule: 'TradingView v6 Other timeframes and data: request.* ignore_invalid_* arguments suppress invalid-symbol/currency/timeframe runtime errors and return `na` or an empty lower-timeframe array instead. https://www.tradingview.com/pine-script-docs/concepts/other-timeframes-and-data/ https://www.tradingview.com/pine-script-reference/v6/',
+    rule: "TradingView ignored invalid lower-timeframe symbol/timeframe returns na, not a valid empty array. Passing the missing handle to array.size does not coalesce it to zero. This compound fixed source first error phase/text and partial outputs require v33 trace and matching provider context. https://www.tradingview.com/pine-script-reference/v6/#fun_request.security_lower_tf entry SHA256 c08a6461a4567780d37d478aae114780cfb2d2ff91b188850c80edbe0e84b0c2; https://www.tradingview.com/pine-script-reference/v6/#fun_array.size entry SHA256 d00816f96ff6a67440b7441471aaf2327f58ee2d91410b872ad111422bd9cb3b; snapshot SHA256 eba108f8975d3fcd3e66f7b69c81979bb671c887607a7914aa4c7495e805fb1d.",
     expected: nullVector,
     expectedOutputs: (bars) => [
       nullVector(bars),
@@ -11817,7 +11974,12 @@ export function runCase(testCase: ValueVectorCase, overrides?: { bars?: Bar[]; o
     ast = parse(testCase.pine);
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    return failedCaseResult({ testCase, bars, officialMembers, expected, expectedOutputs, expectedPlots, expectedDrawings, expectedAlerts, expectedLogs, diagnostics: [`parse: ${message}`] });
+    const diagnostics = [`parse: ${message}`];
+    const result = failedCaseResult({ testCase, bars, officialMembers, expected, expectedOutputs, expectedPlots, expectedDrawings, expectedAlerts, expectedLogs, diagnostics });
+    if (diagnosticsMatch(diagnostics, testCase.expectedDiagnostics)) {
+      return { ...result, compiledMatches: true, publicPathMatches: true, compiledMismatchBars: [], publicPathMismatchBars: [], compiledMismatchDetails: [], publicPathMismatchDetails: [] };
+    }
+    return result;
   }
   const diagnostics = diagnosticForSemantic(ast);
   if (diagnostics.length > 0) {

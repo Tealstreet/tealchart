@@ -210,17 +210,16 @@ describe('native indicator output tag sources', () => {
     ).toEqual([]);
   });
 
-  // A forceOverlay plot draws on the main pane but the shared helper emits no
-  // label for it, so there is no tag and nothing to stack.
-  it('emits nothing for a forceOverlay plot', () => {
-    expect(
-      createNativeIndicatorOutputTagSources({
-        panes,
-        indicatorPaneInfo: { bb: { overlay: true } },
-        plots: [plot({ id: 'basis', scriptId: 'bb', values: [63_500], forceOverlay: true })],
-        totalBarCount: 1,
-      }),
-    ).toEqual([]);
+  // force_overlay routes an indicator-pane output to the main price scale.
+  it('routes a forceOverlay plot to the main price-axis stack', () => {
+    const sources = createNativeIndicatorOutputTagSources({
+      panes,
+      indicatorPaneInfo: { bb: { overlay: false, paneId: 'pane_1' } },
+      plots: [plot({ id: 'basis', scriptId: 'bb', values: [63_500], forceOverlay: true })],
+      totalBarCount: 1,
+    });
+    expect(sources).toHaveLength(1);
+    expect(sources[0]).toMatchObject({ sourceType: 'indicatorOutput', price: 63_500, objectId: 'main:indicator-output:bb:basis' });
   });
 
   it('emits nothing without a main pane', () => {

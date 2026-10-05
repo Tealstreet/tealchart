@@ -198,6 +198,8 @@ export interface ChartCoreOptions {
   onUserDrawingCancelDraft?: () => void;
   /** Crosshair moved callback */
   onCrossHairMoved?: (price: number, time: number) => void;
+  /** Selected bar time for numeric indicator readouts; undefined returns to the latest bar. */
+  onIndicatorReadoutTimeChange?: (time?: number) => void;
   /** Called when pane heights change via divider drag */
   onPaneHeightsChange?: (heights: { paneId: string; heightRatio: number }[]) => void;
   /** Called when auto-scale should be disabled (user starts price axis zoom) */
@@ -377,6 +379,7 @@ export class ChartCore {
   }
   private executionLines: ExecutionLineRenderData[] = [];
   private plots: PlotOutput[] = [];
+  private codedPlots: PlotOutput[] = [];
   private drawings: DrawingOutput[] = [];
   private userDrawingState: UserDrawingState | null = null;
   private userDrawingDraftPreviewAnchor: UserDrawingAnchor | null = null;
@@ -695,9 +698,11 @@ export class ChartCore {
         );
         const time = this.renderer.publicXToTime(x, this.viewport ?? TealchartRenderer.calculateViewport(this.bars));
         this.options.onCrossHairMoved?.(price, time);
+        this.options.onIndicatorReadoutTimeChange?.(time);
       },
       onCrossHairVisibilityChange: (visible) => {
         this.crosshair = { ...this.crosshair, visible };
+        if (!visible) this.options.onIndicatorReadoutTimeChange?.();
       },
       onMouseDown: () => this.options.onMouseDown?.(),
       onMouseUp: () => this.options.onMouseUp?.(),
@@ -858,8 +863,9 @@ export class ChartCore {
    * Reference equality check - skip if same array
    */
   setPlots(plots: PlotOutput[]): void {
-    if (plots === this.plots) return;
-    this.plots = plots;
+    if (plots === this.codedPlots) return;
+    this.codedPlots = plots;
+    this.applyPlotDisplayOverrides();
     // No scheduleRender — paint() is called by the widget after pushing state
   }
 
@@ -916,7 +922,19 @@ export class ChartCore {
    */
   setPlotStyleOverrides(overrides: Map<string, PlotStyleOverride>): void {
     this.plotStyleOverrides = overrides;
+    this.applyPlotDisplayOverrides();
     // No scheduleRender — paint() is called by the widget after pushing state
+  }
+
+  getPlots(): readonly PlotOutput[] {
+    return this.plots;
+  }
+
+  private applyPlotDisplayOverrides(): void {
+    this.plots = this.codedPlots.map((plot) => {
+      const display = plot.editable === false ? undefined : this.plotStyleOverrides.get(plot.id)?.display;
+      return display === undefined ? plot : { ...plot, display };
+    });
   }
 
   /**
@@ -2395,6 +2413,7 @@ export class ChartCore {
 
     // Draw jailbreak indicator tooltips
     this._drawJailbreakTooltips(ctx, x, y);
+    this.renderer.renderTealScriptDrawingTooltip(new WebCanvasContext(ctx), x, y);
   }
 
   private getJailbreakTooltipBarsInSeconds(bars: Bar[]): Bar[] {

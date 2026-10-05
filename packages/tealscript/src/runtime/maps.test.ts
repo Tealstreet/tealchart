@@ -66,13 +66,14 @@ describe('PineMap', () => {
     expect(getMapValue(copy, 'C')).toBe(30);
   });
 
-  it('rejects non-value and non-finite keys', () => {
-    const map = createPineMap();
-
-    expect(() => putMapValue(map, Number.NaN, 1)).toThrow('Map keys must be finite value types');
-    expect(() => putMapValue(map, Number.POSITIVE_INFINITY, 1)).toThrow('Map keys must be finite value types');
-    expect(() => putMapValue(map, Number.NEGATIVE_INFINITY, 1)).toThrow('Map keys must be finite value types');
-    expect(() => putMapValue(map, {}, 1)).toThrow('Map keys must be value types');
+  it('accepts captured missing/overflowing numeric keys and rejects reference keys', () => {
+    for (const key of [Number.NaN, Number.POSITIVE_INFINITY]) {
+      const map = createPineMap();
+      putMapValue(map, key, 7);
+      expect(getMapSize(map)).toBe(1);
+      expect(getMapValue(map, key)).toBe(7);
+    }
+    expect(() => putMapValue(createPineMap(), {}, 1)).toThrow('Map keys must be value types');
   });
 
   it('enforces the Pine map capacity limit for new keys', () => {

@@ -2,9 +2,10 @@ import type { PlotOutput } from '@tealstreet/tealscript';
 import type { ReactElement, ReactNode } from 'react';
 import type { NativeVisibleBar } from './nativeVisibleBars';
 
-import { Group, Rect, Skia, Path as SkiaPath, Text as SkiaText } from '@shopify/react-native-skia';
+import { Group, Picture, Skia, Path as SkiaPath, Text as SkiaText } from '@shopify/react-native-skia';
 import { describe, expect, it, vi } from 'vitest';
 
+import { nativePictureRects } from '../../test/nativePictureRects';
 import { createNativeChartFrameFromPanes } from './nativeChartFrame';
 import { getNativeIndicatorPlotPoints, NativeIndicatorPlotLayerImpl } from './NativeIndicatorPlotLayer';
 import { createNativeChartProjection } from './nativeProjection';
@@ -299,7 +300,7 @@ describe('native Pine visual output rendering', () => {
 
     const rendered = renderVisuals([upper, lower, fill, background]);
     const paths = findProps(rendered, SkiaPath);
-    const rects = findProps(rendered, Rect);
+    const rects = findProps(rendered, Picture).flatMap((props) => nativePictureRects(props.picture));
     const pathColors = paths.map((props) => props.color);
 
     expect(pathColors).toContain('#787B86');
@@ -342,6 +343,27 @@ describe('native Pine visual output rendering', () => {
     expect(vi.mocked(greenPath.value.lineTo as never).mock.calls).toHaveLength(0);
     expect(vi.mocked(redPath.value.moveTo as never).mock.calls).toHaveLength(1);
     expect(vi.mocked(redPath.value.lineTo as never).mock.calls).toHaveLength(1);
+  });
+
+  it('keeps na-colored native horizontal lines hidden', () => {
+    const rendered = renderVisuals([plot({ type: 'hline', price: 50, color: [] })]);
+    const path = findProps(rendered, SkiaPath)[0].path as { value: { moveTo: unknown } };
+    expect(vi.mocked(path.value.moveTo as never).mock.calls).toHaveLength(0);
+    expect(findProps(rendered, Group).some((props) => props.opacity === 0)).toBe(true);
+  });
+
+  it('uses pixel widths for native histograms and one pixel point joins', () => {
+    const histogram = renderVisuals([plot({ style: 'histogram', linewidth: 200, values: [20, 40, 60] })]);
+    const path = findProps(histogram, SkiaPath)[0].path as { value: { addRect: unknown } };
+    expect(
+      vi.mocked(path.value.addRect as never).mock.calls.map((call) => (call[0] as { width: number }).width),
+    ).toEqual([200, 200, 200]);
+    for (const style of ['cross', 'circles'] as const) {
+      const points = renderVisuals([plot({ style, linewidth: 4, join: true, values: [20, 40, 60] })]);
+      const paths = findProps(points, SkiaPath);
+      expect(paths[0].strokeWidth).toBe(4);
+      expect(paths[1].strokeWidth).toBe(1);
+    }
   });
 
   it('renders histogram bars with per-bar colors and skips color na', () => {
@@ -567,10 +589,10 @@ describe('native Pine visual output rendering', () => {
     expect(vi.mocked(downPath.value.close as never).mock.calls).toHaveLength(1);
   });
 
-  it('renders plotarrow with TradingView-style default up and down colors', () => {
+  it('renders plotarrow with runtime-resolved default up and down colors', () => {
     const rendered = renderVisuals([
       {
-        color: undefined as never,
+        color: ['#4CAF50', '#F23645', null],
         id: 'plotarrow_Default',
         scriptId: 'script',
         title: 'Default',

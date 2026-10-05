@@ -87,6 +87,7 @@ export function parse(source: string, options: ParseOptions<ParseStartRule> = {}
   source = normalizeLineEndings(source);
   // Replace non-breaking spaces (U+00A0) outside string literals with regular spaces.
   source = normalizeNbspOutsideStrings(source);
+  source = normalizeFullWidthCommentIndent(source);
   assertSourceLength(source, options.maxSourceLength ?? DEFAULT_MAX_SOURCE_LENGTH);
   const normalized = normalizeIndent(normalizeLeadingTabs(source));
   const preflightError = findInvalidForeignSyntax(normalized);
@@ -99,7 +100,9 @@ export function parse(source: string, options: ParseOptions<ParseStartRule> = {}
     });
 
     if ((options.startRule ?? 'Program') === 'Program' && isProgramNode(result)) {
+      assertGlobalStatementIndentation(result, normalized);
       const detectedVersion = detectPineVersion(normalized);
+      if (detectedVersion === 6) assertUndelimitedContinuationIndentation(result, normalized);
       result.version = detectedVersion ?? result.version;
       result.explicitVersion = detectedVersion !== undefined;
     }
@@ -122,6 +125,19 @@ export function parse(source: string, options: ParseOptions<ParseStartRule> = {}
 }
 
 function enhanceParseError(source: string, error: PeggySyntaxError): TealscriptParseError | null {
+  const offset = error.location.start.offset;
+  const lineStart = source.lastIndexOf('\n', offset - 1) + 1;
+  if (detectPineVersion(source) === 5
+    && /^as(?:\s|$)/.test(source.slice(offset))
+    && /^[ \t]*import[ \t]+[A-Za-z0-9_-]+[ \t]+$/.test(source.slice(lineStart, offset))) {
+    return new TealscriptParseError(
+      "'as' cannot be used as a variable or function name.",
+      sourceLocationFromPeggy(error),
+      error.found,
+      error.expected
+    );
+  }
+
   const rejectedInvisibleCharacter = findRejectedInvisibleCharacterAtError(source, error);
   if (rejectedInvisibleCharacter !== undefined) {
     const character = source[rejectedInvisibleCharacter];
@@ -239,7 +255,7 @@ function findInvalidForeignSyntax(source: string): TealscriptParseError | null {
     );
   }
 
-  const returnOffset = findStatementKeywordOffset(source, 'return');
+  const returnOffset = findReturnStatementOffset(source);
   if (returnOffset !== undefined) {
     return new TealscriptParseError(
       'Pine Script has no `return` statement; a Pine function returns the value of its last expression.',
@@ -272,8 +288,8 @@ function findInvalidForeignSyntax(source: string): TealscriptParseError | null {
   return null;
 }
 
-function findStatementKeywordOffset(source: string, keyword: string): number | undefined {
-  const pattern = new RegExp(`(^|\\n)([ \\t]*)${keyword}\\b`, 'g');
+function findReturnStatementOffset(source: string): number | undefined {
+  const pattern = /(^|\n)([ \t]*)return\b(?![ \t]*(?:=(?!=)|\([^\n]*\)[ \t]*=>))/g;
   let match: RegExpExecArray | null;
   while ((match = pattern.exec(source)) !== null) {
     const offset = match.index + (match[1]?.length ?? 0) + (match[2]?.length ?? 0);
@@ -439,59 +455,150 @@ function isIdentifierBoundaryPart(character: string): boolean {
 }
 
 function isInsideStringOrComment(source: string, targetOffset: number): boolean {
-  let inDouble = false;
-  let inSingle = false;
-  let inLineComment = false;
-  let inBlockComment = false;
-  let escaped = false;
+  return protectedSourceRanges(source).some(({ start, end }) => start < targetOffset && targetOffset < end);
+}
 
-  for (let offset = 0; offset < targetOffset; offset++) {
-    const ch = source[offset];
-    const next = source[offset + 1];
+interface ProtectedSourceRange {
+  start: number;
+  end: number;
+  kind: 'string' | 'comment';
+}
 
-    if (inLineComment) {
-      if (ch === '\n' || ch === '\r') inLineComment = false;
-      continue;
-    }
-    if (inBlockComment) {
-      if (ch === '*' && next === '/') {
-        inBlockComment = false;
-        offset += 1;
+function protectedSourceRanges(source: string): ProtectedSourceRange[] {
+  const ranges: ProtectedSourceRange[] = [];
+  for (let offset = 0; offset < source.length;) {
+    const start = offset;
+    if (source.startsWith('//', offset)) {
+      const newline = source.indexOf('\n', offset + 2);
+      offset = newline < 0 ? source.length : newline + 1;
+      ranges.push({ start, end: offset, kind: 'comment' });
+    } else if (source.startsWith('/*', offset)) {
+      const closing = source.indexOf('*/', offset + 2);
+      offset = closing < 0 ? source.length : closing + 2;
+      ranges.push({ start, end: offset, kind: 'comment' });
+    } else if (source[offset] === '"' || source[offset] === "'") {
+      const quote = source[offset];
+      const delimiter = source.startsWith(quote.repeat(3), offset) ? quote.repeat(3) : quote;
+      offset += delimiter.length;
+      while (offset < source.length) {
+        if (source.startsWith(delimiter, offset)) {
+          offset += delimiter.length;
+          break;
+        }
+        offset += delimiter.length === 1 && source[offset] === '\\' ? 2 : 1;
       }
-      continue;
-    }
-    if (escaped) {
-      escaped = false;
-      continue;
-    }
-    if (ch === '\\' && (inDouble || inSingle)) {
-      escaped = true;
-      continue;
-    }
-    if (!inDouble && !inSingle && ch === '/' && next === '/') {
-      inLineComment = true;
+      ranges.push({ start, end: offset, kind: 'string' });
+    } else {
       offset += 1;
-      continue;
     }
-    if (!inDouble && !inSingle && ch === '/' && next === '*') {
-      inBlockComment = true;
-      offset += 1;
-      continue;
-    }
-    if (ch === '"' && !inSingle) inDouble = !inDouble;
-    else if (ch === "'" && !inDouble) inSingle = !inSingle;
   }
+  return ranges;
+}
 
-  return inDouble || inSingle || inLineComment || inBlockComment;
+function replaceOutsideStrings(source: string, pattern: RegExp, replacement: (value: string) => string): string {
+  const ranges = protectedSourceRanges(source).filter(({ kind }) => kind === 'string');
+  let rangeIndex = 0;
+  return source.replace(pattern, (value: string, offset: number) => {
+    while (rangeIndex < ranges.length && ranges[rangeIndex].end <= offset) rangeIndex++;
+    const range = ranges[rangeIndex];
+    return range && range.start <= offset && offset < range.end ? value : replacement(value);
+  });
+}
+
+function stringContinuationLines(source: string, lines: readonly string[]): Set<number> {
+  const ranges = protectedSourceRanges(source).filter(({ kind }) => kind === 'string');
+  const protectedLines = new Set<number>();
+  let offset = 0;
+  let rangeIndex = 0;
+  for (const [index, line] of lines.entries()) {
+    while (rangeIndex < ranges.length && ranges[rangeIndex].end <= offset) rangeIndex++;
+    const range = ranges[rangeIndex];
+    if (range && range.start < offset && offset < range.end) protectedLines.add(index);
+    offset += line.length + 1;
+  }
+  return protectedLines;
 }
 
 function isProgramNode(value: unknown): value is Program {
   return Boolean(value && typeof value === 'object' && (value as { type?: unknown }).type === 'Program');
 }
 
+function assertGlobalStatementIndentation(program: Program, source: string): void {
+  const lines = source.split('\n');
+  for (const statement of program.body) {
+    const location = statement.loc;
+    if (!location) continue;
+    const prefix = (lines[location.start.line - 1] ?? '').slice(0, location.start.column - 1);
+    if (prefix.length > 0 && prefix.trim().length === 0) {
+      throw new TealscriptParseError(
+        'Global Pine statements must begin at the first column; remove leading indentation.',
+        location,
+        null,
+        [],
+      );
+    }
+  }
+}
+
 function detectPineVersion(source: string): number | undefined {
   const match = source.match(/\/\/\s*@version\s*=\s*(\d+)/i);
   return match ? Number(match[1]) : undefined;
+}
+
+function assertUndelimitedContinuationIndentation(program: Program, source: string): void {
+  const lines = source.split('\n');
+  const coverage = new Int32Array(lines.length + 1);
+  const stack: unknown[] = [program];
+  while (stack.length > 0) {
+    const value = stack.pop();
+    if (!value || typeof value !== 'object') continue;
+    const node = value as AnyNode;
+    if (
+      (node.type === 'BinaryExpression' || node.type === 'ConditionalExpression') &&
+      node.loc
+    ) {
+      const { start, end } = node.loc;
+      if (end.line > start.line) {
+        coverage[start.line]++;
+        coverage[end.line]--;
+      }
+    }
+    for (const [key, child] of Object.entries(value)) {
+      if (key === 'loc') continue;
+      if (Array.isArray(child)) stack.push(...child);
+      else if (child && typeof child === 'object') stack.push(child);
+    }
+  }
+  const ranges = protectedSourceRanges(source);
+  let rangeIndex = 0;
+  let offset = 0;
+  let depth = 0;
+  let active = 0;
+  for (const [index, line] of lines.entries()) {
+    active += coverage[index];
+    const indent = line.match(/^[ \t]*/)?.[0] ?? '';
+    const tokenOffset = offset + indent.length;
+    while (rangeIndex < ranges.length && ranges[rangeIndex].end <= tokenOffset) rangeIndex++;
+    const range = ranges[rangeIndex];
+    const protectedToken = range && tokenOffset < range.end && (range.kind === 'comment' || range.start < offset);
+    const columns = indent.replace(/\t/g, '    ').length;
+    if (active > 0 && depth === 0 && line.trim() && !protectedToken && columns % 4 === 0) {
+      throw new TealscriptParseError(
+        'Syntax error at input "end of line without line continuation"',
+        sourceLocationAtOffset(source, offset - 1, offset),
+        '\n',
+        [],
+      );
+    }
+    for (let cursor = offset; cursor < offset + line.length; cursor++) {
+      while (rangeIndex < ranges.length && ranges[rangeIndex].end <= cursor) rangeIndex++;
+      const protectedRange = ranges[rangeIndex];
+      if (protectedRange && protectedRange.start <= cursor && cursor < protectedRange.end) continue;
+      if (source[cursor] === '(' || source[cursor] === '[') depth++;
+      else if (source[cursor] === ')' || source[cursor] === ']') depth--;
+    }
+    offset += line.length + 1;
+  }
 }
 
 function normalizeLineEndings(source: string): string {
@@ -501,69 +608,22 @@ function normalizeLineEndings(source: string): string {
 // Replace leading tabs on each line with 4 spaces (Pine convention).
 // Only affects leading whitespace so tabs inside string literals are untouched.
 function normalizeLeadingTabs(source: string): string {
-  return source.replace(/^(\t+)/gm, (tabs) => '    '.repeat(tabs.length));
+  if (!source.includes('\t')) return source;
+  return replaceOutsideStrings(source, /^\t+/gm, (tabs) => '    '.repeat(tabs.length));
 }
+
+function normalizeFullWidthCommentIndent(source: string): string {
+  if (!source.includes('\u3000')) return source;
+  return replaceOutsideStrings(source, /^[ \t\u3000]*\u3000[ \t\u3000]*(?=\/\/)/gm,
+    (prefix) => prefix.replace(/\u3000/g, ' '));
+}
+
 
 // Replace U+00A0 (non-breaking space) with regular space outside string literals.
 // Leaves NBSP inside single- or double-quoted strings untouched.
 function normalizeNbspOutsideStrings(source: string): string {
-  const NBSP = ' ';
-  if (!source.includes(NBSP)) return source;
-  let result = '';
-  let inDouble = false;
-  let inSingle = false;
-  let inLineComment = false;
-  let inBlockComment = false;
-  let escaped = false;
-  for (let i = 0; i < source.length; i++) {
-    const ch = source[i];
-    const next = source[i + 1];
-
-    if (inLineComment) {
-      if (ch === '\n' || ch === '\r') inLineComment = false;
-      result += ch === NBSP ? ' ' : ch;
-      continue;
-    }
-
-    if (inBlockComment) {
-      if (ch === '*' && next === '/') {
-        result += '*/';
-        i += 1;
-        inBlockComment = false;
-        continue;
-      }
-      result += ch === NBSP ? ' ' : ch;
-      continue;
-    }
-
-    if (escaped) {
-      escaped = false;
-      result += ch;
-      continue;
-    }
-    if (ch === '\\' && (inDouble || inSingle)) {
-      escaped = true;
-      result += ch;
-      continue;
-    }
-    if (!inDouble && !inSingle && ch === '/' && next === '/') {
-      inLineComment = true;
-      result += '//';
-      i += 1;
-      continue;
-    }
-    if (!inDouble && !inSingle && ch === '/' && next === '*') {
-      inBlockComment = true;
-      result += '/*';
-      i += 1;
-      continue;
-    }
-    if (ch === '"' && !inSingle) { inDouble = !inDouble; result += ch; continue; }
-    if (ch === "'" && !inDouble) { inSingle = !inSingle; result += ch; continue; }
-    if (ch === NBSP && !inDouble && !inSingle) { result += ' '; continue; }
-    result += ch;
-  }
-  return result;
+  if (!source.includes('\u00a0')) return source;
+  return replaceOutsideStrings(source, /\u00a0/g, () => ' ');
 }
 
 // Normalize 3-space indented UDF bodies to 4-space. Two-space indentation is
@@ -572,11 +632,12 @@ function normalizeNbspOutsideStrings(source: string): string {
 // present.
 function normalizeIndent(source: string): string {
   const lines = source.split('\n');
-  const continuationLines = continuationLineIndexes(lines);
+  const literalLines = stringContinuationLines(source, lines);
+  const continuationLines = continuationLineIndexes(lines, literalLines);
   let minIndent = Infinity;
   const indentLevels = new Set<number>();
   for (const [index, line] of lines.entries()) {
-    if (continuationLines.has(index)) continue;
+    if (continuationLines.has(index) || literalLines.has(index)) continue;
     if (line.trim().length === 0) continue;
     const leading = line.match(/^ +/);
     if (leading) {
@@ -591,11 +652,11 @@ function normalizeIndent(source: string): string {
   // All observed indent levels must be exact multiples of minIndent.
   // If any level is not a multiple, the script has mixed/irregular indentation — skip.
   if ([...indentLevels].some(n => n % minIndent !== 0)) return source;
-  if (!hasSmallIndentBlockBodyLine(lines, continuationLines, minIndent)) return source;
+  if (!hasSmallIndentBlockBodyLine(lines, continuationLines, literalLines, minIndent)) return source;
   // Consistent small-unit indent — promote each level to multiples of 4.
   return lines
     .map((line, index) => {
-      if (continuationLines.has(index)) return line;
+      if (continuationLines.has(index) || literalLines.has(index)) return line;
       const leading = line.match(/^ +/);
       if (!leading) return line;
       const spaces = leading[0].length;
@@ -605,9 +666,10 @@ function normalizeIndent(source: string): string {
     .join('\n');
 }
 
-function hasSmallIndentBlockBodyLine(lines: readonly string[], continuationLines: ReadonlySet<number>, minIndent: number): boolean {
+function hasSmallIndentBlockBodyLine(lines: readonly string[], continuationLines: ReadonlySet<number>, literalLines: ReadonlySet<number>, minIndent: number): boolean {
   let previousCode = '';
   for (const [index, line] of lines.entries()) {
+    if (literalLines.has(index)) continue;
     const trimmed = line.trim();
     if (trimmed.length === 0 || trimmed.startsWith('//')) continue;
     const leading = line.match(/^ +/)?.[0].length ?? 0;
@@ -623,11 +685,12 @@ function opensIndentedBlock(code: string): boolean {
   return /=>\s*$/.test(code) || /^(?:if|else if|else|for|while|switch)\b/.test(code.trim());
 }
 
-function continuationLineIndexes(lines: readonly string[]): Set<number> {
+function continuationLineIndexes(lines: readonly string[], literalLines: ReadonlySet<number>): Set<number> {
   const indexes = new Set<number>();
   let previousCode = '';
 
   for (let index = 0; index < lines.length; index++) {
+    if (literalLines.has(index)) continue;
     const line = lines[index] ?? '';
     const trimmed = line.trim();
     if (trimmed.length === 0 || trimmed.startsWith('//')) continue;

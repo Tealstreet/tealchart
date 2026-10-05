@@ -31,18 +31,18 @@ plot(direction, title="Direction")
 
     expect(result.errors).toEqual([]);
     expect(roundSeries(getPlot(result, 'Selected MA').values)).toEqual([
-      102,
-      103.5,
-      105.25,
-      104.125,
-      101.5625,
-      100.78125,
-      102.390625,
-      105.695313,
-      106.847656,
-      108.923828,
-      109.461914,
-      110.730957,
+      null,
+      null,
+      104.666667,
+      103.833333,
+      101.416667,
+      100.708333,
+      102.354167,
+      105.677083,
+      106.838542,
+      108.919271,
+      109.459635,
+      110.729818,
     ]);
     expect(roundSeries(getPlot(result, 'Block Selected MA').values)).toEqual([
       103,
@@ -157,8 +157,8 @@ plot(dwm, title="DWM")
     expect(getPlot(result, 'From Seconds').values).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
     expect(getPlot(result, 'From Hour').values).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
     expect(getPlot(result, 'From Day').values).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
-    expect(getPlot(result, 'Three Minute Change').values).toEqual([1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1]);
-    expect(getPlot(result, 'Daily Change').values).toEqual([1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+    expect(getPlot(result, 'Three Minute Change').values).toEqual([0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1]);
+    expect(getPlot(result, 'Daily Change').values).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
     expect(getPlot(result, 'Intraday').values).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
     expect(getPlot(result, 'DWM').values).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
   });

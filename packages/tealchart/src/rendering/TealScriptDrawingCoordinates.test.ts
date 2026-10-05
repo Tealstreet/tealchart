@@ -66,6 +66,79 @@ function makeLine(overrides: Partial<LineDrawingOutput> = {}): LineDrawingOutput
   };
 }
 
+function countedHistory() {
+  let reads = 0;
+  const history = Array.from({ length: 24000 }, (_, index) => ({
+    ...bars[0],
+    get time() {
+      reads++;
+      return (index + 1) * 1000;
+    },
+  }));
+  return { history, reads: () => reads };
+}
+
+describe('time-anchored label lookup cost', () => {
+  it('culls offscreen labels before reading historical timestamps', () => {
+    const counted = countedHistory();
+    expect(
+      resolveLabelDrawingPosition(
+        makeLabel({ xloc: 'bar_time', x: 24000000, yloc: 'abovebar' }),
+        counted.history,
+        viewport,
+        pane,
+        100,
+        resolvers,
+      ),
+    ).toBeNull();
+    expect(counted.reads()).toBe(0);
+  });
+
+  it('does not look up a candle for price-anchored labels', () => {
+    const counted = countedHistory();
+    expect(
+      resolveLabelDrawingPosition(
+        makeLabel({ xloc: 'bar_time', x: 24000000, yloc: 'price' }),
+        counted.history,
+        { ...viewport, endTime: 24000000 },
+        pane,
+        100,
+        resolvers,
+      ),
+    ).not.toBeNull();
+    expect(counted.reads()).toBe(0);
+  });
+
+  it('finds candle-relative labels with logarithmic timestamp reads', () => {
+    const counted = countedHistory();
+    expect(
+      resolveLabelDrawingPosition(
+        makeLabel({ xloc: 'bar_time', x: 24000000, yloc: 'abovebar' }),
+        counted.history,
+        { ...viewport, endTime: 24000000 },
+        pane,
+        100,
+        resolvers,
+      ),
+    ).toEqual({ x: 100, y: 54 });
+    expect(counted.reads()).toBeLessThanOrEqual(16);
+  });
+
+  it('retains the first candle when timestamps repeat', () => {
+    const repeated = [bars[0], bars[1], { ...bars[1], high: 19 }, bars[2]];
+    expect(
+      resolveLabelDrawingPosition(
+        makeLabel({ xloc: 'bar_time', x: 2000, yloc: 'abovebar' }),
+        repeated,
+        viewport,
+        pane,
+        100,
+        resolvers,
+      ),
+    ).toEqual({ x: 50, y: 24 });
+  });
+});
+
 function makeBox(overrides: Partial<BoxDrawingOutput> = {}): BoxDrawingOutput {
   return {
     id: 'box-1',
@@ -158,6 +231,36 @@ describe('TealScript drawing coordinates', () => {
     );
 
     expect(projected).toEqual({ x: 100, y: 90 });
+  });
+
+  // Rank327: visual-output-v1#1123; label.new yloc remarks.
+  // ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json
+  it.each(['abovebar', 'belowbar'] as const)('ignores supplied y for %s in both xloc modes', (yloc) => {
+    for (const xloc of ['bar_index', 'bar_time'] as const) {
+      const label = makeLabel({ xloc, x: xloc === 'bar_index' ? 1 : 2_000, yloc });
+      const expected = resolveLabelDrawingPosition(label, bars, viewport, pane, 100, resolvers);
+      expect(expected).not.toBeNull();
+      for (const y of [-1_000, 0, 1_000, null]) {
+        expect(resolveLabelDrawingPosition({ ...label, y }, bars, viewport, pane, 100, resolvers)).toEqual(expected);
+      }
+      const priceLow = resolveLabelDrawingPosition(
+        { ...label, yloc: 'price', y: 0 },
+        bars,
+        viewport,
+        pane,
+        100,
+        resolvers,
+      );
+      const priceHigh = resolveLabelDrawingPosition(
+        { ...label, yloc: 'price', y: 20 },
+        bars,
+        viewport,
+        pane,
+        100,
+        resolvers,
+      );
+      expect(priceLow).not.toEqual(priceHigh);
+    }
   });
 
   it('requires a real candle for projected abovebar and belowbar labels', () => {
@@ -260,7 +363,9 @@ describe('TealScript drawing coordinates', () => {
 describe('external native drawing index projection', () => {
   const native = {
     ...resolvers,
-    timeToX: () => { throw new Error('bar_index must not interpolate timestamps'); },
+    timeToX: () => {
+      throw new Error('bar_index must not interpolate timestamps');
+    },
     barIndexToX: (index: number) => 10 + index * 15,
   };
 

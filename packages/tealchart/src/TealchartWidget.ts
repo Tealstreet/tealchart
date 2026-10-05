@@ -447,6 +447,7 @@ export class TealchartWidget implements ITealchartWebWidget {
     if (options.createTealscriptWorker) {
       this._tealScriptManager = new TealscriptManager({
         createWorker: options.createTealscriptWorker,
+        onScriptRemoved: (scriptId) => this._handleRemoveIndicator(scriptId),
         onPlotsUpdated: (plots) => {
           if (isTealchartPlotDebugEnabled()) {
             console.info('[tealchart:plots] widget onPlotsUpdated', {
@@ -1421,6 +1422,7 @@ export class TealchartWidget implements ITealchartWebWidget {
       symbol: this._symbol,
       interval: this._interval,
       showTopBar,
+      showDataWindow: this._options.showDataWindow,
       renderOptions: this._renderOptions,
       availableIndicators: this._getAvailableIndicators(),
       additionalIndicatorCategories: this._getAdditionalIndicatorCategories(),
@@ -1442,6 +1444,7 @@ export class TealchartWidget implements ITealchartWebWidget {
       onRemoveIndicator: (indicatorId) => {
         this._handleRemoveIndicator(indicatorId);
       },
+      getStudySourceOptions: (studyId) => this._tealScriptManager?.getSourceOptions(studyId) ?? [],
       getStudyInputDefinitions: (studyId) => {
         return this.getStudyInputDefinitions(studyId);
       },
@@ -2144,7 +2147,10 @@ export class TealchartWidget implements ITealchartWebWidget {
 
   /** Theme + host options, before any persisted or imperative overrides. */
   private _baseRenderOptions(): Partial<RenderOptions> {
-    return mergeChartThemeRenderOptions(this._options.theme, this._options.renderOptions);
+    return {
+      showIndicatorOutputAxisLabelTitles: false,
+      ...mergeChartThemeRenderOptions(this._options.theme, this._options.renderOptions),
+    };
   }
 
   private _markDirty(): void {

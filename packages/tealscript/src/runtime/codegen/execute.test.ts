@@ -287,7 +287,7 @@ plot(store.values.get(0), "Value")`, bars.slice(0, 3));
     });
     const cases: Array<{ name: string; setup?: string; expression: string; expectedFirstValidBar: number }> = [
       { name: 'ta.sma', expression: 'ta.sma(close, 5)', expectedFirstValidBar: 4 },
-      { name: 'ta.ema', expression: 'ta.ema(close, 5)', expectedFirstValidBar: 0 },
+      { name: 'ta.ema', expression: 'ta.ema(close, 5)', expectedFirstValidBar: 4 },
       { name: 'ta.rma', expression: 'ta.rma(close, 5)', expectedFirstValidBar: 4 },
       { name: 'ta.smma', expression: 'ta.smma(close, 5)', expectedFirstValidBar: 4 },
       { name: 'ta.rsi', expression: 'ta.rsi(close, 5)', expectedFirstValidBar: 5 },
@@ -318,37 +318,40 @@ plot(store.values.get(0), "Value")`, bars.slice(0, 3));
       { name: 'ta.mode', expression: 'ta.mode(close, 5)', expectedFirstValidBar: 4 },
       { name: 'ta.percentile_nearest_rank', expression: 'ta.percentile_nearest_rank(close, 5, 50)', expectedFirstValidBar: 4 },
       { name: 'ta.percentile_linear_interpolation', expression: 'ta.percentile_linear_interpolation(close, 5, 50)', expectedFirstValidBar: 4 },
-      { name: 'ta.percentrank', expression: 'ta.percentrank(close, 5)', expectedFirstValidBar: 4 },
+      // Native rank_clean_builtin / 18ace021d3: publication follows length+1 physical bars.
+      { name: 'ta.percentrank', expression: 'ta.percentrank(close, 5)', expectedFirstValidBar: 5 },
       { name: 'ta.linreg', expression: 'ta.linreg(close, 5, 0)', expectedFirstValidBar: 4 },
       { name: 'ta.atr', expression: 'ta.atr(5)', expectedFirstValidBar: 4 },
       { name: 'ta.tr', expression: 'ta.tr(true)', expectedFirstValidBar: 0 },
       { name: 'ta.stoch', expression: 'ta.stoch(close, high, low, 5)', expectedFirstValidBar: 4 },
       { name: 'ta.cci', expression: 'ta.cci(close, 5)', expectedFirstValidBar: 4 },
       { name: 'ta.cmo', expression: 'ta.cmo(close, 5)', expectedFirstValidBar: 5 },
-      { name: 'ta.mfi', expression: 'ta.mfi(close, 5)', expectedFirstValidBar: 5 },
-      { name: 'ta.tsi', expression: 'ta.tsi(close, 3, 5)', expectedFirstValidBar: 1 },
-      { name: 'ta.rci', expression: 'ta.rci(close, 5)', expectedFirstValidBar: 4 },
+      { name: 'ta.mfi', expression: 'ta.mfi(close, 5)', expectedFirstValidBar: 4 },
+      { name: 'ta.tsi', expression: 'ta.tsi(close, 3, 5)', expectedFirstValidBar: 7 },
+      // Native RCI startup / d9e0a1aaa0: publication follows length+1 physical bars.
+      { name: 'ta.rci', expression: 'ta.rci(close, 5)', expectedFirstValidBar: 5 },
       { name: 'ta.wpr', expression: 'ta.wpr(5)', expectedFirstValidBar: 4 },
-      { name: 'ta.obv', expression: 'ta.obv(close, volume)', expectedFirstValidBar: 0 },
+      { name: 'ta.obv', expression: 'ta.obv(close, volume)', expectedFirstValidBar: 1 },
       { name: 'ta.bar_index', expression: 'ta.bar_index(close)', expectedFirstValidBar: 0 },
       { name: 'ta.bb', setup: '[basis, upper, lower] = ta.bb(close, 5, 2)', expression: 'basis', expectedFirstValidBar: 4 },
       { name: 'ta.bbw', expression: 'ta.bbw(close, 5, 2)', expectedFirstValidBar: 4 },
-      { name: 'ta.kc', setup: '[basis, upper, lower] = ta.kc(close, 5, 1.5)', expression: 'basis', expectedFirstValidBar: 0 },
-      { name: 'ta.kcw', expression: 'ta.kcw(close, 5, 1.5)', expectedFirstValidBar: 0 },
+      { name: 'ta.kc', setup: '[basis, upper, lower] = ta.kc(close, 5, 1.5)', expression: 'basis', expectedFirstValidBar: 4 },
+      { name: 'ta.kcw', expression: 'ta.kcw(close, 5, 1.5)', expectedFirstValidBar: 5 },
       { name: 'ta.dmi', setup: '[plus, minus, adx] = ta.dmi(5, 5)', expression: 'plus', expectedFirstValidBar: 5 },
       { name: 'ta.adx', expression: 'ta.adx(5)', expectedFirstValidBar: 18 },
-      { name: 'ta.supertrend', setup: '[trend, direction] = ta.supertrend(2.0, 5)', expression: 'trend', expectedFirstValidBar: 4 },
-      { name: 'ta.sar', expression: 'ta.sar(0.02, 0.02, 0.2)', expectedFirstValidBar: 0 },
+      { name: 'ta.supertrend', setup: '[trend, direction] = ta.supertrend(2.0, 5)', expression: 'trend', expectedFirstValidBar: 0 },
+      // Published bar-1 initialization, confirmed by native coverage-ta-3-v1.
+      { name: 'ta.sar', expression: 'ta.sar(0.02, 0.02, 0.2)', expectedFirstValidBar: 1 },
       { name: 'ta.kst', setup: '[kst, signal] = ta.kst(close, 2, 3, 4, 5, 2, 2, 2, 2, 3)', expression: 'kst', expectedFirstValidBar: 6 },
       { name: 'ta.vwap', expression: 'ta.vwap(close)', expectedFirstValidBar: 0 },
-      { name: 'ta.dema', expression: 'ta.dema(close, 5)', expectedFirstValidBar: 0 },
-      { name: 'ta.tema', expression: 'ta.tema(close, 5)', expectedFirstValidBar: 0 },
+      { name: 'ta.dema', expression: 'ta.dema(close, 5)', expectedFirstValidBar: 8 },
+      { name: 'ta.tema', expression: 'ta.tema(close, 5)', expectedFirstValidBar: 12 },
       { name: 'ta.cum', expression: 'ta.cum(close)', expectedFirstValidBar: 0 },
       { name: 'ta.accdist', expression: 'ta.accdist', expectedFirstValidBar: 0 },
       { name: 'ta.iii', expression: 'ta.iii', expectedFirstValidBar: 0 },
       { name: 'ta.nvi', expression: 'ta.nvi', expectedFirstValidBar: 0 },
       { name: 'ta.pvi', expression: 'ta.pvi', expectedFirstValidBar: 0 },
-      { name: 'ta.pvt', expression: 'ta.pvt', expectedFirstValidBar: 0 },
+      { name: 'ta.pvt', expression: 'ta.pvt', expectedFirstValidBar: 1 },
       { name: 'ta.wad', expression: 'ta.wad', expectedFirstValidBar: 0 },
       { name: 'ta.wvad', expression: 'ta.wvad', expectedFirstValidBar: 0 },
     ];
@@ -498,12 +501,15 @@ plot(close[750], title="Long History")`), longBars);
     expect(findPlot(result, 'Long History').values.slice(748, 752)).toEqual([null, null, 0, 1]);
   });
 
-  it('reports declared history references deeper than max_bars_back', () => {
+  it('sizes declared minimum history buffers for deeper static references', () => {
     const result = executeScript(parse(`//@version=6
 indicator("shallow history capacity", max_bars_back=2)
-plot(close[3], title="Too Deep")`), makeBars([1, 2, 3, 4]));
+plot(close[3], title="Static History")`), makeBars([1, 2, 3, 4]));
 
-    expect(result.errors[0]?.message).toMatch(/Historical offset 3 exceeds max_bars_back 2/);
+    // Reference indicator:max_bars_back is a minimum; static [] needs a larger buffer.
+    expect(result.errors).toEqual([]);
+    expect(result.profile.maxBarsBack).toBe(3);
+    expect(findPlot(result, 'Static History').values).toEqual([null, null, null, 1]);
   });
 
   it('uses max_bars_back function hints for dynamic history offsets', () => {
@@ -522,10 +528,10 @@ plot(close[offset], title="Dynamic Long History")`), longBars);
     const result = executeScript(parse(`//@version=6
 indicator("function history capacity scope")
 max_bars_back(close, 750)
-offset = 750
-plot(open[offset], title="Unhinted Open")`), makeBars(Array.from({ length: 752 }, (_, index) => index)));
+offset = barstate.ishistory ? 1 : 750
+plot(open[offset], title="Unhinted Open")`), makeBars(Array.from({ length: 752 }, (_, index) => index)), undefined, { realtimeLastBar: { isNew: true } });
 
-    expect(result.errors[0]?.message).toMatch(/Historical offset 750 exceeds max_bars_back 500/);
+    expect(result.errors[0]?.message).toMatch(/Historical offset 750 exceeds max_bars_back 1/);
   });
 
   it('compiles mixed source-length helper calls with reference parity', () => {
@@ -691,7 +697,7 @@ plot(ta.atr(5), "ATR")
 plot(ta.atr(length=5), "Named ATR")`, bars);
   });
 
-  it('preserves RMA state across middle na holes for ATR, DMI, and KC', () => {
+  it('preserves ATR/DMI state across holes and masks missing KC source publications', () => {
     const closes = [0, -2, 0, 2, -1, 3, 0, -3, 1, 0, -2, 2];
     const hostileBars: Bar[] = closes.map((close, index) => ({
       time: index * 60_000,
@@ -719,14 +725,23 @@ plot(basis)
 plot(upper)
 plot(lower)`;
     const { compiledResult, interpResult } = assertPlotParity(pine, hostileBars);
+    // Native e6bb97364a starts the DMI TR seed after the first valid bar.
+    // A single-predicate control reproduces the old rows; canonical RMA and
+    // existing hole masks stay fixed. This bounded hole control is not native
+    // certification of a general OHLC-hole policy.
+    // Wilder recurrence calculated independently with missing TR output masked.
+    // DMI cannot advance ADX on bars whose smoothed true range is unavailable.
     const expected = [
-      [null, null, null, 2.3333333333333335, 2.8888888888888893, 3.592592592592593, 3.7283950617283956, 3.7283950617283956, 3.1522633744855972, 2.7681755829903985, 2.7681755829903985, 2.5121170553269323],
-      [null, null, null, 0, 0, 37.113402061855666, 23.841059602649004, 15.894039735099334, 12.532637075718013, 9.514370664023783, 6.3429137760158545, 4.659628685839096],
-      [null, null, null, 28.571428571428566, 49.999999999999986, 26.8041237113402, 44.03973509933774, 29.359823399558493, 23.15056570931244, 29.61678229269904, 19.744521528466024, 14.504712211301218],
-      [null, null, null, null, null, 72.04301075268818, 57.94737302211732, 48.550281201736745, 42.28555332148303, 45.314331171687996, 47.33351640515798, 48.67963989413797],
-      [0, -1, -1, 0.5, -0.25, 1.375, 0.6875, 0.6875, 0.84375, 0.421875, 0.421875, 1.2109375],
-      [3, 2.75, 2.75, 3.875, 4.4375, 7.46875, 6.734375, 6.734375, 5.3671875, 4.18359375, 4.18359375, 4.591796875],
-      [-3, -4.75, -4.75, -2.875, -4.9375, -4.71875, -5.359375, -5.359375, -3.6796875, -3.33984375, -3.33984375, -2.169921875],
+      [null, null, null, 2.3333333333333335, 2.888888888888889, 3.5925925925925926, 3.728395061728395, null, 3.152263374485597, 2.768175582990398, null, 2.512117055326932],
+      [null, null, null, null, 0, 36.36363636363637, 23.529411764705884, null, 12.4031007751938, 9.439528023598818, null, 4.632645674990952],
+      [null, null, null, null, 48.148148148148145, 26.26262626262626, 43.46405228758171, null, 22.91128337639966, 29.383808587348415, null, 14.420718220935381],
+      [null, null, null, null, null, null, 48.62837660634671, null, 42.33761692455635, 45.349040240403546, null, 47.35665578430169],
+      // Confirmed 7e6b9663f6 masks missing strict-TR range publications.
+      // A missing previous close also masks the next valid bar's bands.
+      // These synthetic hole rows are not a native OHLC-hole certificate.
+      [null, null, null, 0, -0.5, 1.25, 0.625, null, 0.8125, 0.40625, null, 1.203125],
+      [null, null, null, null, null, 7.25, 6.625, null, null, 4.90625, null, null],
+      [null, null, null, null, null, -4.75, -5.375, null, null, -4.09375, null, null],
     ];
     for (const result of [compiledResult, interpResult]) {
       expect(result.plots.length).toBe(expected.length);
@@ -1065,37 +1080,39 @@ plot(loopScore, "Loop")`);
 
   it('normalizes history-reference offsets across core series', () => {
     const historyBars = makeBars([10, 20, 30, 40, 50]);
+    // 79c316edec / native v3 history-01-negative-offset: negatives refuse at execution.
+    for (const source of ['close', 'bar_index', 'last_bar_index']) {
+      const rejected = executeScript(parse(`//@version=6
+indicator("negative history offset")
+plot(${source}[-1])`), historyBars.slice(0, 1));
+      expect(rejected.errors.map((error) => error.message).join(' ')).toMatch(/historical.*-1/i);
+    }
+    // 6b47c0d4ca / v3 history-02-unavailable-offset: a missing offset reads current.
     const { compiledResult, interpResult } = assertPlotParity(`//@version=6
 indicator("history offset normalization")
 offset = bar_index % 3
 maybe = bar_index % 2 == 0 ? close : na
 naOffset = bar_index == 2 ? na : 1
 plot(close[10], "Deep Close")
-plot(close[-1], "Negative Close")
 plot(close[1.9], "Fractional Close")
 plot(close[offset], "Dynamic Close")
 plot(close[naOffset], "NA Offset Close")
 plot(maybe[1], "Previous Maybe")
 plot(bar_index[10], "Deep Bar Index")
-plot(bar_index[-1], "Negative Bar Index")
 plot(bar_index[1.9], "Fractional Bar Index")
 plot(bar_index[offset], "Dynamic Bar Index")
 plot(last_bar_index[10], "Deep Last Bar Index")
-plot(last_bar_index[-1], "Negative Last Bar Index")
 plot(last_bar_index[1.9], "Fractional Last Bar Index")`, historyBars);
 
     expect(findPlot(compiledResult, 'Deep Close').values).toEqual([null, null, null, null, null]);
-    expect(findPlot(compiledResult, 'Negative Close').values).toEqual([null, null, null, null, null]);
     expect(findPlot(compiledResult, 'Fractional Close').values).toEqual([null, 10, 20, 30, 40]);
     expect(findPlot(compiledResult, 'Dynamic Close').values).toEqual([10, 10, 10, 40, 40]);
-    expect(findPlot(compiledResult, 'NA Offset Close').values).toEqual([null, 10, null, 30, 40]);
+    expect(findPlot(compiledResult, 'NA Offset Close').values).toEqual([null, 10, 30, 30, 40]);
     expect(findPlot(compiledResult, 'Previous Maybe').values).toEqual([null, 10, null, 30, null]);
     expect(findPlot(compiledResult, 'Deep Bar Index').values).toEqual([null, null, null, null, null]);
-    expect(findPlot(compiledResult, 'Negative Bar Index').values).toEqual([null, null, null, null, null]);
     expect(findPlot(compiledResult, 'Fractional Bar Index').values).toEqual([null, 0, 1, 2, 3]);
     expect(findPlot(compiledResult, 'Dynamic Bar Index').values).toEqual([0, 0, 0, 3, 3]);
     expect(findPlot(compiledResult, 'Deep Last Bar Index').values).toEqual([null, null, null, null, null]);
-    expect(findPlot(compiledResult, 'Negative Last Bar Index').values).toEqual([null, null, null, null, null]);
     expect(findPlot(compiledResult, 'Fractional Last Bar Index').values).toEqual([null, 4, 4, 4, 4]);
     expect(compiledResult.plots.map((plot) => plot.values)).toEqual(interpResult.plots.map((plot) => plot.values));
   });
@@ -1136,20 +1153,34 @@ if true
 
   it('normalizes collection history-reference offsets', () => {
     const historyBars = makeBars([10, 20, 30, 40]);
+    // 79c316edec routes collection history through the same native-backed refusal.
+    const rejected = executeScript(parse(`//@version=6
+indicator("negative collection history offset")
+arr = array.new_float(1, close)
+prev = arr[-1]
+plot(na(prev) ? 1 : 0)`), historyBars.slice(0, 1));
+    expect(rejected.errors.map((error) => error.message).join(' ')).toMatch(/historical.*-1/i);
     const { compiledResult, interpResult } = assertPlotParity(`//@version=6
 indicator("collection history offsets")
 arr = array.new_float(1, close)
 prev = arr[1]
-neg = arr[-1]
 frac = arr[0.9]
 plot(na(prev) ? na : array.get(prev, 0), "Previous Array")
-plot(na(neg) ? 1 : 0, "Negative Is NA")
 plot(na(frac) ? na : array.get(frac, 0), "Fractional Array")`, historyBars);
 
     expect(findPlot(compiledResult, 'Previous Array').values).toEqual([null, 10, 20, 30]);
-    expect(findPlot(compiledResult, 'Negative Is NA').values).toEqual([1, 1, 1, 1]);
     expect(findPlot(compiledResult, 'Fractional Array').values).toEqual([10, 20, 30, 40]);
     expect(compiledResult.plots.map((plot) => plot.values)).toEqual(interpResult.plots.map((plot) => plot.values));
+  });
+
+  it.each(['close', 'bar_index', 'last_bar_index', 'arr'])('refuses negative history for %s', (name) => {
+    const source = `//@version=6
+indicator("negative history")
+arr = array.new_float(1, close)
+value = ${name}[-1]
+plot(1)`;
+    const result = executeScript(parse(source), makeBars([10, 20]));
+    expect(result.errors.some((error) => /Historical offset -1.*non-negative/.test(error.message))).toBe(true);
   });
 
   it('keeps var and varip history at committed bar granularity', () => {
@@ -1737,11 +1768,11 @@ plot(ta.bar_index(source), "Last Source Bar")`, bars);
   it('compiles pivot point levels array output with reference parity', () => {
     assertPlotParity(`//@version=6
 indicator("test")
-levels = ta.pivot_point_levels("Traditional", "Daily")
-developing = ta.pivot_point_levels(type="Traditional", anchor="Daily", developing=true)
+levels = ta.pivot_point_levels("Traditional", true)
+developing = ta.pivot_point_levels(type="Traditional", anchor=true, developing=true)
 plot(array.get(levels, 0), "P")
-plot(array.get(levels, 1), "S1")
-plot(array.get(levels, 2), "R1")
+plot(array.get(levels, 2), "S1")
+plot(array.get(levels, 1), "R1")
 plot(array.size(levels), "Count")
 plot(array.get(developing, 0), "Developing P")`, bars);
   });
@@ -1947,11 +1978,10 @@ plot(array.get(eigenvalues, 0), "First")`;
     ]);
   });
 
-  it('reports array percentile percentage clamps in the runtime profile', () => {
+  it('raises the captured runtime error for an out-of-range array linear-percentile percentage', () => {
     const pine = `//@version=6
 indicator("array percentile profile")
 values = array.from(1, 2, 3, 4)
-plot(array.percentile_nearest_rank(values, close > 0 ? -10 : 50), "Nearest")
 plot(array.percentile_linear_interpolation(values, close > 0 ? 125 : 50), "Linear")`;
     const ast = parse(pine);
     const compiled = tryCompile(ast);
@@ -1962,24 +1992,18 @@ plot(array.percentile_linear_interpolation(values, close > 0 ? 125 : 50), "Linea
       runtime: COMPLETE_RUNTIME_CONTEXT,
     });
 
-    expect(result?.errors).toEqual([]);
-    expect(result?.profile.runtimeApproximations).toEqual([
-      {
-        site: 'array.percentile_linear_interpolation.percentage-clamp',
-        count: 2,
-        firstBarIndex: 0,
-        message: 'array.percentile_linear_interpolation percentage was outside the documented percentile range and was clamped to 0..100; exact TradingView runtime behavior for dynamic out-of-range values is trace-required.',
-      },
-      {
-        site: 'array.percentile_nearest_rank.percentage-clamp',
-        count: 2,
-        firstBarIndex: 0,
-        message: 'array.percentile_nearest_rank percentage was outside the documented percentile range and was clamped to 0..100; exact TradingView runtime behavior for dynamic out-of-range values is trace-required.',
-      },
-    ]);
+    const message = "Error on bar 0: Invalid value of the 'percentage' argument (125) in the 'array.percentile_linear_interpolation' function. It must be in the range [0..100].";
+    expect(result?.errors).toEqual([{
+      message,
+      code: 'RE10002',
+      barIndex: 0,
+      runtimeError: { message, code: 'RE10002', barIndex: 0 },
+    }]);
+    expect(result?.plots.flatMap((plot) => plot.values)).toEqual([]);
+    expect(result?.profile.runtimeApproximations).toBeUndefined();
   });
 
-  it('reports dynamic color constructor channel clamps in the runtime profile', () => {
+  it('reports dynamic color packing and transparency clamps in the runtime profile', () => {
     const pine = `//@version=6
 indicator("color clamp profile")
 r = close > 0 ? 300 : 12
@@ -2008,10 +2032,10 @@ plot(color.t(fresh), "T")`;
         message: 'color.new transparency was outside the documented 0..100 range and was clamped; exact TradingView runtime behavior for dynamic out-of-range values is trace-required.',
       },
       {
-        site: 'color.rgb.channel-clamp',
+        site: 'color.rgb.channel-packing',
         count: 2,
         firstBarIndex: 0,
-        message: 'color.rgb RGB channel value was outside the documented 0..255 range and was clamped; exact TradingView runtime behavior for dynamic out-of-range values is trace-required.',
+        message: 'color.rgb RGB channel value was outside the documented 0..255 range and was packed using native-derived integer channels; outcomes beyond captured integer boundaries remain trace-required.',
       },
       {
         site: 'color.rgb.transparency-clamp',
@@ -2022,7 +2046,7 @@ plot(color.t(fresh), "T")`;
     ]);
   });
 
-  it('reports dynamic table dimension fallbacks in the runtime profile', () => {
+  it('preserves zero table columns and reports the unobserved negative-row fallback', () => {
     const pine = `//@version=6
 indicator("table dimension profile")
 columns = close > 0 ? 0 : 2
@@ -2039,18 +2063,14 @@ plot(1)`;
     });
 
     expect(result?.errors).toEqual([]);
+    const table = result?.drawings.find((drawing) => drawing.type === 'table');
+    expect(table).toMatchObject({ columns: 0, rows: 1 });
     expect(result?.profile.runtimeApproximations).toEqual([
-      {
-        site: 'table.new.columns-fallback',
-        count: 2,
-        firstBarIndex: 0,
-        message: 'table.new.columns-fallback was not a positive integer and fell back to 1; exact TradingView runtime behavior for dynamic invalid table dimensions is trace-required.',
-      },
       {
         site: 'table.new.rows-fallback',
         count: 2,
         firstBarIndex: 0,
-        message: 'table.new.rows-fallback was not a positive integer and fell back to 1; exact TradingView runtime behavior for dynamic invalid table dimensions is trace-required.',
+        message: 'table.new.rows-fallback was below the supported minimum or nonfinite and fell back to 1; exact TradingView runtime behavior for dynamic invalid table dimensions is trace-required.',
       },
     ]);
   });
@@ -2098,9 +2118,9 @@ plot(1, "No Color", color=color.new(na, 40))`;
     });
 
     expect(result?.errors).toEqual([]);
-    expect(findPlot(result!, 'Opaque Blue').color).toEqual(['#2196F3FF']);
-    expect(findPlot(result!, 'Half Blue').color).toEqual(['#2196F380']);
-    expect(findPlot(result!, 'Float Blue').color).toEqual(['#2196F3DF']);
+    expect(findPlot(result!, 'Opaque Blue').color).toEqual(['#2962FFFF']);
+    expect(findPlot(result!, 'Half Blue').color).toEqual(['#2962FF80']);
+    expect(findPlot(result!, 'Float Blue').color).toEqual(['#2962FFDF']);
     expect(findPlot(result!, 'Olive Forty').color).toEqual(['#80800099']);
     expect(findPlot(result!, 'RGB Float').color).toEqual(['#2196F3DF']);
     expect(findPlot(result!, 'Gradient Float').color).toEqual(['#9F734BDF']);
@@ -2818,9 +2838,9 @@ plotcandle(open, high, low, close, title="Transparent Plotcandle", color=color.g
       if (interpPlot.colordown !== undefined) expect(compiledPlot.colordown).toEqual(interpPlot.colordown);
     }
 
-    expect(findPlot(compiledResult, 'Range Fill').color).toEqual(Array(5).fill('#2196F380'));
+    expect(findPlot(compiledResult, 'Range Fill').color).toEqual(Array(5).fill('#2962FF80'));
     expect(findPlot(compiledResult, 'Transparent Close').color).toEqual(Array(5).fill('#4CAF50BF'));
-    expect(findPlot(compiledResult, 'Transparent Background').color).toEqual(Array(5).fill('#2196F366'));
+    expect(findPlot(compiledResult, 'Transparent Background').color).toEqual(Array(5).fill('#2962FF66'));
     expect(findPlot(compiledResult, 'Transparent Bars').color).toEqual(Array(5).fill('#4CAF5099'));
     expect(findPlot(compiledResult, 'Transparent Shape').color).toEqual(Array(5).fill('#4CAF50CC'));
     expect(findPlot(compiledResult, 'Transparent Char').color).toEqual([
@@ -2846,7 +2866,7 @@ plotcandle(open, high, low, close, title="Transparent Plotcandle", color=color.g
     ]);
     expect(findPlot(compiledResult, 'Transparent Plotbar').color).toEqual(Array(5).fill('#4CAF50D9'));
     expect(findPlot(compiledResult, 'Transparent Plotcandle').color).toEqual(Array(5).fill('#4CAF50A6'));
-    expect(findPlot(compiledResult, 'Transparent Plotcandle').wickColor).toEqual(Array(5).fill('#2196F3A6'));
+    expect(findPlot(compiledResult, 'Transparent Plotcandle').wickColor).toEqual(Array(5).fill('#2962FFA6'));
     expect(findPlot(compiledResult, 'Transparent Plotcandle').borderColor).toEqual(Array(5).fill('#F23645A6'));
 
     expect(findPlot(compiledResult, 'Range Fill')).toMatchObject({
@@ -3324,11 +3344,13 @@ plot(array.size(polyline.all), title="Polylines")`;
     expect(interpResult.errors).toEqual([]);
     expect(compiledResult.indicatorDrawingLimits).toEqual({ label: 7, line: 5, box: 4, polyline: 3 });
     expect(compiledResult.drawings.map(drawingKey)).toEqual(interpResult.drawings.map(drawingKey));
-    expect(compiledResult.drawings.filter((drawing) => drawing.type === 'label')).toHaveLength(7);
-    expect(compiledResult.drawings.filter((drawing) => drawing.type === 'line')).toHaveLength(5);
+    expect(compiledResult.drawings.filter((drawing) => drawing.type === 'label')).toHaveLength(9);
+    expect(compiledResult.drawings.filter((drawing) => drawing.type === 'line')).toHaveLength(6);
     expect(compiledResult.drawings.filter((drawing) => drawing.type === 'box')).toHaveLength(4);
     expect(compiledResult.drawings.filter((drawing) => drawing.type === 'polyline')).toHaveLength(3);
     expect(compiledResult.drawings.filter((drawing) => drawing.type === 'label').map((drawing) => drawing.type === 'label' ? drawing.text : '')).toEqual([
+      'L192',
+      'L194',
       'L196',
       'L198',
       'L200',
@@ -3344,6 +3366,7 @@ plot(array.size(polyline.all), title="Polylines")`;
       'B203',
     ]);
     expect(compiledResult.drawings.filter((drawing) => drawing.type === 'line').map(drawingKey)).toEqual([
+      'line:195:195:bar_index:left:#F23645',
       'line:194:196:bar_index:right:#4CAF50',
       'line:200:200:bar_index:left:#F23645',
       'line:199:201:bar_index:right:#4CAF50',
@@ -3538,12 +3561,12 @@ plot(color.t(transparent), "New T")
 plot(color.t(transparentNamed), "New Named T")`, bars);
   });
 
-  it('compiles legacy color global alias with reference parity', () => {
-    assertPlotParity(`//@version=4
-study("compiled legacy color global")
-cSolid = color(255, 0, 0, 0)
-cHalf = color(0, 255, 0, 50)
-cTrans = color(0, 0, 255, 100)
+  it('compiles explicit RGB constructors with reference parity', () => {
+    assertPlotParity(`//@version=6
+indicator("compiled explicit RGB")
+cSolid = color.rgb(255, 0, 0, 0)
+cHalf = color.rgb(0, 255, 0, 50)
+cTrans = color.rgb(0, 0, 255, 100)
 plot(color.r(cSolid), "Solid R")
 plot(color.t(cSolid), "Solid T")
 plot(color.g(cHalf), "Half G")
@@ -3631,33 +3654,62 @@ plot(parsed, "Parsed")
 plot(na(invalid) ? 1 : 0, "Invalid")`, bars.slice(0, 3));
   });
 
-  it('compiles math.random with reference parity', () => {
+  it('repeats explicitly seeded math.random across compiled entry points', () => {
+    // These entry points execute independently. Only explicit seeds promise
+    // repeatable sequences; this helper is not a TradingView oracle.
     assertPlotParity(`//@version=6
 indicator("compiled random")
-plot(math.random(), "Default")
-plot(math.random(10, 20), "Bounded")
+plot(math.random(seed=42), "Default")
+plot(math.random(10, 20, 42), "Bounded")
 plot(math.random(min=5, max=6, seed=3), "Named Seeded")
-plot(math.random(1, 1), "Invalid")`, bars.slice(0, 6));
+plot(math.random(1, 1, 6), "Invalid")`, bars.slice(0, 6));
   });
 
-  it('keeps compiled unseeded math.random stable across conditional call order', () => {
+  it('keeps explicitly seeded math.random independent of another call site', () => {
     const conditionalLead = `//@version=6
 indicator("compiled conditional random")
 if bar_index == 0
-    lead = math.random()
-main = math.random()
+    lead = math.random(seed=42)
+main = math.random(seed=42)
 plot(main, "Main")`;
     const skippedLead = `//@version=6
 indicator("compiled conditional random")
 if false
-    lead = math.random()
-main = math.random()
+    lead = math.random(seed=42)
+main = math.random(seed=42)
 plot(main, "Main")`;
 
     const conditional = assertPlotParity(conditionalLead, bars.slice(0, 6));
     const skipped = assertPlotParity(skippedLead, bars.slice(0, 6));
 
     expect(conditional.compiledResult.plots[0]?.values).toEqual(skipped.compiledResult.plots[0]?.values);
+  });
+
+  it('keeps unseeded math.random inside its default and explicit ranges', () => {
+    const ast = parse(`//@version=6
+indicator("unseeded random ranges")
+plot(math.random(), "Default")
+plot(math.random(10, 20), "Bounded")`);
+    const compiled = tryCompile(ast);
+    expect(compiled.success).toBe(true);
+    const results = [
+      executeCompiled(compiled, bars.slice(0, 6)),
+      executeScript(ast, bars.slice(0, 6)),
+    ];
+    for (const result of results) {
+      expect(result).not.toBeNull();
+      expect(result?.errors).toEqual([]);
+      expect(result?.plots).toHaveLength(2);
+      for (const [index, min, max] of [[0, 0, 1], [1, 10, 20]]) {
+        const values = result?.plots[index]?.values;
+        expect(values).toHaveLength(6);
+        for (const value of values ?? []) {
+          expect(Number.isFinite(value)).toBe(true);
+          expect(value).toBeGreaterThan(min);
+          expect(value).toBeLessThan(max);
+        }
+      }
+    }
   });
 
   it('compiles str.format with reference parity', () => {
@@ -3943,7 +3995,7 @@ plot(sliced.size(), "Slice Size")
 plot(stats.get("count"), "Count")
 plot(keys.size(), "Key Count")
 plot(m.get(0, 1), "Matrix High")
-    plot(row.get(0), "Row Close")`, bars.slice(0, 6));
+plot(row.get(0), "Row Close")`, bars.slice(0, 6));
   });
 
   it('mutates and returns the left matrix from matrix.concat', () => {
@@ -3986,7 +4038,7 @@ plot(values.get(0), "Array Value")`, bars.slice(0, 3));
     expect(compiledResult.plots[0]?.values).toEqual([7, 7, 7]);
   });
 
-  it('allows empty array slices in for-in expressions', () => {
+  it('reports equal array slice endpoints in for-in expressions', () => {
     const ast = parse(`//@version=6
 indicator("empty slice expression")
 source = array.from(close)
@@ -3997,9 +4049,10 @@ plot(value)
 
     const result = executeScript(ast, bars.slice(0, 3));
 
-    expect(result.errors).toEqual([]);
+    expect(result.errors).toHaveLength(1);
+    expect(result.errors[0]?.message).toBe("Index 'from' should be less than index 'to'");
     expect(result.profile.swallowedErrors).toBeUndefined();
-    expect(result.plots[0]?.values).toEqual([null, null, null]);
+    expect(result.plots).toEqual([]);
   });
 
   it('reports descending array slices created during global initialization', () => {
@@ -4028,15 +4081,6 @@ var m = map.new<int, int>()
 for i = 0 to 10000
     map.put(m, bar_index * 10001 + i, i)
 plot(map.size(m))
-`,
-    },
-    {
-      name: 'table capacity',
-      message: 'Too many table cells: maximum is 10000 per script. Reduce table.new() rows or columns, or reuse an existing table instead of creating more table cells.',
-      pine: `//@version=6
-indicator("table capacity")
-t = table.new(position.top_left, 101, 101)
-plot(1)
 `,
     },
     {
@@ -4083,7 +4127,7 @@ plot(array.size(r))
     },
     {
       name: 'plot capacity',
-      message: 'Too many plot outputs: maximum is 64 per script. Remove or combine output calls; plot(), plotshape(), plotchar(), plotarrow(), plotbar(), plotcandle(), bgcolor(), barcolor(), fill(), and alertcondition() each use an output slot.',
+      message: 'Too many plot outputs: maximum is 64 per script. Remove or combine counted outputs; fills count only with series colors.',
       pine: `//@version=6
 indicator("plot capacity")
 ${Array.from({ length: 65 }, (_value, index) => `plot(close, "p${index}")`).join('\n')}
@@ -4166,10 +4210,13 @@ plot(array.size(id=slow), "Slow Size")`, bars.slice(0, 6));
   it('records swallowed compiled per-bar errors in the runtime profile', () => {
     const ast = parse(`//@version=6
 indicator("compiled swallowed bar errors")
-array.clear()
 plot(close, "Close")`);
     const compiled = tryCompile(ast);
     expect(compiled.success).toBe(true);
+    // Exercise a generated-code fault, not a Pine collection runtime refusal.
+    compiled.ScriptClass.prototype.onBar = () => {
+      throw new Error('Injected generated-bar error');
+    };
 
     const compiledResult = executeCompiled(compiled, bars.slice(0, 4));
 
@@ -4178,14 +4225,14 @@ plot(close, "Close")`);
     expect(compiledResult?.profile.compiledBarErrors).toEqual({
       count: 4,
       firstBarIndex: 0,
-      firstMessage: expect.stringContaining('Cannot read'),
+      firstMessage: 'Injected generated-bar error',
     });
     expect(compiledResult?.profile.swallowedErrors).toEqual([
       {
         site: 'compiled-bar',
         count: 4,
         firstBarIndex: 0,
-        firstMessage: expect.stringContaining('Cannot read'),
+        firstMessage: 'Injected generated-bar error',
       },
     ]);
   });
@@ -4204,7 +4251,10 @@ plot(broken, "Broken Request")`);
     const compiledResult = executeCompiled(compiled, bars.slice(0, 4), undefined, { requestDatafeed });
 
     expect(compiledResult?.errors).toEqual([
-      { message: 'Array index 0 is out of bounds. Array size is 0' },
+      {
+        message: 'Array index 0 is out of bounds. Array size is 0',
+        runtimeError: { code: 'runtime.error', message: 'Array index 0 is out of bounds. Array size is 0', barIndex: 0 },
+      },
     ]);
     expect(compiledResult?.profile.swallowedErrors ?? []).toEqual([]);
   });
@@ -4294,7 +4344,7 @@ classify(value) =>
     else
         0
 plot(doubleWithLocal(close), "Doubled")
-    plot(classify(close - open), "Direction")`, bars.slice(0, 8));
+plot(classify(close - open), "Direction")`, bars.slice(0, 8));
   });
 
   it('keeps root locals named after built-in bar fields in UDF call-site outputs', () => {
@@ -5069,8 +5119,8 @@ plot(timeframe.period == "60" and timeframe.multiplier == 60 and timeframe.isint
       },
     });
 
-    expect(findPlot(compiledResult, 'Monthly').values).toEqual([1, 1, 0, 1, 0, 0]);
-    expect(findPlot(compiledResult, 'Weekly').values).toEqual([1, 0, 1, 0, 0, 1]);
+    expect(findPlot(compiledResult, 'Monthly').values).toEqual([0, 1, 0, 1, 0, 0]);
+    expect(findPlot(compiledResult, 'Weekly').values).toEqual([0, 0, 1, 0, 0, 1]);
   });
 
   it('compiles v6 timeframe parsing limits with reference parity', () => {
@@ -5093,7 +5143,7 @@ plot(na(timeframe.in_seconds("1H")) ? 1 : 0, "Bad Hours")`, bars.slice(0, 2));
     expect(findPlot(compiledResult, 'Max Minutes').values).toEqual([86400, 86400]);
     expect(findPlot(compiledResult, 'Max Days').values).toEqual([31536000, 31536000]);
     expect(findPlot(compiledResult, 'Max Weeks').values).toEqual([31449600, 31449600]);
-    expect(findPlot(compiledResult, 'Max Months').values).toEqual([31104000, 31104000]);
+    expect(findPlot(compiledResult, 'Max Months').values).toEqual([31536036, 31536036]);
     for (const title of ['Bad Seconds', 'Bad Minutes', 'Bad Days', 'Bad Weeks', 'Bad Months', 'Bad Ticks', 'Bad Hours']) {
       expect(findPlot(compiledResult, title).values).toEqual([1, 1]);
     }
@@ -5993,6 +6043,8 @@ plot(strategy.closedtrades.first_index, title="First Closed")`;
       close,
       volume: 1_000 + index,
     }));
+    // The SMA-seeded EMA is 105 on bars 1 and 2. Include flat movement
+    // in the pullback trigger so the dashboard still exercises a losing trade.
     const pine = `//@version=6
 strategy("Strategy Performance Dashboard", overlay=true, process_orders_on_close=true, initial_capital=1000)
 fast = ta.ema(close, 2)
@@ -6001,7 +6053,8 @@ if bar_index == 0 and close > open
     strategy.entry("Breakout Long", strategy.long, qty=2, comment="breakout")
 if bar_index == 1 and strategy.position_size > 0 and close > strategy.position_avg_price
     strategy.close("Breakout Long", comment="target")
-if bar_index == 2 and fast < fast[1]
+// The SMA-seeded fast EMA ties on the constructed pullback bar.
+if bar_index == 2 and fast <= fast[1]
     strategy.entry("Pullback Long", strategy.long, qty=1, comment="pullback")
 if bar_index == 3 and strategy.position_size > 0
     strategy.close("Pullback Long", comment="stop")
@@ -6201,19 +6254,22 @@ plot(not na(time(timeframe.period, "${session}", "UTC")) ? 1 : 0, "In Session")`
 });
 
 describe('executeCompiled — request.security integration', () => {
+  // Sparse hourly chart samples every 12 hours; daily provider bars start at
+  // midnight UTC. A daily close is first confirmed on the next day's sample.
+  const requestFixtureTime = (slot: number) => Date.UTC(2024, 0, 1) + (slot / 100 - 1) * 12 * 60 * 60 * 1000;
   const chartBars: Bar[] = [
-    { time: 100, open: 10, high: 12, low: 9, close: 11, volume: 100 },
-    { time: 200, open: 11, high: 13, low: 10, close: 12, volume: 110 },
-    { time: 300, open: 12, high: 14, low: 11, close: 13, volume: 120 },
-    { time: 400, open: 13, high: 15, low: 12, close: 14, volume: 130 },
-    { time: 500, open: 14, high: 16, low: 13, close: 15, volume: 140 },
-    { time: 600, open: 15, high: 17, low: 14, close: 16, volume: 150 },
+    { time: requestFixtureTime(100), open: 10, high: 12, low: 9, close: 11, volume: 100 },
+    { time: requestFixtureTime(200), open: 11, high: 13, low: 10, close: 12, volume: 110 },
+    { time: requestFixtureTime(300), open: 12, high: 14, low: 11, close: 13, volume: 120 },
+    { time: requestFixtureTime(400), open: 13, high: 15, low: 12, close: 14, volume: 130 },
+    { time: requestFixtureTime(500), open: 14, high: 16, low: 13, close: 15, volume: 140 },
+    { time: requestFixtureTime(600), open: 15, high: 17, low: 14, close: 16, volume: 150 },
   ];
 
   const htfBars: Bar[] = [
-    { time: 100, open: 10, high: 13, low: 9, close: 12, volume: 210 },
-    { time: 300, open: 12, high: 15, low: 11, close: 14, volume: 250 },
-    { time: 500, open: 14, high: 17, low: 13, close: 16, volume: 290 },
+    { time: requestFixtureTime(100), open: 10, high: 13, low: 9, close: 12, volume: 210 },
+    { time: requestFixtureTime(300), open: 12, high: 15, low: 11, close: 14, volume: 250 },
+    { time: requestFixtureTime(500), open: 14, high: 17, low: 13, close: 16, volume: 290 },
   ];
   const lowerChartBars: Bar[] = [
     { time: 0, open: 10, high: 15, low: 9, close: 12, volume: 100 },
@@ -6252,13 +6308,12 @@ plot(value, "Requested")`;
 
     const v5Compiled = tryCompile(parse(source(5)));
     const v6Compiled = tryCompile(parse(source(6)));
-    if (!v5Compiled.success) throw new Error(`Compilation failed: ${v5Compiled.unsupported.join(', ')}`);
+    expect(v5Compiled.success).toBe(false);
+    expect(v5Compiled.unsupported).toContain('request.* calls in local scopes require dynamic_requests=true: request.security');
     if (!v6Compiled.success) throw new Error(`Compilation failed: ${v6Compiled.unsupported.join(', ')}`);
 
-    const v5Result = executeCompiled(v5Compiled, chartBars, undefined, { requestDatafeed: datafeed });
     const v6Result = executeCompiled(v6Compiled, chartBars, undefined, { requestDatafeed: datafeed });
 
-    expect(v5Result?.errors.map((error) => error.message)).toContain('request.* calls in local scopes require dynamic_requests=true: request.security');
     expect(v6Result?.errors).toEqual([]);
   });
 
@@ -6353,11 +6408,8 @@ if close > open
     value := wrapped()
 plot(value, "Wrapped")`);
     const compiled = tryCompile(ast);
-    expect(compiled.success).toBe(true);
-    const result = executeCompiled(compiled, chartBars, undefined, { requestDatafeed: datafeed });
-    expect(result?.errors.map((error) => error.message)).toContain(
-      'request.* calls in local scopes require dynamic_requests=true: request.security. Non-exported request wrapper functions were valid without dynamic_requests in Pine v3-v5 but require dynamic_requests=true in Pine v6.',
-    );
+    expect(compiled.success).toBe(false);
+    expect(compiled.unsupported).toContain('request.* calls in local scopes require dynamic_requests=true: request.security');
   });
 
   const multiSymbolDatafeed = new InMemoryRequestDatafeed([
@@ -6431,9 +6483,9 @@ plot(value, "Wrapped")`);
       family: 'currency_rate',
       key: currencyRateRequestKey('USD', 'GBP'),
       points: [
-        { time: 500, value: 0.85 },
-        { time: 100, value: 0.8 },
-        { time: 300, value: 0.82 },
+        { time: requestFixtureTime(500), value: 0.85 },
+        { time: requestFixtureTime(100), value: 0.8 },
+        { time: requestFixtureTime(300), value: 0.82 },
       ],
     },
   ]);
@@ -6579,27 +6631,27 @@ plot(value, "Wrapped")`);
     {
       family: 'dividends',
       key: corporateActionRequestKey('NASDAQ:AAPL', 'dividends.gross', 'USD'),
-      points: [{ time: 300, value: 0.24 }, { time: 500, value: 0.25 }],
+      points: [{ time: requestFixtureTime(300), value: 0.24 }, { time: requestFixtureTime(500), value: 0.25 }],
     },
     {
       family: 'earnings',
       key: corporateActionRequestKey('NASDAQ:AAPL', 'earnings.actual', 'USD'),
-      points: [{ time: 100, value: 1.5 }, { time: 500, value: 1.8 }],
+      points: [{ time: requestFixtureTime(100), value: 1.5 }, { time: requestFixtureTime(500), value: 1.8 }],
     },
     {
       family: 'splits',
       key: corporateActionRequestKey('NASDAQ:AAPL', 'splits.denominator'),
-      points: [{ time: 400, value: 4 }],
+      points: [{ time: requestFixtureTime(400), value: 4 }],
     },
     {
       family: 'financial',
       key: financialRequestKey('NASDAQ:AAPL', 'TOTAL_REVENUE', 'FQ', 'USD'),
-      points: [{ time: 100, value: 1000 }, { time: 500, value: 1100 }],
+      points: [{ time: requestFixtureTime(100), value: 1000 }, { time: requestFixtureTime(500), value: 1100 }],
     },
     {
       family: 'economic',
       key: economicRequestKey('US', 'GDP'),
-      points: [{ time: 300, value: 3.1 }],
+      points: [{ time: requestFixtureTime(300), value: 3.1 }],
     },
   ]);
   const seedDatafeed = new InMemoryRequestDatafeed([
@@ -6782,9 +6834,9 @@ plot(array.size(resistanceLines), "Resistance Count")`);
         symbol: 'HOLES',
         timeframe: 'D',
         bars: [
-          { time: 100, open: 10, high: 13, low: 9, close: 12, volume: 210 },
-          { time: 300, open: 12, high: 15, low: 11, close: Number.NaN, volume: 250 },
-          { time: 500, open: 14, high: 17, low: 13, close: 16, volume: 290 },
+          { time: requestFixtureTime(100), open: 10, high: 13, low: 9, close: 12, volume: 210 },
+          { time: requestFixtureTime(300), open: 12, high: 15, low: 11, close: Number.NaN, volume: 250 },
+          { time: requestFixtureTime(500), open: 14, high: 17, low: 13, close: 16, volume: 290 },
         ],
       },
     ]);
@@ -6820,7 +6872,7 @@ plot(repeat, "Repeat")`, chartBars, { requestDatafeed: countingDatafeed });
       expect(findPlot(compiledResult, title).values).toEqual(values);
       expect(findPlot(interpResult, title).values).toEqual(values);
     }
-    expect(getBarsCalls).toBe(10);
+    expect(getBarsCalls).toBe(2);
   });
 
   it('request.security invalidates cached dispatch when dynamic symbols change', () => {
@@ -6912,7 +6964,9 @@ plot(barstate.isrealtime ? 1 : 0, "Realtime")`);
     expect(compiledResult?.errors).toEqual([]);
     expect(findPlot(compiledResult!, 'LCH').values).toEqual([0, 0, 1, 0]);
     expect(findPlot(compiledResult!, 'PrevLCH').values).toEqual([null, 0, 0, 1]);
-    expect(findPlot(compiledResult!, 'Last').values).toEqual([0, 0, 1, 1]);
+    // Reference barstate.islast: only the chart's last bar is last; the preceding
+    // historical bar is last-confirmed history while the realtime bar follows it.
+    expect(findPlot(compiledResult!, 'Last').values).toEqual([0, 0, 0, 1]);
     expect(findPlot(compiledResult!, 'Realtime').values).toEqual([0, 0, 0, 1]);
   });
 
@@ -7113,7 +7167,7 @@ plot(wrappedClose, "Wrapped Close")
 plot(wrappedOpen, "Wrapped Open")`);
     const compiled = tryCompile(ast);
     expect(compiled.success).toBe(true);
-    expect(compiled.securityScripts.size).toBe(0);
+    expect(compiled.securityScripts.size).toBe(1);
     expect(compiled.analysis.securitySites[0]?.expressionSourceParam).toBe('source');
 
     const compiledResult = executeCompiled(compiled, chartBars, undefined, { requestDatafeed: datafeed });
@@ -7572,7 +7626,7 @@ dividend = request.dividends(adjusted, dividends.gross, currency="USD")
 earn = request.earnings(adjusted, earnings.actual, currency=currency.USD)
 split = request.splits(splitAdjusted, splits.numerator)
 revenue = request.financial(adjusted, "TOTAL_REVENUE", "FQ", currency="USD")
-quandl = request.quandl(lineBreak, barmerge.gaps_off, 0)
+quandl = request.quandl(lineBreak, barmerge.gaps_off, 0, ignore_invalid_symbol=true)
 plot(dividend, "Dividend")
 plot(earn, "Earnings")
 plot(split, "Split")
@@ -7583,7 +7637,7 @@ plot(quandl, "Quandl")`, chartBars, { requestDatafeed: tickerModifierDatafeed })
     expect(findPlot(compiledResult, 'Earnings').values).toEqual([2.7, 2.7, 2.7, 2.7, 2.7, 2.7]);
     expect(findPlot(compiledResult, 'Split').values).toEqual([4, 4, 4, 4, 4, 4]);
     expect(findPlot(compiledResult, 'Revenue').values).toEqual([3000, 3000, 3000, 3000, 3000, 3000]);
-    expect(findPlot(compiledResult, 'Quandl').values).toEqual([41, 41, 41, 41, 41, 41]);
+    expect(findPlot(compiledResult, 'Quandl').values).toEqual([null, null, null, null, null, null]);
   });
 
   it('request.security_lower_tf round-trips seeded ticker modifier contexts with reference parity', () => {
@@ -7634,7 +7688,7 @@ plot(request.dividends(modified, dividends.gross, currency="USD"), "Modified Div
 plot(request.financial(standard, "TOTAL_REVENUE", "FQ", currency="USD"), "Standard Financial")
 plot(request.financial(inherited, "TOTAL_REVENUE", "FQ", currency="USD"), "Inherited Financial")
 plot(request.dividends(renko, dividends.gross, currency="USD"), "Renko Dividend")
-plot(request.quandl(lineBreak, barmerge.gaps_off, 0), "Linebreak Quandl")
+plot(request.quandl(lineBreak, barmerge.gaps_off, 0, ignore_invalid_symbol=true), "Linebreak Quandl")
 plot(request.splits(kagi, splits.numerator), "Kagi Split")
 plot(request.earnings(pointFigure, earnings.actual, currency="USD"), "Point Figure Earnings")`, chartBars, { requestDatafeed: tickerModifierDatafeed });
 
@@ -7642,7 +7696,7 @@ plot(request.earnings(pointFigure, earnings.actual, currency="USD"), "Point Figu
     expect(findPlot(compiledResult, 'Standard Financial').values).toEqual([2000, 2000, 2000, 2000, 2000, 2000]);
     expect(findPlot(compiledResult, 'Inherited Financial').values).toEqual([4000, 4000, 4000, 4000, 4000, 4000]);
     expect(findPlot(compiledResult, 'Renko Dividend').values).toEqual([0.8, 0.8, 0.8, 0.8, 0.8, 0.8]);
-    expect(findPlot(compiledResult, 'Linebreak Quandl').values).toEqual([41, 41, 41, 41, 41, 41]);
+    expect(findPlot(compiledResult, 'Linebreak Quandl').values).toEqual([null, null, null, null, null, null]);
     expect(findPlot(compiledResult, 'Kagi Split').values).toEqual([3, 3, 3, 3, 3, 3]);
     expect(findPlot(compiledResult, 'Point Figure Earnings').values).toEqual([3.1, 3.1, 3.1, 3.1, 3.1, 3.1]);
   });
@@ -7772,20 +7826,20 @@ plot(array.size(missing), "Missing")
 plot(array.size(sameTf), "Same TF")`, [lowerChartBars[0]!], { requestDatafeed: datafeed });
   });
 
-  it('request.security_lower_tf preserves tuple arity for ignored invalid contexts', () => {
+  it('request.security_lower_tf returns na tuple items for ignored invalid contexts', () => {
     const ast = parse(`//@version=6
 indicator("compiled lower tf invalid tuple", timeframe="2")
-[fast, slow, gate] = request.security_lower_tf("TEST", "", [close, open, high], ignore_invalid_timeframe=true)
-plot(array.size(fast), "Fast")
-plot(array.size(slow), "Slow")
-plot(array.size(gate), "Gate")`);
+[fast, slow, gate] = request.security_lower_tf("TEST", "3", [close, open, high], ignore_invalid_timeframe=true)
+plot(na(fast) ? 1 : 0, "Fast")
+plot(na(slow) ? 1 : 0, "Slow")
+plot(na(gate) ? 1 : 0, "Gate")`);
     const compiled = tryCompile(ast);
     expect(compiled.success).toBe(true);
 
     const result = executeCompiled(compiled, [lowerChartBars[0]!], undefined, { requestDatafeed: datafeed });
 
     expect(result?.errors).toEqual([]);
-    expect(result?.plots.map((plot) => plot.values)).toEqual([[0], [0], [0]]);
+    expect(result?.plots.map((plot) => plot.values)).toEqual([[1], [1], [1]]);
   });
 
   it('request.currency_rate merges series points with reference parity', () => {
@@ -7960,13 +8014,13 @@ plot(na(metric) ? 1 : 0, "Missing Is NA")`, chartBars, { requestDatafeed: financ
     expect(findPlot(compiledResult, 'Missing Is NA').values).toEqual([1, 1, 1, 1, 1, 1]);
   });
 
-  it('request.quandl resolves seeded provider values with reference parity', () => {
+  it('request.quandl reports deprecation despite seeded provider values', () => {
     const { compiledResult } = assertPlotParity(`//@version=6
 indicator("compiled seeded quandl")
 cape = request.quandl("MULTPL/SHILLER_PE_RATIO_MONTH", barmerge.gaps_on, 0)
 plot(cape, "CAPE")`, chartBars, { requestDatafeed: quandlDatafeed });
 
-    expect(findPlot(compiledResult, 'CAPE').values).toEqual([28.5, null, null, null, 29.25, null]);
+    expect(compiledResult.errors).toEqual(expect.arrayContaining([expect.objectContaining({ code: 'runtime.error', message: expect.stringMatching(/quandl/i) })]));
   });
 
   it('request.quandl returns na for unseeded provider values with reference parity', () => {
@@ -8202,7 +8256,8 @@ plot(ta.rsi(close, 14), "Native RSI")`;
       0.456621,
     ]);
     expect(result.plots[1]?.title).toBe('Official DEMA');
-    expect(result.plots[1]?.values.every((value) => value !== null && Number.isFinite(value))).toBe(true);
+    // EMA(2) seeds at 102.5 then advances to 107.5; nested seed is 105.
+    expect(result.plots[1]?.values).toEqual([null, null, 110]);
     expect(result.plots[2]?.title).toBe('Native RSI');
   });
 
@@ -8365,10 +8420,10 @@ plot(specialK + specialKSignal + tvta.ulcerIndex(close, 5), "Risk")`;
     }
   });
 
-  it('executes the documented official TradingView ta v14 additions', () => {
+  it('executes the historically published TradingView ta v4 exports', () => {
     const pine = `//@version=6
-indicator("official ta v14 surface")
-import TradingView/ta/14 as tvta
+indicator("official ta v4 surface")
+import TradingView/ta/4 as tvta
 plot(tvta.allTimeHigh(close), "All-Time High")
 plot(tvta.allTimeLow(close), "All-Time Low")
 plot(tvta.trima2(close, 3), "TRIMA2")`;

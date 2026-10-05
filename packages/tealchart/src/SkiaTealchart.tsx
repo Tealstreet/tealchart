@@ -1,5 +1,6 @@
 import type { SkImage } from '@shopify/react-native-skia';
 import type {
+  DrawingOutput,
   PlotOutput,
   Program,
   RequestDatafeed,
@@ -32,7 +33,7 @@ import type { NativePaneSnapshot } from './mobile/render/NativePaneDividerResize
 import type { NativeReleaseHold } from './mobile/interaction/nativeReleaseHold';
 import type { NativeSelectedTradeLine, NativeTradeLineObjectType } from './mobile/utils/tradeLineLayout';
 import type { ChartSettingsControlContext } from './settings/chartSettingsControls';
-import type { ChartSettings, CurrentLayoutState, SaveStatus } from './state/chartState';
+import type { ChartSettings, CurrentLayoutState, PlotStyleOverride, SaveStatus } from './state/chartState';
 import type { ChartThemeInput } from './theme';
 import type { ISaveLoadAdapter, LayoutMetadata } from './transformer/saveLoadIntegration';
 import type { TealchartKeyValueStorage } from './transformer/storageSaveLoadAdapter';
@@ -656,6 +657,10 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     () => indicatorManager?.getPlots() ?? EMPTY_NATIVE_INDICATOR_PLOTS,
     [indicatorManager, nativeIndicatorPlotsRevision],
   );
+  const nativeIndicatorDrawings = useMemo<readonly DrawingOutput[]>(
+    () => indicatorManager?.getDrawings() ?? [],
+    [indicatorManager, nativeIndicatorPlotsRevision],
+  );
   const nativeIndicatorPaneInfo = useMemo<Readonly<Record<string, NativeIndicatorPaneInfo>>>(() => {
     const paneInfo = indicatorManager?.getIndicatorPaneInfo() ?? {};
     const panes = nativeIndicatorPaneLayout?.panes ?? [];
@@ -668,6 +673,10 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       result[scriptId] = {
         overlay: info.overlay,
         paneId: pane?.id,
+        format: info.format,
+        precision: info.precision,
+        scale: info.scale,
+        explicitPlotZOrder: info.explicitPlotZOrder,
       };
     }
 
@@ -698,6 +707,9 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       result[scriptId] = {
         inputs: info.inputs,
         name: info.name,
+        format: info.format,
+        precision: info.precision,
+        scale: info.scale,
         overlay: info.overlay,
         paneId: pane?.id,
       };
@@ -705,6 +717,17 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
 
     return result;
   }, [indicatorManager, nativeIndicatorsRevision, nativeIndicatorPaneLayout]);
+  const nativeIndicatorStyleOverrides = useMemo(
+    () => Object.fromEntries((indicatorManager?.getIndicators() ?? []).map((indicator) => [indicator.instanceId, indicator.styleOverrides ?? []])),
+    [indicatorManager, nativeIndicatorsRevision],
+  );
+  const handleNativeSaveIndicatorStyle = useCallback(
+    (id: string, overrides: PlotStyleOverride[]) => {
+      indicatorManager?.updateStyleOverrides(id, overrides);
+      markNativeLayoutDirtyIfReady();
+    },
+    [indicatorManager, markNativeLayoutDirtyIfReady],
+  );
   const handleNativeToggleIndicator = useCallback(
     (indicatorId: string) => {
       chartApi.toggleStudyVisibility(indicatorId);
@@ -2205,6 +2228,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
                 intervalMs={intervalToMs(nativeRenderInterval)}
                 indicatorPaneInfo={nativeIndicatorPaneInfo}
                 indicatorPlots={nativeIndicatorPlots}
+                indicatorDrawings={nativeIndicatorDrawings}
                 paneRangeOverrides={paneRangeOverrides}
                 indicatorTotalBarCount={nativeRenderBars.length}
                 lineSnapshot={lineSnapshot}
@@ -2278,6 +2302,10 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       {frame && !hideLegend && (
         <NativeChartLegendOverlay
           bars={nativeRenderBars}
+          plots={nativeIndicatorPlots}
+          crosshair={crosshair}
+          sharedViewport={sharedViewport}
+          backgroundColor={backgroundColor}
           downColor={options.downColor}
           frame={nativeLegendFrame ?? frame}
           gridColor={gridColor}
@@ -2289,6 +2317,8 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           mutedTextColor={nativeMutedTextColor}
           onActionTargetsChange={setNativeLegendActionTargets}
           onRemoveIndicator={handleNativeRemoveIndicator}
+          onSaveStyle={handleNativeSaveIndicatorStyle}
+          styleOverrides={nativeIndicatorStyleOverrides}
           onToggleIndicator={handleNativeToggleIndicator}
           pricePrecision={nativePricePrecision}
           symbol={symbol}

@@ -1,6 +1,6 @@
-import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { loadCorpusEntry } from './corpus-runner';
 import { parse } from '../../src/parser';
 import { executeScript } from '../../src/runtime';
 import {
@@ -18,9 +18,9 @@ if (!entryId) {
 }
 
 const dir = path.join(corpusDir, entryId);
-const pine = fs.readFileSync(path.join(dir, 'strategy.pine'), 'utf-8');
-const bars = JSON.parse(fs.readFileSync(path.join(dir, 'bars.json'), 'utf-8'));
-const csv = fs.readFileSync(path.join(dir, 'tv_trades.csv'), 'utf-8');
+const entry = loadCorpusEntry(dir);
+if (!entry) throw new Error(`${entryId}: missing corpus inputs`);
+const { pineSource: pine, bars, referenceCsv: csv, meta } = entry;
 
 console.log(`Bars: ${bars.length}`);
 console.log('Parsing...');
@@ -61,10 +61,7 @@ if (refNorm.length > 0) {
 }
 
 const engineNorm = engineToNormalizedTrades(s.closedTrades);
-const meta = fs.existsSync(path.join(dir, 'meta.json'))
-  ? JSON.parse(fs.readFileSync(path.join(dir, 'meta.json'), 'utf-8'))
-  : {};
-const trimOverlap = meta.source === 'tradingview';
+const trimOverlap = meta?.source === 'tradingview';
 if (trimOverlap) console.log('(Trimming to overlap window — TV reference may have warmup data outside our bar range)');
 const parity = computeParity(entryId, engineNorm, refNorm, { trimOverlap });
 

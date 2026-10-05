@@ -211,11 +211,13 @@ describe('TealchartWidget applied custom source updates', () => {
 
   it('leaves built-in instances and missing sources untouched, and reports recompilation failures', async () => {
     const state = appliedWidget();
+    const reportError = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const workerError = new Error('worker failed');
     state.instances()[1].sourceKind = 'builtin';
-    state.manager.addScript.mockRejectedValueOnce(new Error('worker failed'));
+    state.manager.addScript.mockRejectedValueOnce(workerError);
     state.widget.setCustomTealscriptIndicators([{ ...source, code: 'plot(high)' }]);
     expect(state.manager.addScript).toHaveBeenCalledTimes(1);
-    await vi.waitFor(() => expect(state.internals._logger.error).toHaveBeenCalled());
+    await vi.waitFor(() => expect(reportError).toHaveBeenCalledWith('Failed to update indicator Saved source', workerError));
     state.widget.setCustomTealscriptIndicators([]);
     expect(state.manager.addScript).toHaveBeenCalledTimes(1);
     expect(state.instances()).toHaveLength(2);

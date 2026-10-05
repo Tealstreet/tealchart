@@ -198,11 +198,11 @@ htfClose = request.security(syminfo.tickerid, "2", close)
 plot(htfClose, title="HTF Close")
 `, {
       bars: chartBars,
-      engineOptions: { requestDatafeed: requestDatafeed() },
+      engineOptions: { requestDatafeed: requestDatafeed(), runtime: { timeframe: { period: '1' } } },
     });
 
     expect(result.errors).toEqual([]);
-    expect(getPlot(result, 'HTF Close').values).toEqual([null, null, 10, 10, 20, 20]);
+    expect(getPlot(result, 'HTF Close').values).toEqual([null, 10, 10, 20, 20, 30]);
   });
 
   it('accepts the legacy global security alias', () => {
@@ -231,12 +231,12 @@ plot(confirmedGaps, title="Confirmed Gaps")
 plot(lookaheadGaps, title="Lookahead Gaps")
 `, {
       bars: chartBars,
-      engineOptions: { requestDatafeed: requestDatafeed() },
+      engineOptions: { requestDatafeed: requestDatafeed(), runtime: { timeframe: { period: '1' } } },
     });
 
     expect(result.errors).toEqual([]);
     expect(getPlot(result, 'Lookahead').values).toEqual([10, 10, 20, 20, 30, 30]);
-    expect(getPlot(result, 'Confirmed Gaps').values).toEqual([null, null, 10, null, 20, null]);
+    expect(getPlot(result, 'Confirmed Gaps').values).toEqual([null, 10, null, 20, null, 30]);
     expect(getPlot(result, 'Lookahead Gaps').values).toEqual([10, null, 20, null, 30, null]);
   });
 
@@ -302,9 +302,10 @@ plot(htfAverage, title="HTF Average")
     expect(getPlot(result, 'HTF Average').values).toEqual([null, null, 15, 15, 25, 25]);
   });
 
-  it('propagates Pine runtime errors from request expressions', () => {
+  // Native admission: 642da77ee1, ledger/verify-division-recovery-bbi6nl-v1/REPORT-v1.md.
+  it('admits an integer-derived fractional SMA length in a request expression', () => {
     const result = runCompatScript(`
-indicator("HTF expression runtime error")
+indicator("HTF integer-derived length")
 length = input.int(9, minval=3)
 htfAverage = request.security(syminfo.tickerid, "2", ta.sma(close, length / 2), lookahead=barmerge.lookahead_on)
 plot(htfAverage, title="HTF Average")
@@ -313,8 +314,24 @@ plot(htfAverage, title="HTF Average")
       engineOptions: { requestDatafeed: requestDatafeed() },
     });
 
+    expect(result.errors).toEqual([]);
+    expect(result.profile?.swallowedErrors ?? []).toEqual([]);
+    expect(getPlot(result, 'HTF Average').values).toEqual([null, null, null, null, null, null]);
+  });
+
+  it('propagates Pine runtime errors from request expressions', () => {
+    const result = runCompatScript(`
+indicator("HTF expression runtime error")
+length = input.int(0, minval=0)
+htfAverage = request.security(syminfo.tickerid, "2", ta.sma(close, length / 2), lookahead=barmerge.lookahead_on)
+plot(htfAverage, title="HTF Average")
+`, {
+      bars: chartBars,
+      engineOptions: { requestDatafeed: requestDatafeed() },
+    });
+
     expect(result.errors.map((error) => error.message)).toEqual([
-      expect.stringContaining('TA length must be a positive integer; got 4.5'),
+      expect.stringContaining('TA length must be a positive integer; got 0'),
     ]);
     expect(result.profile?.swallowedErrors ?? []).toEqual([]);
   });
@@ -342,11 +359,11 @@ htfClose = request.security(syminfo.tickerid, "2", close, calc_bars_count=2)
 plot(htfClose, title="HTF Close")
 `, {
       bars: chartBars,
-      engineOptions: { requestDatafeed: requestDatafeed() },
+      engineOptions: { requestDatafeed: requestDatafeed(), runtime: { timeframe: { period: '1' } } },
     });
 
     expect(result.errors).toEqual([]);
-    expect(getPlot(result, 'HTF Close').values).toEqual([null, null, null, null, 20, 20]);
+    expect(getPlot(result, 'HTF Close').values).toEqual([null, null, null, 20, 20, 30]);
   });
 
   it('evaluates other-symbol metadata inside the requested context', () => {
@@ -467,7 +484,7 @@ plot(nested, title="Nested")
   });
 
   it('rejects local-scope and conditional-operand requests when dynamic_requests is false', () => {
-    const local = runCompatScript(`
+    const local = () => runCompatScript(`
 indicator("Local request disabled", dynamic_requests=false)
 if close > open
     plot(request.security(syminfo.tickerid, "2", close), title="Local")
@@ -484,7 +501,7 @@ plot(close > open ? request.security(syminfo.tickerid, "2", close) : close, titl
       engineOptions: { requestDatafeed: requestDatafeed() },
     });
 
-    const initializer = runCompatScript(`
+    const initializer = () => runCompatScript(`
 indicator("Initializer request disabled", dynamic_requests=false)
 value = if close > open
     request.security(syminfo.tickerid, "2", close)
@@ -506,13 +523,13 @@ plot(request.security(syminfo.tickerid, "2", close) and close > open ? 1 : 0, ti
     const disabledLocalRequestMessage =
       'request.* calls in local scopes require dynamic_requests=true: request.security. Non-exported request wrapper functions were valid without dynamic_requests in Pine v3-v5 but require dynamic_requests=true in Pine v6.';
 
-    expect(local.errors.map((error) => error.message)).toEqual([disabledLocalRequestMessage]);
+    expect(local).toThrow('compile-unsupported: request.* calls in local scopes require dynamic_requests=true: request.security');
     expect(conditional.errors.map((error) => error.message)).toEqual([disabledLocalRequestMessage]);
-    expect(initializer.errors.map((error) => error.message)).toEqual([disabledLocalRequestMessage]);
+    expect(initializer).toThrow('compile-unsupported: request.* calls in local scopes require dynamic_requests=true: request.security');
     expect(logical.errors.map((error) => error.message)).toEqual([disabledLocalRequestMessage]);
   });
 
-  it('rejects nested requests when dynamic_requests is false', () => {
+  it('passes independently evaluated inner request values when dynamic_requests is false', () => {
     const result = runCompatScript(`
 indicator("Nested request disabled", dynamic_requests=false)
 plot(request.security(
@@ -522,13 +539,65 @@ plot(request.security(
     lookahead=barmerge.lookahead_on
 ), title="Nested")
 `, {
-      bars: [chartBars[0]!],
+      bars: chartBars,
       engineOptions: { requestDatafeed: multiSymbolRequestDatafeed() },
     });
 
-    expect(result.errors.map((error) => error.message)).toEqual([
-      'Nested request.* calls require dynamic_requests=true: request.security',
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Nested').values).toEqual([10, 10, 20, 20, 30, 30]);
+  });
+
+  for (const dynamic of [false, true]) {
+    it(`evaluates two inline request dependencies with dynamic_requests=${dynamic}`, () => {
+      const result = runCompatScript(`//@version=6
+indicator("Independent request pair", dynamic_requests=${dynamic})
+__independent_request_2_0 = 7
+value = request.security(symbol="NASDAQ:AAPL", timeframe="2", expression=
+    request.security(symbol=syminfo.tickerid, timeframe="2", expression=close, lookahead=barmerge.lookahead_on) +
+    request.security(syminfo.tickerid, "2", open, lookahead=barmerge.lookahead_on),
+    lookahead=barmerge.lookahead_on)
+plot(value + __independent_request_2_0, title="Pair")`, {
+        bars: chartBars,
+        engineOptions: { requestDatafeed: multiSymbolRequestDatafeed() },
+      });
+      expect(result.errors).toEqual([]);
+      expect(getPlot(result, 'Pair').values).toEqual(dynamic
+        ? [368, 368, 373, 373, 380, 380]
+        : [28, 28, 48, 48, 68, 68]);
+    });
+
+    it(`preserves three request levels with dynamic_requests=${dynamic}`, () => {
+      const result = runCompatScript(`//@version=6
+indicator("Three request levels", dynamic_requests=${dynamic})
+plot(request.security("NASDAQ:AAPL", "2",
+    request.security("NASDAQ:AAPL", "2",
+        request.security(syminfo.tickerid, "2", close, lookahead=barmerge.lookahead_on),
+        lookahead=barmerge.lookahead_on),
+    lookahead=barmerge.lookahead_on), title="Three")`, {
+        bars: chartBars,
+        engineOptions: { requestDatafeed: multiSymbolRequestDatafeed() },
+      });
+      expect(result.errors).toEqual([]);
+      expect(getPlot(result, 'Three').values).toEqual(dynamic
+        ? [181, 181, 185, 185, 188, 188]
+        : [10, 10, 20, 20, 30, 30]);
+    });
+  }
+
+  it('reuses a fixed independent request scope across changing inner values', () => {
+    const bars = Array.from({ length: 100 }, (_, index) => ({ ...chartBars[0]!, time: chartBars[0]!.time + index * 120_000, close: 100 + index }));
+    const feed = new InMemoryRequestDatafeed([
+      { symbol: 'BTCUSDT', timeframe: '2', bars: bars.map((bar, index) => ({ ...bar, close: 10 + index })) },
+      { symbol: 'NASDAQ:AAPL', timeframe: '2', bars: bars.map((bar, index) => ({ ...bar, close: 181 + index })) },
     ]);
+    const result = runCompatScript(`//@version=6
+indicator("Independent request budget", dynamic_requests=false)
+plot(request.security("NASDAQ:AAPL", "2", request.security(syminfo.tickerid, "2", close, lookahead=barmerge.lookahead_on), lookahead=barmerge.lookahead_on), title="Independent")`, {
+      bars,
+      engineOptions: { runtime: { timeframe: { period: '2' } }, requestDatafeed: feed },
+    });
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Independent').values).toEqual(bars.map((_, index) => 10 + index));
   });
 
   it('supports ignore_invalid_symbol for missing fixture contexts', () => {
@@ -693,14 +762,14 @@ plot(na(array.get(asks, 1)) ? 1 : 0, title="Missing Ask")
     const result = runCompatScript(`
 indicator("Lower TF missing", timeframe="2")
 missing = request.security_lower_tf("MISSING", "1", close, ignore_invalid_symbol=true)
-plot(array.size(missing), title="Missing Count")
+plot(na(missing) ? 1 : 0, title="Missing")
 `, {
       bars: lowerChartBars,
       engineOptions: { requestDatafeed: lowerTimeframeRequestDatafeed() },
     });
 
     expect(result.errors).toEqual([]);
-    expect(getPlot(result, 'Missing Count').values).toEqual([0, 0, 0]);
+    expect(getPlot(result, 'Missing').values).toEqual([1, 1, 1]);
   });
 
   it('reports missing lower-timeframe contexts when ignore_invalid_symbol is false', () => {
@@ -719,10 +788,10 @@ plot(array.size(request.security_lower_tf("MISSING", "1", close)), title="Missin
     ]);
   });
 
-  it('rejects equal or higher timeframe requests unless ignore_invalid_timeframe is true', () => {
+  it('rejects higher timeframe requests unless ignore_invalid_timeframe is true', () => {
     const invalid = runCompatScript(`
 indicator("Lower TF invalid", timeframe="2")
-plot(array.size(request.security_lower_tf(syminfo.tickerid, "2", close)), title="Count")
+plot(array.size(request.security_lower_tf(syminfo.tickerid, "3", close)), title="Count")
 `, {
       bars: [lowerChartBars[0]!],
       engineOptions: { requestDatafeed: lowerTimeframeRequestDatafeed() },
@@ -730,24 +799,24 @@ plot(array.size(request.security_lower_tf(syminfo.tickerid, "2", close)), title=
 
     const ignored = runCompatScript(`
 indicator("Lower TF invalid ignored", timeframe="2")
-values = request.security_lower_tf(syminfo.tickerid, "2", close, ignore_invalid_timeframe=true)
-plot(array.size(values), title="Count")
+values = request.security_lower_tf(syminfo.tickerid, "3", close, ignore_invalid_timeframe=true)
+plot(na(values) ? 1 : 0, title="Missing")
 `, {
       bars: [lowerChartBars[0]!],
       engineOptions: { requestDatafeed: lowerTimeframeRequestDatafeed() },
     });
 
     expect(invalid.errors.map((error) => error.message)).toEqual([
-      'request.security_lower_tf requires a lower timeframe than the chart timeframe: 2',
+      'request.security_lower_tf requires a lower timeframe than the chart timeframe: 3',
     ]);
     expect(ignored.errors).toEqual([]);
-    expect(getPlot(ignored, 'Count').values).toEqual([0]);
+    expect(getPlot(ignored, 'Missing').values).toEqual([1]);
   });
 
   it('caps unique request.security_lower_tf contexts', () => {
     const requestPlots = Array.from(
       { length: 41 },
-      (_, index) => `plot(array.size(request.security_lower_tf("MISSING${index}", "1", close, ignore_invalid_symbol=true)), title="R${index}")`,
+      (_, index) => `plot(na(request.security_lower_tf("MISSING${index}", "1", close, ignore_invalid_symbol=true)) ? 1 : 0, title="R${index}")`,
     ).join('\n');
     const result = runCompatScript(`
 indicator("Lower TF request cap", timeframe="2")

@@ -306,7 +306,7 @@ quandlMissing = request.quandl("INVALID/DATA", barmerge.gaps_off, 1, ignore_inva
 currencyMissing = request.currency_rate("USD", "ZZZ", ignore_invalid_currency=true)
 footprintMissing = request.footprint(5, 68, 250)
 plot(na(securityMissing) ? 1 : 0, "Security Missing")
-plot(array.size(lowerMissing), "Lower Missing Count")
+plot(na(lowerMissing) ? 1 : 0, "Lower Missing")
 plot(na(seedMissing) ? 1 : 0, "Seed Missing")
 plot(na(divMissing) ? 1 : 0, "Dividend Missing")
 plot(na(earnMissing) ? 1 : 0, "Earnings Missing")
@@ -318,7 +318,7 @@ plot(na(currencyMissing) ? 1 : 0, "Currency Missing")
 plot(na(footprintMissing) ? 1 : 0, "Footprint Missing")`,
     expectedPlots: {
       'Security Missing': [1, 1, 1, 1, 1, 1],
-      'Lower Missing Count': [0, 0, 0, 0, 0, 0],
+      'Lower Missing': [1, 1, 1, 1, 1, 1],
       'Seed Missing': [1, 1, 1, 1, 1, 1],
       'Dividend Missing': [1, 1, 1, 1, 1, 1],
       'Earnings Missing': [1, 1, 1, 1, 1, 1],
@@ -336,7 +336,7 @@ plot(na(footprintMissing) ? 1 : 0, "Footprint Missing")`,
       expect(datafeed.seriesQueries.some((query) => query.family === 'splits' && query.key === corporateActionRequestKey('INVALID:MISS', 'splits.denominator'))).toBe(true);
       expect(datafeed.seriesQueries.some((query) => query.family === 'financial' && query.key === financialRequestKey('INVALID:MISS', 'TOTAL_REVENUE', 'FQ'))).toBe(true);
       expect(datafeed.seriesQueries.some((query) => query.family === 'economic' && query.key === economicRequestKey('ZZ', 'GDP'))).toBe(true);
-      expect(datafeed.seriesQueries.some((query) => query.family === 'quandl' && query.key === quandlRequestKey('INVALID/DATA', 1))).toBe(true);
+      expect(datafeed.seriesQueries.some((query) => query.family === 'quandl')).toBe(false);
       expect(datafeed.currencyQueries.some((query) => query.baseCurrency === 'USD' && query.quoteCurrency === 'ZZZ')).toBe(true);
       expect(datafeed.footprintQueries.some((query) => footprintRequestKey(query.symbol, query.timeframe, query.ticksPerRow, query.valueAreaPercent, query.imbalancePercent) === footprintRequestKey('BTCUSDT', '60', 5, 68, 250))).toBe(true);
     },
@@ -430,7 +430,7 @@ earnings = request.earnings("NASDAQ:AAPL", earnings.actual, currency=currency.US
 split = request.splits("NASDAQ:AAPL", splits.denominator)
 financial = request.financial("NASDAQ:AAPL", "TOTAL_REVENUE", "FQ", currency=currency.USD)
 economic = request.economic("US", "GDP")
-quandl = request.quandl("MULTPL/SHILLER_PE_RATIO_MONTH", barmerge.gaps_off, 1)
+quandl = request.quandl("MULTPL/SHILLER_PE_RATIO_MONTH", barmerge.gaps_off, 1, ignore_invalid_symbol=true)
 rate = request.currency_rate(currency.USD, currency.EUR)
 fp = request.footprint(10, 70)
 plot(seedClose, "Seed Close")
@@ -449,7 +449,7 @@ plot(na(fp) ? na : fp.total_volume(), "Footprint Total")`,
       Split: [null, null, 4, 4, 4, 4],
       Financial: [null, null, 1000, 1000, 1000, 1000],
       Economic: [null, null, 3.2, 3.2, 3.2, 3.2],
-      Quandl: [null, null, 29.5, 29.5, 29.5, 29.5],
+      Quandl: [null, null, null, null, null, null],
       Rate: [0.9, 0.9, 0.9, 0.9, 0.9, 0.9],
       'Footprint Total': [1200, 1200, 1200, 1200, 1200, 1200],
     },
@@ -464,7 +464,7 @@ plot(na(fp) ? na : fp.total_volume(), "Footprint Total")`,
       expect(datafeed.corporateQueries.some((query) => query.kind === 'splits' && query.ticker === 'NASDAQ:AAPL')).toBe(true);
       expect(datafeed.financialQueries.some((query) => query.symbol === 'NASDAQ:AAPL' && query.financialId === 'TOTAL_REVENUE' && query.period === 'FQ' && query.currency === 'USD')).toBe(true);
       expect(datafeed.economicQueries.some((query) => query.countryCode === 'US' && query.field === 'GDP')).toBe(true);
-      expect(datafeed.quandlQueries.some((query) => query.ticker === 'MULTPL/SHILLER_PE_RATIO_MONTH' && query.column === 1)).toBe(true);
+      expect(datafeed.quandlQueries).toEqual([]);
       expect(datafeed.currencyQueries.some((query) => query.baseCurrency === 'USD' && query.quoteCurrency === 'EUR')).toBe(true);
       expect(datafeed.footprintQueries.some((query) => query.symbol === 'BTCUSDT' && query.timeframe === '60' && query.ticksPerRow === 10 && query.valueAreaPercent === 70)).toBe(true);
     },

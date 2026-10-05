@@ -9,6 +9,7 @@ import {
   resolveLineDrawingSegment,
   resolvePolylineDrawingPoints,
 } from './TealScriptDrawingCoordinates';
+import { drawingFont, fontSizeForDrawing } from './TealScriptDrawingText';
 
 export interface TealScriptDrawingRendererOptions {
   ctx: CanvasContext;
@@ -38,7 +39,17 @@ interface ResolvedWrappedTextLayout {
   lineHeight: number;
 }
 
+interface DrawingTooltipTarget {
+  text: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
 export class TealScriptDrawingRenderer {
+  private tooltipTargets: DrawingTooltipTarget[] = [];
+  private tooltipPane: ComputedPane | null = null;
   private ctx: CanvasContext;
   private options: RenderOptions;
   private margins: ChartMargins;
@@ -55,54 +66,120 @@ export class TealScriptDrawingRenderer {
     this.getTextWidth = options.getTextWidth;
   }
 
-  render(
-    drawingPartition: TealScriptDrawingPartition,
-    bars: Bar[],
-    viewport: Viewport,
-    pane: ComputedPane,
-  ): void {
-    this.renderLineFillDrawings(drawingPartition, bars, viewport, pane);
-    this.renderBoxDrawings(drawingPartition.boxes, bars, viewport, pane);
-    this.renderPolylineDrawings(drawingPartition.polylines, bars, viewport, pane);
-    this.renderLineDrawings(drawingPartition.lines, bars, viewport, pane);
-    this.renderLabelDrawings(drawingPartition.labels, bars, viewport, pane);
-    this.renderTableDrawings(drawingPartition.tables, pane);
+  render(drawingPartition: TealScriptDrawingPartition, bars: Bar[], viewport: Viewport, pane: ComputedPane): void {
+    this.tooltipTargets = [];
+    this.tooltipPane = pane;
+    paintTealScriptDrawings(
+      {
+        ctx: this.ctx,
+        options: this.options,
+        margins: this.margins,
+        font: this.font,
+        coordinateResolvers: this.coordinateResolvers,
+        getTextWidth: this.getTextWidth,
+      },
+      drawingPartition,
+      bars,
+      viewport,
+      pane,
+      (text, rect) => this.addTooltip(text, rect),
+    );
   }
 
-  private clipToPane(pane: ComputedPane): void {
-    const { ctx, options, margins } = this;
+  /** Paint hover text on the overlay context, using bounds from the latest draw. */
+  renderTooltip(ctx: CanvasContext, cursorX: number, cursorY: number): boolean {
+    const target = this.tooltipTargets.findLast(
+      (candidate) =>
+        cursorX >= candidate.x &&
+        cursorX <= candidate.x + candidate.width &&
+        cursorY >= candidate.y &&
+        cursorY <= candidate.y + candidate.height,
+    );
+    if (!target) return false;
+
+    const padding = 8;
+    const lineHeight = 15;
+    const lines = target.text.replace(/\r\n?/g, '\n').split('\n');
+    const font = `12px ${this.font}`;
+    ctx.save();
+    ctx.font = font;
+    const width = Math.max(...lines.map((line) => this.getTextWidth(ctx, line, font))) + padding * 2;
+    const height = lines.length * lineHeight + padding * 2;
+    const minX = this.margins.left;
+    const maxX = this.options.width - this.margins.right;
+    const minY = this.margins.top;
+    const maxY = this.options.height - this.margins.bottom;
+    const preferredX = cursorX + 12 + width <= maxX ? cursorX + 12 : cursorX - width - 12;
+    const x = Math.max(minX, Math.min(preferredX, maxX - width));
+    const y = Math.max(minY, Math.min(cursorY + 12, maxY - height));
+    ctx.beginPath();
+    ctx.roundRect(x, y, width, height, 3);
+    ctx.fillStyle = this.options.backgroundColor;
+    ctx.fill();
+    ctx.strokeStyle = this.options.textColor;
+    ctx.lineWidth = 1;
+    ctx.setLineDash([]);
+    ctx.stroke();
+    ctx.fillStyle = this.options.textColor;
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'top';
+    for (let index = 0; index < lines.length; index++) {
+      ctx.fillText(lines[index]!, x + padding, y + padding + index * lineHeight);
+    }
+    ctx.restore();
+    return true;
+  }
+
+  private addTooltip(text: string | undefined, rect: { x: number; y: number; width: number; height: number }): void {
+    if (!text || !this.tooltipPane) return;
+    const x = Math.max(this.margins.left, rect.x);
+    const y = Math.max(this.tooltipPane.top, rect.y);
+    const right = Math.min(this.options.width - this.margins.right, rect.x + rect.width);
+    const bottom = Math.min(this.tooltipPane.bottom, rect.y + rect.height);
+    if (right > x && bottom > y) {
+      this.tooltipTargets.push({ text, x, y, width: right - x, height: bottom - y });
+    }
+  }
+}
+
+export type TealScriptDrawingPainterOptions = Omit<TealScriptDrawingRendererOptions, 'options'> & {
+  options: Pick<RenderOptions, 'width'>;
+};
+
+/** Shared immediate-mode painter. Geometry and layout run on web and the native UI thread. */
+export function paintTealScriptDrawings(
+  configuration: TealScriptDrawingPainterOptions,
+  drawingPartition: TealScriptDrawingPartition,
+  bars: readonly Bar[],
+  viewport: Viewport,
+  pane: ComputedPane,
+  recordTooltip?: (text: string | undefined, rect: { x: number; y: number; width: number; height: number }) => void,
+): void {
+  'worklet';
+  const { ctx, options, margins, font, coordinateResolvers, getTextWidth } = configuration;
+  function clipToPane(pane: ComputedPane): void {
     ctx.beginPath();
     ctx.rect(margins.left, pane.top, options.width - margins.left - margins.right, pane.height);
     ctx.clip();
   }
 
-  private renderBoxDrawings(
+  function renderBoxDrawings(
     boxes: TealScriptDrawingPartition['boxes'],
-    bars: Bar[],
+    bars: readonly Bar[],
     viewport: Viewport,
     pane: ComputedPane,
   ): void {
     if (boxes.length === 0) return;
 
-    const { ctx, options, margins } = this;
     const chartWidth = options.width - margins.left;
     const minX = margins.left;
     const maxX = options.width - margins.right;
 
     ctx.save();
-    this.clipToPane(pane);
+    clipToPane(pane);
 
     for (const box of boxes) {
-      const rect = resolveBoxDrawingRect(
-        box,
-        bars,
-        viewport,
-        pane,
-        chartWidth,
-        minX,
-        maxX,
-        this.coordinateResolvers,
-      );
+      const rect = resolveBoxDrawingRect(box, bars, viewport, pane, chartWidth, minX, maxX, coordinateResolvers);
       if (!rect) continue;
 
       if (box.bgcolor) {
@@ -110,7 +187,7 @@ export class TealScriptDrawingRenderer {
         ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
       }
 
-      if (box.borderColor) {
+      if (box.borderColor && box.borderWidth !== 0) {
         ctx.strokeStyle = box.borderColor;
         ctx.lineWidth = Math.max(1, box.borderWidth);
         if (box.borderStyle === 'dashed') {
@@ -125,12 +202,12 @@ export class TealScriptDrawingRenderer {
 
       if (box.text) {
         ctx.setLineDash([]);
-        const fontSize = this.fontSizeForDrawing(box.textSize);
-        const font = this.fontForDrawing(box.textSize, box.textFontFamily, box.textFormatting);
+        const fontSize = fontSizeForDrawing(box.textSize);
+        const font = fontForDrawing(box.textSize, box.textFontFamily, box.textFormatting);
         ctx.font = font;
         if (box.textColor && box.textWrap === 'auto') {
           ctx.fillStyle = box.textColor;
-          const textLayout = this.resolveWrappedBoxTextLayout(box, rect, fontSize, font);
+          const textLayout = resolveWrappedBoxTextLayout(box, rect, fontSize, font);
           ctx.textAlign = textLayout.align;
           ctx.textBaseline = 'top';
           for (let index = 0; index < textLayout.lines.length; index++) {
@@ -138,12 +215,12 @@ export class TealScriptDrawingRenderer {
           }
         } else if (box.textColor) {
           ctx.fillStyle = box.textColor;
-          const textLines = this.splitDrawingTextLines(box.text);
+          const textLines = splitDrawingTextLines(box.text);
           const lineHeight = Math.ceil(fontSize * 1.25);
-          const textPosition = this.resolveBoxTextPosition(box, rect);
+          const textPosition = resolveBoxTextPosition(box, rect);
           ctx.textAlign = textPosition.align;
           ctx.textBaseline = textPosition.baseline;
-          this.drawAlignedTextLines(textLines, textPosition, lineHeight);
+          drawAlignedTextLines(textLines, textPosition, lineHeight);
         }
       }
     }
@@ -152,31 +229,7 @@ export class TealScriptDrawingRenderer {
     ctx.restore();
   }
 
-  private fontSizeForDrawing(size: string): number {
-    if (/^[1-9]\d*$/.test(size)) {
-      return Number.parseInt(size, 10);
-    }
-
-    switch (size) {
-      case 'tiny':
-        return 9;
-      case 'small':
-        return 10;
-      case 'large':
-        return 14;
-      case 'huge':
-        return 18;
-      default:
-        return 12;
-    }
-  }
-
-  private fontFamilyForDrawing(fontFamily?: string): string {
-    if (fontFamily === 'monospace') return 'monospace';
-    return this.font;
-  }
-
-  private resolveBoxTextPosition(
+  function resolveBoxTextPosition(
     box: TealScriptDrawingPartition['boxes'][number],
     rect: { x: number; y: number; width: number; height: number },
   ): { x: number; y: number; align: CanvasTextAlign; baseline: CanvasTextBaseline } {
@@ -207,7 +260,7 @@ export class TealScriptDrawingRenderer {
     return { x, y, align, baseline };
   }
 
-  private resolveWrappedBoxTextLayout(
+  function resolveWrappedBoxTextLayout(
     box: TealScriptDrawingPartition['boxes'][number],
     rect: { x: number; y: number; width: number; height: number },
     fontSize: number,
@@ -216,7 +269,7 @@ export class TealScriptDrawingRenderer {
     const padding = 6;
     const lineHeight = Math.ceil(fontSize * 1.25);
     const maxTextWidth = Math.max(1, rect.width - padding * 2);
-    const lines = this.wrapDrawingText(box.text, maxTextWidth, font);
+    const lines = wrapDrawingText(box.text, maxTextWidth, font);
     const totalTextHeight = lines.length * lineHeight;
     const halign = box.textHalign ?? 'center';
     const valign = box.textValign ?? 'center';
@@ -241,7 +294,7 @@ export class TealScriptDrawingRenderer {
     return { lines, x, y, align, lineHeight };
   }
 
-  private wrapDrawingText(text: string, maxWidth: number, font: string): string[] {
+  function wrapDrawingText(text: string, maxWidth: number, font: string): string[] {
     const wrappedLines: string[] = [];
     for (const paragraph of text.split('\n')) {
       const words = paragraph.split(/\s+/).filter(Boolean);
@@ -253,7 +306,7 @@ export class TealScriptDrawingRenderer {
       let currentLine = '';
       for (const word of words) {
         const candidate = currentLine ? `${currentLine} ${word}` : word;
-        if (currentLine && this.getTextWidth(this.ctx, candidate, font) > maxWidth) {
+        if (currentLine && getTextWidth(ctx, candidate, font) > maxWidth) {
           wrappedLines.push(currentLine);
           currentLine = word;
         } else {
@@ -266,9 +319,9 @@ export class TealScriptDrawingRenderer {
     return wrappedLines.length > 0 ? wrappedLines : [''];
   }
 
-  private renderLineFillDrawings(
+  function renderLineFillDrawings(
     drawingPartition: TealScriptDrawingPartition,
-    bars: Bar[],
+    bars: readonly Bar[],
     viewport: Viewport,
     pane: ComputedPane,
   ): void {
@@ -277,13 +330,12 @@ export class TealScriptDrawingRenderer {
 
     if (linesById.size === 0) return;
 
-    const { ctx, options, margins } = this;
     const chartWidth = options.width - margins.left;
     const minX = margins.left;
     const maxX = options.width - margins.right;
 
     ctx.save();
-    this.clipToPane(pane);
+    clipToPane(pane);
 
     for (const linefill of linefills) {
       if (!linefill.color) continue;
@@ -299,7 +351,7 @@ export class TealScriptDrawingRenderer {
         chartWidth,
         minX,
         maxX,
-        this.coordinateResolvers,
+        coordinateResolvers,
       );
       const line2Segment = resolveLineDrawingSegment(
         line2,
@@ -309,7 +361,7 @@ export class TealScriptDrawingRenderer {
         chartWidth,
         minX,
         maxX,
-        this.coordinateResolvers,
+        coordinateResolvers,
       );
       if (!line1Segment || !line2Segment) continue;
 
@@ -326,21 +378,20 @@ export class TealScriptDrawingRenderer {
     ctx.restore();
   }
 
-  private renderLineDrawings(
+  function renderLineDrawings(
     lines: TealScriptDrawingPartition['lines'],
-    bars: Bar[],
+    bars: readonly Bar[],
     viewport: Viewport,
     pane: ComputedPane,
   ): void {
     if (lines.length === 0) return;
 
-    const { ctx, options, margins } = this;
     const chartWidth = options.width - margins.left;
     const minX = margins.left;
     const maxX = options.width - margins.right;
 
     ctx.save();
-    this.clipToPane(pane);
+    clipToPane(pane);
 
     for (const line of lines) {
       const extended = resolveLineDrawingSegment(
@@ -351,7 +402,7 @@ export class TealScriptDrawingRenderer {
         chartWidth,
         minX,
         maxX,
-        this.coordinateResolvers,
+        coordinateResolvers,
       );
       if (!extended) continue;
       if (!line.color) continue;
@@ -372,11 +423,11 @@ export class TealScriptDrawingRenderer {
 
       if (line.style === 'arrow_left' || line.style === 'arrow_both') {
         ctx.setLineDash([]);
-        this.drawLineArrowhead(extended.start, extended.end, Math.max(1, line.width), line.color);
+        drawLineArrowhead(extended.start, extended.end, Math.max(1, line.width), line.color);
       }
       if (line.style === 'arrow_right' || line.style === 'arrow_both') {
         ctx.setLineDash([]);
-        this.drawLineArrowhead(extended.end, extended.start, Math.max(1, line.width), line.color);
+        drawLineArrowhead(extended.end, extended.start, Math.max(1, line.width), line.color);
       }
     }
 
@@ -384,7 +435,7 @@ export class TealScriptDrawingRenderer {
     ctx.restore();
   }
 
-  private drawLineArrowhead(
+  function drawLineArrowhead(
     tip: { x: number; y: number },
     tail: { x: number; y: number },
     width: number,
@@ -404,7 +455,6 @@ export class TealScriptDrawingRenderer {
     const perpX = -unitY;
     const perpY = unitX;
 
-    const { ctx } = this;
     ctx.fillStyle = color;
     ctx.beginPath();
     ctx.moveTo(tip.x, tip.y);
@@ -414,29 +464,21 @@ export class TealScriptDrawingRenderer {
     ctx.fill();
   }
 
-  private renderPolylineDrawings(
+  function renderPolylineDrawings(
     polylines: TealScriptDrawingPartition['polylines'],
-    bars: Bar[],
+    bars: readonly Bar[],
     viewport: Viewport,
     pane: ComputedPane,
   ): void {
     if (polylines.length === 0) return;
 
-    const { ctx, options, margins } = this;
     const chartWidth = options.width - margins.left;
 
     ctx.save();
-    this.clipToPane(pane);
+    clipToPane(pane);
 
     for (const polyline of polylines) {
-      const points = resolvePolylineDrawingPoints(
-        polyline,
-        bars,
-        viewport,
-        pane,
-        chartWidth,
-        this.coordinateResolvers,
-      );
+      const points = resolvePolylineDrawingPoints(polyline, bars, viewport, pane, chartWidth, coordinateResolvers);
       if (points.length < 2) continue;
 
       ctx.lineWidth = Math.max(1, polyline.lineWidth);
@@ -449,7 +491,7 @@ export class TealScriptDrawingRenderer {
       }
 
       ctx.beginPath();
-      this.drawPolylinePath(points, polyline.curved);
+      drawPolylinePath(points, polyline.curved, polyline.closed);
       if (polyline.closed) {
         ctx.closePath();
         if (polyline.fillColor) {
@@ -463,11 +505,11 @@ export class TealScriptDrawingRenderer {
 
         if (polyline.lineStyle === 'arrow_left' || polyline.lineStyle === 'arrow_both') {
           ctx.setLineDash([]);
-          this.drawLineArrowhead(points[0]!, points[1]!, Math.max(1, polyline.lineWidth), polyline.lineColor);
+          drawLineArrowhead(points[0]!, points[1]!, Math.max(1, polyline.lineWidth), polyline.lineColor);
         }
         if (polyline.lineStyle === 'arrow_right' || polyline.lineStyle === 'arrow_both') {
           ctx.setLineDash([]);
-          this.drawLineArrowhead(
+          drawLineArrowhead(
             points[points.length - 1]!,
             points[points.length - 2]!,
             Math.max(1, polyline.lineWidth),
@@ -481,8 +523,7 @@ export class TealScriptDrawingRenderer {
     ctx.restore();
   }
 
-  private drawPolylinePath(points: Array<{ x: number; y: number }>, curved: boolean): void {
-    const { ctx } = this;
+  function drawPolylinePath(points: Array<{ x: number; y: number }>, curved: boolean, closed: boolean): void {
     ctx.moveTo(points[0]!.x, points[0]!.y);
     if (!curved || points.length < 3) {
       for (let index = 1; index < points.length; index++) {
@@ -492,71 +533,100 @@ export class TealScriptDrawingRenderer {
       return;
     }
 
-    for (let index = 1; index < points.length - 1; index++) {
-      const control = points[index]!;
-      const next = points[index + 1]!;
-      if (index === points.length - 2) {
-        ctx.quadraticCurveTo(control.x, control.y, next.x, next.y);
-      } else {
-        ctx.quadraticCurveTo(control.x, control.y, (control.x + next.x) / 2, (control.y + next.y) / 2);
-      }
+    // Interpolating Catmull-Rom segments satisfy Pine's documented point passage.
+    // The exact TradingView spline kernel is still trace-undetermined.
+    const segmentCount = closed ? points.length : points.length - 1;
+    const pointAt = (index: number) =>
+      closed
+        ? points[(index + points.length) % points.length]!
+        : points[Math.max(0, Math.min(index, points.length - 1))]!;
+    for (let index = 0; index < segmentCount; index++) {
+      const previous = pointAt(index - 1);
+      const start = pointAt(index);
+      const end = pointAt(index + 1);
+      const next = pointAt(index + 2);
+      ctx.bezierCurveTo(
+        start.x + (end.x - previous.x) / 6,
+        start.y + (end.y - previous.y) / 6,
+        end.x - (next.x - start.x) / 6,
+        end.y - (next.y - start.y) / 6,
+        end.x,
+        end.y,
+      );
     }
   }
 
-  private renderLabelDrawings(
+  function renderLabelDrawings(
     labels: TealScriptDrawingPartition['labels'],
-    bars: Bar[],
+    bars: readonly Bar[],
     viewport: Viewport,
     pane: ComputedPane,
   ): void {
     if (labels.length === 0) return;
 
-    const { ctx, options, margins } = this;
     const chartWidth = options.width - margins.left;
 
     ctx.save();
     ctx.textBaseline = 'middle';
 
     for (const label of labels) {
-      const position = resolveLabelDrawingPosition(
-        label,
-        bars,
-        viewport,
-        pane,
-        chartWidth,
-        this.coordinateResolvers,
-      );
+      const position = resolveLabelDrawingPosition(label, bars, viewport, pane, chartWidth, coordinateResolvers);
       if (!position) continue;
 
-      const textLines = this.splitDrawingTextLines(label.text ?? '');
+      const textLines = splitDrawingTextLines(label.text ?? '');
       const paddingX = 8;
       const paddingY = 4;
       const minHeight = 22;
-      const fontSize = this.fontSizeForDrawing(label.size);
+      const fontSize = fontSizeForDrawing(label.size, 'label');
       const lineHeight = Math.ceil(fontSize * 1.25);
-      const shouldExpandBody = !this.isSymbolLabelStyle(label.style) && textLines.length > 1;
+      const shouldExpandBody = !isSymbolLabelStyle(label.style) && textLines.length > 1;
       const height = shouldExpandBody ? Math.max(minHeight, textLines.length * lineHeight + paddingY * 2) : minHeight;
-      const font = this.fontForDrawing(label.size, label.textFontFamily, label.textFormatting);
+      const font = fontForDrawing(label.size, label.textFontFamily, label.textFormatting, 'label');
       ctx.font = font;
-      const width = Math.max(18, this.measureDrawingTextLines(textLines, font) + paddingX * 2);
-      const layout = this.resolveLabelLayout(label.style, label.textAlign, position, width, height, lineHeight, margins.left, options.width - margins.right, pane);
+      const textWidth = measureDrawingTextLines(textLines, font);
+      const width = Math.max(18, textWidth + paddingX * 2);
+      const layout = resolveLabelLayout(
+        label.style,
+        label.textAlign,
+        position,
+        width,
+        height,
+        lineHeight,
+        margins.left,
+        options.width - margins.right,
+        pane,
+      );
 
-      if (label.style !== 'none' && label.color) {
+      if (label.style !== 'none' && label.style !== 'text_outline' && label.color) {
         ctx.fillStyle = label.color;
-        this.drawLabelBody(label.style, layout, position);
+        drawLabelBody(label.style, layout, position);
+        addTooltip(label.tooltip, {
+          x: layout.bodyX,
+          y: layout.bodyY,
+          width: layout.bodyWidth,
+          height: layout.bodyHeight,
+        });
       }
 
       if (label.textColor) {
         ctx.fillStyle = label.textColor;
         ctx.textAlign = layout.textAlign;
-        this.drawLabelTextLines(textLines, layout);
+        drawLabelTextLines(textLines, layout, label.style === 'text_outline' ? label.color : null);
+        const textX =
+          layout.textX - (layout.textAlign === 'center' ? textWidth / 2 : layout.textAlign === 'right' ? textWidth : 0);
+        addTooltip(label.tooltip, {
+          x: textX,
+          y: layout.textY - (textLines.length * lineHeight) / 2,
+          width: textWidth,
+          height: textLines.length * lineHeight,
+        });
       }
     }
 
     ctx.restore();
   }
 
-  private resolveLabelLayout(
+  function resolveLabelLayout(
     style: string,
     textAlign: string | undefined,
     anchor: { x: number; y: number },
@@ -569,20 +639,25 @@ export class TealScriptDrawingRenderer {
   ): ResolvedLabelLayout {
     const paddingX = 8;
     const gap = 6;
-    const isSymbol = this.isSymbolLabelStyle(style);
+    const isSymbol = isSymbolLabelStyle(style);
+    const isTextOnly = style === 'none' || style === 'text_outline';
     const bodyWidth = isSymbol ? height : width;
     let bodyX = anchor.x;
     let bodyY = anchor.y;
 
-    if (style.includes('right')) {
+    if (style === 'label_left') {
+      bodyX += gap;
+    } else if (style === 'label_right') {
+      bodyX -= bodyWidth + gap;
+    } else if (style.includes('right')) {
       bodyX -= bodyWidth;
     } else if (!style.includes('left')) {
       bodyX -= bodyWidth / 2;
     }
 
-    if (style.includes('down') || style.includes('upper') || style === 'arrowdown' || anchor.y <= pane.top) {
+    if (style.includes('down') || style.includes('lower') || style === 'arrowdown' || anchor.y <= pane.top) {
       bodyY -= height + gap;
-    } else if (style.includes('up') || style.includes('lower') || style === 'arrowup') {
+    } else if (style.includes('up') || style.includes('upper') || style === 'arrowup') {
       bodyY += gap;
     } else {
       bodyY -= height / 2;
@@ -597,7 +672,7 @@ export class TealScriptDrawingRenderer {
         bodyY,
         bodyWidth,
         bodyHeight: height,
-        textX: style === 'none' ? anchor.x : bodyX + bodyWidth + paddingX,
+        textX: isTextOnly ? anchor.x : bodyX + bodyWidth + paddingX,
         textY: bodyY + height / 2,
         textAlign: 'left',
         lineHeight,
@@ -609,46 +684,72 @@ export class TealScriptDrawingRenderer {
       bodyY,
       bodyWidth,
       bodyHeight: height,
-      textX: this.resolveLabelTextX(
+      textX: resolveLabelTextX(
         textAlign,
-        style === 'none' ? anchor.x : bodyX,
-        style === 'none' ? 0 : bodyWidth,
-        style === 'none' ? 0 : paddingX,
+        isTextOnly ? anchor.x : bodyX,
+        isTextOnly ? 0 : bodyWidth,
+        isTextOnly ? 0 : paddingX,
       ),
-      textY: style === 'none' ? anchor.y : bodyY + height / 2,
-      textAlign: this.canvasTextAlignForDrawing(textAlign),
+      textY: isTextOnly ? anchor.y : bodyY + height / 2,
+      textAlign: canvasTextAlignForDrawing(textAlign),
       lineHeight,
     };
   }
 
-  private splitDrawingTextLines(text: string): string[] {
+  function splitDrawingTextLines(text: string): string[] {
     return text.split(/\r\n|\r|\n/);
   }
 
-  private measureDrawingTextLines(lines: string[], font: string): number {
-    return lines.reduce((maxWidth, line) => Math.max(maxWidth, this.getTextWidth(this.ctx, line, font)), 0);
+  function measureDrawingTextLines(lines: string[], font: string): number {
+    return lines.reduce((maxWidth, line) => Math.max(maxWidth, getTextWidth(ctx, line, font)), 0);
   }
 
-  private drawLabelTextLines(lines: string[], layout: ResolvedLabelLayout): void {
+  function drawLabelTextLines(lines: string[], layout: ResolvedLabelLayout, outlineColor: string | null): void {
     const startY = layout.textY - ((lines.length - 1) * layout.lineHeight) / 2;
     for (let index = 0; index < lines.length; index++) {
-      this.ctx.fillText(lines[index]!, layout.textX, startY + index * layout.lineHeight);
+      const text = lines[index]!;
+      const y = startY + index * layout.lineHeight;
+      if (outlineColor) {
+        ctx.strokeStyle = outlineColor;
+        ctx.lineWidth = 2;
+        ctx.lineJoin = 'round';
+        if (ctx.strokeText) {
+          ctx.strokeText(text, layout.textX, y);
+        } else {
+          const textColor = ctx.fillStyle;
+          ctx.fillStyle = outlineColor;
+          for (const [dx, dy] of [
+            [-1, -1],
+            [0, -1],
+            [1, -1],
+            [-1, 0],
+            [1, 0],
+            [-1, 1],
+            [0, 1],
+            [1, 1],
+          ]) {
+            ctx.fillText(text, layout.textX + dx!, y + dy!);
+          }
+          ctx.fillStyle = textColor;
+        }
+      }
+      ctx.fillText(text, layout.textX, y);
     }
   }
 
-  private canvasTextAlignForDrawing(textAlign: string | undefined): CanvasTextAlign {
+  function canvasTextAlignForDrawing(textAlign: string | undefined): CanvasTextAlign {
     if (textAlign === 'right') return 'right';
     if (textAlign === 'left') return 'left';
     return 'center';
   }
 
-  private resolveLabelTextX(textAlign: string | undefined, x: number, width: number, padding: number): number {
+  function resolveLabelTextX(textAlign: string | undefined, x: number, width: number, padding: number): number {
     if (textAlign === 'right') return x + Math.max(0, width - padding);
     if (textAlign === 'left') return x + padding;
     return x + width / 2;
   }
 
-  private isSymbolLabelStyle(style: string): boolean {
+  function isSymbolLabelStyle(style: string): boolean {
     return [
       'circle',
       'square',
@@ -663,28 +764,26 @@ export class TealScriptDrawingRenderer {
     ].includes(style);
   }
 
-  private drawLabelBody(style: string, layout: ResolvedLabelLayout, anchor: { x: number; y: number }): void {
-    if (this.isSymbolLabelStyle(style)) {
-      this.drawSymbolLabelBody(style, layout);
+  function drawLabelBody(style: string, layout: ResolvedLabelLayout, anchor: { x: number; y: number }): void {
+    if (isSymbolLabelStyle(style)) {
+      drawSymbolLabelBody(style, layout);
       return;
     }
 
-    const { ctx } = this;
     const radius = 4;
     ctx.beginPath();
     ctx.roundRect(layout.bodyX, layout.bodyY, layout.bodyWidth, layout.bodyHeight, radius);
     ctx.fill();
 
-    this.drawLabelPointer(style, layout, anchor);
+    drawLabelPointer(style, layout, anchor);
   }
 
-  private drawLabelPointer(style: string, layout: ResolvedLabelLayout, anchor: { x: number; y: number }): void {
-    const { ctx } = this;
+  function drawLabelPointer(style: string, layout: ResolvedLabelLayout, anchor: { x: number; y: number }): void {
     const centerX = layout.bodyX + layout.bodyWidth / 2;
     const centerY = layout.bodyY + layout.bodyHeight / 2;
     const pointerSize = 6;
-    const pointsUp = style === 'label_up' || style.includes('lower') || style === 'arrowup';
-    const pointsDown = style === 'label_down' || style.includes('upper') || style === 'arrowdown';
+    const pointsUp = style === 'label_up' || style.includes('upper') || style === 'arrowup';
+    const pointsDown = style === 'label_down' || style.includes('lower') || style === 'arrowdown';
 
     ctx.beginPath();
     if (pointsUp) {
@@ -696,12 +795,12 @@ export class TealScriptDrawingRenderer {
       ctx.lineTo(centerX + pointerSize, layout.bodyY + layout.bodyHeight);
       ctx.lineTo(anchor.x, anchor.y);
     } else if (style.includes('left')) {
-      ctx.moveTo(layout.bodyX + layout.bodyWidth, centerY - pointerSize);
-      ctx.lineTo(layout.bodyX + layout.bodyWidth, centerY + pointerSize);
-      ctx.lineTo(anchor.x, anchor.y);
-    } else if (style.includes('right')) {
       ctx.moveTo(layout.bodyX, centerY - pointerSize);
       ctx.lineTo(layout.bodyX, centerY + pointerSize);
+      ctx.lineTo(anchor.x, anchor.y);
+    } else if (style.includes('right')) {
+      ctx.moveTo(layout.bodyX + layout.bodyWidth, centerY - pointerSize);
+      ctx.lineTo(layout.bodyX + layout.bodyWidth, centerY + pointerSize);
       ctx.lineTo(anchor.x, anchor.y);
     } else {
       return;
@@ -710,8 +809,7 @@ export class TealScriptDrawingRenderer {
     ctx.fill();
   }
 
-  private drawSymbolLabelBody(style: string, layout: ResolvedLabelLayout): void {
-    const { ctx } = this;
+  function drawSymbolLabelBody(style: string, layout: ResolvedLabelLayout): void {
     const centerX = layout.bodyX + layout.bodyWidth / 2;
     const centerY = layout.bodyY + layout.bodyHeight / 2;
     const size = Math.min(layout.bodyWidth, layout.bodyHeight);
@@ -738,7 +836,6 @@ export class TealScriptDrawingRenderer {
         ctx.fill();
         return;
       case 'triangleup':
-      case 'arrowup':
         ctx.moveTo(centerX, layout.bodyY);
         ctx.lineTo(layout.bodyX + size, layout.bodyY + size);
         ctx.lineTo(layout.bodyX, layout.bodyY + size);
@@ -746,13 +843,35 @@ export class TealScriptDrawingRenderer {
         ctx.fill();
         return;
       case 'triangledown':
-      case 'arrowdown':
         ctx.moveTo(layout.bodyX, layout.bodyY);
         ctx.lineTo(layout.bodyX + size, layout.bodyY);
         ctx.lineTo(centerX, layout.bodyY + size);
         ctx.closePath();
         ctx.fill();
         return;
+      case 'arrowup':
+      case 'arrowdown': {
+        // A head plus shaft, rather than the triangle glyph used by triangle*.
+        const vertices = [
+          [0.5, 0],
+          [1, 0.5],
+          [0.67, 0.5],
+          [0.67, 1],
+          [0.33, 1],
+          [0.33, 0.5],
+          [0, 0.5],
+        ];
+        for (let index = 0; index < vertices.length; index++) {
+          const [vx, vy] = vertices[index]!;
+          const x = layout.bodyX + vx! * size;
+          const y = layout.bodyY + (style === 'arrowdown' ? 1 - vy! : vy!) * size;
+          if (index === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.closePath();
+        ctx.fill();
+        return;
+      }
       case 'flag':
         ctx.rect(layout.bodyX, layout.bodyY, size * 0.75, size * 0.55);
         ctx.fill();
@@ -780,17 +899,26 @@ export class TealScriptDrawingRenderer {
     }
   }
 
-  private renderTableDrawings(tables: TealScriptDrawingPartition['tables'], pane: ComputedPane): void {
+  function renderTableDrawings(tables: TealScriptDrawingPartition['tables'], pane: ComputedPane): void {
     if (tables.length === 0) return;
 
-    const { ctx, options, margins } = this;
     ctx.save();
 
+    const latestSites = new Map<string, (typeof tables)[number]>();
     for (const table of tables) {
+      if (table.creationSite) latestSites.set(JSON.stringify([table.scriptId, table.creationSite]), table);
+    }
+    const latestLocations = new Map<string, (typeof tables)[number]>();
+    for (const table of tables) {
+      if (table.creationSite && latestSites.get(JSON.stringify([table.scriptId, table.creationSite])) !== table)
+        continue;
+      latestLocations.set(JSON.stringify([table.scriptId, table.position]), table);
+    }
+    for (const table of latestLocations.values()) {
       if (table.cells.length === 0) continue;
 
-      const metrics = this.measureTable(table, pane);
-      const origin = this.resolveTableOrigin(table.position, metrics.width, metrics.height, options.width, margins, pane);
+      const metrics = measureTable(table, pane);
+      const origin = resolveTableOrigin(table.position, metrics.width, metrics.height, options.width, margins, pane);
 
       if (table.bgcolor) {
         ctx.fillStyle = table.bgcolor;
@@ -799,19 +927,20 @@ export class TealScriptDrawingRenderer {
 
       for (let row = 0; row < table.rows; row++) {
         for (let column = 0; column < table.columns; column++) {
-          const mergedCell = this.findMergedTableCell(table, column, row);
+          const mergedCell = findMergedTableCell(table, column, row);
           if (mergedCell && (mergedCell.startColumn !== column || mergedCell.startRow !== row)) continue;
 
           const cell = table.cells.find((candidate) => candidate.column === column && candidate.row === row);
           const x = origin.x + metrics.columnOffsets[column]!;
           const y = origin.y + metrics.rowOffsets[row]!;
           const width = mergedCell
-            ? this.sumTableMetricRange(metrics.columnWidths, mergedCell.startColumn, mergedCell.endColumn)
+            ? sumTableMetricRange(metrics.columnWidths, mergedCell.startColumn, mergedCell.endColumn)
             : metrics.columnWidths[column]!;
           const height = mergedCell
-            ? this.sumTableMetricRange(metrics.rowHeights, mergedCell.startRow, mergedCell.endRow)
+            ? sumTableMetricRange(metrics.rowHeights, mergedCell.startRow, mergedCell.endRow)
             : metrics.rowHeights[row]!;
 
+          addTooltip(cell?.tooltip, { x, y, width, height });
           if (cell?.bgcolor) {
             ctx.fillStyle = cell.bgcolor;
             ctx.fillRect(x, y, width, height);
@@ -825,15 +954,15 @@ export class TealScriptDrawingRenderer {
           }
 
           if (cell?.text) {
-            const textLines = this.splitDrawingTextLines(cell.text);
-            const fontSize = this.fontSizeForDrawing(cell.textSize);
+            const textLines = splitDrawingTextLines(cell.text);
+            const fontSize = fontSizeForDrawing(cell.textSize);
             const lineHeight = Math.ceil(fontSize * 1.25);
-            const textPosition = this.resolveTableCellTextPosition(cell.textHalign, cell.textValign, x, y, width, height);
+            const textPosition = resolveTableCellTextPosition(cell.textHalign, cell.textValign, x, y, width, height);
             ctx.fillStyle = cell.textColor ?? '#FFFFFF';
-            ctx.font = this.fontForDrawing(cell.textSize, cell.textFontFamily, cell.textFormatting);
+            ctx.font = fontForDrawing(cell.textSize, cell.textFontFamily, cell.textFormatting);
             ctx.textAlign = textPosition.align;
             ctx.textBaseline = textPosition.baseline;
-            this.drawAlignedTextLines(textLines, textPosition, lineHeight);
+            drawAlignedTextLines(textLines, textPosition, lineHeight);
           }
         }
       }
@@ -849,7 +978,10 @@ export class TealScriptDrawingRenderer {
     ctx.restore();
   }
 
-  private measureTable(table: TealScriptDrawingPartition['tables'][number], pane: ComputedPane): {
+  function measureTable(
+    table: TealScriptDrawingPartition['tables'][number],
+    pane: ComputedPane,
+  ): {
     width: number;
     height: number;
     columnWidths: number[];
@@ -859,7 +991,7 @@ export class TealScriptDrawingRenderer {
   } {
     const defaultColumnWidth = 48;
     const defaultRowHeight = 22;
-    const drawableWidth = this.options.width - this.margins.left - this.margins.right;
+    const drawableWidth = options.width - margins.left - margins.right;
     const columnWidths = Array.from({ length: table.columns }, () => defaultColumnWidth);
     const rowHeights = Array.from({ length: table.rows }, () => defaultRowHeight);
     const explicitColumns = Array.from({ length: table.columns }, () => false);
@@ -867,20 +999,21 @@ export class TealScriptDrawingRenderer {
 
     for (const cell of table.cells) {
       if (cell.column < 0 || cell.column >= table.columns || cell.row < 0 || cell.row >= table.rows) continue;
-      const textLines = cell.text ? this.splitDrawingTextLines(cell.text) : [];
-      const fontSize = this.fontSizeForDrawing(cell.textSize);
+      if (findMergedTableCell(table, cell.column, cell.row)) continue;
+      const textLines = cell.text ? splitDrawingTextLines(cell.text) : [];
+      const fontSize = fontSizeForDrawing(cell.textSize);
       const lineHeight = Math.ceil(fontSize * 1.25);
-      const measuredText = textLines.length > 0
-        ? this.measureDrawingTextLines(
-          textLines,
-          this.fontForDrawing(cell.textSize, cell.textFontFamily, cell.textFormatting),
-        ) + 12
-        : defaultColumnWidth;
-      const measuredHeight = textLines.length > 1
-        ? Math.max(defaultRowHeight, textLines.length * lineHeight + 12)
-        : defaultRowHeight;
-      const explicitWidth = this.tablePercentDimension(cell.width, drawableWidth);
-      const explicitHeight = this.tablePercentDimension(cell.height, pane.height);
+      const measuredText =
+        textLines.length > 0
+          ? measureDrawingTextLines(
+              textLines,
+              fontForDrawing(cell.textSize, cell.textFontFamily, cell.textFormatting),
+            ) + 12
+          : defaultColumnWidth;
+      const measuredHeight =
+        textLines.length > 1 ? Math.max(defaultRowHeight, textLines.length * lineHeight + 12) : defaultRowHeight;
+      const explicitWidth = tablePercentDimension(cell.width, drawableWidth);
+      const explicitHeight = tablePercentDimension(cell.height, pane.height);
       if (explicitWidth !== undefined) {
         columnWidths[cell.column] = explicitColumns[cell.column]
           ? Math.max(columnWidths[cell.column]!, explicitWidth)
@@ -899,8 +1032,8 @@ export class TealScriptDrawingRenderer {
       }
     }
 
-    const columnOffsets = this.prefixOffsets(columnWidths);
-    const rowOffsets = this.prefixOffsets(rowHeights);
+    const columnOffsets = prefixOffsets(columnWidths);
+    const rowOffsets = prefixOffsets(rowHeights);
     return {
       width: columnWidths.reduce((sum, width) => sum + width, 0),
       height: rowHeights.reduce((sum, height) => sum + height, 0),
@@ -911,12 +1044,12 @@ export class TealScriptDrawingRenderer {
     };
   }
 
-  private tablePercentDimension(value: number | null | undefined, availableSize: number): number | undefined {
-    if (value == null || !Number.isFinite(value)) return undefined;
+  function tablePercentDimension(value: number | null | undefined, availableSize: number): number | undefined {
+    if (value == null || value === 0 || !Number.isFinite(value)) return undefined;
     return Math.max(0, (value / 100) * Math.max(0, availableSize));
   }
 
-  private prefixOffsets(values: number[]): number[] {
+  function prefixOffsets(values: number[]): number[] {
     const offsets: number[] = [];
     let current = 0;
     for (const value of values) {
@@ -926,20 +1059,21 @@ export class TealScriptDrawingRenderer {
     return offsets;
   }
 
-  private findMergedTableCell(
+  function findMergedTableCell(
     table: TealScriptDrawingPartition['tables'][number],
     column: number,
     row: number,
   ): NonNullable<TealScriptDrawingPartition['tables'][number]['mergedCells']>[number] | undefined {
-    return table.mergedCells?.find((mergedCell) => (
-      column >= mergedCell.startColumn
-      && column <= mergedCell.endColumn
-      && row >= mergedCell.startRow
-      && row <= mergedCell.endRow
-    ));
+    return table.mergedCells?.find(
+      (mergedCell) =>
+        column >= mergedCell.startColumn &&
+        column <= mergedCell.endColumn &&
+        row >= mergedCell.startRow &&
+        row <= mergedCell.endRow,
+    );
   }
 
-  private sumTableMetricRange(values: number[], start: number, end: number): number {
+  function sumTableMetricRange(values: number[], start: number, end: number): number {
     let total = 0;
     for (let index = start; index <= end; index++) {
       total += values[index] ?? 0;
@@ -947,7 +1081,7 @@ export class TealScriptDrawingRenderer {
     return total;
   }
 
-  private resolveTableOrigin(
+  function resolveTableOrigin(
     position: string,
     width: number,
     height: number,
@@ -974,7 +1108,7 @@ export class TealScriptDrawingRenderer {
     return { x, y };
   }
 
-  private resolveTableCellTextPosition(
+  function resolveTableCellTextPosition(
     halign: string,
     valign: string,
     x: number,
@@ -1006,35 +1140,40 @@ export class TealScriptDrawingRenderer {
     return { x: textX, y: textY, align, baseline };
   }
 
-  private drawAlignedTextLines(
+  function drawAlignedTextLines(
     lines: string[],
     position: { x: number; y: number; align: CanvasTextAlign; baseline: CanvasTextBaseline },
     lineHeight: number,
   ): void {
     if (position.baseline === 'bottom') {
       for (let index = 0; index < lines.length; index++) {
-        this.ctx.fillText(lines[index]!, position.x, position.y - (lines.length - 1 - index) * lineHeight);
+        ctx.fillText(lines[index]!, position.x, position.y - (lines.length - 1 - index) * lineHeight);
       }
       return;
     }
 
-    const startY = position.baseline === 'middle'
-      ? position.y - ((lines.length - 1) * lineHeight) / 2
-      : position.y;
+    const startY = position.baseline === 'middle' ? position.y - ((lines.length - 1) * lineHeight) / 2 : position.y;
     for (let index = 0; index < lines.length; index++) {
-      this.ctx.fillText(lines[index]!, position.x, startY + index * lineHeight);
+      ctx.fillText(lines[index]!, position.x, startY + index * lineHeight);
     }
   }
 
-  private fontForDrawing(size: string, fontFamily?: string, textFormatting?: string): string {
-    const styleParts: string[] = [];
-    const formatting = (textFormatting ?? 'none').trim().toLowerCase();
-    const tokens = new Set(formatting.split(/[\s,]+/).filter(Boolean));
-    const isCombined = formatting === 'bolditalic' || formatting === 'italicbold';
-    if (tokens.has('italic') || isCombined) styleParts.push('italic');
-    if (tokens.has('bold') || isCombined) styleParts.push('bold');
-    styleParts.push(`${this.fontSizeForDrawing(size)}px`);
-    styleParts.push(this.fontFamilyForDrawing(fontFamily));
-    return styleParts.join(' ');
+  function fontForDrawing(
+    size: string,
+    fontFamily?: string,
+    textFormatting?: string,
+    family: 'label' | 'text' = 'text',
+  ): string {
+    return drawingFont(size, fontFamily, textFormatting, font, family);
   }
+  function addTooltip(text: string | undefined, rect: { x: number; y: number; width: number; height: number }): void {
+    recordTooltip?.(text, rect);
+  }
+
+  renderLineFillDrawings(drawingPartition, bars, viewport, pane);
+  renderBoxDrawings(drawingPartition.boxes, bars, viewport, pane);
+  renderPolylineDrawings(drawingPartition.polylines, bars, viewport, pane);
+  renderLineDrawings(drawingPartition.lines, bars, viewport, pane);
+  renderLabelDrawings(drawingPartition.labels, bars, viewport, pane);
+  renderTableDrawings(drawingPartition.tables, pane);
 }

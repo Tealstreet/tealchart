@@ -23,10 +23,12 @@ export interface RoutedTealScriptDrawings {
 }
 
 function forcesOverlay(drawing: DrawingOutput): boolean {
+  'worklet';
   return 'forceOverlay' in drawing && drawing.forceOverlay === true;
 }
 
 function findIndicatorPane(scriptId: string, panes: readonly DrawingPaneRouteTarget[]): DrawingPaneRouteTarget | undefined {
+  'worklet';
   return panes.find((pane) => pane.type === 'indicator' && pane.indicatorIds?.includes(scriptId));
 }
 
@@ -34,6 +36,7 @@ export function routeTealScriptDrawings(
   drawings: readonly DrawingOutput[],
   panes: readonly DrawingPaneRouteTarget[],
 ): RoutedTealScriptDrawings {
+  'worklet';
   const routed: RoutedTealScriptDrawings = {
     main: [],
     byPaneId: new Map(),

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { CHART_PROPERTY_KEYS, sanitizeChartProperties } from './overrides';
+import { CHART_PROPERTY_KEYS, sanitizeChartProperties, applyChartOverridesToRenderOptions } from './overrides';
 
 describe('sanitizeChartProperties', () => {
   it('keeps supported chart property paths', () => {
@@ -56,4 +56,12 @@ describe('sanitizeChartProperties', () => {
     expect(CHART_PROPERTY_KEYS).toContain('mainSeriesProperties.candleStyle.upColor');
     expect(new Set(CHART_PROPERTY_KEYS).size).toBe(CHART_PROPERTY_KEYS.length);
   });
+});
+
+it('persists the canonical indicator name-label boolean and forwards both values to rendering', () => {
+  for (const enabled of [true, false]) {
+    const properties = { 'scalesProperties.showStudyPlotLabels': enabled };
+    expect(sanitizeChartProperties(properties)).toEqual(properties);
+    expect(applyChartOverridesToRenderOptions({}, properties)).toMatchObject({ showIndicatorOutputAxisLabelTitles: enabled });
+  }
 });

@@ -5,6 +5,8 @@ export interface BuiltinGlobalTypeMetadata {
   qualifier: BuiltinGlobalQualifier;
 }
 
+export const DERIVED_PRICE_BUILTINS = new Set(['hl2', 'hlc3', 'ohlc4', 'hlcc4']);
+
 export const BUILTIN_GLOBALS = new Set([
   'bar_index',
   'ask',
@@ -463,6 +465,7 @@ export const BUILTIN_COLLECTION_MEMBER_METHODS = new Map<string, Set<string>>([
     'get',
     'inv',
     'is_antidiagonal',
+    'is_antisymmetric',
     'is_binary',
     'is_diagonal',
     'is_identity',

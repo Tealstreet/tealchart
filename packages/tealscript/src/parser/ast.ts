@@ -420,6 +420,7 @@ export interface ColorLiteral extends BaseNode {
  */
 export interface BinaryExpression extends BaseNode {
   type: 'BinaryExpression';
+  parenthesized?: boolean;
   operator: BinaryOperator;
   left: Expression;
   right: Expression;

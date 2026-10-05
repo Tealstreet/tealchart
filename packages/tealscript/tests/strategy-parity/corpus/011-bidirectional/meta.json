@@ -1,8 +1,8 @@
 {
-  "description": "Auto-bootstrapped from engine output",
+  "description": "Engine baseline after TV-settled CF040 SMA EMA warmup; initial pre-warmup trade removed",
   "barCount": 200,
-  "closedTradeCount": 13,
+  "closedTradeCount": 12,
   "openTradeCount": 1,
-  "netProfit": 0.9700000000000415,
+  "netProfit": -0.9299999999999642,
   "source": "engine-baseline"
 }

@@ -62,20 +62,23 @@ plot(window.size(), title="Window Size")
     expect(roundSeries(getPlot(result, 'Window Size').values)).toEqual([1, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]);
   });
 
-  it('runs nested collection constructor idioms', () => {
+  it('runs collection constructor idioms with UDT wrappers for nested collections', () => {
     const result = runCompatScript(`
 indicator("Nested Collections")
-var array<array<float>> rows = array.new<array<float>>()
-var matrix<array<float>> grid = matrix.new<array<float>>(1, 1)
-var map<string, array<float>> lookup = map.new<string, array<float>>()
+type Row
+    array<float> values
+var array<Row> rows = array.new<Row>()
+var matrix<Row> grid = matrix.new<Row>(1, 1)
+var map<string, Row> lookup = map.new<string, Row>()
 row = array.from(close, high)
-rows.push(row)
-grid.set(0, 0, row)
-lookup.put("last", row)
+wrapped = Row.new(row)
+rows.push(wrapped)
+grid.set(0, 0, wrapped)
+lookup.put("last", wrapped)
 plot(rows.size(), title="Rows")
-plot(rows.last().get(0), title="Row Close")
-plot(grid.get(0, 0).get(1), title="Grid High")
-plot(lookup.get("last").size(), title="Lookup Size")
+plot(rows.last().values.get(0), title="Row Close")
+plot(grid.get(0, 0).values.get(1), title="Grid High")
+plot(lookup.get("last").values.size(), title="Lookup Size")
 `);
 
     expect(result.errors).toEqual([]);
@@ -144,8 +147,10 @@ array.push(id=queue, value=3)
 shifted = array.shift(id=queue)
 popped = array.pop(id=queue)
 array.clear(id=queue)
-nested = array.new<array<int>>(size=0)
-array.push(id=nested, value=array.from(1, 2))
+type IntRow
+    array<int> values
+nested = array.new<IntRow>(size=0)
+array.push(id=nested, value=IntRow.new(array.from(1, 2)))
 methodReceiver = array.new_int(size=0)
 otherReceiver = array.new_int(size=0)
 methodReceiver.push(id=otherReceiver, value=5)
@@ -165,7 +170,7 @@ plot(joined == "4,4,1" ? 1 : 0, title="Joined")
 plot(shifted, title="Shifted")
 plot(popped, title="Popped")
 plot(array.size(id=queue), title="Cleared")
-plot(array.get(id=array.get(id=nested, index=0), index=1), title="Nested")
+plot(array.get(id=array.get(id=nested, index=0).values, index=1), title="Nested")
 plot(methodReceiver.size(), title="Method Receiver")
 plot(otherReceiver.size(), title="Other Receiver")
 `);
@@ -349,7 +354,7 @@ plot(array.get(absValues, 0), title="Abs First")
     expect(roundSeries(getPlot(result, 'Covariance').values)).toEqual([2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5]);
     expect(roundSeries(getPlot(result, 'Nearest Rank').values)).toEqual([2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]);
     expect(roundSeries(getPlot(result, 'Linear Percentile').values)).toEqual([2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5]);
-    expect(roundSeries(getPlot(result, 'Percent Rank').values)).toEqual([75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75]);
+    expect(roundSeries(getPlot(result, 'Percent Rank').values)).toEqual([66.666667, 66.666667, 66.666667, 66.666667, 66.666667, 66.666667, 66.666667, 66.666667, 66.666667, 66.666667, 66.666667, 66.666667]);
     expect(roundSeries(getPlot(result, 'Standardized First').values)).toEqual([-1.341641, -1.341641, -1.341641, -1.341641, -1.341641, -1.341641, -1.341641, -1.341641, -1.341641, -1.341641, -1.341641, -1.341641]);
     expect(roundSeries(getPlot(result, 'Abs First').values)).toEqual([2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]);
   });
@@ -377,6 +382,7 @@ plot(values.binary_search_rightmost(3), title="Right Missing")
 
   it('matches documented Pine array sort-index and predicate helpers', () => {
     const result = runCompatScript(`
+//@version=6
 indicator("Array sort index and predicates")
 values = array.from(5, -2, 0, 9, 1)
 indices = values.sort_indices()
@@ -386,13 +392,14 @@ type Ranked
     float payload
 objects = array.from(Ranked.new(2, 10), Ranked.new(1, 20), Ranked.new(3, 30))
 objectIndices = objects.sort_indices(order.ascending, "key")
-truthy = array.from(1, true, 2)
-mixed = array.from(0, false, 1)
+flags = array.from(true, false, true)
+truthy = array.from(true, true, true)
+mixed = array.from(false, false, true)
 colors = array.new_color(2, color.red)
 plot(array.get(indices, 0), title="Smallest Index")
 plot(array.get(descending, 0), title="Largest Index")
 plot(array.get(objectIndices, 0), title="Object Smallest Index")
-plot(values.every() ? 1 : 0, title="Every Values")
+plot(flags.every() ? 1 : 0, title="Every Values")
 plot(truthy.every() ? 1 : 0, title="Every Truthy")
 plot(mixed.some() ? 1 : 0, title="Some Mixed")
 plot(array.size(colors), title="Color Array Size")

@@ -6,12 +6,14 @@
  */
 
 import type { ActiveIndicator, IndicatorPaneInfo } from './ChartLegend';
+import type { IndicatorOutputReadout } from '../rendering/indicatorOutputReadouts';
 
 import type { ChartChromeMetrics } from '../layout/chartGeometry';
 
 import { computeTopLeftLegendRect, rect, WEB_CHART_CHROME_METRICS } from '../layout/chartGeometry';
 import { Component } from './Component';
 import { button, div, icons, span } from './dom';
+import { createIndicatorStatusValues, updateIndicatorStatusValues } from './IndicatorOutputReadouts';
 
 // ============================================================================
 // Types
@@ -120,6 +122,8 @@ export class IndicatorPaneLegend extends Component<IndicatorPaneLegendState> {
   // Track last indicator signature to avoid unnecessary rebuilds
   private lastIndicatorSignature: string = '';
 
+  private plotReadouts: readonly IndicatorOutputReadout[] = [];
+
   constructor(options: IndicatorPaneLegendOptions) {
     super('div', {
       indicators: [],
@@ -155,15 +159,23 @@ export class IndicatorPaneLegend extends Component<IndicatorPaneLegendState> {
     this.applyLeftPosition();
   }
 
+  setPlotReadouts(readouts: readonly IndicatorOutputReadout[]): void {
+    this.plotReadouts = readouts;
+    for (const container of this.el.querySelectorAll<HTMLElement>('[data-indicator-values]')) {
+      updateIndicatorStatusValues(container, container.getAttribute('data-indicator-values')!, readouts);
+    }
+  }
+
   setIndicators(indicators: ActiveIndicator[], paneInfo: Record<string, IndicatorPaneInfo>): void {
     // Compute signature to detect actual changes (avoid unnecessary re-renders)
     const signature = indicators.map((i) => `${i.id}:${i.name}:${i.isVisible}:${JSON.stringify(i.inputs)}`).join('|');
 
+    this.state.indicators = indicators;
+    this.state.indicatorPaneInfo = paneInfo;
+
     // Only update if indicators actually changed
     if (signature !== this.lastIndicatorSignature) {
       this.lastIndicatorSignature = signature;
-      this.state.indicators = indicators;
-      this.state.indicatorPaneInfo = paneInfo;
       this.render();
     }
   }
@@ -224,6 +236,8 @@ export class IndicatorPaneLegend extends Component<IndicatorPaneLegendState> {
         );
       }
     }
+
+    row.appendChild(createIndicatorStatusValues(indicator.id, this.plotReadouts));
 
     // Action buttons (initially hidden)
     const actions = div({

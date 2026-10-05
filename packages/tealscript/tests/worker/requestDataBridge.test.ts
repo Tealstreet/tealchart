@@ -126,7 +126,28 @@ plot(reqClose, "Requested Close")`;
     expect(result?.output.plots.map((plot) => plot.title)).toEqual(['Requested Open', 'Requested Close']);
     expect(result?.output.plots[0]?.values).toEqual([null, 20, 20, 30, 30, 30]);
     expect(result?.output.plots[1]?.values).toEqual([null, 22, 22, 34, 34, 34]);
+    // migration-v6 requests: static contexts avoid the unnecessary discovery execution.
+    expect(codegenMocks.executeCompiledScript).toHaveBeenCalledTimes(1);
   });
+  it('reports deprecated Quandl requests without waiting for provider data', async () => {
+    const posted: FromWorkerMessage[] = [];
+    const workerGlobal = {
+      onmessage: null as ((event: MessageEvent<ToWorkerMessage>) => void) | null,
+      postMessage: (message: FromWorkerMessage) => { posted.push(message); },
+    };
+    vi.stubGlobal('self', workerGlobal);
+    await import('../../src/worker/worker');
+    workerGlobal.onmessage?.({ data: {
+      type: 'init', scriptId: 'deprecated-quandl',
+      script: '//@version=6\nindicator("Deprecated Quandl")\nplot(request.quandl("CFTC/SB_FO_ALL"))',
+      bars: makeBars([10, 11, 12]), inputs: {},
+    } } as MessageEvent<ToWorkerMessage>);
+    expect(posted.filter(isRequestDataMessage)).toEqual([]);
+    expect(posted).toEqual(expect.arrayContaining([expect.objectContaining({
+      type: 'error', message: expect.stringMatching(/quandl|invalid symbol/i), code: 'runtime.error',
+    })]));
+  });
+
   it('preloads every supported request family and keeps compiled execution enabled', async () => {
     const posted: FromWorkerMessage[] = [];
     const workerGlobal = {
@@ -301,16 +322,6 @@ plot(request.financial("NASDAQ:AAPL", "TOTAL_REVENUE", "FQ", currency="USD"), "R
     );
 
     runCase(
-      'quandl',
-      `//@version=6
-indicator("Quandl")
-plot(request.quandl("MULTPL/SP500_PE_RATIO_MONTH", index=1), "Quandl")`,
-      'quandl',
-      pointValues,
-      (result) => expect(result.output.plots[0]?.values).toEqual([1, 1, 1, 2, 2, 2]),
-    );
-
-    runCase(
       'footprint',
       `//@version=6
 indicator("Footprint")
@@ -368,7 +379,7 @@ dividend = request.dividends("NOPE", dividends.gross)
 split = request.splits("NOPE", splits.denominator)
 earn = request.earnings("NOPE", earnings.actual)
 fin = request.financial("NOPE", "TOTAL_REVENUE", "FQ")
-quandl = request.quandl("NOPE", index=1)
+quandl = request.quandl("NOPE", index=1, ignore_invalid_symbol=true)
 fp = request.footprint(10, 70)
 missingFootprintTotal = na(fp) ? na : fp.total_volume()
 plot(na(sec) ? 1 : 0, "Security NA")
@@ -411,7 +422,6 @@ plot(na(missingFootprintTotal) ? 1 : 0, "Footprint Accessor NA")`;
       'economic',
       'financial',
       'footprint',
-      'quandl',
     ]);
 
     for (const request of requests) {

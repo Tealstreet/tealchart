@@ -45,7 +45,9 @@ import { LogCategory, TealchartLogger } from '../debug/TealchartLogger';
 import { EventEmitter } from '../events/EventEmitter';
 import { type BuiltinIndicator } from '../indicators/builtinIndicators';
 import { PaneManager } from '../rendering/PaneManager';
+import { getPlotOhlcGeometry } from '../rendering/plotOhlcGeometry';
 import { TealscriptManager } from '../tealscript/TealscriptManager';
+import { applyNativeIndicatorStyle, filterNativeIndicatorStyles } from './nativeIndicatorStyles';
 
 const DISPLAY_PANE = 1;
 
@@ -130,6 +132,8 @@ export class MobileIndicatorManager {
   private _paneManager: PaneManager;
   private _indicators: ActiveIndicator[] = [];
   private _plots: PlotOutput[] = [];
+  private _styledPlotsRevision = -1;
+  private _styledPlots: PlotOutput[] = [];
   private _drawings: DrawingOutput[] = [];
   private _astCache: Map<string, Program> = new Map();
   private _inputDefsCache: Map<string, InputDefinition[]> = new Map();
@@ -167,6 +171,7 @@ export class MobileIndicatorManager {
         onError: this._emitError,
         onInputsDiscovered: this._handleInputsDiscovered,
         onPlotsUpdated: this._handlePlotsUpdated,
+        onScriptRemoved: this._handleScriptRemoved,
         resolveRequestData: this._resolveRequestData,
       });
     }
@@ -319,24 +324,28 @@ export class MobileIndicatorManager {
    */
   addTealscriptIndicator(options: MobileTealscriptIndicatorOptions): string {
     const instanceId = options.id?.trim() || `custom_${++this._instanceCounter}`;
-    if (this._indicators.some((indicator) => indicator.instanceId === instanceId)) {
-      this.removeIndicator(instanceId);
-    }
+    const existing = this._indicators.find((indicator) => indicator.instanceId === instanceId);
 
     const indicator: BuiltinIndicator = {
       id: instanceId,
-      name: options.name?.trim() || 'Custom Indicator',
+      name: options.name?.trim() || existing?.indicator.name || 'Custom Indicator',
       category: 'other',
-      overlay: options.overlay ?? false,
-      yAxisRange: options.yAxisRange,
+      overlay: options.overlay ?? existing?.indicator.overlay ?? false,
+      yAxisRange: options.yAxisRange ?? existing?.indicator.yAxisRange,
       code: options.code,
     };
 
-    this._paneManager.addIndicator({
-      indicatorId: instanceId,
-      overlay: indicator.overlay,
-      yAxisRange: indicator.yAxisRange,
-    });
+    if (!existing || existing.indicator.overlay !== indicator.overlay || existing.indicator.yAxisRange !== indicator.yAxisRange) {
+      if (existing) this._paneManager.removeIndicator(instanceId);
+      this._paneManager.addIndicator({
+        indicatorId: instanceId,
+        overlay: indicator.overlay,
+        yAxisRange: indicator.yAxisRange,
+      });
+    }
+    this._inputDefsCache.delete(instanceId);
+    this._declarationCache.delete(instanceId);
+    this._astCache.delete(instanceId);
 
     let ast: Program | undefined;
     try {
@@ -347,15 +356,22 @@ export class MobileIndicatorManager {
       this._emitError(instanceId, this._toParseError(err));
     }
 
-    this._indicators.push({
+    const replacement: ActiveIndicator = {
       instanceId,
       indicator,
-      layoutBuiltinId: options.builtinId,
-      inputs: options.inputs,
+      layoutBuiltinId: options.builtinId ?? existing?.layoutBuiltinId,
+      inputs: options.inputs ?? existing?.inputs,
       ast,
-      isVisible: true,
-    });
-    this._addWorkerScript(instanceId, indicator.code, options.inputs);
+      isVisible: existing?.isVisible ?? true,
+      styleOverrides: existing?.styleOverrides,
+    };
+    if (existing) {
+      this._indicators[this._indicators.indexOf(existing)] = replacement;
+    } else {
+      this._indicators.push(replacement);
+    }
+    this._addWorkerScript(instanceId, indicator.code, replacement.inputs);
+    this._tealscriptManager?.setScriptVisibility(instanceId, replacement.isVisible);
 
     this._indicatorsRevision += 1;
     this._recomputePlots();
@@ -381,6 +397,12 @@ export class MobileIndicatorManager {
    * Remove an indicator by instance ID
    */
   removeIndicator(instanceId: string): void {
+    this._tealscriptManager?.removeScript(instanceId);
+    this._handleScriptRemoved(instanceId);
+  }
+
+  private _handleScriptRemoved = (instanceId: string): void => {
+    if (!this._indicators.some((indicator) => indicator.instanceId === instanceId)) return;
     // Remove from PaneManager
     this._paneManager.removeIndicator(instanceId);
 
@@ -392,12 +414,11 @@ export class MobileIndicatorManager {
     this._declarationCache.delete(instanceId);
     this._astCache.delete(instanceId);
     this._lastErrorKeys.delete(instanceId);
-    this._tealscriptManager?.removeScript(instanceId);
 
     // Recompute plots without this indicator
     this._indicatorsRevision += 1;
     this._recomputePlots();
-  }
+  };
 
   /**
    * Update inputs for an indicator
@@ -468,7 +489,18 @@ export class MobileIndicatorManager {
    * Get computed plot outputs from all indicators
    */
   getPlots(): PlotOutput[] {
-    return this._plots;
+    if (this._styledPlotsRevision === this._plotsRevision) return this._styledPlots;
+    let changed = false;
+    const styled = this._plots.map((plot) => {
+      const indicator = this._indicators.find((ind) => ind.instanceId === plot.scriptId);
+      const override = indicator?.styleOverrides?.find((value) => value.plotId === plot.id);
+      const result = applyNativeIndicatorStyle(plot, override);
+      if (result !== plot) changed = true;
+      return result;
+    });
+    this._styledPlots = changed ? styled : this._plots;
+    this._styledPlotsRevision = this._plotsRevision;
+    return this._styledPlots;
   }
 
   /**
@@ -527,7 +559,13 @@ export class MobileIndicatorManager {
   updateStyleOverrides(instanceId: string, styleOverrides?: PlotStyleOverride[]): void {
     const indicator = this._indicators.find((ind) => ind.instanceId === instanceId);
     if (indicator) {
-      indicator.styleOverrides = styleOverrides;
+      indicator.styleOverrides = styleOverrides
+        ? filterNativeIndicatorStyles(
+            this._plots.filter((plot) => plot.scriptId === instanceId),
+            styleOverrides,
+          )
+        : undefined;
+      this._plotsRevision += 1;
       this._indicatorsRevision += 1;
       this._onUpdate?.();
     }
@@ -856,18 +894,27 @@ export class MobileIndicatorManager {
           max = Math.max(max, histbase);
         }
 
-        const values =
-          plot.type === 'plotbar' || plot.type === 'plotcandle'
-            ? [plot.openValues, plot.highValues, plot.lowValues, plot.closeValues]
-            : [plot.values];
-        for (const series of values) {
-          if (!series) continue;
-          for (let index = firstVisiblePlotIndex(plot, series.length); index < series.length; index += 1) {
-            const value = series[index];
-            if (typeof value !== 'number' || !Number.isFinite(value)) continue;
-            min = Math.min(min, value);
-            max = Math.max(max, value);
+        if (plot.type === 'plotbar' || plot.type === 'plotcandle') {
+          const length = Math.max(
+            plot.openValues?.length ?? 0,
+            plot.highValues?.length ?? 0,
+            plot.lowValues?.length ?? 0,
+            plot.closeValues?.length ?? 0,
+          );
+          for (let index = firstVisiblePlotIndex(plot, length); index < length; index += 1) {
+            const geometry = getPlotOhlcGeometry(plot, index);
+            if (!geometry) continue;
+            min = Math.min(min, geometry.low);
+            max = Math.max(max, geometry.high);
           }
+          continue;
+        }
+
+        for (let index = firstVisiblePlotIndex(plot, plot.values.length); index < plot.values.length; index += 1) {
+          const value = plot.values[index];
+          if (typeof value !== 'number' || !Number.isFinite(value)) continue;
+          min = Math.min(min, value);
+          max = Math.max(max, value);
         }
       }
 

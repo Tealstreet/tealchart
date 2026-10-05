@@ -1,6 +1,43 @@
+Pine Style controls on web retain coded plots separately from display overrides.
+Reselecting a plot sets all display locations; Defaults resets coded inputs and
+clears Style overrides. Omitted percent precision uses two decimal places in the
+shared output formatter; explicit script precision still wins.
+
 # CLAUDE.md — @tealstreet/tealchart
 
+The native canvas mounts the Pine drawing worklet only while drawing outputs
+exist. Empty charts never capture their bar history for an empty picture;
+removing the last drawing unmounts its derived-value mapper.
+
+Native zero-offset plots share their original output and visible-bar objects.
+Nonzero offsets share memoized source windows by offset, invalidated by the
+history, visible bars, outputs or viewport bounds.
+
+Native background stripes are recorded in one picture per plot, with a single
+live geometry mapper and plot-level clipping. Rectangle order, colors and
+minimum pixel widths are retained, including overlapping translucent stripes.
+
+Time-anchored labels are culled before searching history. Price labels need no
+candle lookup; above/below-bar labels use a lower-bound binary timestamp search
+on sorted bars, preserving the first match when timestamps repeat.
+
+Explicit Pine `format.price` output labels inherit chart precision when script
+precision is omitted, including in an indicator pane. The shared web/native
+formatter uses supplied chart `pricePrecision` for this format before pane-range
+heuristics. Explicit script precision wins; unspecified-format pane labels and
+volume formatting retain their existing policies.
+
 Canvas-based OHLCV charting library with a TradingView-compatible widget API.
+
+Pine tables display the newest object per creation site and per location within
+each script. Select replacements before excluding empty tables so an empty
+replacement does not expose an older table. Merged dimensions use neighboring
+unmerged cells; merged and covered cells do not influence column/row sizing.
+
+Serialized native worklet tests must materialize the closure shape emitted by
+the installed mobile Babel plugin: Worklets 0.13 uses arrays, while older
+versions used objects. Preserve array captures recursively instead of forcing
+object closures, so these gates execute the actual serialized UI function body.
 
 ## Architecture
 
@@ -119,11 +156,61 @@ weight and colour and immediately looks foreign next to the real chrome.
 | `GapDetectionManager` | `src/GapDetectionManager.ts`          | Detects bar data gaps, auto-recovery with backoff                  |
 
 **Indicator output axis labels:** Missing Pine `indicator(precision=...)` means
-"unspecified", not a fixed decimal count. Main-pane indicator readouts inherit
-the instrument tick precision from `RenderOptions.pricePrecision`; secondary
-indicator panes use the range-based magnitude ladder in
-`rendering/indicatorOutputAxisLabels.ts`. Apply this only while formatting axis
-tag text. Never round or clamp stored plot values to make labels tidy.
+"unspecified", not a fixed decimal count. Indicator readouts in every pane inherit
+the instrument tick precision from `RenderOptions.pricePrecision`; the range-based
+magnitude ladder is a fallback when that context is unavailable. Apply this only
+while formatting text. Never round or clamp stored plot values to make labels tidy.
+
+**Pine numeric display surfaces:** `plot`, `plotshape`, `plotchar`, `plotarrow`,
+`plotbar`, and `plotcandle` independently consume pane (1), Data Window (2),
+status line (4), and price scale (8) bits. Pine `display.all` is 31. The web
+legends and opt-in expandable Data Window show values at the hovered source bar (latest
+on mouse leave). `show_last` masks earlier values as na; drawing offsets do not
+rewrite the underlying readout series. Candle/bar
+readouts contain four OHLC values. Plot-level format/precision override declaration
+defaults; `format.volume` intentionally ignores precision. Numeric marker readouts
+use `displayValues` so false/zero remain visible as 0 even when no marker is drawn.
+Price tags use all six numeric types, with `force_overlay` routed to the main axis.
+Color, level, and fill outputs support only `display.all`/`display.none`, not
+numeric readouts. Native legends consume the same numeric readout helper for status lines and
+the per-study Data Window. The legend owns its selected source index: a UI
+reaction changes it only when the crosshair moves to another loaded bar, and
+resets to latest when hidden. This updates the React Native overlay without
+putting crosshair state in the chart owner. Data Window controls report measured
+layout into the legend's gesture suppression zones; the window uses the shared
+native floating Modal. Titles label its rows and accessible status values. Native price tags also consume
+`scalesProperties.showStudyPlotLabels` through the shared render option; the
+default is false, and enabled titles participate in tag width measurement.
+
+**Pine title labels (web):** The Scales setting “Indicator Name Label” persists
+as the canonical boolean `scalesProperties.showStudyPlotLabels`. It prepends
+authored output titles to numeric price tags and participates in normal axis
+width measurement. The default is false; layout loads must explicitly forward
+that false when the next layout omits the setting, because renderer option
+updates merge. Unchecked tags remain numeric; display.price_scale is still
+required. Preserve the boolean in imported/exported layouts.
+
+**External Pine plot sources (web):** Settings Source dropdowns show authored
+`plot()` titles from other managed scripts, including display.none and hidden
+providers. Persist the stable script/plot binding string, not its title or
+sample array. The manager sends a `plot-source` sample descriptor through the
+existing inputs payload, waits for provider results, recalculates dependents
+when providers change, and cascades removal through the widget’s persisted
+indicator cleanup (including its study/instance maps). Cycles are refused. `addScript` on an existing id only swaps the worker: it
+must not call `removeScript`, whose cascade and `onScriptRemoved` delete the
+indicator and its dependents from the saved layout on every source edit. Source inputs
+read unshifted source samples, including na and history. Other numeric plot
+families are not offered without explicit authority for their source eligibility.
+Source refreshes retain the last plots and drawings only while a replacement
+result is pending. A completed provider missing the selected plot or a fatal
+consumer/provider error clears visuals through all descendants and retires blocked
+descendants' workers; valid provider results or builtin-source edits recover them.
+Only direct dependents refresh; each consumer has one refresh in flight
+and coalesces intervening provider results into one follow-up full recalculation.
+Input edits during a source refresh join that queue and retain consumer visuals.
+Mobile removal callbacks also clean dependent indicator entries, panes and caches.
+Replacing a mobile script swaps its worker in place while preserving visibility,
+inputs, styles and pane placement; replacement must not cascade-remove dependents.
 
 **Host indicator catalogs:** Tealchart's picker owns the built-in categories, but
 hosts may pass `customTealscriptIndicators` plus `additionalIndicatorCategories`
@@ -139,14 +226,40 @@ inputs, styles, visibility and panes. Explicit overlay changes move the existing
 indicator; delayed adds and restores reconcile with the newest source only
 while their widget and layout generation still own the pending study.
 
-**TealScript drawing outputs on native:** `MobileIndicatorManager` stores
-TealScript `DrawingOutput` objects so hosts can observe them, but the native Skia
-chart renderer currently does not consume those outputs. The web renderer has
-`TealScriptDrawing*` renderers; native drawing code under `mobile/` is the
-interactive user-drawing surface plus the generated WebView runtime, not a
-native renderer for TealScript `line`/`box`/`label`/`polyline` outputs. Do not
-count TealScript drawing objects as a web-vs-native renderer differential until
-a native `DrawingOutput` consumer exists.
+**TealScript drawing outputs on native:** `SkiaTealchart` reads
+`MobileIndicatorManager.getDrawings()` on the plot revision (drawing updates
+advance that revision too) and passes them through `NativeChartCanvasLayers` to
+`NativeTealScriptDrawingLayer`. All six families (line, label, box, table,
+polyline, linefill) use the same pure `paintTealScriptDrawings` function,
+coordinate helpers and pane routing as web. The native adapter lives in
+`mobile/render/nativeTealScriptDrawings.ts` and `nativeDrawingContext.ts`.
+The picture is derived on the UI thread from the live viewport and pane range
+overrides; it recomputes pixel geometry, so stroke widths and arrowheads do not
+stretch during pan/zoom. Static projection holds use the held viewport.
+Labels use shared font normalization with native font host objects prepared on
+JS, including numeric sizes, monospace, bold/italic and multiline layout.
+`TealScriptDrawingText` distinguishes label sizes from box/table sizes, and
+native font preparation must include that family in its cache key. The shared
+worklet painter also owns zero-as-auto table dimensions, interpolating closed
+curves, arrow label shafts and outlined text. Native `strokeText` uses the same
+font metrics and glyph origin as `fillText`, with Skia stroke paint before fill;
+outlined labels do not need offset text copies. Web tooltip targets are collected
+through an optional painter callback owned by the JS renderer; native omits it
+so mutable web hover state never enters a UI worklet closure.
+Boxes reuse web border/extension and wrapped-text alignment/padding rules.
+Tables share all nine anchors, auto and percent sizing, merged-cell skipping
+and cell/frame paints with web. Polylines share straight/curved paths,
+closure/fill, point coordinate resolution and arrowhead/stroke styles.
+Linefills resolve their two handles inside the routed pane and paint beneath
+boxes, polylines, lines, labels and tables, in web order. The inherited
+trace-undetermined label clamping/table sizing rules remain in
+`pineVisualNormalizationRegister.ts`; native support does not resolve those TV
+raster questions. `nativeDrawingWorklet.test.ts` exercises serialized mobile
+Babel worklets as well as ordinary Skia draw-call tests. Interactive user
+drawings remain in `NativeUserDrawingLayer`.
+Serialized-worklet test loaders must preserve the plugin's `__closure` container
+shape (named object or indexed array) while recursively materializing imports.
+Turning an array closure into an object fails before the UI body can paint.
 Native TealScript indicator colors are passed to Skia as strings; the installed
 Skia CSS color parser supports `#rrggbbaa`, and
 `NativeWebIndicatorRendererDifferential.test.tsx` guards eight-digit alpha
@@ -159,6 +272,74 @@ TealScript runtime/codegen changes that must reach mobile. As of 2026-09-12,
 no CI/test freshness gate was found for this artifact; checking for runtime
 symbols in the committed bundle is manual until a gate is added.
 
+**Pine plot widths:** Histogram `linewidth` is its width in pixels, even when
+wider than a bar slot; columns ignore `linewidth`. Cross/circle marker sizes
+remain relative to `linewidth`, but `join=true` uses a one-pixel joining line
+on both web canvas and native Skia.
+
+**Native study styles:** The native legend offers a Style sheet when a study has
+editable outputs. The sheet labels rows by plot title, omits `editable=false`
+outputs, and saves only user changes. Native manager style views preserve raw
+worker arrays so Reset to script restores dynamic colors, and style changes
+advance the plot revision as well as the indicator revision. Barcolor overrides
+retain the aligned color array and its na slots, which the candle painter
+requires. Locked outputs ignore incoming overrides and are excluded from newly saved overrides. The
+sheet uses the shared floating Modal, while its measured legend gear suppresses
+canvas gestures. Hex color edits retain incomplete local text without sending
+invalid Skia colors; palette choices and valid hex values update the draft.
+
+**Pine OHLC drawing adapters:** Keep supplied `openValues`, `highValues`,
+`lowValues`, and `closeValues` available to numeric readouts. The shared web
+OHLC painter derives its upper/lower stem from the maximum/minimum of all four
+finite samples; open/close still define body or ticks. If any sample is missing
+or nonfinite, suppress the whole glyph. Projection must not rewrite the packet
+arrays. Legacy and unified routes use the same painter. This preserves the
+previous on-screen geometry as engine output moves to raw, individually supplied
+OHLC fields. Pane scaling also excludes incomplete quartets so suppressed bars
+cannot stretch the visible range. This is a status-quo preservation adapter;
+`MobileIndicatorManager` uses shared `getPlotOhlcGeometry` to scan only complete
+quartets within `show_last`, retaining raw fields for readouts and the existing
+native glyph adapter.
+TradingView-specific geometry remains unsettled pending v4 screenshots. Numeric
+CSV evidence alone does not establish glyph geometry.
+
+**Pine locked styles:** Outputs with `editable=false` are omitted from the
+indicator Style controls, including fills, levels and color outputs. The modal
+also filters locked plots out of saved/default style overrides, so opening and
+applying settings cannot introduce an override for a locked output.
+
+**Pine bar offsets on web:** Plot points and axis-guide source times resolve
+`sourceIndex + offset` against loaded bars, including session gaps. Only targets
+outside loaded history extrapolate from the nearest end's interval. Fills sample
+each boundary at `destinationIndex - boundary.offset`, including hidden
+boundary plots; they must follow the plotted geometry rather than source time.
+
+**Pine plotchar glyphs:** An explicitly empty `char` hides the glyph while
+leaving any `text` visible. Only an omitted `char` selects the default glyph.
+
+**Pine tracking lines on web:** `trackprice` uses the latest finite source
+value, independent of shifted plot position and viewport time. Its residual
+one-pixel dotted line survives `show_last=1, offset=-99999`. Price tags come
+through the ordinary `display.price_scale` consumer, never through `trackprice`.
+
+**Pine hline colors:** An omitted color defaults to gray; explicit `color=na`
+is an empty color output and paints no horizontal line on web or native. Hidden
+levels remain available as fill boundaries.
+
+**Pine gradient fills:** `PlotOutput.gradient` carries per-bar stop
+values/colors. Canvas creates a vertical gradient at those stop values and uses
+the two boundary plots/hlines as its polygon mask. `fillgaps` defaults to false;
+true bridges missing boundary values. Gradient stops do not contribute to the
+mask geometry. TradingView native capture CF011 (v2 batch8 visual PNG)
+confirms gradient fills between hline handles: use each hline `price` as the
+mask boundary even when its values array is empty or its own display is hidden.
+Keep stop100/red above stop0/blue and clip the paint to the handle mask; the
+web behavior suite covers both legacy and unified indicator-pane routes.
+`WebCanvasContext` exposes gradients; adapters without that API
+omit gradient painting. Native Skia uses the same stop values/colors and polygon sampling, with a vertical
+`LinearGradient` shader inside the boundary path. Equal stop values paint
+transparently, matching Canvas degenerate gradients.
+
 **Pine visual normalization register:** Renderer-side Pine normalizations whose
 TradingView behavior is not documented live in
 `src/rendering/pineVisualNormalizationRegister.ts`. Keep unresolved visual
@@ -167,6 +348,58 @@ entries cover label price-coordinate clamping, area fill alpha normalization,
 plotarrow height flooring/reordering, table explicit width/height invalid-input
 normalization, and `plotshape`/`plotchar` `textcolor=na` fallback. Do not turn
 these into behavior fixes or quiet assumptions without a TradingView trace.
+
+**Pine drawing text sizes:** `TealScriptDrawingRenderer` uses distinct documented
+font maps: labels tiny/small/normal/large/huge are approximately 7/10/12/18/24px;
+box and table text use 8/10/14/20/36px. Positive integer strings are pixel sizes.
+Do not share the label map with table measurement or box wrapping; their font
+and line-height calculations must agree with the font used to paint text.
+
+**Table dimensions:** A cell width or height of zero selects automatic text
+measurement, just like omission. Positive dimensions are percentages of the
+pane's drawable space; explicit columns/rows still take precedence over auto
+measurements in other cells. Invalid-input normalization remains in the visual
+normalization register.
+
+**Curved polylines:** Supplied points are interpolation points, not quadratic
+control points. Each cubic segment ends at the next supplied point; closed
+curves include a curved last-to-first segment with periodic tangents. The local
+Catmull-Rom kernel satisfies point passage but is not a certified TradingView
+spline match; its exact kernel remains in the visual normalization register.
+
+**Script drawing tooltips:** Label bodies/text and table cells record their
+painted rectangles during the drawing pass. Hit targets are clipped to the pane
+and chart area; merged cells expose only the leading cell's tooltip over the
+whole merged span. `ChartCore` paints the hovered tooltip on the crosshair
+canvas, so cursor movement does not repaint plots. The renderer replaces targets
+on each content draw, clears absent/removed/collapsed panes, and retains targets
+through axis-only passes. Runtime tooltip setter updates follow the normal
+drawing invalidation path.
+Hosted content passes use the same pane retirement and replace visible tooltip
+targets on every redraw, including empty drawing output. Removed or collapsed
+hosted panes cannot retain hover targets.
+
+**Arrow label styles:** Arrow labels have both a head and shaft; they must
+not share the triangle-label branch. Shaft proportions are local approximations,
+not a TradingView raster-dimension certification.
+
+**Horizontal label pointers:** `label_left` places its body to the right of the
+anchor, while `label_right` places it to the left. A gap separates the anchor
+from the body, and the triangle base attaches to the nearest body edge. Web and
+native share this layout and path; exact spacing and glyph pixels remain unpinned.
+
+**Corner label pointers:** `label_lower_left` and `label_lower_right` place the
+body above the tip; `label_upper_left` and `label_upper_right` place it below.
+Left/right controls which side the body extends toward, and the pointer base
+attaches to the body edge nearest the tip. This topology follows the official
+Text and shapes illustrations and is shared by web and native; exact glyph
+dimensions and boundary clamping remain unpinned.
+
+**Outlined label text:** `text_outline` is anchored text without a rounded
+label body: paint a stroke in the label's `color`, then fill the glyphs in
+`textColor`. Web uses `strokeText`; canvas adapters without it use a one-pixel
+text halo. Outline thickness is a local approximation, not a TradingView raster
+dimension certification.
 
 Order drag handlers read the cached group's current projected line Y when a
 gesture starts. Scale/pan updates translate cached groups without rebuilding
@@ -372,6 +605,51 @@ Tealscript visual rendering covers both web canvas and native Skia for
 `plotbar`/`plotcandle` skip a bar when any OHLC value is `na`, and native
 Skia batches those OHLC and arrow primitives by resolved per-bar color instead
 of allocating one path per bar.
+OHLC output arrays retain the supplied raw values. The native draw adapter
+uses the maximum/minimum of all four finite fields for the spine/wick, preserving
+the geometry formerly normalized by the producer without rewriting readouts.
+This preserves existing rendering; inconsistent-OHLC TV geometry still requires
+visual capture evidence.
+Native `plot` paths close every area island using the shared baseline geometry,
+break joined point-marker lines at `na`, retain color alpha without additional
+histogram opacity, and use rounded line caps/joins. `trackprice` adds a one-pixel
+dotted residual line at the latest finite value in the full history (subject to
+`show_last` and the latest color), including historical views; axis readouts are
+handled separately. Live and static plot paths follow the same rules.
+Native `hline` defaults to gray dashed paint, preserves invisible colors, skips
+out-of-range levels, and clips to its routed pane; the clip follows the same
+live or static channel as the path.
+Native base-candle `barcolor` evaluates `show_last` against the full source bar
+count supplied by the canvas owner, rather than the currently visible slice.
+The native host preserves declaration format/precision/scale and
+`explicit_plot_zorder` in its pane-info handoff. Native paints default fills
+beneath each script's plots/levels; explicit plot order sorts that script's
+plots, fills and levels by their recorded call order.
+Native fills share pure boundary sampling and quadrilateral geometry with web.
+Each boundary is sampled at destination index minus its own offset, including
+hidden levels/plots and each boundary's `show_last`; the fill independently owns
+its `show_last` and pane route. Color transitions retain the connecting quad,
+`fillgaps` defaults false, and invisible/invalid gradient stops break islands.
+Native batches identical paints and derives live paths, clips and gradient stops
+on the UI thread; static holds use their frozen projection for all three.
+Native `bgcolor` uses its own `force_overlay`/study-pane route and `show_last`
+window. Live rectangles derive their coordinates and pane geometry on the UI
+thread, while snapshot rectangles retain the frozen projection.
+Native numeric plot offsets select source bars before culling and use the shared
+bar-index time resolver, so loaded gaps and endpoint extrapolation match web.
+Projected marker bars retain their source index/OHLC and carry the shifted time;
+the painter receives offset zero to avoid applying it twice.
+Web and native marker glyphs share `plotMarkerGeometry.ts`: vertices, rounded
+label bounds, and separate fill/stroke parts. Native flags retain their stems,
+crosses use two-pixel strokes, and text is centered with font metrics, per-size
+fonts, and shared multiline offsets. Marker text follows pane clipping and UI
+viewport visibility even when the marker body color is `na`.
+Native `plotchar` prepares a separate body font at `max(10, size*2)` and keeps
+that centered glyph on the middle baseline; its optional marker text uses the
+shared text font/line layout. An explicit empty `char` suppresses only the body.
+Native `plotarrow` uses the shared web glyph, excludes `na` body colors from both
+painting and magnitude normalization, and derives the visible maximum on the UI
+thread so arrow heights update during gestures.
 `src/rendering/tealscriptRenderingBehavior.test.ts` is the named web-canvas
 render-command matrix for TealScript output behavior: plot styles, per-bar
 colors, transparency, fills, OHLC/arrow skip rules, overlay-vs-pane routing,
@@ -1087,6 +1365,14 @@ offset `arrowSpacing` px beside the bar, `caret` the squat triangle planted ON
 the price that icon shapes draw. Defaults to `arrow`, so existing execution
 shapes are unchanged.
 
+**Pine Style reset persistence:** Applying settings always publishes the override
+list, including an empty list after Reset, so the host clears persisted overrides.
+Background plot arrays use source-bar coordinates. Apply plot.offset during web projection and native offset-bar selection, preserving raw color/value indices and show_last source filtering; never pre-shift samples a second time.
+
+Pine box border_width zero suppresses border strokes in the shared web/native painter.
+Keep box fill and text, every border style, and width-one commands unchanged.
+Line and polyline zero widths retain their runtime one-pixel normalization.
+
 Hosted study adapters keep managed study IDs in the existing `TealchartApi`: hosts wire
 `setOnStudyInputsChange` to their existing `TealscriptManager` owner so `IStudyApi.setInputs`
 merges values and re-executes that same worker. Removed handles cannot trigger input callbacks.
@@ -1119,3 +1405,22 @@ default rightward opening; Hosted uses left at its right-axis plus button.
 Hosted last-trade external axis labels match web Konva text placement: shared
 11px sizing, two-row centers 11px apart, and alphabetic glyph metrics measured
 with an alphabetic baseline. Ordinary external tags retain native middle alignment.
+
+Legacy web price projection maps a flat price range to its midpoint, matching
+unified pane projection and keeping gradient endpoints finite.
+
+Built-in MACD and Volume histograms explicitly request linewidth 3 to preserve
+their web appearance; Pine histogram widths remain literal pixel widths.
+
+Web readouts consume ChartCore effective plots after editable display overrides,
+so a hidden plot has neither a status value nor a Data Window row.
+
+Web readout spans/rows retain their DOM identity across ticks. Unchanged formatted
+readouts skip publication; a closed Data Window defers its rows until opened.
+
+`TealchartWidgetOptions.showDataWindow` defaults to false on web. Only explicit
+true mounts its control; legend status values remain available by default.
+
+Native background pictures retain the axis-exclusive clip width
+`frame.priceAxisLeft - frame.contentLeft` in live and static branches. Gesture
+tests retain the mounted picture before changing shared viewport values.

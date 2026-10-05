@@ -9,8 +9,13 @@ export function toDrawingId(value: unknown, isNa: (value: unknown) => boolean): 
   return String(value);
 }
 
-export function toLineWidth(value: unknown, clampNumber: (value: unknown, min: number, max: number) => number): number {
-  return Math.max(1, clampNumber(value ?? 1, 1, 100));
+export function toLineWidth(
+  value: unknown,
+  clampNumber: (value: unknown, min: number, max: number) => number,
+  allowZero = false,
+): number {
+  if (allowZero && Number(value ?? 1) === 0) return 0;
+  return Math.max(1, clampNumber(value ?? 1, 1, Number.POSITIVE_INFINITY));
 }
 
 export function withDrawing<T extends DrawingType>(

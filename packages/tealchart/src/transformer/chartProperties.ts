@@ -46,6 +46,7 @@ const TV_PROPERTY_LOCATIONS: Record<ChartPropertyKey, TvPropertyLocation> = {
     container: 'chartProperties',
     path: ['paneProperties', 'crossHairProperties', 'color'],
   },
+  'scalesProperties.showStudyPlotLabels': { container: 'chartProperties', path: ['scalesProperties', 'showStudyPlotLabels'] },
   'scalesProperties.textColor': {
     container: 'chartProperties',
     path: ['scalesProperties', 'textColor'],

@@ -120,6 +120,8 @@ export interface TableCellDrawingOutput {
 }
 
 export interface TableMergedCellDrawingOutput {
+  /** Internal permission consumed by an identical merge after table.cell resets its anchor. */
+  anchorRedefinedSinceMerge?: boolean;
   startColumn: number;
   startRow: number;
   endColumn: number;
@@ -129,6 +131,8 @@ export interface TableMergedCellDrawingOutput {
 export interface TableDrawingOutput {
   id: string;
   type: 'table';
+  /** Identifies the table.new call that produced this table across bars. */
+  creationSite?: string;
   /** Script ID that produced this drawing (set by TealscriptManager). */
   scriptId?: string;
   /** True when the drawing was created by a persistent declaration. */

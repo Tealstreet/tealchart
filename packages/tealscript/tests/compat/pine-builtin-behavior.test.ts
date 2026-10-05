@@ -221,7 +221,7 @@ plot(na(str.tonumber("nope")) ? 1 : 0, title="Bad Number")
 plot(str.tostring(12.3456, "#.##") == "12.35" ? 1 : 0, title="To String")
 plot(str.tostring(na) == "NaN" ? 1 : 0, title="To String NA")
 plot(str.repeat("ha", 3, "-") == "ha-ha-ha" ? 1 : 0, title="Repeat")
-plot(na(str.repeat("ha", -1)) ? 1 : 0, title="Repeat Negative")
+plot(str.repeat("ha", 0) == "" ? 1 : 0, title="Repeat Zero")
 plot(na(str.length(na)) ? 1 : 0, title="Length NA")
 plot(na(str.pos("abc", "z")) ? 1 : 0, title="Missing Position")
 `,
@@ -235,7 +235,8 @@ plot(na(str.pos("abc", "z")) ? 1 : 0, title="Missing Position")
         'To String': 1,
         'To String NA': 1,
         Repeat: 1,
-        'Repeat Negative': 1,
+        // Native bounds06 refuses negative repeat; pine-native-v3-repeat.test.ts covers that fatal path.
+        'Repeat Zero': 1,
         'Length NA': 1,
         'Missing Position': 1,
       },
@@ -466,7 +467,7 @@ plot(na(array.avg(empty)) ? 1 : 0, title="Empty Avg")
         'Binary Right Missing': 3,
         'Nearest Rank': 2,
         'Linear Percentile': 2,
-        'Percent Rank': 75,
+        'Percent Rank': 66.666667,
         'Standard First': -1.224745,
         'Empty Avg': 1,
       },
@@ -941,15 +942,17 @@ plot(clearMe.size(), title="Cleared")
       },
     },
     {
-      name: 'invalid keys report a runtime error',
-      covers: ['map.put'],
+      name: 'missing numeric keys retain an entry and its value',
+      covers: ['map.put', 'map.get'],
       source: `
-indicator("map invalid key")
+indicator("map missing numeric key")
 m = map.new()
 m.put(na, 1)
-plot(m.size(), title="Bad")
+plot(m.size(), title="Key Count")
+plot(m.get(na), title="Stored Value")
 `,
-      expectedErrors: ['Map keys must be finite value types'],
+      // V7 missing-key captures retain SIZE=1 and VALUE=7; the stored literal here is 1.
+      expectedPlots: { 'Key Count': 1, 'Stored Value': 1 },
     },
   ],
   color: [
@@ -1021,7 +1024,7 @@ plot(color.r(color.yellow), title="Yellow R")
         'New T': 75,
         'Aqua R': 0,
         'Black R': 54,
-        'Blue R': 33,
+        'Blue R': 41,
         'Fuchsia R': 224,
         'Gray R': 120,
         'Green R': 76,
@@ -1138,9 +1141,9 @@ describe('Pine v6 builtin behavior tables', () => {
 
   it('declares provenance for every literal expected value and diagnostic string', () => {
     expect(expectedValueProvenanceCounts()).toEqual({
-      'independently-derived': 212,
+      'independently-derived': 214,
       'published-worked-example': 0,
-      'tealscript-regression-pin': 15,
+      'tealscript-regression-pin': 14,
     });
   });
 

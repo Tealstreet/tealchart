@@ -1,7 +1,8 @@
+import type { PineV6KnownMissingBuiltinReview } from '../../src/compat/pineV6BuiltinReference';
+
 import { describe, expect, it } from 'vitest';
 
 import {
-  type PineV6KnownMissingBuiltinReview,
   PINE_V6_KNOWN_MISSING_BUILTIN_GROUPS,
   PINE_V6_KNOWN_MISSING_BUILTIN_REVIEW,
   PINE_V6_KNOWN_MISSING_BUILTINS,
@@ -48,7 +49,7 @@ describe('Pine v6 reference manual audit', () => {
     expect(audit.officialBuiltinNames).toBe(861);
     expect(audit.committedBuiltinNames).toBe(901);
     expect(audit.builtinNamesAbsentFromCommittedListCount).toBe(0);
-    expect(audit.unresolvedManualBuiltinNamesCount).toBe(13);
+    expect(audit.unresolvedManualBuiltinNamesCount).toBe(0);
     expect(audit.committedBuiltinNamesAbsentFromManualCount).toBe(40);
     expect(audit.grammarEntriesAbsentFromCommittedListCount).toBe(0);
   });
@@ -62,9 +63,7 @@ describe('Pine v6 reference manual audit', () => {
   });
 
   it('keeps known-missing builtin names reasoned and grouped', () => {
-    expect(PINE_V6_KNOWN_MISSING_BUILTINS).toEqual(
-      flattenedAuditGroupNames(PINE_V6_KNOWN_MISSING_BUILTIN_GROUPS),
-    );
+    expect(PINE_V6_KNOWN_MISSING_BUILTINS).toEqual(flattenedAuditGroupNames(PINE_V6_KNOWN_MISSING_BUILTIN_GROUPS));
   });
 
   it('keeps known-missing builtin review complete and tied to the manual index', () => {

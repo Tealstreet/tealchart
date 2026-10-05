@@ -100,6 +100,10 @@ export class WebCanvasContext implements CanvasContext {
   // Path Operations
   // ==========================================================================
 
+  createLinearGradient(x0: number, y0: number, x1: number, y1: number): CanvasGradient {
+    return this.ctx.createLinearGradient(x0, y0, x1, y1);
+  }
+
   beginPath(): void {
     this.ctx.beginPath();
   }
@@ -171,6 +175,10 @@ export class WebCanvasContext implements CanvasContext {
 
   fillText(text: string, x: number, y: number): void {
     this.ctx.fillText(text, x, y);
+  }
+
+  strokeText(text: string, x: number, y: number): void {
+    this.ctx.strokeText(text, x, y);
   }
 
   drawImage(image: CanvasImageSource, x: number, y: number, width: number, height: number): void {

@@ -1,0 +1,10 @@
+//@version=6
+indicator("silent-s4-time-offset--501-dynamic-v20-v1", precision=16, calc_bars_count=6000)
+int offset = bar_index < 3 ? 0 : -501
+int result = time("1", bars_back=offset)
+plot(bar_index, title="CHART_INDEX", display=display.data_window)
+plot(time, title="CHART_TIME_MS", display=display.data_window)
+plot(offset, title="REQUESTED_BARS_BACK", display=display.data_window)
+plot(result, title="TIME_RESULT_MS", display=display.data_window)
+plot(na(result) ? 1 : 0, title="RESULT_NA", display=display.data_window)
+plot(na(result) ? na : result - time, title="RESULT_MINUS_CHART_MS", display=display.data_window)

@@ -1,5 +1,10 @@
+import { resolveDependencyMember } from './importedDependencies';
+import { POSITIONAL_DRAWING_GETTERS } from '../drawings/singleIdGetters';
+import { PINE_EXP_RUNTIME_HELPER } from './pineExp';
+import { comparisonEqual } from './float-comparison';
 import type {
   Program, Statement, Expression,
+  BinaryExpression,
   VariableDeclaration,
   AssignmentStatement,
   TupleAssignment,
@@ -15,10 +20,20 @@ import type {
   Identifier,
   SwitchExpression,
   SourceLocation,
+  TypeAnnotation,
 } from '../../parser/ast';
 import type { AnalysisContext, FuncInfo, ImportedMethodOverloadInfo, LocalMethodOverloadInfo, TACallSite, VarDeclInfo } from './analyzer';
 import { BUILTIN_NAMESPACES } from '../../builtinMetadata';
 import { pineVersionRules } from '../../pineVersionRules';
+import { pineColorConstant } from '../../pineColorConstants';
+import { checkProgram } from '../../semantic/checker';
+import type { SemanticExpressionTypeContext, SemanticType } from '../../semantic/checker';
+
+import { inferUdtArrayExpressions } from './udtArrayTypes';
+import { invariantLineReads } from './drawingLoopReads';
+import { extractStaticNumber } from './analyzer';
+import { CORPORATE_FORECAST_MEMBERS } from '../../corporateForecastMetadata';
+import { canonicalBuiltinArguments } from '../../pineBuiltinParameterRenames';
 
 const BAR_FIELDS: Record<string, string> = {
   open: '_s_open', high: '_s_high', low: '_s_low', close: '_s_close',
@@ -31,6 +46,8 @@ const BARSTATE_FIELDS = new Set([
 ]);
 
 const SYMINFO_FIELDS = new Set([
+  'recommendations_buy', 'recommendations_buy_strong', 'recommendations_hold',
+  'recommendations_sell', 'recommendations_sell_strong', 'recommendations_total',
   'ticker', 'tickerid', 'prefix', 'root', 'currency', 'basecurrency',
   'description', 'type', 'timezone', 'session', 'pricescale', 'mintick',
   'pointvalue', 'mincontract', 'volumetype', 'main_tickerid', 'country',
@@ -54,7 +71,7 @@ const TIMEFRAME_FIELDS = new Set([
 ]);
 
 const TIMEFRAME_DERIVED_FIELDS: Record<string, string> = {
-  main_period: 'ctx.timeframe.period',
+  main_period: '(ctx.timeframe.main_period ?? ctx.timeframe.period)',
   isdwm: '(ctx.timeframe.isdaily || ctx.timeframe.isweekly || ctx.timeframe.ismonthly)',
 };
 
@@ -96,14 +113,16 @@ const DISPLAY_CONSTANTS: Record<string, number> = {
 const MATH_FUNCS: Record<string, string> = {
   'math.abs': 'Math.abs', 'math.ceil': 'Math.ceil', 'math.floor': 'Math.floor',
   'math.sqrt': 'Math.sqrt', 'math.pow': 'Math.pow',
-  'math.log': 'Math.log', 'math.log10': 'Math.log10', 'math.exp': 'Math.exp',
+  'math.exp': '_exp',
+
+
   'math.sign': 'Math.sign', 'math.sin': 'Math.sin', 'math.cos': 'Math.cos',
   'math.tan': 'Math.tan', 'math.asin': 'Math.asin', 'math.acos': 'Math.acos',
   'math.atan': 'Math.atan', 'math.tanh': 'Math.tanh',
   'math.max': 'Math.max', 'math.min': 'Math.min',
   'math.pi': 'Math.PI', 'math.e': 'Math.E',
   'math.phi': '1.618033988749895',
-  'math.rphi': '0.618033988749895',
+  'math.rphi': '0.6180339887498948',
 };
 
 const PLOT_FUNCTIONS = new Set([
@@ -161,10 +180,10 @@ const RUNTIME_STR_FUNCTIONS = new Set([
 ]);
 
 const LEGACY_GLOBAL_MATH_ALIASES = new Set([
-  'abs', 'ceil', 'floor', 'round', 'sqrt',
+  'abs', 'ceil', 'floor', 'round', 'round_to_mintick', 'sqrt',
   'log', 'log10', 'pow', 'sign', 'max', 'min', 'avg', 'sum',
   'sin', 'cos', 'tan', 'asin', 'acos', 'atan', 'exp',
-  'toradians', 'todegrees',
+  'toradians', 'todegrees', 'random',
 ]);
 
 const LEGACY_GLOBAL_STR_ALIASES = new Map([
@@ -193,25 +212,6 @@ const LEGACY_INPUT_TYPE_ALIASES = new Map([
   ['symbol', 'input.symbol'],
   ['timeframe', 'input.timeframe'],
 ]);
-const LEGACY_BARE_COLOR_CONSTANTS: Record<string, string> = {
-  aqua: '#00BCD4',
-  black: '#363A45',
-  blue: '#2196F3',
-  fuchsia: '#E040FB',
-  gray: '#787B86',
-  green: '#4CAF50',
-  lime: '#00E676',
-  maroon: '#880E4F',
-  navy: '#311B92',
-  olive: '#808000',
-  orange: '#FF9800',
-  purple: '#9C27B0',
-  red: '#F23645',
-  silver: '#B2B5BE',
-  teal: '#089981',
-  white: '#FFFFFF',
-  yellow: '#FDD835',
-};
 const LEGACY_BARE_VISUAL_CONSTANTS = new Set([
   'area',
   'areabr',
@@ -226,7 +226,7 @@ const LEGACY_BARE_VISUAL_CONSTANTS = new Set([
   'stepline',
 ]);
 
-const ITERATION_CAP = 10000;
+const LOOP_TIME_LIMIT_MS = 500;
 const DRAWING_NAMESPACES = new Set(['label', 'line', 'box', 'polyline', 'linefill', 'table', 'chart']);
 const DRAWING_RECEIVER_TYPES = new Set(['label', 'line', 'box', 'polyline', 'linefill', 'table', 'chart.point']);
 const DRAWING_CONSTRUCTOR_FUNCTIONS = new Set(['label.new', 'line.new', 'box.new', 'polyline.new', 'linefill.new', 'table.new']);
@@ -402,7 +402,7 @@ const MATRIX_ARG_NAMES: Record<string, readonly string[]> = {
   'matrix.columns': ['id'],
   'matrix.elements_count': ['id'],
   'matrix.copy': ['id'],
-  'matrix.concat': ['id', 'id2'],
+  'matrix.concat': ['id1', 'id2'],
   'matrix.row': ['id', 'row'],
   'matrix.col': ['id', 'column'],
   'matrix.column': ['id', 'column'],
@@ -451,6 +451,7 @@ const MATRIX_ARG_NAMES: Record<string, readonly string[]> = {
 };
 
 const MATRIX_ARG_ALIASES: Record<string, Record<string, string>> = {
+  'matrix.concat': { id: 'id1' },
   'matrix.sum': { id: 'id1' },
   'matrix.diff': { id: 'id1' },
   'matrix.mult': { id: 'id1' },
@@ -463,8 +464,11 @@ interface FunctionEmitContext {
   localVars: Map<string, VarDeclInfo[]>;
   callSites: Map<CallExpression, number>;
   callSiteFunctions: Map<CallExpression, string[]>;
+  nestedCallSites: Set<CallExpression>;
   calledFunctions: Map<string, Set<string>>;
   paramHistory: Map<string, Set<string>>;
+  deepParamHistory: Map<string, Set<string>>;
+  conditionalCallSites: Set<CallExpression>;
   localHistory: Map<string, Set<string>>;
 }
 
@@ -478,7 +482,7 @@ const COLLECTION_METHOD_RETURNS: Record<CollectionKind, Record<string, Collectio
   },
   matrix: {
     copy: 'matrix', concat: 'matrix', row: 'array', col: 'array',
-    column: 'array', submatrix: 'matrix', diff: 'matrix', mult: 'matrix',
+    column: 'array', submatrix: 'matrix', diff: 'matrix',
     sum: 'matrix', pow: 'matrix', inv: 'matrix', pinv: 'matrix', eigenvalues: 'array',
     eigenvectors: 'matrix', kron: 'matrix',
   },
@@ -626,6 +630,7 @@ function inferCollectionVars(ast: Program): Map<string, CollectionKind> {
     if (expr.type !== 'CallExpression') return undefined;
 
     const fullName = staticMemberChainName(expr.callee) ?? '';
+    if (fullName === 'ta.pivot_point_levels') return 'array';
     if (fullName === 'array.new' || fullName.startsWith('array.new_') || fullName === 'array.from') return 'array';
     if (fullName === 'map.new') return 'map';
     if (fullName === 'matrix.new' || fullName.startsWith('matrix.new_')) return 'matrix';
@@ -727,7 +732,9 @@ function inferCollectionHistoryVars(ast: Program, collectionVars: Map<string, Co
       const kind = collectionVars.get(node.object.name ?? '');
       if (kind) historyVars.set(node.object.name ?? '', kind);
     }
-    for (const child of Object.values(value)) {
+    for (const key of Object.keys(value)) {
+      if (key === 'loc') continue;
+      const child = (value as Record<string, unknown>)[key];
       if (Array.isArray(child)) {
         for (const item of child) visit(item);
       } else {
@@ -747,13 +754,20 @@ function inferFunctionEmitContext(
   importedMethods: Map<string, string>,
   localMethodOverloads: Map<string, LocalMethodOverloadInfo[]>,
   importedMethodOverloads: Map<string, ImportedMethodOverloadInfo[]>,
+  importedFunctionOwners: Map<string, string>,
+  importedLocalFunctions: Map<string, string>,
+  importedDependencyScopes: Map<string, Map<string, string>>,
 ): FunctionEmitContext {
   const functionNames = new Set(funcInfos.keys());
   const localVars = new Map<string, VarDeclInfo[]>();
   const callSites = new Map<CallExpression, number>();
   const callSiteFunctions = new Map<CallExpression, string[]>();
+  const nestedCallSites = new Set<CallExpression>();
   const calledFunctions = new Map<string, Set<string>>();
   const paramHistory = new Map<string, Set<string>>();
+  const deepParamHistory = new Map<string, Set<string>>();
+  const conditionalCallSites = new Set<CallExpression>();
+  let conditionalDepth = 0;
   const localHistory = new Map<string, Set<string>>();
   const regularLocalNames = new Map<string, Set<string>>();
   let callSiteIndex = 0;
@@ -788,10 +802,8 @@ function inferFunctionEmitContext(
   };
 
   const sameImportedLibraryFunctionName = (ownerName: string | undefined, calleeName: string): string | undefined => {
-    if (!ownerName?.includes('__')) return undefined;
-    const alias = ownerName.split('__')[0];
-    const candidate = `${alias}__${calleeName}`;
-    return functionNames.has(candidate) ? candidate : undefined;
+    const alias = ownerName ? importedFunctionOwners.get(ownerName) : undefined;
+    return alias ? importedLocalFunctions.get(`${alias}.${calleeName}`) : undefined;
   };
 
   const registerCallSite = (expr: CallExpression, ownerName?: string): void => {
@@ -800,11 +812,13 @@ function inferFunctionEmitContext(
       const sameLibraryFunction = sameImportedLibraryFunctionName(ownerName, expr.callee.name);
       names = sameLibraryFunction
         ? [sameLibraryFunction]
-        : (userFunctionOverloads.get(expr.callee.name)
-          ?? (localMethodOverloads.get(expr.callee.name)?.map((overload) => overload.internalName)
-            ?? [expr.callee.name]));
+        : [
+          ...(userFunctionOverloads.get(expr.callee.name) ?? [expr.callee.name]),
+          ...(localMethodOverloads.get(expr.callee.name)?.map((overload) => overload.internalName) ?? []),
+        ];
     } else if (expr.callee.type === 'MemberExpression') {
-      const fullName = staticMemberChainName(expr.callee);
+      const rawName = staticMemberChainName(expr.callee);
+      const fullName = rawName ? resolveDependencyMember(rawName, ownerName, importedDependencyScopes) : undefined;
       const localOverloads = isStaticNamespaceReceiverName(staticMemberChainName(expr.callee.object))
         ? undefined
         : localMethodOverloads.get(expr.callee.property.name);
@@ -824,6 +838,7 @@ function inferFunctionEmitContext(
     callSites.set(expr, callSiteIndex++);
     callSiteFunctions.set(expr, names);
     if (ownerName) {
+      nestedCallSites.add(expr);
       let called = calledFunctions.get(ownerName);
       if (!called) {
         called = new Set();
@@ -833,8 +848,21 @@ function inferFunctionEmitContext(
     }
   };
 
-  const collectRegularLocals = (stmts: Statement[]): Set<string> => {
+  const collectRegularLocals = (body: Statement[] | Expression): Set<string> => {
     const names = new Set<string>();
+    const visitExpression = (expr: Expression | IfStatement): void => {
+      if (expr.type === 'ForStatement' || expr.type === 'WhileStatement' || expr.type === 'IfStatement') {
+        visit(expr);
+      } else if (expr.type === 'SwitchExpression') {
+        for (const branch of expr.cases) {
+          if (Array.isArray(branch.consequent)) {
+            for (const child of branch.consequent) visit(child);
+          } else {
+            visitExpression(branch.consequent);
+          }
+        }
+      }
+    };
     const visit = (stmt: Statement): void => {
       if (stmt.type === 'VariableDeclaration') {
         if (stmt.names.type === 'VariableDeclarator') {
@@ -842,6 +870,7 @@ function inferFunctionEmitContext(
         } else {
           for (const name of stmt.names.names) names.add(name.name);
         }
+        visitExpression(stmt.init);
       } else if (stmt.type === 'MultiDeclaration') {
         for (const declaration of stmt.declarations) visit(declaration);
       } else if (stmt.type === 'IfStatement') {
@@ -853,9 +882,17 @@ function inferFunctionEmitContext(
         }
       } else if (stmt.type === 'ForStatement' || stmt.type === 'WhileStatement') {
         for (const child of stmt.body) visit(child);
+      } else if (stmt.type === 'ExpressionStatement') {
+        visitExpression(stmt.expression);
+      } else if (stmt.type === 'AssignmentStatement' || stmt.type === 'TupleAssignment') {
+        visitExpression(stmt.right);
       }
     };
-    for (const stmt of stmts) visit(stmt);
+    if (Array.isArray(body)) {
+      for (const stmt of body) visit(stmt);
+    } else {
+      visitExpression(body);
+    }
     return names;
   };
 
@@ -863,6 +900,7 @@ function inferFunctionEmitContext(
     switch (expr.type) {
       case 'CallExpression':
         registerCallSite(expr, ownerName);
+        if (conditionalDepth > 0) conditionalCallSites.add(expr);
         if (ownerName && ownerParams) {
           const fullName = staticMemberChainName(expr.callee) ?? (expr.callee.type === 'Identifier' ? expr.callee.name : '');
           if (fullName.startsWith('ta.')) {
@@ -899,6 +937,11 @@ function inferFunctionEmitContext(
             paramHistory.set(ownerName, params);
           }
           params.add(expr.object.name);
+          if (expr.index.type === 'NumericLiteral' && (expr.index.value === 2 || expr.index.value === 3)) {
+            const deep = deepParamHistory.get(ownerName) ?? new Set<string>();
+            deep.add(expr.object.name);
+            deepParamHistory.set(ownerName, deep);
+          }
         } else if (expr.object.type === 'Identifier' && ownerName && regularLocalNames.get(ownerName)?.has(expr.object.name)) {
           let locals = localHistory.get(ownerName);
           if (!locals) {
@@ -919,20 +962,35 @@ function inferFunctionEmitContext(
         break;
       case 'ConditionalExpression':
         walkExpr(expr.test, ownerParams, ownerName);
+        conditionalDepth += 1;
         walkExpr(expr.consequent, ownerParams, ownerName);
         walkExpr(expr.alternate, ownerParams, ownerName);
+        conditionalDepth -= 1;
         break;
       case 'SwitchExpression':
         if (expr.discriminant) walkExpr(expr.discriminant, ownerParams, ownerName);
         for (const branch of expr.cases) {
           if (branch.test) walkExpr(branch.test, ownerParams, ownerName);
           if (Array.isArray(branch.consequent)) {
-            for (const stmt of branch.consequent) walkStmt(stmt);
+            const owner = ownerName ? {
+              name: { name: ownerName },
+              params: [...(ownerParams ?? [])].map(name => ({ name })),
+            } as FunctionDeclaration : undefined;
+            for (const stmt of branch.consequent) walkStmt(stmt, owner);
           } else {
             walkExpr(branch.consequent, ownerParams, ownerName);
           }
         }
         break;
+      case 'ForStatement':
+      case 'WhileStatement': {
+        const owner = ownerName ? {
+          name: { name: ownerName },
+          params: [...(ownerParams ?? [])].map(name => ({ name })),
+        } as FunctionDeclaration : undefined;
+        walkStmt(expr, owner);
+        break;
+      }
       case 'ArrayExpression':
         for (const element of expr.elements) walkExpr(element, ownerParams, ownerName);
         break;
@@ -945,10 +1003,12 @@ function inferFunctionEmitContext(
   };
 
   const walkStmt = (stmt: Statement, owner?: FunctionDeclaration): void => {
+    const ownerParams = owner ? new Set(owner.params.map((p) => p.name)) : undefined;
+    const ownerName = owner?.name.name;
     switch (stmt.type) {
       case 'FunctionDeclaration':
         if (!localVars.has(stmt.name.name)) localVars.set(stmt.name.name, []);
-        if (Array.isArray(stmt.body)) regularLocalNames.set(stmt.name.name, collectRegularLocals(stmt.body));
+        regularLocalNames.set(stmt.name.name, collectRegularLocals(stmt.body));
         paramHistory.set(stmt.name.name, new Set());
         localHistory.set(stmt.name.name, new Set());
         if (Array.isArray(stmt.body)) {
@@ -982,6 +1042,7 @@ function inferFunctionEmitContext(
         break;
       case 'IfStatement':
         walkExpr(stmt.test, owner ? new Set(owner.params.map((p) => p.name)) : undefined, owner?.name.name);
+        conditionalDepth += 1;
         for (const s of stmt.consequent) walkStmt(s, owner);
         if (stmt.alternate) {
           if (Array.isArray(stmt.alternate)) {
@@ -990,19 +1051,20 @@ function inferFunctionEmitContext(
             walkStmt(stmt.alternate, owner);
           }
         }
+        conditionalDepth -= 1;
         break;
       case 'ForStatement':
         if (stmt.kind === 'numeric') {
-          walkExpr(stmt.start);
-          walkExpr(stmt.end);
-          if (stmt.step) walkExpr(stmt.step);
+          walkExpr(stmt.start, ownerParams, ownerName);
+          walkExpr(stmt.end, ownerParams, ownerName);
+          if (stmt.step) walkExpr(stmt.step, ownerParams, ownerName);
         } else {
-          walkExpr(stmt.iterable);
+          walkExpr(stmt.iterable, ownerParams, ownerName);
         }
         for (const s of stmt.body) walkStmt(s, owner);
         break;
       case 'WhileStatement':
-        walkExpr(stmt.test);
+        walkExpr(stmt.test, ownerParams, ownerName);
         for (const s of stmt.body) walkStmt(s, owner);
         break;
       case 'MultiDeclaration':
@@ -1012,7 +1074,7 @@ function inferFunctionEmitContext(
         for (const a of stmt.assignments) walkStmt(a, owner);
         break;
       case 'MultiExpressionStatement':
-        for (const e of stmt.expressions) walkExpr(e);
+        for (const e of stmt.expressions) walkExpr(e, ownerParams, ownerName);
         break;
       case 'TypeDeclaration':
         for (const field of stmt.fields) {
@@ -1029,8 +1091,8 @@ function inferFunctionEmitContext(
     localVars.set(name, []);
     paramHistory.set(name, new Set());
     localHistory.set(name, new Set());
+    regularLocalNames.set(name, collectRegularLocals(fi.body));
     if (Array.isArray(fi.body)) {
-      regularLocalNames.set(name, collectRegularLocals(fi.body));
       const owner = {
         name: { name },
         params: fi.params.map((param) => ({ name: param })),
@@ -1043,10 +1105,10 @@ function inferFunctionEmitContext(
 
   for (const stmt of ast.body) walkStmt(stmt);
   for (const [name, fi] of funcInfos) walkFunctionInfo(name, fi);
-  return { localVars, callSites, callSiteFunctions, calledFunctions, paramHistory, localHistory };
+  return { localVars, callSites, callSiteFunctions, nestedCallSites, calledFunctions, paramHistory, deepParamHistory, conditionalCallSites, localHistory };
 }
 
-function inferRootRegularVars(ast: Program): Set<string> {
+function inferRootRegularVars(ast: Program, includeBranchDeclarations = true): Set<string> {
   const vars = new Set<string>();
   const addDeclaration = (stmt: VariableDeclaration): void => {
     if (
@@ -1079,7 +1141,7 @@ function inferRootRegularVars(ast: Program): Set<string> {
     if (stmt.type === 'VariableDeclaration') addDeclaration(stmt);
     else if (stmt.type === 'MultiDeclaration') {
       for (const declaration of stmt.declarations) addDeclaration(declaration);
-    } else if (stmt.type === 'IfStatement') {
+    } else if (includeBranchDeclarations && stmt.type === 'IfStatement') {
       addBranchDeclarations(stmt.consequent);
       if (Array.isArray(stmt.alternate)) addBranchDeclarations(stmt.alternate);
       else if (stmt.alternate) addBranchDeclarations([stmt.alternate]);
@@ -1147,7 +1209,9 @@ function inferFieldHistory(ast: Program): Map<string, Set<string>> {
         }
       }
     }
-    for (const child of Object.values(value)) {
+    for (const key of Object.keys(value)) {
+      if (key === 'loc') continue;
+      const child = (value as Record<string, unknown>)[key];
       if (Array.isArray(child)) {
         for (const item of child) visit(item);
       } else {
@@ -1159,24 +1223,74 @@ function inferFieldHistory(ast: Program): Map<string, Set<string>> {
   return fields;
 }
 
-function containsNode(root: unknown, target: object): boolean {
+function indexNodes(root: object): WeakSet<object> {
   const seen = new WeakSet<object>();
-  const visit = (node: unknown): boolean => {
-    if (!node || typeof node !== 'object') return false;
-    if (node === target) return true;
-    if (seen.has(node)) return false;
+  const visit = (node: unknown): void => {
+    if (!node || typeof node !== 'object' || seen.has(node)) return;
     seen.add(node);
-
-    for (const child of Object.values(node)) {
+    for (const key of Object.keys(node)) {
+      if (key === 'loc') continue;
+      const child = (node as Record<string, unknown>)[key];
       if (Array.isArray(child)) {
-        if (child.some((item) => visit(item))) return true;
-      } else if (visit(child)) {
-        return true;
+        for (const item of child) visit(item);
+      } else {
+        visit(child);
       }
     }
-    return false;
   };
-  return visit(root);
+  visit(root);
+  return seen;
+}
+
+function indexLocalEvaluationNodes(root: object): WeakSet<object> {
+  const seen = new WeakSet<object>();
+  const local = new WeakSet<object>();
+  const visit = (value: unknown, insideLocal: boolean): void => {
+    if (!value || typeof value !== 'object') return;
+    // Shared AST objects can first occur outside a local subtree, then inside it.
+    if (seen.has(value) && (!insideLocal || local.has(value))) return;
+    seen.add(value);
+    if (insideLocal) local.add(value);
+    const node = value as { type?: string; consequent?: unknown; alternate?: unknown; body?: unknown; cases?: unknown; right?: unknown; operator?: string };
+    const localChildren: unknown[] = [];
+    if (!insideLocal) {
+      if (node.type === 'IfStatement' || node.type === 'ConditionalExpression') {
+        localChildren.push(node.consequent, node.alternate);
+      }
+      if (['ForStatement', 'WhileStatement', 'OnceStatement', 'FunctionDeclaration'].includes(node.type ?? '')) {
+        localChildren.push(node.body);
+      }
+      if (node.type === 'SwitchExpression') localChildren.push(node.cases);
+      if (node.type === 'BinaryExpression' && ['and', 'or', '&&', '||'].includes(node.operator ?? '')) {
+        localChildren.push(node.right);
+      }
+    }
+    for (const key of Object.keys(value)) {
+      if (key === 'loc') continue;
+      const child = (value as Record<string, unknown>)[key];
+      visit(child, insideLocal || localChildren.includes(child));
+    }
+  };
+  visit(root, false);
+  return local;
+}
+
+function containsFunctionCall(root: unknown): boolean {
+  if (!root || typeof root !== 'object') return false;
+  if (Array.isArray(root)) return root.some(containsFunctionCall);
+  if ('type' in root && root.type === 'CallExpression') return true;
+  return Object.values(root).some(containsFunctionCall);
+}
+
+function writesLoopCounter(root: unknown, name: string): boolean {
+  if (!root || typeof root !== 'object') return false;
+  if (Array.isArray(root)) return root.some((child) => writesLoopCounter(child, name));
+  const node = root as Statement;
+  if (node.type === 'AssignmentStatement' && node.left.type === 'Identifier' && node.left.name === name) return true;
+  if (node.type === 'TupleAssignment' && node.names.some((target) => target.name === name)) return true;
+  if (node.type === 'ForStatement' && (node.counter.name === name || (node.kind === 'collection' && node.indexCounter?.name === name))) return true;
+  if (node.type === 'VariableDeclaration' && collectIdentifierReferences(node.names as unknown as Expression).has(name)) return true;
+  return Object.entries(root).some(([key, child]) => key !== 'loc' && writesLoopCounter(child, name));
 }
 
 function collectIdentifierReferences(expr: Expression, references = new Set<string>()): Set<string> {
@@ -1196,9 +1310,64 @@ function collectIdentifierReferences(expr: Expression, references = new Set<stri
   return references;
 }
 
-export function emit(ast: Program, ctx: AnalysisContext): string {
+export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string, Program>): string {
   const versionRules = pineVersionRules(ctx.pineVersion);
+  let literalTimestampCount: number | undefined;
+  const loopResultTypes = new WeakMap<ForStatement | WhileStatement, SemanticType[]>();
+  let recordedExpressionTypes: WeakMap<Expression | IfStatement, SemanticType> | undefined;
+  function expressionType(expression: Expression | IfStatement): SemanticType | undefined {
+    if (!recordedExpressionTypes) {
+      recordedExpressionTypes = new WeakMap();
+      checkProgram(ast, { expressionTypes: recordedExpressionTypes, loopResultTypes, libraries });
+    }
+    return recordedExpressionTypes.get(expression);
+  }
+  function expressionKind(expression: Expression | IfStatement): SemanticType['kind'] | undefined {
+    return expressionType(expression)?.kind;
+  }
+  const divisionSites = new Map<BinaryExpression, number>();
+  const additionSites = new Map<BinaryExpression, number>();
+  const subtractionOperands = new WeakMap<BinaryExpression, { left: string; right: string }>();
+  function collectAdditiveOperand(expression: Expression | IfStatement): void {
+    if (expression.type !== 'BinaryExpression' || expression.operator !== '-') return;
+    if (!additionSites.has(expression)) additionSites.set(expression, additionSites.size);
+    collectAdditiveOperand(expression.left);
+  }
+  function collectArithmeticSites(node: unknown): void {
+    if (!node || typeof node !== 'object') return;
+    const expression = node as Expression | AssignmentStatement;
+    if (expression.type === 'BinaryExpression') {
+      if (expression.operator === '/' && !divisionSites.has(expression)) divisionSites.set(expression, divisionSites.size);
+      if (expression.operator === '+') collectAdditiveOperand(expression.right);
+    }
+    if (expression.type === 'AssignmentStatement' && expression.operator === '+=') collectAdditiveOperand(expression.right);
+    for (const [key, value] of Object.entries(node)) {
+      if (key === 'loc') continue;
+      if (Array.isArray(value)) value.forEach(collectArithmeticSites);
+      else collectArithmeticSites(value);
+    }
+  }
+  collectArithmeticSites(ast);
+  for (const info of ctx.funcInfos.values()) {
+    collectArithmeticSites(info.body);
+    collectArithmeticSites(info.paramDefaults);
+  }
+  const needsAdditiveContexts = ctx.pineVersion >= 5 && additionSites.size > 0;
+  const arithmeticTypes = needsAdditiveContexts || (ctx.pineVersion >= 4 && !versionRules.constIntDivisionCanReturnFractional)
+    ? checkProgram(ast, { libraries, recordCallTypeContexts: needsAdditiveContexts }) : undefined;
+  const expressionTypes = arithmeticTypes?.expressionTypes;
+  const resolvedUserMethods = new WeakMap<CallExpression, FunctionDeclaration | null>();
+  let methodTypes: ReturnType<typeof checkProgram> | undefined;
+  if (ctx.localMethodOverloads.size > 0) {
+    recordedExpressionTypes ??= new WeakMap();
+    methodTypes = checkProgram(ast, { expressionTypes: recordedExpressionTypes, loopResultTypes, resolvedUserMethods, libraries });
+
+  }
+  const udtArrayExpressions = inferUdtArrayExpressions(ast, ctx.typeDecls, resolvedUserMethods);
+  let needsDrawingBetween = false;
+  const cachedLineReads = new Map<CallExpression, { cache: string; index: Identifier }>();
   const builtinCallCounts = new Map<string, number>();
+  const functionCallPresence = new WeakMap<FuncInfo, boolean>();
   const runtimeErrorLocStack: SourceLocation[] = [];
   const collectionVars = inferCollectionVars(ast);
   const collectionHistoryVars = inferCollectionHistoryVars(ast, collectionVars);
@@ -1210,11 +1379,62 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
     ctx.importedMethods,
     ctx.localMethodOverloads,
     ctx.importedMethodOverloads,
+    ctx.importedFunctionOwners,
+    ctx.importedLocalFunctions,
+    ctx.importedDependencyScopes,
   );
+  function isConstIntPair(left?: SemanticType, right?: SemanticType): boolean {
+    return left?.kind === 'int' && right?.kind === 'int'
+      && left.qualifier === 'const' && right.qualifier === 'const';
+  }
+
+  function arithmeticContextDescriptor(context?: SemanticExpressionTypeContext): unknown {
+    if (!context) return null;
+    return {
+      additions: Object.fromEntries([...additionSites].map(([site, id]) => [
+        id, additiveAssociationMode(context.expressionTypes.get(site)),
+      ])),
+      divisions: Object.fromEntries([...divisionSites].map(([site, id]) => [
+        id, isConstIntPair(context.expressionTypes.get(site.left), context.expressionTypes.get(site.right)),
+      ])),
+      calls: Object.fromEntries([...functionEmitContext.callSites].flatMap(([call, id]) => {
+        const child = context.callTypeContexts.get(call);
+        return child ? [[id, arithmeticContextDescriptor(child)]] : [];
+      })),
+    };
+  }
+  function methodContextDescriptor(context?: SemanticExpressionTypeContext): unknown {
+    if (!context) return null;
+    const selected = context.resolvedUserMethod;
+    const method = selected && [...ctx.funcInfos].find(([, info]) => info.body === selected.body)?.[0];
+    return {
+      method,
+      calls: Object.fromEntries([...functionEmitContext.callSites].flatMap(([call, id]) => {
+        const child = context.callTypeContexts.get(call);
+        return child ? [[id, methodContextDescriptor(child)]] : [];
+      })),
+    };
+  }
   const rootRegularVars = inferRootRegularVars(ast);
   const rootPersistentVars = inferRootPersistentVars(ast);
+  const rootDeclaredNames = new Set<string>();
+  for (const statement of ast.body) {
+    const declarations = statement.type === 'MultiDeclaration' ? statement.declarations : statement.type === 'VariableDeclaration' ? [statement] : [];
+    for (const declaration of declarations) {
+      if (declaration.names.type === 'VariableDeclarator') rootDeclaredNames.add(declaration.names.name.name);
+      else for (const name of declaration.names.names) if (name.name !== '_') rootDeclaredNames.add(name.name);
+    }
+  }
   const rootSourceAliases = inferRootSourceAliases(ast);
   const fieldHistory = inferFieldHistory(ast);
+  // A series-length lag call owns one source history across all offsets.
+  const momentumSourceHistory = new Map<TACallSite, string>();
+  for (const site of ctx.taCallSites) {
+    if (['Mom', 'ROC', 'Change'].includes(site.className) && site.dynamicCtorArgExprs) {
+      momentumSourceHistory.set(site, `_mom_source_${site.memberName}`);
+    }
+  }
+  const hasDynamicLagCalls = [...momentumSourceHistory.keys()].some((site) => site.className !== 'Mom');
   const expressionHistory = new Map<IndexExpression, string>();
   const collectExpressionHistory = (value: unknown): void => {
     if (!value || typeof value !== 'object') return;
@@ -1232,7 +1452,9 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
         expressionHistory.set(value as IndexExpression, `_expr_history_${expressionHistory.size}`);
       }
     }
-    for (const child of Object.values(value)) {
+    for (const key of Object.keys(value)) {
+      if (key === 'loc') continue;
+      const child = (value as Record<string, unknown>)[key];
       if (Array.isArray(child)) {
         for (const item of child) collectExpressionHistory(item);
       } else {
@@ -1241,9 +1463,19 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
     }
   };
   collectExpressionHistory(ast);
+  const nodeMembership = new WeakMap<object, WeakSet<object>>();
+  const containsNode = (root: unknown, target: object): boolean => {
+    if (!root || typeof root !== 'object') return false;
+    let nodes = nodeMembership.get(root);
+    if (!nodes) {
+      nodes = indexNodes(root);
+      nodeMembership.set(root, nodes);
+    }
+    return nodes.has(target);
+  };
   const expressionHistoryFunctions = new Set<string>();
   for (const [name, info] of ctx.funcInfos) {
-    if ([...expressionHistory.keys()].some((expression) => containsNode(info.body, expression))) {
+    if ([...expressionHistory.keys(), ...momentumSourceHistory.keys()].some((expression) => containsNode(info.body, "node" in expression ? expression.node : expression))) {
       expressionHistoryFunctions.add(name);
     }
   }
@@ -1254,24 +1486,42 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
       if (containsNode(fi.body, site.node)) taSiteFunctionNames.set(site, name);
     }
   }
-  const smaSourceSeries = new Map<TACallSite, string>();
-  const inlineSmaSourceSeries = new Set<TACallSite>();
+  const localEvaluationNodes = indexLocalEvaluationNodes(ast);
+  const localTASites = new Set(ctx.taCallSites.filter((site) => taSiteFunctionNames.has(site) || localEvaluationNodes.has(site.node)));
+  const dynamicWindowClasses = new Set(['Highest', 'Lowest', 'HighestBars', 'LowestBars', 'LinReg', 'Range', 'Median', 'Mode', 'PivotHigh', 'PivotLow', 'Dev', 'WMA']);
+  const taSourceSeries = new Map<TACallSite, string>();
+  const inlineTASourceSeries = new Set<TACallSite>();
+  const sourceSeriesSMASites = ctx.taCallSites.filter((site) => site.className === 'SMA'
+    && !localTASites.has(site) && !taSiteFunctionNames.has(site));
+  const fixedLengthSMASites = new Set(sourceSeriesSMASites.filter((site) => {
+    const length = site.dynamicCtorArgExprs?.[0];
+    const qualifier = length && expressionType(length)?.qualifier;
+    return !length || qualifier === 'const' || qualifier === 'input' || qualifier === 'simple';
+  }));
   for (const site of ctx.taCallSites) {
-    if (site.className === 'SMA' && !taSiteFunctionNames.has(site) && site.computeArgExprs[0]?.type !== 'Identifier') {
-      smaSourceSeries.set(site, `_ta_source_${site.memberName.replace(/^_ta_/, '')}`);
+    if (site.dynamicCtorArgExprs && dynamicWindowClasses.has(site.className)) {
+      taSourceSeries.set(site, `_ta_source_${site.memberName.replace(/^_ta_/, '')}`);
+      inlineTASourceSeries.add(site);
+    }
+    if (site.className === 'SMA' && !localTASites.has(site) && !taSiteFunctionNames.has(site) && site.computeArgExprs[0]?.type !== 'Identifier') {
+      taSourceSeries.set(site, `_ta_source_${site.memberName.replace(/^_ta_/, '')}`);
       const references = collectIdentifierReferences(site.computeArgExprs[0]);
       if ([...references].some((name) => rootRegularVars.has(name) || ctx.seriesVars.has(name))) {
-        inlineSmaSourceSeries.add(site);
+        inlineTASourceSeries.add(site);
       }
     }
   }
 
   const lines: string[] = [];
+  const udtFactories = new Map<string, { member: string; names: string[]; varip: string[] }>();
   const indent = (n: number) => '  '.repeat(n);
   let fixnanIndex = 0;
   let indexedTAResultIndex = 0;
   let loopId = 0;
   const localNameStack: Map<string, string>[] = [];
+  const nonnegativeIntegerLoopCounters = new Set<string>();
+  const pendingRootShadows = new WeakMap<Map<string, string>, Set<string>>();
+  let rootShadowIndex = 0;
   const localSourceNameStack: Map<string, string>[] = [];
   const localHistoryNameStack: Map<string, string>[] = [];
   const persistentLocalStack: Map<string, string>[] = [];
@@ -1280,6 +1530,110 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
   const rootBlockPersistentInitByValue = new Map<string, string>();
   const functionNameStack: string[] = [];
   const functionStateNameStack: string[] = [];
+  const globalEnumValueTypes = new Map<string, string>();
+  const localEnumValueTypes = new WeakMap<Map<string, string>, Map<string, string>>();
+  const enumTypeNames = new Set([...ctx.enumValues.keys(), ...ctx.importedEnumValues.keys()].map((name) => name.slice(0, name.lastIndexOf('.'))));
+  const enumTitlesByValue = Object.fromEntries([
+    ...[...ctx.enumValues].map(([name, value]) => [value, ctx.enumTitles.get(name)]),
+    ...[...ctx.importedEnumValues].map(([name, value]) => [value, ctx.importedEnumTitles.get(name)]),
+  ]);
+
+  function enumVariableScope(name: string): Map<string, string> | undefined {
+    for (const scopes of [localNameStack, persistentLocalStack]) {
+      for (let i = scopes.length - 1; i >= 0; i--) {
+        if (scopes[i].has(name)) return scopes[i];
+      }
+    }
+    return undefined;
+  }
+
+  function enumRelatedAnnotationType(annotation?: TypeAnnotation | null): string | undefined {
+    if (annotation?.baseType === 'udt') return annotation.name;
+    if (annotation?.baseType === 'array') return `array<${annotation.elementType}>`;
+    return undefined;
+  }
+
+  function enumRelatedValueType(expr: Expression | IfStatement, bindings?: Map<string, string>, activeFunctions = new Set<string>()): string | undefined {
+    if (expr.type === 'Identifier') {
+      if (bindings?.has(expr.name)) return bindings.get(expr.name) || undefined;
+      const scope = enumVariableScope(expr.name);
+      return scope ? localEnumValueTypes.get(scope)?.get(expr.name) : globalEnumValueTypes.get(expr.name);
+    }
+    if (expr.type === 'MemberExpression') {
+      const name = getMemberChainName(expr);
+      if (name && (ctx.enumValues.has(name) || ctx.importedEnumValues.has(name))) return name.slice(0, name.lastIndexOf('.'));
+      const typeName = enumRelatedValueType(expr.object, bindings, activeFunctions);
+      const field = typeName ? ctx.typeDecls.get(typeName)?.node.fields.find((field) => field.name.name === expr.property.name) : undefined;
+      return enumRelatedAnnotationType(field?.typeAnnotation);
+    }
+    if (expr.type === 'ConditionalExpression') {
+      const consequent = enumRelatedValueType(expr.consequent, bindings, activeFunctions);
+      const alternate = enumRelatedValueType(expr.alternate, bindings, activeFunctions);
+      if (expr.alternate.type === 'NaExpression') return consequent;
+      if (expr.consequent.type === 'NaExpression') return alternate;
+      return consequent === alternate ? consequent : undefined;
+    }
+    if (expr.type === 'IndexExpression') return enumRelatedValueType(expr.object, bindings, activeFunctions);
+    if (expr.type !== 'CallExpression') return undefined;
+    const name = getMemberChainName(expr.callee);
+    if (name === 'input.enum') {
+      const defval = orderedArgExpression(expr.arguments, ['defval'], 'defval', 0);
+      return defval ? enumRelatedValueType(defval, bindings, activeFunctions) : undefined;
+    }
+    if (name === 'array.new') return expr.typeArguments?.[0] ? `array<${expr.typeArguments[0]}>` : undefined;
+    if (name === 'array.from') {
+      const types = expr.arguments.map((arg) => enumRelatedValueType(arg.value, bindings, activeFunctions));
+      return types[0] && types.every((type) => type === types[0]) ? `array<${types[0]}>` : undefined;
+    }
+    const receiver = name === 'array.get'
+      ? orderedArgExpression(expr.arguments, ['id', 'index'], 'id', 0)
+      : expr.callee.type === 'MemberExpression' && expr.callee.property.name === 'get' ? expr.callee.object : undefined;
+    if (receiver) {
+      const type = enumRelatedValueType(receiver, bindings, activeFunctions);
+      if (type?.startsWith('array<')) return type.slice(6, -1);
+    }
+    if (name?.endsWith('.new') && ctx.typeDecls.has(name.slice(0, -4))) return name.slice(0, -4);
+    const functionNames = functionEmitContext.callSiteFunctions.get(expr) ?? (name && ctx.funcInfos.has(name) ? [name] : []);
+    const returnTypes = functionNames.map((functionName) => {
+      const info = ctx.funcInfos.get(functionName);
+      if (!info || activeFunctions.has(functionName)) return undefined;
+      const nestedActive = new Set([...activeFunctions, functionName]);
+      const locals = new Map(info.params.map((param, index) => [param, enumRelatedAnnotationType(info.paramTypeAnnotations[index]) ?? '']));
+      if (!Array.isArray(info.body)) return enumRelatedValueType(info.body, locals, nestedActive);
+      for (const statement of info.body) {
+        const declarations = statement.type === 'VariableDeclaration' ? [statement] : statement.type === 'MultiDeclaration' ? statement.declarations : [];
+        for (const declaration of declarations) {
+          if (declaration.names.type === 'VariableDeclarator') {
+            locals.set(declaration.names.name.name, enumRelatedAnnotationType(declaration.typeAnnotation) ?? enumRelatedValueType(declaration.init, locals, nestedActive) ?? '');
+          }
+        }
+      }
+      const tail = info.body.at(-1);
+      return tail?.type === 'ExpressionStatement' ? enumRelatedValueType(tail.expression, locals, nestedActive) : undefined;
+    });
+    return returnTypes[0] && returnTypes.every((type) => type === returnTypes[0]) ? returnTypes[0] : undefined;
+  }
+
+  function isEnumValue(expr: Expression | IfStatement): boolean {
+    const type = enumRelatedValueType(expr);
+    return type !== undefined && enumTypeNames.has(type);
+  }
+
+  function registerEnumVariable(stmt: VariableDeclaration): void {
+    if (stmt.names.type !== 'VariableDeclarator') return;
+    const type = enumRelatedAnnotationType(stmt.typeAnnotation) ?? enumRelatedValueType(stmt.init);
+    const name = stmt.names.name.name;
+    const scope = enumVariableScope(name);
+    const vars = scope ? (localEnumValueTypes.get(scope) ?? new Map<string, string>()) : globalEnumValueTypes;
+    if (scope) localEnumValueTypes.set(scope, vars);
+    if (type) vars.set(name, type);
+    else vars.delete(name);
+  }
+
+  for (const stmt of ast.body) {
+    if (stmt.type === 'VariableDeclaration') registerEnumVariable(stmt);
+    else if (stmt.type === 'MultiDeclaration') stmt.declarations.forEach(registerEnumVariable);
+  }
 
   function currentFunctionStateName(): string {
     return functionStateNameStack[functionStateNameStack.length - 1] ?? '_state';
@@ -1287,15 +1641,17 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
 
   function sameImportedLibraryFunctionName(calleeName: string): string | undefined {
     const currentFunctionName = functionNameStack[functionNameStack.length - 1];
-    if (!currentFunctionName?.includes('__')) return undefined;
-    const alias = currentFunctionName.split('__')[0];
-    const candidate = `${alias}__${calleeName}`;
-    return ctx.funcInfos.has(candidate) ? candidate : undefined;
+    const alias = currentFunctionName ? ctx.importedFunctionOwners.get(currentFunctionName) : undefined;
+    return alias ? ctx.importedLocalFunctions.get(`${alias}.${calleeName}`) : undefined;
+  }
+
+  function importedMemberName(name: string): string {
+    return resolveDependencyMember(name, functionNameStack[functionNameStack.length - 1], ctx.importedDependencyScopes);
   }
 
   function currentImportedAlias(): string | undefined {
     const currentFunctionName = functionNameStack[functionNameStack.length - 1];
-    return currentFunctionName?.includes('__') ? currentFunctionName.split('__')[0] : ctx.importedAliasContext;
+    return (currentFunctionName ? ctx.importedFunctionOwners.get(currentFunctionName) : undefined) ?? ctx.importedAliasContext;
   }
 
   function sameImportedLibraryTypeName(typeName: string): string | undefined {
@@ -1319,6 +1675,8 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
   }
 
   function resolveUserFunctionCallName(functionName: string, expr: CallExpression): string | undefined {
+    const resolved = ctx.resolvedUserFunctionCalls.get(expr);
+    if (resolved) return resolved;
     const overloads = ctx.userFunctionOverloads.get(functionName);
     if (overloads && overloads.length > 0) {
       const compatible = overloads.filter((name) => !validateUserFunctionCall(name, expr, 0, false));
@@ -1331,6 +1689,38 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
     return compatibleMethods.length === 1 ? compatibleMethods[0]!.internalName : undefined;
   }
 
+  function emitFunctionSyntaxMethodCall(name: string, expr: CallExpression): string | undefined {
+    const methods = (ctx.localMethodOverloads.get(name) ?? [])
+      .filter(overload => !validateUserFunctionCall(overload.internalName, expr, 0, true));
+    if (methods.length === 0) return undefined;
+
+    // Evaluate provided arguments once, including when the regular function is
+    // the fallback. Dispatching on the first argument must not repeat side effects.
+    const argumentValues = new Map<Expression, string>();
+    const callSiteId = functionEmitContext.callSites.get(expr) ?? 'x';
+    const setup = expr.arguments.map((arg, index) => {
+      const temporary = `_function_method_arg_${callSiteId}_${index}`;
+      argumentValues.set(arg.value, temporary);
+      return `const ${temporary} = ${emitExpr(arg.value)};`;
+    }).join(' ');
+    const branches = methods.flatMap(overload => {
+      const params = ctx.funcInfos.get(overload.internalName)!.params;
+      const receiver = orderedArgExpression(expr.arguments, params, params[0], 0);
+      const value = receiver && argumentValues.get(receiver);
+      if (!value) return [];
+      const condition = localReceiverCondition(value, overload.receiverType);
+      const call = emitUserFunctionCall(overload.internalName, expr, undefined, argumentValues);
+      return [`if (${condition}) return ${call};`];
+    });
+    const regularFunction = ctx.funcInfos.has(name) || ctx.userFunctionOverloads.has(name)
+      ? resolveUserFunctionCallName(name, expr)
+      : undefined;
+    const fallback = regularFunction
+      ? emitUserFunctionCall(regularFunction, expr, undefined, argumentValues)
+      : runtimeErrorExpr(`No method overload matched function call ${name}`);
+    return `(() => { ${setup} ${branches.join(' ')} return ${fallback}; })()`;
+  }
+
   function importedFunctionDisplayName(internalName: string): string | undefined {
     for (const [displayName, name] of ctx.importedFunctions) {
       if (name === internalName) return displayName;
@@ -1340,10 +1730,10 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
 
   function importedMethodDisplayName(internalName: string): string | undefined {
     for (const [methodName, name] of ctx.importedMethods) {
-      if (name === internalName) return `${internalName.split('__')[0]}.${methodName}`;
+      if (name === internalName) return `${ctx.importedFunctionOwners.get(internalName)}.${methodName}`;
     }
     for (const [methodName, overloads] of ctx.importedMethodOverloads) {
-      if (overloads.some((overload) => overload.internalName === internalName)) return `${internalName.split('__')[0]}.${methodName}`;
+      if (overloads.some((overload) => overload.internalName === internalName)) return `${ctx.importedFunctionOwners.get(internalName)}.${methodName}`;
     }
     return undefined;
   }
@@ -1379,11 +1769,13 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
   }
 
   function callSiteNeedsState(callExpr: CallExpression): boolean {
+    if (functionEmitContext.nestedCallSites.has(callExpr)) return false;
     const names = functionEmitContext.callSiteFunctions.get(callExpr) ?? [];
     return names.some((name) => functionNeedsState(name));
   }
 
   function callSiteHistoryParams(callExpr: CallExpression): string[] {
+    if (functionEmitContext.nestedCallSites.has(callExpr)) return [];
     const names = functionEmitContext.callSiteFunctions.get(callExpr) ?? [];
     const params = new Set<string>();
     for (const name of names) {
@@ -1393,6 +1785,7 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
   }
 
   function callSiteHistoryLocals(callExpr: CallExpression): string[] {
+    if (functionEmitContext.nestedCallSites.has(callExpr)) return [];
     const names = functionEmitContext.callSiteFunctions.get(callExpr) ?? [];
     const locals = new Set<string>();
     for (const name of names) {
@@ -1409,25 +1802,69 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
     return usesPineFloorModulo() ? `_mod(${left}, ${right})` : `(${left} % ${right})`;
   }
 
-  function emitCompoundAssignmentExpr(current: string, operator: AssignmentStatement['operator'], rhs: string): string {
-    if (operator === '%=') return emitModuloExpr(current, rhs);
-    const op = operator.charAt(0);
-    return `(${current} ${op} ${rhs})`;
+  function emitDivisionExpr(left: string, right: string): string {
+    return ctx.pineVersion === 5 ? `(${left} / _divisionDenominator(${right}))` : `(${left} / ${right})`;
   }
 
-  function emitAssignmentLine(pad: string, target: string, operator: AssignmentStatement['operator'], rhs: string): void {
+  function isUngroupedAdditiveExpression(expression: AssignmentStatement['right']): boolean {
+    return expression.type === 'BinaryExpression' && !expression.parenthesized && ['+', '-'].includes(expression.operator);
+  }
+
+  function additiveAssociationMode(type?: SemanticType): number {
+    if (type?.kind !== 'float') return -1;
+    if (type.qualifier === 'const') return 0;
+    return type.qualifier === 'series' ? 1 : -1;
+  }
+
+  function emitAssociatedAddition(current: string, expression: BinaryExpression): string {
+    const operands = subtractionOperands.get(expression)!;
+    const groupedLeft = `(${current} + ${operands.left})`;
+    const left = expression.left.type === 'BinaryExpression' && expression.left.operator === '-'
+      ? emitAddition(current, operands.left, expression.left, groupedLeft)
+      : groupedLeft;
+    return `(${left} - ${operands.right})`;
+  }
+
+  function emitAddition(current: string, rhs: string, expression: Expression | IfStatement, fallback: string): string {
+    if (ctx.pineVersion < 5 || expression.type !== 'BinaryExpression' || expression.operator !== '-') return fallback;
+    const grouped = `(${current} + ${rhs})`;
+    const associated = emitAssociatedAddition(current, expression);
+    if (functionNameStack.length > 0) {
+      const mode = `_arithmeticContext?.additions[${additionSites.get(expression)}]`;
+      return `(${mode} === 1 ? ${associated} : ${mode} === 0 ? ${grouped} : ${fallback})`;
+    }
+    const mode = additiveAssociationMode(expressionTypes?.get(expression));
+    return mode === 1 ? associated : mode === 0 ? grouped : fallback;
+  }
+
+  function emitCompoundAssignmentExpr(current: string, operator: AssignmentStatement['operator'], rhs: string, expression: AssignmentStatement['right']): string {
+    if (operator === '%=') return emitModuloExpr(current, rhs);
+    if (operator === '/=') return emitDivisionExpr(current, rhs);
+    if (operator === '+=' && expression.type === 'BinaryExpression' && expression.operator === '-' && !expression.parenthesized
+      && !isUngroupedAdditiveExpression(expression.left) && !isUngroupedAdditiveExpression(expression.right)) {
+      // Binary arithmetic emission wraps the whole RHS once; preserve each operand's grouping.
+      return emitAddition(current, rhs, expression, `(${current} + ${rhs.slice(1, -1)})`);
+    }
+    const op = operator.charAt(0);
+    const fallback = `(${current} ${op} ${rhs})`;
+    return operator === '+=' ? emitAddition(current, rhs, expression, fallback) : fallback;
+  }
+
+  function emitAssignmentLine(pad: string, target: string, operator: AssignmentStatement['operator'], rhs: string, expression: AssignmentStatement['right']): void {
     if (operator === ':=') {
       lines.push(`${pad}${target} = ${rhs};`);
       return;
     }
-    if (operator === '%=' && usesPineFloorModulo()) {
-      lines.push(`${pad}${target} = ${emitModuloExpr(target, rhs)};`);
-      return;
-    }
-    lines.push(`${pad}${target} ${operator} ${rhs};`);
+    lines.push(`${pad}${target} = ${emitCompoundAssignmentExpr(target, operator, rhs, expression)};`);
   }
 
   function emitExpr(expr: Expression): string {
+    if (ctx.discardedFootprintCalls?.has(expr)) return 'NaN';
+    const value = emitExprValue(expr);
+    return udtArrayExpressions.has(expr) ? `deps._arr.withUdtElementType(${value})` : value;
+  }
+
+  function emitExprValue(expr: Expression): string {
     const comparisonHelpers = ctx.pineVersion === 5
       ? { eq: '_eqLegacyNa', neq: '_neqLegacyNa', cmp: '_cmpLegacyNa' }
       : { eq: '_eq', neq: '_neq', cmp: '_cmp' };
@@ -1452,11 +1889,31 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
       case 'BinaryExpression': {
         const left = emitExpr(expr.left);
         const right = emitExpr(expr.right);
+        if (expr.operator === '-') subtractionOperands.set(expr, { left, right });
         switch (expr.operator) {
-          case 'and':
-            return `(_isTruthy(${left}) ? _isTruthy(${right}) : false)`;
+          case '+':
+            return emitAddition(left, right, expr.right, `(${left} + ${right})`);
+          case 'and': {
+            if (!versionRules.usesLazyLogicalOperators && expr.left.type === 'BinaryExpression' && expr.right.type === 'BinaryExpression'
+              && expr.left.left.type === 'CallExpression' && expr.right.left.type === 'CallExpression') {
+              const firstRead = cachedLineReads.get(expr.left.left);
+              const secondRead = cachedLineReads.get(expr.right.left);
+              const first = /^_cmpLegacyNa\((.+), (this\._s_(?:high|low)\.get\((?:0|_historyOffset\(\w+\))\)), "<="\)$/.exec(left);
+              const second = /^_cmpLegacyNa\((.+), (this\._s_(?:high|low)\.get\((?:0|_historyOffset\(\w+\))\)), ">="\)$/.exec(right);
+              if (firstRead && secondRead && firstRead.cache === secondRead.cache
+                && firstRead.index.name === secondRead.index.name && first && second && first[1] === second[1]) {
+                needsDrawingBetween = true;
+                return `_betweenLegacyNa(${first[1]}, ${first[2]}, ${second[2]})`;
+              }
+            }
+            return versionRules.usesLazyLogicalOperators
+              ? `(_isTruthy(${left}) ? _isTruthy(${right}) : false)`
+              : `_and(${left}, ${right})`;
+          }
           case 'or':
-            return `(_isTruthy(${left}) ? true : _isTruthy(${right}))`;
+            return versionRules.usesLazyLogicalOperators
+              ? `(_isTruthy(${left}) ? true : _isTruthy(${right}))`
+              : `_or(${left}, ${right})`;
           case '==':
             return `${comparisonHelpers.eq}(${left}, ${right})`;
           case '!=':
@@ -1468,6 +1925,27 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
             return `${comparisonHelpers.cmp}(${left}, ${right}, "${expr.operator}")`;
           case '%':
             return emitModuloExpr(left, right);
+          case '/': {
+            if (ctx.pineVersion >= 6) {
+              const numerator = extractStaticNumber(expr.left);
+              const denominator = extractStaticNumber(expr.right);
+              if (numerator !== null && denominator !== null) {
+                const quotient = numerator / denominator;
+                if (Number.isFinite(quotient) && quotient !== 0) return String(Number(quotient.toPrecision(16)));
+              }
+            }
+            const leftType = expressionTypes?.get(expr.left);
+            const rightType = expressionTypes?.get(expr.right);
+            if (ctx.pineVersion >= 4 && !versionRules.constIntDivisionCanReturnFractional) {
+              const divide = `this._deps.constIntDivide(${left}, ${right})`;
+              if (functionNameStack.length > 0 && divisionSites.has(expr)) {
+                return `(_arithmeticContext?.divisions[${divisionSites.get(expr)}] ? ${divide} : ${emitDivisionExpr(left, right)})`;
+
+              }
+              if (isConstIntPair(leftType, rightType)) return divide;
+            }
+            return emitDivisionExpr(left, right);
+          }
           default:
             return `(${left} ${expr.operator} ${right})`;
         }
@@ -1483,8 +1961,16 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
         return emitCallExpr(expr);
       case 'MemberExpression':
         return emitMemberExpr(expr);
-      case 'IndexExpression':
-        return emitIndexExpr(expr);
+      case 'IndexExpression': {
+        const history = emitIndexExpr(expr);
+        if (versionRules.allowsBoolNaHelpers) return history;
+        const kind = expressionKind(expr.object);
+        if (kind === 'bool') return `_boolHistory(${history})`;
+        if (kind === 'unknown' && expr.object.type === 'Identifier') {
+          return `_boolHistory(${history}, typeof ${emitIdentifier(expr.object)} === "boolean")`;
+        }
+        return history;
+      }
       case 'ArrayExpression':
         return `deps._arr.from(${expr.elements.map(emitExpr).join(', ')})`;
       case 'LambdaExpression':
@@ -1516,7 +2002,7 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
     if (rootRegularVars.has(name)) return `this.${jsStateMember('_g_', name)}`;
     if (name === 'bar_index') return 'ctx.barIndex';
     if (name === 'last_bar_index') return 'ctx.lastBarIndex';
-    if (name in BAR_FIELDS) return `this.${BAR_FIELDS[name]}.get(0)`;
+    if (name in BAR_FIELDS) return `this.${BAR_FIELDS[name]}.current()`;
     if (name === 'hl2') return '((ctx.bar.high + ctx.bar.low) / 2)';
     if (name === 'hlc3') return '((ctx.bar.high + ctx.bar.low + ctx.bar.close) / 3)';
     if (name === 'ohlc4') return '((ctx.bar.open + ctx.bar.high + ctx.bar.low + ctx.bar.close) / 4)';
@@ -1529,11 +2015,16 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
     if (name === 'math') return 'Math';
     if (ctx.capturedParams.has(name)) return `ctx.capture("${name}")`;
     if (LEGACY_INPUT_TYPE_ALIASES.has(name)) return JSON.stringify(LEGACY_INPUT_TYPE_ALIASES.get(name));
-    if (Object.prototype.hasOwnProperty.call(LEGACY_BARE_COLOR_CONSTANTS, name)) return JSON.stringify(LEGACY_BARE_COLOR_CONSTANTS[name]);
+    const color = pineColorConstant(name, ctx.pineVersion);
+    if (color) return JSON.stringify(color);
     if (LEGACY_BARE_VISUAL_CONSTANTS.has(name)) return JSON.stringify(name);
     if (name === 'ticker') return 'ctx.syminfo.ticker';
-    if (name === 'tickerid') return '(ctx.syminfo.tickerid ?? ctx.syminfo.ticker)';
+    if (name === 'period' && ctx.pineVersion < 4) return 'ctx.timeframe.period';
+    if (name === 'tickerid' && ctx.pineVersion < 4) return '(ctx.syminfo.tickerid ?? ctx.syminfo.ticker)';
     if (name === 'n') return 'ctx.barIndex';
+    if (versionRules.supportsLegacyTimeframeVariableAliases && name === 'isintraday') return 'ctx.timeframe.isintraday';
+    if (versionRules.supportsLegacyTimeframeVariableAliases && name === 'interval') return 'ctx.timeframe.multiplier';
+    if (name === 'sunday' && pineVersionRules(ctx.pineVersion).supportsLegacySundayConstant) return String(DAYOFWEEK_CONSTANTS.sunday);
     if (name === 'tr') return emitTrueRangeMemberValue();
     return jsPineName(name);
   }
@@ -1555,10 +2046,24 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
 
   function currentLocalName(name: string): string | undefined {
     for (let i = localNameStack.length - 1; i >= 0; i--) {
+      if (pendingRootShadows.get(localNameStack[i])?.has(name)) continue;
       const localName = localNameStack[i].get(name);
       if (localName) return localName;
     }
     return undefined;
+  }
+
+  function declarationLocalName(name: string): string | undefined {
+    return localNameStack[localNameStack.length - 1]?.get(name) ?? currentLocalName(name);
+  }
+
+  function activateLocalDeclaration(name: string): void {
+    const scope = localNameStack[localNameStack.length - 1];
+    if (scope) pendingRootShadows.get(scope)?.delete(name);
+  }
+
+  function isRootGlobalShadow(name: string): boolean {
+    return functionNameStack.length === 0 && rootDeclaredNames.has(name) && Boolean(currentLocalName(name));
   }
 
   function currentLocalSourceName(name: string): string | undefined {
@@ -1640,25 +2145,44 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
   }
 
   function emitRootLocalSeriesWrite(pad: string, name: string, valueExpr: string, readsOwnHistory = false): void {
-    if (functionNameStack.length === 0 && ctx.seriesVars.has(name)) {
+    if (functionNameStack.length === 0 && ctx.seriesVars.has(name) && !isRootGlobalShadow(name)) {
       emitSeriesVarWrite(pad, name, valueExpr, readsOwnHistory);
     }
   }
 
-  function emitSourceDescriptor(expr: Expression | undefined): string {
-    if (!expr || expr.type !== 'Identifier') return 'undefined';
-    const forwarded = currentLocalSourceName(expr.name);
-    if (forwarded) return forwarded;
-    if (ctx.capturedParams.has(expr.name)) return `ctx.captureSource("${expr.name}")`;
-    const rootAlias = rootSourceAliases.get(expr.name);
-    if (rootAlias && rootAlias !== expr) return emitSourceDescriptor(rootAlias);
-    return expr.name in BAR_FIELDS || expr.name === 'hl2' || expr.name === 'hlc3' || expr.name === 'ohlc4' || expr.name === 'hlcc4'
-      ? `{"kind":"series","name":${JSON.stringify(expr.name)}}`
-      : 'undefined';
+  function functionRequestsData(name: string, seen = new Set<string>()): boolean {
+    if (seen.has(name)) return false;
+    seen.add(name);
+    return ctx.securitySites.some((site) => site.ownerFunctionName === name)
+      || [...(functionEmitContext.calledFunctions.get(name) ?? [])].some((callee) => functionRequestsData(callee, seen));
+  }
+
+  function emitSourceDescriptor(expr: Expression | undefined, replayExpression = false): string {
+    if (!expr) return 'undefined';
+    if (expr.type === 'Identifier') {
+      const forwarded = currentLocalSourceName(expr.name);
+      if (forwarded) return forwarded;
+      if (ctx.capturedParams.has(expr.name)) return `ctx.captureSource("${expr.name}")`;
+      const localCapture = ctx.requestSourceCaptures.get(expr)?.params.includes(expr.name);
+      const rootAlias = rootSourceAliases.get(expr.name);
+      if (!localCapture && rootAlias && rootAlias !== expr) return emitSourceDescriptor(rootAlias, replayExpression);
+      if (!localCapture && (expr.name in BAR_FIELDS || ['hl2', 'hlc3', 'ohlc4', 'hlcc4'].includes(expr.name))) {
+        return `{"kind":"series","name":${JSON.stringify(expr.name)}}`;
+      }
+    }
+    if (!replayExpression) return 'undefined';
+    let site = ctx.requestSourceSites.get(expr);
+    if (!site) {
+      const captures = ctx.requestSourceCaptures.get(expr) ?? { params: [], locals: [] };
+      site = { id: ctx.requestSourceSites.size, expression: expr, ownerFunctionName: functionNameStack.at(-1), ...captures };
+      ctx.requestSourceSites.set(expr, site);
+    }
+    return `ctx.requestSource(${site.id}, ${emitRequestCaptureObject(site.params)})`;
   }
 
   function emitCaptureDescriptor(param: string): string {
-    const source = currentLocalSourceName(param);
+    const source = currentLocalSourceName(param)
+      ?? (ctx.capturedParams.has(param) ? `ctx.captureSource("${param}")` : undefined);
     const resolved = currentLocalName(param) ?? currentPersistentLocalName(param);
     const value = resolved
       ?? (param in BAR_FIELDS ? `this.${BAR_FIELDS[param]}.get(0)` : undefined)
@@ -1666,14 +2190,20 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
       ?? (ctx.varDecls.some((v) => v.name === param) ? `this.${jsStateMember('_v_', param)}` : undefined)
       ?? (rootRegularVars.has(param) ? `this.${jsStateMember('_g_', param)}` : undefined)
       ?? (ctx.capturedParams.has(param) && functionNameStack.length === 0 ? `ctx.capture("${param}")` : jsPineName(param));
+    const scope = functionNameStack.length > 0 ? currentFunctionStateName() : 'this';
     return source
-      ? `{kind:"capture", value:${value}, source:${source}}`
-      : `{kind:"capture", value:${value}}`;
+      ? `{kind:"capture", value:${value}, source:${source}, scope:${scope}}`
+      : `{kind:"capture", value:${value}, scope:${scope}}`;
   }
 
-  function emitRequestCaptureObject(params: string[] | undefined): string {
+  function emitRequestCaptureObject(params: string[] | undefined, independentRequests?: Map<string, Expression>): string {
     if (!params || params.length === 0) return 'undefined';
-    return `{${params.map((param) => `${JSON.stringify(param)}:${emitCaptureDescriptor(param)}`).join(',')}}`;
+    return `{${params.map((param) => {
+      const request = independentRequests?.get(param);
+      const scope = functionNameStack.length > 0 ? currentFunctionStateName() : 'this';
+      const descriptor = request ? `{kind:"capture", value:${emitExpr(request)}, scope:${scope}}` : emitCaptureDescriptor(param);
+      return `${JSON.stringify(param)}:${descriptor}`;
+    }).join(',')}}`;
   }
 
   function currentPersistentLocalName(name: string): string | undefined {
@@ -1688,6 +2218,7 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
     return ctx.seriesVars.has(name) && (
       rootRegularVars.has(name)
       || rootPersistentVars.has(name)
+      || ctx.capturedParams.has(name)
       || Boolean(currentLocalName(name))
       || Boolean(currentPersistentLocalName(name))
     );
@@ -1750,7 +2281,8 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
   registerRootBlockPersistentDeclarations(ast.body);
 
   function emitMemberExpr(expr: MemberExpression): string {
-    const chainName = getMemberChainName(expr);
+    const rawChainName = getMemberChainName(expr);
+    const chainName = rawChainName ? importedMemberName(rawChainName) : undefined;
     if (chainName) {
       const enumValue = ctx.enumValues.get(chainName);
       if (enumValue) return JSON.stringify(enumValue);
@@ -1767,7 +2299,10 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
     if (expr.object.type === 'Identifier') {
       const ns = expr.object.name;
       const prop = expr.property.name;
-      const fullName = `${ns}.${prop}`;
+      const fullName = importedMemberName(`${ns}.${prop}`);
+      if (ns === 'size' && expressionKind(expr.object) === 'udt') {
+        return `_getField(${emitExpr(expr.object)}, "${prop}")`;
+      }
 
       const importedConstant = ctx.importedConstants.get(fullName);
       if (importedConstant) return emitExpr(importedConstant);
@@ -1786,20 +2321,25 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
       const taVarSite = ctx.taVarSiteMap.get(expr);
       if (taVarSite) return `this.${taVarSite.seriesName}.get(0)`;
       if (DRAWING_NAMESPACES.has(ns) && prop === 'all') {
-        return `deps._arr.from(...ctx.callBuiltin("${fullName}", [], {}, "${nextBuiltinCallId(fullName)}"))`;
+        return `deps._arr.readOnlyFrom(...ctx.callBuiltin("${fullName}", [], {}, ${nextBuiltinCallId(fullName)}))`;
       }
       if (ns === 'math' && fullName in MATH_FUNCS) return MATH_FUNCS[fullName];
       if (ns === 'strategy') return `ctx.strategyProp("${prop}")`;
-      if (ns === 'color') return `"${prop}"`;
+      if (ns === 'color') return JSON.stringify(pineColorConstant(prop, ctx.pineVersion) ?? prop);
       if (ns === 'shape') return `"${prop}"`;
       if (ns === 'plotshape') return `"plotshape.${prop}"`;
       if (ns === 'location') return `"${prop}"`;
       if (ns === 'size') return `"${prop}"`;
+      if (fullName === 'plot.style_columns' && versionRules.columnsStyleNumericValue !== undefined) {
+        return String(versionRules.columnsStyleNumericValue);
+      }
       if (ns === 'plot') return `"plot.${prop}"`;
       if (ns === 'display') return prop in DISPLAY_CONSTANTS ? String(DISPLAY_CONSTANTS[prop]) : `"${prop}"`;
       if (ns === 'format') return `"${prop}"`;
       if (ns === 'scale') return `"${prop}"`;
       if (ns === 'currency') return `"${prop}"`;
+      const forecast = CORPORATE_FORECAST_MEMBERS[fullName];
+      if (forecast) return `ctx.syminfo.${forecast.field}`;
       if (ns === 'dividends') return `"dividends.${prop}"`;
       if (ns === 'earnings') return `"earnings.${prop}"`;
       if (ns === 'splits') return `"splits.${prop}"`;
@@ -1823,35 +2363,36 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
       if (ns === 'barmerge') return `"barmerge.${prop}"`;
       if (ns === 'dayofweek' && prop in DAYOFWEEK_CONSTANTS) return String(DAYOFWEEK_CONSTANTS[prop]);
       if (ns === 'input') return `"${prop}"`;
-      if (BUILTIN_NAMESPACES.has(ns)) return `ctx.callBuiltin("${fullName}", [], {}, "${nextBuiltinCallId(fullName)}")`;
+      if (BUILTIN_NAMESPACES.has(ns)) return `ctx.callBuiltin("${fullName}", [], {}, ${nextBuiltinCallId(fullName)})`;
     }
     return `_getField(${emitExpr(expr.object)}, "${expr.property.name}")`;
   }
 
   function emitIndexExpr(expr: IndexExpression): string {
     const idx = emitExpr(expr.index);
+    const historyIdx = nonnegativeIntegerLoopCounters.has(idx) ? idx : `_historyOffset(${idx})`;
     if (expr.object.type === 'CallExpression') {
       const taSite = ctx.taCallSiteMap.get(expr.object);
       if (taSite) {
         const tmp = `_ta_indexed_${indexedTAResultIndex++}`;
         const series = isFunctionScopedTASite(taSite)
-          ? `this._scopedTASeries(${currentFunctionStateName()}, "${taSite.memberName}")`
+          ? `this._scopedTASeries(${currentFunctionStateName()}, "${taSite.memberName}", ${taSite.className === 'PivotPointLevels'})`
           : `this._ta_result_${taSite.memberName}`;
-        return `(() => { const ${tmp} = ${emitTACall(taSite, expr.object)}; const _series = ${series}; _series.push(${tmp}); return _series.get(${idx}); })()`;
+        return `(() => { const ${tmp} = ${emitTACall(taSite, expr.object)}; const _series = ${series}; _series.push(${tmp}); return _series.get(${historyIdx}); })()`;
       }
     }
     if (expr.object.type === 'MemberExpression') {
       const chainName = getMemberChainName(expr.object);
       if (chainName?.startsWith('strategy.')) {
-        return `ctx.strategyPropHistory("${chainName.slice('strategy.'.length)}", ${idx})`;
+        return `ctx.strategyPropHistory("${chainName.slice('strategy.'.length)}", ${historyIdx})`;
       }
       const taVarSite = ctx.taVarSiteMap.get(expr.object);
-      if (taVarSite) return `this.${taVarSite.seriesName}.get(${idx})`;
+      if (taVarSite) return `this.${taVarSite.seriesName}.get(${historyIdx})`;
       if (expr.object.object.type === 'Identifier') {
         const objectName = expr.object.object.name;
         const fieldName = expr.object.property.name;
         if (fieldHistory.get(objectName)?.has(fieldName)) {
-          return `this.${fieldHistoryMemberName(objectName, fieldName)}.get(${idx})`;
+          return `this.${fieldHistoryMemberName(objectName, fieldName)}.get(${historyIdx})`;
         }
       }
     }
@@ -1861,30 +2402,30 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
       const historyName = currentLocalHistoryName(name);
       if (historyName) {
         const localName = currentLocalName(name) ?? jsPineName(name);
-        return `(${historyName} ? ${historyName}.get(${idx}) : _idx(${localName}, ${idx}))`;
+        return `(${historyName} ? ${historyName}.get(${historyIdx}) : _idx(${localName}, ${idx}))`;
       }
       if (collectionKind && collectionHistoryVars.has(name)) {
         const history = `this.${jsCollectionHistoryMember(name)}`;
-        return `_historyCollection(${emitIdentifier(expr.object)}, ${history}, ${idx}, ${seriesMaxBarsBackExpr(name)})`;
+        return `_historyCollection(${emitIdentifier(expr.object)}, ${history}, ${idx}, ${seriesHistoryHint(name)}, "collection:${name}", this._deps.historyCheck)`;
       }
       if (collectionKind) return `_idx(${emitIdentifier(expr.object)}, ${idx})`;
       const taVarSite = ctx.taVarSiteMap.get(expr.object);
-      if (taVarSite) return `this.${taVarSite.seriesName}.get(${idx})`;
-      if (isUserDeclaredSeriesName(name)) return `this.${jsSeriesMember(name)}.get(${idx})`;
-      if (name in BAR_FIELDS) return `this.${BAR_FIELDS[name]}.get(${idx})`;
-      if (name === 'bar_index' || name === 'n') return `_historyBarIndex(${idx}, ctx.barIndex, ${seriesMaxBarsBackExpr(name)})`;
-      if (name === 'last_bar_index') return `_historyConstant(ctx.lastBarIndex, ${idx}, ctx.barIndex, ${seriesMaxBarsBackExpr(name)})`;
-      if (RUNTIME_TIME_VALUES.has(name)) return `ctx.runtimeTimeValue("${name}", ${idx}, ${seriesMaxBarsBackExpr(name)})`;
-      if (CALENDAR_PARTS.has(name)) return `ctx.calendarPart("${name}", [this._s_time.get(${idx})], {})`;
+      if (taVarSite) return `this.${taVarSite.seriesName}.get(${historyIdx})`;
+      if (isUserDeclaredSeriesName(name)) return `this.${jsSeriesMember(name)}.get(${historyIdx})`;
+      if (name in BAR_FIELDS) return `this.${BAR_FIELDS[name]}.get(${historyIdx})`;
+      if (name === 'bar_index' || name === 'n') return `_historyBarIndex(${idx}, ctx.barIndex, ${seriesHistoryHint(name)}, this._deps.historyCheck)`;
+      if (name === 'last_bar_index') return `_historyConstant(ctx.lastBarIndex, ${idx}, ctx.barIndex, ${seriesHistoryHint(name)}, this._deps.historyCheck)`;
+      if (RUNTIME_TIME_VALUES.has(name)) return `ctx.runtimeTimeValue("${name}", ${historyIdx}, ${seriesHistoryHint(name)})`;
+      if (CALENDAR_PARTS.has(name)) return `ctx.calendarPart("${name}", [this._s_time.get(${historyIdx})], {})`;
       if (name === 'hl2' || name === 'hlc3' || name === 'ohlc4' || name === 'hlcc4') {
-        return `this._s_${name}.get(${idx})`;
+        return `this._s_${name}.get(${historyIdx})`;
       }
     }
     const historyMember = expressionHistory.get(expr);
     if (historyMember) {
       const value = emitExpr(expr.object);
       const state = functionNameStack.length > 0 ? currentFunctionStateName() : 'undefined';
-      return `(() => { const _value = ${value}; const _series = this._expressionHistory(${state}, "${historyMember}", _value, ctx.barIndex); return _series.get(${idx}); })()`;
+      return `(() => { const _value = ${value}; const _series = this._expressionHistory(${state}, "${historyMember}", _value, ctx.barIndex); return _series.get(${historyIdx}); })()`;
     }
     return `_idx(${emitExpr(expr.object)}, ${idx})`;
   }
@@ -1897,12 +2438,22 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
     if (taSite) return emitTACall(taSite, expr);
 
     const callee = expr.callee;
-    const fullName = getMemberChainName(callee) ?? (callee.type === 'Identifier' ? callee.name : '');
+    const fullName = importedMemberName(getMemberChainName(callee) ?? (callee.type === 'Identifier' ? callee.name : ''));
     const namespace = fullName.split('.')[0] ?? '';
 
     const posArgs = expr.arguments.filter((a) => !a.name).map((a) => emitExpr(a.value));
     const hasNamedArgs = expr.arguments.some((arg) => arg.name);
     const collectionMethodKind = getCollectionMethodKind(expr);
+    if (fullName === 'str.tostring' && expr.arguments.length === 1 && (!expr.arguments[0].name || expr.arguments[0].name.name === 'value')) {
+      const enumName = getMemberChainName(expr.arguments[0].value);
+      const title = enumName ? (ctx.enumTitles.get(enumName) ?? ctx.importedEnumTitles.get(enumName)) : undefined;
+      if (title !== undefined) return JSON.stringify(title);
+      if (isEnumValue(expr.arguments[0].value)) {
+        const value = emitExpr(expr.arguments[0].value);
+        const callId = nextBuiltinCallId(fullName);
+        return `((__value) => Object.hasOwn(${JSON.stringify(enumTitlesByValue)}, __value) ? ${JSON.stringify(enumTitlesByValue)}[__value] : ctx.callBuiltin("str.tostring", [__value], {}, ${callId}))(${value})`;
+      }
+    }
 
     if (
       expr.callee.type === 'MemberExpression'
@@ -1916,15 +2467,15 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
       if (Object.keys(enumTitles).length > 0) {
         const receiver = emitExpr(expr.callee.object);
         const callId = nextBuiltinCallId('title');
-        return `((__receiver) => (${JSON.stringify(enumTitles)}[__receiver] ?? ctx.callMethodBuiltin("title", __receiver, [], {}, "${callId}")))(${receiver})`;
+        return `((__receiver) => (${JSON.stringify(enumTitles)}[__receiver] ?? ctx.callMethodBuiltin("title", __receiver, [], {}, ${callId})))(${receiver})`;
       }
     }
 
     const officialLibraryFunctionName = ctx.officialLibraryFunctions.get(fullName);
     if (officialLibraryFunctionName) {
-      return `ctx.callBuiltin("${officialLibraryFunctionName}", [${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)}, "${nextBuiltinCallId(officialLibraryFunctionName)}")`;
+      return `ctx.callBuiltin("${officialLibraryFunctionName}", [${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)}, ${nextBuiltinCallId(officialLibraryFunctionName)})`;
     }
-    const importedFunctionName = ctx.importedFunctions.get(fullName);
+    const importedFunctionName = ctx.resolvedUserFunctionCalls.get(expr) ?? ctx.importedFunctions.get(fullName);
     if (importedFunctionName) {
       return emitUserFunctionCall(importedFunctionName, expr);
     }
@@ -1945,12 +2496,14 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
       }
     }
     if (expr.callee.type === 'Identifier') {
-      const importedContextFunction = ctx.importedAliasContext ? `${ctx.importedAliasContext}__${fullName}` : undefined;
+      const importedContextFunction = ctx.importedAliasContext ? ctx.importedLocalFunctions.get(`${ctx.importedAliasContext}.${fullName}`) : undefined;
       if (importedContextFunction && ctx.funcInfos.has(importedContextFunction)) return emitUserFunctionCall(importedContextFunction, expr);
       const sameLibraryFunction = sameImportedLibraryFunctionName(fullName);
       if (sameLibraryFunction) return emitUserFunctionCall(sameLibraryFunction, expr);
     }
     if (expr.callee.type === 'Identifier') {
+      const methodCall = emitFunctionSyntaxMethodCall(fullName, expr);
+      if (methodCall) return methodCall;
       const resolvedFunction = resolveUserFunctionCallName(fullName, expr);
       if (resolvedFunction) return emitUserFunctionCall(resolvedFunction, expr);
     }
@@ -1967,17 +2520,22 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
     }
 
     if (fullName === 'iff') {
-      return `ctx.callBuiltin("iff", [${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)}, "${nextBuiltinCallId(fullName)}")`;
+      return `ctx.callBuiltin("iff", [${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)}, ${nextBuiltinCallId(fullName)})`;
     }
 
     if (LEGACY_GLOBAL_MATH_ALIASES.has(fullName)) {
       const mathName = `math.${fullName}`;
-      return `ctx.mathCall("${mathName}", [${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)}, "${builtinCallId(mathName, expr)}")`;
+      const args = canonicalBuiltinArguments(expr.arguments, mathName, ctx.pineVersion);
+      return `ctx.mathCall("${mathName}", [${posArgs.join(', ')}], ${emitNamedArgsObj(args)}, ${builtinCallId(mathName, expr)})`;
     }
 
     // Math functions
     if (namespace === 'math' && hasNamedArgs) {
-      return `ctx.mathCall("${fullName}", [${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)}, "${builtinCallId(fullName, expr)}")`;
+      return `ctx.mathCall("${fullName}", [${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)}, ${builtinCallId(fullName, expr)})`;
+    }
+    if (fullName === 'math.log') {
+      builtinCallId(fullName, expr);
+      return `ctx.mathLog(${posArgs.join(', ')})`;
     }
     if (fullName === 'math.avg') {
       return posArgs.length > 0
@@ -1985,13 +2543,13 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
         : 'NaN';
     }
     if (fullName === 'math.sum') {
-      return `ctx.mathCall("${fullName}", [${posArgs.join(', ')}], {}, "${builtinCallId(fullName, expr)}")`;
+      return `ctx.mathCall("${fullName}", [${posArgs.join(', ')}], {}, ${builtinCallId(fullName, expr)})`;
     }
     if (fullName === 'math.random') {
-      return `ctx.mathCall("${fullName}", [${posArgs.join(', ')}], {}, "${builtinCallId(fullName, expr)}")`;
+      return `ctx.mathCall("${fullName}", [${posArgs.join(', ')}], {}, ${builtinCallId(fullName, expr)})`;
     }
     if (fullName === 'math.round') {
-      return `ctx.mathCall("${fullName}", [${posArgs.join(', ')}], {}, "${builtinCallId(fullName, expr)}")`;
+      return `ctx.mathCall("${fullName}", [${posArgs.join(', ')}], {}, ${builtinCallId(fullName, expr)})`;
     }
     if (fullName in MATH_FUNCS) {
       const fn = MATH_FUNCS[fullName];
@@ -2000,22 +2558,38 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
       return `${fn}(${posArgs.join(', ')})`;
     }
     if (namespace === 'math') {
-      return `ctx.mathCall("${fullName}", [${posArgs.join(', ')}], {}, "${builtinCallId(fullName, expr)}")`;
+      return `ctx.mathCall("${fullName}", [${posArgs.join(', ')}], {}, ${builtinCallId(fullName, expr)})`;
     }
 
     // nz / na
     if (fullName === 'nz') {
-      const value = emitOrderedArg(expr.arguments, ['source', 'replacement'], 'source', 0) ?? 'NaN';
-      const replacement = emitOrderedArg(expr.arguments, ['source', 'replacement'], 'replacement', 1);
-      return replacement ? `_nz(${value}, ${replacement})` : `_nz(${value})`;
+      const args = ctx.pineVersion <= 4 ? expr.arguments.map((arg) => {
+        const alias = arg.name?.name === 'x' ? 'source' : arg.name?.name === 'y' ? 'replacement' : undefined;
+        return alias ? { ...arg, name: { ...arg.name!, name: alias } } : arg;
+      }) : expr.arguments;
+      const value = emitOrderedArg(args, ['source', 'replacement'], 'source', 0) ?? 'NaN';
+      const replacement = emitOrderedArg(args, ['source', 'replacement'], 'replacement', 1);
+      if (replacement) return `_nz(${value}, ${replacement})`;
+      const source = readOrderedCallArg(args, ['source', 'replacement'], 'source', 0);
+      const sourceKind = source && expressionKind(source);
+      if (sourceKind === 'color') return `_nz(${value}, "#00000000")`;
+      if (sourceKind === 'bool' && versionRules.allowsBoolNaHelpers) return `_nz(${value}, false)`;
+      return `_nz(${value})`;
     }
     if (fullName === 'na') {
-      const value = emitOrderedArg(expr.arguments, ['x'], 'x', 0);
-      return value ? `_isNa(${value})` : 'NaN';
+      const operand = orderedArgExpression(expr.arguments, ['x'], 'x', 0);
+      if (!operand) return 'NaN';
+      const value = emitExpr(operand);
+      const kind = expressionKind(operand);
+      if (kind === 'int' || kind === 'float') return `_isNa(${value})`;
+      return `_isNa(ctx.callBuiltin("__resolveTableReference", [${value}]))`;
     }
     if (fullName === 'fixnan') {
-      const fnIdx = fixnanIndex++;
       const value = emitOrderedArg(expr.arguments, ['source'], 'source', 0) ?? 'NaN';
+      if (functionNameStack.length > 0) {
+        return `this._fixnanValue(${currentFunctionStateName()}, ${nextBuiltinCallId('fixnan')}, ${value})`;
+      }
+      const fnIdx = fixnanIndex++;
       return `(_isNa(${value}) ? this._fixnan_${fnIdx} : (this._fixnan_${fnIdx} = ${value}))`;
     }
 
@@ -2023,21 +2597,31 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
     if (fullName === 'int') return `Math.trunc(${emitOrderedArg(expr.arguments, ['x'], 'x', 0) ?? 'NaN'})`;
     if (fullName === 'float') return `+(${emitOrderedArg(expr.arguments, ['x'], 'x', 0) ?? 'NaN'})`;
     if (fullName === 'bool') return `_isTruthy(${emitOrderedArg(expr.arguments, ['x'], 'x', 0) ?? 'NaN'})`;
-    if (fullName === 'string') return `String(${emitOrderedArg(expr.arguments, ['x'], 'x', 0) ?? 'NaN'})`;
+    if (fullName === 'string') return `_string(${emitOrderedArg(expr.arguments, ['x'], 'x', 0) ?? 'NaN'})`;
 
     // String functions
     if (LEGACY_GLOBAL_STR_ALIASES.has(fullName)) {
       const strName = LEGACY_GLOBAL_STR_ALIASES.get(fullName)!;
-      return `ctx.callBuiltin("${strName}", [${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)}, "${nextBuiltinCallId(strName)}")`;
+      const args = fullName === 'tostring' && versionRules.allowsLegacyGlobalBuiltinAliases
+        ? expr.arguments.map((arg) => {
+          const legacyName = arg.name?.name;
+          if (legacyName !== 'x' && legacyName !== 'y') return arg;
+          return { ...arg, name: { ...arg.name!, name: legacyName === 'x' ? 'value' : 'format' } };
+        })
+        : expr.arguments;
+      return `ctx.callBuiltin("${strName}", [${posArgs.join(', ')}], ${emitNamedArgsObj(canonicalBuiltinArguments(args, strName, ctx.pineVersion))}, ${nextBuiltinCallId(strName)})`;
     }
     if (RUNTIME_STR_FUNCTIONS.has(fullName)) {
-      return `ctx.callBuiltin("${fullName}", [${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)}, "${nextBuiltinCallId(fullName)}")`;
+      return `ctx.callBuiltin("${fullName}", [${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)}, ${nextBuiltinCallId(fullName)})`;
     }
     if (fullName === 'str.format') return `ctx.strFormat([${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)})`;
     if (fullName === 'str.format_time') return `ctx.strFormatTime([${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)})`;
 
     // Color functions
     if (fullName === 'color') {
+      if (expr.arguments.length > 1 && !versionRules.supportsLegacyColorTransparencyOverload) {
+        return runtimeErrorExpr('The color() transparency constructor was renamed to color.new() in Pine v4.');
+      }
       if (expr.arguments.length <= 1 || expr.arguments.some((argument) => argument.name?.name === 'x')) {
         const castArg = emitOrderedArg(expr.arguments, ['x'], 'x', 0);
         if (castArg) return castArg;
@@ -2056,7 +2640,6 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
     if (fullName === 'color.t') return `ctx.colorT([${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)})`;
     if (fullName === 'color.from_gradient') return `ctx.colorFromGradient([${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)})`;
 
-    if (fullName === 'ta.pivot_point_levels') return emitPivotPointLevelsCall(expr);
 
     // Array functions
     if (namespace === 'array' && isStaticCollectionNamespaceCall(expr, 'array')) {
@@ -2093,15 +2676,27 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
       return runtimeErrorExpr(`Unknown function: ${fullName}`);
     }
     if (fullName === 'syminfo.prefix' || fullName === 'syminfo.ticker') {
-      return `ctx.callBuiltin("${fullName}", [${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)}, "${nextBuiltinCallId(fullName)}")`;
+      return `ctx.callBuiltin("${fullName}", [${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)}, ${nextBuiltinCallId(fullName)})`;
     }
 
     // Drawing functions — delegate to context
-    if (namespace && DRAWING_NAMESPACES.has(namespace)) {
+    if (namespace && DRAWING_NAMESPACES.has(namespace) && !collectionMethodKind) {
+      if (expr.arguments.length === 1 && !expr.arguments[0].name) {
+        if (fullName === 'line.get_y1') {
+          const cached = cachedLineReads.get(expr);
+          if (cached) {
+            const index = emitExpr(cached.index);
+            return `(${cached.cache}[${index}] ?? (${cached.cache}[${index}] = ctx.readLineY1(${posArgs[0]})))`;
+          }
+          return `ctx.readLineY1(${posArgs[0]})`;
+        }
+        if (fullName === 'label.get_text') return `ctx.readLabelText(${posArgs[0]})`;
+        if (POSITIONAL_DRAWING_GETTERS.has(fullName)) return `ctx.readDrawingGetter(${JSON.stringify(fullName)}, ${posArgs[0]})`;
+      }
       const namedObj = emitNamedArgsObj(expr.arguments);
       const callId = DRAWING_CONSTRUCTOR_FUNCTIONS.has(fullName)
         ? `ctx.nextBuiltinCallId("${fullName}")`
-        : `"${nextBuiltinCallId(fullName)}"`;
+        : `${nextBuiltinCallId(fullName)}`;
       return `ctx.callBuiltin("${fullName}", [${posArgs.join(', ')}], ${namedObj}, ${callId})`;
     }
 
@@ -2131,7 +2726,7 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
           const sourceDescriptorExpr = emitSourceDescriptor(secSite.expressionSourceParam
             ? { type: 'Identifier', name: secSite.expressionSourceParam, loc: undefined }
             : undefined);
-          const captureExpr = emitRequestCaptureObject(secSite.expressionCaptureParams);
+          const captureExpr = emitRequestCaptureObject(secSite.expressionCaptureParams, secSite.independentRequestCaptures);
           return `ctx.requestSeed(${secSite.id}, ${sourceExpr}, ${symExpr}, ${ignoreSymbolExpr}, ${calcExpr}, ${sourceDescriptorExpr}, ${captureExpr})`;
         }
         const symExpr = emitExpr(secSite.symbolExpr);
@@ -2144,7 +2739,7 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
           const sourceDescriptorExpr = emitSourceDescriptor(secSite.expressionSourceParam
             ? { type: 'Identifier', name: secSite.expressionSourceParam, loc: undefined }
             : undefined);
-          const captureExpr = emitRequestCaptureObject(secSite.expressionCaptureParams);
+          const captureExpr = emitRequestCaptureObject(secSite.expressionCaptureParams, secSite.independentRequestCaptures);
           return `ctx.requestSecurityLowerTf(${secSite.id}, ${symExpr}, ${tfExpr}, ${ignoreSymbolExpr}, ${currencyExpr}, ${ignoreTfExpr}, ${calcExpr}, ${sourceDescriptorExpr}, ${captureExpr}, ${secSite.expressionTupleArity ?? 'undefined'})`;
         }
         const gapsExpr = secSite.gapsExpr ? emitExpr(secSite.gapsExpr) : '"barmerge.gaps_off"';
@@ -2155,7 +2750,7 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
         const sourceDescriptorExpr = emitSourceDescriptor(secSite.expressionSourceParam
           ? { type: 'Identifier', name: secSite.expressionSourceParam, loc: undefined }
           : undefined);
-        const captureExpr = emitRequestCaptureObject(secSite.expressionCaptureParams);
+        const captureExpr = emitRequestCaptureObject(secSite.expressionCaptureParams, secSite.independentRequestCaptures);
         return `ctx.requestSecurity(${secSite.id}, ${symExpr}, ${tfExpr}, ${gapsExpr}, ${laExpr}, ${ignoreSymbolExpr}, ${currencyExpr}, ${calcExpr}, ${sourceDescriptorExpr}, ${captureExpr})`;
       }
     }
@@ -2166,17 +2761,19 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
       return `ctx.requestFootprint([${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)})`;
     }
     if (namespace === 'footprint' || namespace === 'volume_row') {
-      return `ctx.callBuiltin("${fullName}", [${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)}, "${nextBuiltinCallId(fullName)}")`;
+      return `ctx.callBuiltin("${fullName}", [${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)}, ${nextBuiltinCallId(fullName)})`;
     }
+    const pointRequestName = fullName === 'dividends' && ctx.pineVersion < 5
+      ? 'request.dividends' : fullName;
     if (
-      fullName === 'request.dividends'
-      || fullName === 'request.earnings'
-      || fullName === 'request.splits'
-      || fullName === 'request.financial'
-      || fullName === 'request.economic'
-      || fullName === 'request.quandl'
+      pointRequestName === 'request.dividends'
+      || pointRequestName === 'request.earnings'
+      || pointRequestName === 'request.splits'
+      || pointRequestName === 'request.financial'
+      || pointRequestName === 'request.economic'
+      || pointRequestName === 'request.quandl'
     ) {
-      return `ctx.requestPointSeries("${fullName}", [${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)})`;
+      return `ctx.requestPointSeries("${pointRequestName}", [${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)})`;
     }
 
     // Plot functions
@@ -2190,8 +2787,8 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
     }
 
     // Alert
-    if (fullName === 'alert') return `ctx.alert([${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)}, "${builtinCallId(fullName, expr)}")`;
-    if (fullName === 'alertcondition') return `ctx.alertCondition([${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)}, "${nextBuiltinCallId(fullName)}")`;
+    if (fullName === 'alert') return `ctx.alert([${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)}, ${builtinCallId(fullName, expr)})`;
+    if (fullName === 'alertcondition') return `ctx.alertCondition([${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)}, ${nextBuiltinCallId(fullName)})`;
 
     // Log
     if (fullName === 'log.info') return `ctx.logInfo([${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)})`;
@@ -2201,16 +2798,35 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
     // Runtime
     if (fullName === 'runtime.error') return emitRuntimeErrorCall(expr, expr.loc);
     if (fullName === 'max_bars_back') {
-      return `ctx.callBuiltin("${fullName}", [${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)}, "${nextBuiltinCallId(fullName)}")`;
+      return `ctx.callBuiltin("${fullName}", [${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)}, ${nextBuiltinCallId(fullName)})`;
     }
 
     // Time
     if (fullName === 'time') return `ctx.timeFilter(false, [${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)})`;
-    if (fullName === 'time_close') return `ctx.timeFilter(true, [${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)})`;
-    if (fullName === 'timestamp') return `ctx.timestamp([${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)})`;
+    if (fullName === 'time_close') {
+      const args = versionRules.supportsLegacyResolutionDeclarationParams
+        ? expr.arguments.map((argument) => argument.name?.name === 'resolution'
+          ? { ...argument, name: { ...argument.name, name: 'timeframe' } }
+          : argument)
+        : expr.arguments;
+      return `ctx.timeFilter(true, [${posArgs.join(', ')}], ${emitNamedArgsObj(args)})`;
+    }
+    if (fullName === 'timestamp') {
+      const args = `[${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)}`;
+      if (expr.arguments.length > 0 && expr.arguments.every(arg =>
+        arg.value.type === 'NumericLiteral' || arg.value.type === 'StringLiteral')) {
+        const namedZone = expr.arguments.find(arg => arg.name?.name === 'timezone');
+        const firstPositional = expr.arguments.find(arg => !arg.name);
+        const zone = namedZone?.value ?? (posArgs.length > 1 && firstPositional?.value.type === 'StringLiteral'
+          ? firstPositional.value : undefined);
+        literalTimestampCount ??= 0;
+        return `ctx.timestamp(${args}, "literal_timestamp_${literalTimestampCount++}", ${zone ? emitExpr(zone) : 'undefined'})`;
+      }
+      return `ctx.timestamp(${args})`;
+    }
     if (CALENDAR_PARTS.has(fullName)) return `ctx.calendarPart("${fullName}", [${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)})`;
     if (namespace === 'timeframe') {
-      return `ctx.callBuiltin("${fullName}", [${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)}, "${nextBuiltinCallId(fullName)}")`;
+      return `ctx.callBuiltin("${fullName}", [${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)}, ${nextBuiltinCallId(fullName)})`;
     }
 
     // Strategy functions
@@ -2264,14 +2880,32 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
     }
 
     if (collectionMethodKind) {
+      const methodExpr = expr as CallExpression & { callee: MemberExpression };
+      const overloads = (ctx.localMethodOverloads.get(methodExpr.callee.property.name) ?? []).filter((overload) =>
+        overload.receiverType === collectionMethodKind && !validateUserFunctionCall(overload.internalName, methodExpr, 1, true)
+        && (!resolvedUserMethods.has(methodExpr) || ctx.funcInfos.get(overload.internalName)?.body === resolvedUserMethods.get(methodExpr)?.body)
+      );
+      if (overloads.length === 1) return emitUserFunctionCall(overloads[0]!.internalName, methodExpr, emitExpr(methodExpr.callee.object));
+      if (overloads.length > 0) return emitLocalMethodCall(overloads, methodExpr);
       const receiver = emitExpr((expr.callee as MemberExpression).object);
       const method = (expr.callee as MemberExpression).property.name;
-      const runtimeMethod = collectionRuntimeMethodName(collectionMethodKind, method) ?? method;
+      const resolvedRuntimeMethod = collectionRuntimeMethodName(collectionMethodKind, method);
+      const runtimeMethod = resolvedRuntimeMethod ?? method;
       const methodFullName = `${collectionMethodKind}.${method}`;
       const methodArgNames = collectionArgNames(methodFullName)?.slice(1);
       const methodArgs = methodArgNames
         ? emitCollectionCallArgs(methodFullName, expr.arguments, methodArgNames)
         : posArgs;
+      const needsLegacyIndexGuard = collectionMethodKind === 'array'
+        && !versionRules.allowsNegativeArrayIndices
+        && ['get', 'set', 'insert', 'remove'].includes(runtimeMethod);
+      if (resolvedRuntimeMethod && needsLegacyIndexGuard) {
+        return `_legacyArray_${runtimeMethod}(${[receiver, ...methodArgs].join(', ')})`;
+      }
+      if (resolvedRuntimeMethod && !needsLegacyIndexGuard) {
+        const helpers = collectionMethodKind === 'array' ? '_arr' : collectionMethodKind === 'map' ? '_map' : '_mtx';
+        return `deps.${helpers}.${runtimeMethod}(${[receiver, ...methodArgs].join(', ')})`;
+      }
       return `_callCollectionMethod("${collectionMethodKind}", ${receiver}, "${runtimeMethod}", [${methodArgs.join(', ')}])`;
     }
 
@@ -2287,16 +2921,6 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
       if (localOverloads && localOverloads.length > 0) {
         return emitLocalMethodCall(localOverloads, expr as CallExpression & { callee: MemberExpression });
       }
-    }
-
-    // User-defined method
-    if (expr.callee.type === 'MemberExpression' && ctx.funcInfos.has(expr.callee.property.name)) {
-      if (validateUserFunctionCall(expr.callee.property.name, expr, 1, true)) {
-        return emitReceiverBuiltinMethodCall(expr as CallExpression & { callee: MemberExpression });
-      }
-      const receiver = emitExpr(expr.callee.object);
-      const methodName = expr.callee.property.name;
-      return emitUserFunctionCall(methodName, expr, receiver);
     }
 
     if (expr.callee.type === 'MemberExpression') {
@@ -2318,10 +2942,33 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
       }
     }
 
+    // User-defined method
+    if (expr.callee.type === 'MemberExpression' && ctx.funcInfos.has(expr.callee.property.name)) {
+      if (validateUserFunctionCall(expr.callee.property.name, expr, 1, true)) {
+        return emitReceiverBuiltinMethodCall(expr as CallExpression & { callee: MemberExpression });
+      }
+      const receiver = emitExpr(expr.callee.object);
+      const methodName = expr.callee.property.name;
+      return emitUserFunctionCall(methodName, expr, receiver);
+    }
+
+    if (expr.callee.type === 'MemberExpression' && !isStaticNamespaceReceiver(expr.callee.object)) {
+      const receiverType = expressionType(expr.callee.object);
+      const method = expr.callee.property.name;
+      if (receiverType?.kind === 'udt'
+        && ((receiverType.name === 'footprint' && method === 'rows')
+          || (receiverType.name === 'volume_row' && method === 'up_price'))) {
+        const name = `${receiverType.name}.${method}`;
+        return `ctx.callBuiltin("${name}", [${[emitExpr(expr.callee.object), ...posArgs].join(', ')}], ${emitNamedArgsObj(expr.arguments)}, ${nextBuiltinCallId(name)})`;
+      }
+    }
+
     if (expr.callee.type === 'MemberExpression' && expr.callee.property.name === 'copy') {
       const receiver = emitExpr(expr.callee.object);
+      const kindHint = getCollectionParameterKind(expr.callee.object);
+      const nullableObjectCopy = getFunctionParameterType(expr.callee.object)?.baseType === 'udt';
       const callId = nextBuiltinCallId('chart.point.copy');
-      return `((__receiver) => (__receiver?.type === "chart.point" ? ctx.callBuiltin("chart.point.copy", [__receiver], {}, "${callId}") : (__receiver && __receiver.__tealscriptUdt) ? deps._udt.copy(__receiver) : _callAnyCollectionMethod(__receiver, "copy", [])))(${receiver})`;
+      return `((__receiver) => (__receiver?.type === "chart.point" ? ctx.callBuiltin("chart.point.copy", [__receiver], {}, ${callId}) : (__receiver && __receiver.__tealscriptUdt) ? deps._udt.copy(__receiver) : (${nullableObjectCopy} && _isNa(__receiver)) ? NaN : (${JSON.stringify(kindHint) ?? 'undefined'} || _isNa(__receiver) || (__receiver && (__receiver.__tealscriptArray || __receiver.__tealscriptMap || __receiver.__tealscriptMatrix || Array.isArray(__receiver)))) ? _callAnyCollectionMethod(ctx, __receiver, "copy", [], ${JSON.stringify(kindHint) ?? 'undefined'}) : ctx.callMethodBuiltin("copy", __receiver, [], ${emitNamedArgsObj(expr.arguments)}, ${callId})))(${receiver})`;
     }
     if (
       expr.callee.type === 'MemberExpression'
@@ -2330,19 +2977,21 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
     ) {
       const receiver = emitExpr(expr.callee.object);
       const method = expr.callee.property.name;
-      const methodArgs = emitCollectionReceiverArgs(expr.arguments, method, posArgs);
+      const kindHint = getCollectionParameterKind(expr.callee.object);
+      const emittedKindHint = JSON.stringify(kindHint) ?? 'undefined';
+      const methodArgs = emitCollectionReceiverArgs(expr.arguments, method, posArgs, kindHint);
       if (FOOTPRINT_METHODS.has(method)) {
         const namedArgs = emitNamedArgsObj(expr.arguments);
         const callId = nextBuiltinCallId(method);
-        return `((__receiver) => (__receiver && (__receiver.__tealscriptArray || __receiver.__tealscriptMap || __receiver.__tealscriptMatrix)) ? _callAnyCollectionMethod(__receiver, "${method}", [${methodArgs.join(', ')}]) : ctx.footprintMethod("${method}", __receiver, [${posArgs.join(', ')}], ${namedArgs}, "${callId}"))(${receiver})`;
+        return `((__receiver) => (${emittedKindHint} || (__receiver && (__receiver.__tealscriptArray || __receiver.__tealscriptMap || __receiver.__tealscriptMatrix))) ? _callAnyCollectionMethod(ctx, __receiver, "${method}", [${methodArgs.join(', ')}], ${emittedKindHint}) : ctx.footprintMethod("${method}", __receiver, [${posArgs.join(', ')}], ${namedArgs}, ${callId}))(${receiver})`;
       }
-      return `_callAnyCollectionMethod(${receiver}, "${method}", [${methodArgs.join(', ')}])`;
+      return `((__receiver) => (${emittedKindHint} || _isNa(__receiver) || (__receiver && (__receiver.__tealscriptArray || __receiver.__tealscriptMap || __receiver.__tealscriptMatrix || Array.isArray(__receiver)))) ? _callAnyCollectionMethod(ctx, __receiver, "${method}", [${methodArgs.join(', ')}], ${emittedKindHint}) : ctx.callMethodBuiltin("${method}", __receiver, [${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)}, ${nextBuiltinCallId(method)}))(${receiver})`;
     }
 
     if (expr.callee.type === 'MemberExpression' && FOOTPRINT_METHODS.has(expr.callee.property.name)) {
       const receiver = emitExpr(expr.callee.object);
       const methodName = expr.callee.property.name;
-      return `ctx.footprintMethod("${methodName}", ${receiver}, [${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)}, "${nextBuiltinCallId(methodName)}")`;
+      return `ctx.footprintMethod("${methodName}", ${receiver}, [${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)}, ${nextBuiltinCallId(methodName)})`;
     }
 
     if (expr.callee.type === 'MemberExpression') {
@@ -2351,13 +3000,15 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
 
     // User-defined function
     if (expr.callee.type === 'Identifier') {
+      const methodCall = emitFunctionSyntaxMethodCall(fullName, expr);
+      if (methodCall) return methodCall;
       const resolvedFunction = resolveUserFunctionCallName(fullName, expr);
       if (resolvedFunction) return emitUserFunctionCall(resolvedFunction, expr);
     }
 
     const callId = DRAWING_CONSTRUCTOR_FUNCTIONS.has(fullName)
       ? `ctx.nextBuiltinCallId("${fullName}")`
-      : `"${nextBuiltinCallId(fullName)}"`;
+      : `${nextBuiltinCallId(fullName)}`;
     return `ctx.callBuiltin("${fullName}", [${posArgs.join(', ')}], {}, ${callId})`;
   }
 
@@ -2390,12 +3041,24 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
   }
 
   function emitLocalMethodCall(overloads: LocalMethodOverloadInfo[], expr: CallExpression & { callee: MemberExpression }): string {
+    const selected = resolvedUserMethods.get(expr);
+    const selectedOverload = selected && overloads.find((overload) => ctx.funcInfos.get(overload.internalName)?.body === selected.body);
+    if (selectedOverload && functionNameStack.length === 0) return emitUserFunctionCall(selectedOverload.internalName, expr, emitExpr(expr.callee.object));
     const receiver = emitExpr(expr.callee.object);
     const temp = `_method_receiver_${functionEmitContext.callSites.get(expr) ?? 'x'}`;
-    const compatible = overloads.filter((overload) => !validateUserFunctionCall(overload.internalName, expr, 1, true));
+    const receiverKind = expressionKind(expr.callee.object);
+    const compatible = overloads.filter((overload) => {
+      if (validateUserFunctionCall(overload.internalName, expr, 1, true)) return false;
+      if (
+        receiverKind && receiverKind !== 'unknown' && overload.receiverType
+        && (DRAWING_RECEIVER_TYPES.has(receiverKind) || DRAWING_RECEIVER_TYPES.has(overload.receiverType))
+      ) return overload.receiverType === receiverKind;
+      return true;
+    });
     if (
       compatible.length === 0
-      && overloads.some((overload) => overload.receiverType && DRAWING_RECEIVER_TYPES.has(overload.receiverType))
+      && ((receiverKind && DRAWING_RECEIVER_TYPES.has(receiverKind))
+        || overloads.some((overload) => overload.receiverType && DRAWING_RECEIVER_TYPES.has(overload.receiverType)))
     ) {
       return emitReceiverBuiltinMethodCall(expr);
     }
@@ -2405,14 +3068,26 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
       const condition = localReceiverCondition(temp, overload.receiverType);
       return condition === 'true' ? `return ${call};` : `if (${condition}) return ${call};`;
     });
-    return `(() => { const ${temp} = ${receiver}; ${branches.join(' ')} throw new Error("No local method overload matched ${expr.callee.property.name} for receiver " + (${temp} && ${temp}.__tealscriptUdt ? ${temp}.typeName : typeof ${temp})); })()`;
+    const contextualBranches = functionNameStack.length > 0 ? candidates.map((overload) => {
+      const call = emitUserFunctionCall(overload.internalName, expr, temp);
+      return `if (_methodContext?.calls[${functionEmitContext.callSites.get(expr)}]?.method === ${JSON.stringify(overload.internalName)}) return ${call};`;
+    }) : [];
+    const builtinCall = emitReceiverBuiltinMethodCall(expr, temp);
+    return `(() => { const ${temp} = ${receiver}; ${contextualBranches.join(' ')} ${branches.join(' ')} if (ctx.hasMethodBuiltin(${JSON.stringify(expr.callee.property.name)}, ${temp})) return ${builtinCall}; throw new Error("No local method overload matched ${expr.callee.property.name} for receiver " + (${temp} && ${temp}.__tealscriptUdt ? ${temp}.typeName : typeof ${temp})); })()`;
   }
 
-  function emitReceiverBuiltinMethodCall(expr: CallExpression & { callee: MemberExpression }): string {
-    const receiver = emitExpr(expr.callee.object);
+  function emitReceiverBuiltinMethodCall(expr: CallExpression & { callee: MemberExpression }, receiver = emitExpr(expr.callee.object)): string {
     const methodName = expr.callee.property.name;
     const args = expr.arguments.filter((arg) => !arg.name).map((arg) => emitExpr(arg.value));
-    return `ctx.callMethodBuiltin("${methodName}", ${receiver}, [${args.join(', ')}], ${emitNamedArgsObj(expr.arguments)}, "${nextBuiltinCallId(methodName)}")`;
+    const receiverKind = expressionKind(expr.callee.object);
+    const getterName = `${receiverKind}.${methodName}`;
+    if (expr.arguments.length === 0 && POSITIONAL_DRAWING_GETTERS.has(getterName)) {
+      return `ctx.readDrawingGetter(${JSON.stringify(getterName)}, ${receiver})`;
+    }
+    const resolvedName = receiverKind && DRAWING_RECEIVER_TYPES.has(receiverKind)
+      ? `, ${JSON.stringify(`${receiverKind}.${methodName}`)}`
+      : '';
+    return `ctx.callMethodBuiltin("${methodName}", ${receiver}, [${args.join(', ')}], ${emitNamedArgsObj(expr.arguments)}, ${nextBuiltinCallId(methodName)}${resolvedName})`;
   }
 
   function localTypeQualifiedMethodOverloads(callee: MemberExpression): LocalMethodOverloadInfo[] | undefined {
@@ -2439,6 +3114,9 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
     if (ctx.typeDecls.has(receiverType)) {
       return `_isNa(${receiver}) || (${receiver} && ${receiver}.__tealscriptUdt && ${receiver}.typeName === ${JSON.stringify(receiverType)})`;
     }
+    if (receiverType === 'array') return `_isNa(${receiver}) || (${receiver} && ${receiver}.__tealscriptArray) || Array.isArray(${receiver})`;
+    if (receiverType === 'matrix') return `_isNa(${receiver}) || ${receiver} && ${receiver}.__tealscriptMatrix`;
+    if (receiverType === 'map') return `_isNa(${receiver}) || ${receiver} && ${receiver}.__tealscriptMap`;
     if (receiverType === 'float' || receiverType === 'int') return `typeof ${receiver} === "number"`;
     if (receiverType === 'string') return `typeof ${receiver} === "string"`;
     if (receiverType === 'bool') return `typeof ${receiver} === "boolean"`;
@@ -2462,7 +3140,7 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
     return expr.arguments.every((arg) => !arg.name || allowedParams.includes(arg.name.name));
   }
 
-  function emitUserFunctionCall(name: string, expr: CallExpression, receiver?: string): string {
+  function emitUserFunctionCall(name: string, expr: CallExpression, receiver?: string, argumentValues?: Map<Expression, string>): string {
     const fi = ctx.funcInfos.get(name)!;
     const args = expr.arguments;
     const start = receiver ? 1 : 0;
@@ -2470,13 +3148,22 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
       ?? validateUserFunctionCall(name, expr, start, receiver !== undefined);
     if (validationError) return runtimeErrorExpr(validationError);
     const callSiteId = functionEmitContext.callSites.get(expr);
+    const arithmeticContextArgs = arithmeticTypes ? [functionNameStack.length > 0
+      ? `_arithmeticContext?.calls[${callSiteId}]`
+      : JSON.stringify(arithmeticContextDescriptor(arithmeticTypes.callTypeContexts?.get(expr)))] : [];
+    const methodContextArgs = methodTypes ? [functionNameStack.length > 0
+      ? `_methodContext?.calls[${callSiteId}]`
+      : JSON.stringify(methodContextDescriptor(methodTypes.callTypeContexts?.get(expr)))] : [];
     const localVars = functionEmitContext.localVars.get(name) ?? [];
     const hasTACalls = ctx.funcInfos.get(name)?.hasTACalls ?? false;
-    const hasState = functionNeedsState(name) && callSiteId !== undefined;
+    const historyParams = functionEmitContext.paramHistory.get(name) ?? new Set();
+    const historyLocals = functionEmitContext.localHistory.get(name) ?? new Set();
+    const needsHistory = (historyParams.size > 0 || historyLocals.size > 0) && callSiteId !== undefined;
     const currentFunctionName = functionNameStack[functionNameStack.length - 1];
+    const hasState = (functionNeedsState(name) || Boolean(currentFunctionName) && needsHistory) && callSiteId !== undefined;
     const stateArg = hasState
       ? currentFunctionName
-        ? `this._childFnState(_state, ${callSiteId}, [${localVars.map((localVar) => JSON.stringify(jsPineName(localVar.name))).join(', ')}], ${hasTACalls ? 'true' : 'false'}, ${expressionHistoryFunctions.has(name) ? 'true' : 'false'})`
+        ? `this._childFnState(_state, ${callSiteId}, [${localVars.map((localVar) => JSON.stringify(jsPineName(localVar.name))).join(', ')}], ${hasTACalls ? 'true' : 'false'}, ${expressionHistoryFunctions.has(name) ? 'true' : 'false'}, [${localVars.filter((localVar) => localVar.kind === 'varip').map((localVar) => JSON.stringify(jsPineName(localVar.name))).join(', ')}], [${localVars.filter((localVar) => localVar.kind === 'var').map((localVar) => JSON.stringify(jsPineName(localVar.name))).join(', ')}])`
         : `this.${jsStateMember('_fn_state_', String(callSiteId))}`
       : 'undefined';
     const values = receiver ? [receiver] : [];
@@ -2487,7 +3174,7 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
       const param = fi.params[i];
       const named = args.find((arg) => arg.name?.name === param)?.value;
       if (named) {
-        values.push(emitExpr(named));
+        values.push(argumentValues?.get(named) ?? emitExpr(named));
         sourceArgs.set(param, named);
         continue;
       }
@@ -2495,28 +3182,47 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
       const positionalArg = positional[positionalIndex];
       const defaultArg = fi.paramDefaults[i];
       const valueArg = positionalArg ?? defaultArg;
-      values.push(valueArg ? emitExpr(valueArg) : 'undefined');
+      if (!positionalArg && defaultArg) {
+        // Default expressions belong to the called function's library, while
+        // explicit arguments retain the caller's name resolution.
+        functionNameStack.push(name);
+        try {
+          values.push(emitExpr(defaultArg));
+        } finally {
+          functionNameStack.pop();
+        }
+      } else {
+        values.push(valueArg ? argumentValues?.get(valueArg) ?? emitExpr(valueArg) : 'undefined');
+      }
       if (valueArg) sourceArgs.set(param, valueArg);
     }
-    const sourceDescriptors = fi.params.map((param) => emitSourceDescriptor(sourceArgs.get(param)));
-    const historyParams = functionEmitContext.paramHistory.get(name) ?? new Set();
-    const historyLocals = functionEmitContext.localHistory.get(name) ?? new Set();
-    const needsHistory = (historyParams.size > 0 || historyLocals.size > 0) && callSiteId !== undefined;
+    const sourceDescriptors = fi.params.map((param) => emitSourceDescriptor(sourceArgs.get(param), functionRequestsData(name)));
     if (!needsHistory) {
-      return `this.${jsFunctionMember(name)}(${['ctx', stateArg, ...values, ...sourceDescriptors, ...fi.params.map(() => 'undefined'), ...historyLocals].join(', ')})`;
+      return `this.${jsFunctionMember(name)}(${['ctx', stateArg, ...arithmeticContextArgs, ...methodContextArgs, ...values, ...sourceDescriptors, ...fi.params.map(() => 'undefined'), ...historyLocals].join(', ')})`;
+
     }
     const tempPrefix = `_fn_arg_${callSiteId}_`;
-    const setup = values.map((value, index) => `const ${tempPrefix}${index} = ${value};`).join(' ');
+    const scopedState = `${tempPrefix}state`;
+    const setup = values.map((value, index) => `const ${tempPrefix}${index} = ${value};`).join(' ')
+      + (currentFunctionName ? ` const ${scopedState} = ${stateArg};` : '');
+    const historyMember = (kind: string, variable: string): string => currentFunctionName
+      ? `this._functionHistory(${scopedState}, ${JSON.stringify(`${kind}:${variable}`)})`
+      : `this.${jsStateMember(kind === 'param' ? '_fn_param_series_' : '_fn_local_series_', `${callSiteId}_${variable}`)}`;
     const historyUpdates: string[] = [];
     const historyArgs = fi.params.map((param, index) => {
       if (!historyParams.has(param)) return 'undefined';
-      const member = `this.${jsStateMember('_fn_param_series_', `${callSiteId}_${param}`)}`;
-      historyUpdates.push(`${member}.__tealscriptLastBar = this._updateScopeHistory(${member}, ${member}.__tealscriptLastBar, ${tempPrefix}${index}, ctx.barIndex, false);`);
+      const member = `${tempPrefix}history_${index}`;
+      historyUpdates.push(`const ${member} = ${historyMember('param', param)};`);
+      const fillSkippedBars = ctx.pineVersion === 6 && !currentFunctionName
+        && functionEmitContext.conditionalCallSites.has(expr)
+        && functionEmitContext.deepParamHistory.get(name)?.has(param);
+      historyUpdates.push(`${member}.__tealscriptLastBar = this._updateScopeHistory(${member}, ${member}.__tealscriptLastBar, ${tempPrefix}${index}, ctx.barIndex${fillSkippedBars ? '' : ', false'});`);
       return member;
     });
-    const localHistoryArgs = [...historyLocals].map((local) => `this.${jsStateMember('_fn_local_series_', `${callSiteId}_${local}`)}`);
+    const localHistoryArgs = [...historyLocals].map((local) => historyMember('local', local));
     const callValues = fi.params.map((_, index) => `${tempPrefix}${index}`);
-    return `(() => { ${setup} ${historyUpdates.join(' ')} return this.${jsFunctionMember(name)}(${['ctx', stateArg, ...callValues, ...sourceDescriptors, ...historyArgs, ...localHistoryArgs].join(', ')}); })()`;
+    return `(() => { ${setup} ${historyUpdates.join(' ')} return this.${jsFunctionMember(name)}(${['ctx', currentFunctionName ? scopedState : stateArg, ...arithmeticContextArgs, ...methodContextArgs, ...callValues, ...sourceDescriptors, ...historyArgs, ...localHistoryArgs].join(', ')}); })()`;
+
   }
 
   function validateUserFunctionCall(name: string, expr: CallExpression, start: number, isMethod: boolean): string | undefined {
@@ -2602,9 +3308,21 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
   function functionNeedsState(name: string, seen = new Set<string>()): boolean {
     if (seen.has(name)) return false;
     seen.add(name);
+    const info = ctx.funcInfos.get(name);
+    if (info?.hasTACalls) return true;
+    if (info) {
+      let containsCalls = functionCallPresence.get(info);
+      if (containsCalls === undefined) {
+        containsCalls = containsFunctionCall(info.body) || info.paramDefaults.some(containsFunctionCall);
+        functionCallPresence.set(info, containsCalls);
+      }
+      if (containsCalls) return true;
+    }
     if ((functionEmitContext.localVars.get(name)?.length ?? 0) > 0) return true;
-    if (ctx.funcInfos.get(name)?.hasTACalls ?? false) return true;
     if (expressionHistoryFunctions.has(name)) return true;
+    // A request's captured expression belongs to a stable UDF call scope even
+    // when the function has no persistent variables or TA state.
+    if (ctx.securitySites.some((site) => site.ownerFunctionName === name)) return true;
     for (const callee of functionEmitContext.calledFunctions.get(name) ?? []) {
       if (functionNeedsState(callee, seen)) return true;
     }
@@ -2614,14 +3332,35 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
   function nextBuiltinCallId(name: string): string {
     const count = builtinCallCounts.get(name) ?? 0;
     builtinCallCounts.set(name, count + 1);
-    return `${name}_${count}`;
+    return scopedBuiltinCallId(`${name}_${count}`);
   }
 
   function builtinCallId(name: string, expr: CallExpression): string {
     if ((name === 'alert' || name === 'math.random') && expr.loc) {
-      return `${name}_${expr.loc.start.line}_${expr.loc.start.column}`;
+      return scopedBuiltinCallId(`${name}_${expr.loc.start.line}_${expr.loc.start.column}`);
     }
     return nextBuiltinCallId(name);
+  }
+
+  function getFunctionParameterType(expr: Expression): VariableDeclaration['typeAnnotation'] {
+    // A missing receiver has no wrapper tag. Retain its declared type without
+    // leaking parameter names into the global collection-variable lookup.
+    if (expr.type !== 'Identifier' || currentLocalName(expr.name) !== localParamName(expr.name)) return undefined;
+    const functionName = functionNameStack[functionNameStack.length - 1];
+    const info = functionName ? ctx.funcInfos.get(functionName) : undefined;
+    if (!info) return undefined;
+    return info.paramTypes[info.params.indexOf(expr.name)];
+  }
+
+  function getCollectionParameterKind(expr: Expression): CollectionKind | undefined {
+    return collectionKindFromTypeAnnotation(getFunctionParameterType(expr));
+  }
+
+  function scopedBuiltinCallId(id: string): string {
+    const literal = JSON.stringify(id);
+    return functionNameStack.length > 0
+      ? `this._builtinCallId(${currentFunctionStateName()}, ${literal})`
+      : literal;
   }
 
   function getCollectionExprKind(expr: Expression): CollectionKind | undefined {
@@ -2629,6 +3368,7 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
     if (expr.type === 'ArrayExpression') return 'array';
     if (expr.type === 'MemberExpression') {
       const memberName = staticMemberChainName(expr);
+      if (expr.property.name === 'all' && expr.object.type === 'Identifier' && DRAWING_NAMESPACES.has(expr.object.name) && expr.object.name !== 'chart') return 'array';
       const knownMemberKind = memberName ? collectionVars.get(memberName) : undefined;
       if (knownMemberKind) return knownMemberKind;
       if (expr.object.type === 'CallExpression') return getCollectionExprKind(expr.object);
@@ -2637,6 +3377,7 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
     if (expr.type !== 'CallExpression') return undefined;
 
     const fullName = getMemberChainName(expr.callee) ?? (expr.callee.type === 'Identifier' ? expr.callee.name : '');
+    if (fullName === 'ta.pivot_point_levels') return 'array';
     if (fullName === 'array.new' || fullName.startsWith('array.new_') || fullName === 'array.from') return 'array';
     if (fullName === 'map.new') return 'map';
     if (fullName === 'matrix.new' || fullName.startsWith('matrix.new_')) return 'matrix';
@@ -2661,6 +3402,12 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
     const method = expr.callee.property.name;
     if (!COLLECTION_METHOD_NAMES.has(method)) return undefined;
     const kind = getCollectionExprKind(expr.callee.object);
+    if (
+      kind === 'matrix'
+      && expr.callee.object.type === 'Identifier'
+      && expr.callee.object.name === 'matrix'
+      && isStaticCollectionNamespaceCall(expr, kind)
+    ) return undefined;
     return kind && isCollectionReceiverMethod(kind, method) ? kind : undefined;
   }
 
@@ -2731,10 +3478,15 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
       } else {
         value = 'NaN';
       }
-      fieldEntries.push(`["${field.name}", ${value}]`);
+      fieldEntries.push(value);
       if (field.varip) varipFields.push(`"${field.name}"`);
     }
-    return `deps._udt.create("${typeName}", [${fieldEntries.join(', ')}], [${varipFields.join(', ')}])`;
+    let factory = udtFactories.get(typeName);
+    if (!factory) {
+      factory = { member: `_udtCtor_${udtFactories.size}`, names: typeInfo.fields.map((field) => field.name), varip: varipFields };
+      udtFactories.set(typeName, factory);
+    }
+    return `this.${factory.member}([${fieldEntries.join(', ')}])`;
   }
 
   function importedPrivateCallErrorMessage(expr: CallExpression): string | undefined {
@@ -2763,17 +3515,68 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
   function emitTACall(site: TACallSite, _expr: CallExpression): string {
     const args = site.computeArgExprs.map(emitExpr);
     const scoped = isFunctionScopedTASite(site);
+    const emitCtorArg = (argument: Expression, index: number): string => {
+      const value = emitExpr(argument);
+      return index === 0 && (site.integerDivisionLength || site.truncateTimeframeRatioLength) ? `Math.trunc(${value})` : value;
+    };
     const ctorArgExpr = site.dynamicCtorArgExprs
-      ? `[${site.dynamicCtorArgExprs.map(emitExpr).join(', ')}]`
+      ? `[${site.dynamicCtorArgExprs.map(emitCtorArg).join(', ')}]`
       : `[${site.ctorArgs.map((arg) => JSON.stringify(arg)).join(', ')}]`;
-    const member = scoped
+    let member = scoped
       ? `this._scopedTA(${currentFunctionStateName()}, "${site.memberName}", "${site.className}", ${ctorArgExpr})`
       : site.dynamicCtorArgExprs
-      ? `this._dynamicTA("${site.memberName}", "${site.className}", [${site.dynamicCtorArgExprs.map(emitExpr).join(', ')}])`
+      ? `this._dynamicTA("${site.memberName}", "${site.className}", [${site.dynamicCtorArgExprs.map(emitCtorArg).join(', ')}])`
       : `this.${site.memberName}`;
+    if (site.captureInitialCtorArgs) {
+      const state = scoped ? currentFunctionStateName() : 'undefined';
+      member = `(() => { const _args = ${ctorArgExpr}; const _state = ${state}; const _last = _state ? _state.__taLast?.get("${site.memberName}") : this._dynamicTALast.get("${site.memberName}"); return _last?.instance ?? this._scopedTA(_state, "${site.memberName}", "${site.className}", _args); })()`;
+    }
+
+    if (ctx.pineVersion === 5 && ['Cross', 'Crossover', 'Crossunder'].includes(site.className)) {
+      return `(() => { const _a = ${args[0]}; const _b = ${args[1]}; const _instance = ${member}; const _value = ctx.isFirstTick ? _instance.compute(_a, _b) : _instance.recompute(_a, _b); return _a !== _a || _b !== _b ? NaN : _value; })()`;
+    }
+
+    const momentumHistory = momentumSourceHistory.get(site);
+    if (momentumHistory) {
+      const state = scoped ? currentFunctionStateName() : 'undefined';
+      const source = args[0] ?? 'NaN';
+      const length = site.dynamicCtorArgExprs?.[0] ? emitExpr(site.dynamicCtorArgExprs[0]) : '10';
+      const history = `this._expressionHistory(${state}, "${momentumHistory}", ${source}, ctx.barIndex)`;
+      return site.className === 'Mom'
+        ? `this._momFromSeries(${history}, ${length})`
+        : `this._lagChangeFromSeries(${history}, ${length}, ${site.className === 'ROC'})`;
+    }
+    if (site.className === 'PivotPointLevels') {
+      const computeArgs = [...args, 'ctx.bar.open', 'ctx.bar.high', 'ctx.bar.low', 'ctx.bar.close'].join(', ');
+      return `deps._arr.from(...(ctx.isFirstTick ? ${member}.compute(${computeArgs}) : ${member}.recompute(${computeArgs})))`;
+    }
+    if (site.dynamicCtorArgExprs && (site.className === 'Variance' || site.className === 'StdDev')) {
+      const instance = scoped
+        ? `this._scopedTA(${currentFunctionStateName()}, "${site.memberName}", "${site.className}", _args)`
+        : `this._dynamicTA("${site.memberName}", "${site.className}", _args)`;
+      return `(() => { const _args = ${ctorArgExpr}; const _instance = ${instance}; return ctx.isFirstTick ? _instance.compute(${args[0]}, _args[1]) : _instance.recompute(${args[0]}, _args[1]); })()`;
+    }
 
     if (site.className === 'ATR') {
       return `(ctx.isFirstTick ? ${member}.compute(ctx.bar.high, ctx.bar.low, ctx.bar.close) : ${member}.recompute(ctx.bar.high, ctx.bar.low, ctx.bar.close))`;
+    }
+
+    if (site.className === 'Falling' && site.dynamicCtorArgExprs) {
+      const state = scoped ? currentFunctionStateName() : 'undefined';
+      const persistent = scoped
+        ? `this._scopedTA(${state}, "${site.memberName}", "Falling", [1])`
+        : `this._dynamicTA("${site.memberName}", "Falling", [1])`;
+      const length = emitExpr(site.dynamicCtorArgExprs[0]);
+      const source = args[0] ?? 'NaN';
+      return `(ctx.isFirstTick ? ${persistent}.compute(${source}, ${length}) : ${persistent}.recompute(${source}, ${length}))`;
+    }
+
+    const windowSeries = taSourceSeries.get(site);
+    if (site.dynamicCtorArgExprs && dynamicWindowClasses.has(site.className) && windowSeries) {
+      const source = args[0] ?? (site.className.startsWith('Highest') || site.className === 'PivotHigh' ? 'ctx.bar.high' : 'ctx.bar.low');
+      const state = scoped ? currentFunctionStateName() : 'undefined';
+      const sourceHistory = site.className === 'WMA' ? '_wmaSourceHistory' : '_expressionHistory';
+      return `this._windowTAFromSeries(this.${sourceHistory}(${state}, ${JSON.stringify(windowSeries)}, ${source}, ctx.barIndex), ${JSON.stringify(site.className)}, ${ctorArgExpr}, ctx.barIndex)`;
     }
 
     if (site.className === 'TrueRange') {
@@ -2785,14 +3588,18 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
     }
 
     if (site.className === 'Supertrend') {
-      return `(ctx.isFirstTick ? ${member}.compute(ctx.bar.high, ctx.bar.low, ctx.bar.close) : ${member}.recompute(ctx.bar.high, ctx.bar.low, ctx.bar.close))`;
+      return `(ctx.isFirstTick ? ${member}.compute(ctx.bar.high, ctx.bar.low, ctx.bar.close, ${args[0]}) : ${member}.recompute(ctx.bar.high, ctx.bar.low, ctx.bar.close, ${args[0]}))`;
     }
 
     if (site.className === 'SAR') {
-      return `(ctx.isFirstTick ? ${member}.compute(ctx.bar.high, ctx.bar.low) : ${member}.recompute(ctx.bar.high, ctx.bar.low))`;
+      return `(ctx.isFirstTick ? ${member}.compute(ctx.bar.high, ctx.bar.low, ctx.bar.close) : ${member}.recompute(ctx.bar.high, ctx.bar.low, ctx.bar.close))`;
     }
 
-    if (site.className === 'SMA' && site.computeArgExprs[0]?.type === 'Identifier') {
+    if (site.className === 'SMA' && (scoped || localTASites.has(site))) {
+      return `(ctx.isFirstTick ? ${member}.compute(${args.join(', ')}) : ${member}.recompute(${args.join(', ')}))`;
+    }
+
+    if (site.className === 'SMA' && site.computeArgExprs[0]?.type === 'Identifier' && !isRootGlobalShadow(site.computeArgExprs[0].name)) {
       const sourceName = site.computeArgExprs[0].name;
       const historyName = currentLocalHistoryName(sourceName);
       const sourceSeries = historyName
@@ -2800,28 +3607,30 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
         ?? (ctx.seriesVars.has(sourceName) ? `this.${jsSeriesMember(sourceName)}` : undefined);
       if (sourceSeries) {
         const length = site.dynamicCtorArgExprs?.[0]
-          ? emitExpr(site.dynamicCtorArgExprs[0])
+          ? emitCtorArg(site.dynamicCtorArgExprs[0], 0)
           : JSON.stringify(site.ctorArgs[0] ?? 0);
-        return `this._smaFromSeries(${sourceSeries}, ${length})`;
+        return `this._sma_source_${site.memberName}.compute(${sourceSeries}, ${length}, ctx.barIndex)`;
       }
     }
-    const smaExpressionSeries = smaSourceSeries.get(site);
+    const smaExpressionSeries = taSourceSeries.get(site);
     if (site.className === 'SMA' && smaExpressionSeries) {
       const length = site.dynamicCtorArgExprs?.[0]
-        ? emitExpr(site.dynamicCtorArgExprs[0])
+        ? emitCtorArg(site.dynamicCtorArgExprs[0], 0)
         : JSON.stringify(site.ctorArgs[0] ?? 0);
-      if (inlineSmaSourceSeries.has(site)) {
+      if (inlineTASourceSeries.has(site)) {
         const source = site.computeArgExprs[0] ? emitExpr(site.computeArgExprs[0]) : 'NaN';
-        return `(() => { const _series = this.${smaExpressionSeries}; const _value = ${source}; if (this.${smaExpressionSeries}_bar < ctx.barIndex - 1) { for (let index = this.${smaExpressionSeries}_bar + 1; index < ctx.barIndex; index += 1) _series.push(NaN); } if (this.${smaExpressionSeries}_bar === ctx.barIndex) _series.update(_value); else _series.push(_value); this.${smaExpressionSeries}_bar = ctx.barIndex; return this._smaFromSeries(_series, ${length}); })()`;
+        return `(() => { const _series = this.${smaExpressionSeries}; const _value = ${source}; if (this.${smaExpressionSeries}_bar < ctx.barIndex - 1) { for (let index = this.${smaExpressionSeries}_bar + 1; index < ctx.barIndex; index += 1) _series.push(NaN); } if (this.${smaExpressionSeries}_bar === ctx.barIndex) _series.update(_value); else _series.push(_value); this.${smaExpressionSeries}_bar = ctx.barIndex; return this._sma_source_${site.memberName}.compute(_series, ${length}, ctx.barIndex); })()`;
       }
-      return `this._smaFromSeries(this.${smaExpressionSeries}, ${length})`;
+      return `this._sma_source_${site.memberName}.compute(this.${smaExpressionSeries}, ${length}, ctx.barIndex)`;
     }
 
     if (site.className === 'VWAP') {
-      const sourceArg = readOrderedCallArg(site.node.arguments, ['source', 'anchor', 'stdev_mult'], 'source', 0);
+      const sourceName = ctx.pineVersion <= 4 ? 'x' : 'source';
+      const sourceArg = readOrderedCallArg(site.node.arguments, [sourceName, 'anchor', 'stdev_mult'], sourceName, 0);
       const anchorArg = readOrderedCallArg(site.node.arguments, ['source', 'anchor', 'stdev_mult'], 'anchor', 1);
       const source = sourceArg ? emitExpr(sourceArg) : '((ctx.bar.high + ctx.bar.low + ctx.bar.close) / 3)';
-      const anchor = anchorArg ? emitExpr(anchorArg) : 'false';
+      const anchor = anchorArg ? emitExpr(anchorArg)
+        : `(ctx.barIndex === 0 || ctx.callBuiltin("timeframe.change", ["1D"], {}, ${nextBuiltinCallId('timeframe.change')}))`;
       return `(ctx.isFirstTick ? ${member}.compute(${source}, ${anchor}, ctx.bar.volume) : ${member}.recompute(${source}, ${anchor}, ctx.bar.volume))`;
     }
 
@@ -3006,8 +3815,9 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
     args: { name?: Identifier; value: Expression }[],
     method: string,
     fallbackPosArgs: string[],
+    kindHint?: CollectionKind,
   ): string[] {
-    const candidates = [`array.${method}`, `map.${method}`, `matrix.${method}`];
+    const candidates = kindHint ? [`${kindHint}.${method}`] : [`array.${method}`, `map.${method}`, `matrix.${method}`];
     const matchingCandidates = candidates.filter((candidate) => collectionArgNames(candidate));
     if (matchingCandidates.length !== 1) return fallbackPosArgs;
     const fullName = matchingCandidates[0]!;
@@ -3034,10 +3844,26 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
     if (expr.callee.type !== 'MemberExpression') return true;
     if (expr.callee.object.type !== 'Identifier' || expr.callee.object.name !== kind) return true;
     if (!collectionVars.has(kind)) return true;
+    if (!currentLocalName(kind) && !currentPersistentLocalName(kind) && !rootRegularVars.has(kind) && !rootPersistentVars.has(kind)) return true;
     const method = expr.callee.property.name;
-    return method === 'new'
+    if (kind === 'matrix' && (method === 'get' || method === 'set')) {
+      const names = MATRIX_ARG_NAMES[`matrix.${method}`]!;
+      const id = readOrderedCallArg(expr.arguments, names, 'id', 0);
+      if (expr.arguments.length === names.length && id && getCollectionExprKind(id) === kind) return true;
+    }
+    if (method === 'new'
       || (kind === 'array' && (method === 'from' || method.startsWith('new_')))
-      || (kind === 'matrix' && method.startsWith('new_'));
+      || (kind === 'matrix' && method.startsWith('new_'))) return true;
+    const fullName = `${kind}.${method}`;
+    const argNames = collectionArgNames(fullName);
+    if (!argNames?.[0]) return false;
+    const aliases = collectionArgAliases(fullName);
+    const namedReceiver = expr.arguments.find((arg) => arg.name && (aliases[arg.name.name] ?? arg.name.name) === argNames[0]);
+    // A single other collection is the argument to a receiver method such as
+    // matrix.sum(other), not a complete namespace call matrix.sum(id1, id2).
+    if (!namedReceiver && argNames[1] === 'id2' && expr.arguments.length === 1) return false;
+    const receiver = namedReceiver?.value ?? expr.arguments.find((arg) => !arg.name)?.value;
+    return receiver !== undefined && getCollectionExprKind(receiver) === kind;
   }
 
   function emitCollectionCallArgs(
@@ -3059,17 +3885,21 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
     const positional = args.filter((arg) => !arg.name);
     const firstName = names[0];
     const arrayIsSecondArg = fullName === 'matrix.add_row' || fullName === 'matrix.add_col' || fullName === 'matrix.add_column';
+    // Keep numeric indices in the index slot; preserve the existing array shorthand.
+    // A runtime distinction also covers UDF returns without evaluating them twice.
+    const insertArgument = (value: Expression): string =>
+      `...((value) => typeof value === "number" ? [value] : [undefined, value])(${emitExpr(value)})`;
     if (arrayIsSecondArg && !hasNamedInsertIndex && !hasNamedArray) {
       if (firstName === 'id') {
         const namedId = args.find((arg) => arg.name?.name === 'id')?.value;
         if (namedId && positional.length === 1) {
-          return [emitExpr(namedId), 'undefined', emitExpr(positional[0]!.value)];
+          return [emitExpr(namedId), insertArgument(positional[0]!.value)];
         }
         if (!namedId && positional.length === 2) {
-          return [emitExpr(positional[0]!.value), 'undefined', emitExpr(positional[1]!.value)];
+          return [emitExpr(positional[0]!.value), insertArgument(positional[1]!.value)];
         }
       } else if (positional.length === 1) {
-        return ['undefined', emitExpr(positional[0]!.value)];
+        return [insertArgument(positional[0]!.value)];
       }
     }
     return emitOrderedCallArgs(args, names, MATRIX_ARG_ALIASES[fullName]);
@@ -3078,11 +3908,6 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
   function isFunctionScopedTASite(site: TACallSite): boolean {
     const currentFunctionName = functionNameStack[functionNameStack.length - 1];
     return currentFunctionName !== undefined && taSiteFunctionNames.get(site) === currentFunctionName;
-  }
-
-  function emitPivotPointLevelsCall(expr: CallExpression): string {
-    const developing = emitOrderedArg(expr.arguments, ['type', 'anchor', 'developing'], 'developing', 2) ?? 'false';
-    return `_pivotPointLevels(${developing}, this._s_high.get(0), this._s_low.get(0), this._s_close.get(0), this._s_high.get(1), this._s_low.get(1), this._s_close.get(1))`;
   }
 
   function emitPlotCall(funcName: string, expr: CallExpression): string {
@@ -3102,17 +3927,20 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
     const site = ctx.inputSites.find((s) => s.node === expr);
     const id = site?.id ?? 'unknown';
     const posArgs = expr.arguments.filter((a) => !a.name).map((a) => emitExpr(a.value));
-    const sourceHint = funcName === 'input'
-      ? inputDefaultSourceName(expr.arguments.find((arg) => arg.name?.name === 'defval')?.value ?? expr.arguments.find((arg) => !arg.name)?.value)
-      : undefined;
+    const defaultExpression = expr.arguments.find((arg) => arg.name?.name === 'defval')?.value ?? expr.arguments.find((arg) => !arg.name)?.value;
+    const sourceHint = funcName === 'input' ? inputDefaultSourceName(defaultExpression) : undefined;
+    const defaultType = funcName === 'input' && !sourceHint && defaultExpression ? expressionType(defaultExpression) : undefined;
+    const typeHint = defaultType?.qualifier === 'const' ? defaultType.kind : undefined;
     const metadataEntries = [
+      site?.defaultTitle ? `__tealscriptInputDefaultTitle: ${JSON.stringify(site.defaultTitle)}` : undefined,
       sourceHint ? `__tealscriptInputDefaultSource: "${sourceHint}"` : undefined,
+      typeHint ? `__tealscriptInputDefaultType: "${typeHint}"` : undefined,
       hasStaticInputTitle(expr.arguments) ? undefined : '__tealscriptStaticTitle: false',
     ].filter(Boolean);
     const namedObj = metadataEntries.length > 0
       ? `({...${emitNamedArgsObj(expr.arguments)}, ${metadataEntries.join(', ')}})`
       : emitNamedArgsObj(expr.arguments);
-    return `ctx.input("${id}", "${funcName}", ${posArgs[0] ?? 'NaN'}, ${namedObj}, [${posArgs.slice(1).join(', ')}])`;
+    return `ctx.input("${id}", "${funcName}", ${posArgs[0] ?? 'undefined'}, ${namedObj}, [${posArgs.slice(1).join(', ')}])`;
   }
 
   function emitStrategyCall(method: string, expr: CallExpression): string {
@@ -3129,11 +3957,19 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
       : argNames
       ? emitOrderedCallArgs(expr.arguments, argNames, ARRAY_ARG_ALIASES[fullName])
       : expr.arguments.filter((a) => !a.name).map((a) => emitExpr(a.value));
+    if (!versionRules.allowsNegativeArrayIndices && ['array.get', 'array.set', 'array.insert', 'array.remove'].includes(fullName)) {
+      posArgs[1] = `_arrayIndex(${posArgs[1] ?? 'undefined'})`;
+    }
     if (fullName === 'array.push') return `ctx.arrayPush(${posArgs.join(', ')})`;
     if (fullName === 'array.set') return `ctx.arraySet(${posArgs.join(', ')})`;
     if (fullName === 'array.unshift') return `ctx.arrayUnshift(${posArgs.join(', ')})`;
     if (fullName === 'array.insert') return `ctx.arrayInsert(${posArgs.join(', ')})`;
     if (fullName === 'array.concat') return `ctx.arrayConcat(${posArgs.join(', ')})`;
+    const isBoolConstructor = fullName === 'array.new_bool'
+      || (fullName === 'array.new' && expr.typeArguments?.[0] === 'bool');
+    if (isBoolConstructor && !versionRules.allowsBoolNaHelpers && posArgs.length < 2) {
+      return `deps._arr.create(${posArgs[0] ?? '0'}, false)`;
+    }
     const mapped = ARRAY_FUNC_MAP[fullName];
     if (mapped) return `deps._arr.${mapped}(${posArgs.join(', ')})`;
     return `deps._arr.${fullName.replace('array.', '')}(${posArgs.join(', ')})`;
@@ -3141,6 +3977,7 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
 
   function emitSwitchExpr(expr: SwitchExpression): string {
     let hasDefault = false;
+    const missingResult = !versionRules.allowsBoolNaHelpers && expressionKind(expr) === 'bool' ? 'false' : 'NaN';
 
     if (expr.discriminant) {
       const eqHelper = ctx.pineVersion === 5 ? '_eqLegacyNa' : '_eq';
@@ -3160,8 +3997,8 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
           parts.push(body);
         }
       }
-      if (parts.length === 0) return 'NaN';
-      if (!hasDefault) parts.push('NaN');
+      if (parts.length === 0) return missingResult;
+      if (!hasDefault) parts.push(missingResult);
       return `(${parts.join(' : ')})`;
     }
 
@@ -3180,8 +4017,8 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
         parts.push(body);
       }
     }
-    if (parts.length === 0) return 'NaN';
-    if (!hasDefault) parts.push('NaN');
+    if (parts.length === 0) return missingResult;
+    if (!hasDefault) parts.push(missingResult);
     return `(${parts.join(' : ')})`;
   }
 
@@ -3203,6 +4040,8 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
       && lastStmt.type !== 'IfStatement'
       && lastStmt.type !== 'ForStatement'
       && lastStmt.type !== 'WhileStatement'
+      && lastStmt.type !== 'VariableDeclaration'
+      && lastStmt.type !== 'AssignmentStatement'
     ) {
       return null;
     }
@@ -3213,7 +4052,10 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
     localNameStack.push(blockLocals);
     lines.push(`let ${retName} = NaN;`);
     for (let i = 0; i < stmts.length - 1; i++) emitStmt(stmts[i], 0);
-    if (!emitTailAssignment(lastStmt, 0, retName)) emitStmt(lastStmt, 0);
+    if (lastStmt.type === 'AssignmentStatement') {
+      emitStmt(lastStmt, 0);
+      lines.push(`${retName} = ${emitExpr(lastStmt.left)};`);
+    } else if (!emitTailAssignment(lastStmt, 0, retName)) emitStmt(lastStmt, 0);
     lines.push(`return ${retName};`);
     localNameStack.pop();
     return `(() => { ${lines.splice(start).join(' ')} })()`;
@@ -3262,7 +4104,7 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
         }
         const left = emitExpr(stmt.left);
         const right = emitExpr(stmt.right);
-        body.push(stmt.operator === ':=' ? `${left} = ${right};` : `${left} = ${emitCompoundAssignmentExpr(left, stmt.operator, right)};`);
+        body.push(stmt.operator === ':=' ? `${left} = ${right};` : `${left} = ${emitCompoundAssignmentExpr(left, stmt.operator, right, stmt.right)};`);
         continue;
       }
       if (stmt.type === 'MultiDeclaration') {
@@ -3350,8 +4192,25 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
     return name === '_';
   }
 
+  function rootBlockDeclarationName(name: string, stmt: VariableDeclaration): string | undefined {
+    if (functionNameStack.length > 0 || localNameStack.length === 0 || !rootRegularVars.has(name)) return undefined;
+    return `${localVariableName(name)}_${stmt.loc?.start.offset ?? lines.length}`;
+  }
+
+  function bindRootBlockDeclaration(name: string, localName: string | undefined): void {
+    if (localName) localNameStack[localNameStack.length - 1].set(name, localName);
+  }
+
   function emitVarDecl(stmt: VariableDeclaration, depth: number): string | undefined {
+    registerEnumVariable(stmt);
     const pad = indent(depth);
+    if (stmt.names.type === 'VariableDeclarator' && stmt.names.name.name === '_' && stmt.kind !== 'var' && stmt.kind !== 'varip') {
+      if (stmt.init.type === 'IfStatement') emitIf(stmt.init, depth);
+      else if (stmt.init.type === 'ForStatement') emitFor(stmt.init, depth);
+      else if (stmt.init.type === 'WhileStatement') emitWhile(stmt.init, depth);
+      else lines.push(`${pad}${emitExpr(stmt.init)};`);
+      return;
+    }
     if (stmt.names.type === 'TupleDeclarator') {
       const tmpVar = `_tup_${stmt.names.names.map((n) => n.name).join('_')}_${lines.length}`;
       if (stmt.init.type === 'IfStatement') {
@@ -3369,7 +4228,10 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
       for (let i = 0; i < stmt.names.names.length; i++) {
         const name = stmt.names.names[i].name;
         if (isDiscardTupleName(name)) continue;
-        const localDeclName = currentLocalName(name);
+        const blockLocal = rootBlockDeclarationName(name, stmt);
+        bindRootBlockDeclaration(name, blockLocal);
+        activateLocalDeclaration(name);
+        const localDeclName = blockLocal ?? declarationLocalName(name);
         const isRootRegular = rootRegularVars.has(name) && functionNameStack.length === 0;
         const value = `_idx(${tmpVar}, ${i})`;
         if (localDeclName) {
@@ -3396,8 +4258,10 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
     }
 
     const name = stmt.names.name.name;
+    const ifDefault = stmt.typeAnnotation?.baseType === 'bool' && !versionRules.allowsBoolNaHelpers ? 'false' : 'NaN';
     const isRootExecutionScope = depth === 2 && functionNameStack.length === 0;
-    const isRootRegularTarget = rootRegularVars.has(name) && functionNameStack.length === 0;
+    const blockLocal = stmt.kind === 'var' || stmt.kind === 'varip' ? undefined : rootBlockDeclarationName(name, stmt);
+    const isRootRegularTarget = !blockLocal && rootRegularVars.has(name) && functionNameStack.length === 0;
     const importedPrivateError = stmt.init.type === 'CallExpression' ? importedPrivateCallErrorMessage(stmt.init) : undefined;
     if (importedPrivateError) {
       lines.push(`${pad}${runtimeErrorExpr(importedPrivateError)};`);
@@ -3419,14 +4283,14 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
         lines.push(`${pad}if (!${initFlag}) {`);
         lines.push(`${pad}  const ${persistentStart} = ctx.drawingCount();`);
         if (stmt.init.type === 'IfStatement') {
-          lines.push(`${pad}  ${localPersistent} = NaN;`);
+          lines.push(`${pad}  ${localPersistent} = ${ifDefault};`);
           emitIf(stmt.init, depth + 1, localPersistent);
         } else if (stmt.init.type === 'ForStatement') {
           lines.push(`${pad}  ${localPersistent} = NaN;`);
-          emitFor(stmt.init, depth + 1, localPersistent);
+          emitFor(stmt.init, depth + 1, localPersistent, true);
         } else if (stmt.init.type === 'WhileStatement') {
           lines.push(`${pad}  ${localPersistent} = NaN;`);
-          emitWhile(stmt.init, depth + 1, localPersistent);
+          emitWhile(stmt.init, depth + 1, localPersistent, true);
         } else {
           lines.push(`${pad}  ${localPersistent} = ${emitExpr(stmt.init)};`);
         }
@@ -3440,7 +4304,7 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
       if (stmt.init.type === 'IfStatement') {
         lines.push(`${pad}if (!this.${jsInitMember(name)}) {`);
         lines.push(`${pad}  const ${persistentStart} = ctx.drawingCount();`);
-        lines.push(`${pad}  this.${jsVarMember(name)} = NaN;`);
+        lines.push(`${pad}  this.${jsVarMember(name)} = ${ifDefault};`);
         emitIf(stmt.init, depth + 1, `this.${jsVarMember(name)}`);
         lines.push(`${pad}  ctx.markPersistentRuntimeValue(this.${jsVarMember(name)});`);
         lines.push(`${pad}  this.${jsInitMember(name)} = true;`);
@@ -3450,7 +4314,7 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
         lines.push(`${pad}if (!this.${jsInitMember(name)}) {`);
         lines.push(`${pad}  const ${persistentStart} = ctx.drawingCount();`);
         lines.push(`${pad}  this.${jsVarMember(name)} = NaN;`);
-        emitFor(stmt.init, depth + 1, `this.${jsVarMember(name)}`);
+        emitFor(stmt.init, depth + 1, `this.${jsVarMember(name)}`, true);
         lines.push(`${pad}  ctx.markPersistentRuntimeValue(this.${jsVarMember(name)});`);
         lines.push(`${pad}  this.${jsInitMember(name)} = true;`);
         lines.push(`${pad}  ctx.markDrawingsPersistentFrom(${persistentStart});`);
@@ -3459,7 +4323,7 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
         lines.push(`${pad}if (!this.${jsInitMember(name)}) {`);
         lines.push(`${pad}  const ${persistentStart} = ctx.drawingCount();`);
         lines.push(`${pad}  this.${jsVarMember(name)} = NaN;`);
-        emitWhile(stmt.init, depth + 1, `this.${jsVarMember(name)}`);
+        emitWhile(stmt.init, depth + 1, `this.${jsVarMember(name)}`, true);
         lines.push(`${pad}  ctx.markPersistentRuntimeValue(this.${jsVarMember(name)});`);
         lines.push(`${pad}  this.${jsInitMember(name)} = true;`);
         lines.push(`${pad}  ctx.markDrawingsPersistentFrom(${persistentStart});`);
@@ -3481,11 +4345,13 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
 
     // Regular variable
     if (stmt.init.type === 'IfStatement') {
-      const localDeclName = currentLocalName(name);
+      const localDeclName = blockLocal ?? declarationLocalName(name);
       const target = localDeclName ?? (isRootRegularTarget ? `this.${jsGlobalMember(name)}` : jsPineName(name));
-      lines.push(isRootRegularTarget ? `${pad}${target} = NaN;` : `${pad}let ${target} = NaN;`);
+      lines.push(isRootRegularTarget ? `${pad}${target} = ${ifDefault};` : `${pad}let ${target} = ${ifDefault};`);
       emitIf(stmt.init, depth, target);
-      if (ctx.seriesVars.has(name)) {
+      bindRootBlockDeclaration(name, blockLocal);
+        activateLocalDeclaration(name);
+      if (ctx.seriesVars.has(name) && !isRootGlobalShadow(name)) {
         emitSeriesVarWrite(pad, name, target);
       }
       emitLocalHistoryPush(pad, name, target);
@@ -3493,11 +4359,13 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
       return;
     }
     if (stmt.init.type === 'ForStatement') {
-      const localDeclName = currentLocalName(name);
+      const localDeclName = blockLocal ?? declarationLocalName(name);
       const target = localDeclName ?? (isRootRegularTarget ? `this.${jsGlobalMember(name)}` : jsPineName(name));
       lines.push(isRootRegularTarget ? `${pad}${target} = NaN;` : `${pad}let ${target} = NaN;`);
       emitFor(stmt.init, depth, target);
-      if (ctx.seriesVars.has(name)) {
+      bindRootBlockDeclaration(name, blockLocal);
+        activateLocalDeclaration(name);
+      if (ctx.seriesVars.has(name) && !isRootGlobalShadow(name)) {
         emitSeriesVarWrite(pad, name, target);
       }
       emitLocalHistoryPush(pad, name, target);
@@ -3505,11 +4373,13 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
       return;
     }
     if (stmt.init.type === 'WhileStatement') {
-      const localDeclName = currentLocalName(name);
+      const localDeclName = blockLocal ?? declarationLocalName(name);
       const target = localDeclName ?? (isRootRegularTarget ? `this.${jsGlobalMember(name)}` : jsPineName(name));
       lines.push(isRootRegularTarget ? `${pad}${target} = NaN;` : `${pad}let ${target} = NaN;`);
       emitWhile(stmt.init, depth, target);
-      if (ctx.seriesVars.has(name)) {
+      bindRootBlockDeclaration(name, blockLocal);
+        activateLocalDeclaration(name);
+      if (ctx.seriesVars.has(name) && !isRootGlobalShadow(name)) {
         emitSeriesVarWrite(pad, name, target);
       }
       emitLocalHistoryPush(pad, name, target);
@@ -3518,6 +4388,8 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
     }
 
     const rhs = emitExpr(stmt.init);
+    bindRootBlockDeclaration(name, blockLocal);
+        activateLocalDeclaration(name);
 
     const taSite = stmt.init.type === 'CallExpression' ? ctx.taCallSiteMap.get(stmt.init) : null;
     if (taSite?.returnsTuple && stmt.names.type === 'VariableDeclarator') {
@@ -3525,13 +4397,13 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
       return;
     }
 
-    const localDeclName = currentLocalName(name);
+    const localDeclName = blockLocal ?? declarationLocalName(name);
     if (localDeclName) {
       lines.push(`${pad}let ${localDeclName} = ${rhs};`);
       emitRootLocalSeriesWrite(pad, name, localDeclName, rhs.includes(`this.${jsStateMember('_sv_', name)}.get(`));
       emitLocalHistoryPush(pad, name, localDeclName);
       emitFieldHistoryPush(pad, name, localDeclName);
-    } else if (ctx.seriesVars.has(name)) {
+    } else if (ctx.seriesVars.has(name) && !isRootGlobalShadow(name)) {
       emitSeriesVarWrite(pad, name, rhs, rhs.includes(`this.${jsStateMember('_sv_', name)}.get(`));
       emitLocalHistoryPush(pad, name, `this.${jsSeriesMember(name)}.get(0)`);
       emitFieldHistoryPush(pad, name, `this.${jsSeriesMember(name)}.get(0)`);
@@ -3576,7 +4448,7 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
       }
       const localName = currentLocalName(name);
       if (localName) {
-        emitAssignmentLine(pad, localName, stmt.operator, rhs);
+        emitAssignmentLine(pad, localName, stmt.operator, rhs, stmt.right);
         emitRootLocalSeriesWrite(pad, name, localName, rhs.includes(`this.${jsStateMember('_sv_', name)}.get(`));
         emitLocalHistoryPush(pad, name, localName);
         if (persistentAssignmentStart) {
@@ -3587,7 +4459,7 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
       }
       const localPersistent = currentPersistentLocalName(name);
       if (localPersistent) {
-        emitAssignmentLine(pad, localPersistent, stmt.operator, rhs);
+        emitAssignmentLine(pad, localPersistent, stmt.operator, rhs, stmt.right);
         if (persistentAssignmentStart) {
           lines.push(`${pad}ctx.markPersistentRuntimeValue(${localPersistent});`);
           lines.push(`${pad}if (${persistentAssignmentStart} !== undefined) ctx.markDrawingsPersistentFrom(${persistentAssignmentStart});`);
@@ -3600,7 +4472,7 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
         if (stmt.operator === ':=') {
           lines.push(`${pad}const ${tmpVar} = ${rhs};`);
         } else {
-          lines.push(`${pad}const ${tmpVar} = ${emitCompoundAssignmentExpr(`this.${jsSeriesMember(name)}.get(0)`, stmt.operator, rhs)};`);
+          lines.push(`${pad}const ${tmpVar} = ${emitCompoundAssignmentExpr(`this.${jsSeriesMember(name)}.get(0)`, stmt.operator, rhs, stmt.right)};`);
         }
         emitSeriesVarWrite(pad, name, tmpVar);
         if (persistentAssignmentStart) {
@@ -3610,14 +4482,14 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
         return;
       }
       if (ctx.varDecls.some((v) => v.name === name)) {
-        emitAssignmentLine(pad, `this.${jsVarMember(name)}`, stmt.operator, rhs);
+        emitAssignmentLine(pad, `this.${jsVarMember(name)}`, stmt.operator, rhs, stmt.right);
         if (persistentAssignmentStart) {
           lines.push(`${pad}ctx.markPersistentRuntimeValue(this.${jsVarMember(name)});`);
           lines.push(`${pad}if (${persistentAssignmentStart} !== undefined) ctx.markDrawingsPersistentFrom(${persistentAssignmentStart});`);
         }
         return;
       }
-      emitAssignmentLine(pad, emitAssignmentTarget(name), stmt.operator, rhs);
+      emitAssignmentLine(pad, emitAssignmentTarget(name), stmt.operator, rhs, stmt.right);
       if (persistentAssignmentStart) {
         lines.push(`${pad}ctx.markPersistentRuntimeValue(${emitAssignmentTarget(name)});`);
         lines.push(`${pad}if (${persistentAssignmentStart} !== undefined) ctx.markDrawingsPersistentFrom(${persistentAssignmentStart});`);
@@ -3631,7 +4503,7 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
       if (stmt.operator === ':=') {
         lines.push(`${pad}_setField(${obj}, "${field}", ${rhs});`);
       } else {
-        lines.push(`${pad}_setField(${obj}, "${field}", ${emitCompoundAssignmentExpr(`_getField(${obj}, "${field}")`, stmt.operator, rhs)});`);
+        lines.push(`${pad}_setField(${obj}, "${field}", ${emitCompoundAssignmentExpr(`_getField(${obj}, "${field}")`, stmt.operator, rhs, stmt.right)});`);
       }
       lines.push(`${pad}ctx.markPersistentUdtField(${obj}, "${field}");`);
       if (stmt.left.object.type === 'Identifier') {
@@ -3647,12 +4519,12 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
       if (stmt.operator === ':=') {
         lines.push(`${pad}_setIndex(${obj}, ${idx}, ${rhs});`);
       } else {
-        lines.push(`${pad}_setIndex(${obj}, ${idx}, ${emitCompoundAssignmentExpr(`_idx(${obj}, ${idx})`, stmt.operator, rhs)});`);
+        lines.push(`${pad}_setIndex(${obj}, ${idx}, ${emitCompoundAssignmentExpr(`_idx(${obj}, ${idx})`, stmt.operator, rhs, stmt.right)});`);
       }
       return;
     }
     const left = emitExpr(stmt.left);
-    lines.push(stmt.operator === ':=' ? `${pad}${left} = ${rhs};` : `${pad}${left} = ${emitCompoundAssignmentExpr(left, stmt.operator, rhs)};`);
+    lines.push(stmt.operator === ':=' ? `${pad}${left} = ${rhs};` : `${pad}${left} = ${emitCompoundAssignmentExpr(left, stmt.operator, rhs, stmt.right)};`);
   }
 
   function emitTupleAssignment(stmt: TupleAssignment, depth: number): void {
@@ -3741,6 +4613,10 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
         emitIf(stmt.alternate, depth, assignTarget);
       }
     } else {
+      if (assignTarget && !versionRules.allowsBoolNaHelpers && expressionKind(stmt) === 'bool') {
+        lines.push(`${pad}} else {`);
+        lines.push(`${pad}  ${assignTarget} = false;`);
+      }
       lines.push(`${pad}}`);
     }
   }
@@ -3768,6 +4644,17 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
   }
 
   function emitTailAssignment(stmt: Statement, depth: number, assignTarget: string): boolean {
+    if (stmt.type === 'VariableDeclaration') {
+      const tupleValue = emitVarDecl(stmt, depth);
+      const value = stmt.names.type === 'VariableDeclarator' ? emitIdentifier(stmt.names.name) : tupleValue;
+      if (value) lines.push(`${indent(depth)}${assignTarget} = ${value};`);
+      return true;
+    }
+    if (stmt.type === 'AssignmentStatement' && stmt.left.type === 'Identifier') {
+      emitAssignment(stmt, depth);
+      lines.push(`${indent(depth)}${assignTarget} = ${emitIdentifier(stmt.left)};`);
+      return true;
+    }
     if (stmt.type === 'ExpressionStatement') {
       lines.push(`${indent(depth)}${assignTarget} = ${emitExpr(stmt.expression)};`);
       return true;
@@ -3805,8 +4692,76 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
     if (scopeBlockLocals) localNameStack.pop();
   }
 
-  function emitFor(stmt: ForStatement, depth: number, assignTarget?: string): void {
+  function emitLoopTimeCheck(started: string, depth: number, loc?: SourceLocation, sampled = false): void {
+    const line = loc?.start.line;
+    const location = line === undefined ? '' : ` at line ${line}`;
     const pad = indent(depth);
+    if (sampled) lines.push(`${pad}if ((++this._loopIters & 63) === 0) {`);
+    const checkPad = sampled ? indent(depth + 1) : pad;
+    if (sampled) lines.push(`${checkPad}this._loopTime = this._loopNow();`);
+    else lines.push(`${checkPad}if (--this._loopDepth === 0) this._loopTime = this._loopNow();`);
+    lines.push(`${checkPad}if (this._loopTime - ${sampled ? 'this._loopStarted' : started} > ${LOOP_TIME_LIMIT_MS}) ctx.runtimeError(["Loop${location} exceeds the ${LOOP_TIME_LIMIT_MS} ms execution time limit"], undefined, ${line});`);
+    if (sampled) lines.push(`${pad}}`);
+  }
+
+  function emitLoopResultDefault(stmt: ForStatement | WhileStatement, depth: number, target?: string): void {
+    if (!target || versionRules.allowsBoolNaHelpers) return;
+    expressionType(stmt);
+    const types = loopResultTypes.get(stmt);
+    if (!types?.some((type) => type.kind === 'bool')) return;
+    const defaults = types.map((type) => type.kind === 'bool' ? 'false' : 'NaN');
+    const value = defaults.length === 1 ? defaults[0] : `[${defaults.join(', ')}]`;
+    lines.push(`${indent(depth)}${target} = ${value};`);
+  }
+
+  function loopAccumulators(stmt: ForStatement): string[] {
+    if (stmt.kind !== 'numeric' || functionNameStack.length > 0) return [];
+    const names = new Set<string>();
+    const declared = new Set<string>([stmt.counter.name]);
+    let safe = true;
+    const visit = (value: unknown): void => {
+      if (!value || typeof value !== 'object') return;
+      if (Array.isArray(value)) { value.forEach(visit); return; }
+      const node = value as Statement | Expression;
+      if (node.type === 'FunctionDeclaration' || node.type === 'LambdaExpression') safe = false;
+      if (node.type === 'CallExpression' && !(node.callee.type === 'Identifier' && node.callee.name === 'nz' && !ctx.funcInfos.has('nz') && !ast.body.some((statement) => statement.type === 'FunctionDeclaration' && statement.name.name === 'nz') && !rootDeclaredNames.has('nz'))) safe = false;
+      if (node.type === 'ForStatement') { declared.add(node.counter.name); if (node.kind === 'collection' && node.indexCounter) declared.add(node.indexCounter.name); }
+      if (node.type === 'VariableDeclaration') collectIdentifierReferences(node.names as unknown as Expression).forEach((name) => declared.add(name));
+      if (node.type === 'AssignmentStatement' && node.left.type === 'Identifier'
+        && rootRegularVars.has(node.left.name) && !ctx.seriesVars.has(node.left.name)
+        && ['+=', '-=', '*='].includes(node.operator)) names.add(node.left.name);
+      for (const [key, child] of Object.entries(value)) if (key !== 'loc') visit(child);
+    };
+    visit(stmt.body);
+    const boundaryNames = collectIdentifierReferences(stmt.start);
+    collectIdentifierReferences(stmt.end, boundaryNames);
+    if (stmt.step) collectIdentifierReferences(stmt.step, boundaryNames);
+    return safe ? [...names].filter((name) => !declared.has(name) && !boundaryNames.has(name)) : [];
+  }
+
+  function emitFor(stmt: ForStatement, depth: number, assignTarget?: string, stopAfterFirstIteration = false): void {
+    emitLoopResultDefault(stmt, depth, assignTarget);
+    const started = `_loop_started_${loopId++}`;
+    const accumulators = loopAccumulators(stmt).map((name) => [name, `${started}_${jsPineName(name)}`] as const);
+    const locals = accumulators.map(([name, local]) => `let ${local} = ${emitAssignmentTarget(name)};`).join(' ');
+    lines.push(`${indent(depth)}{ if (this._loopDepth++ === 0) this._loopStarted = this._loopTime = this._loopNow(); const ${started} = this._loopStarted; ${locals} try {`);
+    depth += 1;
+    const pad = indent(depth);
+    const reads = functionNameStack.length === 0 && ctx.localMethodOverloads.size === 0 && ctx.importedMethodOverloads.size === 0 && ctx.importedNamespaces.size === 0
+      ? invariantLineReads(stmt, expressionType) : new Map<CallExpression, { array: Identifier; index: Identifier }>();
+    const newReads: CallExpression[] = [];
+    const arrays = new Map<string, string>();
+    for (const [call, read] of reads) {
+      if (cachedLineReads.has(call)) continue;
+      let cache = arrays.get(read.array.name);
+      if (!cache) {
+        cache = `_loop_line_levels_${loopId++}`;
+        arrays.set(read.array.name, cache);
+        lines.push(`${pad}const ${cache} = [];`);
+      }
+      cachedLineReads.set(call, { cache, index: read.index });
+      newReads.push(call);
+    }
     if (stmt.kind === 'numeric') {
       const currentLoopId = loopId++;
       const counter = stmt.counter.name;
@@ -3816,46 +4771,83 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
       const guardName = `_loop_iter_${currentLoopId}`;
       const start = emitExpr(stmt.start);
       const end = emitExpr(stmt.end);
-      const step = stmt.step ? emitExpr(stmt.step) : `(${counterName} <= ${endName} ? 1 : -1)`;
-      const condition = versionRules.forLoopEndBoundaryIsDynamic
-        ? `((${endName} = ${end}), ${stepName} > 0 ? ${counterName} <= ${endName} : ${counterName} >= ${endName})`
+      const stepMagnitude = stmt.step ? `Math.abs(${emitExpr(stmt.step)})` : '1';
+      const step = `(${counterName} <= ${endName} ? ${stepMagnitude} : -${stepMagnitude})`;
+      const fixedStep = !stmt.step || (stmt.step.type === 'NumericLiteral' && Number.isFinite(stmt.step.value) && stmt.step.value !== 0);
+      const fixedDirection = fixedStep && stmt.start.type === 'NumericLiteral' && stmt.end.type === 'NumericLiteral'
+        ? (stmt.start.value <= stmt.end.value ? '<=' : '>=') : undefined;
+      const boundary = fixedDirection
+        ? `${counterName} ${fixedDirection} ${endName}`
         : `(${stepName} > 0 ? ${counterName} <= ${endName} : ${counterName} >= ${endName})`;
-      lines.push(`${pad}for (let ${counterName} = ${start}, ${endName} = ${end}, ${stepName} = ${step}, ${guardName} = 0; ${condition}; ${counterName} += ${stepName}, ${guardName}++) {`);
-      lines.push(`${indent(depth + 1)}if (${guardName} >= ${ITERATION_CAP}) break;`);
-      localNameStack.push(new Map([[counter, counterName]]));
+      const condition = versionRules.forLoopEndBoundaryIsDynamic && stmt.end.type !== 'NumericLiteral'
+        ? `(${guardName} > 0 && (${endName} = ${end}), ${boundary})`
+        : boundary;
+      const guardedCondition = stopAfterFirstIteration ? `${guardName} < 1 && ${condition}` : condition;
+      lines.push(`${pad}for (let ${counterName} = ${start}, ${endName} = ${end}, ${stepName} = ${step}, ${guardName} = 0; ${guardedCondition}; ${counterName} += ${stepName}, ${guardName}++) {`);
+      emitLoopTimeCheck(started, depth + 1, stmt.loc, true);
+      const safeHistoryCounter = !stmt.step && stmt.start.type === 'NumericLiteral' && stmt.end.type === 'NumericLiteral'
+        && Number.isSafeInteger(stmt.start.value) && stmt.start.value >= 0
+        && Number.isSafeInteger(stmt.end.value) && stmt.end.value >= 0 && !writesLoopCounter(stmt.body, counter);
+      const alreadySafe = nonnegativeIntegerLoopCounters.has(counterName);
+      if (safeHistoryCounter) nonnegativeIntegerLoopCounters.add(counterName);
+      else nonnegativeIntegerLoopCounters.delete(counterName);
+      localNameStack.push(new Map([[counter, counterName], ...accumulators]));
       emitLoopBody(stmt.body, depth + 1, assignTarget);
       localNameStack.pop();
+      if (alreadySafe) nonnegativeIntegerLoopCounters.add(counterName);
+      else nonnegativeIntegerLoopCounters.delete(counterName);
       lines.push(`${pad}}`);
     } else {
       const counter = stmt.counter.name;
-      const counterName = jsPineName(counter);
+      const counterName = localVariableName(counter);
       const iterable = emitExpr(stmt.iterable);
       const iterVar = `_iter_${counterName}`;
       if (stmt.indexCounter) {
-        const entriesVar = `_entries_${counterName}`;
-        const indexCounterName = jsPineName(stmt.indexCounter.name);
-        lines.push(`${pad}{ const ${iterVar} = ${iterable}; const ${entriesVar} = _iterEntries(${iterVar});`);
-        lines.push(`${pad}for (let _i = 0; _i < ${entriesVar}.length && _i < ${ITERATION_CAP}; _i++) {`);
-        lines.push(`${indent(depth + 1)}let ${indexCounterName} = ${entriesVar}[_i][0];`);
-        lines.push(`${indent(depth + 1)}let ${counterName} = ${entriesVar}[_i][1];`);
+        const entryVar = `_entry_${counterName}`;
+        const indexCounterName = localVariableName(stmt.indexCounter.name);
+        lines.push(`${pad}{ const ${iterVar} = ${iterable};`);
+        lines.push(`${pad}if (${iterVar} && ${iterVar}.__tealscriptMap) deps._map.beginIteration(${iterVar}); try {`);
+        lines.push(`${pad}for (let _i = 0; ${stopAfterFirstIteration ? "_i < 1 && " : ""}_i < _iterSize(${iterVar}); _i++) {`);
+        lines.push(`${indent(depth + 1)}const ${entryVar} = _iterEntry(${iterVar}, _i);`);
+        lines.push(`${indent(depth + 1)}let ${indexCounterName} = ${entryVar}[0];`);
+        lines.push(`${indent(depth + 1)}let ${counterName} = ${entryVar}[1];`);
         localNameStack.push(new Map([[stmt.indexCounter.name, indexCounterName], [counter, counterName]]));
       } else {
-        lines.push(`${pad}{ const ${iterVar} = ${iterable}; for (let _i = 0; _i < _iterSize(${iterVar}) && _i < ${ITERATION_CAP}; _i++) {`);
+        lines.push(`${pad}{ const ${iterVar} = ${iterable}; for (let _i = 0; ${stopAfterFirstIteration ? "_i < 1 && " : ""}_i < _iterSize(${iterVar}); _i++) {`);
         lines.push(`${indent(depth + 1)}let ${counterName} = _iterGet(${iterVar}, _i);`);
         localNameStack.push(new Map([[counter, counterName]]));
       }
+      emitLoopTimeCheck(started, depth + 1, stmt.loc, true);
       emitLoopBody(stmt.body, depth + 1, assignTarget);
       localNameStack.pop();
-      lines.push(`${pad}}}`)
+      if (stmt.indexCounter) {
+        lines.push(`${pad}} } finally { if (${iterVar} && ${iterVar}.__tealscriptMap) deps._map.endIteration(${iterVar}); } }`);
+      } else {
+        lines.push(`${pad}}}`);
+      }
     }
+    for (const call of newReads) cachedLineReads.delete(call);
+    lines.push(`${pad}} finally {`);
+    for (const [name, local] of accumulators) lines.push(`${indent(depth + 1)}${emitAssignmentTarget(name)} = ${local};`);
+    emitLoopTimeCheck(started, depth + 1, stmt.loc);
+    lines.push(`${pad}} }`);
   }
 
-  function emitWhile(stmt: WhileStatement, depth: number, assignTarget?: string): void {
+  function emitWhile(stmt: WhileStatement, depth: number, assignTarget?: string, stopAfterFirstIteration = false): void {
+    emitLoopResultDefault(stmt, depth, assignTarget);
+    const started = `_loop_started_${loopId++}`;
+    lines.push(`${indent(depth)}{ if (this._loopDepth++ === 0) this._loopStarted = this._loopTime = this._loopNow(); const ${started} = this._loopStarted; try {`);
+    depth += 1;
     const pad = indent(depth);
     const guardName = `_loop_iter_${loopId++}`;
-    lines.push(`${pad}for (let ${guardName} = 0; ${guardName} < ${ITERATION_CAP} && _isTruthy(${emitExpr(stmt.test)}); ${guardName}++) {`);
+    const condition = stopAfterFirstIteration ? `${guardName} < 1 && ` : "";
+    lines.push(`${pad}for (let ${guardName} = 0; ${condition}_isTruthy(${emitExpr(stmt.test)}); ${guardName}++) {`);
+    emitLoopTimeCheck(started, depth + 1, stmt.loc, true);
     emitLoopBody(stmt.body, depth + 1, assignTarget);
     lines.push(`${pad}}`);
+    lines.push(`${pad}} finally {`);
+    emitLoopTimeCheck(started, depth + 1, stmt.loc);
+    lines.push(`${pad}} }`);
   }
 
   function collectFunctionLocalNames(stmts: Statement[]): Map<string, string> {
@@ -3880,21 +4872,14 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
     const names = collectFunctionLocalNames(stmts);
     if (functionNameStack.length > 0) return names;
     for (const name of [...names.keys()]) {
-      if (rootRegularVars.has(name)) names.delete(name);
+      if (rootRegularVars.has(name) && !rootDeclaredNames.has(name)) names.delete(name);
+      else if (rootDeclaredNames.has(name)) names.set(name, `${localVariableName(name)}_${rootShadowIndex++}`);
     }
+    pendingRootShadows.set(names, new Set([...names.keys()].filter((name) => rootDeclaredNames.has(name))));
     return names;
   }
 
-  function emitsFunctionNameReturn(stmt: Statement, functionName: string): boolean {
-    if (stmt.type === 'VariableDeclaration' && stmt.names.type === 'VariableDeclarator') {
-      return stmt.names.name.name === functionName;
-    }
-    return stmt.type === 'AssignmentStatement'
-      && stmt.left.type === 'Identifier'
-      && stmt.left.name === functionName;
-  }
-
-  function emitFunctionBody(stmts: Statement[], functionName: string): void {
+  function emitFunctionBody(stmts: Statement[]): void {
     if (stmts.length === 0) return;
     const functionLocals = collectFunctionLocalNames(stmts);
     localNameStack.push(functionLocals);
@@ -3907,32 +4892,12 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
       localNameStack.pop();
       return;
     }
-    if (lastStmt.type === 'IfStatement') {
-      const retName = `_fn_ret_${lines.length}`;
-      lines.push(`    let ${retName} = NaN;`);
-      emitIf(lastStmt, 2, retName);
+    const retName = `_fn_ret_${lines.length}`;
+    lines.push(`    let ${retName} = NaN;`);
+    if (emitTailAssignment(lastStmt, 2, retName)) {
       lines.push(`    return ${retName};`);
-      localNameStack.pop();
-      return;
-    }
-    if (lastStmt.type === 'ForStatement' || lastStmt.type === 'WhileStatement') {
-      const retName = `_fn_ret_${lines.length}`;
-      lines.push(`    let ${retName} = NaN;`);
-      if (lastStmt.type === 'ForStatement') emitFor(lastStmt, 2, retName);
-      else emitWhile(lastStmt, 2, retName);
-      lines.push(`    return ${retName};`);
-      localNameStack.pop();
-      return;
-    }
-    if (lastStmt.type === 'VariableDeclaration' && lastStmt.names.type === 'TupleDeclarator') {
-      const tupleValue = emitVarDecl(lastStmt, 2);
-      if (tupleValue) lines.push(`    return ${tupleValue};`);
-      localNameStack.pop();
-      return;
-    }
-    emitStmt(lastStmt, 2);
-    if (emitsFunctionNameReturn(lastStmt, functionName)) {
-      lines.push(`    return ${currentLocalName(functionName) ?? emitAssignmentTarget(functionName)};`);
+    } else {
+      emitStmt(lastStmt, 2);
     }
     localNameStack.pop();
   }
@@ -3940,6 +4905,7 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
   // --- Generate the class ---
 
   lines.push('// Generated by TealScript codegen');
+  lines.push(`const _allowsNegativeArrayIndices = ${versionRules.allowsNegativeArrayIndices};`);
   lines.push('return class GeneratedScript {');
 
   function seriesMaxBarsBackExpr(name: string): string {
@@ -3947,14 +4913,23 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
     return hint === undefined ? 'deps.maxBarsBack' : `Math.max(deps.maxBarsBack, ${hint})`;
   }
 
+  function seriesHistoryHint(name: string): number {
+    return ctx.maxBarsBackHints.get(name) ?? 0;
+  }
+
   // Constructor
   lines.push('  constructor(deps) {');
   lines.push('    this._deps = deps;');
+  lines.push('    const _clock = performance;');
+  lines.push('    this._loopNow = _clock.now.bind(_clock);');
+  const udtFactoryInsertionIndex = lines.length;
 
   // Bar field series
   for (const [name, field] of Object.entries(BAR_FIELDS)) {
-    const maxBarsBack = seriesMaxBarsBackExpr(name);
-    lines.push(`    this.${field} = new deps.NumericSeries(${maxBarsBack} + 1, ${maxBarsBack});`);
+    const maxBarsBack = name === 'close'
+      ? `Math.min(10000, ${seriesMaxBarsBackExpr(name)})`
+      : seriesMaxBarsBackExpr(name);
+    lines.push(`    this.${field} = new deps.NumericSeries(${maxBarsBack} + 1, ${maxBarsBack}, "${name}", ${seriesHistoryHint(name)});`);
   }
 
   // Computed bar field series (only if history-accessed)
@@ -3962,29 +4937,29 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
   for (const name of computedBarFields) {
     if (ctx.barFieldSeriesVars.has(name)) {
       const maxBarsBack = seriesMaxBarsBackExpr(name);
-      lines.push(`    this._s_${name} = new deps.NumericSeries(${maxBarsBack} + 1, ${maxBarsBack});`);
+      lines.push(`    this._s_${name} = new deps.NumericSeries(${maxBarsBack} + 1, ${maxBarsBack}, "${name}", ${seriesHistoryHint(name)});`);
     }
   }
 
   // Series vars
   for (const name of ctx.seriesVars) {
     const maxBarsBack = seriesMaxBarsBackExpr(name);
-    lines.push(`    this.${jsSeriesMember(name)} = new deps.ValueSeries(${maxBarsBack} + 1, ${maxBarsBack});`);
+    lines.push(`    this.${jsSeriesMember(name)} = new deps.ValueSeries(${maxBarsBack} + 1, ${maxBarsBack}, "var:${name}", ${seriesHistoryHint(name)});`);
     lines.push(`    this.${jsSeriesBarMember(name)} = -1;`);
   }
   for (const [objectName, fields] of fieldHistory) {
     for (const field of fields) {
       const maxBarsBack = seriesMaxBarsBackExpr(objectName);
-      lines.push(`    this.${fieldHistoryMemberName(objectName, field)} = new deps.ValueSeries(${maxBarsBack} + 1, ${maxBarsBack});`);
+      lines.push(`    this.${fieldHistoryMemberName(objectName, field)} = new deps.ValueSeries(${maxBarsBack} + 1, ${maxBarsBack}, "field:${objectName}:${field}", ${seriesHistoryHint(objectName)});`);
     }
   }
-  for (const member of expressionHistory.values()) {
-    lines.push(`    this.${member} = new deps.ValueSeries(deps.maxBarsBack + 1, deps.maxBarsBack);`);
+  for (const member of [...expressionHistory.values(), ...momentumSourceHistory.values()]) {
+    lines.push(`    this.${member} = new deps.ValueSeries(deps.maxBarsBack + 1, deps.maxBarsBack, "${member}");`);
     lines.push(`    this.${member}_bar = -1;`);
   }
   for (const name of collectionHistoryVars.keys()) {
     const maxBarsBack = seriesMaxBarsBackExpr(name);
-    lines.push(`    this.${jsCollectionHistoryMember(name)} = new deps.ValueSeries(${maxBarsBack} + 1, ${maxBarsBack});`);
+    lines.push(`    this.${jsCollectionHistoryMember(name)} = new deps.ValueSeries(${maxBarsBack} + 1, ${maxBarsBack}, "collection:${name}", ${seriesHistoryHint(name)});`);
   }
 
   // Var/varip
@@ -4007,6 +4982,10 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
     const hasExpressionHistory = callSiteHasExpressionHistory(callExpr);
     if (callSiteNeedsState(callExpr)) {
       lines.push(`    this.${jsStateMember('_fn_state_', String(id))} = {`);
+      lines.push(`      __historyKey: "fn:${id}",`);
+      lines.push(`      __callPath: ${JSON.stringify(`fn_${id}`)},`);
+      lines.push(`      __varipNames: [${localVars.filter((localVar) => localVar.kind === 'varip').map((localVar) => JSON.stringify(jsPineName(localVar.name))).join(', ')}],`);
+      lines.push(`      __udtNames: [${localVars.filter((localVar) => localVar.kind === 'var').map((localVar) => JSON.stringify(jsPineName(localVar.name))).join(', ')}],`);
       for (const localVar of localVars) {
         lines.push(`      ${jsVarMember(localVar.name)}: NaN,`);
         lines.push(`      ${jsInitMember(localVar.name)}: false,`);
@@ -4020,11 +4999,11 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
       lines.push('    };');
     }
     for (const param of callSiteHistoryParams(callExpr)) {
-      lines.push(`    this.${jsStateMember('_fn_param_series_', `${id}_${param}`)} = new deps.ValueSeries(deps.maxBarsBack + 1, deps.maxBarsBack);`);
+      lines.push(`    this.${jsStateMember('_fn_param_series_', `${id}_${param}`)} = new deps.ValueSeries(deps.maxBarsBack + 1, deps.maxBarsBack, "${jsStateMember('_fn_param_series_', `${id}_${param}`)}");`);
       lines.push(`    this.${jsStateMember('_fn_param_series_', `${id}_${param}`)}.__tealscriptLastBar = -1;`);
     }
     for (const local of callSiteHistoryLocals(callExpr)) {
-      lines.push(`    this.${jsStateMember('_fn_local_series_', `${id}_${local}`)} = new deps.ValueSeries(deps.maxBarsBack + 1, deps.maxBarsBack);`);
+      lines.push(`    this.${jsStateMember('_fn_local_series_', `${id}_${local}`)} = new deps.ValueSeries(deps.maxBarsBack + 1, deps.maxBarsBack, "${jsStateMember('_fn_local_series_', `${id}_${local}`)}");`);
       lines.push(`    this.${jsStateMember('_fn_local_series_', `${id}_${local}`)}.__tealscriptLastBar = -1;`);
     }
   }
@@ -4036,23 +5015,32 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
     lines.push(`    this.${site.memberName} = new deps.${site.className}(${argsStr});`);
   }
   for (const site of ctx.taCallSites) {
-    lines.push(`    this._ta_result_${site.memberName} = new deps.NumericSeries(deps.maxBarsBack + 1, deps.maxBarsBack);`);
+    const seriesClass = site.className === 'PivotPointLevels' ? 'ValueSeries' : 'NumericSeries';
+    lines.push(`    this._ta_result_${site.memberName} = new deps.${seriesClass}(deps.maxBarsBack + 1, deps.maxBarsBack, "_ta_result_${site.memberName}");`);
   }
-  for (const memberName of smaSourceSeries.values()) {
-    lines.push(`    this.${memberName} = new deps.ValueSeries(deps.maxBarsBack + 1, deps.maxBarsBack);`);
+  for (const memberName of taSourceSeries.values()) {
+    lines.push(`    this.${memberName} = new deps.ValueSeries(deps.maxBarsBack + 1, deps.maxBarsBack, "${memberName}");`);
     lines.push(`    this.${memberName}_bar = -1;`);
   }
   for (const site of ctx.taVarSites) {
-    lines.push(`    this.${site.memberName} = new deps.${site.className}();`);
-    lines.push(`    this.${site.seriesName} = new deps.NumericSeries(deps.maxBarsBack + 1, deps.maxBarsBack);`);
+    const ctorArgs = site.className === 'VWAP' ? 'false, NaN' : '';
+    lines.push(`    this.${site.memberName} = new deps.${site.className}(${ctorArgs});`);
+    lines.push(`    this.${site.seriesName} = new deps.NumericSeries(deps.maxBarsBack + 1, deps.maxBarsBack, "${site.seriesName}");`);
+  }
+
+  for (const site of sourceSeriesSMASites) {
+    const fixedLength = fixedLengthSMASites.has(site);
+    const capacity = site.dynamicCtorArgExprs ? (fixedLength ? '0' : 'deps.maxBarsBack + 1') : JSON.stringify(Number(site.ctorArgs[0]) + 1);
+    lines.push(`    this._sma_source_${site.memberName} = deps.SMA.sourceHistory(${capacity}, ${fixedLength});`);
   }
 
   // Placeholder for fixnan members (filled after body emission)
   const fixnanPlaceholderIdx = lines.length;
   lines.push('    this._dynamicTACache = new Map();');
+  lines.push('    this._dynamicTALast = new Map();');
   lines.push('  }');
   lines.push('  _copyCollection(kind, value) {');
-  lines.push('    if (kind === "array" && value?.__tealscriptArray) return this._deps._arr.copy(value);');
+  lines.push('    if (kind === "array" && value?.__tealscriptArray) return this._deps._arr.copy(value, true);');
   lines.push('    if (kind === "matrix" && value?.__tealscriptMatrix) return this._deps._mtx.copy(value);');
   lines.push('    if (kind === "map" && value?.__tealscriptMap) return this._deps._map.copy(value);');
   lines.push('    return value;');
@@ -4069,12 +5057,22 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
   lines.push('  }');
 
   lines.push('  _dynamicTA(memberName, className, args) {');
-  lines.push('    const key = memberName + ":" + args.map((arg) => typeof arg + "=" + String(arg)).join("|");');
+  lines.push('    const last = this._dynamicTALast.get(memberName);');
+  lines.push('    if (last && last.args.length === args.length) {');
+  lines.push('      let unchanged = true;');
+  lines.push('      for (let index = 0; index < args.length; index += 1) {');
+  lines.push('        if (!Object.is(last.args[index], args[index])) { unchanged = false; break; }');
+  lines.push('      }');
+  lines.push('      if (unchanged) return last.instance;');
+  lines.push('    }');
+  lines.push('    const keyArgs = className === "Variance" || className === "StdDev" ? args.slice(0, 1) : args;');
+  lines.push('    const key = memberName + ":" + keyArgs.map((arg) => typeof arg + "=" + String(arg)).join("|");');
   lines.push('    let entry = this._dynamicTACache.get(key);');
   lines.push('    if (!entry) {');
   lines.push('      entry = { className, args, instance: new this._deps[className](...args) };');
   lines.push('      this._dynamicTACache.set(key, entry);');
   lines.push('    }');
+  lines.push('    this._dynamicTALast.set(memberName, entry);');
   lines.push('    return entry.instance;');
   lines.push('  }');
   lines.push('  _expressionHistory(state, member, value, barIndex) {');
@@ -4082,7 +5080,7 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
   lines.push('    if (state) {');
   lines.push('      if (!owner.__expressionHistories) owner.__expressionHistories = new Map();');
   lines.push('      let entry = owner.__expressionHistories.get(member);');
-  lines.push('      if (!entry) { entry = { series: new this._deps.ValueSeries(this._deps.maxBarsBack + 1, this._deps.maxBarsBack), lastBar: -1 }; owner.__expressionHistories.set(member, entry); }');
+  lines.push('      if (!entry) { entry = { series: new this._deps.ValueSeries(this._deps.maxBarsBack + 1, this._deps.maxBarsBack, owner.__historyKey + ":expression:" + member), lastBar: -1 }; owner.__expressionHistories.set(member, entry); }');
   lines.push('      const series = entry.series;');
   lines.push('      if (entry.lastBar === barIndex) series.update(value); else series.push(value);');
   lines.push('      entry.lastBar = barIndex;');
@@ -4105,7 +5103,8 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
   lines.push('    if (!state.__taLast) state.__taLast = new Map();');
   lines.push('    const last = state.__taLast.get(memberName);');
   lines.push('    if (last && last.args.length === args.length && last.args.every((value, index) => Object.is(value, args[index]))) return last.instance;');
-  lines.push('    const key = memberName + ":" + args.map((arg) => typeof arg + "=" + String(arg)).join("|");');
+  lines.push('    const keyArgs = className === "Variance" || className === "StdDev" ? args.slice(0, 1) : args;');
+  lines.push('    const key = memberName + ":" + keyArgs.map((arg) => typeof arg + "=" + String(arg)).join("|");');
   lines.push('    let entry = state.__taCache.get(key);');
   lines.push('    if (!entry) {');
   lines.push('      entry = { className, args, instance: new this._deps[className](...args) };');
@@ -4114,36 +5113,127 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
   lines.push('    state.__taLast.set(memberName, entry);');
   lines.push('    return entry.instance;');
   lines.push('  }');
-  lines.push('  _scopedTASeries(state, memberName) {');
+  lines.push('  _scopedTASeries(state, memberName, returnsArray = false) {');
   lines.push('    if (!state) return this[`_ta_result_${memberName}`];');
   lines.push('    if (!state.__taSeries) state.__taSeries = new Map();');
   lines.push('    let series = state.__taSeries.get(memberName);');
   lines.push('    if (!series) {');
-  lines.push('      series = new this._deps.NumericSeries(this._deps.maxBarsBack + 1, this._deps.maxBarsBack);');
+  lines.push('      const Series = returnsArray ? this._deps.ValueSeries : this._deps.NumericSeries;');
+  lines.push('      series = new Series(this._deps.maxBarsBack + 1, this._deps.maxBarsBack, state.__historyKey + ":ta:" + memberName);');
   lines.push('      state.__taSeries.set(memberName, series);');
   lines.push('    }');
   lines.push('    return series;');
   lines.push('  }');
-  lines.push('  _smaFromSeries(series, length) {');
+  lines.push('  _momFromSeries(series, length) {');
   lines.push('    const n = Number(length);');
   lines.push('    if (!Number.isFinite(n) || Math.trunc(n) !== n || n < 1) throw new Error(`TA length must be a positive integer; got ${Number.isNaN(n) ? "na" : n}. TradingView rejects zero, negative, fractional, and na lengths, so guard computed lengths or add one before calling TA functions`);');
-  lines.push('    let sum = 0;');
-  lines.push('    let count = 0;');
-  lines.push('    for (let i = 0; i < series.length && count < n; i++) {');
-  lines.push('      const value = Number(series?.get(i));');
-  lines.push('      if (Number.isNaN(value)) continue;');
-  lines.push('      sum += value;');
-  lines.push('      count += 1;');
-  lines.push('    }');
-  lines.push('    if (count < n) return NaN;');
-  lines.push('    return sum / n;');
+  lines.push('    return Number(series.get(0)) - Number(series.get(n));');
   lines.push('  }');
-  lines.push('  _childFnState(parentState, callSiteId, localNames, hasTACalls, hasExpressionHistory) {');
+  if (hasDynamicLagCalls) {
+    lines.push('  _lagChangeFromSeries(series, length, rate) {');
+    lines.push('    const difference = this._momFromSeries(series, length);');
+    lines.push('    const previous = Number(series.get(Number(length)));');
+    lines.push('    if (rate) return previous === 0 ? NaN : (100 * difference) / previous;');
+    lines.push('    const current = series.get(0);');
+    lines.push('    return typeof current === "boolean" && previous === previous ? current !== Boolean(previous) : difference;');
+    lines.push('  }');
+  }
+  // Immutable slot metadata preserves WMA warmup/fill through bounded history
+  // eviction, while the normal series update/restore handles replacement.
+  lines.push('  _wmaSourceHistory(state, member, source, barIndex) {');
+  lines.push('    const series = this._expressionHistory(state, member, NaN, barIndex);');
+  lines.push('    const previous = series.get(1);');
+  lines.push('    const defined = !Number.isNaN(Number(source));');
+  lines.push('    series.update({ source: Number(source), filled: defined ? Number(source) : (previous?.filled ?? NaN), valid: (previous?.valid ?? 0) + (defined ? 1 : 0) });');
+  lines.push('    return series;');
+  lines.push('  }');
+  lines.push('  _windowTAFromSeries(series, className, args, barIndex) {');
+  lines.push('    if (["Highest", "Lowest", "HighestBars", "LowestBars"].includes(className)) {');
+  lines.push('      const n = Number(args[0]);');
+  lines.push('      const highest = className === "Highest" || className === "HighestBars";');
+  lines.push('      const returnsOffset = className.endsWith("Bars");');
+  lines.push('      if (!this._windowTAStates) this._windowTAStates = new WeakMap();');
+  lines.push('      let state = this._windowTAStates.get(series);');
+  lines.push(
+    '      const rebuild = !state || state.className !== className || !Object.is(state.length, args[0]) || state.barIndex + 1 !== barIndex;',
+  );
+  lines.push('      if (rebuild) {');
+  lines.push('        new this._deps[className](...args);');
+  lines.push('        series.get(Math.min(n - 1, series.capacity - 1));');
+  lines.push('        state = { className, length: args[0], barIndex, queue: [], head: 0, samples: Math.min(series.size, n) };');
+  lines.push('        this._windowTAStates.set(series, state);');
+  lines.push('      }');
+  lines.push('      const queue = state.queue;');
+  lines.push('      for (let offset = rebuild ? Math.min(series.size, n) - 1 : 0; offset >= 0; offset--) {');
+  lines.push('        const value = Number(series.get(offset));');
+  lines.push('        if (Number.isNaN(value)) { queue.length = 0; state.head = 0; continue; }');
+  lines.push('        while (queue.length > state.head) {');
+  lines.push('          const previous = queue[queue.length - 1][1];');
+  lines.push(
+    '          const betterZero = !returnsOffset && value === 0 && previous === 0 && !Object.is(value, previous) && (highest ? Object.is(value, 0) : Object.is(value, -0));',
+  );
+  lines.push('          if (!(highest ? value > previous : value < previous) && !betterZero) break;');
+  lines.push('          queue.pop();');
+  lines.push('        }');
+  lines.push('        queue.push([barIndex - offset, value]);');
+  lines.push('      }');
+  lines.push('      while (state.head < queue.length && queue[state.head][0] <= barIndex - n) state.head++;');
+  lines.push('      if (!rebuild) state.samples = Math.min(n, state.samples + 1); const first = queue[state.head];');
+  lines.push(
+    '      const result = state.samples < n ? NaN : first ? (returnsOffset ? first[0] - barIndex : first[1]) : (returnsOffset ? 0 : NaN);',
+  );
+  lines.push('      state.barIndex = barIndex;');
+  lines.push(
+    '      if (state.head > 128 && state.head * 2 > queue.length) { state.queue = queue.slice(state.head); state.head = 0; }',
+  );
+  lines.push('      return result;');
+  lines.push('    }');
+  lines.push('    const pivot = className === "PivotHigh" || className === "PivotLow";');
+  lines.push('    const strengths = pivot ? this._deps[className].windowStrengths(...args) : undefined;');
+  lines.push('    const instance = pivot ? undefined : new this._deps[className](...args);');
+  lines.push('    const n = Number(args[0]) + (className === "PivotHigh" || className === "PivotLow" ? Number(args[1]) + 1 : 0);');
+  lines.push('    if (Number.isInteger(n) && n > 0) series.get(Math.min(n - 1, series.capacity - 1));');
+  lines.push('    if (className === "WMA") {');
+  lines.push('      if (series.size < n) return NaN;');
+  lines.push('      const filledWMA = args[1];');
+  lines.push('      const current = series.get(0);');
+  lines.push('      if (filledWMA && (Number.isNaN(current.source) || current.valid < n)) return NaN;');
+  lines.push('      let result = NaN;');
+  lines.push('      for (let index = n - 1; index >= 0; index -= 1) {');
+  lines.push('        const slot = series.get(index);');
+  lines.push('        result = instance.compute(filledWMA ? slot.filled : Number(slot));');
+  lines.push('      }');
+  lines.push('      return result;');
+  lines.push('    }');
+  lines.push('    const skipNa = ["Median", "Mode", "Range"].includes(className);');
+  lines.push('    const samples = [];');
+  lines.push('    for (let index = 0; index < series.size && samples.length < n; index += 1) {');
+  lines.push('      const value = Number(series.get(index));');
+  lines.push('      if (!skipNa || !Number.isNaN(value)) samples.push(value);');
+  lines.push('    }');
+  lines.push('    if (samples.length < n) return NaN;');
+  lines.push('    if (pivot) return this._deps[className].computeWindow(samples, ...strengths);');
+  lines.push('    let result = NaN;');
+  lines.push(
+    '    for (let index = samples.length - 1; index >= 0; index -= 1) result = instance.compute(samples[index]);',
+  );
+  lines.push('    return result;');
+  lines.push('  }');
+  lines.push('  _builtinCallId(state, id) {');
+  lines.push('    return state ? `${state.__callPath}:${id}` : id;');
+  lines.push('  }');
+  lines.push('  _fixnanValue(state, id, value) {');
+  lines.push('    if (!state.__fixnan) state.__fixnan = new Map();');
+  lines.push('    if (_isNa(value)) return state.__fixnan.has(id) ? state.__fixnan.get(id) : NaN;');
+  lines.push('    state.__fixnan.set(id, value);');
+  lines.push('    return value;');
+  lines.push('  }');
+  lines.push('  _childFnState(parentState, callSiteId, localNames, hasTACalls, hasExpressionHistory, varipNames, udtNames) {');
   lines.push('    if (!parentState) return undefined;');
   lines.push('    if (!parentState.__fnStates) parentState.__fnStates = new Map();');
   lines.push('    let state = parentState.__fnStates.get(callSiteId);');
   lines.push('    if (!state) {');
-  lines.push('      state = {};');
+  lines.push('      state = { __historyKey: parentState.__historyKey + "/" + callSiteId, __callPath: `${parentState.__callPath}/${callSiteId}`, __varipNames: varipNames, __udtNames: udtNames };');
   lines.push('      for (const name of localNames) {');
   lines.push('        state[`_v_${name}`] = NaN;');
   lines.push('        state[`__init_${name}`] = false;');
@@ -4158,18 +5248,30 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
   lines.push('    }');
   lines.push('    return state;');
   lines.push('  }');
+  lines.push('  _functionHistory(state, member) {');
+  lines.push('    if (!state.__functionHistories) state.__functionHistories = new Map();');
+  lines.push('    let series = state.__functionHistories.get(member);');
+  lines.push('    if (!series) {');
+  lines.push('      series = new this._deps.ValueSeries(this._deps.maxBarsBack + 1, this._deps.maxBarsBack, state.__historyKey + ":function:" + member);');
+  lines.push('      series.__tealscriptLastBar = -1;');
+  lines.push('      state.__functionHistories.set(member, series);');
+  lines.push('    }');
+  lines.push('    return series;');
+  lines.push('  }');
   lines.push('  _saveChildFnStates(states) {');
   lines.push('    return Array.from((states ?? new Map()).entries()).map(([key, state]) => [key, this._saveFnState(state)]);');
   lines.push('  }');
   lines.push('  _saveFnState(state) {');
   lines.push('    const snap = {};');
   lines.push('    for (const [key, value] of Object.entries(state)) {');
-  lines.push('      if (key !== "__taCache" && key !== "__taSeries" && key !== "__taLast" && key !== "__fnStates" && key !== "__expressionHistories") snap[key] = value;');
+  lines.push('      if (key !== "__taCache" && key !== "__taSeries" && key !== "__taLast" && key !== "__fnStates" && key !== "__expressionHistories" && key !== "__functionHistories" && key !== "__fixnan") snap[key] = value;');
   lines.push('    }');
+  lines.push('    if (state.__fixnan) snap.__fixnan = Array.from(state.__fixnan.entries());');
   lines.push('    if (state.__taCache) snap.__taCache = Array.from(state.__taCache.entries()).map(([key, entry]) => [key, entry.className, entry.args, entry.instance.save()]);');
   lines.push('    if (state.__taSeries) snap.__taSeries = Array.from(state.__taSeries.entries()).map(([key, series]) => [key, series.save()]);');
   lines.push('    if (state.__fnStates) snap.__fnStates = this._saveChildFnStates(state.__fnStates);');
   lines.push('    if (state.__expressionHistories) snap.__expressionHistories = Array.from(state.__expressionHistories.entries()).map(([key, entry]) => [key, entry.lastBar, entry.series.save()]);');
+  lines.push('    if (state.__functionHistories) snap.__functionHistories = Array.from(state.__functionHistories.entries()).map(([key, series]) => [key, series.__tealscriptLastBar, series.save()]);');
   lines.push('    return snap;');
   lines.push('  }');
   lines.push('  _restoreChildFnStates(snapshots) {');
@@ -4183,8 +5285,9 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
   lines.push('  }');
   lines.push('  _restoreFnState(state, snap) {');
   lines.push('    for (const [key, value] of Object.entries(snap ?? {})) {');
-  lines.push('      if (key !== "__taCache" && key !== "__taSeries" && key !== "__taLast" && key !== "__fnStates" && key !== "__expressionHistories") state[key] = value;');
+  lines.push('      if (key !== "__taCache" && key !== "__taSeries" && key !== "__taLast" && key !== "__fnStates" && key !== "__expressionHistories" && key !== "__functionHistories" && key !== "__fixnan") state[key] = value;');
   lines.push('    }');
+  lines.push('    state.__fixnan = new Map(snap?.__fixnan ?? []);');
   lines.push('    state.__taCache = new Map();');
   lines.push('    for (const [key, className, args, saved] of snap?.__taCache ?? []) {');
   lines.push('      const instance = new this._deps[className](...args);');
@@ -4193,7 +5296,7 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
   lines.push('    }');
   lines.push('    state.__taSeries = new Map();');
   lines.push('    for (const [key, saved] of snap?.__taSeries ?? []) {');
-  lines.push('      const series = new this._deps.NumericSeries(this._deps.maxBarsBack + 1, this._deps.maxBarsBack);');
+  lines.push('      const series = new this._deps.NumericSeries(this._deps.maxBarsBack + 1, this._deps.maxBarsBack, state.__historyKey + ":ta:" + key);');
   lines.push('      series.restore(saved);');
   lines.push('      state.__taSeries.set(key, series);');
   lines.push('    }');
@@ -4201,9 +5304,15 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
   lines.push('    state.__fnStates = this._restoreChildFnStates(snap?.__fnStates);');
   lines.push('    state.__expressionHistories = new Map();');
   lines.push('    for (const [key, lastBar, saved] of snap?.__expressionHistories ?? []) {');
-  lines.push('      const series = new this._deps.ValueSeries(this._deps.maxBarsBack + 1, this._deps.maxBarsBack);');
+  lines.push('      const series = new this._deps.ValueSeries(this._deps.maxBarsBack + 1, this._deps.maxBarsBack, state.__historyKey + ":expression:" + key);');
   lines.push('      series.restore(saved);');
   lines.push('      state.__expressionHistories.set(key, { lastBar, series });');
+  lines.push('    }');
+  lines.push('    state.__functionHistories = new Map();');
+  lines.push('    for (const [key, lastBar, saved] of snap?.__functionHistories ?? []) {');
+  lines.push('      const series = this._functionHistory(state, key);');
+  lines.push('      series.restore(saved);');
+  lines.push('      series.__tealscriptLastBar = lastBar;');
   lines.push('    }');
   lines.push('  }');
 
@@ -4222,11 +5331,16 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
       ...localHistoryVars.map((local) => [local, localVariableHistoryParamName(local)] as [string, string]),
     ]);
     const localVars = new Map((functionEmitContext.localVars.get(name) ?? []).map((v) => [v.name, `${functionStateName}.${jsVarMember(v.name)}`]));
-    const functionParams = ['ctx', functionStateName, ...paramNames, ...sourceParamNames, ...historyParamNames, ...localHistoryParamNames].join(', ');
+    const functionParams = ['ctx', functionStateName, ...(arithmeticTypes ? ['_arithmeticContext'] : []), ...(methodTypes ? ['_methodContext'] : []), ...paramNames, ...sourceParamNames, ...historyParamNames, ...localHistoryParamNames].join(', ');
+
     lines.push(`  ${jsFunctionMember(name)}(${functionParams}) {`);
     functionNameStack.push(name);
     functionStateNameStack.push(functionStateName);
     localNameStack.push(localNames);
+    localEnumValueTypes.set(localNames, new Map(fi.params.flatMap((param, index) => {
+      const type = enumRelatedAnnotationType(fi.paramTypeAnnotations[index]);
+      return type ? [[param, type] as [string, string]] : [];
+    })));
     localSourceNameStack.push(localSourceNames);
     localHistoryNameStack.push(localHistoryNames);
     persistentLocalStack.push(localVars);
@@ -4237,7 +5351,7 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
       }
     }
     if (Array.isArray(fi.body)) {
-      emitFunctionBody(fi.body, name);
+      emitFunctionBody(fi.body);
     } else {
       lines.push(`    return ${emitExpr(fi.body)};`);
     }
@@ -4252,6 +5366,7 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
 
   // onBar method
   lines.push('  onBar(ctx) {');
+  const loopClockInsertionIndex = lines.length;
   for (const diagnostic of ctx.importDiagnostics) {
     lines.push(`    ${runtimeErrorExpr(diagnostic)};`);
   }
@@ -4278,14 +5393,18 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
 
   // Update TA variable series
   for (const site of ctx.taVarSites) {
-    if (site.className === 'OBV') {
+    if (site.className === 'VWAP') {
+      const source = '((ctx.bar.high + ctx.bar.low + ctx.bar.close) / 3)';
+      const anchor = '(ctx.barIndex === 0 || ctx.callBuiltin("timeframe.change", ["1D"], {}, "vwap_variable_anchor"))';
+      lines.push(`    if (ctx.isFirstTick) this.${site.seriesName}.push(this.${site.memberName}.compute(${source}, ${anchor}, ctx.bar.volume)); else this.${site.seriesName}.update(this.${site.memberName}.recompute(${source}, ${anchor}, ctx.bar.volume));`);
+    } else if (site.className === 'OBV') {
       lines.push(`    if (ctx.isFirstTick) this.${site.seriesName}.push(this.${site.memberName}.compute(ctx.bar.close, ctx.bar.volume)); else this.${site.seriesName}.update(this.${site.memberName}.recompute(ctx.bar.close, ctx.bar.volume));`);
     } else {
       lines.push(`    if (ctx.isFirstTick) this.${site.seriesName}.push(this.${site.memberName}.compute(ctx.bar.open, ctx.bar.high, ctx.bar.low, ctx.bar.close, ctx.bar.volume)); else this.${site.seriesName}.update(this.${site.memberName}.recompute(ctx.bar.open, ctx.bar.high, ctx.bar.low, ctx.bar.close, ctx.bar.volume));`);
     }
   }
-  for (const [site, memberName] of smaSourceSeries) {
-    if (inlineSmaSourceSeries.has(site)) continue;
+  for (const [site, memberName] of taSourceSeries) {
+    if (inlineTASourceSeries.has(site)) continue;
     const sourceArg = site.computeArgExprs[0];
     if (sourceArg) {
       lines.push(`    if (ctx.isFirstTick) this.${memberName}.push(${emitExpr(sourceArg)}); else this.${memberName}.update(${emitExpr(sourceArg)});`);
@@ -4303,6 +5422,9 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
   }
 
   lines.push('  }');
+  if (loopId > 0) {
+    lines.splice(loopClockInsertionIndex, 0, '    this._loopIters = 0; this._loopDepth = 0;');
+  }
 
   // Insert fixnan member initialization into the constructor
   if (fixnanIndex > 0) {
@@ -4316,9 +5438,73 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
     lines.splice(fixnanPlaceholderIdx, 0, `    this.${member} = false;`);
   }
 
+  const varipStates = [
+    ...ctx.varDecls.filter((v) => v.kind === 'varip').map((v) => ({ value: `this.${jsVarMember(v.name)}`, init: `this.${jsInitMember(v.name)}` })),
+    ...rootBlockPersistentStates.filter((state) => state.kind === 'varip'),
+  ];
+  const varipFunctionStates = [...functionEmitContext.callSites]
+    .filter(([callExpr]) => callSiteNeedsState(callExpr))
+    .map(([, id]) => `this.${jsStateMember('_fn_state_', String(id))}`);
+  const varipUdtStates = [
+    ...ctx.varDecls.filter((v) => v.kind === 'var').map((v) => `this.${jsVarMember(v.name)}`),
+    ...rootBlockPersistentStates.filter((state) => state.kind === 'var').map((state) => state.value),
+  ];
+  lines.push('  _saveUdtVarip(object) {');
+  lines.push('    if (!object || object.__tealscriptUdt !== true) return [];');
+  lines.push('    return Array.from(object.varipFields).flatMap((name) => {');
+  lines.push('      const value = object.fields.get(name);');
+  lines.push('      return ["number", "string", "boolean"].includes(typeof value) ? [[name, value]] : [];');
+  lines.push('    });');
+  lines.push('  }');
+  lines.push('  _restoreUdtVarip(object, fields) {');
+  lines.push('    if (!object || object.__tealscriptUdt !== true) return;');
+  lines.push('    for (const [name, value] of fields) {');
+  lines.push('      if (object.varipFields.has(name) && object.fields.has(name)) object.fields.set(name, value);');
+  lines.push('    }');
+  lines.push('  }');
+  lines.push('  _saveFnVarip(state, barTime, before) {');
+  lines.push('    return [(state.__varipNames ?? []).map((name) => [name, this._deps._udt.captureVaripReference(state[`_v_${name}`], barTime, before), state[`__init_${name}`]]), Array.from(state.__fnStates ?? []).map(([id, child]) => [id, this._saveFnVarip(child, barTime, before)]), (state.__udtNames ?? []).map((name) => [name, this._saveUdtVarip(state[`_v_${name}`])])];');
+  lines.push('  }');
+  lines.push('  _restoreFnVarip(state, snap) {');
+  lines.push('    state.__varipNames = snap[0].map(([name]) => name);');
+  lines.push('    for (const [name, value, initialized] of snap[0]) {');
+  lines.push('      state[`_v_${name}`] = this._deps._udt.restoreVaripReference(value);');
+  lines.push('      state[`__init_${name}`] = initialized;');
+  lines.push('    }');
+  lines.push('    state.__udtNames = snap[2].map(([name]) => name);');
+  lines.push('    for (const [name, fields] of snap[2]) this._restoreUdtVarip(state[`_v_${name}`], fields);');
+  lines.push('    if (!state.__fnStates) state.__fnStates = new Map();');
+  lines.push('    for (const [id, child] of snap[1]) {');
+  lines.push('      if (!state.__fnStates.has(id)) state.__fnStates.set(id, {});');
+  lines.push('      this._restoreFnVarip(state.__fnStates.get(id), child);');
+  lines.push('    }');
+  lines.push('  }');
+  lines.push('  saveVarip(barTime, before = false) {');
+  lines.push('    return [');
+  for (const state of varipStates) lines.push(`      [this._deps._udt.captureVaripReference(${state.value}, barTime, before), ${state.init}],`);
+  for (const state of varipFunctionStates) lines.push(`      this._saveFnVarip(${state}, barTime, before),`);
+  for (const state of varipUdtStates) lines.push(`      this._saveUdtVarip(${state}),`);
+  lines.push('    ];');
+  lines.push('  }');
+  lines.push('  restoreVarip(snap) {');
+  for (const [index, state] of varipStates.entries()) {
+    lines.push(`    ${state.value} = this._deps._udt.restoreVaripReference(snap[${index}][0]);`);
+    lines.push(`    ${state.init} = snap[${index}][1];`);
+  }
+  for (const [index, state] of varipFunctionStates.entries()) {
+    lines.push(`    this._restoreFnVarip(${state}, snap[${varipStates.length + index}]);`);
+  }
+  for (const [index, state] of varipUdtStates.entries()) {
+    lines.push(`    this._restoreUdtVarip(${state}, snap[${varipStates.length + varipFunctionStates.length + index}]);`);
+  }
+  lines.push('  }');
+
   // save/restore for realtime rollback
   lines.push('  save() {');
   lines.push('    return {');
+  for (const site of sourceSeriesSMASites) {
+    lines.push(`      _sma_source_${site.memberName}: this._sma_source_${site.memberName}.save(),`);
+  }
   for (const field of Object.values(BAR_FIELDS)) {
     lines.push(`      ${field}: this.${field}.save(),`);
   }
@@ -4337,7 +5523,7 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
       lines.push(`      ${member}: this.${member}.save(),`);
     }
   }
-  for (const member of expressionHistory.values()) {
+  for (const member of [...expressionHistory.values(), ...momentumSourceHistory.values()]) {
     lines.push(`      ${member}: this.${member}.save(),`);
     lines.push(`      ${member}_bar: this.${member}_bar,`);
   }
@@ -4373,6 +5559,10 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
         lines.push(`        __taCache: Array.from(this.${stateMember}.__taCache.entries()).map(([key, entry]) => [key, entry.className, entry.args, entry.instance.save()]),`);
         lines.push(`        __taSeries: Array.from(this.${stateMember}.__taSeries.entries()).map(([key, series]) => [key, series.save()]),`);
       }
+      if (hasDynamicLagCalls && callSiteHasExpressionHistory(callExpr)) {
+        lines.push(`        __expressionHistories: Array.from(this.${stateMember}.__expressionHistories.entries()).map(([key, entry]) => [key, entry.lastBar, entry.series.save()]),`);
+      }
+      lines.push(`        __fixnan: Array.from(this.${stateMember}.__fixnan ?? []),`);
       lines.push(`        __fnStates: this._saveChildFnStates(this.${stateMember}.__fnStates),`);
       lines.push('      },');
     }
@@ -4394,7 +5584,7 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
   for (const site of ctx.taCallSites) {
     lines.push(`      _ta_result_${site.memberName}: this._ta_result_${site.memberName}.save(),`);
   }
-  for (const memberName of smaSourceSeries.values()) {
+  for (const memberName of taSourceSeries.values()) {
     lines.push(`      ${memberName}: this.${memberName}.save(),`);
     lines.push(`      ${memberName}_bar: this.${memberName}_bar,`);
   }
@@ -4413,6 +5603,10 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
   lines.push('  }');
 
   lines.push('  restore(snap) {');
+  lines.push('    this._windowTAStates = undefined;');
+  for (const site of sourceSeriesSMASites) {
+    lines.push(`    this._sma_source_${site.memberName}.restore(snap._sma_source_${site.memberName});`);
+  }
   for (const field of Object.values(BAR_FIELDS)) {
     lines.push(`    this.${field}.restore(snap.${field});`);
   }
@@ -4431,7 +5625,7 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
       lines.push(`    this.${member}.restore(snap.${member});`);
     }
   }
-  for (const member of expressionHistory.values()) {
+  for (const member of [...expressionHistory.values(), ...momentumSourceHistory.values()]) {
     lines.push(`    this.${member}.restore(snap.${member});`);
     lines.push(`    this.${member}_bar = snap.${member}_bar;`);
   }
@@ -4477,12 +5671,21 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
         lines.push('      }');
         lines.push(`      this.${stateMember}.__taSeries = new Map();`);
         lines.push(`      for (const [key, state] of snap.${stateMember}.__taSeries ?? []) {`);
-        lines.push('        const series = new this._deps.NumericSeries(this._deps.maxBarsBack + 1, this._deps.maxBarsBack);');
+        lines.push(`        const series = new this._deps.NumericSeries(this._deps.maxBarsBack + 1, this._deps.maxBarsBack, this.${stateMember}.__historyKey + ":ta:" + key);`);
         lines.push('        series.restore(state);');
         lines.push(`        this.${stateMember}.__taSeries.set(key, series);`);
         lines.push('      }');
         lines.push(`      this.${stateMember}.__taLast = new Map();`);
       }
+      if (hasDynamicLagCalls && callSiteHasExpressionHistory(callExpr)) {
+        lines.push(`      this.${stateMember}.__expressionHistories = new Map();`);
+        lines.push(`      for (const [key, lastBar, saved] of snap.${stateMember}.__expressionHistories ?? []) {`);
+        lines.push(`        const series = new this._deps.ValueSeries(this._deps.maxBarsBack + 1, this._deps.maxBarsBack, this.${stateMember}.__historyKey + ":expression:" + key);`);
+        lines.push('        series.restore(saved);');
+        lines.push(`        this.${stateMember}.__expressionHistories.set(key, { lastBar, series });`);
+        lines.push('      }');
+      }
+      lines.push(`      this.${stateMember}.__fixnan = new Map(snap.${stateMember}.__fixnan ?? []);`);
       lines.push(`      this.${stateMember}.__fnStates = this._restoreChildFnStates(snap.${stateMember}.__fnStates);`);
       lines.push('    }');
     }
@@ -4504,11 +5707,12 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
   for (const site of ctx.taCallSites) {
     lines.push(`    this._ta_result_${site.memberName}.restore(snap._ta_result_${site.memberName});`);
   }
-  for (const memberName of smaSourceSeries.values()) {
+  for (const memberName of taSourceSeries.values()) {
     lines.push(`    this.${memberName}.restore(snap.${memberName});`);
     lines.push(`    this.${memberName}_bar = snap.${memberName}_bar;`);
   }
   lines.push('    this._dynamicTACache = new Map();');
+  lines.push('    this._dynamicTALast = new Map();');
   lines.push('    for (const [key, className, args, state] of snap._dynamicTACache ?? []) {');
   lines.push('      const instance = new this._deps[className](...args);');
   lines.push('      instance.restore(state);');
@@ -4528,16 +5732,28 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
 
   lines.push('};');
 
+  if (needsDrawingBetween) {
+    lines.unshift('function _betweenLegacyNa(value, upper, lower) { return !_isNa(value) && !_isNa(upper) && !_isNa(lower) && value <= upper && value >= lower; }');
+  }
+  lines.splice(udtFactoryInsertionIndex, 0, ...[...udtFactories].map(([typeName, factory]) =>
+    `    this.${factory.member} = deps._udt.factory(${JSON.stringify(typeName)}, ${JSON.stringify(factory.names)}, [${factory.varip.join(', ')}]);`));
   return lines.join('\n');
 }
 
 export const RUNTIME_HELPERS = `
+${PINE_EXP_RUNTIME_HELPER}
+function _divisionDenominator(v) { const n = Number(v); return n === 0 ? NaN : n; }
 function _isNa(v) { return v !== v || v === undefined || v === null; }
+function _string(v) { return _isNa(v) ? NaN : String(v); }
+function _boolHistory(v, sourceIsBool = true) { return sourceIsBool && _isNa(v) ? false : v; }
 function _isTruthy(v) { return v !== false && v !== 0 && !_isNa(v); }
-function _eq(a, b) { return _isNa(a) || _isNa(b) ? false : a === b; }
-function _neq(a, b) { return _isNa(a) || _isNa(b) ? false : a !== b; }
+// Native v4 comparison and builtin MFI share one captured predicate.
+const _comparisonEqual = ${comparisonEqual.toString()};
+function _eq(a, b) { return _isNa(a) || _isNa(b) ? false : _comparisonEqual(a, b); }
+function _neq(a, b) { return _isNa(a) || _isNa(b) ? false : !_comparisonEqual(a, b); }
 function _cmp(a, b, op) {
   if (_isNa(a) || _isNa(b)) return false;
+  if (_comparisonEqual(a, b)) return op === '>=' || op === '<=';
   switch (op) {
     case '>': return a > b;
     case '<': return a < b;
@@ -4571,55 +5787,33 @@ function _idx(obj, i) {
   return obj[i];
 }
 function _historyOffset(i) {
-  const offset = Number(i);
-  return Number.isFinite(offset) ? Math.trunc(offset) : NaN;
+  if (typeof i === 'number' && i >= 0 && i < Infinity) return Math.trunc(i);
+  const value = Number(i);
+  const offset = Number.isFinite(value) ? Math.trunc(value) : value;
+  if (Number.isFinite(offset) && offset < 0) throw new Error("Historical offset " + offset + " is invalid; bars back must be non-negative");
+  return Number.isNaN(offset) ? 0 : Number.isFinite(offset) ? offset : NaN;
 }
-function _historyCheck(offset, maxBarsBack) {
-  if (Number.isFinite(offset) && offset > maxBarsBack) {
-    throw new Error('Historical offset ' + offset + ' exceeds max_bars_back ' + maxBarsBack);
-  }
-}
-function _historyBarIndex(i, barIndex, maxBarsBack) {
+function _historyBarIndex(i, barIndex, hint, check) {
   const offset = _historyOffset(i);
-  _historyCheck(offset, maxBarsBack);
+  check("bar_index", offset, hint);
   return Number.isFinite(offset) && offset >= 0 && offset <= barIndex ? barIndex - offset : NaN;
 }
-function _historyConstant(value, i, barIndex, maxBarsBack) {
+function _historyConstant(value, i, barIndex, hint, check) {
   const offset = _historyOffset(i);
-  _historyCheck(offset, maxBarsBack);
+  check("last_bar_index", offset, hint);
   return Number.isFinite(offset) && offset >= 0 && offset <= barIndex ? value : NaN;
 }
-function _historyCollection(current, series, i, maxBarsBack) {
+function _historyCollection(current, series, i, hint, key, check) {
   const offset = _historyOffset(i);
-  _historyCheck(offset, maxBarsBack);
+  check(key, offset, hint);
   if (!Number.isFinite(offset) || offset < 0) return NaN;
-  return offset === 0 ? current : series.get(offset - 1);
+  if (offset === 0) return current;
+  const value = series.get(offset - 1);
+  return value?.__tealscriptArray ? deps._arr.readOnlyCopy(value) : value;
 }
 function _setIndex(obj, i, val) {
   if (obj && obj.__tealscriptArray) { deps._arr.set(obj, i, val); return; }
   obj[i] = val;
-}
-function _pivotPointLevels(developing, currentHigh, currentLow, currentClose, previousHigh, previousLow, previousClose) {
-  const usePrevious = !_isTruthy(developing) && !_isNa(previousHigh) && !_isNa(previousLow) && !_isNa(previousClose);
-  const high = usePrevious ? previousHigh : currentHigh;
-  const low = usePrevious ? previousLow : currentLow;
-  const close = usePrevious ? previousClose : currentClose;
-  if (_isNa(high) || _isNa(low) || _isNa(close)) {
-    return deps._arr.from(NaN, NaN, NaN, NaN, NaN, NaN, NaN, NaN, NaN, NaN, NaN);
-  }
-  const range = high - low;
-  const p = (high + low + close) / 3;
-  const r1 = 2 * p - low;
-  const s1 = 2 * p - high;
-  const r2 = p + range;
-  const s2 = p - range;
-  const r3 = high + 2 * (p - low);
-  const s3 = low - 2 * (high - p);
-  const r4 = r3 + range;
-  const s4 = s3 - range;
-  const r5 = r4 + range;
-  const s5 = s4 - range;
-  return deps._arr.from(p, s1, r1, s2, r2, s3, r3, s4, r4, s5, r5);
 }
 function _getField(obj, name) {
   if (obj && obj.__tealscriptUdt) return deps._udt.getField(obj, name);
@@ -4635,14 +5829,43 @@ const _collectionMethodAliases = {
   map: ${JSON.stringify(Object.fromEntries(Object.entries(MAP_FUNC_MAP).map(([key, value]) => [key.replace('map.', ''), value])))},
   matrix: ${JSON.stringify(Object.fromEntries(Object.entries(MATRIX_FUNC_MAP).map(([key, value]) => [key.replace('matrix.', ''), value])))},
 };
+function _arrayIndex(index) {
+  if (!_allowsNegativeArrayIndices && index < 0) {
+    throw new Error('Array index ' + index + ' is negative in this Pine version');
+  }
+  return index;
+}
+function _legacyArray_get(obj, index) {
+  _arrayIndex(index);
+  return deps._arr.get(obj, index);
+}
+function _legacyArray_set(obj, index, value) {
+  _arrayIndex(index);
+  return deps._arr.set(obj, index, value);
+}
+function _legacyArray_insert(obj, index, value) {
+  _arrayIndex(index);
+  return deps._arr.insert(obj, index, value);
+}
+function _legacyArray_remove(obj, index) {
+  _arrayIndex(index);
+  return deps._arr.remove(obj, index);
+}
 function _callCollectionMethod(kind, obj, name, args) {
   const runtimeName = _collectionMethodAliases[kind]?.[name] ?? name;
-  if (kind === 'array') return deps._arr[runtimeName](obj, ...args);
+  if (kind === 'array') {
+    if (!_allowsNegativeArrayIndices && ['get', 'set', 'insert', 'remove'].includes(runtimeName)) _arrayIndex(args[0]);
+    return deps._arr[runtimeName](obj, ...args);
+  }
   if (kind === 'map') return deps._map[runtimeName](obj, ...args);
   if (kind === 'matrix') return deps._mtx[runtimeName](obj, ...args);
   return undefined;
 }
-function _callAnyCollectionMethod(obj, name, args) {
+function _callAnyCollectionMethod(ctx, obj, name, args, kindHint) {
+  if (_isNa(obj)) {
+    if (kindHint) return _callCollectionMethod(kindHint, obj, name, args);
+    return ctx.runtimeError(["Collection methods cannot be called when the ID is na"]);
+  }
   if (obj && obj.__tealscriptArray) return _callCollectionMethod("array", obj, name, args);
   if (obj && obj.__tealscriptMap) return _callCollectionMethod("map", obj, name, args);
   if (obj && obj.__tealscriptMatrix) return _callCollectionMethod("matrix", obj, name, args);
@@ -4662,21 +5885,8 @@ function _iterGet(obj, i) {
   if (Array.isArray(obj)) return obj[i];
   return undefined;
 }
-function _iterEntries(obj) {
-  if (obj && obj.__tealscriptMap) return Array.from(obj.entries.entries());
-  if (obj && obj.__tealscriptArray) {
-    var result = [];
-    var size = deps._arr.size(obj);
-    for (var i = 0; i < size; i++) result.push([i, deps._arr.get(obj, i)]);
-    return result;
-  }
-  if (obj && obj.__tealscriptMatrix) {
-    var result = [];
-    var rows = deps._mtx.rows(obj);
-    for (var i = 0; i < rows; i++) result.push([i, deps._mtx.row(obj, i)]);
-    return result;
-  }
-  if (Array.isArray(obj)) return obj.map(function(v, i) { return [i, v]; });
-  return [];
+function _iterEntry(obj, i) {
+  if (obj && obj.__tealscriptMap) return Array.from(obj.entries.entries())[i];
+  return [i, _iterGet(obj, i)];
 }
 `;

@@ -1,7 +1,23 @@
+// Kept under its existing dependency name; used for v4/v5 const int pairs.
+// Native v3 captures establish truncation toward zero for either operand sign.
+export function divideV5ConstInts(left: number, right: number): number {
+  const quotient = left / right;
+  if (!Number.isFinite(quotient)) return NaN;
+  const integer = Math.trunc(quotient);
+  return integer === 0 ? 0 : integer;
+}
+
 export interface NumericSeriesSnapshot {
   head: number;
   size: number;
   buf: Float64Array;
+}
+
+export interface NumericSeriesAppendCheckpoint {
+  head: number;
+  size: number;
+  index: number;
+  value: number;
 }
 
 export interface ValueSeriesSnapshot {
@@ -58,6 +74,17 @@ export class NumericSeries {
 
   current(): number {
     return this.size === 0 ? NaN : this.buf[this.head];
+  }
+
+  checkpointAppend(): NumericSeriesAppendCheckpoint {
+    const index = this.size === 0 ? 0 : this.head === 0 ? this.capacity - 1 : this.head - 1;
+    return { head: this.head, size: this.size, index, value: this.buf[index] };
+  }
+
+  restoreAppend(checkpoint: NumericSeriesAppendCheckpoint): void {
+    this.buf[checkpoint.index] = checkpoint.value;
+    this.head = checkpoint.head;
+    this.size = checkpoint.size;
   }
 
   save(): NumericSeriesSnapshot {

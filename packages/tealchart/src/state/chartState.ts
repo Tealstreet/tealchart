@@ -27,6 +27,7 @@ export type LineStyle = 'solid' | 'dashed' | 'dotted';
 /** Style override for a single plot */
 export interface PlotStyleOverride {
   plotId: string;
+  display?: number;
   color?: string;
   linewidth?: number;
   lineStyle?: LineStyle;

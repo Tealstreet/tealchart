@@ -1,7 +1,8 @@
+import type { BoxDrawingOutput, LabelDrawingOutput, LineDrawingOutput, PolylineDrawingOutput } from './types';
+
 import { describe, expect, it } from 'vitest';
 
 import { DEFAULT_DRAWING_LIMITS, DrawingStore } from './store';
-import type { BoxDrawingOutput, LabelDrawingOutput, LineDrawingOutput, PolylineDrawingOutput } from './types';
 
 function label(overrides: Partial<LabelDrawingOutput> = {}): LabelDrawingOutput {
   return {
@@ -116,11 +117,14 @@ describe('DrawingStore', () => {
     store.add(polyline({ id: 'polyline_0' }));
     store.add(polyline({ id: 'polyline_1' }));
 
-    expect(store.getIds('label')).toEqual(['label_1', 'label_2']);
-    expect(store.getIds('line')).toEqual(['line_1']);
+    for (let index = 3; index < 8; index++) store.add(label({ id: `label_${index}` }));
+    for (let index = 2; index < 7; index++) store.add(line({ id: `line_${index}` }));
+
+    expect(store.getIds('label')).toEqual(['label_6', 'label_7']);
+    expect(store.getIds('line')).toEqual(['line_6']);
     expect(store.getIds('box')).toEqual(['box_0']);
     expect(store.getIds('polyline')).toEqual(['polyline_1']);
-    expect(store.all().map((drawing) => drawing.id)).toEqual(['label_1', 'line_1', 'label_2', 'box_0', 'polyline_1']);
+    expect(store.all().map((drawing) => drawing.id)).toEqual(['box_0', 'polyline_1', 'label_6', 'label_7', 'line_6']);
   });
 
   it('normalizes non-finite limits to zero', () => {
@@ -139,8 +143,29 @@ describe('DrawingStore', () => {
     store.add(label({ id: 'label_0' }));
 
     expect(store.copyLabel('label_0', 'label_1', 4)).toMatchObject({ id: 'label_1' });
+    expect(store.getIds('label')).toEqual(['label_0', 'label_1']);
+    for (let index = 2; index < 7; index++) store.copyLabel('label_0', `label_${index}`, index);
     expect(store.get('label_0')).toBeUndefined();
-    expect(store.getIds('label')).toEqual(['label_1']);
+    expect(store.getIds('label')).toEqual(['label_6']);
+  });
+
+  it('keeps the declaration ceiling separate from native quota500 collection slack', () => {
+    const store = new DrawingStore();
+    expect(store.getLimit('line')).toBe(50);
+    expect(store.getLimit('label')).toBe(50);
+    for (const type of ['line', 'label'] as const) {
+      store.setLimit(type, 500);
+      for (let index = 0; index < 501; index++) {
+        store.add(type === 'line' ? line({ id: `line_${index}` }) : label({ id: `label_${index}` }));
+      }
+      expect(store.getLimit(type)).toBe(500);
+      expect(store.getIds(type)).toHaveLength(501);
+      expect(store.getIds(type)[0]).toBe(`${type}_0`);
+      store.setLimit(type, 999);
+      expect(store.getLimit(type)).toBe(500);
+      expect(store.getIds(type)).toHaveLength(500);
+      expect(store.getIds(type)[0]).toBe(`${type}_1`);
+    }
   });
 
   it('marks drawings from an index onward as persistent', () => {
@@ -248,3 +273,24 @@ describe('DrawingStore', () => {
     expect(store.getLimit('label')).toBe(DEFAULT_DRAWING_LIMITS.label);
   });
 });
+
+// linefill.new reference remarks: deleting either parent also deletes its fill.
+for (const removal of ['delete', 'evict'] as const) {
+  it(`removes every dependent fill when a parent line is removed by ${removal}`, () => {
+    const store = new DrawingStore();
+    store.add(line({ id: 'a' }));
+    store.add(line({ id: 'b' }));
+    store.add(line({ id: 'c' }));
+    for (const [id, line1, line2] of [
+      ['ab', 'a', 'b'],
+      ['ca', 'c', 'a'],
+      ['bc', 'b', 'c'],
+    ] as const) {
+      store.add({ id, type: 'linefill', barIndex: 0, line1, line2, color: '#000000' });
+    }
+    if (removal === 'delete') store.delete('a');
+    else store.setLimit('line', 2);
+    expect(store.getIds('line')).toEqual(['b', 'c']);
+    expect(store.getIds('linefill')).toEqual(['bc']);
+  });
+}

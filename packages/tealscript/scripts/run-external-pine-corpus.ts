@@ -2189,6 +2189,8 @@ function createOutputProbeBars(): Bar[] {
 }
 
 export class SyntheticExternalCorpusRequestDatafeed implements RequestDatafeed {
+  private readonly datasets = new Map<string, Bar[]>();
+
   constructor(private readonly chartBars: Bar[]) {}
 
   getBars(query: RequestDatafeedQuery): RequestDatafeedResult {
@@ -2251,14 +2253,20 @@ export class SyntheticExternalCorpusRequestDatafeed implements RequestDatafeed {
   }
 
   private context(symbol: string, timeframe: string, calcBarsCount?: number, currency?: string): RequestDataContext {
-    const offset = stableSymbolOffset(symbol, timeframe);
-    const bars = this.chartBars.slice(calcBarsCount === undefined ? 0 : Math.max(0, this.chartBars.length - calcBarsCount)).map((bar) => ({
-      ...bar,
-      open: bar.open + offset,
-      high: bar.high + offset,
-      low: bar.low + offset,
-      close: bar.close + offset,
-    }));
+    const key = JSON.stringify([symbol, timeframe, calcBarsCount, currency ?? 'USD']);
+    let bars = this.datasets.get(key);
+    if (!bars) {
+      const offset = stableSymbolOffset(symbol, timeframe);
+      bars = this.chartBars.slice(calcBarsCount === undefined ? 0 : Math.max(0, this.chartBars.length - calcBarsCount)).map((bar) => Object.freeze({
+        ...bar,
+        open: bar.open + offset,
+        high: bar.high + offset,
+        low: bar.low + offset,
+        close: bar.close + offset,
+      }));
+      Object.freeze(bars);
+      this.datasets.set(key, bars);
+    }
     return {
       symbol,
       timeframe,

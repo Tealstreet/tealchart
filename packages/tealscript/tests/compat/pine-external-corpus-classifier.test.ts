@@ -77,6 +77,12 @@ const requestDatafeed = new InMemoryRequestDatafeed([
     syminfo: { ticker: 'TEST', tickerid: 'TEST', currency: 'USD', timezone: 'Etc/UTC' },
   },
   {
+    symbol: 'TEST',
+    timeframe: '2',
+    bars: lowerChartBars,
+    syminfo: { ticker: 'TEST', tickerid: 'TEST', currency: 'USD', timezone: 'Etc/UTC' },
+  },
+  {
     symbol: 'NASDAQ:AAPL',
     timeframe: 'D',
     bars: htfBars,
@@ -495,7 +501,7 @@ plot(gapped, "Gapped")`,
   },
   {
     id: 'external-security-ignore-invalid-timeframe',
-    title: 'Ignored invalid lower timeframe',
+    title: 'Equal lower-request timeframe with a supplied context',
     featureTags: ['request.security_lower_tf', 'ignore_invalid_timeframe'],
     bars: lowerChartBars,
     source: `//@version=6
@@ -964,11 +970,11 @@ plot(requested, "Requested")`,
   },
   {
     id: 'external-unsupported-quandl',
-    title: 'Seeded Quandl datafeed',
+    title: 'Ignored unavailable Quandl datafeed',
     featureTags: ['request.quandl', 'datafeed'],
     source: `//@version=5
 indicator("Quandl")
-plot(request.quandl("MULTPL/SHILLER_PE_RATIO_MONTH", barmerge.gaps_off, 0), "Quandl")`,
+plot(request.quandl("MULTPL/SHILLER_PE_RATIO_MONTH", barmerge.gaps_off, 0, ignore_invalid_symbol=true), "Quandl")`,
   },
   {
     id: 'external-datafeed-quandl-unseeded-na',

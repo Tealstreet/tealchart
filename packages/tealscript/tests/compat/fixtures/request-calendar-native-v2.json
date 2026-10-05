@@ -1,0 +1,183 @@
+{
+  "captureFile": "oracle-probes/v2/captures/v2/coverage-request-1-v1.csv",
+  "captureSha256": "64c774a34318316b84c39d53b91f9fd9055e077872f51f46ff4f2d8bb6dc3ce7",
+  "chartBarRange": [0, 8],
+  "requestedBarRange": [0, 4],
+  "chartBars": [
+    {
+      "time": 1788134400000.0,
+      "open": 77682.0,
+      "high": 77682.01,
+      "low": 77572.0,
+      "close": 77674.04,
+      "volume": 51.86295
+    },
+    {
+      "time": 1788134520000.0,
+      "open": 77674.5,
+      "high": 77780.34,
+      "low": 77646.0,
+      "close": 77758.24,
+      "volume": 33.50717
+    },
+    {
+      "time": 1788134640000.0,
+      "open": 77758.24,
+      "high": 77827.99,
+      "low": 77724.0,
+      "close": 77740.01,
+      "volume": 33.1126
+    },
+    {
+      "time": 1788134760000.0,
+      "open": 77740.01,
+      "high": 77751.37,
+      "low": 77490.0,
+      "close": 77508.86,
+      "volume": 94.421
+    },
+    {
+      "time": 1788134880000.0,
+      "open": 77508.86,
+      "high": 77525.28,
+      "low": 77436.4,
+      "close": 77437.58,
+      "volume": 30.43664
+    },
+    {
+      "time": 1788135000000.0,
+      "open": 77437.57,
+      "high": 77636.0,
+      "low": 77436.41,
+      "close": 77636.0,
+      "volume": 31.56641
+    },
+    {
+      "time": 1788135120000.0,
+      "open": 77635.99,
+      "high": 77726.0,
+      "low": 77576.0,
+      "close": 77725.99,
+      "volume": 32.61091
+    },
+    {
+      "time": 1788135240000.0,
+      "open": 77726.0,
+      "high": 77797.91,
+      "low": 77720.88,
+      "close": 77797.91,
+      "volume": 19.17203
+    },
+    {
+      "time": 1788135360000.0,
+      "open": 77797.99,
+      "high": 77896.0,
+      "low": 77784.0,
+      "close": 77864.01,
+      "volume": 38.48407
+    }
+  ],
+  "requestedContext": {
+    "symbol": "BINANCE:BTCUSDT",
+    "timeframe": "6",
+    "first_bar_index": 0,
+    "index_basis": "Native 6m bars clipped to unchanged probe htf6_requested_time=1788134400000 / htf6_requested_index=0. Original uncut native dataset preserved in evidence/native-contexts-v1.json.",
+    "end_of_data": true,
+    "captured_at_utc": "2026-10-03T12:38:16.488Z",
+    "syminfo": {
+      "ticker": "BTCUSDT",
+      "tickerid": "BINANCE:BTCUSDT",
+      "prefix": "BINANCE",
+      "timezone": "Etc/UTC",
+      "mintick": 0.01,
+      "pricescale": 100,
+      "pointvalue": 1
+    },
+    "bars": [
+      {
+        "time": 1788134400000,
+        "open": 77682,
+        "high": 77827.99,
+        "low": 77572,
+        "close": 77740.01,
+        "volume": 118.48272
+      },
+      {
+        "time": 1788134760000,
+        "open": 77740.01,
+        "high": 77751.37,
+        "low": 77436.4,
+        "close": 77636,
+        "volume": 156.42405
+      },
+      {
+        "time": 1788135120000,
+        "open": 77635.99,
+        "high": 77896,
+        "low": 77576,
+        "close": 77864.01,
+        "volume": 90.26701
+      },
+      {
+        "time": 1788135480000,
+        "open": 77864.01,
+        "high": 77962.93,
+        "low": 77861,
+        "close": 77962.93,
+        "volume": 43.82721
+      },
+      {
+        "time": 1788135840000,
+        "open": 77962.92,
+        "high": 77971.47,
+        "low": 77888,
+        "close": 77901.33,
+        "volume": 54.74324
+      }
+    ],
+    "original_requested_start_available": true
+  },
+  "expected": {
+    "htf6_goff_loff_dayofweek": [null, null, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0],
+    "htf6_goff_loff_daily_open": [
+      null,
+      null,
+      1788134400000.0,
+      1788134400000.0,
+      1788134400000.0,
+      1788134400000.0,
+      1788134400000.0,
+      1788134400000.0,
+      1788134400000.0
+    ],
+    "htf6_goff_lon_dayofweek": [2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0],
+    "htf6_goff_lon_daily_open": [
+      1788134400000.0, 1788134400000.0, 1788134400000.0, 1788134400000.0, 1788134400000.0, 1788134400000.0,
+      1788134400000.0, 1788134400000.0, 1788134400000.0
+    ],
+    "htf6_gon_loff_dayofweek": [null, null, 2.0, null, null, 2.0, null, null, 2.0],
+    "htf6_gon_loff_daily_open": [null, null, 1788134400000.0, null, null, 1788134400000.0, null, null, 1788134400000.0],
+    "htf6_gon_lon_dayofweek": [2.0, null, null, 2.0, null, null, 2.0, null, null],
+    "htf6_gon_lon_daily_open": [1788134400000.0, null, null, 1788134400000.0, null, null, 1788134400000.0, null, null]
+  },
+  "runtime": {
+    "timeframe": {
+      "period": "2",
+      "multiplier": 2,
+      "isminutes": true,
+      "isintraday": true
+    },
+    "syminfo": {
+      "ticker": "BTCUSDT",
+      "tickerid": "BINANCE:BTCUSDT",
+      "prefix": "BINANCE",
+      "timezone": "Etc/UTC",
+      "mintick": 0.01,
+      "pricescale": 100
+    },
+    "chart": {
+      "type": "standard"
+    },
+    "now": 1791030960000.0
+  }
+}

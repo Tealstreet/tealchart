@@ -25,6 +25,7 @@ function createPath(svg?: string) {
 
 const font = {
   getSize: () => 12,
+  getMetrics: () => ({ ascent: -9, descent: 3, leading: 0 }),
   getTextWidth: (text: string) => text.length * 7,
   // Codepoint as the id: distinct per character, and readable in assertions.
   getGlyphIDs: (text: string) => Array.from(text, (character) => character.codePointAt(0) ?? 0),
@@ -35,6 +36,7 @@ const font = {
 };
 
 const paint = {
+  getAlphaf: vi.fn(() => 1),
   setAlphaf: vi.fn(),
   setAntiAlias: vi.fn(),
   setColor: vi.fn(),
@@ -84,6 +86,7 @@ export const Canvas = createSkiaComponent('Canvas');
 export const Circle = createSkiaComponent('Circle');
 export const DashPathEffect = createSkiaComponent('DashPathEffect');
 export const Group = createSkiaComponent('Group');
+export const LinearGradient = createSkiaComponent('LinearGradient');
 export const Oval = createSkiaComponent('Oval');
 export const Picture = createSkiaComponent('Picture');
 export const Rect = createSkiaComponent('Rect');
@@ -94,9 +97,22 @@ export const Text = createSkiaComponent('Text');
 export const Glyphs = createSkiaComponent('Glyphs');
 
 export const Skia = {
+  Color: vi.fn((color: string) => color),
   Font: vi.fn(() => font),
   FontMgr: { System: () => ({ matchFamilyStyle: vi.fn(() => null) }) },
   Paint: vi.fn(() => ({ ...paint })),
+  PictureRecorder: vi.fn(() => {
+    const rects: { x: number; y: number; width: number; height: number; color: unknown }[] = [];
+    return {
+      beginRecording: vi.fn(() => ({
+        drawRect: vi.fn((rect: { x: number; y: number; width: number; height: number }, activePaint: typeof paint) => {
+          rects.push({ ...rect, color: activePaint.setColor.mock.lastCall?.[0] });
+        }),
+      })),
+      finishRecordingAsPicture: vi.fn(() => ({ rects })),
+      dispose: vi.fn(),
+    };
+  }),
   PathEffect: { MakeDash: vi.fn((segments: number[], phase: number) => ({ phase, segments })) },
   Path: {
     Make: vi.fn(() => createPath()),

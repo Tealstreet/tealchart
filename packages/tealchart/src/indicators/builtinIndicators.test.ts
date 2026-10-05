@@ -35,3 +35,13 @@ describe('built-in indicator definitions', () => {
     expect(finiteCount(result.plots.find((plot) => plot.title === 'D')?.values ?? [])).toBeGreaterThan(0);
   });
 });
+
+
+it.each(["macd", "macd-signals", "volume-sma"])("preserves three-pixel builtin histogram width for %s", id => {
+  const result = executeScript(parse(getIndicatorById(id)!.code), createBars(80));
+  expect(result.errors).toEqual([]);
+  const histogram = result.plots.find(plot => plot.style === "histogram")!;
+  expect(histogram).toBeDefined();
+  const oldWidthAtDefaultSlot = Math.max(1, Math.min(10, 1 * 3));
+  expect(Math.max(1, histogram.linewidth ?? 1)).toBe(oldWidthAtDefaultSlot);
+});

@@ -19,6 +19,7 @@ export interface TealScriptDrawingPartition {
 }
 
 export function partitionTealScriptDrawings(drawings: readonly DrawingOutput[]): TealScriptDrawingPartition {
+  'worklet';
   const boxes: BoxDrawingOutput[] = [];
   const labels: LabelDrawingOutput[] = [];
   const lines: LineDrawingOutput[] = [];

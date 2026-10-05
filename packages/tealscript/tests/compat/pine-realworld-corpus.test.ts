@@ -11,6 +11,7 @@ const stratBars = [
   { time: 1_700_610_180_000, open: 105, high: 106, low: 104, close: 105, volume: 100 },
 ];
 
+// EMA-derived baselines follow TV-native CF040 / v2 SMA startup and missing masks.
 describe('Pine real-world corpus probe', () => {
   it('locks a reduced public RSI overbought/oversold signal idiom', () => {
     // Public idiom reference: RSI scripts expose overbought/oversold level
@@ -69,15 +70,9 @@ plot(bullish ? 1 : 0, title="Bullish")
       ['Slow Length', 'int'],
       ['Signal Length', 'int'],
     ]);
-    expect(roundSeries(getPlot(result, 'MACD').values)).toEqual([
-      0, 0.642857, 1.209184, 0.38156, -0.825672,
-      -0.924587, 0.029313, 1.437232, 1.520456, 1.975828, 1.641914, 1.716671,
-    ]);
-    expect(roundSeries(getPlot(result, 'Signal').values)).toEqual([
-      0, 0.428571, 0.94898, 0.5707, -0.360214,
-      -0.736463, -0.225946, 0.88284, 1.307917, 1.753191, 1.679006, 1.704116,
-    ]);
-    expect(getPlot(result, 'Bullish').values).toEqual([0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0, 1]);
+    expect(roundSeries(getPlot(result, 'MACD').values)).toEqual([null, null, null, null, null, -1.958333, -0.693452, 0.928784, 1.161185, 1.721159, 1.460984, 1.587924]);
+    expect(roundSeries(getPlot(result, 'Signal').values)).toEqual([null, null, null, null, null, null, -1.325893, 0.177225, 0.833198, 1.425172, 1.449047, 1.541631]);
+    expect(getPlot(result, 'Bullish').values).toEqual([0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1]);
   });
 
   it('locks a reduced public ATR-based position sizing idiom', () => {
@@ -140,10 +135,10 @@ plot(bullish ? 1 : 0, title="Bullish")
       ['Signal Length', 'int'],
     ]);
     expect(roundSeries(getPlot(result, 'PVT').values)).toEqual([
-      0, 32.352941, 49.495798, 2.766826, -51.602106,
-      -40.996045, 11.003955, 87.927032, 76.917858, 118.584524, 106.422362, 132.785998,
+      null, 32.352941, 49.495798, 2.766826, -51.602106, -40.996045,
+      11.003955, 87.927032, 76.917858, 118.584524, 106.422362, 132.785998,
     ]);
-    expect(getPlot(result, 'Bullish').values).toEqual([0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1]);
+    expect(getPlot(result, 'Bullish').values).toEqual([0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1]);
   });
 
   it('locks a reduced public Bollinger-Band / Keltner-Channel squeeze idiom', () => {
@@ -168,7 +163,7 @@ plot(middle, title="Middle")
       null, null, null, null,
       10.851728, 11.973304, 11.48216, 14.085453, 16.198765, 15.717506, 9.666437, 5.656854,
     ]);
-    expect(getPlot(result, 'Squeeze').values).toEqual([0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1]);
+    expect(getPlot(result, 'Squeeze').values).toEqual([0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1]);
     expect(roundSeries(getPlot(result, 'Middle').values)).toEqual([
       null, null, null, null,
       103.2, 102.8, 102.6, 103, 104, 106.4, 108.4, 110,
@@ -194,10 +189,10 @@ plot(bullTrend ? 1 : 0, title="Bull Trend")
     expect(result.errors).toEqual([]);
     expect(result.indicatorTitle).toBe('Public MA Ribbon Checkpoint');
     expect(roundSeries(getPlot(result, 'EMA3').values)).toEqual([
-      102, 103.5, 105.25, 104.125, 101.5625, 100.78125,
-      102.390625, 105.695313, 106.847656, 108.923828, 109.461914, 110.730957,
+      null, null, 104.666667, 103.833333, 101.416667, 100.708333,
+      102.354167, 105.677083, 106.838542, 108.919271, 109.459635, 110.729818,
     ]);
-    expect(getPlot(result, 'Bull Trend').values).toEqual([0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1]);
+    expect(getPlot(result, 'Bull Trend').values).toEqual([0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1]);
   });
 
   it('locks a reduced public bar-coloring trend-state idiom', () => {
@@ -306,12 +301,8 @@ plot(highVol ? 1 : 0, title="High Volume")
 
     expect(result.errors).toEqual([]);
     expect(result.indicatorTitle).toBe('Public Volume Analysis Checkpoint');
-    expect(getPlot(result, 'OBV').values).toEqual([
-      0, 1100, 2000, 750, -650, 400, 1700, 3300, 2100, 3600, 2250, 3700,
-    ]);
-    expect(roundSeries(getPlot(result, 'OBV SMA').values)).toEqual([
-      null, null, null, null, 640, 720, 840, 1100, 1370, 2220, 2590, 2990,
-    ]);
+    expect(getPlot(result, 'OBV').values).toEqual([null, 1100.0, 2000.0, 750.0, -650.0, 400.0, 1700.0, 3300.0, 2100.0, 3600.0, 2250.0, 3700.0]);
+    expect(roundSeries(getPlot(result, 'OBV SMA').values)).toEqual([null, null, null, null, null, 720.0, 840.0, 1100.0, 1370.0, 2220.0, 2590.0, 2990.0]);
     expect(getPlot(result, 'High Volume').values).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
   });
 
@@ -608,13 +599,8 @@ plot(snCustom, title="Custom Norm")
     expect(roundSeries(getPlot(result, 'Norm').values)).toEqual([
       null, null, null, null, 0, 12.5, 62.5, 100, 90, 100, 85.714286, 100,
     ]);
-    expect(roundSeries(getPlot(result, 'Smoothed Norm').values)).toEqual([
-      null, null, null, null, 0, 8.333333, 44.444444, 81.481481,
-      87.160494, 95.720165, 89.049579, 96.34986,
-    ]);
-    expect(roundSeries(getPlot(result, 'Custom Norm').values)).toEqual([
-      null, null, null, null, 20, 23.75, 40.625, 60.3125, 67.15625, 73.578125, 72.503348, 76.251674,
-    ]);
+    expect(roundSeries(getPlot(result, 'Smoothed Norm').values)).toEqual([null, null, null, null, null, 6.25, 43.75, 81.25, 87.083333, 95.694444, 89.041005, 96.347002]);
+    expect(roundSeries(getPlot(result, 'Custom Norm').values)).toEqual([null, null, null, null, null, null, 35, 57.5, 65.75, 72.875, 72.151786, 76.075893]);
   });
 
   it('locks a reduced advanced drawing objects lifecycle idiom', () => {
@@ -1223,8 +1209,8 @@ plot(e, title="EMA")
 
     expect(result.errors).toEqual([]);
     expect(roundSeries(getPlot(result, 'EMA').values)).toEqual([
-      102, 103.5, 105.25, 104.125, 101.5625, 100.78125,
-      102.390625, 105.695313, 106.847656, 108.923828, 109.461914, 110.730957,
+      null, null, 104.666667, 103.833333, 101.416667, 100.708333,
+      102.354167, 105.677083, 106.838542, 108.919271, 109.459635, 110.729818,
     ]);
   });
 
@@ -1300,8 +1286,8 @@ plot(bullish ? 1 : 0, title="Bull")
       104.666667, 105, 103, 100.666667, 101, 104.333333, 107, 109.333333, 109.666667, 111,
     ]);
     expect(roundSeries(getPlot(result, 'EMA').values)).toEqual([
-      102, 103.5, 105.25, 104.125, 101.5625, 100.78125,
-      102.390625, 105.695313, 106.847656, 108.923828, 109.461914, 110.730957,
+      null, null, 104.666667, 103.833333, 101.416667, 100.708333,
+      102.354167, 105.677083, 106.838542, 108.919271, 109.459635, 110.729818,
     ]);
     expect(getPlot(result, 'Bull').values).toEqual([0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1]);
   });
@@ -1428,9 +1414,9 @@ plot(s, title="SMA") // output
   });
 
   it('mixed tabs and spaces in block bodies', () => {
-    // Tab-indented if body, space-indented else body. Parser normalizes leading
-    // tabs to spaces; runtime promotes branch declarations to the outer scope.
-    const src = 'indicator("Mixed Indent")\nif close > open\n\tx = 1\nelse\n    x = 0\nplot(x, title="X")';
+    // Tab-indented if body and space-indented else body.
+    // Assign the same outer variable: block-local declarations cannot escape.
+    const src = 'indicator("Mixed Indent")\nx = 0\nif close > open\n\tx := 1\nelse\n    x := 0\nplot(x, title="X")';
     const result = runCompatScript(src);
     expect(result.errors).toEqual([]);
     // close > open on bars: 0,1,2,5,6,7,9,11 → 1; bars 3,4,8,10 → 0
@@ -2220,21 +2206,19 @@ plot(winRate, title="WinRate")
       ['Slow Length', 'int'],
     ]);
     expect(roundSeries(getPlot(result, 'FastEMA').values)).toEqual([
-      102, 103.5, 105.25, 104.125, 101.5625, 100.78125,
-      102.390625, 105.695313, 106.847656, 108.923828, 109.461914, 110.730957,
+      null, null, 104.666667, 103.833333, 101.416667, 100.708333,
+      102.354167, 105.677083, 106.838542, 108.919271, 109.459635, 110.729818,
     ]);
     expect(roundSeries(getPlot(result, 'SlowEMA').values)).toEqual([
-      102, 102.857143, 104.040816, 103.74344, 102.388172, 101.705837,
-      102.361312, 104.25808, 105.3272, 106.948, 107.82, 109.014286,
+      null, null, null, null, null, 102.666667,
+      103.047619, 104.748299, 105.677357, 107.198112, 107.998651, 109.141894,
     ]);
-    // crossUp fires at bar1 (fast crosses above slow) and bar6
-    expect(getPlot(result, 'CrossUp').values).toEqual([0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0]);
+    // CF040 warmup delays the first fast/slow upward cross to bar 7.
+    expect(getPlot(result, 'CrossUp').values).toEqual([0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0]);
     // trendUp: fast > slow
-    expect(getPlot(result, 'TrendUp').values).toEqual([0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1]);
-    // winRate: 2 cross events total (bar1 up, bar4 down), 1 win → 50% at bar4; then bar6 up → 2/3 wins
-    expect(roundSeries(getPlot(result, 'WinRate').values)).toEqual([
-      0, 100, 100, 100, 50, 50, 66.666667, 66.666667, 66.666667, 66.666667, 66.666667, 66.666667,
-    ]);
+    expect(getPlot(result, 'TrendUp').values).toEqual([0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1]);
+    // The only seeded crossover is upward at bar 7, so its win rate is 100%.
+    expect(roundSeries(getPlot(result, 'WinRate').values)).toEqual([0, 0, 0, 0, 0, 0, 0, 100, 100, 100, 100, 100]);
     // barcolor and bgcolor outputs present
     expect(result.plots.some((p) => p.type === 'barcolor')).toBe(true);
     expect(result.plots.some((p) => p.type === 'bgcolor')).toBe(true);
@@ -2271,8 +2255,8 @@ plot(upper - lower, title="BBWidth")
     expect(roundSeries(getPlot(result, 'ATR').values)).toEqual([
       0, 0, 0, 0, 5.2, 5.16, 5.328, 5.6624, 5.52992, 5.423936, 5.339149, 5.271319,
     ]);
-    // squeeze is always true once BB and KC are available
-    expect(getPlot(result, 'Squeeze').values).toEqual([0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1]);
+    // CF041/CF043 strict-TR KC is available one bar after BB warmup.
+    expect(getPlot(result, 'Squeeze').values).toEqual([0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1]);
     // AvgATR tracks rolling mean of up to 5 ATR values
     expect(roundSeries(getPlot(result, 'AvgATR').values)).toEqual([
       0, 0, 0, 0, 5.2, 5.18, 5.229333, 5.3376, 5.376064, 5.420851, 5.456681, 5.445345,
@@ -2430,18 +2414,12 @@ plot(osc > signal ? 1 : 0, title="BullOsc")
       ['Length', 'int'],
       ['Signal', 'int'],
     ]);
-    expect(roundSeries(getPlot(result, 'Osc').values)).toEqual([
-      null, null, null, null,
-      -0.940741, -1.293827, -0.262551, 1.558299, 1.705533, 1.070355, -0.08643, -0.45762,
-    ]);
-    expect(roundSeries(getPlot(result, 'Signal').values)).toEqual([
-      null, null, null, null,
-      -0.940741, -1.117284, -0.689918, 0.434191, 1.069862, 1.070108, 0.491839, 0.01711,
-    ]);
+    expect(roundSeries(getPlot(result, 'Osc').values)).toEqual([null, null, null, null, 0, -0.666667, 0.155556, 1.837037, 1.891358, 1.194239, -0.003841, -0.402561]);
+    expect(roundSeries(getPlot(result, 'Signal').values)).toEqual([null, null, null, null, null, null, -0.17037, 0.833333, 1.362346, 1.278292, 0.637226, 0.117333]);
     // fill output present
     expect(result.plots.some((p) => p.type === 'fill')).toBe(true);
     // osc > signal: bars 4(0-eq no),5(no),6(osc=-0.26 > sig=-0.69 yes),7(yes),8(yes),9(yes),10(no),11(no)
-    expect(getPlot(result, 'BullOsc').values).toEqual([0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0]);
+    expect(getPlot(result, 'BullOsc').values).toEqual([0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0]);
   });
 
   it('locks session-aware indicator: var state tracking, barcolor, plotshape, table', () => {
@@ -2478,19 +2456,19 @@ plot(bullBars, title="BullBars")
     expect(result.errors).toEqual([]);
     expect(result.indicatorTitle).toBe('Multi-Feature EMA State Table Checkpoint');
     expect(roundSeries(getPlot(result, 'FastEMA').values)).toEqual([
-      102, 103.5, 105.25, 104.125, 101.5625, 100.78125,
-      102.390625, 105.695313, 106.847656, 108.923828, 109.461914, 110.730957,
+      null, null, 104.666667, 103.833333, 101.416667, 100.708333,
+      102.354167, 105.677083, 106.838542, 108.919271, 109.459635, 110.729818,
     ]);
     expect(roundSeries(getPlot(result, 'SlowEMA').values)).toEqual([
-      102, 103, 104.333333, 103.888889, 102.259259, 101.506173,
-      102.337449, 104.558299, 105.705533, 107.470355, 108.31357, 109.54238,
+      null, null, null, null, 103.2, 102.133333,
+      102.755556, 104.837037, 105.891358, 107.594239, 108.396159, 109.597439,
     ]);
     // bullBars accumulates on trendUp bars (fastEma > slowEma)
-    // bar0: 102==102 → not bull → 0; bar1: 103.5>103 → bull →1; etc.
-    expect(getPlot(result, 'BullBars').values).toEqual([0, 1, 2, 3, 3, 3, 4, 5, 6, 7, 8, 9]);
-    // crossUp at bar1, crossDn at bar4
-    expect(getPlot(result, 'BuySignal').values).toEqual([null, 1, null, null, null, null, 1, null, null, null, null, null]);
-    expect(getPlot(result, 'SellSignal').values).toEqual([null, null, null, null, 1, null, null, null, null, null, null, null]);
+    // Missing warmup comparisons are false; bullish bars accumulate from bar 7.
+    expect(getPlot(result, 'BullBars').values).toEqual([0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 5]);
+    // The seeded upward cross is at bar 7; no downward cross occurs in this fixture.
+    expect(getPlot(result, 'BuySignal').values).toEqual([null, null, null, null, null, null, null, 1, null, null, null, null]);
+    expect(getPlot(result, 'SellSignal').values).toEqual([null, null, null, null, null, null, null, null, null, null, null, null]);
     expect(result.plots.some((p) => p.type === 'barcolor')).toBe(true);
     expect(result.drawings.filter((d) => d.type === 'table').length).toBeGreaterThan(0);
   });
@@ -2599,12 +2577,9 @@ plot(osc > 0 ? 1 : 0, title="AboveZero")
     expect(result.errors).toEqual([]);
     expect(result.indicatorTitle).toBe('Multi-Feature Oscillator Gradient Checkpoint');
     // osc = close - ema(close,5); ema(close,5) uses alpha=2/6 by the EMA formula
-    expect(roundSeries(getPlot(result, 'Osc').values)).toEqual([
-      0, 2, 2.666667, -0.888889, -3.259259, -1.506173,
-      1.662551, 4.441701, 2.294467, 3.529645, 1.68643, 2.45762,
-    ]);
+    expect(roundSeries(getPlot(result, 'Osc').values)).toEqual([null, null, null, null, -4.2, -2.133333, 1.244444, 4.162963, 2.108642, 3.405761, 1.603841, 2.402561]);
     // above zero: close > ema(close,5)
-    expect(getPlot(result, 'AboveZero').values).toEqual([0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1]);
+    expect(getPlot(result, 'AboveZero').values).toEqual([0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1]);
     expect(result.plots.some((p) => p.type === 'fill')).toBe(true);
   });
 
@@ -2877,16 +2852,14 @@ plot(m2, title="Max2")`);
     ]);
   });
 
-  it('locks v3/v4 legacy color(r, g, b, transp) global function alias', () => {
-    // Pine v3/v4 scripts call color() as a global function: color(r, g, b, transp).
-    // In v5/v6 this became color.rgb(). Confirms the alias delegates to color.rgb and
-    // produces correct #RRGGBBAA hex strings, including transparency clamping.
-    // Source search: https://www.tradingview.com/scripts/search/color%20r%20g%20b%20transp%20v4/
+  it('locks v6 color.rgb channels and transparency', () => {
+    // The former RGB color() alias was invalid in this implicit-v6 fixture.
+    // Use the published color.rgb channels/transparency contract.
     const result = runCompatScript(`
-indicator("Legacy color() Global Checkpoint")
-cSolid = color(255, 0, 0, 0)
-cHalf = color(0, 255, 0, 50)
-cTrans = color(0, 0, 255, 100)
+indicator("V6 RGB Color Checkpoint")
+cSolid = color.rgb(255, 0, 0, 0)
+cHalf = color.rgb(0, 255, 0, 50)
+cTrans = color.rgb(0, 0, 255, 100)
 isSolid = cSolid == "#FF0000FF"
 isHalf = cHalf == "#00FF0080"
 isTrans = cTrans == "#0000FF00"
@@ -2896,7 +2869,7 @@ plot(isTrans ? 1 : 0, title="Trans")
 `);
 
     expect(result.errors).toEqual([]);
-    expect(result.indicatorTitle).toBe('Legacy color() Global Checkpoint');
+    expect(result.indicatorTitle).toBe('V6 RGB Color Checkpoint');
     expect(getPlot(result, 'Solid').values).toEqual(Array(compatibilityBars.length).fill(1));
     expect(getPlot(result, 'Half').values).toEqual(Array(compatibilityBars.length).fill(1));
     expect(getPlot(result, 'Trans').values).toEqual(Array(compatibilityBars.length).fill(1));
@@ -3330,7 +3303,7 @@ if barstate.islast
 
     expect(result.errors).toEqual([]);
     expect(result.drawings).toHaveLength(1);
-    expect(result.drawings[0]).toMatchObject({ type: 'label', text: 'Signal', color: '#2196F3' });
+    expect(result.drawings[0]).toMatchObject({ type: 'label', text: 'Signal', color: '#2962FF' });
     const tooltip = (result.drawings[0] as { tooltip?: string }).tooltip;
     expect(tooltip).toBeDefined();
     expect(tooltip).toContain('RSI:');
@@ -3414,7 +3387,7 @@ plot(line.get_x2(myLine), title="Line X2")
     expect(result.errors).toEqual([]);
     // Only the last line survives (all prior ones were deleted)
     expect(result.drawings.filter((d) => d.type === 'line').length).toBe(1);
-    expect(result.drawings[0]).toMatchObject({ type: 'line', color: '#2196F3', width: 2 });
+    expect(result.drawings[0]).toMatchObject({ type: 'line', color: '#2962FF', width: 2 });
     // x2 = bar_index on each bar
     expect(getPlot(result, 'Line X2').values).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
   });
@@ -3987,8 +3960,8 @@ plot(pct75, title="Pct75")
     ]);
     // percentrank of last element at each bar
     expect(roundSeries(getPlot(result, 'PctRank').values)).toEqual([
-      100, 100, 100, 50, 20, 33.333333, 66.666667, 100,
-      83.333333, 100, 83.333333, 100,
+      100, 100, 100, 33.333333, 0, 20, 60, 100,
+      80, 100, 80, 100,
     ]);
     // 75th-percentile nearest rank
     expect(getPlot(result, 'Pct75').values).toEqual([
@@ -5123,10 +5096,9 @@ plot(x, title="Outer")
     expect(getPlot(result, 'Outer').values).toEqual(Array(12).fill(100));
   });
 
-  it('locks EMA seeding — ta.ema seeds from bar 0 with no warmup gap', () => {
-    // Unlike ta.sma, ta.ema in TealScript seeds immediately from bar 0 (no na warmup).
-    // The first value equals close[0]; subsequent values follow the EMA recurrence.
-    // Source search: https://www.tradingview.com/scripts/search/ema%20seeding%20first%20bar%20value/
+  it('locks CF040 EMA warmup when the fixture is shorter than the seed length', () => {
+    // TV-native CF040 / v2 refutes the former first-source seed baseline.
+    // The first output requires 14 valid samples; this fixture contains only 12.
     const result = runCompatScript(`
 indicator("Series EMA Warmup Checkpoint")
 plot(ta.ema(close, 14), title="EMA14")
@@ -5134,13 +5106,10 @@ plot(ta.ema(close, 14), title="EMA14")
 
     expect(result.errors).toEqual([]);
     expect(result.indicatorTitle).toBe('Series EMA Warmup Checkpoint');
-    // EMA(14): seeds with close[0]=102, then follows alpha=2/15 recurrence
-    expect(roundSeries(getPlot(result, 'EMA14').values)).toEqual([
-      102, 102.4, 103.013333, 103.011556, 102.476681, 102.146457,
-      102.393596, 103.27445, 103.904523, 104.850587, 105.537175, 106.398885,
-    ]);
-    // No null values — EMA has no warmup gap
-    expect(getPlot(result, 'EMA14').values.every((v) => v !== null)).toBe(true);
+    // The SMA seed is incomplete on every fixture bar.
+    expect(roundSeries(getPlot(result, 'EMA14').values)).toEqual([null, null, null, null, null, null, null, null, null, null, null, null]);
+    // CF040: the 12-bar fixture cannot complete a 14-sample SMA seed.
+    expect(getPlot(result, 'EMA14').values).toEqual(Array(compatibilityBars.length).fill(null));
   });
 
   it('locks manual prev-bar tracking — var float accumulator mirrors bar_index - 1', () => {
@@ -5767,8 +5736,8 @@ plot(bbWidth, title="BB Width")
     expect(roundSeries(getPlot(result, 'Momentum').values)).toEqual([
       null, null, null, null, -4.2, -2.8, 1.4, 6, 4, 4.6, 1.6, 2,
     ]);
-    // BB always narrower than KC → squeeze is always true after warmup
-    expect(getPlot(result, 'Squeeze').values).toEqual([0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1]);
+    // CF041/CF043: strict-TR KC seeds one bar after BB; squeeze starts at bar 5.
+    expect(getPlot(result, 'Squeeze').values).toEqual([0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1]);
     expect(roundSeries(getPlot(result, 'BB Width').values)).toEqual([
       null, null, null, null,
       10.851728, 11.973304, 11.48216, 14.085453, 16.198765, 15.717506, 9.666437, 5.656854,
@@ -5799,15 +5768,13 @@ plot(trendDir, title="Trend Dir")
       ['ATR Length', 'int'],
       ['Factor', 'float'],
     ]);
-    // SuperTrend line values — bars 0-1 are na (ATR seeds on bar 2 with SMA of first 3 TRs)
+    // Native Supertrend starts at zero/+1; the seeded ATR bands follow at bar 2.
     expect(roundSeries(getPlot(result, 'SuperTrend Line').values)).toEqual([
-      null, null,
-      110.333333, 110.333333, 106.481481, 103.820988,
-      96.452675, 100.46845, 102.8123, 104.041533,
-      106.194356, 106.194356,
+      0, null, 110.333333, 110.333333, 106.481481, 103.820988,
+      96.452675, 100.46845, 102.8123, 104.041533, 106.194356, 106.194356,
     ]);
     // Direction follows Pine's public idiom: negative is uptrend, positive is downtrend.
-    expect(getPlot(result, 'Trend Dir').values).toEqual([null, null, 1, 1, 1, 1, -1, -1, -1, -1, -1, -1]);
+    expect(getPlot(result, 'Trend Dir').values).toEqual([1, 1, 1, 1, 1, 1, -1, -1, -1, -1, -1, -1]);
   });
 
   it('replicates Volume Profile Lite — volume colored by direction + volume SMA + bgcolor for high volume', () => {
@@ -5904,17 +5871,17 @@ plot(trendState, title="Trend State")
       ['Slow Length', 'int'],
     ]);
     expect(roundSeries(getPlot(result, 'Fast MA').values)).toEqual([
-      102, 103.5, 105.25, 104.125, 101.5625, 100.78125,
-      102.390625, 105.695313, 106.847656, 108.923828, 109.461914, 110.730957,
+      null, null, 104.666667, 103.833333, 101.416667, 100.708333,
+      102.354167, 105.677083, 106.838542, 108.919271, 109.459635, 110.729818,
     ]);
     expect(roundSeries(getPlot(result, 'Med MA').values)).toEqual([
-      102, 103, 104.333333, 103.888889, 102.259259, 101.506173,
-      102.337449, 104.558299, 105.705533, 107.470355, 108.31357, 109.54238,
+      null, null, null, null, 103.2, 102.133333,
+      102.755556, 104.837037, 105.891358, 107.594239, 108.396159, 109.597439,
     ]);
     // fill emits 1 for every bar (fill is always "active")
     expect(getPlot(result, 'MA Fill').values).toEqual(Array(compatibilityBars.length).fill(1));
     // slowMA needs 7 bars to warm up; trendState=1 once all three align bullish (bar 7+)
-    expect(getPlot(result, 'Trend State').values).toEqual([0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1]);
+    expect(getPlot(result, 'Trend State').values).toEqual([0, 0, 0, 0, 0, 0, -1, 1, 1, 1, 1, 1]);
   });
 
   it('replicates Smart Money Concepts — structure detection via swing high/low + var trend + break-of-structure plotshape', () => {
@@ -5966,14 +5933,12 @@ plot(smoothOsc > 0 ? 1 : 0, title="Bullish")
     expect(result.inputs.map((i) => [i.title, i.type])).toEqual([['Smooth Length', 'int']]);
     // haClose = (o+h+l+c)/4; haOpen = EMA(open,3)
     expect(roundSeries(getPlot(result, 'HA Oscillator').values)).toEqual([
-      1, 2.5, 3, 0.25, -3, -2.5, 1.25, 4.125, 2.8125, 2.65625, 2.078125, 1.289063,
+      null, null, 3.666667, 0.583333, -2.833333, -2.416667,
+      1.291667, 4.145833, 2.822917, 2.661458, 2.080729, 1.290365,
     ]);
-    expect(roundSeries(getPlot(result, 'Smooth Oscillator').values)).toEqual([
-      1, 1.75, 2.375, 1.3125, -0.84375, -1.671875, -0.210937, 1.957031,
-      2.384766, 2.520508, 2.299316, 1.794189,
-    ]);
+    expect(roundSeries(getPlot(result, 'Smooth Oscillator').values)).toEqual([null, null, null, null, 0.472222, -0.972222, 0.159722, 2.152778, 2.487847, 2.574653, 2.327691, 1.809028]);
     // bullish when smooth oscillator > 0
-    expect(getPlot(result, 'Bullish').values).toEqual([1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1]);
+    expect(getPlot(result, 'Bullish').values).toEqual([0, 0, 0, 0, 1, 0, 1, 1, 1, 1, 1, 1]);
   });
 
   it('replicates the Position Size Calculator — account/risk inputs + ATR stop math + position size output', () => {
@@ -6085,12 +6050,12 @@ plot(close, color=c80, title="Close")
 
     expect(result.errors).toEqual([]);
     expect(result.indicatorTitle).toBe('Color Transparency Checkpoint');
-    // color.blue = #2196F3; transparency=80 → alpha=51=0x33 → t()=80
+    // color.blue = #2962FF; transparency=80 → alpha=51=0x33 → t()=80
     expect(roundSeries(getPlot(result, 'T80').values)).toEqual(Array(compatibilityBars.length).fill(80));
     expect(getPlot(result, 'T0').values).toEqual(Array(compatibilityBars.length).fill(0));
     const colors = getPlot(result, 'Close').color as string[];
-    // Every bar: color.blue #2196F3 with 0x33 alpha → #2196F333
-    expect(colors.every((c) => c === '#2196F333')).toBe(true);
+    // Every bar: color.blue #2962FF with 0x33 alpha → #2962FF33
+    expect(colors.every((c) => c === '#2962FF33')).toBe(true);
   });
 
   it('locks str.format with currency format — formats a number as $N,NNN.NN', () => {
@@ -6288,7 +6253,8 @@ plot(ma(close, 5, 'EMA'), title="EMA")
       null, null, null, null, 103.2, 102.8, 102.6, 103, 104, 106.4, 108.4, 110,
     ]);
     expect(roundSeries(getPlot(result, 'EMA').values)).toEqual([
-      102, 103, 104.333333, 103.888889, 102.259259, 101.506173, 102.337449, 104.558299, 105.705533, 107.470355, 108.31357, 109.54238,
+      null, null, null, null, 103.2, 102.133333,
+      102.755556, 104.837037, 105.891358, 107.594239, 108.396159, 109.597439,
     ]);
   });
 
@@ -6347,7 +6313,8 @@ plot(r, title="R")
     expect(result.errors).toEqual([]);
     expect(result.indicatorTitle).toBe('Switch Scope Checkpoint');
     expect(roundSeries(getPlot(result, 'R').values)).toEqual([
-      102, 103, 104.333333, 103.888889, 102.259259, 101.506173, 102.337449, 104.558299, 105.705533, 107.470355, 108.31357, 109.54238,
+      null, null, null, null, 103.2, 102.133333,
+      102.755556, 104.837037, 105.891358, 107.594239, 108.396159, 109.597439,
     ]);
   });
 
@@ -6370,9 +6337,7 @@ plot(ma(close, 'SMA'), title="SMA")
 
     expect(result.errors).toEqual([]);
     expect(result.indicatorTitle).toBe('Switch UDF Scope Checkpoint');
-    expect(roundSeries(getPlot(result, 'EMA').values)).toEqual([
-      102, 102.4, 103.013333, 103.011556, 102.476681, 102.146457, 102.393596, 103.27445, 103.904523, 104.850587, 105.537175, 106.398885,
-    ]);
+    expect(roundSeries(getPlot(result, 'EMA').values)).toEqual([null, null, null, null, null, null, null, null, null, null, null, null]);
     // SMA-14 needs 14 bars; compatibility fixture has 12, so all bars are null.
     expect(roundSeries(getPlot(result, 'SMA').values)).toEqual([
       null, null, null, null, null, null, null, null, null, null, null, null,
@@ -6411,8 +6376,8 @@ plot(ta.sma(src, 3), title="SMA")
     ]);
   });
 
-  it('ta.ema seeds with the first source value on bar 0', () => {
-    // Pine: EMA seeds with source value on bar 0 (no "warming up" period returning na).
+  it('ta.ema uses the CF040 SMA seed before applying its recurrence', () => {
+    // TV-native CF040 / v2 confirms a three-sample SMA seed, then alpha = 0.5.
     const result = runCompatScript(`
 indicator("EMA seeding")
 plot(ta.ema(close, 3), title="EMA")
@@ -6420,13 +6385,9 @@ plot(ta.ema(close, 3), title="EMA")
 
     expect(result.errors).toEqual([]);
     // alpha = 2/(3+1) = 0.5
-    // bar 0: 102 (seed), bar 1: 0.5*105 + 0.5*102 = 103.5
-    // bar 2: 0.5*107 + 0.5*103.5 = 105.25
-    // bar 3: 0.5*103 + 0.5*105.25 = 104.125
-    // bar 4: 0.5*99  + 0.5*104.125 = 101.5625
-    expect(roundSeries(getPlot(result, 'EMA').values)).toEqual([
-      102, 103.5, 105.25, 104.125, 101.5625,
-    ]);
+    // Bars 0 and 1 are missing; bar 2: (102 + 105 + 107) / 3.
+    // Bar 3: 0.5*103 + 0.5*(314/3); bar 4 applies the same recurrence to 99.
+    expect(roundSeries(getPlot(result, 'EMA').values)).toEqual([null, null, 104.666667, 103.833333, 101.416667]);
   });
 
   it('array.indexof returns -1 when searching for na', () => {

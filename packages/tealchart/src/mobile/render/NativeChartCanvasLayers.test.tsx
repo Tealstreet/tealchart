@@ -15,6 +15,7 @@ import { NativeCrosshairLayer } from './NativeCrosshairLayer';
 import { NativeIndicatorOutputAxisLabelLayer } from './NativeIndicatorOutputAxisLabelLayer';
 import { NativeIndicatorPaneAxisLayer } from './NativeIndicatorPaneAxisLayer';
 import { NativeIndicatorPlotLayer } from './NativeIndicatorPlotLayer';
+import { NativeTealScriptDrawingLayer } from './NativeTealScriptDrawingLayer';
 import { NativeUserDrawingLayer } from './NativeUserDrawingLayer';
 
 function shared<T>(value: T) {
@@ -111,7 +112,25 @@ describe('NativeChartCanvasLayers', () => {
   }
 
   it('keeps native chart surfaces in deterministic back-to-front order', () => {
-    const layer = NativeChartCanvasLayersImpl(createLayerProps(true)) as ReactElement;
+    const layer = NativeChartCanvasLayersImpl({
+      ...createLayerProps(true),
+      indicatorDrawings: [
+        {
+          type: 'line',
+          id: 'line-1',
+          barIndex: 0,
+          x1: 0,
+          y1: 1,
+          x2: 1,
+          y2: 2,
+          xloc: 'bar_index',
+          extend: 'none',
+          color: '#fff',
+          width: 1,
+          style: 'solid',
+        },
+      ],
+    }) as ReactElement;
     const children = layer.props.children as ReactElement[];
     const plotGroup = children[1] as ReactElement;
 
@@ -121,6 +140,7 @@ describe('NativeChartCanvasLayers', () => {
       NativeIndicatorPaneAxisLayer,
       NativeCandleVolumeLayer,
       NativeIndicatorPlotLayer,
+      NativeTealScriptDrawingLayer,
       NativeChartPrimitiveLayer,
       NativeIndicatorPaneAxisLayer,
       NativeIndicatorOutputAxisLabelLayer,
@@ -140,16 +160,17 @@ describe('NativeChartCanvasLayers', () => {
       totalBarCount: 0,
       visibleBars: [],
     });
-    expect(plotChildren[4]?.props).toMatchObject({ showAxisLabels: true, showGridLines: false });
+    expect(plotChildren[4]?.props).toMatchObject({ drawings: [{ id: 'line-1' }], bars: [], frame, sharedViewport });
     expect(plotChildren[5]?.props).toMatchObject({ showAxisLabels: true, showGridLines: false });
-    expect(plotChildren[6]?.props).toMatchObject({
+    expect(plotChildren[6]?.props).toMatchObject({ showAxisLabels: true, showGridLines: false });
+    expect(plotChildren[7]?.props).toMatchObject({
       bars: [],
       indicatorPaneInfo: {},
       plots: [],
       sharedViewport,
       totalBarCount: 0,
     });
-    expect(plotChildren[9]?.props).toMatchObject({ hasContextMenu: false });
+    expect(plotChildren[10]?.props).toMatchObject({ hasContextMenu: false });
   });
 
   it('applies loading opacity inside the Skia plot layer', () => {

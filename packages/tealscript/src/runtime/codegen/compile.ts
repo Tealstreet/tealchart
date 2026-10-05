@@ -1,11 +1,14 @@
+import { PineRuntimeArgumentError } from '../runtimeArgumentError';
 import type { Program, Expression, FunctionDeclaration, Statement } from '../../parser/ast';
+import { checkProgram, normalizeV5DuplicateCallArguments } from '../../semantic/checker';
+import { pineVersionRules } from '../../pineVersionRules';
 import { analyze } from './analyzer';
 import type { AnalysisContext, AnalyzeOptions, SecurityCallSite } from './analyzer';
 import { emit, RUNTIME_HELPERS } from './emitter';
 import {
   NumericSeries, ValueSeries,
   SMA, EMA, RMA, RSI, BarsSince, ValueWhen, Cross, Crossover, Crossunder, Change,
-  Highest, Lowest, HighestBars, LowestBars, PivotHigh, PivotLow, Range, Rising, Falling, Max, Min,
+  Highest, Lowest, HighestBars, LowestBars, PivotHigh, PivotLow, PivotPointLevels, Range, Rising, Falling, Max, Min,
   MACD, ATR, DMI, ADX, Supertrend, SAR, Stoch, StdDev, Variance, Dev, Covariance, Correlation, COG, Median, Mode,
   PercentileNearestRank, PercentileLinearInterpolation, PercentRank, LinReg, TrueRange, MFI, TSI, BBW, KC, KCW, KST, VWAP, RCI, BB,
   DEMA, TEMA, Cum, HMA, WMA, VWMA, SWMA, ALMA, CCI, CMO, WPR,
@@ -16,10 +19,20 @@ import * as arrFuncs from '../arrays';
 import * as mapFuncs from '../maps';
 import * as udtFuncs from '../objects';
 import * as mtxFuncs from '../matrices';
+import { divideV5ConstInts } from './runtime';
+import { discardedFootprintCalls } from './footprintDependencies';
 
 export interface CompiledSecurityScript {
   ScriptClass: new (deps: ScriptDependencies) => GeneratedScriptInstance;
+  constantInputValue?: number;
+  inputSourceName?: 'hlc3';
+  fixedEmaProgram?: { captures: string[]; count: number };
   generatedCode?: string;
+  securityScripts?: Map<number, CompiledSecurityScript>;
+  sourceScripts?: Map<number, CompiledSecurityScript>;
+  securitySites?: SecurityCallSite[];
+  independentScalarProgram?: boolean;
+  scalarBuiltinContextProgram?: boolean;
 }
 
 export interface CompiledScript {
@@ -29,13 +42,17 @@ export interface CompiledScript {
   unsupported: string[];
   generatedCode?: string;
   securityScripts: Map<number, CompiledSecurityScript>;
+  sourceScripts?: Map<number, CompiledSecurityScript>;
 }
 
 export type CompileOptions = AnalyzeOptions;
 
 export interface ArrayHelpers {
+  withUdtElementType<T>(value: T): T;
   create(size?: unknown, val?: unknown): arrFuncs.PineArray;
   from(...args: unknown[]): arrFuncs.PineArray;
+  readOnlyFrom(...args: unknown[]): arrFuncs.PineArray;
+  readOnlyCopy(arr: arrFuncs.PineArray): arrFuncs.PineArray;
   push(arr: arrFuncs.PineArray, val: unknown): number;
   pop(arr: arrFuncs.PineArray): unknown;
   shift(arr: arrFuncs.PineArray): unknown;
@@ -44,7 +61,7 @@ export interface ArrayHelpers {
   set(arr: arrFuncs.PineArray, idx: number, val: unknown): void;
   size(arr: arrFuncs.PineArray): number;
   clear(arr: arrFuncs.PineArray): void;
-  copy(arr: arrFuncs.PineArray): arrFuncs.PineArray;
+  copy(arr: arrFuncs.PineArray, preserveReadOnly?: boolean): arrFuncs.PineArray;
   sort(arr: arrFuncs.PineArray, order?: unknown): void;
   sortIndices(arr: arrFuncs.PineArray, order?: unknown, sortField?: unknown): arrFuncs.PineArray;
   reverse(arr: arrFuncs.PineArray): void;
@@ -84,6 +101,8 @@ export interface ArrayHelpers {
 }
 
 export interface MapHelpers {
+  beginIteration(map: mapFuncs.PineMap): void;
+  endIteration(map: mapFuncs.PineMap): void;
   create(): mapFuncs.PineMap;
   put(map: mapFuncs.PineMap, key: unknown, value: unknown): unknown;
   get(map: mapFuncs.PineMap, key: unknown): unknown;
@@ -98,6 +117,9 @@ export interface MapHelpers {
 }
 
 export interface UdtHelpers {
+  factory: typeof udtFuncs.createPineUdtFactory;
+  captureVaripReference(value: unknown, barTime: number, before: boolean): unknown;
+  restoreVaripReference(value: unknown): unknown;
   create(typeName: string, fields: Iterable<[string, unknown]>, varipFields: Iterable<string>): udtFuncs.PineUdtObject;
   getField(obj: udtFuncs.PineUdtObject, fieldName: string): unknown;
   setField(obj: udtFuncs.PineUdtObject, fieldName: string, value: unknown): void;
@@ -119,8 +141,8 @@ export interface MatrixHelpers {
   reshape(m: mtxFuncs.PineMatrix, r: number, c: number): void;
   addRow(m: mtxFuncs.PineMatrix, r: number, vals?: arrFuncs.PineArray): void;
   addCol(m: mtxFuncs.PineMatrix, c: number, vals?: arrFuncs.PineArray): void;
-  removeRow(m: mtxFuncs.PineMatrix, r: number): arrFuncs.PineArray;
-  removeCol(m: mtxFuncs.PineMatrix, c: number): arrFuncs.PineArray;
+  removeRow(m: mtxFuncs.PineMatrix, r?: number): arrFuncs.PineArray;
+  removeCol(m: mtxFuncs.PineMatrix, c?: number): arrFuncs.PineArray;
   swapRows(m: mtxFuncs.PineMatrix, a: number, b: number): void;
   swapCols(m: mtxFuncs.PineMatrix, a: number, b: number): void;
   reverse(m: mtxFuncs.PineMatrix): void;
@@ -158,9 +180,11 @@ export interface MatrixHelpers {
 }
 
 export interface ScriptDependencies {
+  constIntDivide: typeof divideV5ConstInts;
   NumericSeries: typeof NumericSeries;
   ValueSeries: typeof ValueSeries;
   maxBarsBack: number;
+  historyCheck(key: string, offset: number, hint?: number): void;
   _arr: ArrayHelpers;
   _map: MapHelpers;
   _udt: UdtHelpers;
@@ -181,6 +205,7 @@ export interface ScriptDependencies {
   LowestBars: typeof LowestBars;
   PivotHigh: typeof PivotHigh;
   PivotLow: typeof PivotLow;
+  PivotPointLevels: typeof PivotPointLevels;
   Range: typeof Range;
   Rising: typeof Rising;
   Falling: typeof Falling;
@@ -238,6 +263,8 @@ export interface ScriptDependencies {
 
 export interface GeneratedScriptInstance {
   onBar(ctx: CompiledBarContext): void;
+  saveVarip(barTime?: number, before?: boolean): unknown;
+  restoreVarip(snap: unknown): void;
   save(): unknown;
   restore(snap: unknown): void;
 }
@@ -293,7 +320,8 @@ export interface CompiledBarContext {
   runtimeError(args: unknown[], named?: Record<string, unknown>, line?: number, column?: number): void;
   capture(name: string): unknown;
   captureSource(name: string): unknown;
-  timestamp(args: unknown[], named?: Record<string, unknown>): number;
+  requestSource?(id: number, captures?: Record<string, unknown>): unknown;
+  timestamp(args: unknown[], named?: Record<string, unknown>, literalId?: string, literalTimezone?: string): number;
   timeFilter(closeTime: boolean, args: unknown[], named?: Record<string, unknown>): number;
   calendarPart(part: string, args: unknown[], named?: Record<string, unknown>): number;
   runtimeTimeValue(name: string, offset?: number, maxBarsBack?: number): number;
@@ -335,8 +363,12 @@ export interface CompiledBarContext {
     captures?: Record<string, unknown>,
   ): unknown;
   nextBuiltinCallId(name: string): string;
+  readDrawingGetter(name: string, value: unknown): unknown;
+  readLineY1(value: unknown): unknown;
+  readLabelText(value: unknown): unknown;
   callBuiltin(name: string, args: unknown[], named?: Record<string, unknown>, callId?: string): unknown;
-  callMethodBuiltin(name: string, receiver: unknown, args: unknown[], named?: Record<string, unknown>, callId?: string): unknown;
+  hasMethodBuiltin(name: string, receiver: unknown): boolean;
+  callMethodBuiltin(name: string, receiver: unknown, args: unknown[], named?: Record<string, unknown>, callId?: string, resolvedName?: string): unknown;
   footprintMethod(name: string, receiver: unknown, args: unknown[], named?: Record<string, unknown>, callId?: string): unknown;
   tickerNew(args: unknown[], named?: Record<string, unknown>): string;
   tickerModify(args: unknown[], named?: Record<string, unknown>): string;
@@ -355,6 +387,7 @@ export interface CompiledBarContext {
   colorT(args: unknown[], named?: Record<string, unknown>): unknown;
   colorFromGradient(args: unknown[], named?: Record<string, unknown>): unknown;
   mathCall(name: string, args: unknown[], named?: Record<string, unknown>, callId?: string): unknown;
+  mathLog(value: unknown): number;
   mathSum(...args: unknown[]): unknown;
   strFormat(args: unknown[], named?: Record<string, unknown>): string;
   strFormatTime(args: unknown[], named?: Record<string, unknown>): string;
@@ -362,8 +395,12 @@ export interface CompiledBarContext {
 
 function fillArray(arr: arrFuncs.PineArray, val: unknown, from?: number, to?: number): void {
   const size = arrFuncs.getArraySize(arr);
-  const start = from ?? 0;
-  const end = to ?? size;
+  const start = Math.floor(from ?? 0);
+  const end = Math.floor(to ?? size);
+  const invalidEndpoint = start < 0 ? start : end > size ? end : undefined;
+  if (invalidEndpoint !== undefined) {
+    throw new PineRuntimeArgumentError(`In 'array.fill()' function. Index ${invalidEndpoint} is out of bounds, array size is ${size}.`, 'RE10045');
+  }
   for (let i = start; i < end; i++) {
     arrFuncs.setArrayValue(arr, i, val);
   }
@@ -414,8 +451,39 @@ function filterArray(arr: arrFuncs.PineArray, fn: (val: unknown) => boolean): ar
   return result;
 }
 
-export const ARRAY_HELPERS: ArrayHelpers = {
+function withCollectionReceiverChecks<T extends object>(
+  helpers: T,
+  isValid: (value: unknown) => boolean,
+  kind: 'Array' | 'Matrix',
+  withoutReceiver: readonly string[],
+): T {
+  return Object.fromEntries(Object.entries(helpers).map(([name, helper]) => {
+    if (withoutReceiver.includes(name)) return [name, helper];
+    if (kind === 'Array' && name === 'push') {
+      return [name, (array: unknown, value: unknown) => {
+        if (!isValid(array)) throw new Error('Array methods cannot be called when the ID is na');
+        return (helper as (array: unknown, value: unknown) => unknown)(array, value);
+      }];
+    }
+    const receiverCount = name === 'concat'
+      || (kind === 'Array' && name === 'covariance')
+      || (kind === 'Matrix' && name === 'kron') ? 2 : 1;
+    return [name, (...args: unknown[]) => {
+      for (let index = 0; index < receiverCount; index++) {
+        if (!isValid(args[index])) {
+          throw new Error(`${kind} methods cannot be called when the ID is na`);
+        }
+      }
+      return (helper as (...args: unknown[]) => unknown)(...args);
+    }];
+  })) as T;
+}
+
+export const ARRAY_HELPERS: ArrayHelpers = withCollectionReceiverChecks({
+  withUdtElementType: arrFuncs.withUdtArrayElementType,
   create: (size?: unknown, val?: unknown) => arrFuncs.createPineArray(Number(size) || 0, val),
+  readOnlyFrom: (...args: unknown[]) => arrFuncs.createReadOnlyPineArray(args),
+  readOnlyCopy: arrFuncs.asReadOnlyPineArray,
   from: (...args: unknown[]) => {
     const arr = arrFuncs.createPineArray();
     for (const v of args) arrFuncs.pushArrayValue(arr, v);
@@ -466,9 +534,11 @@ export const ARRAY_HELPERS: ArrayHelpers = {
   some: someArray,
   map: mapArray,
   filter: filterArray,
-} as ArrayHelpers;
+} as ArrayHelpers, arrFuncs.isPineArray, 'Array', ['create', 'from', 'readOnlyFrom']);
 
 export const MAP_HELPERS: MapHelpers = {
+  beginIteration: mapFuncs.beginMapIteration,
+  endIteration: mapFuncs.endMapIteration,
   create: mapFuncs.createPineMap,
   put: mapFuncs.putMapValue,
   get: mapFuncs.getMapValue,
@@ -483,13 +553,16 @@ export const MAP_HELPERS: MapHelpers = {
 };
 
 export const UDT_HELPERS: UdtHelpers = {
+  factory: udtFuncs.createPineUdtFactory,
+  captureVaripReference: udtFuncs.captureVaripReference,
+  restoreVaripReference: udtFuncs.restoreVaripReference,
   create: udtFuncs.createPineUdtObject,
   getField: udtFuncs.getUdtField,
   setField: udtFuncs.setUdtField,
   copy: udtFuncs.copyUdtObject,
 };
 
-export const MATRIX_HELPERS: MatrixHelpers = {
+export const MATRIX_HELPERS: MatrixHelpers = withCollectionReceiverChecks({
   create: (rows?: unknown, cols?: unknown, val?: unknown) =>
     mtxFuncs.createPineMatrix(Number(rows) || 0, Number(cols) || 0, val),
   get: mtxFuncs.getMatrixValue,
@@ -541,18 +614,23 @@ export const MATRIX_HELPERS: MatrixHelpers = {
   isTriangular: mtxFuncs.isTriangularMatrix,
   isStochastic: mtxFuncs.isStochasticMatrix,
   isValid: mtxFuncs.isValidMatrix,
-} as MatrixHelpers;
+} as MatrixHelpers, mtxFuncs.isPineMatrix, 'Matrix', ['create', 'isValid']);
 
 const DEFAULT_DEPS: ScriptDependencies = {
+  constIntDivide: divideV5ConstInts,
   NumericSeries,
   ValueSeries,
   maxBarsBack: 500,
+  historyCheck(_key, offset, hint = 0) {
+    const limit = Math.max(500, hint);
+    if (offset > limit) throw new Error(`Historical offset ${offset} exceeds max_bars_back ${limit}`);
+  },
   _arr: ARRAY_HELPERS,
   _map: MAP_HELPERS,
   _udt: UDT_HELPERS,
   _mtx: MATRIX_HELPERS,
   SMA, EMA, RMA, RSI, BarsSince, ValueWhen, Cross, Crossover, Crossunder, Change,
-  Highest, Lowest, HighestBars, LowestBars, PivotHigh, PivotLow, Range, Rising, Falling, Max, Min,
+  Highest, Lowest, HighestBars, LowestBars, PivotHigh, PivotLow, PivotPointLevels, Range, Rising, Falling, Max, Min,
   MACD, ATR, DMI, ADX, Supertrend, SAR, Stoch, StdDev, Variance, Dev, Covariance, Correlation, COG, Median, Mode,
   PercentileNearestRank, PercentileLinearInterpolation, PercentRank, LinReg, TrueRange, MFI, TSI, BBW, KC, KCW, KST, VWAP, RCI, BB,
   DEMA, TEMA, Cum, HMA, WMA, VWMA, SWMA, ALMA, CCI, CMO, WPR,
@@ -633,18 +711,29 @@ function nodeContainsRequest(
   return false;
 }
 
-function nodeContainsExact(node: unknown, target: unknown): boolean {
-  if (node === target) return true;
-  if (!node || typeof node !== 'object') return false;
-  for (const value of Object.values(node)) {
-    if (value === target) return true;
-    if (Array.isArray(value)) {
-      if (value.some((item) => nodeContainsExact(item, target))) return true;
-    } else if (value && typeof value === 'object' && nodeContainsExact(value, target)) {
-      return true;
-    }
-  }
-  return false;
+function allowsNestedRequests(ast: Program): boolean {
+  const declaration = ast.body.find((stmt) => stmt.type === 'IndicatorDeclaration' || stmt.type === 'LibraryDeclaration');
+  const setting = declaration && 'dynamic_requests' in declaration ? declaration.dynamic_requests : undefined;
+  return setting?.type === 'BooleanLiteral' ? setting.value : pineVersionRules(ast.version).dynamicRequestsDefault;
+}
+
+interface SecurityParentContext {
+  ownerIndices: WeakMap<object, number>;
+  functionContainsRequest: (name: string) => boolean;
+}
+
+function buildSecurityParentContext(parentAST: Program, securityNodes: Set<unknown>): SecurityParentContext {
+  const requestFunctionMap = buildRequestFunctionMap(parentAST, securityNodes);
+  const ownerIndices = new WeakMap<object, number>();
+  const visit = (node: unknown, index: number): void => {
+    if (!node || typeof node !== 'object' || ownerIndices.has(node)) return;
+    // First owner wins, matching the previous body.findIndex() scans even for
+    // source nodes shared by several statements.
+    ownerIndices.set(node, index);
+    for (const child of Object.values(node)) visit(child, index);
+  };
+  if (securityNodes.size > 0) parentAST.body.forEach((stmt, index) => visit(stmt, index));
+  return { ownerIndices, functionContainsRequest: (name) => requestFunctionMap.get(name) === true };
 }
 
 function variableDeclarationNames(stmt: Statement): string[] {
@@ -662,6 +751,7 @@ function collectExpressionReferences(expr: Expression, references = new Set<stri
       collectExpressionReferences(expr.object, references);
       return references;
     case 'CallExpression':
+      { const name = expressionFullName(expr.callee); if (name) references.add(name); }
       collectExpressionReferences(expr.callee, references);
       for (const arg of expr.arguments) collectExpressionReferences(arg.value, references);
       return references;
@@ -710,6 +800,9 @@ function collectExpressionReferences(expr: Expression, references = new Set<stri
 }
 
 function collectStatementReferences(stmt: Statement, references = new Set<string>()): Set<string> {
+  if (stmt.type === 'AssignmentStatement' && stmt.left.type === 'MemberExpression') {
+    collectExpressionReferences(stmt.left, references);
+  }
   if (stmt.type === 'VariableDeclaration' && stmt.init.type !== 'IfStatement') {
     collectExpressionReferences(stmt.init, references);
   } else if (stmt.type === 'ExpressionStatement') {
@@ -774,9 +867,8 @@ function collectSecurityGlobalDependencies(
   site: SecurityCallSite,
   parentAST: Program,
   ownerIndex: number,
-  securityNodes: Set<unknown>,
-  functionContainsRequest: (name: string) => boolean,
   captureNames?: Set<string>,
+  parentContext?: SecurityParentContext,
 ): Set<Statement> {
   const priorDeclarations = parentAST.body.slice(0, ownerIndex === -1 ? parentAST.body.length : ownerIndex)
     .filter((stmt): stmt is Extract<Statement, { type: 'VariableDeclaration' }> => stmt.type === 'VariableDeclaration');
@@ -784,15 +876,21 @@ function collectSecurityGlobalDependencies(
   for (const stmt of priorDeclarations) {
     for (const name of variableDeclarationNames(stmt)) declarationByName.set(name, stmt);
   }
+  const securityNodes = new Set<unknown>();
+  const requestFunctions = parentContext ? undefined : buildRequestFunctionMap(parentAST, securityNodes);
+  const functionContainsRequest = parentContext?.functionContainsRequest ?? ((name: string) => requestFunctions?.get(name) === true);
+  const replayRequests = allowsNestedRequests(parentAST);
   const candidates = priorDeclarations
     .filter((stmt): stmt is Extract<Statement, { type: 'VariableDeclaration' }> => (
-      isRequestReplayableGlobalStatement(stmt, securityNodes, functionContainsRequest)
+      isRequestReplayableGlobalStatement(stmt)
+      && (replayRequests || !nodeContainsRequest(stmt.init, securityNodes, functionContainsRequest))
     ));
   const functionDecls = new Map<string, FunctionDeclaration>();
   for (const stmt of parentAST.body) {
     if (stmt.type === 'FunctionDeclaration') functionDecls.set(stmt.name.name, stmt);
   }
   const needed = collectSecuritySiteReferences(site);
+  const capturedNames = new Set(site.expressionCaptureParams ?? []);
   const expandedFunctions = new Set<string>();
   const included = new Set<Statement>();
   let changed = true;
@@ -812,7 +910,7 @@ function collectSecurityGlobalDependencies(
     }
     for (const stmt of candidates) {
       if (included.has(stmt)) continue;
-      if (!variableDeclarationNames(stmt).some((name) => needed.has(name))) continue;
+      if (!variableDeclarationNames(stmt).some((name) => needed.has(name) && !capturedNames.has(name))) continue;
       included.add(stmt);
       for (const reference of collectStatementReferences(stmt)) {
         if (!needed.has(reference)) {
@@ -833,14 +931,12 @@ function collectSecurityGlobalDependencies(
 
 function isRequestReplayableGlobalStatement(
   stmt: Extract<Statement, { type: 'VariableDeclaration' }>,
-  securityNodes: Set<unknown>,
-  functionContainsRequest: (name: string) => boolean,
 ): boolean {
   // Dependency-selected `var`/`varip` globals get an independent requested-
-  // context state, just like regular globals. Only declarations that perform a
-  // request or depend on block execution are excluded from replay.
+  // context state, just like regular globals. Block execution is not yet replayed.
   if (stmt.init.type === 'IfStatement') return false;
-  if (nodeContainsRequest(stmt.init, securityNodes, functionContainsRequest)) return false;
+  // Prior requests are dependencies too; each requested subprogram compiles
+  // its own nested request graph rather than sampling the chart result.
   return true;
 }
 
@@ -865,34 +961,91 @@ function collectSecuritySiteReferences(site: SecurityCallSite): Set<string> {
   return references;
 }
 
-function prepareSecurityCaptureParams(parentAST: Program, analysis: AnalysisContext, securityNodes: Set<unknown>): void {
-  const requestFunctionMap = buildRequestFunctionMap(parentAST, securityNodes);
-  const functionContainsRequest = (name: string) => requestFunctionMap.get(name) === true;
+function prepareSecurityCaptureParams(parentAST: Program, analysis: AnalysisContext, parentContext: SecurityParentContext): void {
+  const independentRequests = !allowsNestedRequests(parentAST);
+  const requestsByNode = new Map(analysis.securitySites.map((site) => [site.node, site]));
+  const usedNames = new Set<string>();
+  for (const stmt of parentAST.body) collectStatementReferences(stmt, usedNames);
   for (const site of analysis.securitySites) {
-    const ownerIndex = parentAST.body.findIndex((stmt) => nodeContainsExact(stmt, site.node));
+    const ownerIndex = Math.min(parentContext.ownerIndices.get(site.node) ?? parentAST.body.length, parentContext.ownerIndices.get(site.expressionExpr) ?? parentAST.body.length);
     const captureNames = new Set(site.expressionCaptureParams ?? []);
-    collectSecurityGlobalDependencies(site, parentAST, ownerIndex, securityNodes, functionContainsRequest, captureNames);
+    if (site.expressionSourceParam) captureNames.add(site.expressionSourceParam);
+    const dependencies = collectSecurityGlobalDependencies(site, parentAST, ownerIndex, captureNames, parentContext);
+    for (const statement of dependencies) {
+      for (const name of collectStatementReferences(statement)) {
+        if (analysis.capturedParams.has(name)) captureNames.add(name);
+      }
+    }
+    if (independentRequests) {
+      const captures = new Map<string, Expression>();
+      const collect = (node: unknown): void => {
+        if (!node || typeof node !== 'object') return;
+        const request = requestsByNode.get(node as SecurityCallSite['node']);
+        if (request) {
+          let name = `__independent_request_${site.id}_${request.id}`;
+          while (usedNames.has(name)) name += '_';
+          usedNames.add(name);
+          captures.set(name, request.node);
+          captureNames.add(name);
+          return;
+        }
+        for (const value of Object.values(node)) {
+          if (Array.isArray(value)) value.forEach(collect);
+          else collect(value);
+        }
+      };
+      collect(site.expressionExpr);
+      if (captures.size > 0) site.independentRequestCaptures = captures;
+      if (site.requiresDynamicRequestsReason === 'nested-request') {
+        site.requiresDynamicRequestsReason = undefined;
+      }
+    }
     site.expressionCaptureParams = captureNames.size > 0 ? [...captureNames].sort() : undefined;
   }
 }
 
-function buildSecurityAST(site: SecurityCallSite, parentAST: Program, securityNodes: Set<unknown>): Program {
+function independentSecurityExpression(site: SecurityCallSite): Expression {
+  if (!site.independentRequestCaptures) return site.expressionExpr;
+  const replacements = new Map([...site.independentRequestCaptures].map(([name, expr]) => [expr, name]));
+  const replace = (node: unknown): unknown => {
+    if (!node || typeof node !== 'object') return node;
+    const name = replacements.get(node as Expression);
+    if (name) return { type: 'Identifier', name };
+    if (Array.isArray(node)) return node.map(replace);
+    return Object.fromEntries(Object.entries(node).map(([key, value]) => [key, replace(value)]));
+  };
+  return replace(site.expressionExpr) as Expression;
+}
+
+function buildSecurityAST(site: SecurityCallSite, parentAST: Program, parentContext: SecurityParentContext): Program {
   const body: Statement[] = [
     {
       type: 'IndicatorDeclaration',
       declarationKind: 'indicator',
-      title: { type: 'StringLiteral', value: `security_${site.id}` },
+      title: { type: 'StringLiteral', value: `security_${site.id}`, raw: JSON.stringify(`security_${site.id}`) },
+      dynamic_requests: { type: 'BooleanLiteral', value: allowsNestedRequests(parentAST) },
     } as Statement,
   ];
-  const requestFunctionMap = buildRequestFunctionMap(parentAST, securityNodes);
-  const functionContainsRequest = (name: string) => requestFunctionMap.get(name) === true;
-  const ownerIndex = parentAST.body.findIndex((stmt) => nodeContainsExact(stmt, site.node));
-  const dependencyGlobals = collectSecurityGlobalDependencies(site, parentAST, ownerIndex, securityNodes, functionContainsRequest);
+  const ownerIndex = Math.min(parentContext.ownerIndices.get(site.node) ?? parentAST.body.length, parentContext.ownerIndices.get(site.expressionExpr) ?? parentAST.body.length);
+  const dependencyGlobals = collectSecurityGlobalDependencies(site, parentAST, ownerIndex, undefined, parentContext);
+
+  const neededFunctions = collectSecuritySiteReferences(site);
+  for (const stmt of dependencyGlobals) collectStatementReferences(stmt, neededFunctions);
+  let expanded = true;
+  while (expanded) {
+    expanded = false;
+    for (const stmt of parentAST.body) {
+      if (stmt.type !== 'FunctionDeclaration' || !neededFunctions.has(stmt.name.name)) continue;
+      for (const name of collectFunctionBodyReferences(stmt)) {
+        if (!neededFunctions.has(name)) { neededFunctions.add(name); expanded = true; }
+      }
+    }
+  }
 
   for (let index = 0; index < parentAST.body.length; index += 1) {
     const stmt = parentAST.body[index]!;
     if (
-      stmt.type === 'FunctionDeclaration'
+      (stmt.type === 'FunctionDeclaration' && neededFunctions.has(stmt.name.name))
       || stmt.type === 'ImportDeclaration'
       || stmt.type === 'TypeDeclaration'
       || stmt.type === 'EnumDeclaration'
@@ -916,41 +1069,216 @@ function buildSecurityAST(site: SecurityCallSite, parentAST: Program, securityNo
     expression: {
       type: 'CallExpression',
       callee: { type: 'Identifier', name: 'plot' },
-      arguments: [{ type: 'CallArgument', value: site.expressionExpr }],
+      arguments: [{ type: 'CallArgument', value: independentSecurityExpression(site) }],
     },
   } as Statement);
 
   return { type: 'Program', version: parentAST.version, explicitVersion: parentAST.explicitVersion, body };
 }
 
+function requestedInputDefault(ast: Program): Expression | undefined {
+  if (ast.body.length !== 3) return undefined;
+  const declaration = ast.body[1];
+  const output = ast.body[2];
+  if (declaration?.type !== 'VariableDeclaration' || declaration.kind !== 'none'
+    || declaration.names.type !== 'VariableDeclarator' || declaration.init.type !== 'CallExpression'
+    || output?.type !== 'ExpressionStatement' || output.expression.type !== 'CallExpression') return undefined;
+  if (!['input', 'input.int', 'input.float'].includes(expressionFullName(declaration.init.callee) ?? '')) return undefined;
+  const defaultValue = declaration.init.arguments.find(argument => !argument.name)?.value;
+  if (declaration.init.arguments.some(argument => argument.name?.name === 'defval'
+    || (argument.value !== defaultValue && !['NumericLiteral', 'StringLiteral', 'BooleanLiteral'].includes(argument.value.type)))) return undefined;
+  const result = output.expression.arguments[0]?.value;
+  if (expressionFullName(output.expression.callee) !== 'plot'
+    || result?.type !== 'Identifier' || result.name !== declaration.names.name.name) return undefined;
+  return defaultValue;
+}
+
+function constantRequestedInputValue(ast: Program): number | undefined {
+  const value = requestedInputDefault(ast);
+  return value?.type === 'NumericLiteral' && Number.isFinite(value.value) ? value.value : undefined;
+}
+
+function requestedInputSourceName(ast: Program): 'hlc3' | undefined {
+  const value = requestedInputDefault(ast);
+  return value?.type === 'Identifier' && value.name === 'hlc3' ? 'hlc3' : undefined;
+}
+
+function fixedRequestedEmaProgram(ast: Program, captures: string[]): CompiledSecurityScript['fixedEmaProgram'] {
+  const names = new Set(captures);
+  let count = 0;
+  let plotted = false;
+  const numeric = (value: Expression): boolean => {
+    if (value.type === 'NumericLiteral') return true;
+    if (value.type === 'Identifier') return value.name === 'na' || (names.has(value.name) && !['open', 'high', 'low', 'close', 'volume', 'time', 'timenow', 'bar_index', 'last_bar_index', 'hl2', 'hlc3', 'ohlc4', 'hlcc4', 'bid', 'ask'].includes(value.name));
+    if (value.type === 'UnaryExpression') return ['+', '-'].includes(value.operator) && numeric(value.argument);
+    if (value.type === 'BinaryExpression') return ['+', '-', '*', '/', '%'].includes(value.operator) && numeric(value.left) && numeric(value.right);
+    if (value.type !== 'CallExpression' || value.arguments.some(argument => argument.name)) return false;
+    const callee = value.callee;
+    if (callee.type === 'MemberExpression' && callee.object.type === 'Identifier') {
+      const name = `${callee.object.name}.${callee.property.name}`;
+      if (name === 'ta.ema' && value.arguments.length === 2) count++;
+      else if (name !== 'math.abs' || value.arguments.length !== 1) return false;
+    } else if (callee.type !== 'Identifier' || !['float', 'int'].includes(callee.name) || value.arguments.length !== 1) return false;
+    return value.arguments.every(argument => numeric(argument.value));
+  };
+  for (const statement of ast.body) {
+    if (statement.type === 'IndicatorDeclaration' && statement.declarationKind === 'indicator') continue;
+    if (statement.type === 'FunctionDeclaration') {
+      if (['ema', 'abs', 'float', 'int', 'plot'].includes(statement.name.name)) return undefined;
+      continue;
+    }
+    if (plotted) return undefined;
+    if (statement.type === 'VariableDeclaration' && statement.kind === 'none' && statement.names.type === 'VariableDeclarator'
+      && !['ta', 'math'].includes(statement.names.name.name) && !names.has(statement.names.name.name) && statement.init.type !== 'IfStatement' && numeric(statement.init)) {
+      names.add(statement.names.name.name);
+      continue;
+    }
+    if (statement.type !== 'ExpressionStatement' || statement.expression.type !== 'CallExpression') return undefined;
+    const call = statement.expression;
+    if (call.callee.type !== 'Identifier' || call.callee.name !== 'plot' || call.arguments.length === 0 || !numeric(call.arguments[0].value)) return undefined;
+    if (call.arguments.slice(1).some(argument => !['NumericLiteral', 'StringLiteral', 'BoolLiteral'].includes(argument.value.type))) return undefined;
+    plotted = true;
+  }
+  return plotted && count > 0 ? { captures, count } : undefined;
+}
+
 function compileSecurityExpression(
   site: SecurityCallSite,
   parentAST: Program,
-  securityNodes: Set<unknown>,
+  parentContext: SecurityParentContext,
   maxBarsBack?: number,
   options: CompileOptions = {},
 ): CompiledSecurityScript | null {
-  const secAST = buildSecurityAST(site, parentAST, securityNodes);
-  const secAnalysis = analyze(secAST, {
+  const secAST = buildSecurityAST(site, parentAST, parentContext);
+  const compiled = compile(secAST, maxBarsBack, {
     ...options,
     capturedParams: new Set(site.expressionCaptureParams ?? []),
     importedAliasContext: site.importedAliasContext,
   });
-  if (secAnalysis.unsupported.length > 0) return null;
+  const scalarProgram = compiled.success && isIndependentScalarProgram(secAST);
+  return compiled.success ? {
+    ScriptClass: compiled.ScriptClass,
+    constantInputValue: constantRequestedInputValue(secAST),
+    inputSourceName: requestedInputSourceName(secAST),
+    fixedEmaProgram: fixedRequestedEmaProgram(secAST, site.expressionCaptureParams ?? []),
+    generatedCode: compiled.generatedCode,
+    securityScripts: compiled.securityScripts,
+    sourceScripts: compiled.sourceScripts,
+    securitySites: compiled.analysis.securitySites,
+    independentScalarProgram: !site.expressionCaptureParams?.length && scalarProgram,
+    scalarBuiltinContextProgram: scalarProgram,
+  } : null;
+}
 
-  const code = emit(secAST, secAnalysis);
-  try {
-    const factory = new Function('deps', `${RUNTIME_HELPERS}\n${code}`);
-    const deps = { ...DEFAULT_DEPS };
-    if (maxBarsBack !== undefined) deps.maxBarsBack = maxBarsBack;
-    return { ScriptClass: factory(deps), generatedCode: code };
-  } catch {
-    return null;
+function isIndependentScalarProgram(ast: Program): boolean {
+  const functions = new Set(ast.body.filter((stmt) => stmt.type === 'FunctionDeclaration').map((stmt) => stmt.name.name));
+  const scalarCalls = new Set(['plot', 'input', 'na', 'nz', 'fixnan', 'int', 'float', 'bool', 'string', 'color', 'timestamp', 'time', 'time_close', 'year', 'month', 'weekofyear', 'dayofmonth', 'dayofweek', 'hour', 'minute', 'second']);
+  const scalarNamespaces = new Set(['ta', 'math', 'str', 'color', 'input', 'ticker']);
+  const referenceNamespaces = new Set(['array', 'map', 'matrix', 'line', 'label', 'box', 'table', 'polyline', 'linefill', 'chart', 'request', 'strategy']);
+  const visit = (node: unknown): boolean => {
+    if (!node || typeof node !== 'object') return true;
+    if (Array.isArray(node)) return node.every(visit);
+    const value = node as Record<string, unknown>;
+    if (value.type === 'Identifier' && value.name === 'timenow') return false;
+    if (value.type === 'ImportDeclaration' || value.type === 'TypeDeclaration' || value.type === 'EnumDeclaration') return false;
+    if (value.type === 'FunctionDeclaration' && value.isMethod) return false;
+    if (value.type === 'MemberExpression') {
+      const name = expressionFullName(node as Expression);
+      if (name && referenceNamespaces.has(name.split('.')[0]!)) return false;
+    }
+    if (value.type === 'CallExpression') {
+      const name = expressionFullName(value.callee as Expression);
+      if (!name) return false;
+      if (name.includes('.')) {
+        if (!scalarNamespaces.has(name.split('.')[0]!) || name === 'str.split' || name === 'ta.pivot_point_levels' || name === 'math.random') return false;
+      } else if (!functions.has(name) && !scalarCalls.has(name)) return false;
+    }
+    return Object.entries(value).every(([key, child]) => key === 'loc' || visit(child));
+  };
+  return visit(ast);
+}
+
+function executableFunctionNames(ast: Program, analysis: AnalysisContext): Set<string> {
+  const references = new Set<string>();
+  for (const stmt of ast.body) {
+    if (stmt.type !== 'FunctionDeclaration') collectStatementReferences(stmt, references);
   }
+  const functions = new Set<string>();
+  const pending = [...references];
+  while (pending.length > 0) {
+    const reference = pending.pop()!;
+    const qualified = analysis.importedAliasContext ? `${analysis.importedAliasContext}.${reference}` : reference;
+    const name = analysis.importedFunctions.get(reference) ?? analysis.importedFunctions.get(qualified) ?? reference;
+    for (const overload of analysis.userFunctionOverloads.get(reference) ?? []) {
+      if (!functions.has(overload)) pending.push(overload);
+    }
+    const methodName = reference.split('.').at(-1)!;
+    for (const overload of analysis.localMethodOverloads.get(methodName) ?? []) {
+      if (!functions.has(overload.internalName)) pending.push(overload.internalName);
+    }
+    for (const [method, overloads] of analysis.importedMethodOverloads) {
+      if (method === reference || method.endsWith(`.${methodName}`)) {
+        for (const overload of overloads) if (!functions.has(overload.internalName)) pending.push(overload.internalName);
+      }
+    }
+    const fn = analysis.funcInfos.get(name);
+    if (!fn || functions.has(name)) continue;
+    functions.add(name);
+    const dependencies = new Set<string>();
+    if (Array.isArray(fn.body)) for (const stmt of fn.body) collectStatementReferences(stmt, dependencies);
+    else collectExpressionReferences(fn.body, dependencies);
+    const importedName = [...analysis.importedFunctions].find(([, internal]) => internal === name)?.[0];
+    const alias = importedName?.slice(0, importedName.lastIndexOf('.'));
+    for (const dependency of dependencies) {
+      pending.push(alias && analysis.importedFunctions.has(`${alias}.${dependency}`) ? `${alias}.${dependency}` : dependency);
+    }
+  }
+  return functions;
 }
 
 export function compile(ast: Program, maxBarsBack?: number, options: CompileOptions = {}): CompiledScript {
+  ast = normalizeV5DuplicateCallArguments(ast, options);
   const analysis = analyze(ast, options);
+  const executableFunctions = executableFunctionNames(ast, analysis);
+  const reachableTupleSites = analysis.securitySites.filter(
+    (site) => !site.ownerFunctionName || executableFunctions.has(site.ownerFunctionName),
+  );
+  const explicitTupleElements = reachableTupleSites.reduce(
+    (count, site) =>
+      site.expressionExpr.type === 'ArrayExpression' ? count + (site.expressionTupleArity ?? 0) : count,
+    0,
+  );
+  const largestReturnedTuple = reachableTupleSites.reduce(
+    (largest, site) => Math.max(largest, site.expressionTupleArity ?? 0),
+    0,
+  );
+  const requestedTupleElements = Math.max(explicitTupleElements, largestReturnedTuple);
+  if (requestedTupleElements > 127) {
+    analysis.unsupported.push(`request.* calls cannot collectively return more than 127 tuple elements (got ${requestedTupleElements}).`);
+  }
+  const dynamicOption = analysis.declarationInfo?.node.dynamic_requests;
+  const dynamicRequestsEnabled = dynamicOption?.type === 'BooleanLiteral'
+    ? dynamicOption.value
+    : pineVersionRules(ast.version).dynamicRequestsDefault;
+  if (!dynamicRequestsEnabled) {
+    for (const site of analysis.securitySites) {
+      if (site.requiresDynamicRequestsReason !== 'local-scope') continue;
+      analysis.unsupported.push(`request.* calls in local scopes require dynamic_requests=true: request.${site.kind}`);
+    }
+  }
+  if (analysis.plotSites.some((site) => site.funcName === 'fill')) {
+    const qualifiers = checkProgram(ast, { libraries: options.libraries }).fillColorQualifiers;
+    for (const site of analysis.plotSites) {
+      if (site.funcName !== 'fill') continue;
+      const qualifier = qualifiers.get(site.node);
+      site.plotCount = qualifier === undefined || qualifier === 'series' ? 1 : 0;
+    }
+  }
+  if (pineVersionRules(ast.version).allowsLegacyGlobalBuiltinAliases) {
+    for (const diagnostic of checkProgram(ast, options).diagnostics) {
+      if (diagnostic.code === 'mutable-security-expression') analysis.unsupported.push(diagnostic.message);
+    }
+  }
 
   if (analysis.unsupported.length > 0) {
     return {
@@ -962,9 +1290,11 @@ export function compile(ast: Program, maxBarsBack?: number, options: CompileOpti
     };
   }
 
-  const securityNodes = new Set<unknown>(analysis.securitySites.map((s) => s.node));
-  prepareSecurityCaptureParams(ast, analysis, securityNodes);
-  const code = emit(ast, analysis);
+  const securityNodes = new Set<unknown>(analysis.securitySites.map((site) => site.node));
+  const parentContext = buildSecurityParentContext(ast, securityNodes);
+  prepareSecurityCaptureParams(ast, analysis, parentContext);
+  analysis.discardedFootprintCalls = discardedFootprintCalls(ast, analysis);
+  const code = emit(ast, analysis, options.libraries);
 
   try {
     const factory = new Function(
@@ -979,8 +1309,8 @@ export function compile(ast: Program, maxBarsBack?: number, options: CompileOpti
 
     const securityScripts = new Map<number, CompiledSecurityScript>();
     for (const site of analysis.securitySites) {
-      if (site.expressionSourceParam) continue;
-      const secScript = compileSecurityExpression(site, ast, securityNodes, maxBarsBack, options);
+      if (site.ownerFunctionName && !executableFunctions.has(site.ownerFunctionName)) continue;
+      const secScript = compileSecurityExpression(site, ast, parentContext, maxBarsBack, options);
       if (secScript) {
         securityScripts.set(site.id, secScript);
       } else {
@@ -995,6 +1325,30 @@ export function compile(ast: Program, maxBarsBack?: number, options: CompileOpti
       }
     }
 
+    const sourceScripts = new Map<number, CompiledSecurityScript>();
+    for (const source of analysis.requestSourceSites.values()) {
+      if (source.ownerFunctionName && !executableFunctions.has(source.ownerFunctionName)) continue;
+      const site: SecurityCallSite = {
+        id: source.id, kind: 'security', sourceExpr: null,
+        symbolExpr: { type: 'StringLiteral', value: '', raw: '""' },
+        timeframeExpr: { type: 'StringLiteral', value: '', raw: '""' },
+        expressionExpr: source.expression,
+        gapsExpr: null, lookaheadExpr: null, ignoreInvalidSymbolExpr: null,
+        currencyExpr: null, ignoreInvalidTimeframeExpr: null, calcBarsCountExpr: null,
+        taCallSites: [],
+        node: { type: 'CallExpression', callee: { type: 'Identifier', name: 'plot' }, arguments: [{ type: 'CallArgument', value: source.expression }] },
+        expressionCaptureParams: source.params,
+        expressionLocalStatements: source.locals,
+      };
+      const ownerIndex = parentContext.ownerIndices.get(source.expression) ?? -1;
+      const captures = new Set(source.params);
+      collectSecurityGlobalDependencies(site, ast, ownerIndex, captures);
+      site.expressionCaptureParams = [...captures];
+      const sourceScript = compileSecurityExpression(site, ast, parentContext, maxBarsBack, options);
+      if (!sourceScript) throw new Error(`Request source expression ${source.id} could not be compiled`);
+      sourceScripts.set(source.id, sourceScript);
+    }
+
     return {
       ScriptClass,
       analysis,
@@ -1002,6 +1356,7 @@ export function compile(ast: Program, maxBarsBack?: number, options: CompileOpti
       unsupported: [],
       generatedCode: code,
       securityScripts,
+      sourceScripts,
     };
   } catch (error) {
     return {

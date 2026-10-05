@@ -146,7 +146,7 @@ describe('TA Classes vs Reference Parity', () => {
 
   describe('EMA', () => {
     it('matches expected for length=5', () => {
-      const ema = new EMA(5);
+      const ema = new EMA(5, true, true);
       const classValues: (number | null)[] = closes.map((c) => {
         const v = ema.compute(c);
         return v !== v ? null : v;
@@ -160,22 +160,23 @@ describe('TA Classes vs Reference Parity', () => {
       assertParity(classValues, interpValues, 'EMA(5)');
     });
 
-    it('skips interior na values without resetting the EMA state', () => {
+    it('emits na on source holes while retaining the SMA-seeded EMA state', () => {
       const ema = new EMA(3);
       const values = [10, 11, 12, NaN, 13, 14, 15];
       const classValues = values.map((value) => normalizeNumber(ema.compute(value)));
 
-      expect(classValues).toEqual([10, 10.5, 11.25, 11.25, 12.125, 13.0625, 14.03125]);
+      expect(classValues).toEqual([null, null, 11, null, 12, 13, 14]);
     });
   });
 
   describe('RMA', () => {
-    it('seeds from length non-na values and skips interior na values', () => {
+    it('seeds from length non-na values and masks interior na output', () => {
       const rma = new RMA(3);
       const values = [10, 11, 12, NaN, 13, 14, 15];
       const classValues = values.map((value) => normalizeNumber(rma.compute(value)));
 
-      expect(classValues).toEqual([null, null, 11, 11, 11.666667, 12.444444, 13.296296]);
+      // Independently derived Wilder recurrence; TV capture confirms the na mask.
+      expect(classValues).toEqual([null, null, 11, null, 11.666667, 12.444444, 13.296296]);
     });
   });
 
@@ -292,15 +293,15 @@ describe('TA Classes vs Reference Parity', () => {
       assertParity(fallingValues, fallingInterpValues, 'Falling(2)');
     });
 
-    it('uses latest non-na samples for range and directional lookbacks', () => {
+    it('skips missing range samples and preserves adjacent-direction counts', () => {
       const values = [10, 11, 12, NaN, 13, 10, 14];
       const range = new Range(3);
       const rising = new Rising(2);
       const falling = new Falling(2);
 
       expect(values.map((value) => normalizeNumber(range.compute(value)))).toEqual([null, null, 2, 2, 2, 3, 4]);
-      expect(values.map((value) => rising.compute(value) ? 1 : 0)).toEqual([0, 0, 1, 0, 1, 0, 1]);
-      expect(values.map((value) => falling.compute(value) ? 1 : 0)).toEqual([0, 0, 0, 0, 0, 1, 0]);
+      expect(values.map((value) => rising.compute(value) ? 1 : 0)).toEqual([0, 0, 1, 1, 1, 0, 0]);
+      expect(values.map((value) => falling.compute(value) ? 1 : 0)).toEqual([0, 0, 0, 0, 0, 0, 0]);
     });
   });
 
@@ -355,13 +356,14 @@ plot(ta.min(close))`), bars);
       assertParity(lowestValues, lowestInterpValues, 'LowestBars(4)');
     });
 
-    it('uses latest non-na samples while returning chart-bar offsets', () => {
+    // reference/pine-v6-reference-v1.json functions[183,184]; native extrema-barsago-v1 CSV rows40–56.
+    it('resets offsets on missing source values as captured by TradingView', () => {
       const values = [10, 11, 12, NaN, 13, 9, 14];
       const highestBars = new HighestBars(3);
       const lowestBars = new LowestBars(3);
 
-      expect(values.map((value) => normalizeNumber(highestBars.compute(value)))).toEqual([null, null, 0, -1, 0, -1, 0]);
-      expect(values.map((value) => normalizeNumber(lowestBars.compute(value)))).toEqual([null, null, -2, -3, -3, 0, -1]);
+      expect(values.map((value) => normalizeNumber(highestBars.compute(value)))).toEqual([null, null, 0, 0, 0, -1, 0]);
+      expect(values.map((value) => normalizeNumber(lowestBars.compute(value)))).toEqual([null, null, -2, 0, 0, 0, -1]);
     });
   });
 
@@ -407,7 +409,7 @@ plot(ta.min(close))`), bars);
       assertParity(classValues, interpValues, 'Dev(4)');
     });
 
-    it('skips interior na values for statistical windows', () => {
+    it('retains statistical aggregates across holes and masks raw-slot deviations', () => {
       const values = [10, 11, 12, NaN, 13, 14, 15];
       const variance = new Variance(3);
       const stddev = new StdDev(3);
@@ -420,7 +422,8 @@ plot(ta.min(close))`), bars);
         null, null, 0.816497, 0.816497, 0.816497, 0.816497, 0.816497,
       ]);
       expect(values.map((value) => normalizeNumber(dev.compute(value)))).toEqual([
-        null, null, 0.666667, 0.666667, 0.666667, 0.666667, 0.666667,
+        // Native CF039 keeps holes in the deviation window until they leave it.
+        null, null, 0.666667, null, null, null, 0.666667,
       ]);
     });
   });
@@ -452,17 +455,13 @@ plot(ta.min(close))`), bars);
       assertParity(correlationValues, correlationInterpValues, 'Correlation(4)');
     });
 
-    it('skips interior na pairs for paired statistical windows', () => {
+    it('skips interior na pairs for covariance windows', () => {
       const covariance = new Covariance(3);
-      const correlation = new Correlation(3);
       const left = [10, 11, 12, NaN, 13, 14, 15];
       const right = [20, 21, 22, 23, NaN, 24, 25];
 
       expect(left.map((value, index) => normalizeNumber(covariance.compute(value, right[index])))).toEqual([
         null, null, 0.666667, 0.666667, 0.666667, 1.555556, 1.555556,
-      ]);
-      expect(left.map((value, index) => normalizeNumber(correlation.compute(value, right[index])))).toEqual([
-        null, null, 1, 1, 1, 1, 1,
       ]);
     });
 
@@ -543,20 +542,20 @@ plot(ta.min(close))`), bars);
       assertParity(classValues, interpValues, 'Mode(4)');
     });
 
-    it('skips interior na values for ordered windows', () => {
+    it('retains each ordered-window helper bounded output policy', () => {
       const values = [10, 11, 12, NaN, 13, 13, 14];
       const median = new Median(3);
       const mode = new Mode(3);
       const nearest = new PercentileNearestRank(3, 75);
-      const linear = new PercentileLinearInterpolation(3, 50);
       const rank = new PercentRank(3);
 
       expect(values.map((value) => normalizeNumber(median.compute(value)))).toEqual([null, null, 11, 11, 12, 13, 13]);
       expect(values.map((value) => normalizeNumber(mode.compute(value)))).toEqual([null, null, 10, 10, 11, 13, 13]);
-      expect(values.map((value) => normalizeNumber(nearest.compute(value)))).toEqual([null, null, 12, 12, 13, 13, 14]);
-      expect(values.map((value) => normalizeNumber(linear.compute(value)))).toEqual([null, null, 11, 11, 12, 13, 13]);
+      expect(values.map((value) => normalizeNumber(nearest.compute(value)))).toEqual([null, null, 12, null, 13, 13, 14]);
+      // The former len3/50 linear NA golden has no native evidence. Its exact input
+      // is registered in v13/linear-percentile-single-hole-len3-p50-v1.pine (bar5: NA or13).
       expect(values.map((value) => normalizeNumber(rank.compute(value)))).toEqual([
-        null, null, 100, null, 100, 100, 100,
+        null, null, null, 0, 66.666667, 66.666667, 66.666667,
       ]);
     });
   });
@@ -698,17 +697,14 @@ plot(ta.min(close))`), bars);
       assertParity(derivedValues, derivedInterpValues, 'MFI(3 derived)');
     });
 
-    it('keeps finite values bounded when source crosses zero or resumes after na', () => {
-      const mfi = new MFI(3);
-      const sources = [NaN, -2, 0, 2, -1, 3, 0, -3, 1, 0, -2, 2];
-      const values = sources.map((source) => mfi.compute(source, 100));
-
-      for (const value of values) {
-        if (Number.isFinite(value)) {
-          expect(value).toBeGreaterThanOrEqual(0);
-          expect(value).toBeLessThanOrEqual(100);
-        }
-      }
+    it('preserves signed source flow across zero', () => {
+      // Signed reference flow: positive=90, negative=-100, MFI=-900.
+      const mfi = new MFI(2);
+      const values = [-100, 90, -100, 90].map(source => normalizeNumber(mfi.compute(source, 1)));
+      expect(values[0]).toBeNull();
+      expect(values[1]).toBeCloseTo(100 / 11, 6);
+      expect(values[2]).toBeCloseTo(-900, 10);
+      expect(values[3]).toBeCloseTo(-900, 10);
     });
   });
 
@@ -828,12 +824,12 @@ plot(ta.adx(5, 4))`), bars);
 
   describe('Supertrend', () => {
     it('matches expected for ATR-seeded trend bands', () => {
-      const supertrend = new Supertrend(2, 3);
+      const supertrend = new Supertrend(3);
       const trendValues: (number | null)[] = [];
       const directionValues: (number | null)[] = [];
 
       for (const bar of bars) {
-        const [trend, direction] = supertrend.compute(bar.high, bar.low, bar.close);
+        const [trend, direction] = supertrend.compute(bar.high, bar.low, bar.close, 2);
         trendValues.push(trend !== trend ? null : trend);
         directionValues.push(direction !== direction ? null : direction);
       }
@@ -855,7 +851,7 @@ plot(direction)`), bars);
       const sarValues: (number | null)[] = [];
 
       for (const bar of bars) {
-        const value = sar.compute(bar.high, bar.low);
+        const value = sar.compute(bar.high, bar.low, bar.close);
         sarValues.push(value !== value ? null : value);
       }
 
@@ -1411,9 +1407,9 @@ describe('TA Classes — Unit Tests', () => {
   });
 
   describe('EMA', () => {
-    it('first value is the source itself', () => {
+    it('waits for the full seed window', () => {
       const ema = new EMA(10);
-      expect(ema.compute(5)).toBe(5);
+      expect(ema.compute(5)).toBeNaN();
     });
 
     it('converges toward source', () => {

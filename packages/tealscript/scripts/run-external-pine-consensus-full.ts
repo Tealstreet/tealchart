@@ -657,7 +657,7 @@ async function runExternalInWorker(
       settled = true;
       clearTimeout(timeout);
       void worker.terminate();
-      resolveWorker({ ok: false, stage: engine, message: error.message });
+      resolveWorker({ ok: false, stage: engine, message: error instanceof Error ? error.message : String(error) });
     });
     worker.once('exit', (code) => {
       if (settled) return;

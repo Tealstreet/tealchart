@@ -1,4 +1,5 @@
 // @vitest-environment node
+import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
@@ -7,7 +8,7 @@ import {
   type ProductionWorkerCase,
 } from '../compat/productionWorkerHarness';
 import { summarizeRealtimeParityMismatches } from '../../src/compat/productionWorkerFallbackBaseline';
-import { loadCorpus, runCorpusEntry, type CorpusEntry } from './corpus-runner';
+import { loadCorpus, loadCorpusEntry, runCorpusEntry, type CorpusEntry } from './corpus-runner';
 import {
   alignTrades,
   computeParity,
@@ -20,7 +21,8 @@ import {
 const CORPUS_DIR = path.join(path.dirname(fileURLToPath(import.meta.url)), 'corpus');
 const RUN_REALTIME_SWEEP = process.env.TEALSCRIPT_REALTIME_SWEEP === '1';
 const REALTIME_SWEEP_BACKEND = 'worker';
-const REPRESENTATIVE_REALTIME_REENTRY_TIMEOUT_MS = 15_000;
+// Three worker executions also compile their runtime under the shared CPU gate.
+const REPRESENTATIVE_REALTIME_REENTRY_TIMEOUT_MS = 60_000;
 const FULL_FAST_CORPUS_REALTIME_REENTRY_TIMEOUT_MS = 60_000;
 const realtimeSweepIt = RUN_REALTIME_SWEEP ? it : it.skip;
 
@@ -105,7 +107,7 @@ describe('trade comparison utilities', () => {
 describe('strategy parity corpus', () => {
   const corpus = loadCorpus(CORPUS_DIR);
   const fastCorpus = corpus.filter((e) => !e.id.startsWith('pf-'));
-  const pineforgeCorpus = corpus.filter((e) => e.id.startsWith('pf-'));
+
 
   it('loads corpus entries', () => {
     expect(corpus.length).toBeGreaterThanOrEqual(5);
@@ -123,11 +125,27 @@ describe('strategy parity corpus', () => {
     });
   }
 
-  for (const entry of pineforgeCorpus) {
-    it.skip(`${entry.id}: TV parity (slow — run manually)`, () => {
-      const result = runCorpusEntry(entry);
-      expect(result.errors).toEqual([]);
-      expect(result.parity.grade).toMatch(/excellent|strong/);
+  const KNOWN_UNRUNNABLE_ENTRIES = {
+    'pf-ema-bracket': {
+      ownerLane: 'strategy-parity/external-evidence',
+      reason: 'no tracked bars',
+      openDefect: 'pf-ema-bracket-external-bars',
+    },
+    'pf-ema-cross-flip': {
+      ownerLane: 'strategy-parity/external-evidence',
+      reason: 'no tracked bars',
+      openDefect: 'pf-ema-cross-flip-external-bars',
+    },
+  };
+  for (const [id, known] of Object.entries(KNOWN_UNRUNNABLE_ENTRIES)) {
+    it(`${id}: KNOWN-UNRUNNABLE (${known.reason}; ${known.ownerLane}; ${known.openDefect})`, () => {
+      const dir = path.join(CORPUS_DIR, id);
+      const enableMessage = `${id}: bars added; resolve ${known.openDefect} and enable external parity execution`;
+      expect(fs.existsSync(path.join(dir, 'strategy.pine'))).toBe(true);
+      expect(fs.existsSync(path.join(dir, 'tv_trades.csv'))).toBe(true);
+      expect(JSON.parse(fs.readFileSync(path.join(dir, 'meta.json'), 'utf-8')).source).toBe('tradingview');
+      expect(fs.existsSync(path.join(dir, 'bars.json')), enableMessage).toBe(false);
+      expect(loadCorpusEntry(dir), enableMessage).toBeNull();
     });
   }
 

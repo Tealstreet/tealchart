@@ -1,10 +1,10 @@
 import type { PlotOutput } from '@tealstreet/tealscript';
 import type { SharedValue } from 'react-native-reanimated';
 import type { Bar } from '../../types';
+import type { NativeResolvedPriceAxisTag } from '../utils/priceAxisTagLayout';
 import type { NativeChartFrame, NativePaneFrame } from './nativeChartFrame';
 import type { NativeIndicatorPaneInfo } from './NativeIndicatorPlotLayer';
 import type { NativePaneRange, NativePaneRangeOverrides } from './nativePaneRangeOverride';
-import type { NativeResolvedPriceAxisTag } from '../utils/priceAxisTagLayout';
 import type { NativeViewportSharedValues } from './nativeSharedViewport';
 
 import { memo, useMemo, useRef } from 'react';
@@ -67,6 +67,7 @@ export function NativeIndicatorOutputAxisLabelLayerImpl({
   pricePrecision,
   resolvedPriceAxisTags,
   sharedViewport,
+  showIndicatorOutputAxisLabelTitles = false,
   smallFont,
   totalBarCount,
 }: {
@@ -82,6 +83,7 @@ export function NativeIndicatorOutputAxisLabelLayerImpl({
   /** The shared price-axis stack, which main-pane readouts are resolved in. */
   resolvedPriceAxisTags: SharedValue<NativeResolvedPriceAxisTag[]>;
   sharedViewport: NativeViewportSharedValues;
+  showIndicatorOutputAxisLabelTitles?: boolean;
   smallFont: ReturnType<typeof Skia.Font>;
   totalBarCount: number;
 }) {
@@ -97,9 +99,20 @@ export function NativeIndicatorOutputAxisLabelLayerImpl({
         paneRangeOverrides: paneRangeOverrides?.value,
         plots,
         pricePrecision,
+        showIndicatorOutputAxisLabelTitles,
         totalBarCount,
       }),
-    [bars, frame, indicatorPaneInfo, mainPaneRange, paneRangeOverrides, plots, pricePrecision, totalBarCount],
+    [
+      bars,
+      frame,
+      indicatorPaneInfo,
+      mainPaneRange,
+      paneRangeOverrides,
+      plots,
+      pricePrecision,
+      showIndicatorOutputAxisLabelTitles,
+      totalBarCount,
+    ],
   );
   if (labels.length === 0) return null;
 
@@ -285,6 +298,7 @@ export function resolveNativeIndicatorOutputAxisLabels({
   paneRangeOverrides,
   plots,
   pricePrecision,
+  showIndicatorOutputAxisLabelTitles = false,
   totalBarCount,
 }: {
   bars?: readonly Bar[];
@@ -294,6 +308,7 @@ export function resolveNativeIndicatorOutputAxisLabels({
   paneRangeOverrides?: NativePaneRangeOverrides;
   plots: readonly PlotOutput[];
   pricePrecision?: number;
+  showIndicatorOutputAxisLabelTitles?: boolean;
   totalBarCount: number;
 }): NativeIndicatorOutputAxisLabel[] {
   const paneById = new Map(frame.panes.map((pane) => [pane.id, pane]));
@@ -316,14 +331,15 @@ export function resolveNativeIndicatorOutputAxisLabels({
     if (range <= 0) continue;
 
     const y = nativePaneValueToYWithRange(rawLabel.value, pane, paneRange);
+    const valueText = formatIndicatorOutputAxisValue(rawLabel.value, range, rawLabel.precision, rawLabel.format, {
+      paneType: pane.type,
+      pricePrecision,
+    });
     labels.push({
       id: rawLabel.id,
       pane,
       value: rawLabel.value,
-      text: formatIndicatorOutputAxisValue(rawLabel.value, range, rawLabel.precision, rawLabel.format, {
-        paneType: pane.type,
-        pricePrecision,
-      }),
+      text: showIndicatorOutputAxisLabelTitles && rawLabel.title ? `${rawLabel.title} ${valueText}` : valueText,
       color: rawLabel.color,
       valueY: y,
       y,

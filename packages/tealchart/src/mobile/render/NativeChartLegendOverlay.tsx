@@ -1,13 +1,27 @@
+import type { PlotOutput } from '@tealstreet/tealscript';
 import type { LayoutChangeEvent, LayoutRectangle } from 'react-native';
+import type { IndicatorOutputReadout } from '../../rendering/indicatorOutputReadouts';
+import type { PlotStyleOverride } from '../../state/chartState';
 import type { Bar } from '../../types';
+import type { NativeCrosshairSharedValues } from '../interaction/nativeCrosshair';
 import type { NativeOverlayActionHitTarget } from '../interaction/nativeOverlayActionGestures';
 import type { NativeLeftToolRailLayout } from '../utils/leftToolRailLayout';
 import type { NativeChartFrame } from './nativeChartFrame';
+import type { NativeViewportSharedValues } from './nativeSharedViewport';
 
 import React from 'react';
 
-import { Pressable, StyleSheet, Text, View } from 'react-native';
-import Animated, { Easing, useAnimatedStyle, useSharedValue, withDelay, withRepeat, withTiming } from 'react-native-reanimated';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import Animated, {
+  Easing,
+  useAnimatedReaction,
+  useAnimatedStyle,
+  useSharedValue,
+  withDelay,
+  withRepeat,
+  withTiming,
+} from 'react-native-reanimated';
+import { runOnJS } from 'react-native-worklets';
 
 import {
   LOADING_DOT_COUNT,
@@ -16,8 +30,15 @@ import {
   LOADING_DOT_PERIOD_MS,
   LOADING_DOT_STAGGER_MS,
 } from '../../constants';
+import {
+  getIndicatorOutputReadouts,
+  resolveIndicatorReadoutSourceIndex,
+} from '../../rendering/indicatorOutputReadouts';
+import { nativeCrosshairXToTime } from '../interaction/nativeCrosshairContextMenu';
 import { formatNativeTradeLinePrice } from '../utils/tradeLineLayout';
 import { NativeDrawingIcon } from './NativeDrawingIcon';
+import { NativeFloatingOverlay } from './NativeFloatingOverlay';
+import { NativeIndicatorStyleOverlay } from './NativeIndicatorStyleOverlay';
 import { isNativeMainPaneVisible } from './nativeSharedViewport';
 
 export interface NativeLegendIndicator {
@@ -32,9 +53,12 @@ export interface NativeLegendIndicatorPaneInfo {
   name?: string;
   overlay: boolean;
   paneId?: string;
+  format?: string;
+  precision?: number;
+  scale?: string;
 }
 
-export type NativeLegendActionType = 'removeIndicator' | 'toggleIndicator';
+export type NativeLegendActionType = 'removeIndicator' | 'toggleIndicator' | 'dataWindow' | 'style';
 
 export interface NativeLegendActionCommand {
   indicatorId: string;
@@ -46,6 +70,17 @@ export type NativeLegendActionHitTarget = NativeOverlayActionHitTarget<NativeLeg
 export interface NativeChartLegendOverlayProps {
   activeIndicators?: readonly NativeLegendIndicator[];
   bars: readonly Bar[];
+  plots?: readonly PlotOutput[];
+  sourceIndex?: number;
+  crosshair?: NativeCrosshairSharedValues;
+  sharedViewport?: NativeViewportSharedValues;
+  dataWindowIndicatorId?: string;
+  backgroundColor?: string;
+  onOpenDataWindow?: (indicatorId: string) => void;
+  onCloseDataWindow?: () => void;
+  onOpenStyle?: (indicatorId: string) => void;
+  onSaveStyle?: (indicatorId: string, overrides: PlotStyleOverride[]) => void;
+  styleOverrides?: Readonly<Record<string, readonly PlotStyleOverride[]>>;
   downColor: string;
   frame: NativeChartFrame;
   gridColor?: string;
@@ -120,6 +155,10 @@ interface NativeIndicatorLegendRowProps {
   onRowLayout: (key: string, event: LayoutChangeEvent) => void;
   onToggleIndicator?: (indicatorId: string) => void;
   paneInfo?: NativeLegendIndicatorPaneInfo;
+  readouts: readonly IndicatorOutputReadout[];
+  editable: boolean;
+  onOpenStyle?: (indicatorId: string) => void;
+  onOpenDataWindow?: (indicatorId: string) => void;
   textColor: string;
 }
 
@@ -215,6 +254,10 @@ function renderNativeIndicatorLegendRow({
   onRowLayout,
   onToggleIndicator,
   paneInfo,
+  readouts,
+  editable,
+  onOpenStyle,
+  onOpenDataWindow,
   textColor,
 }: NativeIndicatorLegendRowProps) {
   const name = paneInfo?.name || indicator.name;
@@ -241,6 +284,41 @@ function renderNativeIndicatorLegendRow({
           </Text>
         ) : null}
       </View>
+      {readouts
+        .filter((readout) => readout.statusLine)
+        .map((readout) => (
+          <Text
+            key={readout.plotId}
+            accessibilityLabel={`${readout.title}: ${readout.values.join(' · ')}`}
+            style={[styles.ohlcValue, { color: readout.color, marginRight: 4 }]}
+          >
+            {readout.values.join(' · ')}
+          </Text>
+        ))}
+      {onOpenStyle && editable ? (
+        <Pressable
+          accessibilityLabel={`Edit ${name} Style`}
+          accessibilityRole="button"
+          hitSlop={6}
+          onLayout={(event) => onActionButtonLayout(`${rowKey}:style`, 'style', indicator.id, event)}
+          onPress={() => onOpenStyle(indicator.id)}
+          style={styles.iconButton}
+        >
+          <NativeDrawingIcon name="gear" color={mutedTextColor} size={14} strokeWidth={2} />
+        </Pressable>
+      ) : null}
+      {onOpenDataWindow && readouts.some((readout) => readout.dataWindow) ? (
+        <Pressable
+          accessibilityLabel={`Open ${name} Data Window`}
+          accessibilityRole="button"
+          hitSlop={6}
+          onLayout={(event) => onActionButtonLayout(`${rowKey}:dataWindow`, 'dataWindow', indicator.id, event)}
+          onPress={() => onOpenDataWindow(indicator.id)}
+          style={styles.iconButton}
+        >
+          <NativeDrawingIcon name="objectTree" color={mutedTextColor} size={14} strokeWidth={2} />
+        </Pressable>
+      ) : null}
       {onToggleIndicator ? (
         <Pressable
           accessibilityLabel={indicator.isVisible ? `Hide ${name}` : `Show ${name}`}
@@ -310,6 +388,10 @@ function resolveNativeLegendActionOrigins({
   left,
   onRemoveIndicator,
   onToggleIndicator,
+  onOpenDataWindow,
+  dataWindowIndicatorIds,
+  editableIndicatorIds,
+  onOpenStyle,
   overlayIndicators,
   top,
 }: {
@@ -317,12 +399,28 @@ function resolveNativeLegendActionOrigins({
   left: number;
   onRemoveIndicator?: (indicatorId: string) => void;
   onToggleIndicator?: (indicatorId: string) => void;
+  onOpenDataWindow?: (indicatorId: string) => void;
+  dataWindowIndicatorIds?: ReadonlySet<string>;
+  editableIndicatorIds?: ReadonlySet<string>;
+  onOpenStyle?: (indicatorId: string) => void;
   overlayIndicators: readonly NativeLegendIndicator[];
   top: number;
 }): NativeLegendActionOrigin[] {
   const origins: NativeLegendActionOrigin[] = [];
   const appendOrigins = (indicator: NativeLegendIndicator, blockTop: number, actionKeyPrefix: string) => {
     const rowKey = `${actionKeyPrefix}:${indicator.id}`;
+    if (onOpenStyle && editableIndicatorIds?.has(indicator.id)) {
+      origins.push({ action: 'style', indicatorId: indicator.id, key: `${rowKey}:style`, left, top: blockTop });
+    }
+    if (onOpenDataWindow && dataWindowIndicatorIds?.has(indicator.id)) {
+      origins.push({
+        action: 'dataWindow',
+        indicatorId: indicator.id,
+        key: `${rowKey}:dataWindow`,
+        left,
+        top: blockTop,
+      });
+    }
     if (onToggleIndicator) {
       origins.push({
         action: 'toggleIndicator',
@@ -368,6 +466,13 @@ interface NativeChartLegendOverlayViewProps extends NativeChartLegendOverlayProp
 function NativeChartLegendOverlayView({
   activeIndicators = [],
   bars,
+  plots = [],
+  sourceIndex,
+  dataWindowIndicatorId,
+  backgroundColor = '#171b24',
+  onOpenDataWindow,
+  onCloseDataWindow,
+  onOpenStyle,
   downColor,
   frame,
   gridColor,
@@ -385,8 +490,16 @@ function NativeChartLegendOverlayView({
   textColor,
   upColor,
 }: NativeChartLegendOverlayViewProps) {
-  const latestBar = bars[bars.length - 1] ?? null;
-  const previousBar = bars[bars.length - 2] ?? null;
+  const selectedIndex = sourceIndex ?? bars.length - 1;
+  const readouts = getIndicatorOutputReadouts({
+    plots,
+    totalBarCount: bars.length,
+    sourceIndex: selectedIndex,
+    indicatorPaneInfo,
+    pricePrecision,
+  });
+  const latestBar = bars[selectedIndex] ?? null;
+  const previousBar = bars[selectedIndex - 1] ?? null;
   const change = latestBar && previousBar ? latestBar.close - previousBar.close : 0;
   const valueColor = change < 0 ? downColor : upColor;
   const left = getNativeLegendLeft(frame, leftToolRailLayout);
@@ -436,12 +549,44 @@ function NativeChartLegendOverlayView({
               onRowLayout,
               onToggleIndicator,
               paneInfo: indicatorPaneInfo[indicator.id],
+              readouts: readouts.filter((readout) => readout.scriptId === indicator.id),
+              onOpenDataWindow,
+              onOpenStyle,
+              editable: plots.some((plot) => plot.scriptId === indicator.id && plot.editable !== false),
               textColor,
             }),
           )}
         </View>
       ) : null}
 
+      {dataWindowIndicatorId && onCloseDataWindow ? (
+        <NativeFloatingOverlay
+          visible
+          onRequestClose={onCloseDataWindow}
+          backdropAccessibilityLabel="Close Data Window"
+          contentContainerStyle={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
+        >
+          <ScrollView style={{ backgroundColor, padding: 16, borderRadius: 8, maxWidth: '90%', maxHeight: '80%' }}>
+            <Text style={{ color: textColor, fontWeight: '600', marginBottom: 8 }}>Data Window</Text>
+            {readouts
+              .filter((readout) => readout.scriptId === dataWindowIndicatorId && readout.dataWindow)
+              .map((readout) => (
+                <View key={readout.plotId} style={styles.row}>
+                  <Text style={{ color: textColor, marginRight: 8 }}>{readout.title}</Text>
+                  <Text style={[styles.ohlcValue, { color: readout.color }]}>{readout.values.join(' · ')}</Text>
+                </View>
+              ))}
+            <Pressable
+              accessibilityLabel="Close Data Window"
+              accessibilityRole="button"
+              onPress={onCloseDataWindow}
+              style={{ paddingTop: 12 }}
+            >
+              <Text style={{ color: textColor }}>Close</Text>
+            </Pressable>
+          </ScrollView>
+        </NativeFloatingOverlay>
+      ) : null}
       {indicatorPanes.map(({ pane, indicators }) => (
         <View
           key={pane.id}
@@ -462,6 +607,10 @@ function NativeChartLegendOverlayView({
               onRowLayout,
               onToggleIndicator,
               paneInfo: indicatorPaneInfo[indicator.id],
+              readouts: readouts.filter((readout) => readout.scriptId === indicator.id),
+              onOpenDataWindow,
+              onOpenStyle,
+              editable: plots.some((plot) => plot.scriptId === indicator.id && plot.editable !== false),
               textColor,
             }),
           )}
@@ -514,6 +663,28 @@ export function NativeLegendLoadingDots({ color }: { color: string }) {
 }
 
 function NativeChartLegendOverlayRuntime(props: NativeChartLegendOverlayProps) {
+  const [styleIndicatorId, setStyleIndicatorId] = React.useState<string>();
+  const openStyle = React.useCallback((id: string) => setStyleIndicatorId(id), []);
+  const closeStyle = React.useCallback(() => setStyleIndicatorId(undefined), []);
+  const [dataWindowIndicatorId, setDataWindowIndicatorId] = React.useState<string>();
+  const [sourceIndex, setSourceIndex] = React.useState<number>();
+  const openDataWindow = React.useCallback((id: string) => setDataWindowIndicatorId(id), []);
+  const closeDataWindow = React.useCallback(() => setDataWindowIndicatorId(undefined), []);
+  const barTimes = React.useMemo(() => props.bars.map((bar) => ({ time: bar.time })), [props.bars]);
+  const { crosshair, sharedViewport, frame } = props;
+  useAnimatedReaction(
+    () => {
+      if (!crosshair?.visible.value || !sharedViewport) return undefined;
+      return resolveIndicatorReadoutSourceIndex(
+        barTimes,
+        nativeCrosshairXToTime(crosshair.x.value, sharedViewport, frame),
+      );
+    },
+    (next, previous) => {
+      if (next !== previous) runOnJS(setSourceIndex)(next);
+    },
+    [barTimes, props.crosshair, props.sharedViewport, props.frame],
+  );
   const [rowLayouts, setRowLayouts] = React.useState<Record<string, LayoutRectangle>>({});
   const [actionLayouts, setActionLayouts] = React.useState<Record<string, NativeLegendActionLayout>>({});
   const lastActionTargetsRef = React.useRef<readonly NativeLegendActionHitTarget[]>([]);
@@ -533,6 +704,20 @@ function NativeChartLegendOverlayRuntime(props: NativeChartLegendOverlayProps) {
       }),
     [props.activeIndicators, props.frame, props.indicatorPaneInfo],
   );
+  const dataWindowIndicatorIds = React.useMemo(
+    () =>
+      new Set(
+        getIndicatorOutputReadouts({ plots: props.plots ?? [], totalBarCount: props.bars.length })
+          .filter((readout) => readout.dataWindow)
+          .map((readout) => readout.scriptId),
+      ),
+    [props.plots, props.bars.length],
+  );
+  const editableIndicatorIds = React.useMemo(
+    () =>
+      new Set((props.plots ?? []).filter((plot) => plot.editable !== false).map((plot) => plot.scriptId ?? 'unknown')),
+    [props.plots],
+  );
   const actionOrigins = React.useMemo(
     () =>
       resolveNativeLegendActionOrigins({
@@ -540,10 +725,26 @@ function NativeChartLegendOverlayRuntime(props: NativeChartLegendOverlayProps) {
         left,
         onRemoveIndicator: props.onRemoveIndicator,
         onToggleIndicator: props.onToggleIndicator,
+        onOpenDataWindow: openDataWindow,
+        dataWindowIndicatorIds,
+        editableIndicatorIds,
+        onOpenStyle: props.onSaveStyle ? openStyle : undefined,
         overlayIndicators,
         top,
       }),
-    [indicatorPanes, left, overlayIndicators, props.onRemoveIndicator, props.onToggleIndicator, top],
+    [
+      editableIndicatorIds,
+      openStyle,
+      props.onSaveStyle,
+      indicatorPanes,
+      left,
+      overlayIndicators,
+      props.onRemoveIndicator,
+      props.onToggleIndicator,
+      openDataWindow,
+      dataWindowIndicatorIds,
+      top,
+    ],
   );
   const nativeLegendActionTargets = React.useMemo(
     () => resolveNativeLegendActionTargets({ actionLayouts, actionOrigins, rowLayouts }),
@@ -594,11 +795,33 @@ function NativeChartLegendOverlayRuntime(props: NativeChartLegendOverlayProps) {
   );
 
   return (
-    <NativeChartLegendOverlayView
-      {...props}
-      onActionButtonLayout={handleActionButtonLayout}
-      onRowLayout={handleRowLayout}
-    />
+    <>
+      {styleIndicatorId && props.onSaveStyle ? (
+        <NativeIndicatorStyleOverlay
+          key={styleIndicatorId}
+          name={props.activeIndicators?.find((indicator) => indicator.id === styleIndicatorId)?.name ?? 'Indicator'}
+          plots={(props.plots ?? []).filter((plot) => plot.scriptId === styleIndicatorId)}
+          overrides={props.styleOverrides?.[styleIndicatorId] ?? []}
+          backgroundColor={props.backgroundColor ?? '#171b24'}
+          textColor={props.textColor}
+          onClose={closeStyle}
+          onSave={(overrides) => {
+            props.onSaveStyle?.(styleIndicatorId, overrides);
+            closeStyle();
+          }}
+        />
+      ) : null}
+      <NativeChartLegendOverlayView
+        {...props}
+        sourceIndex={sourceIndex}
+        dataWindowIndicatorId={dataWindowIndicatorId}
+        onOpenDataWindow={openDataWindow}
+        onOpenStyle={props.onSaveStyle ? openStyle : undefined}
+        onCloseDataWindow={closeDataWindow}
+        onActionButtonLayout={handleActionButtonLayout}
+        onRowLayout={handleRowLayout}
+      />
+    </>
   );
 }
 

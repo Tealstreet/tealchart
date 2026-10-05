@@ -284,6 +284,26 @@ describe('ChartCore viewport management', () => {
     });
   }
 
+  // ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json constants[176] remark 2.
+  it('ledger804 applies saved display masks to public painting and restores coded output', async () => {
+    const core = await createChartCore();
+    const renderer = (core as unknown as { renderer: TealchartRenderer }).renderer;
+    const renderSpy = vi.spyOn(renderer, 'renderWithLayout');
+    const plot = { id: 'visibility', type: 'plot' as const, title: 'Visibility', values: [7, 8], color: '#00ff00', display: 1 };
+    core.setBars(makeBars(2));
+    core.setPlots([plot]);
+    for (const display of [0, 31]) {
+      core.setPlotStyleOverrides(new Map([['visibility', { plotId: 'visibility', display }]]));
+      core.paint(DIRTY.FULL);
+      expect(renderSpy.mock.calls.at(-1)?.[4]?.[0].display).toBe(display);
+    }
+    core.setPlotStyleOverrides(new Map());
+    core.paint(DIRTY.FULL);
+    expect(renderSpy.mock.calls.at(-1)?.[4]?.[0].display).toBe(1);
+    expect(plot.display).toBe(1);
+    core.dispose();
+  });
+
   it('setBars auto-calculates viewport on first bar load', async () => {
     const core = await createChartCore();
     expect(core.getViewport()).toBeNull();

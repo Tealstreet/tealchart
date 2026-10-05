@@ -20,6 +20,7 @@ import {
 } from '../../src/compat/productionWorkerFallbackBaseline';
 import { executeCompiled, tryCompile, type CompiledScript } from '../../src/runtime/codegen';
 import type { Program } from '../../src/parser/ast';
+import { checkProgram } from '../../src/semantic/checker';
 import { measureProductionWorkerSessions, measureRealtimeReentryParity } from './productionWorkerHarness';
 
 interface BenchmarkCase {
@@ -420,7 +421,7 @@ function makeRequestFanoutComposite(): string {
     ...Array.from({ length: 24 }, (_, index) => `plot(remote${index}, "Remote ${index}", color=${index % 2 === 0 ? 'color.teal' : 'color.orange'})`),
     'plot(map.get(board, "score"), "Fanout Score", color=color.white, linewidth=2)',
     'plot(map.get(board, "hits"), "Fanout Hits")',
-    'plotshape(state.score > nz(state.score[1], state.score), title="Fanout Rising", style=shape.triangleup, text="F")',
+    'plotshape(state.score > nz((state[1]).score, state.score), title="Fanout Rising", style=shape.triangleup, text="F")',
     'var table fanoutTable = table.new(position.top_right, 2, 4)',
     'if barstate.islast',
     '    table.cell(fanoutTable, 0, 0, "Score")',
@@ -428,7 +429,7 @@ function makeRequestFanoutComposite(): string {
     '    table.cell(fanoutTable, 0, 1, "Hits")',
     '    table.cell(fanoutTable, 1, 1, str.tostring(state.hits))',
     'bgcolor(state.score > 0 ? color.new(color.green, 92) : na)',
-    'alertcondition(state.score > nz(state.score[1], state.score), title="Fanout Rising", message="Fanout score rising")',
+    'alertcondition(state.score > nz((state[1]).score, state.score), title="Fanout Rising", message="Fanout score rising")',
   ].join('\n');
 }
 
@@ -450,15 +451,15 @@ function makeStrategyLedgerComposite(): string {
     'scoreComponent(series float src, simple int fastLen, simple int slowLen) =>',
     '    fast = ta.ema(src, fastLen)',
     '    slow = ta.sma(src, slowLen)',
-    '    range = ta.highest(src, slowLen) - ta.lowest(src, slowLen)',
-    '    range == 0 ? 0 : (fast - slow) / range',
+    '    priceRange = ta.highest(src, slowLen) - ta.lowest(src, slowLen)',
+    '    priceRange == 0 ? 0 : (fast - slow) / priceRange',
     ...Array.from({ length: 72 }, (_, index) => `component${index} = scoreComponent(close + nz(close[${index % 16}], close) * risk${index % 24}, len${index % 56}, len${(index + 9) % 56})`),
     'scoreTotal = 0.0',
     ...Array.from({ length: 72 }, (_, index) => `scoreTotal += nz(component${index}) * risk${index % 24}`),
     'state.score := scoreTotal / 72',
     'state.fast := ta.ema(state.score, len1)',
     'state.slow := ta.sma(state.score, len2)',
-    'state.regime := state.score > state.fast ? 1 : state.score < state.slow ? -1 : nz(state.regime[1], 0)',
+    'state.regime := state.score > state.fast ? 1 : state.score < state.slow ? -1 : nz((state[1]).regime, 0)',
     'array.push(scoreHistory, state.score)',
     'if array.size(scoreHistory) > 160',
     '    array.shift(scoreHistory)',
@@ -583,6 +584,16 @@ describe('composite performance baselines', () => {
       thresholds: { compileMs: 250, referenceUsPerBar: 4_000, compiledUsPerBar: 1_900 },
     },
   ];
+
+  it('admits every performance composite through the worker semantic boundary', () => {
+    for (const testCase of cases) {
+      const diagnostics = checkProgram(parse(testCase.source), {
+        requireDeclaration: true,
+        libraries: testCase.options?.libraries,
+      }).diagnostics.filter((diagnostic) => diagnostic.severity === 'error');
+      expect(diagnostics, testCase.name).toEqual([]);
+    }
+  });
 
   it('tracks compiled fallback rate for performance composites', () => {
     const baseline = getCompiledFallbackBaselineGroup('performance-composites');

@@ -17,6 +17,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 
 import { TealchartRenderer, type IndicatorPaneInfo } from '../TealchartRenderer';
 import { clearChartStoreCache } from '../state/chartState';
+import { DEFAULT_UNIFIED_PANE_LAYOUT } from '../types';
 import {
   formatIndicatorOutputAxisValue,
   getIndicatorOutputAxisLabelSources,
@@ -58,6 +59,16 @@ interface CanvasState {
 
 class RecordingCanvasContext implements CanvasContext {
   readonly calls: DrawCall[] = [];
+  readonly gradients: { y0: number; y1: number; stops: { offset: number; color: string }[] }[] = [];
+
+  createLinearGradient(_x0: number, y0: number, _x1: number, y1: number): CanvasGradient {
+    const gradient = { y0, y1, stops: [] as { offset: number; color: string }[] };
+    this.gradients.push(gradient);
+    return {
+      addColorStop: (offset: number, color: string) => gradient.stops.push({ offset, color }),
+      toString: () => 'gradient',
+    } as unknown as CanvasGradient;
+  }
   fillStyle: string | CanvasGradient | CanvasPattern = '#000000';
   strokeStyle: string | CanvasGradient | CanvasPattern = '#000000';
   lineWidth = 1;
@@ -463,6 +474,164 @@ describe('TealScript rendering behavior matrix', () => {
     clearChartStoreCache();
   });
 
+  it('uses pixel histogram widths even when wider than a bar slot', () => {
+    for (const linewidth of [2, 200]) {
+      const ctx = renderPlots([basePlot({ style: 'histogram', linewidth })]);
+      expect(fillRectCalls(ctx).map((call) => call.width)).toEqual(BARS.map(() => linewidth));
+    }
+    const narrow = renderPlots([basePlot({ style: 'columns', linewidth: 1 })]);
+    const wide = renderPlots([basePlot({ style: 'columns', linewidth: 20 })]);
+    expect(fillRectCalls(narrow)).toEqual(fillRectCalls(wide));
+  });
+
+  it('joins point plots with one pixel lines while preserving marker size', () => {
+    for (const style of ['cross', 'circles'] as const) {
+      const ctx = renderPlots([basePlot({ style, linewidth: 4, join: true })]);
+      expect(strokeCalls(ctx)[0].lineWidth).toBe(1);
+      if (style === 'cross') expect(strokeCalls(ctx).slice(1).every((call) => call.lineWidth === 4)).toBe(true);
+      else expect(ctx.calls.filter((call) => call.op === 'arc')).toEqual(
+        BARS.map(() => expect.objectContaining({ radius: 8 })),
+      );
+    }
+  });
+
+  it('shifts plot points to target bars across gaps and fills between shifted boundaries', () => {
+    const bars = BARS.map((bar, index) => ({ ...bar, time: [1000, 2000, 10000, 11000][index] }));
+    const viewport = { ...VIEWPORT, endTime: 11000 };
+    const ctx = new RecordingCanvasContext();
+    const renderer = makeRenderer(ctx);
+    const upper = basePlot({ id: 'upper', offset: 1, values: [110, 112, 114, 115], display: 0 });
+    const lower = basePlot({ id: 'lower', offset: -1, values: [100, 101, 102, 103], display: 0 });
+    const fill = basePlot({ type: 'fill', plot1Id: 'upper', plot2Id: 'lower', color: '#123456', fillgaps: false });
+    renderer.renderPlots([upper, lower, fill], bars, viewport);
+    const expected = new RecordingCanvasContext();
+    makeRenderer(expected).renderPlots([
+      { ...upper, offset: 0, values: [null, 110, 112, 114] },
+      { ...lower, offset: 0, values: [101, 102, 103, null] }, fill,
+    ], bars, viewport);
+    expect(ctx.calls).toEqual(expected.calls);
+    expect(ctx.calls.filter((call) => call.op === 'fill')).toHaveLength(1);
+
+    const shifted = new RecordingCanvasContext();
+    makeRenderer(shifted).renderPlots([basePlot({ offset: 1, values: [110, null, null, null] })], bars, viewport);
+    const target = new RecordingCanvasContext();
+    makeRenderer(target).renderPlots([basePlot({ values: [null, 110, null, null] })], bars, viewport);
+    expect(shifted.calls).toEqual(target.calls);
+  });
+
+  it('keeps an empty plotchar glyph empty while rendering its text', () => {
+    const ctx = renderPlots([basePlot({ type: 'plotchar', char: '', text: 'Signal' })]);
+    expect(fillTextCalls(ctx).map((call) => call.text).filter(Boolean)).toEqual(BARS.map(() => 'Signal'));
+    const defaultChar = renderPlots([basePlot({ type: 'plotchar' })]);
+    expect(fillTextCalls(defaultChar).map((call) => call.text)).toEqual(BARS.map(() => '●'));
+  });
+
+  it('tracks the latest source value despite a hidden offset without an independent axis tag', () => {
+    const ctx = renderPlots([basePlot({ values: [100, 105, 110, 115], offset: -99999, showLast: 1, trackprice: true, display: 1 })]);
+    expect(strokeCalls(ctx)).toEqual([expect.objectContaining({ strokeStyle: '#2962ff', lineDash: [2, 3], lineWidth: 1 })]);
+    expect(fillTextCalls(ctx)).toHaveLength(0);
+    const offscreen = new RecordingCanvasContext();
+    makeRenderer(offscreen).renderPlots([basePlot({ values: [100, 105, 110, 115], trackprice: true })], BARS, { ...VIEWPORT, endTime: 2000 });
+    const full = renderPlots([basePlot({ values: [100, 105, 110, 115], offset: -99999, trackprice: true })]);
+    expect(offscreen.calls.filter((call) => call.op === 'moveTo').at(-1)?.y)
+      .toBe(full.calls.find((call) => call.op === 'moveTo')?.y);
+  });
+
+  it('does not paint hlines whose color is na in main or indicator panes', () => {
+    for (const inPane of [false, true]) {
+      const ctx = renderPlots([basePlot({ type: 'hline', price: inPane ? 50 : 110, color: [], scriptId: inPane ? 'pane-script' : 'overlay-script' })], inPane ? {
+        paneLayout: INDICATOR_LAYOUT, indicatorPaneInfo: { 'pane-script': { overlay: false } },
+      } : {});
+      expect(strokeCalls(ctx).some((call) => call.strokeStyle === '#787B86')).toBe(false);
+    }
+  });
+
+  // TV v2 CF011: conflicts-batch-8-v1.pine + its attempt1-visual.png show
+  // a red-to-blue vertical gradient between hline(100) and hline(0).
+  // CSV sentinel proves admission only; these draw commands prove paint/mask.
+  it.each(['legacy', 'unified'] as const)('draws CF011 hline gradient inside its price mask on the %s web path', (path) => {
+    const ctx = new RecordingCanvasContext();
+    const renderer = makeRenderer(ctx);
+    const upper = basePlot({ id: 'cf011-top', scriptId: 'pane-script', type: 'hline', price: 100, values: [], display: 0 });
+    const lower = basePlot({ id: 'cf011-bottom', scriptId: 'pane-script', type: 'hline', price: 0, values: [], display: 0 });
+    const fill = basePlot({
+      id: 'cf011-fill', scriptId: 'pane-script', type: 'fill', color: [],
+      plot1Id: upper.id, plot2Id: lower.id,
+      gradient: {
+        topValues: [100, 100, 100, 100], bottomValues: [0, 0, 0, 0],
+        topColors: ['#F23645', '#F23645', '#F23645', '#F23645'],
+        bottomColors: ['#2962FF', '#2962FF', '#2962FF', '#2962FF'],
+      },
+    });
+    const layout = {
+      ...INDICATOR_LAYOUT,
+      indicatorPanes: [{ ...INDICATOR_LAYOUT.indicatorPanes[0], yMin: -50, yMax: 150 }],
+    };
+    const info = { 'pane-script': { overlay: false } };
+    if (path === 'legacy') {
+      renderer.renderPlots([upper, lower, fill], BARS, VIEWPORT, layout, info);
+    } else {
+      renderer.renderUnifiedPanes(BARS, VIEWPORT, {
+        ...DEFAULT_UNIFIED_PANE_LAYOUT,
+        panes: [
+          { ...DEFAULT_UNIFIED_PANE_LAYOUT.panes[0], heightRatio: 0.6 },
+          { id: 'pane_rsi', type: 'indicator', indicatorIds: ['pane-script'], heightRatio: 0.4, yMin: -50, yMax: 150, fixedRange: true },
+        ],
+      }, undefined, [upper, lower, fill], info, undefined, undefined, undefined, undefined, undefined,
+      new Set(['indicator-content']));
+    }
+    const options = renderer.getOptions();
+    const chartHeight = path === 'legacy'
+      ? options.height - options.margins.top - options.margins.bottom
+      : options.height - DEFAULT_UNIFIED_PANE_LAYOUT.timeAxisHeight;
+    const paneTop = (path === 'legacy' ? options.margins.top : 0) + chartHeight * 0.6;
+    const paneHeight = chartHeight * 0.4;
+    const topY = paneTop + paneHeight * 0.25;
+    const bottomY = paneTop + paneHeight * 0.75;
+    expect(ctx.gradients).toEqual([0, 1, 2].map(() => ({
+      y0: topY, y1: bottomY,
+      stops: [{ offset: 0, color: '#F23645' }, { offset: 1, color: '#2962FF' }],
+    })));
+    expect(ctx.calls.filter((call) => call.op === 'fill')).toEqual([0, 1, 2].map(() => ({ op: 'fill', fillStyle: 'gradient' })));
+    const masks: { x: number; y: number }[][] = [];
+    let vertices: { x: number; y: number }[] = [];
+    for (const call of ctx.calls) {
+      if (call.op === 'beginPath') vertices = [];
+      else if (call.op === 'moveTo' || call.op === 'lineTo') vertices.push({ x: call.x, y: call.y });
+      else if (call.op === 'fill') masks.push(vertices);
+    }
+    expect(masks).toHaveLength(3);
+    for (const mask of masks) {
+      expect(mask.map((vertex) => vertex.y)).toEqual([topY, topY, bottomY, bottomY].map(roundCoord));
+      expect(mask[0].x).toBeLessThan(mask[1].x);
+      expect(mask[2].x).toBe(mask[1].x);
+      expect(mask[3].x).toBe(mask[0].x);
+    }
+  });
+
+  it('paints vertical gradient stops inside the plot mask and honors fill gaps', () => {
+    const upper = basePlot({ id: 'upper', values: [112, 113, null, 114], display: 0 });
+    const lower = basePlot({ id: 'lower', values: [100, 101, 102, 103], display: 0 });
+    const gradient = {
+      topValues: [115, 116, 117, 118], bottomValues: [95, 96, 97, 98],
+      topColors: ['#ff000080', '#00ff0080', '#0000ff80', '#ffffff80'],
+      bottomColors: ['#00000000', '#00000000', '#00000000', '#00000000'],
+    };
+    const fill = basePlot({ type: 'fill', color: [], plot1Id: 'upper', plot2Id: 'lower', gradient, fillgaps: false });
+    const ctx = renderPlots([upper, lower, fill]);
+    expect(ctx.gradients).toHaveLength(1);
+    expect(ctx.gradients[0].y0).toBeLessThan(ctx.gradients[0].y1);
+    expect(ctx.gradients[0].stops).toEqual([
+      { offset: 0, color: '#00ff0080' }, { offset: 1, color: '#00000000' },
+    ]);
+    expect(ctx.calls.filter((call) => call.op === 'fill')).toHaveLength(1);
+    const flat = renderPlots([upper, lower, { ...fill, gradient: undefined, color: '#123456' }]);
+    expect(ctx.calls.filter((call) => ['moveTo', 'lineTo'].includes(call.op)))
+      .toEqual(flat.calls.filter((call) => ['moveTo', 'lineTo'].includes(call.op)));
+    const joined = renderPlots([upper, lower, { ...fill, fillgaps: true }]);
+    expect(joined.gradients).toHaveLength(2);
+  });
+
   it('covers every plot style with named render-command behavior', () => {
     const cases: Array<{
       expected: (ctx: RecordingCanvasContext) => void;
@@ -556,6 +725,16 @@ describe('TealScript rendering behavior matrix', () => {
     }
   });
 
+  it('applies signed global bgcolor offsets to raw color samples', () => {
+    const x = (offset: number) => {
+      const ctx = renderPlots([basePlot({ type: 'bgcolor', values: [null, 1, null, null], color: [null, '#123456', null, null], offset })]);
+      const rects = fillRectCalls(ctx).filter(call => call.fillStyle === '#123456');
+      expect(rects).toHaveLength(1);
+      return rects[0].x;
+    };
+    expect(x(1) - x(0)).toBeCloseTo(x(0) - x(-1));
+    expect(x(1)).toBeGreaterThan(x(0));
+  });
   it('applies per-bar colors, transparency, hlines, bgcolor, and fill gaps as visible commands', () => {
     const ctx = renderPlots([
       basePlot({
@@ -609,6 +788,60 @@ describe('TealScript rendering behavior matrix', () => {
     expect(fillRectCalls(ctx).map((call) => call.fillStyle)).toEqual(
       expect.arrayContaining(['#11182722', '#7c3aed22', '#dc262622']),
     );
+  });
+
+  it.each([
+    ['legacy', 'plotbar'],
+    ['legacy', 'plotcandle'],
+    ['unified', 'plotbar'],
+    ['unified', 'plotcandle'],
+  ] as const)('projects raw OHLC extrema without rewriting samples on the %s %s path', (path, type) => {
+    const raw = basePlot({
+      type,
+      display: 1,
+      color: '#123456',
+      wickColor: '#654321',
+      borderColor: '#abcdef',
+      openValues: [114, null, 102, 109],
+      highValues: [101, 110, 112, 114],
+      lowValues: [107, 101, Infinity, 106],
+      closeValues: [96, 102, 109, 111],
+    });
+    // Previous producer output, independently calculated: first bar extremes are
+    // 114/96; missing open and nonfinite low suppress their entire glyphs.
+    const normalized = {
+      ...raw,
+      openValues: [114, null, null, 109],
+      highValues: [114, null, null, 114],
+      lowValues: [96, null, null, 106],
+      closeValues: [96, null, null, 111],
+    };
+    const paint = (plot: PlotOutput) => {
+      const ctx = new RecordingCanvasContext();
+      const renderer = makeRenderer(ctx);
+      if (path === 'legacy') renderer.renderPlots([plot], BARS, VIEWPORT);
+      else
+        renderer.renderWithLayoutPasses({
+          bars: BARS,
+          viewport: VIEWPORT,
+          layout: DEFAULT_UNIFIED_PANE_LAYOUT,
+          plots: [plot],
+          indicatorPaneInfo: { 'overlay-script': { overlay: true } },
+          passes: ['main-overlay-content'],
+        });
+      return ctx;
+    };
+    const actual = paint(raw);
+    const expected = paint(normalized);
+    const plotStrokeColor = type === 'plotbar' ? raw.color : raw.wickColor;
+    expect(strokeCalls(expected).filter((call) => call.strokeStyle === plotStrokeColor)).toHaveLength(2);
+    expect(actual.calls).toEqual(expected.calls);
+    if (type === 'plotcandle')
+      expect(fillRectCalls(actual).filter((call) => call.fillStyle === raw.color)).toHaveLength(2);
+    expect(raw.openValues).toEqual([114, null, 102, 109]);
+    expect(raw.highValues).toEqual([101, 110, 112, 114]);
+    expect(raw.lowValues).toEqual([107, 101, Infinity, 106]);
+    expect(raw.closeValues).toEqual([96, 102, 109, 111]);
   });
 
   it('renders OHLC and arrow outputs with Pine skip and color semantics', () => {
@@ -733,6 +966,42 @@ describe('TealScript rendering behavior matrix', () => {
     expect(formatIndicatorOutputAxisValue(labels[1]!.value, 1, labels[1]!.precision, labels[1]!.format)).toBe('0.129');
   });
 
+  it('paints price-scale readouts for all numeric outputs independently of pane display', () => {
+    for (const type of ['plot', 'plotshape', 'plotchar', 'plotarrow', 'plotbar', 'plotcandle'] as const) {
+      const output = basePlot({ type, values: [109.25, 109.25, 109.25, 109.25], display: 8, precision: 2, format: 'percent' });
+      const ctx = new RecordingCanvasContext();
+      makeRenderer(ctx).renderWithLayoutPasses({
+        bars: BARS, viewport: VIEWPORT, layout: DEFAULT_UNIFIED_PANE_LAYOUT,
+        plots: [output], passes: ['main-axis'],
+      });
+      expect(fillTextCalls(ctx)).toContainEqual(expect.objectContaining({ text: '109.25%', fillStyle: '#2962ff' }));
+      // Status line and Data Window flags must not produce a painted plot or price tag.
+      const hidden = new RecordingCanvasContext();
+      const renderer = makeRenderer(hidden);
+      renderer.renderWithLayoutPasses({
+        bars: BARS, viewport: VIEWPORT, layout: DEFAULT_UNIFIED_PANE_LAYOUT,
+        plots: [{ ...output, display: 6 }], passes: ['main-axis'],
+      });
+      expect(fillTextCalls(hidden).some((call) => call.text === '109.25%')).toBe(false);
+      expect(renderPlots([{ ...output, display: 6 }]).calls.filter((call) =>
+        ['stroke', 'fill', 'fillRect', 'fillText', 'strokeRect', 'arc'].includes(call.op),
+      )).toHaveLength(0);
+    }
+  });
+
+  it('paints authored titles on numeric price tags only when indicator name labels are enabled', () => {
+    for (const type of ['plot', 'plotshape', 'plotchar', 'plotarrow', 'plotbar', 'plotcandle'] as const) {
+      for (const enabled of [false, true]) {
+        const ctx = new RecordingCanvasContext();
+        const renderer = makeRenderer(ctx);
+        renderer.setOptions({ showIndicatorOutputAxisLabelTitles: enabled });
+        renderer.renderWithLayoutPasses({ bars: BARS, viewport: VIEWPORT, layout: DEFAULT_UNIFIED_PANE_LAYOUT,
+          plots: [basePlot({ type, title: 'Authored title', values: [109.25, 109.25, 109.25, 109.25], display: 8, precision: 2 })], passes: ['main-axis'] });
+        expect(fillTextCalls(ctx).map(call => call.text)).toContain(enabled ? 'Authored title 109.25' : '109.25');
+      }
+    }
+  });
+
   it('formats unspecified output-axis precision by pane context without changing values', () => {
     expect(
       formatIndicatorOutputAxisValue(78_256.1306, 5_000, undefined, undefined, {
@@ -788,5 +1057,21 @@ describe('TealScript rendering behavior matrix', () => {
       textAlign: 'center',
       textBaseline: 'middle',
     }));
+  });
+});
+
+
+describe("web review flat-range gradient", () => {
+  it("keeps legacy gradient endpoints finite on a flat price viewport", () => {
+    const ctx = new RecordingCanvasContext();
+    const upper = basePlot({ id: "upper", values: [100, 100, 100, 100] });
+    const lower = basePlot({ id: "lower", values: [100, 100, 100, 100] });
+    const fill = basePlot({ type: "fill", plot1Id: "upper", plot2Id: "lower", gradient: {
+      topValues: [100, 100, 100, 100], bottomValues: [100, 100, 100, 100],
+      topColors: ["red", "red", "red", "red"], bottomColors: ["blue", "blue", "blue", "blue"],
+    }});
+    makeRenderer(ctx).renderPlots([upper, lower, fill], BARS, { ...VIEWPORT, priceMin: 100, priceMax: 100 });
+    expect(ctx.gradients).toHaveLength(3);
+    expect(ctx.gradients.every(g => Number.isFinite(g.y0) && Number.isFinite(g.y1) && g.y0 === g.y1)).toBe(true);
   });
 });

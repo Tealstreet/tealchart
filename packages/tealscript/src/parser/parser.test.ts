@@ -1615,12 +1615,13 @@ plot(close)`);
       expect(decl?.type).toBe('VariableDeclaration');
     });
 
-    it('parses multiline string continuation with 4-space indent (standard)', () => {
+    // https://www.tradingview.com/pine-script-docs/language/script-structure/#line-wrapping
+    it('parses parenthesized multiline strings with four-space indentation', () => {
       const ast = parse(`//@version=6
 indicator("Test")
-txt =
+txt = (
     'Part A' +
-    'Part B'
+    'Part B')
 plot(close)`);
       const decl = ast.body.find(s => s.type === 'VariableDeclaration');
       expect(decl?.type).toBe('VariableDeclaration');

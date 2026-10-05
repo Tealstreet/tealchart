@@ -15,7 +15,7 @@ import {
   selectTealscriptExecutionBackend,
 } from '../runtime/backendSelection';
 import { collectCompiledRequestDataQueryCollection, executeCompiledScript } from '../runtime/codegen';
-import type { CompiledRequestDataQuery } from '../runtime/codegen';
+import type { CompiledExecutionOptions, CompiledRequestDataQuery } from '../runtime/codegen';
 import { checkProgram } from '../semantic';
 import type { Program } from '../parser/ast';
 import type { Bar, InputDefinition } from '../runtime/context';
@@ -58,15 +58,25 @@ interface ScriptState {
   realtimeLastBar?: {
     time: number;
     isNew: boolean;
+    previousIsNew?: boolean;
   };
   confirmedRealtimeBarIndex?: number;
   confirmedRealtimeBarStartIndex?: number;
   requestDiscoveryGeneration?: number;
   requestDiscoveryFetchRounds: number;
+  intrabarState: NonNullable<CompiledExecutionOptions['intrabarState']>;
+  timenowObservations: Array<number | undefined>;
+  haltedRuntimeError?: {
+    runtimeError: NonNullable<ErrorMessage['runtimeError']>;
+    profile?: ErrorMessage['profile'];
+  };
+  logs: ExecutionResult['logs'];
+  lastLogExecutionBarIndex: number;
 }
 
 // Current script state
 let state: ScriptState | null = null;
+let validatedProgram: { script: string; options: string; ast: Program } | undefined;
 let nextRequestDataId = 0;
 const pendingRequestData = new Map<number, { generation: number; cacheKey: string; query: WorkerRequestDataCacheQuery }>();
 const MAX_RUNTIME_REQUEST_DISCOVERY_FETCH_ROUNDS = 3;
@@ -132,11 +142,17 @@ function handleInit(
   libraries?: Map<string, Program>,
   metadata?: WorkerOutputMetadata
 ): void {
+  const previousProgram = validatedProgram;
+  handleDispose();
   try {
-    // Parse the script
-    const ast = parse(script);
-    const semanticResult = checkProgram(ast, semanticOptionsFromLibraries(libraries));
-    const semanticErrors = semanticResult.diagnostics.filter((diagnostic) => diagnostic.severity === 'error');
+    const validationOptions = JSON.stringify({ libraries: Array.from(libraries ?? []), runtime, requireDeclaration: true });
+    const cachedAst = previousProgram?.script === script && previousProgram.options === validationOptions
+      ? previousProgram.ast
+      : undefined;
+    const ast = cachedAst ?? parse(script);
+    const semanticErrors = cachedAst ? [] : checkProgram(ast, {
+      ...semanticOptionsFromLibraries(libraries), requireDeclaration: true,
+    }).diagnostics.filter((diagnostic) => diagnostic.severity === 'error');
     if (semanticErrors[0]) {
       postResult(createSemanticErrorMessage(
         scriptId,
@@ -147,8 +163,9 @@ function handleInit(
       return;
     }
 
+    validatedProgram = { script, options: validationOptions, ast };
+
     // Store state
-    pendingRequestData.clear();
     state = {
       scriptId,
       ast,
@@ -163,6 +180,10 @@ function handleInit(
       confirmedRealtimeBarIndex: undefined,
       confirmedRealtimeBarStartIndex: undefined,
       requestDiscoveryFetchRounds: 0,
+      intrabarState: new Map(),
+      timenowObservations: [],
+      logs: [],
+      lastLogExecutionBarIndex: -1,
     };
 
     // Execute and send results
@@ -202,9 +223,12 @@ function handleUpdateBars(bars: Bar[], metadata?: WorkerOutputMetadata): void {
   }
 
   state.bars = bars;
+  state.haltedRuntimeError = undefined;
   state.realtimeLastBar = undefined;
   state.confirmedRealtimeBarIndex = undefined;
   state.confirmedRealtimeBarStartIndex = undefined;
+  state.intrabarState.clear();
+  state.timenowObservations = [];
   state.requestCache.clear();
   resetPendingRequests();
   resetRequestDiscovery();
@@ -226,7 +250,11 @@ function handleUpdateBar(bar: Bar, metadata?: WorkerOutputMetadata): void {
 
   if (lastBar && bar.time === lastBar.time) {
     state.bars[state.bars.length - 1] = bar;
-    state.realtimeLastBar = { time: bar.time, isNew: false };
+    state.realtimeLastBar = {
+      time: bar.time,
+      isNew: false,
+      previousIsNew: state.realtimeLastBar?.time === bar.time && state.realtimeLastBar.isNew,
+    };
     state.confirmedRealtimeBarIndex = undefined;
     resetPendingRequests();
     resetRequestDiscovery();
@@ -257,9 +285,12 @@ function handleSetInputs(inputs: Record<string, unknown>, metadata?: WorkerOutpu
   }
 
   state.inputs = inputs;
+  state.haltedRuntimeError = undefined;
   state.realtimeLastBar = undefined;
   state.confirmedRealtimeBarIndex = undefined;
   state.confirmedRealtimeBarStartIndex = undefined;
+  state.intrabarState.clear();
+  state.timenowObservations = [];
   state.requestCache.clear();
   resetPendingRequests();
   resetRequestDiscovery();
@@ -272,6 +303,7 @@ function handleSetInputs(inputs: Record<string, unknown>, metadata?: WorkerOutpu
  * Clean up worker resources
  */
 function handleDispose(): void {
+  validatedProgram = undefined;
   state = null;
   pendingRequestData.clear();
 }
@@ -304,6 +336,12 @@ function executeAndSendResults(metadata?: WorkerOutputMetadata): void {
   if (!state) {
     return;
   }
+  if (state.haltedRuntimeError) {
+    const { runtimeError, profile } = state.haltedRuntimeError;
+    postResult(createRuntimeErrorMessage(state.scriptId, runtimeError, metadata, profile));
+    return;
+  }
+  if (state.realtimeLastBar) state.timenowObservations[state.bars.length - 1] = undefined;
 
   try {
     // Convert inputs Record to Map
@@ -367,6 +405,8 @@ function executeAndSendResults(metadata?: WorkerOutputMetadata): void {
       realtimeLastBar: state.realtimeLastBar,
       confirmedRealtimeBarIndex: state.confirmedRealtimeBarIndex,
       confirmedRealtimeBarStartIndex: state.confirmedRealtimeBarStartIndex,
+      intrabarState: state.intrabarState,
+      timenowObservations: state.timenowObservations,
     });
     if (execution.status === 'failure') {
       postCompiledUnsupported(backendSelection, execution.reason, [
@@ -393,6 +433,8 @@ function discoverRuntimeRequestDataMisses(
     realtimeLastBar: state.realtimeLastBar,
     confirmedRealtimeBarIndex: state.confirmedRealtimeBarIndex,
     confirmedRealtimeBarStartIndex: state.confirmedRealtimeBarStartIndex,
+    intrabarState: new Map(state.intrabarState),
+    timenowObservations: [...state.timenowObservations],
   });
 
   return {
@@ -470,7 +512,7 @@ function sendExecutionResult(result: ExecutionResult, metadata?: WorkerOutputMet
 
   const runtimeError = result.errors.find((error) => error.runtimeError)?.runtimeError;
   if (runtimeError) {
-    postResult(createRuntimeErrorMessage(state.scriptId, runtimeError, metadata, result.profile));
+    postRuntimeError(runtimeError, metadata, result.profile);
     return;
   }
 
@@ -483,12 +525,24 @@ function sendExecutionResult(result: ExecutionResult, metadata?: WorkerOutputMet
   // Cache inputs for intrabar ticks
   state.lastInputs = inputs;
 
+  const currentBarIndex = state.bars.length - 1;
+  const isStrategy = state.ast.body.some(statement => statement.type === 'IndicatorDeclaration' && statement.declarationKind === 'strategy');
+  if (state.realtimeLastBar && !isStrategy) {
+    const firstNewLogBarIndex = Math.min(state.lastLogExecutionBarIndex + 1, currentBarIndex);
+    for (const log of result.logs) {
+      if (log.barIndex >= firstNewLogBarIndex) state.logs.push(log);
+    }
+  } else {
+    state.logs = result.logs;
+  }
+  state.lastLogExecutionBarIndex = currentBarIndex;
+
   // Send results
   const resultMessage = createResultMessage(state.scriptId, {
     plots: result.plots,
     drawings: result.drawings,
     alerts: result.alerts,
-    logs: result.logs,
+    logs: state.logs,
     inputs,
     declaration: result.declaration,
     strategy: result.strategy,
@@ -534,7 +588,7 @@ function handleRequestDataResult(message: RequestDataResultMessage): void {
 function handleError(error: unknown, metadata?: WorkerOutputMetadata): void {
   const runtimeError = createRuntimeErrorPayload(error);
   if (runtimeError) {
-    postResult(createRuntimeErrorMessage(state?.scriptId ?? 'unknown', runtimeError, metadata));
+    postRuntimeError(runtimeError, metadata);
     return;
   }
 
@@ -545,6 +599,15 @@ function handleError(error: unknown, metadata?: WorkerOutputMetadata): void {
     metadata,
   };
   postResult(errorMessage);
+}
+
+function postRuntimeError(
+  runtimeError: NonNullable<ErrorMessage['runtimeError']>,
+  metadata?: WorkerOutputMetadata,
+  profile?: ErrorMessage['profile'],
+): void {
+  if (state) state.haltedRuntimeError = { runtimeError, profile };
+  postResult(createRuntimeErrorMessage(state?.scriptId ?? 'unknown', runtimeError, metadata, profile));
 }
 
 function createRuntimeErrorMessage(

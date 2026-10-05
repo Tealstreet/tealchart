@@ -124,15 +124,17 @@ export interface ExecutionError {
   code?: RuntimeErrorCode;
   line?: number;
   column?: number;
+  barIndex?: number;
   runtimeError?: RuntimeErrorPayload;
 }
 
-export type RuntimeErrorCode = 'runtime.error';
+export type RuntimeErrorCode = 'runtime.error' | 'RE10127' | 'RE10039' | 'RE10001' | 'RE10002' | 'RE10045' | 'RE10073' | 'RE10029' | 'RE10145';
 export type RuntimeInfrastructureErrorCode =
   | 'mobile-tealscript-webview-required'
   | 'request-data-unavailable';
 
 export interface RuntimeErrorPayload {
+  barIndex?: number;
   code: RuntimeErrorCode;
   message: string;
   line?: number;
@@ -146,6 +148,7 @@ export interface TealscriptExecutionOptions {
   runtime?: TealscriptRuntimeOptions;
   realtimeLastBar?: {
     isNew: boolean;
+    previousIsNew?: boolean;
   };
   confirmedRealtimeBarIndex?: number;
   confirmedRealtimeBarStartIndex?: number;

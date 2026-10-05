@@ -92,9 +92,16 @@ Implemented:
 - Conservative mutation diagnostics for known array element types:
   `push`, `unshift`, `set`, `insert`, and `fill`.
 - Conservative `concat` diagnostics for known target/source element types.
+- Reference-derived numeric receiver diagnostics for 13 listed stat/transform
+  helpers, including both covariance inputs, empty arrays, namespace/method calls,
+  and named/alias argument bindings. User-method shadows remain distinct.
 - Known array/map collection loop value typing and numeric index/counter typing.
 
 ## Remaining Audit Items
+
+- `array.abs` and `array.standardize` receiver restrictions remain a documented
+  admission gap: previous-OK corpus admission is preserved while independent
+  native adjudication is pending. Do not cite their former matrix as closed proof.
 
 - Reconcile this list against the official Pine v6 reference whenever the
   bundled reference data is easier to extract or a manual reference pass is

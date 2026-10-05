@@ -1,4 +1,9 @@
-import type { BoxDrawingOutput, LabelDrawingOutput, LineDrawingOutput, PolylineDrawingOutput } from '@tealstreet/tealscript';
+import type {
+  BoxDrawingOutput,
+  LabelDrawingOutput,
+  LineDrawingOutput,
+  PolylineDrawingOutput,
+} from '@tealstreet/tealscript';
 import type { Bar, ComputedPane, Viewport } from '../types';
 
 export interface DrawingPoint {
@@ -26,6 +31,7 @@ export interface DrawingCoordinateResolvers {
 }
 
 export function barIndexToTime(index: number, bars: readonly Bar[]): number | null {
+  'worklet';
   if (bars.length === 0 || !Number.isFinite(index)) return null;
 
   const roundedIndex = Math.trunc(index);
@@ -38,7 +44,15 @@ export function barIndexToTime(index: number, bars: readonly Bar[]): number | nu
 }
 
 function barIndexForTime(time: number, bars: readonly Bar[]): number {
-  return bars.findIndex((bar) => bar.time === time);
+  'worklet';
+  let low = 0;
+  let high = bars.length;
+  while (low < high) {
+    const mid = (low + high) >>> 1;
+    if (bars[mid].time < time) low = mid + 1;
+    else high = mid;
+  }
+  return low < bars.length && bars[low].time === time ? low : -1;
 }
 
 export function resolveExtendedLineSegment(
@@ -48,6 +62,7 @@ export function resolveExtendedLineSegment(
   minX: number,
   maxX: number,
 ): DrawingSegment {
+  'worklet';
   if (start.x === end.x) {
     return { start, end };
   }
@@ -77,6 +92,7 @@ export function resolveLineDrawingPoint(
   chartWidth: number,
   resolvers: DrawingCoordinateResolvers,
 ): DrawingPoint | null {
+  'worklet';
   if (xValue === null || yValue === null || !Number.isFinite(xValue) || !Number.isFinite(yValue)) {
     return null;
   }
@@ -84,8 +100,10 @@ export function resolveLineDrawingPoint(
   const time = xloc === 'bar_time' ? xValue : barIndexToTime(xValue, bars);
   if (time === null) return null;
 
-  const x = xloc !== 'bar_time' && resolvers.barIndexToX
-    ? resolvers.barIndexToX(xValue) : resolvers.timeToX(time, viewport, chartWidth);
+  const x =
+    xloc !== 'bar_time' && resolvers.barIndexToX
+      ? resolvers.barIndexToX(xValue)
+      : resolvers.timeToX(time, viewport, chartWidth);
   const y = resolvers.valueToY(yValue, pane);
   return Number.isFinite(x) && Number.isFinite(y) ? { x, y } : null;
 }
@@ -100,6 +118,7 @@ export function resolveLineDrawingSegment(
   maxX: number,
   resolvers: DrawingCoordinateResolvers,
 ): DrawingSegment | null {
+  'worklet';
   const start = resolveLineDrawingPoint(line.x1, line.y1, line.xloc, bars, viewport, pane, chartWidth, resolvers);
   const end = resolveLineDrawingPoint(line.x2, line.y2, line.xloc, bars, viewport, pane, chartWidth, resolvers);
   if (!start || !end) return null;
@@ -114,6 +133,7 @@ export function resolvePolylineDrawingPoints(
   chartWidth: number,
   resolvers: DrawingCoordinateResolvers,
 ): DrawingPoint[] {
+  'worklet';
   const points: DrawingPoint[] = [];
   for (const point of polyline.points) {
     const xValue = polyline.xloc === 'bar_time' ? point.time : point.index;
@@ -142,15 +162,16 @@ export function resolveBoxDrawingRect(
   maxX: number,
   resolvers: DrawingCoordinateResolvers,
 ): DrawingRect | null {
+  'worklet';
   if (
-    box.left === null
-    || box.right === null
-    || box.top === null
-    || box.bottom === null
-    || !Number.isFinite(box.left)
-    || !Number.isFinite(box.right)
-    || !Number.isFinite(box.top)
-    || !Number.isFinite(box.bottom)
+    box.left === null ||
+    box.right === null ||
+    box.top === null ||
+    box.bottom === null ||
+    !Number.isFinite(box.left) ||
+    !Number.isFinite(box.right) ||
+    !Number.isFinite(box.top) ||
+    !Number.isFinite(box.bottom)
   ) {
     return null;
   }
@@ -159,10 +180,14 @@ export function resolveBoxDrawingRect(
   const rightTime = box.xloc === 'bar_time' ? box.right : barIndexToTime(box.right, bars);
   if (leftTime === null || rightTime === null) return null;
 
-  let leftX = box.xloc !== 'bar_time' && resolvers.barIndexToX
-    ? resolvers.barIndexToX(box.left) : resolvers.timeToX(leftTime, viewport, chartWidth);
-  let rightX = box.xloc !== 'bar_time' && resolvers.barIndexToX
-    ? resolvers.barIndexToX(box.right) : resolvers.timeToX(rightTime, viewport, chartWidth);
+  let leftX =
+    box.xloc !== 'bar_time' && resolvers.barIndexToX
+      ? resolvers.barIndexToX(box.left)
+      : resolvers.timeToX(leftTime, viewport, chartWidth);
+  let rightX =
+    box.xloc !== 'bar_time' && resolvers.barIndexToX
+      ? resolvers.barIndexToX(box.right)
+      : resolvers.timeToX(rightTime, viewport, chartWidth);
   if (!Number.isFinite(leftX) || !Number.isFinite(rightX)) return null;
   if (box.extend === 'left' || box.extend === 'both') leftX = minX;
   if (box.extend === 'right' || box.extend === 'both') rightX = maxX;
@@ -188,6 +213,7 @@ export function resolveLabelDrawingPosition(
   chartWidth: number,
   resolvers: DrawingCoordinateResolvers,
 ): DrawingPoint | null {
+  'worklet';
   const barIndex = Number.isFinite(label.barIndex) ? Math.trunc(label.barIndex) : -1;
   let time: number | undefined;
   let anchorIndex = barIndex;
@@ -195,7 +221,6 @@ export function resolveLabelDrawingPosition(
   if (label.xloc === 'bar_time') {
     if (label.x === null || !Number.isFinite(label.x)) return null;
     time = label.x;
-    anchorIndex = barIndexForTime(time, bars);
   } else {
     const xValue = label.x ?? barIndex;
     const xIndex = Number.isFinite(xValue) ? Math.trunc(xValue) : barIndex;
@@ -203,14 +228,22 @@ export function resolveLabelDrawingPosition(
     time = barIndexToTime(xIndex, bars) ?? undefined;
   }
 
-  const bar = anchorIndex >= 0 && anchorIndex < bars.length ? bars[anchorIndex] : undefined;
-  if (time === undefined || (!resolvers.barIndexToX || label.xloc === 'bar_time') && (time < viewport.startTime || time > viewport.endTime)) {
+  if (
+    time === undefined ||
+    ((!resolvers.barIndexToX || label.xloc === 'bar_time') && (time < viewport.startTime || time > viewport.endTime))
+  ) {
     return null;
   }
 
-  const x = label.xloc !== 'bar_time' && resolvers.barIndexToX
-    ? resolvers.barIndexToX(anchorIndex) : resolvers.timeToX(time, viewport, chartWidth);
+  const x =
+    label.xloc !== 'bar_time' && resolvers.barIndexToX
+      ? resolvers.barIndexToX(anchorIndex)
+      : resolvers.timeToX(time, viewport, chartWidth);
   if (!Number.isFinite(x) || (resolvers.barIndexToX && (x < 0 || x > chartWidth))) return null;
+  if (label.xloc === 'bar_time' && (label.yloc === 'abovebar' || label.yloc === 'belowbar')) {
+    anchorIndex = barIndexForTime(time, bars);
+  }
+  const bar = anchorIndex >= 0 && anchorIndex < bars.length ? bars[anchorIndex] : undefined;
   let y: number;
 
   if (label.yloc === 'abovebar') {

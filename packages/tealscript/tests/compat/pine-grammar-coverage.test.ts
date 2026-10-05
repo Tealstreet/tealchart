@@ -56,6 +56,17 @@ describe('Pine v6 grammar coverage inventory', () => {
   const missingConstructs = PINE_V6_GRAMMAR_CONSTRUCTS.filter((construct) => knownMissing.has(construct.id));
 
   it.each(coveredConstructs)('parses and typechecks $id', (construct) => {
+    if (construct.id === 'formatting.expression-continuation'
+      || construct.id === 'formatting.expression-continuation-nested') {
+      // Script structure / line wrapping: four-space continuations require parentheses.
+      expect(checkConstruct(construct)).toMatchObject({ passed: false, stage: 'parse' });
+      expect(checkConstruct({
+        ...construct,
+        snippet: construct.snippet.replace('value = close +', 'value = (close +')
+          .replace('\nplot(value)', ')\nplot(value)'),
+      })).toEqual({ passed: true });
+      return;
+    }
     expect(checkConstruct(construct)).toEqual({ passed: true });
   });
 

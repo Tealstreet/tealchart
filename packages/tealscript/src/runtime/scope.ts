@@ -1,3 +1,13 @@
+import type { ChartPoint } from './drawings/types';
+import type { PineUdtObject } from './objects';
+import type { SeriesSnapshot } from './series';
+
+import { asReadOnlyPineArray, copyArray, isPineArray } from './arrays';
+import { copyMap, isPineMap } from './maps';
+import { copyMatrix, isPineMatrix } from './matrices';
+import { cloneIntrabarFields, createPineUdtObject, isPineUdtObject } from './objects';
+import { Series } from './series';
+
 /**
  * Scope - Variable Management
  *
@@ -7,12 +17,6 @@
  * - varip variables (persist even during intrabar updates)
  * - Block scoping for if/for/while
  */
-
-import { Series, type SeriesSnapshot } from './series';
-import { copyArray, isPineArray } from './arrays';
-import { copyMatrix, isPineMatrix } from './matrices';
-import { copyMap, isPineMap } from './maps';
-import { createPineUdtObject, isPineUdtObject, type PineUdtObject } from './objects';
 
 /**
  * Variable declaration kind
@@ -499,13 +503,19 @@ export class Scope {
 interface CloneContext {
   udtClones: WeakMap<PineUdtObject, PineUdtObject>;
   varipSources: WeakMap<PineUdtObject, PineUdtObject>;
+  pointClones: WeakMap<ChartPoint, ChartPoint>;
 }
 
 function createCloneContext(): CloneContext {
   return {
     udtClones: new WeakMap(),
     varipSources: new WeakMap(),
+    pointClones: new WeakMap(),
   };
+}
+
+export function cloneRuntimeSnapshot(value: unknown): unknown {
+  return cloneSnapshotValue(value, createCloneContext());
 }
 
 function cloneSnapshotValue(value: unknown, context: CloneContext): unknown {
@@ -513,15 +523,31 @@ function cloneSnapshotValue(value: unknown, context: CloneContext): unknown {
     return value.map((entry) => cloneSnapshotValue(entry, context));
   }
   if (isPineArray(value)) {
-    return copyArray(value);
+    const copy = copyArray(value);
+    copy.values = copy.values.map((entry) => clonePointSnapshotValue(entry, context));
+    return value.readOnly ? asReadOnlyPineArray(copy) : copy;
   }
   if (isPineMatrix(value)) {
-    return copyMatrix(value);
+    const copy = copyMatrix(value);
+    copy.values = copy.values.map((entry) => clonePointSnapshotValue(entry, context));
+    return copy;
   }
   if (isPineMap(value)) {
-    return copyMap(value);
+    const copy = copyMap(value);
+    for (const [key, entry] of copy.entries) copy.entries.set(key, clonePointSnapshotValue(entry, context));
+    return copy;
   }
-  return isPineUdtObject(value) ? cloneUdtSnapshotValue(value, context) : value;
+  return isPineUdtObject(value) ? cloneUdtSnapshotValue(value, context) : clonePointSnapshotValue(value, context);
+}
+
+function clonePointSnapshotValue(value: unknown, context: CloneContext): unknown {
+  if (!value || typeof value !== 'object' || !('type' in value) || value.type !== 'chart.point') return value;
+  const point = value as ChartPoint;
+  const existing = context.pointClones.get(point);
+  if (existing) return existing;
+  const copy = { ...point };
+  context.pointClones.set(point, copy);
+  return copy;
 }
 
 function cloneUdtSnapshotValue(value: PineUdtObject, context: CloneContext): PineUdtObject {
@@ -533,12 +559,12 @@ function cloneUdtSnapshotValue(value: PineUdtObject, context: CloneContext): Pin
   const varipSource = context.varipSources.get(value);
 
   for (const [fieldName, fieldValue] of value.fields) {
-    const sourceValue = varipSource && value.varipFields.has(fieldName)
-      ? varipSource.fields.get(fieldName)
-      : fieldValue;
+    const sourceValue =
+      varipSource && value.varipFields.has(fieldName) ? varipSource.fields.get(fieldName) : fieldValue;
     clone.fields.set(fieldName, cloneSnapshotValue(sourceValue, context));
   }
 
+  cloneIntrabarFields(value, clone, (field) => cloneSnapshotValue(field, context));
   return clone;
 }
 

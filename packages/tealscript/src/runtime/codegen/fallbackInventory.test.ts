@@ -69,8 +69,7 @@ describe('compiled fallback inventory', () => {
     const analyzer = sourceFor('analyzer.ts');
     const taClassNames = quotedNames(objectBody(analyzer, 'TA_CLASS_MAP')).filter((name) => name.startsWith('ta.'));
     const taVarNames = quotedNames(objectBody(analyzer, 'TA_VAR_CLASS_MAP')).filter((name) => name.startsWith('ta.'));
-    const directTaNames = quotedNames(stringSetBody(analyzer, 'DIRECT_TA_FUNCS')).filter((name) => name.startsWith('ta.'));
-    const compiledNames = new Set([...taClassNames, ...taVarNames, ...directTaNames]);
+    const compiledNames = new Set([...taClassNames, ...taVarNames]);
     const missing = PINE_V6_REFERENCE_BUILTINS.ta.filter((name) => !compiledNames.has(name));
 
     expect(missing).toEqual([]);

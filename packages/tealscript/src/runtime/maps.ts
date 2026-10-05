@@ -7,6 +7,23 @@ export interface PineMap<K extends PineMapKey = PineMapKey, V = unknown> {
   entries: Map<K, V>;
 }
 
+// Direct map iteration locks the size, including changes through aliases/UDFs.
+const activeMapIterations = new WeakMap<PineMap, number>();
+
+export function beginMapIteration(map: PineMap): void {
+  activeMapIterations.set(map, (activeMapIterations.get(map) ?? 0) + 1);
+}
+
+export function endMapIteration(map: PineMap): void {
+  const remaining = (activeMapIterations.get(map) ?? 1) - 1;
+  if (remaining > 0) activeMapIterations.set(map, remaining);
+  else activeMapIterations.delete(map);
+}
+
+function assertMapSizeChangeAllowed(map: PineMap): void {
+  if (activeMapIterations.has(map)) throw new Error('Map cannot change size during direct map iteration');
+}
+
 export function createPineMap<K extends PineMapKey = PineMapKey, V = unknown>(): PineMap<K, V> {
   return {
     __tealscriptMap: true,
@@ -43,11 +60,13 @@ export function removeMapValue<V = unknown>(map: PineMap<PineMapKey, V>, key: un
   const normalizedKey = normalizeMapKey(key);
   if (!map.entries.has(normalizedKey)) return Number.NaN;
   const value = map.entries.get(normalizedKey) as V;
+  assertMapSizeChangeAllowed(map);
   map.entries.delete(normalizedKey);
   return value;
 }
 
 export function clearMap(map: PineMap): void {
+  if (map.entries.size > 0) assertMapSizeChangeAllowed(map);
   map.entries.clear();
 }
 
@@ -86,6 +105,7 @@ export function mapEntries(map: PineMap): Array<[PineMapKey, unknown]> {
 }
 
 function assertMapCapacity(map: PineMap, key: unknown): void {
+  if (!map.entries.has(normalizeMapKey(key))) assertMapSizeChangeAllowed(map);
   if (!map.entries.has(normalizeMapKey(key)) && map.entries.size >= 50_000) {
     throw new Error('Map cannot contain more than 50000 key-value pairs. Remove old keys or update existing keys before adding more entries.');
   }
@@ -93,9 +113,6 @@ function assertMapCapacity(map: PineMap, key: unknown): void {
 
 function normalizeMapKey(key: unknown): PineMapKey {
   if (typeof key === 'number') {
-    if (!Number.isFinite(key)) {
-      throw new Error('Map keys must be finite value types');
-    }
     return key;
   }
   if (typeof key === 'string' || typeof key === 'boolean') {

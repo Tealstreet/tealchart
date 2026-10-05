@@ -34,6 +34,15 @@ import {
   getIndicatorOutputAxisLabelSources,
   resolveIndicatorOutputSourceTime,
 } from './rendering/indicatorOutputAxisLabels';
+import { appendPlotFillQuad, getPlotFillIndexBounds, getPlotFillSample } from './rendering/plotFillGeometry';
+import { appendPlotAreaBaseline } from './rendering/plotGeometry';
+import {
+  getPlotMarkerGeometry,
+  plotArrowHeight,
+  plotMarkerSize,
+  plotMarkerTextLineOffset,
+} from './rendering/plotMarkerGeometry';
+import { getPlotOhlcGeometry } from './rendering/plotOhlcGeometry';
 import { computeProjectedPriceLineLabelBounds } from './rendering/priceLineLayout';
 import { routeTealScriptDrawings } from './rendering/TealScriptDrawingPaneRouting';
 import { partitionTealScriptDrawings } from './rendering/TealScriptDrawingPartition';
@@ -351,6 +360,7 @@ export class TealchartRenderer {
   private ctx: CanvasContext;
   private options: RenderOptions;
   private margins: ChartMargins;
+  private readonly scriptDrawingRenderers = new Map<string, TealScriptDrawingRenderer>();
   private jailbreakManager: JailbreakIndicatorManager | null = null;
   private readonly priceLineAxisTagWidthCache = new PriceAxisTagWidthCache();
   private readonly indicatorOutputAxisTagWidthCache = new PriceAxisTagWidthCache();
@@ -577,6 +587,7 @@ export class TealchartRenderer {
     }
 
     if (frame.bars.length === 0) {
+      this.scriptDrawingRenderers.clear();
       if (passSet.has('background')) {
         this.drawNoDataMessage();
       }
@@ -2357,8 +2368,7 @@ export class TealchartRenderer {
     }
     const pixelsPerMs = chartWidth / viewportTimeRange;
     const slotWidth = this.externalProjection?.barSpacingPx ?? barInterval * pixelsPerMs;
-    const barWidth =
-      style === 'columns' ? Math.max(1, slotWidth * 0.6) : Math.max(1, Math.min(slotWidth, linewidth * 3));
+    const barWidth = style === 'columns' ? Math.max(1, slotWidth * 0.6) : Math.max(1, linewidth);
 
     const baselineY = this.priceToY(this.getPlotHistbase(plot), viewport, priceHeight);
 
@@ -2468,10 +2478,10 @@ export class TealchartRenderer {
 
     const { ctx, options, margins } = this;
     const chartWidth = options.width - margins.left;
-    const { values, color, linewidth = 1 } = plot;
+    const { values, color } = plot;
 
     ctx.strokeStyle = baseColor;
-    ctx.lineWidth = linewidth;
+    ctx.lineWidth = 1;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
     ctx.setLineDash(this.lineStyleToDashPattern(plot.lineStyle ?? 'solid'));
@@ -2598,11 +2608,7 @@ export class TealchartRenderer {
   }
 
   private getPlotTime(plot: Pick<PlotOutput, 'offset'>, bars: Bar[], index: number): number {
-    const bar = bars[index];
-    if (!bar) return NaN;
-    const offset = plot.offset ?? 0;
-    if (offset === 0 || bars.length < 2) return bar.time;
-    return bar.time + offset * (bars[1].time - bars[0].time);
+    return resolveIndicatorOutputSourceTime({ bars, sourceIndex: index, plotOffset: plot.offset }) ?? NaN;
   }
 
   private getPlotX(
@@ -2638,17 +2644,11 @@ export class TealchartRenderer {
     return Number.isFinite(plot.histbase);
   }
 
-  private getLatestRenderablePlotValue(
-    plot: PlotOutput,
-    bars: Bar[],
-    viewport: Viewport,
-  ): { index: number; value: number } | null {
+  private getLatestRenderablePlotValue(plot: PlotOutput, bars: Bar[]): { index: number; value: number } | null {
     const scanEnd = Math.min(bars.length, plot.values.length);
     for (let i = scanEnd - 1; i >= 0; i--) {
       const value = plot.values[i];
       if (!this.shouldRenderPlotBar(plot, bars, i)) continue;
-      const plotTime = this.getPlotTime(plot, bars, i);
-      if (this.isPlotOutsideViewport(plot, bars, i, viewport, plotTime)) continue;
       if (typeof value === 'number' && Number.isFinite(value)) {
         return { index: i, value };
       }
@@ -2659,14 +2659,13 @@ export class TealchartRenderer {
   private renderPlotTrackPrice(
     plot: PlotOutput,
     bars: Bar[],
-    viewport: Viewport,
     yMin: number,
     yMax: number,
     valueToY: (value: number) => number,
   ): void {
     if (plot.type !== 'plot' || !plot.trackprice) return;
 
-    const latest = this.getLatestRenderablePlotValue(plot, bars, viewport);
+    const latest = this.getLatestRenderablePlotValue(plot, bars);
     if (!latest || latest.value < yMin || latest.value > yMax) return;
 
     const { ctx, options, margins } = this;
@@ -2676,16 +2675,13 @@ export class TealchartRenderer {
     const y = valueToY(latest.value);
 
     ctx.strokeStyle = color;
-    ctx.lineWidth = plot.linewidth || 1;
-    ctx.setLineDash(this.lineStyleToDashPattern(plot.lineStyle ?? 'dotted'));
+    ctx.lineWidth = 1;
+    ctx.setLineDash(this.lineStyleToDashPattern('dotted'));
     ctx.beginPath();
     ctx.moveTo(margins.left, y);
     ctx.lineTo(options.width - margins.right, y);
     ctx.stroke();
     ctx.setLineDash([]);
-
-    const labelViewport = { ...viewport, priceMin: yMin, priceMax: yMax };
-    this.drawTradingPriceLabel(y, latest.value, color, color, options.backgroundColor, labelViewport, 0);
   }
 
   private renderPlotTrackPriceInMainPane(plot: PlotOutput, bars: Bar[], viewport: Viewport): void {
@@ -2693,27 +2689,17 @@ export class TealchartRenderer {
     const chartHeight = options.height - margins.top - margins.bottom;
     const volumeHeight = options.showVolume ? chartHeight * options.volumeHeight : 0;
     const priceHeight = chartHeight - volumeHeight;
-    this.renderPlotTrackPrice(plot, bars, viewport, viewport.priceMin, viewport.priceMax, (value) =>
+    this.renderPlotTrackPrice(plot, bars, viewport.priceMin, viewport.priceMax, (value) =>
       this.priceToY(value, viewport, priceHeight),
     );
   }
 
-  private renderPlotTrackPriceInComputedPane(
-    plot: PlotOutput,
-    bars: Bar[],
-    viewport: Viewport,
-    pane: ComputedPane,
-  ): void {
-    this.renderPlotTrackPrice(plot, bars, viewport, pane.yMin, pane.yMax, (value) => this.valueToY(value, pane));
+  private renderPlotTrackPriceInComputedPane(plot: PlotOutput, bars: Bar[], pane: ComputedPane): void {
+    this.renderPlotTrackPrice(plot, bars, pane.yMin, pane.yMax, (value) => this.valueToY(value, pane));
   }
 
-  private renderPlotTrackPriceInPaneOffset(
-    plot: PlotOutput,
-    bars: Bar[],
-    viewport: Viewport,
-    paneOffset: PaneOffset,
-  ): void {
-    this.renderPlotTrackPrice(plot, bars, viewport, paneOffset.yMin, paneOffset.yMax, (value) =>
+  private renderPlotTrackPriceInPaneOffset(plot: PlotOutput, bars: Bar[], paneOffset: PaneOffset): void {
+    this.renderPlotTrackPrice(plot, bars, paneOffset.yMin, paneOffset.yMax, (value) =>
       this.valueToPaneY(value, paneOffset),
     );
   }
@@ -2752,22 +2738,9 @@ export class TealchartRenderer {
       if (!this.shouldRenderPlotBar(plot, bars, i)) continue;
       if (bar.time < viewport.startTime || bar.time > viewport.endTime) continue;
 
-      const open = openValues[i];
-      const high = highValues[i];
-      const low = lowValues[i];
-      const close = closeValues[i];
-      if (
-        open === null ||
-        high === null ||
-        low === null ||
-        close === null ||
-        isNaN(open) ||
-        isNaN(high) ||
-        isNaN(low) ||
-        isNaN(close)
-      ) {
-        continue;
-      }
+      const geometry = getPlotOhlcGeometry(plot, i);
+      if (!geometry) continue;
+      const { open, high, low, close } = geometry;
 
       const x = this.timeToX(bar.time, viewport, chartWidth);
       const openY = valueToY(open);
@@ -2983,8 +2956,7 @@ export class TealchartRenderer {
   private closeAreaFillPath(firstX: number, lastX: number, baselineY: number): void {
     const { ctx } = this;
 
-    ctx.lineTo(lastX, baselineY);
-    ctx.lineTo(firstX, baselineY);
+    appendPlotAreaBaseline(ctx, firstX, lastX, baselineY);
     ctx.closePath();
     ctx.fill();
   }
@@ -2997,75 +2969,54 @@ export class TealchartRenderer {
     valueToY: (value: number, priceHeight: number) => number,
   ): void {
     const { ctx, options, margins } = this;
-    const plot1 = plots.find((plot) => plot.id === fill.plot1Id);
-    const plot2 = plots.find((plot) => plot.id === fill.plot2Id);
-    if (!plot1 || !plot2) return;
-
+    const plot1 = plots.find((plot) => plot.id === fill.plot1Id),
+      plot2 = plots.find((plot) => plot.id === fill.plot2Id);
+    if (!plot1 || !plot2 || (fill.gradient && !ctx.createLinearGradient)) return;
     const chartWidth = options.width - margins.left;
     const chartHeight = options.height - margins.top - margins.bottom;
-    const volumeHeight = options.showVolume ? chartHeight * options.volumeHeight : 0;
-    const priceHeight = chartHeight - volumeHeight;
-    const fillgaps = fill.fillgaps ?? true;
-    const colors = Array.isArray(fill.color) ? fill.color : [];
-    const staticColor = !Array.isArray(fill.color) ? fill.color : undefined;
-
-    let previous: { x: number; y1: number; y2: number; color: string | null } | null = null;
-
-    for (let i = 0; i < bars.length; i++) {
-      const bar = bars[i];
-      if (
-        !bar ||
-        !this.shouldRenderPlotBar(fill, bars, i) ||
-        bar.time < viewport.startTime ||
-        bar.time > viewport.endTime
-      ) {
+    const priceHeight = chartHeight - (options.showVolume ? chartHeight * options.volumeHeight : 0);
+    const [firstIndex, lastIndex] = getPlotFillIndexBounds(plot1, plot2, bars.length);
+    let previous: { x: number; y1: number; y2: number } | null = null;
+    for (let index = firstIndex; index <= lastIndex; index++) {
+      const time = resolveIndicatorOutputSourceTime({ bars, sourceIndex: 0, plotOffset: index });
+      if (time === undefined || time < viewport.startTime || time > viewport.endTime) {
         previous = null;
         continue;
       }
-
-      const value1 = this.getFillPlotValue(plot1, i);
-      const value2 = this.getFillPlotValue(plot2, i);
-      const color = colors[i] ?? staticColor ?? null;
-
-      if (color === null) {
+      const sample = getPlotFillSample(fill, plot1, plot2, index, bars.length);
+      if (sample.kind === 'break') {
         previous = null;
         continue;
       }
-
-      if (value1 === null || value2 === null) {
-        if (!fillgaps) previous = null;
+      if (sample.kind === 'gap') {
+        if (!fill.fillgaps) previous = null;
         continue;
       }
-
       const current = {
-        x: this.timeToX(bar.time, viewport, chartWidth),
-        y1: valueToY(value1, priceHeight),
-        y2: valueToY(value2, priceHeight),
-        color,
+        x: this.timeToX(time, viewport, chartWidth),
+        y1: valueToY(sample.value1, priceHeight),
+        y2: valueToY(sample.value2, priceHeight),
       };
-
       if (previous) {
-        ctx.fillStyle = current.color;
+        if (sample.gradient) {
+          const gradient = sample.gradient;
+          const paint = ctx.createLinearGradient!(
+            0,
+            valueToY(gradient.topValue, priceHeight),
+            0,
+            valueToY(gradient.bottomValue, priceHeight),
+          );
+          paint.addColorStop(0, gradient.topColor);
+          paint.addColorStop(1, gradient.bottomColor);
+          ctx.fillStyle = paint;
+        } else ctx.fillStyle = sample.color!;
         ctx.beginPath();
-        ctx.moveTo(previous.x, previous.y1);
-        ctx.lineTo(current.x, current.y1);
-        ctx.lineTo(current.x, current.y2);
-        ctx.lineTo(previous.x, previous.y2);
+        appendPlotFillQuad(ctx, previous, current);
         ctx.closePath();
         ctx.fill();
       }
-
       previous = current;
     }
-  }
-
-  private getFillPlotValue(plot: PlotOutput, index: number): number | null {
-    if (plot.type === 'hline') {
-      return typeof plot.price === 'number' && Number.isFinite(plot.price) ? plot.price : null;
-    }
-
-    const value = plot.values[index];
-    return typeof value === 'number' && Number.isFinite(value) ? value : null;
   }
 
   /**
@@ -3078,7 +3029,8 @@ export class TealchartRenderer {
     const priceHeight = chartHeight - volumeHeight;
 
     const price = plot.price;
-    if (price === undefined) return;
+    if (price === undefined || !Number.isFinite(price) || this.getVisiblePlotColorAt(plot.color, 0, '#787B86') === null)
+      return;
 
     // Skip if outside visible price range
     if (price < viewport.priceMin || price > viewport.priceMax) {
@@ -3132,12 +3084,12 @@ export class TealchartRenderer {
     const slotWidth = this.externalProjection?.barSpacingPx ?? barInterval * pixelsPerMs;
 
     for (let i = 0; i < bars.length && i < values.length; i++) {
-      const bar = bars[i];
+      const plotTime = this.getPlotTime(plot, bars, i);
       const value = values[i];
 
       if (!this.shouldRenderPlotBar(plot, bars, i)) continue;
 
-      if (bar.time < viewport.startTime || bar.time > viewport.endTime) {
+      if (!Number.isFinite(plotTime) || plotTime < viewport.startTime || plotTime > viewport.endTime) {
         continue;
       }
 
@@ -3146,7 +3098,7 @@ export class TealchartRenderer {
         continue;
       }
 
-      const x = this.timeToX(bar.time, viewport, chartWidth);
+      const x = this.timeToX(plotTime, viewport, chartWidth);
       const fallbackColor = this.getPlotBaseColor(color, 'rgba(33, 150, 243, 0.2)');
       const barColor = this.getVisiblePlotColorAt(color, i, fallbackColor);
       if (barColor === null) continue;
@@ -3185,16 +3137,7 @@ export class TealchartRenderer {
     const baseColor = this.getPlotBaseColor(color, '#2196F3');
     const textColor = Array.isArray(plot.textColor) ? plot.textColor[0] || '#FFFFFF' : plot.textColor || '#FFFFFF';
 
-    // Size mapping
-    const sizeMap: Record<string, number> = {
-      tiny: 4,
-      small: 6,
-      normal: 8,
-      large: 12,
-      huge: 16,
-      auto: 8,
-    };
-    const baseMarkerSize = sizeMap[size || 'small'] || 6;
+    const baseMarkerSize = plotMarkerSize(size);
     const arrowMaxMagnitude =
       plot.type === 'plotarrow' ? this.getVisiblePlotArrowMaxMagnitude(plot, bars, viewport) : 0;
 
@@ -3220,7 +3163,7 @@ export class TealchartRenderer {
 
       const markerSize =
         plot.type === 'plotarrow'
-          ? this.getPlotArrowMarkerSize(plot, Math.abs(value as number), arrowMaxMagnitude, baseMarkerSize)
+          ? plotArrowHeight(plot, Math.abs(value as number), arrowMaxMagnitude, baseMarkerSize)
           : baseMarkerSize;
 
       const x = this.getPlotX(plot, bars, i, viewport, chartWidth, plotTime);
@@ -3257,7 +3200,7 @@ export class TealchartRenderer {
           ctx.font = `${Math.max(10, markerSize * 2)}px sans-serif`;
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
-          ctx.fillText(plot.char || '●', x, y);
+          ctx.fillText(plot.char ?? '●', x, y);
         } else {
           const markerShape = plot.type === 'plotarrow' ? (value > 0 ? 'arrowup' : 'arrowdown') : shape || 'circle';
           this.drawShape(x, y, markerShape, markerSize);
@@ -3283,19 +3226,9 @@ export class TealchartRenderer {
   private drawPlotMarkerText(text: string, x: number, y: number, markerSize: number, location: string): void {
     const { ctx } = this;
     const lines = text.split(/\r?\n/);
-    const lineHeight = Math.max(10, markerSize * 1.5);
-
-    if (location === 'belowbar') {
-      ctx.textBaseline = 'top';
-      for (let index = 0; index < lines.length; index++) {
-        ctx.fillText(lines[index], x, y + index * lineHeight);
-      }
-      return;
-    }
-
-    ctx.textBaseline = 'bottom';
+    ctx.textBaseline = location === 'belowbar' ? 'top' : 'bottom';
     for (let index = 0; index < lines.length; index++) {
-      ctx.fillText(lines[index], x, y - (lines.length - 1 - index) * lineHeight);
+      ctx.fillText(lines[index], x, y + plotMarkerTextLineOffset(location, markerSize, index, lines.length));
     }
   }
 
@@ -3318,125 +3251,40 @@ export class TealchartRenderer {
     return maxMagnitude;
   }
 
-  private getPlotArrowMarkerSize(
-    plot: PlotOutput,
-    magnitude: number,
-    maxMagnitude: number,
-    fallbackSize: number,
-  ): number {
-    const minHeight = Number.isFinite(plot.minHeight) ? Math.max(1, plot.minHeight!) : fallbackSize;
-    const maxHeight = Number.isFinite(plot.maxHeight)
-      ? Math.max(minHeight, plot.maxHeight!)
-      : Math.max(minHeight, fallbackSize);
-    if (maxMagnitude <= 0 || maxHeight === minHeight) return minHeight;
-    return minHeight + (magnitude / maxMagnitude) * (maxHeight - minHeight);
-  }
-
   /**
    * Draw a shape at the specified position
    */
   private drawShape(x: number, y: number, shape: string, size: number): void {
     const { ctx } = this;
-
-    switch (shape) {
-      case 'circle':
+    const geometry = getPlotMarkerGeometry(x, y, shape, size);
+    if (geometry.lines.length) {
+      ctx.lineWidth = geometry.strokeWidth;
+      ctx.beginPath();
+      for (const line of geometry.lines) {
+        ctx.moveTo(line[0][0], line[0][1]);
+        for (const point of line.slice(1)) ctx.lineTo(point[0], point[1]);
+      }
+      ctx.stroke();
+    }
+    for (const box of geometry.boxes) {
+      if (box.radius === undefined) ctx.fillRect(box.x, box.y, box.width, box.height);
+      else {
         ctx.beginPath();
-        ctx.arc(x, y, size / 2, 0, Math.PI * 2);
+        this.drawRoundedRectPath(box.x, box.y, box.width, box.height, box.radius);
         ctx.fill();
-        break;
-
-      case 'square':
-        ctx.fillRect(x - size / 2, y - size / 2, size, size);
-        break;
-
-      case 'diamond':
-        ctx.beginPath();
-        ctx.moveTo(x, y - size / 2);
-        ctx.lineTo(x + size / 2, y);
-        ctx.lineTo(x, y + size / 2);
-        ctx.lineTo(x - size / 2, y);
-        ctx.closePath();
-        ctx.fill();
-        break;
-
-      case 'triangleup':
-      case 'arrowup':
-        ctx.beginPath();
-        ctx.moveTo(x, y - size / 2);
-        ctx.lineTo(x + size / 2, y + size / 2);
-        ctx.lineTo(x - size / 2, y + size / 2);
-        ctx.closePath();
-        ctx.fill();
-        break;
-
-      case 'triangledown':
-      case 'arrowdown':
-        ctx.beginPath();
-        ctx.moveTo(x, y + size / 2);
-        ctx.lineTo(x + size / 2, y - size / 2);
-        ctx.lineTo(x - size / 2, y - size / 2);
-        ctx.closePath();
-        ctx.fill();
-        break;
-
-      case 'cross':
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.moveTo(x - size / 2, y);
-        ctx.lineTo(x + size / 2, y);
-        ctx.moveTo(x, y - size / 2);
-        ctx.lineTo(x, y + size / 2);
-        ctx.stroke();
-        break;
-
-      case 'xcross':
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.moveTo(x - size / 2, y - size / 2);
-        ctx.lineTo(x + size / 2, y + size / 2);
-        ctx.moveTo(x + size / 2, y - size / 2);
-        ctx.lineTo(x - size / 2, y + size / 2);
-        ctx.stroke();
-        break;
-
-      case 'flag':
-        ctx.lineWidth = Math.max(1, size / 8);
-        ctx.beginPath();
-        ctx.moveTo(x - size / 3, y + size / 2);
-        ctx.lineTo(x - size / 3, y - size / 2);
-        ctx.stroke();
-        ctx.fillRect(x - size / 3, y - size / 2, size * 0.8, size * 0.45);
-        break;
-
-      case 'labelup':
-        ctx.beginPath();
-        this.drawRoundedRectPath(x - size * 0.7, y - size * 0.45, size * 1.4, size * 0.9, Math.max(2, size * 0.15));
-        ctx.fill();
-        ctx.beginPath();
-        ctx.moveTo(x, y + size * 0.65);
-        ctx.lineTo(x - size * 0.25, y + size * 0.25);
-        ctx.lineTo(x + size * 0.25, y + size * 0.25);
-        ctx.closePath();
-        ctx.fill();
-        break;
-
-      case 'labeldown':
-        ctx.beginPath();
-        this.drawRoundedRectPath(x - size * 0.7, y - size * 0.45, size * 1.4, size * 0.9, Math.max(2, size * 0.15));
-        ctx.fill();
-        ctx.beginPath();
-        ctx.moveTo(x, y - size * 0.65);
-        ctx.lineTo(x - size * 0.25, y - size * 0.25);
-        ctx.lineTo(x + size * 0.25, y - size * 0.25);
-        ctx.closePath();
-        ctx.fill();
-        break;
-
-      default:
-        // Default to circle
-        ctx.beginPath();
-        ctx.arc(x, y, size / 2, 0, Math.PI * 2);
-        ctx.fill();
+      }
+    }
+    for (const polygon of geometry.polygons) {
+      ctx.beginPath();
+      ctx.moveTo(polygon[0][0], polygon[0][1]);
+      for (const point of polygon.slice(1)) ctx.lineTo(point[0], point[1]);
+      ctx.closePath();
+      ctx.fill();
+    }
+    if (geometry.circle) {
+      ctx.beginPath();
+      ctx.arc(geometry.circle.x, geometry.circle.y, geometry.circle.radius, 0, Math.PI * 2);
+      ctx.fill();
     }
   }
 
@@ -3503,7 +3351,9 @@ export class TealchartRenderer {
    */
   private priceToY(price: number, viewport: Viewport, priceHeight: number): number {
     const { margins } = this;
-    const ratio = (viewport.priceMax - price) / (viewport.priceMax - viewport.priceMin);
+    const range = viewport.priceMax - viewport.priceMin;
+    if (range === 0) return margins.top + priceHeight / 2;
+    const ratio = (viewport.priceMax - price) / range;
     return margins.top + ratio * priceHeight;
   }
 
@@ -3711,8 +3561,10 @@ export class TealchartRenderer {
       Object.fromEntries((input.plots ?? []).map((plot) => [plot.scriptId ?? 'unknown', { overlay: true }]));
     const routedDrawings = routeTealScriptDrawings(input.drawings ?? [], input.projection.panes);
     try {
+      this.retireScriptDrawingRenderers(input.projection.panes);
       for (const pane of input.projection.panes) {
         if (pane.height <= 0) continue;
+        this.scriptDrawingRenderers.delete(pane.id);
         this.ctx.save();
         try {
           this.ctx.beginPath();
@@ -4094,6 +3946,8 @@ export class TealchartRenderer {
       viewport,
     );
 
+    this.retireScriptDrawingRenderers(computedPanes);
+
     // Render each pane with its specific price lines and TealScript drawings
     for (const pane of computedPanes) {
       if (paneIdFilter && !paneIdFilter.has(pane.id)) continue;
@@ -4101,6 +3955,9 @@ export class TealchartRenderer {
       // pane is deliberately unclipped, so without this its candles, markers
       // and lines smear along the seam across the pane that was maximised.
       if (pane.height <= 0) continue;
+      if (passes.has(pane.type === 'main' ? 'main-overlay-content' : 'indicator-content')) {
+        this.scriptDrawingRenderers.delete(pane.id);
+      }
       const paneLabelBounds = labelBoundsByPane.get(pane.id) || [];
       const paneDrawings = pane.type === 'main' ? routedDrawings?.main : routedDrawings?.byPaneId.get(pane.id);
       this.renderPaneUnified(
@@ -4375,20 +4232,36 @@ export class TealchartRenderer {
     }
   }
 
+  private retireScriptDrawingRenderers(panes: readonly ComputedPane[]): void {
+    const visiblePaneIds = new Set(panes.filter((pane) => pane.height > 0).map((pane) => pane.id));
+    for (const paneId of this.scriptDrawingRenderers.keys()) {
+      if (!visiblePaneIds.has(paneId)) this.scriptDrawingRenderers.delete(paneId);
+    }
+  }
+
+  /** Script drawing hover belongs on the crosshair canvas, without repainting plots. */
+  renderTealScriptDrawingTooltip(ctx: CanvasContext, x: number, y: number): void {
+    for (const renderer of [...this.scriptDrawingRenderers.values()].reverse()) {
+      if (renderer.renderTooltip(ctx, x, y)) return;
+    }
+  }
+
   private renderTealScriptDrawings(
     drawingPartition: TealScriptDrawingPartition,
     bars: Bar[],
     viewport: Viewport,
     pane: ComputedPane,
   ): void {
-    new TealScriptDrawingRenderer({
+    const renderer = new TealScriptDrawingRenderer({
       ctx: this.ctx,
       options: this.options,
       margins: this.margins,
       font: this.font,
       coordinateResolvers: this.getDrawingCoordinateResolvers(),
       getTextWidth: getCachedTextWidth,
-    }).render(drawingPartition, bars, viewport, pane);
+    });
+    renderer.render(drawingPartition, bars, viewport, pane);
+    this.scriptDrawingRenderers.set(pane.id, renderer);
   }
 
   /**
@@ -5040,10 +4913,11 @@ export class TealchartRenderer {
       const y = this.valueToY(output.value, pane);
       if (y < visibleTop || y > pane.bottom) continue;
 
-      const text = formatIndicatorOutputAxisValue(output.value, range, output.precision, output.format, {
+      const valueText = formatIndicatorOutputAxisValue(output.value, range, output.precision, output.format, {
         paneType: pane.type,
         pricePrecision: this.options.pricePrecision,
       });
+      const text = this.options.showIndicatorOutputAxisLabelTitles && output.title ? `${output.title} ${valueText}` : valueText;
       const measuredTagWidth = Math.max(
         INDICATOR_OUTPUT_AXIS_TAG_MIN_WIDTH,
         getCachedTextWidth(this.ctx, text, textFont) + WEB_PRICE_AXIS_TAG_SIZING.indicatorOutput.paddingX * 2,
@@ -5192,8 +5066,10 @@ export class TealchartRenderer {
     let override: string | null = null;
     for (const plot of plots) {
       if (plot.type !== 'barcolor' || !Array.isArray(plot.color)) continue;
-      if (!this.shouldRenderPlot(plot) || !this.shouldRenderPlotBar(plot, { length: barCount }, barIndex)) continue;
-      const color = plot.color[barIndex];
+      const sourceIndex = barIndex - (Number.isFinite(plot.offset) ? plot.offset! : 0);
+      if (sourceIndex < 0 || sourceIndex >= barCount) continue;
+      if (!this.shouldRenderPlot(plot) || !this.shouldRenderPlotBar(plot, { length: barCount }, sourceIndex)) continue;
+      const color = plot.color[sourceIndex];
       if (color) {
         override = color;
       }
@@ -5374,7 +5250,8 @@ export class TealchartRenderer {
     const { ctx, options, margins } = this;
 
     const price = plot.price;
-    if (price === undefined) return;
+    if (price === undefined || !Number.isFinite(price) || this.getVisiblePlotColorAt(plot.color, 0, '#787B86') === null)
+      return;
 
     if (price < pane.yMin || price > pane.yMax) {
       return;
@@ -5431,13 +5308,13 @@ export class TealchartRenderer {
     // Handle histogram style
     if (style === 'histogram' || style === 'columns') {
       this.renderHistogramInPaneUnified(plot, bars, viewport, pane, plotStyleOverrides);
-      this.renderPlotTrackPriceInComputedPane(plot, bars, viewport, pane);
+      this.renderPlotTrackPriceInComputedPane(plot, bars, pane);
       return;
     }
 
     if (style === 'cross' || style === 'circles') {
       this.renderPointMarkersWithY(plot, bars, viewport, style, (value) => this.valueToY(value, pane));
-      this.renderPlotTrackPriceInComputedPane(plot, bars, viewport, pane);
+      this.renderPlotTrackPriceInComputedPane(plot, bars, pane);
       return;
     }
 
@@ -5546,7 +5423,7 @@ export class TealchartRenderer {
       );
     }
 
-    this.renderPlotTrackPriceInComputedPane(plot, bars, viewport, pane);
+    this.renderPlotTrackPriceInComputedPane(plot, bars, pane);
 
     // Reset line dash
     ctx.setLineDash([]);
@@ -5583,8 +5460,7 @@ export class TealchartRenderer {
 
     const pixelsPerMs = chartWidth / viewportTimeRange;
     const slotWidth = this.externalProjection?.barSpacingPx ?? barInterval * pixelsPerMs;
-    const barWidth =
-      style === 'columns' ? Math.max(1, slotWidth * 0.6) : Math.max(1, Math.min(slotWidth, linewidth * 3));
+    const barWidth = style === 'columns' ? Math.max(1, slotWidth * 0.6) : Math.max(1, linewidth);
 
     const baselineY = this.valueToY(this.getPlotHistbase(plot), pane);
 
@@ -6124,7 +6000,7 @@ export class TealchartRenderer {
       switch (plot.type) {
         case 'plot':
           this.renderLinePlotInPane(plot, bars, viewport, paneOffset);
-          this.renderPlotTrackPriceInPaneOffset(plot, bars, viewport, paneOffset);
+          this.renderPlotTrackPriceInPaneOffset(plot, bars, paneOffset);
           break;
         case 'plotbar':
         case 'plotcandle':
@@ -6290,8 +6166,7 @@ export class TealchartRenderer {
     }
     const pixelsPerMs = chartWidth / viewportTimeRange;
     const slotWidth = this.externalProjection?.barSpacingPx ?? barInterval * pixelsPerMs;
-    const barWidth =
-      style === 'columns' ? Math.max(1, slotWidth * 0.6) : Math.max(1, Math.min(slotWidth, linewidth * 3));
+    const barWidth = style === 'columns' ? Math.max(1, slotWidth * 0.6) : Math.max(1, linewidth);
 
     const baselineY = this.valueToPaneY(this.getPlotHistbase(plot), paneOffset);
 
@@ -6329,7 +6204,8 @@ export class TealchartRenderer {
     const { ctx, options, margins } = this;
 
     const price = plot.price;
-    if (price === undefined) return;
+    if (price === undefined || !Number.isFinite(price) || this.getVisiblePlotColorAt(plot.color, 0, '#787B86') === null)
+      return;
 
     // Skip if outside pane range
     if (price < paneOffset.yMin || price > paneOffset.yMax) {

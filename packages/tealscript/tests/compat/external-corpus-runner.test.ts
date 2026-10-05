@@ -216,8 +216,7 @@ plot(close)
       const emptyArrayScript = `//@version=6
 indicator("Empty Array")
 var values = array.new<float>(0)
-if barstate.islast
-    plot(values.get(0))
+plot(barstate.islast ? values.get(0) : na)
 `;
       await writeFile(join(dir, 'sources/0023-Erald12-PinescriptIndicator-order_block.txt'), emptyArrayScript, 'utf8');
       await writeFile(join(dir, 'sources/unguarded-array.pine'), emptyArrayScript, 'utf8');

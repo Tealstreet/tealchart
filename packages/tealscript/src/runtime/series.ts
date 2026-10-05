@@ -113,6 +113,25 @@ export class Series<T> {
     }
   }
 
+  advanceWithValue(value: T): void {
+    // Commit any uncommitted value
+    if (this.hasUncommittedValue && this.currentIndex >= 0) {
+      this.values[this.currentIndex] = this.uncommittedValue;
+      this.hasUncommittedValue = false;
+      this.uncommittedValue = undefined;
+    }
+
+    this.currentIndex++;
+    this.committedIndex = this.currentIndex - 1;
+
+    // Ensure array has space for the new bar
+    if (this.currentIndex >= this.values.length) {
+      this.values.push(undefined);
+    }
+    this.uncommittedValue = value;
+    this.hasUncommittedValue = true;
+  }
+
   /**
    * Commit the current bar's value.
    * Called when a bar closes and becomes historical.

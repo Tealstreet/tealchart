@@ -146,13 +146,19 @@ export function referenceToNormalizedTrades(refs: ReferenceTrade[]): NormalizedT
 export function engineToNormalizedTrades(trades: StrategyTrade[]): NormalizedTrade[] {
   return trades
     .filter((t) => t.exitPrice !== undefined)
-    .map((t) => ({
-      direction: t.direction,
-      entryPrice: t.entryPrice,
-      exitPrice: t.exitPrice!,
-      qty: t.qty,
-      profit: t.profit,
-    }));
+    .map((t) => {
+      // The committed engine-baseline CSV Profit column is gross by provenance.
+      // These frozen historical snapshots must compare against the internal
+      // gross field, independently of Pine's commission-inclusive profit accessor.
+      const grossProfit = t.profit;
+      return {
+        direction: t.direction,
+        entryPrice: t.entryPrice,
+        exitPrice: t.exitPrice!,
+        qty: t.qty,
+        profit: grossProfit,
+      };
+    });
 }
 
 export function alignTrades(engine: NormalizedTrade[], reference: NormalizedTrade[]): TradeMatch[] {

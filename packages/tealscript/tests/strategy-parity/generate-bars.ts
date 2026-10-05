@@ -1,5 +1,7 @@
 import type { Bar } from '../../src/runtime';
 
+export const SYNTHETIC_STRATEGY_BAR_COUNT = 200;
+
 export function generateDeterministicBars(count: number, seed: number = 42): Bar[] {
   const bars: Bar[] = [];
   let price = 100;

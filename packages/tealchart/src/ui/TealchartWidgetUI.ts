@@ -21,6 +21,7 @@ import type {
 import type { BuiltinIndicator } from '../indicators/builtinIndicators';
 import type { DrawingDragEventOptions } from '../interaction/EventManager';
 import type { ChartChromeMetrics } from '../layout/chartGeometry';
+import type { IndicatorOutputReadout } from '../rendering/indicatorOutputReadouts';
 import type { DirtyFlags } from '../rendering/RenderScheduler';
 import type { ChartSettingsControlContext } from '../settings/chartSettingsControls';
 import type { ChartStore, PlotStyleOverride } from '../state/chartState';
@@ -65,6 +66,7 @@ import {
   WEB_CHART_CHROME_METRICS,
 } from '../layout/chartGeometry';
 import { getChartStore } from '../state/chartState';
+import { getIndicatorOutputReadouts, resolveIndicatorReadoutSourceIndex } from '../rendering/indicatorOutputReadouts';
 import { DEFAULT_MARGINS, TIME_AXIS_HEIGHT } from '../types';
 import { ChartCore } from './ChartCore';
 import { ChartLegend } from './ChartLegend';
@@ -73,6 +75,7 @@ import { ChartTopBar } from './ChartTopBar';
 import { applyChromeThemeVars } from './chromeTheme';
 import { div, icons, span } from './dom';
 import { IndicatorPaneLegend } from './IndicatorPaneLegend';
+import { IndicatorDataWindow } from './IndicatorOutputReadouts';
 import { IndicatorSettingsModal } from './IndicatorSettingsModal';
 import type { IndicatorCategory } from '../indicators/builtinIndicators';
 
@@ -118,6 +121,8 @@ export interface TealchartWidgetUIOptions {
   interval: ResolutionString;
   /** Show top bar */
   showTopBar?: boolean;
+  /** Enable the expandable indicator Data Window (default: false). */
+  showDataWindow?: boolean;
   /** Render options */
   renderOptions?: Partial<RenderOptions>;
   /** Callback when interval changes */
@@ -141,6 +146,7 @@ export interface TealchartWidgetUIOptions {
   onRemoveIndicator?: (indicatorId: string) => void;
   /** Get study input definitions */
   getStudyInputDefinitions?: (studyId: string) => InputDefinition[];
+  getStudySourceOptions?: (studyId: string) => { value: string; label: string }[];
   /** Callback when indicator settings are saved */
   onSaveIndicatorSettings?: (
     indicatorId: string,
@@ -306,6 +312,10 @@ export class TealchartWidgetUI {
   private chartCore: ChartCore | null = null;
   private topBar: ChartTopBar | null = null;
   private legend: ChartLegend | null = null;
+  private dataWindow: IndicatorDataWindow | null = null;
+  private indicatorReadouts: readonly IndicatorOutputReadout[] = [];
+  private readoutTime: number | undefined;
+  private readoutSourceIndex: number | undefined;
   private indicatorsModal: IndicatorsModal | null = null;
   private settingsModal: IndicatorSettingsModal | null = null;
   private chartSettingsModal: ChartSettingsModal | null = null;
@@ -453,6 +463,10 @@ export class TealchartWidgetUI {
     });
     // Use mount() instead of getElement() to trigger onMount/render
     this.legend.mount(this.chartArea);
+    if (options.showDataWindow === true) {
+      this.dataWindow = new IndicatorDataWindow();
+      this.chartArea.appendChild(this.dataWindow.getElement());
+    }
 
     // Create loading dots indicator (shown when loading with no candles)
     // Appended to the legend so it appears below the OHLC/indicator info
@@ -588,6 +602,11 @@ export class TealchartWidgetUI {
       onMouseDown: this.options.onMouseDown,
       onMouseUp: this.options.onMouseUp,
       onCrossHairMoved: this.options.onCrossHairMoved,
+      onIndicatorReadoutTimeChange: (time) => {
+        this.readoutTime = time;
+        const index = resolveIndicatorReadoutSourceIndex(this.chartCore?.getBars() ?? [], time);
+        if (index !== this.readoutSourceIndex) this.refreshIndicatorReadouts();
+      },
       onUserDrawingInput: this.options.onUserDrawingInput,
       onUserDrawingSelection: this.options.onUserDrawingSelection,
       onUserDrawingEditStart: (point, spacesByPaneId, options) => {
@@ -654,6 +673,7 @@ export class TealchartWidgetUI {
       const previousBar = bars.length > 1 ? bars[bars.length - 2] : null;
       this.legend?.setBars(latestBar, previousBar);
     }
+    this.refreshIndicatorReadouts();
   }
 
   /**
@@ -674,6 +694,7 @@ export class TealchartWidgetUI {
   updateBar(bar: Bar, bars: Bar[]): void {
     const previousBar = bars.length > 1 ? bars[bars.length - 2] : null;
     this.legend?.setBars(bar, previousBar);
+    this.refreshIndicatorReadouts();
   }
 
   /**
@@ -710,6 +731,28 @@ export class TealchartWidgetUI {
   setPlots(plots: PlotOutput[]): void {
     this.currentPlots = plots; // Store for openIndicatorSettings
     this.chartCore?.setPlots(plots);
+    this.refreshIndicatorReadouts();
+  }
+
+  private refreshIndicatorReadouts(): void {
+    const bars = this.chartCore?.getBars() ?? [];
+    this.readoutSourceIndex = resolveIndicatorReadoutSourceIndex(bars, this.readoutTime);
+    const readouts = getIndicatorOutputReadouts({
+      plots: this.chartCore?.getPlots() ?? [], totalBarCount: bars.length, sourceIndex: this.readoutSourceIndex,
+      indicatorPaneInfo: this.currentIndicatorPaneInfo, pricePrecision: this.options.renderOptions?.pricePrecision,
+    });
+    if (readouts.length === this.indicatorReadouts.length && readouts.every((entry, index) => {
+      const previous = this.indicatorReadouts[index];
+      return entry.plotId === previous.plotId && entry.scriptId === previous.scriptId
+        && entry.title === previous.title && entry.color === previous.color
+        && entry.statusLine === previous.statusLine && entry.dataWindow === previous.dataWindow
+        && entry.values.length === previous.values.length
+        && entry.values.every((value, valueIndex) => value === previous.values[valueIndex]);
+    })) return;
+    this.indicatorReadouts = readouts;
+    this.legend?.setPlotReadouts(this.indicatorReadouts);
+    for (const legend of this.indicatorPaneLegends.values()) legend.setPlotReadouts(this.indicatorReadouts);
+    this.dataWindow?.setReadouts(this.indicatorReadouts);
   }
 
   /**
@@ -956,6 +999,7 @@ export class TealchartWidgetUI {
 
     // Update indicator pane legends (non-overlay indicators)
     this.updateIndicatorPaneLegends();
+    this.refreshIndicatorReadouts();
   }
 
   setAvailableIndicators(indicators: BuiltinIndicator[]): void {
@@ -1054,6 +1098,7 @@ export class TealchartWidgetUI {
     applyChromeThemeVars(this.rootEl, this.options.renderOptions);
     this.topBar?.setRenderOptions(this.options.renderOptions);
     this.chartCore?.setRenderOptions(options);
+    this.refreshIndicatorReadouts();
   }
 
   /**
@@ -1091,6 +1136,7 @@ export class TealchartWidgetUI {
       (inputs, styleOverrides) => {
         this.options.onSaveIndicatorSettings?.(indicatorId, inputs, styleOverrides);
       },
+      this.options.getStudySourceOptions?.(indicatorId) ?? [],
     );
   }
 
@@ -1191,6 +1237,7 @@ export class TealchartWidgetUI {
 
       // Update indicators
       legend.setIndicators(paneIndicators, paneInfo);
+      legend.setPlotReadouts(this.indicatorReadouts);
 
       currentTop += paneHeight;
     }
@@ -1223,6 +1270,7 @@ export class TealchartWidgetUI {
     this.chartCore?.dispose(preserveDom);
     this.topBar?.unmount();
     this.legend?.unmount();
+    this.dataWindow?.getElement().remove();
     // Clean up indicator pane legends
     for (const legend of this.indicatorPaneLegends.values()) {
       legend.unmount();

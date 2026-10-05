@@ -1,3 +1,4 @@
+import type { IndicatorOutputReadout } from '../rendering/indicatorOutputReadouts';
 import type { PlotStyleOverride } from '../state/chartState';
 import type { Bar, ResolutionString } from '../types';
 import type { ComponentOptions } from './Component';
@@ -15,6 +16,7 @@ import { safeToFixed } from '../utils/safeNumber';
 import { formatPriceByMagnitude } from '../utils/priceFormatters';
 import { Component } from './Component';
 import { button, div, icons, span } from './dom';
+import { createIndicatorStatusValues, updateIndicatorStatusValues } from './IndicatorOutputReadouts';
 
 /**
  * ChartLegend - Vanilla DOM legend overlay
@@ -266,6 +268,8 @@ export class ChartLegend extends Component<ChartLegendState> {
   // Track last indicator signature to avoid unnecessary rebuilds
   private lastIndicatorSignature: string = '';
 
+  private plotReadouts: readonly IndicatorOutputReadout[] = [];
+
   constructor(options: ChartLegendOptions) {
     super('div', {
       latestBar: null,
@@ -363,6 +367,13 @@ export class ChartLegend extends Component<ChartLegendState> {
     }
   }
 
+  setPlotReadouts(readouts: readonly IndicatorOutputReadout[]): void {
+    this.plotReadouts = readouts;
+    for (const container of this.el.querySelectorAll<HTMLElement>('[data-indicator-values]')) {
+      updateIndicatorStatusValues(container, container.getAttribute('data-indicator-values')!, readouts);
+    }
+  }
+
   setIndicators(indicators: ActiveIndicator[], paneInfo: Record<string, IndicatorPaneInfo>): void {
     // Compute signature to detect actual changes (avoid unnecessary re-renders)
     const overlayIndicators = indicators.filter((ind) => {
@@ -371,11 +382,12 @@ export class ChartLegend extends Component<ChartLegendState> {
     });
     const signature = overlayIndicators.map((i) => `${i.id}:${i.name}:${i.isVisible}`).join('|');
 
+    this.state.activeIndicators = indicators;
+    this.state.indicatorPaneInfo = paneInfo;
+
     // Only update if indicators actually changed
     if (signature !== this.lastIndicatorSignature) {
       this.lastIndicatorSignature = signature;
-      this.state.activeIndicators = indicators;
-      this.state.indicatorPaneInfo = paneInfo;
       this.updateIndicatorList(overlayIndicators);
     }
   }
@@ -640,6 +652,8 @@ export class ChartLegend extends Component<ChartLegendState> {
       }
       row.appendChild(inputsDiv);
     }
+
+    row.appendChild(createIndicatorStatusValues(indicator.id, this.plotReadouts));
 
     // Action buttons (initially hidden)
     const actions = div({

@@ -142,6 +142,14 @@ describe('indicator output axis labels', () => {
     expect(formatIndicatorOutputAxisValue(1 / 3, 1, 16)).toBe('0.3333333333333333');
   });
 
+  it('shifts by loaded bar indexes across gaps and extrapolates only outside history', () => {
+    const bars = [{ time: 0 }, { time: 1000 }, { time: 10000 }, { time: 11000 }];
+    expect(resolveIndicatorOutputSourceTime({ bars, plotOffset: 1, sourceIndex: 1 })).toBe(10000);
+    expect(resolveIndicatorOutputSourceTime({ bars, plotOffset: -1, sourceIndex: 2 })).toBe(1000);
+    expect(resolveIndicatorOutputSourceTime({ bars, plotOffset: 1, sourceIndex: 3 })).toBe(12000);
+    expect(resolveIndicatorOutputSourceTime({ bars, plotOffset: -1, sourceIndex: 0 })).toBe(-1000);
+  });
+
   it('resolves source time with plot offset applied', () => {
     const bars = [{ time: 0 }, { time: 60_000 }, { time: 120_000 }];
 

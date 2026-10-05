@@ -23,6 +23,7 @@ vi.mock('./NativeChartPrimitiveLayer', () => stubLayer('NativeChartPrimitiveLaye
 vi.mock('./NativeIndicatorPaneAxisLayer', () => stubLayer('NativeIndicatorPaneAxisLayer'));
 vi.mock('./NativeCandleVolumeLayer', () => stubLayer('NativeCandleVolumeLayer'));
 vi.mock('./NativeIndicatorPlotLayer', () => stubLayer('NativeIndicatorPlotLayer'));
+vi.mock('./NativeTealScriptDrawingLayer', () => stubLayer('NativeTealScriptDrawingLayer'));
 vi.mock('./NativeUserDrawingLayer', () => stubLayer('NativeUserDrawingLayer'));
 vi.mock('./NativeChartTradeLinesLayer', () => stubLayer('NativeChartTradeLinesLayer'));
 vi.mock('./NativeCrosshairLayer', () => stubLayer('NativeCrosshairLayer'));
@@ -78,6 +79,17 @@ const props = {
 describe('NativeChartCanvasLayers memoisation', () => {
   beforeEach(() => {
     layerRenders.mockClear();
+  });
+
+  it('does not mount an empty drawing worklet and removes it when drawings disappear', () => {
+    const { rerender } = render(<NativeChartCanvasLayers {...props} indicatorDrawings={[]} />);
+    expect(layerRenders.mock.calls.filter(([name]) => name === 'NativeTealScriptDrawingLayer')).toHaveLength(0);
+    const drawings = [{ type: 'line', id: 'line-1' }] as NativeChartCanvasLayersProps['indicatorDrawings'];
+    rerender(<NativeChartCanvasLayers {...props} indicatorDrawings={drawings} />);
+    expect(layerRenders.mock.calls.filter(([name]) => name === 'NativeTealScriptDrawingLayer')).toHaveLength(1);
+    layerRenders.mockClear();
+    rerender(<NativeChartCanvasLayers {...props} indicatorDrawings={[]} />);
+    expect(layerRenders.mock.calls.filter(([name]) => name === 'NativeTealScriptDrawingLayer')).toHaveLength(0);
   });
 
   it('leaves the Skia subtree alone when the chart re-renders with the same props', () => {

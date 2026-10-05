@@ -38,7 +38,16 @@ const auditedMemberValueNames = [...new Set([
 
 describe('compiled builtin member value emission', () => {
   it('does not emit bare builtin namespace object reads for official value members', () => {
-    expect(auditedMemberValueNames).toHaveLength(358);
+    expect(auditedMemberValueNames).toHaveLength(371);
+    expect(auditedMemberValueNames).toEqual(expect.arrayContaining([
+      'dividends.future_amount',
+      'dividends.future_ex_date',
+      'dividends.future_pay_date',
+      'earnings.future_eps',
+      'earnings.future_period_end_time',
+      'earnings.future_revenue',
+      'earnings.future_time',
+    ]));
 
     const failures: string[] = [];
     for (const name of auditedMemberValueNames) {

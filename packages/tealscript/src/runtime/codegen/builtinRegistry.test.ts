@@ -40,6 +40,8 @@ const DRAWING_ALL_REGISTRY_VALUES = new Set([
   'table.all',
 ]);
 
+const INTERNAL_RUNTIME_HELPERS = new Set(['__resolveTableReference']);
+
 describe('compiled builtin registry coverage', () => {
   it('keeps runtime registry entries aligned with semantic names, constants, and official runtime names', () => {
     const registryNames = compiledBuiltinRegistryNamesForCoverage();
@@ -50,6 +52,7 @@ describe('compiled builtin registry coverage', () => {
       !signatureNames.has(name)
       && !EXPORTABLE_BUILTIN_CONSTANTS.has(name)
       && !DRAWING_ALL_REGISTRY_VALUES.has(name)
+      && !INTERNAL_RUNTIME_HELPERS.has(name)
       && !officialNames.has(name)
     ));
 

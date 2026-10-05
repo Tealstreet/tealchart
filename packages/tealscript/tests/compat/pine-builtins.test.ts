@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { compatibilityBars, getPlot, roundSeries, runCompatScript } from './fixtures';
 
+// EMA-derived baselines follow TV-native CF040 / v2 SMA startup and missing masks.
 describe('Pine compatibility golden harness', () => {
   it('runs ta.barssince and ta.valuewhen helpers', () => {
     const result = runCompatScript(`
@@ -313,12 +314,12 @@ plot(ta.rsi(source=close, 3), title="RSI")
     expect(mixedRsi.errors).toEqual([]);
     expect(roundSeries(getPlot(result, 'Stoch Close').values)).toEqual([null, null, 88.888889, 25, 9.090909, 30.769231, 88.888889, 92.857143, 75, 88.888889, 50, 71.428571]);
     expect(roundSeries(getPlot(result, 'Stoch HL2').values)).toEqual([null, null, 77.777778, 56.25, 27.272727, 19.230769, 66.666667, 75, 79.166667, 72.222222, 68.75, 50]);
-    expect(roundSeries(getPlot(result, 'MFI').values)).toEqual([null, null, null, 61.624951, 26.076294, 0, 35.319543, 74.59367, 100, 100, 100, 100]);
+    expect(roundSeries(getPlot(result, 'MFI').values)).toEqual([null, null, 75.450214, 61.624951, 26.076294, 0.0, 35.319543, 74.59367, 100.0, 100.0, 100.0, 100.0]);
     expect(roundSeries(getPlot(result, 'WPR').values)).toEqual([null, null, -11.111111, -75, -90.909091, -69.230769, -11.111111, -7.142857, -25, -11.111111, -50, -28.571429]);
     expect(roundSeries(getPlot(result, 'CMO').values)).toEqual([null, null, null, 11.111111, -60, -77.777778, 11.111111, 100, 80, 77.777778, 20, 66.666667]);
     expect(roundSeries(getPlot(result, 'RSI').values)).toEqual([null, null, null, 55.555556, 33.333333, 42.028986, 67.479675, 82.162765, 72.361316, 82.015652, 69.821198, 79.13023]);
-    expect(roundSeries(getPlot(result, 'TSI').values)).toEqual([null, 1, 1, 0.127273, -0.423181, -0.350948, 0.263311, 0.667454, 0.546809, 0.68082, 0.455692, 0.582409]);
-    expect(roundSeries(getPlot(result, 'Derived TSI').values)).toEqual([null, 1, 0.333333, -0.708333, -0.792793, 0.212408, 0.577159, 0.708576, -0.246146, 0.084836, -0.231693, 0.049573]);
+    expect(roundSeries(getPlot(result, 'TSI').values)).toEqual([null, null, null, null, -0.230769, -0.204301, 0.345912, 0.705563, 0.571189, 0.694111, 0.463963, 0.587054]);
+    expect(roundSeries(getPlot(result, 'Derived TSI').values)).toEqual([null, null, null, null, -0.75, 0.3, 0.652174, 0.770642, -0.234229, 0.092568, -0.228738, 0.051687]);
     expect(roundSeries(getPlot(result, 'Close CCI').values)).toEqual([null, null, 87.5, -100, -100, -28.571429, 100, 100, 33.333333, 100, 20, 100]);
     expect(roundSeries(getPlot(result, 'Typical CCI').values)).toEqual([null, null, 95.652174, -25, -100, -70, 100, 100, 64.516129, 100, 84.615385, 50]);
     expect(roundSeries(getPlot(result, 'Named Stoch Close').values)).toEqual(roundSeries(getPlot(result, 'Stoch Close').values));
@@ -534,10 +535,10 @@ plot(math.abs(ta.accdist - adExpected) < 0.000001, title="AD")
 plot(math.abs(ta.iii - iiiExpected) < 0.000001, title="III")
 plot(math.abs(ta.nvi - expectedNvi) < 0.000001, title="NVI")
 plot(math.abs(ta.pvi - expectedPvi) < 0.000001, title="PVI")
-plot(math.abs(ta.pvt - pvtExpected) < 0.000001, title="PVT")
+plot(bar_index == 0 ? na(ta.pvt) : math.abs(ta.pvt - pvtExpected) < 0.000001, title="PVT")
 plot(math.abs(ta.wad - wadExpected) < 0.000001, title="WAD")
 plot(math.abs(ta.wvad - wvadExpected) < 0.000001, title="WVAD")
-plot(bar_index == 0 ? na(ta.pvt[1]) : math.abs(ta.pvt[1] - pvtExpected[1]) < 0.000001, title="PVT History")
+plot(bar_index < 2 ? na(ta.pvt[1]) : math.abs(ta.pvt[1] - pvtExpected[1]) < 0.000001, title="PVT History")
 `);
 
     expect(result.errors).toEqual([]);
@@ -579,13 +580,22 @@ plot(ta.bbw(series=close, 3, 2.0), title="Mixed BB Width")
 `);
 
     expect(result.errors).toEqual([]);
-    expect(roundSeries(getPlot(result, 'KC Basis').values)).toEqual([102, 103.5, 105.25, 104.125, 101.5625, 100.78125, 102.390625, 105.695313, 106.847656, 108.923828, 109.461914, 110.730957]);
-    expect(roundSeries(getPlot(result, 'KC Upper').values)).toEqual([107, 109.125, 110.5625, 111.15625, 108.828125, 107.539063, 109.519531, 113.634766, 113.942383, 115.596191, 115.923096, 117.086548]);
-    expect(roundSeries(getPlot(result, 'KC Lower').values)).toEqual([97, 97.875, 99.9375, 97.09375, 94.296875, 94.023438, 95.261719, 97.755859, 99.75293, 102.251465, 103.000732, 104.375366]);
-    expect(roundSeries(getPlot(result, 'KC Width').values)).toEqual([0.098039, 0.108696, 0.10095, 0.135054, 0.143077, 0.134109, 0.139249, 0.150233, 0.132801, 0.122514, 0.118054, 0.114793]);
-    expect(roundSeries(getPlot(result, 'HL Upper').values)).toEqual(roundSeries(getPlot(result, 'KC Upper').values));
-    expect(roundSeries(getPlot(result, 'HL Width').values)).toEqual(roundSeries(getPlot(result, 'KC Width').values));
-    expect(roundSeries(getPlot(result, 'BB Width').values)).toEqual([null, null, 0.078528, 0.062209, 0.126834, 0.067537, 0.085554, 0.141155, 0.080757, 0.04563, 0.045491, 0.029423]);
+    expect(roundSeries(getPlot(result, 'KC Basis').values)).toEqual([
+      null, null, 104.666667, 103.833333, 101.416667, 100.708333,
+      102.354167, 105.677083, 106.838542, 108.919271, 109.459635, 110.729818,
+    ]);
+    expect(roundSeries(getPlot(result, 'KC Upper').values)).toEqual([null, null, null, 110.5, 108.5, 107.375, 109.4375, 113.59375, 113.921875, 115.585938, 115.917969, 117.083984]);
+    expect(roundSeries(getPlot(result, 'KC Lower').values)).toEqual([
+      null, null, null, 97.166667, 94.333333, 94.041667,
+      95.270833, 97.760417, 99.755208, 102.252604, 103.001302, 104.375651,
+    ]);
+    expect(roundSeries(getPlot(result, 'KC Width').values)).toEqual([null, null, null, 0.128411, 0.139688, 0.132396, 0.138408, 0.149828, 0.132599, 0.122415, 0.118004, 0.114769]);
+    expect(roundSeries(getPlot(result, 'HL Upper').values)).toEqual([
+      null, null, 110.083333, 110.916667, 108.708333, 107.479167,
+      109.489583, 113.619792, 113.934896, 115.592448, 115.921224, 117.085612,
+    ]);
+    expect(roundSeries(getPlot(result, 'HL Width').values)).toEqual([null, null, 0.103503, 0.136437, 0.143796, 0.134464, 0.139426, 0.15032, 0.132843, 0.122534, 0.118063, 0.114798]);
+    expect(roundSeries(getPlot(result, 'BB Width').values)).toEqual([null, null, 7.852757, 6.220926, 12.683442, 6.753668, 8.555433, 14.115477, 8.075689, 4.562997, 4.549128, 2.94233]);
     expect(roundSeries(getPlot(result, 'Named KC Basis').values)).toEqual(roundSeries(getPlot(result, 'KC Basis').values));
     expect(roundSeries(getPlot(result, 'Named KC Upper').values)).toEqual(roundSeries(getPlot(result, 'KC Upper').values));
     expect(roundSeries(getPlot(result, 'Named KC Lower').values)).toEqual(roundSeries(getPlot(result, 'KC Lower').values));
@@ -646,20 +656,7 @@ plot(ta.pivotlow(source=spread, 1, 1), title="Mixed Spread Pivot Low")
       null,
       null,
     ]);
-    expect(roundSeries(getPlot(result, 'Spread Pivot Low').values)).toEqual([
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      -1,
-      null,
-      -1,
-    ]);
+    expect(roundSeries(getPlot(result, 'Spread Pivot Low').values)).toEqual([null, null, null, null, null, -4.0, null, null, null, -1.0, null, -1.0]);
     expect(roundSeries(getPlot(result, 'Named Spread Pivot High').values)).toEqual(roundSeries(getPlot(result, 'Spread Pivot High').values));
     expect(roundSeries(getPlot(result, 'Named Spread Pivot Low').values)).toEqual(roundSeries(getPlot(result, 'Spread Pivot Low').values));
     expect(roundSeries(getPlot(result, 'Mixed Spread Pivot High').values)).toEqual(roundSeries(getPlot(result, 'Spread Pivot High').values));
@@ -783,12 +780,15 @@ plot(histLine, title="Hist")
     for (const title of mixed.plots.map((plot) => plot.title)) {
       expect(roundSeries(getPlot(mixed, title).values)).toEqual(roundSeries(getPlot(positional, title).values));
     }
-    expect(roundSeries(getPlot(positional, 'Supertrend').values)).toEqual([null, null, 114.666667, 114.666667, 111.962963, 109.141975, 109.141975, 109.141975, 109.141975, 98.583067, 100.888711, 100.888711]);
-    expect(getPlot(positional, 'Supertrend Direction').values).toEqual([null, null, 1, 1, 1, 1, 1, 1, 1, -1, -1, -1]);
-    expect(roundSeries(getPlot(positional, 'MACD').values)).toEqual([0, 0.642857, 1.209184, 0.38156, -0.825672, -0.924587, 0.029313, 1.437232, 1.520456, 1.975828, 1.641914, 1.716671]);
-    expect(roundSeries(getPlot(positional, 'Signal').values)).toEqual([0, 0.428571, 0.94898, 0.5707, -0.360214, -0.736463, -0.225946, 0.88284, 1.307917, 1.753191, 1.679006, 1.704116]);
-    expect(roundSeries(getPlot(positional, 'Hist').values)).toEqual([0, 0.214286, 0.260204, -0.18914, -0.465457, -0.188124, 0.255259, 0.554393, 0.212539, 0.222637, -0.037092, 0.012555]);
-    expect(getPlot(positional, 'OBV').values).toEqual([0, 1100, 2000, 750, -650, 400, 1700, 3300, 2100, 3600, 2250, 3700]);
+    expect(roundSeries(getPlot(positional, 'Supertrend').values)).toEqual([
+      0, null, 114.666667, 114.666667, 111.962963, 109.141975,
+      109.141975, 109.141975, 109.141975, 98.583067, 100.888711, 100.888711,
+    ]);
+    expect(getPlot(positional, 'Supertrend Direction').values).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, -1, -1, -1]);
+    expect(roundSeries(getPlot(positional, 'MACD').values)).toEqual([null, null, null, null, null, -1.958333, -0.693452, 0.928784, 1.161185, 1.721159, 1.460984, 1.587924]);
+    expect(roundSeries(getPlot(positional, 'Signal').values)).toEqual([null, null, null, null, null, null, -1.325893, 0.177225, 0.833198, 1.425172, 1.449047, 1.541631]);
+    expect(roundSeries(getPlot(positional, 'Hist').values)).toEqual([null, null, null, null, null, null, 0.63244, 0.751559, 0.327987, 0.295987, 0.011937, 0.046292]);
+    expect(getPlot(positional, 'OBV').values).toEqual([null, 1100.0, 2000.0, 750.0, -650.0, 400.0, 1700.0, 3300.0, 2100.0, 3600.0, 2250.0, 3700.0]);
     expect(getPlot(positional, 'Legacy OBV').values).toEqual(getPlot(positional, 'OBV').values);
     expect(getPlot(positional, 'Mixed Legacy OBV').values).toEqual(getPlot(positional, 'OBV').values);
     expect(getPlot(positional, 'TR Function').values).toEqual([4, 5, 4, 7, 6, 5, 6, 7, 5, 5, 5, 5]);
@@ -797,17 +797,18 @@ plot(histLine, title="Hist")
       null,
       null,
       null,
-      31.914894,
-      20.27027,
-      13.921114,
-      32.937685,
-      47.828065,
-      39.673607,
-      33.666546,
-      35.656079,
-      24.236113,
+      31.25,
+      20,
+      13.793103,
+      32.743363,
+      47.654657,
+      39.571807,
+      33.606489,
+      35.612429,
+      24.215938,
     ]);
-    expect(roundSeries(getPlot(named, 'SAR').values)).toEqual([103, 99, 99, 99.36, 109, 109, 108.48, 96, 96.28, 96.8688, 97.776672, 99.074538]);
+    // Authority: ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json fun_ta.sar; native lb679c7143bdd54e, coverage-ta-3-v1.csv bar0.
+    expect(roundSeries(getPlot(named, 'SAR').values)).toEqual([null, 99, 99, 99.36, 109, 109, 108.48, 96, 96.28, 96.8688, 97.776672, 99.074538]);
     expect(roundSeries(getPlot(named, 'Pivot High').values)).toEqual([
       null,
       null,
@@ -884,7 +885,7 @@ plot(namedSar, title="Named SAR")
 `);
 
     expect(result.errors).toEqual([]);
-    expect(getPlot(result, 'Open OBV').values).toEqual([0, 1100, 2000, 3250, 1850, 800, 2100, 3700, 4900, 3400, 4750, 3300]);
+    expect(getPlot(result, 'Open OBV').values).toEqual([null, 1100.0, 2000.0, 3250.0, 1850.0, 800.0, 2100.0, 3700.0, 4900.0, 3400.0, 4750.0, 3300.0]);
     expect(roundSeries(getPlot(result, 'Second ATR').values)).toEqual(roundSeries(getPlot(result, 'First ATR').values));
     expect(roundSeries(getPlot(result, 'Named ATR').values)).toEqual(roundSeries(getPlot(result, 'First ATR').values));
     expect(roundSeries(getPlot(result, 'Second Supertrend').values)).toEqual(roundSeries(getPlot(result, 'First Supertrend').values));
@@ -908,7 +909,7 @@ upMove = high - high[1]
 downMove = low[1] - low
 plusDm = na(upMove) ? na : upMove > downMove and upMove > 0 ? upMove : 0
 minusDm = na(downMove) ? na : downMove > upMove and downMove > 0 ? downMove : 0
-smoothTr = ta.rma(ta.tr(true), 3)
+smoothTr = ta.rma(ta.tr, 3)
 manualPlus = 100 * ta.rma(plusDm, 3) / smoothTr
 manualMinus = 100 * ta.rma(minusDm, 3) / smoothTr
 manualSum = manualPlus + manualMinus
@@ -1497,7 +1498,7 @@ plot(level, title="Level")
   it('registers Pine source input metadata', () => {
     const result = runCompatScript(`
 indicator("Source input")
-source = input.source(close, "Source", "Select source", "src", "Data", true, display.data_window, true)
+source = input.source(defval=close, title="Source", tooltip="Select source", inline="src", group="Data", confirm=true, display=display.data_window, active=true)
 plot(source, title="Source")
 `);
 
@@ -1710,7 +1711,7 @@ plot(rgbKey(color.yellow), title="Yellow")
     };
     expectConstant('Aqua', 48340);
     expectConstant('Black', 3553861);
-    expectConstant('Blue', 2201331);
+    expectConstant('Blue', 2712319);
     expectConstant('Fuchsia', 14696699);
     expectConstant('Gray', 7895942);
     expectConstant('Green', 5025616);
@@ -1803,8 +1804,9 @@ plot(breakdown, title="Breakdown")
 `);
 
     expect(result.errors).toEqual([]);
-    expect(getPlot(result, 'Breakout').values).toEqual([false, false, true, false, false, false, true, true, false, true, false, true]);
-    expect(getPlot(result, 'Breakdown').values).toEqual([false, false, false, true, true, false, false, false, false, false, false, false]);
+    // Native na-holes-crosses-v1.csv lines 8/12 reject the old window rule; 47d5986d18.
+    expect(getPlot(result, 'Breakout').values).toEqual([false, false, true, false, false, false, true, true, false, false, false, false]);
+    expect(getPlot(result, 'Breakdown').values).toEqual([false, false, false, false, true, false, false, false, false, false, false, false]);
   });
 
   it('matches common Pine statistical helper idioms', () => {
@@ -1832,8 +1834,10 @@ plot(ta.percentrank(source=close, length), title="Mixed Percent Rank")
     expect(getPlot(result, 'Median').values).toEqual([null, null, 105, 105, 103, 100, 100, 104, 108, 109, 110, 111]);
     expect(getPlot(result, 'Mode').values).toEqual([null, null, 102, 103, 99, 99, 99, 100, 104, 108, 108, 110]);
     expect(getPlot(result, 'Nearest').values).toEqual([null, null, 107, 107, 107, 103, 104, 109, 109, 111, 111, 112]);
-    expect(getPlot(result, 'Linear').values).toEqual([null, null, 106, 106, 105, 101.5, 102, 106.5, 108.5, 110, 110.5, 111.5]);
-    expect(roundSeries(getPlot(result, 'Percent Rank').values)).toEqual([null, null, 100, 33.333333, 33.333333, 66.666667, 100, 100, 66.666667, 100, 66.666667, 100]);
+    // Native linear_clean_builtin / 18ace021d3: sorted position 0.75*3-0.5 = 1.75.
+    expect(getPlot(result, 'Linear').values).toEqual([null, null, 106.5, 106.5, 106, 102.25, 103, 107.75, 108.75, 110.5, 110.75, 111.75]);
+    // Native rank_clean_builtin / 18ace021d3: compare with the preceding three bars.
+    expect(roundSeries(getPlot(result, 'Percent Rank').values)).toEqual([null, null, null, 33.333333, 0, 33.333333, 100, 100, 66.666667, 100, 66.666667, 100]);
     expect(getPlot(result, 'Named Median').values).toEqual(getPlot(result, 'Median').values);
     expect(getPlot(result, 'Mixed Median').values).toEqual(getPlot(result, 'Median').values);
     expect(getPlot(result, 'Named Mode').values).toEqual(getPlot(result, 'Mode').values);
@@ -1901,9 +1905,10 @@ plot(ta.falling(source=close, 2), title="Mixed Falling")
     expect(getPlot(result, 'Mixed Default Lowest Offset').values).toEqual([null, null, -2, -2, 0, 0, -1, -2, -2, -2, -2, -2]);
     expect(getPlot(result, 'Default Highest Offset').values).toEqual(getPlot(result, 'Mixed Default Highest Offset').values);
     expect(getPlot(result, 'Default Lowest Offset').values).toEqual(getPlot(result, 'Mixed Default Lowest Offset').values);
-    expect(getPlot(result, 'Named Rising').values).toEqual([false, false, true, false, false, false, true, true, false, true, false, true]);
+    // Same captured adjacent-direction rule as the positional witness above; 47d5986d18.
+    expect(getPlot(result, 'Named Rising').values).toEqual([false, false, true, false, false, false, true, true, false, false, false, false]);
     expect(getPlot(result, 'Mixed Rising').values).toEqual(getPlot(result, 'Named Rising').values);
-    expect(getPlot(result, 'Named Falling').values).toEqual([false, false, false, true, true, false, false, false, false, false, false, false]);
+    expect(getPlot(result, 'Named Falling').values).toEqual([false, false, false, false, true, false, false, false, false, false, false, false]);
     expect(getPlot(result, 'Mixed Falling').values).toEqual(getPlot(result, 'Named Falling').values);
   });
 
@@ -1939,7 +1944,10 @@ plot(ta.roc(source=spread, 2), title="Mixed Spread ROC")
 
     expect(result.errors).toEqual([]);
     expect(roundSeries(getPlot(result, 'Spread SMA').values)).toEqual([null, null, 2.333333, 0.333333, -2, -2.333333, 0.333333, 3.333333, 2.666667, 2.333333, 0.333333, 1.333333]);
-    expect(roundSeries(getPlot(result, 'Spread EMA').values)).toEqual([2, 2.5, 2.25, -0.875, -2.4375, -0.71875, 1.640625, 3.320313, 1.160156, 2.080078, 0.540039, 1.27002]);
+    expect(roundSeries(getPlot(result, 'Spread EMA').values)).toEqual([
+      null, null, 2.333333, -0.833333, -2.416667, -0.708333,
+      1.645833, 3.322917, 1.161458, 2.080729, 0.540365, 1.270182,
+    ]);
     expect(roundSeries(getPlot(result, 'Mixed Spread EMA').values)).toEqual(roundSeries(getPlot(result, 'Spread EMA').values));
     expect(roundSeries(getPlot(result, 'Spread RMA').values)).toEqual([null, null, 2.333333, 0.222222, -1.185185, -0.45679, 1.028807, 2.352538, 1.235025, 1.82335, 0.882233, 1.254822]);
     expect(roundSeries(getPlot(result, 'Spread WMA').values)).toEqual([null, null, 2.333333, -0.833333, -3, -1.5, 1.666667, 4, 1.833333, 2, 0.333333, 1.166667]);
@@ -1963,7 +1971,7 @@ plot(ta.roc(source=spread, 2), title="Mixed Spread ROC")
     expect(roundSeries(getPlot(result, 'Mixed Spread ROC').values)).toEqual(roundSeries(getPlot(result, 'Spread ROC').values));
   });
 
-  it('preserves real bar offsets after TA offset helpers collect length non-na values', () => {
+  it('uses physical warmup slots and stops TA offset scans at a source hole', () => {
     const result = runCompatScript(`
 indicator("TA offset na smoke")
 source = bar_index == 1 ? na : close
@@ -1972,7 +1980,7 @@ plot(ta.lowestbars(source, 3), title="Lowest Offset")
 `);
 
     expect(result.errors).toEqual([]);
-    expect(getPlot(result, 'Highest Offset').values.slice(0, 5)).toEqual([null, null, null, -1, -2]);
-    expect(getPlot(result, 'Lowest Offset').values.slice(0, 5)).toEqual([null, null, null, -3, 0]);
+    expect(getPlot(result, 'Highest Offset').values.slice(0, 5)).toEqual([null, null, 0, -1, -2]);
+    expect(getPlot(result, 'Lowest Offset').values.slice(0, 5)).toEqual([null, null, 0, 0, 0]);
   });
 });

@@ -4,7 +4,8 @@ import { executeScript } from '../compiledOnly';
 import { compile, ARRAY_HELPERS, MAP_HELPERS, UDT_HELPERS, MATRIX_HELPERS } from './compile';
 import type { Bar } from '../context';
 import type { PineArray } from '../arrays';
-import { NumericSeries, ValueSeries } from './runtime';
+import { HistoryBufferSizing } from './history';
+import { divideV5ConstInts } from './runtime';
 import * as ta from './ta-classes';
 
 function makeBars(closes: number[]): Bar[] {
@@ -47,7 +48,7 @@ function runCompiledSimple(pine: string, bars: Bar[]): Map<number, (number | nul
     throw new Error(`Compilation failed: ${compiled.unsupported.join(', ')}`);
   }
 
-  const deps = { NumericSeries, ValueSeries, maxBarsBack: 500, _arr: ARRAY_HELPERS, _map: MAP_HELPERS, _udt: UDT_HELPERS, _mtx: MATRIX_HELPERS, ...ta };
+  const deps = { constIntDivide: divideV5ConstInts, ...new HistoryBufferSizing(500, 500).dependencies(500, () => false), maxBarsBack: 500, _arr: ARRAY_HELPERS, _map: MAP_HELPERS, _udt: UDT_HELPERS, _mtx: MATRIX_HELPERS, ...ta };
   const inst = new compiled.ScriptClass(deps);
   const plots = new Map<number, (number | null)[]>();
 
@@ -95,13 +96,18 @@ function runCompiledSimple(pine: string, bars: Bar[]): Map<number, (number | nul
       runtimeTimeValue() { return NaN; },
       sessionValue() { return NaN; },
       nextBuiltinCallId(name: string) { return `${name}_0`; },
+      readDrawingGetter() { return NaN; },
+      readLineY1() { return NaN; },
+      readLabelText() { return NaN; },
       callBuiltin() { return NaN; },
       callMethodBuiltin() { return NaN; },
+      hasMethodBuiltin() { return false; },
       colorNew() { return ''; }, colorRgb() { return ''; },
       colorR() { return 0; }, colorG() { return 0; },
       colorB() { return 0; }, colorT() { return 0; },
       colorFromGradient() { return ''; },
       mathCall() { return NaN; },
+      mathLog() { return NaN; },
       mathSum() { return 0; },
       strFormat(args: unknown[]) { return String(args[0]); },
       strFormatTime(args: unknown[]) { return String(args[0]); },
@@ -468,6 +474,7 @@ plot(htfClose)`;
     expect(site.taCallSites[0].className).toBe('SMA');
   });
 
+  // 79c316edec native history refusal keeps user history reads behind _historyOffset.
   it('classifies promoted root block shadow names as user history series', () => {
     const pine = `//@version=6
 indicator("promoted block shadow classification")
@@ -486,10 +493,10 @@ if true
     expect(compiled.analysis.seriesVars.has('n')).toBe(true);
     expect(compiled.analysis.seriesVars.has('close')).toBe(true);
     expect(compiled.analysis.barFieldSeriesVars.has('close')).toBe(false);
-    expect(compiled.generatedCode).toContain('this._sv_source.get(1)');
-    expect(compiled.generatedCode).toContain('this._sv_n.get(1)');
-    expect(compiled.generatedCode).toContain('this._sv_close.get(1)');
-    expect(compiled.generatedCode).not.toContain('this._s_close.get(1)');
+    expect(compiled.generatedCode).toContain('this._sv_source.get(_historyOffset(1))');
+    expect(compiled.generatedCode).toContain('this._sv_n.get(_historyOffset(1))');
+    expect(compiled.generatedCode).toContain('this._sv_close.get(_historyOffset(1))');
+    expect(compiled.generatedCode).not.toContain('this._s_close.get(_historyOffset(1))');
   });
 
   it('writes branch-local shadow declarations into their user history series', () => {
@@ -534,7 +541,7 @@ plot(value)`,
         const escapedMember = member.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
         expect(compiled.analysis.seriesVars.has(name), name).toBe(true);
-        expect(compiled.generatedCode, name).toContain(`this.${member}.get(1)`);
+        expect(compiled.generatedCode, name).toContain(`this.${member}.get(_historyOffset(1))`);
         expect(compiled.generatedCode, name).toMatch(new RegExp(`this\\.${escapedMember}\\.(push|update)\\(_l_${name}\\)`));
       }
     }
@@ -564,7 +571,7 @@ plot(${name}[1])`));
       expect(compiled.analysis.seriesVars.has(name), name).toBe(false);
       expect(compiled.generatedCode, name).toContain(`new deps.${className}()`);
       expect(compiled.generatedCode, name).toContain('.get(0)');
-      expect(compiled.generatedCode, name).toContain('.get(1)');
+      expect(compiled.generatedCode, name).toContain('.get(_historyOffset(1))');
       expect(compiled.generatedCode, name).not.toMatch(new RegExp(`[^._A-Za-z0-9]${name}[^A-Za-z0-9]`));
     }
   });
@@ -581,7 +588,8 @@ plot(mtf(close, "D"))`;
     expect(compiled.success).toBe(true);
     expect(compiled.analysis.securitySites.length).toBe(1);
     expect(compiled.analysis.securitySites[0].expressionSourceParam).toBe('source');
-    expect(compiled.securityScripts.size).toBe(0);
+    // Parameter expressions need their own requested-context history too.
+    expect(compiled.securityScripts.size).toBe(1);
 
     const computedPine = `//@version=6
 indicator("test")
@@ -645,7 +653,7 @@ plot(seedWrap(close))`;
     expect(compiled.success).toBe(true);
     expect(compiled.unsupported).toEqual([]);
     expect(compiled.analysis.securitySites.map((site) => site.expressionSourceParam)).toEqual(['source', 'source']);
-    expect(compiled.securityScripts.size).toBe(0);
+    expect(compiled.securityScripts.size).toBe(2);
   });
 
   it('compiles computed request subprograms for security, lower timeframe, and seed', () => {

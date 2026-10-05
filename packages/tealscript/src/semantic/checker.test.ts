@@ -20,7 +20,7 @@ import { checkSemanticTypeInvariants } from './semanticTypeInvariants';
 
 describe('semantic checker', () => {
   const boolNaV6Message = (subject: string): string =>
-    `${subject} because Pine v6 does not allow boolean na values. This was valid in Pine v3-v5 but is not valid in Pine v6. Use bool(na) for an explicitly nullable bool, or test a value with na(...).`;
+    `${subject} because Pine v6 does not allow boolean na values. This was valid in Pine v3-v5 but is not valid in Pine v6. Use true or false for a boolean state, or use another type for a nullable value and test it with na(...).`;
   const numericBoolV6Message = (kind: string): string =>
     `Numeric ${kind} expression cannot be used as a boolean in Pine v6. This was valid in Pine v3-v5 but is not valid in Pine v6. Compare it explicitly or wrap it in bool(...).`;
   const computedBarmergeMessage = (calleeName: string, parameterName: 'gaps' | 'lookahead'): string =>
@@ -373,10 +373,10 @@ plot(ta.allTimeHigh(close))`;
     }));
   });
 
-  it('resolves documented official TradingView ta v14 exports without widening older versions', () => {
+  it('resolves historical TradingView ta v4 exports without restoring removed v10 members', () => {
     const pine = `//@version=6
-indicator("Official ta v14")
-import TradingView/ta/14 as tvta
+indicator("Official ta v4")
+import TradingView/ta/4 as tvta
 plot(tvta.allTimeHigh(close))
 plot(tvta.allTimeLow(close))
 plot(tvta.trima2(close, 5))`;
@@ -476,7 +476,11 @@ line trend = line.new(bar_index, close, bar_index + 1, close)
 line.get_y1(trend)
 var table dashboard = table.new(position.top_right, 2, 2)
 table.clear(dashboard, 0, 0, 1, 1)
-choose(float value, bool upper) => upper ? [value, value + 1] : [value - 1, value]
+choose(float value, bool upper) =>
+    if upper
+        [value, value + 1]
+    else
+        [value - 1, value]
 [lower, upper] = choose(close, close > open)
 int bins = 10
 int index = math.floor(close)
@@ -903,7 +907,8 @@ badDateString = timestamp(1700000000000, 1, 5, 9, timezone="UTC")
       'timeframe.change timeframe must be a string, got int',
       'timeframe.in_seconds timeframe must be a string, got int',
       'timeframe.to_seconds timeframe must be a string, got bool',
-      'timeframe.from_seconds seconds must be a number, got string',
+      // Reference pine-v6-reference-v1.json functions203/204: seconds is int.
+      'timeframe.from_seconds seconds must be an integer, got string',
       'year timezone must be a string, got int',
       'year time must be a number, got string',
       'hour timezone must be a string, got int',
@@ -993,7 +998,7 @@ indicator("Boolean Guards")
 isGreen = close > open
 gap = close[100]
 if isGreen and not na(gap)
-    plot(bool(gap), title="Gap")
+    bool(gap)
 plot(na(gap) ? 0 : 1, title="Present")
 `));
 
@@ -1022,7 +1027,8 @@ plot(na <= gap ? 1 : 0)
     const result = checkProgram(parse(`
 indicator("NA Bool")
 if na
-    plot(close)
+    float value = close
+plot(close)
 while na
     break
 plot(na ? 1 : 0)
@@ -1039,7 +1045,7 @@ plot(na or close > open ? 1 : 0)
     ]);
   });
 
-  it('allows typed bool na initializers and rejects na reassignment', () => {
+  it('rejects typed bool na initializers and na reassignment in v6', () => {
     const result = checkProgram(parse(`
 indicator("NA Bool Assignments")
 bool converted = bool(na)
@@ -1050,6 +1056,7 @@ plot(converted ? 1 : 0)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      boolNaV6Message('Cannot assign na value to bool variable initialized'),
       boolNaV6Message('Cannot assign na value to bool variable reassigned'),
     ]);
   });
@@ -1058,7 +1065,7 @@ plot(converted ? 1 : 0)
     const result = checkProgram(parse(`
 indicator("Numeric Bool")
 if close
-    plot(close)
+    float value = close
 plot(volume ? 1 : 0)
 while bar_index
     break
@@ -1166,17 +1173,17 @@ plot(multiplier + secondsValue + legacySecondsValue + sessionOpen + sessionClose
       'Cannot assign string value to int variable sessionClose',
       'Cannot assign string value to int variable stamp',
     ]);
-    expect(types.get('period')).toMatchObject({ kind: 'string', qualifier: 'simple' });
-    expect(types.get('mainPeriod')).toMatchObject({ kind: 'string', qualifier: 'simple' });
-    expect(types.get('multiplier')).toMatchObject({ kind: 'int', qualifier: 'simple' });
-    expect(types.get('intraday')).toMatchObject({ kind: 'bool', qualifier: 'simple' });
-    expect(types.get('secondsValue')).toMatchObject({ kind: 'int', qualifier: 'simple' });
-    expect(types.get('legacySecondsValue')).toMatchObject({ kind: 'int', qualifier: 'simple' });
-    expect(types.get('rounded')).toMatchObject({ kind: 'string', qualifier: 'simple' });
+    expect(types.get('period')).toMatchObject({ kind: 'string', qualifier: 'series' });
+    expect(types.get('mainPeriod')).toMatchObject({ kind: 'string', qualifier: 'series' });
+    expect(types.get('multiplier')).toMatchObject({ kind: 'int', qualifier: 'series' });
+    expect(types.get('intraday')).toMatchObject({ kind: 'bool', qualifier: 'series' });
+    expect(types.get('secondsValue')).toMatchObject({ kind: 'int', qualifier: 'series' });
+    expect(types.get('legacySecondsValue')).toMatchObject({ kind: 'int', qualifier: 'series' });
+    expect(types.get('rounded')).toMatchObject({ kind: 'string', qualifier: 'series' });
     expect(types.get('changed')).toMatchObject({ kind: 'bool', qualifier: 'series' });
     expect(types.get('sessionOpen')).toMatchObject({ kind: 'int', qualifier: 'series' });
     expect(types.get('sessionClose')).toMatchObject({ kind: 'int', qualifier: 'series' });
-    expect(types.get('stamp')).toMatchObject({ kind: 'int', qualifier: 'simple' });
+    expect(types.get('stamp')).toMatchObject({ kind: 'int', qualifier: 'series' });
   });
 
   it('infers syminfo member return types for downstream diagnostics', () => {
@@ -1273,29 +1280,29 @@ plot(minMove + priceScale + employees + shareholders + expirationDate + recommen
       'Cannot assign string value to float variable targetLow',
       'Cannot assign string value to float variable targetMedian',
     ]);
-    expect(types.get('ticker')).toMatchObject({ kind: 'string', qualifier: 'simple' });
-    expect(types.get('tickerId')).toMatchObject({ kind: 'string', qualifier: 'simple' });
-    expect(types.get('root')).toMatchObject({ kind: 'string', qualifier: 'simple' });
-    expect(types.get('timezone')).toMatchObject({ kind: 'string', qualifier: 'simple' });
-    expect(types.get('currency')).toMatchObject({ kind: 'string', qualifier: 'simple' });
-    expect(types.get('volumeType')).toMatchObject({ kind: 'string', qualifier: 'simple' });
-    expect(types.get('country')).toMatchObject({ kind: 'string', qualifier: 'simple' });
-    expect(types.get('sector')).toMatchObject({ kind: 'string', qualifier: 'simple' });
-    expect(types.get('industry')).toMatchObject({ kind: 'string', qualifier: 'simple' });
-    expect(types.get('isin')).toMatchObject({ kind: 'string', qualifier: 'simple' });
-    expect(types.get('currentContract')).toMatchObject({ kind: 'string', qualifier: 'simple' });
-    expect(types.get('minMove')).toMatchObject({ kind: 'int', qualifier: 'simple' });
-    expect(types.get('priceScale')).toMatchObject({ kind: 'int', qualifier: 'simple' });
-    expect(types.get('employees')).toMatchObject({ kind: 'int', qualifier: 'simple' });
-    expect(types.get('shareholders')).toMatchObject({ kind: 'int', qualifier: 'simple' });
-    expect(types.get('expirationDate')).toMatchObject({ kind: 'int', qualifier: 'simple' });
+    expect(types.get('ticker')).toMatchObject({ kind: 'string', qualifier: 'series' });
+    expect(types.get('tickerId')).toMatchObject({ kind: 'string', qualifier: 'series' });
+    expect(types.get('root')).toMatchObject({ kind: 'string', qualifier: 'series' });
+    expect(types.get('timezone')).toMatchObject({ kind: 'string', qualifier: 'series' });
+    expect(types.get('currency')).toMatchObject({ kind: 'string', qualifier: 'series' });
+    expect(types.get('volumeType')).toMatchObject({ kind: 'string', qualifier: 'series' });
+    expect(types.get('country')).toMatchObject({ kind: 'string', qualifier: 'series' });
+    expect(types.get('sector')).toMatchObject({ kind: 'string', qualifier: 'series' });
+    expect(types.get('industry')).toMatchObject({ kind: 'string', qualifier: 'series' });
+    expect(types.get('isin')).toMatchObject({ kind: 'string', qualifier: 'series' });
+    expect(types.get('currentContract')).toMatchObject({ kind: 'string', qualifier: 'series' });
+    expect(types.get('minMove')).toMatchObject({ kind: 'int', qualifier: 'series' });
+    expect(types.get('priceScale')).toMatchObject({ kind: 'int', qualifier: 'series' });
+    expect(types.get('employees')).toMatchObject({ kind: 'int', qualifier: 'series' });
+    expect(types.get('shareholders')).toMatchObject({ kind: 'int', qualifier: 'series' });
+    expect(types.get('expirationDate')).toMatchObject({ kind: 'int', qualifier: 'series' });
     expect(types.get('recommendationsDate')).toMatchObject({ kind: 'int', qualifier: 'series' });
     expect(types.get('targetPriceDate')).toMatchObject({ kind: 'int', qualifier: 'series' });
-    expect(types.get('minTick')).toMatchObject({ kind: 'float', qualifier: 'simple' });
-    expect(types.get('pointValue')).toMatchObject({ kind: 'float', qualifier: 'simple' });
-    expect(types.get('minContract')).toMatchObject({ kind: 'float', qualifier: 'simple' });
-    expect(types.get('floatShares')).toMatchObject({ kind: 'float', qualifier: 'simple' });
-    expect(types.get('totalShares')).toMatchObject({ kind: 'float', qualifier: 'simple' });
+    expect(types.get('minTick')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('pointValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('minContract')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('floatShares')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('totalShares')).toMatchObject({ kind: 'float', qualifier: 'series' });
     expect(types.get('targetAverage')).toMatchObject({ kind: 'float', qualifier: 'series' });
     expect(types.get('targetEstimates')).toMatchObject({ kind: 'float', qualifier: 'series' });
     expect(types.get('targetHigh')).toMatchObject({ kind: 'float', qualifier: 'series' });
@@ -1383,24 +1390,24 @@ plot(close)
   it('accepts request footprint calls and reports normal argument diagnostics', () => {
     expect(checkProgram(parse(`
 indicator("Footprint")
-request.footprint(10, 70)
+request.footprint(10)
 plot(close)
 `)).diagnostics).toEqual([]);
 
     const result = checkProgram(parse(`
 indicator("Footprint Argument Error")
-request.footprint(syminfo.tickerid)
+request.footprint()
 plot(close)
 `));
 
     expect(result.diagnostics).toEqual([
       expect.objectContaining({
         code: 'argument-count',
-        message: 'request.footprint() expects at least 2 arguments',
+        message: 'request.footprint() expects at least 1 argument',
       }),
       expect.objectContaining({
         code: 'argument-count',
-        message: "request.footprint() missing required argument 'va_percent'",
+        message: "request.footprint() missing required argument 'ticks_per_row'",
       }),
     ]);
   });
@@ -1577,7 +1584,6 @@ max_bars_back(close, 10, 20)
       "Argument 'price' for hline() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
       "Unknown argument 'style' for hline()",
       "Argument 'hline1' for fill() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
-      'fill() expects at least 3 arguments',
       "fill() missing required argument 'plot2'",
       "Unknown argument 'caption' for plotshape()",
       'ta.sma() expects at least 2 arguments (source, length); got 1',
@@ -1612,11 +1618,11 @@ strategy("Invalid Strategy Drawing Limits", max_labels_count=-3)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
-      'indicator max_labels_count must be a non-negative integer',
-      'indicator max_lines_count must be a non-negative integer',
+      'indicator max_labels_count must be a non-negative integer no greater than 500',
+      'indicator max_lines_count must be a non-negative integer no greater than 500',
       'indicator max_boxes_count must be a non-negative integer',
       'indicator max_polylines_count must be a non-negative integer',
-      'strategy max_labels_count must be a non-negative integer',
+      'strategy max_labels_count must be a non-negative integer no greater than 500',
     ]);
   });
 
@@ -1763,9 +1769,11 @@ hline(200, "Bad Positional", color.red, hline.style_arrow)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'plot style requires a plot_style constant.',
       'Invalid plot style: zigzag',
       'Invalid plot linestyle: plot.linestyle_arrow',
       'Invalid plot style: plot.style_bad',
+      'hline linestyle requires a hline_style constant.',
       'Invalid hline linestyle: dashdot',
       'Invalid hline linestyle: hline.style_arrow',
     ]);
@@ -1827,7 +1835,7 @@ plotarrow(close - open, minheight=0, maxheight=1.5)
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
       'plot linewidth must be at least 1 in Pine v6. This was valid in Pine v3-v5 but is not valid in Pine v6.',
       'plot linewidth must be a positive integer',
-      'hline linewidth must be a positive integer',
+      'hline linewidth must be at least 1 in Pine v6. This was valid in Pine v3-v5 but is not valid in Pine v6.',
       'hline linewidth must be a positive integer',
       'plotarrow minheight must be a positive integer',
       'plotarrow maxheight must be a positive integer',
@@ -1907,7 +1915,8 @@ plot(filled ? 1 : 0)
     const result = checkProgram(parse(`//@version=${version}
 ${version <= 4 ? 'study' : 'indicator'}("Versioned Bare NA")
 if na
-    plot(close)
+    float value = close
+plot(close)
 `));
 
     const errors = result.diagnostics.filter((diagnostic) => diagnostic.severity === 'error');
@@ -1931,7 +1940,7 @@ plotcandle(open, high, low, close, color=color.yellow, wickcolor=color.gray, bor
 `));
 
     expect(result.diagnostics.filter((diagnostic) => diagnostic.severity === 'error')).toEqual([]);
-    expect(result.diagnostics.map((diagnostic) => diagnostic.code)).toEqual(Array(8).fill('legacy-argument'));
+    expect(result.diagnostics.map((diagnostic) => diagnostic.code)).toEqual(Array(9).fill('legacy-argument'));
   });
 
   it('accepts v5 deprecated visual transp arguments with info diagnostics', () => {
@@ -2163,7 +2172,7 @@ strategy.exit("Exit")
 indicator("Object Casts")
 var color transparent = color(na)
 var color base = color(#DBD07C)
-var color faded = color(color.red, 50)
+var color faded = color.new(color.red, 50)
 var box b = box(na)
 var label lb = label(na)
 var line ln = line(na)
@@ -2228,7 +2237,7 @@ strategy.entry("Long", true)
 indicator("V5 Numeric Bool")
 plot(close)
 if close - open
-    plot(open)
+    float value = open
 `));
 
     expect(result.diagnostics).toEqual([]);
@@ -2298,7 +2307,7 @@ plotarrow(series="spread", offset=false, minheight="5", maxheight=false, show_la
     ]);
   });
 
-  it('rejects legacy visual transp arguments in v6 signatures except bgcolor compatibility', () => {
+  it('rejects legacy visual transp arguments in v6 signatures including bgcolor', () => {
     const result = checkProgram(parse(`//@version=6
 indicator("V6 Visual Transparency Rejection", overlay=true)
 linePlot = plot(close, color=color.blue, transp=25)
@@ -2317,6 +2326,7 @@ plotcandle(open, high, low, close, color=color.yellow, wickcolor=color.gray, bor
       "Unknown argument 'transp' for plot(); use color.new(color, transparency) in Pine v6",
       "Unknown argument 'transp' for fill()",
       "Unknown argument 'transp' for barcolor()",
+      "Unknown argument 'transp' for bgcolor()",
       "Unknown argument 'transp' for plotshape(); use color.new(color, transparency) in Pine v6",
       "Unknown argument 'transp' for plotchar(); use color.new(color, transparency) in Pine v6",
       "Unknown argument 'transp' for plotarrow(); use color.new(color, transparency) in Pine v6",
@@ -2519,6 +2529,7 @@ export f(float x) => x
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'indicator behind_chart requires a const value, got series',
       'indicator overlay must be a boolean, got string',
       'indicator timeframe_gaps must be a boolean, got int',
       'indicator explicit_plot_zorder must be a boolean, got string',
@@ -2595,6 +2606,7 @@ strategy("Bad Strategy Boolean Settings",
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'strategy use_bar_magnifier requires a const value, got series',
       'strategy calc_on_order_fills must be a boolean, got string',
       'strategy calc_on_every_tick must be a boolean, got int',
       'strategy calc_on_every_history_tick must be a boolean, got float',
@@ -2974,9 +2986,7 @@ strategy.risk.max_cons_loss_days(-1)
       'strategy.exit id must not be empty',
       'strategy.exit qty must be a positive number',
       'strategy.exit qty_percent must be a positive number',
-      'strategy.exit profit must be a positive number',
-      'strategy.exit loss must be a positive number',
-      'strategy.exit trail_points must be a non-negative number',
+      'strategy.exit loss must be a non-negative number',
       'strategy.exit trailing stop offset must be positive',
       'Invalid strategy entry direction: sideways',
       'strategy.risk.max_position_size contracts must be a positive number',
@@ -3118,7 +3128,7 @@ strategy.risk.max_intraday_filled_orders(count="two")
   it('reports assignments from void-returning builtin side effects', () => {
     const result = checkProgram(parse(`//@version=6
 strategy("Void Returns", overlay=true)
-plot p = plot(close)
+p = plot(close)
 label lab = label.new(bar_index, close, "x")
 line ln = line.new(bar_index, close, bar_index + 1, close)
 table tbl = table.new(position.top_right, 1, 1)
@@ -3201,7 +3211,7 @@ library("Valid")
 export type Pivot
     float y
 export scale(float value, simple float multiplier) => value * multiplier
-export method lifted(Pivot this, float amount) => this
+export method lifted(Pivot this, float amount) => Pivot.new(this.y + amount)
 export enum Direction
     up = "Up"
     down = "Down"
@@ -3221,10 +3231,10 @@ export enum Direction
 `));
     const untypedExport = checkProgram(parse(`
 library("Untyped Export")
-export scale(value, float multiplier) => value * multiplier
-export method lifted(Pivot this, amount) => this
 export type Pivot
     float y
+export scale(value, float multiplier) => value * multiplier
+export method lifted(Pivot this, amount) => Pivot.new(this.y + amount)
 `));
 
     expect(validLibrary.diagnostics).toEqual([]);
@@ -3246,19 +3256,17 @@ export type Pivot
     const valid = checkProgram(parse(`
 library("Constants")
 export const int length = 14
-export color bull = color.green
-export float ratio = math.pi
-export string period = timeframe.period
-export string ticker = syminfo.ticker
-export string labelStyle = label.style_label_center
-export string lineStyle = line.style_arrow_both
-export string labelXloc = xloc.bar_time
-export string labelYloc = yloc.abovebar
-export string lineExtend = extend.both
-export string tablePosition = position.bottom_right
-export string textAlignment = text.align_center
-export string fontFamily = font.family_monospace
-export string labelSize = size.small
+export const color bull = color.green
+export const float ratio = math.pi
+export const string labelStyle = label.style_label_center
+export const string lineStyle = line.style_arrow_both
+export const string labelXloc = xloc.bar_time
+export const string labelYloc = yloc.abovebar
+export const string lineExtend = extend.both
+export const string tablePosition = position.bottom_right
+export const string textAlignment = text.align_center
+export const string fontFamily = font.family_monospace
+export const string labelSize = size.small
 export const color supportZone = color.new(color.green, 92)
 export const color resistanceZone = color.rgb(220, 40, 40, 75)
 export prefix(simple string value) => value
@@ -3284,10 +3292,12 @@ export [a, b] = array.from(1, 2)
       'Exported declarations are only allowed in library scripts: outside',
     ]);
     expect(invalid.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Exported variables must declare const int, float, bool, color, or string.',
       'Exported constants must declare a type',
       'Exported constants must be literal values or compatible built-in variables',
       'Exported constants must be literal values or compatible built-in variables',
       'Exported constants must be literal values or compatible built-in variables',
+      'Exported variables must declare const int, float, bool, color, or string.',
       'Exported constants cannot use tuple declarations',
       'Exported constants must declare a type',
       'Exported constants must be literal values or compatible built-in variables',
@@ -3304,8 +3314,8 @@ export type Visible
     Hidden direct
     array<Hidden> list
     map<string, Hidden> lookup
-export consume(Hidden direct, array<Hidden> list, map<string, Hidden> lookup) => direct.value
-export method lifted(Hidden this, float amount) => this
+export consume(Hidden direct, array<Hidden> list, map<string, Hidden> lookup) => direct.value + array.size(list) + map.size(lookup)
+export method lifted(Hidden this, float amount) => Hidden.new(this.value + amount)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
@@ -3329,7 +3339,10 @@ export type Visible
     float value
 export makeHidden(float value) => Hidden.new(value)
 export makeHiddenList(float value) => array.from(Hidden.new(value))
-export makeHiddenMap(float value) => map.new<string, Hidden>()
+export makeHiddenMap(float value) =>
+    result = map.new<string, Hidden>()
+    map.put(result, "value", Hidden.new(value))
+    result
 export makeHiddenFromBlock(float value) =>
     result = Hidden.new(value)
     result
@@ -3372,14 +3385,14 @@ export lateShadow(float value) =>
       'Exported function assignsGlobal cannot use non-const global variable: scale',
       'Exported function usesInput cannot call input.*() functions',
       'Exported function lateShadow cannot use non-const global variable: scale',
-      'Cannot assign float value to int variable scale. Pine does not round floats into ints automatically; use int(...) to convert explicitly or declare it as float.',
+      "Cannot reassign global variable 'scale' from a user-defined function or method.",
     ]);
   });
 
   it('reports exported library request expressions that depend on parameters', () => {
     const result = checkProgram(parse(`
 library("Export Request Scope")
-export validRequest(float value) => request.security(syminfo.tickerid, "1", close)
+export validRequest(float value) => request.security(syminfo.tickerid, "1", close) + value
 export invalidPositional(float value) => request.security(syminfo.tickerid, "1", value)
 export invalidNamed(float value) => request.security(syminfo.tickerid, "1", expression=value + close)
 export invalidNested(float value) => request.security(syminfo.tickerid, "1", ta.sma(value, 2))
@@ -3395,8 +3408,8 @@ export invalidNested(float value) => request.security(syminfo.tickerid, "1", ta.
   it('reports exported library request calls when dynamic requests are disabled', () => {
     const result = checkProgram(parse(`
 library("Static Export Requests", dynamic_requests=false)
-export requested(float value) => request.security(syminfo.tickerid, "1", close)
-export method requestedMethod(float this) => request.security(syminfo.tickerid, "1", close)
+export requested(float value) => request.security(syminfo.tickerid, "1", close) + value
+export method requestedMethod(float this) => request.security(syminfo.tickerid, "1", close) + this
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
@@ -3514,7 +3527,7 @@ plot(markerValue)
       'Cannot assign line value to label variable marker',
     ]);
     expect(types.get('seriesValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('constTitle')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('constTitle')).toMatchObject({ kind: 'string', qualifier: 'series' });
     expect(types.get('markerValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
     expect(types.get('marker')).toMatchObject({ kind: 'label' });
     expect(types.get('unknownValue')).toMatchObject({ kind: 'unknown' });
@@ -3601,13 +3614,13 @@ plot(branchValue + layeredValue + widenedValue + partialValue)
       'Cannot assign int value to string variable partialTitle',
     ]);
     expect(types.get('branchValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('branchTitle')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('branchTitle')).toMatchObject({ kind: 'string', qualifier: 'series' });
     expect(types.get('layeredValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('layeredTitle')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('layeredTitle')).toMatchObject({ kind: 'string', qualifier: 'series' });
     expect(types.get('widenedValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('widenedTitle')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('widenedTitle')).toMatchObject({ kind: 'string', qualifier: 'series' });
     expect(types.get('partialValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('partialTitle')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('partialTitle')).toMatchObject({ kind: 'string', qualifier: 'series' });
     expect(types.get('unknownValue')).toMatchObject({ kind: 'unknown' });
     expect(types.get('unknownTitle')).toMatchObject({ kind: 'unknown' });
   });
@@ -3637,13 +3650,14 @@ plot(branchValue + partialValue)
       'Cannot assign int value to string variable partialTitle',
     ]);
     expect(types.get('branchValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('branchTitle')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('branchTitle')).toMatchObject({ kind: 'string', qualifier: 'series' });
     expect(types.get('partialValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('partialTitle')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('partialTitle')).toMatchObject({ kind: 'string', qualifier: 'series' });
   });
 
   it('treats na as a tuple-compatible arm when the other arm returns a tuple', () => {
-    const result = checkProgram(parse(`
+    const result = checkProgram(
+      parse(`
 indicator("Tuple NA Arm")
 pair(series float source) =>
     if na(source)
@@ -3653,9 +3667,21 @@ pair(series float source) =>
 [first, second] = pair(close)
 first := "bad"
 second := "bad"
-`));
+`),
+    );
 
-    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+    expect(result.diagnostics).toContainEqual(
+      expect.objectContaining({
+        code: 'builtin-shadow',
+        severity: 'warning',
+        message: expect.stringContaining('second'),
+      }),
+    );
+    expect(
+      result.diagnostics
+        .filter((diagnostic) => diagnostic.severity === 'error')
+        .map((diagnostic) => diagnostic.message),
+    ).toEqual([
       'Cannot assign string value to float variable first',
       'Cannot assign string value to float variable second',
     ]);
@@ -3704,13 +3730,13 @@ plot(keyedValue + conditionValue + blockValue + partialValue)
       'Cannot assign int value to string variable partialTitle',
     ]);
     expect(types.get('keyedValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('keyedTitle')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('keyedTitle')).toMatchObject({ kind: 'string', qualifier: 'series' });
     expect(types.get('conditionValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('conditionTitle')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('conditionTitle')).toMatchObject({ kind: 'string', qualifier: 'series' });
     expect(types.get('blockValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('blockTitle')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('blockTitle')).toMatchObject({ kind: 'string', qualifier: 'series' });
     expect(types.get('partialValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('partialTitle')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('partialTitle')).toMatchObject({ kind: 'string', qualifier: 'series' });
   });
 
   it('infers tuple destructuring element types from direct loop initializer returns', () => {
@@ -3745,11 +3771,11 @@ plot(numericValue + collectionValue + whileValue)
       'Cannot assign int value to string variable whileTitle',
     ]);
     expect(types.get('numericValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('numericTitle')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('numericTitle')).toMatchObject({ kind: 'string', qualifier: 'series' });
     expect(types.get('collectionValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('collectionTitle')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('collectionTitle')).toMatchObject({ kind: 'string', qualifier: 'series' });
     expect(types.get('whileValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('whileTitle')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('whileTitle')).toMatchObject({ kind: 'string', qualifier: 'series' });
   });
 
   it('infers tuple destructuring element types from user function loop tuple returns', () => {
@@ -3790,11 +3816,11 @@ plot(numericValue + collectionValue + whileValue)
       'Cannot assign int value to string variable whileTitle',
     ]);
     expect(types.get('numericValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('numericTitle')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('numericTitle')).toMatchObject({ kind: 'string', qualifier: 'series' });
     expect(types.get('collectionValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('collectionTitle')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('collectionTitle')).toMatchObject({ kind: 'string', qualifier: 'series' });
     expect(types.get('whileValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('whileTitle')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('whileTitle')).toMatchObject({ kind: 'string', qualifier: 'series' });
   });
 
   it('infers tuple destructuring element types from user function switch tuple returns', () => {
@@ -3846,6 +3872,7 @@ plot(keyedValue + conditionValue + blockValue + partialValue + partialBlockValue
     const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Function return branches must have compatible types',
       'Tuple declaration expects 2 values but initializer arm returns a non-tuple value',
       'Cannot assign string value to float variable keyedValue',
       'Cannot assign int value to string variable keyedTitle',
@@ -3859,15 +3886,15 @@ plot(keyedValue + conditionValue + blockValue + partialValue + partialBlockValue
       'Cannot assign int value to string variable partialBlockTitle',
     ]);
     expect(types.get('keyedValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('keyedTitle')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('keyedTitle')).toMatchObject({ kind: 'string', qualifier: 'series' });
     expect(types.get('conditionValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('conditionTitle')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('conditionTitle')).toMatchObject({ kind: 'string', qualifier: 'series' });
     expect(types.get('blockValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('blockTitle')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('blockTitle')).toMatchObject({ kind: 'string', qualifier: 'series' });
     expect(types.get('partialValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('partialTitle')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('partialTitle')).toMatchObject({ kind: 'string', qualifier: 'series' });
     expect(types.get('partialBlockValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('partialBlockTitle')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('partialBlockTitle')).toMatchObject({ kind: 'string', qualifier: 'series' });
     expect(types.get('unknownValue')).toMatchObject({ kind: 'unknown' });
     expect(types.get('unknownTitle')).toMatchObject({ kind: 'unknown' });
   });
@@ -3899,9 +3926,9 @@ plot(priceValue + pivotValue)
       'Cannot assign int value to string variable pivotTitle',
     ]);
     expect(types.get('priceValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('priceTitle')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('priceTitle')).toMatchObject({ kind: 'string', qualifier: 'series' });
     expect(types.get('pivotValue')).toMatchObject({ kind: 'float' });
-    expect(types.get('pivotTitle')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('pivotTitle')).toMatchObject({ kind: 'string', qualifier: 'series' });
   });
 
   it('infers tuple destructuring element types from user method control-flow tuple returns', () => {
@@ -3952,6 +3979,7 @@ plot(branchValue + partialBranchValue + loopValue + switchValue + partialSwitchV
     const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Function return branches must have compatible types',
       'Tuple declaration expects 2 values but initializer arm returns a non-tuple value',
       'Cannot assign string value to float variable branchValue',
       'Cannot assign int value to string variable branchTitle',
@@ -3965,15 +3993,15 @@ plot(branchValue + partialBranchValue + loopValue + switchValue + partialSwitchV
       'Cannot assign int value to string variable partialSwitchTitle',
     ]);
     expect(types.get('branchValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('branchTitle')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('branchTitle')).toMatchObject({ kind: 'string', qualifier: 'series' });
     expect(types.get('partialBranchValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('partialBranchTitle')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('partialBranchTitle')).toMatchObject({ kind: 'string', qualifier: 'series' });
     expect(types.get('loopValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('loopTitle')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('loopTitle')).toMatchObject({ kind: 'string', qualifier: 'series' });
     expect(types.get('switchValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('switchTitle')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('switchTitle')).toMatchObject({ kind: 'string', qualifier: 'series' });
     expect(types.get('partialSwitchValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('partialSwitchTitle')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('partialSwitchTitle')).toMatchObject({ kind: 'string', qualifier: 'series' });
     expect(types.get('mixedValue')).toMatchObject({ kind: 'unknown' });
     expect(types.get('mixedTitle')).toMatchObject({ kind: 'unknown' });
   });
@@ -4051,6 +4079,7 @@ plot(close)
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
       "Cannot assign string value to float variable ternaryValue",
       "Cannot assign string value to float variable switchValue",
+      'If branches return incompatible types: float and string',
       "Cannot assign string value to float variable ifValue",
     ]);
   });
@@ -4169,7 +4198,17 @@ plot(price)
     ]);
   });
 
-  it('allows explicit bool variables to initialize from na', () => {
+  it('allows explicit bool variables to initialize from na in v5', () => {
+    const result = checkProgram(parse(`//@version=5
+indicator("Bool Na")
+bool flag = na
+flag := close > open
+plot(flag ? 1 : 0)
+`));
+    expect(result.diagnostics.filter((diagnostic) => diagnostic.severity === 'error')).toEqual([]);
+  });
+
+  it('rejects explicit bool variables initialized from na in v6', () => {
     const result = checkProgram(parse(`
 indicator("Bool Na")
 bool flag = na
@@ -4177,7 +4216,9 @@ flag := close > open
 plot(flag ? 1 : 0)
 `));
 
-    expect(result.diagnostics.filter((diagnostic) => diagnostic.severity === 'error')).toEqual([]);
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      boolNaV6Message('Cannot assign na value to bool variable flag'),
+    ]);
   });
 
   it('infers compatible switch expression types for downstream diagnostics', () => {
@@ -4282,6 +4323,8 @@ plot(priceValue + blockResult)
     const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Function return branches must have compatible types',
+      'If branches return incompatible types: float and string',
       'Cannot assign string value to float variable priceValue',
       'Cannot assign int value to string variable title',
       'Cannot assign string value to float variable blockResult',
@@ -4346,6 +4389,8 @@ plot(numericResult + collectionResult + whileResult)
     const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Function return branches must have compatible types',
+      'If branches return incompatible types: float and string',
       'Cannot assign string value to float variable numericResult',
       'Cannot assign string value to float variable collectionResult',
       'Cannot assign string value to float variable whileResult',
@@ -4383,7 +4428,7 @@ plot(numericResult + whileResult + simpleWhile)
       'Cannot assign string value to int variable whileResult',
     ]);
     expect(types.get('numericResult')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('whileResult')).toMatchObject({ kind: 'int', qualifier: 'const' });
+    expect(types.get('whileResult')).toMatchObject({ kind: 'int', qualifier: 'series' });
     expect(types.get('simpleWhile')).toMatchObject({ kind: 'int', qualifier: 'simple' });
   });
 
@@ -4440,7 +4485,7 @@ plot(priceValue + constValue)
     ]);
     expect(types.get('priceValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
     expect(types.get('title')).toMatchObject({ kind: 'string', qualifier: 'series' });
-    expect(types.get('constValue')).toMatchObject({ kind: 'float', qualifier: 'const' });
+    expect(types.get('constValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
     expect(types.get('mixedValue')).toMatchObject({ kind: 'unknown', qualifier: 'series' });
   });
 
@@ -4643,8 +4688,8 @@ type Box
     float value
 badReturn() => 1
 method badReturn(Box this) => this.value
-box = Box.new(2)
-plot(badReturn() + box.badReturn())
+valueBox = Box.new(2)
+plot(badReturn() + valueBox.badReturn())
 `));
 
     expect(result.diagnostics).toEqual([]);
@@ -4677,9 +4722,9 @@ type Marker
     float value
 method first(Box this) => this.value
 method first(Marker this) => this.value + 1
-box = Box.new(2)
+valueBox = Box.new(2)
 marker = Marker.new(3)
-plot(box.first() + marker.first())
+plot(valueBox.first() + marker.first())
 `));
 
     expect(result.diagnostics).toEqual([]);
@@ -4767,9 +4812,9 @@ currencySymbol = currency.SGD
 array<float> values = array.new_float()
 genericValues = array.new<float>()
 genericGrid = matrix.new<float>(1, 1, 0)
-nestedValues = array.new<array<float>>()
-nestedGrid = matrix.new<map<string, float>>(1, 1)
-nestedLookup = map.new<string, array<float>>()
+wrappedValues = array.new<pivotPoint>()
+wrappedGrid = matrix.new<pivotPoint>(1, 1)
+wrappedLookup = map.new<string, pivotPoint>()
 floatValues = array.new_float()
 intValues = array.new_int()
 labelValues = array.new_label()
@@ -4790,15 +4835,15 @@ pivotPoint pivot = na
     expect(types.get('values')).toMatchObject({ kind: 'array', elementType: { kind: 'float' } });
     expect(types.get('genericValues')).toMatchObject({ kind: 'array', elementType: { kind: 'float' } });
     expect(types.get('genericGrid')).toMatchObject({ kind: 'matrix', elementType: { kind: 'float' } });
-    expect(types.get('nestedValues')).toMatchObject({ kind: 'array', elementType: { kind: 'array', elementType: { kind: 'float' } } });
-    expect(types.get('nestedGrid')).toMatchObject({
+    expect(types.get('wrappedValues')).toMatchObject({ kind: 'array', elementType: { kind: 'udt', name: 'pivotPoint' } });
+    expect(types.get('wrappedGrid')).toMatchObject({
       kind: 'matrix',
-      elementType: { kind: 'map', keyType: { kind: 'string' }, valueType: { kind: 'float' } },
+      elementType: { kind: 'udt', name: 'pivotPoint' },
     });
-    expect(types.get('nestedLookup')).toMatchObject({
+    expect(types.get('wrappedLookup')).toMatchObject({
       kind: 'map',
       keyType: { kind: 'string' },
-      valueType: { kind: 'array', elementType: { kind: 'float' } },
+      valueType: { kind: 'udt', name: 'pivotPoint' },
     });
     expect(types.get('floatValues')).toMatchObject({ kind: 'array', elementType: { kind: 'float' } });
     expect(types.get('intValues')).toMatchObject({ kind: 'array', elementType: { kind: 'int' } });
@@ -4810,6 +4855,21 @@ pivotPoint pivot = na
       valueType: { kind: 'float' },
     });
     expect(types.get('pivot')).toMatchObject({ kind: 'udt', name: 'pivotPoint' });
+  });
+
+  it.each(['array<float>', 'matrix<float>', 'map<string, float>'])('rejects directly storing %s in collection annotations and constructors', (innerType) => {
+    const result = checkProgram(parse(`
+indicator("Direct Collection Nesting")
+array<${innerType}> rows = array.new<${innerType}>()
+matrix<${innerType}> grid = matrix.new<${innerType}>(1, 1)
+map<string, ${innerType}> lookup = map.new<string, ${innerType}>()
+type InvalidWrapper
+    array<${innerType}> data
+consume(map<string, ${innerType}> data) => 1
+`));
+    expect(result.diagnostics).toHaveLength(8);
+    expect(result.diagnostics.every((diagnostic) => diagnostic.code === 'invalid-type-template'
+      && diagnostic.message.includes('collections cannot directly contain other collections'))).toBe(true);
   });
 
   it('validates template annotation type arguments', () => {
@@ -4848,13 +4908,15 @@ invalidCtorArity = map.new<string>()
       'matrix.new() expects exactly 1 type argument',
       "Invalid matrix element type 'map'; collection template types must include their element templates",
       "Invalid matrix element type 'map'; collection template types must include their element templates",
-      'Map key type must be int, float, bool, string, or color in variable declaration',
-      'Map key type must be int, float, bool, string, or color in variable declaration',
+      'Map key type must be int, float, bool, string, color, or an enum in variable declaration',
+      "Invalid map key type 'array<float>'; collections cannot directly contain other collections",
+      'Map key type must be int, float, bool, string, color, or an enum in variable declaration',
       "Invalid map value type 'series'; qualifiers cannot be used as template types",
       "Invalid map value type 'array'; collection template types must include their element templates",
       "Invalid map key type 'const'; qualifiers cannot be used as template types",
-      'Map key type must be int, float, bool, string, or color in map.new',
-      'Map key type must be int, float, bool, string, or color in map.new',
+      'Map key type must be int, float, bool, string, color, or an enum in map.new',
+      "Invalid map key type 'array<float>'; collections cannot directly contain other collections",
+      'Map key type must be int, float, bool, string, color, or an enum in map.new',
       "Invalid map value type 'series'; qualifiers cannot be used as template types",
       "Invalid map value type 'matrix'; collection template types must include their element templates",
       'map.new() expects exactly 2 type arguments',
@@ -5051,6 +5113,7 @@ badFrom = array.from(value=1)
       'array.push() expects at least 2 arguments',
       "array.push() missing required argument 'value'",
       "Unknown argument 'value' for array.from()",
+      'array.from() expects at least 1 argument',
     ]);
   });
 
@@ -5361,7 +5424,7 @@ missingReshape = matrix.reshape(id=m, rows=1)
 tooManyReverse = matrix.reverse(m, m)
 duplicateAddRow = matrix.add_row(m, id=m)
 unknownAddCol = matrix.add_col(id=m, row=0)
-missingRemove = matrix.remove_column(id=m)
+missingRemove = matrix.remove_column()
 tooManySwap = matrix.swap_rows(m, 0, 1, 2)
 missingSwapColumn = matrix.swap_columns(id=m, column1=0)
 `));
@@ -5375,8 +5438,8 @@ missingSwapColumn = matrix.swap_columns(id=m, column1=0)
       'matrix.reverse() expects at most 1 argument',
       "Argument 'id' for matrix.add_row() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
       "Unknown argument 'row' for matrix.add_col()",
-      'matrix.remove_column() expects at least 2 arguments',
-      "matrix.remove_column() missing required argument 'column'",
+      'matrix.remove_column() expects at least 1 argument',
+      "matrix.remove_column() missing required argument 'id'",
       'matrix.swap_rows() expects at most 3 arguments',
       'matrix.swap_columns() expects at least 3 arguments',
       "matrix.swap_columns() missing required argument 'column2'",
@@ -5502,6 +5565,8 @@ plot(matrix.rows(id=sumNamed) + matrix.rows(id=sumAlias) + matrix.rows(id=diffNa
     expect(result.diagnostics).toEqual([]);
   });
 
+  // https://www.tradingview.com/pine-script-reference/v6/#fun_matrix.pow
+  // The integer-matrix overload returns matrix<int>; matrix references do not widen.
   it('infers matrix-vector and mixed numeric matrix calculation return types', () => {
     const result = checkProgram(parse(`
 //@version=6
@@ -5512,7 +5577,7 @@ vf = array.new<float>(2, 1.0)
 matrix<float> mixedKron = matrix.kron(mi, mf)
 matrix<float> mixedDiff = mi.diff(mf)
 matrix<float> inverse = matrix.inv(mi)
-matrix<float> power = mi.pow(2)
+matrix<int> power = mi.pow(2)
 array<float> vector = matrix.mult(mf, vf)
 matrix<int> bad = matrix.mult(mf, mf)
 plot(matrix.get(mixedKron, 0, 0) + matrix.get(mixedDiff, 0, 0) + matrix.get(inverse, 0, 0) + matrix.get(power, 0, 0) + array.get(vector, 0) + matrix.get(bad, 0, 0))
@@ -5609,7 +5674,7 @@ first = matrix.get(id=m, 0, 1)
 matrix.fill(id=m, 6, 0, 1, 0, 1)
 slice = matrix.submatrix(id=m, 0, 2, 0, 2)
 matrix.reshape(id=m, rows=1, 4)
-matrix.add_row(id=m, array.from(3, 4))
+matrix.add_row(id=m, row=0, array_id=array.from(3, 4))
 matrix.concat(id=m, tail)
 diff = matrix.diff(id1=m, 1)
 matrix.sort(id=m, 1, order.descending)
@@ -5653,6 +5718,7 @@ unknown.push("allowed")
 prices.concat(unknown)
 `));
 
+    // https://www.tradingview.com/pine-script-docs/language/arrays/#declaring-arrays
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
       'Cannot use string value as float array element',
       'Cannot use bool value as float array element',
@@ -5666,6 +5732,7 @@ prices.concat(unknown)
       'Cannot use string value as float array element',
       'Cannot concatenate string array into float array',
       'Cannot concatenate string array into float array',
+      'array.from arguments must have compatible element types, got int and string',
     ]);
   });
 
@@ -5778,6 +5845,8 @@ float widened = namespaceValue
     ]);
   });
 
+  // Authority: ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json, type/const and type/int.
+  // Bare int annotations preserve literal const inference; qualifier-loss mutation failed this test, restored passed.
   it('validates matrix sort_field const int and string requirements', () => {
     const result = checkProgram(parse(`
 indicator("Matrix Sort Field Types")
@@ -5795,11 +5864,11 @@ matrix.sort(id=values, column=0, order=order.ascending, sort_field="score")
 inputField = input.string("score")
 simple string simpleField = "score"
 seriesIndex = bar_index
-int unqualifiedField = 1
+int inferredConstField = 1
 matrix.sort(values, 0, order.ascending, inputField)
 values.sort(0, order.ascending, simpleField)
 values.sort(0, order.ascending, seriesIndex)
-values.sort(0, order.ascending, unqualifiedField)
+values.sort(0, order.ascending, inferredConstField)
 values.sort(0, order.ascending, true)
 `));
 
@@ -5807,11 +5876,13 @@ values.sort(0, order.ascending, true)
       'matrix.sort() sort_field requires const int or const string, got input string',
       'matrix.sort() sort_field requires const int or const string, got simple string',
       'matrix.sort() sort_field requires const int or const string, got series int',
-      'matrix.sort() sort_field requires const int or const string, got unqualified int',
       'matrix.sort() sort_field must be a const int or const string, got bool',
     ]);
+    expect(result.symbols.find((symbol) => symbol.name === 'inferredConstField')?.type).toEqual({ kind: 'int', qualifier: 'const' });
   });
 
+  // Authority: ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json, type/const and type/int.
+  // Bare int annotations preserve literal const inference; qualifier-loss mutation failed this test, restored passed.
   it('validates array sort_field const int and string requirements', () => {
     const result = checkProgram(parse(`
 indicator("Array Sort Field Types")
@@ -5828,11 +5899,11 @@ array.sort(values, order.ascending, 1)
 inputField = input.string("score")
 simple string simpleField = "score"
 seriesIndex = bar_index
-int unqualifiedField = 1
+int inferredConstField = 1
 array.sort(values, order.ascending, inputField)
 values.sort(order.ascending, simpleField)
 values.sort(order.ascending, seriesIndex)
-values.sort(order.ascending, unqualifiedField)
+values.sort(order.ascending, inferredConstField)
 values.sort(order.ascending, true)
 array.binary_search(values, 1, inputField)
 `));
@@ -5841,10 +5912,10 @@ array.binary_search(values, 1, inputField)
       'array.sort() sort_field requires const int or const string, got input string',
       'array.sort() sort_field requires const int or const string, got simple string',
       'array.sort() sort_field requires const int or const string, got series int',
-      'array.sort() sort_field requires const int or const string, got unqualified int',
       'array.sort() sort_field must be a const int or const string, got bool',
       'array.binary_search() sort_field requires const int or const string, got input string',
     ]);
+    expect(result.symbols.find((symbol) => symbol.name === 'inferredConstField')?.type).toEqual({ kind: 'int', qualifier: 'const' });
   });
 
   it('resolves chart point helper named arguments', () => {
@@ -5934,20 +6005,29 @@ badTime = chart.point.from_time(time="now", price="close")
   });
 
   it('resolves label.new named arguments and positional tails', () => {
-    const result = checkProgram(parse(`
+    const result = checkProgram(
+      parse(`
 indicator("Label Signatures")
-first = label.new(x=bar_index, close, "Entry", xloc.bar_index, yloc.price, color.green, label.style_label_up, color.white, size.small, "center", "tip", "monospace", true, "bold")
+first = label.new(x=bar_index, close, "Entry", xloc.bar_index, yloc.price, color.green, label.style_label_up, color.white, size.small, "center", "tip", "monospace", true, text.format_bold)
 second = label.new(bar_index, high, text="High", color=color.orange, style=label.style_label_down)
 labelPoint = chart.point.from_index(bar_index, low)
 third = label.new(labelPoint, "Point", xloc.bar_index, yloc.price, color.blue)
 fourth = label.new(point=labelPoint, text="Named Point", color=color.yellow)
 labels = array.from(first, second, third, fourth)
 plot(array.size(labels))
-`));
+`),
+    );
 
     const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
 
-    expect(result.diagnostics).toEqual([]);
+    expect(result.diagnostics).toContainEqual(
+      expect.objectContaining({
+        code: 'builtin-shadow',
+        severity: 'warning',
+        message: expect.stringContaining('second'),
+      }),
+    );
+    expect(result.diagnostics.filter((diagnostic) => diagnostic.severity === 'error')).toEqual([]);
     expect(types.get('first')).toMatchObject({ kind: 'label' });
     expect(types.get('second')).toMatchObject({ kind: 'label' });
     expect(types.get('third')).toMatchObject({ kind: 'label' });
@@ -5960,7 +6040,7 @@ indicator("Bad Label Signatures")
 unknown = label.new(bar_index, close, caption="Bad")
 missing = label.new(text="Only Text")
 duplicate = label.new(bar_index, close, x=bar_index)
-tooMany = label.new(bar_index, close, "A", xloc.bar_index, yloc.price, color.green, label.style_label_up, color.white, size.small, "center", "tip", "monospace", true, "bold", 1)
+tooMany = label.new(bar_index, close, "A", xloc.bar_index, yloc.price, color.green, label.style_label_up, color.white, size.small, "center", "tip", "monospace", true, text.format_bold, 1)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
@@ -6262,7 +6342,7 @@ region = box.new(bar_index, high, bar_index + 1, low, text_size=size.giant)
 dashboard = table.new(position.top_right, 1, 1)
 table.cell(dashboard, 0, 0, text_size=size.giant)
 label.set_size(marker, size="giant")
-box.set_text_size(region, size=size.giant)
+box.set_text_size(region, text_size=size.giant)
 table.cell_set_text_size(dashboard, 0, 0, text_size="giant")
 `));
 
@@ -6271,7 +6351,7 @@ table.cell_set_text_size(dashboard, 0, 0, text_size="giant")
       'Invalid box.new text_size: size.giant',
       'Invalid table.cell text_size: size.giant',
       'Invalid label.set_size size: giant',
-      'Invalid box.set_text_size size: size.giant',
+      'Invalid box.set_text_size text_size: size.giant',
       'Invalid table.cell_set_text_size text_size: giant',
     ]);
   });
@@ -6293,7 +6373,7 @@ label.set_textcolor(id=marker, color.white)
 label.set_size(marker, size=size.small)
 label.set_textalign(id=marker, "right")
 label.set_text_font_family(id=marker, "monospace")
-label.set_text_formatting(marker, text_formatting="bolditalic")
+label.set_text_formatting(marker, text_formatting=text.format_bold + text.format_italic)
 label.set_tooltip(id=marker, "tip")
 x = label.get_x(id=marker)
 y = label.get_y(marker)
@@ -6421,8 +6501,8 @@ line.set_y1(id=trend, high)
 line.set_y2(trend, y=low)
 line.set_xy1(id=trend, x=bar_index, y=high)
 line.set_xy2(trend, bar_index + 2, y=low)
-line.set_first_point(id=trend, first_point=firstPoint)
-line.set_second_point(trend, second_point=secondPoint)
+line.set_first_point(id=trend, point=firstPoint)
+line.set_second_point(trend, point=secondPoint)
 line.set_xloc(id=trend, bar_index, bar_index + 2, xloc.bar_index)
 line.set_extend(trend, extend="right")
 line.set_color(id=trend, color.blue)
@@ -6479,20 +6559,29 @@ plot(qualified.first().value)
   });
 
   it('resolves line.new chart point overload argument bindings', () => {
-    const result = checkProgram(parse(`
+    const result = checkProgram(
+      parse(`
 indicator("Line Constructor Point Signatures")
 firstPoint = chart.point.from_index(bar_index - 1, high)
 secondPoint = chart.point.from_index(bar_index + 1, low)
 first = line.new(firstPoint, secondPoint, xloc.bar_index, extend.none, color.green)
 second = line.new(first_point=firstPoint, second_point=secondPoint, color=color.orange)
-third = line.new(first_point=firstPoint, secondPoint, color.blue)
+third = line.new(first_point=firstPoint, secondPoint, xloc.bar_index, extend.none, color.blue)
 lines = array.from(first, second, third)
 plot(array.size(lines))
-`));
+`),
+    );
 
     const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
 
-    expect(result.diagnostics).toEqual([]);
+    expect(result.diagnostics).toContainEqual(
+      expect.objectContaining({
+        code: 'builtin-shadow',
+        severity: 'warning',
+        message: expect.stringContaining('second'),
+      }),
+    );
+    expect(result.diagnostics.filter((diagnostic) => diagnostic.severity === 'error')).toEqual([]);
     expect(types.get('first')).toMatchObject({ kind: 'line' });
     expect(types.get('second')).toMatchObject({ kind: 'line' });
     expect(types.get('third')).toMatchObject({ kind: 'line' });
@@ -6533,7 +6622,7 @@ tooMany = line.set_width(trend, 2, 3)
 missingFirstPoint = line.set_first_point(id=trend)
 duplicateSecondPoint = line.set_second_point(trend, secondPoint, id=trend)
 tooManyFirstPoint = line.set_first_point(trend, firstPoint, secondPoint)
-unknownSecondPoint = line.set_second_point(trend, point=secondPoint)
+unknownSecondPoint = line.set_second_point(trend, second_point=secondPoint)
 missingCopy = line.copy()
 `));
 
@@ -6545,12 +6634,12 @@ missingCopy = line.copy()
       "Argument 'id' for line.set_xy1() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
       'line.set_width() expects at most 2 arguments',
       'line.set_first_point() expects at least 2 arguments',
-      "line.set_first_point() missing required argument 'first_point'",
+      "line.set_first_point() missing required argument 'point'",
       "Argument 'id' for line.set_second_point() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
       'line.set_first_point() expects at most 2 arguments',
-      "Unknown argument 'point' for line.set_second_point()",
+      "Unknown argument 'second_point' for line.set_second_point()",
       'line.set_second_point() expects at least 2 arguments',
-      "line.set_second_point() missing required argument 'second_point'",
+      "line.set_second_point() missing required argument 'point'",
       'line.copy() expects at least 1 argument',
       "line.copy() missing required argument 'id'",
     ]);
@@ -6660,7 +6749,8 @@ plot(1)
   });
 
   it('resolves box.new chart point overload argument bindings', () => {
-    const result = checkProgram(parse(`
+    const result = checkProgram(
+      parse(`
 indicator("Box Constructor Point Signatures")
 topLeft = chart.point.from_index(bar_index - 1, high)
 bottomRight = chart.point.from_index(bar_index + 1, low)
@@ -6669,11 +6759,19 @@ second = box.new(top_left=topLeft, bottom_right=bottomRight, bgcolor=color.new(c
 third = box.new(top_left=topLeft, bottomRight, color.green)
 boxes = array.from(first, second, third)
 plot(array.size(boxes))
-`));
+`),
+    );
 
     const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
 
-    expect(result.diagnostics).toEqual([]);
+    expect(result.diagnostics).toContainEqual(
+      expect.objectContaining({
+        code: 'builtin-shadow',
+        severity: 'warning',
+        message: expect.stringContaining('second'),
+      }),
+    );
+    expect(result.diagnostics.filter((diagnostic) => diagnostic.severity === 'error')).toEqual([]);
     expect(types.get('first')).toMatchObject({ kind: 'box' });
     expect(types.get('second')).toMatchObject({ kind: 'box' });
     expect(types.get('third')).toMatchObject({ kind: 'box' });
@@ -6687,7 +6785,7 @@ topLeft = chart.point.from_index(bar_index - 1, high)
 bottomRight = chart.point.from_index(bar_index + 1, low)
 missingCoordinates = box.new(bar_index, high)
 duplicatePoint = box.new(topLeft, bottomRight, top_left=topLeft)
-tooManyPoint = box.new(topLeft, bottomRight, color.blue, 1, line.style_solid, extend.none, xloc.bar_index, color.new(color.blue, 80), "zone", size.small, color.white, "center", "center", "wrap", "monospace", true, "bold", color.red)
+tooManyPoint = box.new(topLeft, bottomRight, color.blue, 1, line.style_solid, extend.none, xloc.bar_index, color.new(color.blue, 80), "zone", size.small, color.white, "center", "center", "wrap", "monospace", true, text.format_bold, color.red)
 unknownPoint = box.new(top_left=topLeft, bottom_right=bottomRight, left=bar_index)
 `));
 
@@ -6790,7 +6888,7 @@ box.set_text_halign(region, text_halign="left")
 box.set_text_valign(id=region, "top")
 box.set_text_wrap(region, text_wrap="auto")
 box.set_text_font_family(id=region, "monospace")
-box.set_text_formatting(region, text_formatting="bolditalic")
+box.set_text_formatting(region, text_formatting=text.format_bold + text.format_italic)
 plot(1)
 `));
 
@@ -6805,7 +6903,7 @@ unknown = box.set_text(region, "Updated", tooltip="tip")
 missing = box.set_text_color(id=region)
 duplicate = box.set_text_size(region, size.small, id=region)
 tooMany = box.set_text_wrap(region, "auto", "none")
-badName = box.set_text_size(region, text_size=size.small)
+badName = box.set_text_size(region, size=size.small)
 missingFormatting = box.set_text_formatting(id=region)
 duplicateFormatting = box.set_text_formatting(region, "bold", id=region)
 unknownFormatting = box.set_text_formatting(region, formatting="italic")
@@ -6817,9 +6915,9 @@ unknownFormatting = box.set_text_formatting(region, formatting="italic")
       "box.set_text_color() missing required argument 'text_color'",
       "Argument 'id' for box.set_text_size() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
       'box.set_text_wrap() expects at most 2 arguments',
-      "Unknown argument 'text_size' for box.set_text_size()",
+      "Unknown argument 'size' for box.set_text_size()",
       'box.set_text_size() expects at least 2 arguments',
-      "box.set_text_size() missing required argument 'size'",
+      "box.set_text_size() missing required argument 'text_size'",
       'box.set_text_formatting() expects at least 2 arguments',
       "box.set_text_formatting() missing required argument 'text_formatting'",
       "Argument 'id' for box.set_text_formatting() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
@@ -6958,8 +7056,8 @@ secondPoint = chart.point.from_index(bar_index + 1, low)
 points = array.from(firstPoint, secondPoint)
 shape = polyline.new(points=points)
 clone = polyline.copy(id=shape)
-shape := table.new(columns=1, rows=1)
-clone := table.new(columns=1, rows=1)
+shape := table.new(position=position.top_right, columns=1, rows=1)
+clone := table.new(position=position.top_right, columns=1, rows=1)
 plot(1)
 `));
 
@@ -7075,15 +7173,15 @@ plot(array.size(linefills))
 indicator("Bad Linefill Signatures")
 upper = line.new(bar_index, high, bar_index + 1, high)
 lower = line.new(bar_index, low, bar_index + 1, low)
-unknown = linefill.new(upper, lower, opacity=80)
-missing = linefill.new(line1=upper)
-duplicate = linefill.new(upper, lower, line1=upper)
+unknown = linefill.new(upper, lower, color.blue, opacity=80)
+missing = linefill.new(line1=upper, color=color.blue)
+duplicate = linefill.new(upper, lower, color.blue, line1=upper)
 tooMany = linefill.new(upper, lower, color.blue, color.red)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
       "Unknown argument 'opacity' for linefill.new()",
-      'linefill.new() expects at least 2 arguments',
+      'linefill.new() expects at least 3 arguments',
       "linefill.new() missing required argument 'line2'",
       "Argument 'line1' for linefill.new() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
       'linefill.new() expects at most 3 arguments',
@@ -7095,7 +7193,7 @@ tooMany = linefill.new(upper, lower, color.blue, color.red)
 indicator("Linefill Method Signatures")
 upper = line.new(bar_index, high, bar_index + 1, high)
 lower = line.new(bar_index, low, bar_index + 1, low)
-filled = linefill.new(upper, lower)
+filled = linefill.new(upper, lower, color.blue)
 linefill.set_color(id=filled, color.orange)
 firstLine = linefill.get_line1(id=filled)
 secondLine = linefill.get_line2(filled)
@@ -7115,7 +7213,7 @@ plot(1)
 indicator("Linefill Getter Return Types")
 upper = line.new(bar_index, high, bar_index + 1, high)
 lower = line.new(bar_index, low, bar_index + 1, low)
-filled = linefill.new(upper, lower)
+filled = linefill.new(upper, lower, color.blue)
 firstLine = linefill.get_line1(id=filled)
 secondLine = linefill.get_line2(filled)
 firstLine := filled
@@ -7138,7 +7236,7 @@ plot(1)
 indicator("Bad Linefill Method Signatures")
 upper = line.new(bar_index, high, bar_index + 1, high)
 lower = line.new(bar_index, low, bar_index + 1, low)
-filled = linefill.new(upper, lower)
+filled = linefill.new(upper, lower, color.blue)
 unknown = linefill.set_color(filled, color.blue, opacity=80)
 missing = linefill.set_color(id=filled)
 duplicate = linefill.delete(filled, id=filled)
@@ -7162,7 +7260,7 @@ missingGetter = linefill.get_line2()
 indicator("Linefill copy and get_color")
 upper = line.new(bar_index, high, bar_index + 1, high)
 lower = line.new(bar_index, low, bar_index + 1, low)
-filled = linefill.new(upper, lower)
+filled = linefill.new(upper, lower, color.blue)
 clone = linefill.copy(id=filled)
 colorValue = linefill.get_color(id=filled)
 plot(1)
@@ -7180,7 +7278,7 @@ plot(1)
 indicator("Bad linefill copy and get_color")
 upper = line.new(bar_index, high, bar_index + 1, high)
 lower = line.new(bar_index, low, bar_index + 1, low)
-filled = linefill.new(upper, lower)
+filled = linefill.new(upper, lower, color.blue)
 missingCopy = linefill.copy()
 missingColor = linefill.get_color()
 `));
@@ -7198,7 +7296,7 @@ missingColor = linefill.get_color()
 indicator("Table Signatures")
 dashboard = table.new(position=position.top_right, 2, 3, color.new(color.black, 80), color.gray, 1, color.white, 1, force_overlay=true)
 compact = table.new(position.bottom_left, columns=1, rows=1, bgcolor=color.blue)
-defaulted = table.new(columns=2, rows=2)
+defaulted = table.new(position=position.top_right, columns=2, rows=2)
 tables = array.from(dashboard, compact, defaulted)
 plot(array.size(tables))
 `));
@@ -7219,7 +7317,7 @@ firstPoint = chart.point.from_index(bar_index, high)
 secondPoint = chart.point.from_index(bar_index + 1, low)
 points = array.from(firstPoint, secondPoint)
 shape = polyline.new(points=points)
-dashboard = table.new(columns=2, rows=2)
+dashboard = table.new(position=position.top_right, columns=2, rows=2)
 compact = table.new(position.bottom_left, columns=1, rows=1)
 dashboard := shape
 compact := shape
@@ -7247,6 +7345,7 @@ tooMany = table.new(position.top_right, 2, 3, color.black, color.gray, 1, color.
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
       "Unknown argument 'frame' for table.new()",
+      'table.new() expects at least 3 arguments',
       "table.new() missing required argument 'rows'",
       "Argument 'position' for table.new() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
       'table.new force_overlay must be a boolean, got int',
@@ -7273,8 +7372,8 @@ table.set_position(compact, position="center")
   it('resolves table management named arguments and positional tails', () => {
     const result = checkProgram(parse(`
 indicator("Table Management Signatures")
-dashboard = table.new(columns=2, rows=2)
-temporary = table.new(columns=1, rows=1)
+dashboard = table.new(position=position.top_right, columns=2, rows=2)
+temporary = table.new(position=position.top_right, columns=1, rows=1)
 table.clear(table_id=dashboard, 0, 0)
 table.clear(dashboard, start_column=0, start_row=0, end_column=1, end_row=1)
 table.merge_cells(table_id=dashboard, start_column=0, start_row=0, end_column=1, end_row=0)
@@ -7295,7 +7394,7 @@ plot(1)
   it('reports invalid table management argument bindings', () => {
     const result = checkProgram(parse(`
 indicator("Bad Table Management Signatures")
-dashboard = table.new(columns=2, rows=2)
+dashboard = table.new(position=position.top_right, columns=2, rows=2)
 unknown = table.clear(dashboard, 0, 0, width=1)
 missingClear = table.clear(table_id=dashboard, start_column=0)
 duplicateClear = table.clear(dashboard, 0, 0, table_id=dashboard)
@@ -7332,7 +7431,7 @@ tooManyDelete = table.delete(dashboard, dashboard)
   it('reports invalid table numeric value types', () => {
     const result = checkProgram(parse(`
 indicator("Bad Table Values")
-dashboard = table.new(columns="2", rows=true, frame_width="1", border_width=false)
+dashboard = table.new(position=position.top_right, columns="2", rows=true, frame_width="1", border_width=false)
 table.clear(table_id=dashboard, start_column="0", start_row=true, end_column="1", end_row=false)
 table.merge_cells(dashboard, "0", true, "1", false)
 table.set_frame_width(dashboard, frame_width="2")
@@ -7373,7 +7472,7 @@ table.cell_set_height(dashboard, column=true, row="0", height=false)
   it('resolves table.cell named arguments and positional tails', () => {
     const result = checkProgram(parse(`
 indicator("Table Cell Signatures")
-dashboard = table.new(columns=2, rows=2)
+dashboard = table.new(position=position.top_right, columns=2, rows=2)
 table.cell(table_id=dashboard, 0, 0, "Entry", 10, 2, color.white, "left", "top", size.small, color.blue)
 table.cell(dashboard, column=1, row=0, text="Exit", bgcolor=color.orange, tooltip="Exit details")
 table.cell(table_id=dashboard, column=0, row=1, text="Center", text_valign=text.align_center)
@@ -7383,14 +7482,24 @@ plot(1)
     expect(result.diagnostics).toEqual([]);
   });
 
+  // Pine v6 table.cell reference: tooltip precedes font family and formatting.
+  it('accepts positional table.cell tooltip before font and formatting', () => {
+    const result = checkProgram(parse(`//@version=6
+indicator("Table Cell Positional Tooltip")
+dashboard = table.new(position.top_right, 2, 3)
+table.cell(dashboard, 1, 2, "keep", 12, 9, color.red, text.align_left, text.align_top, size.small, color.blue, "tip", font.family_monospace, text.format_bold)
+`));
+    expect(result.diagnostics).toEqual([]);
+  });
+
   it('reports invalid table.cell argument bindings', () => {
     const result = checkProgram(parse(`
 indicator("Bad Table Cell Signatures")
-dashboard = table.new(columns=2, rows=2)
+dashboard = table.new(position=position.top_right, columns=2, rows=2)
 unknown = table.cell(dashboard, 0, 0, label="Entry")
 missing = table.cell(table_id=dashboard, column=1)
 duplicate = table.cell(dashboard, 0, 0, table_id=dashboard)
-tooMany = table.cell(dashboard, 0, 0, "A", 1, 1, color.white, "left", "top", size.small, color.blue, "mono", "bold", "tip", 1)
+tooMany = table.cell(dashboard, 0, 0, "A", 1, 1, color.white, "left", "top", size.small, color.blue, "tip", "mono", text.format_bold, 1)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
@@ -7406,7 +7515,7 @@ tooMany = table.cell(dashboard, 0, 0, "A", 1, 1, color.white, "left", "top", siz
   it('resolves table cell setter named arguments and positional tails', () => {
     const result = checkProgram(parse(`
 indicator("Table Cell Setter Signatures")
-dashboard = table.new(columns=2, rows=2)
+dashboard = table.new(position=position.top_right, columns=2, rows=2)
 table.cell(dashboard, 0, 0)
 table.cell_set_text(table_id=dashboard, 0, 0, "Entry")
 table.cell_set_bgcolor(dashboard, column=0, row=0, bgcolor=color.blue)
@@ -7417,7 +7526,7 @@ table.cell_set_height(dashboard, column=0, row=0, height=2)
 table.cell_set_text_halign(table_id=dashboard, 0, 0, "left")
 table.cell_set_text_valign(dashboard, column=0, row=0, text_valign="top")
 table.cell_set_text_font_family(table_id=dashboard, column=0, row=0, text_font_family="monospace")
-table.cell_set_text_formatting(dashboard, column=0, row=0, text_formatting="bold")
+table.cell_set_text_formatting(dashboard, column=0, row=0, text_formatting=text.format_bold)
 table.cell_set_tooltip(table_id=dashboard, column=0, row=0, tooltip="Details")
 plot(1)
 `));
@@ -7428,27 +7537,25 @@ plot(1)
   it('reports invalid table cell setter argument bindings', () => {
     const result = checkProgram(parse(`
 indicator("Bad Table Cell Setter Signatures")
-dashboard = table.new(columns=2, rows=2)
+dashboard = table.new(position=position.top_right, columns=2, rows=2)
 unknown = table.cell_set_text(dashboard, 0, 0, "Entry", tooltip="Details")
-missing = table.cell_set_bgcolor(table_id=dashboard, column=0, row=0)
+missing = table.cell_set_bgcolor(table_id=dashboard, column=0, bgcolor=color.red)
 duplicate = table.cell_set_text_color(dashboard, 0, 0, color.white, table_id=dashboard)
 tooMany = table.cell_set_width(dashboard, 0, 0, 10, 20)
 missingCoordinate = table.cell_set_height(table_id=dashboard, row=0, height=2)
-missingTooltip = table.cell_set_tooltip(table_id=dashboard, column=0, row=0)
+missingTooltipCoordinate = table.cell_set_tooltip(table_id=dashboard, column=0)
 duplicateTooltip = table.cell_set_tooltip(dashboard, 0, 0, "Tip", table_id=dashboard)
 tooManyTooltip = table.cell_set_tooltip(dashboard, 0, 0, "Tip", "Extra")
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
       "Unknown argument 'tooltip' for table.cell_set_text()",
-      'table.cell_set_bgcolor() expects at least 4 arguments',
-      "table.cell_set_bgcolor() missing required argument 'bgcolor'",
+      "table.cell_set_bgcolor() missing required argument 'row'",
       "Argument 'table_id' for table.cell_set_text_color() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
       'table.cell_set_width() expects at most 4 arguments',
-      'table.cell_set_height() expects at least 4 arguments',
       "table.cell_set_height() missing required argument 'column'",
-      'table.cell_set_tooltip() expects at least 4 arguments',
-      "table.cell_set_tooltip() missing required argument 'tooltip'",
+      'table.cell_set_tooltip() expects at least 3 arguments',
+      "table.cell_set_tooltip() missing required argument 'row'",
       "Argument 'table_id' for table.cell_set_tooltip() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
       'table.cell_set_tooltip() expects at most 4 arguments',
     ]);
@@ -7491,7 +7598,9 @@ ints.push(mixed.get(0))
     expect(types.get('literalLabels')).toMatchObject({ kind: 'array', elementType: { kind: 'label' } });
     expect(types.get('fromPoints')).toMatchObject({ kind: 'array', elementType: { kind: 'chart.point' } });
     expect(types.get('mixed')).toMatchObject({ kind: 'array', elementType: { kind: 'unknown' } });
+    // https://www.tradingview.com/pine-script-docs/language/arrays/#declaring-arrays
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'array.from arguments must have compatible element types, got int and string',
       'Cannot use float value as int array element',
       'Cannot use string value as label array element',
       'Cannot use label value as chart.point array element',
@@ -7757,8 +7866,10 @@ upper = plot(close)
 level = hline(100)
 upper := hline(90)
 level := plot(open)
-plot badPlot = hline(80)
-hline badLine = plot(high)
+badPlot = plot(close)
+badPlot := hline(80)
+badLine = hline(90)
+badLine := plot(high)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
@@ -8187,12 +8298,12 @@ indicator("Remaining TA Signatures")
 legacyObv = ta.obv(source=close, volume=volume)
 mixedObv = ta.obv(source=close, volume)
 currentObv = ta.obv
-range = ta.tr(handle_na=true)
+rangeValue = ta.tr(handle_na=true)
 rawRange = ta.tr
 spread = ta.range(source=close, 3)
 up = ta.rising(source=close, 2)
 down = ta.falling(source=close, 2)
-plot(line + signal + hist + mixedLine + mixedSignal + mixedHist + legacyObv + mixedObv + currentObv + range + rawRange + spread)
+plot(line + signal + hist + mixedLine + mixedSignal + mixedHist + legacyObv + mixedObv + currentObv + rangeValue + rawRange + spread)
 plotshape(up or down)
 `));
 
@@ -8238,15 +8349,15 @@ badIff = iff(1, close, open)
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
       'ta.barssince condition must be a boolean, got float',
-      'ta.valuewhen occurrence must be a number, got string',
+      'ta.valuewhen occurrence must be an integer, got string',
       'ta.valuewhen condition must be a boolean, got int',
       'ta.cross source2 must be a number, got bool',
       'ta.highest source must be a number, got string',
-      'ta.highest length must be a number, got string',
+      'ta.highest length must be an integer, got string',
       'ta.variance length must be a number, got string',
       'ta.variance biased must be a boolean, got string',
       'ta.alma series must be a number, got string',
-      'ta.alma length must be a number, got bool',
+      'ta.alma length must be an integer, got bool',
       'ta.alma offset must be a number, got string',
       'ta.alma sigma must be a number, got bool',
       'ta.alma floor must be a boolean, got int',
@@ -8255,12 +8366,12 @@ badIff = iff(1, close, open)
       'ta.kc mult must be a number, got string',
       'ta.kc useTrueRange must be a boolean, got string',
       'ta.macd source must be a number, got string',
-      'ta.macd fastlen must be a number, got bool',
-      'ta.macd slowlen must be a number, got string',
-      'ta.macd siglen must be a number, got bool',
+      'ta.macd fastlen must be an integer, got bool',
+      'ta.macd slowlen must be an integer, got string',
+      'ta.macd siglen must be an integer, got bool',
       'ta.stoch high must be a number, got string',
       'ta.stoch low must be a number, got bool',
-      'ta.stoch length must be a number, got string',
+      'ta.stoch length must be an integer, got string',
       'ta.pivothigh source must be a number, got string',
       'ta.pivothigh leftbars must be a number, got bool',
       'ta.pivothigh rightbars must be a number, got string',
@@ -8321,11 +8432,11 @@ plot(redChannel + inputTransparency + seriesBlue)
       'Cannot assign string value to float variable inputTransparency',
       'Cannot assign string value to float variable seriesBlue',
     ]);
-    expect(types.get('base')).toMatchObject({ kind: 'color', qualifier: 'const' });
-    expect(types.get('derived')).toMatchObject({ kind: 'color', qualifier: 'input' });
+    expect(types.get('base')).toMatchObject({ kind: 'color', qualifier: 'series' });
+    expect(types.get('derived')).toMatchObject({ kind: 'color', qualifier: 'series' });
     expect(types.get('gradient')).toMatchObject({ kind: 'color', qualifier: 'series' });
-    expect(types.get('redChannel')).toMatchObject({ kind: 'float', qualifier: 'const' });
-    expect(types.get('inputTransparency')).toMatchObject({ kind: 'float', qualifier: 'input' });
+    expect(types.get('redChannel')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('inputTransparency')).toMatchObject({ kind: 'float', qualifier: 'series' });
     expect(types.get('seriesBlue')).toMatchObject({ kind: 'float', qualifier: 'series' });
   });
 
@@ -8348,9 +8459,9 @@ plot(close, color=color.teal)
       'Cannot assign string value to color variable trend',
       'Cannot assign int value to color variable hidden',
     ]);
-    expect(types.get('accent')).toMatchObject({ kind: 'color', qualifier: 'const' });
+    expect(types.get('accent')).toMatchObject({ kind: 'color', qualifier: 'series' });
     expect(types.get('trend')).toMatchObject({ kind: 'color', qualifier: 'series' });
-    expect(types.get('hidden')).toMatchObject({ kind: 'color', qualifier: 'const' });
+    expect(types.get('hidden')).toMatchObject({ kind: 'color', qualifier: 'series' });
   });
 
   it('reports literal color transparency values outside the Pine range', () => {
@@ -8403,14 +8514,14 @@ plot(leftVisible + rightVisible + (standard ? 1 : 0) + (renko ? 1 : 0) + (heikin
       'Cannot assign string value to bool variable heikin',
       'Cannot assign string value to bool variable lineBreak',
     ]);
-    expect(types.get('bg')).toMatchObject({ kind: 'color', qualifier: 'simple' });
-    expect(types.get('fg')).toMatchObject({ kind: 'color', qualifier: 'simple' });
-    expect(types.get('leftVisible')).toMatchObject({ kind: 'int', qualifier: 'input' });
-    expect(types.get('rightVisible')).toMatchObject({ kind: 'int', qualifier: 'input' });
-    expect(types.get('standard')).toMatchObject({ kind: 'bool', qualifier: 'simple' });
-    expect(types.get('renko')).toMatchObject({ kind: 'bool', qualifier: 'simple' });
-    expect(types.get('heikin')).toMatchObject({ kind: 'bool', qualifier: 'simple' });
-    expect(types.get('lineBreak')).toMatchObject({ kind: 'bool', qualifier: 'simple' });
+    expect(types.get('bg')).toMatchObject({ kind: 'color', qualifier: 'series' });
+    expect(types.get('fg')).toMatchObject({ kind: 'color', qualifier: 'series' });
+    expect(types.get('leftVisible')).toMatchObject({ kind: 'int', qualifier: 'series' });
+    expect(types.get('rightVisible')).toMatchObject({ kind: 'int', qualifier: 'series' });
+    expect(types.get('standard')).toMatchObject({ kind: 'bool', qualifier: 'series' });
+    expect(types.get('renko')).toMatchObject({ kind: 'bool', qualifier: 'series' });
+    expect(types.get('heikin')).toMatchObject({ kind: 'bool', qualifier: 'series' });
+    expect(types.get('lineBreak')).toMatchObject({ kind: 'bool', qualifier: 'series' });
   });
 
   it('reports invalid color helper named arguments', () => {
@@ -8467,7 +8578,7 @@ badDuplicate = color.new(1, 20, color=color.red)
   it('resolves string helper named arguments and aliases', () => {
     const result = checkProgram(parse(`
 indicator("String Signatures")
-text = "BTC-USDT-USDT"
+textValue = "BTC-USDT-USDT"
 formatted = str.tostring(value=close, format="#.0")
 prefixFormatted = str.tostring(value=close, "#.00")
 parsed = str.tonumber(string="42.5")
@@ -8476,29 +8587,29 @@ timeText = str.format_time(time=time, format="yyyy-MM-dd", timezone=syminfo.time
 prefixTimeText = str.format_time(time=time, "yyyy-MM-dd", syminfo.timezone)
 message = str.format(format="close={0}", close)
 liveMessage = str.format(formatString="live={0}", arg0=close)
-hasUsdt = str.contains(string=text, substring="USDT")
-prefixHasUsdt = str.contains(source=text, "USDT")
-starts = str.startswith(source=text, target="BTC")
-prefixStarts = str.startswith(string=text, "BTC")
-ends = str.endswith(source=text, str="USDT")
-position = str.pos(source=text, str="USDT")
-prefixPosition = str.pos(string=text, "USDT")
-prefix = str.substring(string=text, begin_pos=0, end_pos=3)
-prefixSlice = str.substring(source=text, 0, 3)
+hasUsdt = str.contains(string=textValue, substring="USDT")
+prefixHasUsdt = str.contains(source=textValue, "USDT")
+starts = str.startswith(source=textValue, target="BTC")
+prefixStarts = str.startswith(string=textValue, "BTC")
+ends = str.endswith(source=textValue, str="USDT")
+position = str.pos(source=textValue, str="USDT")
+prefixPosition = str.pos(string=textValue, "USDT")
+prefix = str.substring(string=textValue, begin_pos=0, end_pos=3)
+prefixSlice = str.substring(source=textValue, 0, 3)
 match = str.match(source="Trade NASDAQ:AAPL", pattern="[A-Z]+:[A-Z]+")
 prefixMatch = str.match(string="Trade NASDAQ:AAPL", "[A-Z]+:[A-Z]+")
 repeated = str.repeat(string="?", repeat_count=3, separator=",")
 officialRepeated = str.repeat(source="?", repeat=3, separator=",")
 prefixRepeated = str.repeat(source="?", 3, ",")
-parts = str.split(string=text, separator="-")
-prefixParts = str.split(source=text, "-")
-upper = str.upper(string=text)
-lower = str.lower(string=text)
+parts = str.split(string=textValue, separator="-")
+prefixParts = str.split(source=textValue, "-")
+upper = str.upper(string=textValue)
+lower = str.lower(string=textValue)
 trimmed = str.trim(string=" BTC ")
-replaceOne = str.replace(string=text, substring="USDT", replacement="PERP", occurrence=1)
-prefixReplaceOne = str.replace(source=text, "USDT", "PERP", 1)
-replaceAll = str.replace_all(source=text, str="USDT", replacement="PERP")
-prefixReplaceAll = str.replace_all(string=text, "USDT", "PERP")
+replaceOne = str.replace(string=textValue, substring="USDT", replacement="PERP", occurrence=1)
+prefixReplaceOne = str.replace(source=textValue, "USDT", "PERP", 1)
+replaceAll = str.replace_all(source=textValue, str="USDT", replacement="PERP")
+prefixReplaceAll = str.replace_all(string=textValue, "USDT", "PERP")
 plot(parsed + parsedInt + position + prefixPosition + str.length(string=formatted + prefixFormatted + timeText + prefixTimeText + message + liveMessage + prefix + prefixSlice + match + prefixMatch + repeated + officialRepeated + prefixRepeated + upper + lower + trimmed + replaceOne + prefixReplaceOne + replaceAll + prefixReplaceAll))
 `));
 
@@ -8508,22 +8619,22 @@ plot(parsed + parsedInt + position + prefixPosition + str.length(string=formatte
   it('infers string helper return types for downstream diagnostics', () => {
     const result = checkProgram(parse(`
 indicator("String Return Types")
-text = "BTC-USDT"
+textValue = "BTC-USDT"
 seriesText = str.tostring(close)
 formatted = str.format(format="close={0}", close)
 liveFormatted = str.format(formatString="close={0}", arg0=close)
 timeText = str.format_time(time=time)
 parsed = str.tonumber("42.5")
 parsedInt = str.tointeger("42.9")
-length = str.length(text)
-position = str.pos(source=text, str="USDT")
-hasUsdt = str.contains(source=text, str="USDT")
-starts = str.startswith(source=text, str="BTC")
-prefix = str.substring(source=text, begin_pos=0, end_pos=3)
+length = str.length(textValue)
+position = str.pos(source=textValue, str="USDT")
+hasUsdt = str.contains(source=textValue, str="USDT")
+starts = str.startswith(source=textValue, str="BTC")
+prefix = str.substring(source=textValue, begin_pos=0, end_pos=3)
 matched = str.match(source="Trade NASDAQ:AAPL", regex="[A-Z]+:[A-Z]+")
 repeated = str.repeat(source="?", repeat_count=3, separator=",")
-upper = str.upper(text)
-parts = str.split(source=text, separator="-")
+upper = str.upper(textValue)
+parts = str.split(source=textValue, separator="-")
 seriesText := 1
 formatted := 2
 liveFormatted := 2
@@ -8564,15 +8675,15 @@ plot(hasUsdt and starts ? 1 : 0)
     expect(types.get('formatted')).toMatchObject({ kind: 'string', qualifier: 'series' });
     expect(types.get('liveFormatted')).toMatchObject({ kind: 'string', qualifier: 'series' });
     expect(types.get('timeText')).toMatchObject({ kind: 'string', qualifier: 'series' });
-    expect(types.get('parsed')).toMatchObject({ kind: 'float', qualifier: 'const' });
-    expect(types.get('length')).toMatchObject({ kind: 'int', qualifier: 'const' });
-    expect(types.get('position')).toMatchObject({ kind: 'int', qualifier: 'const' });
-    expect(types.get('hasUsdt')).toMatchObject({ kind: 'bool', qualifier: 'const' });
-    expect(types.get('starts')).toMatchObject({ kind: 'bool', qualifier: 'const' });
-    expect(types.get('prefix')).toMatchObject({ kind: 'string', qualifier: 'const' });
-    expect(types.get('matched')).toMatchObject({ kind: 'string', qualifier: 'const' });
-    expect(types.get('repeated')).toMatchObject({ kind: 'string', qualifier: 'const' });
-    expect(types.get('upper')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('parsed')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('length')).toMatchObject({ kind: 'int', qualifier: 'series' });
+    expect(types.get('position')).toMatchObject({ kind: 'int', qualifier: 'series' });
+    expect(types.get('hasUsdt')).toMatchObject({ kind: 'bool', qualifier: 'series' });
+    expect(types.get('starts')).toMatchObject({ kind: 'bool', qualifier: 'series' });
+    expect(types.get('prefix')).toMatchObject({ kind: 'string', qualifier: 'series' });
+    expect(types.get('matched')).toMatchObject({ kind: 'string', qualifier: 'series' });
+    expect(types.get('repeated')).toMatchObject({ kind: 'string', qualifier: 'series' });
+    expect(types.get('upper')).toMatchObject({ kind: 'string', qualifier: 'series' });
     expect(types.get('parts')).toMatchObject({ kind: 'array', qualifier: 'const', elementType: { kind: 'string' } });
   });
 
@@ -8713,7 +8824,7 @@ plot(absFloat + maxInt + maxFloat + avgSimple + roundedFloat + mintickSimple + r
       'Cannot assign string value to float variable powered',
       'Cannot assign string value to float variable runningSum',
     ]);
-    expect(types.get('piValue')).toMatchObject({ kind: 'float', qualifier: 'const' });
+    expect(types.get('piValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
     expect(types.get('absInt')).toMatchObject({ kind: 'int', qualifier: 'series' });
     expect(types.get('absFloat')).toMatchObject({ kind: 'float', qualifier: 'series' });
     expect(types.get('maxInt')).toMatchObject({ kind: 'int', qualifier: 'const' });
@@ -8723,7 +8834,7 @@ plot(absFloat + maxInt + maxFloat + avgSimple + roundedFloat + mintickSimple + r
     expect(types.get('roundedFloat')).toMatchObject({ kind: 'float', qualifier: 'series' });
     expect(types.get('mintickSimple')).toMatchObject({ kind: 'float', qualifier: 'simple' });
     expect(types.get('floored')).toMatchObject({ kind: 'int', qualifier: 'series' });
-    expect(types.get('powered')).toMatchObject({ kind: 'float', qualifier: 'const' });
+    expect(types.get('powered')).toMatchObject({ kind: 'float', qualifier: 'series' });
     expect(types.get('runningSum')).toMatchObject({ kind: 'float', qualifier: 'series' });
     expect(types.get('randomValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
     expect(types.get('degrees')).toMatchObject({ kind: 'float', qualifier: 'series' });
@@ -8808,7 +8919,7 @@ badDuplicate = math.round("1", number=2)
     ]);
   });
 
-  it('resolves global helper named arguments', () => {
+  it('resolves global helper named arguments and rejects a nonnumeric float cast', () => {
     const result = checkProgram(parse(`
 indicator("Global Helper Signatures")
 source = bar_index % 3 == 0 ? na : close
@@ -8822,7 +8933,9 @@ isMissing = na(x=source)
 plot(filled + fixed + asFloat + asInt + (asBool ? 1 : 0) + str.length(asString) + (isMissing ? 1 : 0))
 `));
 
-    expect(result.diagnostics).toEqual([]);
+    expect(result.diagnostics).toEqual([
+      expect.objectContaining({ code: 'type-mismatch', message: 'float x must be a number, got string' }),
+    ]);
   });
 
   it('reports invalid global helper value types', () => {
@@ -8880,6 +8993,8 @@ plot(filledFloat + fixedFloat + filledInt)
     const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'No nz overload accepts these source and replacement types',
+      'No nz overload accepts these source and replacement types',
       'Cannot assign string value to float variable filledFloat',
       'Cannot assign string value to float variable fixedFloat',
       'Cannot assign string value to int variable filledInt',
@@ -8889,7 +9004,7 @@ plot(filledFloat + fixedFloat + filledInt)
     expect(types.get('filledFloat')).toMatchObject({ kind: 'float', qualifier: 'series' });
     expect(types.get('fixedFloat')).toMatchObject({ kind: 'float', qualifier: 'series' });
     expect(types.get('filledInt')).toMatchObject({ kind: 'int', qualifier: 'series' });
-    expect(types.get('filledString')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('filledString')).toMatchObject({ kind: 'string', qualifier: 'series' });
     expect(types.get('namedPrefixFloat')).toMatchObject({ kind: 'float', qualifier: 'series' });
     expect(types.get('mixed')).toMatchObject({ kind: 'unknown' });
   });
@@ -8957,15 +9072,15 @@ plot(str.length(base + modified + standard + inherited + heikinashi + renko + li
       'Cannot assign int value to string variable kagi',
       'Cannot assign int value to string variable pointFigure',
     ]);
-    expect(types.get('base')).toMatchObject({ kind: 'string', qualifier: 'simple' });
-    expect(types.get('modified')).toMatchObject({ kind: 'string', qualifier: 'simple' });
-    expect(types.get('standard')).toMatchObject({ kind: 'string', qualifier: 'simple' });
-    expect(types.get('inherited')).toMatchObject({ kind: 'string', qualifier: 'simple' });
-    expect(types.get('heikinashi')).toMatchObject({ kind: 'string', qualifier: 'simple' });
-    expect(types.get('renko')).toMatchObject({ kind: 'string', qualifier: 'simple' });
-    expect(types.get('lineBreak')).toMatchObject({ kind: 'string', qualifier: 'simple' });
-    expect(types.get('kagi')).toMatchObject({ kind: 'string', qualifier: 'simple' });
-    expect(types.get('pointFigure')).toMatchObject({ kind: 'string', qualifier: 'simple' });
+    expect(types.get('base')).toMatchObject({ kind: 'string', qualifier: 'series' });
+    expect(types.get('modified')).toMatchObject({ kind: 'string', qualifier: 'series' });
+    expect(types.get('standard')).toMatchObject({ kind: 'string', qualifier: 'series' });
+    expect(types.get('inherited')).toMatchObject({ kind: 'string', qualifier: 'series' });
+    expect(types.get('heikinashi')).toMatchObject({ kind: 'string', qualifier: 'series' });
+    expect(types.get('renko')).toMatchObject({ kind: 'string', qualifier: 'series' });
+    expect(types.get('lineBreak')).toMatchObject({ kind: 'string', qualifier: 'series' });
+    expect(types.get('kagi')).toMatchObject({ kind: 'string', qualifier: 'series' });
+    expect(types.get('pointFigure')).toMatchObject({ kind: 'string', qualifier: 'series' });
   });
 
   it('reports invalid ticker helper named arguments', () => {
@@ -9003,6 +9118,8 @@ plot(str.length(badConstants + badStrings))
       'Invalid ticker.new adjustment: adjustment.all',
       'Invalid ticker.new backadjustment: backadjustment.auto',
       'Invalid ticker.new settlement_as_close: settlement_as_close.auto',
+      'ticker.modify backadjustment must be a backadjustment selector, got string',
+      'ticker.modify settlement_as_close must be a settlement selector, got string',
       'Invalid ticker.modify session: premarket',
       'Invalid ticker.modify adjustment: all',
       'Invalid ticker.modify backadjustment: auto',
@@ -9353,31 +9470,31 @@ plot(source + level + multiplier + length + genericLength + genericMultiplier + 
       'Cannot assign string value to color variable legacyTint',
       'Cannot assign string value to float variable legacySource',
     ]);
-    expect(types.get('length')).toMatchObject({ kind: 'int', qualifier: 'input' });
-    expect(types.get('multiplier')).toMatchObject({ kind: 'float', qualifier: 'input' });
-    expect(types.get('enabled')).toMatchObject({ kind: 'bool', qualifier: 'input' });
-    expect(types.get('mode')).toMatchObject({ kind: 'string', qualifier: 'input' });
-    expect(types.get('tint')).toMatchObject({ kind: 'color', qualifier: 'input' });
-    expect(types.get('start')).toMatchObject({ kind: 'int', qualifier: 'input' });
-    expect(types.get('tf')).toMatchObject({ kind: 'string', qualifier: 'input' });
-    expect(types.get('symbol')).toMatchObject({ kind: 'string', qualifier: 'input' });
-    expect(types.get('session')).toMatchObject({ kind: 'string', qualifier: 'input' });
-    expect(types.get('memo')).toMatchObject({ kind: 'string', qualifier: 'input' });
-    expect(types.get('direction')).toMatchObject({ kind: 'udt', name: 'Direction', qualifier: 'input' });
-    expect(types.get('level')).toMatchObject({ kind: 'float', qualifier: 'input' });
+    expect(types.get('length')).toMatchObject({ kind: 'int', qualifier: 'series' });
+    expect(types.get('multiplier')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('enabled')).toMatchObject({ kind: 'bool', qualifier: 'series' });
+    expect(types.get('mode')).toMatchObject({ kind: 'string', qualifier: 'series' });
+    expect(types.get('tint')).toMatchObject({ kind: 'color', qualifier: 'series' });
+    expect(types.get('start')).toMatchObject({ kind: 'int', qualifier: 'series' });
+    expect(types.get('tf')).toMatchObject({ kind: 'string', qualifier: 'series' });
+    expect(types.get('symbol')).toMatchObject({ kind: 'string', qualifier: 'series' });
+    expect(types.get('session')).toMatchObject({ kind: 'string', qualifier: 'series' });
+    expect(types.get('memo')).toMatchObject({ kind: 'string', qualifier: 'series' });
+    expect(types.get('direction')).toMatchObject({ kind: 'udt', name: 'Direction', qualifier: 'series' });
+    expect(types.get('level')).toMatchObject({ kind: 'float', qualifier: 'series' });
     expect(types.get('source')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('genericLength')).toMatchObject({ kind: 'int', qualifier: 'input' });
-    expect(types.get('genericMultiplier')).toMatchObject({ kind: 'float', qualifier: 'input' });
-    expect(types.get('genericEnabled')).toMatchObject({ kind: 'bool', qualifier: 'input' });
-    expect(types.get('genericMode')).toMatchObject({ kind: 'string', qualifier: 'input' });
-    expect(types.get('legacyLength')).toMatchObject({ kind: 'int', qualifier: 'input' });
-    expect(types.get('legacyMultiplier')).toMatchObject({ kind: 'float', qualifier: 'input' });
-    expect(types.get('legacyEnabled')).toMatchObject({ kind: 'bool', qualifier: 'input' });
-    expect(types.get('legacyMode')).toMatchObject({ kind: 'string', qualifier: 'input' });
-    expect(types.get('legacyTf')).toMatchObject({ kind: 'string', qualifier: 'input' });
-    expect(types.get('legacySymbol')).toMatchObject({ kind: 'string', qualifier: 'input' });
-    expect(types.get('legacySession')).toMatchObject({ kind: 'string', qualifier: 'input' });
-    expect(types.get('legacyTint')).toMatchObject({ kind: 'color', qualifier: 'input' });
+    expect(types.get('genericLength')).toMatchObject({ kind: 'int', qualifier: 'series' });
+    expect(types.get('genericMultiplier')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('genericEnabled')).toMatchObject({ kind: 'bool', qualifier: 'series' });
+    expect(types.get('genericMode')).toMatchObject({ kind: 'string', qualifier: 'series' });
+    expect(types.get('legacyLength')).toMatchObject({ kind: 'int', qualifier: 'series' });
+    expect(types.get('legacyMultiplier')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('legacyEnabled')).toMatchObject({ kind: 'bool', qualifier: 'series' });
+    expect(types.get('legacyMode')).toMatchObject({ kind: 'string', qualifier: 'series' });
+    expect(types.get('legacyTf')).toMatchObject({ kind: 'string', qualifier: 'series' });
+    expect(types.get('legacySymbol')).toMatchObject({ kind: 'string', qualifier: 'series' });
+    expect(types.get('legacySession')).toMatchObject({ kind: 'string', qualifier: 'series' });
+    expect(types.get('legacyTint')).toMatchObject({ kind: 'color', qualifier: 'series' });
     expect(types.get('legacySource')).toMatchObject({ kind: 'float', qualifier: 'series' });
   });
 
@@ -9515,7 +9632,7 @@ plot(badConfirm + badActive + badSource + okActive)
     ]);
   });
 
-  it('reports non-string Pine input text metadata', () => {
+  it('reports non-string and non-const Pine input text metadata', () => {
     const result = checkProgram(parse(`
 indicator("Bad Input Text Metadata")
 section = input.string("Signals", "Section")
@@ -9526,10 +9643,10 @@ badTitle = input.int(14, title=1)
 badTooltip = input.float(2.0, "Multiplier", tooltip=true)
 badInline = input.enum(Direction.long, "Direction", inline=3)
 badGroup = input.source(close, "Source", group=false)
-okGroup = input.price(101.25, title="Level", tooltip=section, inline="levels", group=section)
+badQualifiedGroup = input.price(101.25, title="Level", tooltip=section, inline="levels", group=section)
 badGenericTitle = input(14, title=1)
 badGenericConfirm = input(true, "Enabled", confirm=1)
-plot(badTitle + badTooltip + badGroup + okGroup + badGenericTitle)
+plot(badTitle + badTooltip + badGroup + badQualifiedGroup + badGenericTitle)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
@@ -9537,6 +9654,8 @@ plot(badTitle + badTooltip + badGroup + okGroup + badGenericTitle)
       'input.float tooltip must be a string, got bool',
       'input.enum inline must be a string, got int',
       'input.source group must be a string, got bool',
+      "Cannot pass input value to const parameter 'tooltip' for input.price; use an input/simple value or declare a compatible parameter",
+      "Cannot pass input value to const parameter 'group' for input.price; use an input/simple value or declare a compatible parameter",
       'input title must be a string, got int',
       "Unknown argument 'confirm' for input()",
     ]);
@@ -10270,9 +10389,9 @@ type Pivot
       'Cannot assign int value to string field Pivot.name',
       'Cannot assign string value to color field Pivot.tint',
       'Cannot assign string value to label field Pivot.tag',
-      'Cannot assign array<string> value to array<float> field Pivot.values',
-      'Cannot assign map<int, float> value to map<string, float> field Pivot.prices',
-      'Cannot assign matrix<float> value to matrix<int> field Pivot.grid',
+      'Default value for field Pivot.values must be a literal value or compatible built-in variable',
+      'Default value for field Pivot.prices must be a literal value or compatible built-in variable',
+      'Default value for field Pivot.grid must be a literal value or compatible built-in variable',
     ]);
   });
 
@@ -10296,6 +10415,7 @@ type Pivot
       'Default value for field Pivot.fromCall must be a literal value or compatible built-in variable',
       'Default value for field Pivot.fromBinary must be a literal value or compatible built-in variable',
       'Default value for field Pivot.fromCondition must be a literal value or compatible built-in variable',
+      'Default value for field Pivot.values must be a literal value or compatible built-in variable',
     ]);
   });
 
@@ -10351,6 +10471,19 @@ pivotHolder = HasPivot.new(Other.new(close))
       'Cannot assign array<float> value to map<string, float> field Cache.prices',
       'Cannot assign matrix<float> value to matrix<int> field Cache.grid',
       'Cannot assign Other value to Pivot field HasPivot.pivot',
+    ]);
+  });
+
+  it('keeps history offset diagnostics separate from array index assignment diagnostics', () => {
+    const result = checkProgram(parse(`//@version=6
+indicator("Index diagnostic contexts")
+values = array.new<int>()
+values["first"] := 1
+prior = close["first"]
+`));
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Array assignment index must be numeric, got string',
+      'History offset must be numeric, got string',
     ]);
   });
 
@@ -10505,7 +10638,7 @@ plot(factorial(4))
     expect(executed.plots[0]?.values).toEqual([24]);
   });
 
-  it('accepts collection constructor calls as UDT field defaults', () => {
+  it('rejects v6 collection constructor calls as UDT field defaults', () => {
     const result = checkProgram(parse(`
 indicator("UDT Collection Defaults")
 type Foo
@@ -10515,7 +10648,8 @@ type Foo
     matrix<float> grid = matrix.new<float>()
 `));
 
-    expect(result.diagnostics).toEqual([]);
+    expect(result.diagnostics.map((diagnostic) => diagnostic.code)).toEqual(Array(4).fill('invalid-field-default'));
+    expect(result.diagnostics.every((diagnostic) => diagnostic.severity === 'error')).toBe(true);
   });
 
   it('accepts calendar series globals without diagnostics', () => {
@@ -10564,8 +10698,8 @@ plot(plain + persistent + intrabar + typed + fixed)
     const errors = result.diagnostics.filter((diagnostic) => diagnostic.severity === 'error');
     expect(errors).toMatchObject([
       {
-        code: 'qualifier-mismatch',
-        message: 'Cannot assign series value to const float variable fixed',
+        code: 'const-reassignment',
+        message: "Cannot reassign const variable 'fixed', including with compound assignment.",
       },
     ]);
 
@@ -10577,10 +10711,11 @@ plot(plain + persistent + intrabar + typed + fixed)
     expect(types.get('fixed')).toMatchObject({ kind: 'float', qualifier: 'const' });
   });
 
-  it('allows a variable to reference its own history in its initializer', () => {
+  it('allows history in reassignment after declaration', () => {
     const result = checkProgram(parse(`//@version=6
 indicator("Self history")
-float value = nz(value[1]) + 1
+float value = 0.0
+value := nz(value[1]) + 1
 plot(value)
 `));
 

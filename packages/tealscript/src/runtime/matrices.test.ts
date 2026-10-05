@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { createPineArray, getArrayValue, pushArrayValue } from './arrays';
 import { createPineUdtObject } from './objects';
@@ -97,7 +97,7 @@ describe('PineMatrix', () => {
     expect(left.values).toEqual([1, 2, 3, 4, 5, 6]);
     expect(right.values).toEqual([5, 6]);
 
-    const empty = createPineMatrix<number>();
+    const empty = createPineMatrix<number>(0, 2);
     const emptyConcat = concatMatrix(empty, right);
     expect(emptyConcat).toBe(empty);
     expect(empty.rows).toBe(1);
@@ -438,6 +438,19 @@ describe('PineMatrix', () => {
     expect(symmetric.values).toEqual([2, 1, 0, 1, 2, 0, 0, 0, 3]);
   });
 
+  it('bounds array materialization across nonconvergent QR iterations', () => {
+    const matrix = createPineMatrix<number>(3, 3, 0);
+    matrix.values = [0, -1, 0, 1, 0, 0, 0, 0, 2];
+    const map = vi.spyOn(Array.prototype, 'map');
+    try {
+      expect(eigenvaluesMatrixValue(matrix).values).toEqual([0, 0, 2]);
+      expect(map.mock.calls.length).toBeLessThan(100);
+      expect(matrix.values).toEqual([0, -1, 0, 1, 0, 0, 0, 0, 2]);
+    } finally {
+      map.mockRestore();
+    }
+  });
+
   it('computes real eigenvectors as matrix columns', () => {
     const diagonal = createPineMatrix<number>(2, 2, 0);
     diagonal.values = [2, 0, 0, 3];
@@ -455,7 +468,7 @@ describe('PineMatrix', () => {
     expect(values.values).toEqual([2, 4, 6, 8]);
   });
 
-  it('rejects eigenvalues for non-square matrices and returns na structures for complex roots', () => {
+  it('rejects non-square matrices and preserves bounded complex publication', () => {
     expect(() => eigenvaluesMatrixValue(createPineMatrix<number>(2, 3, 1))).toThrow('Matrix eigenvalues requires a square matrix. Matrix is 2x3');
 
     const rotation = createPineMatrix<number>(2, 2, 0);
@@ -465,8 +478,15 @@ describe('PineMatrix', () => {
 
     const blockRotation = createPineMatrix<number>(3, 3, 0);
     blockRotation.values = [0, -1, 0, 1, 0, 0, 0, 0, 2];
-    expect(eigenvaluesMatrixValue(blockRotation).values).toEqual([Number.NaN, Number.NaN, Number.NaN]);
+    expect(eigenvaluesMatrixValue(blockRotation).values).toEqual([0, 0, 2]);
+    expect(() => eigenvectorsMatrixValue(blockRotation)).not.toThrow();
     expect(eigenvectorsMatrixValue(blockRotation).values).toEqual(Array(9).fill(Number.NaN));
+  });
+
+  it('retains missing publication for an unresolved real Jordan block', () => {
+    const matrix = createPineMatrix<number>(3, 3, 0);
+    matrix.values = [2, 1, 0, 0, 2, 1, 0, 0, 2];
+    expect(eigenvaluesMatrixValue(matrix).values).toEqual(Array(3).fill(Number.NaN));
   });
 
   it('rejects matrix inverses for non-square or singular matrices', () => {

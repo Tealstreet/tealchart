@@ -45,6 +45,7 @@ const setRenderOptionsCalls: Array<unknown> = [];
 const setExecutionLinesCalls: Array<unknown> = [];
 const setAvailableIndicatorsCalls: BuiltinIndicator[][] = [];
 const widgetUiOptionsCalls: Array<{
+  showDataWindow?: boolean;
   availableIndicators?: BuiltinIndicator[];
   onUserDrawingToolSelect?: (tool: UserDrawingTool) => void;
   onUserDrawingUndo?: () => void;
@@ -344,6 +345,25 @@ describe('volume settings persistence', () => {
     widget.remove();
   });
 
+  it('clears indicator name labels when the next layout omits that setting', () => {
+    const datafeed = createMockDatafeed();
+    const widget = createWidget(datafeed);
+    completeInit(datafeed);
+    const state = widget as unknown as {
+      _handleLoadLayout: (settings: ChartSettings, warnings: string[], id: string, name: string) => void;
+      _getCurrentSettings: () => ChartSettings;
+      _render: (dirty: number) => void;
+    };
+    const base = state._getCurrentSettings();
+    state._handleLoadLayout({ ...base, chartProperties: { 'scalesProperties.showStudyPlotLabels': true } }, [], 'a', 'A');
+    state._render(DIRTY.OPTIONS);
+    expect(setRenderOptionsCalls.at(-1)).toMatchObject({ showIndicatorOutputAxisLabelTitles: true });
+    state._handleLoadLayout({ ...base, chartProperties: undefined }, [], 'b', 'B');
+    state._render(DIRTY.OPTIONS);
+    expect(setRenderOptionsCalls.at(-1)).toMatchObject({ showIndicatorOutputAxisLabelTitles: false });
+    widget.remove();
+  });
+
   it('persists a volume toggle applied through applyOverrides', () => {
     // applyOverrides only touched _renderOptions, so an override-hidden volume
     // still saved as visible and reappeared on the next load.
@@ -430,6 +450,26 @@ describe('TealchartWidget', () => {
   // TealScript Rendering
   // ============================================================================
   describe('tealscript rendering', () => {
+    it('removes cascaded external-source dependents from persisted indicators and tracking maps', () => {
+      const datafeed = createMockDatafeed();
+      const widget = createWidget(datafeed, { createTealscriptWorker: () => new TealscriptTestWorker() as unknown as Worker });
+      completeInit(datafeed);
+      const state = widget as unknown as {
+        _chartStore: import('./state/chartState').ChartStore;
+        _studyInstanceMap: Map<string, string>;
+        _indicatorStudyMap: Map<string, string>;
+        _tealScriptManager: { options: { onScriptRemoved: (id: string) => void } };
+      };
+      state._chartStore.settings.setKey('indicators', [{ id: 'saved-consumer', name: 'Consumer', builtinId: 'custom', inputs: { input_Source: 'tealscript-source:provider:curve' }, isVisible: true, createdAt: 1 }]);
+      state._studyInstanceMap.set('consumer', 'saved-consumer');
+      state._indicatorStudyMap.set('saved-consumer', 'consumer');
+      state._tealScriptManager.options.onScriptRemoved('consumer');
+      expect(state._chartStore.settings.get().indicators).toEqual([]);
+      expect(state._studyInstanceMap.has('consumer')).toBe(false);
+      expect(state._indicatorStudyMap.has('saved-consumer')).toBe(false);
+      widget.remove();
+    });
+
     it('passes host-supplied custom Tealscript indicators to the picker and updates them live', () => {
       const datafeed = createMockDatafeed();
       const customIndicator: BuiltinIndicator = {
@@ -5131,4 +5171,13 @@ describe('TealchartWidget viewport history coverage', () => {
 
     widget.remove();
   });
+
+  it.each([undefined, false, true])("forwards Data Window opt-in %s to the web UI", enabled => {
+    const datafeed = createMockDatafeed();
+    const widget = createWidget(datafeed, { showDataWindow: enabled });
+    completeInit(datafeed);
+    expect(widgetUiOptionsCalls.at(-1)?.showDataWindow).toBe(enabled);
+    widget.remove();
+  });
+
 });

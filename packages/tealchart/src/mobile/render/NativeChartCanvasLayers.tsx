@@ -1,4 +1,4 @@
-import type { PlotOutput } from '@tealstreet/tealscript';
+import type { DrawingOutput, PlotOutput } from '@tealstreet/tealscript';
 import type { SharedValue } from 'react-native-reanimated';
 import type { UserDrawingAnchor, UserDrawingRenderEntry } from '../../drawings';
 import type { Bar, OrderLineRenderData, PositionLineRenderData, RenderOptions } from '../../types';
@@ -28,6 +28,7 @@ import { NativeCrosshairLayer } from './NativeCrosshairLayer';
 import { NativeIndicatorOutputAxisLabelLayer } from './NativeIndicatorOutputAxisLabelLayer';
 import { NativeIndicatorPaneAxisLayer } from './NativeIndicatorPaneAxisLayer';
 import { NativeIndicatorPlotLayer } from './NativeIndicatorPlotLayer';
+import { NativeTealScriptDrawingLayer } from './NativeTealScriptDrawingLayer';
 import { NativeUserDrawingLayer } from './NativeUserDrawingLayer';
 
 export interface NativeChartCanvasLayersProps {
@@ -46,6 +47,7 @@ export interface NativeChartCanvasLayersProps {
   intervalMs: number;
   indicatorPaneInfo: Readonly<Record<string, NativeIndicatorPaneInfo>>;
   indicatorPlots: readonly PlotOutput[];
+  indicatorDrawings?: readonly DrawingOutput[];
   paneRangeOverrides?: SharedValue<NativePaneRangeOverrides>;
   indicatorTotalBarCount: number;
   onDragPriceLabelWidth?: (objectId: string, width: number) => void;
@@ -94,6 +96,7 @@ export function NativeChartCanvasLayersImpl({
   intervalMs,
   indicatorPaneInfo,
   indicatorPlots,
+  indicatorDrawings = [],
   paneRangeOverrides,
   indicatorTotalBarCount,
   lineSnapshot,
@@ -158,6 +161,7 @@ export function NativeChartCanvasLayersImpl({
           />
 
           <NativeCandleVolumeLayer
+            totalBarCount={indicatorTotalBarCount}
             barColorPlots={indicatorPlots.filter((plot) => plot.type === 'barcolor')}
             frame={frame}
             options={options}
@@ -168,6 +172,7 @@ export function NativeChartCanvasLayersImpl({
           />
 
           <NativeIndicatorPlotLayer
+            bars={bars}
             frame={frame}
             indicatorPaneInfo={indicatorPaneInfo}
             paneRangeOverrides={paneRangeOverrides}
@@ -178,6 +183,18 @@ export function NativeChartCanvasLayersImpl({
             totalBarCount={indicatorTotalBarCount}
             visibleBars={visibleBars}
           />
+
+          {indicatorDrawings.length > 0 && (
+            <NativeTealScriptDrawingLayer
+              drawings={indicatorDrawings}
+              bars={bars}
+              frame={frame}
+              indicatorPaneInfo={indicatorPaneInfo}
+              paneRangeOverrides={paneRangeOverrides}
+              sharedViewport={sharedViewport}
+              staticProjection={staticProjection}
+            />
+          )}
 
           <NativeChartPrimitiveLayer
             axisFont={axisFont}
@@ -213,6 +230,7 @@ export function NativeChartCanvasLayersImpl({
               pricePrecision={pricePrecision}
               resolvedPriceAxisTags={resolvedPriceAxisTags}
               sharedViewport={sharedViewport}
+              showIndicatorOutputAxisLabelTitles={options.showIndicatorOutputAxisLabelTitles}
               smallFont={smallFont}
               totalBarCount={indicatorTotalBarCount}
             />

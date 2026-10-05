@@ -1218,7 +1218,7 @@ signalLen = input.int(9, "Signal Length")
 [macdLine, signalLine, histLine] = ta.macd(close, fastLen, slowLen, signalLen)
 plot(macdLine, "MACD", color=color.blue, linewidth=2)
 plot(signalLine, "Signal", color=color.orange, linewidth=2)
-plot(histLine, "Histogram", style=plot.style_histogram, color=histLine >= 0 ? color.green : color.red)`,
+plot(histLine, "Histogram", style=plot.style_histogram, linewidth=3, color=histLine >= 0 ? color.green : color.red)`,
   },
   {
     id: 'stochastic',
@@ -1343,7 +1343,7 @@ signalLen = input.int(9, "Signal Length")
 [macdLine, signalLine, histLine] = ta.macd(close, fastLen, slowLen, signalLen)
 plot(macdLine, "MACD", color=color.blue, linewidth=2)
 plot(signalLine, "Signal", color=color.orange, linewidth=2)
-plot(histLine, "Histogram", style=plot.style_histogram, color=histLine >= 0 ? color.green : color.red)
+plot(histLine, "Histogram", style=plot.style_histogram, linewidth=3, color=histLine >= 0 ? color.green : color.red)
 bullSignal = ta.crossover(macdLine, signalLine)
 bearSignal = ta.crossunder(macdLine, signalLine)
 plotshape(bullSignal, title="Bull Cross", style=shape.triangleup, location=location.bottom, color=color.green, size=size.tiny)
@@ -1459,7 +1459,7 @@ plot(obvValue, "OBV", color=color.teal, linewidth=2)`,
 indicator("Volume SMA")
 length = input.int(20, "MA Length", minval=1)
 volColor = close >= open ? color.green : color.red
-plot(volume, "Volume", style=plot.style_histogram, color=volColor)
+plot(volume, "Volume", style=plot.style_histogram, linewidth=3, color=volColor)
 plot(ta.sma(volume, length), "Volume MA", color=color.blue, linewidth=2)`,
   },
 ];

@@ -18,7 +18,7 @@ import type {
   LineDrawingOutput,
   PolylineDrawingOutput,
 } from './drawings/types';
-import { DrawingStore, type DrawingStoreSnapshot } from './drawings/store';
+import { DrawingStore, type DrawingStoreSnapshot, type PineTableReference } from './drawings/store';
 import { Series } from './series';
 import {
   cloneStrategyIntrabarContext,
@@ -106,6 +106,12 @@ export interface SymInfo {
   shareholders: number;
   shares_outstanding_float: number;
   shares_outstanding_total: number;
+  recommendations_buy: number;
+  recommendations_buy_strong: number;
+  recommendations_hold: number;
+  recommendations_sell: number;
+  recommendations_sell_strong: number;
+  recommendations_total: number;
   recommendations_date: number;
   target_price_date: number;
   target_price_average: number;
@@ -113,6 +119,13 @@ export interface SymInfo {
   target_price_high: number;
   target_price_low: number;
   target_price_median: number;
+  dividends_future_amount: number;
+  dividends_future_ex_date: number;
+  dividends_future_pay_date: number;
+  earnings_future_eps: number;
+  earnings_future_period_end_time: number;
+  earnings_future_revenue: number;
+  earnings_future_time: number;
   timezone: string;
 }
 
@@ -169,6 +182,7 @@ export function mergeChartInfo(base: ChartInfo, override?: Partial<ChartInfo>): 
  */
 export interface TimeframeInfo {
   period: string; // e.g., '1', '5', '60', 'D', 'W'
+  main_period?: string;
   multiplier: number; // e.g., 1, 5, 60
   isminutes: boolean;
   isdaily: boolean;
@@ -214,6 +228,8 @@ export interface PlotOutput {
   type: 'plot' | 'hline' | 'bgcolor' | 'barcolor' | 'plotbar' | 'plotcandle' | 'plotshape' | 'plotchar' | 'plotarrow' | 'fill';
   title: string;
   values: (number | null)[];
+  /** Unsuppressed numeric/boolean marker series for status, Data Window, and axis readouts. */
+  displayValues?: (number | null)[];
   zOrder?: number;
 
   /** Script ID that produced this plot (set by TealscriptManager) */
@@ -235,7 +251,7 @@ export interface PlotOutput {
   precision?: number;
   forceOverlay?: boolean;
 
-  // For plotbar/plotcandle
+  // Raw supplied OHLC fields; drawing adapters normalize extrema and mask gaps.
   openValues?: (number | null)[];
   highValues?: (number | null)[];
   lowValues?: (number | null)[];
@@ -265,6 +281,12 @@ export interface PlotOutput {
   plot1Id?: string;
   plot2Id?: string;
   fillgaps?: boolean;
+  gradient?: {
+    topValues: (number | null)[];
+    bottomValues: (number | null)[];
+    topColors: (string | null)[];
+    bottomColors: (string | null)[];
+  };
 }
 
 export type PlotStyle =
@@ -375,6 +397,8 @@ export class ExecutionContext {
 
   /** Current runtime wall-clock timestamp in milliseconds. */
   now: number = Date.now();
+  private hasFixedNow = false;
+  private timenowObservations?: Array<number | undefined>;
 
   /** Bar state information */
   barstate: BarState = {
@@ -412,6 +436,12 @@ export class ExecutionContext {
     shareholders: Number.NaN,
     shares_outstanding_float: Number.NaN,
     shares_outstanding_total: Number.NaN,
+    recommendations_buy: Number.NaN,
+    recommendations_buy_strong: Number.NaN,
+    recommendations_hold: Number.NaN,
+    recommendations_sell: Number.NaN,
+    recommendations_sell_strong: Number.NaN,
+    recommendations_total: Number.NaN,
     recommendations_date: Number.NaN,
     target_price_date: Number.NaN,
     target_price_average: Number.NaN,
@@ -419,6 +449,13 @@ export class ExecutionContext {
     target_price_high: Number.NaN,
     target_price_low: Number.NaN,
     target_price_median: Number.NaN,
+    dividends_future_amount: Number.NaN,
+    dividends_future_ex_date: Number.NaN,
+    dividends_future_pay_date: Number.NaN,
+    earnings_future_eps: Number.NaN,
+    earnings_future_period_end_time: Number.NaN,
+    earnings_future_revenue: Number.NaN,
+    earnings_future_time: Number.NaN,
     timezone: 'UTC',
   };
 
@@ -458,6 +495,7 @@ export class ExecutionContext {
 
   /** Plot outputs (populated during execution) */
   readonly plots: Map<string, PlotOutput> = new Map();
+  private plotCounts = new Map<string, number>();
 
   /** Plot order (for layering) */
   readonly plotOrder: string[] = [];
@@ -478,6 +516,11 @@ export class ExecutionContext {
 
   /** Alert outputs (populated during execution) */
   readonly alerts: Map<string, AlertOutput> = new Map();
+  private readonly nonAllAlertEventBars = new WeakMap<AlertOutput, {
+    events: AlertEvent[];
+    scannedLength: number;
+    bars: Set<number>;
+  }>();
 
   /** Alert order */
   readonly alertOrder: string[] = [];
@@ -603,27 +646,15 @@ export class ExecutionContext {
 
     const bar = this.bars[this.bar_index];
 
-    // Advance all built-in series
-    this.open.advance();
-    this.high.advance();
-    this.low.advance();
-    this.close.advance();
-    this.volume.advance();
-    this.bid.advance();
-    this.ask.advance();
-    this.time.advance();
-    this.timenow.advance();
-
-    // Set values for current bar
-    this.open.set(bar.open);
-    this.high.set(bar.high);
-    this.low.set(bar.low);
-    this.close.set(bar.close);
-    this.volume.set(bar.volume);
-    this.bid.set(this.getTickQuoteValue(bar.bid));
-    this.ask.set(this.getTickQuoteValue(bar.ask));
-    this.time.set(bar.time);
-    this.timenow.set(this.now);
+    this.open.advanceWithValue(bar.open);
+    this.high.advanceWithValue(bar.high);
+    this.low.advanceWithValue(bar.low);
+    this.close.advanceWithValue(bar.close);
+    this.volume.advanceWithValue(bar.volume);
+    this.bid.advanceWithValue(this.getTickQuoteValue(bar.bid));
+    this.ask.advanceWithValue(this.getTickQuoteValue(bar.ask));
+    this.time.advanceWithValue(bar.time);
+    this.timenow.advanceWithValue(this.observeExecutionTime());
 
     // Update barstate
     this.barstate.isfirst = this.bar_index === 0;
@@ -650,7 +681,7 @@ export class ExecutionContext {
     this.bid.set(this.getTickQuoteValue(bar.bid));
     this.ask.set(this.getTickQuoteValue(bar.ask));
     this.time.set(bar.time);
-    this.timenow.set(this.now);
+    this.timenow.set(this.observeExecutionTime());
 
     this.barstate.isnew = false;
     this.barstate.isrealtime = true;
@@ -696,7 +727,7 @@ export class ExecutionContext {
     this.bid.set(this.getTickQuoteValue(bar.bid));
     this.ask.set(this.getTickQuoteValue(bar.ask));
     this.time.set(bar.time);
-    this.timenow.set(this.now);
+    this.timenow.set(this.observeExecutionTime());
 
     this.barstate.isfirst = this.bar_index === 0;
     this.barstate.islast = true;
@@ -776,7 +807,21 @@ export class ExecutionContext {
   /**
    * Set the current runtime wall-clock timestamp.
    */
+  /** Attach host-owned observations so replaying confirmed bars preserves their clocks. */
+  setTimenowObservations(observations: Array<number | undefined>): void {
+    this.timenowObservations = observations;
+  }
+
+  private observeExecutionTime(): number {
+    const retained = this.timenowObservations?.[this.bar_index];
+    if (retained !== undefined) this.now = retained;
+    else if (!this.hasFixedNow) this.now = Date.now();
+    if (this.timenowObservations) this.timenowObservations[this.bar_index] = this.now;
+    return this.now;
+  }
+
   setNow(now: number): void {
+    this.hasFixedNow = true;
     this.now = now;
   }
 
@@ -815,10 +860,9 @@ export class ExecutionContext {
   /**
    * Register a plot
    */
-  registerPlot(plot: Omit<PlotOutput, 'values'>): void {
-    const isLimitedPlot = plot.type !== 'hline';
-    if (!this.plots.has(plot.id) && isLimitedPlot && this.countLimitedPlots() >= ExecutionContext.MAX_PLOT_OUTPUTS) {
-      throw new Error(`Too many plot outputs: maximum is ${ExecutionContext.MAX_PLOT_OUTPUTS} per script. Remove or combine output calls; plot(), plotshape(), plotchar(), plotarrow(), plotbar(), plotcandle(), bgcolor(), barcolor(), fill(), and alertcondition() each use an output slot.`);
+  registerPlot(plot: Omit<PlotOutput, 'values'>, plotCount = plot.type === 'hline' ? 0 : 1): void {
+    if (!this.plots.has(plot.id) && this.countLimitedPlots() + plotCount > ExecutionContext.MAX_PLOT_OUTPUTS) {
+      throw new Error(`Too many plot outputs: maximum is ${ExecutionContext.MAX_PLOT_OUTPUTS} per script. Remove or combine counted outputs; fills count only with series colors.`);
     }
 
     const fullPlot: PlotOutput = {
@@ -827,6 +871,7 @@ export class ExecutionContext {
       values: [],
     };
     this.plots.set(plot.id, fullPlot);
+    this.plotCounts.set(plot.id, plotCount);
     this.plotOrder.push(plot.id);
   }
 
@@ -848,6 +893,7 @@ export class ExecutionContext {
   truncatePlots(length: number): void {
     for (const plot of this.plots.values()) {
       plot.values.length = length;
+      if (plot.displayValues) plot.displayValues.length = length;
       if (Array.isArray(plot.color)) {
         plot.color.length = length;
       }
@@ -859,6 +905,12 @@ export class ExecutionContext {
       if (Array.isArray(plot.borderColor)) plot.borderColor.length = length;
       if (Array.isArray(plot.textColor)) plot.textColor.length = length;
       if (Array.isArray(plot.textValues)) plot.textValues.length = length;
+      if (plot.gradient) {
+        plot.gradient.topValues.length = length;
+        plot.gradient.bottomValues.length = length;
+        plot.gradient.topColors.length = length;
+        plot.gradient.bottomColors.length = length;
+      }
     }
   }
 
@@ -872,9 +924,7 @@ export class ExecutionContext {
   private countLimitedPlots(): number {
     let count = 0;
     for (const plot of this.plots.values()) {
-      if (plot.type !== 'hline') {
-        count++;
-      }
+      count += this.plotCounts.get(plot.id) ?? 0;
     }
     return count;
   }
@@ -925,13 +975,23 @@ export class ExecutionContext {
     return this.drawingStore.get(id);
   }
 
+  getDrawingReferenceType(id: string): DrawingObjectType | undefined {
+    return this.drawingStore.getReferenceType(id);
+  }
+
   getDrawingIds(type: DrawingObjectType): string[] {
     return this.drawingStore.getIds(type);
   }
 
-  /**
-   * Delete a drawing object by handle ID.
-   */
+  getTableReference(id: string): PineTableReference {
+    return this.drawingStore.getTableReference(id);
+  }
+
+  resolveTableReference(value: unknown): unknown {
+    return this.drawingStore.resolveTableReference(value);
+  }
+
+  /** Delete a drawing object by handle ID. */
   deleteDrawing(id: string): void {
     this.drawingStore.delete(id);
   }
@@ -1067,7 +1127,16 @@ export class ExecutionContext {
       return false;
     }
 
-    return alert.events.some((event) => event.barIndex === this.bar_index && event.frequency !== 'all');
+    let index = this.nonAllAlertEventBars.get(alert);
+    if (!index || index.events !== alert.events || index.scannedLength > alert.events.length) {
+      index = { events: alert.events, scannedLength: 0, bars: new Set() };
+      this.nonAllAlertEventBars.set(alert, index);
+    }
+    while (index.scannedLength < alert.events.length) {
+      const event = alert.events[index.scannedLength++];
+      if (event.frequency !== 'all') index.bars.add(event.barIndex);
+    }
+    return index.bars.has(this.bar_index);
   }
 
   /**

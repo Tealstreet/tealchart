@@ -12,6 +12,17 @@ export interface PineVisualNormalizationEntry {
 
 export const PINE_VISUAL_NORMALIZATION_REGISTER = [
   {
+    id: 'tealchart.curved-polyline-spline-kernel',
+    surface: 'polyline.new curved path rendering',
+    status: 'trace-undetermined',
+    code: ['src/rendering/TealScriptDrawingRenderer.ts:drawPolylinePath'],
+    currentBehavior:
+      'Interpolating Catmull-Rom cubic segments pass through every supplied point, with periodic tangents for closed paths.',
+    unresolvedQuestion:
+      'The Pine reference documents point passage but does not specify the spline kernel or tangent calculation used by TradingView.',
+    nextEvidence: 'TradingView coordinate or raster trace of open and closed curved polylines, including unevenly spaced points.',
+  },
+  {
     id: 'tealchart.label-price-coordinate-clamp',
     surface: 'TealScript label yloc.price rendering',
     status: 'trace-undetermined',

@@ -1,18 +1,19 @@
+import type { Bar, ExecutionResult, TealscriptExecutionOptions } from '../../src/runtime';
+import type { CompiledExecutionOptions } from '../../src/runtime/codegen/execute';
+import type { ExpectedValueProvenanceCounts, ExpectedValueProvenanceDeclaration } from './behaviorProvenance';
+
 import { describe, expect, it } from 'vitest';
 
 import { PINE_V6_KNOWN_MISSING_BUILTINS } from '../../src/compat/pineV6BuiltinReference';
 import { PINE_V6_REFERENCE_MANUAL_BUILTIN_INDEX } from '../../src/compat/pineV6ReferenceManualIndex';
 import { parse } from '../../src/parser';
-import type { Bar, ExecutionResult, TealscriptExecutionOptions } from '../../src/runtime';
 import { executeScript } from '../../src/runtime';
-import { executeCompiled, type CompiledExecutionOptions, tryCompile } from '../../src/runtime/codegen/execute';
+import { executeCompiled, tryCompile } from '../../src/runtime/codegen/execute';
 import {
   addExpectedValueProvenanceCount,
   assertExpectedValueProvenanceDeclared,
   countExpectedPlotValues,
   emptyExpectedValueProvenanceCounts,
-  type ExpectedValueProvenanceDeclaration,
-  type ExpectedValueProvenanceCounts,
 } from './behaviorProvenance';
 import { getPlot, roundSeries } from './fixtures';
 
@@ -79,6 +80,12 @@ const metadataOptions: TealscriptExecutionOptions & CompiledExecutionOptions = {
       shareholders: 1_000,
       shares_outstanding_float: 1.5,
       shares_outstanding_total: 2.5,
+      recommendations_buy: 3,
+      recommendations_buy_strong: 5,
+      recommendations_hold: 7,
+      recommendations_sell: 11,
+      recommendations_sell_strong: 13,
+      recommendations_total: 39,
       recommendations_date: 1_777_852_800_000,
       target_price_date: 1_777_852_800_000,
       target_price_average: 210.5,
@@ -131,7 +138,7 @@ const metadataCases: RuntimeMetadataCase[] = [
     name: 'timeframe period parsing and flags',
     expectedValueProvenance: 'independently-derived',
     expectedValueProvenanceNote:
-      'Calculated outside TealScript from Pine v6 timeframe period parsing, seconds conversion, and bucket-change semantics.',
+      'Calculated outside TealScript from Pine v6 timeframe period parsing and bucket-change semantics; the timeframe.in_seconds reference explicitly specifies 2,628,003 seconds per month (365/12 days).',
     covers: [
       'timeframe.change',
       'timeframe.from_seconds',
@@ -170,7 +177,8 @@ plot(timeframe.in_seconds("12M"), "12M")
 plot(timeframe.in_seconds("1H"), "Invalid Hour")
 plot(timeframe.from_seconds(1) == "1S" ? 1 : 0, "From 1S")
 plot(timeframe.from_seconds(46) == "1" ? 1 : 0, "From Rounded Minute")
-plot(timeframe.from_seconds(604801) == "2W" ? 1 : 0, "From Rounded Week")
+// Authority: ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json, functions203/204.
+plot(timeframe.from_seconds(604801) == "8D" ? 1 : 0, "From Rounded Week")
 plot(timeframe.change("1D") ? 1 : 0, "Daily Change")
 `,
     expectedPlots: {
@@ -185,17 +193,17 @@ plot(timeframe.change("1D") ? 1 : 0, "Daily Change")
       Multiplier: allBars(3),
       'Period Length': allBars(2),
       'Main Period Length': allBars(2),
-      'Current Seconds': allBars(7_776_000),
+      'Current Seconds': allBars(7_884_009),
       '45S': allBars(45),
       '1440': allBars(86_400),
       '2D': allBars(172_800),
       '3W': allBars(1_814_400),
-      '12M': allBars(31_104_000),
+      '12M': allBars(31_536_036),
       'Invalid Hour': allBars(null),
       'From 1S': allBars(1),
       'From Rounded Minute': allBars(1),
       'From Rounded Week': allBars(1),
-      'Daily Change': [1, 0, 0, 0],
+      'Daily Change': [0, 0, 0, 0],
     },
   },
   {
@@ -281,6 +289,12 @@ plot(syminfo.employees, "Employees")
 plot(syminfo.shareholders, "Shareholders")
 plot(syminfo.shares_outstanding_float, "Float Shares")
 plot(syminfo.shares_outstanding_total, "Total Shares")
+plot(syminfo.recommendations_buy, "Buy Ratings")
+plot(syminfo.recommendations_buy_strong, "Strong Buy Ratings")
+plot(syminfo.recommendations_hold, "Hold Ratings")
+plot(syminfo.recommendations_sell, "Sell Ratings")
+plot(syminfo.recommendations_sell_strong, "Strong Sell Ratings")
+plot(syminfo.recommendations_total, "Total Ratings")
 plot(syminfo.recommendations_date, "Recommendations Date")
 plot(syminfo.target_price_date, "Target Date")
 plot(syminfo.target_price_average, "Target Average")
@@ -321,6 +335,12 @@ plot(syminfo.ticker(symbol=modifiedTicker) == "A1CAP" ? 1 : 0, "Ticker Function"
       Shareholders: allBars(1_000),
       'Float Shares': allBars(1.5),
       'Total Shares': allBars(2.5),
+      'Buy Ratings': allBars(3),
+      'Strong Buy Ratings': allBars(5),
+      'Hold Ratings': allBars(7),
+      'Sell Ratings': allBars(11),
+      'Strong Sell Ratings': allBars(13),
+      'Total Ratings': allBars(39),
       'Recommendations Date': allBars(1_777_852_800_000),
       'Target Date': allBars(1_777_852_800_000),
       'Target Average': allBars(210.5),
@@ -483,7 +503,11 @@ function expectedValueProvenanceCounts(): ExpectedValueProvenanceCounts {
   const counts = emptyExpectedValueProvenanceCounts();
   for (const entry of metadataCases) {
     assertExpectedValueProvenanceDeclared(entry);
-    addExpectedValueProvenanceCount(counts, entry.expectedValueProvenance, countExpectedPlotValues(entry.expectedPlots));
+    addExpectedValueProvenanceCount(
+      counts,
+      entry.expectedValueProvenance,
+      countExpectedPlotValues(entry.expectedPlots),
+    );
   }
   return counts;
 }
@@ -503,7 +527,7 @@ describe('Pine v6 runtime metadata behavior', () => {
 
   it('declares provenance for every literal expected value', () => {
     expect(expectedValueProvenanceCounts()).toEqual({
-      'independently-derived': 398,
+      'independently-derived': 422,
       'published-worked-example': 0,
       'tealscript-regression-pin': 0,
     });

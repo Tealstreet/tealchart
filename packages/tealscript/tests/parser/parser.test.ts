@@ -1715,7 +1715,7 @@ plot(value)
     });
 
     it('does not normalize a script from one orphan two-space top-level line', () => {
-      const ast = parse(`//@version=5
+      const source = `//@version=5
   indicator("Indented Declaration", overlay = true)
 main_logic(_input) =>
     _result = 0.0
@@ -1725,17 +1725,14 @@ main_logic(_input) =>
         _result := open
     _result
 plot(main_logic(close))
-`);
+`;
+      expect(() => parse(source)).toThrow();
+      const ast = parse(source.replace('  indicator(', 'indicator('));
       const fn = ast.body[1] as FunctionDeclaration;
-
       expect(fn.type).toBe('FunctionDeclaration');
       expect(Array.isArray(fn.body)).toBe(true);
       if (Array.isArray(fn.body)) {
-        expect(fn.body.map((statement) => statement.type)).toEqual([
-          'VariableDeclaration',
-          'IfStatement',
-          'ExpressionStatement',
-        ]);
+        expect(fn.body.map((statement) => statement.type)).toEqual(['VariableDeclaration', 'IfStatement', 'ExpressionStatement']);
       }
     });
 
@@ -1824,14 +1821,7 @@ plot(close)
       });
 
       it('does not parse bare 2e as scientific notation (no trailing digits)', () => {
-        // "2e" without following digits: the 2 is consumed as an integer,
-        // not as scientific notation. The init value is 2, not NaN or 20.
-        const ast = parse('x = 2e\n');
-        const decl = ast.body[0] as VariableDeclaration;
-        expect(decl.init).toEqual(expect.objectContaining({
-          type: 'NumericLiteral',
-          value: 2,
-        }));
+        expect(() => parse('x = 2e\n')).toThrow();
       });
 
       it('parses plain integer unchanged after scientific notation fix', () => {
@@ -2597,9 +2587,7 @@ var max_array_size = 14, var zigzag = array.new_float(0), oldzigzag = array.copy
     it('parses declaration chains followed by expression calls', () => {
       const ast = parse(`indicator("Drawing Swap")
 x2 = id.get_x2(), x1 = id.get_x1()
-y2 = id.get_y2(), y1 = id.get_y1(),
-         id.set_xy2(x1, y1),
-         id.set_xy1(x2, y2)
+y2 = id.get_y2(), y1 = id.get_y1(), id.set_xy2(x1, y1), id.set_xy1(x2, y2)
 plot(close)
 `);
 

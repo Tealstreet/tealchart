@@ -90,7 +90,7 @@ export function createChartPropertyControl(options: {
     read: (context) => context.getSettings().chartProperties?.[options.path] ?? options.fallback(),
     write: (context, value) => {
       const current = context.getSettings().chartProperties;
-      const next: ChartProperties = { ...current, [options.path]: String(value) };
+      const next: ChartProperties = { ...current, [options.path]: options.kind === 'bool' ? Boolean(value) : String(value) };
       context.setChartProperties(next);
       context.markLayoutDirty();
     },
@@ -105,6 +105,7 @@ export const SHOW_INDICATOR_OUTPUT_AXIS_LABELS_CONTROL_ID = 'showIndicatorOutput
  * rather than a change to either platform's UI.
  */
 export const CHART_SETTINGS_CONTROLS: readonly ChartSettingControl[] = [
+  createChartPropertyControl({ id: 'showStudyPlotLabels', tabId: 'scales', label: 'Indicator Name Label', kind: 'bool', path: 'scalesProperties.showStudyPlotLabels', fallback: () => false }),
   {
     id: SHOW_VOLUME_CONTROL_ID,
     tabId: 'symbol',

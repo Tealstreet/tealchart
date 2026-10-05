@@ -64,7 +64,7 @@ const taValueCases: TaValueCase[] = [
     name: 'smoothing, oscillators, channels, and trend state machines',
     expectedValueProvenance: 'independently-derived',
     expectedValueProvenanceNote:
-      'Calculated outside TealScript from Pine v6 TA formulas and state-machine semantics on taValueBars; supertrend direction follows the Pine public direction < 0 uptrend idiom.',
+      'Calculated outside TealScript from Pine v6 TA formulas and state-machine semantics on taValueBars; SAR initializes on bar 1 per the published helper and native coverage-ta-3-v1 capture; supertrend follows the public helper initialization nz(previous bands, 0), direction=1 while prior ATR is missing, and direction < 0 uptrend idiom. EMA SMA seeding and missing-input masking, percentage BBW and independent KC range use TradingView oscillator-capture policies and independently calculated nested EMA/true-range formulas; MFI startup, explicit VWAP anchor startup, and OBV/PVT availability use TradingView volume-capture policies with independently calculated arithmetic on these hand-built bars.',
     covers: [
       'ta.alma',
       'ta.atr',
@@ -146,7 +146,7 @@ plot(vl, "VWAP Lower")
 `,
     expectedPlots: {
       SMA: [null, null, 104.666667, 105, 103, 100.666667, 101, 104.333333, 107, 109.333333, 109.666667, 111],
-      EMA: [102, 103.5, 105.25, 104.125, 101.5625, 100.78125, 102.390625, 105.695313, 106.847656, 108.923828, 109.461914, 110.730957],
+      EMA: [null, null, 104.666667, 103.833333, 101.416667, 100.708333, 102.354167, 105.677083, 106.838542, 108.919271, 109.459635, 110.729818],
       RMA: [null, null, 104.666667, 104.111111, 102.407407, 101.604938, 102.403292, 104.602195, 105.734797, 107.489864, 108.326576, 109.551051],
       SMMA: [null, null, 104.666667, 104.111111, 102.407407, 101.604938, 102.403292, 104.602195, 105.734797, 107.489864, 108.326576, 109.551051],
       WMA: [null, null, 105.5, 104.666667, 101.666667, 100.166667, 101.833333, 105.833333, 107.666667, 109.666667, 110, 111.166667],
@@ -154,44 +154,52 @@ plot(vl, "VWAP Lower")
       SWMA: [null, null, null, 104.833333, 104, 101.833333, 100.833333, 102.666667, 105.666667, 108.166667, 109.5, 110.333333],
       ALMA: [null, null, null, null, 101.918274, 99.97516, 101.504063, 105.458142, 107.88929, 109.296928, 110.200868, 110.912922],
       HMA: [null, null, null, null, null, 97.822222, 101.466667, 108.133333, 110.755556, 111.533333, 111.511111, 111.866667],
-      DEMA: [102, 104.25, 106.5, 104.1875, 100.3125, 99.765625, 102.6875, 107.496094, 108.324219, 110.700195, 110.619141, 111.944092],
-      TEMA: [102, 104.625, 106.9375, 103.8125, 99.46875, 99.460938, 103.191406, 108.5, 108.664063, 111.02002, 110.469482, 111.897217],
+      DEMA: [null, null, null, null, 99.527778, 99.409722, 102.527778, 107.425347, 108.293403, 110.687066, 110.613715, 111.941949],
+      TEMA: [null, null, null, null, null, null, 103.018519, 108.458044, 108.66305, 111.028356, 110.477503, 111.902868],
       ATR: [null, null, 5, 5.666667, 5.777778, 5.518519, 5.679012, 6.119342, 5.746228, 5.497485, 5.331657, 5.221105],
       RSI: [null, null, null, 55.555556, 33.333333, 42.028986, 67.479675, 82.162765, 72.361316, 82.015652, 69.821198, 79.13023],
       CCI: [null, null, 87.5, -100, -100, -28.571429, 100, 100, 33.333333, 100, 20, 100],
-      MACD: [0, 0.642857, 1.209184, 0.38156, -0.825672, -0.924587, 0.029313, 1.437232, 1.520456, 1.975828, 1.641914, 1.716671],
-      'MACD Signal': [0, 0.428571, 0.94898, 0.5707, -0.360214, -0.736463, -0.225946, 0.88284, 1.307917, 1.753191, 1.679006, 1.704116],
-      'MACD Hist': [0, 0.214286, 0.260204, -0.18914, -0.465457, -0.188124, 0.255259, 0.554393, 0.212539, 0.222637, -0.037092, 0.012555],
+      // SMA-seeded child EMAs; exact-rational 3/6/2 recurrence, rounded to six decimals.
+      MACD: [null, null, null, null, null, -1.958333, -0.693452, 0.928784, 1.161185, 1.721159, 1.460984, 1.587924],
+      'MACD Signal': [null, null, null, null, null, null, -1.325893, 0.177225, 0.833198, 1.425172, 1.449047, 1.541631],
+      'MACD Hist': [null, null, null, null, null, null, 0.63244, 0.751559, 0.327987, 0.295987, 0.011937, 0.046292],
       CMO: [null, null, null, 11.111111, -60, -77.777778, 11.111111, 100, 80, 77.777778, 20, 66.666667],
-      TSI: [null, 1, 1, 0.551402, 0.09434, -0.009854, 0.178656, 0.437434, 0.443215, 0.538941, 0.478354, 0.525987],
+      TSI: [null, null, null, null, null, null, null, 0.310658, 0.369565, 0.496489, 0.451013, 0.508213],
       Stoch: [null, null, 88.888889, 25, 9.090909, 30.769231, 88.888889, 92.857143, 75, 88.888889, 50, 71.428571],
-      MFI: [null, null, null, 62.19351, 26.481507, 28.199275, 63.410771, 100, 70.491803, 72.454835, 37.449393, 68.894009],
+      MFI: [null, null, 75.468975, 62.19351, 26.481507, 28.199275, 63.410771, 100, 70.491803, 72.454835, 37.449393, 68.894009],
       WPR: [null, null, -11.111111, -75, -90.909091, -69.230769, -11.111111, -7.142857, -25, -11.111111, -50, -28.571429],
       'BB Basis': [null, null, 104.666667, 105, 103, 100.666667, 101, 104.333333, 107, 109.333333, 109.666667, 111],
       'BB Upper': [null, null, 108.776276, 108.265986, 109.531973, 104.066013, 105.320494, 111.696907, 111.320494, 111.827772, 112.161105, 112.632993],
       'BB Lower': [null, null, 100.557057, 101.734014, 96.468027, 97.26732, 96.679506, 96.969759, 102.679506, 106.838895, 107.172228, 109.367007],
-      BBW: [null, null, 0.078528, 0.062209, 0.126834, 0.067537, 0.085554, 0.141155, 0.080757, 0.04563, 0.045491, 0.029423],
-      'KC Basis': [102, 103.5, 105.25, 104.125, 101.5625, 100.78125, 102.390625, 105.695313, 106.847656, 108.923828, 109.461914, 110.730957],
-      'KC Upper': [111, 111.75, 112.375, 112.9375, 110.46875, 108.984375, 110.992188, 115.246094, 115.373047, 116.936523, 117.218262, 118.359131],
-      'KC Lower': [93, 95.25, 98.125, 95.3125, 92.65625, 92.578125, 93.789063, 96.144531, 98.322266, 100.911133, 101.705566, 103.102783],
-      KCW: [0.176471, 0.15942, 0.135392, 0.169268, 0.175385, 0.162791, 0.168015, 0.180723, 0.15958, 0.147125, 0.141718, 0.137779],
-      Supertrend: [null, null, 116, 116, 112.555556, 109.537037, 109.537037, 109.537037, 109.537037, 98.50503, 100.836686, 100.836686],
-      'Supertrend Dir': [null, null, 1, 1, 1, 1, 1, 1, 1, -1, -1, -1],
-      'DI+': [null, null, null, 17.647059, 11.538462, 8.053691, 28.695652, 44.989913, 37.741704, 32.362971, 34.750293, 23.6574],
-      'DI-': [null, null, null, 11.764706, 30.769231, 33.557047, 21.73913, 13.449899, 9.548818, 6.653913, 4.573912, 9.498185],
+      // Re-derived independently from unrounded bands and SMA-seeded EMA
+      // recurrences: BBW is percent; KC uses three valid samples for its seed.
+      BBW: [null, null, 7.852757, 6.220926, 12.683442, 6.753668, 8.555433, 14.115477, 8.075689, 4.562997, 4.549128, 2.94233],
+      'KC Basis': [null, null, 104.666667, 103.833333, 101.416667, 100.708333, 102.354167, 105.677083, 106.838542, 108.919271, 109.459635, 110.729818],
+      'KC Upper': [null, null, null, 111.833333, 109.916667, 108.708333, 110.854167, 115.177083, 115.338542, 116.919271, 117.209635, 118.354818],
+      'KC Lower': [null, null, null, 95.833333, 92.916667, 92.708333, 93.854167, 96.177083, 98.338542, 100.919271, 101.709635, 103.104818],
+      KCW: [null, null, null, 0.154093, 0.167625, 0.158875, 0.16609, 0.179793, 0.159119, 0.146898, 0.141605, 0.137723],
+      // Lane D's verified public helper: nz(previous bands, 0) and missing previous ATR.
+      Supertrend: [0, null, 116, 116, 112.555556, 109.537037, 109.537037, 109.537037, 109.537037, 98.50503, 100.836686, 100.836686],
+      'Supertrend Dir': [1, 1, 1, 1, 1, 1, 1, 1, 1, -1, -1, -1],
+      // Verified e6bb97364a / native coverage-register-ta-1 DMI seed.
+      // Only the TR seed predicate changes this bounded clean control; ADX
+      // and every unrelated expected row retain their prior values.
+      'DI+': [null, null, null, 18.75, 12.0, 8.275862, 29.20354, 45.479266, 38.032235, 32.536165, 34.877916, 23.716479],
+      'DI-': [null, null, null, 12.5, 32.0, 34.482759, 22.123894, 13.596193, 9.622324, 6.689523, 4.59071, 9.521905],
       ADX: [null, null, null, null, null, 42.248289, 32.763227, 39.832178, 46.426904, 52.915314, 60.856017, 54.805801],
-      SAR: [105, 99, 99, 99.36, 109, 109, 108.48, 96, 96.28, 96.8688, 97.776672, 99.074538],
+      // Published SAR helper initializes at bar 1; subsequent recurrence unchanged.
+      SAR: [null, 99, 99, 99.36, 109, 109, 108.48, 96, 96.28, 96.8688, 97.776672, 99.074538],
       VWAP: [102, 103.571429, 104.6, 104.129412, 102.858407, 102.410448, 102.66875, 103.723958, 104.199074, 105.028455, 105.520147, 106.142384],
-      'VWAP Anchored': [102, 103.571429, 104.6, 104.129412, 102.858407, 102.410448, 104, 106.758621, 107.121951, 108.160714, 108.517986, 109.119048],
-      'VWAP Upper': [102, 105.069727, 106.609975, 105.968774, 105.587689, 105.123635, 104, 109.245208, 109.288156, 110.687547, 110.90003, 111.654063],
-      'VWAP Lower': [102, 102.07313, 102.590025, 102.29005, 100.129125, 99.697261, 104, 104.272034, 104.955746, 105.633881, 106.135941, 106.584032],
+      'VWAP Anchored': [null, null, null, null, null, null, 104, 106.758621, 107.121951, 108.160714, 108.517986, 109.119048],
+      'VWAP Upper': [null, null, null, null, null, null, 104, 109.245208, 109.288156, 110.687547, 110.90003, 111.654063],
+      'VWAP Lower': [null, null, null, null, null, null, 104, 104.272034, 104.955746, 105.633881, 106.135941, 106.584032],
     },
   },
   {
     name: 'rolling, statistical, event, pivot, and volume helpers',
     expectedValueProvenance: 'independently-derived',
     expectedValueProvenanceNote:
-      'Calculated outside TealScript from Pine v6 rolling, statistical, event, pivot, and volume formulas on taValueBars.',
+      'Calculated outside TealScript from Pine v6 rolling, statistical, event, pivot, and volume formulas on taValueBars; rising/falling require consecutive strict adjacent changes as established by the TradingView crosses capture. Native register/TA1 captures and original caae3364f3/28cc18d4d1 establish PercentRank prior-bar comparisons and RCI startup after length preceding bars; these arithmetic values are independently derived on the listed closes.',
     covers: [
       'ta.accdist',
       'ta.adx',
@@ -274,10 +282,10 @@ plot(ta.crossover(close, open) ? 1 : 0, "Crossover")
 plot(ta.crossunder(close, open) ? 1 : 0, "Crossunder")
 plot(ta.pivothigh(high, 1, 1), "Pivot High")
 plot(ta.pivotlow(low, 1, 1), "Pivot Low")
-levels = ta.pivot_point_levels("Traditional", "Daily", false)
+levels = ta.pivot_point_levels("Traditional", true, false)
 plot(array.get(levels, 0), "Pivot P")
-plot(array.get(levels, 1), "Pivot S1")
-plot(array.get(levels, 2), "Pivot R1")
+plot(array.get(levels, 2), "Pivot S1")
+plot(array.get(levels, 1), "Pivot R1")
 plot(ta.cum(close), "Cum")
 plot(ta.cum(bar_index == 0 ? na : close), "Cum Na")
 plot(ta.accdist, "AccDist")
@@ -300,8 +308,11 @@ plot(ta.obv(close, volume), "OBV")
       Change: [null, null, 5, -2, -8, -3, 5, 9, 4, 2, 2, 1],
       Momentum: [null, null, 5, -2, -8, -3, 5, 9, 4, 2, 2, 1],
       ROC: [null, null, 4.901961, -1.904762, -7.476636, -2.912621, 5.050505, 9, 3.846154, 1.834862, 1.851852, 0.900901],
-      Rising: [0, 0, 1, 0, 0, 0, 1, 1, 0, 1, 0, 1],
-      Falling: [0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0],
+      // Native na-holes-crosses-v1 establishes adjacent-direction streaks.
+      // At9/11 the preceding change fell, and at3 it rose: only one change in
+      // the new direction has occurred, short of the requested two changes.
+      Rising: [0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0],
+      Falling: [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
       Max: [102, 105, 107, 107, 107, 107, 107, 109, 109, 111, 111, 112],
       Min: [102, 102, 102, 102, 99, 99, 99, 99, 99, 99, 99, 99],
       Stdev: [null, null, 2.054805, 1.632993, 3.265986, 1.699673, 2.160247, 3.681787, 2.160247, 1.247219, 1.247219, 0.816497],
@@ -314,9 +325,11 @@ plot(ta.obv(close, volume), "OBV")
       Mode: [null, null, 102, 103, 99, 99, 99, 100, 104, 108, 108, 110],
       'Nearest Rank': [null, null, 105, 105, 103, 100, 100, 104, 108, 109, 110, 111],
       'Linear Percentile': [null, null, 105, 105, 103, 100, 100, 104, 108, 109, 110, 111],
-      'Percent Rank': [null, null, 100, 33.333333, 33.333333, 66.666667, 100, 100, 66.666667, 100, 66.666667, 100],
+      // Native rank_clean_builtin / 18ace021d3: preceding-three population and length+1 startup.
+      'Percent Rank': [null, null, null, 33.333333, 0, 33.333333, 100, 100, 66.666667, 100, 66.666667, 100],
       LinReg: [null, null, 107.166667, 104, 99, 99.166667, 103.5, 108.833333, 109, 110.333333, 110.666667, 111.5],
-      RCI: [null, null, 100, -50, -100, -50, 100, 100, 50, 50, 50, 50],
+      // Native RCI startup / d9e0a1aaa0: one more physical observation before publication.
+      RCI: [null, null, null, -50, -100, -50, 100, 100, 50, 50, 50, 50],
       TR: [6, 5, 4, 7, 6, 5, 6, 7, 5, 5, 5, 5],
       'Bars Since': [0, 0, 0, 1, 2, 0, 0, 0, 1, 0, 1, 0],
       'Value When': [null, 102, 105, 105, 105, 107, 100, 104, 104, 109, 109, 111],
@@ -325,21 +338,21 @@ plot(ta.obv(close, volume), "OBV")
       Crossunder: [0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0],
       'Pivot High': [null, null, null, null, 109, null, null, null, null, null, null, 114],
       'Pivot Low': [null, null, null, null, null, null, 96, null, null, null, null, null],
-      'Pivot P': [102, 102, 104, 106.333333, 104.666667, 100.333333, 99, 102.666667, 107.333333, 108.333333, 110, 111],
-      'Pivot S1': [99, 99, 102, 104.666667, 100.333333, 96.666667, 97, 100.333333, 104.666667, 105.666667, 108, 108],
-      'Pivot R1': [105, 105, 107, 108.666667, 107.333333, 102.666667, 102, 106.333333, 111.666667, 110.666667, 113, 113],
+      'Pivot P': [null, 102, 104, 106.333333, 104.666667, 100.333333, 99, 102.666667, 107.333333, 108.333333, 110, 111],
+      'Pivot S1': [null, 99, 102, 104.666667, 100.333333, 96.666667, 97, 100.333333, 104.666667, 105.666667, 108, 108],
+      'Pivot R1': [null, 105, 107, 108.666667, 107.333333, 102.666667, 102, 106.333333, 111.666667, 110.666667, 113, 113],
       Cum: [102, 207, 314, 417, 516, 616, 720, 829, 937, 1048, 1158, 1270],
       'Cum Na': [null, 105, 212, 315, 414, 514, 618, 727, 835, 946, 1056, 1168],
       AccDist: [0, 660, 1110, 217.142857, -716.190476, -86.190476, 780.47619, 1923.333333, 1683.333333, 2583.333333, 1773.333333, 2643.333333],
       III: [0, 660, 450, -892.857143, -933.333333, 630, 866.666667, 1142.857143, -240, 900, -810, 870],
       NVI: [1, 1, 1.019048, 1.019048, 1.019048, 1.029341, 1.029341, 1.029341, 1.019898, 1.019898, 1.010709, 1.010709],
       PVI: [1, 1.029412, 1.029412, 0.990929, 0.952446, 0.952446, 0.990544, 1.038167, 1.038167, 1.067005, 1.067005, 1.086405],
-      PVT: [0, 32.352941, 49.495798, 2.766826, -51.602106, -40.996045, 11.003955, 87.927032, 76.917858, 118.584524, 106.422362, 132.785998],
+      PVT: [null, 32.352941, 49.495798, 2.766826, -51.602106, -40.996045, 11.003955, 87.927032, 76.917858, 118.584524, 106.422362, 132.785998],
       WAD: [0, 4, 7, 1, -4, 0, 5, 11, 8, 12, 8, 12],
       WVAD: [333.333333, 660, 450, -714.285714, -933.333333, 210, 866.666667, 1142.857143, -240, 900, -270, 580],
       'Bar Index': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
       'ADX Scalar': [null, null, null, null, null, 42.248289, 32.763227, 39.832178, 46.426904, 52.915314, 60.856017, 54.805801],
-      OBV: [0, 1100, 2000, 750, -650, 400, 1700, 3300, 2100, 3600, 2250, 3700],
+      OBV: [null, 1100, 2000, 750, -650, 400, 1700, 3300, 2100, 3600, 2250, 3700],
     },
   },
 ];

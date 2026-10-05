@@ -18,6 +18,7 @@ const PINE_APPROXIMATION_AUDIT_ROOTS = [
 const SEEDED_PINE_APPROXIMATION_FILE_PATTERNS: readonly RegExp[] = [
   /packages\/tealscript\/src\/runtime\/(?:arrays|maps|matrices)\.ts$/,
   /packages\/tealscript\/src\/runtime\/builtins\/drawings\.ts$/,
+  /packages\/tealscript\/src\/runtime\/drawings\/(?:helpers|store)\.ts$/,
   /packages\/tealscript\/src\/runtime\/context\.ts$/,
   /packages\/tealscript\/src\/runtime\/codegen\/(?:execute|fallbackInventory|runtime|ta-classes)\.ts$/,
   /packages\/tealchart\/src\/TealchartRenderer\.ts$/,
@@ -78,12 +79,67 @@ interface AccountedSite {
     | 'known-pine-runtime-error-boundary'
     | 'loud-runtime-refusal'
     | 'ordinary-chart-geometry'
+    | 'trace-undetermined-normalization'
     | 'trace-undetermined-visual-normalization'
     | 'visible-profiled-approximation';
   reason: string;
 }
 
 const ACCOUNTED_SITES: readonly AccountedSite[] = [
+  {
+    file: 'packages/tealscript/src/runtime/drawings/helpers.ts',
+    source: 'return Math.max(1, clampNumber(value ?? 1, 1, Number.POSITIVE_INFINITY));',
+    category: 'trace-undetermined-normalization',
+    reason: 'S1: Confirmed v20 captures retain width 151, removing the arbitrary 100 ceiling. Negative/missing fallback and a universal maximum remain unobserved. Proof: ~/cs/docs/tealscript-parity-archive/ledger/verify-native-v20-s1-width-bk-v1/REPORT-v1.md.',
+  },
+  {
+    file: 'packages/tealscript/src/runtime/drawings/store.ts',
+    source: /Math\.trunc\(value\)|Math\.min\(max, Math\.max\(0, normalizedValue\)\)/,
+    category: 'trace-undetermined-normalization',
+    reason: 'S3: Valid drawing GC limits are documented; silent normalization of invalid declared counts needs a native trace. Audit: ~/cs/docs/tealscript-parity-archive/ledger/silent-truncation-audit-vmp8l6-v1/REPORT-v1.md.',
+  },
+  {
+    file: 'packages/tealscript/src/runtime/codegen/execute.ts',
+    source: 'if (!Number.isInteger(offset) || offset < -500 || offset > 5000) return null;',
+    category: 'trace-undetermined-normalization',
+    reason: 'S4: Future projection to -500 is documented; the positive 5000 ceiling and invalid-offset NA response remain untraced. Audit: ~/cs/docs/tealscript-parity-archive/ledger/silent-truncation-audit-vmp8l6-v1/REPORT-v1.md.',
+  },
+  {
+    file: 'packages/tealscript/src/runtime/codegen/execute.ts',
+    source: /!Number\.isFinite\(numberValue\).*return min|Math\.min\(max, Math\.max\(min, Math\.round\(numberValue\)\)\)/,
+    category: 'trace-undetermined-normalization',
+    reason: 'S1: The drawing width callback applies the same untraced rounding/clamping and nonfinite fallback as toLineWidth. Audit: ~/cs/docs/tealscript-parity-archive/ledger/silent-truncation-audit-vmp8l6-v1/REPORT-v1.md.',
+  },
+  {
+    file: 'packages/tealscript/src/runtime/codegen/ta-classes.ts',
+    source: /Math\.max\(0, Math\.trunc\((?:left|right)Bars\)\)/,
+    category: 'trace-undetermined-normalization',
+    reason: 'S5: Negative pivot strength truncation/clamping to zero is not specified by the reference; native invalid-strength outcomes remain pending. Audit: ~/cs/docs/tealscript-parity-archive/ledger/silent-truncation-audit-vmp8l6-v1/REPORT-v1.md.',
+  },
+  {
+    file: 'packages/tealscript/src/runtime/matrices.ts',
+    source: 'return Math.abs(value) <= MATRIX_EPSILON ? 0 : value;',
+    category: 'trace-undetermined-normalization',
+    reason: 'S6: QL is documented, but the 1e-10 numerical output cleanup threshold is not; tiny-value native results remain pending. Audit: ~/cs/docs/tealscript-parity-archive/ledger/silent-truncation-audit-vmp8l6-v1/REPORT-v1.md.',
+  },
+  {
+    file: 'packages/tealscript/src/runtime/matrices.ts',
+    source: 'if (++iter > 128 * n)',
+    category: 'trace-undetermined-normalization',
+    reason: 'P1: The QL iteration ceiling and native nonconvergence response remain untraced; the complex-root witness does not prove nonconvergence. Audit: ~/cs/docs/tealscript-parity-archive/ledger/silent-truncation-audit-vmp8l6-v1/REPORT-v1.md.',
+  },
+  {
+    file: 'packages/tealscript/src/runtime/matrices.ts',
+    source: 'const iterations = 128;',
+    category: 'trace-undetermined-normalization',
+    reason: 'P1: The QR iteration ceiling and native nonconvergence response remain untraced; the existing catch/profile route is separately inventoried. Audit: ~/cs/docs/tealscript-parity-archive/ledger/silent-truncation-audit-vmp8l6-v1/REPORT-v1.md.',
+  },
+  {
+    file: 'packages/tealscript/src/runtime/codegen/runtime.ts',
+    source: 'const integer = Math.trunc(quotient);',
+    category: 'documented-pine-normalization',
+    reason: 'Native v3 captures settle v4/v5 const-int signed division as truncation toward zero; float/nonconst/v6 operands retain fractional results.',
+  },
   {
     file: 'packages/tealscript/src/runtime/arrays.ts',
     source: 'const safeSize = Math.trunc(Number(size));',
@@ -98,6 +154,12 @@ const ACCOUNTED_SITES: readonly AccountedSite[] = [
   },
   {
     file: 'packages/tealscript/src/runtime/arrays.ts',
+    source: 'const normalizedIndex = Math.trunc(Number(index));',
+    category: 'loud-runtime-refusal',
+    reason: 'array.percentrank validates element bounds before lookup; an empty array returns na as documented.',
+  },
+  {
+    file: 'packages/tealscript/src/runtime/arrays.ts',
     source: 'throw new Error(`Array index ${Math.trunc(index)} is out of bounds. Array size is ${size}`);',
     category: 'known-pine-runtime-error-boundary',
     reason: 'Pine-facing array bounds errors are classified by isKnownPineRuntimeError().',
@@ -106,13 +168,13 @@ const ACCOUNTED_SITES: readonly AccountedSite[] = [
     file: 'packages/tealscript/src/runtime/arrays.ts',
     source: 'const normalizedFrom = Math.trunc(from);',
     category: 'loud-runtime-refusal',
-    reason: 'array.slice range endpoints are validated, including from > to.',
+    reason: 'array.slice range endpoints are validated, including from >= to.',
   },
   {
     file: 'packages/tealscript/src/runtime/arrays.ts',
     source: 'const normalizedTo = Math.trunc(to);',
     category: 'loud-runtime-refusal',
-    reason: 'array.slice range endpoints are validated, including from > to.',
+    reason: 'array.slice range endpoints are validated, including from >= to.',
   },
   {
     file: 'packages/tealscript/src/runtime/arrays.ts',
@@ -374,6 +436,12 @@ const ACCOUNTED_SITES: readonly AccountedSite[] = [
   },
   {
     file: 'packages/tealscript/src/runtime/codegen/execute.ts',
+    source: 'const ratio = Math.min(1, Math.max(0, (value - bottomValue) / range));',
+    category: 'trace-undetermined-normalization',
+    reason: 'Color-gradient ratio clamping lacks an exact native trace for this path. TRACE probe assigned to ymk07v v17; preserve the clamp pending its result.',
+  },
+  {
+    file: 'packages/tealscript/src/runtime/codegen/execute.ts',
     source: 'const ratio = range === 0 ? 0 : Math.min(1, Math.max(0, (value - bottomValue) / range));',
     category: 'documented-pine-normalization',
     reason: 'color.from_gradient endpoint clamping is documented by TradingView.',
@@ -620,7 +688,39 @@ const SUSPICIOUS_RULES: readonly {
   name: string;
   file: RegExp;
   source: RegExp;
+  enclosingFunction?: string;
 }[] = [
+  {
+    name: 'drawing width normalization',
+    file: /packages\/tealscript\/src\/runtime\/drawings\/helpers\.ts$/,
+    source: /Math\.max\(1, clampNumber/,
+  },
+  {
+    name: 'drawing count normalization',
+    file: /packages\/tealscript\/src\/runtime\/drawings\/store\.ts$/,
+    source: /Math\.trunc\(value\)|Math\.min\(max, Math\.max\(0, normalizedValue\)\)/,
+  },
+  {
+    name: 'compiled time offset and drawing width normalization',
+    file: /packages\/tealscript\/src\/runtime\/codegen\/execute\.ts$/,
+    source: /!Number\.isInteger\(offset\).*offset > 5000/,
+  },
+  {
+    name: 'compiled drawing width callback normalization',
+    file: /packages\/tealscript\/src\/runtime\/codegen\/execute\.ts$/,
+    source: /!Number\.isFinite\(numberValue\).*return min|Math\.min\(max, Math\.max\(min, Math\.round\(numberValue\)\)\)/,
+    enclosingFunction: 'toRuntimeLineWidth',
+  },
+  {
+    name: 'pivot strength normalization',
+    file: /packages\/tealscript\/src\/runtime\/codegen\/ta-classes\.ts$/,
+    source: /Math\.max\(0, Math\.trunc\((?:left|right)Bars\)\)/,
+  },
+  {
+    name: 'matrix numerical cleanup and iteration budget',
+    file: /packages\/tealscript\/src\/runtime\/matrices\.ts$/,
+    source: /Math\.abs\(value\) <= MATRIX_EPSILON \? 0|\+\+iter > 128 \* n|const iterations = 128;/,
+  },
   {
     name: 'array index/range/domain normalization',
     file: /packages\/tealscript\/src\/runtime\/arrays\.ts$/,
@@ -765,7 +865,12 @@ function detectSuspiciousSites(): SuspiciousSite[] {
       const source = line.trim();
       if (!source || source.startsWith('//') || source.startsWith('*') || source.startsWith('import ')) continue;
 
-      const rule = SUSPICIOUS_RULES.find((candidate) => candidate.file.test(file) && candidate.source.test(source));
+      const rule = SUSPICIOUS_RULES.find((candidate) => {
+        if (!candidate.file.test(file) || !candidate.source.test(source)) return false;
+        if (!candidate.enclosingFunction) return true;
+        const declaration = lines.slice(0, index + 1).reverse().find((line) => /^(?:export )?function /.test(line));
+        return declaration?.startsWith(`function ${candidate.enclosingFunction}(`) ?? false;
+      });
       if (rule) {
         sites.push({ file, line: index + 1, source, rule: rule.name });
       }

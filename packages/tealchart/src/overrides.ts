@@ -25,6 +25,7 @@ const CHART_PROPERTY_KEY_PRESENCE: Record<ChartPropertyKey, true> = {
   'paneProperties.horzGridProperties.color': true,
   'paneProperties.crossHairProperties.color': true,
   'scalesProperties.textColor': true,
+  'scalesProperties.showStudyPlotLabels': true,
 };
 
 export const CHART_PROPERTY_KEYS = Object.keys(CHART_PROPERTY_KEY_PRESENCE) as readonly ChartPropertyKey[];
@@ -42,12 +43,12 @@ const CHART_PROPERTY_KEY_SET: ReadonlySet<string> = new Set<string>(CHART_PROPER
 export function sanitizeChartProperties(value: unknown): ChartProperties | undefined {
   if (value == null || typeof value !== 'object' || Array.isArray(value)) return undefined;
 
-  const result: Record<string, string> = {};
+  const result: Record<string, string | boolean> = {};
   for (const [key, entry] of Object.entries(value as Record<string, unknown>)) {
     if (!CHART_PROPERTY_KEY_SET.has(key)) continue;
-    // Every supported path is a color string today. Widen this alongside the
-    // union when a numeric or boolean property is added.
-    if (typeof entry !== 'string') continue;
+    if (key === 'scalesProperties.showStudyPlotLabels') {
+      if (typeof entry !== 'boolean') continue;
+    } else if (typeof entry !== 'string') continue;
     result[key] = entry;
   }
 
@@ -74,6 +75,9 @@ export function applyChartOverridesToRenderOptions(
   }
   if (overrides['paneProperties.horzGridProperties.color']) {
     next.gridColor = overrides['paneProperties.horzGridProperties.color'];
+  }
+  if (overrides['scalesProperties.showStudyPlotLabels'] !== undefined) {
+    next.showIndicatorOutputAxisLabelTitles = overrides['scalesProperties.showStudyPlotLabels'];
   }
   if (overrides['scalesProperties.textColor']) {
     next.textColor = overrides['scalesProperties.textColor'];

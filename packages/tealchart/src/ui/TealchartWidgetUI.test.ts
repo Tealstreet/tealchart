@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 
 import type { UserDrawingState } from '../drawings';
+import type { EventManagerCallbacks } from '../interaction/EventManager';
 import type { PaneLayout } from '../types';
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -9,8 +10,13 @@ import { clearChartStoreCache, DEFAULT_CHART_SETTINGS } from '../state/chartStat
 import { DEFAULT_MARGINS } from '../types';
 import { TealchartWidgetUI } from './TealchartWidgetUI';
 
+const events = vi.hoisted(() => ({ callbacks: null as EventManagerCallbacks | null }));
+
 vi.mock('../interaction/EventManager', () => ({
   EventManager: class {
+    constructor(_canvas: unknown, callbacks: EventManagerCallbacks) {
+      events.callbacks = callbacks;
+    }
     getIsDragging() {
       return false;
     }
@@ -207,6 +213,40 @@ describe('TealchartWidgetUI legend layout', () => {
     clearChartStoreCache();
   });
 
+  it('updates numeric readouts on hover, leave, plot ticks, and metadata changes', () => {
+    stubCanvasContext();
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    const ui = new TealchartWidgetUI({ container, chartKey: 'readouts', symbol: 'TEST', interval: '60', showTopBar: false, showDataWindow: true });
+    container.querySelector<HTMLDetailsElement>("[data-tealchart-data-window]")!.open = true;
+    const bars = [1000, 2000, 10000].map((time) => ({ time, open: 1, high: 3, low: 1, close: 2, volume: 1 }));
+    const indicators = [{ id: 'study', name: 'Study', isVisible: true, inputs: {} }];
+    const output = { id: 'plot', scriptId: 'study', type: 'plot' as const, title: 'Signal', values: [10, 20, 30], color: '#ff0000', display: 6 };
+    ui.setBars(bars);
+    ui.setViewport({ startTime: 1000, endTime: 10000, priceMin: 0, priceMax: 40 });
+    ui.setActiveIndicators(indicators, { study: { overlay: true, name: 'Study', precision: 1 } });
+    ui.setPlots([output]);
+    const status = () => container.querySelector('[data-indicator-values="study"]')?.textContent;
+    const window = container.querySelector('[data-tealchart-data-window]')!;
+    expect(status()).toBe('30.0');
+    expect(window.textContent).toContain('Signal30.0');
+
+    events.callbacks!.onCrossHairMoved!(DEFAULT_MARGINS.left, 100);
+    expect(status()).toBe('10.0');
+    expect(window.textContent).toContain('Signal10.0');
+    ui.setPlots([{ ...output, values: [11, 20, 31] }]);
+    expect(status()).toBe('11.0');
+    events.callbacks!.onCrossHairVisibilityChange!(false);
+    expect(status()).toBe('31.0');
+    ui.setActiveIndicators(indicators, { study: { overlay: true, name: 'Study', format: 'percent', precision: 2 } });
+    expect(status()).toBe('31.00%');
+    expect(window.textContent).toContain('Signal31.00%');
+    ui.setPlots([{ ...output, display: 2 }]);
+    expect(status()).toBe('');
+    expect(window.textContent).toContain('Signal30.00%');
+    ui.dispose();
+  });
+
   it('moves indicator pane legends right when drawing tools own the left rail', () => {
     stubCanvasContext();
     const container = document.createElement('div');
@@ -286,4 +326,33 @@ describe('TealchartWidgetUI legend layout', () => {
     expect(gear!.querySelector('svg')).not.toBeNull();
 
   });
+});
+
+
+it("hides overridden plot readouts together with the canvas output", () => {
+  stubCanvasContext();
+  const container = document.createElement("div");
+  const ui = new TealchartWidgetUI({ container, chartKey: "hidden-readouts", symbol: "TEST", interval: "60", showTopBar: false, showDataWindow: true });
+  ui.setBars([{ time: 1000, open: 1, high: 2, low: 1, close: 2, volume: 1 }]);
+  const output = { id: "signal", type: "plot" as const, scriptId: "study", title: "Signal", values: [42], color: "red" };
+  ui.setPlots([output]);
+  ui.setActiveIndicators([{ id: "study", name: "Study", isVisible: true, inputs: {}, styleOverrides: [{ plotId: "signal", display: 0 }] }], { study: { overlay: true, name: "Study" } });
+  expect(container.querySelector("[data-indicator-values] ")?.textContent).toBe("");
+  expect(container.querySelector("[data-tealchart-data-window]")?.hasAttribute("hidden")).toBe(true);
+  ui.dispose();
+});
+
+
+it("keeps Data Window opt-in while retaining default legend values", () => {
+  stubCanvasContext();
+  for (const enabled of [undefined, false, true]) {
+    const container = document.createElement("div");
+    const ui = new TealchartWidgetUI({ container, chartKey: "window-option-" + enabled, symbol: "TEST", interval: "60", showTopBar: false, showDataWindow: enabled });
+    ui.setBars([{ time: 1000, open: 1, high: 2, low: 1, close: 2, volume: 1 }]);
+    ui.setActiveIndicators([{ id: "study", name: "Study", isVisible: true, inputs: {} }], { study: { overlay: true, name: "Study" } });
+    ui.setPlots([{ id: "signal", type: "plot", scriptId: "study", title: "Signal", values: [42], color: "red", precision: 0 }]);
+    expect(Boolean(container.querySelector("[data-tealchart-data-window]"))).toBe(enabled === true);
+    expect(container.querySelector("[data-indicator-values]")?.textContent).toBe("42");
+    ui.dispose();
+  }
 });

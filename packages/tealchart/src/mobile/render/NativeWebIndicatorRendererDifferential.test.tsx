@@ -3,15 +3,16 @@ import type { ReactElement, ReactNode } from 'react';
 import type { Bar, ComputedPane, Viewport } from '../../types';
 import type { NativeVisibleBar } from './nativeVisibleBars';
 
-import { Group, Rect, Skia, Path as SkiaPath, Text as SkiaText } from '@shopify/react-native-skia';
+import { Group, Picture, Rect, Skia, Path as SkiaPath, Text as SkiaText } from '@shopify/react-native-skia';
 import { describe, expect, it, vi } from 'vitest';
 
 import { TealchartRenderer } from '../../TealchartRenderer';
-import { NativeCandleVolumeLayerImpl } from './NativeCandleVolumeLayer';
+import { nativePictureRects } from '../../test/nativePictureRects';
+import { getVisiblePlotRange } from '../../viewport/viewScale';
 import { MobileIndicatorManager } from '../MobileIndicatorManager';
+import { NativeCandleVolumeLayerImpl } from './NativeCandleVolumeLayer';
 import { createNativeChartFrameFromPanes } from './nativeChartFrame';
 import { NativeIndicatorPlotLayerImpl } from './NativeIndicatorPlotLayer';
-import { getVisiblePlotRange } from '../../viewport/viewScale';
 
 vi.mock('react', async (importOriginal) => {
   const actual = await importOriginal<typeof import('react')>();
@@ -169,7 +170,13 @@ function expandChildren(root: ReactNode): ReactNode[] {
   walkElements(root, (element, opacity) => {
     if (opacity === 0) return;
     if (typeof element.type !== 'function') return;
-    if (element.type === Group || element.type === Rect || element.type === SkiaPath || element.type === SkiaText)
+    if (
+      element.type === Group ||
+      element.type === Picture ||
+      element.type === Rect ||
+      element.type === SkiaPath ||
+      element.type === SkiaText
+    )
       return;
     rendered.push((element.type as (props: unknown) => ReactNode)(element.props));
   });
@@ -228,7 +235,9 @@ function summarizeNativeIndicatorPaneRange(plots: PlotOutput[]): { min: number; 
     },
   };
 
-  (manager as unknown as { _updateAutoPaneRanges: (plots: readonly PlotOutput[]) => void })._updateAutoPaneRanges(plots);
+  (manager as unknown as { _updateAutoPaneRanges: (plots: readonly PlotOutput[]) => void })._updateAutoPaneRanges(
+    plots,
+  );
   return range;
 }
 
@@ -236,6 +245,11 @@ function normalizeNativeElements(nodes: readonly ReactNode[]): PrimitiveSummary 
   const operations: RecordingCanvasContext['operations'] = [];
   walkElements(nodes, (element, opacity) => {
     if (opacity === 0) return;
+    if (element.type === Picture) {
+      for (const rect of nativePictureRects(element.props.picture))
+        operations.push({ kind: 'fill', color: rect.color });
+      return;
+    }
     if (element.type === Rect) {
       operations.push({ kind: 'fill', color: String(element.props.color ?? '') });
       return;

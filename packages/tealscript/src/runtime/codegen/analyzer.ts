@@ -1,3 +1,7 @@
+import { importedInternalName } from './importedNames';
+import { resolveDependencyMember } from './importedDependencies';
+import { isTimeframeSecondsRatio } from '../../compat/legacyHighestTimeframeRatio';
+import { tradingViewTimeframeCompileRefusal } from '../../compat/tradingViewTimeframeRefusals';
 import type {
   Program, Statement, Expression,
   IndicatorDeclaration,
@@ -9,17 +13,24 @@ import type {
   TypeDeclaration,
   FunctionDeclaration,
   EnumDeclaration,
+  TypeAnnotation,
 } from '../../parser/ast';
 import {
   getOfficialTradingViewLibrary,
 } from '../../officialTradingViewLibraries';
-import { pineVersionRules } from '../../pineVersionRules';
+import { isPineBuiltinGlobalAvailable, pineVersionRules } from '../../pineVersionRules';
+import { checkProgram, type SemanticType } from '../../semantic/checker';
+import { DERIVED_PRICE_BUILTINS } from '../../builtinMetadata';
+import { canonicalBuiltinArguments } from '../../pineBuiltinParameterRenames';
 
 export interface TACallSite {
   memberName: string;
   className: string;
   ctorArgs: unknown[];
   dynamicCtorArgExprs?: Expression[];
+  truncateTimeframeRatioLength?: boolean;
+  integerDivisionLength?: boolean;
+  captureInitialCtorArgs?: boolean;
   computeArgExprs: Expression[];
   returnsTuple: boolean;
   tupleFields?: string[];
@@ -40,12 +51,14 @@ export interface VarDeclInfo {
 }
 
 export interface InputCallSite {
+  defaultTitle?: string;
   id: string;
   funcName: string;
   node: CallExpression;
 }
 
 export interface PlotCallSite {
+  plotCount: number;
   index: number;
   funcCallIndex: number;
   funcName: string;
@@ -55,7 +68,9 @@ export interface PlotCallSite {
 export interface FuncInfo {
   name: string;
   params: string[];
+  paramTypes: FunctionDeclaration['params'][number]['typeAnnotation'][];
   paramDefaults: (Expression | undefined)[];
+  paramTypeAnnotations: (TypeAnnotation | null | undefined)[];
   body: Expression | Statement[];
   hasTACalls: boolean;
   hasSeriesVars: boolean;
@@ -67,6 +82,8 @@ export interface DeclarationInfo {
   kind: 'indicator' | 'strategy' | 'library';
   title: string;
   node: IndicatorDeclaration | LibraryDeclaration;
+  constantExpressions?: ReadonlyMap<string, Expression>;
+  constantExpressionTypes?: WeakMap<Expression, SemanticType>;
 }
 
 export interface TypeDeclInfo {
@@ -102,6 +119,7 @@ export interface SecurityCallSite {
   node: CallExpression;
   expressionSourceParam?: string;
   expressionCaptureParams?: string[];
+  independentRequestCaptures?: Map<string, Expression>;
   expressionLocalStatements?: Statement[];
   expressionTupleArity?: number;
   importedAliasContext?: string;
@@ -109,8 +127,17 @@ export interface SecurityCallSite {
   requiresDynamicRequestsReason?: 'local-scope' | 'conditional-operand' | 'nested-request';
 }
 
+export interface RequestSourceSite {
+  id: number;
+  ownerFunctionName?: string;
+  expression: Expression;
+  params: string[];
+  locals: Statement[];
+}
+
 export interface AnalysisContext {
   pineVersion: number;
+  discardedFootprintCalls?: Set<Expression>;
   seriesVars: Set<string>;
   taCallSites: TACallSite[];
   taCallSiteMap: Map<CallExpression, TACallSite>;
@@ -127,10 +154,16 @@ export interface AnalysisContext {
   typeDecls: Map<string, TypeDeclInfo>;
   securitySites: SecurityCallSite[];
   capturedParams: Set<string>;
+  requestSourceSites: Map<Expression, RequestSourceSite>;
+  requestSourceCaptures: Map<Expression, { params: string[]; locals: Statement[] }>;
   importedNamespaces: Set<string>;
   officialLibraryFunctions: Map<string, string>;
   importedFunctions: Map<string, string>;
+  importedLocalFunctions: Map<string, string>;
+  importedFunctionOwners: Map<string, string>;
+  importedDependencyScopes: Map<string, Map<string, string>>;
   userFunctionOverloads: Map<string, string[]>;
+  resolvedUserFunctionCalls: Map<CallExpression, string>;
   importedMethods: Map<string, string>;
   localMethodOverloads: Map<string, LocalMethodOverloadInfo[]>;
   importedMethodOverloads: Map<string, ImportedMethodOverloadInfo[]>;
@@ -178,6 +211,7 @@ const TA_CLASS_MAP: Record<string, { className: string; returnsTuple: boolean; t
   'ta.lowestbars': { className: 'LowestBars', returnsTuple: false },
   'ta.pivothigh': { className: 'PivotHigh', returnsTuple: false },
   'ta.pivotlow': { className: 'PivotLow', returnsTuple: false },
+  'ta.pivot_point_levels': { className: 'PivotPointLevels', returnsTuple: false },
   'ta.range': { className: 'Range', returnsTuple: false },
   'ta.rising': { className: 'Rising', returnsTuple: false },
   'ta.falling': { className: 'Falling', returnsTuple: false },
@@ -236,6 +270,7 @@ const TA_VAR_CLASS_MAP: Record<string, string> = {
   'ta.pvi': 'PositiveVolumeIndex',
   'ta.pvt': 'PriceVolumeTrend',
   'ta.obv': 'OBV',
+  'ta.vwap': 'VWAP',
   'ta.wad': 'WilliamsAccumulationDistribution',
   'ta.wvad': 'WilliamsVariableAccumulationDistribution',
 };
@@ -243,24 +278,20 @@ const TA_VAR_CLASS_MAP: Record<string, string> = {
 function canonicalTAVarName(name: string, pineVersion: number): string | undefined {
   if (name.includes('.') || pineVersion > 4) return undefined;
   const taName = `ta.${name}`;
-  return taName in TA_VAR_CLASS_MAP ? taName : undefined;
+  return Object.prototype.hasOwnProperty.call(TA_VAR_CLASS_MAP, taName) ? taName : undefined;
 }
 
-const DIRECT_TA_FUNCS = new Set([
-  'ta.pivot_point_levels',
-]);
-
 const LEGACY_GLOBAL_MATH_ALIASES = new Set([
-  'abs', 'ceil', 'floor', 'round', 'sqrt',
+  'abs', 'ceil', 'floor', 'round', 'round_to_mintick', 'sqrt',
   'log', 'log10', 'pow', 'sign', 'max', 'min', 'avg', 'sum',
   'sin', 'cos', 'tan', 'asin', 'acos', 'atan', 'exp',
-  'toradians', 'todegrees',
+  'toradians', 'todegrees', 'random',
 ]);
 
 function canonicalTACallName(fullName: string): string {
   if (fullName.includes('.') || LEGACY_GLOBAL_MATH_ALIASES.has(fullName)) return fullName;
   const taName = `ta.${fullName}`;
-  return taName in TA_CLASS_MAP || DIRECT_TA_FUNCS.has(taName) ? taName : fullName;
+  return Object.prototype.hasOwnProperty.call(TA_CLASS_MAP, taName) ? taName : fullName;
 }
 
 const REQUIRED_STATIC_TA_CTOR_ARG_COUNTS: Record<string, number> = {
@@ -317,7 +348,7 @@ const REQUIRED_STATIC_TA_CTOR_ARG_COUNTS: Record<string, number> = {
   'ta.kcw': 2,
   'ta.dmi': 2,
   'ta.adx': 1,
-  'ta.supertrend': 2,
+  'ta.supertrend': 1,
   'ta.sar': 3,
   'ta.kst': 9,
   'ta.vwap': 2,
@@ -363,7 +394,7 @@ function orderedCallExprArg(args: CallArgument[], names: readonly string[], inde
   return positional[positionalIndex];
 }
 
-function extractStaticNumber(expr: Expression | undefined): number | null {
+export function extractStaticNumber(expr: Expression | undefined): number | null {
   if (!expr) return null;
   if (expr.type === 'NumericLiteral') return expr.value;
   if (expr.type === 'UnaryExpression' && expr.operator === '-' && expr.argument.type === 'NumericLiteral') {
@@ -406,6 +437,7 @@ function vwapHasStdevMult(args: CallArgument[]): boolean {
 }
 
 export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisContext {
+  const highestTimeframeRatioNames = new Set<string>();
   const ctx: AnalysisContext = {
     pineVersion: ast.version,
     seriesVars: new Set(),
@@ -424,10 +456,16 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
     typeDecls: new Map(),
     securitySites: [],
     capturedParams: new Set(options.capturedParams ?? []),
+    requestSourceSites: new Map(),
+    requestSourceCaptures: new Map(),
     importedNamespaces: new Set(),
     officialLibraryFunctions: new Map(),
     importedFunctions: new Map(),
+    importedLocalFunctions: new Map(),
+    importedFunctionOwners: new Map(),
+    importedDependencyScopes: new Map(),
     userFunctionOverloads: new Map(),
+    resolvedUserFunctionCalls: new Map(),
     importedMethods: new Map(),
     localMethodOverloads: new Map(),
     importedMethodOverloads: new Map(),
@@ -444,14 +482,125 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
     maxBarsBackHints: new Map(),
   };
 
+  // Retain structural matching for cloned request expressions, but serialize
+  // each immutable body/target only once during this analysis.
+  const serializedNodes = new WeakMap<object, string>();
+  function serializedNode(node: object): string {
+    let json = serializedNodes.get(node);
+    if (json === undefined) {
+      json = JSON.stringify(node);
+      serializedNodes.set(node, json);
+    }
+    return json;
+  }
+
+  function callPosition(node: CallExpression): string | undefined {
+    const start = node.loc?.start?.offset;
+    const end = node.loc?.end?.offset;
+    return Number.isFinite(start) && Number.isFinite(end) ? `${start}:${end}` : undefined;
+  }
+
+  type BodyMembership = {
+    nodes: WeakSet<object>;
+    calls: CallExpression[];
+    positions: Set<string>;
+    names: Set<string>;
+    hasUnlocatedCalls: boolean;
+  };
+  const bodyMembership = new WeakMap<object, BodyMembership>();
+  function membership(body: Expression | Statement[]): BodyMembership {
+    const cached = bodyMembership.get(body);
+    if (cached) return cached;
+    const nodes = new WeakSet<object>();
+    const calls: CallExpression[] = [];
+    const positions = new Set<string>();
+    const names = new Set<string>();
+    let hasUnlocatedCalls = false;
+    const visit = (value: unknown): void => {
+      if (!value || typeof value !== 'object' || nodes.has(value)) return;
+      nodes.add(value);
+      if (Array.isArray(value)) {
+        for (const child of value) visit(child);
+        return;
+      }
+      if ((value as { type?: string }).type === 'CallExpression') {
+        const call = value as CallExpression;
+        calls.push(call);
+        const position = callPosition(call);
+        if (position === undefined) hasUnlocatedCalls = true;
+        else positions.add(position);
+      }
+      for (const key of Object.keys(value)) {
+        if (key === 'loc') continue;
+        const child = (value as Record<string, unknown>)[key];
+        if (key === 'name' && typeof child === 'string' && !names.has(child) && JSON.stringify(child) === `"${child}"`) {
+          names.add(child);
+        }
+        visit(child);
+      }
+    };
+    visit(body);
+    const result = { nodes, calls, positions, names, hasUnlocatedCalls };
+    bodyMembership.set(body, result);
+    return result;
+  }
+
+  function containsNode(body: Expression | Statement[], target: CallExpression): boolean {
+    const index = membership(body);
+    if (index.nodes.has(target)) return true;
+    const position = callPosition(target);
+    if (position !== undefined && !index.hasUnlocatedCalls && !index.positions.has(position)) return false;
+    const json = serializedNode(body);
+    const targetJson = serializedNode(target);
+    return json.includes(targetJson);
+  }
+
+  function hasSeriesAccess(body: Expression | Statement[], seriesVars: Set<string>): boolean {
+    const names = membership(body).names;
+    for (const name of seriesVars) {
+      if (names.has(name)) return true;
+    }
+    return false;
+  }
+
   let taIndex = 0;
   const taVarSitesByName = new Map<string, TAVarSite>();
   let plotIndex = 0;
   const plotCallCounts = new Map<string, number>();
   const functionBodies = new Map<string, Expression | Statement[]>();
   const registeredImportKeys = new Set<string>();
+  const dependencyAliases = new Map<string, Set<string>>();
+  const inspectedLibraries = new Set<string>();
+  function collectDependencyAliases(program: Program): void {
+    for (const statement of program.body) {
+      if (statement.type !== 'ImportDeclaration') continue;
+      const paths = dependencyAliases.get(statement.alias.name) ?? new Set<string>();
+      paths.add(statement.path);
+      dependencyAliases.set(statement.alias.name, paths);
+      if (inspectedLibraries.has(statement.path)) continue;
+      inspectedLibraries.add(statement.path);
+      const library = getOfficialTradingViewLibrary(statement.path)?.program ?? options.libraries?.get(statement.path);
+      if (library) collectDependencyAliases(library);
+    }
+  }
+  collectDependencyAliases(ast);
+  const scopedDependencyNames = new Map<string, string>();
+  function dependencyNamespace(alias: string, path: string): string {
+    if ((dependencyAliases.get(alias)?.size ?? 0) < 2) return alias;
+    const key = `${alias}\u0000${path}`;
+    let name = scopedDependencyNames.get(key);
+    if (!name) {
+      name = `$dependency${scopedDependencyNames.size}`;
+      scopedDependencyNames.set(key, name);
+    }
+    return name;
+  }
+
   const userFunctionCounts = new Map<string, number>();
   const rootDeclaredNames = new Set<string>();
+  const builtinDeclarationScopes = isPineBuiltinGlobalAvailable(ast.version, 'bar_index')
+    ? undefined
+    : [new Set<string>()];
   const addRootDeclaredNames = (statements: Statement[]): void => {
     for (const statement of statements) {
       if (statement.type === 'VariableDeclaration') {
@@ -482,10 +631,39 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
       else if (statement.alternate) addRootDeclaredNames([statement.alternate]);
     }
   }
+  const userFunctionNames = new Map<FunctionDeclaration, string>();
+  const arityCounts = new Map<string, number>();
+  for (const statement of ast.body) {
+    if (statement.type !== 'FunctionDeclaration' || statement.isMethod) continue;
+    const name = statement.name.name;
+    const arityName = `${name}$arity${statement.params.length}`;
+    arityCounts.set(arityName, (arityCounts.get(arityName) ?? 0) + 1);
+  }
+  const arityIndices = new Map<string, number>();
+  for (const statement of ast.body) {
+    if (statement.type !== 'FunctionDeclaration' || statement.isMethod) continue;
+    const name = statement.name.name;
+    const arityName = `${name}$arity${statement.params.length}`;
+    const ordinal = arityIndices.get(arityName) ?? 0;
+    arityIndices.set(arityName, ordinal + 1);
+    userFunctionNames.set(statement, (userFunctionCounts.get(name) ?? 0) === 1
+      ? name
+      : (arityCounts.get(arityName) ?? 0) === 1 ? arityName : `${arityName}$overload${ordinal}`);
+  }
+  if ([...userFunctionCounts.values()].some((count) => count > 1)) {
+    const semantic = checkProgram(ast, { libraries: options.libraries });
+    for (const diagnostic of semantic.diagnostics) {
+      if (diagnostic.code === 'ambiguous-call') ctx.unsupported.push(diagnostic.message);
+    }
+    for (const [call, declaration] of semantic.userFunctionCallDeclarations) {
+      const name = userFunctionNames.get(declaration);
+      if (name) ctx.resolvedUserFunctionCalls.set(call, name);
+    }
+  }
   let activeFunctionName: string | null = null;
   let activeFunctionParams: Set<string> | null = null;
   let activeFunctionLocals: Set<string> | null = null;
-  let activeFunctionPriorLocalStatements: Map<string, Statement> | null = null;
+  let activeFunctionPriorLocalStatements: Statement[] | null = null;
   let localScopeDepth = 0;
   const localNameScopeStack: Set<string>[] = [];
   const loopExpressionForbiddenStack: Set<string>[] = [];
@@ -497,31 +675,29 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
     if (!ctx.unsupported.includes(message)) ctx.unsupported.push(message);
   }
 
-  function importedExportName(alias: string, exportName: string): string {
-    return `${alias}__${exportName}`;
-  }
+  const reservedImportedNames = new Set([...userFunctionNames.values(), ...ast.body.flatMap(statement =>
+    statement.type === 'TypeDeclaration' || statement.type === 'EnumDeclaration' ? [statement.name.name] : [])]);
 
-  function importedMethodExportName(alias: string, receiverType: string | null, exportName: string): string {
-    return receiverType ? `${alias}__${receiverType}__${exportName}` : importedExportName(alias, exportName);
+  function importedExportName(alias: string, exportName: string): string {
+    return importedInternalName([alias, exportName], reservedImportedNames);
   }
 
   function importedMethodInternalName(alias: string, receiverType: string | null, exportName: string, paramCount: number): string {
-    return `${importedMethodExportName(alias, receiverType, exportName)}__${paramCount}`;
+    return importedInternalName(receiverType ? [alias, receiverType, exportName, String(paramCount)] : [alias, exportName, String(paramCount)], reservedImportedNames);
   }
 
   function importedTypeName(alias: string, typeName: string): string {
-    return `${alias}__type__${typeName}`;
+    return importedInternalName([alias, 'type', typeName], reservedImportedNames);
   }
 
   function currentImportedAlias(): string | undefined {
-    return activeFunctionName?.includes('__') ? activeFunctionName.split('__')[0] : options.importedAliasContext;
+    return (activeFunctionName ? ctx.importedFunctionOwners.get(activeFunctionName) : undefined) ?? options.importedAliasContext;
   }
 
   function sameImportedLibraryFunctionName(calleeName: string): string | undefined {
     const alias = currentImportedAlias();
     if (!alias) return undefined;
-    const candidate = importedExportName(alias, calleeName);
-    return ctx.funcInfos.has(candidate) ? candidate : undefined;
+    return ctx.importedLocalFunctions.get(`${alias}.${calleeName}`);
   }
 
   function sameImportedLibraryMethodOverloads(methodName: string): ImportedMethodOverloadInfo[] | undefined {
@@ -537,14 +713,22 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
     return annotation.baseType === 'udt' ? annotation.name : annotation.baseType;
   }
 
-  function registerFunctionInfo(name: string, fn: FunctionDeclaration): void {
+  function registerFunctionInfo(name: string, fn: FunctionDeclaration, importedAlias?: string): void {
+    if (importedAlias) ctx.importedFunctionOwners.set(name, importedAlias);
     const params = fn.params.map((p) => p.name);
     const paramDefaults = fn.params.map((p) => p.defaultValue);
+    // Defaults are emitted even when the caller supplies no expression to walk.
+    // Capture their bar dependencies before onBar decides which fields to push.
+    for (const defaultExpr of paramDefaults) {
+      if (defaultExpr) walkExpr(defaultExpr);
+    }
     functionBodies.set(name, fn.body);
     ctx.funcInfos.set(name, {
       name,
       params,
+      paramTypes: fn.params.map((p) => p.typeAnnotation),
       paramDefaults,
+      paramTypeAnnotations: fn.params.map((param) => param.typeAnnotation),
       body: fn.body,
       hasTACalls: false,
       hasSeriesVars: false,
@@ -553,8 +737,18 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
     });
   }
 
-  function localMethodInternalName(receiverType: string | null, methodName: string, paramCount: number): string {
-    return `${receiverType ?? 'any'}__${methodName}__${paramCount}`;
+  const localMethodSignatures = new Map<string, Map<string, string>>();
+
+  function localMethodInternalName(receiverType: string | null, methodName: string, declaration: FunctionDeclaration): string {
+    const baseName = `${receiverType ?? 'any'}__${methodName}__${declaration.params.length}`;
+    const signature = JSON.stringify(declaration.params.map((parameter) => parameter.typeAnnotation), (key, value) => key === 'loc' ? undefined : value);
+    const signatures = localMethodSignatures.get(baseName) ?? new Map<string, string>();
+    const existingName = signatures.get(signature);
+    if (existingName) return existingName;
+    const internalName = signatures.size === 0 ? baseName : `${baseName}$overload${signatures.size}`;
+    signatures.set(signature, internalName);
+    localMethodSignatures.set(baseName, signatures);
+    return internalName;
   }
 
   function userFunctionInternalName(functionName: string, paramCount: number): string {
@@ -567,7 +761,7 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
     if (expr.type === 'ArrayExpression') return expr.elements.length;
     if (expr.type !== 'CallExpression' || expr.callee.type !== 'Identifier') return undefined;
 
-    const body = functionBodies.get(userFunctionInternalName(expr.callee.name, expr.arguments.length));
+    const body = functionBodies.get(ctx.resolvedUserFunctionCalls.get(expr) ?? userFunctionInternalName(expr.callee.name, expr.arguments.length));
     if (!body) return undefined;
     if (!Array.isArray(body)) return body.type === 'ArrayExpression' ? body.elements.length : undefined;
 
@@ -586,7 +780,8 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
     activeFunctionName = name;
     activeFunctionParams = new Set(params);
     activeFunctionLocals = Array.isArray(body) ? collectFunctionLocalNames(body) : new Set();
-    activeFunctionPriorLocalStatements = new Map();
+    activeFunctionPriorLocalStatements = [];
+    builtinDeclarationScopes?.push(new Set(params));
     try {
       if (Array.isArray(body)) {
         for (const s of body) walkStmt(s);
@@ -598,6 +793,7 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
       activeFunctionParams = previousFunctionParams;
       activeFunctionLocals = previousFunctionLocals;
       activeFunctionPriorLocalStatements = previousFunctionPriorLocalStatements;
+      builtinDeclarationScopes?.pop();
     }
   }
 
@@ -654,8 +850,10 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
 
   function activeRequestCaptureNames(): Set<string> {
     return new Set([
+      ...ctx.capturedParams,
       ...(activeFunctionParams ?? []),
       ...(activeFunctionLocals ?? []),
+      ...activeLoopExpressionForbiddenNames(),
     ]);
   }
 
@@ -687,58 +885,87 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
       || Boolean(activeFunctionLocals?.has(name));
   }
 
+  function isUnavailableBuiltinReference(name: string): boolean {
+    return !isPineBuiltinGlobalAvailable(ast.version, name)
+      && !builtinDeclarationScopes?.some((scope) => scope.has(name));
+  }
+
   function walkScopedStatements(body: Statement[], extras: string[] = []): void {
     localNameScopeStack.push(collectBlockLocalNames(body, extras));
+    const priorStatementCount = activeFunctionPriorLocalStatements?.length ?? 0;
+    builtinDeclarationScopes?.push(new Set(extras));
     try {
       for (const stmt of body) walkStmt(stmt);
     } finally {
       localNameScopeStack.pop();
+      if (activeFunctionPriorLocalStatements) activeFunctionPriorLocalStatements.length = priorStatementCount;
+      builtinDeclarationScopes?.pop();
+    }
+  }
+
+  function localWrittenNames(stmt: Statement): string[] {
+    switch (stmt.type) {
+      case 'VariableDeclaration':
+        return localDeclarationNames(stmt);
+      case 'AssignmentStatement':
+        return stmt.left.type === 'Identifier' ? [stmt.left.name] : [];
+      case 'TupleAssignment':
+        return stmt.names.map(name => name.name);
+      case 'MultiDeclaration':
+        return stmt.declarations.flatMap(localWrittenNames);
+      case 'IfStatement':
+        return [
+          ...stmt.consequent.flatMap(localWrittenNames),
+          ...(Array.isArray(stmt.alternate)
+            ? stmt.alternate.flatMap(localWrittenNames)
+            : stmt.alternate ? localWrittenNames(stmt.alternate) : []),
+        ];
+      case 'ForStatement':
+      case 'WhileStatement':
+      case 'OnceStatement':
+        return stmt.body.flatMap(localWrittenNames);
+      default:
+        return [];
     }
   }
 
   function registerPriorLocalStatement(stmt: Statement): void {
-    if (!activeFunctionPriorLocalStatements || stmt.type !== 'VariableDeclaration') return;
-    if (stmt.kind === 'var' || stmt.kind === 'varip') return;
-    if (stmt.init.type === 'IfStatement') return;
-    for (const name of localDeclarationNames(stmt)) {
-      activeFunctionPriorLocalStatements.set(name, stmt);
+    if (activeFunctionPriorLocalStatements && localWrittenNames(stmt).length > 0) {
+      activeFunctionPriorLocalStatements.push(stmt);
     }
   }
 
   function collectRequestCaptures(expression: Expression): { params: string[]; locals: Statement[] } {
-    if (!activeFunctionName) return { params: [], locals: [] };
-    const params = activeFunctionParams ?? new Set<string>();
-    const localStatements = activeFunctionPriorLocalStatements ?? new Map<string, Statement>();
-    const pending = [...collectReferencedNames(expression, activeRequestCaptureNames())];
+    if (!activeFunctionName && loopExpressionForbiddenStack.length === 0 && ctx.capturedParams.size === 0) return { params: [], locals: [] };
+    const params = new Set([...ctx.capturedParams, ...(activeFunctionParams ?? []), ...activeLoopExpressionForbiddenNames()]);
+    const localStatements = activeFunctionPriorLocalStatements ?? [];
+    const captureNames = activeRequestCaptureNames();
+    const pending = [...collectReferencedNames(expression, captureNames)];
     const paramNames = new Set<string>();
-    const localNames = new Set<string>();
+    const visitedNames = new Set<string>();
+    const selectedStatements = new Set<Statement>();
 
     while (pending.length > 0) {
       const name = pending.pop()!;
+      if (visitedNames.has(name)) continue;
+      visitedNames.add(name);
       if (params.has(name)) {
         paramNames.add(name);
         continue;
       }
-      const stmt = localStatements.get(name);
-      if (!stmt || localNames.has(name)) continue;
-      for (const localName of localDeclarationNames(stmt)) localNames.add(localName);
-      if (stmt.type === 'VariableDeclaration' && stmt.init.type !== 'IfStatement') {
-        for (const dependency of collectReferencedNames(stmt.init, activeRequestCaptureNames())) {
-          if (!paramNames.has(dependency) && !localNames.has(dependency)) pending.push(dependency);
+      for (const stmt of localStatements) {
+        if (!localWrittenNames(stmt).includes(name)) continue;
+        selectedStatements.add(stmt);
+        for (const dependency of collectReferencedNames([stmt], captureNames)) {
+          if (!visitedNames.has(dependency)) pending.push(dependency);
         }
       }
     }
 
-    const locals: Statement[] = [];
-    const seen = new Set<Statement>();
-    for (const stmt of localStatements.values()) {
-      if (seen.has(stmt)) continue;
-      if (localDeclarationNames(stmt).some((name) => localNames.has(name))) {
-        locals.push(stmt);
-        seen.add(stmt);
-      }
-    }
-    return { params: [...paramNames].sort(), locals };
+    return {
+      params: [...paramNames].sort(),
+      locals: localStatements.filter(stmt => selectedStatements.has(stmt)),
+    };
   }
 
   function activeLoopExpressionForbiddenNames(): Set<string> {
@@ -818,8 +1045,12 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
       return;
     }
 
+    const dependencyScope = new Map<string, string>();
     for (const libraryStmt of libraryAst.body) {
-      if (libraryStmt.type === 'ImportDeclaration') registerImportedLibrary(libraryStmt);
+      if (libraryStmt.type !== 'ImportDeclaration') continue;
+      const alias = dependencyNamespace(libraryStmt.alias.name, libraryStmt.path);
+      dependencyScope.set(libraryStmt.alias.name, alias);
+      registerImportedLibrary({ ...libraryStmt, alias: { ...libraryStmt.alias, name: alias } });
     }
 
     ctx.importedNamespaces.add(stmt.alias.name);
@@ -849,11 +1080,36 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
       }
     }
 
+    const importedFunctionNames = new Map<FunctionDeclaration, string>();
+    const importedFunctionCounts = new Map<string, number>();
+    for (const declaration of libraryAst.body) {
+      if (declaration.type === 'FunctionDeclaration' && !declaration.isMethod) {
+        importedFunctionCounts.set(declaration.name.name, (importedFunctionCounts.get(declaration.name.name) ?? 0) + 1);
+      }
+    }
+    const importedFunctionIndices = new Map<string, number>();
+    for (const declaration of libraryAst.body) {
+      if (declaration.type !== 'FunctionDeclaration' || declaration.isMethod) continue;
+      const name = declaration.name.name;
+      const ordinal = importedFunctionIndices.get(name) ?? 0;
+      importedFunctionIndices.set(name, ordinal + 1);
+      const base = importedExportName(stmt.alias.name, name);
+      importedFunctionNames.set(
+        declaration,
+        importedFunctionCounts.get(name) === 1 ? base : `${base}$overload${ordinal}`,
+      );
+    }
+
     for (const libraryStmt of libraryAst.body) {
       if (libraryStmt.type === 'FunctionDeclaration') {
         if (libraryStmt.isMethod) {
           const receiverType = receiverTypeName(libraryStmt);
-          const internalName = importedMethodInternalName(stmt.alias.name, receiverType, libraryStmt.name.name, libraryStmt.params.length);
+          const internalName = importedMethodInternalName(
+            stmt.alias.name,
+            receiverType,
+            libraryStmt.name.name,
+            libraryStmt.params.length,
+          );
           const localOverload = {
             receiverType: receiverType ? importedTypeName(stmt.alias.name, receiverType) : null,
             internalName,
@@ -871,13 +1127,24 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
             overloads.push(publicOverload);
             ctx.importedMethodOverloads.set(libraryStmt.name.name, overloads);
           }
-          registerFunctionInfo(internalName, libraryStmt);
+          registerFunctionInfo(internalName, libraryStmt, stmt.alias.name);
         } else {
-          const internalName = importedExportName(stmt.alias.name, libraryStmt.name.name);
+          const internalName = importedFunctionNames.get(libraryStmt)!;
+          ctx.importedLocalFunctions.set(`${stmt.alias.name}.${libraryStmt.name.name}`, internalName);
           if (libraryStmt.exported) {
             ctx.importedFunctions.set(`${stmt.alias.name}.${libraryStmt.name.name}`, internalName);
           }
-          registerFunctionInfo(internalName, libraryStmt);
+          registerFunctionInfo(internalName, libraryStmt, stmt.alias.name);
+        }
+      }
+    }
+
+    if ([...importedFunctionCounts.values()].some((count) => count > 1)) {
+      for (const program of [ast, libraryAst]) {
+        const declarations = checkProgram(program, { libraries: options.libraries }).userFunctionCallDeclarations;
+        for (const [call, declaration] of declarations) {
+          const name = importedFunctionNames.get(declaration);
+          if (name) ctx.resolvedUserFunctionCalls.set(call, name);
         }
       }
     }
@@ -886,7 +1153,10 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
       if (libraryStmt.type === 'FunctionDeclaration') {
         const internalName = libraryStmt.isMethod
           ? importedMethodInternalName(stmt.alias.name, receiverTypeName(libraryStmt), libraryStmt.name.name, libraryStmt.params.length)
-          : importedExportName(stmt.alias.name, libraryStmt.name.name);
+          : importedFunctionNames.get(libraryStmt)!;
+        const localNames = Array.isArray(libraryStmt.body) ? collectFunctionLocalNames(libraryStmt.body) : new Set<string>();
+        for (const parameter of libraryStmt.params) localNames.add(parameter.name);
+        ctx.importedDependencyScopes.set(internalName, new Map([...dependencyScope].filter(([alias]) => !localNames.has(alias))));
         walkFunctionBody(internalName, libraryStmt.params.map((p) => p.name), libraryStmt.body);
         continue;
       }
@@ -903,7 +1173,11 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
         continue;
       }
 
-      if (libraryStmt.type === 'VariableDeclaration' && libraryStmt.exported && libraryStmt.names.type === 'VariableDeclarator') {
+      if (
+        libraryStmt.type === 'VariableDeclaration' &&
+        libraryStmt.exported &&
+        libraryStmt.names.type === 'VariableDeclarator'
+      ) {
         if (libraryStmt.init.type === 'IfStatement') {
           continue;
         }
@@ -940,6 +1214,9 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
   }
 
   function walkExpr(expr: Expression): void {
+    if (expr.type === 'CallExpression') {
+      for (const arg of expr.arguments) ctx.requestSourceCaptures.set(arg.value, collectRequestCaptures(arg.value));
+    }
     switch (expr.type) {
       case 'IndexExpression': {
         walkExpr(expr.index);
@@ -949,7 +1226,7 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
         }
         if (expr.object.type === 'MemberExpression' && expr.object.object.type === 'Identifier') {
           const fullName = `${expr.object.object.name}.${expr.object.property.name}`;
-          if (fullName in TA_VAR_CLASS_MAP) {
+          if (Object.prototype.hasOwnProperty.call(TA_VAR_CLASS_MAP, fullName)) {
             registerTAVarSite(expr.object, fullName);
             break;
           }
@@ -971,10 +1248,19 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
         break;
       }
       case 'CallExpression': {
-        const { fullName, namespace } = resolveCallee(expr.callee);
+        const resolved = resolveCallee(expr.callee);
+        const fullName = resolveDependencyMember(resolved.fullName, activeFunctionName, ctx.importedDependencyScopes);
+        const namespace = fullName.split('.')[0] ?? '';
+        if (!hasUserDeclarationName('timeframe')) {
+          const refusal = tradingViewTimeframeCompileRefusal(expr, ast.version);
+          if (refusal) addUnsupported(refusal);
+        }
         if (fullName === 'max_bars_back') {
           const target = orderedCallExprArg(expr.arguments, ['var', 'num'], 0);
           const depth = extractStaticNumber(orderedCallExprArg(expr.arguments, ['var', 'num'], 1));
+          if (target?.type === 'Identifier' && DERIVED_PRICE_BUILTINS.has(target.name) && !hasUserDeclarationName(target.name)) {
+            addUnsupported(`max_bars_back cannot target derived builtin ${target.name}; size its underlying series instead`);
+          }
           if (target?.type === 'Identifier' && depth !== null && Number.isFinite(depth) && depth >= 0) {
             ctx.maxBarsBackHints.set(
               target.name,
@@ -983,7 +1269,7 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
           }
         }
         const isBareUserFunctionCall = expr.callee.type === 'Identifier' && ctx.funcInfos.has(fullName);
-        const importedFunctionName = ctx.importedFunctions.get(fullName);
+        const importedFunctionName = ctx.resolvedUserFunctionCalls.get(expr) ?? ctx.importedFunctions.get(fullName);
         const officialRuntimeName = ctx.officialLibraryFunctions.get(fullName);
         const taFullName = isBareUserFunctionCall || importedFunctionName ? fullName : canonicalTACallName(officialRuntimeName ?? fullName);
         const taNamespace = taFullName.split('.')[0] ?? '';
@@ -997,15 +1283,18 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
           const requestArgs = isLowerTf
             ? ['symbol', 'timeframe', 'expression', 'ignore_invalid_symbol', 'currency', 'ignore_invalid_timeframe', 'calc_bars_count'] as const
             : ['symbol', 'timeframe', 'expression', 'gaps', 'lookahead', 'ignore_invalid_symbol', 'currency', 'calc_bars_count'] as const;
-          const symbolExpr = orderedCallExprArg(expr.arguments, requestArgs, 0);
-          const timeframeExpr = orderedCallExprArg(expr.arguments, requestArgs, 1);
-          const expressionExpr = orderedCallExprArg(expr.arguments, requestArgs, 2);
-          const gapsExpr = isLowerTf ? null : orderedCallExprArg(expr.arguments, requestArgs, 3) ?? null;
-          const lookaheadExpr = isLowerTf ? null : orderedCallExprArg(expr.arguments, requestArgs, 4) ?? null;
-          const ignoreInvalidSymbolExpr = orderedCallExprArg(expr.arguments, requestArgs, isLowerTf ? 3 : 5) ?? null;
-          const currencyExpr = orderedCallExprArg(expr.arguments, requestArgs, isLowerTf ? 4 : 6) ?? null;
-          const ignoreInvalidTimeframeExpr = isLowerTf ? orderedCallExprArg(expr.arguments, requestArgs, 5) ?? null : null;
-          const calcBarsCountExpr = orderedCallExprArg(expr.arguments, requestArgs, isLowerTf ? 6 : 7) ?? null;
+          const routingArgs = fullName === 'security' && pineVersionRules(ast.version).allowsLegacyGlobalBuiltinAliases
+            ? expr.arguments.map((arg) => arg.name?.name === 'resolution' ? { ...arg, name: { ...arg.name, name: 'timeframe' } } : arg)
+            : expr.arguments;
+          const symbolExpr = orderedCallExprArg(routingArgs, requestArgs, 0);
+          const timeframeExpr = orderedCallExprArg(routingArgs, requestArgs, 1);
+          const expressionExpr = orderedCallExprArg(routingArgs, requestArgs, 2);
+          const gapsExpr = isLowerTf ? null : orderedCallExprArg(routingArgs, requestArgs, 3) ?? null;
+          const lookaheadExpr = isLowerTf ? null : orderedCallExprArg(routingArgs, requestArgs, 4) ?? null;
+          const ignoreInvalidSymbolExpr = orderedCallExprArg(routingArgs, requestArgs, isLowerTf ? 3 : 5) ?? null;
+          const currencyExpr = orderedCallExprArg(routingArgs, requestArgs, isLowerTf ? 4 : 6) ?? null;
+          const ignoreInvalidTimeframeExpr = isLowerTf ? orderedCallExprArg(routingArgs, requestArgs, 5) ?? null : null;
+          const calcBarsCountExpr = orderedCallExprArg(routingArgs, requestArgs, isLowerTf ? 6 : 7) ?? null;
           if (symbolExpr && timeframeExpr && expressionExpr) {
             const taCallSitesBefore = ctx.taCallSites.length;
             walkExpr(symbolExpr);
@@ -1116,6 +1405,7 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
               symbolExpr,
               timeframeExpr: symbolExpr,
               expressionExpr,
+              expressionTupleArity: inferExpressionTupleArity(expressionExpr),
               gapsExpr: null,
               lookaheadExpr: null,
               ignoreInvalidSymbolExpr,
@@ -1134,16 +1424,17 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
           break;
         }
 
-        if (taNamespace === 'ta' && !importedFunctionName && !(taFullName in TA_CLASS_MAP) && !DIRECT_TA_FUNCS.has(taFullName) && !ctx.officialLibraryFunctions.has(taFullName)) {
+        if (taNamespace === 'ta' && !importedFunctionName && !Object.prototype.hasOwnProperty.call(TA_CLASS_MAP, taFullName) && !ctx.officialLibraryFunctions.has(taFullName)) {
           addUnsupported(`${taFullName} not yet supported by transpiler`);
         }
 
-        if (taFullName in TA_CLASS_MAP) {
+        if (Object.prototype.hasOwnProperty.call(TA_CLASS_MAP, taFullName)) {
           const info = TA_CLASS_MAP[taFullName];
-          const ctorArgs = extractCtorArgs(taFullName, expr.arguments);
+          const canonicalArgs = canonicalBuiltinArguments(expr.arguments, taFullName, ast.version);
+          const ctorArgs = extractCtorArgs(taFullName, canonicalArgs);
           const requiredCtorArgCount = REQUIRED_STATIC_TA_CTOR_ARG_COUNTS[taFullName] ?? 0;
           const dynamicCtorArgExprs = ctorArgs.length < requiredCtorArgCount
-            ? extractCtorArgExprs(taFullName, expr.arguments)
+            ? extractCtorArgExprs(taFullName, canonicalArgs)
             : undefined;
           if (ctorArgs.length < requiredCtorArgCount && (dynamicCtorArgExprs?.length ?? 0) < requiredCtorArgCount) {
             addUnsupported(`${taFullName} with dynamic constructor parameters not yet supported by transpiler`);
@@ -1154,7 +1445,10 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
             className: info.className,
             ctorArgs,
             dynamicCtorArgExprs,
-            computeArgExprs: extractComputeArgs(taFullName, expr.arguments),
+            computeArgExprs: extractComputeArgs(taFullName, canonicalArgs, ast.version),
+            truncateTimeframeRatioLength: ctx.pineVersion === 5 && taFullName === 'ta.highest'
+              && !activeFunctionName && Boolean(dynamicCtorArgExprs?.[0]
+                && isTimeframeSecondsRatio(dynamicCtorArgExprs[0], (name) => highestTimeframeRatioNames.has(name))),
             returnsTuple,
             tupleFields: taFullName === 'ta.vwap' ? ['middle', 'upper', 'lower'] : info.tupleFields,
             node: expr,
@@ -1181,6 +1475,7 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
           plotCallCounts.set(fullName, funcCallIndex + 1);
           ctx.plotSites.push({
             index: plotIndex++,
+            plotCount: fullName === 'hline' ? 0 : 1,
             funcCallIndex,
             funcName: fullName,
             node: expr,
@@ -1194,9 +1489,15 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
           ? ((sameImportedLibraryMethodOverloads(expr.callee.property.name) ?? ctx.importedMethodOverloads.get(expr.callee.property.name))?.map((overload) => overload.internalName)
             ?? (ctx.importedMethods.has(expr.callee.property.name) ? [ctx.importedMethods.get(expr.callee.property.name)!] : []))
           : [];
-        const callableNames = methodNames.length > 0
+        const callableNames =
+          methodNames.length > 0
           ? methodNames
-          : [ctx.importedFunctions.get(fullName) ?? sameLibraryFunction ?? fullName];
+            : [
+                ctx.resolvedUserFunctionCalls.get(expr) ??
+                  ctx.importedFunctions.get(fullName) ??
+                  sameLibraryFunction ??
+                  fullName,
+              ];
         for (const callableName of callableNames) {
           if (ctx.funcInfos.has(callableName)) {
             const fi = ctx.funcInfos.get(callableName)!;
@@ -1254,7 +1555,7 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
       case 'MemberExpression':
         if (expr.object.type === 'Identifier') {
           const fullName = `${expr.object.name}.${expr.property.name}`;
-          if (fullName in TA_VAR_CLASS_MAP) {
+          if (Object.prototype.hasOwnProperty.call(TA_VAR_CLASS_MAP, fullName)) {
             registerTAVarSite(expr, fullName);
             break;
           }
@@ -1274,6 +1575,10 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
         break;
       case 'Identifier':
         {
+          if (isUnavailableBuiltinReference(expr.name)) {
+            addUnsupported(`Unknown identifier: ${expr.name}`);
+            break;
+          }
           const taVarName = canonicalTAVarName(expr.name, ast.version);
           if (taVarName && !hasUserDeclarationName(expr.name)) {
             registerTAVarSite(expr, taVarName);
@@ -1311,6 +1616,13 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
   }
 
   function walkStmt(stmt: Statement): void {
+    const priorStatementCount = activeFunctionPriorLocalStatements?.length ?? 0;
+    walkStatementContents(stmt);
+    if (activeFunctionPriorLocalStatements) activeFunctionPriorLocalStatements.length = priorStatementCount;
+    registerPriorLocalStatement(stmt);
+  }
+
+  function walkStatementContents(stmt: Statement): void {
     switch (stmt.type) {
       case 'IndicatorDeclaration': {
         let title = '';
@@ -1323,6 +1635,14 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
         break;
       }
       case 'VariableDeclaration': {
+        const inputSiteStart = ctx.inputSites.length;
+        if (!activeFunctionName && stmt.names.type === 'VariableDeclarator') {
+          const name = stmt.names.name.name;
+          if (!stmt.typeAnnotation && stmt.init.type !== 'IfStatement'
+            && isTimeframeSecondsRatio(stmt.init, (alias) => highestTimeframeRatioNames.has(alias))) {
+            highestTimeframeRatioNames.add(name);
+          } else highestTimeframeRatioNames.delete(name);
+        }
         if (stmt.kind === 'var' || stmt.kind === 'varip') {
           if (stmt.names.type === 'VariableDeclarator') {
             ctx.varDecls.push({
@@ -1337,10 +1657,17 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
         } else {
           walkExpr(stmt.init);
         }
+        if (stmt.names.type === 'VariableDeclarator') {
+          for (const site of ctx.inputSites.slice(inputSiteStart)) site.defaultTitle ??= stmt.names.name.name;
+        }
         registerPriorLocalStatement(stmt);
+        if (builtinDeclarationScopes) {
+          for (const name of localDeclarationNames(stmt)) builtinDeclarationScopes.at(-1)?.add(name);
+        }
         break;
       }
       case 'AssignmentStatement':
+        if (stmt.left.type === 'Identifier') highestTimeframeRatioNames.delete(stmt.left.name);
         if (stmt.right.type === 'IfStatement') {
           walkStmt(stmt.right);
         } else {
@@ -1348,6 +1675,8 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
         }
         if (stmt.left.type !== 'Identifier') {
           walkExpr(stmt.left);
+        } else if (isUnavailableBuiltinReference(stmt.left.name)) {
+          addUnsupported(`Unknown identifier: ${stmt.left.name}`);
         }
         break;
       case 'TupleAssignment':
@@ -1424,14 +1753,14 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
       case 'FunctionDeclaration': {
         if (stmt.isMethod) {
           const receiverType = receiverTypeName(stmt);
-          const internalName = localMethodInternalName(receiverType, stmt.name.name, stmt.params.length);
+          const internalName = localMethodInternalName(receiverType, stmt.name.name, stmt);
           const overloads = ctx.localMethodOverloads.get(stmt.name.name) ?? [];
           overloads.push({ receiverType, internalName });
           ctx.localMethodOverloads.set(stmt.name.name, overloads);
           registerFunctionInfo(internalName, stmt);
           walkFunctionBody(internalName, stmt.params.map((p) => p.name), stmt.body);
         } else {
-          const internalName = userFunctionInternalName(stmt.name.name, stmt.params.length);
+          const internalName = userFunctionNames.get(stmt)!;
           if (internalName !== stmt.name.name) {
             const overloads = ctx.userFunctionOverloads.get(stmt.name.name) ?? [];
             overloads.push(internalName);
@@ -1486,9 +1815,15 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
     }
   }
 
+  const declarationConstants = new Map<string, Expression>();
   for (const stmt of ast.body) {
+    if (stmt.type === 'VariableDeclaration' && stmt.typeAnnotation?.qualifier === 'const'
+      && stmt.names.type === 'VariableDeclarator' && stmt.init.type !== 'IfStatement') {
+      declarationConstants.set(stmt.names.name.name, stmt.init);
+    }
     walkStmt(stmt);
   }
+  if (ctx.declarationInfo) ctx.declarationInfo.constantExpressions = declarationConstants;
 
   for (const site of ctx.securitySites) {
     if (!site.ownerFunctionName || versionRules.allowsNonExportedFunctionRequestsWithoutDynamicRequests) continue;
@@ -1498,12 +1833,32 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
     }
   }
 
-  // Mark functions that have TA calls or series vars in their bodies
+  // Confirm actual descendants first; retain structural matching for cloned sites.
+  const knownTANodes = new WeakSet(ctx.taCallSites.map((site) => site.node));
   for (const [_name, fi] of ctx.funcInfos) {
-    fi.hasTACalls = ctx.taCallSites.some((site) => containsNode(fi.body, site.node));
+    fi.hasTACalls = membership(fi.body).calls.some((node) => knownTANodes.has(node))
+      || ctx.taCallSites.some((site) => containsNode(fi.body, site.node));
     fi.hasSeriesVars = hasSeriesAccess(fi.body, ctx.seriesVars);
   }
 
+  const legacyDeclarationDivision = !!ctx.declarationInfo && ast.version >= 4
+    && !versionRules.constIntDivisionCanReturnFractional;
+  if (legacyDeclarationDivision || ctx.taCallSites.some(site => ['Highest', 'Lowest', 'SMA', 'EMA', 'WMA'].includes(site.className))) {
+    const types = checkProgram(ast, { libraries: options.libraries }).expressionTypes;
+    if (legacyDeclarationDivision && ctx.declarationInfo) ctx.declarationInfo.constantExpressionTypes = types;
+    let v6Types: typeof types;
+    for (const site of ctx.taCallSites) {
+      if (!['Highest', 'Lowest', 'SMA', 'EMA', 'WMA'].includes(site.className)) continue;
+      const args = extractCtorArgExprs(`ta.${site.className.toLowerCase()}`, canonicalBuiltinArguments(site.node.arguments, `ta.${site.className.toLowerCase()}`, ast.version));
+      site.integerDivisionLength = !!args[0] && types?.get(args[0])?.integerDivision === true;
+      if (ast.version === 5 && site.className === 'EMA' && site.dynamicCtorArgExprs
+        && args[0] && types?.get(args[0])?.qualifier === 'const') {
+        v6Types ??= checkProgram({ ...ast, version: 6 }, { libraries: options.libraries }).expressionTypes;
+        site.captureInitialCtorArgs = v6Types?.get(args[0])?.qualifier === 'series';
+      }
+      if (site.integerDivisionLength && !site.dynamicCtorArgExprs) site.ctorArgs[0] = Math.trunc(Number(site.ctorArgs[0]));
+    }
+  }
   return ctx;
 }
 
@@ -1649,20 +2004,6 @@ function mergeStringSets(sets: Set<string>[]): Set<string> {
   return merged;
 }
 
-function containsNode(body: Expression | Statement[], target: CallExpression): boolean {
-  const json = JSON.stringify(body);
-  const targetJson = JSON.stringify(target);
-  return json.includes(targetJson);
-}
-
-function hasSeriesAccess(body: Expression | Statement[], seriesVars: Set<string>): boolean {
-  const json = JSON.stringify(body);
-  for (const name of seriesVars) {
-    if (json.includes(`"name":"${name}"`)) return true;
-  }
-  return false;
-}
-
 function extractCtorArgs(fullName: string, args: CallArgument[]): unknown[] {
   const positional = args.filter((a) => !a.name).map((a) => a.value);
   switch (fullName) {
@@ -1690,7 +2031,7 @@ function extractCtorArgs(fullName: string, args: CallArgument[]): unknown[] {
         ?? positional[args.some((a) => a.name?.name === 'source') ? 0 : 1];
       if (lengthExpr) {
         const v = extractStaticNumber(lengthExpr);
-        if (v !== null) return [v];
+        if (v !== null) return fullName === 'ta.ema' ? [v, true, true] : (fullName === 'ta.wma' || fullName === 'ta.rma') ? [v, true] : [v];
       }
       return [];
     }
@@ -1926,9 +2267,8 @@ function extractCtorArgs(fullName: string, args: CallArgument[]): unknown[] {
         const positionalIndex = index - names.slice(0, index).filter((param) => args.some((a) => a.name?.name === param)).length;
         return positional[positionalIndex];
       };
-      const factor = extractStaticNumber(readArg('factor', 0));
       const atrPeriod = extractStaticNumber(readArg('atrPeriod', 1));
-      if (factor !== null && atrPeriod !== null) return [factor, atrPeriod];
+      if (atrPeriod !== null) return [atrPeriod];
       return [];
     }
     case 'ta.sar': {
@@ -2037,7 +2377,10 @@ function extractCtorArgExprs(fullName: string, args: CallArgument[]): Expression
     {
       const lengthExpr = args.find((a) => a.name?.name === 'length')?.value
         ?? positional[args.some((a) => a.name?.name === 'source') ? 0 : 1];
-      return lengthExpr ? [lengthExpr] : [];
+      if (!lengthExpr) return [];
+      return fullName === 'ta.ema'
+        ? [lengthExpr, booleanLiteral(true), booleanLiteral(true)]
+        : (fullName === 'ta.wma' || fullName === 'ta.rma') ? [lengthExpr, booleanLiteral(true)] : [lengthExpr];
     }
     case 'ta.stdev': {
       const names = ['source', 'length', 'biased'];
@@ -2225,7 +2568,7 @@ function extractCtorArgExprs(fullName: string, args: CallArgument[]): Expression
         const positionalIndex = index - names.slice(0, index).filter((param) => args.some((a) => a.name?.name === param)).length;
         return positional[positionalIndex];
       };
-      return [readArg('factor', 0), readArg('atrPeriod', 1)].filter(isDefinedExpression);
+      return [readArg('atrPeriod', 1)].filter(isDefinedExpression);
     }
     case 'ta.dmi':
     case 'ta.adx': {
@@ -2276,9 +2619,19 @@ function extractCtorArgExprs(fullName: string, args: CallArgument[]): Expression
   }
 }
 
-function extractComputeArgs(fullName: string, args: CallArgument[]): Expression[] {
+function extractComputeArgs(fullName: string, args: CallArgument[], pineVersion: number): Expression[] {
   const positional = args.filter((a) => !a.name).map((a) => a.value);
   switch (fullName) {
+    case 'ta.pivot_point_levels': {
+      const names = ['type', 'anchor', 'developing'];
+      const developing: Expression = readOrderedArg(args, names, 'developing', 2)
+        ?? { type: 'BooleanLiteral', value: false };
+      return [
+        readOrderedArg(args, names, 'type', 0),
+        readOrderedArg(args, names, 'anchor', 1),
+        developing,
+      ].filter(isDefinedExpression);
+    }
     case 'ta.barssince':
       return [args.find((a) => a.name?.name === 'condition')?.value ?? positional[0]].filter(isDefinedExpression);
     case 'ta.valuewhen': {
@@ -2325,7 +2678,8 @@ function extractComputeArgs(fullName: string, args: CallArgument[]): Expression[
     case 'ta.kst':
       return [readAliasedOrderedArg(args, [['source', 'series']], 0)].filter(isDefinedExpression);
     case 'ta.vwap': {
-      const source = readOrderedArg(args, ['source', 'anchor', 'stdev_mult'], 'source', 0);
+      const sourceName = pineVersion <= 4 ? 'x' : 'source';
+      const source = readOrderedArg(args, [sourceName, 'anchor', 'stdev_mult'], sourceName, 0);
       const anchor = readOrderedArg(args, ['source', 'anchor', 'stdev_mult'], 'anchor', 1);
       return [source, anchor].filter(isDefinedExpression);
     }
@@ -2349,10 +2703,14 @@ function extractComputeArgs(fullName: string, args: CallArgument[]): Expression[
     case 'ta.kcw':
       return [readOrderedArg(args, ['series', 'length', 'mult', 'useTrueRange'], 'series', 0)].filter(isDefinedExpression);
     case 'ta.crossover':
-    case 'ta.cross':
-    case 'ta.crossunder': {
+    case 'ta.cross': {
       const a = readOrderedArg(args, ['source1', 'source2'], 'source1', 0);
       const b = readOrderedArg(args, ['source1', 'source2'], 'source2', 1);
+      return [a, b].filter(isDefinedExpression);
+    }
+    case 'ta.crossunder': {
+      const a = readAliasedOrderedArg(args, [['source1', 'x'], ['source2', 'y']], 0);
+      const b = readAliasedOrderedArg(args, [['source1', 'x'], ['source2', 'y']], 1);
       return [a, b].filter(isDefinedExpression);
     }
     case 'ta.max':
@@ -2373,12 +2731,13 @@ function extractComputeArgs(fullName: string, args: CallArgument[]): Expression[
         readOrderedArg(args, ['source', 'length'], 'length', 1),
       ].filter(isDefinedExpression);
     }
+    case 'ta.supertrend':
+      return [readOrderedArg(args, ['factor', 'atrPeriod'], 'factor', 0)].filter(isDefinedExpression);
     case 'ta.atr':
     case 'ta.tr':
     case 'ta.wpr':
     case 'ta.dmi':
     case 'ta.adx':
-    case 'ta.supertrend':
     case 'ta.sar':
       return []; // OHLC classes read high/low/close from bar directly
     case 'ta.highestbars':

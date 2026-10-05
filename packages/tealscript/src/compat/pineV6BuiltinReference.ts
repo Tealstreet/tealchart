@@ -477,11 +477,7 @@ export const PINE_V6_REFERENCE_BUILTINS = {
     'earnings.future_time',
     'earnings.standardized',
   ],
-  settlement_as_close: [
-    'settlement_as_close.inherit',
-    'settlement_as_close.off',
-    'settlement_as_close.on',
-  ],
+  settlement_as_close: ['settlement_as_close.inherit', 'settlement_as_close.off', 'settlement_as_close.on'],
   splits: ['splits.denominator', 'splits.numerator'],
   barstate: [
     'barstate.isconfirmed',
@@ -942,118 +938,13 @@ export interface PineV6KnownMissingBuiltinReview {
   reason: string;
 }
 
-export const PINE_V6_KNOWN_MISSING_BUILTIN_GROUPS = {
-  providerFutureFields: {
-    reason:
-      'Future corporate-action fields require provider freshness and forecast semantics that are not exposed by the current request datafeed seam; historical/current fields are implemented separately.',
-    names: [
-      'dividends.future_amount',
-      'dividends.future_ex_date',
-      'dividends.future_pay_date',
-      'earnings.future_eps',
-      'earnings.future_period_end_time',
-      'earnings.future_revenue',
-      'earnings.future_time',
-    ],
-  },
-  providerRecommendationSeries: {
-    reason:
-      'syminfo.recommendations_* depends on a recommendations provider series not currently available through TealScript host data; this is rare for indicators and should stay visible as provider-tail work.',
-    names: [
-      'syminfo.recommendations_buy',
-      'syminfo.recommendations_buy_strong',
-      'syminfo.recommendations_hold',
-      'syminfo.recommendations_sell',
-      'syminfo.recommendations_sell_strong',
-      'syminfo.recommendations_total',
-    ],
-  },
-} as const satisfies Record<string, PineV6KnownMissingBuiltinGroup>;
+export const PINE_V6_KNOWN_MISSING_BUILTIN_GROUPS: Record<string, PineV6KnownMissingBuiltinGroup> = {};
 
 export const PINE_V6_KNOWN_MISSING_BUILTINS = uniqueSorted(
   Object.values(PINE_V6_KNOWN_MISSING_BUILTIN_GROUPS).flatMap((group) => [...group.names]),
 );
 
-export const PINE_V6_KNOWN_MISSING_BUILTIN_REVIEW = {
-  'dividends.future_amount': {
-    manualCategories: ['variables'],
-    traffic: 'low-provider-tail',
-    decision: 'keep-allowlisted',
-    reason: 'Forward dividend forecasts require a provider freshness/forecast contract; current request.dividends support is historical/current data.',
-  },
-  'dividends.future_ex_date': {
-    manualCategories: ['variables'],
-    traffic: 'low-provider-tail',
-    decision: 'keep-allowlisted',
-    reason: 'Forward dividend forecasts require a provider freshness/forecast contract; current request.dividends support is historical/current data.',
-  },
-  'dividends.future_pay_date': {
-    manualCategories: ['variables'],
-    traffic: 'low-provider-tail',
-    decision: 'keep-allowlisted',
-    reason: 'Forward dividend forecasts require a provider freshness/forecast contract; current request.dividends support is historical/current data.',
-  },
-  'earnings.future_eps': {
-    manualCategories: ['variables'],
-    traffic: 'low-provider-tail',
-    decision: 'keep-allowlisted',
-    reason: 'Forward earnings forecasts require a provider freshness/forecast contract; current request.earnings support is historical/current data.',
-  },
-  'earnings.future_period_end_time': {
-    manualCategories: ['variables'],
-    traffic: 'low-provider-tail',
-    decision: 'keep-allowlisted',
-    reason: 'Forward earnings forecasts require a provider freshness/forecast contract; current request.earnings support is historical/current data.',
-  },
-  'earnings.future_revenue': {
-    manualCategories: ['variables'],
-    traffic: 'low-provider-tail',
-    decision: 'keep-allowlisted',
-    reason: 'Forward earnings forecasts require a provider freshness/forecast contract; current request.earnings support is historical/current data.',
-  },
-  'earnings.future_time': {
-    manualCategories: ['variables'],
-    traffic: 'low-provider-tail',
-    decision: 'keep-allowlisted',
-    reason: 'Forward earnings forecasts require a provider freshness/forecast contract; current request.earnings support is historical/current data.',
-  },
-  'syminfo.recommendations_buy': {
-    manualCategories: ['variables'],
-    traffic: 'low-provider-tail',
-    decision: 'keep-allowlisted',
-    reason: 'Requires a recommendations provider series; public indicators rarely depend on analyst recommendation counts.',
-  },
-  'syminfo.recommendations_buy_strong': {
-    manualCategories: ['variables'],
-    traffic: 'low-provider-tail',
-    decision: 'keep-allowlisted',
-    reason: 'Requires a recommendations provider series; public indicators rarely depend on analyst recommendation counts.',
-  },
-  'syminfo.recommendations_hold': {
-    manualCategories: ['variables'],
-    traffic: 'low-provider-tail',
-    decision: 'keep-allowlisted',
-    reason: 'Requires a recommendations provider series; public indicators rarely depend on analyst recommendation counts.',
-  },
-  'syminfo.recommendations_sell': {
-    manualCategories: ['variables'],
-    traffic: 'low-provider-tail',
-    decision: 'keep-allowlisted',
-    reason: 'Requires a recommendations provider series; public indicators rarely depend on analyst recommendation counts.',
-  },
-  'syminfo.recommendations_sell_strong': {
-    manualCategories: ['variables'],
-    traffic: 'low-provider-tail',
-    decision: 'keep-allowlisted',
-    reason: 'Requires a recommendations provider series; public indicators rarely depend on analyst recommendation counts.',
-  },
-  'syminfo.recommendations_total': {
-    manualCategories: ['variables'],
-    traffic: 'low-provider-tail',
-    decision: 'keep-allowlisted',
-    reason: 'Requires a recommendations provider series; public indicators rarely depend on analyst recommendation counts.',
-  },
-} as const satisfies Record<string, PineV6KnownMissingBuiltinReview>;
+export const PINE_V6_KNOWN_MISSING_BUILTIN_REVIEW: Record<string, PineV6KnownMissingBuiltinReview> = {};
 
 function uniqueSorted(values: readonly string[]): string[] {
   return [...new Set(values)].sort();

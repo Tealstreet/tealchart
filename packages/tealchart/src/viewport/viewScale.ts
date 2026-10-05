@@ -10,6 +10,7 @@
 import type { PlotOutput } from '@tealstreet/tealscript';
 import type { Bar, Viewport, ViewScaleState } from '../types';
 
+import { getPlotOhlcGeometry } from '../rendering/plotOhlcGeometry';
 import { TealchartRenderer } from '../TealchartRenderer';
 import { intervalToMs } from '../utils/intervalMs';
 
@@ -328,10 +329,19 @@ export function getVisiblePlotRange(
     if (plot.type !== 'plot' && plot.type !== 'plotbar' && plot.type !== 'plotcandle') continue;
     if (!hasVisiblePlotBar(plot, bars, startTime, endTime)) continue;
 
-    const values =
-      plot.type === 'plotbar' || plot.type === 'plotcandle'
-        ? [plot.openValues, plot.highValues, plot.lowValues, plot.closeValues]
-        : [plot.values];
+    if (plot.type === 'plotbar' || plot.type === 'plotcandle') {
+      for (let i = 0; i < bars.length; i++) {
+        if (!isPlotBarVisible(plot, bars, i, startTime, endTime)) continue;
+        const geometry = getPlotOhlcGeometry(plot, i);
+        if (!geometry) continue;
+        min = Math.min(min, geometry.low);
+        max = Math.max(max, geometry.high);
+        hasValue = true;
+      }
+      continue;
+    }
+
+    const values = [plot.values];
     if (plot.type === 'plot' && plotUsesHistbaseForVisualScale(plot)) {
       const histbase = getPlotHistbase(plot);
       if (histbase < min) min = histbase;

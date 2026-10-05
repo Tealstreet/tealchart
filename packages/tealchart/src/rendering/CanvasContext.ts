@@ -47,6 +47,9 @@ export interface CanvasContext {
   // Path Operations
   // ==========================================================================
 
+  /** Vertical fill gradients; absent on canvas adapters without gradient support. */
+  createLinearGradient?(x0: number, y0: number, x1: number, y1: number): CanvasGradient;
+
   /** Begin a new path */
   beginPath(): void;
 
@@ -105,6 +108,9 @@ export interface CanvasContext {
 
   /** Draw filled text */
   fillText(text: string, x: number, y: number): void;
+
+  /** Draw outlined text when supported by the backend. */
+  strokeText?(text: string, x: number, y: number): void;
 
   /** Draw an image into a destination rectangle when supported */
   drawImage?(image: CanvasImageSource, x: number, y: number, width: number, height: number): void;

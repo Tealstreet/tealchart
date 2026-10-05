@@ -133,11 +133,14 @@ if close > open
     expectClean(compiled);
     expect(compiled.alerts).toEqual(interpreted.alerts);
 
-    const allAlert = compiled.alerts.find((alert) => alert.frequency === 'all');
+    const allAlerts = compiled.alerts.filter((alert) => alert.frequency === 'all');
     const onceAlert = compiled.alerts.find((alert) => alert.frequency === 'once_per_bar');
     const closeAlert = compiled.alerts.find((alert) => alert.frequency === 'once_per_bar_close');
 
-    expect(allAlert?.events.map((event) => [event.barIndex, event.message])).toEqual([
+    expect(allAlerts).toHaveLength(2);
+    expect(allAlerts.flatMap((alert) => alert.events)
+      .sort((left, right) => left.barIndex - right.barIndex)
+      .map((event) => [event.barIndex, event.message])).toEqual([
       [0, 'all 0'],
       [0, 'all 0'],
       [2, 'all 2'],

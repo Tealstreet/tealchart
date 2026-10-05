@@ -23,6 +23,7 @@ export interface IndicatorOutputAxisLabelSource {
   id: string;
   paneId: string;
   plotId: string;
+  title?: string;
   plotOffset?: number;
   scriptId: string;
   sourceIndex: number;
@@ -55,10 +56,17 @@ export function resolveIndicatorOutputSourceTime({
   const offset = Number.isFinite(plotOffset ?? NaN) ? plotOffset! : 0;
   if (offset === 0 || !bars || bars.length < 2) return bar.time;
 
-  const interval = (bars[1]?.time ?? NaN) - (bars[0]?.time ?? NaN);
+  const targetIndex = sourceIndex + offset;
+  const targetTime = bars[targetIndex]?.time;
+  if (Number.isFinite(targetTime ?? NaN)) return targetTime;
+
+  const anchorIndex = targetIndex < 0 ? 0 : bars.length - 1;
+  const neighborIndex = targetIndex < 0 ? 1 : bars.length - 2;
+  const anchorTime = bars[anchorIndex]?.time ?? NaN;
+  const interval = Math.abs(anchorTime - (bars[neighborIndex]?.time ?? NaN));
   if (!Number.isFinite(interval) || interval === 0) return bar.time;
 
-  return bar.time! + offset * interval;
+  return anchorTime + (targetIndex - anchorIndex) * interval;
 }
 
 export function getIndicatorPlotColor(color: PlotOutput['color'], sourceIndex: number, fallback = '#2196F3'): string {
@@ -73,10 +81,13 @@ export function getIndicatorPlotColor(color: PlotOutput['color'], sourceIndex: n
   return color || fallback;
 }
 
+export function isNumericIndicatorOutput(plot: PlotOutput): boolean {
+  return ['plot', 'plotshape', 'plotchar', 'plotarrow', 'plotbar', 'plotcandle'].includes(plot.type);
+}
+
 export function shouldUseIndicatorPlotForAxisLabel(plot: PlotOutput): boolean {
-  return plot.type === 'plot'
-    && (plot.display === undefined || (plot.display & DISPLAY_PRICE_SCALE) !== 0)
-    && !plot.forceOverlay;
+  return isNumericIndicatorOutput(plot)
+    && (plot.display === undefined || (plot.display & DISPLAY_PRICE_SCALE) !== 0);
 }
 
 export function getLatestIndicatorPlotValue(
@@ -84,14 +95,15 @@ export function getLatestIndicatorPlotValue(
   totalBarCount = plot.values.length,
 ): { sourceIndex: number; value: number } | null {
   if (!shouldUseIndicatorPlotForAxisLabel(plot)) return null;
-  if (totalBarCount <= 0 || plot.values.length === 0) return null;
+  const values = plot.displayValues ?? plot.values;
+  if (totalBarCount <= 0 || values.length === 0) return null;
   if (plot.showLast !== undefined && plot.showLast <= 0) return null;
 
-  const lastIndex = Math.min(totalBarCount - 1, plot.values.length - 1);
+  const lastIndex = Math.min(totalBarCount - 1, values.length - 1);
   const firstAllowedIndex = plot.showLast !== undefined ? Math.max(0, totalBarCount - plot.showLast) : 0;
 
   for (let index = lastIndex; index >= firstAllowedIndex; index -= 1) {
-    const value = plot.values[index];
+    const value = values[index];
     if (typeof value === 'number' && Number.isFinite(value)) {
       return { sourceIndex: index, value };
     }
@@ -126,8 +138,8 @@ export function getIndicatorOutputAxisLabelSources({
   for (const plot of plots) {
     const scriptId = plot.scriptId ?? 'unknown';
     const info = indicatorPaneInfo?.[scriptId];
-    if (info?.scale === 'none') continue;
-    const paneId = info?.overlay === false ? info.paneId ?? paneByScriptId.get(scriptId) : mainPaneId;
+    if (info?.scale === 'none' && !plot.forceOverlay) continue;
+    const paneId = info?.overlay === false && !plot.forceOverlay ? info.paneId ?? paneByScriptId.get(scriptId) : mainPaneId;
     if (!paneId) continue;
 
     const latest = getLatestIndicatorPlotValue(plot, totalBarCount);
@@ -137,6 +149,7 @@ export function getIndicatorOutputAxisLabelSources({
       id: `${paneId}:indicator-output:${scriptId}:${plot.id}`,
       paneId,
       plotId: plot.id,
+      title: plot.title,
       plotOffset: plot.offset,
       scriptId,
       sourceIndex: latest.sourceIndex,
@@ -177,12 +190,15 @@ export function getIndicatorOutputAxisLabelDecimals(
   range: number,
   precision?: number,
   context?: IndicatorOutputAxisLabelFormatContext,
+  format?: string,
 ): number {
   if (typeof precision === 'number' && Number.isFinite(precision) && precision >= 0) {
     return Math.min(PINE_PLOT_PRECISION_MAX, Math.floor(precision));
   }
 
-  if (context?.paneType === 'main' && context.pricePrecision && context.pricePrecision > 0) {
+  if (format === 'percent') return 2;
+
+  if ((context?.paneType === 'main' || format === 'price') && context?.pricePrecision && context.pricePrecision > 0) {
     return getDecimalPlacesFromPrecision(context.pricePrecision);
   }
 
@@ -204,7 +220,7 @@ export function formatIndicatorOutputAxisValue(
     return formatVolumeValue(value);
   }
 
-  const decimals = getIndicatorOutputAxisLabelDecimals(range, precision, context);
+  const decimals = getIndicatorOutputAxisLabelDecimals(range, precision, context, format);
   const formatted = new Intl.NumberFormat('en-US', {
     minimumFractionDigits: decimals,
     maximumFractionDigits: decimals,

@@ -25,6 +25,7 @@ import type {
 import type { TealscriptExecutionTelemetry, TealscriptRequestDataResolver } from '../types';
 import { isTealchartPlotDebugEnabled, summarizePlotsForDebug } from '../debug/plotDebug';
 import { preserveLongerCurrentPlotSeries } from './plotSeriesFreshness';
+import { decodePlotSource, encodePlotSource, type PlotSourceOption } from './plotSource';
 
 /**
  * Managed script state
@@ -40,7 +41,10 @@ interface ManagedScript {
   declaration?: IndicatorDeclarationMetadata;
   inputValues: Record<string, unknown>;
   isReady: boolean;
+  isAwaitingResult: boolean;
   isVisible: boolean;
+  sourceRefreshInFlight: boolean;
+  sourceRefreshDirty: boolean;
   error?: WorkerError;
 }
 
@@ -66,6 +70,9 @@ export interface TealscriptManagerOptions {
    * Called when any script produces new plot outputs
    */
   onPlotsUpdated?: (plots: PlotOutput[]) => void;
+
+  /** Includes dependent scripts removed when an external source is removed. */
+  onScriptRemoved?: (scriptId: string) => void;
 
   /**
    * Called when any script produces new drawing outputs
@@ -536,10 +543,10 @@ export class TealscriptManager {
     code: string,
     inputs: Record<string, unknown> = {}
   ): Promise<void> {
-    // Remove existing script with same ID if present
-    if (this.scripts.has(scriptId)) {
-      this.removeScript(scriptId);
-    }
+    this.assertAcyclicSources(scriptId, inputs);
+    // Recompiling replaces the worker in place. removeScript would cascade to
+    // dependents and fire onScriptRemoved, which deletes the indicator from the layout.
+    this.scripts.get(scriptId)?.worker.dispose();
 
     const workerGeneration = ++this.nextWorkerGeneration;
     const worker = this.createScriptWorker(scriptId, workerGeneration);
@@ -555,7 +562,10 @@ export class TealscriptManager {
       inputs: [],
       inputValues: { ...inputs },
       isReady: false,
+      isAwaitingResult: true,
       isVisible: true,
+      sourceRefreshInFlight: false,
+      sourceRefreshDirty: false,
     };
     this.scripts.set(scriptId, managedScript);
 
@@ -576,8 +586,11 @@ export class TealscriptManager {
   removeScript(scriptId: string): void {
     const script = this.scripts.get(scriptId);
     if (script) {
+      const dependents = [...this.scripts.values()].filter(candidate => this.sourceDependencies(candidate.inputValues).includes(scriptId));
       script.worker.dispose();
       this.scripts.delete(scriptId);
+      for (const dependent of dependents) this.removeScript(dependent.id);
+      this.options.onScriptRemoved?.(scriptId);
       this.notifyPlotsUpdated();
       this.notifyDrawingsUpdated();
     }
@@ -624,7 +637,7 @@ export class TealscriptManager {
 
     // Notify all workers
     for (const script of this.scripts.values()) {
-      if (script.isReady) {
+      if (script.isReady && this.sourceDependencies(script.inputValues).length === 0) {
         script.worker.updateBar(bar);
       }
     }
@@ -636,9 +649,13 @@ export class TealscriptManager {
   setInputs(scriptId: string, inputs: Record<string, unknown>): void {
     const script = this.scripts.get(scriptId);
     if (script) {
+      this.assertAcyclicSources(scriptId, inputs);
+      const hadSources = this.sourceDependencies(script.inputValues).length > 0;
       script.inputValues = { ...inputs };
-      if (script.isReady) {
-        this.restartScriptWorker(script);
+      if (script.sourceRefreshInFlight) {
+        script.sourceRefreshDirty = true;
+      } else if (script.isReady || !script.isAwaitingResult) {
+        this.restartScriptWorker(script, hadSources || this.sourceDependencies(inputs).length > 0);
       }
     }
   }
@@ -646,10 +663,10 @@ export class TealscriptManager {
   /**
    * Get all plot outputs from all visible scripts
    */
-  getAllPlots(): PlotOutput[] {
+  getAllPlots(includeHidden = false): PlotOutput[] {
     const allPlots: PlotOutput[] = [];
     for (const script of this.scripts.values()) {
-      if (script.isVisible) {
+      if (script.isVisible || includeHidden) {
         // Tag each plot with its script ID for pane routing
         for (const plot of script.plots) {
           allPlots.push({ ...plot, scriptId: script.id });
@@ -657,6 +674,78 @@ export class TealscriptManager {
       }
     }
     return allPlots;
+  }
+
+  getSourceOptions(consumerId: string): PlotSourceOption[] {
+    return this.getAllPlots(true)
+      .filter(plot => plot.type === 'plot' && plot.scriptId !== consumerId)
+      .filter(plot => !this.wouldCreateSourceCycle(consumerId, plot.scriptId!))
+      .map(plot => ({ value: encodePlotSource(plot.scriptId!, plot.id), label: plot.title }));
+  }
+
+  private sourceDependencies(inputs: Record<string, unknown>): string[] {
+    return [...new Set(Object.values(inputs).map(decodePlotSource).filter(source => source !== undefined).map(source => source.scriptId))];
+  }
+
+  private wouldCreateSourceCycle(consumerId: string, providerId: string, visited = new Set<string>()): boolean {
+    if (providerId === consumerId) return true;
+    if (visited.has(providerId)) return false;
+    visited.add(providerId);
+    const provider = this.scripts.get(providerId);
+    return !!provider && this.sourceDependencies(provider.inputValues).some(id => this.wouldCreateSourceCycle(consumerId, id, visited));
+  }
+
+  private assertAcyclicSources(scriptId: string, inputs: Record<string, unknown>): void {
+    if (this.sourceDependencies(inputs).some(id => this.wouldCreateSourceCycle(scriptId, id))) {
+      throw new Error('External plot source would create a script dependency cycle');
+    }
+  }
+
+  private resolveSourceInputs(inputs: Record<string, unknown>): Record<string, unknown> {
+    return Object.fromEntries(Object.entries(inputs).map(([id, value]) => {
+      const source = decodePlotSource(value);
+      if (!source) return [id, value];
+      const plot = this.scripts.get(source.scriptId)?.plots.find(plot => plot.id === source.plotId && plot.type === 'plot');
+      return [id, { type: 'plot-source', values: plot?.values ?? this.bars.map(() => null) }];
+    }));
+  }
+
+  private hasMissingSource(inputs: Record<string, unknown>, completedOnly = false): boolean {
+    return Object.values(inputs).some(value => {
+      const source = decodePlotSource(value);
+      if (!source) return false;
+      const provider = this.scripts.get(source.scriptId);
+      const plot = provider?.plots.find(plot => plot.id === source.plotId && plot.type === 'plot');
+      return !plot && (!completedOnly || !provider?.isAwaitingResult);
+    });
+  }
+
+  private invalidateSourceOutputs(script: ManagedScript): void {
+    if (script.isReady || script.isAwaitingResult) {
+      script.worker.dispose();
+      script.workerGeneration = ++this.nextWorkerGeneration;
+    }
+    script.isReady = false;
+    script.isAwaitingResult = false;
+    script.sourceRefreshInFlight = false;
+    script.sourceRefreshDirty = false;
+    script.plots = [];
+    script.drawings = [];
+    this.refreshSourceDependents(script.id);
+  }
+
+  private refreshSourceDependents(providerId: string): void {
+    for (const dependent of this.scripts.values()) {
+      if (this.sourceDependencies(dependent.inputValues).includes(providerId)) {
+        if (this.hasMissingSource(dependent.inputValues, true)) {
+          this.invalidateSourceOutputs(dependent);
+        } else if (dependent.sourceRefreshInFlight) {
+          dependent.sourceRefreshDirty = true;
+        } else {
+          this.restartScriptWorker(dependent, true);
+        }
+      }
+    }
   }
 
   /**
@@ -780,14 +869,19 @@ export class TealscriptManager {
     }) as unknown as TealscriptWorker;
   }
 
-  private restartScriptWorker(script: ManagedScript): void {
+  private restartScriptWorker(script: ManagedScript, sourceRefresh = false): void {
     script.worker.dispose();
     const workerGeneration = ++this.nextWorkerGeneration;
     script.workerGeneration = workerGeneration;
     script.worker = this.createScriptWorker(script.id, workerGeneration);
-    script.plots = [];
-    script.drawings = [];
+    script.sourceRefreshInFlight = sourceRefresh;
+    script.sourceRefreshDirty = false;
+    if (!sourceRefresh) {
+      script.plots = [];
+      script.drawings = [];
+    }
     script.isReady = false;
+    script.isAwaitingResult = true;
 
     if (isTealchartPlotDebugEnabled()) {
       console.info('[tealchart:plots] manager restartScriptWorker', {
@@ -815,11 +909,26 @@ export class TealscriptManager {
     const currentScript = this.getCurrentScript(scriptId, workerGeneration);
     if (!currentScript) return;
 
+    // A source link waits for the provider's first result (also on symbol changes).
+    const dependencies = this.sourceDependencies(currentScript.inputValues);
+    if (this.hasMissingSource(currentScript.inputValues)) {
+      if (this.hasMissingSource(currentScript.inputValues, true)) {
+        this.invalidateSourceOutputs(currentScript);
+        this.notifyPlotsUpdated();
+        this.notifyDrawingsUpdated();
+      } else {
+        currentScript.sourceRefreshInFlight = false;
+        currentScript.sourceRefreshDirty = false;
+      }
+      return;
+    }
+    currentScript.sourceRefreshInFlight ||= dependencies.length > 0;
+
     await currentScript.worker.init(
       currentScript.id,
       currentScript.code,
       this.bars,
-      currentScript.inputValues,
+      this.resolveSourceInputs(currentScript.inputValues),
       this.options.getRuntimeOptions?.(),
       this.options.getLibraries?.(),
     );
@@ -837,6 +946,7 @@ export class TealscriptManager {
 
     // Clear any previous error
     script.error = undefined;
+    script.isAwaitingResult = false;
 
     const resultMetadata = result.metadata;
     const shouldPreserveExistingPlots =
@@ -877,6 +987,8 @@ export class TealscriptManager {
       this.options.onDeclarationDiscovered?.(scriptId, result.declaration);
     }
 
+    this.refreshSourceDependents(scriptId);
+    this.completeSourceRefresh(script);
     // Notify listeners
     this.notifyPlotsUpdated();
     this.notifyDrawingsUpdated();
@@ -889,8 +1001,12 @@ export class TealscriptManager {
 
     script.error = error;
     if (error.code !== REQUEST_DATA_UNAVAILABLE_ERROR_CODE) {
-      script.plots = []; // Clear plots on fatal errors
-      script.drawings = []; // Clear drawings on fatal errors
+      script.plots = [];
+      script.drawings = [];
+      script.isAwaitingResult = false;
+      script.sourceRefreshInFlight = false;
+      script.sourceRefreshDirty = false;
+      this.refreshSourceDependents(scriptId);
     }
 
     if (isTealchartPlotDebugEnabled()) {
@@ -912,6 +1028,12 @@ export class TealscriptManager {
     if (script) {
       script.isReady = true;
     }
+  }
+
+  private completeSourceRefresh(script: ManagedScript): void {
+    if (!script.sourceRefreshInFlight) return;
+    script.sourceRefreshInFlight = false;
+    if (script.sourceRefreshDirty) this.restartScriptWorker(script, true);
   }
 
   private notifyPlotsUpdated(): void {

@@ -20,6 +20,7 @@ const defaultBoxMetadata = {
 };
 
 const defaultTableMetadata = {
+  creationSite: 'table.new_0',
   forceOverlay: false,
 };
 
@@ -293,7 +294,7 @@ plot(label.get_x(marker), title="Marker X")
         xloc: 'bar_index',
         yloc: 'price',
         style: 'label_left',
-        color: '#2196F3CC',
+        color: '#2962FFCC',
         textColor: '#FFFFFF',
         size: 'normal',
         textAlign: 'right',
@@ -544,10 +545,10 @@ plot(line.get_price(upper, bar_index), title="Upper Price")
         bottom: 108,
         xloc: 'bar_index',
         extend: 'none',
-        borderColor: '#2196F3',
+        borderColor: '#2962FF',
         borderWidth: 1,
         borderStyle: 'solid',
-        bgcolor: '#2196F333',
+        bgcolor: '#2962FF33',
         text: 'range',
         textColor: '#363A45',
         textSize: 'auto',
@@ -629,8 +630,8 @@ if barstate.islast
     line.set_xloc(id=trend, x1=bar_index - 2, x2=bar_index, xloc=xloc.bar_index)
     firstPoint = chart.point.from_index(index=bar_index - 2, price=low[2])
     secondPoint = chart.point.now(price=high)
-    line.set_first_point(id=trend, first_point=firstPoint)
-    line.set_second_point(id=trend, second_point=secondPoint)
+    line.set_first_point(id=trend, point=firstPoint)
+    line.set_second_point(id=trend, point=secondPoint)
     line.set_extend(id=trend, extend=extend.right)
     line.set_color(id=trend, color=color.new(color.yellow, 40))
     line.set_style(id=trend, style=line.style_dashed)
@@ -813,7 +814,7 @@ if barstate.islast
     box.set_extend(id=zone, extend=extend.both)
     box.set_text(id=zone, text="Named zone")
     box.set_text_color(id=zone, text_color=color.black)
-    box.set_text_size(id=zone, size=size.small)
+    box.set_text_size(id=zone, text_size=size.small)
     box.set_text_halign(id=zone, text_halign=text.align_center)
     box.set_text_valign(id=zone, text_valign=text.align_bottom)
     box.set_text_wrap(id=zone, text_wrap=text.wrap_auto)
@@ -895,10 +896,10 @@ plot(array.size(box.all), title="Box Count")
         bottom: 108,
         xloc: 'bar_index',
         extend: 'none',
-        borderColor: '#2196F3',
+        borderColor: '#2962FF',
         borderWidth: 1,
         borderStyle: 'solid',
-        bgcolor: '#2196F3',
+        bgcolor: '#2962FF',
         text: 'seed',
         textColor: '#363A45',
         textSize: 'auto',
@@ -1010,7 +1011,7 @@ if barstate.islast
             width: undefined,
             height: undefined,
             textColor: '#FFFFFF',
-            bgcolor: '#2196F3',
+            bgcolor: '#2962FF',
           },
           {
             ...defaultTableCellMetadata,
@@ -1083,7 +1084,7 @@ plot(array.size(table.all), title="Named Table Count")
             height: undefined,
             textColor: '#FFFFFF',
             tooltip: 'Label details',
-            bgcolor: '#2196F3',
+            bgcolor: '#2962FF',
           },
           {
             ...defaultTableCellMetadata,
@@ -1216,7 +1217,7 @@ if barstate.islast
         y2: 108,
         xloc: 'bar_index',
         extend: 'none',
-        color: '#2196F3',
+        color: '#2962FF',
         style: 'solid',
         width: 1,
         forceOverlay: false,
@@ -1240,7 +1241,7 @@ if barstate.islast
         bottom: 108,
         xloc: 'bar_index',
         extend: 'none',
-        borderColor: '#2196F3',
+        borderColor: '#2962FF',
         borderWidth: 1,
         borderStyle: 'solid',
         bgcolor: '#FF980033',
@@ -1319,7 +1320,7 @@ if barstate.islast
     line.set_color(id=upper, color.green)
     line.set_width(id=upper, 2)
     lower = line.new(bar_index - 1, low[1], bar_index, low)
-    channel = linefill.new(upper, lower)
+    channel = linefill.new(upper, lower, color.blue)
     linefill.set_color(id=channel, color.new(color.orange, 60))
     zone = box.new(na, na, na, na)
     box.set_lefttop(id=zone, bar_index - 2, high)
@@ -1407,10 +1408,10 @@ plot(mixedPrice, title="Mixed Line Price")
         bottom: 108,
         xloc: 'bar_index',
         extend: 'none',
-        borderColor: '#2196F3',
+        borderColor: '#2962FF',
         borderWidth: 1,
         borderStyle: 'solid',
-        bgcolor: '#2196F333',
+        bgcolor: '#2962FF33',
         text: 'mixed box',
         textColor: '#363A45',
         textSize: 'auto',

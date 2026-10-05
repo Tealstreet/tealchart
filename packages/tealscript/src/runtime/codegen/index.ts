@@ -4,7 +4,7 @@ export type { NumericSeriesSnapshot, ValueSeriesSnapshot } from './runtime';
 export {
   SMA, Sum, EMA, RMA, RSI, BarsSince, ValueWhen,
   Cross, Crossover, Crossunder, Change,
-  Highest, Lowest, HighestBars, LowestBars, PivotHigh, PivotLow, Range, Rising, Falling, Max, Min,
+  Highest, Lowest, HighestBars, LowestBars, PivotHigh, PivotLow, PivotPointLevels, Range, Rising, Falling, Max, Min,
   MACD, ATR, DMI, ADX, Supertrend, SAR, Stoch, StdDev, Variance, Dev,
   Covariance, Correlation, COG, Median, Mode,
   PercentileNearestRank, PercentileLinearInterpolation, PercentRank, LinReg, TrueRange, MFI, TSI, BBW, KC, KCW, KST, VWAP, RCI, BB,

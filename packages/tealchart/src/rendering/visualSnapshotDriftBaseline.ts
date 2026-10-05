@@ -112,11 +112,12 @@ export const VISUAL_SNAPSHOT_DRIFT_BASELINE: VisualSnapshotDriftBaselineEntry[] 
     height: 300,
   },
   {
+    // 1d7b293ff0: MACD's default histogram bars now use one-pixel Pine linewidth.
     name: 'composite-macd',
     platform: 'linux',
-    differingPixels: 4356,
+    differingPixels: 7035,
     totalPixels: 120000,
-    differingPixelRatio: 0.0363,
+    differingPixelRatio: 0.058625,
     channelTolerance: 16,
     maxDifferingPixelRatio: 0.08,
     width: 400,
@@ -145,11 +146,12 @@ export const VISUAL_SNAPSHOT_DRIFT_BASELINE: VisualSnapshotDriftBaselineEntry[] 
     height: 300,
   },
   {
+    // 2092d0fe48: normal box text uses Pine's 14px text-family font instead of 12px.
     name: 'drawing-boxes',
     platform: 'linux',
-    differingPixels: 236,
+    differingPixels: 249,
     totalPixels: 120000,
-    differingPixelRatio: 0.0019666666666666665,
+    differingPixelRatio: 0.002075,
     channelTolerance: 16,
     maxDifferingPixelRatio: 0.08,
     width: 400,
@@ -211,11 +213,12 @@ export const VISUAL_SNAPSHOT_DRIFT_BASELINE: VisualSnapshotDriftBaselineEntry[] 
     height: 300,
   },
   {
+    // 2092d0fe48: normal table text uses Pine's 14px text-family font instead of 12px.
     name: 'drawing-table',
     platform: 'linux',
-    differingPixels: 846,
+    differingPixels: 865,
     totalPixels: 120000,
-    differingPixelRatio: 0.00705,
+    differingPixelRatio: 0.007208333333333333,
     channelTolerance: 16,
     maxDifferingPixelRatio: 0.08,
     width: 400,
@@ -266,11 +269,12 @@ export const VISUAL_SNAPSHOT_DRIFT_BASELINE: VisualSnapshotDriftBaselineEntry[] 
     height: 300,
   },
   {
+    // 1d7b293ff0: default histogram bars now use one-pixel Pine linewidth.
     name: 'histogram-basic',
     platform: 'linux',
-    differingPixels: 5841,
+    differingPixels: 9344,
     totalPixels: 120000,
-    differingPixelRatio: 0.048675,
+    differingPixelRatio: 0.07786666666666667,
     channelTolerance: 16,
     maxDifferingPixelRatio: 0.08,
     width: 400,

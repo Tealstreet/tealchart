@@ -14,10 +14,11 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { DEFAULT_BUY_CANDLE_COLOR } from './constants';
 import { computePaneGeometry } from './layout/chartGeometry';
+import { plotArrowHeight } from './rendering/plotMarkerGeometry';
 import { clearChartStoreCache } from './state/chartState';
 import { TealchartRenderer } from './TealchartRenderer';
 import { TIME_AXIS_HEIGHT } from './types';
-import { WEB_PLOT_TRACK_PRICE_AXIS_TAG_SIZING, WEB_PRICE_AXIS_TAG_SIZING } from './utils/priceAxisTagSizing';
+import { WEB_PRICE_AXIS_TAG_SIZING } from './utils/priceAxisTagSizing';
 
 afterEach(() => {
   clearChartStoreCache();
@@ -667,7 +668,7 @@ describe('TealchartRenderer coordinate transforms', () => {
       renderer.renderPlots([{ ...basePlot, style: 'columns' }], bars, viewport);
       const columnsWidth = fillRect.mock.calls[0]![2];
 
-      expect(histogramWidth).toBe(12);
+      expect(histogramWidth).toBe(4);
       expect(columnsWidth).toBeGreaterThan(histogramWidth);
     });
 
@@ -783,22 +784,16 @@ describe('TealchartRenderer coordinate transforms', () => {
 
       const opts = renderer.getOptions();
       const trackY = renderer.publicPriceToY(120, viewport);
-      const labelWidth = '120'.length * 7 + WEB_PLOT_TRACK_PRICE_AXIS_TAG_SIZING.paddingX * 2;
       expect(lineTo).toHaveBeenCalledWith(opts.width - opts.margins.right, trackY);
       expect(setLineDash).toHaveBeenCalledWith([2, 3]);
       expect(stroke).toHaveBeenCalled();
-      expect(roundRect).toHaveBeenCalledWith(
-        opts.width - opts.margins.right,
-        trackY - WEB_PLOT_TRACK_PRICE_AXIS_TAG_SIZING.height / 2,
-        labelWidth,
-        WEB_PLOT_TRACK_PRICE_AXIS_TAG_SIZING.height,
-        2,
-      );
-      expect(fillText).toHaveBeenCalledWith('120', expect.any(Number), trackY);
+      expect(roundRect).not.toHaveBeenCalled();
+      expect(fillText).not.toHaveBeenCalled();
+      expect(ctx.lineWidth).toBe(1);
       expect(ctx.strokeStyle).toBe('#333333');
     });
 
-    it('chooses the latest visible offset plot value for trackprice', () => {
+    it('uses the latest full-history value for trackprice independently of offset', () => {
       const lineTo = vi.fn();
       const ctx = {
         ...createMockCtx(),
@@ -827,8 +822,8 @@ describe('TealchartRenderer coordinate transforms', () => {
       renderer.renderPlots(plots, bars, viewport);
 
       const opts = renderer.getOptions();
-      expect(lineTo).toHaveBeenCalledWith(opts.width - opts.margins.right, renderer.publicPriceToY(110, viewport));
-      expect(lineTo).not.toHaveBeenCalledWith(opts.width - opts.margins.right, renderer.publicPriceToY(120, viewport));
+      expect(lineTo).toHaveBeenCalledWith(opts.width - opts.margins.right, renderer.publicPriceToY(120, viewport));
+      expect(lineTo).not.toHaveBeenCalledWith(opts.width - opts.margins.right, renderer.publicPriceToY(110, viewport));
     });
 
     it('renders pane plot trackprice at the latest showLast value', () => {
@@ -874,7 +869,7 @@ describe('TealchartRenderer coordinate transforms', () => {
       const trackY = renderer.valueToY(50, pane);
       expect(lineTo).toHaveBeenCalledWith(opts.width - opts.margins.right, trackY);
       expect(lineTo).not.toHaveBeenCalledWith(opts.width - opts.margins.right, renderer.valueToY(40, pane));
-      expect(fillText).toHaveBeenCalledWith('50', expect.any(Number), trackY);
+      expect(fillText).not.toHaveBeenCalled();
     });
 
     it('joins circle plot markers when join metadata is enabled', () => {
@@ -1447,6 +1442,21 @@ describe('TealchartRenderer coordinate transforms', () => {
       expect(ctx.strokeStyle).toBe('#ff0000');
     });
 
+    it('selects barcolor from the offset source and applies show_last there', () => {
+      const renderer = new TealchartRenderer(createMockCtx(), { width: 800, height: 600, showVolume: false });
+      const plot: PlotOutput = {
+        id: 'barcolor_offset',
+        type: 'barcolor',
+        title: 'Offset',
+        values: [1, 1, 1],
+        color: [null, null, '#FF5252'],
+        offset: -2,
+        showLast: 1,
+      };
+      expect((renderer as any).resolveBarColorOverride([plot], 0, 3)).toBe('#FF5252');
+      expect((renderer as any).resolveBarColorOverride([plot], 2, 3)).toBeNull();
+    });
+
     it('applies barcolor candle overrides only when display and show_last allow them', () => {
       const candleBodyColors: string[] = [];
       const ctx = {
@@ -1926,6 +1936,46 @@ describe('TealchartRenderer coordinate transforms', () => {
       expect(arc).toHaveBeenCalledTimes(1);
     });
 
+    it('positions a historical plotchar using the final offset', () => {
+      const fillText = vi.fn();
+      const renderer = new TealchartRenderer(
+        { ...createMockCtx(), fillText },
+        { width: 800, height: 600, showVolume: false },
+      );
+      const bars = makeBars(5, 1_000_000, 60_000, 100);
+      const viewport: Viewport = { startTime: bars[0]!.time, endTime: bars[4]!.time, priceMin: 50, priceMax: 200 };
+      const plot: PlotOutput = {
+        id: 'plotchar_offset',
+        type: 'plotchar',
+        title: 'Offset',
+        values: [null, null, 1, null, null],
+        color: '#FF5252',
+        char: 'X',
+        location: 'top',
+        offset: -2,
+      };
+      (renderer as any).renderPlotShape(plot, bars, viewport);
+      const shiftedX = fillText.mock.calls[0]![1];
+      fillText.mockClear();
+      (renderer as any).renderPlotShape({ ...plot, offset: 0, values: [1, null, null, null, null] }, bars, viewport);
+      expect(shiftedX).toBe(fillText.mock.calls[0]![1]);
+    });
+
+    it('normalizes plotarrow against visible source magnitudes after offset', () => {
+      const renderer = new TealchartRenderer(createMockCtx(), { width: 800, height: 600, showVolume: false });
+      const bars = makeBars(5, 1_000_000, 60_000, 100);
+      const viewport: Viewport = { startTime: bars[1]!.time, endTime: bars[4]!.time, priceMin: 50, priceMax: 200 };
+      const plot: PlotOutput = {
+        id: 'plotarrow_domain',
+        type: 'plotarrow',
+        title: 'Domain',
+        values: [1000, 1, 4, null, null],
+        color: '#FF5252',
+      };
+      expect((renderer as any).getVisiblePlotArrowMaxMagnitude(plot, bars, viewport)).toBe(4);
+      expect((renderer as any).getVisiblePlotArrowMaxMagnitude({ ...plot, offset: 1 }, bars, viewport)).toBe(1000);
+    });
+
     it('renders plotchar glyphs and marker text', () => {
       const fillText = vi.fn();
       const ctx = {
@@ -2023,6 +2073,15 @@ describe('TealchartRenderer coordinate transforms', () => {
       expect(buyCall![2]).toBeLessThan(buyNowCall![2]);
     });
 
+    it.each([
+      [60, 10, 22.5],
+      [-10, 60, 22.5],
+      [10, -60, 22.5],
+      [0, 60, 15],
+    ])('uses native absolute sorted plotarrow bounds %s/%s', (minHeight, maxHeight, expected) => {
+      expect(plotArrowHeight({ minHeight, maxHeight }, 1, 4, 6)).toBe(expected);
+    });
+
     it('scales plotarrow markers between minHeight and maxHeight and skips zero values', () => {
       const fill = vi.fn();
       const ctx = {
@@ -2050,8 +2109,8 @@ describe('TealchartRenderer coordinate transforms', () => {
       (renderer as any).renderPlotShape(plot, bars, viewport);
 
       expect(fill).toHaveBeenCalledTimes(2);
-      expect((renderer as any).getPlotArrowMarkerSize(plot, 5, 10, 6)).toBeCloseTo(12.5);
-      expect((renderer as any).getPlotArrowMarkerSize(plot, 10, 10, 6)).toBe(20);
+      expect(plotArrowHeight(plot, 5, 10, 6)).toBeCloseTo(12.5);
+      expect(plotArrowHeight(plot, 10, 10, 6)).toBe(20);
     });
 
     it('renders shape markers in computed pane coordinates', () => {
@@ -2478,6 +2537,27 @@ describe('TealchartRenderer coordinate transforms', () => {
   });
 
   describe('background rendering', () => {
+    it('places bgcolor at the final offset', () => {
+      const fillRect = vi.fn();
+      const ctx = { ...createMockCtx(), fillRect };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600, showVolume: false });
+      const bars = makeBars(5, 1_000_000, 60_000, 100);
+      const viewport: Viewport = { startTime: bars[0]!.time, endTime: bars[4]!.time, priceMin: 50, priceMax: 200 };
+      const plot: PlotOutput = {
+        id: 'bgcolor_offset',
+        type: 'bgcolor',
+        title: 'Offset',
+        values: [null, null, 1, null, null],
+        color: '#FF9800',
+        offset: -2,
+      };
+      (renderer as any).renderBgcolor(plot, bars, viewport);
+      const shiftedX = fillRect.mock.calls[0]![0];
+      fillRect.mockClear();
+      (renderer as any).renderBgcolor({ ...plot, offset: 0, values: [1, null, null, null, null] }, bars, viewport);
+      expect(shiftedX).toBe(fillRect.mock.calls[0]![0]);
+    });
+
     it('renders bgcolor only for active bars', () => {
       const fillRect = vi.fn();
       const ctx = {
@@ -3301,6 +3381,61 @@ describe('TealchartRenderer coordinate transforms', () => {
       );
     });
 
+    it('paints script tooltips on hover and drops stale targets after redraw', () => {
+      const ctx = { ...createMockCtx(), fillText: vi.fn(), roundRect: vi.fn() };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600 });
+      const bars = makeBars(20);
+      const viewport = TealchartRenderer.calculateViewport(bars);
+      const layout: UnifiedPaneLayout = {
+        panes: [{ id: 'main', type: 'main', heightRatio: 1, yMin: 0, yMax: 0, fixedRange: false }],
+        timeAxisHeight: TIME_AXIS_HEIGHT,
+      };
+      const drawings: DrawingOutput[] = [
+        {
+          id: 'hover-label',
+          type: 'label',
+          barIndex: 10,
+          x: 10,
+          y: bars[10]!.close,
+          text: 'Signal',
+          tooltip: 'Signal details',
+          xloc: 'bar_index',
+          yloc: 'price',
+          style: 'label_left',
+          color: '#123456',
+          textColor: '#FFFFFF',
+          size: 'normal',
+        },
+      ];
+      const draw = (outputs: DrawingOutput[]) =>
+        renderer.renderWithLayout(
+          bars,
+          viewport,
+          layout,
+          [],
+          [],
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          outputs,
+        );
+      draw(drawings);
+      const [left, top, width, height] = ctx.roundRect.mock.calls[0]!;
+      ctx.fillText.mockClear();
+      renderer.renderTealScriptDrawingTooltip(ctx, left + width / 2, top + height / 2);
+      expect(ctx.fillText).toHaveBeenCalledWith('Signal details', expect.any(Number), expect.any(Number));
+      renderer.renderWithLayoutPasses({ bars, viewport, layout, drawings, passes: ['main-axis'] });
+      ctx.fillText.mockClear();
+      renderer.renderTealScriptDrawingTooltip(ctx, left + width / 2, top + height / 2);
+      expect(ctx.fillText).toHaveBeenCalledWith('Signal details', expect.any(Number), expect.any(Number));
+      draw([]);
+      ctx.fillText.mockClear();
+      renderer.renderTealScriptDrawingTooltip(ctx, left + width / 2, top + height / 2);
+      expect(ctx.fillText).not.toHaveBeenCalled();
+    });
+
     it('renders label drawings in the main pane', () => {
       const fillText = vi.fn();
       const roundRect = vi.fn();
@@ -3366,9 +3501,13 @@ describe('TealchartRenderer coordinate transforms', () => {
 
     it('positions bar_index label drawings from mutable x values', () => {
       const roundRect = vi.fn();
+      const lineTo = vi.fn();
+      const fillText = vi.fn();
       const ctx = {
         ...createMockCtx(),
         roundRect,
+        lineTo,
+        fillText,
       };
       const renderer = new TealchartRenderer(ctx, { width: 800, height: 600 });
 
@@ -3424,7 +3563,18 @@ describe('TealchartRenderer coordinate transforms', () => {
       const expectedX =
         options.margins.left +
         ((bars[12]!.time - viewport.startTime) / (viewport.endTime - viewport.startTime)) * chartWidth;
-      expect(drawnX).toBeCloseTo(expectedX, 0);
+      expect(roundRect).toHaveBeenCalledOnce();
+      const bodyOrder = roundRect.mock.invocationCallOrder[0]!;
+      const textCall = fillText.mock.calls.findIndex(([text]) => text === 'Moved');
+      expect(textCall).toBeGreaterThanOrEqual(0);
+      const textOrder = fillText.mock.invocationCallOrder[textCall]!;
+      const pointerCalls = lineTo.mock.calls.filter((_, index) => {
+        const order = lineTo.mock.invocationCallOrder[index]!;
+        return order > bodyOrder && order < textOrder;
+      });
+      expect(pointerCalls).toHaveLength(2);
+      expect(pointerCalls).toContainEqual([expect.closeTo(expectedX, 0), expect.any(Number)]);
+      expect(drawnX).toBeGreaterThan(expectedX);
     });
 
     it('routes label drawings from non-overlay scripts into their indicator pane', () => {
@@ -4386,7 +4536,11 @@ describe('value axis label layout', () => {
   });
 
   it('keeps web price-line axis tag widths grow-only per line id', () => {
-    const renderer = new TealchartRenderer(createMockCtx(), { height: 400, width: 800 }, { bottom: 32, right: 76, top: 24 });
+    const renderer = new TealchartRenderer(
+      createMockCtx(),
+      { height: 400, width: 800 },
+      { bottom: 32, right: 76, top: 24 },
+    );
     const layout: UnifiedPaneLayout = {
       timeAxisHeight: TIME_AXIS_HEIGHT,
       panes: [{ id: 'main', type: 'main', heightRatio: 1, yMin: 78_000, yMax: 88_000, fixedRange: false }],
@@ -4425,7 +4579,11 @@ describe('value axis label layout', () => {
   // A drag writes its live price straight into the tag, so the width it reached
   // has to survive the amend the drag settles into.
   it('grows a price line axis tag to fit a price the line does not carry yet', () => {
-    const renderer = new TealchartRenderer(createMockCtx(), { height: 400, width: 800 }, { bottom: 32, right: 76, top: 24 });
+    const renderer = new TealchartRenderer(
+      createMockCtx(),
+      { height: 400, width: 800 },
+      { bottom: 32, right: 76, top: 24 },
+    );
     const layout: UnifiedPaneLayout = {
       timeAxisHeight: TIME_AXIS_HEIGHT,
       panes: [{ id: 'main', type: 'main', heightRatio: 1, yMin: 78_000, yMax: 88_000, fixedRange: false }],
@@ -4923,6 +5081,55 @@ describe('external Tealscript overlay render passes', () => {
     panes: [pane], valueToY: nativeY, barIndexToX: indexToX, barSpacingPx: 40,
     timeToX: (time: number) => indexToX(bars.findIndex(bar => bar.time === time)),
   };
+
+  it.each(['main', 'unified', 'legacy'] as const)('composes hosted column spacing with pixel histogram width in the %s route', (route) => {
+    const ctx = createMockCtx();
+    ctx.fillRect = vi.fn();
+    const renderer = new TealchartRenderer(ctx, { width: 800, height: 200 });
+    const internal = renderer as any;
+    internal.externalProjection = projection;
+    for (const style of ['columns', 'histogram'] as const) {
+      ctx.fillRect.mockClear();
+      const plot: PlotOutput = { id: style, type: 'plot', title: style, style, linewidth: 80, histbase: 10, values: [20, null, null], color: '#00ff00' };
+      if (route === 'main') internal.renderHistogramPlot(plot, bars, viewport);
+      if (route === 'unified') internal.renderHistogramInPaneUnified(plot, bars, viewport, pane);
+      if (route === 'legacy') internal.renderHistogramInPane(plot, bars, viewport, pane);
+      expect(ctx.fillRect).toHaveBeenCalledTimes(1);
+      expect(ctx.fillRect.mock.calls[0]![2]).toBe(style === 'columns' ? 24 : 80);
+    }
+  });
+
+  it('keeps hosted residual trackprice at the latest source value beyond a hidden offset', () => {
+    const ctx = createMockCtx();
+    ctx.lineTo = vi.fn();
+    ctx.fillText = vi.fn();
+    const renderer = new TealchartRenderer(ctx, { width: 800, height: 200 });
+    renderer.renderExternalOverlayContent({ bars, viewport, projection,
+      plots: [{ id: 'hidden', type: 'plot', title: 'Hidden', values: [20, 40, 80], color: '#00ff00', offset: 30, trackprice: true }],
+    });
+    expect(ctx.lineTo).toHaveBeenCalledWith(800 - renderer.getOptions().margins.right, nativeY(80));
+    expect(ctx.lineTo).not.toHaveBeenCalledWith(indexToX(30), nativeY(20));
+    expect(ctx.fillText).not.toHaveBeenCalled();
+    expect(ctx.lineWidth).toBe(1);
+  });
+
+  it.each(['drawings removed', 'pane removed', 'pane collapsed'] as const)('retires hosted tooltip targets when %s', (change) => {
+    const ctx = { ...createMockCtx(), fillText: vi.fn(), roundRect: vi.fn() };
+    const renderer = new TealchartRenderer(ctx, { width: 800, height: 200 });
+    renderer.renderExternalOverlayContent({ bars, viewport, projection,
+      drawings: [{ id: 'label', type: 'label', barIndex: 1, x: 1, y: 40, text: 'Signal', tooltip: 'Hosted details',
+        xloc: 'bar_index', yloc: 'price', style: 'label_left', color: '#123456', textColor: '#ffffff', size: 'normal' }],
+    });
+    const [left, top, width, height] = ctx.roundRect.mock.calls[0]!;
+    ctx.fillText.mockClear();
+    renderer.renderTealScriptDrawingTooltip(ctx, left + width / 2, top + height / 2);
+    expect(ctx.fillText).toHaveBeenCalledWith('Hosted details', expect.any(Number), expect.any(Number));
+    const panes = change === 'pane removed' ? [] : change === 'pane collapsed' ? [{ ...pane, height: 0 }] : [pane];
+    renderer.renderExternalOverlayContent({ bars, viewport, projection: { ...projection, panes }, drawings: [] });
+    ctx.fillText.mockClear();
+    renderer.renderTealScriptDrawingTooltip(ctx, left + width / 2, top + height / 2);
+    expect(ctx.fillText).not.toHaveBeenCalled();
+  });
 
   it('uses native index spacing and nonlinear price projection for plots, drawing lines, and execution markers', () => {
     const ctx = createMockCtx();

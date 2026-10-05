@@ -62,7 +62,9 @@ describe('IndicatorSettingsModal', () => {
       (inputs) => saved.push(inputs),
     );
 
-    const selects = document.querySelectorAll('select');
+    const selects = Array.from(document.querySelectorAll('select')).filter(
+      (select) => select.getAttribute('aria-label') !== 'Defaults',
+    );
     expect(selects).toHaveLength(3);
 
     fireEvent.change(selects[0], { target: { value: '21' } });
@@ -87,4 +89,15 @@ describe('IndicatorSettingsModal', () => {
       },
     ]);
   });
+});
+
+it('shows authored external plot titles and saves the stable source binding', () => {
+  const modal = new IndicatorSettingsModal(); modal.mount(document.body);
+  const saved: unknown[] = [];
+  modal.openWith({ id: 'consumer', name: 'Consumer', inputs: {} }, [{ id: 'input_Source', type: 'source', title: 'Source', defval: 1 }], [], undefined, inputs => saved.push(inputs), [{ value: 'tealscript-source:provider:plot1', label: 'Authored curve' }]);
+  const option = screen.getByRole('option', { name: 'Authored curve' });
+  fireEvent.change(option.parentElement!, { target: { value: 'tealscript-source:provider:plot1' } });
+  fireEvent.click(screen.getByText('Apply'));
+  expect(saved).toEqual([{ input_Source: 'tealscript-source:provider:plot1' }]);
+  modal.unmount(); document.body.innerHTML = '';
 });

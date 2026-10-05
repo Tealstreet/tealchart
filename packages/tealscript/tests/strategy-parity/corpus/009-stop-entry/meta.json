@@ -1,8 +1,8 @@
 {
-  "description": "Auto-bootstrapped from engine output",
+  "description": "Engine baseline refreshed after verified conditional SMA call-site clock fix; identical strategy output at 47d0828f7a and 28bca9dda9.",
   "barCount": 200,
-  "closedTradeCount": 17,
+  "closedTradeCount": 20,
   "openTradeCount": 1,
-  "netProfit": -30.350000000000023,
+  "netProfit": -30.110000000000014,
   "source": "engine-baseline"
 }

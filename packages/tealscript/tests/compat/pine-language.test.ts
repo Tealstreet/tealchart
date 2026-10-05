@@ -73,8 +73,8 @@ plot(st.delayedAverage(src=open), title="Named Imported Average")
     });
 
     expect(result.errors).toEqual([]);
-    expect(getPlot(result, 'Imported Average').values).toEqual([null, 15, 25]);
-    expect(getPlot(result, 'Named Imported Average').values).toEqual([null, 15, 25]);
+    expect(getPlot(result, 'Imported Average').values).toEqual([null, null, 25]);
+    expect(getPlot(result, 'Named Imported Average').values).toEqual([null, null, 25]);
   });
 
   it('preserves source identity through imported same-source conditional returns', () => {
@@ -99,7 +99,7 @@ plot(bar_index >= 1 ? ta.sma(st.passthrough(open), 2) : na, title="Imported Cond
     });
 
     expect(result.errors).toEqual([]);
-    expect(getPlot(result, 'Imported Conditional Average').values).toEqual([null, 15, 25]);
+    expect(getPlot(result, 'Imported Conditional Average').values).toEqual([null, null, 25]);
   });
 
   it('preserves source identity through imported same-source block if returns', () => {
@@ -129,7 +129,7 @@ plot(bar_index >= 1 ? ta.sma(selected, 2) : na, title="Imported Block If Average
     });
 
     expect(result.errors).toEqual([]);
-    expect(getPlot(result, 'Imported Block If Average').values).toEqual([null, 15, 25]);
+    expect(getPlot(result, 'Imported Block If Average').values).toEqual([null, null, 25]);
   });
 
   it('preserves source identity through same-source if initializers', () => {
@@ -149,7 +149,7 @@ plot(bar_index >= 1 ? ta.sma(selected, 2) : na, title="If Initializer Average")
     });
 
     expect(result.errors).toEqual([]);
-    expect(getPlot(result, 'If Initializer Average').values).toEqual([null, 15, 25]);
+    expect(getPlot(result, 'If Initializer Average').values).toEqual([null, null, 25]);
   });
 
   it('preserves source identity through imported same-source switch returns', () => {
@@ -176,7 +176,7 @@ plot(bar_index >= 1 ? ta.sma(st.passthrough(open), 2) : na, title="Imported Swit
     });
 
     expect(result.errors).toEqual([]);
-    expect(getPlot(result, 'Imported Switch Average').values).toEqual([null, 15, 25]);
+    expect(getPlot(result, 'Imported Switch Average').values).toEqual([null, null, 25]);
   });
 
   it('preserves source identity through imported same-source block switch returns', () => {
@@ -208,7 +208,7 @@ plot(bar_index >= 1 ? ta.sma(selected, 2) : na, title="Imported Block Switch Ave
     });
 
     expect(result.errors).toEqual([]);
-    expect(getPlot(result, 'Imported Block Switch Average').values).toEqual([null, 15, 25]);
+    expect(getPlot(result, 'Imported Block Switch Average').values).toEqual([null, null, 25]);
   });
 
   it('preserves source identity through imported arithmetic source returns', () => {
@@ -235,8 +235,8 @@ plot(bar_index >= 1 ? ta.sma(st.scaled(open), 2) : na, title="Imported Scaled Av
     });
 
     expect(result.errors).toEqual([]);
-    expect(getPlot(result, 'Imported Arithmetic Average').values).toEqual([null, 15, 25]);
-    expect(getPlot(result, 'Imported Scaled Average').values).toEqual([null, 30, 50]);
+    expect(getPlot(result, 'Imported Arithmetic Average').values).toEqual([null, null, 25]);
+    expect(getPlot(result, 'Imported Scaled Average').values).toEqual([null, null, 50]);
   });
 
   it('preserves source identity through imported same-arithmetic branch returns', () => {
@@ -265,8 +265,8 @@ plot(bar_index >= 1 ? ta.sma(st.switchScaled(open), 2) : na, title="Imported Swi
     });
 
     expect(result.errors).toEqual([]);
-    expect(getPlot(result, 'Imported Conditional Arithmetic Average').values).toEqual([null, 15, 25]);
-    expect(getPlot(result, 'Imported Switch Arithmetic Average').values).toEqual([null, 30, 50]);
+    expect(getPlot(result, 'Imported Conditional Arithmetic Average').values).toEqual([null, null, 25]);
+    expect(getPlot(result, 'Imported Switch Arithmetic Average').values).toEqual([null, null, 50]);
   });
 
   it('preserves source identity through imported same-arithmetic block if returns', () => {
@@ -302,8 +302,8 @@ plot(bar_index >= 1 ? ta.sma(st.blockScaled(open), 2) : na, title="Imported Bloc
     });
 
     expect(result.errors).toEqual([]);
-    expect(getPlot(result, 'Imported Block If Arithmetic Average').values).toEqual([null, 15, 25]);
-    expect(getPlot(result, 'Imported Block If Initializer Average').values).toEqual([null, 30, 50]);
+    expect(getPlot(result, 'Imported Block If Arithmetic Average').values).toEqual([null, null, 25]);
+    expect(getPlot(result, 'Imported Block If Initializer Average').values).toEqual([null, null, 50]);
   });
 
   it('keeps imported library function var state isolated per call site', () => {
@@ -1876,21 +1876,18 @@ indicator("Dynamic history")
 length = input.int(2, "Lookback")
 previous = close[length]
 fractional = close[1.9]
-future = close[-1]
 tooFar = close[100]
 plot(previous, title="Previous")
 plot(fractional, title="Fractional")
-plot(future, title="Future")
 plot(tooFar, title="Too Far")
-plot(na(future) ? 1 : 0, title="Future Is NA")
 `);
 
     expect(result.errors).toEqual([]);
     expect(roundSeries(getPlot(result, 'Previous').values)).toEqual([null, null, 102, 105, 107, 103, 99, 100, 104, 109, 108, 111]);
     expect(roundSeries(getPlot(result, 'Fractional').values)).toEqual([null, 102, 105, 107, 103, 99, 100, 104, 109, 108, 111, 110]);
-    expect(getPlot(result, 'Future').values).toEqual([null, null, null, null, null, null, null, null, null, null, null, null]);
     expect(getPlot(result, 'Too Far').values).toEqual([null, null, null, null, null, null, null, null, null, null, null, null]);
-    expect(getPlot(result, 'Future Is NA').values).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    const invalid = runCompatScript('//@version=6\nindicator("Negative history")\nplot(close[-1])');
+    expect(invalid.errors.map((error) => error.message).join(' ')).toMatch(/historical.*-1|historical.*negative/i);
   });
 
   it('persists root var values across bars', () => {

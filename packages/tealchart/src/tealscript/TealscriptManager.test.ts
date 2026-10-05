@@ -1127,3 +1127,332 @@ describe('TealscriptManager', () => {
     expect(errors[0]!.error.message).toContain('upstream footprint cache failed');
   });
 });
+
+// TradingView Source inputs link scripts; upstream recalculation updates the
+// dependent, and removing the provider removes scripts that depend on it.
+describe('external Pine source bindings', () => {
+  const sourceDrawing: DrawingOutput = {
+    id: 'source-label', type: 'label', barIndex: 1, x: 1, y: 101, text: 'Source',
+    xloc: 'bar_index', yloc: 'price', style: 'label.style_label_down',
+    color: '#000000', textColor: '#ffffff', size: 'normal',
+  };
+  const sourceOutput = (id: string, plots = [plot]) => createResultMessage(id, {
+    plots, drawings: plots.length ? [sourceDrawing] : [], inputs: [], alerts: [], logs: [],
+  });
+  const sourceChain = async () => {
+    const workers: FakeWorker[] = [];
+    const plotUpdates: PlotOutput[][] = [];
+    const drawingUpdates: DrawingOutput[][] = [];
+    const manager = new TealscriptManager({
+      createWorker: () => { const worker = new FakeWorker(); workers.push(worker); return worker as unknown as Worker; },
+      onPlotsUpdated: plots => plotUpdates.push(plots),
+      onDrawingsUpdated: drawings => drawingUpdates.push(drawings),
+    });
+    for (const [id, provider] of [['A', undefined], ['B', 'A'], ['C', 'B']] as const) {
+      const pending = manager.addScript(id, 'indicator("Source")', provider ? { source: `tealscript-source:${provider}:plot_close` } : {});
+      workers.at(-1)!.emit({ type: 'ready' });
+      await pending;
+      workers.at(-1)!.emit(sourceOutput(id));
+    }
+    return { manager, workers, plotUpdates, drawingUpdates };
+  };
+
+  it.each(['empty result', 'fatal error', 'missing selected plot'] as const)(
+    'clears all descendants when the provider finishes with %s', async outcome => {
+      const { manager, workers, plotUpdates, drawingUpdates } = await sourceChain();
+      const provider = workers[0];
+      if (outcome === 'fatal error') {
+        provider.emit({ type: 'error', message: 'provider stopped', code: 'runtime.error', line: 2 });
+      } else {
+        provider.emit(sourceOutput('A', outcome === 'empty result' ? [] : [{ ...plot, id: 'unrelated' }]));
+      }
+      for (const id of ['B', 'C']) {
+        expect(manager.getPlots(id)).toEqual([]);
+        expect(manager.getDrawings(id)).toEqual([]);
+      }
+      expect(plotUpdates.at(-1)?.some(output => output.scriptId === 'B' || output.scriptId === 'C')).toBe(false);
+      expect(drawingUpdates.at(-1)?.some(output => output.scriptId === 'B' || output.scriptId === 'C')).toBe(false);
+      expect(workers[1].terminated).toBe(true);
+      expect(workers[2].terminated).toBe(true);
+      expect(manager.getScriptIds()).toEqual(['A', 'B', 'C']);
+      manager.dispose();
+    },
+  );
+
+  it('clears a consumer and descendants on its own fatal refresh error', async () => {
+    const { manager, workers } = await sourceChain();
+    workers[0].emit(sourceOutput('A', [{ ...plot, values: [100, 102] }]));
+    const refreshingConsumer = workers.at(-1)!;
+    refreshingConsumer.emit({ type: 'ready' });
+    await flushWorkerInit();
+    refreshingConsumer.emit({ type: 'error', message: 'consumer stopped', code: 'runtime.error', line: 3 });
+    for (const id of ['B', 'C']) {
+      expect(manager.getPlots(id)).toEqual([]);
+      expect(manager.getDrawings(id)).toEqual([]);
+    }
+    expect(manager.getError('B')?.message).toBe('consumer stopped');
+    manager.dispose();
+  });
+
+  it('discards in-flight stale results after invalidation and recovers on a valid provider result', async () => {
+    const { manager, workers } = await sourceChain();
+    workers[0].emit(sourceOutput('A'));
+    const staleConsumer = workers.at(-1)!;
+    staleConsumer.emit({ type: 'ready' });
+    await flushWorkerInit();
+    workers[0].emit(sourceOutput('A', []));
+    staleConsumer.emit(sourceOutput('B'));
+    workers[2].emit(sourceOutput('C'));
+    expect(manager.getPlots('B')).toEqual([]);
+    expect(manager.getPlots('C')).toEqual([]);
+    workers[0].emit(sourceOutput('A', [{ ...plot, values: [100, 110] }]));
+    const recoveredConsumer = workers.at(-1)!;
+    recoveredConsumer.emit({ type: 'ready' });
+    await flushWorkerInit();
+    expect(recoveredConsumer.messages.find((message: any) => message.type === 'init')).toMatchObject({
+      inputs: { source: { type: 'plot-source', values: [100, 110] } },
+    });
+    recoveredConsumer.emit(sourceOutput('B'));
+    const recoveredDescendant = workers.at(-1)!;
+    recoveredDescendant.emit({ type: 'ready' });
+    await flushWorkerInit();
+    recoveredDescendant.emit(sourceOutput('C'));
+    expect(manager.getPlots('C')).toEqual([plot]);
+    manager.dispose();
+  });
+
+  it('allows an invalidated consumer to switch to a builtin source', async () => {
+    const { manager, workers } = await sourceChain();
+    workers[0].emit(sourceOutput('A', []));
+    manager.setInputs('B', { source: 'close' });
+    const consumer = workers.at(-1)!;
+    consumer.emit({ type: 'ready' });
+    await flushWorkerInit();
+    expect(consumer.messages.find((message: any) => message.type === 'init')).toMatchObject({ inputs: { source: 'close' } });
+    consumer.emit(sourceOutput('B'));
+    expect(manager.getPlots('B')).toEqual([plot]);
+    manager.dispose();
+  });
+
+  it('retains consumers while a recompiled provider is pending, then invalidates on its empty result', async () => {
+    const { manager, workers } = await sourceChain();
+    const pending = manager.addScript('A', 'indicator("Recompiled")');
+    const provider = workers.at(-1)!;
+    expect(manager.getPlots('B')).toEqual([plot]);
+    expect(manager.getPlots('C')).toEqual([plot]);
+    provider.emit({ type: 'ready' });
+    await pending;
+    expect(manager.getPlots('B')).toEqual([plot]);
+    provider.emit(sourceOutput('A', []));
+    expect(manager.getPlots('B')).toEqual([]);
+    expect(manager.getPlots('C')).toEqual([]);
+    manager.dispose();
+  });
+
+  it('keeps visuals while a consumer waits for a pending provider, without initializing with null samples', async () => {
+    const { manager, workers } = await sourceChain();
+    const pending = manager.addScript('A', 'indicator("Recompiled")');
+    const provider = workers.at(-1)!;
+    manager.setInputs('B', { source: 'tealscript-source:A:plot_close', length: 2 });
+    const consumer = workers.at(-1)!;
+    consumer.emit({ type: 'ready' });
+    await flushWorkerInit();
+    expect(consumer.messages.some((message: any) => message.type === 'init')).toBe(false);
+    expect(manager.getPlots('B')).toEqual([plot]);
+    expect(manager.getDrawings('C')).toEqual([sourceDrawing]);
+    provider.emit({ type: 'ready' });
+    await pending;
+    provider.emit(sourceOutput('A'));
+    const resumedConsumer = workers.at(-1)!;
+    expect(resumedConsumer).not.toBe(consumer);
+    resumedConsumer.emit({ type: 'ready' });
+    await flushWorkerInit();
+    expect(resumedConsumer.messages.find((message: any) => message.type === 'init')).toMatchObject({
+      inputs: { source: { type: 'plot-source', values: [100, 101] }, length: 2 },
+    });
+    expect(manager.getPlots('B')).toEqual([plot]);
+    expect(manager.getDrawings('C')).toEqual([sourceDrawing]);
+    manager.dispose();
+  });
+
+  it('only invalidates consumers whose selected plot disappeared', async () => {
+    const { manager, workers } = await sourceChain();
+    workers[0].emit(sourceOutput('A', [plot, { ...plot, id: 'other' }]));
+    const pending = manager.addScript('D', 'indicator("Other")', { source: 'tealscript-source:A:other' });
+    const unaffected = workers.at(-1)!;
+    unaffected.emit({ type: 'ready' });
+    await pending;
+    unaffected.emit(sourceOutput('D'));
+    workers[0].emit(sourceOutput('A', [{ ...plot, id: 'other' }]));
+    expect(manager.getPlots('B')).toEqual([]);
+    expect(manager.getPlots('C')).toEqual([]);
+    expect(manager.getPlots('D')).toEqual([plot]);
+    expect(manager.getDrawings('D')).toEqual([sourceDrawing]);
+    manager.dispose();
+  });
+
+  it('preserves a pending refresh on a nonfatal request-data warning', async () => {
+    const { manager, workers } = await sourceChain();
+    workers[0].emit(sourceOutput('A'));
+    const consumer = workers.at(-1)!;
+    consumer.emit({ type: 'ready' });
+    await flushWorkerInit();
+    consumer.emit({ type: 'error', message: 'waiting for provider', code: 'request-data-unavailable' });
+    expect(manager.getPlots('B')).toEqual([plot]);
+    expect(manager.getDrawings('C')).toEqual([sourceDrawing]);
+    expect(consumer.terminated).toBe(false);
+    consumer.emit(sourceOutput('B'));
+    expect(manager.getError('B')).toBeUndefined();
+    manager.dispose();
+  });
+
+  it('removes pending dependents and prevents their late results from publishing', async () => {
+    const { manager, workers, plotUpdates, drawingUpdates } = await sourceChain();
+    workers[0].emit(sourceOutput('A'));
+    const pendingConsumer = workers.at(-1)!;
+    manager.removeScript('A');
+    pendingConsumer.emit(sourceOutput('B'));
+    workers[2].emit(sourceOutput('C'));
+    expect(manager.getScriptIds()).toEqual([]);
+    expect(plotUpdates.at(-1)).toEqual([]);
+    expect(drawingUpdates.at(-1)).toEqual([]);
+    expect(pendingConsumer.terminated).toBe(true);
+    manager.dispose();
+  });
+
+  it('restarts a failed provider on new bars and recovers its invalidated consumers', async () => {
+    const { manager, workers } = await sourceChain();
+    workers[0].emit({ type: 'error', message: 'provider stopped', code: 'runtime.error', line: 2 });
+    expect(manager.getPlots('B')).toEqual([]);
+    const count = workers.length;
+    manager.setBars([bar]);
+    expect(workers).toHaveLength(count + 1);
+    const provider = workers.at(-1)!;
+    provider.emit({ type: 'ready' });
+    await flushWorkerInit();
+    provider.emit(sourceOutput('A'));
+    const consumer = workers.at(-1)!;
+    consumer.emit({ type: 'ready' });
+    await flushWorkerInit();
+    consumer.emit(sourceOutput('B'));
+    expect(manager.getPlots('B')).toEqual([plot]);
+    manager.dispose();
+  });
+
+  it('coalesces provider ticks without blanking consumers or restarting descendants early', async () => {
+    const workers: FakeWorker[] = [];
+    const manager = new TealscriptManager({
+      createWorker: () => { const worker = new FakeWorker(); workers.push(worker); return worker as unknown as Worker; },
+    });
+    const drawing: DrawingOutput = {
+      id: 'label', type: 'label', barIndex: 1, x: 1, y: 101, text: 'Retained',
+      xloc: 'bar_index', yloc: 'price', style: 'label.style_label_down',
+      color: '#000000', textColor: '#ffffff', size: 'normal',
+    };
+    const output = (id: string, values = [100, 101]) => createResultMessage(id, {
+      plots: [{ ...plot, values }], drawings: [drawing], inputs: [], alerts: [], logs: [],
+    });
+    const add = async (id: string, provider?: string) => {
+      const pending = manager.addScript(id, 'indicator("Test")', provider ? { source: `tealscript-source:${provider}:plot_close` } : {});
+      const worker = workers.at(-1)!;
+      worker.emit({ type: 'ready' });
+      await pending;
+      worker.emit(output(id));
+      return worker;
+    };
+    const provider = await add('A');
+    await add('B', 'A');
+    await add('C', 'B');
+
+    for (let tick = 0; tick < 10; tick++) provider.emit(output('A', [100, 102 + tick]));
+    expect(workers).toHaveLength(4);
+    expect(workers[2].terminated).toBe(false);
+    expect(manager.getPlots('B')[0].values).toEqual([100, 101]);
+    expect(manager.getDrawings('B')).toEqual([drawing]);
+    expect(manager.getPlots('C')[0].values).toEqual([100, 101]);
+    manager.setInputs('B', { source: 'tealscript-source:A:plot_close', length: 2 });
+    expect(workers).toHaveLength(4);
+    expect(manager.getPlots('B')[0].values).toEqual([100, 101]);
+    workers[3].emit({ type: 'ready' });
+    await flushWorkerInit();
+    expect(workers[3].messages.find((message: any) => message.type === 'init')).toMatchObject({
+      inputs: { source: { type: 'plot-source', values: [100, 111] }, length: 2 },
+    });
+    workers[3].emit(output('B', [100, 105]));
+    expect(workers).toHaveLength(6);
+    expect(manager.getPlots('B')[0].values).toEqual([100, 105]);
+    expect(manager.getDrawings('B')).toEqual([drawing]);
+    const rerun = workers[5];
+    rerun.emit({ type: 'ready' });
+    await flushWorkerInit();
+    rerun.emit(output('B', [100, 111]));
+    expect(workers).toHaveLength(6);
+    expect(manager.getPlots('B')[0].values).toEqual([100, 111]);
+    workers[4].emit({ type: 'ready' });
+    await flushWorkerInit();
+    workers[4].emit(output('C', [100, 111]));
+    expect(workers).toHaveLength(7);
+    workers[6].emit({ type: 'ready' });
+    await flushWorkerInit();
+    workers[6].emit(output('C', [100, 111]));
+    expect(workers).toHaveLength(7);
+    manager.setInputs('B', { source: 'close', length: 3 });
+    expect(manager.getPlots('B')[0].values).toEqual([100, 111]);
+    expect(manager.getDrawings('B')).toEqual([drawing]);
+    workers[7].emit({ type: 'ready' });
+    await flushWorkerInit();
+    workers[7].emit(output('B', [100, 109]));
+    expect(manager.getPlots('B')[0].values).toEqual([100, 109]);
+    manager.dispose();
+  });
+
+  it('uses stable plot IDs with authored titles, refreshes downstream workers and cascades removal', async () => {
+    const workers: FakeWorker[] = [];
+    const removed: string[] = [];
+    const manager = new TealscriptManager({
+      createWorker: () => { const worker = new FakeWorker(); workers.push(worker); return worker as unknown as Worker; },
+      onScriptRemoved: (id) => removed.push(id),
+    });
+    const addProvider = manager.addScript('provider', 'indicator("Provider")');
+    workers[0].emit({ type: 'ready' }); await addProvider;
+    workers[0].emit(createResultMessage('provider', { plots: [{ ...plot, title: 'Authored curve', display: 0 }], drawings: [], inputs: [], alerts: [], logs: [] }));
+    const choices = manager.getSourceOptions('consumer');
+    expect(choices).toEqual([{ value: 'tealscript-source:provider:plot_close', label: 'Authored curve' }]);
+    expect(manager.getSourceOptions('provider')).toEqual([]);
+    const addConsumer = manager.addScript('consumer', 'indicator("Consumer")', { input_Source: choices[0].value });
+    workers[1].emit({ type: 'ready' }); await addConsumer;
+    expect(workers[1].messages.find((m: any) => m.type === 'init')).toMatchObject({ inputs: { input_Source: { type: 'plot-source', values: [100, 101] } } });
+    workers[1].emit(createResultMessage('consumer', { plots: [plot], drawings: [], inputs: [], alerts: [], logs: [] }));
+    manager.updateBar(bar);
+    expect(workers[1].messages.some((m: any) => m.type === 'updateBar')).toBe(false);
+    workers[0].emit(createResultMessage('provider', { plots: [{ ...plot, title: 'Renamed curve', values: [100, 102] }], drawings: [], inputs: [], alerts: [], logs: [] }));
+    expect(workers[1].terminated).toBe(true);
+    workers[2].emit({ type: 'ready' }); await flushWorkerInit();
+    expect(workers[2].messages.find((m: any) => m.type === 'init')).toMatchObject({ inputs: { input_Source: { type: 'plot-source', values: [100, 102] } } });
+    expect(() => manager.setInputs('provider', { input_Source: 'tealscript-source:consumer:plot_close' })).toThrow(/cycle/i);
+    manager.removeScript('provider');
+    expect(manager.getScriptIds()).toEqual([]);
+    expect(removed.sort()).toEqual(['consumer', 'provider']);
+  });
+
+  it('recompiling a provider replaces its worker without removing it or its dependents', async () => {
+    const workers: FakeWorker[] = [];
+    const removed: string[] = [];
+    const manager = new TealscriptManager({
+      createWorker: () => { const worker = new FakeWorker(); workers.push(worker); return worker as unknown as Worker; },
+      onScriptRemoved: (id) => removed.push(id),
+    });
+    const addProvider = manager.addScript('provider', 'indicator("Provider")');
+    workers[0].emit({ type: 'ready' }); await addProvider;
+    workers[0].emit(createResultMessage('provider', { plots: [{ ...plot, title: 'Authored curve' }], drawings: [], inputs: [], alerts: [], logs: [] }));
+    const addConsumer = manager.addScript('consumer', 'indicator("Consumer")', { input_Source: 'tealscript-source:provider:plot_close' });
+    workers[1].emit({ type: 'ready' }); await addConsumer;
+
+    const recompile = manager.addScript('provider', 'indicator("Provider v2")');
+    expect(workers[0].terminated).toBe(true);
+    workers[2].emit({ type: 'ready' }); await recompile;
+
+    expect(removed).toEqual([]);
+    expect(manager.getScriptIds().sort()).toEqual(['consumer', 'provider']);
+  });
+});

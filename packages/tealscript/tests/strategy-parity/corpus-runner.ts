@@ -41,9 +41,25 @@ export interface CorpusRunResult {
 export function loadCorpusEntry(dir: string): CorpusEntry | null {
   const id = path.basename(dir);
   const pinePath = path.join(dir, 'strategy.pine');
-  const csvPath = path.join(dir, 'tv_trades.csv');
   const barsPath = path.join(dir, 'bars.json');
   const metaPath = path.join(dir, 'meta.json');
+
+  const meta: CorpusEntryMeta | undefined = fs.existsSync(metaPath)
+    ? JSON.parse(fs.readFileSync(metaPath, 'utf-8'))
+    : undefined;
+  if (meta?.source === 'engine-baseline') {
+    const contradictoryFilename = fs.readdirSync(dir).find((name) =>
+      /(?:^|[^a-z0-9])tv(?:[^a-z0-9]|$)|tradingview/i.test(name) && /\.csv$/i.test(name),
+    );
+    if (contradictoryFilename) {
+      throw new Error(
+        `${id}: ${contradictoryFilename} claims TradingView provenance but meta.json says source=engine-baseline`,
+      );
+    }
+  }
+  const csvPath = path.join(dir, meta?.source === 'engine-baseline'
+    ? 'engine_baseline_trades.csv'
+    : 'tv_trades.csv');
 
   if (!fs.existsSync(pinePath) || !fs.existsSync(csvPath) || !fs.existsSync(barsPath)) {
     return null;
@@ -52,9 +68,6 @@ export function loadCorpusEntry(dir: string): CorpusEntry | null {
   const pineSource = fs.readFileSync(pinePath, 'utf-8');
   const referenceCsv = fs.readFileSync(csvPath, 'utf-8');
   const bars: Bar[] = JSON.parse(fs.readFileSync(barsPath, 'utf-8'));
-  const meta: CorpusEntryMeta | undefined = fs.existsSync(metaPath)
-    ? JSON.parse(fs.readFileSync(metaPath, 'utf-8'))
-    : undefined;
 
   return { id, pineSource, referenceCsv, bars, meta };
 }

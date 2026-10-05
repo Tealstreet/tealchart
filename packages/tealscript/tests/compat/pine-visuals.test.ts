@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { compatibilityBars, getPlot, roundSeries, runCompatScript } from './fixtures';
+import { compatibilityBars, getPlot, runCompatScript } from './fixtures';
 
 describe('Pine compatibility golden harness', () => {
   it('runs conditional barcolor helper idioms', () => {
@@ -86,28 +86,28 @@ plotbar(o, h + 1, l - 1, c, "Custom bars", bodyColor, false, 6, display.none, fo
       null,
       '#B2B5BE',
       '#B2B5BE',
-      '#2196F3',
-      '#2196F3',
+      '#2962FF',
+      '#2962FF',
       '#B2B5BE',
       '#B2B5BE',
       '#B2B5BE',
-      '#2196F3',
+      '#2962FF',
       '#B2B5BE',
-      '#2196F3',
+      '#2962FF',
       '#B2B5BE',
     ]);
     expect(candles.wickColor).toEqual([
       null,
       '#B2B5BE4D',
       '#B2B5BE4D',
-      '#2196F34D',
-      '#2196F34D',
+      '#2962FF4D',
+      '#2962FF4D',
       '#B2B5BE4D',
       '#B2B5BE4D',
       '#B2B5BE4D',
-      '#2196F34D',
+      '#2962FF4D',
       '#B2B5BE4D',
-      '#2196F34D',
+      '#2962FF4D',
       '#B2B5BE4D',
     ]);
     expect(candles.editable).toBe(true);
@@ -140,8 +140,8 @@ barcolor(bar_index == 0 ? color.red : na, 1, true, 5, "Bar Tint", display.none)
     expect(result.errors).toEqual([]);
     const background = getPlot(result, 'Session');
     expect(background.type).toBe('bgcolor');
-    expect(background.color).toEqual([null, '#2196F340', ...Array(compatibilityBars.length - 1).fill(null)]);
-    expect(background.values).toEqual([null, 1, ...Array(compatibilityBars.length - 1).fill(null)]);
+    expect(background.color).toEqual(['#2962FF40', ...Array(compatibilityBars.length - 1).fill(null)]);
+    expect(background.values).toEqual([1, ...Array(compatibilityBars.length - 1).fill(null)]);
     expect(background.offset).toBe(1);
     expect(background.editable).toBe(false);
     expect(background.showLast).toBe(4);
@@ -150,7 +150,9 @@ barcolor(bar_index == 0 ? color.red : na, 1, true, 5, "Bar Tint", display.none)
 
     const barTint = getPlot(result, 'Bar Tint');
     expect(barTint.type).toBe('barcolor');
-    expect(barTint.color).toEqual([null, '#F23645', ...Array(compatibilityBars.length - 1).fill(null)]);
+    // Native v7 barcolor-series-offset-v5: source_plot_row + native_main_candles[].color.
+    // BARCOLOR-NATIVE-MODEL-AUDIT-v1.json proves source storage followed by painter offset.
+    expect(barTint.color).toEqual(['#F23645', ...Array(compatibilityBars.length - 1).fill(null)]);
     expect(barTint.offset).toBe(1);
     expect(barTint.editable).toBe(true);
     expect(barTint.showLast).toBe(5);
@@ -213,7 +215,7 @@ plot(scaleMatches ? 1 : 0, title="Scale Constants")
     expect(midline).toMatchObject({
       type: 'hline',
       price: 50,
-      color: '#2196F3',
+      color: '#2962FF',
       lineStyle: 'dotted',
       linewidth: 2,
       editable: false,
@@ -244,6 +246,7 @@ plot(scaleMatches ? 1 : 0, title="Scale Constants")
     expect(getPlot(result, 'Scale Constants').values).toEqual(Array(compatibilityBars.length).fill(1));
   });
 
+  // Pine v6 functions[58]: hline fills omit the plot overload's show_last slot.
   it('fills between Pine plot and hline handles', () => {
     const result = runCompatScript(`
 indicator("Fill handles smoke", overlay=true)
@@ -256,7 +259,8 @@ topLine = hline(110, title="Top")
 bottomLine = hline(100, title="Bottom")
 fillColor = bar_index == 1 ? na : color.new(color.green, 80)
 fill(upperPlot, lowerPlot, color=fillColor, title="Band Fill", editable=false, show_last=6, fillgaps=false, display=display.price_scale)
-fill(topLine, bottomLine, color.new(color.blue, 90), "Range Fill", true, 4, true, display.none)
+// The hline overload has no show_last slot.
+fill(topLine, bottomLine, color.new(color.blue, 90), "Range Fill", true, true, display.none)
 `);
 
     expect(result.errors).toEqual([]);
@@ -288,9 +292,9 @@ fill(topLine, bottomLine, color.new(color.blue, 90), "Range Fill", true, 4, true
     expect(rangeFill.type).toBe('fill');
     expect(rangeFill.plot1Id).toBe('hline_Top');
     expect(rangeFill.plot2Id).toBe('hline_Bottom');
-    expect(rangeFill.color).toEqual(Array(compatibilityBars.length).fill('#2196F31A'));
+    expect(rangeFill.color).toEqual(Array(compatibilityBars.length).fill('#2962FF1A'));
     expect(rangeFill.editable).toBe(true);
-    expect(rangeFill.showLast).toBe(4);
+    expect(rangeFill.showLast).toBeUndefined();
     expect(rangeFill.fillgaps).toBe(true);
     expect(rangeFill.display).toBe(0);
   });
@@ -537,7 +541,7 @@ fill(plot1=upper, lower, color.new(color.orange, 80), "Mixed Fill", false, 6)
       linewidth: 2,
       style: 'columns',
     });
-    expect(getPlot(result, 'Mixed Plot').color).toEqual(Array(compatibilityBars.length).fill('#2196F3'));
+    expect(getPlot(result, 'Mixed Plot').color).toEqual(Array(compatibilityBars.length).fill('#2962FF'));
 
     expect(getPlot(result, 'Mixed HLine')).toMatchObject({
       type: 'hline',
@@ -549,14 +553,16 @@ fill(plot1=upper, lower, color.new(color.orange, 80), "Mixed Fill", false, 6)
 
     const mixedBg = getPlot(result, 'Mixed Bg');
     expect(mixedBg.type).toBe('bgcolor');
-    expect(mixedBg.color).toEqual([null, '#2196F3', ...Array(compatibilityBars.length - 1).fill(null)]);
+    expect(mixedBg.color).toEqual(['#2962FF', ...Array(compatibilityBars.length - 1).fill(null)]);
     expect(mixedBg.offset).toBe(1);
     expect(mixedBg.editable).toBe(false);
     expect(mixedBg.showLast).toBe(3);
 
     const mixedBar = getPlot(result, 'Mixed Bar');
     expect(mixedBar.type).toBe('barcolor');
-    expect(mixedBar.color).toEqual([null, '#F23645', ...Array(compatibilityBars.length - 1).fill(null)]);
+    // Native v7 barcolor-series-offset-v5: source_plot_row + native_main_candles[].color.
+    // BARCOLOR-NATIVE-MODEL-AUDIT-v1.json proves source storage followed by painter offset.
+    expect(mixedBar.color).toEqual(['#F23645', ...Array(compatibilityBars.length - 1).fill(null)]);
     expect(mixedBar.offset).toBe(1);
     expect(mixedBar.editable).toBe(true);
     expect(mixedBar.showLast).toBe(4);

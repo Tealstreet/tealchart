@@ -44,7 +44,7 @@ plot(rsi, title="RSI")
 
     expect(result.errors).toEqual([]);
     expect(result.plots.map((plot) => plot.title)).toEqual(['Fast EMA', 'Slow SMA', 'RSI']);
-    expect(roundSeries(getPlot(result, 'Fast EMA').values)).toEqual([102, 103.5, 105.25, 104.125, 101.5625, 100.78125, 102.390625, 105.695313, 106.847656, 108.923828, 109.461914, 110.730957]);
+    expect(roundSeries(getPlot(result, 'Fast EMA').values)).toEqual([null, null, 104.666667, 103.833333, 101.416667, 100.708333, 102.354167, 105.677083, 106.838542, 108.919271, 109.459635, 110.729818]);
     expect(roundSeries(getPlot(result, 'Slow SMA').values)).toEqual([null, null, null, null, 103.2, 102.8, 102.6, 103, 104, 106.4, 108.4, 110]);
     expect(getPlot(result, 'RSI').values).toHaveLength(compatibilityBars.length);
   });
@@ -70,7 +70,7 @@ plot(momentum, title="RSI")
 `);
 
     expect(result.errors).toEqual([]);
-    expect(roundSeries(getPlot(result, 'Fast EMA').values)).toEqual([102, 103.5, 105.25, 104.125, 101.5625, 100.78125, 102.390625, 105.695313, 106.847656, 108.923828, 109.461914, 110.730957]);
+    expect(roundSeries(getPlot(result, 'Fast EMA').values)).toEqual([null, null, 104.666667, 103.833333, 101.416667, 100.708333, 102.354167, 105.677083, 106.838542, 108.919271, 109.459635, 110.729818]);
     expect(roundSeries(getPlot(result, 'Slow SMA').values)).toEqual([null, null, null, null, 103.2, 102.8, 102.6, 103, 104, 106.4, 108.4, 110]);
     expect(getPlot(result, 'Highest').values).toEqual([null, 106, 108, 109, 109, 104, 105, 110, 111, 112, 114, 114]);
     expect(getPlot(result, 'Lowest').values).toEqual([null, 99, 101, 102, 98, 96, 96, 99, 103, 106, 107, 108]);
@@ -104,7 +104,7 @@ plot(signal, title="Signal")
       ['Length', 'int'],
       ['Show', 'bool'],
     ]);
-    expect(roundSeries(getPlot(result, 'Fast').values)).toEqual([102, 103.5, 105.25, 104.125, 101.5625, 100.78125, 102.390625, 105.695313, 106.847656, 108.923828, 109.461914, 110.730957]);
+    expect(roundSeries(getPlot(result, 'Fast').values)).toEqual([null, null, 104.666667, 103.833333, 101.416667, 100.708333, 102.354167, 105.677083, 106.838542, 108.919271, 109.459635, 110.729818]);
     expect(roundSeries(getPlot(result, 'Slow').values)).toEqual([null, null, null, null, 103.2, 102.8, 102.6, 103, 104, 106.4, 108.4, 110]);
     expect(getPlot(result, 'Signal').values).toEqual([null, null, null, null, null, null, null, 110, null, null, null, null]);
   });
@@ -138,7 +138,7 @@ plot(basis, title="Basis")
 `);
 
     expect(result.errors).toEqual([]);
-    expect(getPlot(result, 'Direction').values).toEqual([null, null, 1, 1, 1, 1, 1, 1, 1, -1, -1, -1]);
+    expect(getPlot(result, 'Direction').values).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, -1, -1, -1]);
     expect(roundSeries(getPlot(result, 'Basis').values)).toEqual([null, null, null, null, 103.2, 102.8, 102.6, 103, 104, 106.4, 108.4, 110]);
   });
 

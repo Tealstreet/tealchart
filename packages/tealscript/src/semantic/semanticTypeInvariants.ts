@@ -14,6 +14,7 @@ import type {
   VariableDeclaration,
 } from '../parser/ast';
 import { BUILTIN_GLOBAL_TYPES } from '../builtinMetadata';
+import { pineVersionRules } from '../pineVersionRules';
 import type { SemanticCheckResult, SemanticQualifier, SemanticSymbol, SemanticType, SemanticTypeKind } from './checker';
 
 export type SemanticTypeInvariantCode =
@@ -32,6 +33,7 @@ export interface SemanticTypeInvariantIssue {
 }
 
 interface InvariantScope {
+  pineVersion: number;
   parent?: InvariantScope;
   symbols: Map<string, SemanticType>;
   typeFields: Map<string, Map<string, SemanticType>>;
@@ -211,7 +213,7 @@ const TA_DEFAULT_SOURCE_RETURN_CALLS = new Set(['ta.highest', 'ta.lowest', 'ta.p
 
 export function checkSemanticTypeInvariants(program: Program, result: SemanticCheckResult): SemanticTypeInvariantIssue[] {
   const issues: SemanticTypeInvariantIssue[] = [];
-  const rootScope = createScope();
+  const rootScope = createScope(undefined, program.version);
   seedTypeDeclarations(program.body, rootScope);
   const checkerSymbols = new Map(result.symbols.map((symbol) => [symbol.name, symbol]));
   const reassignedNames = collectReassignedNames(program.body);
@@ -223,7 +225,7 @@ export function checkSemanticTypeInvariants(program: Program, result: SemanticCh
 }
 
 export function analyzeSemanticTypeInvariantCoverage(program: Program, _result: SemanticCheckResult): SemanticTypeInvariantCoverage {
-  const scope = createScope();
+  const scope = createScope(undefined, program.version);
   seedTypeDeclarations(program.body, scope);
   const stats = createCoverageStats();
   collectStatementCoverage(program.body, scope, stats);
@@ -585,8 +587,13 @@ function inferBinaryExpression(expression: BinaryExpression, scope: InvariantSco
   }
 
   if (ARITHMETIC_OPERATORS.has(expression.operator) && isNumeric(left) && isNumeric(right)) {
+    const constIntDivision = expression.operator === '/'
+      && scope.pineVersion >= 4
+      && !pineVersionRules(scope.pineVersion).constIntDivisionCanReturnFractional
+      && left.kind === 'int' && right.kind === 'int'
+      && left.qualifier === 'const' && right.qualifier === 'const';
     return known({
-      kind: left.kind === 'float' || right.kind === 'float' || expression.operator === '/' ? 'float' : 'int',
+      kind: left.kind === 'float' || right.kind === 'float' || (expression.operator === '/' && !constIntDivision) ? 'float' : 'int',
       qualifier,
     });
   }
@@ -654,7 +661,11 @@ function inferCallExpression(expression: CallExpression, scope: InvariantScope):
     const argumentTypes = expression.arguments.map((argument) => inferKnown(argument.value, scope));
     return known({ kind: 'bool', qualifier: maxQualifier(...argumentTypes) });
   }
-  if (calleeName === 'nz' || calleeName === 'fixnan') {
+  if (calleeName === 'fixnan') {
+    const source = callArgumentType(expression, scope, ['source'], 0);
+    return source ? known({ ...source, qualifier: 'series' }) : unknown();
+  }
+  if (calleeName === 'nz') {
     const source = callArgumentType(expression, scope, ['source', 'replacement'], 0);
     const replacement = callArgumentType(expression, scope, ['source', 'replacement'], 1);
     if (!source) return unknown();
@@ -914,7 +925,9 @@ function typeFromAnnotation(annotation: TypeAnnotation): SemanticType {
     };
   }
   if (annotation.baseType === 'udt' && isSemanticTypeKind(annotation.name)) {
-    return { kind: annotation.name, qualifier: qualifier ?? (isReferenceTypeKind(annotation.name) ? 'series' : undefined) };
+    const constReference = qualifier === 'const' && isReferenceTypeKind(annotation.name)
+      && annotation.name !== 'plot' && annotation.name !== 'hline';
+    return { kind: annotation.name, qualifier: constReference ? 'series' : qualifier ?? (isReferenceTypeKind(annotation.name) ? 'series' : undefined) };
   }
   if (annotation.baseType === 'series' || annotation.baseType === 'simple' || annotation.baseType === 'const' || annotation.baseType === 'input') {
     return { kind: 'unknown', qualifier: annotation.baseType };
@@ -1231,8 +1244,8 @@ function unknown(): InferredType {
   return { kind: 'unknown' };
 }
 
-function createScope(parent?: InvariantScope): InvariantScope {
-  return { parent, symbols: new Map(), typeFields: new Map() };
+function createScope(parent?: InvariantScope, pineVersion = parent?.pineVersion ?? 6): InvariantScope {
+  return { parent, pineVersion, symbols: new Map(), typeFields: new Map() };
 }
 
 function lookup(scope: InvariantScope, name: string): SemanticType | undefined {

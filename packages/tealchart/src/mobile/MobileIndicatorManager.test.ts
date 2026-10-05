@@ -61,6 +61,60 @@ function flushWorkerInit(): Promise<void> {
 }
 
 describe('MobileIndicatorManager custom Tealscript indicators', () => {
+  async function sourceChain() {
+    const workers: FakeWorker[] = [];
+    const manager = new MobileIndicatorManager({
+      createWorker: () => { const worker = new FakeWorker(); workers.push(worker); return worker as unknown as Worker; },
+    });
+    const plot: PlotOutput = { id: 'plot_close', type: 'plot', title: 'Close', values: [101, 102], color: '#ffffff' };
+    manager.setBars(makeBars(2));
+    for (const [id, provider] of [['A', undefined], ['B', 'A'], ['C', 'B']] as const) {
+      manager.addTealscriptIndicator({
+        id, code: 'indicator("Source")\nplot(close)',
+        inputs: provider ? { source: `tealscript-source:${provider}:plot_close` } : {},
+      });
+      const worker = workers.at(-1)!;
+      worker.emit({ type: 'ready' });
+      await flushWorkerInit();
+      worker.emit(createResultMessage(id, { plots: [plot], drawings: [], inputs: [], alerts: [], logs: [] }));
+    }
+    return { manager, workers, plot };
+  }
+
+  it('removes cascaded source dependents from mobile indicators, panes and caches', async () => {
+    const { manager, workers } = await sourceChain();
+    manager.removeIndicator('A');
+    expect(manager.getIndicators()).toEqual([]);
+    expect(manager.getIndicatorPaneInfo()).toEqual({});
+    expect(manager.getPaneManager().getPanes()).toHaveLength(1);
+    expect(manager.getPlots()).toEqual([]);
+    expect(workers.every(worker => worker.terminated)).toBe(true);
+    expect(manager.getInputDefinitions('B')).toEqual([]);
+  });
+
+  it('replaces a mobile source provider in place without deleting its dependents', async () => {
+    const { manager, workers, plot } = await sourceChain();
+    manager.setIndicatorVisibility('A', false);
+    const paneIds = manager.getPaneManager().getPanes().map(pane => pane.id);
+    manager.addTealscriptIndicator({ id: 'A', code: 'indicator("Recompiled")\nplot(close + 1)' });
+    expect(workers).toHaveLength(4);
+    expect(workers[0].terminated).toBe(true);
+    expect(workers[1].terminated).toBe(false);
+    expect(workers[2].terminated).toBe(false);
+    expect(manager.getIndicators().map(indicator => indicator.instanceId)).toEqual(['A', 'B', 'C']);
+    expect(manager.getIndicator('A')?.isVisible).toBe(false);
+    expect(manager.getPaneManager().getPanes().map(pane => pane.id)).toEqual(paneIds);
+    workers[3].emit({ type: 'ready' });
+    await flushWorkerInit();
+    workers[3].emit(createResultMessage('A', { plots: [{ ...plot, values: [102, 103] }], drawings: [], inputs: [], alerts: [], logs: [] }));
+    expect(workers).toHaveLength(5);
+    expect(workers[1].terminated).toBe(true);
+    expect(workers[2].terminated).toBe(false);
+    expect(manager.getIndicators()).toHaveLength(3);
+    manager.removeIndicator('A');
+    expect(manager.getIndicators()).toEqual([]);
+  });
+
   afterEach(() => {
     clearChartStoreCache();
   });

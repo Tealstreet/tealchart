@@ -1,10 +1,14 @@
-import type { BuiltinRegistry } from './registry';
+import { PineRuntimeArgumentError } from '../runtimeArgumentError';
+import type { BuiltinFunction, BuiltinRegistry } from './registry';
+import { pineColorConstant } from '../../pineColorConstants';
+import { pineVersionRules } from '../../pineVersionRules';
 import {
   getDrawingValue,
   toDrawingId,
   withDrawing,
 } from '../drawings/helpers';
 import type { ExecutionContext } from '../context';
+import { PineTableReference } from '../drawings/store';
 import type {
   BoxDrawingOutput,
   ChartPoint,
@@ -17,17 +21,18 @@ import type {
 } from '../drawings/types';
 
 export interface DrawingBuiltinRuntime {
+  raiseRuntimeError(message: string): never;
   isNa(value: unknown): boolean;
   toNullableNumber(value: unknown): number | null;
   toStringValue(value: unknown): string;
   toNumber(value: unknown): number;
   toNullableColor(value: unknown): string | null;
   toOptionalString(value: unknown): string | undefined;
-  toLineWidth(value: unknown): number;
+  toLineWidth(value: unknown, allowZero?: boolean): number;
   toDrawingId(value: unknown): string | undefined;
   withLine(value: unknown, ctx: ExecutionContext, fn: (line: LineDrawingOutput) => void): void;
   getLineValue<T>(value: unknown, ctx: ExecutionContext, fn: (line: LineDrawingOutput) => T): T | number;
-  interpolateLinePrice(line: LineDrawingOutput, x: number): number;
+  interpolateLinePrice(line: LineDrawingOutput, x: number, barIndex: number): number;
 }
 
 export interface DrawingRuntimeApproximation {
@@ -63,13 +68,20 @@ function pointX(point: ChartPoint, xloc: string): number | null {
   return xloc === 'bar_time' ? point.time : point.index;
 }
 
+function validateDrawingXCoordinate(ctx: ExecutionContext, xloc: string, x: number | null): number | null {
+  if (xloc === 'bar_index' && x !== null && x > ctx.last_bar_index + 500) {
+    throw new Error(`Error on bar ${ctx.bar_index}: Objects positioned using xloc.bar_index cannot be drawn further than 500 bars into the future.`);
+  }
+  return x;
+}
+
 function copyPoint(point: ChartPoint): ChartPoint {
   return { ...point };
 }
 
-function applyLinePoint(line: LineDrawingOutput, pointValue: unknown, endpoint: 'first' | 'second'): void {
+function applyLinePoint(line: LineDrawingOutput, pointValue: unknown, endpoint: 'first' | 'second', ctx: ExecutionContext): void {
   const point = isChartPoint(pointValue) ? pointValue : undefined;
-  const x = point ? pointX(point, line.xloc) : null;
+  const x = validateDrawingXCoordinate(ctx, line.xloc, point ? pointX(point, line.xloc) : null);
   const y = point ? point.price : null;
 
   if (endpoint === 'first') {
@@ -81,9 +93,9 @@ function applyLinePoint(line: LineDrawingOutput, pointValue: unknown, endpoint: 
   }
 }
 
-function applyBoxPoint(box: BoxDrawingOutput, pointValue: unknown, corner: 'topLeft' | 'bottomRight'): void {
+function applyBoxPoint(box: BoxDrawingOutput, pointValue: unknown, corner: 'topLeft' | 'bottomRight', ctx: ExecutionContext): void {
   const point = isChartPoint(pointValue) ? pointValue : undefined;
-  const x = point ? pointX(point, box.xloc) : null;
+  const x = validateDrawingXCoordinate(ctx, box.xloc, point ? pointX(point, box.xloc) : null);
   const y = point ? point.price : null;
 
   if (corner === 'topLeft') {
@@ -128,25 +140,29 @@ function optionalBoolean(value: unknown): boolean | undefined {
   return value === undefined ? undefined : Boolean(value);
 }
 
-function positiveInteger(runtime: DrawingBuiltinRuntime, value: unknown, fallback: number, site?: string): number {
-  const parsed = Math.trunc(runtime.toNumber(value ?? fallback));
-  if ((!Number.isFinite(parsed) || parsed <= 0) && site) {
+function tableDimension(runtime: DrawingBuiltinRuntime, value: unknown, argument: 'columns' | 'rows'): number {
+  const numeric = runtime.toNumber(value ?? 1);
+  if (argument === 'columns' && Number.isInteger(numeric) && numeric < 0) {
+    throw new PineRuntimeArgumentError(
+      `Invalid value of the 'columns' argument (${numeric}) in the 'table.new' function. It must be >= 0.`,
+    );
+  }
+  const parsed = Math.trunc(numeric);
+  const minimum = argument === 'columns' ? 0 : 1;
+  if (!Number.isFinite(parsed) || parsed < minimum) {
+    const site = `table.new.${argument}-fallback`;
     reportDrawingRuntimeApproximation({
       site,
-      message: `${site} was not a positive integer and fell back to ${fallback}; exact TradingView runtime behavior for dynamic invalid table dimensions is trace-required.`,
+      message: `${site} was below the supported minimum or nonfinite and fell back to 1; exact TradingView runtime behavior for dynamic invalid table dimensions is trace-required.`,
     });
   }
-  return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+  return Number.isFinite(parsed) && parsed >= minimum ? parsed : 1;
 }
 
 function tableBorderWidth(runtime: DrawingBuiltinRuntime, value: unknown): number {
   if (value === undefined || runtime.isNa(value)) return 0;
   const parsed = Math.trunc(runtime.toNumber(value));
-  return Number.isFinite(parsed) ? Math.min(100, Math.max(0, parsed)) : 0;
-}
-
-function tableCellKey(column: number, row: number): string {
-  return `${column}:${row}`;
+  return Number.isFinite(parsed) ? Math.max(0, parsed) : 0;
 }
 
 const MAX_TABLE_CELLS = 10000;
@@ -162,6 +178,45 @@ function normalizeTableRow(runtime: DrawingBuiltinRuntime, value: unknown): numb
   return Math.trunc(runtime.toNumber(value));
 }
 
+function registerSingleDrawingGetter(
+  builtins: BuiltinRegistry,
+  name: string,
+  read: (value: unknown, ctx: ExecutionContext) => unknown,
+): void {
+  const builtin: BuiltinFunction = (args, named, ctx) => read(callArg(args, named, 0, 'id'), ctx);
+  builtin.positionalSingleArgument = read;
+  builtins.set(name, builtin);
+}
+
+const labelX = (label: LabelDrawingOutput) => label.x ?? Number.NaN;
+const labelY = (label: LabelDrawingOutput) => label.y ?? Number.NaN;
+const labelXloc = (label: LabelDrawingOutput) => label.xloc;
+const labelYloc = (label: LabelDrawingOutput) => label.yloc;
+const labelStyle = (label: LabelDrawingOutput) => label.style;
+const labelColor = (label: LabelDrawingOutput) => label.color ?? Number.NaN;
+const labelTextcolor = (label: LabelDrawingOutput) => label.textColor ?? Number.NaN;
+const labelSize = (label: LabelDrawingOutput) => label.size;
+const labelTooltip = (label: LabelDrawingOutput) => label.tooltip ?? '';
+const lineX1 = (line: LineDrawingOutput) => line.x1 ?? Number.NaN;
+const lineX2 = (line: LineDrawingOutput) => line.x2 ?? Number.NaN;
+const lineY2 = (line: LineDrawingOutput) => line.y2 ?? Number.NaN;
+const lineColor = (line: LineDrawingOutput) => line.color ?? Number.NaN;
+const lineExtend = (line: LineDrawingOutput) => line.extend;
+const lineStyle = (line: LineDrawingOutput) => line.style;
+const lineWidth = (line: LineDrawingOutput) => line.width;
+const boxLeft = (box: BoxDrawingOutput) => box.left ?? Number.NaN;
+const boxRight = (box: BoxDrawingOutput) => box.right ?? Number.NaN;
+const boxTop = (box: BoxDrawingOutput) => box.top ?? Number.NaN;
+const boxBottom = (box: BoxDrawingOutput) => box.bottom ?? Number.NaN;
+const boxBgcolor = (box: BoxDrawingOutput) => box.bgcolor ?? Number.NaN;
+const boxBorderColor = (box: BoxDrawingOutput) => box.borderColor ?? Number.NaN;
+const boxText = (box: BoxDrawingOutput) => box.text;
+const boxTextHalign = (box: BoxDrawingOutput) => box.textHalign ?? 'center';
+const boxTextValign = (box: BoxDrawingOutput) => box.textValign ?? 'center';
+
+const lineY1 = (line: LineDrawingOutput): number => line.y1 ?? Number.NaN;
+const labelText = (label: LabelDrawingOutput): string => label.text;
+
 function callArg(
   args: unknown[],
   namedArgs: Map<string, unknown>,
@@ -170,7 +225,10 @@ function callArg(
   fallback?: unknown,
   priorNames: readonly string[] = [],
 ): unknown {
-  const positionalIndex = index - priorNames.filter((priorName) => namedArgs.has(priorName)).length;
+  let positionalIndex = index;
+  for (const priorName of priorNames) {
+    if (namedArgs.has(priorName)) positionalIndex -= 1;
+  }
   return namedArgs.has(name) ? namedArgs.get(name) : args[positionalIndex] !== undefined ? args[positionalIndex] : fallback;
 }
 
@@ -182,15 +240,28 @@ function orderedCallArg(
   fallback?: unknown,
 ): unknown {
   const name = names[index];
-  const positionalIndex = index - names.slice(0, index).filter((priorName) => namedArgs.has(priorName)).length;
-  return name && namedArgs.has(name)
-    ? namedArgs.get(name)
-    : args[positionalIndex] !== undefined
-      ? args[positionalIndex]
-      : fallback;
+  if (name && namedArgs.has(name)) return namedArgs.get(name);
+  let positionalIndex = index;
+  for (let priorIndex = 0; priorIndex < index; priorIndex += 1) {
+    if (namedArgs.has(names[priorIndex])) positionalIndex -= 1;
+  }
+  return args[positionalIndex] !== undefined ? args[positionalIndex] : fallback;
 }
 
-export function registerLabelBuiltins(builtins: BuiltinRegistry, runtime: DrawingBuiltinRuntime): void {
+export function registerDrawingObjectCastBuiltins(builtins: BuiltinRegistry): void {
+  for (const kind of ['box', 'label', 'line', 'linefill', 'table']) {
+    builtins.set(kind, (args, namedArgs, ctx) => {
+      const value = callArg(args, namedArgs, 0, 'x', Number.NaN);
+      if (value === null || value === undefined || (typeof value === 'number' && Number.isNaN(value))) return value;
+      if (kind === 'table' && value instanceof PineTableReference && ctx.getDrawingReferenceType(value.id) === kind) return value;
+      if (kind !== 'table' && typeof value === 'string' && ctx.getDrawingReferenceType(value) === kind) return value;
+      throw new TypeError(`${kind} x requires ${kind} reference`);
+    });
+  }
+}
+
+export function registerLabelBuiltins(builtins: BuiltinRegistry, runtime: DrawingBuiltinRuntime, pineVersion = 6): void {
+  const defaultTextColor = pineVersionRules(pineVersion).usesV6DefaultColors ? PINE_COLOR_WHITE : '#000000';
   const labelNewPointArgs = [
     'point',
     'text',
@@ -264,7 +335,7 @@ export function registerLabelBuiltins(builtins: BuiltinRegistry, runtime: Drawin
       yloc: runtime.toStringValue(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 3 : 4, 'price')),
       style: runtime.toStringValue(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 5 : 6, 'label_down')),
       color: runtime.toNullableColor(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 4 : 5, PINE_COLOR_BLUE)),
-      textColor: runtime.toNullableColor(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 6 : 7, PINE_COLOR_WHITE)),
+      textColor: runtime.toNullableColor(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 6 : 7, defaultTextColor)),
       size: runtime.toStringValue(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 7 : 8, 'normal')),
       tooltip: runtime.toOptionalString(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 9 : 10)),
     };
@@ -273,6 +344,7 @@ export function registerLabelBuiltins(builtins: BuiltinRegistry, runtime: Drawin
     if (textFormatting !== undefined) drawing.textFormatting = textFormatting;
     if (forceOverlay !== undefined) drawing.forceOverlay = forceOverlay;
 
+    validateDrawingXCoordinate(ctx, xloc, x);
     ctx.addDrawing(drawing);
 
     return id;
@@ -294,7 +366,7 @@ export function registerLabelBuiltins(builtins: BuiltinRegistry, runtime: Drawin
 
   builtins.set('label.set_x', (args, namedArgs, ctx) => {
     withDrawing(callArg(args, namedArgs, 0, 'id'), ctx, 'label', runtime.isNa, (label) => {
-      label.x = runtime.toNullableNumber(callArg(args, namedArgs, 1, 'x', undefined, ['id']));
+      label.x = validateDrawingXCoordinate(ctx, label.xloc, runtime.toNullableNumber(callArg(args, namedArgs, 1, 'x', undefined, ['id'])));
       label.barIndex = ctx.bar_index;
     });
     return undefined;
@@ -310,7 +382,7 @@ export function registerLabelBuiltins(builtins: BuiltinRegistry, runtime: Drawin
 
   builtins.set('label.set_xy', (args, namedArgs, ctx) => {
     withDrawing(callArg(args, namedArgs, 0, 'id'), ctx, 'label', runtime.isNa, (label) => {
-      label.x = runtime.toNullableNumber(callArg(args, namedArgs, 1, 'x', undefined, ['id']));
+      label.x = validateDrawingXCoordinate(ctx, label.xloc, runtime.toNullableNumber(callArg(args, namedArgs, 1, 'x', undefined, ['id'])));
       label.y = runtime.toNullableNumber(callArg(args, namedArgs, 2, 'y', undefined, ['id', 'x']));
       label.barIndex = ctx.bar_index;
     });
@@ -321,7 +393,7 @@ export function registerLabelBuiltins(builtins: BuiltinRegistry, runtime: Drawin
     withDrawing(callArg(args, namedArgs, 0, 'id'), ctx, 'label', runtime.isNa, (label) => {
       const point = callArg(args, namedArgs, 1, 'point', undefined, ['id']);
       if (isChartPoint(point)) {
-        label.x = pointX(point, label.xloc);
+        label.x = validateDrawingXCoordinate(ctx, label.xloc, pointX(point, label.xloc));
         label.y = point.price;
       } else {
         label.x = null;
@@ -341,8 +413,9 @@ export function registerLabelBuiltins(builtins: BuiltinRegistry, runtime: Drawin
 
   builtins.set('label.set_xloc', (args, namedArgs, ctx) => {
     withDrawing(callArg(args, namedArgs, 0, 'id'), ctx, 'label', runtime.isNa, (label) => {
-      label.x = runtime.toNullableNumber(callArg(args, namedArgs, 1, 'x', undefined, ['id']));
-      label.xloc = runtime.toStringValue(callArg(args, namedArgs, 2, 'xloc', undefined, ['id', 'x']));
+      const xloc = runtime.toStringValue(callArg(args, namedArgs, 2, 'xloc', undefined, ['id', 'x']));
+      label.x = validateDrawingXCoordinate(ctx, xloc, runtime.toNullableNumber(callArg(args, namedArgs, 1, 'x', undefined, ['id'])));
+      label.xloc = xloc;
       label.barIndex = ctx.bar_index;
     });
     return undefined;
@@ -378,7 +451,11 @@ export function registerLabelBuiltins(builtins: BuiltinRegistry, runtime: Drawin
 
   builtins.set('label.set_size', (args, namedArgs, ctx) => {
     withDrawing(callArg(args, namedArgs, 0, 'id'), ctx, 'label', runtime.isNa, (label) => {
-      label.size = runtime.toStringValue(callArg(args, namedArgs, 1, 'size', undefined, ['id']));
+      const size = callArg(args, namedArgs, 1, 'size', undefined, ['id']);
+      if (typeof size === 'number' && size < 0) {
+        runtime.raiseRuntimeError(`Error on bar ${ctx.bar_index}: Invalid value of the 'size' argument (${size}) in the 'label.set_size' function. It must be >= 0.`);
+      }
+      label.size = runtime.toStringValue(size);
     });
     return undefined;
   });
@@ -411,16 +488,16 @@ export function registerLabelBuiltins(builtins: BuiltinRegistry, runtime: Drawin
     return undefined;
   });
 
-  builtins.set('label.get_x', (args, namedArgs, ctx) => getDrawingValue(callArg(args, namedArgs, 0, 'id'), ctx, 'label', runtime.isNa, (label) => label.x ?? Number.NaN));
-  builtins.set('label.get_y', (args, namedArgs, ctx) => getDrawingValue(callArg(args, namedArgs, 0, 'id'), ctx, 'label', runtime.isNa, (label) => label.y ?? Number.NaN));
-  builtins.set('label.get_text', (args, namedArgs, ctx) => getDrawingValue(callArg(args, namedArgs, 0, 'id'), ctx, 'label', runtime.isNa, (label) => label.text));
-  builtins.set('label.get_xloc', (args, namedArgs, ctx) => getDrawingValue(callArg(args, namedArgs, 0, 'id'), ctx, 'label', runtime.isNa, (label) => label.xloc));
-  builtins.set('label.get_yloc', (args, namedArgs, ctx) => getDrawingValue(callArg(args, namedArgs, 0, 'id'), ctx, 'label', runtime.isNa, (label) => label.yloc));
-  builtins.set('label.get_style', (args, namedArgs, ctx) => getDrawingValue(callArg(args, namedArgs, 0, 'id'), ctx, 'label', runtime.isNa, (label) => label.style));
-  builtins.set('label.get_color', (args, namedArgs, ctx) => getDrawingValue(callArg(args, namedArgs, 0, 'id'), ctx, 'label', runtime.isNa, (label) => label.color ?? Number.NaN));
-  builtins.set('label.get_textcolor', (args, namedArgs, ctx) => getDrawingValue(callArg(args, namedArgs, 0, 'id'), ctx, 'label', runtime.isNa, (label) => label.textColor ?? Number.NaN));
-  builtins.set('label.get_size', (args, namedArgs, ctx) => getDrawingValue(callArg(args, namedArgs, 0, 'id'), ctx, 'label', runtime.isNa, (label) => label.size));
-  builtins.set('label.get_tooltip', (args, namedArgs, ctx) => getDrawingValue(callArg(args, namedArgs, 0, 'id'), ctx, 'label', runtime.isNa, (label) => label.tooltip ?? ''));
+  registerSingleDrawingGetter(builtins, 'label.get_x', (value, ctx) => getDrawingValue(value, ctx, 'label', runtime.isNa, labelX));
+  registerSingleDrawingGetter(builtins, 'label.get_y', (value, ctx) => getDrawingValue(value, ctx, 'label', runtime.isNa, labelY));
+  registerSingleDrawingGetter(builtins, 'label.get_text', (value, ctx) => getDrawingValue(value, ctx, 'label', runtime.isNa, labelText));
+  registerSingleDrawingGetter(builtins, 'label.get_xloc', (value, ctx) => getDrawingValue(value, ctx, 'label', runtime.isNa, labelXloc));
+  registerSingleDrawingGetter(builtins, 'label.get_yloc', (value, ctx) => getDrawingValue(value, ctx, 'label', runtime.isNa, labelYloc));
+  registerSingleDrawingGetter(builtins, 'label.get_style', (value, ctx) => getDrawingValue(value, ctx, 'label', runtime.isNa, labelStyle));
+  registerSingleDrawingGetter(builtins, 'label.get_color', (value, ctx) => getDrawingValue(value, ctx, 'label', runtime.isNa, labelColor));
+  registerSingleDrawingGetter(builtins, 'label.get_textcolor', (value, ctx) => getDrawingValue(value, ctx, 'label', runtime.isNa, labelTextcolor));
+  registerSingleDrawingGetter(builtins, 'label.get_size', (value, ctx) => getDrawingValue(value, ctx, 'label', runtime.isNa, labelSize));
+  registerSingleDrawingGetter(builtins, 'label.get_tooltip', (value, ctx) => getDrawingValue(value, ctx, 'label', runtime.isNa, labelTooltip));
   builtins.set('label.all', (_args, _namedArgs, ctx) => ctx.getDrawingIds('label'));
 }
 
@@ -449,6 +526,8 @@ export function registerLineBuiltins(builtins: BuiltinRegistry, runtime: Drawing
       : runtime.toNullableNumber(orderedCallArg(args, namedArgs, lineNewCoordinateArgs, 3));
     const id = `line_${callId}_${ctx.bar_index}`;
 
+    validateDrawingXCoordinate(ctx, xloc, x1);
+    validateDrawingXCoordinate(ctx, xloc, x2);
     ctx.addDrawing({
       id,
       type: 'line',
@@ -484,7 +563,7 @@ export function registerLineBuiltins(builtins: BuiltinRegistry, runtime: Drawing
 
   builtins.set('line.set_x1', (args, namedArgs, ctx) => {
     runtime.withLine(callArg(args, namedArgs, 0, 'id'), ctx, (line) => {
-      line.x1 = runtime.toNullableNumber(callArg(args, namedArgs, 1, 'x', undefined, ['id']));
+      line.x1 = validateDrawingXCoordinate(ctx, line.xloc, runtime.toNullableNumber(callArg(args, namedArgs, 1, 'x', undefined, ['id'])));
       line.barIndex = ctx.bar_index;
     });
     return undefined;
@@ -492,7 +571,7 @@ export function registerLineBuiltins(builtins: BuiltinRegistry, runtime: Drawing
 
   builtins.set('line.set_x2', (args, namedArgs, ctx) => {
     runtime.withLine(callArg(args, namedArgs, 0, 'id'), ctx, (line) => {
-      line.x2 = runtime.toNullableNumber(callArg(args, namedArgs, 1, 'x', undefined, ['id']));
+      line.x2 = validateDrawingXCoordinate(ctx, line.xloc, runtime.toNullableNumber(callArg(args, namedArgs, 1, 'x', undefined, ['id'])));
       line.barIndex = ctx.bar_index;
     });
     return undefined;
@@ -516,7 +595,7 @@ export function registerLineBuiltins(builtins: BuiltinRegistry, runtime: Drawing
 
   builtins.set('line.set_xy1', (args, namedArgs, ctx) => {
     runtime.withLine(callArg(args, namedArgs, 0, 'id'), ctx, (line) => {
-      line.x1 = runtime.toNullableNumber(callArg(args, namedArgs, 1, 'x', undefined, ['id']));
+      line.x1 = validateDrawingXCoordinate(ctx, line.xloc, runtime.toNullableNumber(callArg(args, namedArgs, 1, 'x', undefined, ['id'])));
       line.y1 = runtime.toNullableNumber(callArg(args, namedArgs, 2, 'y', undefined, ['id', 'x']));
       line.barIndex = ctx.bar_index;
     });
@@ -525,7 +604,7 @@ export function registerLineBuiltins(builtins: BuiltinRegistry, runtime: Drawing
 
   builtins.set('line.set_xy2', (args, namedArgs, ctx) => {
     runtime.withLine(callArg(args, namedArgs, 0, 'id'), ctx, (line) => {
-      line.x2 = runtime.toNullableNumber(callArg(args, namedArgs, 1, 'x', undefined, ['id']));
+      line.x2 = validateDrawingXCoordinate(ctx, line.xloc, runtime.toNullableNumber(callArg(args, namedArgs, 1, 'x', undefined, ['id'])));
       line.y2 = runtime.toNullableNumber(callArg(args, namedArgs, 2, 'y', undefined, ['id', 'x']));
       line.barIndex = ctx.bar_index;
     });
@@ -534,7 +613,7 @@ export function registerLineBuiltins(builtins: BuiltinRegistry, runtime: Drawing
 
   builtins.set('line.set_first_point', (args, namedArgs, ctx) => {
     runtime.withLine(callArg(args, namedArgs, 0, 'id'), ctx, (line) => {
-      applyLinePoint(line, callArg(args, namedArgs, 1, 'first_point', undefined, ['id']), 'first');
+      applyLinePoint(line, callArg(args, namedArgs, 1, 'point', undefined, ['id']), 'first', ctx);
       line.barIndex = ctx.bar_index;
     });
     return undefined;
@@ -542,7 +621,7 @@ export function registerLineBuiltins(builtins: BuiltinRegistry, runtime: Drawing
 
   builtins.set('line.set_second_point', (args, namedArgs, ctx) => {
     runtime.withLine(callArg(args, namedArgs, 0, 'id'), ctx, (line) => {
-      applyLinePoint(line, callArg(args, namedArgs, 1, 'second_point', undefined, ['id']), 'second');
+      applyLinePoint(line, callArg(args, namedArgs, 1, 'point', undefined, ['id']), 'second', ctx);
       line.barIndex = ctx.bar_index;
     });
     return undefined;
@@ -550,9 +629,10 @@ export function registerLineBuiltins(builtins: BuiltinRegistry, runtime: Drawing
 
   builtins.set('line.set_xloc', (args, namedArgs, ctx) => {
     runtime.withLine(callArg(args, namedArgs, 0, 'id'), ctx, (line) => {
-      line.x1 = runtime.toNullableNumber(callArg(args, namedArgs, 1, 'x1', undefined, ['id']));
-      line.x2 = runtime.toNullableNumber(callArg(args, namedArgs, 2, 'x2', undefined, ['id', 'x1']));
-      line.xloc = runtime.toStringValue(callArg(args, namedArgs, 3, 'xloc', undefined, ['id', 'x1', 'x2']));
+      const xloc = runtime.toStringValue(callArg(args, namedArgs, 3, 'xloc', undefined, ['id', 'x1', 'x2']));
+      line.x1 = validateDrawingXCoordinate(ctx, xloc, runtime.toNullableNumber(callArg(args, namedArgs, 1, 'x1', undefined, ['id'])));
+      line.x2 = validateDrawingXCoordinate(ctx, xloc, runtime.toNullableNumber(callArg(args, namedArgs, 2, 'x2', undefined, ['id', 'x1'])));
+      line.xloc = xloc;
       line.barIndex = ctx.bar_index;
     });
     return undefined;
@@ -586,17 +666,17 @@ export function registerLineBuiltins(builtins: BuiltinRegistry, runtime: Drawing
     return undefined;
   });
 
-  builtins.set('line.get_x1', (args, namedArgs, ctx) => runtime.getLineValue(callArg(args, namedArgs, 0, 'id'), ctx, (line) => line.x1 ?? Number.NaN));
-  builtins.set('line.get_x2', (args, namedArgs, ctx) => runtime.getLineValue(callArg(args, namedArgs, 0, 'id'), ctx, (line) => line.x2 ?? Number.NaN));
-  builtins.set('line.get_y1', (args, namedArgs, ctx) => runtime.getLineValue(callArg(args, namedArgs, 0, 'id'), ctx, (line) => line.y1 ?? Number.NaN));
-  builtins.set('line.get_y2', (args, namedArgs, ctx) => runtime.getLineValue(callArg(args, namedArgs, 0, 'id'), ctx, (line) => line.y2 ?? Number.NaN));
-  builtins.set('line.get_color', (args, namedArgs, ctx) => runtime.getLineValue(callArg(args, namedArgs, 0, 'id'), ctx, (line) => line.color ?? Number.NaN));
-  builtins.set('line.get_extend', (args, namedArgs, ctx) => runtime.getLineValue(callArg(args, namedArgs, 0, 'id'), ctx, (line) => line.extend));
-  builtins.set('line.get_style', (args, namedArgs, ctx) => runtime.getLineValue(callArg(args, namedArgs, 0, 'id'), ctx, (line) => line.style));
-  builtins.set('line.get_width', (args, namedArgs, ctx) => runtime.getLineValue(callArg(args, namedArgs, 0, 'id'), ctx, (line) => line.width));
+  registerSingleDrawingGetter(builtins, 'line.get_x1', (value, ctx) => runtime.getLineValue(value, ctx, lineX1));
+  registerSingleDrawingGetter(builtins, 'line.get_x2', (value, ctx) => runtime.getLineValue(value, ctx, lineX2));
+  registerSingleDrawingGetter(builtins, 'line.get_y1', (value, ctx) => runtime.getLineValue(value, ctx, lineY1));
+  registerSingleDrawingGetter(builtins, 'line.get_y2', (value, ctx) => runtime.getLineValue(value, ctx, lineY2));
+  registerSingleDrawingGetter(builtins, 'line.get_color', (value, ctx) => runtime.getLineValue(value, ctx, lineColor));
+  registerSingleDrawingGetter(builtins, 'line.get_extend', (value, ctx) => runtime.getLineValue(value, ctx, lineExtend));
+  registerSingleDrawingGetter(builtins, 'line.get_style', (value, ctx) => runtime.getLineValue(value, ctx, lineStyle));
+  registerSingleDrawingGetter(builtins, 'line.get_width', (value, ctx) => runtime.getLineValue(value, ctx, lineWidth));
   builtins.set('line.get_price', (args, namedArgs, ctx) => {
     const x = runtime.toNumber(callArg(args, namedArgs, 1, 'x', undefined, ['id']));
-    return runtime.getLineValue(callArg(args, namedArgs, 0, 'id'), ctx, (line) => runtime.interpolateLinePrice(line, x));
+    return runtime.getLineValue(callArg(args, namedArgs, 0, 'id'), ctx, (line) => runtime.interpolateLinePrice(line, x, ctx.bar_index));
   });
   builtins.set('line.all', (_args, _namedArgs, ctx) => ctx.getDrawingIds('line'));
 }
@@ -663,7 +743,8 @@ export function registerLineFillBuiltins(builtins: BuiltinRegistry, runtime: Dra
   builtins.set('linefill.all', (_args, _namedArgs, ctx) => ctx.getDrawingIds('linefill'));
 }
 
-export function registerBoxBuiltins(builtins: BuiltinRegistry, runtime: DrawingBuiltinRuntime): void {
+export function registerBoxBuiltins(builtins: BuiltinRegistry, runtime: DrawingBuiltinRuntime, pineVersion = 6): void {
+  const defaultBlue = pineColorConstant('blue', pineVersion)!;
   const boxNewPointArgs = [
     'top_left',
     'bottom_right',
@@ -736,12 +817,12 @@ export function registerBoxBuiltins(builtins: BuiltinRegistry, runtime: DrawingB
       bottom: usesPointOverload
         ? bottomRight.price
         : runtime.toNullableNumber(orderedCallArg(args, namedArgs, boxNewCoordinateArgs, 3)),
-      borderColor: runtime.toNullableColor(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 2 : 4, PINE_COLOR_BLUE)),
-      borderWidth: runtime.toLineWidth(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 3 : 5)),
+      borderColor: runtime.toNullableColor(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 2 : 4, defaultBlue)),
+      borderWidth: runtime.toLineWidth(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 3 : 5), true),
       borderStyle: runtime.toStringValue(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 4 : 6, 'solid')),
       extend: runtime.toStringValue(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 5 : 7, 'none')),
       xloc,
-      bgcolor: runtime.toNullableColor(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 7 : 9, PINE_COLOR_BLUE)),
+      bgcolor: runtime.toNullableColor(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 7 : 9, defaultBlue)),
       text: runtime.toStringValue(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 8 : 10, '')),
       textSize: runtime.toStringValue(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 9 : 11, 'auto')),
       textColor: runtime.toNullableColor(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 10 : 12, PINE_COLOR_BLACK)),
@@ -753,6 +834,8 @@ export function registerBoxBuiltins(builtins: BuiltinRegistry, runtime: DrawingB
     if (textFormatting !== undefined) drawing.textFormatting = textFormatting;
     if (forceOverlay !== undefined) drawing.forceOverlay = forceOverlay;
 
+    validateDrawingXCoordinate(ctx, xloc, drawing.left);
+    validateDrawingXCoordinate(ctx, xloc, drawing.right);
     ctx.addDrawing(drawing);
 
     return id;
@@ -774,14 +857,14 @@ export function registerBoxBuiltins(builtins: BuiltinRegistry, runtime: DrawingB
 
   builtins.set('box.set_left', (args, namedArgs, ctx) => {
     withDrawing(callArg(args, namedArgs, 0, 'id'), ctx, 'box', runtime.isNa, (box) => {
-      box.left = runtime.toNullableNumber(callArg(args, namedArgs, 1, 'left', undefined, ['id']));
+      box.left = validateDrawingXCoordinate(ctx, box.xloc, runtime.toNullableNumber(callArg(args, namedArgs, 1, 'left', undefined, ['id'])));
       box.barIndex = ctx.bar_index;
     });
     return undefined;
   });
   builtins.set('box.set_right', (args, namedArgs, ctx) => {
     withDrawing(callArg(args, namedArgs, 0, 'id'), ctx, 'box', runtime.isNa, (box) => {
-      box.right = runtime.toNullableNumber(callArg(args, namedArgs, 1, 'right', undefined, ['id']));
+      box.right = validateDrawingXCoordinate(ctx, box.xloc, runtime.toNullableNumber(callArg(args, namedArgs, 1, 'right', undefined, ['id'])));
       box.barIndex = ctx.bar_index;
     });
     return undefined;
@@ -802,7 +885,7 @@ export function registerBoxBuiltins(builtins: BuiltinRegistry, runtime: DrawingB
   });
   builtins.set('box.set_lefttop', (args, namedArgs, ctx) => {
     withDrawing(callArg(args, namedArgs, 0, 'id'), ctx, 'box', runtime.isNa, (box) => {
-      box.left = runtime.toNullableNumber(callArg(args, namedArgs, 1, 'left', undefined, ['id']));
+      box.left = validateDrawingXCoordinate(ctx, box.xloc, runtime.toNullableNumber(callArg(args, namedArgs, 1, 'left', undefined, ['id'])));
       box.top = runtime.toNullableNumber(callArg(args, namedArgs, 2, 'top', undefined, ['id', 'left']));
       box.barIndex = ctx.bar_index;
     });
@@ -810,7 +893,7 @@ export function registerBoxBuiltins(builtins: BuiltinRegistry, runtime: DrawingB
   });
   builtins.set('box.set_rightbottom', (args, namedArgs, ctx) => {
     withDrawing(callArg(args, namedArgs, 0, 'id'), ctx, 'box', runtime.isNa, (box) => {
-      box.right = runtime.toNullableNumber(callArg(args, namedArgs, 1, 'right', undefined, ['id']));
+      box.right = validateDrawingXCoordinate(ctx, box.xloc, runtime.toNullableNumber(callArg(args, namedArgs, 1, 'right', undefined, ['id'])));
       box.bottom = runtime.toNullableNumber(callArg(args, namedArgs, 2, 'bottom', undefined, ['id', 'right']));
       box.barIndex = ctx.bar_index;
     });
@@ -818,23 +901,24 @@ export function registerBoxBuiltins(builtins: BuiltinRegistry, runtime: DrawingB
   });
   builtins.set('box.set_xloc', (args, namedArgs, ctx) => {
     withDrawing(callArg(args, namedArgs, 0, 'id'), ctx, 'box', runtime.isNa, (box) => {
-      box.left = runtime.toNullableNumber(callArg(args, namedArgs, 1, 'left', undefined, ['id']));
-      box.right = runtime.toNullableNumber(callArg(args, namedArgs, 2, 'right', undefined, ['id', 'left']));
-      box.xloc = runtime.toStringValue(callArg(args, namedArgs, 3, 'xloc', undefined, ['id', 'left', 'right']));
+      const xloc = runtime.toStringValue(callArg(args, namedArgs, 3, 'xloc', undefined, ['id', 'left', 'right']));
+      box.left = validateDrawingXCoordinate(ctx, xloc, runtime.toNullableNumber(callArg(args, namedArgs, 1, 'left', undefined, ['id'])));
+      box.right = validateDrawingXCoordinate(ctx, xloc, runtime.toNullableNumber(callArg(args, namedArgs, 2, 'right', undefined, ['id', 'left'])));
+      box.xloc = xloc;
       box.barIndex = ctx.bar_index;
     });
     return undefined;
   });
   builtins.set('box.set_top_left_point', (args, namedArgs, ctx) => {
     withDrawing(callArg(args, namedArgs, 0, 'id'), ctx, 'box', runtime.isNa, (box) => {
-      applyBoxPoint(box, callArg(args, namedArgs, 1, 'point', undefined, ['id']), 'topLeft');
+      applyBoxPoint(box, callArg(args, namedArgs, 1, 'point', undefined, ['id']), 'topLeft', ctx);
       box.barIndex = ctx.bar_index;
     });
     return undefined;
   });
   builtins.set('box.set_bottom_right_point', (args, namedArgs, ctx) => {
     withDrawing(callArg(args, namedArgs, 0, 'id'), ctx, 'box', runtime.isNa, (box) => {
-      applyBoxPoint(box, callArg(args, namedArgs, 1, 'point', undefined, ['id']), 'bottomRight');
+      applyBoxPoint(box, callArg(args, namedArgs, 1, 'point', undefined, ['id']), 'bottomRight', ctx);
       box.barIndex = ctx.bar_index;
     });
     return undefined;
@@ -853,7 +937,7 @@ export function registerBoxBuiltins(builtins: BuiltinRegistry, runtime: DrawingB
   });
   builtins.set('box.set_border_width', (args, namedArgs, ctx) => {
     withDrawing(callArg(args, namedArgs, 0, 'id'), ctx, 'box', runtime.isNa, (box) => {
-      box.borderWidth = runtime.toLineWidth(callArg(args, namedArgs, 1, 'width', undefined, ['id']));
+      box.borderWidth = runtime.toLineWidth(callArg(args, namedArgs, 1, 'width', undefined, ['id']), true);
     });
     return undefined;
   });
@@ -883,7 +967,7 @@ export function registerBoxBuiltins(builtins: BuiltinRegistry, runtime: DrawingB
   });
   builtins.set('box.set_text_size', (args, namedArgs, ctx) => {
     withDrawing(callArg(args, namedArgs, 0, 'id'), ctx, 'box', runtime.isNa, (box) => {
-      box.textSize = runtime.toStringValue(callArg(args, namedArgs, 1, 'size', undefined, ['id']));
+      box.textSize = runtime.toStringValue(callArg(args, namedArgs, 1, 'text_size', undefined, ['id']));
     });
     return undefined;
   });
@@ -918,19 +1002,20 @@ export function registerBoxBuiltins(builtins: BuiltinRegistry, runtime: DrawingB
     return undefined;
   });
 
-  builtins.set('box.get_left', (args, namedArgs, ctx) => getDrawingValue(callArg(args, namedArgs, 0, 'id'), ctx, 'box', runtime.isNa, (box) => box.left ?? Number.NaN));
-  builtins.set('box.get_right', (args, namedArgs, ctx) => getDrawingValue(callArg(args, namedArgs, 0, 'id'), ctx, 'box', runtime.isNa, (box) => box.right ?? Number.NaN));
-  builtins.set('box.get_top', (args, namedArgs, ctx) => getDrawingValue(callArg(args, namedArgs, 0, 'id'), ctx, 'box', runtime.isNa, (box) => box.top ?? Number.NaN));
-  builtins.set('box.get_bottom', (args, namedArgs, ctx) => getDrawingValue(callArg(args, namedArgs, 0, 'id'), ctx, 'box', runtime.isNa, (box) => box.bottom ?? Number.NaN));
-  builtins.set('box.get_bgcolor', (args, namedArgs, ctx) => getDrawingValue(callArg(args, namedArgs, 0, 'id'), ctx, 'box', runtime.isNa, (box) => box.bgcolor ?? Number.NaN));
-  builtins.set('box.get_border_color', (args, namedArgs, ctx) => getDrawingValue(callArg(args, namedArgs, 0, 'id'), ctx, 'box', runtime.isNa, (box) => box.borderColor ?? Number.NaN));
-  builtins.set('box.get_text', (args, namedArgs, ctx) => getDrawingValue(callArg(args, namedArgs, 0, 'id'), ctx, 'box', runtime.isNa, (box) => box.text));
-  builtins.set('box.get_text_halign', (args, namedArgs, ctx) => getDrawingValue(callArg(args, namedArgs, 0, 'id'), ctx, 'box', runtime.isNa, (box) => box.textHalign ?? 'center'));
-  builtins.set('box.get_text_valign', (args, namedArgs, ctx) => getDrawingValue(callArg(args, namedArgs, 0, 'id'), ctx, 'box', runtime.isNa, (box) => box.textValign ?? 'center'));
+  registerSingleDrawingGetter(builtins, 'box.get_left', (value, ctx) => getDrawingValue(value, ctx, 'box', runtime.isNa, boxLeft));
+  registerSingleDrawingGetter(builtins, 'box.get_right', (value, ctx) => getDrawingValue(value, ctx, 'box', runtime.isNa, boxRight));
+  registerSingleDrawingGetter(builtins, 'box.get_top', (value, ctx) => getDrawingValue(value, ctx, 'box', runtime.isNa, boxTop));
+  registerSingleDrawingGetter(builtins, 'box.get_bottom', (value, ctx) => getDrawingValue(value, ctx, 'box', runtime.isNa, boxBottom));
+  registerSingleDrawingGetter(builtins, 'box.get_bgcolor', (value, ctx) => getDrawingValue(value, ctx, 'box', runtime.isNa, boxBgcolor));
+  registerSingleDrawingGetter(builtins, 'box.get_border_color', (value, ctx) => getDrawingValue(value, ctx, 'box', runtime.isNa, boxBorderColor));
+  registerSingleDrawingGetter(builtins, 'box.get_text', (value, ctx) => getDrawingValue(value, ctx, 'box', runtime.isNa, boxText));
+  registerSingleDrawingGetter(builtins, 'box.get_text_halign', (value, ctx) => getDrawingValue(value, ctx, 'box', runtime.isNa, boxTextHalign));
+  registerSingleDrawingGetter(builtins, 'box.get_text_valign', (value, ctx) => getDrawingValue(value, ctx, 'box', runtime.isNa, boxTextValign));
   builtins.set('box.all', (_args, _namedArgs, ctx) => ctx.getDrawingIds('box'));
 }
 
-export function registerPolylineBuiltins(builtins: BuiltinRegistry, runtime: DrawingBuiltinRuntime): void {
+export function registerPolylineBuiltins(builtins: BuiltinRegistry, runtime: DrawingBuiltinRuntime, pineVersion = 6): void {
+  const defaultBlue = pineColorConstant('blue', pineVersion)!;
   const polylineNewArgs = [
     'points',
     'curved',
@@ -957,7 +1042,7 @@ export function registerPolylineBuiltins(builtins: BuiltinRegistry, runtime: Dra
       curved: Boolean(orderedCallArg(args, namedArgs, polylineNewArgs, 1, false)),
       closed: Boolean(orderedCallArg(args, namedArgs, polylineNewArgs, 2, false)),
       xloc: runtime.toStringValue(orderedCallArg(args, namedArgs, polylineNewArgs, 3, 'bar_index')),
-      lineColor: runtime.toNullableColor(orderedCallArg(args, namedArgs, polylineNewArgs, 4, PINE_COLOR_BLUE)),
+      lineColor: runtime.toNullableColor(orderedCallArg(args, namedArgs, polylineNewArgs, 4, defaultBlue)),
       fillColor: runtime.toNullableColor(orderedCallArg(args, namedArgs, polylineNewArgs, 5)),
       lineStyle: runtime.toStringValue(orderedCallArg(args, namedArgs, polylineNewArgs, 6, 'solid')),
       lineWidth: runtime.toLineWidth(orderedCallArg(args, namedArgs, polylineNewArgs, 7)),
@@ -985,7 +1070,7 @@ export function registerPolylineBuiltins(builtins: BuiltinRegistry, runtime: Dra
   builtins.set('polyline.all', (_args, _namedArgs, ctx) => ctx.getDrawingIds('polyline'));
 }
 
-export function registerTableBuiltins(builtins: BuiltinRegistry, runtime: DrawingBuiltinRuntime): void {
+export function registerTableBuiltins(builtins: BuiltinRegistry, runtime: DrawingBuiltinRuntime, pineVersion = 6): void {
   const tableNewArgs = [
     'position',
     'columns',
@@ -1009,9 +1094,9 @@ export function registerTableBuiltins(builtins: BuiltinRegistry, runtime: Drawin
     'text_valign',
     'text_size',
     'bgcolor',
+    'tooltip',
     'text_font_family',
     'text_formatting',
-    'tooltip',
   ] as const;
   const withTable = (value: unknown, ctx: ExecutionContext, fn: (table: TableDrawingOutput) => void): void => {
     withDrawing(value, ctx, 'table', runtime.isNa, fn);
@@ -1019,12 +1104,12 @@ export function registerTableBuiltins(builtins: BuiltinRegistry, runtime: Drawin
   const tableCellCapacity = (table: Pick<TableDrawingOutput, 'columns' | 'rows'>): number => table.columns * table.rows;
   const assertTableCellCapacity = (
     ctx: ExecutionContext,
-    table: Pick<TableDrawingOutput, 'columns' | 'rows'>,
+    table: Pick<TableDrawingOutput, 'columns' | 'rows' | 'position'>,
   ): void => {
     const nextCells = tableCellCapacity(table);
     const currentCells = ctx
       .getDrawings()
-      .filter((drawing): drawing is TableDrawingOutput => drawing.type === 'table')
+      .filter((drawing): drawing is TableDrawingOutput => drawing.type === 'table' && drawing.position !== table.position)
       .reduce((sum, drawing) => sum + tableCellCapacity(drawing), 0);
 
     if (nextCells + currentCells > MAX_TABLE_CELLS) {
@@ -1043,11 +1128,33 @@ export function registerTableBuiltins(builtins: BuiltinRegistry, runtime: Drawin
     textSize: 'normal',
     bgcolor: null,
   });
+  type TableCellIndex = {
+    cells: TableCellDrawingOutput[];
+    length: number;
+    positions: Map<number, number>;
+  };
+  const cellIndexes = new WeakMap<TableDrawingOutput, TableCellIndex>();
+  const cellIndex = (table: TableDrawingOutput): TableCellIndex => {
+    let state = cellIndexes.get(table);
+    if (!state || state.cells !== table.cells || state.length !== table.cells.length) {
+      const positions = new Map<number, number>();
+      table.cells.forEach((cell, index) => {
+        const key = cell.row * table.columns + cell.column;
+        if (!positions.has(key)) positions.set(key, index);
+      });
+      state = { cells: table.cells, length: table.cells.length, positions };
+      cellIndexes.set(table, state);
+    }
+    return state;
+  };
   const upsertCell = (table: TableDrawingOutput, cell: TableCellDrawingOutput): void => {
-    const key = tableCellKey(cell.column, cell.row);
-    const index = table.cells.findIndex((existing) => tableCellKey(existing.column, existing.row) === key);
-    if (index === -1) {
+    const state = cellIndex(table);
+    const key = cell.row * table.columns + cell.column;
+    const index = state.positions.get(key);
+    if (index === undefined) {
+      state.positions.set(key, table.cells.length);
       table.cells.push(cell);
+      state.length = table.cells.length;
     } else {
       table.cells[index] = cell;
     }
@@ -1059,6 +1166,12 @@ export function registerTableBuiltins(builtins: BuiltinRegistry, runtime: Drawin
   ): { column: number; row: number } => {
     const normalizedColumn = normalizeTableColumn(runtime, column);
     const normalizedRow = normalizeTableRow(runtime, row);
+    if (table.columns === 0) {
+      throw new PineRuntimeArgumentError(
+        `Column ${normalizedColumn} is out of table bounds, number of columns is 0.`,
+        'RE10039',
+      );
+    }
     if (
       !Number.isFinite(normalizedColumn)
       || !Number.isFinite(normalizedRow)
@@ -1097,11 +1210,17 @@ export function registerTableBuiltins(builtins: BuiltinRegistry, runtime: Drawin
     const start = normalizeCellCoordinates(table, startColumn, startRow);
     const end = normalizeCellCoordinates(table, endColumn, endRow);
 
+    if (start.column > end.column || start.row > end.row) {
+      throw new PineRuntimeArgumentError(
+        `Start cell in [${start.column}, ${start.row}] cannot be below or to the right of the end cell [${end.column}, ${end.row}].`,
+        'RE10127',
+      );
+    }
     return {
-      startColumn: Math.min(start.column, end.column),
-      startRow: Math.min(start.row, end.row),
-      endColumn: Math.max(start.column, end.column),
-      endRow: Math.max(start.row, end.row),
+      startColumn: start.column,
+      startRow: start.row,
+      endColumn: end.column,
+      endRow: end.row,
     };
   };
   const mergedCellRangesOverlap = (
@@ -1113,27 +1232,20 @@ export function registerTableBuiltins(builtins: BuiltinRegistry, runtime: Drawin
     && first.startRow <= second.endRow
     && first.endRow >= second.startRow
   );
-  const mergedCellRangesEqual = (
-    first: { startColumn: number; startRow: number; endColumn: number; endRow: number },
-    second: { startColumn: number; startRow: number; endColumn: number; endRow: number },
-  ): boolean => (
-    first.startColumn === second.startColumn
-    && first.startRow === second.startRow
-    && first.endColumn === second.endColumn
-    && first.endRow === second.endRow
-  );
 
   builtins.set('table.new', (args, namedArgs, ctx, _scope, callId) => {
     const id = `table_${callId}_${ctx.bar_index}`;
-    const columns = positiveInteger(runtime, orderedCallArg(args, namedArgs, tableNewArgs, 1), 1, 'table.new.columns-fallback');
-    const rows = positiveInteger(runtime, orderedCallArg(args, namedArgs, tableNewArgs, 2), 1, 'table.new.rows-fallback');
-    assertTableCellCapacity(ctx, { columns, rows });
+    const columns = tableDimension(runtime, orderedCallArg(args, namedArgs, tableNewArgs, 1), 'columns');
+    const rows = tableDimension(runtime, orderedCallArg(args, namedArgs, tableNewArgs, 2), 'rows');
+    const position = runtime.toStringValue(orderedCallArg(args, namedArgs, tableNewArgs, 0, 'top_right'));
+    assertTableCellCapacity(ctx, { columns, rows, position });
 
     const drawing: TableDrawingOutput = {
       id,
       type: 'table',
+      creationSite: callId,
       barIndex: ctx.bar_index,
-      position: runtime.toStringValue(orderedCallArg(args, namedArgs, tableNewArgs, 0, 'top_right')),
+      position,
       columns,
       rows,
       bgcolor: runtime.toNullableColor(orderedCallArg(args, namedArgs, tableNewArgs, 3)),
@@ -1146,16 +1258,21 @@ export function registerTableBuiltins(builtins: BuiltinRegistry, runtime: Drawin
     const forceOverlay = optionalBoolean(orderedCallArg(args, namedArgs, tableNewArgs, 8, false));
     if (forceOverlay !== undefined) drawing.forceOverlay = forceOverlay;
 
+    for (const previous of ctx.getDrawings()) {
+      if (previous.type === 'table' && previous.position === position) ctx.deleteDrawing(previous.id);
+    }
     ctx.addDrawing(drawing);
-    return id;
+    return ctx.getTableReference(id);
   });
+
+  builtins.set('__resolveTableReference', (args, _namedArgs, ctx) => ctx.resolveTableReference(args[0]));
 
   builtins.set('table.delete', (args, namedArgs, ctx) => {
     withTable(callArg(args, namedArgs, 0, 'table_id'), ctx, (table) => ctx.deleteDrawing(table.id));
     return undefined;
   });
 
-  builtins.set('table.all', (_args, _namedArgs, ctx) => ctx.getDrawingIds('table'));
+  builtins.set('table.all', (_args, _namedArgs, ctx) => ctx.getDrawingIds('table').map((id) => ctx.getTableReference(id)));
 
   builtins.set('table.clear', (args, namedArgs, ctx) => {
     withTable(callArg(args, namedArgs, 0, 'table_id'), ctx, (table) => {
@@ -1165,10 +1282,10 @@ export function registerTableBuiltins(builtins: BuiltinRegistry, runtime: Drawin
       const endRowArg = callArg(args, namedArgs, 4, 'end_row', undefined, ['table_id', 'start_column', 'start_row', 'end_column']);
       const endColumn = (namedArgs.has('end_column') || endColumnArg !== undefined)
         ? normalizeTableColumn(runtime, endColumnArg)
-        : table.columns - 1;
+        : startColumn;
       const endRow = (namedArgs.has('end_row') || endRowArg !== undefined)
         ? normalizeTableRow(runtime, endRowArg)
-        : table.rows - 1;
+        : startRow;
       table.cells = table.cells.filter((cell) => (
         cell.column < startColumn
         || cell.column > endColumn
@@ -1190,11 +1307,17 @@ export function registerTableBuiltins(builtins: BuiltinRegistry, runtime: Drawin
         callArg(args, namedArgs, 4, 'end_row', undefined, ['table_id', 'start_column', 'start_row', 'end_column']),
       );
       const overlappingRange = table.mergedCells?.find((mergedCell) => mergedCellRangesOverlap(mergedCell, range));
-      if (overlappingRange && !mergedCellRangesEqual(overlappingRange, range)) {
-        throw new Error(`Table merged cell range overlaps existing merged cells: columns ${range.startColumn}-${range.endColumn}, rows ${range.startRow}-${range.endRow}`);
-      }
       if (overlappingRange) {
-        return;
+        // Native v3 scalar-07 accepts identical repeated merges without a reset.
+        // Preserve the existing range rather than adding duplicate topology.
+        if (overlappingRange.startColumn === range.startColumn
+          && overlappingRange.startRow === range.startRow
+          && overlappingRange.endColumn === range.endColumn
+          && overlappingRange.endRow === range.endRow) {
+          delete overlappingRange.anchorRedefinedSinceMerge;
+          return;
+        }
+        throw new Error(`Table merged cell range overlaps existing merged cells: columns ${range.startColumn}-${range.endColumn}, rows ${range.startRow}-${range.endRow}`);
       }
       table.mergedCells = [...(table.mergedCells ?? []), range];
     });
@@ -1238,36 +1361,56 @@ export function registerTableBuiltins(builtins: BuiltinRegistry, runtime: Drawin
     return undefined;
   });
 
+  const tableCellDefaults: readonly unknown[] = [
+    undefined, undefined, undefined, '', undefined, undefined, PINE_COLOR_BLACK,
+    'center', 'center', 'normal', undefined, undefined, 'default', 'none',
+  ];
+
   builtins.set('table.cell', (args, namedArgs, ctx) => {
-    withTable(orderedCallArg(args, namedArgs, tableCellArgs, 0), ctx, (table) => {
-      const { column, row } = normalizeCellCoordinates(
-        table,
-        orderedCallArg(args, namedArgs, tableCellArgs, 1),
-        orderedCallArg(args, namedArgs, tableCellArgs, 2),
-      );
-      const textFontFamily = optionalString(runtime, orderedCallArg(args, namedArgs, tableCellArgs, 11, 'default'));
-      const textFormatting = optionalString(runtime, orderedCallArg(args, namedArgs, tableCellArgs, 12, 'none'));
-      const tooltip = runtime.toOptionalString(orderedCallArg(args, namedArgs, tableCellArgs, 13));
+    const values: unknown[] = [];
+    let positionalIndex = 0;
+    for (let index = 0; index < tableCellArgs.length; index += 1) {
+      const name = tableCellArgs[index];
+      if (namedArgs.has(name)) {
+        values.push(namedArgs.get(name));
+      } else {
+        const value = args[positionalIndex++];
+        values.push(value !== undefined ? value : tableCellDefaults[index]);
+      }
+    }
+    const argument = (index: number, fallback?: unknown): unknown =>
+      namedArgs.has(tableCellArgs[index]) || values[index] !== undefined ? values[index] : fallback;
+    withTable(argument(0), ctx, (table) => {
+      const rowValue = argument(2);
+      const rowArgument = pineVersionRules(pineVersion).normalizesNaTableCellRow && Number.isNaN(rowValue)
+        ? 0
+        : rowValue;
+      const { column, row } = normalizeCellCoordinates(table, argument(1), rowArgument);
+      const textFontFamily = optionalString(runtime, argument(12, 'default'));
+      const textFormatting = optionalString(runtime, argument(13, 'none'));
+      const tooltip = runtime.toOptionalString(argument(11));
       const cell: TableCellDrawingOutput = {
         column,
         row,
-        text: runtime.toStringValue(orderedCallArg(args, namedArgs, tableCellArgs, 3, '')),
-        width: namedArgs.has('width') || orderedCallArg(args, namedArgs, tableCellArgs, 4) !== undefined
-          ? runtime.toNullableNumber(orderedCallArg(args, namedArgs, tableCellArgs, 4))
-          : undefined,
-        height: namedArgs.has('height') || orderedCallArg(args, namedArgs, tableCellArgs, 5) !== undefined
-          ? runtime.toNullableNumber(orderedCallArg(args, namedArgs, tableCellArgs, 5))
-          : undefined,
-        textColor: runtime.toNullableColor(orderedCallArg(args, namedArgs, tableCellArgs, 6, PINE_COLOR_BLACK)),
-        textHalign: runtime.toStringValue(orderedCallArg(args, namedArgs, tableCellArgs, 7, 'center')),
-        textValign: runtime.toStringValue(orderedCallArg(args, namedArgs, tableCellArgs, 8, 'center')),
-        textSize: runtime.toStringValue(orderedCallArg(args, namedArgs, tableCellArgs, 9, 'normal')),
-        bgcolor: runtime.toNullableColor(orderedCallArg(args, namedArgs, tableCellArgs, 10)),
+        text: runtime.toStringValue(values[3]),
+        width: namedArgs.has('width') || values[4] !== undefined ? runtime.toNullableNumber(values[4]) : undefined,
+        height:
+          namedArgs.has('height') || values[5] !== undefined ? runtime.toNullableNumber(values[5]) : undefined,
+        textColor: runtime.toNullableColor(values[6]),
+        textHalign: runtime.toStringValue(values[7]),
+        textValign: runtime.toStringValue(values[8]),
+        textSize: runtime.toStringValue(values[9]),
+        bgcolor: runtime.toNullableColor(values[10]),
       };
       if (textFontFamily !== undefined) cell.textFontFamily = textFontFamily;
       if (textFormatting !== undefined) cell.textFormatting = textFormatting;
       if (tooltip !== undefined) cell.tooltip = tooltip;
       upsertCell(table, cell);
+      for (const range of table.mergedCells ?? []) {
+        if (range.startColumn === cell.column && range.startRow === cell.row) {
+          range.anchorRedefinedSinceMerge = true;
+        }
+      }
     });
     return undefined;
   });
@@ -1296,7 +1439,7 @@ export function registerTableBuiltins(builtins: BuiltinRegistry, runtime: Drawin
   builtins.set('table.cell_set_text_size', (args, namedArgs, ctx) => {
     withTable(callArg(args, namedArgs, 0, 'table_id'), ctx, (table) => {
       const cell = ensureCell(table, callArg(args, namedArgs, 1, 'column', undefined, ['table_id']), callArg(args, namedArgs, 2, 'row', undefined, ['table_id', 'column']));
-      cell.textSize = runtime.toStringValue(callArg(args, namedArgs, 3, 'text_size', undefined, ['table_id', 'column', 'row']));
+      cell.textSize = runtime.toStringValue(callArg(args, namedArgs, 3, 'text_size', 'normal', ['table_id', 'column', 'row']));
     });
     return undefined;
   });
@@ -1429,16 +1572,15 @@ export function registerDrawingConstants(builtins: BuiltinRegistry): void {
     };
   });
   builtins.set('chart.point.now', (args, namedArgs, ctx) => {
-    const price = callArg(args, namedArgs, 0, 'price');
+    const price = callArg(args, namedArgs, 0, 'price', ctx.close.get(0));
     const currentTime = ctx.time.get(0);
-    const closeValue = ctx.close.get(0);
     return {
       type: 'chart.point',
       time: typeof currentTime === 'number' && Number.isFinite(currentTime) ? currentTime : null,
       index: ctx.bar_index,
       price: typeof price === 'number' && Number.isFinite(price)
         ? price
-        : typeof closeValue === 'number' && Number.isFinite(closeValue) ? closeValue : null,
+        : null,
     };
   });
   builtins.set('chart.point.from_index', (args, namedArgs) => {
@@ -1447,7 +1589,7 @@ export function registerDrawingConstants(builtins: BuiltinRegistry): void {
     return {
       type: 'chart.point',
       time: null,
-      index: typeof index === 'number' && Number.isFinite(index) ? Math.trunc(index) : null,
+      index: typeof index === 'number' && Number.isFinite(index) ? index : null,
       price: typeof price === 'number' && Number.isFinite(price) ? price : null,
     };
   });

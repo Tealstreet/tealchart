@@ -1123,7 +1123,7 @@ export type Pivot
 export enum Direction
     up = "Up"
 //@variable defaultPrice Docs
-export float defaultPrice = 1.0
+export const float defaultPrice = 1.0
 //@strategy_alert_message fill
 export message() => "fill"
 `),
@@ -1145,7 +1145,7 @@ export spread(float highValue, float lowValue) =>
     result = highValue - lowValue
     result
 //@variable seed Default seed
-export float seed = 1.0
+export const float seed = 1.0
 `),
     notes: 'Pine doc annotations remain parser-level comments; this snippet keeps multiline function and exported variable forms covered.',
   },

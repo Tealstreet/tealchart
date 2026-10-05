@@ -454,7 +454,8 @@ pack(series float src, simple int length) =>
 [score, basis] = pack(close, len)
 dash = helper.Dashboard.new(score=score, title=helper.Regime.range.title())
 adjusted = dash.adjusted(basis, factor=0.25)
-previous = dash.score[1]
+dashScore = dash.score
+previous = dashScore[1]
 delta = dash.score - nz(previous, dash.score)
 var float persistent = na
 persistent := nz(persistent[1], adjusted)
@@ -563,7 +564,8 @@ formatRow(Row row, string suffix) =>
 remote = metaScore(sym, tf, close, len)
 local = helper.blockScore(close, 2, len)
 row = Row.new(value=remote, caption=helper.Regime.trend.title())
-prevRemote = row.value[1]
+rowValue = row.value
+prevRemote = rowValue[1]
 spread = row.value - nz(prevRemote, row.value)
 var table dash = table.new(position.top_left, 2, 3)
 var label note = na
@@ -614,7 +616,8 @@ if not na(remoteScore)
     cell.main := remoteScore
     cell.aux := remoteWeight
     cell.updates += 1
-delta = cell.main - nz(cell.main[1], cell.main)
+cellMain = cell.main
+delta = cell.main - nz(cellMain[1], cell.main)
 normalized = cell.aux == 0 ? na : cell.main / cell.aux
 var table dash = table.new(position.middle_right, 2, 3)
 var label tag = na
@@ -625,7 +628,7 @@ if show and barstate.islast
     table.cell(dash, 0, 1, "Updates")
     table.cell(dash, 1, 1, str.tostring(cell.updates))
     tag := label.new(bar_index, high, str.format("{0} {1:#.00} {2}", sym, delta, timeframe.period))
-    guide := line.new(bar_index - 1, nz(cell.main[1], cell.main), bar_index, cell.main, color=color.teal)
+    guide := line.new(bar_index - 1, nz(cellMain[1], cell.main), bar_index, cell.main, color=color.teal)
 basePlot = plot(show ? cell.main : na, "Loop Score", color=color.teal)
 normPlot = plot(show ? normalized : na, "Normalized", color=color.orange)
 fill(basePlot, normPlot, color=color.new(color.blue, 90), title="Loop Fill")
@@ -742,8 +745,9 @@ alertcondition(spread > 0, title="Object Spread", message="Imported object sprea
       'map.put(board, "score", bucket.score)',
       'map.put(board, "remote", bucket.remote)',
       'map.put(board, "spread", bucket.score - bucket.remote)',
-      'trendLine = bucket.score - nz(bucket.score[1], bucket.score)',
-      'lineStart = nz(bucket.score[20], bucket.score)',
+      'bucketScore = bucket.score',
+      'trendLine = bucket.score - nz(bucketScore[1], bucket.score)',
+      'lineStart = nz(bucketScore[20], bucket.score)',
       'state = helper.Dashboard.new(score=bucket.score, title=helper.Regime.trend.title())',
       'adjusted = state.adjusted(bucket.remote, factor=0.25)',
       'fastPlot = plot(bucket.score, "Confluence Score", color=color.teal, linewidth=2)',
@@ -950,8 +954,8 @@ alertcondition(spread > 0, title="Object Spread", message="Imported object sprea
       '    float val = na',
       '    varip int updates = 0',
       'bucketScore(series float src, simple int len) =>',
-      '    range = ta.highest(high, len) - ta.lowest(low, len)',
-      '    range == 0 ? 0 : volume / range',
+      '    priceRange = ta.highest(high, len) - ta.lowest(low, len)',
+      '    priceRange == 0 ? 0 : volume / priceRange',
       'lowerPack(simple string sym, simple string tf, series float src) =>',
       '    request.security_lower_tf(sym, tf, bucketScore(src, bucketLen0))',
       'lowerValues = lowerPack(profileSymbol, profileTf, close)',
@@ -1141,8 +1145,10 @@ alertcondition(spread > 0, title="Object Spread", message="Imported object sprea
       'map.put(board, "remote", state.remote)',
       'map.put(board, "spread", state.spread)',
       'map.put(board, "history", historyAvg)',
-      'histFast = nz(state.score[5], state.score)',
-      'histSlow = nz(state.remote[13], state.remote)',
+      'stateScore = state.score',
+      'stateRemote = state.remote',
+      'histFast = nz(stateScore[5], state.score)',
+      'histSlow = nz(stateRemote[13], state.remote)',
       'dashboard = helper.Dashboard.new(score=state.score, title=helper.Regime.trend.title())',
       'adjusted = dashboard.adjusted(state.remote, factor=0.5)',
       'scorePlot = plot(map.get(board, "score"), "True MTF Score", color=color.teal, linewidth=2)',
@@ -1405,9 +1411,9 @@ remote =
            src,
            a),
   lookahead=barmerge.lookahead_on)
-gate =
+gate = (
     (remote > src and timeframe.isintraday and session.ismarket) or
-    (remote < src and not session.ispostmarket and chart.right_visible_bar_time >= time)
+    (remote < src and not session.ispostmarket and chart.right_visible_bar_time >= time))
 score = gate ? remote > src ? 2 : -2 : na(remote) ? 0 : remote - src
 plot(score, "Awkward Request Score")
 plot(remote, "Awkward Remote")
@@ -1543,10 +1549,10 @@ left = helper.Dashboard.new(score=close, title="left")
 right = helper.Dashboard.new(score=open, title="right")
 remoteA = request.security(symbol, tf, helper.blockScore(close, 2, 3), lookahead=barmerge.lookahead_on)
 remoteB = request.security("NASDAQ:MSFT", "15", helper.smooth(close, 3), lookahead=barmerge.lookahead_on)
-condition =
+condition = (
     (left.adjusted(remoteA, factor=0.5) > right.adjusted(remoteB, factor=0.25)) and
     (timeframe.in_seconds(tf) >= timeframe.in_seconds()) and
-    (str.length(helper.Regime.trend.title()) > str.length(helper.Regime.range.title()) or session.ismarket)
+    (str.length(helper.Regime.trend.title()) > str.length(helper.Regime.range.title()) or session.ismarket))
 score = condition ? remoteA - remoteB : remoteB - remoteA
 plot(score, "Awkward Imported Score")
 plot(left.adjusted(score, factor=0.1), "Awkward Imported Adjusted")

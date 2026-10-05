@@ -755,6 +755,34 @@ describe('getVisiblePlotRange', () => {
     expect(result).toEqual({ min: 20, max: 25 });
   });
 
+  it.each(['plotbar', 'plotcandle'] as const)(
+    'preserves the pre-raw %s range while incomplete bars remain invisible',
+    (type) => {
+      const bars = makeBars(4);
+      const raw = makePlot('ohlc', [96, null, null, 111], {
+        type,
+        openValues: [114, null, 102, 109],
+        highValues: [101, 10000, null, 114],
+        lowValues: [107, -10000, -5000, 106],
+        closeValues: [96, 102, 109, 111],
+      });
+      // The previous producer normalized complete quartets and erased every
+      // field of an incomplete quartet before pane scaling.
+      const previous = {
+        ...raw,
+        openValues: [114, null, null, 109],
+        highValues: [114, null, null, 114],
+        lowValues: [96, null, null, 106],
+        closeValues: [96, null, null, 111],
+      };
+      const range = (plot: PlotOutput) => getVisiblePlotRange([plot], ['ohlc'], bars, bars[0].time, bars[3].time, 0);
+      expect(range(previous)).toEqual({ min: 96, max: 114 });
+      expect(range(raw)).toEqual(range(previous));
+      expect(raw.highValues).toEqual([101, 10000, null, 114]);
+      expect(raw.lowValues).toEqual([107, -10000, -5000, 106]);
+    },
+  );
+
   it('includes hline and style histbase values that are part of the visible pane scale', () => {
     const bars = makeBars(3, { startTime: 1_000_000, interval: 60_000 });
     const columns = makePlot('ind', [10, 20, 30], { style: 'columns', histbase: -50 });

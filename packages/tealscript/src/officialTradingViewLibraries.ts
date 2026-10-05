@@ -816,35 +816,25 @@ export ulcerIndex(source, length) =>
     math.sqrt(math.sum(drawdown * drawdown, len) / len)
 `;
 
-const TRADINGVIEW_TA_V14_SOURCE = `${TRADINGVIEW_TA_V12_SOURCE}
-
-export allTimeHigh(src) =>
-    na
-
-export allTimeLow(src) =>
-    na
-
-export trima2(src, length) =>
-    trima(src, _safeLen(length))
-`;
-
 const TRADINGVIEW_TA_V1_PROGRAM = parse(TRADINGVIEW_TA_V1_SOURCE, {
   grammarSource: TRADINGVIEW_TA_DOCS_URL,
 });
 
-// v4 is the v3 export surface; its release note only changes aroon's calculation.
-const TRADINGVIEW_TA_V4_SOURCE = `${TRADINGVIEW_TA_V7_SOURCE.replace(
-  /^export (atr2|changePercent|highestSince|lowestSince|relativeVolume|rma2|supertrend2|vStop2)\(/gm,
-  '/* v7-only */ $1(',
-)}
+const TRADINGVIEW_TA_V4_SOURCE = `${TRADINGVIEW_TA_V7_SOURCE}
+
+export allTimeHigh(src = high) =>
+    var float highest = na
+    highest := na(highest) ? src : math.max(highest, src)
+    highest
+
+export allTimeLow(src = low) =>
+    var float lowest = na
+    lowest := na(lowest) ? src : math.min(lowest, src)
+    lowest
 
 export trima2(src, length) =>
     trima(src, _safeLen(length))
 `;
-
-const TRADINGVIEW_TA_V4_PROGRAM = parse(TRADINGVIEW_TA_V4_SOURCE, {
-  grammarSource: TRADINGVIEW_TA_DOCS_URL,
-});
 
 const TRADINGVIEW_TA_V7_PROGRAM = parse(TRADINGVIEW_TA_V7_SOURCE, {
   grammarSource: TRADINGVIEW_TA_DOCS_URL,
@@ -855,10 +845,6 @@ const TRADINGVIEW_TA_V9_PROGRAM = parse(TRADINGVIEW_TA_V9_SOURCE, {
 });
 
 const TRADINGVIEW_TA_V12_PROGRAM = parse(TRADINGVIEW_TA_V12_SOURCE, {
-  grammarSource: TRADINGVIEW_TA_DOCS_URL,
-});
-
-const TRADINGVIEW_TA_V14_PROGRAM = parse(TRADINGVIEW_TA_V14_SOURCE, {
   grammarSource: TRADINGVIEW_TA_DOCS_URL,
 });
 
@@ -1039,7 +1025,7 @@ const TRADINGVIEW_TA_V7_FUNCTIONS: OfficialTradingViewLibraryFunction[] = [
 ];
 
 const TRADINGVIEW_TA_V4_FUNCTION_NAMES = new Set([
-  'cagr', 'aroon', 'coppock', 'dema', 'dema2', 'dm', 'donchian', 'ema2', 'eom',
+  'allTimeHigh', 'allTimeLow', 'cagr', 'aroon', 'coppock', 'dema', 'dema2', 'dm', 'donchian', 'ema2', 'eom',
   'frama', 'ft', 'ht', 'ichimoku', 'ift', 'kvo', 'pzo', 'rms', 'rwi', 'stc',
   'stochFull', 'stochRsi', 'supertrend', 'szo', 't3', 't3Alt', 'tema', 'tema2',
   'trima', 'trima2', 'trix', 'uo', 'vhf', 'vi', 'vzo', 'williamsFractal', 'wpo',
@@ -1047,7 +1033,20 @@ const TRADINGVIEW_TA_V4_FUNCTION_NAMES = new Set([
 
 const TRADINGVIEW_TA_V4_FUNCTIONS = TRADINGVIEW_TA_V7_FUNCTIONS
   .filter(({ name }) => TRADINGVIEW_TA_V4_FUNCTION_NAMES.has(name))
-  .concat([taFunction('trima2', ['src', 'length'], 2, 2)]);
+  .concat([
+    taFunction('allTimeHigh', ['src'], 0, 1),
+    taFunction('allTimeLow', ['src'], 0, 1),
+    taFunction('trima2', ['src', 'length'], 2, 2),
+  ]);
+
+const TRADINGVIEW_TA_V4_PROGRAM = parse(TRADINGVIEW_TA_V4_SOURCE, {
+  grammarSource: TRADINGVIEW_TA_DOCS_URL,
+});
+for (const statement of TRADINGVIEW_TA_V4_PROGRAM.body) {
+  if (statement.type === 'FunctionDeclaration') {
+    statement.exported = TRADINGVIEW_TA_V4_FUNCTION_NAMES.has(statement.name.name);
+  }
+}
 
 const TRADINGVIEW_TA_V8_ADDITIONS: OfficialTradingViewLibraryFunction[] = [
   taFunction('requestUpAndDownVolume', ['lowerTimeframe'], 1, 1, 'tuple', undefined, 3),
@@ -1067,12 +1066,6 @@ const TRADINGVIEW_TA_V12_ADDITIONS: OfficialTradingViewLibraryFunction[] = [
   taFunction('ulcerIndex', ['source', 'length'], 2, 2),
 ];
 
-const TRADINGVIEW_TA_V14_ADDITIONS: OfficialTradingViewLibraryFunction[] = [
-  taFunction('allTimeHigh', ['src'], 1, 1, 'float', 'TradingView.ta.allTimeHigh'),
-  taFunction('allTimeLow', ['src'], 1, 1, 'float', 'TradingView.ta.allTimeLow'),
-  taFunction('trima2', ['src', 'length'], 2, 2),
-];
-
 const TRADINGVIEW_TA_SUPPORTED_VERSIONS = new Set(['1', '4', '7', '8', '9', '10', '12', '14']);
 
 function tradingViewTaFunctions(version: '1' | '4' | '7' | '8' | '9' | '10' | '12' | '14'): Map<string, OfficialTradingViewLibraryFunction> {
@@ -1082,9 +1075,7 @@ function tradingViewTaFunctions(version: '1' | '4' | '7' | '8' | '9' | '10' | '1
     ? TRADINGVIEW_TA_V4_FUNCTIONS
     : version === '7'
     ? TRADINGVIEW_TA_V7_FUNCTIONS
-    : version === '14'
-      ? [...TRADINGVIEW_TA_V7_FUNCTIONS, ...TRADINGVIEW_TA_V8_ADDITIONS, ...TRADINGVIEW_TA_V12_ADDITIONS, ...TRADINGVIEW_TA_V14_ADDITIONS]
-      : version === '12'
+    : version === '12' || version === '14'
         ? [...TRADINGVIEW_TA_V7_FUNCTIONS, ...TRADINGVIEW_TA_V8_ADDITIONS, ...TRADINGVIEW_TA_V12_ADDITIONS]
       : [...TRADINGVIEW_TA_V7_FUNCTIONS, ...TRADINGVIEW_TA_V8_ADDITIONS];
   const result = new Map(functions.map((fn) => [fn.name, fn]));
@@ -1171,10 +1162,8 @@ export function getOfficialTradingViewLibrary(path: string): OfficialTradingView
         ? TRADINGVIEW_TA_V7_PROGRAM
         : version === '10'
         ? TRADINGVIEW_TA_V10_PROGRAM
-        : version === '12'
+        : version === '12' || version === '14'
           ? TRADINGVIEW_TA_V12_PROGRAM
-        : version === '14'
-          ? TRADINGVIEW_TA_V14_PROGRAM
           : TRADINGVIEW_TA_V9_PROGRAM,
     };
   }

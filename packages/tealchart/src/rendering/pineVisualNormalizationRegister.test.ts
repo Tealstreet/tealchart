@@ -5,6 +5,7 @@ import { getPineVisualNormalizationEntry, PINE_VISUAL_NORMALIZATION_REGISTER } f
 describe('Pine visual normalization register', () => {
   it('keeps trace-undetermined tealchart renderer normalizations inventoried', () => {
     expect(PINE_VISUAL_NORMALIZATION_REGISTER.map((entry) => entry.id)).toEqual([
+      'tealchart.curved-polyline-spline-kernel',
       'tealchart.label-price-coordinate-clamp',
       'tealchart.area-fill-alpha-normalization',
       'tealchart.plotarrow-height-floor',

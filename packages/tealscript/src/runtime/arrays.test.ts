@@ -11,6 +11,8 @@ import {
   copyArray,
   covarianceArrayValue,
   createPineArray,
+  createReadOnlyPineArray,
+  type PineArray,
   firstArrayValue,
   getArraySize,
   getArrayValue,
@@ -45,8 +47,63 @@ import {
   varianceArrayValue,
 } from './arrays';
 import { createPineUdtObject } from './objects';
+import { Scope } from './scope';
 
 describe('PineArray', () => {
+  it('does not find numeric or reference NA in owning arrays and slices', () => {
+    const array = createPineArray(3, Number.NaN);
+    expect(includesArrayValue(array, Number.NaN)).toBe(false);
+    expect(includesArrayValue(sliceArray(array, 0, 2), Number.NaN)).toBe(false);
+  });
+
+  it('preserves finite equality, signed zero and reference identity in includes', () => {
+    const object = { field: 3 };
+    const array = createPineArray<unknown>();
+    array.values = [7, -0, object, '7'];
+    expect(includesArrayValue(array, 7)).toBe(true);
+    expect(includesArrayValue(array, 0)).toBe(true);
+    expect(includesArrayValue(array, object)).toBe(true);
+    expect(includesArrayValue(array, { field: 3 })).toBe(false);
+    expect(includesArrayValue(array, 8)).toBe(false);
+    expect(includesArrayValue(sliceArray(array, 1, 3), object)).toBe(true);
+    expect(includesArrayValue(sliceArray(array, 1, 3), 7)).toBe(false);
+  });
+
+  it.each([
+    ['indexof', indexOfArrayValue, 0],
+    ['lastindexof', lastIndexOfArrayValue, 9_999],
+    ['includes', includesArrayValue, true],
+  ] as const)('%s stops reading a large owning array at the first search hit', (_name, search, expected) => {
+    const array = createPineArray(10_000, 7);
+    let reads = 0;
+    array.values = new Proxy(array.values, {
+      get(target, property, receiver) {
+        if (typeof property === 'string' && /^\d+$/.test(property)) reads++;
+        return Reflect.get(target, property, receiver);
+      },
+    });
+
+    expect(search(array, 7)).toBe(expected);
+    // A market-profile price lookup must not visit/copy every price level
+    // before searching. Count reads instead of relying on wall-clock timing.
+    expect(reads).toBe(1);
+  });
+
+  it('keeps searches relative to a live slice and detects invalidated bounds', () => {
+    const array = createPineArray<number>();
+    array.values = [7, 2, 7, 3, 7];
+    const slice = sliceArray(array, 1, 4);
+    expect(indexOfArrayValue(slice, 7)).toBe(1);
+    expect(lastIndexOfArrayValue(slice, 7)).toBe(1);
+    expect(includesArrayValue(slice, 3)).toBe(true);
+    setArrayValue(array, 2, 9);
+    expect(indexOfArrayValue(slice, 7)).toBe(-1);
+    expect(includesArrayValue(slice, 9)).toBe(true);
+    popArrayValue(array);
+    popArrayValue(array);
+    expect(() => indexOfArrayValue(slice, 9)).toThrow('Slice is out of bounds of the parent array');
+  });
+
   it('creates mutable arrays with an initial size and value', () => {
     const array = createPineArray(3, 7);
 
@@ -316,7 +373,7 @@ describe('PineArray', () => {
     removeArrayValue(array, 0);
 
     expect(() => getArraySize(slice)).toThrow('Slice is out of bounds of the parent array');
-    expect(getArraySize(sliceArray(array, 2, 2))).toBe(0);
+    expect(() => sliceArray(array, 2, 2)).toThrow("Index 'from' should be less than index 'to'");
     expect(() => sliceArray(array, 3, 2)).toThrow("Index 'from' should be less than index 'to'");
     expect(() => sliceArray(array, Number.NaN, 3)).toThrow('Slice indices must be finite numbers');
   });
@@ -377,7 +434,7 @@ describe('PineArray', () => {
     const one = createPineArray<number>();
     pushArrayValue(one, 1);
 
-    expect(covarianceArrayValue(empty, one)).toBeNaN();
+    expect(covarianceArrayValue(empty, empty)).toBeNaN();
     expect(covarianceArrayValue(one, one, false)).toBeNaN();
   });
 
@@ -396,11 +453,11 @@ describe('PineArray', () => {
 
     expect(percentileNearestRankArrayValue(array, 50)).toBe(2);
     expect(percentileLinearInterpolationArrayValue(array, 50)).toBe(2.5);
-    expect(percentRankArrayValue(array, 2)).toBe(75);
-    expect(percentRankArrayValue(array, 4.0)).toBe(100);
+    expect(percentRankArrayValue(array, 2)).toBe(66.66666666666667);
+    expect(percentRankArrayValue(array, 3)).toBe(100);
     const sparse = createPineArray<number>();
     [1, 2, 4, 7].forEach((value) => pushArrayValue(sparse, value));
-    expect(percentRankArrayValue(sparse, 4.0)).toBe(75);
+    expect(percentRankArrayValue(sparse, 2)).toBe(66.66666666666667);
     expect(standardizeArrayValue(array).values).toEqual([
       -1.3416407864998738,
       -0.4472135954999579,
@@ -434,4 +491,20 @@ describe('PineArray', () => {
     expect(binarySearchLeftmostArrayValue(array, 4, 'score')).toBe(1);
     expect(binarySearchRightmostArrayValue(array, 4, 'score')).toBe(2);
   });
+});
+
+it('preserves read-only arrays in scope snapshots while explicit copies remain editable', () => {
+  const scope = new Scope();
+  scope.declare('ids', 'var', createReadOnlyPineArray(['oldest', 'newest']));
+  const snapshot = scope.snapshot();
+  const saved = snapshot.variables.get('ids')?.value as PineArray;
+  expect(() => clearArray(saved)).toThrow('Array is read-only');
+  expect(saved.values).toEqual(['oldest', 'newest']);
+  scope.restore(snapshot);
+  const restored = scope.get('ids') as PineArray;
+  expect(() => clearArray(restored)).toThrow('Array is read-only');
+  const editable = copyArray(restored);
+  clearArray(editable);
+  expect(editable.values).toEqual([]);
+  expect(restored.values).toEqual(['oldest', 'newest']);
 });

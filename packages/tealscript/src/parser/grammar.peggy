@@ -98,6 +98,13 @@
     const previousLineIsAssignment = startsWithAssignmentStatement(previousLine);
     const previousLineIsBlockHeader = /^(if|else\s+if|for|while|switch)\b/.test(previousLine);
     const previousLineIsSwitchAssignment = previousLineIsAssignment && /\bswitch\b/.test(previousLine);
+    // A signed case on the next line starts a new arm, rather than adding
+    // its key to the preceding arm's result. Ignore arrows in strings/comments.
+    const nextLineEnd = input.indexOf('\n', offset);
+    const nextLine = input.slice(offset, nextLineEnd === -1 ? input.length : nextLineEnd)
+      .replace(/"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|\/\*.*?\*\//g, '')
+      .split('//')[0];
+    const nextLineIsSignedSwitchCase = /^[+-].*=>/.test(nextLine);
     const beforeOperator = input.slice(0, start);
     const openDelimiters = [...beforeOperator].reduce((depth, char) => {
       if (char === '(' || char === '[' || char === '{') return depth + 1;
@@ -106,7 +113,7 @@
     }, 0);
     return (input[offset] === '-' || input[offset] === '+') &&
       openDelimiters === 0 &&
-      (previousLineIsBlockHeader || previousLineIsSwitchAssignment || (nextIndentation <= previousIndentation && previousLineIsAssignment));
+      (nextLineIsSignedSwitchCase || previousLineIsBlockHeader || previousLineIsSwitchAssignment || (nextIndentation <= previousIndentation && previousLineIsAssignment));
   }
 
   function startsWithAssignmentStatement(line) {
@@ -211,9 +218,7 @@ StatementList
 // ============================================================================
 
 Statement
-  = IndicatorDeclaration
-  / LibraryDeclaration
-  / ImportDeclaration
+  = GlobalDeclarationStatement
   / TypeDeclaration
   / EnumDeclaration
   / MethodDeclaration
@@ -234,9 +239,25 @@ EmptyStatement
   = LineTerminator { return null; }
   / Comment { return null; }
 
+GlobalDeclarationStatement
+  = head:(IndicatorDeclaration / LibraryDeclaration / ImportDeclaration) tail:(GlobalBeforeComma "," CommaContinuationSpace GlobalChainedStatement)* _ LineTerminator? {
+      return tail.length ? buildStatementChain(head, tail) : head;
+    }
+
+GlobalChainedStatement
+  = IndicatorDeclaration
+  / LibraryDeclaration
+  / ImportDeclaration
+  / ChainedStatement
+
+// Keep wrapped leading commas confined to global declaration chains.
+GlobalBeforeComma
+  = BeforeComma
+  / &(_ LineTerminator BlankLine* ContinuationLeadingSpace ",") _ LineTerminator BlankLine* ContinuationLeadingSpace
+
 // indicator("title", ...) / strategy("title", ...) / legacy study("title", ...)
 IndicatorDeclaration
-  = declarationKind:("indicator" / "strategy" / "study") _ "(" __ args:ArgumentList __ ")" _ LineTerminator? {
+  = declarationKind:("indicator" / "strategy" / "study") _ "(" __ args:ArgumentList __ ")" _ {
       const result = {
         type: 'IndicatorDeclaration',
         declarationKind: declarationKind === 'study' ? 'indicator' : declarationKind,
@@ -304,7 +325,7 @@ IndicatorDeclaration
 
 // library("title", ...)
 LibraryDeclaration
-  = "library" !IdentifierPart _ "(" __ args:ArgumentList __ ")" _ LineTerminator? {
+  = "library" !IdentifierPart _ "(" __ args:ArgumentList __ ")" _ {
       const result = {
         type: 'LibraryDeclaration',
         loc: loc()
@@ -326,7 +347,7 @@ LibraryDeclaration
     }
 
 ImportDeclaration
-  = "import" !IdentifierPart _ importPath:ImportPath _ "as" !IdentifierPart _ alias:Identifier _ LineTerminator? {
+  = "import" !IdentifierPart _ importPath:ImportPath _ "as" !IdentifierPart _ alias:Identifier _ {
       return {
         type: 'ImportDeclaration',
         path: importPath.path,
@@ -337,7 +358,7 @@ ImportDeclaration
         loc: loc()
       };
     }
-  / "import" !IdentifierPart _ importPath:ImportPath _ LineTerminator? {
+  / "import" !IdentifierPart _ importPath:ImportPath _ {
       const alias = { type: 'Identifier', name: importPath.library, loc: loc() };
       return {
         type: 'ImportDeclaration',
@@ -522,6 +543,16 @@ FunctionDeclaration
         name,
         params: params || [],
         body: [body],
+        exported: !!exported,
+        loc: loc()
+      };
+    }
+  / exported:("export" !IdentifierPart _)? name:Identifier _ "(" __ params:ParameterList? __ ")" _ "=>" _ head:SingleAssignment tail:(BeforeComma "," CommaContinuationSpace FunctionChainedStatement)* _ LineTerminator? {
+      return {
+        type: 'FunctionDeclaration',
+        name,
+        params: params || [],
+        body: [head, ...tail.map(item => item[3])].flatMap(flattenTransientStatement),
         exported: !!exported,
         loc: loc()
       };
@@ -3070,6 +3101,9 @@ SwitchConsequentExpression
   / statement:SingleAssignment {
       return [statement];
     }
+  / statement:(TypedChainedVariableDeclaration / UntypedChainedVariableDeclaration) {
+      return [statement];
+    }
   / head:Expression tail:(BeforeComma "," CommaContinuationSpace Expression)* {
       if (tail.length === 0) return head;
       return [head, ...tail.map(t => t[3])].map(expression => ({
@@ -3260,7 +3294,7 @@ LambdaParams
 PrimaryExpression
   = LambdaExpression
   / opens:("(" __)+ inner:Identifier closes:(")" _)+ &{ return opens.length === closes.length; } { return inner; }
-  / "(" __ expr:Expression __ ")" { return expr; }
+  / "(" __ expr:Expression __ ")" { return expr.type === "BinaryExpression" ? { ...expr, parenthesized: true } : expr; }
   / ArrayLiteral
   / NaFunctionIdentifier
   / NaLiteral
@@ -3322,6 +3356,15 @@ StringLiteral
         loc: loc()
       };
     }
+  / "'''" chars:TripleSingleStringChar* "'''" {
+      const value = chars.join('');
+      return {
+        type: 'StringLiteral',
+        value,
+        raw: "'''" + value + "'''",
+        loc: loc()
+      };
+    }
   / '"' chars:DoubleStringChar* '"' {
       return {
         type: 'StringLiteral',
@@ -3338,6 +3381,9 @@ StringLiteral
         loc: loc()
       };
     }
+
+TripleSingleStringChar
+  = !("'''") . { return text(); }
 
 TripleDoubleStringChar
   = !("\"\"\"") . { return text(); }
@@ -3362,8 +3408,7 @@ EscapeSequence
   / char:. { return '\\' + char; }
 
 NumberLiteral
-  = Float
-  / Integer
+  = literal:(Float / Integer) !IdentifierPart { return literal; }
 
 Float
   = value:$([0-9]+ "." [0-9]* / "." [0-9]+) exp:$([eE] [+-]? [0-9]+)? {
@@ -3505,7 +3550,7 @@ InitializerSpace
   / _
 
 DeclarationEqualsSpace
-  = &( _ LineTerminator ContinuationLeadingSpace "=") _ LineTerminator ContinuationLeadingSpace _
+  = &( _ LineTerminator BlankLine* ContinuationLeadingSpace "=") _ LineTerminator BlankLine* ContinuationLeadingSpace _
   / _
 
 AssignEquals

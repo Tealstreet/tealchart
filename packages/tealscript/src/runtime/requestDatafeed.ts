@@ -184,6 +184,8 @@ export interface RequestSeriesSuccess {
 
 export type RequestSeriesResult = RequestSeriesSuccess | RequestDatafeedFailure;
 
+export class FinancialSymbolResolutionError extends Error {}
+
 export interface RequestDatafeed {
   getBars(query: RequestDatafeedQuery): RequestDatafeedResult;
   getSeries?(query: RequestSeriesQuery): RequestSeriesResult;
@@ -351,6 +353,7 @@ export class CacheBackedRequestDatafeed implements RequestDatafeed {
 
   getFinancialMetric(query: RequestFinancialMetricQuery): RequestSeriesPoint | undefined {
     const entry = this.entries.get(workerRequestDataCacheKey('financial', query));
+    if (entry?.error?.code === 'invalid_symbol') throw new FinancialSymbolResolutionError(entry.error.message);
     if (!entry || entry.error || entry.value === null) return undefined;
     const point = selectPoint(entry.value, query.time);
     return point === undefined ? undefined : { ...point };

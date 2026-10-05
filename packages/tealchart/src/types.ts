@@ -131,6 +131,8 @@ export interface RenderOptions {
   crosshairColor: string;
   showVolume: boolean;
   showIndicatorOutputAxisLabels: boolean;
+  /** Mirrors scalesProperties.showStudyPlotLabels. */
+  showIndicatorOutputAxisLabelTitles?: boolean;
   volumeHeight: number; // Percentage of chart height for volume (0-1)
   devicePixelRatio: number;
   candleSpacing: number; // Gap between candles in pixels
@@ -432,6 +434,7 @@ export interface ChartOverrides {
   'paneProperties.horzGridProperties.color'?: string;
   // Scale properties
   'scalesProperties.textColor'?: string;
+  'scalesProperties.showStudyPlotLabels'?: boolean;
   // Crosshair properties
   'paneProperties.crossHairProperties.color'?: string;
   // Volume properties.
@@ -468,18 +471,18 @@ export type ChartPropertyKey =
   | 'paneProperties.vertGridProperties.color'
   | 'paneProperties.horzGridProperties.color'
   | 'paneProperties.crossHairProperties.color'
-  | 'scalesProperties.textColor';
+  | 'scalesProperties.textColor'
+  | 'scalesProperties.showStudyPlotLabels';
 
 /**
  * Sparse map of persisted chart properties. Only values the user actually
  * changed are stored, so defaults stay free to evolve.
  *
- * Values are strings because every supported path is currently a color. Widen
- * this and `sanitizeChartProperties` together when the first numeric or boolean
- * property lands — allowing a type the sanitizer strips would let a value save
- * and then silently vanish on reload.
+ * Color paths store strings; the study-name-label path stores a boolean.
  */
-export type ChartProperties = Partial<Record<ChartPropertyKey, string>>;
+export type ChartProperties = {
+  [K in ChartPropertyKey]?: K extends 'scalesProperties.showStudyPlotLabels' ? boolean : string;
+};
 
 /**
  * TradingView property objects carried through untouched from an imported layout.
@@ -553,6 +556,7 @@ export const DEFAULT_RENDER_OPTIONS: RenderOptions = {
   crosshairColor: '#71757a',
   showVolume: true,
   showIndicatorOutputAxisLabels: true,
+  showIndicatorOutputAxisLabelTitles: false,
   volumeHeight: 0.2,
   devicePixelRatio: 1,
   candleSpacing: 2,
@@ -1166,6 +1170,8 @@ export interface TealchartWidgetOptions {
   chartKey?: string;
   /** Whether to show the built-in top bar with timeframe selector (default: true) */
   showTopBar?: boolean;
+  /** Enable the expandable indicator Data Window (default: false). */
+  showDataWindow?: boolean;
   /** Called when the built-in top bar symbol control is clicked. */
   onSymbolClick?: () => void;
   /**
