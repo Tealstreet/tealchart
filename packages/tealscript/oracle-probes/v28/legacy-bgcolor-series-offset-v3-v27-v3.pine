@@ -1,0 +1,13 @@
+//@version=3
+study("Legacy bgcolor offset v3 v27 v3", overlay=false)
+sourceCode = n % 11 + 1
+dynamicOffset = n % 5 - 2
+plot(n % 55, title="SOURCE_INDEX_MOD55", transp=100)
+plot(sourceCode, title="SOURCE_CODE", transp=100)
+plot(dynamicOffset, title="DYNAMIC_OFFSET", transp=100)
+shade = n % 3 == 0 ? red : n % 3 == 1 ? blue : green
+plot(n % 3, title="SHADE_CODE", transp=100)
+bgcolor(shade, transp=65, offset=dynamicOffset)
+plot(sourceCode + 20, title="ZERO_ANCHOR", color=black, style=circles, linewidth=2, offset=0)
+plot(sourceCode + 40, title="PLUS2_CONTROL", color=black, style=circles, linewidth=2, offset=2)
+plot(sourceCode + 60, title="MINUS2_CONTROL", color=black, style=circles, linewidth=2, offset=-2)

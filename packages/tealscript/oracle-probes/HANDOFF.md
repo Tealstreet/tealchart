@@ -78,6 +78,10 @@
 > dynamic/string/history defaults, TA-hole recovery. Run each separately; follow each instructions file.
 > Reply under `v27/captures/v27/` with a versioned RESPONSE document.
 
+> **Then round v28.** After v27, do [`v28/HANDOFF-v28-v1.md`](v28/HANDOFF-v28-v1.md) — 12 probes (114 columns, 22 ledger
+> ranks): batched numeric/TA state holes, legacy-version member isolation, sort/percentile/covariance.
+> Run each separately; follow each instructions file. Reply under `v28/captures/v28/`.
+
 Agent exchange: [capture response v1](RESPONSE-v1.md). The next reply belongs in
 `RESPONSE-v2.md` beside this handoff; commit responses so both machines can read them.
 

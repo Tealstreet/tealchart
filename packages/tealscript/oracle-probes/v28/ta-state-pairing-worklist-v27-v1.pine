@@ -1,0 +1,88 @@
+//@version=6
+indicator("V27 TA state and pairing discriminators CNF v1")
+pearson(array<float> xs, array<float> ys) =>
+    float result = na
+    if array.size(xs) == 5 and array.size(ys) == 5
+        sx = 0.0
+        sy = 0.0
+        sxx = 0.0
+        syy = 0.0
+        sxy = 0.0
+        for i = 0 to 4
+            x = array.get(xs, i)
+            y = array.get(ys, i)
+            sx += x
+            sy += y
+            sxx += x * x
+            syy += y * y
+            sxy += x * y
+        vx = 5 * sxx - sx * sx
+        vy = 5 * syy - sy * sy
+        result := vx > 0 and vy > 0 ? (5 * sxy - sx * sy) / math.sqrt(vx * vy) : na
+    result
+phase = bar_index % 64
+base = 20.0 + (bar_index * 7) % 23
+hole = phase < 12 or phase == 18 or (phase >= 24 and phase <= 33) or (phase >= 40 and phase <= 47 and phase % 2 == 0)
+src = hole ? na : base
+plot(bar_index, "ChartBarIndex", display=display.data_window)
+plot(phase, "Phase", display=display.data_window)
+rsi = ta.rsi(src, 5)
+rawChange = src - src[1]
+var float lastDefined = na
+bridgeChange = na(src) or na(lastDefined) ? na : src - lastDefined
+if not na(src)
+    lastDefined := src
+rawUp = ta.rma(math.max(rawChange, 0.0), 5)
+rawDown = ta.rma(-math.min(rawChange, 0.0), 5)
+bridgeUp = ta.rma(math.max(bridgeChange, 0.0), 5)
+bridgeDown = ta.rma(-math.min(bridgeChange, 0.0), 5)
+rawRsi = rawDown == 0 ? (rawUp == 0 ? na : 100.0) : 100.0 - 100.0 / (1.0 + rawUp / rawDown)
+bridgeRsi = bridgeDown == 0 ? (bridgeUp == 0 ? na : 100.0) : 100.0 - 100.0 / (1.0 + bridgeUp / bridgeDown)
+rsiMask = (na(rsi) ? 1 : 0) + (na(rawRsi) ? 2 : 0) + (na(bridgeRsi) ? 4 : 0) + (not na(rsi) and not na(rawRsi) and math.abs(rsi - rawRsi) <= 1e-8 ? 8 : 0) + (not na(rsi) and not na(bridgeRsi) and math.abs(rsi - bridgeRsi) <= 1e-8 ? 16 : 0)
+plot(rsi, "R442_RSI_LeadLongAlternatingHoldReset", display=display.data_window)
+plot(rsiMask, "R444_RSI_RawPreviousVsLastDefined", display=display.data_window)
+plot(rawRsi, "Control_RawRSI", display=display.data_window)
+plot(bridgeRsi, "Control_BridgedRSI", display=display.data_window)
+yHole = phase < 12 or phase == 19 or (phase >= 26 and phase <= 35) or (phase >= 40 and phase <= 47 and phase % 2 == 1)
+y = yHole ? na : 30.0 + (bar_index * 13) % 29
+var pairX = array.new<float>(0)
+var pairY = array.new<float>(0)
+var independentX = array.new<float>(0)
+var independentY = array.new<float>(0)
+var physicalX = array.new<float>(0)
+var physicalY = array.new<float>(0)
+if not na(src) and not na(y)
+    array.push(pairX, src)
+    array.push(pairY, y)
+    if array.size(pairX) > 5
+        array.shift(pairX)
+        array.shift(pairY)
+if not na(src)
+    array.push(independentX, src)
+    if array.size(independentX) > 5
+        array.shift(independentX)
+if not na(y)
+    array.push(independentY, y)
+    if array.size(independentY) > 5
+        array.shift(independentY)
+array.push(physicalX, src)
+array.push(physicalY, y)
+if array.size(physicalX) > 5
+    array.shift(physicalX)
+    array.shift(physicalY)
+paired = pearson(pairX, pairY)
+independent = pearson(independentX, independentY)
+physical = pearson(physicalX, physicalY)
+correlation = ta.correlation(src, y, 5)
+pairMask = (na(correlation) ? 1 : 0) + (na(paired) ? 2 : 0) + (na(independent) ? 4 : 0) + (na(physical) ? 8 : 0) + (not na(correlation) and not na(paired) and math.abs(correlation - paired) <= 1e-8 ? 16 : 0) + (not na(correlation) and not na(independent) and math.abs(correlation - independent) <= 1e-8 ? 32 : 0) + (not na(correlation) and not na(physical) and math.abs(correlation - physical) <= 1e-8 ? 64 : 0)
+plot(correlation, "R925_Correlation_LongAsymmetricRecovery", display=display.data_window)
+plot(pairMask, "R926_Correlation_PairedIndependentPhysical", display=display.data_window)
+plot(paired, "Control_PairedRows", display=display.data_window)
+plot(independent, "Control_IndependentCompression", display=display.data_window)
+plot(physical, "Control_PhysicalRows", display=display.data_window)
+negative = bar_index < 12 or (phase >= 24 and phase <= 33) ? na : -10.0 - (bar_index * 3) % 17
+positive = bar_index < 12 or (phase >= 24 and phase <= 33) ? na : 10.0 + (bar_index * 3) % 17
+plot(ta.max(negative), "R1477_Max_LeadingNA_NegativeVsZeroSeed", display=display.data_window)
+plot(ta.min(positive), "R1547_Min_LeadingNA_PositiveVsZeroSeed", display=display.data_window)
+rciSource = phase >= 48 and phase <= 55 ? 5.0 : src
+plot(ta.rci(rciSource, 5), "R1548_RCI_MissingSlotsTiesRecovery", display=display.data_window)

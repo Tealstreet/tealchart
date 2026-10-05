@@ -1,0 +1,11 @@
+//@version=3
+study("Legacy plotshape offset v3 v27 v3", overlay=false)
+sourceCode = n % 11 + 1
+dynamicOffset = n % 5 - 2
+plot(n % 55, title="SOURCE_INDEX_MOD55", transp=100)
+plot(sourceCode, title="SOURCE_CODE", transp=100)
+plot(dynamicOffset, title="DYNAMIC_OFFSET", transp=100)
+plotshape(sourceCode, title="DYNAMIC_TARGET", style=shape.triangleup, location=location.absolute, color=red, offset=dynamicOffset, size=size.small)
+plotshape(sourceCode + 20, title="ZERO_ANCHOR", style=shape.circle, location=location.absolute, color=blue, offset=0, size=size.small)
+plotshape(sourceCode + 40, title="PLUS2_CONTROL", style=shape.circle, location=location.absolute, color=green, offset=2, size=size.small)
+plotshape(sourceCode + 60, title="MINUS2_CONTROL", style=shape.circle, location=location.absolute, color=purple, offset=-2, size=size.small)

@@ -1,0 +1,9 @@
+//@version=6
+indicator("array-percentile_nearest_rank-negative-after20-bbi-v1")
+a = array.from(1.0, 4.0, 6.0, 9.0)
+float percentage = bar_index < 20 ? 50.0 : -1.0
+plot(bar_index, "BAR_INDEX")
+plot(percentage, "PERCENTAGE")
+plot(array.percentile_nearest_rank(a, 0), "ZERO_CONTROL")
+plot(array.percentile_nearest_rank(a, 100), "HUNDRED_CONTROL")
+plot(array.percentile_nearest_rank(a, percentage), "DYNAMIC_NEGATIVE_TARGET")
