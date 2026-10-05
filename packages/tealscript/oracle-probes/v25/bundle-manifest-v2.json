@@ -1,0 +1,227 @@
+{
+  "schemaVersion": 1,
+  "bundle": "v25",
+  "version": 2,
+  "status": "OPEN",
+  "frozen": false,
+  "scripts": [
+    {
+      "probe": "dynamic-optimizer-first-live-omitted-v6-v1.pine",
+      "path": "dynamic-optimizer-first-live-omitted-v6-v1.pine",
+      "owner": "codex-6y3sjh",
+      "sourceSha256": "d2e8c659801c3ad3f80b2dc181de32f9917271d3e2d7ad3c06c075ed12e047f3",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "compile-outcome+runtime-outcome+raw-csv+context+snapshot",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "columns": [
+        "ChartBarIndex",
+        "ChartHistory",
+        "ChartRealtime",
+        "RequestedClose"
+      ],
+      "question": "Does a fixed global request on the first realtime-only execution trigger a historical-preload refusal in omitted,true,false dynamic modes?",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC",
+        "requiredMarketState": "ACTIVE-REALTIME",
+        "requestedSymbol": "NASDAQ:MSFT",
+        "requestedTimeframe": "1D"
+      },
+      "instructions": [
+        "Do not edit source. Record compile/runtime phase,code/text,line/bar and screenshot. If runs export all4 columns. Establish whether a historical execution occurred before realtime; if so this run does not settle first-realtime-only behavior. Compare three separate sources on same chart/context."
+      ],
+      "instructionsPath": "instructions/dynamic-optimizer-first-live-omitted-v6-v1.md",
+      "instructionsSha256": "072212ff33df05ed24ddc9ba7c8f38b22f125375083b24cbf8b458ccd6a5c03b",
+      "ledgerRanks": [
+        1909
+      ],
+      "authority": [
+        "https://www.tradingview.com/pine-script-docs/migration-guides/to-pine-version-6/#dynamic-requests"
+      ],
+      "limits": "No optimizer/performance credit; native must certify first execution without historical request access. Historical preload makes this discriminator inconclusive."
+    },
+    {
+      "probe": "dynamic-optimizer-first-live-true-v6-v1.pine",
+      "path": "dynamic-optimizer-first-live-true-v6-v1.pine",
+      "owner": "codex-6y3sjh",
+      "sourceSha256": "7433dd38b820ce2f495823c71849baef64c217cb4ed286cd0656f26d05d29a9e",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "compile-outcome+runtime-outcome+raw-csv+context+snapshot",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "columns": [
+        "ChartBarIndex",
+        "ChartHistory",
+        "ChartRealtime",
+        "RequestedClose"
+      ],
+      "question": "Does a fixed global request on the first realtime-only execution trigger a historical-preload refusal in omitted,true,false dynamic modes?",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC",
+        "requiredMarketState": "ACTIVE-REALTIME",
+        "requestedSymbol": "NASDAQ:MSFT",
+        "requestedTimeframe": "1D"
+      },
+      "instructions": [
+        "Do not edit source. Record compile/runtime phase,code/text,line/bar and screenshot. If runs export all4 columns. Establish whether a historical execution occurred before realtime; if so this run does not settle first-realtime-only behavior. Compare three separate sources on same chart/context."
+      ],
+      "instructionsPath": "instructions/dynamic-optimizer-first-live-true-v6-v1.md",
+      "instructionsSha256": "b88ca67a3b340c827cb9f3d047cc4a315dec9f42d123a9d3a1b587a779cc40ef",
+      "ledgerRanks": [
+        1909
+      ],
+      "authority": [
+        "https://www.tradingview.com/pine-script-docs/migration-guides/to-pine-version-6/#dynamic-requests"
+      ],
+      "limits": "No optimizer/performance credit; native must certify first execution without historical request access. Historical preload makes this discriminator inconclusive."
+    },
+    {
+      "probe": "dynamic-optimizer-first-live-false-v6-v1.pine",
+      "path": "dynamic-optimizer-first-live-false-v6-v1.pine",
+      "owner": "codex-6y3sjh",
+      "sourceSha256": "f19335f5c6400d39679341d0d1c674dcf44d8fbe81f9eb5f92039e36f0ed671c",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "compile-outcome+runtime-outcome+raw-csv+context+snapshot",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "columns": [
+        "ChartBarIndex",
+        "ChartHistory",
+        "ChartRealtime",
+        "RequestedClose"
+      ],
+      "question": "Does a fixed global request on the first realtime-only execution trigger a historical-preload refusal in omitted,true,false dynamic modes?",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC",
+        "requiredMarketState": "ACTIVE-REALTIME",
+        "requestedSymbol": "NASDAQ:MSFT",
+        "requestedTimeframe": "1D"
+      },
+      "instructions": [
+        "Do not edit source. Record compile/runtime phase,code/text,line/bar and screenshot. If runs export all4 columns. Establish whether a historical execution occurred before realtime; if so this run does not settle first-realtime-only behavior. Compare three separate sources on same chart/context."
+      ],
+      "instructionsPath": "instructions/dynamic-optimizer-first-live-false-v6-v1.md",
+      "instructionsSha256": "00cdfb344a7974871b3362cefc36dbcfcb5fd72c8dddbac4efd4bc49a59cba8c",
+      "ledgerRanks": [
+        1909
+      ],
+      "authority": [
+        "https://www.tradingview.com/pine-script-docs/migration-guides/to-pine-version-6/#dynamic-requests"
+      ],
+      "limits": "No optimizer/performance credit; native must certify first execution without historical request access. Historical preload makes this discriminator inconclusive."
+    },
+    {
+      "probe": "matrix-inv-singular-v25-v1.pine",
+      "path": "matrix-inv-singular-v25-v1.pine",
+      "owner": "codex-w8oe9i",
+      "sourceSha256": "1ec60cc8bf9b1aba082ece1271196e77dbf8c8009c3d97e1d92a6c09eb0a40ef",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "compile-runtime-outcome+raw-csv+context",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "columns": [
+        "MATRIX_NA",
+        "INV_00"
+      ],
+      "question": "For singular [[1,2],[2,4]], does matrix.inv return a na matrix, a value matrix, or an executed runtime refusal? Preserve full error and bar identity.",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC"
+      },
+      "instructionsPath": "instructions/matrix-inv-singular-v25-v1.md",
+      "instructionsSha256": "667fa9578c16d5b9d3467620ec9505cb0087a398fbf4562a6bf9f3e701a19d48",
+      "instructions": [
+        "For singular [[1,2],[2,4]], does matrix.inv return a na matrix, a value matrix, or an executed runtime refusal? Preserve full error and bar identity.",
+        "Run separately, unchanged. Preserve all native phases and diagnostics; see exact per-probe instructions."
+      ]
+    },
+    {
+      "probe": "matrix-inv-int-values-v25-v1.pine",
+      "path": "matrix-inv-int-values-v25-v1.pine",
+      "owner": "codex-w8oe9i",
+      "sourceSha256": "c2a43efae01b25c61c4258033408135eb7a1b3e7880b1d2947ed8599bc143557",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "compile-runtime-outcome+raw-csv+context",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "columns": [
+        "FUNCTION_00",
+        "FUNCTION_01",
+        "FUNCTION_10",
+        "FUNCTION_11",
+        "METHOD_00",
+        "METHOD_01",
+        "METHOD_10",
+        "METHOD_11"
+      ],
+      "question": "For an int matrix [[1,2],[3,4]], export all inverse cells for namespace and method. Preserve fractional outputs if any; no return-type assumption from numeric values alone.",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC"
+      },
+      "instructionsPath": "instructions/matrix-inv-int-values-v25-v1.md",
+      "instructionsSha256": "d950b5bef1e327588554655b4dbca0d3c5693521fe477c2f0b911866810b9c69",
+      "instructions": [
+        "For an int matrix [[1,2],[3,4]], export all inverse cells for namespace and method. Preserve fractional outputs if any; no return-type assumption from numeric values alone.",
+        "Run separately, unchanged. Preserve all native phases and diagnostics; see exact per-probe instructions."
+      ]
+    },
+    {
+      "probe": "matrix-inv-int-target-v25-v1.pine",
+      "path": "matrix-inv-int-target-v25-v1.pine",
+      "owner": "codex-w8oe9i",
+      "sourceSha256": "443f4ee447488e66b8965f7ba99e4976021a5bc63ca3c2473f148f94d21b0861",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "compile-runtime-outcome+raw-csv+context",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "columns": [
+        "INT_TARGET_10"
+      ],
+      "question": "Does explicit matrix<int> assignment of matrix.inv(int matrix) compile? If it runs export the fractional-location value. This independently tests selected return-type acceptance without hiding the untyped value capture.",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC"
+      },
+      "instructionsPath": "instructions/matrix-inv-int-target-v25-v1.md",
+      "instructionsSha256": "242e5e7741f5ad092095faec02d9751a1a6da4e5b681686d2b112030af16b9b3",
+      "instructions": [
+        "Does explicit matrix<int> assignment of matrix.inv(int matrix) compile? If it runs export the fractional-location value. This independently tests selected return-type acceptance without hiding the untyped value capture.",
+        "Run separately, unchanged. Preserve all native phases and diagnostics; see exact per-probe instructions."
+      ]
+    }
+  ]
+}

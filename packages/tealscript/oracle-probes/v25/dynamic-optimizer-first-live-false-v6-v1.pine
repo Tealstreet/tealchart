@@ -1,0 +1,6 @@
+//@version=6
+indicator("1909 first live false", calc_bars_count=1, dynamic_requests=false)
+plot(bar_index, "ChartBarIndex")
+plot(barstate.ishistory ? 1 : 0, "ChartHistory")
+plot(barstate.isrealtime ? 1 : 0, "ChartRealtime")
+plot(request.security("NASDAQ:MSFT", "1D", close), "RequestedClose")

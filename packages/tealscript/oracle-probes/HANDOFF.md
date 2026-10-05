@@ -63,6 +63,11 @@
 > overload selection with a const argument (const vs simple+series, const-only, series-only control).
 > Run each overload script separately. Reply at `v24/captures/v24/RESPONSE-v24.md`.
 
+> **Then round v25.** After v24, do [`v25/HANDOFF-v25-v1.md`](v25/HANDOFF-v25-v1.md) — 6 probes: first realtime
+> execution of a fixed `request.security` with `dynamic_requests` omitted/true/false (needs a genuinely
+> realtime first execution; record ChartHistory/ChartRealtime), and `matrix.inv` on a singular int matrix,
+> int-matrix inverse values, and a `matrix<int>` target. Reply at `v25/captures/v25/RESPONSE-v25.md`.
+
 Agent exchange: [capture response v1](RESPONSE-v1.md). The next reply belongs in
 `RESPONSE-v2.md` beside this handoff; commit responses so both machines can read them.
 

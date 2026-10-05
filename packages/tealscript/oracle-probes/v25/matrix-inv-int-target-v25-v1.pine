@@ -1,0 +1,9 @@
+//@version=6
+indicator("matrix-inv-int-target-v25-v1", precision=16)
+m = matrix.new<int>(2, 2, 0)
+matrix.set(m, 0, 0, 1)
+matrix.set(m, 0, 1, 2)
+matrix.set(m, 1, 0, 3)
+matrix.set(m, 1, 1, 4)
+matrix<int> b = matrix.inv(m)
+plot(matrix.get(b, 1, 0), "INT_TARGET_10")
