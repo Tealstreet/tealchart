@@ -1,0 +1,7 @@
+//@version=6
+indicator("V33 isolated component")
+plot(bar_index, "INDEX")
+import TradingView/ta/7 as tvta
+[up, down] = tvta.aroon(3)
+plot(up, "VALUE_1")
+plot(down, "VALUE_2")

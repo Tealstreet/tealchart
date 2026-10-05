@@ -1,0 +1,15 @@
+//@version=6
+indicator("V33 isolated component")
+v33_close = switch bar_index
+    0 => 0.0
+    1 => 0.0
+    2 => 0.0
+    3 => 0.0
+    4 => 0.0
+    5 => 0.0
+    6 => 0.0
+    7 => 0.0
+    => float(na)
+plot(v33_close, "SRC_CLOSE")
+plot(bar_index, "INDEX")
+plot(ta.rsi(v33_close, 3), "VALUE_1")

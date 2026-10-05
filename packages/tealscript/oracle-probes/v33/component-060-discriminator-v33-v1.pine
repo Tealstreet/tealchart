@@ -1,0 +1,19 @@
+//@version=6
+indicator("V33 isolated component")
+v33_low = switch bar_index
+    0 => -1.0
+    1 => -3.0
+    2 => -1.0
+    3 => 1.0
+    4 => -2.0
+    5 => float(na)
+    6 => -1.0
+    7 => -4.0
+    8 => 0.0
+    9 => -1.0
+    10 => -3.0
+    11 => 1.0
+    => float(na)
+plot(v33_low, "SRC_LOW")
+plot(bar_index, "INDEX")
+plot(ta.lowest(v33_low, 3), "VALUE_1")

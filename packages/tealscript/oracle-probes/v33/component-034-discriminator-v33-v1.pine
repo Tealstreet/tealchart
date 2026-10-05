@@ -1,0 +1,4 @@
+//@version=6
+indicator("V33 isolated component")
+plot(bar_index, "INDEX")
+plot(ta.atr(3), "VALUE_1")

@@ -1,0 +1,19 @@
+//@version=6
+indicator("V33 isolated component")
+v33_close = switch bar_index
+    0 => 0.0
+    1 => -2.0
+    2 => 0.0
+    3 => 2.0
+    4 => -1.0
+    5 => float(na)
+    6 => 0.0
+    7 => -3.0
+    8 => 1.0
+    9 => 0.0
+    10 => -2.0
+    11 => 2.0
+    => float(na)
+plot(v33_close, "SRC_CLOSE")
+plot(bar_index, "INDEX")
+plot(ta.percentile_linear_interpolation(v33_close, 3, 50), "VALUE_1")

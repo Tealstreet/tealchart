@@ -1,0 +1,20 @@
+//@version=6
+indicator("V33 isolated component")
+v33_close = switch bar_index
+    0 => 11.0
+    1 => 12.0
+    2 => 13.0
+    3 => 14.0
+    4 => 15.0
+    5 => 16.0
+    => float(na)
+plot(v33_close, "SRC_CLOSE")
+plot(bar_index, "INDEX")
+offGapsOff = request.security(syminfo.tickerid, "D", v33_close, gaps=barmerge.gaps_off, lookahead=barmerge.lookahead_off)
+offGapsOn = request.security(syminfo.tickerid, "D", v33_close, gaps=barmerge.gaps_on, lookahead=barmerge.lookahead_off)
+onGapsOff = request.security(syminfo.tickerid, "D", v33_close, gaps=barmerge.gaps_off, lookahead=barmerge.lookahead_on)
+onGapsOn = request.security(syminfo.tickerid, "D", v33_close, gaps=barmerge.gaps_on, lookahead=barmerge.lookahead_on)
+plot(offGapsOff, "VALUE_1")
+plot(offGapsOn, "VALUE_2")
+plot(onGapsOff, "VALUE_3")
+plot(onGapsOn, "VALUE_4")

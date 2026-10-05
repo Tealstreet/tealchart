@@ -105,6 +105,12 @@
 > masks and exact refusal text and site. Keep changed-context attempts separate. Fourteen extension candidates are
 > excluded. Reply under `v32/captures/v32/`.
 
+> **Then round v33.** After v32, do [`v33/HANDOFF-v33-v1.md`](v33/HANDOFF-v33-v1.md) — 83 isolated sources, captured
+> individually in `bundle-manifest-v2.json` order with each literal instruction file, source bytes and defaults kept.
+> Return source-hash-bound CSV, exact refusal text/code/site/bar and requested screenshots. Native outcomes are
+> unspecified; keep unavailable history/provider/input and insufficient precision as UNOBSERVED. Chart proxies cannot
+> close synthetic implicit-input facets or the PVT bar-6 question. Reply under `v33/captures/v33/`.
+
 Agent exchange: [capture response v1](RESPONSE-v1.md). The next reply belongs in
 `RESPONSE-v2.md` beside this handoff; commit responses so both machines can read them.
 
