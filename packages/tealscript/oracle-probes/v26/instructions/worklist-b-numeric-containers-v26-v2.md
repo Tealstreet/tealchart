@@ -1,0 +1,14 @@
+# Numeric-container capture instructions v1
+
+Run the exact v2 source unchanged on any standard candle chart with at least24 historical bars (BINANCE:BTCUSDT2min suggested). All inputs are deterministic; no provider or realtime dependency. Export all9 data-window columns, including Phase. Capture source SHA, compile/runtime phase, complete error text/code/line/bar, inputs/context and screenshot. Native phase and values are UNSPECIFIED; local preflight is not native authority.
+
+Column decoders and competing outcomes:
+
+- R1217:100*namespace_allNA_size+10*method_allNA_size+namespace_empty_size. Phase%4 selects sizes0/1/2/5. This separates empty outputs, input-length outputs and namespace/method divergence; it does not inspect elements in a returned all-NA array.
+- R1218:1000000*output_size+1000*NA_position_bitmask+finite_count. Phase%3 rotates input finite indices{0,3,5},{1,2,4},{0,1,2}. Retained positions would encode6022003/6041003/6056003; compact three finite slots3000003; six propagated NA6063000; empty0. These are competing decoded hypotheses, not expected native answers. No z-score divisor/arithmetic claim.
+- R1429:bits1/2/4 are namespace row-only/column-only/negative double-stochastic results; bits8/16/32 corresponding methods. Row-only acceptance yields9, column-only18, either27; acceptance of negative doubly normalized input adds36. Any other mask is retained as observed.
+- R1468:bits1/2/4/8/16 mean zero/binary/identity/symmetric/antisymmetric. Phase deltas are0,1e-12,1e-11,9.999e-11,1e-10,1.0001e-10,1e-9,1e-8,-1e-12,-1e-10,-1.0001e-10,-1e-9. Perturbations near2 undergo actual Pine floating arithmetic; do not assume their represented difference equals the literal delta. Exact/inclusive/exclusive/wider/narrower predicate rules produce different masks. This is not a universal tolerance proof.
+- R1136/R1140:float namespace/method search on sorted[2,2,2,7,9]. Phase queries1.99999999999,2,2.00000000001,6.99999999999,7,7.00000000001,9,9.00000000001,-1,10,4.5,8.5. Distinguishes duplicate left/right/interior matches and raw vs tolerant near-boundary matches. Gap queries discriminate insertion neighbor vs floor/ceiling/clamp/not-found.
+- R1137/R1141:int namespace/method on the same sorted values; phase queries-1,2,3,6,7,8,9,10,0,1,4,5. Preserve below/above endpoint values even when they are0 or array.size; do not infer array.get admissibility from returned search indices.
+
+Rightmost captures observe outputs only: comparison sequence, halving and complexity remain uncertified. Prior shipped sources are retained as authority constraints; this source adds the near-key float sweep, typed receiver comparison and rotated NA layouts. No unsafe get or throwing bounds test is mixed into this batch. If any native call refuses, preserve the full failure and do not treat hidden subsequent plots as NA values.

@@ -1,0 +1,70 @@
+//@version=6
+indicator("V26 extrema hole span D v1", precision=10, max_bars_back=64)
+phase = bar_index % 32
+source = phase < 4 ? na : phase == 4 ? 100.0 : phase == 5 ? 20.0 : phase == 6 ? 30.0 : phase == 9 ? 40.0 : phase == 14 or phase == 15 or phase == 17 ? 10.0 : phase == 18 ? 90.0 : phase == 20 ? 15.0 : phase == 7 or phase == 8 or phase >= 10 and phase <= 13 or phase == 16 or phase == 19 ? na : float(phase)
+float allMissing = na
+float fixedMax = na
+float validMax = na
+int fixedAge = na
+int validAge = na
+int oldestTieAge = na
+float fixedMin = na
+float validMin = na
+int fixedLowAge = na
+int validLowAge = na
+int oldestLowTieAge = na
+int validCount = 0
+for age = 0 to 31
+    value = source[age]
+    if not na(value)
+        if age < 3 and (na(fixedMax) or value > fixedMax)
+            fixedMax := value
+            fixedAge := -age
+        if age < 3 and (na(fixedMin) or value < fixedMin)
+            fixedMin := value
+            fixedLowAge := -age
+        if validCount < 3
+            if na(validMax) or value > validMax
+                validMax := value
+                validAge := -age
+                oldestTieAge := -age
+            else if value == validMax
+                oldestTieAge := -age
+            if na(validMin) or value < validMin
+                validMin := value
+                validLowAge := -age
+                oldestLowTieAge := -age
+            else if value == validMin
+                oldestLowTieAge := -age
+            validCount += 1
+highest = ta.highest(source, 3)
+highAge = ta.highestbars(source, 3)
+lowAge = ta.lowestbars(source, 3)
+plot(float(bar_index), "INPUT_BAR_INDEX")
+plot(float(phase), "INPUT_PHASE32")
+plot(source, "INPUT_SOURCE")
+plot(na(source) ? 1 : 0, "INPUT_SOURCE_NA")
+plot(highest, "R296_HIGHEST_hole_NA_vs_hold_vs_recalc")
+plot(na(highest) ? 1 : 0, "R296_HIGHEST_result_NA")
+plot(ta.highest(allMissing, 3), "R296_ALL_NA_seed_NA_vs_zero")
+plot(na(ta.highest(allMissing, 3)) ? 1 : 0, "R296_ALL_NA_mask")
+plot(highest, "R297_ACTUAL_fixed3_vs_valid3_span")
+plot(fixedMax, "R297_MODEL_fixed3bars")
+plot(validMax, "R297_MODEL_last3valid")
+plot(highAge, "R840_HIGHESTBARS_hole_age_or_NA")
+plot(na(highAge) ? 1 : 0, "R840_HIGHESTBARS_NA_mask")
+plot(ta.highestbars(allMissing, 3), "R840_ALL_NA_age_or_NA")
+plot(highAge, "R841_ACTUAL_physical_vs_compacted_age")
+plot(float(fixedAge), "R841_MODEL_fixed3_physical_age")
+plot(float(validAge), "R841_MODEL_valid3_newest_tie_age")
+plot(float(oldestTieAge), "R841_MODEL_valid3_oldest_tie_age")
+plot(lowAge, "R850_LOWESTBARS_fixed_vs_valid_tie_span")
+plot(float(fixedLowAge), "R850_MODEL_fixed3_physical_age")
+plot(float(validLowAge), "R850_MODEL_valid3_newest_tie_age")
+plot(float(oldestLowTieAge), "R850_MODEL_valid3_oldest_tie_age")
+plot(ta.lowestbars(allMissing, 3), "R850_ALL_NA_age_or_NA")
+plot(ta.lowestbars(-source, 3), "R850_NEGATED_SOURCE_high_age_symmetry")
+plot(na(lowAge) ? 1 : 0, "R850_LOWESTBARS_NA_mask")
+plot(ta.highest(float(phase), 3), "R297_CLEAN_CONTROL_highest3")
+plot(ta.highestbars(float(phase), 3), "R841_CLEAN_CONTROL_highage3")
+plot(ta.lowestbars(float(phase), 3), "R850_CLEAN_CONTROL_lowage3")

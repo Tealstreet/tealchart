@@ -1,0 +1,58 @@
+//@version=6
+indicator("V26 direction hole recovery D v1", precision=10, max_bars_back=64)
+phase = bar_index % 32
+source = phase < 3 ? na : phase <= 6 ? float(phase + 7) : phase >= 7 and phase <= 10 ? na : phase == 11 ? 13.0 : phase == 12 ? 12.0 : phase == 13 ? 13.0 : phase == 14 or phase == 15 ? 14.0 : phase == 16 ? na : phase >= 17 and phase <= 20 ? float(phase - 2) : phase >= 21 and phase <= 25 ? float(39 - phase) : phase >= 26 and phase <= 29 ? na : 11.0
+var int risingHold = 0
+var int fallingHold = 0
+var int risingReset = 0
+var int fallingReset = 0
+var int risingBridge = 0
+var int fallingBridge = 0
+var float priorValid = na
+pairValid = not na(source) and not na(source[1])
+if pairValid
+    risingHold := source > source[1] ? risingHold + 1 : 0
+    fallingHold := source < source[1] ? fallingHold + 1 : 0
+    risingReset := source > source[1] ? risingReset + 1 : 0
+    fallingReset := source < source[1] ? fallingReset + 1 : 0
+else
+    risingReset := 0
+    fallingReset := 0
+if not na(source)
+    if not na(priorValid)
+        risingBridge := source > priorValid ? risingBridge + 1 : 0
+        fallingBridge := source < priorValid ? fallingBridge + 1 : 0
+    priorValid := source
+float previousMax = na
+float previousMin = na
+int previousCount = 0
+for age = 1 to 31
+    value = source[age]
+    if not na(value) and previousCount < 3
+        previousMax := na(previousMax) ? value : math.max(previousMax, value)
+        previousMin := na(previousMin) ? value : math.min(previousMin, value)
+        previousCount += 1
+rising = ta.rising(source, 3)
+falling = ta.falling(source, 3)
+plot(float(bar_index), "INPUT_BAR_INDEX")
+plot(float(phase), "INPUT_PHASE32")
+plot(source, "INPUT_SOURCE")
+plot(na(source) ? 1 : 0, "INPUT_SOURCE_NA")
+plot(rising ? 1 : 0, "R1011_RISING_missing_pair_hold_reset_bridge")
+plot(risingHold >= 3 ? 1 : 0, "R1011_MODEL_adjacent_hold3")
+plot(risingReset >= 3 ? 1 : 0, "R1011_MODEL_adjacent_reset3")
+plot(risingBridge >= 3 ? 1 : 0, "R1011_MODEL_valid_bridge3")
+plot(rising ? 1 : 0, "R1012_RISING_adjacent_vs_valid_extrema3")
+plot(not na(source) and previousCount == 3 and source > previousMax ? 1 : 0, "R1012_MODEL_above_last3valid")
+plot(float(risingHold), "R1012_MODEL_held_pair_count")
+plot(float(risingBridge), "R1012_MODEL_bridged_pair_count")
+plot(falling ? 1 : 0, "R1034_FALLING_missing_pair_hold_reset_bridge")
+plot(fallingHold >= 3 ? 1 : 0, "R1034_MODEL_adjacent_hold3")
+plot(fallingReset >= 3 ? 1 : 0, "R1034_MODEL_adjacent_reset3")
+plot(fallingBridge >= 3 ? 1 : 0, "R1034_MODEL_valid_bridge3")
+plot(not na(source) and previousCount == 3 and source < previousMin ? 1 : 0, "R1034_MODEL_below_last3valid")
+plot(ta.rising(float(phase), 3) ? 1 : 0, "R1011_CLEAN_CONTROL_rising3")
+plot(ta.falling(-float(phase), 3) ? 1 : 0, "R1034_CLEAN_CONTROL_falling3")
+plot(ta.falling(source, 5) ? 1 : 0, "R1034_FALLING5_hold_vs_bridge_recovery")
+plot(fallingHold >= 5 ? 1 : 0, "R1034_MODEL_adjacent_hold5")
+plot(fallingBridge >= 5 ? 1 : 0, "R1034_MODEL_valid_bridge5")

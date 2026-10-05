@@ -68,6 +68,11 @@
 > realtime first execution; record ChartHistory/ChartRealtime), and `matrix.inv` on a singular int matrix,
 > int-matrix inverse values, and a `matrix<int>` target. Reply at `v25/captures/v25/RESPONSE-v25.md`.
 
+> **Then round v26.** After v25, do [`v26/HANDOFF-v26-v1.md`](v26/HANDOFF-v26-v1.md) — 10 probes (170 columns,
+> 41 ledger ranks): pinv cutoff bracket, `request.quandl` non-zero index text, matrix.det return kind, TA
+> long-gap/hole recovery batches, analyst/futures session context. Run each separately; follow each
+> instructions file. Reply under `v26/captures/v26/` with a versioned RESPONSE document.
+
 Agent exchange: [capture response v1](RESPONSE-v1.md). The next reply belongs in
 `RESPONSE-v2.md` beside this handoff; commit responses so both machines can read them.
 

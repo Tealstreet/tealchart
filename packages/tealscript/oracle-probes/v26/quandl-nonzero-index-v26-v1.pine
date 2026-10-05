@@ -1,0 +1,4 @@
+//@version=6
+indicator("V26-QUANDL-NONZERO-INDEX-v1", max_bars_back=256)
+columnIndex = input.int(1, "Column index", options=[1, 2])
+plot(request.quandl("INVALID/__ARG_AUDIT__", index=columnIndex, ignore_invalid_symbol=false), "OUTCOME")

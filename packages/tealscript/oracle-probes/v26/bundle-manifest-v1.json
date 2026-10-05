@@ -1,0 +1,584 @@
+{
+  "schemaVersion": 1,
+  "bundle": "v26",
+  "version": 1,
+  "status": "SEALED",
+  "frozen": true,
+  "scripts": [
+    {
+      "probe": "pinv-cutoff-bracket-relative-v26-v1.pine",
+      "path": "pinv-cutoff-bracket-relative-v26-v1.pine",
+      "owner": "codex-vmp8l6",
+      "sourceSha256": "2e132ce781378b5d6b48df0b38562da67ba17bb228e7635c9b6cf6d7d5ab90ae",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "raw-csv+outcome+context",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED",
+        "basis": "NATIVE-PENDING"
+      },
+      "columns": [
+        "tiny13 pinv00",
+        "tiny13 pinv11",
+        "tiny13 source11",
+        "tiny14 pinv00",
+        "tiny14 pinv11",
+        "tiny14 source11",
+        "tiny15 pinv00",
+        "tiny15 pinv11",
+        "tiny15 source11",
+        "scaled pinv00",
+        "scaled pinv11",
+        "scaled source11"
+      ],
+      "question": "Bracket native pinv singular-value cutoff and distinguish relative from absolute using sigma_max1e6. Exact threshold and algorithm remain TRACE.",
+      "instructionsPath": "instructions/pinv-cutoff-bracket-relative-v26-v1.md",
+      "instructionsSha256": "3979539440e57bff86a878bbb549413033246a47027a188b4fdd354117c9ef79",
+      "instructions": [
+        "Preserve exact source and SHA. Run indicator unchanged on BINANCE:BTCUSDT2m/UTC. Record account/build, compile/runtime phase and full diagnostics including bar. Export all12 named columns as raw CSV with context and certified historical cutoff. For sigma_max=1, record whether1e-13,1e-14,1e-15 produce reciprocal pinv11 or zero; retain any other result. The scaled matrix has diag(1e6,1e-12): nativev12 diag(1,1e-12) yields1e12. If scaled pinv11 remains1e12 this supports an absolute cutoff; if it becomes0 this supports scale-relative cutoff, but one point does not settle exact threshold or singular-value algorithm. Record pinv00/source11 to prove input and reciprocal-large control. Never rewrite source or round small source11 values to zero; retain CSV scientific notation and Data Window screenshots when display rounds. No expected native phase or numeric result is asserted."
+      ],
+      "ledgerRanks": [
+        1061,
+        1062
+      ],
+      "priorNativeControl": {
+        "sourceSha256": "6e42dc1fde7c2ef0e160b2657b924639ed441d5019d3fd1032c20bf1d31c883f",
+        "version": 12,
+        "pinv11": 1000000000000.0
+      },
+      "localReadiness": {
+        "status": "NOT-RUN",
+        "owner": "codex-3rye5w",
+        "reason": "Sole bundle assembler owns compile preflight; avoid duplicate compute."
+      }
+    },
+    {
+      "probe": "direction-long-gap-recovery-ranks1011-1034-v26-v1.pine",
+      "path": "direction-long-gap-recovery-ranks1011-1034-v26-v1.pine",
+      "owner": "codex-i5qr9c",
+      "sourceSha256": "2738dfac5b4b0803d9357bce3fdd6d5865df7b5d2b09179575a8b7cc7e6d4f11",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "compile-outcome+runtime-outcome+raw-csv+context",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "columns": [
+        "INPUT_BAR_INDEX",
+        "INPUT_PHASE32",
+        "INPUT_SOURCE",
+        "INPUT_SOURCE_NA",
+        "R1011_RISING_missing_pair_hold_reset_bridge",
+        "R1011_MODEL_adjacent_hold3",
+        "R1011_MODEL_adjacent_reset3",
+        "R1011_MODEL_valid_bridge3",
+        "R1012_RISING_adjacent_vs_valid_extrema3",
+        "R1012_MODEL_above_last3valid",
+        "R1012_MODEL_held_pair_count",
+        "R1012_MODEL_bridged_pair_count",
+        "R1034_FALLING_missing_pair_hold_reset_bridge",
+        "R1034_MODEL_adjacent_hold3",
+        "R1034_MODEL_adjacent_reset3",
+        "R1034_MODEL_valid_bridge3",
+        "R1034_MODEL_below_last3valid",
+        "R1011_CLEAN_CONTROL_rising3",
+        "R1034_CLEAN_CONTROL_falling3",
+        "R1034_FALLING5_hold_vs_bridge_recovery",
+        "R1034_MODEL_adjacent_hold5",
+        "R1034_MODEL_valid_bridge5"
+      ],
+      "question": "Long-gap/equality/recovery direction state: adjacent retention/reset versus valid bridge/extrema.",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC",
+        "requiredMarketState": "HISTORICAL-CLOSED-BARS"
+      },
+      "instructions": [
+        "# Capture instructions v1\n\nRun this unchanged Pine v6 indicator on BINANCE:BTCUSDT, standard2m candles, Etc/UTC. Record native account/build, chart/source first time, historical cutoff and compile/runtime phase with full diagnostic line/bar/text. Native phase and values are UNSPECIFIED. Export every named plot as raw CSV, including empty cells; no rounding or NA-to-zero replacement. Preserve exact source SHA and CSV SHA. At least128 closed historical bars are required; retain first source bars and at least three complete32-bar cycles. Bar_index defines the source sequence, so do not realign it to a different dataset origin. Realtime/tick behavior is outside scope.\n\nThe R1011/R1012/R1034 columns distinguish retained adjacent-pair counts, resetting on missing pairs, bridging the last valid value, and a last3-valid extrema comparison. Phases7\u201310 and26\u201329 are long gaps; phase15 is an equality break, phase12 reverses direction, phases17\u201325 recover/rise/fall. Observe the target on holes and the first/two later recovered bars. Candidate MODEL columns are explicit competing constructions, not expected native outcomes. The prior native adjacent-change ruling is not revoked; this asks about its exact long-gap/equality/recovery boundary. Clean controls expose nonmissing consecutive trends.\n\nThis extends prior v7 sixteen-bar short-gap sources with32-bar long gaps, extrema ties and explicit competing models; it does not request another identical capture. No native whole-clause, live stream or universal window policy credit is permitted before outcomes adjudication. Engine preflight output is instrument-only.\n\nFalling length5 target and models distinguish a retained4-pair state from a fifth bridged change after the final gap. Preserve those recovery bars. Phase21 equals prior18, then phases22\u201325 make four declines.\n"
+      ],
+      "instructionsPath": "instructions/direction-long-gap-recovery-ranks1011-1034-v26-v1.md",
+      "instructionsSha256": "f582668ce650ccf62c5fb0dd24cc2731c5e45fb9d51361c6f2d83aa60fff3ac3",
+      "ledgerRanks": [
+        1011,
+        1012,
+        1034
+      ],
+      "authority": [
+        "https://www.tradingview.com/pine-script-reference/v6/#fun_ta.rising",
+        "https://www.tradingview.com/pine-script-reference/v6/#fun_ta.falling"
+      ],
+      "limits": "Source-specific historical discrimination only; MODEL columns are candidates, engine output instrument-only; no engine edits or generic policy inference."
+    },
+    {
+      "probe": "extrema-long-gap-tie-ranks296-850-v26-v1.pine",
+      "path": "extrema-long-gap-tie-ranks296-850-v26-v1.pine",
+      "owner": "codex-i5qr9c",
+      "sourceSha256": "471eb896eaac03cd3ab8b7751d6cb929acfa4b7092bad863d3165ba5b03e4c9d",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "compile-outcome+runtime-outcome+raw-csv+context",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "columns": [
+        "INPUT_BAR_INDEX",
+        "INPUT_PHASE32",
+        "INPUT_SOURCE",
+        "INPUT_SOURCE_NA",
+        "R296_HIGHEST_hole_NA_vs_hold_vs_recalc",
+        "R296_HIGHEST_result_NA",
+        "R296_ALL_NA_seed_NA_vs_zero",
+        "R296_ALL_NA_mask",
+        "R297_ACTUAL_fixed3_vs_valid3_span",
+        "R297_MODEL_fixed3bars",
+        "R297_MODEL_last3valid",
+        "R840_HIGHESTBARS_hole_age_or_NA",
+        "R840_HIGHESTBARS_NA_mask",
+        "R840_ALL_NA_age_or_NA",
+        "R841_ACTUAL_physical_vs_compacted_age",
+        "R841_MODEL_fixed3_physical_age",
+        "R841_MODEL_valid3_newest_tie_age",
+        "R841_MODEL_valid3_oldest_tie_age",
+        "R850_LOWESTBARS_fixed_vs_valid_tie_span",
+        "R850_MODEL_fixed3_physical_age",
+        "R850_MODEL_valid3_newest_tie_age",
+        "R850_MODEL_valid3_oldest_tie_age",
+        "R850_ALL_NA_age_or_NA",
+        "R850_NEGATED_SOURCE_high_age_symmetry",
+        "R850_LOWESTBARS_NA_mask",
+        "R297_CLEAN_CONTROL_highest3",
+        "R841_CLEAN_CONTROL_highage3",
+        "R850_CLEAN_CONTROL_lowage3"
+      ],
+      "question": "Missing extrema window and offset provenance: fixed physical span versus valid-sample span, leading/all-NA and tie age.",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC",
+        "requiredMarketState": "HISTORICAL-CLOSED-BARS"
+      },
+      "instructions": [
+        "# Capture instructions v1\n\nRun this unchanged Pine v6 indicator on BINANCE:BTCUSDT, standard2m candles, Etc/UTC. Record native account/build, chart/source first time, historical cutoff and compile/runtime phase with full diagnostic line/bar/text. Native phase and values are UNSPECIFIED. Export every named plot as raw CSV, including empty cells; no rounding or NA-to-zero replacement. Preserve exact source SHA and CSV SHA. At least128 closed historical bars are required; retain first source bars and at least three complete32-bar cycles. Bar_index defines the source sequence, so do not realign it to a different dataset origin. Realtime/tick behavior is outside scope.\n\nR296 observes result and missingness on leading/current/all-missing inputs. R297 compares fixed3 physical bars against last3 valid samples: the100 peak at phase4 leaves the physical window while gaps separate later20/30/40 values. R840/R841 expose offset missingness, physical age versus compacted valid-sample age, and newest versus oldest equal-value selection. R850 applies the analogous minimum/tie/gap discrimination with negated-source symmetry and clean controls. Phases10\u201313 create an all-missing physical window, phases14/15/17 equal minima, phase18 a new maximum. MODEL columns are competing constructions, never asserted native expectations. First-cycle history differs from later cycles intentionally; preserve both.\n\nThis extends prior v7 sixteen-bar short-gap sources with32-bar long gaps, extrema ties and explicit competing models; it does not request another identical capture. No native whole-clause, live stream or universal window policy credit is permitted before outcomes adjudication. Engine preflight output is instrument-only.\n"
+      ],
+      "instructionsPath": "instructions/extrema-long-gap-tie-ranks296-850-v26-v1.md",
+      "instructionsSha256": "9e4e2810ef94380925d608d2c068dde8489df1e777a3ddaa4a8cf955ece55ca9",
+      "ledgerRanks": [
+        296,
+        297,
+        840,
+        841,
+        850
+      ],
+      "authority": [
+        "https://www.tradingview.com/pine-script-reference/v6/#fun_ta.highest",
+        "https://www.tradingview.com/pine-script-reference/v6/#fun_ta.highestbars",
+        "https://www.tradingview.com/pine-script-reference/v6/#fun_ta.lowestbars"
+      ],
+      "limits": "Source-specific historical discrimination only; MODEL columns are candidates, engine output instrument-only; no engine edits or generic policy inference."
+    },
+    {
+      "probe": "worklist-b-numeric-containers-v26-v2.pine",
+      "path": "worklist-b-numeric-containers-v26-v2.pine",
+      "owner": "codex-cnf04e",
+      "sourceSha256": "26cda3aa298aa5fe5f0328791b154e9637c0515dea0fa24d865845e3cb480669",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "compile-outcome+runtime-outcome+raw-csv+context+snapshot",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "columns": [
+        "Phase",
+        "R1217_AllNAEmpty_DropVsRetain",
+        "R1218_MixedNA_PreserveCompactPropagate",
+        "R1429_Stochastic_RowColumnNonnegative",
+        "R1468_Predicates_ExactInclusiveExclusiveEpsilon",
+        "R1136_FloatNS_RightmostExactGapOutside",
+        "R1137_IntNS_RightmostExactGapOutside",
+        "R1140_FloatMethod_RightmostExactGapOutside",
+        "R1141_IntMethod_RightmostExactGapOutside"
+      ],
+      "question": "Discriminate numeric-container missing layout/orientation/epsilon/search output rules",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC"
+      },
+      "instructions": [
+        "Capture unchanged source, full phase/error/context; if RUNS export all columns. Decode Phase and masks using the linked instructions. No local observation is a native expected value."
+      ],
+      "instructionsPath": "instructions/worklist-b-numeric-containers-v26-v2.md",
+      "instructionsSha256": "94daf4210d463dde3186d26b6ba6a6eff8a8b44ed69a8b0321dff87c00e46baa",
+      "ledgerRanks": [
+        1217,
+        1218,
+        1429,
+        1468,
+        1136,
+        1137,
+        1140,
+        1141
+      ],
+      "authority": [
+        "https://www.tradingview.com/pine-script-reference/v6/#fun_array.standardize",
+        "https://www.tradingview.com/pine-script-reference/v6/#fun_array.binary_search_rightmost",
+        "https://www.tradingview.com/pine-script-reference/v6/#fun_matrix.is_stochastic",
+        "https://www.tradingview.com/pine-script-reference/v6/#fun_matrix.is_zero"
+      ],
+      "limits": "Output evidence only; no algorithm-internal/complexity or universal numerical-policy credit. Native outcomes unknown.",
+      "discriminatorsByRank": {
+        "1217": "Empty/all-NA cardinality: namespace vs receiver outputs empty arrays, input-length arrays, or divergent lengths; size1/2/5 beyond prior size3 source.",
+        "1218": "Dynamic NA-layout preservation vs compaction vs NA propagation: rotate holes through three distinct 6-element patterns.",
+        "1429": "Row-only vs column-only vs either convention; reject/accept negative entries whose row and column sums both equal1; namespace/method agreement.",
+        "1468": "Exact vs inclusive/exclusive epsilon tests for zero/binary/identity/symmetric/antisymmetric at signed0,1e-12,1e-11, just below/at/above1e-10 and1e-9/1e-8.",
+        "1136": "Float namespace exact duplicates vs nearest/insertion/absent behavior; near-2/7 perturbations below1e-10 distinguish tolerant matching from raw comparisons.",
+        "1137": "Int namespace duplicate-index and gap/below/above behavior.",
+        "1140": "Float receiver same float boundaries versus namespace semantics.",
+        "1141": "Int receiver same integer boundaries versus namespace semantics."
+      }
+    },
+    {
+      "probe": "matrix-det-return-kind-v26-v2.pine",
+      "path": "matrix-det-return-kind-v26-v2.pine",
+      "owner": "codex-cnf04e",
+      "sourceSha256": "73efcc0fa032813ad0f50fd1ecaee22f0c2bf3ceb5eb1fac235c7c5c4c0aa9c5",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "compile-outcome+runtime-outcome+raw-csv+context+snapshot",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "columns": [
+        "R1324_FloatNS_StaticFloatVsNumericInt",
+        "R1325_IntNS_StaticIntVsGenericFloat",
+        "R1328_FloatMethod_StaticFloatVsNumericInt",
+        "R1329_IntMethod_StaticIntVsGenericFloat",
+        "Control_IntLiteral",
+        "Control_FloatLiteral"
+      ],
+      "question": "Does matrix.det preserve static int/float type through namespace and receiver overload resolution despite equal numeric values?",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC"
+      },
+      "instructions": [
+        "Capture unchanged source, full phase/error/context; if RUNS export all columns. Decode Phase and masks using the linked instructions. No local observation is a native expected value."
+      ],
+      "instructionsPath": "instructions/matrix-det-return-kind-v26-v2.md",
+      "instructionsSha256": "664e4209b2fc88a103958de08a20ab21e7689ae5ccec052590620fba1eede363",
+      "ledgerRanks": [
+        1324,
+        1325,
+        1328,
+        1329
+      ],
+      "authority": [
+        "https://www.tradingview.com/pine-script-reference/v6/#fun_matrix.det"
+      ],
+      "limits": "Output evidence only; no algorithm-internal/complexity or universal numerical-policy credit. Native outcomes unknown.",
+      "discriminatorsByRank": {
+        "1324": "Static int versus float overload; same numerical determinant6, paired literal controls",
+        "1325": "Static int versus float overload; same numerical determinant6, paired literal controls",
+        "1328": "Static int versus float overload; same numerical determinant6, paired literal controls",
+        "1329": "Static int versus float overload; same numerical determinant6, paired literal controls"
+      }
+    },
+    {
+      "probe": "analyst-closed-open-availability-v26-v1.pine",
+      "path": "analyst-closed-open-availability-v26-v1.pine",
+      "owner": "codex-tkxtd0",
+      "sourceSha256": "4af357868f0eee9e59ec6662fdf48e611efe0576a3f6ee0726817e610084f3a2",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "compile-runtime-outcome+raw-csv+context+paired-snapshot",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "columns": [
+        "CHART_INDEX",
+        "CHART_TIME_MS",
+        "CHART_CLOSE_MS",
+        "OBSERVATION_TIME_MS",
+        "CHART_CLOSE",
+        "CHART_MARKET",
+        "CHART_REALTIME",
+        "CHART_CONFIRMED",
+        "TARGET_AVERAGE",
+        "TARGET_AVERAGE_NA",
+        "TARGET_MEDIAN",
+        "TARGET_MEDIAN_NA",
+        "TARGET_DATE",
+        "TARGET_DATE_NA",
+        "TARGET_ESTIMATES",
+        "TARGET_ESTIMATES_NA",
+        "TARGET_HIGH",
+        "TARGET_HIGH_NA",
+        "TARGET_LOW",
+        "TARGET_LOW_NA"
+      ],
+      "question": "Which analyst-target values/NA flags are observed while cash market is closed and after open, with verified provider-update evidence if available?",
+      "chartContext": {
+        "symbol": "NASDAQ:MSFT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC",
+        "requiredMarketState": "PAIRED-CASH-CLOSED-AND-OPEN",
+        "session": "EXTENDED"
+      },
+      "instructionsPath": "instructions/analyst-closed-open-availability-v26-v1.md",
+      "instructionsSha256": "0e5067533ab0911611241c606ef5755dcc50dd4036eb4960771da56568e63856",
+      "instructions": [
+        "Keep source unchanged. Capture all phases/context/columns and follow paired-observation instructions."
+      ],
+      "ledgerRanks": [
+        1536,
+        1537,
+        1611,
+        1612,
+        1613,
+        1614
+      ],
+      "minimumHistoryBars": 20,
+      "limits": "No verified closed-period provider update means availability-only evidence, not update-delay closure."
+    },
+    {
+      "probe": "futures-session-omitted-context-v26-v1.pine",
+      "path": "futures-session-omitted-context-v26-v1.pine",
+      "owner": "codex-tkxtd0",
+      "sourceSha256": "11586fdb8a43027dfff71917a4cbbcdc1db7ab497a2df89b6332dd3dddf1324e",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "compile-runtime-outcome+raw-csv+context+paired-snapshot",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "columns": [
+        "CHART_INDEX",
+        "CHART_TIME_MS",
+        "CHART_CLOSE_MS",
+        "OBSERVATION_TIME_MS",
+        "CHART_CLOSE",
+        "CHART_MARKET",
+        "CHART_REALTIME",
+        "CHART_CONFIRMED",
+        "OMITTED_TIME_MS",
+        "OMITTED_CLOSE_MS",
+        "OMITTED_PRICE",
+        "OMITTED_MARKET",
+        "OMITTED_FIRST_REGULAR",
+        "OMITTED_LAST_REGULAR",
+        "EXPLICIT_TIME_MS",
+        "EXPLICIT_CLOSE_MS",
+        "EXPLICIT_PRICE",
+        "EXPLICIT_MARKET",
+        "EXPLICIT_FIRST_REGULAR",
+        "EXPLICIT_LAST_REGULAR",
+        "REGULAR_TIME_MS",
+        "REGULAR_CLOSE_MS",
+        "REGULAR_PRICE",
+        "REGULAR_MARKET",
+        "REGULAR_FIRST_REGULAR",
+        "REGULAR_LAST_REGULAR",
+        "EXTENDED_TIME_MS",
+        "EXTENDED_CLOSE_MS",
+        "EXTENDED_PRICE",
+        "EXTENDED_MARKET",
+        "EXTENDED_FIRST_REGULAR",
+        "EXTENDED_LAST_REGULAR"
+      ],
+      "question": "How do omitted vs explicit chart context and futures regular vs extended requested sessions differ across overnight/cash hours?",
+      "chartContext": {
+        "symbol": "CME_MINI:ES1!",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC",
+        "requiredMarketState": "HISTORICAL-OVERNIGHT-AND-CASH",
+        "session": "PAIRED-ETH-AND-AVAILABLE-RTH"
+      },
+      "instructionsPath": "instructions/futures-session-omitted-context-v26-v1.md",
+      "instructionsSha256": "886b0092114cd10703921c961e112ae9e1b4663ca64550be032f3ad190aed14a",
+      "instructions": [
+        "Keep source unchanged. Capture all phases/context/columns and follow paired-observation instructions."
+      ],
+      "ledgerRanks": [
+        1759,
+        1760
+      ],
+      "minimumHistoryBars": 1600,
+      "limits": "Contextual observations only; no universal omitted default or live phase claim."
+    },
+    {
+      "probe": "cum-tsi-recovery-discriminators-bbi-v1.pine",
+      "path": "cum-tsi-recovery-discriminators-bbi-v1.pine",
+      "owner": "codex-bbi6nl",
+      "sourceSha256": "c816d26811fd2dd57854dd90a9ee93956edc7cf006f11a3b12d7a140437c492d",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "compile-outcome+runtime-outcome+raw-csv+context+snapshot",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "columns": [
+        "BAR_INDEX",
+        "SOURCE_HOLE",
+        "SOURCE",
+        "CUM_HOLES",
+        "CUM_ZERO_FILLED",
+        "CONTROL_SKIP_CARRY",
+        "CONTROL_SKIP_MASK_OUTPUT",
+        "CONTROL_STICKY_NA",
+        "CONTROL_RESUME_AFTER_NA",
+        "TSI_HOLES_2_3",
+        "TSI_HOLES_3_7",
+        "TSI_CLEAN_2_3",
+        "TSI_ZERO_FILLED_2_3"
+      ],
+      "question": "Does cum retain, reset or poison its state across leading and postwarm consecutive NA holes, and does TSI bridge holes rather than zero-fill?",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC"
+      },
+      "instructions": [
+        "See bounded discriminator/eligibility instructions; preserve all columns and raw OHLCV."
+      ],
+      "instructionsPath": "instructions/cum-tsi-recovery-discriminators-bbi-v1.md",
+      "instructionsSha256": "7cd30cd866a6fa4199b2cd8dbe8cc09aa67c5e4ccd1ead2499e6bce11d028f97",
+      "ledgerRanks": [
+        753,
+        1435
+      ],
+      "authority": [
+        "https://www.tradingview.com/pine-script-reference/v6/#fun_ta.cum",
+        "https://www.tradingview.com/pine-script-reference/v6/#fun_ta.tsi"
+      ],
+      "limits": "No native credit before capture; ordinary/zero-hole host runs do not settle hole policies; candidate formulas are not authorities."
+    },
+    {
+      "probe": "implicit-flow-wpr-hole-coverage-bbi-v1.pine",
+      "path": "implicit-flow-wpr-hole-coverage-bbi-v1.pine",
+      "owner": "codex-bbi6nl",
+      "sourceSha256": "7e2e6f8b9a34690ca48763a44206de897da3f6c09e01328a784e6c992d9b98a4",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "compile-outcome+runtime-outcome+raw-csv+context+snapshot",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "columns": [
+        "BAR_INDEX",
+        "RAW_HIGH",
+        "RAW_LOW",
+        "RAW_CLOSE",
+        "RAW_VOLUME",
+        "PRICE_HOLE",
+        "VOLUME_HOLE",
+        "PRICE_HOLE_COUNT",
+        "VOLUME_HOLE_COUNT",
+        "OBV_RAW_FLOW",
+        "PVT_RAW_FLOW",
+        "WAD_RAW_FLOW",
+        "OBV_BUILTIN",
+        "OBV_DOCUMENTED_COMPOSITION",
+        "OBV_ZERO_FLOW_CONTROL",
+        "PVT_BUILTIN",
+        "PVT_DOCUMENTED_COMPOSITION",
+        "PVT_ZERO_FLOW_CONTROL",
+        "WAD_BUILTIN",
+        "WAD_DOCUMENTED_COMPOSITION",
+        "WAD_ZERO_FLOW_CONTROL",
+        "WPR_1",
+        "WPR_3",
+        "WPR_7",
+        "WPR_WINDOW_3_CONTROL",
+        "HIGH_WINDOW_3",
+        "LOW_WINDOW_3"
+      ],
+      "question": "At observed actual chart OHLCV holes, do builtin OBV/PVT/WAD match documented raw-flow cum compositions or zero-flow controls, and how do WPR windows recover?",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC"
+      },
+      "instructions": [
+        "See bounded discriminator/eligibility instructions; preserve all columns and raw OHLCV."
+      ],
+      "instructionsPath": "instructions/implicit-flow-wpr-hole-coverage-bbi-v1.md",
+      "instructionsSha256": "659649fea76c7f04917603ed65a1818f756e804609e2f8fb0acfb21568df86e2",
+      "ledgerRanks": [
+        1051,
+        1053,
+        1436,
+        1544,
+        1549,
+        1617
+      ],
+      "authority": [
+        "https://www.tradingview.com/pine-script-reference/v6/#var_ta.obv",
+        "https://www.tradingview.com/pine-script-reference/v6/#var_ta.pvt",
+        "https://www.tradingview.com/pine-script-reference/v6/#var_ta.wad",
+        "https://www.tradingview.com/pine-script-reference/v6/#fun_ta.wpr"
+      ],
+      "limits": "No native credit before capture; ordinary/zero-hole host runs do not settle hole policies; candidate formulas are not authorities."
+    },
+    {
+      "probe": "quandl-nonzero-index-v26-v1.pine",
+      "path": "quandl-nonzero-index-v26-v1.pine",
+      "owner": "codex-bk7nqp",
+      "sourceSha256": "daa666f3026d9da0abaea09623fe299537fe68cf5b38d0d42c7815e6429bd53a",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "nativeStatus": "UNOBSERVED",
+      "captureKind": "compile-outcome+runtime-outcome+diagnostic-screenshot+context",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED",
+        "text": "UNSPECIFIED"
+      },
+      "columns": [
+        "OUTCOME"
+      ],
+      "question": "What exact invalid-symbol text does request.quandl publish for index 1 and 2 with ignore_invalid_symbol=false?",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 256
+      },
+      "instructions": [
+        "Run unchanged source twice: Column index=1 then 2.",
+        "Record complete diagnostic text and settings separately, even if the first attempt fails."
+      ],
+      "instructionsPath": "instructions/quandl-nonzero-index-v26-v1.md",
+      "instructionsSha256": "71c2771e83af03a1877a60e6e4dda04761fdca8170baf008dfe9944158cd3378",
+      "ledgerRanks": [
+        1276,
+        1277,
+        1278
+      ],
+      "limits": "V6 index1/2 invalid-symbol wording only; zero-only native authority is not extrapolated.",
+      "localPreflight": {
+        "phase": "NOT-RUN",
+        "reason": "3rye5w owns sole v26 preflight and manifest writes"
+      }
+    }
+  ]
+}
