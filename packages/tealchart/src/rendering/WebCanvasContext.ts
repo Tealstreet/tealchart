@@ -12,11 +12,7 @@
 import type { CanvasContext } from './CanvasContext';
 
 export class WebCanvasContext implements CanvasContext {
-  private lastFont: string;
-
-  constructor(private ctx: CanvasRenderingContext2D) {
-    this.lastFont = ctx.font;
-  }
+  constructor(private ctx: CanvasRenderingContext2D) {}
 
   /**
    * Get the underlying native context (for cases where direct access is needed)
@@ -51,11 +47,10 @@ export class WebCanvasContext implements CanvasContext {
   }
 
   get font(): string {
-    return this.lastFont;
+    return this.ctx.font;
   }
   set font(value: string) {
-    if (value === this.lastFont) return;
-    this.lastFont = value;
+    if (value === this.ctx.font) return;
     this.ctx.font = value;
   }
 

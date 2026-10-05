@@ -15,6 +15,10 @@ Programmatic drag cancellation restores geometry without submitting callbacks.
 - **Konva.js**: Interactive trading geometry on web — order/position lines with draggable labels and controls
 - **DOM / React Native overlays**: Menus, buttons, chrome controls, and toolbars that do not require per-frame chart projection
 
+`WebCanvasContext.font` reads and deduplicates against the actual native context
+state. A private font cache becomes stale after save/restore or canvas resizing,
+making repeated Hosted axis-tag paints fall back to the default 10px font.
+
 
 `ui/LayoutSelector` is the shared saved-layout list and action modal. Hosts can
 open/close it through a native header without adding a second menu. Optional
