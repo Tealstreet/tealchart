@@ -93,6 +93,12 @@
 > record exact refusals and unavailable UI channels verbatim. The 827 source is an explicit v11 RECAPTURE for the
 > missing visible-range timestamps. Reply under `v30/captures/v30/`.
 
+> **Then round v31.** After v30, do [`v31/HANDOFF-v31-v1.md`](v31/HANDOFF-v31-v1.md) — 8 isolated sources: exported
+> method bare/namespace/receiver forms, nested UDT field identity, a builtin `nz` shadow, two-import alias UDT
+> identity with its control, and the 752 scanner symbol-context source. Run each separately with its instruction
+> file; keep published library versions and every early-refusal/alias/alternation limit. The 752 source is an
+> explicit v13 RECAPTURE for the missing isolated ZOMATO/UNIONBANK contexts only. Reply under `v31/captures/v31/`.
+
 Agent exchange: [capture response v1](RESPONSE-v1.md). The next reply belongs in
 `RESPONSE-v2.md` beside this handoff; commit responses so both machines can read them.
 

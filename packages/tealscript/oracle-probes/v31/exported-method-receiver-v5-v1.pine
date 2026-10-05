@@ -1,0 +1,6 @@
+//@version=5
+indicator("Exported method receiver discriminator")
+import faiyaz7283/tools/15 as lib
+bool obj = bar_index % 2 == 0
+bool result = obj._bool()
+plot(result ? 1 : 0, "exported_method_receiver")

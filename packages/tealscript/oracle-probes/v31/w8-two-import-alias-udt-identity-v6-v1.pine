@@ -1,0 +1,6 @@
+//@version=6
+indicator("w8-two-import-alias-udt-identity-v6-v1")
+import TradingView/ZigZag/6 as a
+import TradingView/ZigZag/6 as b
+a.Point value = b.Point.new(price=7)
+plot(value.price, "VALUE")
