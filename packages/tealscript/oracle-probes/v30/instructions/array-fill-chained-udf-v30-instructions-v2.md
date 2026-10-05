@@ -1,0 +1,4 @@
+V30 chained array fill receiver v1
+Paste unchanged on BINANCE:BTCUSDT, one-minute chart. Record compile/runtime outcome first. If it runs, export all five named plots with input/context and source hash. UDF_COPY_SIZE distinguishes valid inferred-UDF method admission from a compile refusal; original-element columns distinguish copy-only mutation from mutation of the caller array. Record actual values without assumed expected phase or numbers. A compile refusal must be recorded verbatim. This script isolates chained fill from every unrelated call in corpus v7:9.
+
+Load at least 32 closed bars on standard candles, Etc/UTC, with source-default inputs. Export time/OHLCV and all named columns for all loaded closed bars; record cutoff, settings, and exact refusal text/site. Native phase and values remain UNSPECIFIED.

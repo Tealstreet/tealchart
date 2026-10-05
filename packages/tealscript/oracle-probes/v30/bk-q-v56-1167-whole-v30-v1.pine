@@ -1,0 +1,6 @@
+//@version=6
+indicator("Matrix call-result negative power")
+
+values = matrix.new<float>(2, 2, 1.0)
+rows = matrix.copy(values).pow(-1).rows()
+plot(rows)

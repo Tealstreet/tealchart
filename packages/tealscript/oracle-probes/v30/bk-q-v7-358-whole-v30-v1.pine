@@ -1,0 +1,361 @@
+// ===== QQE × HMA [v3.0.1 Pine v6対応版] - 2026/01/11更新 =====
+// 視覚的改善・スマホ最適化版
+// 2025/10/16 v6完全版
+//@version=6
+indicator('QQEシグナル v3.0', shorttitle='QQE v6', overlay=true, max_labels_count=500)
+
+// ===== ⏱️ MTF設定 =====
+group_mtf = "⏱️ MTF設定"
+use_mtf = input.bool(true, 'MTF使用', group=group_mtf)
+manual_tf = input.timeframe("", "手動時間足", group=group_mtf)
+show_tf_panel = input.bool(false, '時間足パネル', group=group_mtf, tooltip='右上の情報パネル表示')
+
+// ===== 🎨 デザイン設定 =====
+group_design = "🎨 デザイン"
+use_neon = input.bool(true, 'ネオンカラー', group=group_design)
+show_hma_line = input.bool(false, 'HMAライン表示', group=group_design, tooltip='HMAラインを表示（デフォルトOFF）')
+min_score = input.int(60, '最低スコア', minval=40, maxval=80, group=group_design, tooltip='表示する最低スコア')
+label_transparency = input.int(30, 'ラベル透明度', minval=0, maxval=60, group=group_design, tooltip='ラベルの透明度（グラデーションとの調和）')
+use_large_labels = input.bool(true, '大きなラベル', group=group_design, tooltip='スマホ用に大きめラベル表示')
+
+// ===== 🔧 QQE/HMA設定 =====
+group_qqe = "🔧 QQE"
+RSI_Period = input.int(14, 'RSI期間', group=group_qqe)
+SF = input.int(5, 'スムージング', group=group_qqe)
+enable_ai = input.bool(true, "AIスコア", group=group_qqe)
+
+group_hma = "⚡ HMA"
+hma_length = input.int(9, "HMA期間", minval=3, maxval=21, group=group_hma)
+
+// ===== 🔔 アラート設定 =====
+group_alert = "🔔 アラート"
+enable_alert = input.bool(true, "アラート有効", group=group_alert)
+alert_min = input.int(60, "最低スコア", minval=60, maxval=90, group=group_alert, tooltip="60以上で全アラート推奨（5ラインと重複検知）")
+
+// ===== カラー定義（v6対応） =====
+CYAN = #13C9FC
+MAGENTA = #FF0080
+YELLOW = #FFFF00
+GOLD = #FFD700
+LIME = #00FF00
+RED = #FF0000
+
+// ===== 銘柄判定 =====
+get_asset() =>
+    t = str.upper(syminfo.ticker)
+    if str.contains(t, "USDJPY") or str.contains(t, "USD/JPY")
+        ["ドル円", "5", 4.238]
+    else if str.contains(t, "EURUSD") or str.contains(t, "EUR/USD")
+        ["ユーロドル", "5", 3.8]
+    else if str.contains(t, "GBPJPY") or str.contains(t, "GBP/JPY")
+        ["ポンド円", "5", 4.238]
+    else if str.contains(t, "NASDAQ") or str.contains(t, "NAS100") or str.contains(t, "US100")
+        ["ナスダック", "5", 4.238]
+    else if str.contains(t, "GOLD") or str.contains(t, "XAUUSD") or str.contains(t, "XAU")
+        ["ゴールド", "5", 8.0]
+    else if str.contains(t, "BTC") or str.contains(t, "BITCOIN")
+        ["BTC", "5", 12.0]
+    else if str.contains(t, "ETH") or str.contains(t, "ETHEREUM")
+        ["ETH", "5", 10.0]
+    else
+        [syminfo.ticker, "5", 4.238]
+
+[asset_name, auto_tf, qqe_factor] = get_asset()
+final_tf = manual_tf != "" ? manual_tf : auto_tf
+
+// ===== HMA計算 =====
+hma_calc(src, len) =>
+    wma1 = ta.wma(src, len / 2)
+    wma2 = ta.wma(src, len)
+    ta.wma(2 * wma1 - wma2, math.round(math.sqrt(len)))
+
+// ===== MTFデータ取得 =====
+mtf_close_data = request.security(syminfo.tickerid, final_tf, close, barmerge.gaps_off, barmerge.lookahead_off)
+mtf_high_data = request.security(syminfo.tickerid, final_tf, high, barmerge.gaps_off, barmerge.lookahead_off)
+mtf_low_data = request.security(syminfo.tickerid, final_tf, low, barmerge.gaps_off, barmerge.lookahead_off)
+mtf_volume_data = request.security(syminfo.tickerid, final_tf, volume, barmerge.gaps_off, barmerge.lookahead_off)
+mtf_rsi_data = request.security(syminfo.tickerid, final_tf, ta.rsi(close, RSI_Period), barmerge.gaps_off, barmerge.lookahead_off)
+mtf_hma_data = request.security(syminfo.tickerid, final_tf, hma_calc(close, hma_length), barmerge.gaps_off, barmerge.lookahead_off)
+mtf_atr_data = request.security(syminfo.tickerid, final_tf, ta.atr(14), barmerge.gaps_off, barmerge.lookahead_off)
+
+mtf_close = use_mtf ? mtf_close_data : close
+mtf_high = use_mtf ? mtf_high_data : high
+mtf_low = use_mtf ? mtf_low_data : low
+mtf_volume = use_mtf ? mtf_volume_data : volume
+
+// ===== QQE計算 =====
+Wilders = RSI_Period * 2 - 1
+Rsi = use_mtf ? mtf_rsi_data : ta.rsi(close, RSI_Period)
+RsiMa = ta.ema(Rsi, SF)
+AtrRsi = math.abs(RsiMa[1] - RsiMa)
+MaAtrRsi = ta.ema(AtrRsi, Wilders)
+dar = ta.ema(MaAtrRsi, Wilders) * qqe_factor
+
+var float longband = na
+var float shortband = na
+var int trend = na
+
+RSIndex = RsiMa
+newshortband = RSIndex + dar
+newlongband = RSIndex - dar
+
+longband := RSIndex[1] > longband[1] and RSIndex > longband[1] ? math.max(longband[1], newlongband) : newlongband
+shortband := RSIndex[1] < shortband[1] and RSIndex < shortband[1] ? math.min(shortband[1], newshortband) : newshortband
+
+cross_1 = ta.cross(longband[1], RSIndex)
+trend := ta.cross(RSIndex, shortband[1]) ? 1 : cross_1 ? -1 : nz(trend[1], 1)
+FastAtrRsiTL = trend == 1 ? longband : shortband
+
+var int QQExlong = 0
+var int QQExshort = 0
+QQExlong := FastAtrRsiTL < RSIndex ? QQExlong + 1 : 0
+QQExshort := FastAtrRsiTL > RSIndex ? QQExshort + 1 : 0
+
+qqe_long = QQExlong == 1
+qqe_short = QQExshort == 1
+qqe_trend = trend == 1
+
+// ===== HMA計算 =====
+hma = use_mtf ? mtf_hma_data : hma_calc(close, hma_length)
+hma_prev = hma[1]
+
+hma_long = ta.crossover(hma, hma_prev) and mtf_close > hma
+hma_short = ta.crossunder(hma, hma_prev) and mtf_close < hma
+hma_trend = mtf_close > hma
+
+// ===== AIスコア =====
+ai_score = 0
+if enable_ai
+    atr_c = use_mtf ? mtf_atr_data : ta.atr(14)
+    atr_avg = ta.sma(atr_c, 20)
+    atr_ratio = atr_c / atr_avg
+    
+    sig_base = (qqe_long and hma_long) or (qqe_short and hma_short) ? 35 : (qqe_long or qqe_short or hma_long or hma_short) ? 25 : 0
+    qqe_dist = math.abs(RSIndex - 50)
+    qqe_str = qqe_dist > 30 ? 25 : qqe_dist > 20 ? 20 : qqe_dist > 10 ? 15 : 10
+    vol_sc = atr_ratio > 1.1 and atr_ratio < 2.0 ? 15 : atr_ratio < 0.8 ? -10 : 5
+    
+    vol_avg = ta.sma(mtf_volume, 20)
+    vol_ratio = mtf_volume / vol_avg
+    vol_conf = vol_ratio > 1.2 ? 15 : vol_ratio < 0.8 ? -5 : 0
+    
+    raw = sig_base + qqe_str + vol_sc + vol_conf + 15
+    ai_score := math.max(0, math.min(100, raw))
+
+// ===== シグナル判定 =====
+big_long = qqe_long and ai_score >= 90
+big_short = qqe_short and ai_score >= 90
+super_long = qqe_long and ai_score >= 80 and ai_score < 90
+super_short = qqe_short and ai_score >= 80 and ai_score < 90
+power_long = qqe_long and hma_long and ai_score >= 70 and ai_score < 80
+power_short = qqe_short and hma_short and ai_score >= 70 and ai_score < 80
+strong_long = qqe_long and hma_trend and ai_score >= 60 and ai_score < 70 and not power_long and not super_long and not big_long
+strong_short = qqe_short and not hma_trend and ai_score >= 60 and ai_score < 70 and not power_short and not super_short and not big_short
+
+// ===== v6改善版：表示関数 =====
+get_label_props(sc, is_long) =>
+    base_trans = label_transparency
+    
+    if sc >= 90
+        // BIG CHANCE - 最大サイズ・太字
+        bg = use_neon ? color.new(GOLD, base_trans + 0) : color.new(color.yellow, base_trans)
+        txt = color.black
+        icon = "💰🚀"
+        label_text = "BIG CHANCE\n" + (is_long ? "BUY" : "SELL") + "\n" + str.tostring(math.round(sc))
+        size_val = use_large_labels ? size.huge : size.large
+        formatting = text.format_bold
+        [bg, txt, icon, label_text, size_val, formatting]
+    else if sc >= 80
+        // SUPER - 大きめ・太字
+        bg = use_neon ? color.new(YELLOW, base_trans + 5) : color.new(color.yellow, base_trans + 5)
+        txt = color.black
+        icon = "⚡"
+        label_text = "SUPER\n" + (is_long ? "BUY" : "SELL") + "\n" + str.tostring(math.round(sc))
+        size_val = use_large_labels ? size.huge : size.large
+        formatting = text.format_bold
+        [bg, txt, icon, label_text, size_val, formatting]
+    else if sc >= 70
+        // POWER - 大きめ・太字
+        bg = use_neon ? (is_long ? color.new(CYAN, base_trans + 10) : color.new(MAGENTA, base_trans + 10)) : (is_long ? color.new(LIME, base_trans + 10) : color.new(RED, base_trans + 10))
+        txt = color.white
+        icon = is_long ? "🚀" : "💥"
+        label_text = "POWER\n" + (is_long ? "BUY" : "SELL") + "\n" + str.tostring(math.round(sc))
+        size_val = use_large_labels ? size.large : size.normal
+        formatting = text.format_bold
+        [bg, txt, icon, label_text, size_val, formatting]
+    else if sc >= 60
+        // STRONG - 通常サイズ
+        bg = is_long ? color.new(LIME, base_trans + 20) : color.new(RED, base_trans + 20)
+        txt = color.white
+        icon = "💪"
+        label_text = (is_long ? "BUY" : "SELL") + "\n" + str.tostring(math.round(sc))
+        size_val = use_large_labels ? size.normal : size.small
+        formatting = text.format_none
+        [bg, txt, icon, label_text, size_val, formatting]
+    else
+        bg = is_long ? color.new(LIME, 50) : color.new(RED, 50)
+        txt = color.white
+        icon = ""
+        label_text = ""
+        size_val = size.tiny
+        formatting = text.format_none
+        [bg, txt, icon, label_text, size_val, formatting]
+
+// ===== シグナル表示 + アラート（v6完全対応版） =====
+
+// BIG CHANCE（90点以上）- 太字
+if big_long
+    [bg, txt, icon, label_text, sz, _] = get_label_props(ai_score, true)
+    label.new(bar_index, low, icon + "\n" + label_text, 
+         style=label.style_label_up, 
+         color=bg, 
+         textcolor=txt, 
+         size=sz,
+         text_formatting=text.format_bold)
+    if enable_alert and ai_score >= alert_min
+        alert("💰💰【買い】" + asset_name + " QQE:" + str.tostring(math.round(ai_score)) + "点 | BIG CHANCE", alert.freq_once_per_bar_close)
+
+if big_short
+    [bg, txt, icon, label_text, sz, _] = get_label_props(ai_score, false)
+    label.new(bar_index, high, icon + "\n" + label_text, 
+         style=label.style_label_down, 
+         color=bg, 
+         textcolor=txt, 
+         size=sz,
+         text_formatting=text.format_bold)
+    if enable_alert and ai_score >= alert_min
+        alert("💰💰【売り】" + asset_name + " QQE:" + str.tostring(math.round(ai_score)) + "点 | BIG CHANCE", alert.freq_once_per_bar_close)
+
+// SUPER（80点以上）- 太字
+if super_long
+    [bg, txt, icon, label_text, sz, _] = get_label_props(ai_score, true)
+    label.new(bar_index, low, icon + "\n" + label_text, 
+         style=label.style_label_up, 
+         color=bg, 
+         textcolor=txt, 
+         size=sz,
+         text_formatting=text.format_bold)
+    if enable_alert and ai_score >= alert_min
+        alert("⚡【買い】" + asset_name + " QQE:" + str.tostring(math.round(ai_score)) + "点 | SUPER", alert.freq_once_per_bar_close)
+
+if super_short
+    [bg, txt, icon, label_text, sz, _] = get_label_props(ai_score, false)
+    label.new(bar_index, high, icon + "\n" + label_text, 
+         style=label.style_label_down, 
+         color=bg, 
+         textcolor=txt, 
+         size=sz,
+         text_formatting=text.format_bold)
+    if enable_alert and ai_score >= alert_min
+        alert("⚡【売り】" + asset_name + " QQE:" + str.tostring(math.round(ai_score)) + "点 | SUPER", alert.freq_once_per_bar_close)
+
+// POWER（70点以上）- 太字
+if power_long
+    [bg, txt, icon, label_text, sz, _] = get_label_props(ai_score, true)
+    label.new(bar_index, low, icon + "\n" + label_text, 
+         style=label.style_label_up, 
+         color=bg, 
+         textcolor=txt, 
+         size=sz,
+         text_formatting=text.format_bold)
+    if enable_alert and ai_score >= alert_min
+        alert("🚀【買い】" + asset_name + " QQE:" + str.tostring(math.round(ai_score)) + "点 | POWER", alert.freq_once_per_bar_close)
+
+if power_short
+    [bg, txt, icon, label_text, sz, _] = get_label_props(ai_score, false)
+    label.new(bar_index, high, icon + "\n" + label_text, 
+         style=label.style_label_down, 
+         color=bg, 
+         textcolor=txt, 
+         size=sz,
+         text_formatting=text.format_bold)
+    if enable_alert and ai_score >= alert_min
+        alert("💥【売り】" + asset_name + " QQE:" + str.tostring(math.round(ai_score)) + "点 | POWER", alert.freq_once_per_bar_close)
+
+// STRONG（60点以上）- 通常
+if strong_long and ai_score >= min_score
+    [bg, txt, icon, label_text, sz, _] = get_label_props(ai_score, true)
+    label.new(bar_index, low, icon + "\n" + label_text, 
+         style=label.style_label_up, 
+         color=bg, 
+         textcolor=txt, 
+         size=sz)
+    if enable_alert and ai_score >= alert_min
+        alert("💪【買い】" + asset_name + " QQE:" + str.tostring(math.round(ai_score)) + "点 | STRONG", alert.freq_once_per_bar_close)
+
+if strong_short and ai_score >= min_score
+    [bg, txt, icon, label_text, sz, _] = get_label_props(ai_score, false)
+    label.new(bar_index, high, icon + "\n" + label_text, 
+         style=label.style_label_down, 
+         color=bg, 
+         textcolor=txt, 
+         size=sz)
+    if enable_alert and ai_score >= alert_min
+        alert("💪【売り】" + asset_name + " QQE:" + str.tostring(math.round(ai_score)) + "点 | STRONG", alert.freq_once_per_bar_close)
+
+// ===== HMAライン（デフォルトOFF） =====
+hma_color = use_neon ? (hma_trend ? CYAN : MAGENTA) : (hma_trend ? LIME : RED)
+plot(show_hma_line ? hma : na, "HMA", color=hma_color, linewidth=2)
+
+// ===== v6改善版：パネル（デフォルトOFF） =====
+if show_tf_panel and barstate.islast
+    var table panel = table.new(position.top_right, 2, 7, 
+         bgcolor=color.new(#1e222d, 10), 
+         frame_color=color.new(color.white, 50), 
+         frame_width=2, 
+         border_color=color.new(color.white, 70), 
+         border_width=1)
+    
+    // ヘッダー
+    table.cell(panel, 0, 0, "QQE Suite", 
+         text_color=color.white, 
+         text_size=14,
+         text_formatting=text.format_bold)
+    table.cell(panel, 1, 0, "v3.0 [v6]", 
+         text_color=color.yellow, 
+         text_size=14,
+         text_formatting=text.format_bold)
+    
+    // 銘柄
+    table.cell(panel, 0, 1, "銘柄", text_color=color.white, text_size=12)
+    table.cell(panel, 1, 1, asset_name, 
+         text_color=color.yellow, 
+         text_size=14,
+         text_formatting=text.format_bold)
+    
+    // チャート時間足
+    table.cell(panel, 0, 2, "チャート TF", text_color=color.white, text_size=12)
+    table.cell(panel, 1, 2, timeframe.period, text_color=color.aqua, text_size=13)
+    
+    // アラート時間足
+    table.cell(panel, 0, 3, "アラート TF", text_color=color.white, text_size=12)
+    table.cell(panel, 1, 3, use_mtf ? final_tf : timeframe.period, 
+         text_color=color.lime, 
+         text_size=14,
+         text_formatting=text.format_bold)
+    
+    // MTF状態
+    table.cell(panel, 0, 4, "MTF", text_color=color.white, text_size=12)
+    table.cell(panel, 1, 4, use_mtf ? "✓ ON" : "✗ OFF", 
+         text_color=use_mtf ? color.lime : color.red, 
+         text_size=13,
+         text_formatting=text.format_bold)
+    
+    // AIスコア
+    table.cell(panel, 0, 5, "AIスコア", text_color=color.white, text_size=12)
+    sc_col = ai_score >= 90 ? color.new(GOLD, label_transparency) : ai_score >= 80 ? color.new(YELLOW, label_transparency + 5) : ai_score >= 70 ? color.new(LIME, label_transparency + 10) : ai_score >= 60 ? color.new(color.orange, label_transparency + 20) : color.new(RED, 30)
+    sc_txt = ai_score >= 80 ? color.black : color.white
+    table.cell(panel, 1, 5, str.tostring(math.round(ai_score)), 
+         text_color=sc_txt, 
+         text_size=18, 
+         bgcolor=sc_col,
+         text_formatting=text.format_bold)
+    
+    // レベル
+    table.cell(panel, 0, 6, "レベル", text_color=color.white, text_size=12)
+    lvl = ai_score >= 90 ? "💰 BIG" : ai_score >= 80 ? "⚡ SUPER" : ai_score >= 70 ? "🚀 POWER" : ai_score >= 60 ? "💪 STRONG" : "様子見"
+    table.cell(panel, 1, 6, lvl, 
+         text_color=color.white, 
+         text_size=13, 
+         bgcolor=sc_col,
+         text_formatting=text.format_bold)

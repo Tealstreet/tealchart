@@ -1,0 +1,5 @@
+//@version=6
+indicator("W8 library alias builtin color precedence")
+import kaigouthro/hsvColor/17 as color
+plot(color.t(color.white), "BUILTIN_TRANSPARENCY")
+plot(color.hue(#ff0000), "LIBRARY_HUE")

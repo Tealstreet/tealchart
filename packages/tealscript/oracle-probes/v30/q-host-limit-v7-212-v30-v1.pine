@@ -1,0 +1,5 @@
+//@version=6
+indicator("Matrix swap_columns bounds")
+
+values = matrix.new<float>(1, 1, close)
+matrix.swap_columns(values, 1, 0)

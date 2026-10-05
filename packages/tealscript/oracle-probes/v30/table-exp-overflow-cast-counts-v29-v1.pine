@@ -1,0 +1,31 @@
+//@version=6
+indicator("V29-TableCastCounts-v1", precision=16, max_bars_back=256)
+caseId = input.int(0, "Case", options=[0, 1, 2, 3, 4])
+axis = input.string("Columns", "Axis", options=["Columns", "Rows"])
+rawCandidate = caseId == 0 ? 1.0 : caseId == 1 ? math.exp(1000.0) : caseId == 2 ? -math.exp(1000.0) : caseId == 3 ? 1.5 : -1.5
+raw = bar_index == 8 ? rawCandidate : 1.0
+count = int(raw)
+columns = axis == "Columns" ? count : 1
+rows = axis == "Rows" ? count : 1
+var table control = table.new(position.bottom_left, 1, 1)
+var table tested = na
+var bool returned = false
+if barstate.isfirst
+    table.cell(control, 0, 0, "CONTROL")
+plot(bar_index, "PineIndex")
+plot(caseId, "CaseId")
+plot(axis == "Columns" ? 0 : 1, "AxisId")
+plot(raw, "RawBeforeCast")
+plot(na(raw) ? 1 : 0, "RawIsNa")
+plot(count, "CountAfterInt")
+plot(na(count) ? 1 : 0, "CountIsNa")
+plot(columns, "ColumnsArgument")
+plot(rows, "RowsArgument")
+plot(1, "PositivePlotControl")
+if bar_index == 8
+    log.info("Case=" + str.tostring(caseId) + ";Axis=" + axis + ";RawNa=" + str.tostring(na(raw)) + ";CountNa=" + str.tostring(na(count)) + ";Count=" + str.tostring(count))
+    tested := table.new(position.top_right, columns, rows)
+    returned := true
+plot(returned ? 1 : 0, "ConstructorReturned")
+plot(na(tested) ? 1 : 0, "TableReferenceIsNa")
+plot(array.size(table.all), "AllTableCount")

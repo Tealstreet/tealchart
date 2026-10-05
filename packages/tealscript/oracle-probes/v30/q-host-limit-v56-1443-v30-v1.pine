@@ -1,0 +1,5 @@
+//@version=5
+indicator("Table cell set text coordinate row bounds")
+table_id = table.new(position.top_left, 2, 1)
+table.cell_set_text(table_id, 0, 1, "bounds")
+plot(close)

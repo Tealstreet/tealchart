@@ -87,6 +87,12 @@
 > context. Follow every per-source input attempt and screenshot/live instruction; record refusals verbatim.
 > Reply under `v29/captures/v29/`.
 
+> **Then round v30.** After v29, do [`v30/HANDOFF-v30-v2.md`](v30/HANDOFF-v30-v2.md) — 44 isolated sources: corpus
+> runtime-outcome whole sources with provider/viewport context, authority-refusal discriminators, table/matrix NA
+> facets and the 1186 loop-budget question. Keep required history/viewport/provider context and every CASE attempt;
+> record exact refusals and unavailable UI channels verbatim. The 827 source is an explicit v11 RECAPTURE for the
+> missing visible-range timestamps. Reply under `v30/captures/v30/`.
+
 Agent exchange: [capture response v1](RESPONSE-v1.md). The next reply belongs in
 `RESPONSE-v2.md` beside this handoff; commit responses so both machines can read them.
 

@@ -1,0 +1,1628 @@
+//@version=5
+indicator("VOB Asym T3 ×6 + MutEx Lines + Claude v10", overlay = true
+             , max_lines_count = 500, max_labels_count = 500, max_bars_back = 5000)
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// ARCHITECTURE — READ THIS FIRST (Claude Code: this is your dictionary)
+// ═══════════════════════════════════════════════════════════════════════════════
+//
+// WHAT THIS INDICATOR DOES:
+//   This indicator detects Volume Order Blocks (VOBs) — price zones where
+//   significant volume accumulated during an EMA crossover event. These zones
+//   act as support (bullish) or resistance (bearish) levels. When price returns
+//   to a zone, it tends to bounce (support holds) or reject (resistance holds).
+//
+// HOW IT WORKS (the physical measurement):
+//   1. Two Exponential Moving Averages (EMAs) are computed per sensitivity tier.
+//      The fast EMA length = sensitivity value (e.g., 2500 bars for tier A).
+//      The slow EMA length = sensitivity + 13.
+//   2. When the fast EMA crosses ABOVE the slow EMA (bullish crossover), the
+//      engine identifies the lowest price bar in the lookback window and creates
+//      a BULLISH zone around that low point. Volume is accumulated from that
+//      low bar to the crossover bar.
+//   3. When the fast EMA crosses BELOW the slow EMA (bearish crossunder), the
+//      engine identifies the highest price bar and creates a BEARISH zone around
+//      that high point with accumulated volume.
+//   4. Zones persist until INVALIDATED: a bullish zone is invalidated when price
+//      closes BELOW the zone's lower boundary. A bearish zone is invalidated
+//      when price closes ABOVE the zone's upper boundary.
+//   5. Zones too close together (within 3× ATR) are deduplicated — the newer
+//      zone replaces the older one.
+//
+// SIX SENSITIVITY TIERS (A through F):
+//   A = highest sensitivity (longest EMA, slowest to trigger, fewest zones)
+//   F = lowest sensitivity (shortest EMA, fastest to trigger, most zones)
+//   Each tier runs its own independent VOB engine. Zones from different tiers
+//   can overlap at the same price level — this is "stacking" and represents
+//   extreme confluence.
+//
+// MUTUALLY EXCLUSIVE (MutEx) OVERLAP ENGINE:
+//   When zones from different sensitivities overlap in price, the highest
+//   sensitivity tier gets full visual treatment (top line + bottom line +
+//   midline + shaded fill). Lower tiers get degraded to a single midline.
+//   This prevents visual clutter while preserving all zone data.
+//
+// T3 SUPER SIGNALS:
+//   A T3 signal fires when: exactly ONE zone exists in the dominant direction,
+//   that zone's volume exceeds the opposing pool × super_mult, and current
+//   price is inside that zone. This is the highest-conviction signal.
+//
+// NAGASAKI SIGNAL:
+//   Fires when the previous bar's volume exceeds ALL prior volume ever seen
+//   on this ticker/timeframe. All-time high volume event.
+//
+// MULTI-ZONE SAME-CANDLE DETECTION (v10 ADDITION):
+//   Fires when 2 OR 3+ zone-formation visual plots (zA / zB / zC / zD / zE / zF)
+//   appear on the SAME candle, separately for bullish and bearish. Four new
+//   detection plots — Bull 2, Bull 3+, Bear 2, Bear 3+ — each with its own
+//   alertcondition and Bloomberg-format alert() payload. The plot and alert
+//   share a single barstate.isconfirmed-gated boolean so visual + inbox parity
+//   is 1:1 and non-repainting.
+//
+// EMISSION LAYER (NEW — for Claude Code MCP reading):
+//   This indicator emits data through ALL SIX channels Claude Code can read:
+//   1. plot() → data_get_study_values: 37 numeric time series per bar
+//   2. label.new() → data_get_pine_labels: metadata text at zone formation
+//   3. table.new() → data_get_pine_tables: comprehensive snapshot + definitions
+//   4. log.info() → pine_get_console: per-bar structured streaming data
+//   5. alert() → alert strings with all metadata fields
+//   6. line.new() → data_get_pine_lines: zone boundary prices (existing)
+//
+// PLOT BUDGET (v10): 31 plotshapes + 7 alertconditions = 38 outputs / 64 budget.
+//   (Adds 4 multi-zone plotshapes + 4 multi-zone alertconditions on top of v10
+//    base. All three visual tables were removed in v10. VLB Bull + VLB Bear
+//    plus the 4 new MZ plots all share the cooldown_bars parameter.)
+//
+// ═══════════════════════════════════════════════════════════════════════════════
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+// UDTs — User-Defined Types (data structures)
+// ─────────────────────────────────────────────────────────────────────────────
+// "level" stores one VOB zone: its origin time, upper/lower price boundaries,
+// midpoint, accumulated volume, plus the OHLC of the swing-origin bar (v10+).
+// A zone with na fields has been invalidated.
+
+type level
+    int   indx    // Origin bar time (xloc.bar_time format). When the zone was born.
+    float upper   // Upper price boundary of the zone.
+    float lower   // Lower price boundary of the zone.
+    float mid     // Midpoint price = average of upper and lower.
+    float vol     // Total volume accumulated from the swing bar to the crossover bar.
+    float o       // Origin (swing) bar open.  Captured at zone formation. v10+.
+    float h       // Origin (swing) bar high.  Captured at zone formation. v10+.
+    float l       // Origin (swing) bar low.   Captured at zone formation. v10+.
+    float c       // Origin (swing) bar close. Captured at zone formation. v10+.
+
+// "hist_entry" stores one historical zone/T3-fire event. Visual tables were
+// removed in v10; the history-acquisition arrays remain for future consumers.
+type hist_entry
+    int   t       // Timestamp of the event.
+    float vol     // Volume at the event bar.
+    float pct     // Volume as percentage of total pool (zone events only).
+    string date_s // Human-readable date string.
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+// INPUTS — Sensitivities
+// ─────────────────────────────────────────────────────────────────────────────
+// These control the EMA lengths for each of the 6 VOB engines.
+// Higher value = longer EMA = slower to trigger = fewer but stronger zones.
+// Lower value = shorter EMA = faster to trigger = more but weaker zones.
+// Claude Code: these are the PRIMARY optimization targets per timeframe.
+
+int sens_a = input.int(2500, "Sensitivity A (Highest — fewest, strongest zones)",  group = "Sensitivities", minval = 1)
+int sens_b = input.int(2250, "Sensitivity B (second highest)",            group = "Sensitivities", minval = 1)
+int sens_c = input.int(2000, "Sensitivity C (middle-high)",            group = "Sensitivities", minval = 1)
+int sens_d = input.int(1500, "Sensitivity D (middle-low)",            group = "Sensitivities", minval = 1)
+int sens_e = input.int(1250, "Sensitivity E (second lowest)",            group = "Sensitivities", minval = 1)
+int sens_f = input.int(1000, "Sensitivity F (Lowest — most, weakest zones)",   group = "Sensitivities", minval = 1)
+
+// ─────────────────────────────────────────────────────────────────────────────
+// INPUTS — T3 Signal Toggles (checkbox = plot + alert for T3 signals)
+// ─────────────────────────────────────────────────────────────────────────────
+
+bool show_t3_buy_a  = input.bool(true, "T3a Buy",  group = "A Signals")
+bool show_t3_sell_a = input.bool(true, "T3a Sell", group = "A Signals")
+bool show_t3_buy_b  = input.bool(true, "T3b Buy",  group = "B Signals")
+bool show_t3_sell_b = input.bool(true, "T3b Sell", group = "B Signals")
+bool show_t3_buy_c  = input.bool(true, "T3c Buy",  group = "C Signals")
+bool show_t3_sell_c = input.bool(true, "T3c Sell", group = "C Signals")
+bool show_t3_buy_d  = input.bool(true, "T3d Buy",  group = "D Signals")
+bool show_t3_sell_d = input.bool(true, "T3d Sell", group = "D Signals")
+bool show_t3_buy_e  = input.bool(true, "T3e Buy",  group = "E Signals")
+bool show_t3_sell_e = input.bool(true, "T3e Sell", group = "E Signals")
+bool show_t3_buy_f  = input.bool(true, "T3f Buy",  group = "F Signals")
+bool show_t3_sell_f = input.bool(true, "T3f Sell", group = "F Signals")
+bool show_nagasaki  = input.bool(true, "Nagasaki (All-Time High Volume)", group = "Nagasaki")
+
+// ─────────────────────────────────────────────────────────────────────────────
+// INPUTS — Zone Line + Marker Toggles
+// ─────────────────────────────────────────────────────────────────────────────
+
+bool en_zone_a = input.bool(true, "Zone Lines + Markers A", group = "Zone Drawing")
+bool en_zone_b = input.bool(true, "Zone Lines + Markers B", group = "Zone Drawing")
+bool en_zone_c = input.bool(true, "Zone Lines + Markers C", group = "Zone Drawing")
+bool en_zone_d = input.bool(true, "Zone Lines + Markers D", group = "Zone Drawing")
+bool en_zone_e = input.bool(true, "Zone Lines + Markers E", group = "Zone Drawing")
+bool en_zone_f = input.bool(true, "Zone Lines + Markers F", group = "Zone Drawing")
+
+// ─────────────────────────────────────────────────────────────────────────────
+// INPUTS — Signal Parameters
+// ─────────────────────────────────────────────────────────────────────────────
+// Claude Code: asym_threshold is reserved for future Tier 1 asymmetric signals.
+// super_mult is the ACTIVE T3 signal threshold — dominant zone volume must
+// exceed the opposing pool volume multiplied by this value.
+
+float asym_threshold = input.float(99.0, "Tier 1 — Asymmetric Percent Threshold",
+     minval = 0.1, step = 5,
+     group = "Signal Parameters",
+     tooltip = "Reserved for future Tier 1 asymmetric signals. T3 uses Super Mult only. No upper cap.")
+float super_mult = input.float(1.5, "Tier 3 — Super Volume Multiplier",
+     minval = 0.1, step = 0.1,
+     group = "Signal Parameters",
+     tooltip = "For T3 signals: dominant zone volume must exceed opposing pool times this multiplier. Higher = stricter = fewer signals. No upper cap.")
+
+// ─────────────────────────────────────────────────────────────────────────────
+// INPUTS — Cooldown
+// ─────────────────────────────────────────────────────────────────────────────
+
+int cooldown_bars = input.int(100, "Cooldown Bars", group = "Cooldown",
+     minval = 0, step = 5,
+     tooltip = "After a signal fires, suppress that SAME signal for this many bars. 0 = no cooldown. No upper cap.")
+
+// ─────────────────────────────────────────────────────────────────────────────
+// INPUTS — VLB Strict Ladder Detection (v10)
+// ─────────────────────────────────────────────────────────────────────────────
+// VLB requires the six zones to FORM in strict chronological order across
+// bars (F → E → D → C → B → A), and at every step the new zone's price
+// range must touch or sit above (bull) / below (bear) the prior zone.
+
+bool show_vlb_bull = input.bool(true, "VLB Bull (strict F→A chronological + price-overlap)",
+     group = "Detection — VLB Strict Ladder",
+     tooltip = "Fires ONE plot on the bar where bullish zone-A completes the strict F→E→D→C→B→A chronological ladder. At every step the new zone's range must not be entirely below the prior zone (new.high >= prior.low). ANY bearish zone (any tier) or any wrong-tier bullish (including a fresh F mid-ladder) kills the in-progress window. After fire OR kill the window resets and waits for the next F.")
+bool show_vlb_bear = input.bool(true, "VLB Bear (strict F→A chronological + price-overlap)",
+     group = "Detection — VLB Strict Ladder",
+     tooltip = "Mirror of VLB Bull. Fires on the bar where bearish zone-A completes the strict F→E→D→C→B→A chronological ladder. At every step the new zone's range must not be entirely above the prior zone (new.low <= prior.high). ANY bullish zone (any tier) or any wrong-tier bearish kills the in-progress window.")
+
+// ─────────────────────────────────────────────────────────────────────────────
+// INPUTS — Multi-Zone Same-Candle Detection (v10 ADDITION)
+// ─────────────────────────────────────────────────────────────────────────────
+// Fires when 2 OR 3+ zone-formation visual plots (zA / zB / zC / zD / zE / zF)
+// appear on the SAME candle. Counted off the same gated booleans that paint
+// the existing zone-formation cross markers (fire_zb_* / fire_zs_*), so the
+// multi-zone detection literally counts how many of those marker plots are
+// visible on the bar. Mutually exclusive within direction: "Bull 2" fires when
+// EXACTLY two bull tiers fired this bar; "Bull 3+" fires when THREE OR MORE
+// bull tiers fired (so 4-, 5-, or 6-tier bars hit Bull 3+). Mirror for bear.
+// Non-repainting (zone formation is barstate.isconfirmed inside f_vob) with
+// 1:1 plot/alert parity (one shared boolean drives both).
+
+bool show_multi_bull_2 = input.bool(true, "Multi-Zone Bull 2 (any 2 bull markers same candle)",
+     group = "Detection — Multi-Zone Same Candle",
+     tooltip = "Fires when EXACTLY 2 bullish zone-formation visual plots (zA / zB / zC / zD / zE / zF) appear on the same candle. Mutually exclusive with Multi-Zone Bull 3+.")
+bool show_multi_bull_3 = input.bool(true, "Multi-Zone Bull 3+ (any 3 or more bull markers same candle)",
+     group = "Detection — Multi-Zone Same Candle",
+     tooltip = "Fires when 3 OR MORE bullish zone-formation visual plots appear on the same candle. Mutually exclusive with Multi-Zone Bull 2 (so 4-, 5-, or 6-tier same-candle bursts also hit this plot, not Bull 2).")
+bool show_multi_bear_2 = input.bool(true, "Multi-Zone Bear 2 (any 2 bear markers same candle)",
+     group = "Detection — Multi-Zone Same Candle",
+     tooltip = "Mirror of Multi-Zone Bull 2 — fires when EXACTLY 2 bearish zone-formation visual plots appear on the same candle.")
+bool show_multi_bear_3 = input.bool(true, "Multi-Zone Bear 3+ (any 3 or more bear markers same candle)",
+     group = "Detection — Multi-Zone Same Candle",
+     tooltip = "Mirror of Multi-Zone Bull 3+ — fires when 3 OR MORE bearish zone-formation visual plots appear on the same candle.")
+
+// ─────────────────────────────────────────────────────────────────────────────
+// INPUTS — Bullish Zone Colors
+// ─────────────────────────────────────────────────────────────────────────────
+
+color col_bull_a = input.color(#0D47A1, "A Bull — Dark Blue",      group = "Bull Colors")
+color col_bull_b = input.color(#64B5F6, "B Bull — Light Blue",     group = "Bull Colors")
+color col_bull_c = input.color(#1B5E20, "C Bull — Dark Green",     group = "Bull Colors")
+color col_bull_d = input.color(#81C784, "D Bull — Light Green",    group = "Bull Colors")
+color col_bull_e = input.color(#00E5FF, "E Bull — Bright Aqua",    group = "Bull Colors")
+color col_bull_f = input.color(#FFFFFF, "F Bull — White",          group = "Bull Colors")
+
+// ─────────────────────────────────────────────────────────────────────────────
+// INPUTS — Bearish Zone Colors
+// ─────────────────────────────────────────────────────────────────────────────
+
+color col_bear_a = input.color(#8B0000, "A Bear — Dark Red",       group = "Bear Colors")
+color col_bear_b = input.color(#EF9A9A, "B Bear — Light Red",      group = "Bear Colors")
+color col_bear_c = input.color(#E65100, "C Bear — Dark Orange",    group = "Bear Colors")
+color col_bear_d = input.color(#FFB74D, "D Bear — Light Orange",   group = "Bear Colors")
+color col_bear_e = input.color(#880E4F, "E Bear — Dark Magenta",   group = "Bear Colors")
+color col_bear_f = input.color(#F48FB1, "F Bear — Light Magenta",  group = "Bear Colors")
+
+// ─────────────────────────────────────────────────────────────────────────────
+// INPUTS — Line Drawing Parameters
+// ─────────────────────────────────────────────────────────────────────────────
+
+int fill_transp = input.int(85, "Fill Transparency", minval = 0, maxval = 100, group = "Line Drawing")
+int mid_transp  = input.int(30, "Midline Transparency", minval = 0, maxval = 100, group = "Line Drawing")
+
+// ─────────────────────────────────────────────────────────────────────────────
+// INPUTS — Emission Layer Controls
+// ─────────────────────────────────────────────────────────────────────────────
+// Visual tables were removed in v10. en_emission_labels gates zone-formation
+// labels; en_emission_logs gates per-bar log.info streaming. hist_depth
+// caps the history-acquisition arrays (no visual consumer, kept for future).
+
+bool en_emission_labels = input.bool(true, "Enable Zone Formation Labels (data_get_pine_labels)", group = "Emission Layer")
+bool en_emission_logs   = input.bool(true, "Enable Console Logs (pine_get_console)",           group = "Emission Layer")
+float stack_thresh_pct  = input.float(2.0, "Stacking Threshold Percent",
+     minval = 0.1, step = 0.5, group = "Emission Layer",
+     tooltip = "Zones within this percentage of current price are counted as 'stacked'. 2.0 = zones whose midpoint is within 2% of close.")
+int   hist_depth        = input.int(50, "History Depth (events stored per signal)",
+     minval = 1, step = 5, group = "Emission Layer",
+     tooltip = "Max zone/T3 events buffered per signal-side. Visual tables were removed in v10 but the underlying history acquisition is preserved for downstream consumers.")
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SHARED CALCULATIONS
+// ─────────────────────────────────────────────────────────────────────────────
+
+float atr_base      = ta.highest(ta.atr(200), 200)
+float atr_proximity = atr_base * 3
+float atr_adjust    = atr_base * 2
+
+// ─────────────────────────────────────────────────────────────────────────────
+// EMISSION LAYER — SUPPLEMENTARY MARKET STATE CALCULATIONS
+// ─────────────────────────────────────────────────────────────────────────────
+// These calculations DO NOT affect any signal logic. They exist solely to
+// provide Claude Code with market context for parameter optimization.
+
+// RSI — Relative Strength Index, 14-period. Measures momentum on a 0-100 scale.
+// Below 30 = oversold (potential bounce). Above 70 = overbought (potential rejection).
+float rsi_14 = ta.rsi(close, 14)
+
+// Session bar counter — counts bars since the regular trading session opened.
+// Resets at session open. Used to identify trade regime:
+//   bars 1-2 = The Opening, bars 3-10 = Opening Drive,
+//   bars 11-40 = Trend Day, bars 41+ = Mid-Day / Silent Accumulation
+var int sess_bar_count = 0
+bool new_session = ta.change(time("D")) != 0
+if new_session
+    sess_bar_count := 1
+else
+    sess_bar_count += 1
+
+// Volume rank — current bar's volume as a percentile rank vs last 200 bars.
+// 95+ = extreme volume. 50 = average. Below 20 = quiet.
+float vol_rank = ta.percentrank(volume, 200)
+
+// EMA slopes per sensitivity — rate of change of the fast EMA.
+// Positive slope = bullish momentum. Negative = bearish.
+// Computed outside f_vob() to avoid modifying signal logic.
+float ema_a_fast  = ta.ema(close, sens_a)
+float slope_ema_a = nz(ema_a_fast[1]) > 0 ? (ema_a_fast - nz(ema_a_fast[1])) / nz(ema_a_fast[1]) * 100 : 0.0
+float ema_b_fast  = ta.ema(close, sens_b)
+float slope_ema_b = nz(ema_b_fast[1]) > 0 ? (ema_b_fast - nz(ema_b_fast[1])) / nz(ema_b_fast[1]) * 100 : 0.0
+float ema_c_fast  = ta.ema(close, sens_c)
+float slope_ema_c = nz(ema_c_fast[1]) > 0 ? (ema_c_fast - nz(ema_c_fast[1])) / nz(ema_c_fast[1]) * 100 : 0.0
+float ema_d_fast  = ta.ema(close, sens_d)
+float slope_ema_d = nz(ema_d_fast[1]) > 0 ? (ema_d_fast - nz(ema_d_fast[1])) / nz(ema_d_fast[1]) * 100 : 0.0
+float ema_e_fast  = ta.ema(close, sens_e)
+float slope_ema_e = nz(ema_e_fast[1]) > 0 ? (ema_e_fast - nz(ema_e_fast[1])) / nz(ema_e_fast[1]) * 100 : 0.0
+float ema_f_fast  = ta.ema(close, sens_f)
+float slope_ema_f = nz(ema_f_fast[1]) > 0 ? (ema_f_fast - nz(ema_f_fast[1])) / nz(ema_f_fast[1]) * 100 : 0.0
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PER-SENSITIVITY STATE ARRAYS
+// ─────────────────────────────────────────────────────────────────────────────
+// Each array stores up to 15 zones. Zones with na fields have been invalidated
+// but not yet garbage-collected.
+
+var array<level> upper_a = array.new<level>()
+var array<level> lower_a = array.new<level>()
+var array<level> upper_b = array.new<level>()
+var array<level> lower_b = array.new<level>()
+var array<level> upper_c = array.new<level>()
+var array<level> lower_c = array.new<level>()
+var array<level> upper_d = array.new<level>()
+var array<level> lower_d = array.new<level>()
+var array<level> upper_e = array.new<level>()
+var array<level> lower_e = array.new<level>()
+var array<level> upper_f = array.new<level>()
+var array<level> lower_f = array.new<level>()
+
+// ─────────────────────────────────────────────────────────────────────────────
+// COOLDOWN STATE — T3 signals
+// ─────────────────────────────────────────────────────────────────────────────
+
+var int last_t3_buy_a  = na, var int last_t3_sell_a = na
+var int last_t3_buy_b  = na, var int last_t3_sell_b = na
+var int last_t3_buy_c  = na, var int last_t3_sell_c = na
+var int last_t3_buy_d  = na, var int last_t3_sell_d = na
+var int last_t3_buy_e  = na, var int last_t3_sell_e = na
+var int last_t3_buy_f  = na, var int last_t3_sell_f = na
+var int last_nagasaki  = na
+
+// ─────────────────────────────────────────────────────────────────────────────
+// COOLDOWN STATE — Zone-creation markers
+// ─────────────────────────────────────────────────────────────────────────────
+
+var int cd_zb_a = na, var int cd_zs_a = na
+var int cd_zb_b = na, var int cd_zs_b = na
+var int cd_zb_c = na, var int cd_zs_c = na
+var int cd_zb_d = na, var int cd_zs_d = na
+var int cd_zb_e = na, var int cd_zs_e = na
+var int cd_zb_f = na, var int cd_zs_f = na
+
+// ─────────────────────────────────────────────────────────────────────────────
+// COOLDOWN STATE — Multi-Zone Same-Candle detections (v10 ADDITION)
+// ─────────────────────────────────────────────────────────────────────────────
+
+var int last_mz_b2 = na
+var int last_mz_b3 = na
+var int last_mz_s2 = na
+var int last_mz_s3 = na
+
+// ─────────────────────────────────────────────────────────────────────────────
+// HISTORY ARRAYS — zone events (data acquisition preserved; visual table gone)
+// ─────────────────────────────────────────────────────────────────────────────
+
+var array<hist_entry> hb_a = array.new<hist_entry>()
+var array<hist_entry> hs_a = array.new<hist_entry>()
+var array<hist_entry> hb_b = array.new<hist_entry>()
+var array<hist_entry> hs_b = array.new<hist_entry>()
+var array<hist_entry> hb_c = array.new<hist_entry>()
+var array<hist_entry> hs_c = array.new<hist_entry>()
+var array<hist_entry> hb_d = array.new<hist_entry>()
+var array<hist_entry> hs_d = array.new<hist_entry>()
+var array<hist_entry> hb_e = array.new<hist_entry>()
+var array<hist_entry> hs_e = array.new<hist_entry>()
+var array<hist_entry> hb_f = array.new<hist_entry>()
+var array<hist_entry> hs_f = array.new<hist_entry>()
+
+// ─────────────────────────────────────────────────────────────────────────────
+// HISTORY ARRAYS — T3 signal events (data acquisition preserved; visual table gone)
+// ─────────────────────────────────────────────────────────────────────────────
+
+var array<hist_entry> ht3ba = array.new<hist_entry>()
+var array<hist_entry> ht3sa = array.new<hist_entry>()
+var array<hist_entry> ht3bb = array.new<hist_entry>()
+var array<hist_entry> ht3sb = array.new<hist_entry>()
+var array<hist_entry> ht3bc = array.new<hist_entry>()
+var array<hist_entry> ht3sc = array.new<hist_entry>()
+var array<hist_entry> ht3bd = array.new<hist_entry>()
+var array<hist_entry> ht3sd = array.new<hist_entry>()
+var array<hist_entry> ht3be = array.new<hist_entry>()
+var array<hist_entry> ht3se = array.new<hist_entry>()
+var array<hist_entry> ht3bf = array.new<hist_entry>()
+var array<hist_entry> ht3sf = array.new<hist_entry>()
+var array<hist_entry> h_nag = array.new<hist_entry>()
+
+// ─────────────────────────────────────────────────────────────────────────────
+// HELPER FUNCTIONS
+// ─────────────────────────────────────────────────────────────────────────────
+
+f_cd_ok(int last_bar, int cd) =>
+    na(last_bar) or (bar_index - last_bar) > cd
+
+f_fmt_vol(float v) =>
+    if v >= 1000000
+        str.tostring(math.round(v / 1000000)) + "M"
+    else if v >= 1000
+        str.tostring(math.round(v / 1000)) + "K"
+    else
+        str.tostring(math.round(v))
+
+f_zones_overlap(float lo1, float hi1, float lo2, float hi2) =>
+    not na(lo1) and not na(hi1) and not na(lo2) and not na(hi2) and lo1 < hi2 and hi1 > lo2
+
+f_push_hist(array<hist_entry> arr, float vol, float pool, int max_depth) =>
+    float pct = pool > 0 ? (vol / pool * 100) : 100.0
+    string full_ds = str.format_time(time, "MM/dd HH:mm", syminfo.timezone)
+    string ds = str.substring(full_ds, 0, str.length(full_ds) - 1)
+    arr.push(hist_entry.new(time, vol, pct, ds))
+    if arr.size() > max_depth
+        arr.shift()
+
+f_push_t3_hist(array<hist_entry> arr, int max_depth) =>
+    string full_ds = str.format_time(time, "MM/dd HH:mm", syminfo.timezone)
+    string ds = str.substring(full_ds, 0, str.length(full_ds) - 1)
+    arr.push(hist_entry.new(time, volume, 0.0, ds))
+    if arr.size() > max_depth
+        arr.shift()
+
+// ─────────────────────────────────────────────────────────────────────────────
+// EMISSION HELPER FUNCTIONS
+// ─────────────────────────────────────────────────────────────────────────────
+// These help compute emission metrics without modifying signal logic.
+
+// Count active (non-invalidated) zones in an array.
+// An active zone has a non-na vol field.
+f_count_active(array<level> arr) =>
+    int c = 0
+    if arr.size() > 0
+        for i = 0 to arr.size() - 1
+            if not na(arr.get(i).vol)
+                c += 1
+    c
+
+// Find the minimum distance (as percent of price) from close to any active
+// zone's midpoint in the given array. Returns -1 if no active zones.
+f_nearest_dist_pct(array<level> arr, float price) =>
+    float best = -1.0
+    if arr.size() > 0 and price > 0
+        for i = 0 to arr.size() - 1
+            level l = arr.get(i)
+            if not na(l.mid)
+                float d = math.abs(price - l.mid) / price * 100
+                if best < 0 or d < best
+                    best := d
+    best
+
+// Count zones whose midpoint is within threshold_pct of current price.
+// This is the "stacking near price" count — zones clustering around price.
+f_stack_near(array<level> arr, float price, float thresh_pct) =>
+    int c = 0
+    if arr.size() > 0 and price > 0
+        for i = 0 to arr.size() - 1
+            level l = arr.get(i)
+            if not na(l.mid) and math.abs(price - l.mid) / price * 100 <= thresh_pct
+                c += 1
+    c
+
+// Find distance (as percent) to the nearest opposing zone ABOVE price.
+// Used for bull gap: how far can price go up before hitting a bear zone?
+// Returns 100.0 if no opposing zones above.
+f_nearest_above_pct(array<level> arr, float price) =>
+    float best = 100.0
+    if arr.size() > 0 and price > 0
+        for i = 0 to arr.size() - 1
+            level l = arr.get(i)
+            if not na(l.mid) and l.mid > price
+                float d = (l.mid - price) / price * 100
+                if d < best
+                    best := d
+    best
+
+// Find distance (as percent) to the nearest opposing zone BELOW price.
+// Used for bear gap: how far can price go down before hitting a bull zone?
+f_nearest_below_pct(array<level> arr, float price) =>
+    float best = 100.0
+    if arr.size() > 0 and price > 0
+        for i = 0 to arr.size() - 1
+            level l = arr.get(i)
+            if not na(l.mid) and l.mid < price
+                float d = (price - l.mid) / price * 100
+                if d < best
+                    best := d
+    best
+
+// Get the nearest active zone's midpoint price from an array.
+f_nearest_mid(array<level> arr, float price) =>
+    float best_mid = na
+    float best_d   = 1e18
+    if arr.size() > 0 and price > 0
+        for i = 0 to arr.size() - 1
+            level l = arr.get(i)
+            if not na(l.mid)
+                float d = math.abs(price - l.mid)
+                if d < best_d
+                    best_d   := d
+                    best_mid := l.mid
+    best_mid
+
+// Get the nearest active zone's volume from an array.
+f_nearest_vol(array<level> arr, float price) =>
+    float best_vol = na
+    float best_d   = 1e18
+    if arr.size() > 0 and price > 0
+        for i = 0 to arr.size() - 1
+            level l = arr.get(i)
+            if not na(l.mid)
+                float d = math.abs(price - l.mid)
+                if d < best_d
+                    best_d   := d
+                    best_vol := l.vol
+    best_vol
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CORE VOB FUNCTION — returns [t3_buy, t3_sell, bull_pool, bear_pool]
+// ─────────────────────────────────────────────────────────────────────────────
+// v10: level.new() calls extended to capture origin-bar OHLC at zone formation.
+// Signal logic is otherwise PRESERVED EXACTLY from the original.
+
+f_vob(int len1, array<level> up_lvl, array<level> lo_lvl, float atr_prox, float atr_adj, float sup_mult) =>
+    int   len2    = len1 + 13
+    float ema1    = ta.ema(close, len1)
+    float ema2    = ta.ema(close, len2)
+    bool  cup     = ta.crossover(ema1, ema2)  and barstate.isconfirmed
+    bool  cdn     = ta.crossunder(ema1, ema2) and barstate.isconfirmed
+    float lowest  = ta.lowest(len2)
+    float highest = ta.highest(len2)
+
+    if cup
+        float vol = 0.0
+        for i = 1 to len2
+            if low[i] == lowest
+                int index = time[i]
+                for k = 0 to i
+                    vol += volume[k]
+                float src = math.min(open[i], close[i])
+                src := (src - lowest) < atr_adj * 0.5 ? lowest + atr_adj * 0.5 : src
+                float mid = math.avg(src, lowest)
+                lo_lvl.push(level.new(index, src, lowest, mid, vol, open[i], high[i], low[i], close[i]))
+
+    if cdn
+        float vol = 0.0
+        for i = 1 to len2
+            if high[i] == highest
+                int index = time[i]
+                for k = 0 to i
+                    vol += volume[k]
+                float src = math.max(open[i], close[i])
+                src := (highest - src) < atr_adj * 0.5 ? highest - atr_adj * 0.5 : src
+                float mid = math.avg(src, highest)
+                up_lvl.push(level.new(index, highest, src, mid, vol, open[i], high[i], low[i], close[i]))
+
+    if lo_lvl.size() > 0
+        for i = 0 to lo_lvl.size() - 1
+            level l  = lo_lvl.get(i)
+            level l1 = lo_lvl.get(i - 1)
+            float mid  = l.mid
+            float mid1 = l1.mid
+            if math.abs(mid - mid1) < atr_prox
+                lo_lvl.set(i - 1, level.new(na, na, na, na, na, na, na, na, na))
+            if close < l.lower
+                lo_lvl.set(i, level.new(na, na, na, na, na, na, na, na, na))
+        if lo_lvl.size() > 15
+            lo_lvl.shift()
+
+    if up_lvl.size() > 0
+        for i = 0 to up_lvl.size() - 1
+            level l     = up_lvl.get(i)
+            level l1    = up_lvl.get(i - 1)
+            float upper = l.upper
+            float mid   = l.mid
+            float mid1  = l1.mid
+            if math.abs(mid - mid1) < atr_prox
+                up_lvl.set(i - 1, level.new(na, na, na, na, na, na, na, na, na))
+            if close > upper
+                up_lvl.set(i, level.new(na, na, na, na, na, na, na, na, na))
+        if up_lvl.size() > 15
+            up_lvl.shift()
+
+    bool  t3_buy  = false
+    bool  t3_sell = false
+    float bp      = 0.0
+    float sp      = 0.0
+
+    if barstate.isconfirmed
+        array<float> vbv = array.new<float>()
+        array<float> vbl = array.new<float>()
+        array<float> vbh = array.new<float>()
+        if lo_lvl.size() > 0
+            for i = 0 to lo_lvl.size() - 1
+                level l = lo_lvl.get(i)
+                if not na(l.vol)
+                    vbv.push(l.vol)
+                    vbl.push(l.lower)
+                    vbh.push(l.upper)
+
+        array<float> vav  = array.new<float>()
+        array<float> val2 = array.new<float>()
+        array<float> vah  = array.new<float>()
+        if up_lvl.size() > 0
+            for i = 0 to up_lvl.size() - 1
+                level l = up_lvl.get(i)
+                if not na(l.vol)
+                    vav.push(l.vol)
+                    val2.push(l.lower)
+                    vah.push(l.upper)
+
+        bp := vbv.size() > 0 ? vbv.sum() : 0.0
+        sp := vav.size() > 0 ? vav.sum() : 0.0
+
+        float db_vol = 0.0
+        float db_low = 0.0
+        float db_high = 0.0
+        int bc = vbv.size()
+        if bc > 0
+            for i = 0 to bc - 1
+                float v = vbv.get(i)
+                if v > db_vol
+                    db_vol  := v
+                    db_low  := vbl.get(i)
+                    db_high := vbh.get(i)
+
+        float da_vol = 0.0
+        float da_low = 0.0
+        float da_high = 0.0
+        int ac = vav.size()
+        if ac > 0
+            for i = 0 to ac - 1
+                float v = vav.get(i)
+                if v > da_vol
+                    da_vol  := v
+                    da_low  := val2.get(i)
+                    da_high := vah.get(i)
+
+        bool pat_bull = close >= db_low and close <= db_high
+        bool pat_bear = close >= da_low and close <= da_high
+
+        t3_buy  := bc == 1 and sp > 0 and db_vol > sp * sup_mult and pat_bull
+        t3_sell := ac == 1 and bp > 0 and da_vol > bp * sup_mult and pat_bear
+
+    [t3_buy, t3_sell, bp, sp]
+
+// ─────────────────────────────────────────────────────────────────────────────
+// FUNCTION CALLS — capture array sizes BEFORE for zone-creation detection
+// ─────────────────────────────────────────────────────────────────────────────
+
+int sz_la = lower_a.size()
+int sz_ua = upper_a.size()
+int sz_lb = lower_b.size()
+int sz_ub = upper_b.size()
+int sz_lc = lower_c.size()
+int sz_uc = upper_c.size()
+int sz_ld = lower_d.size()
+int sz_ud = upper_d.size()
+int sz_le = lower_e.size()
+int sz_ue = upper_e.size()
+int sz_lf = lower_f.size()
+int sz_uf = upper_f.size()
+
+[t3_buy_a, t3_sell_a, bpa, spa] = f_vob(sens_a, upper_a, lower_a, atr_proximity, atr_adjust, super_mult)
+[t3_buy_b, t3_sell_b, bpb, spb] = f_vob(sens_b, upper_b, lower_b, atr_proximity, atr_adjust, super_mult)
+[t3_buy_c, t3_sell_c, bpc, spc] = f_vob(sens_c, upper_c, lower_c, atr_proximity, atr_adjust, super_mult)
+[t3_buy_d, t3_sell_d, bpd, spd] = f_vob(sens_d, upper_d, lower_d, atr_proximity, atr_adjust, super_mult)
+[t3_buy_e, t3_sell_e, bpe, spe] = f_vob(sens_e, upper_e, lower_e, atr_proximity, atr_adjust, super_mult)
+[t3_buy_f, t3_sell_f, bpf, spf] = f_vob(sens_f, upper_f, lower_f, atr_proximity, atr_adjust, super_mult)
+
+// Zone-creation booleans (array grew = new zone pushed)
+bool nzb_a = lower_a.size() > sz_la
+bool nzs_a = upper_a.size() > sz_ua
+bool nzb_b = lower_b.size() > sz_lb
+bool nzs_b = upper_b.size() > sz_ub
+bool nzb_c = lower_c.size() > sz_lc
+bool nzs_c = upper_c.size() > sz_uc
+bool nzb_d = lower_d.size() > sz_ld
+bool nzs_d = upper_d.size() > sz_ud
+bool nzb_e = lower_e.size() > sz_le
+bool nzs_e = upper_e.size() > sz_ue
+bool nzb_f = lower_f.size() > sz_lf
+bool nzs_f = upper_f.size() > sz_uf
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// EMISSION LAYER — ZONE METRICS COMPUTATION (moved here so alerts can use them)
+// ═══════════════════════════════════════════════════════════════════════════════
+// These DO NOT affect signal logic. Computed here (after f_vob populates zone
+// arrays) so Bloomberg-format alert strings can reference them.
+
+int cnt_ba = f_count_active(lower_a)
+int cnt_sa = f_count_active(upper_a)
+int cnt_bb = f_count_active(lower_b)
+int cnt_sb = f_count_active(upper_b)
+int cnt_bc = f_count_active(lower_c)
+int cnt_sc = f_count_active(upper_c)
+int cnt_bd = f_count_active(lower_d)
+int cnt_sd = f_count_active(upper_d)
+int cnt_be = f_count_active(lower_e)
+int cnt_se = f_count_active(upper_e)
+int cnt_bf = f_count_active(lower_f)
+int cnt_sf = f_count_active(upper_f)
+int cnt_bull_all = cnt_ba + cnt_bb + cnt_bc + cnt_bd + cnt_be + cnt_bf
+int cnt_bear_all = cnt_sa + cnt_sb + cnt_sc + cnt_sd + cnt_se + cnt_sf
+
+float nd_ba = f_nearest_dist_pct(lower_a, close)
+float nd_sa = f_nearest_dist_pct(upper_a, close)
+float nd_bb = f_nearest_dist_pct(lower_b, close)
+float nd_sb = f_nearest_dist_pct(upper_b, close)
+float nd_bc = f_nearest_dist_pct(lower_c, close)
+float nd_sc = f_nearest_dist_pct(upper_c, close)
+float nd_bd = f_nearest_dist_pct(lower_d, close)
+float nd_sd = f_nearest_dist_pct(upper_d, close)
+float nd_be = f_nearest_dist_pct(lower_e, close)
+float nd_se = f_nearest_dist_pct(upper_e, close)
+float nd_bf = f_nearest_dist_pct(lower_f, close)
+float nd_sf = f_nearest_dist_pct(upper_f, close)
+
+float nearest_bull_dist = math.min(nd_ba >= 0 ? nd_ba : 999, nd_bb >= 0 ? nd_bb : 999, nd_bc >= 0 ? nd_bc : 999, nd_bd >= 0 ? nd_bd : 999, nd_be >= 0 ? nd_be : 999, nd_bf >= 0 ? nd_bf : 999)
+float nearest_bear_dist = math.min(nd_sa >= 0 ? nd_sa : 999, nd_sb >= 0 ? nd_sb : 999, nd_sc >= 0 ? nd_sc : 999, nd_sd >= 0 ? nd_sd : 999, nd_se >= 0 ? nd_se : 999, nd_sf >= 0 ? nd_sf : 999)
+nearest_bull_dist := nearest_bull_dist >= 999 ? -1.0 : nearest_bull_dist
+nearest_bear_dist := nearest_bear_dist >= 999 ? -1.0 : nearest_bear_dist
+
+int stk_bull = f_stack_near(lower_a, close, stack_thresh_pct) + f_stack_near(lower_b, close, stack_thresh_pct) + f_stack_near(lower_c, close, stack_thresh_pct) + f_stack_near(lower_d, close, stack_thresh_pct) + f_stack_near(lower_e, close, stack_thresh_pct) + f_stack_near(lower_f, close, stack_thresh_pct)
+int stk_bear = f_stack_near(upper_a, close, stack_thresh_pct) + f_stack_near(upper_b, close, stack_thresh_pct) + f_stack_near(upper_c, close, stack_thresh_pct) + f_stack_near(upper_d, close, stack_thresh_pct) + f_stack_near(upper_e, close, stack_thresh_pct) + f_stack_near(upper_f, close, stack_thresh_pct)
+
+float opp_a = f_nearest_above_pct(upper_a, close)
+float opp_b = f_nearest_above_pct(upper_b, close)
+float opp_c = f_nearest_above_pct(upper_c, close)
+float opp_d = f_nearest_above_pct(upper_d, close)
+float opp_e = f_nearest_above_pct(upper_e, close)
+float opp_f = f_nearest_above_pct(upper_f, close)
+float bull_gap = math.min(opp_a, opp_b, opp_c, opp_d, opp_e, opp_f)
+float opp_ba = f_nearest_below_pct(lower_a, close)
+float opp_bb = f_nearest_below_pct(lower_b, close)
+float opp_bc = f_nearest_below_pct(lower_c, close)
+float opp_bd = f_nearest_below_pct(lower_d, close)
+float opp_be = f_nearest_below_pct(lower_e, close)
+float opp_bf = f_nearest_below_pct(lower_f, close)
+float bear_gap = math.min(opp_ba, opp_bb, opp_bc, opp_bd, opp_be, opp_bf)
+
+// ─────────────────────────────────────────────────────────────────────────────
+// NAGASAKI — All-Time High Volume (PRESERVED EXACTLY)
+// ─────────────────────────────────────────────────────────────────────────────
+
+var float maxVolEver = 0.0
+bool isNagasaki = false
+if volume[1] > maxVolEver
+    maxVolEver := volume[1]
+    isNagasaki := true
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// LAYER 1 — ORIGINAL T3 SIGNAL CONDITIONS + COOLDOWN (PRESERVED EXACTLY)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+bool plot_t3_buy_a  = show_t3_buy_a  and t3_buy_a  and f_cd_ok(last_t3_buy_a,  cooldown_bars)
+bool plot_t3_sell_a = show_t3_sell_a and t3_sell_a and f_cd_ok(last_t3_sell_a, cooldown_bars)
+bool plot_t3_buy_b  = show_t3_buy_b  and t3_buy_b  and f_cd_ok(last_t3_buy_b,  cooldown_bars)
+bool plot_t3_sell_b = show_t3_sell_b and t3_sell_b and f_cd_ok(last_t3_sell_b, cooldown_bars)
+bool plot_t3_buy_c  = show_t3_buy_c  and t3_buy_c  and f_cd_ok(last_t3_buy_c,  cooldown_bars)
+bool plot_t3_sell_c = show_t3_sell_c and t3_sell_c and f_cd_ok(last_t3_sell_c, cooldown_bars)
+bool plot_t3_buy_d  = show_t3_buy_d  and t3_buy_d  and f_cd_ok(last_t3_buy_d,  cooldown_bars)
+bool plot_t3_sell_d = show_t3_sell_d and t3_sell_d and f_cd_ok(last_t3_sell_d, cooldown_bars)
+bool plot_t3_buy_e  = show_t3_buy_e  and t3_buy_e  and f_cd_ok(last_t3_buy_e,  cooldown_bars)
+bool plot_t3_sell_e = show_t3_sell_e and t3_sell_e and f_cd_ok(last_t3_sell_e, cooldown_bars)
+bool plot_t3_buy_f  = show_t3_buy_f  and t3_buy_f  and f_cd_ok(last_t3_buy_f,  cooldown_bars)
+bool plot_t3_sell_f = show_t3_sell_f and t3_sell_f and f_cd_ok(last_t3_sell_f, cooldown_bars)
+bool plot_nagasaki  = show_nagasaki  and isNagasaki and f_cd_ok(last_nagasaki, cooldown_bars)
+
+// T3 cooldown stamps
+if plot_t3_buy_a
+    last_t3_buy_a := bar_index
+if plot_t3_sell_a
+    last_t3_sell_a := bar_index
+if plot_t3_buy_b
+    last_t3_buy_b := bar_index
+if plot_t3_sell_b
+    last_t3_sell_b := bar_index
+if plot_t3_buy_c
+    last_t3_buy_c := bar_index
+if plot_t3_sell_c
+    last_t3_sell_c := bar_index
+if plot_t3_buy_d
+    last_t3_buy_d := bar_index
+if plot_t3_sell_d
+    last_t3_sell_d := bar_index
+if plot_t3_buy_e
+    last_t3_buy_e := bar_index
+if plot_t3_sell_e
+    last_t3_sell_e := bar_index
+if plot_t3_buy_f
+    last_t3_buy_f := bar_index
+if plot_t3_sell_f
+    last_t3_sell_f := bar_index
+if plot_nagasaki
+    last_nagasaki := bar_index
+
+// T3 + Nagasaki signal history tracking
+if plot_t3_buy_a
+    f_push_t3_hist(ht3ba, hist_depth)
+if plot_t3_sell_a
+    f_push_t3_hist(ht3sa, hist_depth)
+if plot_t3_buy_b
+    f_push_t3_hist(ht3bb, hist_depth)
+if plot_t3_sell_b
+    f_push_t3_hist(ht3sb, hist_depth)
+if plot_t3_buy_c
+    f_push_t3_hist(ht3bc, hist_depth)
+if plot_t3_sell_c
+    f_push_t3_hist(ht3sc, hist_depth)
+if plot_t3_buy_d
+    f_push_t3_hist(ht3bd, hist_depth)
+if plot_t3_sell_d
+    f_push_t3_hist(ht3sd, hist_depth)
+if plot_t3_buy_e
+    f_push_t3_hist(ht3be, hist_depth)
+if plot_t3_sell_e
+    f_push_t3_hist(ht3se, hist_depth)
+if plot_t3_buy_f
+    f_push_t3_hist(ht3bf, hist_depth)
+if plot_t3_sell_f
+    f_push_t3_hist(ht3sf, hist_depth)
+if plot_nagasaki
+    f_push_t3_hist(h_nag, hist_depth)
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// LAYER 1 — ORIGINAL T3 PLOTSHAPES (13 total — PRESERVED EXACTLY)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+plotshape(plot_t3_buy_a,  "T3a Buy",  shape.circle, location.belowbar, color.new(#00e676, 0), size = size.large, text = "T3a", textcolor = color.new(#00e676, 0))
+plotshape(plot_t3_buy_b,  "T3b Buy",  shape.circle, location.belowbar, color.new(#00bcd4, 0), size = size.large, text = "T3b", textcolor = color.new(#00bcd4, 0))
+plotshape(plot_t3_buy_c,  "T3c Buy",  shape.circle, location.belowbar, color.new(#2196f3, 0), size = size.large, text = "T3c", textcolor = color.new(#2196f3, 0))
+plotshape(plot_t3_buy_d,  "T3d Buy",  shape.circle, location.belowbar, color.new(#ffeb3b, 0), size = size.large, text = "T3d", textcolor = color.new(#ffeb3b, 0))
+plotshape(plot_t3_buy_e,  "T3e Buy",  shape.circle, location.belowbar, color.new(#ff9800, 0), size = size.large, text = "T3e", textcolor = color.new(#ff9800, 0))
+plotshape(plot_t3_buy_f,  "T3f Buy",  shape.circle, location.belowbar, color.new(#ffd700, 0), size = size.large, text = "T3f", textcolor = color.new(#ffd700, 0))
+
+plotshape(plot_t3_sell_a, "T3a Sell", shape.circle, location.abovebar, color.new(#ff5252, 0), size = size.large, text = "T3a", textcolor = color.new(#ff5252, 0))
+plotshape(plot_t3_sell_b, "T3b Sell", shape.circle, location.abovebar, color.new(#e91e63, 0), size = size.large, text = "T3b", textcolor = color.new(#e91e63, 0))
+plotshape(plot_t3_sell_c, "T3c Sell", shape.circle, location.abovebar, color.new(#9c27b0, 0), size = size.large, text = "T3c", textcolor = color.new(#9c27b0, 0))
+plotshape(plot_t3_sell_d, "T3d Sell", shape.circle, location.abovebar, color.new(#ff4400, 0), size = size.large, text = "T3d", textcolor = color.new(#ff4400, 0))
+plotshape(plot_t3_sell_e, "T3e Sell", shape.circle, location.abovebar, color.new(#d50000, 0), size = size.large, text = "T3e", textcolor = color.new(#d50000, 0))
+plotshape(plot_t3_sell_f, "T3f Sell", shape.circle, location.abovebar, color.new(#b71c1c, 0), size = size.large, text = "T3f", textcolor = color.new(#b71c1c, 0))
+
+plotshape(plot_nagasaki,  "Nagasaki", shape.diamond, location.top, color.new(color.purple, 0), size = size.normal, text = "NAG", textcolor = color.purple, offset = -1)
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// LAYER 1 — CONSOLIDATED ALERTCONDITIONS (2 total — each counts toward 64 limit)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+bool any_t3 = plot_t3_buy_a or plot_t3_sell_a or plot_t3_buy_b or plot_t3_sell_b or plot_t3_buy_c or plot_t3_sell_c or plot_t3_buy_d or plot_t3_sell_d or plot_t3_buy_e or plot_t3_sell_e or plot_t3_buy_f or plot_t3_sell_f or plot_nagasaki
+alertcondition(any_t3, "Any T3 Signal or Nagasaki", "VOB T3 SUPER signal or Nagasaki all-time-high volume fired")
+
+// (Zone formation alertcondition uses any_zone bool defined later in the code)
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// LAYER 1 — BLOOMBERG-FORMAT T3 ALERT STRINGS (alert() — does NOT count toward 64)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+f_bloomberg_t3(string sig, string tier, int sens_val, string dir, float bp, float sp, float slope_v) =>
+    "T3_SIGNAL" + "|TICKER:" + syminfo.ticker + "|EXCHANGE:" + syminfo.prefix + "|TF:" + timeframe.period + "|SIGNAL:" + sig + "|TIER:" + tier + "|SENS:" + str.tostring(sens_val) + "|DIR:" + dir + "|CLOSE:" + str.tostring(math.round(close * 100) / 100) + "|VOL:" + str.tostring(math.round(volume)) + "|VOLRANK:" + str.tostring(math.round(vol_rank)) + "|RSI:" + str.tostring(math.round(rsi_14 * 100) / 100) + "|SESS:" + str.tostring(sess_bar_count) + "|BULLPOOL:" + str.tostring(math.round(bp)) + "|BEARPOOL:" + str.tostring(math.round(sp)) + "|BULLZONES:" + str.tostring(cnt_bull_all) + "|BEARZONES:" + str.tostring(cnt_bear_all) + "|BULLSTACK:" + str.tostring(stk_bull) + "|BEARSTACK:" + str.tostring(stk_bear) + "|BULLGAP:" + str.tostring(math.round(bull_gap * 100) / 100) + "|BEARGAP:" + str.tostring(math.round(bear_gap * 100) / 100) + "|NRBULLDIST:" + str.tostring(math.round(nearest_bull_dist * 100) / 100) + "|NRBEARDIST:" + str.tostring(math.round(nearest_bear_dist * 100) / 100) + "|SLOPE:" + str.tostring(math.round(slope_v * 10000) / 10000)
+
+// T3 alert multiplexer
+if plot_t3_buy_a
+    alert(f_bloomberg_t3("T3_SUPER_BUY", "A", sens_a, "BULL", bpa, spa, slope_ema_a), alert.freq_once_per_bar_close)
+if plot_t3_sell_a
+    alert(f_bloomberg_t3("T3_SUPER_SELL", "A", sens_a, "BEAR", bpa, spa, slope_ema_a), alert.freq_once_per_bar_close)
+if plot_t3_buy_b
+    alert(f_bloomberg_t3("T3_SUPER_BUY", "B", sens_b, "BULL", bpb, spb, slope_ema_b), alert.freq_once_per_bar_close)
+if plot_t3_sell_b
+    alert(f_bloomberg_t3("T3_SUPER_SELL", "B", sens_b, "BEAR", bpb, spb, slope_ema_b), alert.freq_once_per_bar_close)
+if plot_t3_buy_c
+    alert(f_bloomberg_t3("T3_SUPER_BUY", "C", sens_c, "BULL", bpc, spc, slope_ema_c), alert.freq_once_per_bar_close)
+if plot_t3_sell_c
+    alert(f_bloomberg_t3("T3_SUPER_SELL", "C", sens_c, "BEAR", bpc, spc, slope_ema_c), alert.freq_once_per_bar_close)
+if plot_t3_buy_d
+    alert(f_bloomberg_t3("T3_SUPER_BUY", "D", sens_d, "BULL", bpd, spd, slope_ema_d), alert.freq_once_per_bar_close)
+if plot_t3_sell_d
+    alert(f_bloomberg_t3("T3_SUPER_SELL", "D", sens_d, "BEAR", bpd, spd, slope_ema_d), alert.freq_once_per_bar_close)
+if plot_t3_buy_e
+    alert(f_bloomberg_t3("T3_SUPER_BUY", "E", sens_e, "BULL", bpe, spe, slope_ema_e), alert.freq_once_per_bar_close)
+if plot_t3_sell_e
+    alert(f_bloomberg_t3("T3_SUPER_SELL", "E", sens_e, "BEAR", bpe, spe, slope_ema_e), alert.freq_once_per_bar_close)
+if plot_t3_buy_f
+    alert(f_bloomberg_t3("T3_SUPER_BUY", "F", sens_f, "BULL", bpf, spf, slope_ema_f), alert.freq_once_per_bar_close)
+if plot_t3_sell_f
+    alert(f_bloomberg_t3("T3_SUPER_SELL", "F", sens_f, "BEAR", bpf, spf, slope_ema_f), alert.freq_once_per_bar_close)
+if plot_nagasaki
+    alert("NAGASAKI_ATH_VOL|TICKER:" + syminfo.ticker + "|EXCHANGE:" + syminfo.prefix + "|TF:" + timeframe.period + "|DIR:NEUTRAL|CLOSE:" + str.tostring(math.round(close * 100) / 100) + "|VOL:" + str.tostring(math.round(volume)) + "|ATHVOL:" + str.tostring(math.round(maxVolEver)) + "|RSI:" + str.tostring(math.round(rsi_14 * 100) / 100) + "|SESS:" + str.tostring(sess_bar_count), alert.freq_once_per_bar_close)
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// LAYER 2 — ZONE-CREATION MARKERS + COOLDOWN + HISTORY (PRESERVED EXACTLY)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+bool fire_zb_a = en_zone_a and nzb_a and f_cd_ok(cd_zb_a, cooldown_bars)
+bool fire_zs_a = en_zone_a and nzs_a and f_cd_ok(cd_zs_a, cooldown_bars)
+bool fire_zb_b = en_zone_b and nzb_b and f_cd_ok(cd_zb_b, cooldown_bars)
+bool fire_zs_b = en_zone_b and nzs_b and f_cd_ok(cd_zs_b, cooldown_bars)
+bool fire_zb_c = en_zone_c and nzb_c and f_cd_ok(cd_zb_c, cooldown_bars)
+bool fire_zs_c = en_zone_c and nzs_c and f_cd_ok(cd_zs_c, cooldown_bars)
+bool fire_zb_d = en_zone_d and nzb_d and f_cd_ok(cd_zb_d, cooldown_bars)
+bool fire_zs_d = en_zone_d and nzs_d and f_cd_ok(cd_zs_d, cooldown_bars)
+bool fire_zb_e = en_zone_e and nzb_e and f_cd_ok(cd_zb_e, cooldown_bars)
+bool fire_zs_e = en_zone_e and nzs_e and f_cd_ok(cd_zs_e, cooldown_bars)
+bool fire_zb_f = en_zone_f and nzb_f and f_cd_ok(cd_zb_f, cooldown_bars)
+bool fire_zs_f = en_zone_f and nzs_f and f_cd_ok(cd_zs_f, cooldown_bars)
+
+if fire_zb_a
+    cd_zb_a := bar_index
+if fire_zs_a
+    cd_zs_a := bar_index
+if fire_zb_b
+    cd_zb_b := bar_index
+if fire_zs_b
+    cd_zs_b := bar_index
+if fire_zb_c
+    cd_zb_c := bar_index
+if fire_zs_c
+    cd_zs_c := bar_index
+if fire_zb_d
+    cd_zb_d := bar_index
+if fire_zs_d
+    cd_zs_d := bar_index
+if fire_zb_e
+    cd_zb_e := bar_index
+if fire_zs_e
+    cd_zs_e := bar_index
+if fire_zb_f
+    cd_zb_f := bar_index
+if fire_zs_f
+    cd_zs_f := bar_index
+
+// History tracking
+if fire_zb_a and lower_a.size() > 0
+    level nz = lower_a.last()
+    if not na(nz.vol)
+        f_push_hist(hb_a, nz.vol, bpa, hist_depth)
+if fire_zs_a and upper_a.size() > 0
+    level nz = upper_a.last()
+    if not na(nz.vol)
+        f_push_hist(hs_a, nz.vol, spa, hist_depth)
+if fire_zb_b and lower_b.size() > 0
+    level nz = lower_b.last()
+    if not na(nz.vol)
+        f_push_hist(hb_b, nz.vol, bpb, hist_depth)
+if fire_zs_b and upper_b.size() > 0
+    level nz = upper_b.last()
+    if not na(nz.vol)
+        f_push_hist(hs_b, nz.vol, spb, hist_depth)
+if fire_zb_c and lower_c.size() > 0
+    level nz = lower_c.last()
+    if not na(nz.vol)
+        f_push_hist(hb_c, nz.vol, bpc, hist_depth)
+if fire_zs_c and upper_c.size() > 0
+    level nz = upper_c.last()
+    if not na(nz.vol)
+        f_push_hist(hs_c, nz.vol, spc, hist_depth)
+if fire_zb_d and lower_d.size() > 0
+    level nz = lower_d.last()
+    if not na(nz.vol)
+        f_push_hist(hb_d, nz.vol, bpd, hist_depth)
+if fire_zs_d and upper_d.size() > 0
+    level nz = upper_d.last()
+    if not na(nz.vol)
+        f_push_hist(hs_d, nz.vol, spd, hist_depth)
+if fire_zb_e and lower_e.size() > 0
+    level nz = lower_e.last()
+    if not na(nz.vol)
+        f_push_hist(hb_e, nz.vol, bpe, hist_depth)
+if fire_zs_e and upper_e.size() > 0
+    level nz = upper_e.last()
+    if not na(nz.vol)
+        f_push_hist(hs_e, nz.vol, spe, hist_depth)
+if fire_zb_f and lower_f.size() > 0
+    level nz = lower_f.last()
+    if not na(nz.vol)
+        f_push_hist(hb_f, nz.vol, bpf, hist_depth)
+if fire_zs_f and upper_f.size() > 0
+    level nz = upper_f.last()
+    if not na(nz.vol)
+        f_push_hist(hs_f, nz.vol, spf, hist_depth)
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// LAYER 2 — ZONE-CREATION MARKER PLOTSHAPES (12 total — PRESERVED EXACTLY)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+plotshape(fire_zb_a, "ZoneBull A", shape.xcross, location.top,      col_bull_a, size=size.small, text="zA", textcolor=col_bull_a)
+plotshape(fire_zb_b, "ZoneBull B", shape.xcross, location.abovebar, col_bull_b, size=size.small, text="zB", textcolor=col_bull_b)
+plotshape(fire_zb_c, "ZoneBull C", shape.xcross, location.belowbar, col_bull_c, size=size.small, text="zC", textcolor=col_bull_c)
+plotshape(fire_zb_d, "ZoneBull D", shape.xcross, location.bottom,   col_bull_d, size=size.small, text="zD", textcolor=col_bull_d)
+plotshape(fire_zb_e, "ZoneBull E", shape.cross,  location.abovebar, col_bull_e, size=size.small, text="zE", textcolor=col_bull_e)
+plotshape(fire_zb_f, "ZoneBull F", shape.cross,  location.belowbar, col_bull_f, size=size.small, text="zF", textcolor=col_bull_f)
+
+plotshape(fire_zs_a, "ZoneBear A", shape.xcross, location.bottom,   col_bear_a, size=size.small, text="zA", textcolor=col_bear_a)
+plotshape(fire_zs_b, "ZoneBear B", shape.xcross, location.belowbar, col_bear_b, size=size.small, text="zB", textcolor=col_bear_b)
+plotshape(fire_zs_c, "ZoneBear C", shape.xcross, location.abovebar, col_bear_c, size=size.small, text="zC", textcolor=col_bear_c)
+plotshape(fire_zs_d, "ZoneBear D", shape.xcross, location.top,      col_bear_d, size=size.small, text="zD", textcolor=col_bear_d)
+plotshape(fire_zs_e, "ZoneBear E", shape.cross,  location.belowbar, col_bear_e, size=size.small, text="zE", textcolor=col_bear_e)
+plotshape(fire_zs_f, "ZoneBear F", shape.cross,  location.abovebar, col_bear_f, size=size.small, text="zF", textcolor=col_bear_f)
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// LAYER 2 — MUTUALLY EXCLUSIVE OVERLAP ENGINE + LINE DRAWING (PRESERVED EXACTLY)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+var array<line>     drawn_lines = array.new<line>()
+var array<linefill> drawn_fills = array.new<linefill>()
+
+if drawn_lines.size() > 0
+    for i = 0 to drawn_lines.size() - 1
+        line.delete(drawn_lines.get(i))
+drawn_lines.clear()
+if drawn_fills.size() > 0
+    for i = 0 to drawn_fills.size() - 1
+        linefill.delete(drawn_fills.get(i))
+drawn_fills.clear()
+
+var array<float> ovlp_bull_lo = array.new<float>()
+var array<float> ovlp_bull_hi = array.new<float>()
+var array<float> ovlp_bear_lo = array.new<float>()
+var array<float> ovlp_bear_hi = array.new<float>()
+ovlp_bull_lo.clear()
+ovlp_bull_hi.clear()
+ovlp_bear_lo.clear()
+ovlp_bear_hi.clear()
+
+f_count_overlaps(array<float> trk_lo, array<float> trk_hi, float zlo, float zhi) =>
+    int count = 0
+    if trk_lo.size() > 0
+        for i = 0 to trk_lo.size() - 1
+            if f_zones_overlap(trk_lo.get(i), trk_hi.get(i), zlo, zhi)
+                count += 1
+    count
+
+f_draw_zone(int origin_time, float z_upper, float z_lower, float z_mid, color col, int priority) =>
+    if priority == 0
+        line lt = line.new(origin_time, z_upper, time, z_upper, xloc.bar_time, extend.right, col, line.style_solid, 1)
+        line lb = line.new(origin_time, z_lower, time, z_lower, xloc.bar_time, extend.right, col, line.style_solid, 1)
+        line lm = line.new(origin_time, z_mid,   time, z_mid,   xloc.bar_time, extend.right, color.new(col, mid_transp), line.style_dashed, 1)
+        linefill lf = linefill.new(lt, lb, color.new(col, fill_transp))
+        drawn_lines.push(lt)
+        drawn_lines.push(lb)
+        drawn_lines.push(lm)
+        drawn_fills.push(lf)
+    else if priority == 1
+        line lm = line.new(origin_time, z_mid, time, z_mid, xloc.bar_time, extend.right, col, line.style_solid, 2)
+        drawn_lines.push(lm)
+    else if priority == 2
+        line lm = line.new(origin_time, z_mid, time, z_mid, xloc.bar_time, extend.right, col, line.style_dotted, 2)
+        drawn_lines.push(lm)
+    else
+        line lm = line.new(origin_time, z_mid, time, z_mid, xloc.bar_time, extend.right, col, line.style_dotted, 1)
+        drawn_lines.push(lm)
+
+f_process_zones(array<level> lvl_arr, array<float> trk_lo, array<float> trk_hi, color col, bool enabled) =>
+    if enabled and lvl_arr.size() > 0
+        for i = 0 to lvl_arr.size() - 1
+            level l = lvl_arr.get(i)
+            if not na(l.vol) and not na(l.upper) and not na(l.lower) and not na(l.indx)
+                int olaps = f_count_overlaps(trk_lo, trk_hi, l.lower, l.upper)
+                f_draw_zone(l.indx, l.upper, l.lower, l.mid, col, olaps)
+                trk_lo.push(l.lower)
+                trk_hi.push(l.upper)
+
+f_process_zones(lower_a, ovlp_bull_lo, ovlp_bull_hi, col_bull_a, en_zone_a)
+f_process_zones(lower_b, ovlp_bull_lo, ovlp_bull_hi, col_bull_b, en_zone_b)
+f_process_zones(lower_c, ovlp_bull_lo, ovlp_bull_hi, col_bull_c, en_zone_c)
+f_process_zones(lower_d, ovlp_bull_lo, ovlp_bull_hi, col_bull_d, en_zone_d)
+f_process_zones(lower_e, ovlp_bull_lo, ovlp_bull_hi, col_bull_e, en_zone_e)
+f_process_zones(lower_f, ovlp_bull_lo, ovlp_bull_hi, col_bull_f, en_zone_f)
+f_process_zones(upper_a, ovlp_bear_lo, ovlp_bear_hi, col_bear_a, en_zone_a)
+f_process_zones(upper_b, ovlp_bear_lo, ovlp_bear_hi, col_bear_b, en_zone_b)
+f_process_zones(upper_c, ovlp_bear_lo, ovlp_bear_hi, col_bear_c, en_zone_c)
+f_process_zones(upper_d, ovlp_bear_lo, ovlp_bear_hi, col_bear_d, en_zone_d)
+f_process_zones(upper_e, ovlp_bear_lo, ovlp_bear_hi, col_bear_e, en_zone_e)
+f_process_zones(upper_f, ovlp_bear_lo, ovlp_bear_hi, col_bear_f, en_zone_f)
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// EMISSION LAYER — ZONE FORMATION LABELS (data_get_pine_labels channel)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+f_emit_label(bool fire, array<level> arr, string dir, string tier, int sens_val, float pool, float rsi_v, int sess_v, float slope_v) =>
+    if en_emission_labels and fire and arr.size() > 0
+        level nz = arr.last()
+        if not na(nz.mid) and not na(nz.vol)
+            string txt = dir + "|" + tier + "|SENS:" + str.tostring(sens_val) + "|VOL:" + f_fmt_vol(nz.vol) + "|POOL:" + f_fmt_vol(pool) + "|RSI:" + str.tostring(math.round(rsi_v)) + "|SESS:" + str.tostring(sess_v) + "|SLOPE:" + str.tostring(math.round(slope_v * 10000) / 10000)
+            color lc = dir == "BULL" ? color.new(color.green, 60) : color.new(color.red, 60)
+            label.new(bar_index, nz.mid, txt, xloc.bar_index, yloc.price, lc, label.style_label_left, color.white, size.tiny)
+
+f_emit_label(nzb_a, lower_a, "BULL", "A", sens_a, bpa, rsi_14, sess_bar_count, slope_ema_a)
+f_emit_label(nzs_a, upper_a, "BEAR", "A", sens_a, spa, rsi_14, sess_bar_count, slope_ema_a)
+f_emit_label(nzb_b, lower_b, "BULL", "B", sens_b, bpb, rsi_14, sess_bar_count, slope_ema_b)
+f_emit_label(nzs_b, upper_b, "BEAR", "B", sens_b, spb, rsi_14, sess_bar_count, slope_ema_b)
+f_emit_label(nzb_c, lower_c, "BULL", "C", sens_c, bpc, rsi_14, sess_bar_count, slope_ema_c)
+f_emit_label(nzs_c, upper_c, "BEAR", "C", sens_c, spc, rsi_14, sess_bar_count, slope_ema_c)
+f_emit_label(nzb_d, lower_d, "BULL", "D", sens_d, bpd, rsi_14, sess_bar_count, slope_ema_d)
+f_emit_label(nzs_d, upper_d, "BEAR", "D", sens_d, spd, rsi_14, sess_bar_count, slope_ema_d)
+f_emit_label(nzb_e, lower_e, "BULL", "E", sens_e, bpe, rsi_14, sess_bar_count, slope_ema_e)
+f_emit_label(nzs_e, upper_e, "BEAR", "E", sens_e, spe, rsi_14, sess_bar_count, slope_ema_e)
+f_emit_label(nzb_f, lower_f, "BULL", "F", sens_f, bpf, rsi_14, sess_bar_count, slope_ema_f)
+f_emit_label(nzs_f, upper_f, "BEAR", "F", sens_f, spf, rsi_14, sess_bar_count, slope_ema_f)
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// EMISSION LAYER — BLOOMBERG-FORMAT ZONE AGGREGATOR ALERT + ALERTCONDITION
+// ═══════════════════════════════════════════════════════════════════════════════
+
+bool any_zone = fire_zb_a or fire_zs_a or fire_zb_b or fire_zs_b or fire_zb_c or fire_zs_c or fire_zb_d or fire_zs_d or fire_zb_e or fire_zs_e or fire_zb_f or fire_zs_f
+alertcondition(any_zone, "Any Zone Formation", "VOB zone formation event — new bullish or bearish zone created at any sensitivity tier")
+
+if any_zone
+    string zmsg = "ZONE_FORMATION|TICKER:" + syminfo.ticker + "|EXCHANGE:" + syminfo.prefix + "|TF:" + timeframe.period + "|CLOSE:" + str.tostring(math.round(close * 100) / 100) + "|VOL:" + str.tostring(math.round(volume)) + "|VOLRANK:" + str.tostring(math.round(vol_rank)) + "|RSI:" + str.tostring(math.round(rsi_14 * 100) / 100) + "|SESS:" + str.tostring(sess_bar_count) + "|BULLPOOL_A:" + str.tostring(math.round(bpa)) + "|BEARPOOL_A:" + str.tostring(math.round(spa)) + "|BULLZONES:" + str.tostring(cnt_bull_all) + "|BEARZONES:" + str.tostring(cnt_bear_all) + "|BULLSTACK:" + str.tostring(stk_bull) + "|BEARSTACK:" + str.tostring(stk_bear) + "|BULLGAP:" + str.tostring(math.round(bull_gap * 100) / 100) + "|BEARGAP:" + str.tostring(math.round(bear_gap * 100) / 100) + "|NRBULLDIST:" + str.tostring(math.round(nearest_bull_dist * 100) / 100) + "|NRBEARDIST:" + str.tostring(math.round(nearest_bear_dist * 100) / 100) + "|ZONES:"
+    if fire_zb_a
+        zmsg += "BULL-A(" + str.tostring(sens_a) + "),"
+    if fire_zs_a
+        zmsg += "BEAR-A(" + str.tostring(sens_a) + "),"
+    if fire_zb_b
+        zmsg += "BULL-B(" + str.tostring(sens_b) + "),"
+    if fire_zs_b
+        zmsg += "BEAR-B(" + str.tostring(sens_b) + "),"
+    if fire_zb_c
+        zmsg += "BULL-C(" + str.tostring(sens_c) + "),"
+    if fire_zs_c
+        zmsg += "BEAR-C(" + str.tostring(sens_c) + "),"
+    if fire_zb_d
+        zmsg += "BULL-D(" + str.tostring(sens_d) + "),"
+    if fire_zs_d
+        zmsg += "BEAR-D(" + str.tostring(sens_d) + "),"
+    if fire_zb_e
+        zmsg += "BULL-E(" + str.tostring(sens_e) + "),"
+    if fire_zs_e
+        zmsg += "BEAR-E(" + str.tostring(sens_e) + "),"
+    if fire_zb_f
+        zmsg += "BULL-F(" + str.tostring(sens_f) + "),"
+    if fire_zs_f
+        zmsg += "BEAR-F(" + str.tostring(sens_f) + "),"
+    alert(zmsg, alert.freq_once_per_bar_close)
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// EMISSION LAYER — log.info() STREAMING (pine_get_console channel)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+if en_emission_logs and barstate.isconfirmed
+    log.info("VOB_EMISSION|TICKER:{0}|TF:{1}|CLOSE:{2}|RSI:{3}|SESS:{4}|VOLRANK:{5}|VOL:{6}|ATHVOL:{7}|BULLZONES:{8}|BEARZONES:{9}|STKBULL:{10}|STKBEAR:{11}|GAPBULL:{12}|GAPBEAR:{13}|NRBULLDIST:{14}|NRBEARDIST:{15}|BPA:{16}|SPA:{17}|BPB:{18}|SPB:{19}|BPC:{20}|SPC:{21}|BPD:{22}|SPD:{23}|BPE:{24}|SPE:{25}|BPF:{26}|SPF:{27}|SLOPEA:{28}|SLOPEB:{29}|SLOPEC:{30}|SLOPED:{31}|SLOPEE:{32}|SLOPEF:{33}",
+        syminfo.ticker, timeframe.period,
+        str.tostring(close), str.tostring(math.round(rsi_14 * 100) / 100),
+        str.tostring(sess_bar_count), str.tostring(math.round(vol_rank)),
+        str.tostring(math.round(volume)), str.tostring(math.round(maxVolEver)),
+        str.tostring(cnt_bull_all), str.tostring(cnt_bear_all),
+        str.tostring(stk_bull), str.tostring(stk_bear),
+        str.tostring(math.round(bull_gap * 100) / 100), str.tostring(math.round(bear_gap * 100) / 100),
+        str.tostring(math.round(nearest_bull_dist * 100) / 100), str.tostring(math.round(nearest_bear_dist * 100) / 100),
+        str.tostring(math.round(bpa)), str.tostring(math.round(spa)),
+        str.tostring(math.round(bpb)), str.tostring(math.round(spb)),
+        str.tostring(math.round(bpc)), str.tostring(math.round(spc)),
+        str.tostring(math.round(bpd)), str.tostring(math.round(spd)),
+        str.tostring(math.round(bpe)), str.tostring(math.round(spe)),
+        str.tostring(math.round(bpf)), str.tostring(math.round(spf)),
+        str.tostring(math.round(slope_ema_a * 10000) / 10000), str.tostring(math.round(slope_ema_b * 10000) / 10000),
+        str.tostring(math.round(slope_ema_c * 10000) / 10000), str.tostring(math.round(slope_ema_d * 10000) / 10000),
+        str.tostring(math.round(slope_ema_e * 10000) / 10000), str.tostring(math.round(slope_ema_f * 10000) / 10000))
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// VLB STRICT LADDER DETECTION (v10) — bullish + bearish chronological F→A
+// ═══════════════════════════════════════════════════════════════════════════════
+// Requires the six zones to FORM in strict chronological order across bars,
+// and at each step the new zone must touch or sit above (bull) / below (bear)
+// the prior zone.
+//
+// BULL RULES (bear is the mirror):
+//   1. Sequence:  F → E → D → C → B → A across bars (or same bar if multiple
+//                 tiers form simultaneously, processed in F→A order).
+//   2. Price:     at each step the new zone must satisfy new.high >= prior.low
+//                 i.e. the new zone is NOT entirely below the prior one;
+//                 fully-inside or fully-above both qualify.
+//   3. Bearish kill: ANY bearish zone formation in ANY tier on a bar resets
+//                 the in-progress bullish window; no new F can start on that
+//                 same bar — the next F-start must be on a later bar.
+//   4. Wrong-tier kill: a bullish zone whose tier does not match the expected
+//                 next step (including a fresh F mid-ladder) kills the window.
+//   5. Price-fail kill: the expected tier fires but new.high < prior.low.
+//   6. Fire: on the bar where bullish A completes step 5→6 the detection
+//            plotshape fires (one bar only) and an alert is emitted with
+//            full per-tier OHLCV. Window then resets to wait for next F.
+//
+// All booleans drive both the plotshape AND the alert() in lockstep, gated by
+// barstate.isconfirmed for non-repainting 1:1 visual/alert parity.
+
+// ─── STATE ──────────────────────────────────────────────────────────────────
+// vlb_*_state encodes "next expected tier":
+//   0 = waiting for F  | 1 = waiting for E  | 2 = waiting for D
+//   3 = waiting for C  | 4 = waiting for B  | 5 = waiting for A
+// vlb_*_p_lo / p_hi store the most-recently-confirmed step's zone range.
+var int   vlb_bull_state = 0
+var float vlb_bull_p_lo  = na
+var float vlb_bull_p_hi  = na
+var int   vlb_bear_state = 0
+var float vlb_bear_p_lo  = na
+var float vlb_bear_p_hi  = na
+
+// Per-step OHLCV snapshots — captured at each accepted step so the firing-bar
+// alert reports the ORIGINAL OHLCV of the zone that triggered each step, even
+// if that zone has since been invalidated by close-through.
+var float vlb_bull_f_o = na, var float vlb_bull_f_h = na, var float vlb_bull_f_l = na, var float vlb_bull_f_c = na, var float vlb_bull_f_v = na
+var float vlb_bull_e_o = na, var float vlb_bull_e_h = na, var float vlb_bull_e_l = na, var float vlb_bull_e_c = na, var float vlb_bull_e_v = na
+var float vlb_bull_d_o = na, var float vlb_bull_d_h = na, var float vlb_bull_d_l = na, var float vlb_bull_d_c = na, var float vlb_bull_d_v = na
+var float vlb_bull_c_o = na, var float vlb_bull_c_h = na, var float vlb_bull_c_l = na, var float vlb_bull_c_c = na, var float vlb_bull_c_v = na
+var float vlb_bull_b_o = na, var float vlb_bull_b_h = na, var float vlb_bull_b_l = na, var float vlb_bull_b_c = na, var float vlb_bull_b_v = na
+var float vlb_bull_a_o = na, var float vlb_bull_a_h = na, var float vlb_bull_a_l = na, var float vlb_bull_a_c = na, var float vlb_bull_a_v = na
+
+var float vlb_bear_f_o = na, var float vlb_bear_f_h = na, var float vlb_bear_f_l = na, var float vlb_bear_f_c = na, var float vlb_bear_f_v = na
+var float vlb_bear_e_o = na, var float vlb_bear_e_h = na, var float vlb_bear_e_l = na, var float vlb_bear_e_c = na, var float vlb_bear_e_v = na
+var float vlb_bear_d_o = na, var float vlb_bear_d_h = na, var float vlb_bear_d_l = na, var float vlb_bear_d_c = na, var float vlb_bear_d_v = na
+var float vlb_bear_c_o = na, var float vlb_bear_c_h = na, var float vlb_bear_c_l = na, var float vlb_bear_c_c = na, var float vlb_bear_c_v = na
+var float vlb_bear_b_o = na, var float vlb_bear_b_h = na, var float vlb_bear_b_l = na, var float vlb_bear_b_c = na, var float vlb_bear_b_v = na
+var float vlb_bear_a_o = na, var float vlb_bear_a_h = na, var float vlb_bear_a_l = na, var float vlb_bear_a_c = na, var float vlb_bear_a_v = na
+
+// Last-fire bar tracking for cooldown parity.
+var int last_vlb_b = na
+var int last_vlb_r = na
+
+// Fetch the just-pushed zone for a tier (the zone that formed this bar).
+f_last_zone(array<level> arr) =>
+    arr.size() > 0 ? arr.get(arr.size() - 1) : na
+
+// ─── BULLISH LADDER PROCESSING ──────────────────────────────────────────────
+bool vlb_bull_complete = false
+bool any_bear_zone_bar = nzs_a or nzs_b or nzs_c or nzs_d or nzs_e or nzs_f
+bool any_bull_zone_bar = nzb_a or nzb_b or nzb_c or nzb_d or nzb_e or nzb_f
+
+if any_bear_zone_bar
+    vlb_bull_state := 0
+    vlb_bull_p_lo  := na
+    vlb_bull_p_hi  := na
+else if any_bull_zone_bar
+    // F (expects state==0)
+    if nzb_f
+        if vlb_bull_state == 0
+            level zf = f_last_zone(lower_f)
+            vlb_bull_p_lo  := zf.lower
+            vlb_bull_p_hi  := zf.upper
+            vlb_bull_f_o   := zf.o
+            vlb_bull_f_h   := zf.h
+            vlb_bull_f_l   := zf.l
+            vlb_bull_f_c   := zf.c
+            vlb_bull_f_v   := zf.vol
+            vlb_bull_state := 1
+        else
+            vlb_bull_state := 0
+            vlb_bull_p_lo  := na
+            vlb_bull_p_hi  := na
+    // E (expects state==1)
+    if nzb_e and vlb_bull_state > 0
+        if vlb_bull_state == 1
+            level ze = f_last_zone(lower_e)
+            if ze.upper >= vlb_bull_p_lo
+                vlb_bull_p_lo  := ze.lower
+                vlb_bull_p_hi  := ze.upper
+                vlb_bull_e_o   := ze.o
+                vlb_bull_e_h   := ze.h
+                vlb_bull_e_l   := ze.l
+                vlb_bull_e_c   := ze.c
+                vlb_bull_e_v   := ze.vol
+                vlb_bull_state := 2
+            else
+                vlb_bull_state := 0
+                vlb_bull_p_lo  := na
+                vlb_bull_p_hi  := na
+        else
+            vlb_bull_state := 0
+            vlb_bull_p_lo  := na
+            vlb_bull_p_hi  := na
+    // D (expects state==2)
+    if nzb_d and vlb_bull_state > 0
+        if vlb_bull_state == 2
+            level zd = f_last_zone(lower_d)
+            if zd.upper >= vlb_bull_p_lo
+                vlb_bull_p_lo  := zd.lower
+                vlb_bull_p_hi  := zd.upper
+                vlb_bull_d_o   := zd.o
+                vlb_bull_d_h   := zd.h
+                vlb_bull_d_l   := zd.l
+                vlb_bull_d_c   := zd.c
+                vlb_bull_d_v   := zd.vol
+                vlb_bull_state := 3
+            else
+                vlb_bull_state := 0
+                vlb_bull_p_lo  := na
+                vlb_bull_p_hi  := na
+        else
+            vlb_bull_state := 0
+            vlb_bull_p_lo  := na
+            vlb_bull_p_hi  := na
+    // C (expects state==3)
+    if nzb_c and vlb_bull_state > 0
+        if vlb_bull_state == 3
+            level zc = f_last_zone(lower_c)
+            if zc.upper >= vlb_bull_p_lo
+                vlb_bull_p_lo  := zc.lower
+                vlb_bull_p_hi  := zc.upper
+                vlb_bull_c_o   := zc.o
+                vlb_bull_c_h   := zc.h
+                vlb_bull_c_l   := zc.l
+                vlb_bull_c_c   := zc.c
+                vlb_bull_c_v   := zc.vol
+                vlb_bull_state := 4
+            else
+                vlb_bull_state := 0
+                vlb_bull_p_lo  := na
+                vlb_bull_p_hi  := na
+        else
+            vlb_bull_state := 0
+            vlb_bull_p_lo  := na
+            vlb_bull_p_hi  := na
+    // B (expects state==4)
+    if nzb_b and vlb_bull_state > 0
+        if vlb_bull_state == 4
+            level zb = f_last_zone(lower_b)
+            if zb.upper >= vlb_bull_p_lo
+                vlb_bull_p_lo  := zb.lower
+                vlb_bull_p_hi  := zb.upper
+                vlb_bull_b_o   := zb.o
+                vlb_bull_b_h   := zb.h
+                vlb_bull_b_l   := zb.l
+                vlb_bull_b_c   := zb.c
+                vlb_bull_b_v   := zb.vol
+                vlb_bull_state := 5
+            else
+                vlb_bull_state := 0
+                vlb_bull_p_lo  := na
+                vlb_bull_p_hi  := na
+        else
+            vlb_bull_state := 0
+            vlb_bull_p_lo  := na
+            vlb_bull_p_hi  := na
+    // A (expects state==5) — ladder completion
+    if nzb_a and vlb_bull_state > 0
+        if vlb_bull_state == 5
+            level za = f_last_zone(lower_a)
+            if za.upper >= vlb_bull_p_lo
+                vlb_bull_a_o      := za.o
+                vlb_bull_a_h      := za.h
+                vlb_bull_a_l      := za.l
+                vlb_bull_a_c      := za.c
+                vlb_bull_a_v      := za.vol
+                vlb_bull_complete := true
+            vlb_bull_state := 0
+            vlb_bull_p_lo  := na
+            vlb_bull_p_hi  := na
+        else
+            vlb_bull_state := 0
+            vlb_bull_p_lo  := na
+            vlb_bull_p_hi  := na
+
+// ─── BEARISH LADDER PROCESSING (mirror — new.low <= prior.high) ─────────────
+bool vlb_bear_complete = false
+
+if any_bull_zone_bar
+    vlb_bear_state := 0
+    vlb_bear_p_lo  := na
+    vlb_bear_p_hi  := na
+else if any_bear_zone_bar
+    if nzs_f
+        if vlb_bear_state == 0
+            level zf = f_last_zone(upper_f)
+            vlb_bear_p_lo  := zf.lower
+            vlb_bear_p_hi  := zf.upper
+            vlb_bear_f_o   := zf.o
+            vlb_bear_f_h   := zf.h
+            vlb_bear_f_l   := zf.l
+            vlb_bear_f_c   := zf.c
+            vlb_bear_f_v   := zf.vol
+            vlb_bear_state := 1
+        else
+            vlb_bear_state := 0
+            vlb_bear_p_lo  := na
+            vlb_bear_p_hi  := na
+    if nzs_e and vlb_bear_state > 0
+        if vlb_bear_state == 1
+            level ze = f_last_zone(upper_e)
+            if ze.lower <= vlb_bear_p_hi
+                vlb_bear_p_lo  := ze.lower
+                vlb_bear_p_hi  := ze.upper
+                vlb_bear_e_o   := ze.o
+                vlb_bear_e_h   := ze.h
+                vlb_bear_e_l   := ze.l
+                vlb_bear_e_c   := ze.c
+                vlb_bear_e_v   := ze.vol
+                vlb_bear_state := 2
+            else
+                vlb_bear_state := 0
+                vlb_bear_p_lo  := na
+                vlb_bear_p_hi  := na
+        else
+            vlb_bear_state := 0
+            vlb_bear_p_lo  := na
+            vlb_bear_p_hi  := na
+    if nzs_d and vlb_bear_state > 0
+        if vlb_bear_state == 2
+            level zd = f_last_zone(upper_d)
+            if zd.lower <= vlb_bear_p_hi
+                vlb_bear_p_lo  := zd.lower
+                vlb_bear_p_hi  := zd.upper
+                vlb_bear_d_o   := zd.o
+                vlb_bear_d_h   := zd.h
+                vlb_bear_d_l   := zd.l
+                vlb_bear_d_c   := zd.c
+                vlb_bear_d_v   := zd.vol
+                vlb_bear_state := 3
+            else
+                vlb_bear_state := 0
+                vlb_bear_p_lo  := na
+                vlb_bear_p_hi  := na
+        else
+            vlb_bear_state := 0
+            vlb_bear_p_lo  := na
+            vlb_bear_p_hi  := na
+    if nzs_c and vlb_bear_state > 0
+        if vlb_bear_state == 3
+            level zc = f_last_zone(upper_c)
+            if zc.lower <= vlb_bear_p_hi
+                vlb_bear_p_lo  := zc.lower
+                vlb_bear_p_hi  := zc.upper
+                vlb_bear_c_o   := zc.o
+                vlb_bear_c_h   := zc.h
+                vlb_bear_c_l   := zc.l
+                vlb_bear_c_c   := zc.c
+                vlb_bear_c_v   := zc.vol
+                vlb_bear_state := 4
+            else
+                vlb_bear_state := 0
+                vlb_bear_p_lo  := na
+                vlb_bear_p_hi  := na
+        else
+            vlb_bear_state := 0
+            vlb_bear_p_lo  := na
+            vlb_bear_p_hi  := na
+    if nzs_b and vlb_bear_state > 0
+        if vlb_bear_state == 4
+            level zb = f_last_zone(upper_b)
+            if zb.lower <= vlb_bear_p_hi
+                vlb_bear_p_lo  := zb.lower
+                vlb_bear_p_hi  := zb.upper
+                vlb_bear_b_o   := zb.o
+                vlb_bear_b_h   := zb.h
+                vlb_bear_b_l   := zb.l
+                vlb_bear_b_c   := zb.c
+                vlb_bear_b_v   := zb.vol
+                vlb_bear_state := 5
+            else
+                vlb_bear_state := 0
+                vlb_bear_p_lo  := na
+                vlb_bear_p_hi  := na
+        else
+            vlb_bear_state := 0
+            vlb_bear_p_lo  := na
+            vlb_bear_p_hi  := na
+    if nzs_a and vlb_bear_state > 0
+        if vlb_bear_state == 5
+            level za = f_last_zone(upper_a)
+            if za.lower <= vlb_bear_p_hi
+                vlb_bear_a_o      := za.o
+                vlb_bear_a_h      := za.h
+                vlb_bear_a_l      := za.l
+                vlb_bear_a_c      := za.c
+                vlb_bear_a_v      := za.vol
+                vlb_bear_complete := true
+            vlb_bear_state := 0
+            vlb_bear_p_lo  := na
+            vlb_bear_p_hi  := na
+        else
+            vlb_bear_state := 0
+            vlb_bear_p_lo  := na
+            vlb_bear_p_hi  := na
+
+// ─── GATING — barstate.isconfirmed + cooldown → 1:1 plot/alert parity ───────
+bool plot_vlb_bull = show_vlb_bull and vlb_bull_complete and barstate.isconfirmed and f_cd_ok(last_vlb_b, cooldown_bars)
+bool plot_vlb_bear = show_vlb_bear and vlb_bear_complete and barstate.isconfirmed and f_cd_ok(last_vlb_r, cooldown_bars)
+
+if plot_vlb_bull
+    last_vlb_b := bar_index
+if plot_vlb_bear
+    last_vlb_r := bar_index
+
+// ─── VISUAL PLOTSHAPES (one bar only — exact zone-A completion bar) ─────────
+// Bull: green up-triangle below the bar.  Bear: red down-triangle above the bar.
+plotshape(plot_vlb_bull, "VLB Bull (strict F→A)", shape.triangleup,   location.belowbar, color.new(color.lime, 0), size = size.normal, text = "VLB↑", textcolor = color.lime)
+plotshape(plot_vlb_bear, "VLB Bear (strict F→A)", shape.triangledown, location.abovebar, color.new(color.red,  0), size = size.normal, text = "VLB↓", textcolor = color.red)
+
+// ─── ALERTCONDITION — single VLB consolidated channel ───────────────────────
+alertcondition(plot_vlb_bull or plot_vlb_bear, "VLB Strict Ladder (v10)", "VOB v10 VLB strict-chronological-ladder detection fired — check alert() payload for direction, per-tier OHLCV, and market context")
+
+// ─── BLOOMBERG-FORMAT ALERTS — 1:1 parity with plotshapes above ─────────────
+// Schema: EVENT|TICKER|EXCHANGE|TF|DIR|CLOSE|SENS_A..F|
+//         ZF_O|ZF_H|ZF_L|ZF_C|ZF_V| ... |ZA_O|ZA_H|ZA_L|ZA_C|ZA_V|
+//         RSI|VOLRANK|SESS|BULLSTACK/BEARSTACK|BULLGAP/BEARGAP
+
+f_vlb_fmt_p(float v) =>
+    na(v) ? "na" : str.tostring(math.round(v * 100) / 100)
+f_vlb_fmt_v(float v) =>
+    na(v) ? "na" : str.tostring(math.round(v))
+
+if plot_vlb_bull
+    string vsb = "SENS_A:" + str.tostring(sens_a) + "|SENS_B:" + str.tostring(sens_b) + "|SENS_C:" + str.tostring(sens_c) + "|SENS_D:" + str.tostring(sens_d) + "|SENS_E:" + str.tostring(sens_e) + "|SENS_F:" + str.tostring(sens_f)
+    string zf = "ZF_O:" + f_vlb_fmt_p(vlb_bull_f_o) + "|ZF_H:" + f_vlb_fmt_p(vlb_bull_f_h) + "|ZF_L:" + f_vlb_fmt_p(vlb_bull_f_l) + "|ZF_C:" + f_vlb_fmt_p(vlb_bull_f_c) + "|ZF_V:" + f_vlb_fmt_v(vlb_bull_f_v)
+    string ze = "ZE_O:" + f_vlb_fmt_p(vlb_bull_e_o) + "|ZE_H:" + f_vlb_fmt_p(vlb_bull_e_h) + "|ZE_L:" + f_vlb_fmt_p(vlb_bull_e_l) + "|ZE_C:" + f_vlb_fmt_p(vlb_bull_e_c) + "|ZE_V:" + f_vlb_fmt_v(vlb_bull_e_v)
+    string zd = "ZD_O:" + f_vlb_fmt_p(vlb_bull_d_o) + "|ZD_H:" + f_vlb_fmt_p(vlb_bull_d_h) + "|ZD_L:" + f_vlb_fmt_p(vlb_bull_d_l) + "|ZD_C:" + f_vlb_fmt_p(vlb_bull_d_c) + "|ZD_V:" + f_vlb_fmt_v(vlb_bull_d_v)
+    string zc = "ZC_O:" + f_vlb_fmt_p(vlb_bull_c_o) + "|ZC_H:" + f_vlb_fmt_p(vlb_bull_c_h) + "|ZC_L:" + f_vlb_fmt_p(vlb_bull_c_l) + "|ZC_C:" + f_vlb_fmt_p(vlb_bull_c_c) + "|ZC_V:" + f_vlb_fmt_v(vlb_bull_c_v)
+    string zb = "ZB_O:" + f_vlb_fmt_p(vlb_bull_b_o) + "|ZB_H:" + f_vlb_fmt_p(vlb_bull_b_h) + "|ZB_L:" + f_vlb_fmt_p(vlb_bull_b_l) + "|ZB_C:" + f_vlb_fmt_p(vlb_bull_b_c) + "|ZB_V:" + f_vlb_fmt_v(vlb_bull_b_v)
+    string za = "ZA_O:" + f_vlb_fmt_p(vlb_bull_a_o) + "|ZA_H:" + f_vlb_fmt_p(vlb_bull_a_h) + "|ZA_L:" + f_vlb_fmt_p(vlb_bull_a_l) + "|ZA_C:" + f_vlb_fmt_p(vlb_bull_a_c) + "|ZA_V:" + f_vlb_fmt_v(vlb_bull_a_v)
+    string tail = "RSI:" + str.tostring(math.round(rsi_14 * 100) / 100) + "|VOLRANK:" + str.tostring(math.round(vol_rank)) + "|SESS:" + str.tostring(sess_bar_count) + "|BULLSTACK:" + str.tostring(stk_bull) + "|BULLGAP:" + str.tostring(math.round(bull_gap * 100) / 100)
+    alert("VLB_BULL|TICKER:" + syminfo.ticker + "|EXCHANGE:" + syminfo.prefix + "|TF:" + timeframe.period + "|DIR:BULL|CLOSE:" + str.tostring(math.round(close * 100) / 100) + "|" + vsb + "|" + zf + "|" + ze + "|" + zd + "|" + zc + "|" + zb + "|" + za + "|" + tail, alert.freq_once_per_bar_close)
+
+if plot_vlb_bear
+    string vsb = "SENS_A:" + str.tostring(sens_a) + "|SENS_B:" + str.tostring(sens_b) + "|SENS_C:" + str.tostring(sens_c) + "|SENS_D:" + str.tostring(sens_d) + "|SENS_E:" + str.tostring(sens_e) + "|SENS_F:" + str.tostring(sens_f)
+    string zf = "ZF_O:" + f_vlb_fmt_p(vlb_bear_f_o) + "|ZF_H:" + f_vlb_fmt_p(vlb_bear_f_h) + "|ZF_L:" + f_vlb_fmt_p(vlb_bear_f_l) + "|ZF_C:" + f_vlb_fmt_p(vlb_bear_f_c) + "|ZF_V:" + f_vlb_fmt_v(vlb_bear_f_v)
+    string ze = "ZE_O:" + f_vlb_fmt_p(vlb_bear_e_o) + "|ZE_H:" + f_vlb_fmt_p(vlb_bear_e_h) + "|ZE_L:" + f_vlb_fmt_p(vlb_bear_e_l) + "|ZE_C:" + f_vlb_fmt_p(vlb_bear_e_c) + "|ZE_V:" + f_vlb_fmt_v(vlb_bear_e_v)
+    string zd = "ZD_O:" + f_vlb_fmt_p(vlb_bear_d_o) + "|ZD_H:" + f_vlb_fmt_p(vlb_bear_d_h) + "|ZD_L:" + f_vlb_fmt_p(vlb_bear_d_l) + "|ZD_C:" + f_vlb_fmt_p(vlb_bear_d_c) + "|ZD_V:" + f_vlb_fmt_v(vlb_bear_d_v)
+    string zc = "ZC_O:" + f_vlb_fmt_p(vlb_bear_c_o) + "|ZC_H:" + f_vlb_fmt_p(vlb_bear_c_h) + "|ZC_L:" + f_vlb_fmt_p(vlb_bear_c_l) + "|ZC_C:" + f_vlb_fmt_p(vlb_bear_c_c) + "|ZC_V:" + f_vlb_fmt_v(vlb_bear_c_v)
+    string zb = "ZB_O:" + f_vlb_fmt_p(vlb_bear_b_o) + "|ZB_H:" + f_vlb_fmt_p(vlb_bear_b_h) + "|ZB_L:" + f_vlb_fmt_p(vlb_bear_b_l) + "|ZB_C:" + f_vlb_fmt_p(vlb_bear_b_c) + "|ZB_V:" + f_vlb_fmt_v(vlb_bear_b_v)
+    string za = "ZA_O:" + f_vlb_fmt_p(vlb_bear_a_o) + "|ZA_H:" + f_vlb_fmt_p(vlb_bear_a_h) + "|ZA_L:" + f_vlb_fmt_p(vlb_bear_a_l) + "|ZA_C:" + f_vlb_fmt_p(vlb_bear_a_c) + "|ZA_V:" + f_vlb_fmt_v(vlb_bear_a_v)
+    string tail = "RSI:" + str.tostring(math.round(rsi_14 * 100) / 100) + "|VOLRANK:" + str.tostring(math.round(vol_rank)) + "|SESS:" + str.tostring(sess_bar_count) + "|BEARSTACK:" + str.tostring(stk_bear) + "|BEARGAP:" + str.tostring(math.round(bear_gap * 100) / 100)
+    alert("VLB_BEAR|TICKER:" + syminfo.ticker + "|EXCHANGE:" + syminfo.prefix + "|TF:" + timeframe.period + "|DIR:BEAR|CLOSE:" + str.tostring(math.round(close * 100) / 100) + "|" + vsb + "|" + zf + "|" + ze + "|" + zd + "|" + zc + "|" + zb + "|" + za + "|" + tail, alert.freq_once_per_bar_close)
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// MULTI-ZONE SAME-CANDLE DETECTION (v10 ADDITION) — 4 new plots + alerts
+// ═══════════════════════════════════════════════════════════════════════════════
+// Fires when 2 or 3+ zone-formation visual plots (zA / zB / zC / zD / zE / zF)
+// appear on the SAME candle, separately for bullish and bearish.
+//
+//   Bull 2  = exactly 2 bullish zone-formation markers on this bar
+//   Bull 3+ = 3 or more bullish zone-formation markers on this bar
+//   Bear 2  = exactly 2 bearish zone-formation markers on this bar
+//   Bear 3+ = 3 or more bearish zone-formation markers on this bar
+//
+// Mutual exclusivity: within a direction, only one of {2, 3+} can fire per bar.
+// Across directions, a bull and a bear multi-zone can co-fire on the same bar.
+//
+// 1:1 parity + non-repainting:
+//   The detection counts off fire_zb_* / fire_zs_*, which are the same booleans
+//   that drive the on-chart zA…zF cross markers. Those booleans are gated on
+//   bar close (zone formation is inside f_vob's barstate.isconfirmed branch),
+//   so they never paint and then disappear. The plotshapes and alert() calls
+//   below all read from a single boolean per detection (plot_mz_*), so what
+//   the eye sees on the chart matches exactly what arrives in the alert inbox.
+
+// ─── COUNTS — how many zone-formation markers fired on this bar ─────────────
+int mz_bull_cnt = (fire_zb_a ? 1 : 0) + (fire_zb_b ? 1 : 0) + (fire_zb_c ? 1 : 0) + (fire_zb_d ? 1 : 0) + (fire_zb_e ? 1 : 0) + (fire_zb_f ? 1 : 0)
+int mz_bear_cnt = (fire_zs_a ? 1 : 0) + (fire_zs_b ? 1 : 0) + (fire_zs_c ? 1 : 0) + (fire_zs_d ? 1 : 0) + (fire_zs_e ? 1 : 0) + (fire_zs_f ? 1 : 0)
+
+// ─── GATED DETECTION BOOLS — toggle + count + barstate.isconfirmed + cooldown
+bool plot_mz_b2 = show_multi_bull_2 and mz_bull_cnt == 2 and barstate.isconfirmed and f_cd_ok(last_mz_b2, cooldown_bars)
+bool plot_mz_b3 = show_multi_bull_3 and mz_bull_cnt >= 3 and barstate.isconfirmed and f_cd_ok(last_mz_b3, cooldown_bars)
+bool plot_mz_s2 = show_multi_bear_2 and mz_bear_cnt == 2 and barstate.isconfirmed and f_cd_ok(last_mz_s2, cooldown_bars)
+bool plot_mz_s3 = show_multi_bear_3 and mz_bear_cnt >= 3 and barstate.isconfirmed and f_cd_ok(last_mz_s3, cooldown_bars)
+
+if plot_mz_b2
+    last_mz_b2 := bar_index
+if plot_mz_b3
+    last_mz_b3 := bar_index
+if plot_mz_s2
+    last_mz_s2 := bar_index
+if plot_mz_s3
+    last_mz_s3 := bar_index
+
+// ─── VISUAL PLOTSHAPES — 1:1 parity with detection bools ────────────────────
+// Bull markers below bar, bear markers above bar. Square = 2-zone (lighter
+// confluence), flag = 3+-zone (heavier confluence).
+plotshape(plot_mz_b2, "Multi-Zone Bull 2 (same candle)",  shape.square, location.belowbar, color.new(color.lime, 0), size = size.small,  text = "MZ2↑", textcolor = color.lime)
+plotshape(plot_mz_b3, "Multi-Zone Bull 3+ (same candle)", shape.flag,   location.belowbar, color.new(color.lime, 0), size = size.normal, text = "MZ3↑", textcolor = color.lime)
+plotshape(plot_mz_s2, "Multi-Zone Bear 2 (same candle)",  shape.square, location.abovebar, color.new(color.red,  0), size = size.small,  text = "MZ2↓", textcolor = color.red)
+plotshape(plot_mz_s3, "Multi-Zone Bear 3+ (same candle)", shape.flag,   location.abovebar, color.new(color.red,  0), size = size.normal, text = "MZ3↓", textcolor = color.red)
+
+// ─── ALERTCONDITIONS — one per detection so each can be subscribed ──────────
+alertcondition(plot_mz_b2, "Multi-Zone Bull 2 (same candle)",  "VOB v10 — exactly 2 bullish zone-formation visual plots on the same candle")
+alertcondition(plot_mz_b3, "Multi-Zone Bull 3+ (same candle)", "VOB v10 — 3 or more bullish zone-formation visual plots on the same candle")
+alertcondition(plot_mz_s2, "Multi-Zone Bear 2 (same candle)",  "VOB v10 — exactly 2 bearish zone-formation visual plots on the same candle")
+alertcondition(plot_mz_s3, "Multi-Zone Bear 3+ (same candle)", "VOB v10 — 3 or more bearish zone-formation visual plots on the same candle")
+
+// ─── BLOOMBERG-FORMAT ALERTS — 1:1 with plotshapes, includes which tiers ────
+// Tier strings are built lazily inside the firing-side if-block to avoid
+// per-bar string concatenation when no multi-zone is firing.
+
+if plot_mz_b2 or plot_mz_b3
+    string tiers_b = ""
+    if fire_zb_a
+        tiers_b += "A(" + str.tostring(sens_a) + "),"
+    if fire_zb_b
+        tiers_b += "B(" + str.tostring(sens_b) + "),"
+    if fire_zb_c
+        tiers_b += "C(" + str.tostring(sens_c) + "),"
+    if fire_zb_d
+        tiers_b += "D(" + str.tostring(sens_d) + "),"
+    if fire_zb_e
+        tiers_b += "E(" + str.tostring(sens_e) + "),"
+    if fire_zb_f
+        tiers_b += "F(" + str.tostring(sens_f) + "),"
+    string mz_b_tail = "|CLOSE:" + str.tostring(math.round(close * 100) / 100) + "|VOL:" + str.tostring(math.round(volume)) + "|VOLRANK:" + str.tostring(math.round(vol_rank)) + "|RSI:" + str.tostring(math.round(rsi_14 * 100) / 100) + "|SESS:" + str.tostring(sess_bar_count) + "|BULLZONES:" + str.tostring(cnt_bull_all) + "|BEARZONES:" + str.tostring(cnt_bear_all) + "|BULLSTACK:" + str.tostring(stk_bull) + "|BULLGAP:" + str.tostring(math.round(bull_gap * 100) / 100) + "|NRBULLDIST:" + str.tostring(math.round(nearest_bull_dist * 100) / 100) + "|TIERS:" + tiers_b
+    if plot_mz_b2
+        alert("MULTI_ZONE_BULL_2|TICKER:" + syminfo.ticker + "|EXCHANGE:" + syminfo.prefix + "|TF:" + timeframe.period + "|DIR:BULL|COUNT:" + str.tostring(mz_bull_cnt) + mz_b_tail, alert.freq_once_per_bar_close)
+    if plot_mz_b3
+        alert("MULTI_ZONE_BULL_3PLUS|TICKER:" + syminfo.ticker + "|EXCHANGE:" + syminfo.prefix + "|TF:" + timeframe.period + "|DIR:BULL|COUNT:" + str.tostring(mz_bull_cnt) + mz_b_tail, alert.freq_once_per_bar_close)
+
+if plot_mz_s2 or plot_mz_s3
+    string tiers_s = ""
+    if fire_zs_a
+        tiers_s += "A(" + str.tostring(sens_a) + "),"
+    if fire_zs_b
+        tiers_s += "B(" + str.tostring(sens_b) + "),"
+    if fire_zs_c
+        tiers_s += "C(" + str.tostring(sens_c) + "),"
+    if fire_zs_d
+        tiers_s += "D(" + str.tostring(sens_d) + "),"
+    if fire_zs_e
+        tiers_s += "E(" + str.tostring(sens_e) + "),"
+    if fire_zs_f
+        tiers_s += "F(" + str.tostring(sens_f) + "),"
+    string mz_s_tail = "|CLOSE:" + str.tostring(math.round(close * 100) / 100) + "|VOL:" + str.tostring(math.round(volume)) + "|VOLRANK:" + str.tostring(math.round(vol_rank)) + "|RSI:" + str.tostring(math.round(rsi_14 * 100) / 100) + "|SESS:" + str.tostring(sess_bar_count) + "|BULLZONES:" + str.tostring(cnt_bull_all) + "|BEARZONES:" + str.tostring(cnt_bear_all) + "|BEARSTACK:" + str.tostring(stk_bear) + "|BEARGAP:" + str.tostring(math.round(bear_gap * 100) / 100) + "|NRBEARDIST:" + str.tostring(math.round(nearest_bear_dist * 100) / 100) + "|TIERS:" + tiers_s
+    if plot_mz_s2
+        alert("MULTI_ZONE_BEAR_2|TICKER:" + syminfo.ticker + "|EXCHANGE:" + syminfo.prefix + "|TF:" + timeframe.period + "|DIR:BEAR|COUNT:" + str.tostring(mz_bear_cnt) + mz_s_tail, alert.freq_once_per_bar_close)
+    if plot_mz_s3
+        alert("MULTI_ZONE_BEAR_3PLUS|TICKER:" + syminfo.ticker + "|EXCHANGE:" + syminfo.prefix + "|TF:" + timeframe.period + "|DIR:BEAR|COUNT:" + str.tostring(mz_bear_cnt) + mz_s_tail, alert.freq_once_per_bar_close)

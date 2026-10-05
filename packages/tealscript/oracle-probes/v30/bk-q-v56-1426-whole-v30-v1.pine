@@ -1,0 +1,278 @@
+// ===== 4銘柄対応QQE S/A/B/C評価システム =====
+// YouTube解説用・SMC価格連動
+//@version=5
+indicator(title='4銘柄QQE評価システム', shorttitle='QQE-4-Grade', overlay=true)
+
+// ===== 基本設定 =====
+group_basic = "基本設定"
+use_alerts = input.bool(true, "アラート有効", group=group_basic)
+enable_time_filter = input.bool(true, "時間フィルター有効", group=group_basic)
+start_hour = input.int(15, "開始時刻（JST）", minval=0, maxval=23, group=group_basic)
+end_hour = input.int(1, "終了時刻（JST）", minval=0, maxval=23, group=group_basic)
+
+// ===== QQE設定 =====
+group_qqe = "QQE設定"
+RSI_Period = input.int(14, title='RSI期間', group=group_qqe)
+SF = input.int(5, title='RSIスムージング', group=group_qqe)
+use_auto_qqe = input.bool(true, "銘柄別QQEファクター自動適用", group=group_qqe)
+manual_qqe = input.float(4.238, title='[手動]QQEファクター', step=0.1, group=group_qqe)
+
+// ===== SMC価格設定（4銘柄） =====
+group_smc = "SMC価格設定"
+
+// USD/JPY
+usdjpy_resist = input.float(149.50, "ドル円 上側ライン", group=group_smc)
+usdjpy_support = input.float(148.50, "ドル円 下側ライン", group=group_smc)
+
+// GOLD
+gold_resist = input.float(2650.0, "GOLD 上側ライン", group=group_smc)
+gold_support = input.float(2620.0, "GOLD 下側ライン", group=group_smc)
+
+// EUR/USD
+eurusd_resist = input.float(1.1150, "ユーロドル 上側ライン", group=group_smc)
+eurusd_support = input.float(1.1050, "ユーロドル 下側ライン", group=group_smc)
+
+// NASDAQ
+nasdaq_resist = input.float(20200, "ナスダック 上側ライン", group=group_smc)
+nasdaq_support = input.float(19800, "ナスダック 下側ライン", group=group_smc)
+
+smc_tolerance_pct = input.float(0.15, "SMC判定許容範囲（%）", group=group_smc, step=0.05, tooltip="価格の何%以内でS評価")
+
+// ===== 表示設定 =====
+group_display = "表示設定"
+show_grade_only = input.bool(true, "評価のみ表示（QQEライン非表示）", group=group_display)
+show_smc_lines = input.bool(true, "SMCライン表示", group=group_display)
+show_debug = input.bool(true, "銘柄判定表示", group=group_display)
+
+// ===== 銘柄判定 =====
+get_asset_info() =>
+    ticker_upper = str.upper(syminfo.ticker)
+    
+    if str.contains(ticker_upper, "USDJPY") or str.contains(ticker_upper, "USD/JPY")
+        [4.238, "ドル円", usdjpy_resist, usdjpy_support]
+    else if str.contains(ticker_upper, "EURUSD") or str.contains(ticker_upper, "EUR/USD")
+        [3.8, "ユーロドル", eurusd_resist, eurusd_support]
+    else if str.contains(ticker_upper, "GOLD") or str.contains(ticker_upper, "XAUUSD") or str.contains(ticker_upper, "XAU")
+        [8.0, "ゴールド", gold_resist, gold_support]
+    else if str.contains(ticker_upper, "NASDAQ") or str.contains(ticker_upper, "NAS100") or str.contains(ticker_upper, "US100")
+        [9.0, "ナスダック", nasdaq_resist, nasdaq_support]
+    else
+        [4.238, syminfo.ticker, na, na]
+
+[auto_qqe, asset_name, smc_resist, smc_support] = get_asset_info()
+final_qqe = use_auto_qqe ? auto_qqe : manual_qqe
+
+// ===== 価格フォーマット =====
+get_price_format() =>
+    ticker_upper = str.upper(syminfo.ticker)
+    if str.contains(ticker_upper, "NASDAQ") or str.contains(ticker_upper, "NAS100")
+        "#"
+    else if str.contains(ticker_upper, "GOLD") or str.contains(ticker_upper, "XAU")
+        "#.##"
+    else if str.contains(ticker_upper, "JPY")
+        "#.###"
+    else if str.contains(ticker_upper, "USD") and not str.contains(ticker_upper, "JPY")
+        "#.#####"
+    else
+        "#.##"
+
+price_fmt = get_price_format()
+
+// ===== 時間判定 =====
+current_hour = hour(time, "GMT+9")
+is_trading_hour = if enable_time_filter
+    if start_hour <= end_hour
+        current_hour >= start_hour and current_hour <= end_hour
+    else
+        current_hour >= start_hour or current_hour <= end_hour
+else
+    true
+
+get_current_session() =>
+    if current_hour >= 8 and current_hour < 15
+        "東京"
+    else if current_hour >= 15 and current_hour < 23
+        "ロンドン"
+    else
+        "NY"
+
+// ===== QQEロジック =====
+src = close
+Wilders_Period = RSI_Period * 2 - 1
+Rsi = ta.rsi(src, RSI_Period)
+RsiMa = ta.ema(Rsi, SF)
+AtrRsi = math.abs(RsiMa[1] - RsiMa)
+MaAtrRsi = ta.ema(AtrRsi, Wilders_Period)
+dar = ta.ema(MaAtrRsi, Wilders_Period) * final_qqe
+
+var float longband = na
+var float shortband = na
+var int trend = na
+
+DeltaFastAtrRsi = dar
+RSIndex = RsiMa
+newshortband = RSIndex + DeltaFastAtrRsi
+newlongband = RSIndex - DeltaFastAtrRsi
+
+longband := RSIndex[1] > longband[1] and RSIndex > longband[1] ? math.max(longband[1], newlongband) : newlongband
+shortband := RSIndex[1] < shortband[1] and RSIndex < shortband[1] ? math.min(shortband[1], newshortband) : newshortband
+
+cross_1 = ta.cross(longband[1], RSIndex)
+trend := ta.cross(RSIndex, shortband[1]) ? 1 : cross_1 ? -1 : nz(trend[1], 1)
+FastAtrRsiTL = trend == 1 ? longband : shortband
+
+var int QQExlong = 0
+var int QQExshort = 0
+QQExlong := FastAtrRsiTL < RSIndex ? QQExlong + 1 : 0
+QQExshort := FastAtrRsiTL > RSIndex ? QQExshort + 1 : 0
+
+basic_long = QQExlong == 1
+basic_short = QQExshort == 1
+
+// ===== スコア計算（内部処理用） =====
+atr_current = ta.atr(14)
+atr_avg = ta.sma(atr_current, 20)
+atr_ratio = atr_current / atr_avg
+
+signal_base = (basic_long or basic_short) ? 25 : 0
+qqe_distance = math.abs(RSIndex - 50)
+qqe_strength = qqe_distance > 20 ? 20 : qqe_distance > 10 ? 15 : 10
+
+vol_score = atr_ratio > 1.1 and atr_ratio < 2.0 ? 15 : atr_ratio < 0.8 ? -10 : 5
+
+volume_avg = ta.sma(volume, 20)
+volume_ratio = volume / volume_avg
+vol_confirm = volume_ratio > 1.2 ? 10 : volume_ratio < 0.8 ? -5 : 0
+
+session = get_current_session()
+time_bonus = session == "ロンドン" or session == "NY" ? 5 : 0
+
+raw_score = signal_base + qqe_strength + vol_score + vol_confirm + time_bonus + 20
+internal_score = math.max(0, math.min(100, raw_score))
+
+// ===== SMC価格判定 =====
+smc_tolerance = close * smc_tolerance_pct / 100
+near_resist = not na(smc_resist) and math.abs(close - smc_resist) <= smc_tolerance
+near_support = not na(smc_support) and math.abs(close - smc_support) <= smc_tolerance
+near_smc = near_resist or near_support
+
+// ===== S/A/B/C評価判定 =====
+get_grade() =>
+    if not (basic_long or basic_short)
+        ""
+    else if near_smc and is_trading_hour
+        "S"
+    else if internal_score >= 70 and is_trading_hour
+        "A"
+    else if internal_score >= 50 and is_trading_hour
+        "B"
+    else
+        "C"
+
+grade = get_grade()
+
+// 最終シグナル
+final_long = basic_long and grade != "" and grade != "C"
+final_short = basic_short and grade != "" and grade != "C"
+weak_long = basic_long and grade == "C"
+weak_short = basic_short and grade == "C"
+
+// ===== 表示 =====
+// QQEライン（オプション）
+qqe_color = trend == 1 ? color.blue : color.red
+plot(show_grade_only ? na : RSIndex, title="QQE RSI", color=qqe_color, linewidth=2)
+plot(show_grade_only ? na : FastAtrRsiTL, title="QQE Signal", color=color.orange, linewidth=1)
+
+// SMCライン表示
+plot(show_smc_lines and not na(smc_resist) ? smc_resist : na, title="上側ライン", color=color.new(color.red, 50), style=plot.style_linebr, linewidth=2)
+plot(show_smc_lines and not na(smc_support) ? smc_support : na, title="下側ライン", color=color.new(color.lime, 50), style=plot.style_linebr, linewidth=2)
+
+// BUYシグナル表示
+if final_long
+    grade_color = grade == "S" ? color.new(color.yellow, 0) : 
+                  grade == "A" ? color.new(color.lime, 0) : 
+                  color.new(color.green, 20)
+    
+    label_text = "BUY\n" + grade
+    label.new(bar_index, low, label_text, 
+              style=label.style_label_up, 
+              color=grade_color, 
+              textcolor=color.black, 
+              size=size.huge,
+              tooltip=asset_name + " QQE BUY " + grade + "評価\nスコア:" + str.tostring(math.round(internal_score)))
+
+// SELLシグナル表示
+if final_short
+    grade_color = grade == "S" ? color.new(color.orange, 0) : 
+                  grade == "A" ? color.new(color.red, 0) : 
+                  color.new(color.maroon, 20)
+    
+    label_text = "SELL\n" + grade
+    label.new(bar_index, high, label_text, 
+              style=label.style_label_down, 
+              color=grade_color, 
+              textcolor=color.white, 
+              size=size.huge,
+              tooltip=asset_name + " QQE SELL " + grade + "評価\nスコア:" + str.tostring(math.round(internal_score)))
+
+// C評価（時間外など）
+if weak_long
+    label.new(bar_index, low, "buy\nC", 
+              style=label.style_label_up, 
+              color=color.new(color.gray, 30), 
+              textcolor=color.white, 
+              size=size.small,
+              tooltip="時間外または弱シグナル")
+
+if weak_short
+    label.new(bar_index, high, "sell\nC", 
+              style=label.style_label_down, 
+              color=color.new(color.gray, 30), 
+              textcolor=color.white, 
+              size=size.small,
+              tooltip="時間外または弱シグナル")
+
+// 情報表示
+if barstate.islast
+    session_name = get_current_session()
+    time_status = is_trading_hour ? "✅取引時間" : "❌時間外"
+    smc_status = near_smc ? "🎯SMC圏内" : "通常"
+    mode_text = use_auto_qqe ? "自動" : "手動"
+    
+    var table info_tbl = table.new(position.top_right, 1, 1,
+         frame_color=color.orange, border_color=color.white,
+         frame_width=2, border_width=1)
+    table.cell(info_tbl, 0, 0, 
+         asset_name + " [" + mode_text + "]\n" + session_name + "\n" + time_status + "\n" + smc_status,
+         text_color=color.white, text_size=size.normal, bgcolor=color.new(color.orange, 30))
+
+// 銘柄判定デバッグ
+if show_debug and barstate.islast
+    var table debug_tbl = table.new(position.top_left, 2, 3,
+         frame_color=color.blue, border_color=color.white,
+         frame_width=2, border_width=1)
+    
+    table.cell(debug_tbl, 0, 0, "元ティッカー", text_color=color.white, text_size=size.small, bgcolor=color.blue)
+    table.cell(debug_tbl, 1, 0, syminfo.ticker, text_color=color.white, text_size=size.small, bgcolor=color.blue)
+    
+    table.cell(debug_tbl, 0, 1, "判定結果", text_color=color.white, text_size=size.small, bgcolor=color.blue)
+    table.cell(debug_tbl, 1, 1, asset_name, text_color=color.white, text_size=size.normal, bgcolor=color.blue)
+    
+    table.cell(debug_tbl, 0, 2, "QQEファクター", text_color=color.white, text_size=size.small, bgcolor=color.blue)
+    table.cell(debug_tbl, 1, 2, str.tostring(final_qqe, "#.##"), text_color=color.white, text_size=size.normal, bgcolor=color.blue)
+
+// ===== アラート =====
+if use_alerts and barstate.isconfirmed
+    price_str = str.tostring(close, price_fmt)
+    session_name = get_current_session()
+    
+    if final_long
+        alert_msg = "🚀 " + asset_name + " BUY-" + grade + " " + price_str + " | " + session_name + "タイム"
+        alert(alert_msg, alert.freq_once_per_bar_close)
+    
+    if final_short
+        alert_msg = "🔥 " + asset_name + " SELL-" + grade + " " + price_str + " | " + session_name + "タイム"
+        alert(alert_msg, alert.freq_once_per_bar_close)
+
+alertcondition(final_long, title="QQE BUY", message="QQE BUY シグナル")
+alertcondition(final_short, title="QQE SELL", message="QQE SELL シグナル")

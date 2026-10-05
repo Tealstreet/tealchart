@@ -1,0 +1,10 @@
+//@version=5
+indicator("Inline switch declaration discriminator")
+rectangular(float value, int selector) =>
+    switch selector
+        1 => result = value * 2
+        2 => result = value * 3
+        => result = value * 4
+plot(rectangular(5, 1), "inline_declaration_first")
+plot(rectangular(5, 2), "inline_declaration_second")
+plot(rectangular(5, 3), "inline_declaration_default")

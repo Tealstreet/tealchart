@@ -1,0 +1,6 @@
+//@version=6
+indicator("Matrix call-result kron cell limit")
+
+left = matrix.new<float>(500, 1, 1.0)
+right = matrix.new<float>(201, 1, 1.0)
+plot(matrix.copy(left).kron(right).rows())

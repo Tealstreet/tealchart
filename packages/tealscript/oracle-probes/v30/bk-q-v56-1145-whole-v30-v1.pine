@@ -1,0 +1,87 @@
+// This Pine Script® code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © HighQTools
+
+//@version=6
+indicator("BB Squeeze | HighQTools", overlay=true)
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Inputs
+// ─────────────────────────────────────────────────────────────────────────────
+len        = input.int(10, "BB Length", minval=2)
+mult       = input.float(2.0, "BB StdDev Mult", step=0.1)
+
+lookback   = input.int(252, "Percentile Lookback (bars counted)", minval=20)
+thresh     = input.float(5.0, "Squeeze Threshold (percentile)", minval=0, maxval=100)
+minBars    = input.int(2, "Min Bars In Squeeze", minval=1)
+
+squeezeCol = input.color(color.rgb(233, 122, 122), "Squeeze Bar Color")
+releaseCol = input.color(color.rgb(197, 22, 22),  "Release Bar Color")
+
+useRTHOnly = input.bool(true, "RTH Only (use only session bars)")
+rthSession = input.session("0930-1600", "RTH Session")
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Session gate
+// ─────────────────────────────────────────────────────────────────────────────
+inRTH = not na(time(timeframe.period, rthSession))
+useBar = useRTHOnly ? inRTH : true
+
+// ─────────────────────────────────────────────────────────────────────────────
+// BB Width
+// ─────────────────────────────────────────────────────────────────────────────
+basis = ta.sma(close, len)
+dev   = ta.stdev(close, len) * mult
+upper = basis + dev
+lower = basis - dev
+
+// Normalize width (basis). If you ever want: (upper-lower)/close instead.
+bbw = (upper - lower) / basis
+
+// ─────────────────────────────────────────────────────────────────────────────
+// RTH-only percentile rank using an array of the last `lookback` eligible BBW values
+// ─────────────────────────────────────────────────────────────────────────────
+var float[] bbwHist = array.new_float()
+
+if useBar and not na(bbw)
+    array.push(bbwHist, bbw)
+    if array.size(bbwHist) > lookback
+        array.shift(bbwHist)
+
+float bbwPct = na
+if array.size(bbwHist) == lookback and useBar
+    float countLE = 0.0
+    for i = 0 to lookback - 1
+        countLE += array.get(bbwHist, i) <= bbw ? 1.0 : 0.0
+    bbwPct := 100.0 * countLE / lookback
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Squeeze logic (only meaningful when bbwPct is available)
+// ─────────────────────────────────────────────────────────────────────────────
+inSqueeze = useBar and not na(bbwPct) and bbwPct <= thresh
+
+// Min-bars filter (count consecutive eligible squeeze bars)
+var int squeezeCount = 0
+if useBar
+    squeezeCount := inSqueeze ? (squeezeCount + 1) : 0
+else
+    squeezeCount := 0
+
+inSqueezeFiltered = inSqueeze and squeezeCount >= minBars
+
+// Release = first eligible bar exiting squeeze
+isRelease = useBar and ta.crossover(bbwPct, thresh)
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Bar coloring
+// ─────────────────────────────────────────────────────────────────────────────
+barcolor(
+     inSqueezeFiltered ? squeezeCol :
+     isRelease          ? releaseCol :
+     na
+)
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Alerts
+// ─────────────────────────────────────────────────────────────────────────────
+alertcondition(inSqueezeFiltered, "In Squeeze", "BBW percentile is below threshold (session-filtered if enabled).")
+alertcondition(isRelease, "Squeeze Release", "BBW percentile exited squeeze (session-filtered if enabled).")

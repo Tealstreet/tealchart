@@ -1,0 +1,1427 @@
+//@version=6
+indicator("Rich Tool Scaping — Signal Dashboard", overlay=true, max_bars_back=500,
+     max_lines_count=500, max_labels_count=500, max_boxes_count=500)
+
+// ═══════════════════════════════════════════════════════════
+//  INPUTS
+// ═══════════════════════════════════════════════════════════
+InpTablePos = input.string("Bottom Left", title="Vị trí bảng",
+     options=["Top Left", "Top Center", "Top Right",
+              "Middle Left", "Middle Center", "Middle Right",
+              "Bottom Left", "Bottom Center", "Bottom Right",
+              "Left Center"])
+InpTblTextSize = input.string("Auto", title="Cỡ chữ bảng (Auto = tự co theo màn hình)",
+     options=["Auto", "Tiny", "Small", "Normal", "Large"])
+InpMobileMode = input.bool(false, title="Chế độ Mobile (bảng chính chỉ hiện M15/H1/H4/D1)")
+
+disp = display.all - display.status_line
+
+// ── Arrow style ─────────────────────────────────────────────
+InpStrongBuyColor  = input.color(color.lime,   title="Màu Strong BUY",  group="Mũi tên")
+InpBuyColor        = input.color(color.green,  title="Màu BUY",         group="Mũi tên")
+InpStrongSellColor = input.color(color.red,    title="Màu Strong SELL", group="Mũi tên")
+InpSellColor       = input.color(color.maroon, title="Màu SELL",        group="Mũi tên")
+InpSizeStrong      = input.string("Normal", title="Cỡ mũi tên Strong",
+     options=["Tiny", "Small", "Normal", "Large", "Huge"], group="Mũi tên")
+InpSizeNormal      = input.string("Small",  title="Cỡ mũi tên thường",
+     options=["Tiny", "Small", "Normal", "Large", "Huge"], group="Mũi tên")
+InpShape           = input.string("Triangle", title="Hình dạng",
+     options=["Triangle", "Arrow", "Label", "Circle", "Diamond", "Square", "Cross"], group="Mũi tên")
+
+// ── Table style ─────────────────────────────────────────────
+InpTblBg         = color.new(#0d1b2a, 0)
+InpTblHdrTxt     = color.silver
+InpTblLblTxt     = color.white
+InpTblNeutral    = color.new(#37474f, 0)
+InpTblStrongBuy  = color.new(#1a6b20, 0)
+InpTblBuyCell    = color.new(#2e7d32, 30)
+InpTblStrongSell = color.new(#9c1a1a, 0)
+InpTblSellCell   = color.new(#c62828, 30)
+
+// ── Killzones (LuxAlgo) ─────────────────────────────────────
+kzGR    = 'Killzones'
+asSH    = input(true,  '', inline='asia', group=kzGR)
+asST    = input.string('Asian',        '', inline='asia', group=kzGR, display=disp)
+asS     = input.session('2000-0000',   '', inline='asia', group=kzGR, display=disp)
+asC     = input.color(color.new(#e91e63, 90), '', inline='asia', group=kzGR)
+
+ldnOSH  = input(true,  '', inline='ldno', group=kzGR)
+ldnOST  = input.string('London',       '', inline='ldno', group=kzGR, display=disp)
+ldnOS   = input.session('0200-0500',   '', inline='ldno', group=kzGR, display=disp)
+ldnOC   = input.color(color.new(#00bcd4, 90), '', inline='ldno', group=kzGR)
+
+nySH    = input(true,  '', inline='nyam', group=kzGR)
+nyST    = input.string('New York AM',  '', inline='nyam', group=kzGR, display=disp)
+nyS     = input.session('0830-1100',   '', inline='nyam', group=kzGR, display=disp)
+nyC     = input.color(color.new(#ff5d00, 90), '', inline='nyam', group=kzGR)
+
+ldnCSH  = input(true,  '', inline='nypm', group=kzGR)
+ldnCST  = input.string('New York PM',  '', inline='nypm', group=kzGR, display=disp)
+ldnCS   = input.session('1330-1600',   '', inline='nypm', group=kzGR, display=disp)
+ldnCC   = input.color(color.new(#2157f3, 90), '', inline='nypm', group=kzGR)
+
+kzMML   = input(true,  'Killzone Lines : Top/Bottom', inline='LN', group=kzGR)
+kzML    = input(false, 'Mean',                         inline='LN', group=kzGR)
+kzLE    = input(true,  'Extend Top/Bottom',            inline='LN', group=kzGR)
+kzLB    = input(true,  'Killzone Labels', group=kzGR)
+kzSH    = input.int(60, 'Display Killzones within Timeframes Up To', options=[1,3,5,15,30,45,60], group=kzGR, display=disp)
+dwmO    = input.string('None', 'Open Price of', options=['Killzones','the Day','the Week','the Month','None'], inline='OP', group=kzGR, display=disp)
+dwmS    = input.bool(true,  'Separator', inline='OP', group=kzGR)
+dwmC    = input(color.new(color.gray, 89), '', inline='OP', group=kzGR)
+dwmL    = input.bool(true,  'Label', inline='OP', group=kzGR)
+
+// ── Order Blocks & Breaker Blocks ───────────────────────────
+obbGR   = 'Order Blocks & Breaker Blocks'
+obSH    = input.bool(true,  'Order Blocks | Breaker Blocks', inline='OB', group=obbGR)
+bbSH    = input.bool(false, '',                               inline='OB', group=obbGR)
+obbLN   = input.int(5, 'Swing Detection Length', minval=3, group=obbGR, display=disp)
+obbMT   = input.string('Closing Price', 'Mitigation Price', options=['Closing Price','Wick'], group=obbGR, display=disp)
+obbMP   = obbMT == 'Closing Price'
+useBody = input(false, 'Use Candle Body in Detection', group=obbGR)
+obbR    = input.bool(true, 'Remove Mitigated Order Blocks & Breaker Blocks', group=obbGR)
+obbEX   = input.bool(true, 'Extend Order Blocks & Breaker Blocks', group=obbGR)
+obbSH   = input.string('First', 'Display Order Blocks & Breaker Blocks', options=['All','First','Last'], group=obbGR, display=disp)
+bullOC  = input(color.new(#2157f3, 80), 'Order Blocks  : Bullish', inline='OBC', group=obbGR)
+bearOC  = input(color.new(#ff5d00, 80), 'Bearish',                 inline='OBC', group=obbGR)
+bullBC  = input(color.new(#ff1100, 80), 'Breaker Blocks : Bullish', inline='BBC', group=obbGR)
+bearBC  = input(color.new(#0cb51a, 80), 'Bearish',                  inline='BBC', group=obbGR)
+obbTX   = input.bool(true, 'Show Order Blocks & Breaker Blocks Text', group=obbGR)
+
+// ── Market Structure Shifts ──────────────────────────────────
+mssGR   = 'Market Structure Shifts'
+mssSH   = input.bool(false, 'Market Structure Shifts', group=mssGR)
+mssLN   = input.int(7, 'Detection Length', minval=1, group=mssGR, display=disp)
+mssDO   = input.string('First', 'Display Market Structure Shifts', options=['All','First','Last'], group=mssGR, display=disp)
+ppLCB   = input.color(color.new(color.teal, 0), 'Market Structure Shifts : Bullish', inline='MSS', group=mssGR)
+ppLCS   = input.color(color.new(color.red,  0), 'Bearish',                           inline='MSS', group=mssGR)
+mssTX   = input.bool(true, 'Show Market Structure Shifts Text', group=mssGR)
+
+// ── Fair Value Gaps ──────────────────────────────────────────
+fvgGR   = 'Fair Value Gaps'
+fvgSH   = input.bool(true, 'Fair Value Gaps', group=fvgGR)
+fvgTH   = input.float(1.2, 'Fair Value Gap Width Filter', minval=0, step=.1, group=fvgGR, display=disp)
+fvgR    = input.bool(true, 'Remove Mitigated Fair Value Gaps', group=fvgGR)
+fvgE    = input.bool(true, 'Extend Fair Value Gaps', group=fvgGR)
+fvgDO   = input.string('First', 'Display Fair Value Gaps', options=['All','First','Last'], group=fvgGR, display=disp)
+fvgBC   = input.color(color.new(#4caf50, 80), 'Bullish Imbalance', group=fvgGR)
+fvgSC   = input.color(color.new(color.red, 80), 'Bearish Imbalance', group=fvgGR)
+fvgTX   = input.bool(true, 'Show Fair Value Gaps Text', group=fvgGR)
+
+// ── Trade Signal Table ───────────────────────────────────────
+trdGR    = 'Bảng Lệnh'
+trdSH    = input.bool(false, 'Hiện Bảng Lệnh', group=trdGR)
+trdTPos  = input.string('Top Right', 'Vị trí bảng',
+     options=['Top Left','Top Center','Top Right','Middle Left','Middle Center','Middle Right','Bottom Left','Bottom Center','Bottom Right'], group=trdGR)
+trdVol   = input.float(0.1,  'Volume (Lot)',          step=0.01, minval=0.01, group=trdGR)
+trdMult  = input.float(100.0,'Hệ số PNL ($/Lot/$1)',  group=trdGR, tooltip='XAUUSD=100 | Forex Major=100000')
+trdSL    = input.float(5.0,  'SL  (giá)',  minval=0, step=0.1, group=trdGR)
+trdTP1   = input.float(10.0, 'TP1 (giá)',  minval=0, step=0.1, group=trdGR)
+trdTP2   = input.float(20.0, 'TP2 (giá)',  minval=0, step=0.1, group=trdGR)
+trdTP3   = input.float(50.0, 'TP3 (giá)',  minval=0, step=0.1, group=trdGR)
+trdLvlSH = input.bool(true, 'Vẽ Entry/SL/TP lên chart', group=trdGR)
+trdTxtSize = input.string('Auto', 'Cỡ chữ bảng lệnh (Auto = tự co theo màn hình)',
+     options=['Auto', 'Tiny', 'Small', 'Normal', 'Large'], group=trdGR)
+trdMobileMode = input.bool(false, 'Chế độ Mobile (chỉ hiện 1 khung giờ)', group=trdGR)
+trdMobileTF   = input.string('M15', 'Khung giờ hiển thị (Mobile)', options=['M5', 'M15', 'M30'], group=trdGR)
+
+_sz(s) =>
+    s == "Tiny" ? size.tiny : s == "Small" ? size.small : s == "Normal" ? size.normal : s == "Large" ? size.large : size.huge
+
+// "Auto" (hoặc giá trị lạ) → size.auto: TradingView tự co chữ theo kích thước màn hình/pane,
+// giúp bảng đọc được trên điện thoại thay vì dùng cỡ chữ cố định.
+_tblSz(s) =>
+    s == "Tiny" ? size.tiny : s == "Small" ? size.small : s == "Normal" ? size.normal : s == "Large" ? size.large : size.auto
+
+_buy_style() =>
+    InpShape == "Arrow"   ? label.style_arrowup   :
+     InpShape == "Label"  ? label.style_label_up  :
+     InpShape == "Circle" ? label.style_circle     :
+     InpShape == "Diamond"? label.style_diamond    :
+     InpShape == "Square" ? label.style_square     :
+     InpShape == "Cross"  ? label.style_cross      :
+     label.style_triangleup
+
+_sell_style() =>
+    InpShape == "Arrow"   ? label.style_arrowdown  :
+     InpShape == "Label"  ? label.style_label_down :
+     InpShape == "Circle" ? label.style_circle      :
+     InpShape == "Diamond"? label.style_diamond     :
+     InpShape == "Square" ? label.style_square      :
+     InpShape == "Cross"  ? label.style_cross       :
+     label.style_triangledown
+
+_tblPos = (InpTablePos == "Top Left"      ? position.top_left      :
+           InpTablePos == "Top Center"    ? position.top_center    :
+           InpTablePos == "Top Right"     ? position.top_right     :
+           InpTablePos == "Middle Left"   ? position.middle_left   :
+           InpTablePos == "Middle Center" ? position.middle_center :
+           InpTablePos == "Middle Right"  ? position.middle_right  :
+           InpTablePos == "Bottom Left"   ? position.bottom_left   :
+           InpTablePos == "Bottom Center" ? position.bottom_center :
+           InpTablePos == "Left Center"   ? position.middle_left  :
+           position.bottom_right)
+
+_trdPos = (trdTPos == 'Top Left'      ? position.top_left      :
+           trdTPos == 'Top Center'    ? position.top_center    :
+           trdTPos == 'Top Right'     ? position.top_right     :
+           trdTPos == 'Middle Left'   ? position.middle_left   :
+           trdTPos == 'Middle Center' ? position.middle_center :
+           trdTPos == 'Middle Right'  ? position.middle_right  :
+           trdTPos == 'Bottom Left'   ? position.bottom_left   :
+           trdTPos == 'Bottom Center' ? position.bottom_center :
+           position.bottom_right)
+
+_dir(v)   => v > 0 ? 'Tăng ↑' : v < 0 ? 'Giảm ↓' : ' — '
+_dirC(v)  => v > 0 ? color.lime : v < 0 ? color.red : color.silver
+_prFmt(v) => na(v) ? '   —   ' : str.tostring(v, format.mintick)
+_calcPnl(entry, dir, vol, mult) =>
+    entry > 0 ? (dir > 0 ? close - entry : entry - close) * mult * vol : float(na)
+_calcPnlAt(entry, dir, target, vol, mult) =>
+    entry > 0 and not na(target) ? (dir > 0 ? target - entry : entry - target) * mult * vol : float(na)
+_pnlStr(v) => na(v) ? '      —      ' : (v >= 0 ? '+' : '') + str.tostring(math.round(v, 2)) + ' USD'
+
+_drawLvl(arr_ln, arr_lb, x1, price, col, stl, w, txt) =>
+    if not na(price)
+        _x1 = na(x1) ? bar_index - 5 : x1
+        arr_ln.push(line.new(_x1, price, bar_index + 3, price,
+             extend=extend.none, color=col, style=stl, width=w))
+        arr_lb.push(label.new(bar_index + 4, price,
+             txt + '  ' + str.tostring(price, format.mintick),
+             color=color.new(col, 80), textcolor=col,
+             style=label.style_label_left, size=size.small))
+
+// ═══════════════════════════════════════════════════════════
+//  HELPERS
+// ═══════════════════════════════════════════════════════════
+sig_col(v) =>
+    v > 0 ? InpTblStrongBuy : v < 0 ? InpTblStrongSell : InpTblNeutral
+
+sig_txt(v) => v > 0 ? "TĂNG" : v < 0 ? "GIẢM" : " — "
+
+score_col(s) =>
+    (s >= 75.0  ? InpTblStrongBuy  :
+     s >= 50.0  ? InpTblBuyCell    :
+     s <= -75.0 ? InpTblStrongSell :
+     s <= -50.0 ? InpTblSellCell   :
+     InpTblNeutral)
+
+// Per-TF consensus: đếm indicator đồng thuận, trả về 1/−1/0
+// bc phải > sc mới tính BUY (tránh tie 2-2 bị tính là BUY)
+tf_signal(e, r, m, i, min_agree) =>
+    bc = (e > 0 ? 1 : 0) + (r > 0 ? 1 : 0) + (m > 0 ? 1 : 0) + (i > 0 ? 1 : 0)
+    sc = (e < 0 ? 1 : 0) + (r < 0 ? 1 : 0) + (m < 0 ? 1 : 0) + (i < 0 ? 1 : 0)
+    bc >= min_agree and bc > sc ? 1 : sc >= min_agree and sc > bc ? -1 : 0
+
+// ═══════════════════════════════════════════════════════════
+//  EMA TREND  —  1 security call per TF (tuple)
+//  Điều kiện: Fast > Mid > Filter → UP | Fast < Mid < Filter → DOWN
+// ═══════════════════════════════════════════════════════════
+_ema3(f, m, fi) => [ta.ema(close, f), ta.ema(close, m), ta.ema(close, fi)]
+
+f_ema(tf, f, m, fi) =>
+    [ef, em, efi] = request.security(syminfo.tickerid, tf, _ema3(f, m, fi))
+    ef > em and em > efi ? 1 : ef < em and em < efi ? -1 : 0
+
+//         TF     Fast  Mid  Filter
+ema_m1  = f_ema("1",    9,  21,   50)
+ema_m5  = f_ema("5",   13,  34,   89)
+ema_m15 = f_ema("15",  21,  50,  200)
+ema_m30 = f_ema("30",  34,  89,  200)
+ema_h1  = f_ema("60",  50, 200,  365)
+ema_h4  = f_ema("240", 50, 200,  500)
+ema_d1  = f_ema("D",   20,  50,  200)
+ema_w1  = f_ema("W",   39,  89,  200)
+
+// ═══════════════════════════════════════════════════════════
+//  RSI
+// ═══════════════════════════════════════════════════════════
+//          TF      Per   OB   OS
+_rsi_m1_sig() =>
+    r = ta.rsi(close, 9)
+    bull = false
+    bear = false
+    if r < 25
+        for i = 2 to 20
+            if r[i] < 25 and low < low[i] and r > r[i]
+                bull := true
+                break
+    if r > 75
+        for i = 2 to 20
+            if r[i] > 75 and high > high[i] and r < r[i]
+                bear := true
+                break
+    bull ? 1 : bear ? -1 : 0
+rsi_m1  = request.security(syminfo.tickerid, "1", _rsi_m1_sig())
+// M5 RSI: RSI < 30 + nến đảo chiều tăng | RSI > 70 + nến đảo chiều giảm
+_rsi_m5_sig() =>
+    r = ta.rsi(close, 14)
+    r < 30 and close > open ? 1 : r > 70 and close < open ? -1 : 0
+rsi_m5  = request.security(syminfo.tickerid, "5", _rsi_m5_sig())
+// M15 RSI: trên/dưới mức 50
+_rsi_m15_sig() =>
+    r = ta.rsi(close, 14)
+    r > 50 ? 1 : r < 50 ? -1 : 0
+rsi_m15 = request.security(syminfo.tickerid, "15", _rsi_m15_sig())
+// M30 RSI: vùng 35-40 bật tăng → BUY | vùng 60-65 quay đầu → SELL
+_rsi_m30_sig() =>
+    r = ta.rsi(close, 14)
+    r >= 35 and r <= 40 and r > r[1] ? 1 : r >= 60 and r <= 65 and r < r[1] ? -1 : 0
+rsi_m30 = request.security(syminfo.tickerid, "30", _rsi_m30_sig())
+// H1 RSI: cắt lên 45 + đáy cao hơn | cắt xuống 55 + đỉnh thấp hơn
+_rsi_h1_sig() =>
+    r = ta.rsi(close, 14)
+    cross_up45  = r > 45 and r[1] <= 45 and low > low[1]
+    cross_dn55  = r < 55 and r[1] >= 55 and high < high[1]
+    cross_up45 ? 1 : cross_dn55 ? -1 : 0
+rsi_h1  = request.security(syminfo.tickerid, "60", _rsi_h1_sig())
+// H4 RSI: chu kỳ 21, OS=30/OB=70 + phân kỳ rõ ràng
+_rsi_h4_sig() =>
+    r = ta.rsi(close, 21)
+    bull = false
+    bear = false
+    if r < 30
+        for i = 2 to 30
+            if r[i] < 30 and low < low[i] and r > r[i]
+                bull := true
+                break
+    if r > 70
+        for i = 2 to 30
+            if r[i] > 70 and high > high[i] and r < r[i]
+                bear := true
+                break
+    bull ? 1 : bear ? -1 : 0
+rsi_h4  = request.security(syminfo.tickerid, "240", _rsi_h4_sig())
+// D1 RSI: < 30 + phân kỳ tăng + volume giảm | > 70 + phân kỳ giảm + volume giảm
+_rsi_d1_sig() =>
+    r = ta.rsi(close, 14)
+    bull = false
+    bear = false
+    if r < 30
+        for i = 2 to 30
+            if r[i] < 30 and low < low[i] and r > r[i] and volume < volume[1]
+                bull := true
+                break
+    if r > 70
+        for i = 2 to 30
+            if r[i] > 70 and high > high[i] and r < r[i] and volume < volume[1]
+                bear := true
+                break
+    bull ? 1 : bear ? -1 : 0
+rsi_d1  = request.security(syminfo.tickerid, "D", _rsi_d1_sig())
+// W1 RSI: thoát OS/OB + tuần sau xác nhận đóng cửa giữ vững
+_rsi_w1_sig() =>
+    r = ta.rsi(close, 14)
+    cross_os = r[1] > 30 and r[2] <= 30 and r > 30
+    cross_ob = r[1] < 70 and r[2] >= 70 and r < 70
+    cross_os ? 1 : cross_ob ? -1 : 0
+rsi_w1  = request.security(syminfo.tickerid, "W", _rsi_w1_sig())
+
+// ═══════════════════════════════════════════════════════════
+//  MACD
+//  Điều kiện: MACD > Signal + Histogram dương → UP
+// ═══════════════════════════════════════════════════════════
+f_macd(tf, f, s, sg) =>
+    [ml, sl, h] = request.security(syminfo.tickerid, tf, ta.macd(close, f, s, sg))
+    ml > sl and h > 0 ? 1 : ml < sl and h < 0 ? -1 : 0
+
+// M1 MACD: 8/21/SMA5, histogram tăng dần 3 nến liên tiếp
+_macd_m1_sig() =>
+    ml = ta.ema(close, 8) - ta.ema(close, 21)
+    sl = ta.sma(ml, 5)
+    h  = ml - sl
+    cross_up   = ml > sl and ml[1] <= sl[1]
+    cross_down = ml < sl and ml[1] >= sl[1]
+    hist_rising  = h > 0 and h[1] > 0 and h[2] > 0 and h > h[1] and h[1] > h[2]
+    hist_falling = h < 0 and h[1] < 0 and h[2] < 0 and h < h[1] and h[1] < h[2]
+    cross_up and hist_rising ? 1 : cross_down and hist_falling ? -1 : 0
+
+// M5 MACD: 12/26/9, histogram tăng dần 2 nến liên tiếp
+_macd_m5_sig() =>
+    [ml, sl, h] = ta.macd(close, 12, 26, 9)
+    cross_up   = ml > sl and ml[1] <= sl[1]
+    cross_down = ml < sl and ml[1] >= sl[1]
+    hist_rising  = h > 0 and h > h[1]
+    hist_falling = h < 0 and h < h[1]
+    cross_up and hist_rising ? 1 : cross_down and hist_falling ? -1 : 0
+
+//           TF     Fast  Slow  Sig
+macd_m1  = request.security(syminfo.tickerid, "1", _macd_m1_sig())
+macd_m5  = request.security(syminfo.tickerid, "5", _macd_m5_sig())
+// M15 MACD: 12/26/9, histogram dương/âm và mở rộng
+_macd_m15_sig() =>
+    [ml, sl, h] = ta.macd(close, 12, 26, 9)
+    ml > sl and h > 0 and h > h[1] ? 1 : ml < sl and h < 0 and h < h[1] ? -1 : 0
+macd_m15 = request.security(syminfo.tickerid, "15", _macd_m15_sig())
+// M30 MACD: 12/26/9, histogram dương/âm liên tiếp 2-3 nến
+_macd_m30_sig() =>
+    [ml, sl, h] = ta.macd(close, 12, 26, 9)
+    hist_pos = h > 0 and h[1] > 0 and ml > sl
+    hist_neg = h < 0 and h[1] < 0 and ml < sl
+    hist_pos ? 1 : hist_neg ? -1 : 0
+macd_m30 = request.security(syminfo.tickerid, "30", _macd_m30_sig())
+// H1 MACD: crossover + histogram chuyển dương/âm rõ ràng
+_macd_h1_sig() =>
+    [ml, sl, h] = ta.macd(close, 12, 26, 9)
+    cross_up   = ml > sl and ml[1] <= sl[1]
+    cross_down = ml < sl and ml[1] >= sl[1]
+    hist_turn_pos = h > 0 and h[1] <= 0
+    hist_turn_neg = h < 0 and h[1] >= 0
+    cross_up and hist_turn_pos ? 1 : cross_down and hist_turn_neg ? -1 : 0
+macd_h1  = request.security(syminfo.tickerid, "60", _macd_h1_sig())
+// H4 MACD: MACD > Signal và > 0 + Histogram dương tăng dần
+_macd_h4_sig() =>
+    [ml, sl, h] = ta.macd(close, 12, 26, 9)
+    bull = ml > sl and ml > 0 and h > 0 and h > h[1]
+    bear = ml < sl and ml < 0 and h < 0 and h < h[1]
+    bull ? 1 : bear ? -1 : 0
+macd_h4  = request.security(syminfo.tickerid, "240", _macd_h4_sig())
+// D1 MACD: crossover bất kỳ vị trí + histogram dương/âm ít nhất 1 nến
+_macd_d1_sig() =>
+    [ml, sl, h] = ta.macd(close, 12, 26, 9)
+    cross_up   = ml > sl and ml[1] <= sl[1]
+    cross_down = ml < sl and ml[1] >= sl[1]
+    cross_up and h > 0 ? 1 : cross_down and h < 0 ? -1 : 0
+macd_d1  = request.security(syminfo.tickerid, "D", _macd_d1_sig())
+// W1 MACD: MACD > Signal liên tục trên 0 + Histogram dương nhiều tuần
+_macd_w1_sig() =>
+    [ml, sl, h] = ta.macd(close, 5, 34, 5)
+    bull = ml > sl and ml > 0 and h > 0 and h[1] > 0 and h[2] > 0
+    bear = ml < sl and ml < 0 and h < 0 and h[1] < 0 and h[2] < 0
+    bull ? 1 : bear ? -1 : 0
+macd_w1  = request.security(syminfo.tickerid, "W", _macd_w1_sig())
+
+// ═══════════════════════════════════════════════════════════
+//  ICHIMOKU  —  1 security call per TF (tuple)
+//  Điều kiện: Giá > Kumo + Tenkan > Kijun → UP
+// ═══════════════════════════════════════════════════════════
+_ichi(t, k, sb) =>
+    tenkan = (ta.highest(high, t)  + ta.lowest(low, t))  / 2
+    kijun  = (ta.highest(high, k)  + ta.lowest(low, k))  / 2
+    spanB  = (ta.highest(high, sb) + ta.lowest(low, sb)) / 2
+    [close, tenkan, kijun, spanB]
+
+f_ichi(tf, t, k, sb) =>
+    [price, tenkan, kijun, spanB] = request.security(syminfo.tickerid, tf, _ichi(t, k, sb))
+    spanA    = (tenkan + kijun) / 2
+    kumo_top = math.max(spanA, spanB)
+    kumo_bot = math.min(spanA, spanB)
+    price > kumo_top and tenkan > kijun ? 1 : price < kumo_bot and tenkan < kijun ? -1 : 0
+
+//          TF      T    K   SB
+ichi_m1  = f_ichi("1",    6, 13, 26)
+// M5 Ichimoku: thêm màu mây + Chikou Span
+_ichi_m5_sig() =>
+    tenkan = (ta.highest(high, 9)  + ta.lowest(low, 9))  / 2
+    kijun  = (ta.highest(high, 26) + ta.lowest(low, 26)) / 2
+    spanB  = (ta.highest(high, 52) + ta.lowest(low, 52)) / 2
+    spanA  = (tenkan + kijun) / 2
+    kumo_top    = math.max(spanA, spanB)
+    kumo_bot    = math.min(spanA, spanB)
+    green_cloud = spanA > spanB
+    red_cloud   = spanA < spanB
+    chikou_up   = close > close[26]
+    chikou_dn   = close < close[26]
+    close > kumo_top and tenkan > kijun and green_cloud and chikou_up ? 1 :
+     close < kumo_bot and tenkan < kijun and red_cloud   and chikou_dn ? -1 : 0
+ichi_m5  = request.security(syminfo.tickerid, "5", _ichi_m5_sig())
+// M15 Ichimoku: màu mây + xác nhận 2 nến đóng trên/dưới mây
+_ichi_m15_sig() =>
+    tenkan = (ta.highest(high, 9)  + ta.lowest(low, 9))  / 2
+    kijun  = (ta.highest(high, 26) + ta.lowest(low, 26)) / 2
+    spanB  = (ta.highest(high, 52) + ta.lowest(low, 52)) / 2
+    spanA  = (tenkan + kijun) / 2
+    kumo_top    = math.max(spanA, spanB)
+    kumo_bot    = math.min(spanA, spanB)
+    green_cloud = spanA > spanB
+    red_cloud   = spanA < spanB
+    confirm_up  = close > kumo_top and close[1] > kumo_top[1]
+    confirm_dn  = close < kumo_bot and close[1] < kumo_bot[1]
+    confirm_up and green_cloud ? 1 : confirm_dn and red_cloud ? -1 : 0
+ichi_m15 = request.security(syminfo.tickerid, "15", _ichi_m15_sig())
+// M30 Ichimoku: Tenkan>Kijun dốc lên + Chikou trên giá hướng lên + close trên Kijun
+_ichi_m30_sig() =>
+    tenkan = (ta.highest(high, 9)  + ta.lowest(low, 9))  / 2
+    kijun  = (ta.highest(high, 26) + ta.lowest(low, 26)) / 2
+    tk_above     = tenkan > kijun
+    tk_slope_up  = tenkan > tenkan[1] and kijun > kijun[1]
+    tk_slope_dn  = tenkan < tenkan[1] and kijun < kijun[1]
+    chikou_up    = close > close[26] and close > close[1]
+    chikou_dn    = close < close[26] and close < close[1]
+    tk_above  and tk_slope_up and chikou_up and close > kijun ? 1 :
+     not tk_above and tk_slope_dn and chikou_dn and close < kijun ? -1 : 0
+ichi_m30 = request.security(syminfo.tickerid, "30", _ichi_m30_sig())
+// H1 Ichimoku: giá trên mây xanh + Tenkan > Kijun
+_ichi_h1_sig() =>
+    tenkan = (ta.highest(high, 9)  + ta.lowest(low, 9))  / 2
+    kijun  = (ta.highest(high, 26) + ta.lowest(low, 26)) / 2
+    spanB  = (ta.highest(high, 52) + ta.lowest(low, 52)) / 2
+    spanA  = (tenkan + kijun) / 2
+    kumo_top    = math.max(spanA, spanB)
+    kumo_bot    = math.min(spanA, spanB)
+    green_cloud = spanA > spanB
+    red_cloud   = spanA < spanB
+    close > kumo_top and green_cloud and tenkan > kijun ? 1 :
+     close < kumo_bot and red_cloud   and tenkan < kijun ? -1 : 0
+ichi_h1  = request.security(syminfo.tickerid, "60", _ichi_h1_sig())
+// H4 Ichimoku: giá trên/dưới mây + màu mây hiện tại + future cloud cùng màu
+_ichi_h4_sig() =>
+    tenkan = (ta.highest(high, 9)  + ta.lowest(low, 9))  / 2
+    kijun  = (ta.highest(high, 26) + ta.lowest(low, 26)) / 2
+    spanB  = (ta.highest(high, 52) + ta.lowest(low, 52)) / 2
+    spanA  = (tenkan + kijun) / 2
+    kumo_top   = math.max(spanA[26], spanB[26])
+    kumo_bot   = math.min(spanA[26], spanB[26])
+    cur_green  = spanA[26] > spanB[26]
+    fut_green  = spanA     > spanB
+    cur_red    = spanA[26] < spanB[26]
+    fut_red    = spanA     < spanB
+    close > kumo_top and cur_green and fut_green ? 1 :
+     close < kumo_bot and cur_red   and fut_red   ? -1 : 0
+ichi_h4  = request.security(syminfo.tickerid, "240", _ichi_h4_sig())
+// D1 Ichimoku: giá trên/dưới mây + Tenkan vs Kijun + Chikou hướng lên/xuống
+_ichi_d1_sig() =>
+    tenkan = (ta.highest(high, 9)  + ta.lowest(low, 9))  / 2
+    kijun  = (ta.highest(high, 26) + ta.lowest(low, 26)) / 2
+    spanB  = (ta.highest(high, 52) + ta.lowest(low, 52)) / 2
+    spanA  = (tenkan + kijun) / 2
+    kumo_top  = math.max(spanA, spanB)
+    kumo_bot  = math.min(spanA, spanB)
+    chikou_up = close > close[26] and close > close[1]
+    chikou_dn = close < close[26] and close < close[1]
+    close > kumo_top and tenkan > kijun and chikou_up ? 1 :
+     close < kumo_bot and tenkan < kijun and chikou_dn ? -1 : 0
+ichi_d1  = request.security(syminfo.tickerid, "D", _ichi_d1_sig())
+// W1 Ichimoku: giá đóng trên/dưới mây + Tenkan cắt Kijun + Chikou cắt qua giá
+_ichi_w1_sig() =>
+    tenkan = (ta.highest(high, 9)  + ta.lowest(low, 9))  / 2
+    kijun  = (ta.highest(high, 26) + ta.lowest(low, 26)) / 2
+    spanB  = (ta.highest(high, 52) + ta.lowest(low, 52)) / 2
+    spanA  = (tenkan + kijun) / 2
+    kumo_top = math.max(spanA, spanB)
+    kumo_bot = math.min(spanA, spanB)
+    tk_cross_up   = tenkan > kijun and tenkan[1] <= kijun[1]
+    tk_cross_down = tenkan < kijun and tenkan[1] >= kijun[1]
+    chikou_cross_up   = close > close[26] and close[1] <= close[27]
+    chikou_cross_down = close < close[26] and close[1] >= close[27]
+    close > kumo_top and tk_cross_up   and chikou_cross_up   ? 1 :
+     close < kumo_bot and tk_cross_down and chikou_cross_down ? -1 : 0
+ichi_w1  = request.security(syminfo.tickerid, "W", _ichi_w1_sig())
+
+// ═══════════════════════════════════════════════════════════
+//  OVERALL SCORE (−100 → +100)
+//  Trọng số: M1=thấp nhất, W1=cao nhất (từ spec)
+//  Tổng trọng số tối đa = 417
+// ═══════════════════════════════════════════════════════════
+_se = float(ema_m1)*4  + float(ema_m5)*6  + float(ema_m15)*8  + float(ema_m30)*10 + float(ema_h1)*12 + float(ema_h4)*15 + float(ema_d1)*20 + float(ema_w1)*25
+_sr = float(rsi_m1)*4  + float(rsi_m5)*6  + float(rsi_m15)*8  + float(rsi_m30)*10 + float(rsi_h1)*12 + float(rsi_h4)*15 + float(rsi_d1)*20 + float(rsi_w1)*25
+_sm = float(macd_m1)*4 + float(macd_m5)*6 + float(macd_m15)*8 + float(macd_m30)*10 + float(macd_h1)*12 + float(macd_h4)*15 + float(macd_d1)*20 + float(macd_w1)*25
+_si = float(ichi_m1)*4 + float(ichi_m5)*6 + float(ichi_m15)*8 + float(ichi_m30)*10 + float(ichi_h1)*12 + float(ichi_h4)*15 + float(ichi_d1)*20 + float(ichi_w1)*25
+overall_score = (_se + _sr + _sm + _si) / 400.0 * 100.0
+
+
+// ═══════════════════════════════════════════════════════════
+//  CONSENSUS SIGNAL (spec điều kiện vào kết hợp)
+//  Ngưỡng đồng thuận theo spec: M1=2/4, M5/M15/M30/H1=3/4, D1/W1=4/4
+//  M30 cần H4 đồng chiều; H1 cần D1 đồng chiều
+// ═══════════════════════════════════════════════════════════
+cs_m1  = tf_signal(ema_m1,  rsi_m1,  macd_m1,  ichi_m1,  2)
+cs_m5  = tf_signal(ema_m5,  rsi_m5,  macd_m5,  ichi_m5,  2)
+cs_m15 = tf_signal(ema_m15, rsi_m15, macd_m15, ichi_m15, 2)
+cs_m30 = tf_signal(ema_m30, rsi_m30, macd_m30, ichi_m30, 2)
+cs_h1  = tf_signal(ema_h1,  rsi_h1,  macd_h1,  ichi_h1,  2)
+cs_h4  = tf_signal(ema_h4,  rsi_h4,  macd_h4,  ichi_h4,  2)
+cs_d1  = tf_signal(ema_d1,  rsi_d1,  macd_d1,  ichi_d1,  3)
+cs_w1  = tf_signal(ema_w1,  rsi_w1,  macd_w1,  ichi_w1,  3)
+
+cs_m30f = (cs_h4 != 0 and cs_m30 != cs_h4) ? 0 : cs_m30
+cs_h1f  = (cs_d1 != 0 and cs_h1  != cs_d1) ? 0 : cs_h1
+
+_m30_flt    = cs_h4 != 0 and cs_m30 != cs_h4
+_h1_flt     = cs_d1 != 0 and cs_h1  != cs_d1
+_cs_denom   = 100.0 - (_m30_flt ? 10.0 : 0.0) - (_h1_flt ? 12.0 : 0.0)
+consensus_score = (float(cs_m1)*4 + float(cs_m5)*6 + float(cs_m15)*8 + float(cs_m30f)*10 + float(cs_h1f)*12 + float(cs_h4)*15 + float(cs_d1)*20 + float(cs_w1)*25) / _cs_denom * 100.0
+
+// ── Auto-entry từ tín hiệu BUY/SELL ─────────────────────────
+_chl() => [close, high, low]
+[m5_cv,  m5_hi,  m5_lo]  = request.security(syminfo.tickerid, "5",  _chl())
+[m15_cv, m15_hi, m15_lo] = request.security(syminfo.tickerid, "15", _chl())
+[m30_cv, m30_hi, m30_lo] = request.security(syminfo.tickerid, "30", _chl())
+
+var float m5_entry  = float(na)
+var int   m5_dir    = 0
+var int   m5_bar    = na
+var float m15_entry = float(na)
+var int   m15_dir   = 0
+var int   m15_bar   = na
+var float m30_entry = float(na)
+var int   m30_dir   = 0
+var int   m30_bar   = na
+var bool  m5_tp1_hit  = false
+var bool  m5_tp2_hit  = false
+var bool  m5_tp3_hit  = false
+var bool  m15_tp1_hit = false
+var bool  m15_tp2_hit = false
+var bool  m15_tp3_hit = false
+var bool  m30_tp1_hit = false
+var bool  m30_tp2_hit = false
+var bool  m30_tp3_hit = false
+
+// Capture entry chỉ khi tín hiệu MỚI xuất hiện — dùng 2-bar debounce giống điều kiện bắn mũi tên
+// Đảm bảo entry luôn khớp với mũi tên gần nhất trên chart khi reload
+is_new_buy_m5   = cs_m5   == 1  and cs_m5[1]   != 1  and cs_m5[2]   != 1
+is_new_sell_m5  = cs_m5   == -1 and cs_m5[1]   != -1 and cs_m5[2]   != -1
+is_new_buy_m15  = cs_m15  == 1  and cs_m15[1]  != 1  and cs_m15[2]  != 1
+is_new_sell_m15 = cs_m15  == -1 and cs_m15[1]  != -1 and cs_m15[2]  != -1
+is_new_buy_m30  = cs_m30f == 1  and cs_m30f[1] != 1  and cs_m30f[2] != 1
+is_new_sell_m30 = cs_m30f == -1 and cs_m30f[1] != -1 and cs_m30f[2] != -1
+
+if is_new_buy_m5 or is_new_sell_m5
+    m5_entry   := m5_cv
+    m5_dir     := cs_m5
+    m5_bar     := bar_index
+    m5_tp1_hit := false
+    m5_tp2_hit := false
+    m5_tp3_hit := false
+else if m5_dir != 0 and cs_m5 != 0 and cs_m5 != m5_dir
+    m5_entry   := float(na)
+    m5_dir     := 0
+    m5_bar     := na
+    m5_tp1_hit := false
+    m5_tp2_hit := false
+    m5_tp3_hit := false
+
+if is_new_buy_m15 or is_new_sell_m15
+    m15_entry   := m15_cv
+    m15_dir     := cs_m15
+    m15_bar     := bar_index
+    m15_tp1_hit := false
+    m15_tp2_hit := false
+    m15_tp3_hit := false
+else if m15_dir != 0 and cs_m15 != 0 and cs_m15 != m15_dir
+    m15_entry   := float(na)
+    m15_dir     := 0
+    m15_bar     := na
+    m15_tp1_hit := false
+    m15_tp2_hit := false
+    m15_tp3_hit := false
+
+if is_new_buy_m30 or is_new_sell_m30
+    m30_entry   := m30_cv
+    m30_dir     := cs_m30f
+    m30_bar     := bar_index
+    m30_tp1_hit := false
+    m30_tp2_hit := false
+    m30_tp3_hit := false
+else if m30_dir != 0 and cs_m30f != 0 and cs_m30f != m30_dir
+    m30_entry   := float(na)
+    m30_dir     := 0
+    m30_bar     := na
+    m30_tp1_hit := false
+    m30_tp2_hit := false
+    m30_tp3_hit := false
+
+
+m5_sl   = na(m5_entry)  ? float(na) : m5_dir  > 0 ? m5_entry  - trdSL  : m5_entry  + trdSL
+m5_tp1  = na(m5_entry)  ? float(na) : m5_dir  > 0 ? m5_entry  + trdTP1 : m5_entry  - trdTP1
+m5_tp2  = na(m5_entry)  ? float(na) : m5_dir  > 0 ? m5_entry  + trdTP2 : m5_entry  - trdTP2
+m5_tp3  = na(m5_entry)  ? float(na) : m5_dir  > 0 ? m5_entry  + trdTP3 : m5_entry  - trdTP3
+m15_sl  = na(m15_entry) ? float(na) : m15_dir > 0 ? m15_entry - trdSL  : m15_entry + trdSL
+m15_tp1 = na(m15_entry) ? float(na) : m15_dir > 0 ? m15_entry + trdTP1 : m15_entry - trdTP1
+m15_tp2 = na(m15_entry) ? float(na) : m15_dir > 0 ? m15_entry + trdTP2 : m15_entry - trdTP2
+m15_tp3 = na(m15_entry) ? float(na) : m15_dir > 0 ? m15_entry + trdTP3 : m15_entry - trdTP3
+m30_sl  = na(m30_entry) ? float(na) : m30_dir > 0 ? m30_entry - trdSL  : m30_entry + trdSL
+m30_tp1 = na(m30_entry) ? float(na) : m30_dir > 0 ? m30_entry + trdTP1 : m30_entry - trdTP1
+m30_tp2 = na(m30_entry) ? float(na) : m30_dir > 0 ? m30_entry + trdTP2 : m30_entry - trdTP2
+m30_tp3 = na(m30_entry) ? float(na) : m30_dir > 0 ? m30_entry + trdTP3 : m30_entry - trdTP3
+
+
+// TP hit detection — khoá PNL floor khi chạm TP1/TP2/TP3
+if not na(m5_entry)
+    if (m5_dir > 0 and close >= m5_tp1) or (m5_dir < 0 and close <= m5_tp1)
+        m5_tp1_hit := true
+    if (m5_dir > 0 and close >= m5_tp2) or (m5_dir < 0 and close <= m5_tp2)
+        m5_tp2_hit := true
+    if (m5_dir > 0 and close >= m5_tp3) or (m5_dir < 0 and close <= m5_tp3)
+        m5_tp3_hit := true
+if not na(m15_entry)
+    if (m15_dir > 0 and close >= m15_tp1) or (m15_dir < 0 and close <= m15_tp1)
+        m15_tp1_hit := true
+    if (m15_dir > 0 and close >= m15_tp2) or (m15_dir < 0 and close <= m15_tp2)
+        m15_tp2_hit := true
+    if (m15_dir > 0 and close >= m15_tp3) or (m15_dir < 0 and close <= m15_tp3)
+        m15_tp3_hit := true
+if not na(m30_entry)
+    if (m30_dir > 0 and close >= m30_tp1) or (m30_dir < 0 and close <= m30_tp1)
+        m30_tp1_hit := true
+    if (m30_dir > 0 and close >= m30_tp2) or (m30_dir < 0 and close <= m30_tp2)
+        m30_tp2_hit := true
+    if (m30_dir > 0 and close >= m30_tp3) or (m30_dir < 0 and close <= m30_tp3)
+        m30_tp3_hit := true
+
+// ═══════════════════════════════════════════════════════════
+//  CHART SIGNALS  —  vẽ theo TF hiện tại của chart
+//  Chỉ hiện thị nếu TF chart nằm trong 8 TF setup
+// ═══════════════════════════════════════════════════════════
+in_setup = (timeframe.period == "1"   or timeframe.period == "5"   or
+            timeframe.period == "15"  or timeframe.period == "30"  or
+            timeframe.period == "60"  or timeframe.period == "240" or
+            timeframe.period == "D"   or timeframe.period == "W")
+
+cur_cs = (timeframe.period == "1"   ? cs_m1   :
+          timeframe.period == "5"   ? cs_m5   :
+          timeframe.period == "15"  ? cs_m15  :
+          timeframe.period == "30"  ? cs_m30f :
+          timeframe.period == "60"  ? cs_h1f  :
+          timeframe.period == "240" ? cs_h4   :
+          timeframe.period == "D"   ? cs_d1   :
+          timeframe.period == "W"   ? cs_w1   : 0)
+
+cur_ema  = (timeframe.period == "1"   ? ema_m1  : timeframe.period == "5"   ? ema_m5  :
+            timeframe.period == "15"  ? ema_m15 : timeframe.period == "30"  ? ema_m30 :
+            timeframe.period == "60"  ? ema_h1  : timeframe.period == "240" ? ema_h4  :
+            timeframe.period == "D"   ? ema_d1  : ema_w1)
+
+cur_rsi  = (timeframe.period == "1"   ? rsi_m1  : timeframe.period == "5"   ? rsi_m5  :
+            timeframe.period == "15"  ? rsi_m15 : timeframe.period == "30"  ? rsi_m30 :
+            timeframe.period == "60"  ? rsi_h1  : timeframe.period == "240" ? rsi_h4  :
+            timeframe.period == "D"   ? rsi_d1  : rsi_w1)
+
+cur_macd = (timeframe.period == "1"   ? macd_m1  : timeframe.period == "5"   ? macd_m5  :
+            timeframe.period == "15"  ? macd_m15 : timeframe.period == "30"  ? macd_m30 :
+            timeframe.period == "60"  ? macd_h1  : timeframe.period == "240" ? macd_h4  :
+            timeframe.period == "D"   ? macd_d1  : macd_w1)
+
+cur_ichi = (timeframe.period == "1"   ? ichi_m1  : timeframe.period == "5"   ? ichi_m5  :
+            timeframe.period == "15"  ? ichi_m15 : timeframe.period == "30"  ? ichi_m30 :
+            timeframe.period == "60"  ? ichi_h1  : timeframe.period == "240" ? ichi_h4  :
+            timeframe.period == "D"   ? ichi_d1  : ichi_w1)
+
+cur_all_buy  = cur_ema > 0 and cur_rsi > 0 and cur_macd > 0 and cur_ichi > 0
+cur_all_sell = cur_ema < 0 and cur_rsi < 0 and cur_macd < 0 and cur_ichi < 0
+
+// Bắn khi cur_cs VỪA trở thành 1/-1 từ chiều ngược lại hoặc từ neutral (0)
+// Không bắn nếu trước đó đã là cùng chiều (loại tín hiệu lặp)
+is_new_buy  = cur_cs == 1  and cur_cs[1] != 1   and cur_cs[2] != 1
+is_new_sell = cur_cs == -1 and cur_cs[1] != -1  and cur_cs[2] != -1
+
+sig_strong_buy  = in_setup and cur_all_buy  and is_new_buy
+sig_buy         = in_setup and not cur_all_buy  and is_new_buy
+sig_strong_sell = in_setup and cur_all_sell and is_new_sell
+sig_sell        = in_setup and not cur_all_sell and is_new_sell
+
+buy_inds  = (cur_ema  > 0 ? "EMA " : "") + (cur_rsi  > 0 ? "RSI " : "") + (cur_macd > 0 ? "MACD " : "") + (cur_ichi > 0 ? "ICH" : "")
+sell_inds = (cur_ema  < 0 ? "EMA " : "") + (cur_rsi  < 0 ? "RSI " : "") + (cur_macd < 0 ? "MACD " : "") + (cur_ichi < 0 ? "ICH" : "")
+
+// label.new() cho phép text động (series string) — plotshape chỉ nhận const string
+if sig_strong_buy
+    label.new(bar_index, na, text="BUY▲▲\n" + buy_inds,
+         yloc=yloc.belowbar, style=_buy_style(),
+         color=InpStrongBuyColor, textcolor=color.white, size=_sz(InpSizeStrong))
+
+if sig_buy
+    label.new(bar_index, na, text="BUY\n" + buy_inds,
+         yloc=yloc.belowbar, style=_buy_style(),
+         color=InpBuyColor, textcolor=color.white, size=_sz(InpSizeNormal))
+
+if sig_strong_sell
+    label.new(bar_index, na, text="SELL▼▼\n" + sell_inds,
+         yloc=yloc.abovebar, style=_sell_style(),
+         color=InpStrongSellColor, textcolor=color.white, size=_sz(InpSizeStrong))
+
+if sig_sell
+    label.new(bar_index, na, text="SELL\n" + sell_inds,
+         yloc=yloc.abovebar, style=_sell_style(),
+         color=InpSellColor, textcolor=color.white, size=_sz(InpSizeNormal))
+
+// Nền sáng khi consensus cực mạnh
+bgcolor(consensus_score >= 75.0  ? color.new(color.lime, 93) : na, title="Strong BUY Background")
+bgcolor(consensus_score <= -75.0 ? color.new(color.red,  93) : na, title="Strong SELL Background")
+
+// ═══════════════════════════════════════════════════════════
+//  ALERTS
+// ═══════════════════════════════════════════════════════════
+alertcondition(sig_strong_buy,
+     title   = "🔥 Strong BUY",
+     message = "Rich Tool Scaping ▲▲ STRONG BUY — Score vượt 75%")
+alertcondition(sig_buy,
+     title   = "Buy Signal",
+     message = "Rich Tool Scaping ▲ BUY — Score vượt 50%")
+alertcondition(sig_strong_sell,
+     title   = "🔥 Strong SELL",
+     message = "Rich Tool Scaping ▼▼ STRONG SELL — Score xuống dưới −75%")
+alertcondition(sig_sell,
+     title   = "Sell Signal",
+     message = "Rich Tool Scaping ▼ SELL — Score xuống dưới −50%")
+
+// ═══════════════════════════════════════════════════════════
+//  TABLE  (9 cột × 8 hàng, hoặc 5 cột nếu bật Chế độ Mobile)
+// ═══════════════════════════════════════════════════════════
+var table tbl    = na
+var table trdTbl = na
+
+C_HDR = InpTblBg
+C_LBL = InpTblBg
+_tblTxtSz = _tblSz(InpTblTextSize)
+
+// Chế độ Mobile: chỉ giữ 4 khung quan trọng (M15/H1/H4/D1) thay vì đủ 8 khung,
+// giảm bề ngang bảng cho vừa màn hình điện thoại. Index tham chiếu vào các
+// mảng 8-phần-tử theo thứ tự cố định: 0=M1 1=M5 2=M15 3=M30 4=H1 5=H4 6=D1 7=W1
+selCols = InpMobileMode ? array.from(2, 4, 5, 6) : array.from(0, 1, 2, 3, 4, 5, 6, 7)
+nCols   = selCols.size()
+
+if barstate.islast
+    tbl := table.new(_tblPos, nCols + 1, 8,
+         border_color = color.new(color.gray, 70),
+         border_width  = 1,
+         frame_color   = color.new(color.gray, 50),
+         frame_width   = 1)
+
+    // ── Header row ──────────────────────────────────────────
+    tfNames = array.from("M1", "M5", "M15", "M30", "H1", "H4", "D1", "W1")
+    table.cell(tbl, 0, 0, "TF",
+         text_color = InpTblHdrTxt,
+         bgcolor    = C_HDR,
+         text_size  = _tblTxtSz,
+         text_halign = text.align_center)
+    for idx = 0 to nCols - 1
+        tfIdx = array.get(selCols, idx)
+        table.cell(tbl, idx + 1, 0, array.get(tfNames, tfIdx),
+             text_color = InpTblHdrTxt,
+             bgcolor    = C_HDR,
+             text_size  = _tblTxtSz,
+             text_halign = text.align_center)
+
+    // ── Row labels ──────────────────────────────────────────
+    labels = array.from("EMA Trend", "RSI", "MACD", "Ichimoku", "Score", "Signal", "OVERALL")
+    for r = 0 to 6
+        table.cell(tbl, 0, r + 1, array.get(labels, r),
+             text_color = InpTblLblTxt,
+             bgcolor    = C_LBL,
+             text_size  = _tblTxtSz,
+             text_halign = text.align_left)
+
+    // ── Signal arrays ───────────────────────────────────────
+    ema_row  = array.from(ema_m1,  ema_m5,  ema_m15,  ema_m30,  ema_h1,  ema_h4,  ema_d1,  ema_w1)
+    rsi_row  = array.from(rsi_m1,  rsi_m5,  rsi_m15,  rsi_m30,  rsi_h1,  rsi_h4,  rsi_d1,  rsi_w1)
+    macd_row = array.from(macd_m1, macd_m5, macd_m15, macd_m30, macd_h1, macd_h4, macd_d1, macd_w1)
+    ichi_row = array.from(ichi_m1, ichi_m5, ichi_m15, ichi_m30, ichi_h1, ichi_h4, ichi_d1, ichi_w1)
+    cs_row   = array.from(cs_m1,   cs_m5,   cs_m15,   cs_m30f,  cs_h1f,  cs_h4,   cs_d1,   cs_w1)
+
+    for idx = 0 to nCols - 1
+        tfIdx = array.get(selCols, idx)
+        ev = array.get(ema_row,  tfIdx)
+        rv = array.get(rsi_row,  tfIdx)
+        mv = array.get(macd_row, tfIdx)
+        iv = array.get(ichi_row, tfIdx)
+        table.cell(tbl, idx+1, 1, sig_txt(ev), text_color=color.white, bgcolor=sig_col(ev), text_size=_tblTxtSz, text_halign=text.align_center)
+        table.cell(tbl, idx+1, 2, sig_txt(rv), text_color=color.white, bgcolor=sig_col(rv), text_size=_tblTxtSz, text_halign=text.align_center)
+        table.cell(tbl, idx+1, 3, sig_txt(mv), text_color=color.white, bgcolor=sig_col(mv), text_size=_tblTxtSz, text_halign=text.align_center)
+        table.cell(tbl, idx+1, 4, sig_txt(iv), text_color=color.white, bgcolor=sig_col(iv), text_size=_tblTxtSz, text_halign=text.align_center)
+
+    // ── Score weights (từ spec) ─────────────────────────────
+    //                  M1  M3   M5  M15  M30  H1   H4   D1   W1
+    ema_wt  = array.from( 4,  6,   8,  10,  12,  15,  20,  25)
+    rsi_wt  = array.from( 4,  6,   8,  10,  12,  15,  20,  25)
+    macd_wt = array.from( 4,  6,   8,  10,  12,  15,  20,  25)
+    ichi_wt = array.from( 4,  6,   8,  10,  12,  15,  20,  25)
+
+    // ── Score & Signal rows (per TF) ────────────────────────
+    for idx = 0 to nCols - 1
+        tfIdx = array.get(selCols, idx)
+        ew = array.get(ema_wt,  tfIdx)
+        rw = array.get(rsi_wt,  tfIdx)
+        mw = array.get(macd_wt, tfIdx)
+        iw = array.get(ichi_wt, tfIdx)
+        tw = float(ew + rw + mw + iw)
+
+        sc = (float(array.get(ema_row,  tfIdx)) * ew +
+              float(array.get(rsi_row,  tfIdx)) * rw +
+              float(array.get(macd_row, tfIdx)) * mw +
+              float(array.get(ichi_row, tfIdx)) * iw) / tw * 100.0
+
+        table.cell(tbl, idx+1, 5,
+             str.tostring(math.round(sc)) + "%",
+             text_color = color.white,
+             bgcolor    = score_col(sc),
+             text_size  = _tblTxtSz,
+             text_halign = text.align_center)
+
+        cs_v = array.get(cs_row, tfIdx)
+        lbl = (cs_v > 0 ? (sc >= 75.0 ? "MẠNH ↑ " : " TĂNG  ") :
+               cs_v < 0 ? (sc <= -75.0 ? "MẠNH ↓ " : " GIẢM  ") : " NONE ")
+        _sig_bg = cs_v != 0 ? score_col(sc) : InpTblNeutral
+        table.cell(tbl, idx+1, 6, lbl,
+             text_color  = color.white,
+             bgcolor     = _sig_bg,
+             text_size   = _tblTxtSz,
+             text_halign = text.align_center)
+
+    // ── Overall row (tổng hợp tất cả TF + indicator) ────────
+    oc = score_col(overall_score)
+    overall_lbl = str.tostring(math.round(overall_score)) + "%" + "  " +
+         (overall_score >= 75.0  ? "MUA MẠNH ▲▲" :
+          overall_score >= 50.0  ? "MUA  ▲"      :
+          overall_score <= -75.0 ? "BÁN MẠNH ▼▼" :
+          overall_score <= -50.0 ? "BÁN  ▼"      : "NONE —")
+
+    table.cell(tbl, 1, 7, overall_lbl,
+         text_color = color.white,
+         bgcolor    = oc,
+         text_size  = _tblTxtSz,
+         text_halign = text.align_center)
+    table.merge_cells(tbl, 1, 7, nCols, 7)
+
+// ═══════════════════════════════════════════════════════════
+//  TRADE SIGNAL TABLE (Bảng Lệnh)
+// ═══════════════════════════════════════════════════════════
+if trdSH and barstate.islast
+    _C    = color.new(#0d1b2a, 0)
+    _B    = color.new(color.gray, 60)
+    _trdTxtSz = _tblSz(trdTxtSize)
+    csLbl = cur_cs == 1 ? 'Đồng\nThuận ↑' : cur_cs == -1 ? 'Đồng\nThuận ↓' : 'Phân Kỳ'
+    csC   = cur_cs == 1 ? color.lime : cur_cs == -1 ? color.red : color.silver
+    m5_entC  = na(m5_entry)  ? color.white : m5_dir  > 0 ? color.lime : color.red
+    m15_entC = na(m15_entry) ? color.white : m15_dir > 0 ? color.lime : color.red
+    m30_entC = na(m30_entry) ? color.white : m30_dir > 0 ? color.lime : color.red
+    pnl5_raw   = _calcPnl(m5_entry,  m5_dir,  trdVol, trdMult)
+    pnl5_floor = m5_tp3_hit  ? _calcPnlAt(m5_entry,  m5_dir,  m5_tp3,  trdVol, trdMult) :
+                 m5_tp2_hit  ? _calcPnlAt(m5_entry,  m5_dir,  m5_tp2,  trdVol, trdMult) :
+                 m5_tp1_hit  ? _calcPnlAt(m5_entry,  m5_dir,  m5_tp1,  trdVol, trdMult) : float(na)
+    pnl5  = m5_tp3_hit ? pnl5_floor : na(pnl5_floor) ? pnl5_raw : na(pnl5_raw) ? pnl5_floor : math.max(pnl5_raw, pnl5_floor)
+
+    pnl15_raw   = _calcPnl(m15_entry, m15_dir, trdVol, trdMult)
+    pnl15_floor = m15_tp3_hit ? _calcPnlAt(m15_entry, m15_dir, m15_tp3, trdVol, trdMult) :
+                  m15_tp2_hit ? _calcPnlAt(m15_entry, m15_dir, m15_tp2, trdVol, trdMult) :
+                  m15_tp1_hit ? _calcPnlAt(m15_entry, m15_dir, m15_tp1, trdVol, trdMult) : float(na)
+    pnl15 = m15_tp3_hit ? pnl15_floor : na(pnl15_floor) ? pnl15_raw : na(pnl15_raw) ? pnl15_floor : math.max(pnl15_raw, pnl15_floor)
+
+    pnl30_raw   = _calcPnl(m30_entry, m30_dir, trdVol, trdMult)
+    pnl30_floor = m30_tp3_hit ? _calcPnlAt(m30_entry, m30_dir, m30_tp3, trdVol, trdMult) :
+                  m30_tp2_hit ? _calcPnlAt(m30_entry, m30_dir, m30_tp2, trdVol, trdMult) :
+                  m30_tp1_hit ? _calcPnlAt(m30_entry, m30_dir, m30_tp1, trdVol, trdMult) : float(na)
+    pnl30 = m30_tp3_hit ? pnl30_floor : na(pnl30_floor) ? pnl30_raw : na(pnl30_raw) ? pnl30_floor : math.max(pnl30_raw, pnl30_floor)
+
+    // Chế độ Mobile: chọn 1 khung giờ duy nhất thay vì hiện cả M5/M15/M30 cùng lúc
+    sel_entry = trdMobileTF == 'M5' ? m5_entry : trdMobileTF == 'M15' ? m15_entry : m30_entry
+    sel_entC  = trdMobileTF == 'M5' ? m5_entC  : trdMobileTF == 'M15' ? m15_entC  : m30_entC
+    sel_sl    = trdMobileTF == 'M5' ? m5_sl    : trdMobileTF == 'M15' ? m15_sl    : m30_sl
+    sel_tp1   = trdMobileTF == 'M5' ? m5_tp1   : trdMobileTF == 'M15' ? m15_tp1   : m30_tp1
+    sel_tp2   = trdMobileTF == 'M5' ? m5_tp2   : trdMobileTF == 'M15' ? m15_tp2   : m30_tp2
+    sel_tp3   = trdMobileTF == 'M5' ? m5_tp3   : trdMobileTF == 'M15' ? m15_tp3   : m30_tp3
+    sel_pnl   = trdMobileTF == 'M5' ? pnl5     : trdMobileTF == 'M15' ? pnl15     : pnl30
+
+    trdTbl := table.new(_trdPos, 4, 13,
+         border_color=_B, border_width=1,
+         frame_color=color.new(color.gray, 40), frame_width=2,
+         bgcolor=_C)
+    // ── Section 1: Đánh Giá Chỉ Báo ──────────────────────────
+    table.cell(trdTbl, 0, 0, 'Dữ Liệu',  text_color=color.yellow, bgcolor=_C, text_size=_trdTxtSz)
+    table.cell(trdTbl, 1, 0, 'Đánh Giá', text_color=color.yellow, bgcolor=_C, text_size=_trdTxtSz)
+    table.merge_cells(trdTbl, 1, 0, 3, 0)
+    table.cell(trdTbl, 0, 1, 'Xu Hướng EMA',       text_color=color.silver, bgcolor=_C, text_size=_trdTxtSz, text_halign=text.align_left)
+    table.cell(trdTbl, 1, 1, _dir(cur_ema),          text_color=_dirC(cur_ema),  bgcolor=_C, text_size=_trdTxtSz)
+    table.cell(trdTbl, 0, 2, 'Dòng Tiền Ichimoku',  text_color=color.silver, bgcolor=_C, text_size=_trdTxtSz, text_halign=text.align_left)
+    table.cell(trdTbl, 1, 2, _dir(cur_ichi),          text_color=_dirC(cur_ichi), bgcolor=_C, text_size=_trdTxtSz)
+    table.cell(trdTbl, 0, 3, 'Động Lượng MACD',     text_color=color.silver, bgcolor=_C, text_size=_trdTxtSz, text_halign=text.align_left)
+    table.cell(trdTbl, 1, 3, _dir(cur_macd),          text_color=_dirC(cur_macd), bgcolor=_C, text_size=_trdTxtSz)
+    table.cell(trdTbl, 0, 4, 'Sức Mạnh RSI',        text_color=color.silver, bgcolor=_C, text_size=_trdTxtSz, text_halign=text.align_left)
+    table.cell(trdTbl, 1, 4, _dir(cur_rsi),           text_color=_dirC(cur_rsi),  bgcolor=_C, text_size=_trdTxtSz)
+    table.cell(trdTbl, 2, 1, csLbl, text_color=csC, bgcolor=_C, text_size=_trdTxtSz)
+    table.merge_cells(trdTbl, 2, 1, 3, 4)
+    // ── Section 2: Tín Hiệu Lệnh ──────────────────────────────
+    table.cell(trdTbl, 0, 5, 'Tín Hiệu', text_color=color.yellow, bgcolor=_C, text_size=_trdTxtSz)
+    table.cell(trdTbl, 1, 5, 'Kết Luận', text_color=color.yellow, bgcolor=_C, text_size=_trdTxtSz)
+    table.merge_cells(trdTbl, 1, 5, 3, 5)
+    if trdMobileMode
+        // Chỉ 1 khung giờ, ô dữ liệu gộp cả 3 cột (1-3) cho dễ đọc trên điện thoại
+        table.cell(trdTbl, 0, 6, 'Time', text_color=color.silver, bgcolor=_C, text_size=_trdTxtSz)
+        table.cell(trdTbl, 1, 6, trdMobileTF, text_color=color.silver, bgcolor=_C, text_size=_trdTxtSz)
+        table.merge_cells(trdTbl, 1, 6, 3, 6)
+        table.cell(trdTbl, 0, 7, 'Entry', text_color=color.white, bgcolor=_C, text_size=_trdTxtSz)
+        table.cell(trdTbl, 1, 7, _prFmt(sel_entry), text_color=sel_entC, bgcolor=_C, text_size=_trdTxtSz)
+        table.merge_cells(trdTbl, 1, 7, 3, 7)
+        table.cell(trdTbl, 0, 8, 'SL', text_color=color.red, bgcolor=_C, text_size=_trdTxtSz)
+        table.cell(trdTbl, 1, 8, _prFmt(na(sel_entry) ? float(na) : sel_sl), text_color=color.red, bgcolor=_C, text_size=_trdTxtSz)
+        table.merge_cells(trdTbl, 1, 8, 3, 8)
+        table.cell(trdTbl, 0, 9, 'TP1', text_color=color.lime, bgcolor=_C, text_size=_trdTxtSz)
+        table.cell(trdTbl, 1, 9, _prFmt(na(sel_entry) ? float(na) : sel_tp1), text_color=color.lime, bgcolor=_C, text_size=_trdTxtSz)
+        table.merge_cells(trdTbl, 1, 9, 3, 9)
+        table.cell(trdTbl, 0, 10, 'TP2', text_color=color.lime, bgcolor=_C, text_size=_trdTxtSz)
+        table.cell(trdTbl, 1, 10, _prFmt(na(sel_entry) ? float(na) : sel_tp2), text_color=color.lime, bgcolor=_C, text_size=_trdTxtSz)
+        table.merge_cells(trdTbl, 1, 10, 3, 10)
+        table.cell(trdTbl, 0, 11, 'TP3', text_color=color.lime, bgcolor=_C, text_size=_trdTxtSz)
+        table.cell(trdTbl, 1, 11, _prFmt(na(sel_entry) ? float(na) : sel_tp3), text_color=color.lime, bgcolor=_C, text_size=_trdTxtSz)
+        table.merge_cells(trdTbl, 1, 11, 3, 11)
+        table.cell(trdTbl, 0, 12, 'Float PNL', text_color=color.silver, bgcolor=_C, text_size=_trdTxtSz)
+        table.cell(trdTbl, 1, 12, _pnlStr(sel_pnl), text_color=na(sel_pnl) ? color.silver : sel_pnl >= 0 ? color.lime : color.red, bgcolor=_C, text_size=_trdTxtSz)
+        table.merge_cells(trdTbl, 1, 12, 3, 12)
+    else
+        table.cell(trdTbl, 0, 6, 'Time', text_color=color.silver, bgcolor=_C, text_size=_trdTxtSz)
+        table.cell(trdTbl, 1, 6, 'M5',   text_color=color.silver, bgcolor=_C, text_size=_trdTxtSz)
+        table.cell(trdTbl, 2, 6, 'M15',  text_color=color.silver, bgcolor=_C, text_size=_trdTxtSz)
+        table.cell(trdTbl, 3, 6, 'M30',  text_color=color.silver, bgcolor=_C, text_size=_trdTxtSz)
+        table.cell(trdTbl, 0, 7, 'Entry', text_color=color.white,  bgcolor=_C, text_size=_trdTxtSz)
+        table.cell(trdTbl, 1, 7, _prFmt(m5_entry),  text_color=m5_entC,  bgcolor=_C, text_size=_trdTxtSz)
+        table.cell(trdTbl, 2, 7, _prFmt(m15_entry), text_color=m15_entC, bgcolor=_C, text_size=_trdTxtSz)
+        table.cell(trdTbl, 3, 7, _prFmt(m30_entry), text_color=m30_entC, bgcolor=_C, text_size=_trdTxtSz)
+        table.cell(trdTbl, 0, 8, 'SL', text_color=color.red, bgcolor=_C, text_size=_trdTxtSz)
+        table.cell(trdTbl, 1, 8, _prFmt(na(m5_entry)  ? float(na) : m5_sl),  text_color=color.red, bgcolor=_C, text_size=_trdTxtSz)
+        table.cell(trdTbl, 2, 8, _prFmt(na(m15_entry) ? float(na) : m15_sl), text_color=color.red, bgcolor=_C, text_size=_trdTxtSz)
+        table.cell(trdTbl, 3, 8, _prFmt(na(m30_entry) ? float(na) : m30_sl), text_color=color.red, bgcolor=_C, text_size=_trdTxtSz)
+        table.cell(trdTbl, 0, 9,  'TP1', text_color=color.lime, bgcolor=_C, text_size=_trdTxtSz)
+        table.cell(trdTbl, 1, 9,  _prFmt(na(m5_entry)  ? float(na) : m5_tp1),  text_color=color.lime, bgcolor=_C, text_size=_trdTxtSz)
+        table.cell(trdTbl, 2, 9,  _prFmt(na(m15_entry) ? float(na) : m15_tp1), text_color=color.lime, bgcolor=_C, text_size=_trdTxtSz)
+        table.cell(trdTbl, 3, 9,  _prFmt(na(m30_entry) ? float(na) : m30_tp1), text_color=color.lime, bgcolor=_C, text_size=_trdTxtSz)
+        table.cell(trdTbl, 0, 10, 'TP2', text_color=color.lime, bgcolor=_C, text_size=_trdTxtSz)
+        table.cell(trdTbl, 1, 10, _prFmt(na(m5_entry)  ? float(na) : m5_tp2),  text_color=color.lime, bgcolor=_C, text_size=_trdTxtSz)
+        table.cell(trdTbl, 2, 10, _prFmt(na(m15_entry) ? float(na) : m15_tp2), text_color=color.lime, bgcolor=_C, text_size=_trdTxtSz)
+        table.cell(trdTbl, 3, 10, _prFmt(na(m30_entry) ? float(na) : m30_tp2), text_color=color.lime, bgcolor=_C, text_size=_trdTxtSz)
+        table.cell(trdTbl, 0, 11, 'TP3', text_color=color.lime, bgcolor=_C, text_size=_trdTxtSz)
+        table.cell(trdTbl, 1, 11, _prFmt(na(m5_entry)  ? float(na) : m5_tp3),  text_color=color.lime, bgcolor=_C, text_size=_trdTxtSz)
+        table.cell(trdTbl, 2, 11, _prFmt(na(m15_entry) ? float(na) : m15_tp3), text_color=color.lime, bgcolor=_C, text_size=_trdTxtSz)
+        table.cell(trdTbl, 3, 11, _prFmt(na(m30_entry) ? float(na) : m30_tp3), text_color=color.lime, bgcolor=_C, text_size=_trdTxtSz)
+        table.cell(trdTbl, 0, 12, 'Float PNL', text_color=color.silver, bgcolor=_C, text_size=_trdTxtSz)
+        table.cell(trdTbl, 1, 12, _pnlStr(pnl5),  text_color=na(pnl5)  ? color.silver : pnl5  >= 0 ? color.lime : color.red, bgcolor=_C, text_size=_trdTxtSz)
+        table.cell(trdTbl, 2, 12, _pnlStr(pnl15), text_color=na(pnl15) ? color.silver : pnl15 >= 0 ? color.lime : color.red, bgcolor=_C, text_size=_trdTxtSz)
+        table.cell(trdTbl, 3, 12, _pnlStr(pnl30), text_color=na(pnl30) ? color.silver : pnl30 >= 0 ? color.lime : color.red, bgcolor=_C, text_size=_trdTxtSz)
+
+// ═══════════════════════════════════════════════════════════
+//  CHART LEVELS — Entry / SL / TP
+// ═══════════════════════════════════════════════════════════
+var line[]  _lvlLines  = array.new<line>()
+var label[] _lvlLabels = array.new<label>()
+
+if barstate.islast
+    for ln in _lvlLines
+        line.delete(ln)
+    for lb in _lvlLabels
+        label.delete(lb)
+    _lvlLines.clear()
+    _lvlLabels.clear()
+
+    if trdSH and trdLvlSH
+        _tf    = timeframe.period
+        _entry = _tf == "5"  ? m5_entry  : _tf == "15" ? m15_entry : _tf == "30" ? m30_entry : float(na)
+        _sl    = _tf == "5"  ? m5_sl     : _tf == "15" ? m15_sl    : _tf == "30" ? m30_sl    : float(na)
+        _tp1   = _tf == "5"  ? m5_tp1    : _tf == "15" ? m15_tp1   : _tf == "30" ? m30_tp1   : float(na)
+        _tp2   = _tf == "5"  ? m5_tp2    : _tf == "15" ? m15_tp2   : _tf == "30" ? m30_tp2   : float(na)
+        _tp3   = _tf == "5"  ? m5_tp3    : _tf == "15" ? m15_tp3   : _tf == "30" ? m30_tp3   : float(na)
+        _dir   = _tf == "5"  ? m5_dir    : _tf == "15" ? m15_dir   : _tf == "30" ? m30_dir   : 0
+        _CE    = _tf == "5"  ? color.new(#64b5f6, 0) : _tf == "15" ? color.new(#ffb74d, 0) : color.new(#ce93d8, 0)
+        _pfx   = _tf == "5"  ? 'M5 '  : _tf == "15" ? 'M15 ' : 'M30 '
+
+        _eb = _tf == "5" ? m5_bar : _tf == "15" ? m15_bar : m30_bar
+        _drawLvl(_lvlLines, _lvlLabels, _eb, _entry,                       _CE,                   line.style_solid,  2, _pfx + (_dir > 0 ? 'BUY ' : 'SELL'))
+        _drawLvl(_lvlLines, _lvlLabels, _eb, trdSL > 0 ? _sl : float(na), color.red,              line.style_dashed, 1, _pfx + 'SL  ')
+        _drawLvl(_lvlLines, _lvlLabels, _eb, _tp1,                         color.new(#69f0ae, 0),  line.style_dashed, 1, _pfx + 'TP1 ')
+        _drawLvl(_lvlLines, _lvlLabels, _eb, _tp2,                         color.new(#00e676, 0),  line.style_dotted, 1, _pfx + 'TP2 ')
+        _drawLvl(_lvlLines, _lvlLabels, _eb, _tp3,                         color.new(#00c853, 0),  line.style_dotted, 1, _pfx + 'TP3 ')
+
+// ═══════════════════════════════════════════════════════════
+//  ICT KILLZONES TOOLKIT — LuxAlgo (CC BY-NC-SA 4.0)
+// ═══════════════════════════════════════════════════════════
+
+// ── User Defined Types ──────────────────────────────────────
+type bar
+    float o = open
+    float h = high
+    float l = low
+    float c = close
+    int   t = time
+    int   i = bar_index
+
+type OB
+    float top = na
+    float btm = na
+    int   obI = bar_index
+    box   bxOB
+    bool  ext = true
+
+type BB
+    box   bxOB
+    box   bxBB
+    bool  ext = true
+    bool  bb  = false
+    int   bbI = na
+    int   lst = na
+
+type swing
+    float y = na
+    int   i = na
+    bool  x = false
+
+type pivotPoint
+    float h
+    int   hi
+    bool  hx
+    float l
+    int   li
+    bool  lx
+
+type KZ
+    line  lnT
+    line  lnM
+    line  lnB
+    line  lnO
+    label lb
+    label lbO
+
+type DWM
+    line  ln
+    label lb
+
+type MSS
+    line  ln
+    box   bx
+
+type FVG
+    box   bx
+    bool  e
+
+// ── ICT Variables ───────────────────────────────────────────
+bar b = bar.new()
+tfM = timeframe.multiplier
+
+nyam  = not na(time(timeframe.period, nyS,  'UTC-5')) and nySH  and tfM <= kzSH
+ldnO  = not na(time(timeframe.period, ldnOS,'UTC-5')) and ldnOSH and tfM <= kzSH
+ldnC  = not na(time(timeframe.period, ldnCS,'UTC-5')) and ldnCSH and tfM <= kzSH
+asian = not na(time(timeframe.period, asS,  'UTC-5')) and asSH  and tfM <= kzSH
+inKZ  = nyam or ldnO or ldnC or asian
+
+var KZ kz = KZ.new()
+var DWM dwm = DWM.new()
+
+var bOB = array.new<OB>(0)
+var aOB = array.new<OB>(0)
+var bBB = array.new<BB>(0)
+var aBB = array.new<BB>(0)
+var bLS = array.new_int()
+var aLS = array.new_int()
+var bMSS = array.new<MSS>(0)
+var aMSS = array.new<MSS>(0)
+
+var pivotPoint pp = pivotPoint.new()
+var shift = 0
+
+var bFVG = array.new<FVG>(0)
+var aFVG = array.new<FVG>(0)
+fvgATR = nz(ta.atr(144)) * fvgTH
+
+// ── ICT Functions ───────────────────────────────────────────
+swings(_l) =>
+    var os = 0
+    var swing top = swing.new(na, na)
+    var swing btm = swing.new(na, na)
+    upper = ta.highest(_l)
+    lower = ta.lowest(_l)
+    os := high[_l] > upper ? 0 : low[_l] < lower ? 1 : os
+    if os == 0 and os[1] != 0
+        top := swing.new(high[_l], bar_index[_l])
+    if os == 1 and os[1] != 1
+        btm := swing.new(low[_l], bar_index[_l])
+    [top, btm]
+
+method killzones(KZ _id, _s, _kz, _o, _h, _l, _c, _t, _cr, _tx, _mml, _ml, _lb, _le, _ol, _olC, _olL, areaCss) =>
+    var float max = na, var float mid = na, var float min = na
+    var int sbT = na, var bool xt = false, var bool xb = false
+    var box area = na
+    var tC = color.rgb(color.r(_cr), color.g(_cr), color.b(_cr))
+    if _s and not _s[1]
+        max := _h, min := _l, mid := math.avg(max, min), sbT := _t
+        area := box.new(bar_index, max, bar_index, min, na, bgcolor=areaCss)
+        if _mml
+            _id.lnT := line.new(sbT, max, sbT, max, xloc.bar_time, color=tC)
+            _id.lnB := line.new(sbT, min, sbT, min, xloc.bar_time, color=tC)
+        if _ml
+            _id.lnM := line.new(sbT, mid, sbT, mid, xloc.bar_time, color=tC, style=line.style_dotted)
+        if _ol
+            _id.lnO := line.new(sbT, _o, sbT, _o, xloc.bar_time, color=color.new(_olC, 0), style=line.style_dotted)
+            if _olL
+                _id.lbO := label.new(sbT, _o, 'KZO(' + str.tostring(_o, format.mintick) + ')', xloc.bar_time, color=color(na), style=label.style_label_left, textcolor=color.new(_olC, 0), size=size.tiny)
+        if _lb
+            _id.lb := label.new(sbT, max, _tx, xloc.bar_time, color=#ffffff00, style=label.style_label_down, textcolor=tC, size=size.small)
+    if _s
+        max := math.max(_h, max), min := math.min(_l, min), mid := math.avg(max, min)
+        xt := true, xb := true
+        area.set_top(max), area.set_rightbottom(bar_index, min)
+        if _lb
+            label.set_x(_id.lb, int(math.avg(_t, sbT))), label.set_y(_id.lb, max)
+        if _mml
+            _id.lnT.set_y1(max), _id.lnT.set_xy2(_t, max)
+            _id.lnB.set_y1(min), _id.lnB.set_xy2(_t, min)
+        if _ml
+            _id.lnM.set_y1(mid), _id.lnM.set_xy2(_t, mid)
+        if _ol
+            _id.lnO.set_x2(_t)
+            if _olL
+                _id.lbO.set_x(_t)
+    if not _s and _le and not _kz
+        if _mml
+            if xt
+                _id.lnT.set_x2(_t)
+                if _h >= _id.lnT.get_y1()
+                    xt := false
+            if xb
+                _id.lnB.set_x2(_t)
+                if _l <= _id.lnB.get_y1()
+                    xb := false
+        if _ml
+            _id.lnM.set_x2(_t)
+
+method pDWM(DWM _id, _tC, _t, _o, _cl, _lbTX, _olL) =>
+    if _tC
+        _id.lb.delete()
+        _id.ln := line.new(_t, _o, _t, _o, xloc.bar_time, extend.none, color.new(_cl, 0), line.style_dotted, 1)
+        if _olL
+            _id.lb := label.new(_t, _o, _lbTX + '(' + str.tostring(_o, format.mintick) + ')', xloc.bar_time, yloc.price, color(na), label.style_label_left, color.new(_cl, 0), size.tiny)
+        float(na)
+    else
+        if not na(_id.ln)
+            _id.ln.set_x2(_t)
+            if _olL and not na(_id.lb)
+                _id.lb.set_x(_t)
+        float(na)
+
+pOBB(_s, _o, _h, _l, _c, _i, _t, _st, _sb, _mx, _mn, _cOBb, _cBBb, _cOBa, _cBBa, _obS, _bbS, _obbM, _obbTX, _obbE, _obbD, _obbR) =>
+    var int sbI = 0, var bool xb = false, var bool xa = false
+    if _s and not _s[1]
+        sbI := _i, xb := true, xa := true
+        if _obbE
+            bOB.clear()
+            aOB.clear()
+            bBB.clear()
+            aBB.clear()
+    if _s
+        if _c[1] > _st.y and not _st.x and _st.i >= sbI
+            _st.x := true
+            minima = _mx[1], maxima = _mn[1], sBT = _t[1]
+            for i = 1 to (_i - _st.i) - 1
+                minima := math.min(_mn[i], minima)
+                maxima := minima == _mn[i] ? _mx[i] : maxima
+                sBT    := minima == _mn[i] ? _t[i]  : sBT
+            bOB.unshift(OB.new(maxima, minima, sBT, box.new(na, na, na, na, color(na), xloc=xloc.bar_time, text=_obbTX ? 'OB' : '', text_size=size.tiny, text_halign=text.align_center, text_valign=text.align_center, text_color=color.new(_cOBb, 0))))
+            bBB.unshift(BB.new(box.new(na, na, na, na, color(na), xloc=xloc.bar_time), box.new(na, na, na, na, color(na), xloc=xloc.bar_time, text=_obbTX ? 'BB' : '', text_size=size.tiny, text_halign=text.align_center, text_valign=text.align_center, text_color=color.new(_cBBb, 0))))
+        if _c[1] < _sb.y and not _sb.x and _st.i >= sbI
+            _sb.x := true
+            minima = _mn[1], maxima = _mx[1], sBT = _t[1]
+            for i = 1 to (_i - _sb.i) - 1
+                maxima := math.max(_mx[i], maxima)
+                minima := maxima == _mx[i] ? _mn[i] : minima
+                sBT    := maxima == _mx[i] ? _t[i]  : sBT
+            aOB.unshift(OB.new(maxima, minima, sBT, box.new(na, na, na, na, color(na), xloc=xloc.bar_time, text=_obbTX ? 'OB' : '', text_size=size.tiny, text_halign=text.align_center, text_valign=text.align_center, text_color=color.new(_cOBa, 0))))
+            aBB.unshift(BB.new(box.new(na, na, na, na, color(na), xloc=xloc.bar_time), box.new(na, na, na, na, color(na), xloc=xloc.bar_time, text=_obbTX ? 'BB' : '', text_size=size.tiny, text_halign=text.align_center, text_valign=text.align_center, text_color=color.new(_cBBa, 0))))
+    if _obbE ? true : _s
+        if bOB.size() > 0
+            for i = bOB.size() - 1 to 0
+                ob = bOB.get(i), bb = bBB.get(i)
+                if _obbR
+                    if not ob.ext
+                        ob.bxOB.delete()
+                    if not bb.ext
+                        bb.bxOB.delete(), bb.bxBB.delete()
+                if not bb.bb
+                    if _obS and (_obbD == 'First' ? i == bOB.size() - 1 : true)
+                        ob.bxOB.set_lefttop(ob.obI, ob.top)
+                        ob.bxOB.set_rightbottom(_t, ob.btm)
+                        ob.bxOB.set_bgcolor(_obbD == 'Last' ? i == 0 ? _cOBb : color(na) : _cOBb)
+                        ob.bxOB.set_text_color(_obbD == 'Last' ? i == 0 ? color.new(_cOBb, 0) : color(na) : color.new(_cOBb, 0))
+                    if math.min(_obbM ? _c[1] : _l[1], _o[1]) < ob.btm
+                        bb.bb := true
+                        if _obS
+                            ob.bxOB.set_right(_t[1]), ob.ext := false
+                        if _bbS and xb
+                            bb.bbI := _t[1]
+                            bb.bxBB.set_lefttop(bb.bbI, ob.top)
+                            bb.bxBB.set_rightbottom(_t, ob.btm)
+                            bb.bxBB.set_bgcolor(_cBBb)
+                            if not _obS or _obbR or not (_obbD == 'First' ? i == bOB.size() - 1 : true)
+                                bb.bxOB.set_lefttop(ob.obI, ob.top)
+                                bb.bxOB.set_rightbottom(bb.bbI, ob.btm)
+                                bb.bxOB.set_bgcolor(color(na))
+                                bb.bxOB.set_border_color(_cBBb)
+                            if _obbD == 'First'
+                                xb := false
+                            if _obbD == 'Last'
+                                bLS.push(bb.bbI)
+                else
+                    if (_obbM ? _c[1] : _h[1]) > ob.top
+                        bb.ext := false
+                    if _obS
+                        ob.bxOB.set_bgcolor(_obbD == 'Last' ? i == 0 ? _cOBb : color(na) : _cOBb)
+                        ob.bxOB.set_text_color(_obbD == 'Last' ? i == 0 ? color.new(_cOBb, 0) : color(na) : color.new(_cOBb, 0))
+                    if _bbS and bb.ext
+                        bb.bxBB.set_right(_t)
+                    if _bbS and _obbD == 'Last'
+                        if i != 0
+                            bb.bxOB.set_lefttop(ob.obI, ob.top)
+                            bb.bxOB.set_rightbottom(bb.bbI, ob.btm)
+                            bb.bxOB.set_bgcolor(color(na))
+                            bb.bxOB.set_border_color(_cBBb)
+                        if bLS.max() != bb.bxBB.get_left()
+                            bb.bxBB.set_bgcolor(color(na))
+                            bb.bxBB.set_text_color(color(na))
+                            bb.bxOB.set_border_color(color(na))
+        if aOB.size() > 0
+            for i = aOB.size() - 1 to 0
+                ob = aOB.get(i), bb = aBB.get(i)
+                if _obbR
+                    if not ob.ext
+                        ob.bxOB.delete()
+                    if not bb.ext
+                        bb.bxOB.delete(), bb.bxBB.delete()
+                if not bb.bb
+                    if _obS and (_obbD == 'First' ? i == aOB.size() - 1 : true)
+                        ob.bxOB.set_lefttop(ob.obI, ob.top)
+                        ob.bxOB.set_rightbottom(_t, ob.btm)
+                        ob.bxOB.set_bgcolor(_obbD == 'Last' ? i == 0 ? _cOBa : color(na) : _cOBa)
+                        ob.bxOB.set_text_color(_obbD == 'Last' ? i == 0 ? color.new(_cOBa, 0) : color(na) : color.new(_cOBa, 0))
+                    if math.max(_obbM ? _c[1] : _h[1], _o[1]) > ob.top
+                        bb.bb := true
+                        if _obS
+                            ob.bxOB.set_right(_t[1]), ob.ext := false
+                        if _bbS and xa
+                            bb.bbI := _t[1]
+                            bb.bxBB.set_lefttop(bb.bbI, ob.top)
+                            bb.bxBB.set_rightbottom(_t, ob.btm)
+                            bb.bxBB.set_bgcolor(_cBBa)
+                            if not _obS or _obbR or not (_obbD == 'First' ? i == aOB.size() - 1 : true)
+                                bb.bxOB.set_lefttop(ob.obI, ob.top)
+                                bb.bxOB.set_rightbottom(bb.bbI, ob.btm)
+                                bb.bxOB.set_bgcolor(color(na))
+                                bb.bxOB.set_border_color(_cBBa)
+                            if _obbD == 'First'
+                                xa := false
+                            if _obbD == 'Last'
+                                aLS.push(bb.bbI)
+                else
+                    if (_obbM ? _c[1] : _l[1]) < ob.btm
+                        bb.ext := false
+                    if _obS
+                        ob.bxOB.set_bgcolor(_obbD == 'Last' ? i == 0 ? _cOBa : color(na) : _cOBa)
+                        ob.bxOB.set_text_color(_obbD == 'Last' ? i == 0 ? color.new(_cOBa, 0) : color(na) : color.new(_cOBa, 0))
+                    if _bbS and bb.ext
+                        bb.bxBB.set_right(_t)
+                    if _bbS and _obbD == 'Last'
+                        if i != 0
+                            bb.bxOB.set_lefttop(ob.obI, ob.top)
+                            bb.bxOB.set_rightbottom(bb.bbI, ob.btm)
+                            bb.bxOB.set_bgcolor(color(na))
+                            bb.bxOB.set_border_color(_cBBa)
+                        if aLS.max() != bb.bxBB.get_left()
+                            bb.bxBB.set_bgcolor(color(na))
+                            bb.bxBB.set_text_color(color(na))
+                            bb.bxOB.set_border_color(color(na))
+    else if not _obbE
+        bOB.clear()
+        aOB.clear()
+        bBB.clear()
+        aBB.clear()
+
+pFVG(_s, _h, _l, _c, _i, _atr, _fR, _fE, _fD, _fTX, _fbC, _faC) =>
+    var bool xb = false, var bool xa = false
+    if _s and not _s[1]
+        xb := true, xa := true
+        if _fE
+            bFVG.clear()
+            aFVG.clear()
+    if _s
+        bull = (_l - _h[2]) > _atr and _l > _h[2] and _c[1] > _h[2]
+        if bull and xb
+            bFVG.unshift(FVG.new(box.new(_i-1, _l, _i, _h[2], na, bgcolor=_fbC, text=_fTX ? 'FVG' : '', text_size=size.tiny, text_halign=text.align_center, text_valign=text.align_center, text_color=color.new(_fbC, 0)), true))
+            if _fD == 'First'
+                xb := false
+            if bFVG.size() > 1 and _fD == 'Last'
+                fvg = bFVG.pop(), fvg.bx.delete()
+        bear = (_l[2] - _h) > _atr and _h < _l[2] and _c[1] < _l[2]
+        if bear and xa
+            aFVG.unshift(FVG.new(box.new(_i-1, _l[2], _i, _h, na, bgcolor=_faC, text=_fTX ? 'FVG' : '', text_size=size.tiny, text_halign=text.align_center, text_valign=text.align_center, text_color=color.new(_faC, 0)), true))
+            if _fD == 'First'
+                xa := false
+            if aFVG.size() > 1 and _fD == 'Last'
+                fvg = aFVG.pop(), fvg.bx.delete()
+    if _fE ? true : _s
+        if bFVG.size() > 0
+            for i = bFVG.size() - 1 to 0
+                fvg = bFVG.get(i)
+                if fvg.e
+                    if _l < fvg.bx.get_bottom()
+                        fvg.bx.set_right(_i)
+                        fvg.e := false
+                        if _fR
+                            fvg.bx.delete()
+                    else
+                        fvg.bx.set_right(_i)
+        if aFVG.size() > 0
+            for i = aFVG.size() - 1 to 0
+                fvg = aFVG.get(i)
+                if fvg.e
+                    if _h > fvg.bx.get_top()
+                        fvg.bx.set_right(_i)
+                        fvg.e := false
+                        if _fR
+                            fvg.bx.delete()
+                    else
+                        fvg.bx.set_right(_i)
+    else if not _fE
+        bFVG.clear()
+        aFVG.clear()
+
+// ── ICT Calculations ────────────────────────────────────────
+kzO = dwmO == 'Killzones'
+
+kz.killzones(nyam  and timeframe.isintraday, inKZ, b.o, b.h, b.l, b.c, b.t, nyC,   nyST,   kzMML, kzML, kzLB, kzLE, kzO, dwmC, dwmL, nyC)
+kz.killzones(ldnO  and timeframe.isintraday, inKZ, b.o, b.h, b.l, b.c, b.t, ldnOC, ldnOST, kzMML, kzML, kzLB, kzLE, kzO, dwmC, dwmL, ldnOC)
+kz.killzones(ldnC  and timeframe.isintraday, inKZ, b.o, b.h, b.l, b.c, b.t, ldnCC, ldnCST, kzMML, kzML, kzLB, kzLE, kzO, dwmC, dwmL, ldnCC)
+kz.killzones(asian and timeframe.isintraday, inKZ, b.o, b.h, b.l, b.c, b.t, asC,   asST,   kzMML, kzML, kzLB, kzLE, kzO, dwmC, dwmL, asC)
+
+[xChg, xTxt] = switch dwmO
+    'the Day'   => [timeframe.change('D'), 'DO']
+    'the Week'  => [timeframe.change('W'), 'WO']
+    'the Month' => [timeframe.change('M'), 'MO']
+    => [false, '']
+
+if dwmO != 'None' and not kzO and timeframe.isintraday and tfM <= kzSH
+    dwm.pDWM(xChg, b.t, b.o, dwmC, xTxt, dwmL)
+
+bgcolor(dwmS and not kzO and timeframe.isintraday and tfM <= kzSH ? xChg ? dwmC : na : na)
+
+[ict_top, ict_btm] = swings(obbLN)
+ict_max = useBody ? math.max(b.c, b.o) : b.h
+ict_min = useBody ? math.min(b.c, b.o) : b.l
+
+if obSH or bbSH
+    pOBB(inKZ, b.o, b.h, b.l, b.c, b.i, b.t, ict_top, ict_btm, ict_max, ict_min, bullOC, bullBC, bearOC, bearBC, obSH, bbSH, obbMP, obbTX, obbEX, obbSH, obbR)
+
+pp_h = ta.pivothigh(mssLN, mssLN)
+pp_l = ta.pivotlow(mssLN, mssLN)
+
+if not na(pp_h)
+    pp.h := pp_h, pp.hx := false, pp.hi := b.i - mssLN
+if not na(pp_l)
+    pp.l := pp_l, pp.lx := false, pp.li := b.i - mssLN
+
+if not inKZ
+    pp.l := 0, pp.h := 10e8, shift := 0
+    bMSS.clear()
+    aMSS.clear()
+
+if mssSH and inKZ
+    if close[1] > pp.h and not pp.hx
+        pp.hx := true
+        if shift == -1 or shift == 0
+            if mssDO == 'First' ? bMSS.size() < 1 : true
+                bMSS.unshift(MSS.new(line.new(pp.hi, pp.h, b.i-1, pp.h, color=ppLCB), box.new(pp.hi, pp.h, b.i-1, pp.h, text='CHoCH', text_size=size.tiny, text_halign=text.align_left, text_valign=text.align_bottom, text_color=mssTX ? ppLCB : color(na), bgcolor=color(na), border_color=color(na))))
+            if bMSS.size() > 1 and mssDO == 'Last'
+                mss = bMSS.pop(), mss.ln.delete(), mss.bx.delete()
+        shift := 1
+    if close[1] < pp.l and not pp.lx
+        pp.lx := true
+        if shift == 1 or shift == 0
+            if mssDO == 'First' ? aMSS.size() < 1 : true
+                aMSS.unshift(MSS.new(line.new(pp.li, pp.l, b.i-1, pp.l, color=ppLCS), box.new(pp.li, pp.l, b.i-1, pp.l, text='CHoCH', text_size=size.tiny, text_halign=text.align_left, text_valign=text.align_top, text_color=mssTX ? ppLCS : color(na), bgcolor=color(na), border_color=color(na))))
+            if aMSS.size() > 1 and mssDO == 'Last'
+                mss = aMSS.pop(), mss.ln.delete(), mss.bx.delete()
+        shift := -1
+
+if fvgSH
+    pFVG(inKZ, b.h, b.l, b.c, b.i, fvgATR, fvgR, fvgE, fvgDO, fvgTX, fvgBC, fvgSC)

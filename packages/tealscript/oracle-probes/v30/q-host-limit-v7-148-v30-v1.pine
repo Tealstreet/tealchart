@@ -1,0 +1,5 @@
+//@version=6
+indicator("Matrix eigenvalues non-square")
+
+values = matrix.new<float>(2, 3, close)
+plot(array.get(matrix.eigenvalues(values), 0))

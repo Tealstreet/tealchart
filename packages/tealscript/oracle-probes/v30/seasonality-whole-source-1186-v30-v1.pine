@@ -1,0 +1,49 @@
+// This source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © jawauntb
+
+
+//@version=5
+indicator("Stocks Seasonality Gauge", overlay=false, shorttitle="SSG")
+
+// Input Parameters
+lookbackYears = input.int(5, title="Lookback Years")
+emaLength = input.int(9, title="EMA Length for Current Month's Performance")
+
+// Function to calculate monthly performance for specific month and year offsets
+getReturn(monthOffset, yearOffset) =>
+    startPrice = request.security(syminfo.tickerid, "M", close[12 * yearOffset + monthOffset])
+    endPrice = request.security(syminfo.tickerid, "M", close[12 * yearOffset + monthOffset + 1])
+    (endPrice - startPrice) / startPrice
+
+// Calculate returns for the current month over past years
+currentMonthReturns = array.new_float(lookbackYears)
+monthOffset = month[0] - 1  // Current month offset from the start of the year
+
+for i = 0 to lookbackYears - 1
+    array.set(currentMonthReturns, i, getReturn(monthOffset, -i))
+
+currentMonthAvg = array.avg(currentMonthReturns)
+
+// Calculate returns for the current year
+currentYearReturns = array.new_float(12)
+for i = 0 to month[0] - 1
+    array.set(currentYearReturns, i, getReturn(i, 0))
+currentYearAvg = array.sum(currentYearReturns) / ta.max(month[0])
+
+// Price change percentage function
+getPriceChangePercentage(period) =>
+    change = (close - close[period]) / close[period]
+    change
+
+// Calculate percentage changes
+threeWeekChange = getPriceChangePercentage(21)
+oneWeekChange = getPriceChangePercentage(7)
+
+// EMA calculation
+currentMonthEMA = (ta.ema(threeWeekChange, emaLength) + ta.ema(oneWeekChange, emaLength)) / 2
+
+// Plotting
+hline(0, "0% Change", color=color.rgb(237, 255, 170), linewidth=1, linestyle=hline.style_dashed)
+plot(currentMonthAvg, color=color.rgb(241, 103, 106), linewidth=2, title="Avg Performance This Month Over Last 5 Years")
+plot(currentYearAvg, color=color.rgb(79, 226, 101), linewidth=3, title="Avg Monthly Performance Year to Date")
+plot(currentMonthEMA, color=color.rgb(55, 245, 255), linewidth=4, title="EMA of Current Months Performance")

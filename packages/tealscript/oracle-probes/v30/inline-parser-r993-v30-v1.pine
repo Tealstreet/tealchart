@@ -1,0 +1,10 @@
+//@version=5
+indicator("Inline field-write discriminator")
+type Frame
+    bool execution = false
+start(Frame frame) => frame.execution := true
+frame = Frame.new()
+start(frame)
+plain(float value) => value * 2 + 1
+plot(frame.execution ? 1 : 0, "inline_field_write")
+plot(plain(2), "plain_expression_return")

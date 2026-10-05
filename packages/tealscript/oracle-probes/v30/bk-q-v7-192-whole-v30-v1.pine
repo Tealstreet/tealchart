@@ -1,0 +1,6 @@
+//@version=6
+indicator("Matrix remove_col na index")
+
+values = matrix.new<float>(1, 1, close)
+matrix.remove_col(values, int(na))
+plot(close)

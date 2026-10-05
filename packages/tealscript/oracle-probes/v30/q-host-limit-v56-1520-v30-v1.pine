@@ -1,0 +1,11 @@
+//@version=5
+indicator("Supported max bars back if expression block call")
+src = close
+branch = if close > open
+    base = 5
+    length = base + 5
+    max_bars_back(src, length)
+    1
+else
+    0
+plot(src[bar_index] + branch)
