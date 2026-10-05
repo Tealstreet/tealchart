@@ -133,7 +133,12 @@ export function renderExternalAxisLabels(ctx: CanvasContext, labels: readonly Ex
       ctx.fillStyle = label.color;
       const lineHeight = label.fontSize + 2;
       const firstY = label.y - ((label.textLines.length - 1) * lineHeight) / 2;
+      const priceFont =
+        label.layer === 'last-trade' ? label.font.replace(/\d+(?:\.\d+)?px/, `${label.fontSize + 2}px`) : label.font;
       label.textLines.forEach((text, index) => {
+        ctx.font = index === 0 ? priceFont : label.font;
+        if (index === 0 && priceFont !== label.font && ctx.measureText(text).width > label.width - 4)
+          ctx.font = label.font;
         ctx.fillStyle = label.textColors?.[index] ?? label.color;
         ctx.fillText(text, label.x + label.width / 2, firstY + index * lineHeight);
       });

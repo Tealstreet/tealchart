@@ -15,6 +15,11 @@ Programmatic drag cancellation restores geometry without submitting callbacks.
 - **Konva.js**: Interactive trading geometry on web — order/position lines with draggable labels and controls
 - **DOM / React Native overlays**: Menus, buttons, chrome controls, and toolbars that do not require per-frame chart projection
 
+External native-axis last-trade labels render the price 2px larger than secondary
+countdown text, retaining the host font family, tag dimensions and line centers.
+Prices that would overflow the axis retain their native font size.
+Other external-axis labels keep their host font unchanged.
+
 `ui/LayoutSelector` is the shared saved-layout list and action modal. Hosts can
 open/close it through a native header without adding a second menu. Optional
 `requestName`, `confirmDelete` and `onClose` callbacks connect Electron's
