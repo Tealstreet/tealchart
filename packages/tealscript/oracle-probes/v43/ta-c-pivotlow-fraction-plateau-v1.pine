@@ -1,0 +1,12 @@
+//@version=6
+indicator("v43 ta-c-pivotlow-fraction-plateau-v1", precision=16)
+phase = bar_index % 12
+pattern = array.from(1.0, 5.0, 5.0, 5.0, 1.0, 4.0, 4.0, 2.0, 7.0, 7.0, 0.0, 3.0)
+src = -array.get(pattern, phase)
+plot(src, "SOURCE")
+plot(ta.pivotlow(src, 2.2, 1.8), "FRACTIONAL_TARGET")
+plot(ta.pivotlow(src, 2, 1), "FLOOR_CONTROL")
+plot(ta.pivotlow(src, 2, 2), "NEAREST_CONTROL")
+plot(ta.pivotlow(src, 3, 2), "CEILING_CONTROL")
+plot(bar_index, "INDEX")
+plot(phase, "PHASE")

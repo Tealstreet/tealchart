@@ -269,3 +269,7 @@ Capture the nine independent scripts in [v40/bundle-manifest-v1.json](v40/bundle
 ## Then round v41 — math.round authority conflicts v1
 
 Capture the three independent sources in [v41/bundle-manifest-v1.json](v41/bundle-manifest-v1.json) order, following [HANDOFF-v41-v1.md](v41/HANDOFF-v41-v1.md) and per-script instructions. Two qualifier consumers and one exact negative-half numeric probe preserve the conflicting authorities without predicting native outcomes. Keep source bytes/defaults unchanged; return full earliest refusals or raw named columns to `v41/captures/v41/RESPONSE-v41.md`. Verify `v41/SHA256SUMS` before capture.
+
+## Then round v43
+
+Capture the five TA-C discriminators in v43/bundle-manifest-v1.json using v43/HANDOFF-v43-v1.md and its literal per-source instructions. Native outcomes are unspecified; return source-hash-bound evidence under v43/captures/v43/RESPONSE-v43.md.

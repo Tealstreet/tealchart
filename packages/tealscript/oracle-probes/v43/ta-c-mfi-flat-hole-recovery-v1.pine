@@ -1,0 +1,11 @@
+//@version=6
+indicator("v43 ta-c-mfi-flat-hole-recovery-v1", precision=16)
+phase = bar_index % 20
+src = phase == 4 or phase == 9 or phase == 14 ? na : phase < 10 ? 0.0 : 7.0
+plot(volume, "CHART_VOLUME")
+plot(src, "SOURCE")
+plot(ta.mfi(src, 3), "MFI3")
+plot(ta.mfi(src, 5), "MFI5")
+plot(ta.mfi(7.0, 3), "FLAT_POSITIVE_CONTROL")
+plot(bar_index, "INDEX")
+plot(phase, "PHASE")

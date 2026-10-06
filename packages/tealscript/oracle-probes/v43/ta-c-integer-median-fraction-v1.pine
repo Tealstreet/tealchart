@@ -1,0 +1,17 @@
+//@version=6
+indicator("v43 ta-c-integer-median-fraction-v1", precision=16)
+phase = bar_index % 2
+int positive = phase == 0 ? 1 : 2
+int negative = phase == 0 ? -2 : -1
+positiveMedian = ta.median(positive, 2)
+negativeMedian = ta.median(negative, 2)
+plot(positive, "POSITIVE_SOURCE")
+plot(negative, "NEGATIVE_SOURCE")
+plot(positiveMedian, "INT_POSITIVE_MEDIAN")
+plot(negativeMedian, "INT_NEGATIVE_MEDIAN")
+plot(ta.median(float(positive), 2), "FLOAT_POSITIVE_MEDIAN")
+plot(ta.median(float(negative), 2), "FLOAT_NEGATIVE_MEDIAN")
+plot(int(positiveMedian), "POSITIVE_TRUNCATED_CONTROL")
+plot(int(negativeMedian), "NEGATIVE_TRUNCATED_CONTROL")
+plot(bar_index, "INDEX")
+plot(phase, "PHASE")
