@@ -1,3 +1,0 @@
-# v48 switch key evaluation count instructions v1
-
-Run switch-key-evaluation-count-v48-v1.pine unchanged with the common v48 setup. Export INDEX,KEY,KEY_CALLS,SELECTED,CONTROL_CALLS,CONTROL_SELECTED,CONTROL_CLOSE plus raw time/OHLCV. Preserve multiple complete KEY 0..4 cycles on closed historical bars. KEY_CALLS records reached selector invocations; CONTROL_CALLS uses an independent explicit UDF evaluation before a variable-key switch. Retain all count/result values without assuming once-per-switch or once-per-arm evaluation. Save exact earliest refusal if the source does not run. Return switch-key-evaluation-count-v48-v1-attempt1.csv, screenshot and diagnostics under captures/v48 with source/capture SHA256 and actual INDEX bounds.
