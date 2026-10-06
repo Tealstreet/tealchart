@@ -1,0 +1,4 @@
+//@version=6
+indicator("ta-b authority falling-float-length-v1")
+plot(ta.falling(close,3.0) ? 1 : 0, "candidate", display=display.data_window)
+plot(bar_index, "input_bar_index", display=display.data_window)

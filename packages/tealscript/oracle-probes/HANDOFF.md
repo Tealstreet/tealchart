@@ -114,6 +114,8 @@
 Agent exchange: [capture response v1](RESPONSE-v1.md). The next reply belongs in
 `RESPONSE-v2.md` beside this handoff; commit responses so both machines can read them.
 
+> **Then round v36.** Capture [v36/HANDOFF-v36-v1.md](v36/HANDOFF-v36-v1.md) — 7 isolated ta-b admission scripts; per-script steps in `v36/instructions/` and source hashes in `v36/SHA256SUMS`. Reply at `v36/captures/v36/RESPONSE-v36.md`. Native outcomes remain unobserved.
+
 ## What these are
 
 Nine Pine v6 indicator scripts, **60 plots each**, written to extract **TradingView's
