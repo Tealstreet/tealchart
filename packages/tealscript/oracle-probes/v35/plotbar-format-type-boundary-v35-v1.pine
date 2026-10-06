@@ -1,0 +1,3 @@
+//@version=6
+indicator("authority", overlay=true)
+plotbar(open=open, high=high, low=low, close=close, title="Authority", color=#123456, editable=false, show_last=2, display=display.all, format=7, precision=2, force_overlay=true)

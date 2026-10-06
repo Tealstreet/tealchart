@@ -1,0 +1,3 @@
+//@version=6
+indicator("authority", overlay=true)
+plotarrow(series=close-open, title="Authority", colorup=#123456, colordown=#654321, offset=2, minheight=6, maxheight=80, editable=false, show_last=2, display=display.all, format=7, precision=2, force_overlay=true)

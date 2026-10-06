@@ -1,0 +1,3 @@
+//@version=6
+indicator("authority", overlay=true)
+plot(series=close, title="Authority", color=#123456, linewidth=2, style=plot.style_line, trackprice=true, histbase=2, offset=2, join=true, editable=false, show_last=2, display=display.all, format=7, precision=2, force_overlay=true, linestyle=plot.linestyle_dashed)

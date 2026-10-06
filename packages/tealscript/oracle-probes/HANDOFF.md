@@ -242,3 +242,7 @@ In `~/cs/docs/tealscript-parity-archive/`:
 - `ledger/` — the parity denominator, per surface, with an oracle status per item
 - `ta-verify/` — `ta.*` family verification against published formulas and non-JS
   independent libraries
+
+## Then round v35 — color and plot type boundaries v1
+
+Capture the 15 indicator-only scripts in [v35/bundle-manifest-v1.json](v35/bundle-manifest-v1.json) order, following [HANDOFF-v35-v1.md](v35/HANDOFF-v35-v1.md) and the per-script instructions. Fourteen exact substitutions discriminate documented type admission; one missing-gradient-endpoint probe preserves the original call and exports color channels/NA flags. Native outcomes are unspecified: retain exact first diagnostics, third outcomes, raw CSV and screenshots without repairing sources. Return to `v35/captures/v35/RESPONSE-v35.md`. Verify `v35/SHA256SUMS` before capture.

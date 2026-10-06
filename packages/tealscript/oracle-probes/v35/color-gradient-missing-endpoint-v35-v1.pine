@@ -1,0 +1,10 @@
+//@version=6
+indicator("authority", overlay=true)
+plot(close,color=color.from_gradient(5,0,10,na,#FF0000))
+observed = color.from_gradient(5, 0, 10, na, #FF0000)
+plot(color.r(observed), "RESULT_R")
+plot(color.g(observed), "RESULT_G")
+plot(color.b(observed), "RESULT_B")
+plot(color.t(observed), "RESULT_T")
+plot(na(observed) ? 1 : 0, "RESULT_NA")
+plot(bar_index, "PINE_INDEX")
