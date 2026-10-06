@@ -1,0 +1,11 @@
+# TradingView v50 tostring qualifier capture handoff v1
+
+Round v50 has nine independent sources in bundle-manifest-v1.json: int, float, bool and string, each with const and input arguments, plus a const local-enum control. Each calls str.tostring with one argument and sends its result directly to plot's const string title consumer. Source bytes are preserved from the allocated PROBE-REQUEST-v1; indicator titles retain their original wording. Native phase, qualified types and values are UNSPECIFIED.
+
+Capture the enum control first, then the eight primitive consumers in manifest order, each separately. Use BINANCE:BTCUSDT, 2-minute standard candles, regular session, Etc/UTC, at least 32 closed bars, no Bar Replay, and unchanged inputs. Record exchange timezone, build/account and actual SOURCE_INDEX origin/cutoff/count. Verify SHA256SUMS from this directory before capture and use each exact instruction path.
+
+For every refusal, retain the full earliest qualified diagnostic, actual and required types, code/location and screenshot. Distinguish a refusal at str.tostring from one at plot(title=result). Do not repair a source or insert a wrapper, cast or explicit const declaration around result. A title-site refusal establishes a stronger-than-const result only if the diagnostic identifies that cause; exact input/simple/series classification requires its actual qualified-type text. A RUNS observation establishes compatibility with the const ceiling for this source, not a general overload or qualifier rule.
+
+For RUNS, export raw time/OHLCV, both plot columns, the actual dynamic title and historical SOURCE_INDEX 0..15, retaining full exports. Capture plot-title and input/settings screenshots, keep live rows separate and retain earliest runtime errors. These sources intentionally emit no TARGET log; do not add logging. Numeric close plots alone cannot establish string contents or qualifiers.
+
+Return source-hash-bound CSV and screenshots under v50/captures/v50/ and list attempts in RESPONSE-v50.md. Each attempt names the manifest ID, original source hash and native compile/runtime phase. The local parser/semantic preflight is an instrument check only; it supplies no TradingView result.

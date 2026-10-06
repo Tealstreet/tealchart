@@ -1,0 +1,323 @@
+{
+  "schemaVersion": 1,
+  "bundle": "v50",
+  "version": 1,
+  "owner": "codex-g6qooy",
+  "scripts": [
+    {
+      "probe": "tostring-onearg-int-const-title-v50-v1.pine",
+      "path": "tostring-onearg-int-const-title-v50-v1.pine",
+      "owner": "codex-g6qooy",
+      "facetIds": [
+        "str.tostring.scalar-result-qualifier-floor",
+        "int",
+        "const",
+        "const-title"
+      ],
+      "sourceSha256": "9308fbd4747fb859f762f3280d011fd22c7f24d0e95d66ad147db223b5b5148e",
+      "instructionsPath": "instructions/tostring-onearg-int-const-title-v50-v1-instructions-v1.md",
+      "instructionsSha256": "6e484d17049cdb355fe03d65212f7ea243f0bce8feba683c9725e69a27dbc7a0",
+      "questions": [
+        "Does one-argument str.tostring with a const int argument satisfy the const string title consumer, and what exact qualified type does native report if it refuses?"
+      ],
+      "powerLimit": "RUNS establishes compatibility with the const string title consumer for this exact argument. A title-site diagnostic naming the actual qualified type distinguishes const/input/simple/series; a generic refusal or a failure at str.tostring itself does not establish the result qualifier. This source does not distinguish stronger qualifiers without that diagnostic.",
+      "columns": [
+        "<dynamic result title UNOBSERVED>",
+        "SOURCE_INDEX"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "tostring-onearg-int-input-title-v50-v1.pine",
+      "path": "tostring-onearg-int-input-title-v50-v1.pine",
+      "owner": "codex-g6qooy",
+      "facetIds": [
+        "str.tostring.scalar-result-qualifier-floor",
+        "int",
+        "input",
+        "const-title"
+      ],
+      "sourceSha256": "1c9332a9a9196bb977961be40bc0bb98dada991cae571a85c4b4ca19cff08281",
+      "instructionsPath": "instructions/tostring-onearg-int-input-title-v50-v1-instructions-v1.md",
+      "instructionsSha256": "1f88404fb6faec34a06069afe54dc71de342061f6aa9cb00ba2036b883c0f41f",
+      "questions": [
+        "Does one-argument str.tostring with a input int argument satisfy the const string title consumer, and what exact qualified type does native report if it refuses?"
+      ],
+      "powerLimit": "RUNS establishes compatibility with the const string title consumer for this exact argument. A title-site diagnostic naming the actual qualified type distinguishes const/input/simple/series; a generic refusal or a failure at str.tostring itself does not establish the result qualifier. This source does not distinguish stronger qualifiers without that diagnostic.",
+      "columns": [
+        "<dynamic result title UNOBSERVED>",
+        "SOURCE_INDEX"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "tostring-onearg-float-const-title-v50-v1.pine",
+      "path": "tostring-onearg-float-const-title-v50-v1.pine",
+      "owner": "codex-g6qooy",
+      "facetIds": [
+        "str.tostring.scalar-result-qualifier-floor",
+        "float",
+        "const",
+        "const-title"
+      ],
+      "sourceSha256": "079d7aa7ecb49e3be16f076b9a460437cc49cd9eeea3505144a8b7582c55c9de",
+      "instructionsPath": "instructions/tostring-onearg-float-const-title-v50-v1-instructions-v1.md",
+      "instructionsSha256": "86beefdba1f426b088c63ed096cebe4c1f8f0fcea06ffc6ccb59149d99f87798",
+      "questions": [
+        "Does one-argument str.tostring with a const float argument satisfy the const string title consumer, and what exact qualified type does native report if it refuses?"
+      ],
+      "powerLimit": "RUNS establishes compatibility with the const string title consumer for this exact argument. A title-site diagnostic naming the actual qualified type distinguishes const/input/simple/series; a generic refusal or a failure at str.tostring itself does not establish the result qualifier. This source does not distinguish stronger qualifiers without that diagnostic.",
+      "columns": [
+        "<dynamic result title UNOBSERVED>",
+        "SOURCE_INDEX"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "tostring-onearg-float-input-title-v50-v1.pine",
+      "path": "tostring-onearg-float-input-title-v50-v1.pine",
+      "owner": "codex-g6qooy",
+      "facetIds": [
+        "str.tostring.scalar-result-qualifier-floor",
+        "float",
+        "input",
+        "const-title"
+      ],
+      "sourceSha256": "05de8d854a6fc6c2a860cd8d164a6d38aa2b6efe94e77f49f9ac5f25517050f1",
+      "instructionsPath": "instructions/tostring-onearg-float-input-title-v50-v1-instructions-v1.md",
+      "instructionsSha256": "d9b1503f725fe3c98bd94920532aaa4583d0adc36500930a527fc4dca6330674",
+      "questions": [
+        "Does one-argument str.tostring with a input float argument satisfy the const string title consumer, and what exact qualified type does native report if it refuses?"
+      ],
+      "powerLimit": "RUNS establishes compatibility with the const string title consumer for this exact argument. A title-site diagnostic naming the actual qualified type distinguishes const/input/simple/series; a generic refusal or a failure at str.tostring itself does not establish the result qualifier. This source does not distinguish stronger qualifiers without that diagnostic.",
+      "columns": [
+        "<dynamic result title UNOBSERVED>",
+        "SOURCE_INDEX"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "tostring-onearg-bool-const-title-v50-v1.pine",
+      "path": "tostring-onearg-bool-const-title-v50-v1.pine",
+      "owner": "codex-g6qooy",
+      "facetIds": [
+        "str.tostring.scalar-result-qualifier-floor",
+        "bool",
+        "const",
+        "const-title"
+      ],
+      "sourceSha256": "1a51127e345428c1e5d3ebdac69db71299404cbc9d177a89f9750334a18a3dcd",
+      "instructionsPath": "instructions/tostring-onearg-bool-const-title-v50-v1-instructions-v1.md",
+      "instructionsSha256": "f03c3cb4d8d2614e5c0ea28294f367923f50f72d075b35ea7f7943847d6feddb",
+      "questions": [
+        "Does one-argument str.tostring with a const bool argument satisfy the const string title consumer, and what exact qualified type does native report if it refuses?"
+      ],
+      "powerLimit": "RUNS establishes compatibility with the const string title consumer for this exact argument. A title-site diagnostic naming the actual qualified type distinguishes const/input/simple/series; a generic refusal or a failure at str.tostring itself does not establish the result qualifier. This source does not distinguish stronger qualifiers without that diagnostic.",
+      "columns": [
+        "<dynamic result title UNOBSERVED>",
+        "SOURCE_INDEX"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "tostring-onearg-bool-input-title-v50-v1.pine",
+      "path": "tostring-onearg-bool-input-title-v50-v1.pine",
+      "owner": "codex-g6qooy",
+      "facetIds": [
+        "str.tostring.scalar-result-qualifier-floor",
+        "bool",
+        "input",
+        "const-title"
+      ],
+      "sourceSha256": "ed1f237923169d2cdbfdd93b11bd3360dc57e77d167063f9c03e2a75264cacc3",
+      "instructionsPath": "instructions/tostring-onearg-bool-input-title-v50-v1-instructions-v1.md",
+      "instructionsSha256": "fdc10adea15930acb74bddd3abfecc3eb31dd682c1bb808918ac11c5660b7e2f",
+      "questions": [
+        "Does one-argument str.tostring with a input bool argument satisfy the const string title consumer, and what exact qualified type does native report if it refuses?"
+      ],
+      "powerLimit": "RUNS establishes compatibility with the const string title consumer for this exact argument. A title-site diagnostic naming the actual qualified type distinguishes const/input/simple/series; a generic refusal or a failure at str.tostring itself does not establish the result qualifier. This source does not distinguish stronger qualifiers without that diagnostic.",
+      "columns": [
+        "<dynamic result title UNOBSERVED>",
+        "SOURCE_INDEX"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "tostring-onearg-string-const-title-v50-v1.pine",
+      "path": "tostring-onearg-string-const-title-v50-v1.pine",
+      "owner": "codex-g6qooy",
+      "facetIds": [
+        "str.tostring.scalar-result-qualifier-floor",
+        "string",
+        "const",
+        "const-title"
+      ],
+      "sourceSha256": "94a71e3348334cde3da4b4a5bdc61dfbcc54304f22a0d4ac0ef9bb5d9cd8a1f0",
+      "instructionsPath": "instructions/tostring-onearg-string-const-title-v50-v1-instructions-v1.md",
+      "instructionsSha256": "ef46dd4ff767f1a93a468b558c49e79ae0215d5fe7cce839e991e662bd1feb06",
+      "questions": [
+        "Does one-argument str.tostring with a const string argument satisfy the const string title consumer, and what exact qualified type does native report if it refuses?"
+      ],
+      "powerLimit": "RUNS establishes compatibility with the const string title consumer for this exact argument. A title-site diagnostic naming the actual qualified type distinguishes const/input/simple/series; a generic refusal or a failure at str.tostring itself does not establish the result qualifier. This source does not distinguish stronger qualifiers without that diagnostic.",
+      "columns": [
+        "<dynamic result title UNOBSERVED>",
+        "SOURCE_INDEX"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "tostring-onearg-string-input-title-v50-v1.pine",
+      "path": "tostring-onearg-string-input-title-v50-v1.pine",
+      "owner": "codex-g6qooy",
+      "facetIds": [
+        "str.tostring.scalar-result-qualifier-floor",
+        "string",
+        "input",
+        "const-title"
+      ],
+      "sourceSha256": "93e9d65d32504414dfef17e771eaa648bde5c6d96e0d28cd1b3e9c96c5951c34",
+      "instructionsPath": "instructions/tostring-onearg-string-input-title-v50-v1-instructions-v1.md",
+      "instructionsSha256": "43a8bb587501a2a2cf45b752d4fa2c8031c3439ba50395dab3473b2051f4808f",
+      "questions": [
+        "Does one-argument str.tostring with a input string argument satisfy the const string title consumer, and what exact qualified type does native report if it refuses?"
+      ],
+      "powerLimit": "RUNS establishes compatibility with the const string title consumer for this exact argument. A title-site diagnostic naming the actual qualified type distinguishes const/input/simple/series; a generic refusal or a failure at str.tostring itself does not establish the result qualifier. This source does not distinguish stronger qualifiers without that diagnostic.",
+      "columns": [
+        "<dynamic result title UNOBSERVED>",
+        "SOURCE_INDEX"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "tostring-onearg-enum-const-title-v50-v1.pine",
+      "path": "tostring-onearg-enum-const-title-v50-v1.pine",
+      "owner": "codex-g6qooy",
+      "facetIds": [
+        "str.tostring.scalar-result-qualifier-floor",
+        "enum",
+        "const",
+        "const-title"
+      ],
+      "sourceSha256": "55f5daf03799eb3d21333915ccc54e97a5eeaa3b00ea8f1b476cd789ab891938",
+      "instructionsPath": "instructions/tostring-onearg-enum-const-title-v50-v1-instructions-v1.md",
+      "instructionsSha256": "3b57017d36ab4c69958c7ae3d89acb5238082141462fe86b13a8fce84d1c1596",
+      "questions": [
+        "Does one-argument str.tostring with a const enum argument satisfy the const string title consumer, and what exact qualified type does native report if it refuses?"
+      ],
+      "powerLimit": "RUNS establishes compatibility with the const string title consumer for this exact argument. A title-site diagnostic naming the actual qualified type distinguishes const/input/simple/series; a generic refusal or a failure at str.tostring itself does not establish the result qualifier. This source does not distinguish stronger qualifiers without that diagnostic.",
+      "columns": [
+        "<dynamic result title UNOBSERVED>",
+        "SOURCE_INDEX"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "reusedSource": false
+    }
+  ]
+}

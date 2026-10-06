@@ -1,0 +1,6 @@
+//@version=6
+indicator("Tostring int const title")
+const int value = 3
+result = str.tostring(value)
+plot(close, title=result)
+plot(bar_index, "SOURCE_INDEX")

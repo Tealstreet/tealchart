@@ -1,0 +1,7 @@
+//@version=6
+indicator("Tostring const enum title control")
+enum Direction
+    up = "UP"
+result = str.tostring(Direction.up)
+plot(close, title=result)
+plot(bar_index, "SOURCE_INDEX")

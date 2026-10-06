@@ -298,3 +298,7 @@ Capture the two independent indicators in [v48/bundle-manifest-v1.json](v48/bund
 ## Then round v49 — native-held scalar and predicate qualifiers v2
 
 Capture the 29 isolated entries in [v49/bundle-manifest-v2.json](v49/bundle-manifest-v2.json), following [HANDOFF-v49-v2.md](v49/HANDOFF-v49-v2.md) and each per-source v49 instruction. Twenty-four new sources add independent active/simple consumers and controls; five reuse exact v42 title/simple/width sources. They discriminate str.match and str.format_time floors, input str.length/pos results and input contains/startswith/endswith results. Native outcomes are UNSPECIFIED: retain full actual/required qualified diagnostics, raw CSV/text and unchanged defaults. Verify v49/SHA256SUMS and return source-bound attempts to v49/captures/v49/RESPONSE-v49.md.
+
+## Then round v50 — one-argument tostring primitive and enum qualifiers v1
+
+Capture the nine isolated consumers in [v50/bundle-manifest-v1.json](v50/bundle-manifest-v1.json), following [HANDOFF-v50-v1.md](v50/HANDOFF-v50-v1.md) and each per-source instruction. Capture the const-enum control first; eight primitive const/input consumers then distinguish the one-argument str.tostring title boundary. Native outcomes are UNSPECIFIED. Preserve complete actual/required qualified diagnostics, exact dynamic titles, CSV/SOURCE_INDEX and unchanged defaults without repairing refusals. Verify v50/SHA256SUMS and return source-bound attempts to v50/captures/v50/RESPONSE-v50.md.
