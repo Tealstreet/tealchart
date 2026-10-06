@@ -116,6 +116,8 @@ Agent exchange: [capture response v1](RESPONSE-v1.md). The next reply belongs in
 
 > **Then round v36.** Capture [v36/HANDOFF-v36-v1.md](v36/HANDOFF-v36-v1.md) — 7 isolated ta-b admission scripts; per-script steps in `v36/instructions/` and source hashes in `v36/SHA256SUMS`. Reply at `v36/captures/v36/RESPONSE-v36.md`. Native outcomes remain unobserved.
 
+> **Then round v37.** Capture [v37/HANDOFF-v37-v1.md](v37/HANDOFF-v37-v1.md) — 6 isolated array admission scripts: series sort_field and bool join, namespace/receiver forms and positive controls. Per-script steps in `v37/instructions/`; hashes in `v37/SHA256SUMS`. Reply at `v37/captures/v37/RESPONSE-v37.md`. Native outcomes remain unobserved.
+
 ## What these are
 
 Nine Pine v6 indicator scripts, **60 plots each**, written to extract **TradingView's

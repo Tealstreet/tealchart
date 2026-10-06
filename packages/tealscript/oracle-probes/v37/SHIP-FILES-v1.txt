@@ -1,0 +1,16 @@
+HANDOFF-v37-v1.md
+SHA256SUMS
+SHIP-FILES-v1.txt
+array-bool-join-control-v37-v1.pine
+array-bool-join-method-v37-v1.pine
+array-bool-join-namespace-v37-v1.pine
+array-sort-indices-control-v37-v1.pine
+array-sort-indices-method-v37-v1.pine
+array-sort-indices-namespace-v37-v1.pine
+bundle-manifest-v2.json
+instructions/array-bool-join-control-v37-v1-instructions-v1.md
+instructions/array-bool-join-method-v37-v1-instructions-v1.md
+instructions/array-bool-join-namespace-v37-v1-instructions-v1.md
+instructions/array-sort-indices-control-v37-v1-instructions-v1.md
+instructions/array-sort-indices-method-v37-v1-instructions-v1.md
+instructions/array-sort-indices-namespace-v37-v1-instructions-v1.md

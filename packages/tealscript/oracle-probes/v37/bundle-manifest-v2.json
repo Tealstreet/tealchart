@@ -1,0 +1,222 @@
+{
+  "schemaVersion": 1,
+  "bundle": "v37",
+  "version": 2,
+  "status": "SHIP-READY-BOUNDED",
+  "frozen": true,
+  "scripts": [
+    {
+      "probe": "array-sort-indices-namespace-v37-v1.pine",
+      "path": "array-sort-indices-namespace-v37-v1.pine",
+      "owner": "codex-v7y3ux",
+      "sourceSha256": "e87bd357beb40f2fb17aa04d569d2f52e01ea5678dd14079fb53b07fac893893",
+      "instructionsPath": "instructions/array-sort-indices-namespace-v37-v1-instructions-v1.md",
+      "instructionsSha256": "21d07675e1ce30b8aaa4b0681ff09e1f1702426707a939bf0397e5e2ebc53ab4",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "componentIds": [
+        "array.sort_indices"
+      ],
+      "questions": [
+        "Does this isolated call admit a series int sort_field, refuse its qualifier, retain its first value, or produce another result?"
+      ],
+      "columns": [
+        "INDEX",
+        "FIELD",
+        "FIRST_INDEX",
+        "SECOND_INDEX"
+      ],
+      "captureMode": "SYNTHETIC-EXPLICIT-INPUT",
+      "nativeStatus": "UNOBSERVED",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 128
+      },
+      "powerLimit": "Source-bound admission and explicit fixture only; preserve third outcomes."
+    },
+    {
+      "probe": "array-sort-indices-method-v37-v1.pine",
+      "path": "array-sort-indices-method-v37-v1.pine",
+      "owner": "codex-v7y3ux",
+      "sourceSha256": "ff20174a9675f04001800bda27fda39c39931c150617350e310df45cf16d134c",
+      "instructionsPath": "instructions/array-sort-indices-method-v37-v1-instructions-v1.md",
+      "instructionsSha256": "ce465b3fe3d9d86907266f380515197e6c8618d12df82b5ef52cffe330cc951e",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "componentIds": [
+        "array.sort_indices"
+      ],
+      "questions": [
+        "Does this isolated call admit a series int sort_field, refuse its qualifier, retain its first value, or produce another result?"
+      ],
+      "columns": [
+        "INDEX",
+        "FIELD",
+        "FIRST_INDEX",
+        "SECOND_INDEX"
+      ],
+      "captureMode": "SYNTHETIC-EXPLICIT-INPUT",
+      "nativeStatus": "UNOBSERVED",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 128
+      },
+      "powerLimit": "Source-bound admission and explicit fixture only; preserve third outcomes."
+    },
+    {
+      "probe": "array-sort-indices-control-v37-v1.pine",
+      "path": "array-sort-indices-control-v37-v1.pine",
+      "owner": "codex-v7y3ux",
+      "sourceSha256": "e6e901dbefb2912a242c8134a3c415d6375bce47a1bb6f22406770acbce369c2",
+      "instructionsPath": "instructions/array-sort-indices-control-v37-v1-instructions-v1.md",
+      "instructionsSha256": "547084f24c16357541f88f3602d9fa6b8530527383ea60479c313381fdbead07",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "componentIds": [
+        "array.sort_indices"
+      ],
+      "questions": [
+        "Does the equivalent const-int sort_field control compile and return indices [1,0]?"
+      ],
+      "columns": [
+        "INDEX",
+        "FIELD",
+        "FIRST_INDEX",
+        "SECOND_INDEX"
+      ],
+      "captureMode": "SYNTHETIC-EXPLICIT-INPUT",
+      "nativeStatus": "UNOBSERVED",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 128
+      },
+      "powerLimit": "Source-bound admission and explicit fixture only; preserve third outcomes."
+    },
+    {
+      "probe": "array-bool-join-namespace-v37-v1.pine",
+      "path": "array-bool-join-namespace-v37-v1.pine",
+      "owner": "codex-v7y3ux",
+      "sourceSha256": "ab824b0a6da6516d06cc66a6cd462a32ade83edab6025359b53388c22c678aa1",
+      "instructionsPath": "instructions/array-bool-join-namespace-v37-v1-instructions-v1.md",
+      "instructionsSha256": "492bfe99ca502a4b5f215a504ec02b8da86ed4e7b56835a917ac2833eeb6a0a1",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "componentIds": [
+        "array.join"
+      ],
+      "questions": [
+        "Does array<bool> join compile, refuse the element type, or run with another string conversion?"
+      ],
+      "columns": [
+        "INDEX",
+        "TEXT_LENGTH",
+        "MATCH_LITERAL"
+      ],
+      "captureMode": "SYNTHETIC-EXPLICIT-INPUT",
+      "nativeStatus": "UNOBSERVED",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 128
+      },
+      "powerLimit": "Source-bound admission and explicit fixture only; preserve third outcomes."
+    },
+    {
+      "probe": "array-bool-join-method-v37-v1.pine",
+      "path": "array-bool-join-method-v37-v1.pine",
+      "owner": "codex-v7y3ux",
+      "sourceSha256": "1d3c4d8eab6a52ca0f019115eb6c7424c3011ab782b452f8327ffd6668af8c9d",
+      "instructionsPath": "instructions/array-bool-join-method-v37-v1-instructions-v1.md",
+      "instructionsSha256": "69adc456b5ede68227b13762b3f80ca44d6ea98df31667a88f615ccf0ad2f743",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "componentIds": [
+        "array.join"
+      ],
+      "questions": [
+        "Does array<bool> join compile, refuse the element type, or run with another string conversion?"
+      ],
+      "columns": [
+        "INDEX",
+        "TEXT_LENGTH",
+        "MATCH_LITERAL"
+      ],
+      "captureMode": "SYNTHETIC-EXPLICIT-INPUT",
+      "nativeStatus": "UNOBSERVED",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 128
+      },
+      "powerLimit": "Source-bound admission and explicit fixture only; preserve third outcomes."
+    },
+    {
+      "probe": "array-bool-join-control-v37-v1.pine",
+      "path": "array-bool-join-control-v37-v1.pine",
+      "owner": "codex-v7y3ux",
+      "sourceSha256": "d80298395c53112ee3403683838331e903a56be1569fef7fd966daa052bc5d7b",
+      "instructionsPath": "instructions/array-bool-join-control-v37-v1-instructions-v1.md",
+      "instructionsSha256": "51e90a55f1e7453eb3bf1597415514f5277130fdd90167b695f8822e6612d829",
+      "pineVersion": 6,
+      "indicatorOnly": true,
+      "componentIds": [
+        "array.join"
+      ],
+      "questions": [
+        "Does the array<string> join positive control compile and preserve true|false|true?"
+      ],
+      "columns": [
+        "INDEX",
+        "TEXT_LENGTH",
+        "MATCH_LITERAL"
+      ],
+      "captureMode": "SYNTHETIC-EXPLICIT-INPUT",
+      "nativeStatus": "UNOBSERVED",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 128
+      },
+      "powerLimit": "Source-bound admission and explicit fixture only; preserve third outcomes."
+    }
+  ]
+}
