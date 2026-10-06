@@ -1,0 +1,22 @@
+//@version=6
+indicator("Missing matrix predicate channels", precision=0, calc_bars_count=32)
+m = matrix.new<float>(1, 1, na)
+plot(matrix.is_zero(m) ? 1 : 0, "ZERO")
+plot(matrix.is_binary(m) ? 1 : 0, "BINARY")
+plot(matrix.is_identity(m) ? 1 : 0, "IDENTITY")
+plot(matrix.is_symmetric(m) ? 1 : 0, "SYMMETRIC")
+plot(matrix.is_antisymmetric(m) ? 1 : 0, "ANTISYMMETRIC")
+plot(matrix.is_diagonal(m) ? 1 : 0, "DIAGONAL")
+plot(matrix.is_antidiagonal(m) ? 1 : 0, "ANTIDIAGONAL")
+plot(matrix.is_triangular(m) ? 1 : 0, "TRIANGULAR")
+finiteZero = matrix.new<float>(1, 1, 0.0)
+finiteOne = matrix.new<float>(1, 1, 1.0)
+plot(na(m.get(0, 0)) ? 1 : 0, "MISSING_CELL_CONTROL")
+plot(matrix.is_zero(finiteZero) ? 1 : 0, "FINITE_ZERO_CONTROL")
+plot(matrix.is_binary(finiteOne) ? 1 : 0, "FINITE_BINARY_CONTROL")
+plot(matrix.is_identity(finiteOne) ? 1 : 0, "FINITE_IDENTITY_CONTROL")
+var int captureSample = 0
+plot(captureSample, "SAMPLE_INDEX")
+plot(bar_index, "SOURCE_INDEX")
+plot(time, "SOURCE_TIME")
+captureSample += 1

@@ -1,0 +1,34 @@
+//@version=6
+indicator("V56 string no-match discriminator", calc_bars_count=32)
+ifNoMatch = if bar_index < 0
+    "AZ"
+fromFunction() =>
+    if bar_index < 0
+        "AZ"
+functionNoMatch = fromFunction()
+selected = if bar_index >= 0
+    "AZ"
+explicitEmpty = ""
+string declaredMissing = na
+plot(na(ifNoMatch) ? 1 : 0, title="IF_NoMatch_NA")
+plot(ifNoMatch == "" ? 1 : 0, title="IF_NoMatch_EmptyEquality")
+plot(str.length(ifNoMatch), title="IF_NoMatch_Length")
+plot(na(functionNoMatch) ? 1 : 0, title="UDF_IF_NoMatch_NA")
+plot(functionNoMatch == "" ? 1 : 0, title="UDF_IF_NoMatch_EmptyEquality")
+plot(str.length(functionNoMatch), title="UDF_IF_NoMatch_Length")
+plot(na(selected) ? 1 : 0, title="Selected_NA_Control")
+plot(selected == "AZ" ? 1 : 0, title="Selected_AZ_Control")
+plot(str.length(selected), title="Selected_Length_Control")
+plot(na(explicitEmpty) ? 1 : 0, title="Empty_NA_Control")
+plot(explicitEmpty == "" ? 1 : 0, title="Empty_Equality_Control")
+plot(str.length(explicitEmpty), title="Empty_Length_Control")
+plot(na(declaredMissing) ? 1 : 0, title="DeclaredMissing_NA_Control")
+plot(declaredMissing == "" ? 1 : 0, title="DeclaredMissing_EmptyEquality_Control")
+plot(str.length(declaredMissing), title="DeclaredMissing_Length_Control")
+plot(bar_index, title="Bar_Index_Control")
+plot(close, title="Close_Control")
+var int captureSample = 0
+plot(captureSample, "SAMPLE_INDEX")
+plot(bar_index, "SOURCE_INDEX")
+plot(time, "SOURCE_TIME")
+captureSample += 1
