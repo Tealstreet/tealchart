@@ -1,0 +1,22 @@
+//@version=6
+indicator("V44 enum conditional default v1")
+
+enum State
+    Up = "Up"
+    Down = "Down"
+
+State value = if bar_index % 2 == 0
+    State.Up
+State complete = if bar_index % 2 == 0
+    State.Up
+else
+    State.Down
+
+plot(bar_index, "INDEX")
+plot(bar_index % 2, "PHASE_CONTROL")
+plot(na(value) ? 1 : 0, "NO_ELSE_NA")
+plot(value == State.Up ? 1 : 0, "NO_ELSE_EQ_UP")
+plot(value == State.Down ? 1 : 0, "NO_ELSE_EQ_DOWN")
+plot(na(complete) ? 1 : 0, "WITH_ELSE_NA_CONTROL")
+plot(complete == State.Up ? 1 : 0, "WITH_ELSE_EQ_UP_CONTROL")
+plot(complete == State.Down ? 1 : 0, "WITH_ELSE_EQ_DOWN_CONTROL")

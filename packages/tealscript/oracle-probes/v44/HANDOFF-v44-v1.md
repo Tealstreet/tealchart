@@ -1,0 +1,13 @@
+# TradingView v44 capture handoff v1
+
+Capture these seven independent sources in [bundle-manifest-v1.json](bundle-manifest-v1.json) order, following each per-script instruction file. Native outcomes are unspecified. This round asks the two remaining lane-C missing-value questions: math.max NA arguments and enum missing/history/default values. It does not cover every enum operation or a universal numeric storage rule.
+
+The first two sources run separate int and float math.max matrices: all eight three-argument NA masks, both two-argument orders, reverse three-argument order, equal-finite calls, and constant missing-first/last/all-missing calls with negative/zero/positive finite controls. Present float operands are dyadic values so rounding cannot mask the NA distinction. Capture raw results and their explicit NA flags.
+
+The five enum sources isolate explicit missing initialization, unavailable [1]/[2] history, omitted array fills with defined-fill/set controls, no-else conditional defaults, and a defined input.enum default with a changed-selection control. Each source declares its own two-member enum. An early refusal in one source must not mask the others. Do not modify a refused source or infer its outcome from another probe.
+
+Use BINANCE:BTCUSDT, 2-minute standard candles, regular session and Etc/UTC; no Bar Replay. Load at least 16 closed bars and retain Pine INDEX=0..15 when available. Record actual origin/cutoff/count, account/build, timestamp and settings. For the input probe, reset to Down for attempt1, then explicitly select Up for attempt2. Preserve both settings screenshots and separate CSVs.
+
+If RUNS, export public chart CSV with time/OHLCV and all named columns, retaining raw missing cells, numeric representations and hashes. INDEX is Pine bar_index, not CSV ordinal. Missing startup rows are INITIAL-WINDOW-UNAVAILABLE; later complete math-mask cycles can still settle argument behavior. Keep settings/Data Window screenshots. If refused, record exact earliest text, exposed native code, line/column/highlight and first runtime bar/INDEX; all masked facets remain UNOBSERVED. Keep live rows separate and do not impute unavailable history or precision.
+
+From this directory, run `sha256sum -c SHA256SUMS` before capture. Return the source-hash-bound per-script outcomes and artifact paths/hashes in `v44/captures/v44/RESPONSE-v44.md` relative to oracle-probes (local reply path: `captures/v44/RESPONSE-v44.md`). Commit responses so both machines can read them. The checksum file covers every shipped source, instruction, handoff and manifest; it excludes itself and later capture outputs. No captures or native answers ship with this round.

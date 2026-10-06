@@ -1,0 +1,26 @@
+//@version=6
+indicator("V44 enum array default v1")
+
+enum State
+    Up = "Up"
+    Down = "Down"
+
+array<State> defaults = array.new<State>(3)
+array<State> filled = array.new<State>(3, State.Down)
+State first = array.get(defaults, 0)
+State middle = array.get(defaults, 1)
+State last = array.get(defaults, 2)
+array.set(defaults, 1, State.Up)
+
+plot(bar_index, "INDEX")
+plot(array.size(defaults), "SIZE_CONTROL")
+plot(na(first) ? 1 : 0, "DEFAULT_FIRST_NA")
+plot(na(middle) ? 1 : 0, "DEFAULT_MIDDLE_NA")
+plot(na(last) ? 1 : 0, "DEFAULT_LAST_NA")
+plot(first == State.Up ? 1 : 0, "DEFAULT_FIRST_EQ_UP")
+plot(first == State.Down ? 1 : 0, "DEFAULT_FIRST_EQ_DOWN")
+plot(na(array.get(filled, 0)) ? 1 : 0, "FILLED_NA_CONTROL")
+plot(array.get(filled, 0) == State.Down ? 1 : 0, "FILLED_EQ_DOWN_CONTROL")
+plot(array.get(defaults, 1) == State.Up ? 1 : 0, "SET_EQ_UP_CONTROL")
+plot(na(array.get(defaults, 0)) ? 1 : 0, "UNSET_FIRST_NA_CONTROL")
+plot(na(array.get(defaults, 2)) ? 1 : 0, "UNSET_LAST_NA_CONTROL")

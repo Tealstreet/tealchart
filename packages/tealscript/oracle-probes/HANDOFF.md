@@ -277,3 +277,7 @@ Capture the five TA-C discriminators in v43/bundle-manifest-v1.json using v43/HA
 ## Then round v46 — Rising re-adjudication v1
 
 Capture the three independent sources in [v46/bundle-manifest-v1.json](v46/bundle-manifest-v1.json), following [HANDOFF-v46-v1.md](v46/HANDOFF-v46-v1.md) and per-script instructions. Compare native Rising with both explicitly labelled candidate models; neither is an expected outcome. Preserve INDEX/PHASE/source controls, exact diagnostics, all CSV columns and source/capture hashes. Verify v46/SHA256SUMS; return to v46/captures/v46/RESPONSE-v46.md.
+
+## Then round v44 — math.max NA arguments and enum defaults v1
+
+Capture the seven independent scripts in [v44/bundle-manifest-v1.json](v44/bundle-manifest-v1.json) order, following [HANDOFF-v44-v1.md](v44/HANDOFF-v44-v1.md) and each per-script instruction. Two int/float math.max matrices cover all three-argument NA masks and pair/order controls; five enum sources isolate missing initialization, history, array defaults, conditional defaults and input defaults. Native outcomes are unspecified. Preserve raw CSV, NA flags, INDEX=0 startup rows, settings and exact earliest refusals without repairing sources. Verify `v44/SHA256SUMS` and return `v44/captures/v44/RESPONSE-v44.md`.

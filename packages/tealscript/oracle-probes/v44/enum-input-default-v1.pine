@@ -1,0 +1,13 @@
+//@version=6
+indicator("V44 enum input default v1")
+
+enum State
+    Up = "Up"
+    Down = "Down"
+
+State selected = input.enum(State.Down, "STATE")
+
+plot(bar_index, "INDEX")
+plot(na(selected) ? 1 : 0, "SELECTED_NA")
+plot(selected == State.Up ? 1 : 0, "SELECTED_EQ_UP")
+plot(selected == State.Down ? 1 : 0, "SELECTED_EQ_DOWN")

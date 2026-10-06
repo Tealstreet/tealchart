@@ -1,0 +1,20 @@
+//@version=6
+indicator("V44 enum history missing v1")
+
+enum State
+    Up = "Up"
+    Down = "Down"
+
+State value = bar_index % 2 == 0 ? State.Up : State.Down
+State previous = value[1]
+State twoBack = value[2]
+
+plot(bar_index, "INDEX")
+plot(value == State.Up ? 1 : 0, "CURRENT_EQ_UP_CONTROL")
+plot(na(value) ? 1 : 0, "CURRENT_NA_CONTROL")
+plot(na(previous) ? 1 : 0, "PREVIOUS_NA")
+plot(previous == State.Up ? 1 : 0, "PREVIOUS_EQ_UP")
+plot(previous == State.Down ? 1 : 0, "PREVIOUS_EQ_DOWN")
+plot(na(twoBack) ? 1 : 0, "TWO_BACK_NA")
+plot(twoBack == State.Up ? 1 : 0, "TWO_BACK_EQ_UP")
+plot(twoBack == State.Down ? 1 : 0, "TWO_BACK_EQ_DOWN")

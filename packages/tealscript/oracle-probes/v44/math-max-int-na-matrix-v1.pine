@@ -1,0 +1,42 @@
+//@version=6
+indicator("V44 math.max int NA matrix v1", precision = 8)
+
+int mask = bar_index % 8
+int a = mask % 2 == 1 ? na : -8
+int b = mask % 4 >= 2 ? na : -4
+int c = mask >= 4 ? na : -2
+int missing = na
+int ab = math.max(a, b)
+int ba = math.max(b, a)
+int abc = math.max(a, b, c)
+int cba = math.max(c, b, a)
+int missingFirst = math.max(missing, -4)
+int missingLast = math.max(-4, missing)
+int allMissing = math.max(missing, missing)
+
+plot(bar_index, "INDEX")
+plot(mask, "NA_MASK")
+plot(a, "A")
+plot(b, "B")
+plot(c, "C")
+plot(na(a) ? 1 : 0, "A_NA")
+plot(na(b) ? 1 : 0, "B_NA")
+plot(na(c) ? 1 : 0, "C_NA")
+plot(ab, "MAX_AB")
+plot(na(ab) ? 1 : 0, "MAX_AB_NA")
+plot(ba, "MAX_BA")
+plot(na(ba) ? 1 : 0, "MAX_BA_NA")
+plot(abc, "MAX_ABC")
+plot(na(abc) ? 1 : 0, "MAX_ABC_NA")
+plot(cba, "MAX_CBA")
+plot(na(cba) ? 1 : 0, "MAX_CBA_NA")
+plot(missingFirst, "MISSING_FIRST")
+plot(na(missingFirst) ? 1 : 0, "MISSING_FIRST_NA")
+plot(missingLast, "MISSING_LAST")
+plot(na(missingLast) ? 1 : 0, "MISSING_LAST_NA")
+plot(allMissing, "ALL_MISSING")
+plot(na(allMissing) ? 1 : 0, "ALL_MISSING_NA")
+plot(math.max(-8, -8), "EQUAL_FINITE_CONTROL")
+plot(math.max(-8, -4, -2), "NEGATIVE_CONTROL")
+plot(math.max(-8, 0, -2), "ZERO_CONTROL")
+plot(math.max(1, 2, -3), "POSITIVE_CONTROL")
