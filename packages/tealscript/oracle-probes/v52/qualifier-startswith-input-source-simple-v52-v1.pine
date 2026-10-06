@@ -1,0 +1,10 @@
+//@version=6
+indicator("V52 qualifier-startswith-input-source-simple", calc_bars_count=32)
+sourceText = input.string("abXab", "Source")
+patternText = "ab"
+value = str.startswith(source=sourceText, str=patternText)
+consume(simple bool sampleBool) => sampleBool ? 1 : 0
+plot(consume(value), "CONSUMER")
+plot(value ? 1 : 0, "TARGET")
+plot(bar_index, "INDEX")
+plot(close, "CONTROL_CLOSE")

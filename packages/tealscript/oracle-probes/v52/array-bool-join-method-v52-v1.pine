@@ -1,0 +1,9 @@
+//@version=6
+indicator("V52 array-bool-join-method", calc_bars_count=32)
+values = array.from(true, false, true)
+string joined = values.join("|")
+plot(bar_index, "INDEX", display=display.data_window)
+plot(str.length(joined), "TEXT_LENGTH", display=display.data_window)
+plot(joined == "true|false|true" ? 1 : 0, "MATCH_LITERAL", display=display.data_window)
+if barstate.islastconfirmedhistory
+    log.info("JOIN_TEXT={0}", joined)

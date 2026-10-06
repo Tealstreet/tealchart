@@ -306,3 +306,7 @@ Capture the nine isolated consumers in [v50/bundle-manifest-v1.json](v50/bundle-
 ## Then round v51 — input string qualifiers and UDT search comparators v1
 
 Capture the twelve isolated indicators in [v51/bundle-manifest-v1.json](v51/bundle-manifest-v1.json), following [HANDOFF-v51-v1.md](v51/HANDOFF-v51-v1.md) and each literal per-source instruction. Nine input lower/upper/substring/replace consumers require full actual/required qualified title diagnostics; three UDT indexof/lastindexof/includes probes distinguish reference identity from equal field values before and after mutation. Native outcomes are UNSPECIFIED; retain OTHER/refusal outcomes and source bytes unchanged. Verify v51/SHA256SUMS and return source-bound evidence to v51/captures/v51/RESPONSE-v51.md.
+
+## Then round v52 — consolidated native-pending register rows v1
+
+Capture the 73 isolated indicators in [v52/bundle-manifest-v1.json](v52/bundle-manifest-v1.json), following [HANDOFF-v52-v1.md](v52/HANDOFF-v52-v1.md) and each literal instruction path. They cover 34 distinct rows: all 26 open v21 rows plus eight supplementary native holds. Each source targets one row; refusal-prone union kinds and qualifier consumers remain isolated. Native phase/values are UNSPECIFIED, and TA entries establish only parameter admission. Retain exact qualified diagnostics, raw text/CSV/screenshots and context; observe 32 closed bars. Verify v52/SHA256SUMS and return v52/captures/v52/RESPONSE-v52.md.

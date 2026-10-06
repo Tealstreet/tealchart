@@ -1,0 +1,9 @@
+//@version=6
+indicator("V52 qualifier-pos-input-simple", calc_bars_count=32)
+sourceText = input.string("abc", "Source")
+value = str.pos(source=sourceText, str="b")
+consume(simple int sampleNumber) => sampleNumber
+plot(consume(value), "CONSUMER")
+plot(value, "TARGET")
+plot(bar_index, "INDEX")
+plot(close, "CONTROL_CLOSE")

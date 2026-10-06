@@ -1,0 +1,9 @@
+//@version=6
+indicator("V52 kc-series-mult", calc_bars_count=32)
+candidateArgument = (bar_index % 4) + 1
+[middle, upper, lower] = ta.kc(series=close, length=3, mult=candidateArgument, useTrueRange=true)
+plot(middle, "MIDDLE")
+plot(upper, "UPPER")
+plot(lower, "LOWER")
+plot(candidateArgument, "ARGUMENT")
+plot(bar_index, "SOURCE_INDEX")

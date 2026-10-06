@@ -1,0 +1,6 @@
+//@version=6
+indicator("V52 kcw-series-mult", calc_bars_count=32)
+candidateArgument = (bar_index % 4) + 1
+plot(ta.kcw(series=close, length=3, mult=candidateArgument, useTrueRange=true), "RESULT")
+plot(candidateArgument, "ARGUMENT")
+plot(bar_index, "SOURCE_INDEX")

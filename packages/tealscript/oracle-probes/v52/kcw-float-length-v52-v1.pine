@@ -1,0 +1,4 @@
+//@version=6
+indicator("V52 kcw-float-length", calc_bars_count=32)
+plot(ta.kcw(close, 3.0, 2.0), "RESULT")
+plot(bar_index, "SOURCE_INDEX")

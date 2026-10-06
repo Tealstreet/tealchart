@@ -1,0 +1,6 @@
+//@version=6
+indicator("V52 qualifier-format-time-const-simple", calc_bars_count=32)
+consume(simple string sampleText) => str.length(sampleText)
+value = str.format_time(0, "yyyy", "UTC")
+plot(consume(value), "VALUE")
+plot(bar_index, "SOURCE_INDEX")

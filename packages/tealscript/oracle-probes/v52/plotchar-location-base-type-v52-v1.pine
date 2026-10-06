@@ -1,0 +1,4 @@
+//@version=6
+indicator("V52 plotchar-location-base-type", overlay=true, calc_bars_count=32)
+plotchar(series=true, location=7, title="CANDIDATE")
+plot(bar_index, "SOURCE_INDEX", display=display.data_window)

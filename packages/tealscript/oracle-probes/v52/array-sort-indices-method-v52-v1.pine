@@ -1,0 +1,12 @@
+//@version=6
+indicator("V52 array-sort-indices-method", calc_bars_count=32)
+type Point
+    int key0
+    int key1
+values = array.from(Point.new(2, 10), Point.new(1, 20))
+int fieldIndex = bar_index % 2
+indices = values.sort_indices(sort_field=fieldIndex)
+plot(bar_index, "INDEX", display=display.data_window)
+plot(fieldIndex, "FIELD", display=display.data_window)
+plot(array.get(indices, 0), "FIRST_INDEX", display=display.data_window)
+plot(array.get(indices, 1), "SECOND_INDEX", display=display.data_window)

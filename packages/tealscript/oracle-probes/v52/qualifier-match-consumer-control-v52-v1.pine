@@ -1,0 +1,8 @@
+//@version=6
+indicator("V52 match consumer control", calc_bars_count=32)
+inputText = input.string("ab", "Source")
+enabled = input.bool(true, "Active input control", active=inputText == "ab")
+simpleConsumer(simple string value) => str.length(value)
+plot(simpleConsumer(inputText), "SIMPLE_INPUT_LENGTH")
+plot(enabled ? 1 : 0, "ACTIVE_INPUT_CONTROL")
+plot(bar_index, "SOURCE_INDEX")

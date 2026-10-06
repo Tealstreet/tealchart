@@ -1,0 +1,4 @@
+//@version=6
+indicator("V52 falling-float-length", calc_bars_count=32)
+plot(ta.falling(close, 3.0) ? 1 : 0, "RESULT")
+plot(bar_index, "SOURCE_INDEX")

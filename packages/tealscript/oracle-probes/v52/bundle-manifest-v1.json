@@ -1,0 +1,3193 @@
+{
+  "schemaVersion": 1,
+  "bundle": "v52",
+  "version": 1,
+  "owner": "codex-3rye5w",
+  "inventory": {
+    "register": "DEFECT_REGISTER_v21.json",
+    "registerSha256": "7cad996c2226c5c8063ab7f1496ae58bdc35bc543dd5c37b76c6305c3e2f03d4",
+    "base": "e17077a8fa40ea0084cc0e3a7fba4fa02f37b33c",
+    "openRows": 26,
+    "nativeQueueRows": 34,
+    "overlappingRows": 26,
+    "distinctRows": 34,
+    "scope": "Union of 26 open rows and the 34-row native queue; open rows are wholly contained in that queue."
+  },
+  "scripts": [
+    {
+      "probe": "array-bool-join-control-v52-v1.pine",
+      "path": "array-bool-join-control-v52-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "array.join.params[0].id.type"
+      ],
+      "registerRowId": "array.join.params[0].id.type",
+      "sourceSha256": "33499cdad9186492f504486b05d41d25c694ce9fe22d677600dc60f2b8f293bc",
+      "instructionsPath": "instructions/array-bool-join-control-v52-v1-instructions-v1.md",
+      "instructionsSha256": "36eafe7369113c8f12848387c80a8b473788ad3dab601602ba09960c3f46a47b",
+      "questions": [
+        "Does the array<string> join positive control compile and preserve true|false|true?"
+      ],
+      "powerLimit": "Source-bound admission and explicit fixture only; preserve third outcomes.",
+      "columns": [
+        "INDEX",
+        "TEXT_LENGTH",
+        "MATCH_LITERAL"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false,
+      "priorInstrument": {
+        "path": "v37/array-bool-join-control-v37-v1.pine",
+        "sha256": "d80298395c53112ee3403683838331e903a56be1569fef7fd966daa052bc5d7b",
+        "changes": "Indicator title and explicit calc_bars_count=32 only; disputed call, controls and observers unchanged."
+      }
+    },
+    {
+      "probe": "array-bool-join-namespace-v52-v1.pine",
+      "path": "array-bool-join-namespace-v52-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "array.join.params[0].id.type"
+      ],
+      "registerRowId": "array.join.params[0].id.type",
+      "sourceSha256": "fedf0a035377c5fa187804983796e522812d4150972eb957734877e866686fd6",
+      "instructionsPath": "instructions/array-bool-join-namespace-v52-v1-instructions-v1.md",
+      "instructionsSha256": "0ffe893f9ac43547badda3c1538d82a2b3249bd01dd425b213fd4a276d8322b3",
+      "questions": [
+        "Does array<bool> join compile, refuse the element type, or run with another string conversion?"
+      ],
+      "powerLimit": "Source-bound admission and explicit fixture only; preserve third outcomes.",
+      "columns": [
+        "INDEX",
+        "TEXT_LENGTH",
+        "MATCH_LITERAL"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false,
+      "priorInstrument": {
+        "path": "v37/array-bool-join-namespace-v37-v1.pine",
+        "sha256": "ab824b0a6da6516d06cc66a6cd462a32ade83edab6025359b53388c22c678aa1",
+        "changes": "Indicator title and explicit calc_bars_count=32 only; disputed call, controls and observers unchanged."
+      }
+    },
+    {
+      "probe": "array-bool-join-method-v52-v1.pine",
+      "path": "array-bool-join-method-v52-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "array.join.params[0].id.type"
+      ],
+      "registerRowId": "array.join.params[0].id.type",
+      "sourceSha256": "49ee9899fcc524b1f47b1e73700a87e112906b4c39ffceaab63f8ea90d136fe3",
+      "instructionsPath": "instructions/array-bool-join-method-v52-v1-instructions-v1.md",
+      "instructionsSha256": "98e10b8cf19366e91386800c916996bea24b4f0464617cbc0b5dc14d783f5b82",
+      "questions": [
+        "Does array<bool> join compile, refuse the element type, or run with another string conversion?"
+      ],
+      "powerLimit": "Source-bound admission and explicit fixture only; preserve third outcomes.",
+      "columns": [
+        "INDEX",
+        "TEXT_LENGTH",
+        "MATCH_LITERAL"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false,
+      "priorInstrument": {
+        "path": "v37/array-bool-join-method-v37-v1.pine",
+        "sha256": "1d3c4d8eab6a52ca0f019115eb6c7424c3011ab782b452f8327ffd6668af8c9d",
+        "changes": "Indicator title and explicit calc_bars_count=32 only; disputed call, controls and observers unchanged."
+      }
+    },
+    {
+      "probe": "array-sort-indices-control-v52-v1.pine",
+      "path": "array-sort-indices-control-v52-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "array.sort_indices.params[2].sort_field.type"
+      ],
+      "registerRowId": "array.sort_indices.params[2].sort_field.type",
+      "sourceSha256": "5302adce03798868880709200fd8bda8e38876415e0a67cb9836c24053378ec7",
+      "instructionsPath": "instructions/array-sort-indices-control-v52-v1-instructions-v1.md",
+      "instructionsSha256": "5e8d5122e6494bb887b7574d97f87aec350a86d9980b59660594c86fa312f92e",
+      "questions": [
+        "Does the equivalent const-int sort_field control compile and return indices [1,0]?"
+      ],
+      "powerLimit": "Source-bound admission and explicit fixture only; preserve third outcomes. A const-field control establishes that this UDT/field form is available; a failure elsewhere leaves the series-field boundary unobserved.",
+      "columns": [
+        "INDEX",
+        "FIELD",
+        "FIRST_INDEX",
+        "SECOND_INDEX"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false,
+      "priorInstrument": {
+        "path": "v37/array-sort-indices-control-v37-v1.pine",
+        "sha256": "e6e901dbefb2912a242c8134a3c415d6375bce47a1bb6f22406770acbce369c2",
+        "changes": "Indicator title and explicit calc_bars_count=32 only; disputed call, controls and observers unchanged."
+      }
+    },
+    {
+      "probe": "array-sort-indices-namespace-v52-v1.pine",
+      "path": "array-sort-indices-namespace-v52-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "array.sort_indices.params[2].sort_field.type"
+      ],
+      "registerRowId": "array.sort_indices.params[2].sort_field.type",
+      "sourceSha256": "3d332b1b8124dd5f51b97f0b4a5122f4d10da5f10aec73c9bbe35866830ce751",
+      "instructionsPath": "instructions/array-sort-indices-namespace-v52-v1-instructions-v1.md",
+      "instructionsSha256": "517dfd172771180716c09c59ce11e9a4b6360c9f811f42533ab6e55dc7f8fbed",
+      "questions": [
+        "Does this isolated call admit a series int sort_field, refuse its qualifier, retain its first value, or produce another result?"
+      ],
+      "powerLimit": "Source-bound admission and explicit fixture only; preserve third outcomes. A const-field control establishes that this UDT/field form is available; a failure elsewhere leaves the series-field boundary unobserved.",
+      "columns": [
+        "INDEX",
+        "FIELD",
+        "FIRST_INDEX",
+        "SECOND_INDEX"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false,
+      "priorInstrument": {
+        "path": "v37/array-sort-indices-namespace-v37-v1.pine",
+        "sha256": "e87bd357beb40f2fb17aa04d569d2f52e01ea5678dd14079fb53b07fac893893",
+        "changes": "Indicator title and explicit calc_bars_count=32 only; disputed call, controls and observers unchanged."
+      }
+    },
+    {
+      "probe": "array-sort-indices-method-v52-v1.pine",
+      "path": "array-sort-indices-method-v52-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "array.sort_indices.params[2].sort_field.type"
+      ],
+      "registerRowId": "array.sort_indices.params[2].sort_field.type",
+      "sourceSha256": "a923180f40b8274e6b0c4db282d11cb178b2db9c0e4e7a3734da9a1300f69bd1",
+      "instructionsPath": "instructions/array-sort-indices-method-v52-v1-instructions-v1.md",
+      "instructionsSha256": "59764f4683f401bf7817d8f363cb8c8a0ccbb070da02a82352857d69fe97e185",
+      "questions": [
+        "Does this isolated call admit a series int sort_field, refuse its qualifier, retain its first value, or produce another result?"
+      ],
+      "powerLimit": "Source-bound admission and explicit fixture only; preserve third outcomes. A const-field control establishes that this UDT/field form is available; a failure elsewhere leaves the series-field boundary unobserved.",
+      "columns": [
+        "INDEX",
+        "FIELD",
+        "FIRST_INDEX",
+        "SECOND_INDEX"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false,
+      "priorInstrument": {
+        "path": "v37/array-sort-indices-method-v37-v1.pine",
+        "sha256": "ff20174a9675f04001800bda27fda39c39931c150617350e310df45cf16d134c",
+        "changes": "Indicator title and explicit calc_bars_count=32 only; disputed call, controls and observers unchanged."
+      }
+    },
+    {
+      "probe": "gradient-missing-lower-endpoint-v52-v1.pine",
+      "path": "gradient-missing-lower-endpoint-v52-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "color.from_gradient.manual-na-endpoint"
+      ],
+      "registerRowId": "color.from_gradient.manual-na-endpoint",
+      "sourceSha256": "41b87743cd52f7a3b7b19a1b7b5d32de03219839fa45e50b0ca29ff2e62ae1fa",
+      "instructionsPath": "instructions/gradient-missing-lower-endpoint-v52-v1-instructions-v1.md",
+      "instructionsSha256": "4f0cccf277e9bdd6a908abd53556205659c4dc2cefaf6646884a4cd2c99881ec",
+      "questions": [
+        "At value 5 within 0..10, does color.from_gradient(5,0,10,na,#FF0000) return missing color or visible red with transparency?"
+      ],
+      "powerLimit": "Observe RESULT_NA and raw R/G/B/T alongside the visible candidate. This is only the missing lower endpoint at this interior value; no rounding or upper-endpoint claim.",
+      "columns": [
+        "<unnamed candidate plot>",
+        "RESULT_R",
+        "RESULT_G",
+        "RESULT_B",
+        "RESULT_T",
+        "RESULT_NA",
+        "PINE_INDEX"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false,
+      "priorInstrument": {
+        "path": "v35/color-gradient-missing-endpoint-v35-v1.pine",
+        "sha256": "375c891ca23223d0eb006547aa53cad0b7047f182e74a8fe161caf65a5343fa2",
+        "changes": "Indicator title and explicit calc_bars_count=32 only; disputed call, controls and observers unchanged."
+      }
+    },
+    {
+      "probe": "plot-format-base-type-v52-v1.pine",
+      "path": "plot-format-base-type-v52-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "plot.parameter-base-type-boundary:format"
+      ],
+      "registerRowId": "plot.parameter-base-type-boundary:format",
+      "sourceSha256": "e08e36ad758acd23ef317e097f4f8ef3103f0b23787ab645ff8930deda424470",
+      "instructionsPath": "instructions/plot-format-base-type-v52-v1-instructions-v1.md",
+      "instructionsSha256": "68f0bd5200d15677fca01ed247429f20915d2a3174eea3775c8b03793fd2879a",
+      "questions": [
+        "Does native admit plot.format with const int 7, or refuse it at that argument?"
+      ],
+      "powerLimit": "Settles only the exact base-type substitution and diagnostic. Admission is not evidence that arbitrary values, qualifiers or other parameters are supported.",
+      "columns": [
+        "CANDIDATE",
+        "SOURCE_INDEX"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "plot-series-base-type-v52-v1.pine",
+      "path": "plot-series-base-type-v52-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "plot.parameter-base-type-boundary:series"
+      ],
+      "registerRowId": "plot.parameter-base-type-boundary:series",
+      "sourceSha256": "bcb818cae35a51c77f0a6a8672eec558761a1c18e9f6ea82f9c23ea8afba88bf",
+      "instructionsPath": "instructions/plot-series-base-type-v52-v1-instructions-v1.md",
+      "instructionsSha256": "34e3b9bdcc2be3336629a2f694cb7c6360e6822e0788acb7627cdd44aad4d38e",
+      "questions": [
+        "Does native admit plot.series with const string bad, or refuse it at that argument?"
+      ],
+      "powerLimit": "Settles only the exact base-type substitution and diagnostic. Admission is not evidence that arbitrary values, qualifiers or other parameters are supported.",
+      "columns": [
+        "CANDIDATE",
+        "SOURCE_INDEX"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "plotarrow-format-base-type-v52-v1.pine",
+      "path": "plotarrow-format-base-type-v52-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "plotarrow.parameter-base-type-boundary:format"
+      ],
+      "registerRowId": "plotarrow.parameter-base-type-boundary:format",
+      "sourceSha256": "a3528184606779dc1f684607ba0c6207e5f70f51518cdd6c9a82cef3b4838fff",
+      "instructionsPath": "instructions/plotarrow-format-base-type-v52-v1-instructions-v1.md",
+      "instructionsSha256": "d917bddfc3371e77327c05c413ec13181bdf29f1e5275695ae00f94f9168fabe",
+      "questions": [
+        "Does native admit plotarrow.format with const int 7, or refuse it at that argument?"
+      ],
+      "powerLimit": "Settles only the exact base-type substitution and diagnostic. Admission is not evidence that arbitrary values, qualifiers or other parameters are supported.",
+      "columns": [
+        "CANDIDATE",
+        "SOURCE_INDEX"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "plotbar-format-base-type-v52-v1.pine",
+      "path": "plotbar-format-base-type-v52-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "plotbar.parameter-base-type-boundary:format"
+      ],
+      "registerRowId": "plotbar.parameter-base-type-boundary:format",
+      "sourceSha256": "c2a5ed2b4bb93eb6bc017c8ae454c06c982b39fe1ba6b726ddbc3308cde7b8ee",
+      "instructionsPath": "instructions/plotbar-format-base-type-v52-v1-instructions-v1.md",
+      "instructionsSha256": "4c1f9a639ccd4a9a36e0333e7fbe8e35d9745813e590235e9f6284dfafcdea35",
+      "questions": [
+        "Does native admit plotbar.format with const int 7, or refuse it at that argument?"
+      ],
+      "powerLimit": "Settles only the exact base-type substitution and diagnostic. Admission is not evidence that arbitrary values, qualifiers or other parameters are supported.",
+      "columns": [
+        "CANDIDATE",
+        "SOURCE_INDEX"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "plotcandle-format-base-type-v52-v1.pine",
+      "path": "plotcandle-format-base-type-v52-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "plotcandle.parameter-base-type-boundary:format"
+      ],
+      "registerRowId": "plotcandle.parameter-base-type-boundary:format",
+      "sourceSha256": "04014851cad275986a12c64df1e8d015b102c30a352e7fb12398bed5bf65f332",
+      "instructionsPath": "instructions/plotcandle-format-base-type-v52-v1-instructions-v1.md",
+      "instructionsSha256": "a9324f2fae8d91050550fd4de1ee1244cb252c0ad69c54bf75ccada1b57ce0c3",
+      "questions": [
+        "Does native admit plotcandle.format with const int 7, or refuse it at that argument?"
+      ],
+      "powerLimit": "Settles only the exact base-type substitution and diagnostic. Admission is not evidence that arbitrary values, qualifiers or other parameters are supported.",
+      "columns": [
+        "CANDIDATE",
+        "SOURCE_INDEX"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "plotchar-format-base-type-v52-v1.pine",
+      "path": "plotchar-format-base-type-v52-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "plotchar.parameter-base-type-boundary:format"
+      ],
+      "registerRowId": "plotchar.parameter-base-type-boundary:format",
+      "sourceSha256": "96ad10677229f9c6ae15178ece1ed8ecce6c053efbf021261a2c6b8edb2b4287",
+      "instructionsPath": "instructions/plotchar-format-base-type-v52-v1-instructions-v1.md",
+      "instructionsSha256": "bd09bb317891dd23f1b9a7805741d11fafe415162ee2860068abf619f177f2b9",
+      "questions": [
+        "Does native admit plotchar.format with const int 7, or refuse it at that argument?"
+      ],
+      "powerLimit": "Settles only the exact base-type substitution and diagnostic. Admission is not evidence that arbitrary values, qualifiers or other parameters are supported.",
+      "columns": [
+        "CANDIDATE",
+        "SOURCE_INDEX"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "plotchar-location-base-type-v52-v1.pine",
+      "path": "plotchar-location-base-type-v52-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "plotchar.parameter-base-type-boundary:location"
+      ],
+      "registerRowId": "plotchar.parameter-base-type-boundary:location",
+      "sourceSha256": "f705085bc47d7d794e7d28f2cd03564d53b150d47d2fec74e0e13f2839dd5866",
+      "instructionsPath": "instructions/plotchar-location-base-type-v52-v1-instructions-v1.md",
+      "instructionsSha256": "195415bb0b23a3dd7bc7d467699dfccdf1470a2bb652263eeb94f023ea53ebe3",
+      "questions": [
+        "Does native admit plotchar.location with const int 7, or refuse it at that argument?"
+      ],
+      "powerLimit": "Settles only the exact base-type substitution and diagnostic. Admission is not evidence that arbitrary values, qualifiers or other parameters are supported.",
+      "columns": [
+        "CANDIDATE",
+        "SOURCE_INDEX"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "plotchar-series-base-type-v52-v1.pine",
+      "path": "plotchar-series-base-type-v52-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "plotchar.parameter-base-type-boundary:series"
+      ],
+      "registerRowId": "plotchar.parameter-base-type-boundary:series",
+      "sourceSha256": "f5de4dfe3a2e1d94fddddbd7d175aa1737a321231ca473da8aed59a7d2bbe357",
+      "instructionsPath": "instructions/plotchar-series-base-type-v52-v1-instructions-v1.md",
+      "instructionsSha256": "b7b6a8039136a623e750d0a38276cdf2b11b2b3096c875a40e607ab3faaf21c0",
+      "questions": [
+        "Does native admit plotchar.series with const string bad, or refuse it at that argument?"
+      ],
+      "powerLimit": "Settles only the exact base-type substitution and diagnostic. Admission is not evidence that arbitrary values, qualifiers or other parameters are supported.",
+      "columns": [
+        "CANDIDATE",
+        "SOURCE_INDEX"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "plotchar-size-base-type-v52-v1.pine",
+      "path": "plotchar-size-base-type-v52-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "plotchar.parameter-base-type-boundary:size"
+      ],
+      "registerRowId": "plotchar.parameter-base-type-boundary:size",
+      "sourceSha256": "ec60b54a268481589488cae66679ac327c5afddf8bb4064de4bc9db4cebca60e",
+      "instructionsPath": "instructions/plotchar-size-base-type-v52-v1-instructions-v1.md",
+      "instructionsSha256": "e063460192bf7d816982f71a7c3be4d97fcce8c541a9725b0612eb58ebe597bb",
+      "questions": [
+        "Does native admit plotchar.size with const int 7, or refuse it at that argument?"
+      ],
+      "powerLimit": "Settles only the exact base-type substitution and diagnostic. Admission is not evidence that arbitrary values, qualifiers or other parameters are supported.",
+      "columns": [
+        "CANDIDATE",
+        "SOURCE_INDEX"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "plotshape-format-base-type-v52-v1.pine",
+      "path": "plotshape-format-base-type-v52-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "plotshape.parameter-base-type-boundary:format"
+      ],
+      "registerRowId": "plotshape.parameter-base-type-boundary:format",
+      "sourceSha256": "c216c0fca592ea5c3afddd3d84c0292bd3838b4d2e2aa454481e6271f0db28c8",
+      "instructionsPath": "instructions/plotshape-format-base-type-v52-v1-instructions-v1.md",
+      "instructionsSha256": "3d3bfed4a49fc0b3f26541994d7fbfa5a5c8743fc31c238fc99d4a95a168c864",
+      "questions": [
+        "Does native admit plotshape.format with const int 7, or refuse it at that argument?"
+      ],
+      "powerLimit": "Settles only the exact base-type substitution and diagnostic. Admission is not evidence that arbitrary values, qualifiers or other parameters are supported.",
+      "columns": [
+        "CANDIDATE",
+        "SOURCE_INDEX"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "plotshape-location-base-type-v52-v1.pine",
+      "path": "plotshape-location-base-type-v52-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "plotshape.parameter-base-type-boundary:location"
+      ],
+      "registerRowId": "plotshape.parameter-base-type-boundary:location",
+      "sourceSha256": "0057da6efb4012bad96c474628553c94a16b4bc0aa914fe418be988ed2715813",
+      "instructionsPath": "instructions/plotshape-location-base-type-v52-v1-instructions-v1.md",
+      "instructionsSha256": "427619b8b3442fc9f1c6608753132e1382bf9227f462a9f4be6fd07cef1adfa8",
+      "questions": [
+        "Does native admit plotshape.location with const int 7, or refuse it at that argument?"
+      ],
+      "powerLimit": "Settles only the exact base-type substitution and diagnostic. Admission is not evidence that arbitrary values, qualifiers or other parameters are supported.",
+      "columns": [
+        "CANDIDATE",
+        "SOURCE_INDEX"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "plotshape-series-base-type-v52-v1.pine",
+      "path": "plotshape-series-base-type-v52-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "plotshape.parameter-base-type-boundary:series"
+      ],
+      "registerRowId": "plotshape.parameter-base-type-boundary:series",
+      "sourceSha256": "bdb9248ab5267b276b5b730810dbf42f700a7719aed8f06966f81e46501f6d9d",
+      "instructionsPath": "instructions/plotshape-series-base-type-v52-v1-instructions-v1.md",
+      "instructionsSha256": "0a62deb9e05ffb91f52cd908568962ca6a64d09c5c84774c972f90bcbf923619",
+      "questions": [
+        "Does native admit plotshape.series with const string bad, or refuse it at that argument?"
+      ],
+      "powerLimit": "Settles only the exact base-type substitution and diagnostic. Admission is not evidence that arbitrary values, qualifiers or other parameters are supported.",
+      "columns": [
+        "CANDIDATE",
+        "SOURCE_INDEX"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "plotshape-size-base-type-v52-v1.pine",
+      "path": "plotshape-size-base-type-v52-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "plotshape.parameter-base-type-boundary:size"
+      ],
+      "registerRowId": "plotshape.parameter-base-type-boundary:size",
+      "sourceSha256": "3a7c4adbad09c3af1265f783c4274d307e6d8c7028560b697939f9bdfe505dfc",
+      "instructionsPath": "instructions/plotshape-size-base-type-v52-v1-instructions-v1.md",
+      "instructionsSha256": "f3cf20b11fb79d7f17edb2b9bebef2d84c65e9056a81ce4f2986de08be8796b5",
+      "questions": [
+        "Does native admit plotshape.size with const int 7, or refuse it at that argument?"
+      ],
+      "powerLimit": "Settles only the exact base-type substitution and diagnostic. Admission is not evidence that arbitrary values, qualifiers or other parameters are supported.",
+      "columns": [
+        "CANDIDATE",
+        "SOURCE_INDEX"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "plotshape-style-base-type-v52-v1.pine",
+      "path": "plotshape-style-base-type-v52-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "plotshape.parameter-base-type-boundary:style"
+      ],
+      "registerRowId": "plotshape.parameter-base-type-boundary:style",
+      "sourceSha256": "67796f6386ba05221d504cad8b0eb1e0adc03392039fd96c78cc1f3ab47f7dd7",
+      "instructionsPath": "instructions/plotshape-style-base-type-v52-v1-instructions-v1.md",
+      "instructionsSha256": "eaae886298196cd9720c451019ef909d11fb0b8d221786a5a6107035b7782a86",
+      "questions": [
+        "Does native admit plotshape.style with const int 7, or refuse it at that argument?"
+      ],
+      "powerLimit": "Settles only the exact base-type substitution and diagnostic. Admission is not evidence that arbitrary values, qualifiers or other parameters are supported.",
+      "columns": [
+        "CANDIDATE",
+        "SOURCE_INDEX"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "format-union-enum-v52-v1.pine",
+      "path": "format-union-enum-v52-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "str.format.argument-union"
+      ],
+      "registerRowId": "str.format.argument-union",
+      "sourceSha256": "b11dd8a03a1373ab89ead07fee4e0cce3c3f9455d531232cdf74a2dd3e1309d8",
+      "instructionsPath": "instructions/format-union-enum-v52-v1-instructions-v1.md",
+      "instructionsSha256": "f24d3c243d194e8093dafd7a9e214d88d9b587ee8415890b677aa7314bf90b3d",
+      "questions": [
+        "Does native admit the exact str.format-union-enum-2 call, and on RUNS what raw string does it return?"
+      ],
+      "powerLimit": "Only this argument kind with this exact arity and format. Raw text and missingness are required; length does not prove formatting. No one-argument or entire overload-union closure.",
+      "columns": [
+        "SOURCE_INDEX",
+        "RESULT_LENGTH",
+        "RESULT_NA"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false,
+      "pendingClauseIds": [
+        "str.format/restart-v2/7e020b53430d68be"
+      ]
+    },
+    {
+      "probe": "format-union-matrix-int-v52-v1.pine",
+      "path": "format-union-matrix-int-v52-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "str.format.argument-union"
+      ],
+      "registerRowId": "str.format.argument-union",
+      "sourceSha256": "1a2476bf45b1e2e2a2e1f2dd419cf11c8219cc20510ea14d8da1162529804828",
+      "instructionsPath": "instructions/format-union-matrix-int-v52-v1-instructions-v1.md",
+      "instructionsSha256": "6157eac5e81785857f227d4378c1cd3cf03d260e03852a178d6186f13af4dd70",
+      "questions": [
+        "Does native admit the exact str.format-union-matrix<int>-2 call, and on RUNS what raw string does it return?"
+      ],
+      "powerLimit": "Only this argument kind with this exact arity and format. Raw text and missingness are required; length does not prove formatting. No one-argument or entire overload-union closure.",
+      "columns": [
+        "SOURCE_INDEX",
+        "RESULT_LENGTH",
+        "RESULT_NA"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false,
+      "pendingClauseIds": [
+        "str.format/restart-v2/946c09d3e76b2838"
+      ]
+    },
+    {
+      "probe": "format-union-matrix-float-v52-v1.pine",
+      "path": "format-union-matrix-float-v52-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "str.format.argument-union"
+      ],
+      "registerRowId": "str.format.argument-union",
+      "sourceSha256": "98662e0e8a4ee1a6d3b5a7fd96a99a611ed0111f4e73bec297772bbf0b548e9b",
+      "instructionsPath": "instructions/format-union-matrix-float-v52-v1-instructions-v1.md",
+      "instructionsSha256": "5bf61fed030133781214d148108c488d442278ec0778bf9e09141d619d50fc36",
+      "questions": [
+        "Does native admit the exact str.format-union-matrix<float>-2 call, and on RUNS what raw string does it return?"
+      ],
+      "powerLimit": "Only this argument kind with this exact arity and format. Raw text and missingness are required; length does not prove formatting. No one-argument or entire overload-union closure.",
+      "columns": [
+        "SOURCE_INDEX",
+        "RESULT_LENGTH",
+        "RESULT_NA"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false,
+      "pendingClauseIds": [
+        "str.format/restart-v2/01e1cb5b8c1b56f2"
+      ]
+    },
+    {
+      "probe": "format-union-matrix-bool-v52-v1.pine",
+      "path": "format-union-matrix-bool-v52-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "str.format.argument-union"
+      ],
+      "registerRowId": "str.format.argument-union",
+      "sourceSha256": "ffd44bf4e8a5d2cb8ecdb6fffdb3bd730a7c882fca605c662bcb1956a8ce6d7f",
+      "instructionsPath": "instructions/format-union-matrix-bool-v52-v1-instructions-v1.md",
+      "instructionsSha256": "c0b774963e2af7f2469ff52757940891d4ea26667c76493ac5f61577b68703c5",
+      "questions": [
+        "Does native admit the exact str.format-union-matrix<bool>-2 call, and on RUNS what raw string does it return?"
+      ],
+      "powerLimit": "Only this argument kind with this exact arity and format. Raw text and missingness are required; length does not prove formatting. No one-argument or entire overload-union closure.",
+      "columns": [
+        "SOURCE_INDEX",
+        "RESULT_LENGTH",
+        "RESULT_NA"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false,
+      "pendingClauseIds": [
+        "str.format/restart-v2/28e7aecd9b376fa8"
+      ]
+    },
+    {
+      "probe": "format-union-matrix-string-v52-v1.pine",
+      "path": "format-union-matrix-string-v52-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "str.format.argument-union"
+      ],
+      "registerRowId": "str.format.argument-union",
+      "sourceSha256": "d57cffdca42decf217cf297b54dafee4d81f2b0042fbdc2ffbf03be7d7f0f297",
+      "instructionsPath": "instructions/format-union-matrix-string-v52-v1-instructions-v1.md",
+      "instructionsSha256": "3c4f5c0017a26f96e9aa820b803bd1e76ba6a205eb96edd31393b74843246de4",
+      "questions": [
+        "Does native admit the exact str.format-union-matrix<string>-2 call, and on RUNS what raw string does it return?"
+      ],
+      "powerLimit": "Only this argument kind with this exact arity and format. Raw text and missingness are required; length does not prove formatting. No one-argument or entire overload-union closure.",
+      "columns": [
+        "SOURCE_INDEX",
+        "RESULT_LENGTH",
+        "RESULT_NA"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false,
+      "pendingClauseIds": [
+        "str.format/restart-v2/503a93d7d63be51d"
+      ]
+    },
+    {
+      "probe": "tostring-union-bool-v52-v1.pine",
+      "path": "tostring-union-bool-v52-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "str.tostring.argument-union"
+      ],
+      "registerRowId": "str.tostring.argument-union",
+      "sourceSha256": "0838e1f353482c0b0012bed2f2476c0272aad7b8df26c627e263b5cc0d26cefc",
+      "instructionsPath": "instructions/tostring-union-bool-v52-v1-instructions-v1.md",
+      "instructionsSha256": "5dc168d09cd7da1d6fac68a2094d90041ed7f00a3174566d8cf8a5a384623b8e",
+      "questions": [
+        "Does native admit the exact str.tostring-union-bool-2 call, and on RUNS what raw string does it return?"
+      ],
+      "powerLimit": "Only this argument kind with this exact arity and format. Raw text and missingness are required; length does not prove formatting. No one-argument or entire overload-union closure.",
+      "columns": [
+        "SOURCE_INDEX",
+        "RESULT_LENGTH",
+        "RESULT_NA"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false,
+      "pendingClauseIds": [
+        "str.tostring/restart-v2/28dbbe0168dcf727"
+      ]
+    },
+    {
+      "probe": "tostring-union-string-v52-v1.pine",
+      "path": "tostring-union-string-v52-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "str.tostring.argument-union"
+      ],
+      "registerRowId": "str.tostring.argument-union",
+      "sourceSha256": "35f882e257581eb242cd1298bd9a477e4490df2b9eb09f49f83acbeee54e15f2",
+      "instructionsPath": "instructions/tostring-union-string-v52-v1-instructions-v1.md",
+      "instructionsSha256": "a09f059aa7f4e9a465e03df0fc23cad944be3a425f2048e4d0c449bce964c739",
+      "questions": [
+        "Does native admit the exact str.tostring-union-string-2 call, and on RUNS what raw string does it return?"
+      ],
+      "powerLimit": "Only this argument kind with this exact arity and format. Raw text and missingness are required; length does not prove formatting. No one-argument or entire overload-union closure.",
+      "columns": [
+        "SOURCE_INDEX",
+        "RESULT_LENGTH",
+        "RESULT_NA"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false,
+      "pendingClauseIds": [
+        "str.tostring/restart-v2/1654615461ca5caf"
+      ]
+    },
+    {
+      "probe": "tostring-union-enum-v52-v1.pine",
+      "path": "tostring-union-enum-v52-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "str.tostring.argument-union"
+      ],
+      "registerRowId": "str.tostring.argument-union",
+      "sourceSha256": "9e6f7b216ce65e1730e07d789df9bc912c9f2fc387291dc979628b04633549e3",
+      "instructionsPath": "instructions/tostring-union-enum-v52-v1-instructions-v1.md",
+      "instructionsSha256": "f826b58ed9ddcb78f03f921559ec6ec72941e834258910842e9f234e3d7932b8",
+      "questions": [
+        "Does native admit the exact str.tostring-union-enum-2 call, and on RUNS what raw string does it return?"
+      ],
+      "powerLimit": "Only this argument kind with this exact arity and format. Raw text and missingness are required; length does not prove formatting. No one-argument or entire overload-union closure.",
+      "columns": [
+        "SOURCE_INDEX",
+        "RESULT_LENGTH",
+        "RESULT_NA"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false,
+      "pendingClauseIds": [
+        "str.tostring/restart-v2/e49805653f2c2fd9"
+      ]
+    },
+    {
+      "probe": "tostring-union-array-bool-v52-v1.pine",
+      "path": "tostring-union-array-bool-v52-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "str.tostring.argument-union"
+      ],
+      "registerRowId": "str.tostring.argument-union",
+      "sourceSha256": "23613fbebfe1100ac00337cd72a17705cab5f9daceca94adb57a4eaf2a0f6668",
+      "instructionsPath": "instructions/tostring-union-array-bool-v52-v1-instructions-v1.md",
+      "instructionsSha256": "173269eb99148d66fbd5e25d149c6755fc60a70bd251c449bf355b9b3ecde1a4",
+      "questions": [
+        "Does native admit the exact str.tostring-union-array<bool>-2 call, and on RUNS what raw string does it return?"
+      ],
+      "powerLimit": "Only this argument kind with this exact arity and format. Raw text and missingness are required; length does not prove formatting. No one-argument or entire overload-union closure.",
+      "columns": [
+        "SOURCE_INDEX",
+        "RESULT_LENGTH",
+        "RESULT_NA"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false,
+      "pendingClauseIds": [
+        "str.tostring/restart-v2/2a8e86a548c3be3b"
+      ]
+    },
+    {
+      "probe": "tostring-union-array-string-v52-v1.pine",
+      "path": "tostring-union-array-string-v52-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "str.tostring.argument-union"
+      ],
+      "registerRowId": "str.tostring.argument-union",
+      "sourceSha256": "1408e652877e6e7ed2035e15736fdb84510e6a79d42acf54c962fe8bee954135",
+      "instructionsPath": "instructions/tostring-union-array-string-v52-v1-instructions-v1.md",
+      "instructionsSha256": "38cd675b3f0fe742ef4306e3a937485807965c4198147cb38ac172b08e68cf14",
+      "questions": [
+        "Does native admit the exact str.tostring-union-array<string>-2 call, and on RUNS what raw string does it return?"
+      ],
+      "powerLimit": "Only this argument kind with this exact arity and format. Raw text and missingness are required; length does not prove formatting. No one-argument or entire overload-union closure.",
+      "columns": [
+        "SOURCE_INDEX",
+        "RESULT_LENGTH",
+        "RESULT_NA"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false,
+      "pendingClauseIds": [
+        "str.tostring/restart-v2/d09cb4cd8c646ff3"
+      ]
+    },
+    {
+      "probe": "tostring-union-matrix-bool-v52-v1.pine",
+      "path": "tostring-union-matrix-bool-v52-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "str.tostring.argument-union"
+      ],
+      "registerRowId": "str.tostring.argument-union",
+      "sourceSha256": "a495d866c95c3984cd74e43037e83b1bd22d4a781194b890a2e79a629188aec1",
+      "instructionsPath": "instructions/tostring-union-matrix-bool-v52-v1-instructions-v1.md",
+      "instructionsSha256": "13c685fcdd19285468095833955cbc3331201bf181d2d672040fb2d3ad4b13e6",
+      "questions": [
+        "Does native admit the exact str.tostring-union-matrix<bool>-2 call, and on RUNS what raw string does it return?"
+      ],
+      "powerLimit": "Only this argument kind with this exact arity and format. Raw text and missingness are required; length does not prove formatting. No one-argument or entire overload-union closure.",
+      "columns": [
+        "SOURCE_INDEX",
+        "RESULT_LENGTH",
+        "RESULT_NA"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false,
+      "pendingClauseIds": [
+        "str.tostring/restart-v2/31e0b7b9c5b1e9b9"
+      ]
+    },
+    {
+      "probe": "tostring-union-matrix-string-v52-v1.pine",
+      "path": "tostring-union-matrix-string-v52-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "str.tostring.argument-union"
+      ],
+      "registerRowId": "str.tostring.argument-union",
+      "sourceSha256": "d9cc29d342fed9ea50edcc083c81c25468366a5f21096d89fbce1d75946a45e3",
+      "instructionsPath": "instructions/tostring-union-matrix-string-v52-v1-instructions-v1.md",
+      "instructionsSha256": "062ac5cd9246ed036b7d77fc795c7ba75fd0754c7573d13a9eb2d0ee5a713092",
+      "questions": [
+        "Does native admit the exact str.tostring-union-matrix<string>-2 call, and on RUNS what raw string does it return?"
+      ],
+      "powerLimit": "Only this argument kind with this exact arity and format. Raw text and missingness are required; length does not prove formatting. No one-argument or entire overload-union closure.",
+      "columns": [
+        "SOURCE_INDEX",
+        "RESULT_LENGTH",
+        "RESULT_NA"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false,
+      "pendingClauseIds": [
+        "str.tostring/restart-v2/48852b5a75660266"
+      ]
+    },
+    {
+      "probe": "falling-float-length-v52-v1.pine",
+      "path": "falling-float-length-v52-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "ta.falling.length.integer"
+      ],
+      "registerRowId": "ta.falling.length.integer",
+      "sourceSha256": "a7bb8e717a6a4bac01b043331bb07ea7166059119b5e015ec2502ee69b808154",
+      "instructionsPath": "instructions/falling-float-length-v52-v1-instructions-v1.md",
+      "instructionsSha256": "8e470cf1d46a4da488bf9f1fb33567586247e1418213e86f6d1289601cdd1891",
+      "questions": [
+        "Does native admit the exact ta.falling.length.integer boundary (float literal 3.0 or reached series-qualified argument), or refuse it with an actual/required type diagnostic?"
+      ],
+      "powerLimit": "Admission and exact diagnostic only for the stated parameter in v6. Numeric cells prove reached execution; they do not certify the TA formula, seeding, missing-data policy or precision.",
+      "columns": [
+        "RESULT",
+        "SOURCE_INDEX"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "kc-float-length-v52-v1.pine",
+      "path": "kc-float-length-v52-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "ta.kc.length.integer"
+      ],
+      "registerRowId": "ta.kc.length.integer",
+      "sourceSha256": "aac83cf9a08f1475e27a368e2c50a27d15182e131d81c2899c561f460231d013",
+      "instructionsPath": "instructions/kc-float-length-v52-v1-instructions-v1.md",
+      "instructionsSha256": "72fbc60f823312ee4298688f58430662bfa3403fee3a5bc94323e557dd1b2782",
+      "questions": [
+        "Does native admit the exact ta.kc.length.integer boundary (float literal 3.0 or reached series-qualified argument), or refuse it with an actual/required type diagnostic?"
+      ],
+      "powerLimit": "Admission and exact diagnostic only for the stated parameter in v6. Numeric cells prove reached execution; they do not certify the TA formula, seeding, missing-data policy or precision.",
+      "columns": [
+        "MIDDLE",
+        "UPPER",
+        "LOWER",
+        "SOURCE_INDEX"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "kc-series-mult-v52-v1.pine",
+      "path": "kc-series-mult-v52-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "ta.kc.mult.qualifier"
+      ],
+      "registerRowId": "ta.kc.mult.qualifier",
+      "sourceSha256": "11d2ca50df96e55e8b589ad8a854fc550a62a7c657d570cf00460d01db73f608",
+      "instructionsPath": "instructions/kc-series-mult-v52-v1-instructions-v1.md",
+      "instructionsSha256": "f2f9de5bd70c75d80ac734e2734d9aa06b6ae36353ff96db85a8da80cdb66393",
+      "questions": [
+        "Does native admit the exact ta.kc.mult.qualifier boundary (float literal 3.0 or reached series-qualified argument), or refuse it with an actual/required type diagnostic?"
+      ],
+      "powerLimit": "Admission and exact diagnostic only for the stated parameter in v6. Numeric cells prove reached execution; they do not certify the TA formula, seeding, missing-data policy or precision.",
+      "columns": [
+        "MIDDLE",
+        "UPPER",
+        "LOWER",
+        "ARGUMENT",
+        "SOURCE_INDEX"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "kc-series-usetruerange-v52-v1.pine",
+      "path": "kc-series-usetruerange-v52-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "ta.kc.useTrueRange.qualifier"
+      ],
+      "registerRowId": "ta.kc.useTrueRange.qualifier",
+      "sourceSha256": "40e4d21ae4e4db1a99724bf904914aa977b1b161df82f17eedbdcabb00419319",
+      "instructionsPath": "instructions/kc-series-usetruerange-v52-v1-instructions-v1.md",
+      "instructionsSha256": "96203f50156931dc42316834922fb68d0c4b0005dea1369b369777b0f08a596b",
+      "questions": [
+        "Does native admit the exact ta.kc.useTrueRange.qualifier boundary (float literal 3.0 or reached series-qualified argument), or refuse it with an actual/required type diagnostic?"
+      ],
+      "powerLimit": "Admission and exact diagnostic only for the stated parameter in v6. Numeric cells prove reached execution; they do not certify the TA formula, seeding, missing-data policy or precision.",
+      "columns": [
+        "MIDDLE",
+        "UPPER",
+        "LOWER",
+        "ARGUMENT",
+        "SOURCE_INDEX"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "kcw-float-length-v52-v1.pine",
+      "path": "kcw-float-length-v52-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "ta.kcw.length.integer"
+      ],
+      "registerRowId": "ta.kcw.length.integer",
+      "sourceSha256": "5a673565d347087b3467ee78e7617e447dd7c096ebc3a7848ba0fa1a4088f066",
+      "instructionsPath": "instructions/kcw-float-length-v52-v1-instructions-v1.md",
+      "instructionsSha256": "780c057748abb4b5ec125deecb78ac179d1d25d94bc49bac16048d392e023438",
+      "questions": [
+        "Does native admit the exact ta.kcw.length.integer boundary (float literal 3.0 or reached series-qualified argument), or refuse it with an actual/required type diagnostic?"
+      ],
+      "powerLimit": "Admission and exact diagnostic only for the stated parameter in v6. Numeric cells prove reached execution; they do not certify the TA formula, seeding, missing-data policy or precision.",
+      "columns": [
+        "RESULT",
+        "SOURCE_INDEX"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "kcw-series-mult-v52-v1.pine",
+      "path": "kcw-series-mult-v52-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "ta.kcw.mult.qualifier"
+      ],
+      "registerRowId": "ta.kcw.mult.qualifier",
+      "sourceSha256": "d25ed1280c3476ca67ddfe01c53c07836c7442eb4b51cdcaa3f0341ade358677",
+      "instructionsPath": "instructions/kcw-series-mult-v52-v1-instructions-v1.md",
+      "instructionsSha256": "acbbd422415921d39f92451383fb044121d50556275a90d550cb30c572b969b2",
+      "questions": [
+        "Does native admit the exact ta.kcw.mult.qualifier boundary (float literal 3.0 or reached series-qualified argument), or refuse it with an actual/required type diagnostic?"
+      ],
+      "powerLimit": "Admission and exact diagnostic only for the stated parameter in v6. Numeric cells prove reached execution; they do not certify the TA formula, seeding, missing-data policy or precision.",
+      "columns": [
+        "RESULT",
+        "ARGUMENT",
+        "SOURCE_INDEX"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "kcw-series-usetruerange-v52-v1.pine",
+      "path": "kcw-series-usetruerange-v52-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "ta.kcw.useTrueRange.qualifier"
+      ],
+      "registerRowId": "ta.kcw.useTrueRange.qualifier",
+      "sourceSha256": "286a0abe38315508710be4ff01073447f58c4113a733580affd4f91371f8732a",
+      "instructionsPath": "instructions/kcw-series-usetruerange-v52-v1-instructions-v1.md",
+      "instructionsSha256": "7a37559d5f4fcd89f0eb50ce10ae942b8295cde19bc4489f90e7d6d8f68a0afc",
+      "questions": [
+        "Does native admit the exact ta.kcw.useTrueRange.qualifier boundary (float literal 3.0 or reached series-qualified argument), or refuse it with an actual/required type diagnostic?"
+      ],
+      "powerLimit": "Admission and exact diagnostic only for the stated parameter in v6. Numeric cells prove reached execution; they do not certify the TA formula, seeding, missing-data policy or precision.",
+      "columns": [
+        "RESULT",
+        "ARGUMENT",
+        "SOURCE_INDEX"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "qualifier-format-time-consumer-control-v52-v1.pine",
+      "path": "qualifier-format-time-consumer-control-v52-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "str.format_time.result-qualifier-floor"
+      ],
+      "registerRowId": "str.format_time.result-qualifier-floor",
+      "sourceSha256": "c23d8e918da3740e96a08e88a8091f36c571c41165145ad82e0752479d30c200",
+      "instructionsPath": "instructions/qualifier-format-time-consumer-control-v52-v1-instructions-v1.md",
+      "instructionsSha256": "c45ebbe1a49320f0146b0ba364a185b9a93618628cdd2f82134b75dea0331e87",
+      "questions": [
+        "Are the input-comparison active consumer and explicit simple string consumer available for this row's paired probes?"
+      ],
+      "powerLimit": "Instrument control only; no builtin result-floor credit.",
+      "columns": [
+        "SIMPLE_INPUT_LENGTH",
+        "ACTIVE_INPUT_CONTROL",
+        "SOURCE_INDEX"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 3,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "qualifier-format-time-const-active-v52-v1.pine",
+      "path": "qualifier-format-time-const-active-v52-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "str.format_time.result-qualifier-floor"
+      ],
+      "registerRowId": "str.format_time.result-qualifier-floor",
+      "sourceSha256": "e65322bbaec4107fe02bdf6473b96738cf9df5d1d343abfcfa71d4095082c883",
+      "instructionsPath": "instructions/qualifier-format-time-const-active-v52-v1-instructions-v1.md",
+      "instructionsSha256": "a606221a6b53bc95a23e6920b426a3b178d0e23d0b2c0d912a6f67118bcdf82c",
+      "questions": [
+        "Does the const str.format_time result meet an input-bool active consumer after equality comparison?"
+      ],
+      "powerLimit": "Active requires input-or-const bool. Pair with the independent input-comparison control and reused const-title/simple consumers; refusal without actual qualified types remains inconclusive. A diagnostic at another site or without the actual qualified type is INCONCLUSIVE; do not infer the floor just from rejection. Pair the named active/width/title and simple consumers for this same row.",
+      "columns": [
+        "CONSUMER",
+        "TARGET_LENGTH",
+        "TARGET_EQUAL",
+        "TARGET_NA",
+        "INDEX",
+        "CONTROL_CLOSE"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false,
+      "priorInstrument": {
+        "path": "v49/format-time-const-active-v49-v1.pine",
+        "sha256": "b1a69ae2b2565d7d8967c7f1043af0341de4932ea2a23d8f176d6e1001090af7",
+        "changes": "Indicator title and explicit calc_bars_count=32 only; disputed call, controls and observers unchanged."
+      }
+    },
+    {
+      "probe": "qualifier-format-time-input-time-active-v52-v1.pine",
+      "path": "qualifier-format-time-input-time-active-v52-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "str.format_time.result-qualifier-floor"
+      ],
+      "registerRowId": "str.format_time.result-qualifier-floor",
+      "sourceSha256": "01474aac5dceeab91977f8022e643ac794be0fec8b9ba3ac983d1af6bae225ef",
+      "instructionsPath": "instructions/qualifier-format-time-input-time-active-v52-v1-instructions-v1.md",
+      "instructionsSha256": "737cb5974563ed1fcd0f4a985acd8d31c4bca8383e3156e9fe3e4d9f6e4a5c28",
+      "questions": [
+        "Does the input-time str.format_time result meet an input-bool active consumer after equality comparison?"
+      ],
+      "powerLimit": "Active requires input-or-const bool. Pair with the independent input-comparison control and reused const-title/simple consumers; refusal without actual qualified types remains inconclusive. A diagnostic at another site or without the actual qualified type is INCONCLUSIVE; do not infer the floor just from rejection. Pair the named active/width/title and simple consumers for this same row.",
+      "columns": [
+        "CONSUMER",
+        "TARGET_LENGTH",
+        "TARGET_EQUAL",
+        "TARGET_NA",
+        "INDEX",
+        "CONTROL_CLOSE"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false,
+      "priorInstrument": {
+        "path": "v49/format-time-input-time-active-v49-v1.pine",
+        "sha256": "41bd5d9561dc52d3ced84268fadbceeb729fb1f4ea2fe614cb85c05159f2b3e8",
+        "changes": "Indicator title and explicit calc_bars_count=32 only; disputed call, controls and observers unchanged."
+      }
+    },
+    {
+      "probe": "qualifier-format-time-input-format-active-v52-v1.pine",
+      "path": "qualifier-format-time-input-format-active-v52-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "str.format_time.result-qualifier-floor"
+      ],
+      "registerRowId": "str.format_time.result-qualifier-floor",
+      "sourceSha256": "e6bdf566d4cc715ccf8ca048788f95f5bd790029a4c4250241d07a4521eb1d90",
+      "instructionsPath": "instructions/qualifier-format-time-input-format-active-v52-v1-instructions-v1.md",
+      "instructionsSha256": "724297832dddaffa8cf5ae9b62c33de3885e45ce72c8a6a5331995ddc9fd0632",
+      "questions": [
+        "Does the input-format str.format_time result meet an input-bool active consumer after equality comparison?"
+      ],
+      "powerLimit": "Active requires input-or-const bool. Pair with the independent input-comparison control and reused const-title/simple consumers; refusal without actual qualified types remains inconclusive. A diagnostic at another site or without the actual qualified type is INCONCLUSIVE; do not infer the floor just from rejection. Pair the named active/width/title and simple consumers for this same row.",
+      "columns": [
+        "CONSUMER",
+        "TARGET_LENGTH",
+        "TARGET_EQUAL",
+        "TARGET_NA",
+        "INDEX",
+        "CONTROL_CLOSE"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false,
+      "priorInstrument": {
+        "path": "v49/format-time-input-format-active-v49-v1.pine",
+        "sha256": "d556fc627d832ef6d2228568340dfc1664a72413589e6247d80eeb3536c150a9",
+        "changes": "Indicator title and explicit calc_bars_count=32 only; disputed call, controls and observers unchanged."
+      }
+    },
+    {
+      "probe": "qualifier-format-time-const-title-v52-v1.pine",
+      "path": "qualifier-format-time-const-title-v52-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "str.format_time.result-qualifier-floor"
+      ],
+      "registerRowId": "str.format_time.result-qualifier-floor",
+      "sourceSha256": "33662a3e3f8e3c0d3695c9763d36fdf5eb40c52efb8b982d219778c88e38d02f",
+      "instructionsPath": "instructions/qualifier-format-time-const-title-v52-v1-instructions-v1.md",
+      "instructionsSha256": "200c7435a825a814444a37cf35b6ce9487aff2fbb693ca73b2644ea571c9b130",
+      "questions": [
+        "What exact qualified type/admission does this existing unchanged v42 consumer reveal?"
+      ],
+      "powerLimit": "Const plot title distinguishes const from stronger results. A diagnostic at another site or without the actual qualified type is INCONCLUSIVE; do not infer the floor just from rejection. Pair the named active/width/title and simple consumers for this same row.",
+      "columns": [
+        "<result title; preserve exact native text>",
+        "SOURCE_INDEX"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false,
+      "priorInstrument": {
+        "path": "v42/floor-const-title-format-time-v42-v1.pine",
+        "sha256": "a33acb5734c06c1598128824dbaa517a6550d7e9a6293c70cb0f286cea656463",
+        "changes": "Indicator title and explicit calc_bars_count=32 only; disputed call, controls and observers unchanged."
+      }
+    },
+    {
+      "probe": "qualifier-format-time-const-simple-v52-v1.pine",
+      "path": "qualifier-format-time-const-simple-v52-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "str.format_time.result-qualifier-floor"
+      ],
+      "registerRowId": "str.format_time.result-qualifier-floor",
+      "sourceSha256": "b1d3e4de6a7cf2e4b705d9e2c491bba1eacdce7ff150e4c46ab9c12400fd7247",
+      "instructionsPath": "instructions/qualifier-format-time-const-simple-v52-v1-instructions-v1.md",
+      "instructionsSha256": "b41d2ddf1d333780b95976127187a7a5c4b283f80b985451bcbae8670b61284a",
+      "questions": [
+        "What exact qualified type/admission does this existing unchanged v42 consumer reveal?"
+      ],
+      "powerLimit": "Explicit simple string parameter distinguishes simple-or-weaker from series. A diagnostic at another site or without the actual qualified type is INCONCLUSIVE; do not infer the floor just from rejection. Pair the named active/width/title and simple consumers for this same row.",
+      "columns": [
+        "VALUE",
+        "SOURCE_INDEX"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false,
+      "priorInstrument": {
+        "path": "v42/floor-simple-consumer-format-time-v42-v1.pine",
+        "sha256": "dfd09b0282f302010f2feb0db794557be0dfb51f119c53593c6bf540d3a3f067",
+        "changes": "Indicator title and explicit calc_bars_count=32 only; disputed call, controls and observers unchanged."
+      }
+    },
+    {
+      "probe": "qualifier-match-consumer-control-v52-v1.pine",
+      "path": "qualifier-match-consumer-control-v52-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "str.match.v49-result-qualifier-hold"
+      ],
+      "registerRowId": "str.match.v49-result-qualifier-hold",
+      "sourceSha256": "bb895678fced4c674d52cd691977a8add6882ea75799004a66dcae5a6bf28db0",
+      "instructionsPath": "instructions/qualifier-match-consumer-control-v52-v1-instructions-v1.md",
+      "instructionsSha256": "6ace760cd1549ec40d96e6be925df5a71bfab9bec90d83934c9c4d957d0cf7dd",
+      "questions": [
+        "Are the input-comparison active consumer and explicit simple string consumer available for this row's paired probes?"
+      ],
+      "powerLimit": "Instrument control only; no builtin result-floor credit.",
+      "columns": [
+        "SIMPLE_INPUT_LENGTH",
+        "ACTIVE_INPUT_CONTROL",
+        "SOURCE_INDEX"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 3,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "qualifier-match-const-active-v52-v1.pine",
+      "path": "qualifier-match-const-active-v52-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "str.match.v49-result-qualifier-hold"
+      ],
+      "registerRowId": "str.match.v49-result-qualifier-hold",
+      "sourceSha256": "619d2a8bae8a92ec9d2131b8bdead7c1fc9d8313089b0c6034ea938971c92932",
+      "instructionsPath": "instructions/qualifier-match-const-active-v52-v1-instructions-v1.md",
+      "instructionsSha256": "cbe1230d26cc98e66d4ffd9a50926c9dbe78f80bb04d7873395e09a44db78fbd",
+      "questions": [
+        "What consumer boundary does str.match with const arguments meet?"
+      ],
+      "powerLimit": "input.bool active requires input-or-const bool. Combined with the comparison control, admission supports an input-compatible result; refusal must retain the actual qualifier. It does not by itself distinguish const from input. A diagnostic at another site or without the actual qualified type is INCONCLUSIVE; do not infer the floor just from rejection. Pair the named active/width/title and simple consumers for this same row.",
+      "columns": [
+        "CONSUMER",
+        "TARGET_LENGTH",
+        "TARGET_EQUAL",
+        "TARGET_NA",
+        "INDEX",
+        "CONTROL_CLOSE"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false,
+      "priorInstrument": {
+        "path": "v49/match-const-active-v49-v1.pine",
+        "sha256": "26cbc2d0d3043a18f16295ef58dd5b8611c236bc9893d4561f75c37140dbb328",
+        "changes": "Indicator title and explicit calc_bars_count=32 only; disputed call, controls and observers unchanged."
+      }
+    },
+    {
+      "probe": "qualifier-match-const-simple-v52-v1.pine",
+      "path": "qualifier-match-const-simple-v52-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "str.match.v49-result-qualifier-hold"
+      ],
+      "registerRowId": "str.match.v49-result-qualifier-hold",
+      "sourceSha256": "8360e8f5a5f6007e3553aa7801d76cc83f9301877a71b5c6f7f244e744b88309",
+      "instructionsPath": "instructions/qualifier-match-const-simple-v52-v1-instructions-v1.md",
+      "instructionsSha256": "835679d2a35963108adfa450a0b3c6fb1b665e7af81d1ae07cc35140de1e9bd4",
+      "questions": [
+        "What consumer boundary does str.match with const arguments meet?"
+      ],
+      "powerLimit": "The explicit simple string parameter separates simple-or-weaker from series. Rejection of const-title with simple admission supports a simple floor; qualified diagnostics remain the strongest evidence. A diagnostic at another site or without the actual qualified type is INCONCLUSIVE; do not infer the floor just from rejection. Pair the named active/width/title and simple consumers for this same row.",
+      "columns": [
+        "CONSUMER",
+        "TARGET_LENGTH",
+        "TARGET_EQUAL",
+        "TARGET_NA",
+        "INDEX",
+        "CONTROL_CLOSE"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false,
+      "priorInstrument": {
+        "path": "v49/match-const-simple-v49-v1.pine",
+        "sha256": "d37cf36cf5981ece3dad49173d4d336bea14b75f54a2d1fc0b27a4593a7ae6f0",
+        "changes": "Indicator title and explicit calc_bars_count=32 only; disputed call, controls and observers unchanged."
+      }
+    },
+    {
+      "probe": "qualifier-match-input-source-active-v52-v1.pine",
+      "path": "qualifier-match-input-source-active-v52-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "str.match.v49-result-qualifier-hold"
+      ],
+      "registerRowId": "str.match.v49-result-qualifier-hold",
+      "sourceSha256": "f3ce29eac7a315dfa66ea3285f1de09939275e7450ebded4228e4d755aacbc5c",
+      "instructionsPath": "instructions/qualifier-match-input-source-active-v52-v1-instructions-v1.md",
+      "instructionsSha256": "9b15998adb3217bd45d65c7ee6ae1f76ae5c037fbe99188ffca4da2c221e2d20",
+      "questions": [
+        "What consumer boundary does str.match with input-source arguments meet?"
+      ],
+      "powerLimit": "input.bool active requires input-or-const bool. Combined with the comparison control, admission supports an input-compatible result; refusal must retain the actual qualifier. It does not by itself distinguish const from input. A diagnostic at another site or without the actual qualified type is INCONCLUSIVE; do not infer the floor just from rejection. Pair the named active/width/title and simple consumers for this same row.",
+      "columns": [
+        "CONSUMER",
+        "TARGET_LENGTH",
+        "TARGET_EQUAL",
+        "TARGET_NA",
+        "INDEX",
+        "CONTROL_CLOSE"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false,
+      "priorInstrument": {
+        "path": "v49/match-input-source-active-v49-v1.pine",
+        "sha256": "d0376e89ec561b5bc29006b16181fccf9a6e8ed7c9851b707fccee88d83256f2",
+        "changes": "Indicator title and explicit calc_bars_count=32 only; disputed call, controls and observers unchanged."
+      }
+    },
+    {
+      "probe": "qualifier-match-input-source-simple-v52-v1.pine",
+      "path": "qualifier-match-input-source-simple-v52-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "str.match.v49-result-qualifier-hold"
+      ],
+      "registerRowId": "str.match.v49-result-qualifier-hold",
+      "sourceSha256": "61e540f774c96f9abd5daf8feb350b55674b6be7952539721ea799813da4cb30",
+      "instructionsPath": "instructions/qualifier-match-input-source-simple-v52-v1-instructions-v1.md",
+      "instructionsSha256": "97967417afbbb3303d24949e20c4e44f925cc104306a897c94f9f37530da81e6",
+      "questions": [
+        "What consumer boundary does str.match with input-source arguments meet?"
+      ],
+      "powerLimit": "The explicit simple string parameter separates simple-or-weaker from series. Rejection of const-title with simple admission supports a simple floor; qualified diagnostics remain the strongest evidence. A diagnostic at another site or without the actual qualified type is INCONCLUSIVE; do not infer the floor just from rejection. Pair the named active/width/title and simple consumers for this same row.",
+      "columns": [
+        "CONSUMER",
+        "TARGET_LENGTH",
+        "TARGET_EQUAL",
+        "TARGET_NA",
+        "INDEX",
+        "CONTROL_CLOSE"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false,
+      "priorInstrument": {
+        "path": "v49/match-input-source-simple-v49-v1.pine",
+        "sha256": "caeca0d038ed0daf55c6300c3bbf8195c37e1a9a9ff02c671c75e2dbf2af168e",
+        "changes": "Indicator title and explicit calc_bars_count=32 only; disputed call, controls and observers unchanged."
+      }
+    },
+    {
+      "probe": "qualifier-match-input-regex-active-v52-v1.pine",
+      "path": "qualifier-match-input-regex-active-v52-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "str.match.v49-result-qualifier-hold"
+      ],
+      "registerRowId": "str.match.v49-result-qualifier-hold",
+      "sourceSha256": "ace1debcbb537f71bfa9a0b61e27bcb42f59eed181ffd0534e7fb4dca07a0022",
+      "instructionsPath": "instructions/qualifier-match-input-regex-active-v52-v1-instructions-v1.md",
+      "instructionsSha256": "cd0f1ca311c89f2597e72cda2b198d6b3272bb41107f91a926d7350da7c4c9c6",
+      "questions": [
+        "What consumer boundary does str.match with input-regex arguments meet?"
+      ],
+      "powerLimit": "input.bool active requires input-or-const bool. Combined with the comparison control, admission supports an input-compatible result; refusal must retain the actual qualifier. It does not by itself distinguish const from input. A diagnostic at another site or without the actual qualified type is INCONCLUSIVE; do not infer the floor just from rejection. Pair the named active/width/title and simple consumers for this same row.",
+      "columns": [
+        "CONSUMER",
+        "TARGET_LENGTH",
+        "TARGET_EQUAL",
+        "TARGET_NA",
+        "INDEX",
+        "CONTROL_CLOSE"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false,
+      "priorInstrument": {
+        "path": "v49/match-input-regex-active-v49-v1.pine",
+        "sha256": "829115ac4ae11dc390bce04821019307e582136dda6fa61623349a402ed9056b",
+        "changes": "Indicator title and explicit calc_bars_count=32 only; disputed call, controls and observers unchanged."
+      }
+    },
+    {
+      "probe": "qualifier-match-input-regex-simple-v52-v1.pine",
+      "path": "qualifier-match-input-regex-simple-v52-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "str.match.v49-result-qualifier-hold"
+      ],
+      "registerRowId": "str.match.v49-result-qualifier-hold",
+      "sourceSha256": "78fc922f9ff1a414059de000d1a198bc7abceb50f9aa64acb4bf2061a3cb2a1d",
+      "instructionsPath": "instructions/qualifier-match-input-regex-simple-v52-v1-instructions-v1.md",
+      "instructionsSha256": "4f2ceeda3e15df63494a7fbbad6057f42d1fb224eb54747a8f029e89d5e249e7",
+      "questions": [
+        "What consumer boundary does str.match with input-regex arguments meet?"
+      ],
+      "powerLimit": "The explicit simple string parameter separates simple-or-weaker from series. Rejection of const-title with simple admission supports a simple floor; qualified diagnostics remain the strongest evidence. A diagnostic at another site or without the actual qualified type is INCONCLUSIVE; do not infer the floor just from rejection. Pair the named active/width/title and simple consumers for this same row.",
+      "columns": [
+        "CONSUMER",
+        "TARGET_LENGTH",
+        "TARGET_EQUAL",
+        "TARGET_NA",
+        "INDEX",
+        "CONTROL_CLOSE"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false,
+      "priorInstrument": {
+        "path": "v49/match-input-regex-simple-v49-v1.pine",
+        "sha256": "2f8229d67c4345dc499374227d3f0588a4dae058dd512b801d40688052bdb200",
+        "changes": "Indicator title and explicit calc_bars_count=32 only; disputed call, controls and observers unchanged."
+      }
+    },
+    {
+      "probe": "qualifier-match-const-title-v52-v1.pine",
+      "path": "qualifier-match-const-title-v52-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "str.match.v49-result-qualifier-hold"
+      ],
+      "registerRowId": "str.match.v49-result-qualifier-hold",
+      "sourceSha256": "af29eba2c726671b06e4c719af43cdccd4d7774d915e40aa25c1e86797fc7e98",
+      "instructionsPath": "instructions/qualifier-match-const-title-v52-v1-instructions-v1.md",
+      "instructionsSha256": "1d51eca968203131ce5681effde7de77e885f42d5103b351ac39b7938712371b",
+      "questions": [
+        "What exact qualified type/admission does this existing unchanged v42 consumer reveal?"
+      ],
+      "powerLimit": "Const plot title distinguishes const from stronger results. A diagnostic at another site or without the actual qualified type is INCONCLUSIVE; do not infer the floor just from rejection. Pair the named active/width/title and simple consumers for this same row.",
+      "columns": [
+        "<result title; preserve exact native text>",
+        "SOURCE_INDEX"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false,
+      "priorInstrument": {
+        "path": "v42/floor-const-title-match-v42-v1.pine",
+        "sha256": "62486bf12e9099c9c1bc08a465249f57742834ecce914fc8a757ddb9bed89715",
+        "changes": "Indicator title and explicit calc_bars_count=32 only; disputed call, controls and observers unchanged."
+      }
+    },
+    {
+      "probe": "qualifier-length-input-simple-v52-v1.pine",
+      "path": "qualifier-length-input-simple-v52-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "str.length.v49-result-qualifier-hold"
+      ],
+      "registerRowId": "str.length.v49-result-qualifier-hold",
+      "sourceSha256": "38011683e9b82bfa9301b243b865e4cec7a1908e5c258897387176b671910dfb",
+      "instructionsPath": "instructions/qualifier-length-input-simple-v52-v1-instructions-v1.md",
+      "instructionsSha256": "96084f46ca842592a3905262bad295608e6120ce756c424dcef76d56fd8fe5c6",
+      "questions": [
+        "Does input-qualified str.length return a value compatible with simple int?"
+      ],
+      "powerLimit": "Combined with its unchanged v42 input-width consumer, simple admission/input-width refusal distinguishes a simple floor from an input-compatible result. Both refusals require actual qualified diagnostics to identify series. A diagnostic at another site or without the actual qualified type is INCONCLUSIVE; do not infer the floor just from rejection. Pair the named active/width/title and simple consumers for this same row.",
+      "columns": [
+        "CONSUMER",
+        "TARGET",
+        "INDEX",
+        "CONTROL_CLOSE"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false,
+      "priorInstrument": {
+        "path": "v49/length-input-simple-v49-v1.pine",
+        "sha256": "3aacdfc72c43a3fd2225e7d768d02be52e96865a9cbc7adf99107404a0b06651",
+        "changes": "Indicator title and explicit calc_bars_count=32 only; disputed call, controls and observers unchanged."
+      }
+    },
+    {
+      "probe": "qualifier-length-input-width-v52-v1.pine",
+      "path": "qualifier-length-input-width-v52-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "str.length.v49-result-qualifier-hold"
+      ],
+      "registerRowId": "str.length.v49-result-qualifier-hold",
+      "sourceSha256": "93048f20e1c539616cc6faa8816f482005f0db2b0ab396f2b0c39a9bad8b8650",
+      "instructionsPath": "instructions/qualifier-length-input-width-v52-v1-instructions-v1.md",
+      "instructionsSha256": "7a35e783ec8f57fb0ba7dc26e9a0ce36a5eb5cbd53b5270e8a14cc37a6078638",
+      "questions": [
+        "What exact qualified type/admission does this existing unchanged v42 consumer reveal?"
+      ],
+      "powerLimit": "Input plot linewidth distinguishes input-compatible from simple or series. A diagnostic at another site or without the actual qualified type is INCONCLUSIVE; do not infer the floor just from rejection. Pair the named active/width/title and simple consumers for this same row.",
+      "columns": [
+        "WIDTH_CONSUMER",
+        "SOURCE_INDEX"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false,
+      "priorInstrument": {
+        "path": "v42/floor-input-consumer-length-v42-v1.pine",
+        "sha256": "da24ada1af113701a5b571f53a83ab5042a840ef34bf237f8b8cf30537b2d6ff",
+        "changes": "Indicator title and explicit calc_bars_count=32 only; disputed call, controls and observers unchanged."
+      }
+    },
+    {
+      "probe": "qualifier-pos-input-simple-v52-v1.pine",
+      "path": "qualifier-pos-input-simple-v52-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "str.pos.v49-result-qualifier-hold"
+      ],
+      "registerRowId": "str.pos.v49-result-qualifier-hold",
+      "sourceSha256": "06ef0fe3f00535de05f268edf4ca44595f55cd0b0781c36f9b64d10ac3a6d0da",
+      "instructionsPath": "instructions/qualifier-pos-input-simple-v52-v1-instructions-v1.md",
+      "instructionsSha256": "0406eb04634a86744cda52fd3c6c6c6ab1a1eed24c36e7dcff968fcc117fe4e4",
+      "questions": [
+        "Does input-qualified str.pos return a value compatible with simple int?"
+      ],
+      "powerLimit": "Combined with its unchanged v42 input-width consumer, simple admission/input-width refusal distinguishes a simple floor from an input-compatible result. Both refusals require actual qualified diagnostics to identify series. A diagnostic at another site or without the actual qualified type is INCONCLUSIVE; do not infer the floor just from rejection. Pair the named active/width/title and simple consumers for this same row.",
+      "columns": [
+        "CONSUMER",
+        "TARGET",
+        "INDEX",
+        "CONTROL_CLOSE"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false,
+      "priorInstrument": {
+        "path": "v49/pos-input-simple-v49-v1.pine",
+        "sha256": "9c84a32bf3b0230693ea6193d0d9e701fa80c11f8ba3378563851b5ce2303d7e",
+        "changes": "Indicator title and explicit calc_bars_count=32 only; disputed call, controls and observers unchanged."
+      }
+    },
+    {
+      "probe": "qualifier-pos-input-width-v52-v1.pine",
+      "path": "qualifier-pos-input-width-v52-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "str.pos.v49-result-qualifier-hold"
+      ],
+      "registerRowId": "str.pos.v49-result-qualifier-hold",
+      "sourceSha256": "65d2dc37648b1000f685f28b984d9c177d851e027228b63eaca731a61e6548f5",
+      "instructionsPath": "instructions/qualifier-pos-input-width-v52-v1-instructions-v1.md",
+      "instructionsSha256": "2cb530e3930ef1e3305bb7047d4d076d8b0e2cf1a30cd8302529f0394f8fb8eb",
+      "questions": [
+        "What exact qualified type/admission does this existing unchanged v42 consumer reveal?"
+      ],
+      "powerLimit": "Input plot linewidth distinguishes input-compatible from simple or series. A diagnostic at another site or without the actual qualified type is INCONCLUSIVE; do not infer the floor just from rejection. Pair the named active/width/title and simple consumers for this same row.",
+      "columns": [
+        "WIDTH_CONSUMER",
+        "SOURCE_INDEX"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false,
+      "priorInstrument": {
+        "path": "v42/floor-input-consumer-pos-v42-v1.pine",
+        "sha256": "e76430f8a9c2787d5a808803442a9edb11a7b261021a5767dbb27af2542703c8",
+        "changes": "Indicator title and explicit calc_bars_count=32 only; disputed call, controls and observers unchanged."
+      }
+    },
+    {
+      "probe": "qualifier-contains-input-source-active-v52-v1.pine",
+      "path": "qualifier-contains-input-source-active-v52-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "str.contains.v49-result-qualifier-hold"
+      ],
+      "registerRowId": "str.contains.v49-result-qualifier-hold",
+      "sourceSha256": "00d0fea92d2b9177f048bf7458ce5d247741a450f3c83292752206c922819309",
+      "instructionsPath": "instructions/qualifier-contains-input-source-active-v52-v1-instructions-v1.md",
+      "instructionsSha256": "3853fb11f380f2d7672d8db9dc07aaee67a79ed9cbdc0c6e1cf7dcb30ce20acf",
+      "questions": [
+        "What is the consumer boundary of str.contains when only its source argument is input-qualified?"
+      ],
+      "powerLimit": "The direct bool result is passed to input.bool active, which requires input-or-const bool. Success establishes that boundary, not exact input versus const identity. A refusal with actual simple/series bool distinguishes stronger floors. A diagnostic at another site or without the actual qualified type is INCONCLUSIVE; do not infer the floor just from rejection. Pair the named active/width/title and simple consumers for this same row.",
+      "columns": [
+        "CONSUMER",
+        "TARGET",
+        "INDEX",
+        "CONTROL_CLOSE"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false,
+      "priorInstrument": {
+        "path": "v49/contains-input-source-active-v49-v1.pine",
+        "sha256": "cf2b9f658c6ddb9b04664013c34dce1a98416806ea09e49d9a2be31ecb5b0f28",
+        "changes": "Indicator title and explicit calc_bars_count=32 only; disputed call, controls and observers unchanged."
+      }
+    },
+    {
+      "probe": "qualifier-contains-input-source-simple-v52-v1.pine",
+      "path": "qualifier-contains-input-source-simple-v52-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "str.contains.v49-result-qualifier-hold"
+      ],
+      "registerRowId": "str.contains.v49-result-qualifier-hold",
+      "sourceSha256": "304655f89e0a8f432af452e94ba718eab699435b11f6f4b8e2e1af309c906acc",
+      "instructionsPath": "instructions/qualifier-contains-input-source-simple-v52-v1-instructions-v1.md",
+      "instructionsSha256": "12a020c82f5961071f8b0d6920c2c60ee919f89132514c446eced505146cde54",
+      "questions": [
+        "What is the consumer boundary of str.contains when only its source argument is input-qualified?"
+      ],
+      "powerLimit": "The explicit simple bool parameter separates simple-or-weaker from series. Pair with the corresponding active source to distinguish input-compatible, simple and series boundaries. A diagnostic at another site or without the actual qualified type is INCONCLUSIVE; do not infer the floor just from rejection. Pair the named active/width/title and simple consumers for this same row.",
+      "columns": [
+        "CONSUMER",
+        "TARGET",
+        "INDEX",
+        "CONTROL_CLOSE"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false,
+      "priorInstrument": {
+        "path": "v49/contains-input-source-simple-v49-v1.pine",
+        "sha256": "6243f736940160b1fb6994dffede7f1b999ff5528b62cbdc62e29217be53da68",
+        "changes": "Indicator title and explicit calc_bars_count=32 only; disputed call, controls and observers unchanged."
+      }
+    },
+    {
+      "probe": "qualifier-contains-input-pattern-active-v52-v1.pine",
+      "path": "qualifier-contains-input-pattern-active-v52-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "str.contains.v49-result-qualifier-hold"
+      ],
+      "registerRowId": "str.contains.v49-result-qualifier-hold",
+      "sourceSha256": "0b3e0832af8191251361783e3f8277ea9bd8f2f010e2892cab279393b69901a5",
+      "instructionsPath": "instructions/qualifier-contains-input-pattern-active-v52-v1-instructions-v1.md",
+      "instructionsSha256": "a4452b05af69f914618c0ce7c88312edb27c53a83522610053f9689a72e08efe",
+      "questions": [
+        "What is the consumer boundary of str.contains when only its pattern argument is input-qualified?"
+      ],
+      "powerLimit": "The direct bool result is passed to input.bool active, which requires input-or-const bool. Success establishes that boundary, not exact input versus const identity. A refusal with actual simple/series bool distinguishes stronger floors. A diagnostic at another site or without the actual qualified type is INCONCLUSIVE; do not infer the floor just from rejection. Pair the named active/width/title and simple consumers for this same row.",
+      "columns": [
+        "CONSUMER",
+        "TARGET",
+        "INDEX",
+        "CONTROL_CLOSE"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false,
+      "priorInstrument": {
+        "path": "v49/contains-input-pattern-active-v49-v1.pine",
+        "sha256": "80389f84d87a952eec11495ef3eed90591bd37ca8ed3c59a99df08e5677b1f81",
+        "changes": "Indicator title and explicit calc_bars_count=32 only; disputed call, controls and observers unchanged."
+      }
+    },
+    {
+      "probe": "qualifier-contains-input-pattern-simple-v52-v1.pine",
+      "path": "qualifier-contains-input-pattern-simple-v52-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "str.contains.v49-result-qualifier-hold"
+      ],
+      "registerRowId": "str.contains.v49-result-qualifier-hold",
+      "sourceSha256": "fd6365c5cc1f51fcd768249545891fecaa87b1f90f0560a5700a62cd0821d410",
+      "instructionsPath": "instructions/qualifier-contains-input-pattern-simple-v52-v1-instructions-v1.md",
+      "instructionsSha256": "c51a0064e224d6d8cf66836ef1f8cc5f2221b2ef3f72d64272479d83a3a98397",
+      "questions": [
+        "What is the consumer boundary of str.contains when only its pattern argument is input-qualified?"
+      ],
+      "powerLimit": "The explicit simple bool parameter separates simple-or-weaker from series. Pair with the corresponding active source to distinguish input-compatible, simple and series boundaries. A diagnostic at another site or without the actual qualified type is INCONCLUSIVE; do not infer the floor just from rejection. Pair the named active/width/title and simple consumers for this same row.",
+      "columns": [
+        "CONSUMER",
+        "TARGET",
+        "INDEX",
+        "CONTROL_CLOSE"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false,
+      "priorInstrument": {
+        "path": "v49/contains-input-pattern-simple-v49-v1.pine",
+        "sha256": "252f1e6edf08cd6e2c7097c9fa6f3d17f4de135d9db754138917a7467155be4c",
+        "changes": "Indicator title and explicit calc_bars_count=32 only; disputed call, controls and observers unchanged."
+      }
+    },
+    {
+      "probe": "qualifier-startswith-input-source-active-v52-v1.pine",
+      "path": "qualifier-startswith-input-source-active-v52-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "str.startswith.v49-result-qualifier-hold"
+      ],
+      "registerRowId": "str.startswith.v49-result-qualifier-hold",
+      "sourceSha256": "6a6eea36a215c9b07cc33478be2ba1f099c1304048bbe3bfa140d53433b65e41",
+      "instructionsPath": "instructions/qualifier-startswith-input-source-active-v52-v1-instructions-v1.md",
+      "instructionsSha256": "ff7086dafd4f5ded772d6a9b0d74c72c02a6870ace49c03f4c91fd1f8235c445",
+      "questions": [
+        "What is the consumer boundary of str.startswith when only its source argument is input-qualified?"
+      ],
+      "powerLimit": "The direct bool result is passed to input.bool active, which requires input-or-const bool. Success establishes that boundary, not exact input versus const identity. A refusal with actual simple/series bool distinguishes stronger floors. A diagnostic at another site or without the actual qualified type is INCONCLUSIVE; do not infer the floor just from rejection. Pair the named active/width/title and simple consumers for this same row.",
+      "columns": [
+        "CONSUMER",
+        "TARGET",
+        "INDEX",
+        "CONTROL_CLOSE"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false,
+      "priorInstrument": {
+        "path": "v49/startswith-input-source-active-v49-v1.pine",
+        "sha256": "396f990ca8c820f9bda67a682fa77edbecbc98d130a086572257a6dd33ce40f9",
+        "changes": "Indicator title and explicit calc_bars_count=32 only; disputed call, controls and observers unchanged."
+      }
+    },
+    {
+      "probe": "qualifier-startswith-input-source-simple-v52-v1.pine",
+      "path": "qualifier-startswith-input-source-simple-v52-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "str.startswith.v49-result-qualifier-hold"
+      ],
+      "registerRowId": "str.startswith.v49-result-qualifier-hold",
+      "sourceSha256": "fe4e02b8159381165408bf3978e855b3f3c83a9fb60140e043b7472fa5e587ff",
+      "instructionsPath": "instructions/qualifier-startswith-input-source-simple-v52-v1-instructions-v1.md",
+      "instructionsSha256": "7105fde715dd2646450f5d7dc8c3fe4c85e31e8f32aa0f900073733eee7a9209",
+      "questions": [
+        "What is the consumer boundary of str.startswith when only its source argument is input-qualified?"
+      ],
+      "powerLimit": "The explicit simple bool parameter separates simple-or-weaker from series. Pair with the corresponding active source to distinguish input-compatible, simple and series boundaries. A diagnostic at another site or without the actual qualified type is INCONCLUSIVE; do not infer the floor just from rejection. Pair the named active/width/title and simple consumers for this same row.",
+      "columns": [
+        "CONSUMER",
+        "TARGET",
+        "INDEX",
+        "CONTROL_CLOSE"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false,
+      "priorInstrument": {
+        "path": "v49/startswith-input-source-simple-v49-v1.pine",
+        "sha256": "0321d599e8a73ad262ca05ce4bb423f2deadbcd6c51e7aeb92cfec5b5ed2b863",
+        "changes": "Indicator title and explicit calc_bars_count=32 only; disputed call, controls and observers unchanged."
+      }
+    },
+    {
+      "probe": "qualifier-startswith-input-pattern-active-v52-v1.pine",
+      "path": "qualifier-startswith-input-pattern-active-v52-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "str.startswith.v49-result-qualifier-hold"
+      ],
+      "registerRowId": "str.startswith.v49-result-qualifier-hold",
+      "sourceSha256": "e74f161d2ebc15eb8743e4b51a48d764d5df7845b707eb67c27b4687ea4718f9",
+      "instructionsPath": "instructions/qualifier-startswith-input-pattern-active-v52-v1-instructions-v1.md",
+      "instructionsSha256": "e282fd0eded420c288740e5c41bc1c06215be5aeb541b8fc67509d6b9a1e6b33",
+      "questions": [
+        "What is the consumer boundary of str.startswith when only its pattern argument is input-qualified?"
+      ],
+      "powerLimit": "The direct bool result is passed to input.bool active, which requires input-or-const bool. Success establishes that boundary, not exact input versus const identity. A refusal with actual simple/series bool distinguishes stronger floors. A diagnostic at another site or without the actual qualified type is INCONCLUSIVE; do not infer the floor just from rejection. Pair the named active/width/title and simple consumers for this same row.",
+      "columns": [
+        "CONSUMER",
+        "TARGET",
+        "INDEX",
+        "CONTROL_CLOSE"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false,
+      "priorInstrument": {
+        "path": "v49/startswith-input-pattern-active-v49-v1.pine",
+        "sha256": "71198d9ba3b97f4e55c6435b8a4c033eae8ed42c62861a5f30a1174ecf98ee16",
+        "changes": "Indicator title and explicit calc_bars_count=32 only; disputed call, controls and observers unchanged."
+      }
+    },
+    {
+      "probe": "qualifier-startswith-input-pattern-simple-v52-v1.pine",
+      "path": "qualifier-startswith-input-pattern-simple-v52-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "str.startswith.v49-result-qualifier-hold"
+      ],
+      "registerRowId": "str.startswith.v49-result-qualifier-hold",
+      "sourceSha256": "5fee7188c795c983908f2123a48e01e09321591c6d2710bd2686ea1c85d846a2",
+      "instructionsPath": "instructions/qualifier-startswith-input-pattern-simple-v52-v1-instructions-v1.md",
+      "instructionsSha256": "3d4b3456881a9269eaf5bfbb721d3dca1bc5a802e2d2a47ad95a6a0b96062859",
+      "questions": [
+        "What is the consumer boundary of str.startswith when only its pattern argument is input-qualified?"
+      ],
+      "powerLimit": "The explicit simple bool parameter separates simple-or-weaker from series. Pair with the corresponding active source to distinguish input-compatible, simple and series boundaries. A diagnostic at another site or without the actual qualified type is INCONCLUSIVE; do not infer the floor just from rejection. Pair the named active/width/title and simple consumers for this same row.",
+      "columns": [
+        "CONSUMER",
+        "TARGET",
+        "INDEX",
+        "CONTROL_CLOSE"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false,
+      "priorInstrument": {
+        "path": "v49/startswith-input-pattern-simple-v49-v1.pine",
+        "sha256": "18abb40f5071bb4c26d28018924df26d75e84970d17d1965c4991a3c66712e87",
+        "changes": "Indicator title and explicit calc_bars_count=32 only; disputed call, controls and observers unchanged."
+      }
+    },
+    {
+      "probe": "qualifier-endswith-input-source-active-v52-v1.pine",
+      "path": "qualifier-endswith-input-source-active-v52-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "str.endswith.v49-result-qualifier-hold"
+      ],
+      "registerRowId": "str.endswith.v49-result-qualifier-hold",
+      "sourceSha256": "79df0f6da428854d35476b3d301d3248b2b4f41cef189e8853562deb183b5a5b",
+      "instructionsPath": "instructions/qualifier-endswith-input-source-active-v52-v1-instructions-v1.md",
+      "instructionsSha256": "9d03aba593b37545e0af7f09eb588cce39b5c43eec9970f353ca9d4897475438",
+      "questions": [
+        "What is the consumer boundary of str.endswith when only its source argument is input-qualified?"
+      ],
+      "powerLimit": "The direct bool result is passed to input.bool active, which requires input-or-const bool. Success establishes that boundary, not exact input versus const identity. A refusal with actual simple/series bool distinguishes stronger floors. A diagnostic at another site or without the actual qualified type is INCONCLUSIVE; do not infer the floor just from rejection. Pair the named active/width/title and simple consumers for this same row.",
+      "columns": [
+        "CONSUMER",
+        "TARGET",
+        "INDEX",
+        "CONTROL_CLOSE"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false,
+      "priorInstrument": {
+        "path": "v49/endswith-input-source-active-v49-v1.pine",
+        "sha256": "b6996db83c0031c424ecec6f84242527ce7eef339fcbb6276aa2c7befce85d49",
+        "changes": "Indicator title and explicit calc_bars_count=32 only; disputed call, controls and observers unchanged."
+      }
+    },
+    {
+      "probe": "qualifier-endswith-input-source-simple-v52-v1.pine",
+      "path": "qualifier-endswith-input-source-simple-v52-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "str.endswith.v49-result-qualifier-hold"
+      ],
+      "registerRowId": "str.endswith.v49-result-qualifier-hold",
+      "sourceSha256": "de2ad9e400b551cb6de12bd7ccdf5964a4ad330f3d8337b558833ae55a28c6bf",
+      "instructionsPath": "instructions/qualifier-endswith-input-source-simple-v52-v1-instructions-v1.md",
+      "instructionsSha256": "4c4b028e1d18e647e43e572049f016461c3deeb420c7d907aa4ae2da99e4ae88",
+      "questions": [
+        "What is the consumer boundary of str.endswith when only its source argument is input-qualified?"
+      ],
+      "powerLimit": "The explicit simple bool parameter separates simple-or-weaker from series. Pair with the corresponding active source to distinguish input-compatible, simple and series boundaries. A diagnostic at another site or without the actual qualified type is INCONCLUSIVE; do not infer the floor just from rejection. Pair the named active/width/title and simple consumers for this same row.",
+      "columns": [
+        "CONSUMER",
+        "TARGET",
+        "INDEX",
+        "CONTROL_CLOSE"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false,
+      "priorInstrument": {
+        "path": "v49/endswith-input-source-simple-v49-v1.pine",
+        "sha256": "67854b028f5d278c67d2a5351298b942f9d38df632f49723eb7eb7a3e330b7f6",
+        "changes": "Indicator title and explicit calc_bars_count=32 only; disputed call, controls and observers unchanged."
+      }
+    },
+    {
+      "probe": "qualifier-endswith-input-pattern-active-v52-v1.pine",
+      "path": "qualifier-endswith-input-pattern-active-v52-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "str.endswith.v49-result-qualifier-hold"
+      ],
+      "registerRowId": "str.endswith.v49-result-qualifier-hold",
+      "sourceSha256": "502905613394fa8dd7c2b29c3a2f380ca49d683c238deb83cdfa1b04916059a5",
+      "instructionsPath": "instructions/qualifier-endswith-input-pattern-active-v52-v1-instructions-v1.md",
+      "instructionsSha256": "8db4e85eb8f3fa99396df706b3cc39fdb4c94f7c20177d49f62a2ba46e3234a6",
+      "questions": [
+        "What is the consumer boundary of str.endswith when only its pattern argument is input-qualified?"
+      ],
+      "powerLimit": "The direct bool result is passed to input.bool active, which requires input-or-const bool. Success establishes that boundary, not exact input versus const identity. A refusal with actual simple/series bool distinguishes stronger floors. A diagnostic at another site or without the actual qualified type is INCONCLUSIVE; do not infer the floor just from rejection. Pair the named active/width/title and simple consumers for this same row.",
+      "columns": [
+        "CONSUMER",
+        "TARGET",
+        "INDEX",
+        "CONTROL_CLOSE"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false,
+      "priorInstrument": {
+        "path": "v49/endswith-input-pattern-active-v49-v1.pine",
+        "sha256": "6ed9c50c11057389d70bc4a9e48699124c0787e72d9f191ba5f0f8dce5b33742",
+        "changes": "Indicator title and explicit calc_bars_count=32 only; disputed call, controls and observers unchanged."
+      }
+    },
+    {
+      "probe": "qualifier-endswith-input-pattern-simple-v52-v1.pine",
+      "path": "qualifier-endswith-input-pattern-simple-v52-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "str.endswith.v49-result-qualifier-hold"
+      ],
+      "registerRowId": "str.endswith.v49-result-qualifier-hold",
+      "sourceSha256": "14387da11383390203c7bf84f5617f1a2c35905281bc682e38a33000b331f959",
+      "instructionsPath": "instructions/qualifier-endswith-input-pattern-simple-v52-v1-instructions-v1.md",
+      "instructionsSha256": "46747deb0f3ec007fdb6282972f56b5260e96942b2e1c053adcddbd26995cfaa",
+      "questions": [
+        "What is the consumer boundary of str.endswith when only its pattern argument is input-qualified?"
+      ],
+      "powerLimit": "The explicit simple bool parameter separates simple-or-weaker from series. Pair with the corresponding active source to distinguish input-compatible, simple and series boundaries. A diagnostic at another site or without the actual qualified type is INCONCLUSIVE; do not infer the floor just from rejection. Pair the named active/width/title and simple consumers for this same row.",
+      "columns": [
+        "CONSUMER",
+        "TARGET",
+        "INDEX",
+        "CONTROL_CLOSE"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false,
+      "priorInstrument": {
+        "path": "v49/endswith-input-pattern-simple-v49-v1.pine",
+        "sha256": "340c7329cf4ed92ec87ad16841e5aae1aa907f85e7dfc34d17f70b857124e5e3",
+        "changes": "Indicator title and explicit calc_bars_count=32 only; disputed call, controls and observers unchanged."
+      }
+    },
+    {
+      "probe": "udt-search-indexof-v52-v1.pine",
+      "path": "udt-search-indexof-v52-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "array.udt-search-comparator-native-hold"
+      ],
+      "registerRowId": "array.udt-search-comparator-native-hold",
+      "sourceSha256": "c7b3bc6b116134a004034ab3bd69c971a221853250641cf4a2f5b8bb7efa195e",
+      "instructionsPath": "instructions/udt-search-indexof-v52-v1-instructions-v1.md",
+      "instructionsSha256": "3c8082861f2760ed4ba9a8b6a81d45bb6d7e1a3f9d528d0b4f9e4a3b25eb9cf1",
+      "questions": [
+        "UDT indexof: reference versus structural field comparison"
+      ],
+      "powerLimit": "Six reached search results discriminate the two named models; OTHER and refusal remain independent outcomes. No equality-operator, missing-field, arbitrary UDT or comparator-native claim before capture.",
+      "columns": [
+        "SAME_REFERENCE",
+        "DISTINCT_EQUAL_FIELDS",
+        "EQUAL_FIELDS_NOT_STORED",
+        "SAME_REFERENCE_AFTER_FIELD_WRITE",
+        "DISTINCT_AFTER_FIELD_WRITE",
+        "NOT_STORED_AFTER_FIELD_WRITE",
+        "BAR_INDEX"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false,
+      "priorInstrument": {
+        "path": "v51/udt-search-indexof-v51-v1.pine",
+        "sha256": "97e1a5ab2ebf545ae1748f46bcf0304f3c406a91bb46467cc98d46cb8e6a8c6e",
+        "changes": "Indicator title and explicit calc_bars_count=32 only; disputed call, controls and observers unchanged."
+      },
+      "candidateAnswers": {
+        "referenceIdentity": [
+          0,
+          1,
+          -1,
+          0,
+          1,
+          -1
+        ],
+        "structuralFieldEquality": [
+          0,
+          0,
+          0,
+          0,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "probe": "udt-search-lastindexof-v52-v1.pine",
+      "path": "udt-search-lastindexof-v52-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "array.udt-search-comparator-native-hold"
+      ],
+      "registerRowId": "array.udt-search-comparator-native-hold",
+      "sourceSha256": "55c1ab817ba2694bdff41c6ef1f17158a7332c3d8567851c164c3cf6aea94f4c",
+      "instructionsPath": "instructions/udt-search-lastindexof-v52-v1-instructions-v1.md",
+      "instructionsSha256": "3c7a19e443cd89931f1b753e652812b126ec802ca8858d870049fd87c52d1ceb",
+      "questions": [
+        "UDT lastindexof: reference versus structural field comparison"
+      ],
+      "powerLimit": "Six reached search results discriminate the two named models; OTHER and refusal remain independent outcomes. No equality-operator, missing-field, arbitrary UDT or comparator-native claim before capture.",
+      "columns": [
+        "SAME_REFERENCE",
+        "DISTINCT_EQUAL_FIELDS",
+        "EQUAL_FIELDS_NOT_STORED",
+        "SAME_REFERENCE_AFTER_FIELD_WRITE",
+        "DISTINCT_AFTER_FIELD_WRITE",
+        "NOT_STORED_AFTER_FIELD_WRITE",
+        "BAR_INDEX"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false,
+      "priorInstrument": {
+        "path": "v51/udt-search-lastindexof-v51-v1.pine",
+        "sha256": "f1cc21c1bf5e3f2923f245a111ef128a6309f3db2b4a7c75aac6afd76e202c14",
+        "changes": "Indicator title and explicit calc_bars_count=32 only; disputed call, controls and observers unchanged."
+      },
+      "candidateAnswers": {
+        "referenceIdentity": [
+          2,
+          1,
+          -1,
+          2,
+          1,
+          -1
+        ],
+        "structuralFieldEquality": [
+          2,
+          2,
+          2,
+          2,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "probe": "udt-search-includes-v52-v1.pine",
+      "path": "udt-search-includes-v52-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "array.udt-search-comparator-native-hold"
+      ],
+      "registerRowId": "array.udt-search-comparator-native-hold",
+      "sourceSha256": "061f5451d0704a2aad89f97605264acbd2bc453e1e23733afb9f7d517e8f09a0",
+      "instructionsPath": "instructions/udt-search-includes-v52-v1-instructions-v1.md",
+      "instructionsSha256": "843726a8fe2c6615e9027e5a11146ba3e7c951ed8d495193add73492ac99f404",
+      "questions": [
+        "UDT includes: reference versus structural field comparison"
+      ],
+      "powerLimit": "Six reached search results discriminate the two named models; OTHER and refusal remain independent outcomes. No equality-operator, missing-field, arbitrary UDT or comparator-native claim before capture.",
+      "columns": [
+        "SAME_REFERENCE",
+        "DISTINCT_EQUAL_FIELDS",
+        "EQUAL_FIELDS_NOT_STORED",
+        "SAME_REFERENCE_AFTER_FIELD_WRITE",
+        "DISTINCT_AFTER_FIELD_WRITE",
+        "NOT_STORED_AFTER_FIELD_WRITE",
+        "BAR_INDEX"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false,
+      "priorInstrument": {
+        "path": "v51/udt-search-includes-v51-v1.pine",
+        "sha256": "1ff23a9c35cde351aa1ae5aad7ab21fc467da44f7638ce3f9565f5aeb03ed9e0",
+        "changes": "Indicator title and explicit calc_bars_count=32 only; disputed call, controls and observers unchanged."
+      },
+      "candidateAnswers": {
+        "referenceIdentity": [
+          1,
+          1,
+          0,
+          1,
+          1,
+          0
+        ],
+        "structuralFieldEquality": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      }
+    }
+  ],
+  "boundedCalculation": {
+    "calcBarsCount": 32,
+    "scope": "At most 32 calculated bars per script; record the closed/live partition actually reached."
+  }
+}

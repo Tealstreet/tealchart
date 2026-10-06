@@ -1,0 +1,52 @@
+# TradingView v52 pending-row capture handoff v1
+
+V52 covers all 34 distinct NATIVE-CAPTURE-PENDING register rows in 73 isolated indicators. The 26 open DEFECT_REGISTER v21 rows are a subset of the 34-row native queue; they are not 60 separate tasks. Every source is mapped to exactly one register row in bundle-manifest-v1.json. Multiple sources for a row isolate refusal-prone kinds, call forms or qualifier consumers. The twelve still-pending string-union clauses are individually mapped; independently confirmed supported kinds are not recaptured as pending defects.
+
+Run each indicator separately in manifest order, following its instructionsPath. Default context: BINANCE:BTCUSDT, 2-minute standard candles, regular session, Etc/UTC, at least 32 closed historical bars and unchanged inputs. Every indicator specifies calc_bars_count=32. Observe the reached closed bars within those 32 calculated bars (the live bar, if present, counts toward the bound); retain raw CSV history for alignment if needed. Verify `sha256sum -c SHA256SUMS` first. Save raw source-hashed diagnostics/screenshots/CSV/Pine Logs and complete chart/input/account/build/index/cutoff context.
+
+Phase and values remain UNSPECIFIED. Record RUNS, COMPILE-ERROR, RUNTIME-ERROR, OTHER or INCONCLUSIVE without repairing the source. Refusals need the actual and required base type AND qualifier, argument and line/column. An unrelated failure cannot settle a row. A const-title failure alone does not distinguish input/simple/series: use actual qualified diagnostics and that row's paired simple and active/width consumers. UDT search vectors are competing candidate answers, not predictions.
+
+The seven TA entries ask only exact parameter admission/refusal (3.0 length or bounded series mult/useTrueRange); their outputs are reached-execution cells. They confer no TA algorithm, precision, initialization, missing-data, long-history or realtime credit.
+
+Prior rounds v35/v36/v37/v42/v49/v51 remain unchanged. Reused instruments have their prior path/hash and title and calc_bars_count-only changes recorded; this consolidated queue gives capture/adjudication a single row-to-source inventory. Existing captures with matching original bytes and fully recorded contexts may be attached with their original source identity; never relabel them as newly captured v52 bytes.
+
+Reply under `v52/captures/v52/RESPONSE-v52.md`. Include each attempted filename and hash, phase, raw artifacts and unresolved boundaries. Local engine preflight is instrument evidence only; native status stays UNOBSERVED until TradingView capture.
+
+## Row-to-probe checklist v1
+
+Each row's control, if present, precedes its questionable consumer/call. Count a row as adjudicated only to its captured domains.
+
+- `array.join.params[0].id.type`: [array-bool-join-control-v52-v1.pine](array-bool-join-control-v52-v1.pine), [array-bool-join-namespace-v52-v1.pine](array-bool-join-namespace-v52-v1.pine), [array-bool-join-method-v52-v1.pine](array-bool-join-method-v52-v1.pine)
+- `array.sort_indices.params[2].sort_field.type`: [array-sort-indices-control-v52-v1.pine](array-sort-indices-control-v52-v1.pine), [array-sort-indices-namespace-v52-v1.pine](array-sort-indices-namespace-v52-v1.pine), [array-sort-indices-method-v52-v1.pine](array-sort-indices-method-v52-v1.pine)
+- `color.from_gradient.manual-na-endpoint`: [gradient-missing-lower-endpoint-v52-v1.pine](gradient-missing-lower-endpoint-v52-v1.pine)
+- `plot.parameter-base-type-boundary:format`: [plot-format-base-type-v52-v1.pine](plot-format-base-type-v52-v1.pine)
+- `plot.parameter-base-type-boundary:series`: [plot-series-base-type-v52-v1.pine](plot-series-base-type-v52-v1.pine)
+- `plotarrow.parameter-base-type-boundary:format`: [plotarrow-format-base-type-v52-v1.pine](plotarrow-format-base-type-v52-v1.pine)
+- `plotbar.parameter-base-type-boundary:format`: [plotbar-format-base-type-v52-v1.pine](plotbar-format-base-type-v52-v1.pine)
+- `plotcandle.parameter-base-type-boundary:format`: [plotcandle-format-base-type-v52-v1.pine](plotcandle-format-base-type-v52-v1.pine)
+- `plotchar.parameter-base-type-boundary:format`: [plotchar-format-base-type-v52-v1.pine](plotchar-format-base-type-v52-v1.pine)
+- `plotchar.parameter-base-type-boundary:location`: [plotchar-location-base-type-v52-v1.pine](plotchar-location-base-type-v52-v1.pine)
+- `plotchar.parameter-base-type-boundary:series`: [plotchar-series-base-type-v52-v1.pine](plotchar-series-base-type-v52-v1.pine)
+- `plotchar.parameter-base-type-boundary:size`: [plotchar-size-base-type-v52-v1.pine](plotchar-size-base-type-v52-v1.pine)
+- `plotshape.parameter-base-type-boundary:format`: [plotshape-format-base-type-v52-v1.pine](plotshape-format-base-type-v52-v1.pine)
+- `plotshape.parameter-base-type-boundary:location`: [plotshape-location-base-type-v52-v1.pine](plotshape-location-base-type-v52-v1.pine)
+- `plotshape.parameter-base-type-boundary:series`: [plotshape-series-base-type-v52-v1.pine](plotshape-series-base-type-v52-v1.pine)
+- `plotshape.parameter-base-type-boundary:size`: [plotshape-size-base-type-v52-v1.pine](plotshape-size-base-type-v52-v1.pine)
+- `plotshape.parameter-base-type-boundary:style`: [plotshape-style-base-type-v52-v1.pine](plotshape-style-base-type-v52-v1.pine)
+- `str.format.argument-union`: [format-union-enum-v52-v1.pine](format-union-enum-v52-v1.pine), [format-union-matrix-int-v52-v1.pine](format-union-matrix-int-v52-v1.pine), [format-union-matrix-float-v52-v1.pine](format-union-matrix-float-v52-v1.pine), [format-union-matrix-bool-v52-v1.pine](format-union-matrix-bool-v52-v1.pine), [format-union-matrix-string-v52-v1.pine](format-union-matrix-string-v52-v1.pine)
+- `str.tostring.argument-union`: [tostring-union-bool-v52-v1.pine](tostring-union-bool-v52-v1.pine), [tostring-union-string-v52-v1.pine](tostring-union-string-v52-v1.pine), [tostring-union-enum-v52-v1.pine](tostring-union-enum-v52-v1.pine), [tostring-union-array-bool-v52-v1.pine](tostring-union-array-bool-v52-v1.pine), [tostring-union-array-string-v52-v1.pine](tostring-union-array-string-v52-v1.pine), [tostring-union-matrix-bool-v52-v1.pine](tostring-union-matrix-bool-v52-v1.pine), [tostring-union-matrix-string-v52-v1.pine](tostring-union-matrix-string-v52-v1.pine)
+- `ta.falling.length.integer`: [falling-float-length-v52-v1.pine](falling-float-length-v52-v1.pine)
+- `ta.kc.length.integer`: [kc-float-length-v52-v1.pine](kc-float-length-v52-v1.pine)
+- `ta.kc.mult.qualifier`: [kc-series-mult-v52-v1.pine](kc-series-mult-v52-v1.pine)
+- `ta.kc.useTrueRange.qualifier`: [kc-series-usetruerange-v52-v1.pine](kc-series-usetruerange-v52-v1.pine)
+- `ta.kcw.length.integer`: [kcw-float-length-v52-v1.pine](kcw-float-length-v52-v1.pine)
+- `ta.kcw.mult.qualifier`: [kcw-series-mult-v52-v1.pine](kcw-series-mult-v52-v1.pine)
+- `ta.kcw.useTrueRange.qualifier`: [kcw-series-usetruerange-v52-v1.pine](kcw-series-usetruerange-v52-v1.pine)
+- `str.format_time.result-qualifier-floor`: [qualifier-format-time-consumer-control-v52-v1.pine](qualifier-format-time-consumer-control-v52-v1.pine), [qualifier-format-time-const-active-v52-v1.pine](qualifier-format-time-const-active-v52-v1.pine), [qualifier-format-time-input-time-active-v52-v1.pine](qualifier-format-time-input-time-active-v52-v1.pine), [qualifier-format-time-input-format-active-v52-v1.pine](qualifier-format-time-input-format-active-v52-v1.pine), [qualifier-format-time-const-title-v52-v1.pine](qualifier-format-time-const-title-v52-v1.pine), [qualifier-format-time-const-simple-v52-v1.pine](qualifier-format-time-const-simple-v52-v1.pine)
+- `str.match.v49-result-qualifier-hold`: [qualifier-match-consumer-control-v52-v1.pine](qualifier-match-consumer-control-v52-v1.pine), [qualifier-match-const-active-v52-v1.pine](qualifier-match-const-active-v52-v1.pine), [qualifier-match-const-simple-v52-v1.pine](qualifier-match-const-simple-v52-v1.pine), [qualifier-match-input-source-active-v52-v1.pine](qualifier-match-input-source-active-v52-v1.pine), [qualifier-match-input-source-simple-v52-v1.pine](qualifier-match-input-source-simple-v52-v1.pine), [qualifier-match-input-regex-active-v52-v1.pine](qualifier-match-input-regex-active-v52-v1.pine), [qualifier-match-input-regex-simple-v52-v1.pine](qualifier-match-input-regex-simple-v52-v1.pine), [qualifier-match-const-title-v52-v1.pine](qualifier-match-const-title-v52-v1.pine)
+- `str.length.v49-result-qualifier-hold`: [qualifier-length-input-simple-v52-v1.pine](qualifier-length-input-simple-v52-v1.pine), [qualifier-length-input-width-v52-v1.pine](qualifier-length-input-width-v52-v1.pine)
+- `str.pos.v49-result-qualifier-hold`: [qualifier-pos-input-simple-v52-v1.pine](qualifier-pos-input-simple-v52-v1.pine), [qualifier-pos-input-width-v52-v1.pine](qualifier-pos-input-width-v52-v1.pine)
+- `str.contains.v49-result-qualifier-hold`: [qualifier-contains-input-source-active-v52-v1.pine](qualifier-contains-input-source-active-v52-v1.pine), [qualifier-contains-input-source-simple-v52-v1.pine](qualifier-contains-input-source-simple-v52-v1.pine), [qualifier-contains-input-pattern-active-v52-v1.pine](qualifier-contains-input-pattern-active-v52-v1.pine), [qualifier-contains-input-pattern-simple-v52-v1.pine](qualifier-contains-input-pattern-simple-v52-v1.pine)
+- `str.startswith.v49-result-qualifier-hold`: [qualifier-startswith-input-source-active-v52-v1.pine](qualifier-startswith-input-source-active-v52-v1.pine), [qualifier-startswith-input-source-simple-v52-v1.pine](qualifier-startswith-input-source-simple-v52-v1.pine), [qualifier-startswith-input-pattern-active-v52-v1.pine](qualifier-startswith-input-pattern-active-v52-v1.pine), [qualifier-startswith-input-pattern-simple-v52-v1.pine](qualifier-startswith-input-pattern-simple-v52-v1.pine)
+- `str.endswith.v49-result-qualifier-hold`: [qualifier-endswith-input-source-active-v52-v1.pine](qualifier-endswith-input-source-active-v52-v1.pine), [qualifier-endswith-input-source-simple-v52-v1.pine](qualifier-endswith-input-source-simple-v52-v1.pine), [qualifier-endswith-input-pattern-active-v52-v1.pine](qualifier-endswith-input-pattern-active-v52-v1.pine), [qualifier-endswith-input-pattern-simple-v52-v1.pine](qualifier-endswith-input-pattern-simple-v52-v1.pine)
+- `array.udt-search-comparator-native-hold`: [udt-search-indexof-v52-v1.pine](udt-search-indexof-v52-v1.pine), [udt-search-lastindexof-v52-v1.pine](udt-search-lastindexof-v52-v1.pine), [udt-search-includes-v52-v1.pine](udt-search-includes-v52-v1.pine)
