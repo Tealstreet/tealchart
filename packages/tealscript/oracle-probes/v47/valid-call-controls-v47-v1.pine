@@ -1,0 +1,8 @@
+//@version=6
+indicator("v47 valid-call-controls v1", precision=16)
+plot(bar_index, "INDEX", display=display.data_window)
+plot(close, "CONTROL_CLOSE", display=display.data_window)
+plot(str.format("{0}", "plain") == "plain" ? 1 : 0, "FORMAT_CONTROL", display=display.data_window)
+plot(str.format_time(1000, "ss", "UTC") == "01" ? 1 : 0, "TIME_LITERAL_CONTROL", display=display.data_window)
+plot(str.format_time(time=time, format="ss", timezone="UTC") == str.format_time(time, "ss", "UTC") ? 1 : 0, "TIME_BINDING_CONTROL", display=display.data_window)
+plot(str.substring("abc", 0, 2) == "ab" ? 1 : 0, "SUBSTRING_CONTROL", display=display.data_window)

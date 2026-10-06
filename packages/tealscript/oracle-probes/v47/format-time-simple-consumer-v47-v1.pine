@@ -1,0 +1,10 @@
+//@version=6
+indicator("v47 format time simple consumer v1", precision=16)
+simple string target = str.format_time(1000, "ss", "UTC")
+plot(bar_index, "INDEX", display=display.data_window)
+plot(close, "CONTROL_CLOSE", display=display.data_window)
+plot(na(target) ? 1 : 0, "TARGET_NA", display=display.data_window)
+plot(str.length(target), "TARGET_LENGTH", display=display.data_window)
+plot(target == "01" ? 1 : 0, "CANDIDATE_SECONDS", display=display.data_window)
+if barstate.isfirst or barstate.islastconfirmedhistory
+    log.info("INDEX={0} TARGET=[{1}]", bar_index, target)

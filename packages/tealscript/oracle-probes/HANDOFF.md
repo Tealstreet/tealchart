@@ -281,3 +281,7 @@ Capture the three independent sources in [v46/bundle-manifest-v1.json](v46/bundl
 ## Then round v44 — math.max NA arguments and enum defaults v1
 
 Capture the seven independent scripts in [v44/bundle-manifest-v1.json](v44/bundle-manifest-v1.json) order, following [HANDOFF-v44-v1.md](v44/HANDOFF-v44-v1.md) and each per-script instruction. Two int/float math.max matrices cover all three-argument NA masks and pair/order controls; five enum sources isolate missing initialization, history, array defaults, conditional defaults and input defaults. Native outcomes are unspecified. Preserve raw CSV, NA flags, INDEX=0 startup rows, settings and exact earliest refusals without repairing sources. Verify `v44/SHA256SUMS` and return `v44/captures/v44/RESPONSE-v44.md`.
+
+## Then round v47 — string arity, delayed bounds and return qualifiers v2
+
+Capture the 9 independent scripts in [v47/bundle-manifest-v2.json](v47/bundle-manifest-v2.json), following [HANDOFF-v47-v2.md](v47/HANDOFF-v47-v2.md) and each per-source instruction. Four sources isolate format-only and omitted-time calls; two add delayed series bounds to existing literal v40 substring probes; one valid-call companion stays separate. Two isolated const/simple format-time consumers settle the parked return-qualifier question. Native phases/values are UNSPECIFIED. Preserve earliest diagnostics, exact raw text logs, CSV/INDEX/time context and screenshots. Check v47/SHA256SUMS and return v47/captures/v47/RESPONSE-v47.md.

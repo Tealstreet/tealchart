@@ -1,0 +1,12 @@
+//@version=6
+indicator("v47 format-only-placeholder v1", precision=16)
+plot(bar_index, "INDEX", display=display.data_window)
+plot(close, "CONTROL_CLOSE", display=display.data_window)
+target = str.format("value={0}")
+plot(na(target) ? 1 : 0, "TARGET_NA", display=display.data_window)
+plot(str.length(target), "TARGET_LENGTH", display=display.data_window)
+plot(target == "" ? 1 : 0, "CANDIDATE_EMPTY", display=display.data_window)
+plot(target == "value={0}" ? 1 : 0, "CANDIDATE_PLACEHOLDER_LITERAL", display=display.data_window)
+plot(target == "value=" ? 1 : 0, "CANDIDATE_EMPTY_SUBSTITUTION", display=display.data_window)
+if barstate.isfirst or barstate.islastconfirmedhistory
+    log.info("INDEX={0} TARGET=[{1}]", bar_index, target)

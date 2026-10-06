@@ -1,0 +1,14 @@
+//@version=6
+indicator("v47 substring-late-reversed-bounds v1", precision=16)
+plot(bar_index, "INDEX", display=display.data_window)
+plot(close, "CONTROL_CLOSE", display=display.data_window)
+begin = bar_index == 0 ? 0 : 2
+finish = bar_index == 0 ? 2 : 1
+target = str.substring("abc", begin, finish)
+plot(na(target) ? 1 : 0, "TARGET_NA", display=display.data_window)
+plot(str.length(target), "TARGET_LENGTH", display=display.data_window)
+plot(target == "" ? 1 : 0, "CANDIDATE_EMPTY", display=display.data_window)
+plot(target == "ab" ? 1 : 0, "CANDIDATE_AB", display=display.data_window)
+plot(target == "b" ? 1 : 0, "CANDIDATE_SWAPPED_B", display=display.data_window)
+if barstate.isfirst or barstate.islastconfirmedhistory
+    log.info("INDEX={0} TARGET=[{1}]", bar_index, target)
