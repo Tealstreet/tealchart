@@ -147,11 +147,12 @@ export const VISUAL_SNAPSHOT_DRIFT_BASELINE: VisualSnapshotDriftBaselineEntry[] 
   },
   {
     // 2092d0fe48: normal box text uses Pine's 14px text-family font instead of 12px.
+    // Re-measured on the CI runners, which all agree; efcfc4be74's figure came from another Linux host.
     name: 'drawing-boxes',
     platform: 'linux',
-    differingPixels: 249,
+    differingPixels: 284,
     totalPixels: 120000,
-    differingPixelRatio: 0.002075,
+    differingPixelRatio: 0.0023666666666666667,
     channelTolerance: 16,
     maxDifferingPixelRatio: 0.08,
     width: 400,
@@ -214,11 +215,12 @@ export const VISUAL_SNAPSHOT_DRIFT_BASELINE: VisualSnapshotDriftBaselineEntry[] 
   },
   {
     // 2092d0fe48: normal table text uses Pine's 14px text-family font instead of 12px.
+    // Re-measured on the CI runners, which all agree; efcfc4be74's figure came from another Linux host.
     name: 'drawing-table',
     platform: 'linux',
-    differingPixels: 865,
+    differingPixels: 951,
     totalPixels: 120000,
-    differingPixelRatio: 0.007208333333333333,
+    differingPixelRatio: 0.007925,
     channelTolerance: 16,
     maxDifferingPixelRatio: 0.08,
     width: 400,
