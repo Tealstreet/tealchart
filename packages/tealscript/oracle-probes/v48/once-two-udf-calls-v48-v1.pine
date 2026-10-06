@@ -1,0 +1,24 @@
+//@version=6
+indicator("V48 once state across written UDF calls", precision=0)
+observe(array<int> counts, bool activate) =>
+    array.set(counts, 1, array.get(counts, 1) + 1)
+    once activate
+        array.set(counts, 0, array.get(counts, 0) + 1)
+    array.get(counts, 0)
+var firstCounts = array.new<int>(2, 0)
+var secondCounts = array.new<int>(2, 0)
+firstActive = bar_index >= 2
+secondActive = bar_index >= 4
+firstResult = observe(firstCounts, firstActive)
+secondResult = observe(secondCounts, secondActive)
+plot(bar_index, "INDEX")
+plot(firstActive ? 1 : 0, "FIRST_ACTIVE")
+plot(secondActive ? 1 : 0, "SECOND_ACTIVE")
+plot(array.get(firstCounts, 0), "FIRST_HITS")
+plot(array.get(secondCounts, 0), "SECOND_HITS")
+plot(firstResult, "FIRST_RETURN")
+plot(secondResult, "SECOND_RETURN")
+plot(array.get(firstCounts, 1), "FIRST_EVALUATIONS")
+plot(array.get(secondCounts, 1), "SECOND_EVALUATIONS")
+plot(barstate.ishistory ? 1 : 0, "HISTORICAL")
+plot(close, "CONTROL_CLOSE")
