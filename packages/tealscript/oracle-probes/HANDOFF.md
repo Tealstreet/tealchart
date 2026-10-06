@@ -265,3 +265,7 @@ Capture the nine indicator-only sources in [v39/bundle-manifest-v1.json](v39/bun
 ## Then round v40 — unresolved string boundaries v1
 
 Capture the nine independent scripts in [v40/bundle-manifest-v1.json](v40/bundle-manifest-v1.json) order, following [HANDOFF-v40-v1.md](v40/HANDOFF-v40-v1.md) and each literal instruction path. Eight literal witnesses discriminate exponent/whitespace conversion, negative/reversed substring bounds, empty-target replacement, apostrophe escaping, integer zero padding and percent formatting; the ninth is a valid-call companion. Native phases/values are unspecified. Export candidate flags and missing masks, copy exact Pine Logs text and record earliest refusals without repairing sources. Return source-bound artifacts to `v40/captures/v40/RESPONSE-v40.md`. Check `v40/SHA256SUMS` before capture.
+
+## Then round v41 — math.round authority conflicts v1
+
+Capture the three independent sources in [v41/bundle-manifest-v1.json](v41/bundle-manifest-v1.json) order, following [HANDOFF-v41-v1.md](v41/HANDOFF-v41-v1.md) and per-script instructions. Two qualifier consumers and one exact negative-half numeric probe preserve the conflicting authorities without predicting native outcomes. Keep source bytes/defaults unchanged; return full earliest refusals or raw named columns to `v41/captures/v41/RESPONSE-v41.md`. Verify `v41/SHA256SUMS` before capture.

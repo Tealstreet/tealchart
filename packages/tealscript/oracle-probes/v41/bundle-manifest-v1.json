@@ -1,0 +1,121 @@
+{
+  "schemaVersion": 1,
+  "bundle": "v41",
+  "version": 1,
+  "status": "SHIP-READY-BOUNDED",
+  "frozen": true,
+  "scope": "DRAWN-INDICATORS-ONLY",
+  "scripts": [
+    {
+      "probe": "round-const-simple-precision-v41-v1.pine",
+      "path": "round-const-simple-precision-v41-v1.pine",
+      "sourceSha256": "ef600ebb2566356926fd4d8215d0090c8936a34e745bfd02357a1af543f227ce",
+      "instructionsPath": "instructions/round-const-simple-precision-v41-v1.md",
+      "instructionsSha256": "44960c36a08d5fe14d3633fe5e7597c6881a7d79d0d434eb917731d6bca9d288",
+      "componentIds": [
+        "math.round"
+      ],
+      "questions": [
+        "Does a const number with simple int precision produce a const result consumable by a const float declaration, or a simple result under the general strongest-argument rule?"
+      ],
+      "captureMode": "COMPILE-OUTCOME-AND-NUMERIC",
+      "powerLimit": "Exact v6 source/consumer only; no cross-version or arbitrary-precision inference.",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "columns": [
+        "Simple_precision",
+        "Const_positional",
+        "Const_named"
+      ]
+    },
+    {
+      "probe": "round-input-simple-precision-v41-v1.pine",
+      "path": "round-input-simple-precision-v41-v1.pine",
+      "sourceSha256": "57cd8f10c7720322c91aa4b93c2cd0857d135dc5ffde940a8ac0e3241b655c57",
+      "instructionsPath": "instructions/round-input-simple-precision-v41-v1.md",
+      "instructionsSha256": "dab2b345a79085d9dcb5d6e4f5523b3e3b9cde9cfe9f227cd2dcee91c2bbef20",
+      "componentIds": [
+        "math.round"
+      ],
+      "questions": [
+        "Does an input number with simple int precision retain an input result accepted by plot linewidth, or a simple result under the general strongest-argument rule?"
+      ],
+      "captureMode": "COMPILE-OUTCOME-AND-NUMERIC",
+      "powerLimit": "Exact v6 source/consumer only; no cross-version or arbitrary-precision inference.",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "columns": [
+        "Simple_precision",
+        "Input_positional",
+        "Input_named",
+        "Input_linewidth_consumer"
+      ]
+    },
+    {
+      "probe": "round-negative-half-ties-v41-v1.pine",
+      "path": "round-negative-half-ties-v41-v1.pine",
+      "sourceSha256": "2736d50d4854e5b7e544fa720fe1a00163e6c75fcc6450f48668f86df02a60b2",
+      "instructionsPath": "instructions/round-negative-half-ties-v41-v1.md",
+      "instructionsSha256": "aeaf99feb1d403f1e686e689700a8c77ac3a799392c902ecc61e00830d28443f",
+      "componentIds": [
+        "math.round"
+      ],
+      "questions": [
+        "For exactly representable negative half ties, does math.round follow reference ties-up prose or the previously captured away-from-zero rule? Compare integer and decimal precision independently."
+      ],
+      "captureMode": "COMPILE-OUTCOME-AND-NUMERIC",
+      "powerLimit": "Exact v6 source/consumer only; no cross-version or arbitrary-precision inference.",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "columns": [
+        "Const_negative_half",
+        "Const_negative_one_half",
+        "Series_negative_one_half",
+        "Positive_one_half_control",
+        "Negative_precision_two",
+        "Named_negative_precision_two",
+        "Positive_precision_two_control",
+        "Negative_non_tie_control"
+      ]
+    }
+  ],
+  "responsePath": "captures/v41/RESPONSE-v41.md",
+  "authorityConflicts": [
+    "math.round simple precision: reference-specific const/input returns versus manual strongest-argument qualification",
+    "math.round negative half ties: reference ties-up versus captured away-from-zero"
+  ],
+  "limits": [
+    "Compile refusals and numeric results are observed independently per source.",
+    "No predictions from local preflight; no arbitrary precision or version extrapolation."
+  ]
+}

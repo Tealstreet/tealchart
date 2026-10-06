@@ -1,0 +1,11 @@
+HANDOFF-v41-v1.md
+bundle-manifest-v1.json
+SHA256SUMS
+SHIP-FILES-v1.txt
+captures/v41/RESPONSE-v41.md
+round-const-simple-precision-v41-v1.pine
+round-input-simple-precision-v41-v1.pine
+round-negative-half-ties-v41-v1.pine
+instructions/round-const-simple-precision-v41-v1.md
+instructions/round-input-simple-precision-v41-v1.md
+instructions/round-negative-half-ties-v41-v1.md
