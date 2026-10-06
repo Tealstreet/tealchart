@@ -1,0 +1,17 @@
+//@version=6
+indicator("UDT includes reference discriminator")
+type Cell
+    int value
+original = Cell.new(7)
+alias = original
+sameFields = Cell.new(7)
+values = array.from(original, sameFields, original)
+plot(array.includes(values, alias) ? 1 : 0, "SAME_REFERENCE")
+plot(array.includes(values, sameFields) ? 1 : 0, "DISTINCT_EQUAL_FIELDS")
+notStored = Cell.new(7)
+plot(array.includes(values, notStored) ? 1 : 0, "EQUAL_FIELDS_NOT_STORED")
+original.value := 23
+plot(array.includes(values, alias) ? 1 : 0, "SAME_REFERENCE_AFTER_FIELD_WRITE")
+plot(array.includes(values, sameFields) ? 1 : 0, "DISTINCT_AFTER_FIELD_WRITE")
+plot(array.includes(values, notStored) ? 1 : 0, "NOT_STORED_AFTER_FIELD_WRITE")
+plot(bar_index, "BAR_INDEX")

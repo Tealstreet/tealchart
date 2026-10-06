@@ -1,0 +1,6 @@
+//@version=6
+indicator("str-replace-input-target-title")
+value = input.string("a")
+result = str.replace(source="a-a", target=value, replacement="X", occurrence=0)
+plot(close, title=result)
+plot(bar_index, "SOURCE_INDEX")

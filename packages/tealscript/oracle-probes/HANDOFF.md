@@ -302,3 +302,7 @@ Capture the 29 isolated entries in [v49/bundle-manifest-v2.json](v49/bundle-mani
 ## Then round v50 — one-argument tostring primitive and enum qualifiers v1
 
 Capture the nine isolated consumers in [v50/bundle-manifest-v1.json](v50/bundle-manifest-v1.json), following [HANDOFF-v50-v1.md](v50/HANDOFF-v50-v1.md) and each per-source instruction. Capture the const-enum control first; eight primitive const/input consumers then distinguish the one-argument str.tostring title boundary. Native outcomes are UNSPECIFIED. Preserve complete actual/required qualified diagnostics, exact dynamic titles, CSV/SOURCE_INDEX and unchanged defaults without repairing refusals. Verify v50/SHA256SUMS and return source-bound attempts to v50/captures/v50/RESPONSE-v50.md.
+
+## Then round v51 — input string qualifiers and UDT search comparators v1
+
+Capture the twelve isolated indicators in [v51/bundle-manifest-v1.json](v51/bundle-manifest-v1.json), following [HANDOFF-v51-v1.md](v51/HANDOFF-v51-v1.md) and each literal per-source instruction. Nine input lower/upper/substring/replace consumers require full actual/required qualified title diagnostics; three UDT indexof/lastindexof/includes probes distinguish reference identity from equal field values before and after mutation. Native outcomes are UNSPECIFIED; retain OTHER/refusal outcomes and source bytes unchanged. Verify v51/SHA256SUMS and return source-bound evidence to v51/captures/v51/RESPONSE-v51.md.

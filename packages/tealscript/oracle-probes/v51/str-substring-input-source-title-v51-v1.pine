@@ -1,0 +1,6 @@
+//@version=6
+indicator("str-substring-input-source-title")
+value = input.string("abcd")
+result = str.substring(source=value, begin_pos=1, end_pos=3)
+plot(close, title=result)
+plot(bar_index, "SOURCE_INDEX")

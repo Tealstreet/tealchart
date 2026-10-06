@@ -1,0 +1,6 @@
+//@version=6
+indicator("str-lower-input-source-title")
+value = input.string("Ab")
+result = str.lower(source=value)
+plot(close, title=result)
+plot(bar_index, "SOURCE_INDEX")

@@ -1,0 +1,494 @@
+{
+  "schemaVersion": 1,
+  "bundle": "v51",
+  "version": 1,
+  "owner": "codex-g6qooy",
+  "scripts": [
+    {
+      "probe": "str-lower-input-source-title-v51-v1.pine",
+      "path": "str-lower-input-source-title-v51-v1.pine",
+      "owner": "codex-g6qooy",
+      "facetIds": [
+        "str.lower.input-result-qualifier-floor",
+        "source",
+        "input",
+        "const-title"
+      ],
+      "sourceSha256": "36cfc834fb9564d47adbb17e0a71bbda5ca14f33d5bc405a2ccaef73c0c1ec50",
+      "instructionsPath": "instructions/str-lower-input-source-title-v51-v1-instructions-v1.md",
+      "instructionsSha256": "c829a4cfba53ca7762d62967bf53dcb0294d54894d696be79e223114f3488a52",
+      "questions": [
+        "Does str.lower with input-qualified source satisfy plot's const string title consumer, and what actual qualified type does native report on refusal?"
+      ],
+      "powerLimit": "RUNS establishes const-title compatibility for this exact source only. A title-site diagnostic naming the actual qualified type distinguishes input/simple/series; generic refusal or failure at the string function itself does not establish the result qualifier.",
+      "columns": [
+        "<dynamic result title UNOBSERVED>",
+        "SOURCE_INDEX"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "str-upper-input-source-title-v51-v1.pine",
+      "path": "str-upper-input-source-title-v51-v1.pine",
+      "owner": "codex-g6qooy",
+      "facetIds": [
+        "str.upper.input-result-qualifier-floor",
+        "source",
+        "input",
+        "const-title"
+      ],
+      "sourceSha256": "eeec2a49edc58f871529f194c0964e01aaeaf88e9d151f0f46232aa4ec72a64a",
+      "instructionsPath": "instructions/str-upper-input-source-title-v51-v1-instructions-v1.md",
+      "instructionsSha256": "5423de51722b7a38012581f906b16e50a9f3bc404b3b5957e586efb0730b711e",
+      "questions": [
+        "Does str.upper with input-qualified source satisfy plot's const string title consumer, and what actual qualified type does native report on refusal?"
+      ],
+      "powerLimit": "RUNS establishes const-title compatibility for this exact source only. A title-site diagnostic naming the actual qualified type distinguishes input/simple/series; generic refusal or failure at the string function itself does not establish the result qualifier.",
+      "columns": [
+        "<dynamic result title UNOBSERVED>",
+        "SOURCE_INDEX"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "str-substring-input-source-title-v51-v1.pine",
+      "path": "str-substring-input-source-title-v51-v1.pine",
+      "owner": "codex-g6qooy",
+      "facetIds": [
+        "str.substring.input-result-qualifier-floor",
+        "source",
+        "input",
+        "const-title"
+      ],
+      "sourceSha256": "f6fd9e05bb82d3040023bf5e658df2dd8572b285f3faa9d2af8e90dea5e94d7c",
+      "instructionsPath": "instructions/str-substring-input-source-title-v51-v1-instructions-v1.md",
+      "instructionsSha256": "03a1b310612100330f396ba85f49c8c840d4861ff78f25b7c9a95c9cb0a4af53",
+      "questions": [
+        "Does str.substring with input-qualified source satisfy plot's const string title consumer, and what actual qualified type does native report on refusal?"
+      ],
+      "powerLimit": "RUNS establishes const-title compatibility for this exact source only. A title-site diagnostic naming the actual qualified type distinguishes input/simple/series; generic refusal or failure at the string function itself does not establish the result qualifier.",
+      "columns": [
+        "<dynamic result title UNOBSERVED>",
+        "SOURCE_INDEX"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "str-substring-input-begin-pos-title-v51-v1.pine",
+      "path": "str-substring-input-begin-pos-title-v51-v1.pine",
+      "owner": "codex-g6qooy",
+      "facetIds": [
+        "str.substring.input-result-qualifier-floor",
+        "begin_pos",
+        "input",
+        "const-title"
+      ],
+      "sourceSha256": "e5adccfa281082040b06325171062cbb6a5d4e84cba8e73f47706fdc7fd0b27a",
+      "instructionsPath": "instructions/str-substring-input-begin-pos-title-v51-v1-instructions-v1.md",
+      "instructionsSha256": "9547c76388299c68965c1f9fbe8f9304a574fccfd0c57c31771bcb500d81296a",
+      "questions": [
+        "Does str.substring with input-qualified begin_pos satisfy plot's const string title consumer, and what actual qualified type does native report on refusal?"
+      ],
+      "powerLimit": "RUNS establishes const-title compatibility for this exact source only. A title-site diagnostic naming the actual qualified type distinguishes input/simple/series; generic refusal or failure at the string function itself does not establish the result qualifier.",
+      "columns": [
+        "<dynamic result title UNOBSERVED>",
+        "SOURCE_INDEX"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "str-substring-input-end-pos-title-v51-v1.pine",
+      "path": "str-substring-input-end-pos-title-v51-v1.pine",
+      "owner": "codex-g6qooy",
+      "facetIds": [
+        "str.substring.input-result-qualifier-floor",
+        "end_pos",
+        "input",
+        "const-title"
+      ],
+      "sourceSha256": "e1fd79651b41c211a193682cf507de6c88c88109afc4d6303917aa9ab77775aa",
+      "instructionsPath": "instructions/str-substring-input-end-pos-title-v51-v1-instructions-v1.md",
+      "instructionsSha256": "29841da3283e9ec3f6e206054ce725fd5868d1cf7bae33c4aa665395ecd3232d",
+      "questions": [
+        "Does str.substring with input-qualified end_pos satisfy plot's const string title consumer, and what actual qualified type does native report on refusal?"
+      ],
+      "powerLimit": "RUNS establishes const-title compatibility for this exact source only. A title-site diagnostic naming the actual qualified type distinguishes input/simple/series; generic refusal or failure at the string function itself does not establish the result qualifier.",
+      "columns": [
+        "<dynamic result title UNOBSERVED>",
+        "SOURCE_INDEX"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "str-replace-input-source-title-v51-v1.pine",
+      "path": "str-replace-input-source-title-v51-v1.pine",
+      "owner": "codex-g6qooy",
+      "facetIds": [
+        "str.replace.input-result-qualifier-floor",
+        "source",
+        "input",
+        "const-title"
+      ],
+      "sourceSha256": "2a986c792fdd3237871a4fd9b5ac7ab77987cf54794065aa69558e505c4b34d0",
+      "instructionsPath": "instructions/str-replace-input-source-title-v51-v1-instructions-v1.md",
+      "instructionsSha256": "bda12c58ef03228b433f3de5901e77e280b653422a45465c6b201f1181371757",
+      "questions": [
+        "Does str.replace with input-qualified source satisfy plot's const string title consumer, and what actual qualified type does native report on refusal?"
+      ],
+      "powerLimit": "RUNS establishes const-title compatibility for this exact source only. A title-site diagnostic naming the actual qualified type distinguishes input/simple/series; generic refusal or failure at the string function itself does not establish the result qualifier.",
+      "columns": [
+        "<dynamic result title UNOBSERVED>",
+        "SOURCE_INDEX"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "str-replace-input-target-title-v51-v1.pine",
+      "path": "str-replace-input-target-title-v51-v1.pine",
+      "owner": "codex-g6qooy",
+      "facetIds": [
+        "str.replace.input-result-qualifier-floor",
+        "target",
+        "input",
+        "const-title"
+      ],
+      "sourceSha256": "8dc569a8f07add3bf24b0166039cc97c0e7894e5d5abcb1d3121f0e75ab6e7eb",
+      "instructionsPath": "instructions/str-replace-input-target-title-v51-v1-instructions-v1.md",
+      "instructionsSha256": "ee9c79180dd6776db86dd8d5ffbca148edd931c30b3eea5d5af1e3edcfe201f6",
+      "questions": [
+        "Does str.replace with input-qualified target satisfy plot's const string title consumer, and what actual qualified type does native report on refusal?"
+      ],
+      "powerLimit": "RUNS establishes const-title compatibility for this exact source only. A title-site diagnostic naming the actual qualified type distinguishes input/simple/series; generic refusal or failure at the string function itself does not establish the result qualifier.",
+      "columns": [
+        "<dynamic result title UNOBSERVED>",
+        "SOURCE_INDEX"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "str-replace-input-replacement-title-v51-v1.pine",
+      "path": "str-replace-input-replacement-title-v51-v1.pine",
+      "owner": "codex-g6qooy",
+      "facetIds": [
+        "str.replace.input-result-qualifier-floor",
+        "replacement",
+        "input",
+        "const-title"
+      ],
+      "sourceSha256": "6b2f53ac433417360712c173ae37ef2aa0b6d5e2c5b8bfc98577eddbd3346c85",
+      "instructionsPath": "instructions/str-replace-input-replacement-title-v51-v1-instructions-v1.md",
+      "instructionsSha256": "be9069da2250035b102442310df67df5a21237ab7626073e64e6c1cfa854a535",
+      "questions": [
+        "Does str.replace with input-qualified replacement satisfy plot's const string title consumer, and what actual qualified type does native report on refusal?"
+      ],
+      "powerLimit": "RUNS establishes const-title compatibility for this exact source only. A title-site diagnostic naming the actual qualified type distinguishes input/simple/series; generic refusal or failure at the string function itself does not establish the result qualifier.",
+      "columns": [
+        "<dynamic result title UNOBSERVED>",
+        "SOURCE_INDEX"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "str-replace-input-occurrence-title-v51-v1.pine",
+      "path": "str-replace-input-occurrence-title-v51-v1.pine",
+      "owner": "codex-g6qooy",
+      "facetIds": [
+        "str.replace.input-result-qualifier-floor",
+        "occurrence",
+        "input",
+        "const-title"
+      ],
+      "sourceSha256": "4c1161deb527d0aea0a024c1eb3847a49aa31cced33d472cc28f45902beffa86",
+      "instructionsPath": "instructions/str-replace-input-occurrence-title-v51-v1-instructions-v1.md",
+      "instructionsSha256": "929375c9d610b43f35f568efe872a5a696d960a5e3f8c9564a70f7d293200c5f",
+      "questions": [
+        "Does str.replace with input-qualified occurrence satisfy plot's const string title consumer, and what actual qualified type does native report on refusal?"
+      ],
+      "powerLimit": "RUNS establishes const-title compatibility for this exact source only. A title-site diagnostic naming the actual qualified type distinguishes input/simple/series; generic refusal or failure at the string function itself does not establish the result qualifier.",
+      "columns": [
+        "<dynamic result title UNOBSERVED>",
+        "SOURCE_INDEX"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "udt-search-indexof-v51-v1.pine",
+      "path": "udt-search-indexof-v51-v1.pine",
+      "owner": "codex-vmp8l6",
+      "facetIds": [
+        "array.indexof.udt-search-comparator"
+      ],
+      "sourceSha256": "97e1a5ab2ebf545ae1748f46bcf0304f3c406a91bb46467cc98d46cb8e6a8c6e",
+      "instructionsPath": "instructions/udt-search-indexof-v51-v1-instructions-v1.md",
+      "instructionsSha256": "d7c404ef822c77e8750067831b916baf2e867a221b6faea289198d83ce30ec3e",
+      "questions": [
+        "UDT indexof: reference versus structural field comparison"
+      ],
+      "powerLimit": "Six reached search results discriminate the two named models; OTHER and refusal remain independent outcomes. No equality-operator, missing-field, arbitrary UDT or comparator-native claim before capture.",
+      "columns": [
+        "SAME_REFERENCE",
+        "DISTINCT_EQUAL_FIELDS",
+        "EQUAL_FIELDS_NOT_STORED",
+        "SAME_REFERENCE_AFTER_FIELD_WRITE",
+        "DISTINCT_AFTER_FIELD_WRITE",
+        "NOT_STORED_AFTER_FIELD_WRITE",
+        "BAR_INDEX"
+      ],
+      "candidateAnswers": {
+        "referenceIdentity": [
+          0,
+          1,
+          -1,
+          0,
+          1,
+          -1
+        ],
+        "structuralFieldEquality": [
+          0,
+          0,
+          0,
+          0,
+          1,
+          1
+        ]
+      },
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "reusedSource": false,
+      "intakeSource": "ledger/restart-20261006/udt-search-v51-intake-vmp-v1/ENTRIES-v1.json",
+      "intakeLocalPreflight": "Related six-case compiled engine witness GREEN; exact probe sources not executed; no native credit"
+    },
+    {
+      "probe": "udt-search-lastindexof-v51-v1.pine",
+      "path": "udt-search-lastindexof-v51-v1.pine",
+      "owner": "codex-vmp8l6",
+      "facetIds": [
+        "array.lastindexof.udt-search-comparator"
+      ],
+      "sourceSha256": "f1cc21c1bf5e3f2923f245a111ef128a6309f3db2b4a7c75aac6afd76e202c14",
+      "instructionsPath": "instructions/udt-search-lastindexof-v51-v1-instructions-v1.md",
+      "instructionsSha256": "c3faabd03ea0c55733ea320b29b4222ccbbab04d08de933eae747139f75dcfd2",
+      "questions": [
+        "UDT lastindexof: reference versus structural field comparison"
+      ],
+      "powerLimit": "Six reached search results discriminate the two named models; OTHER and refusal remain independent outcomes. No equality-operator, missing-field, arbitrary UDT or comparator-native claim before capture.",
+      "columns": [
+        "SAME_REFERENCE",
+        "DISTINCT_EQUAL_FIELDS",
+        "EQUAL_FIELDS_NOT_STORED",
+        "SAME_REFERENCE_AFTER_FIELD_WRITE",
+        "DISTINCT_AFTER_FIELD_WRITE",
+        "NOT_STORED_AFTER_FIELD_WRITE",
+        "BAR_INDEX"
+      ],
+      "candidateAnswers": {
+        "referenceIdentity": [
+          2,
+          1,
+          -1,
+          2,
+          1,
+          -1
+        ],
+        "structuralFieldEquality": [
+          2,
+          2,
+          2,
+          2,
+          1,
+          1
+        ]
+      },
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "reusedSource": false,
+      "intakeSource": "ledger/restart-20261006/udt-search-v51-intake-vmp-v1/ENTRIES-v1.json",
+      "intakeLocalPreflight": "Related six-case compiled engine witness GREEN; exact probe sources not executed; no native credit"
+    },
+    {
+      "probe": "udt-search-includes-v51-v1.pine",
+      "path": "udt-search-includes-v51-v1.pine",
+      "owner": "codex-vmp8l6",
+      "facetIds": [
+        "array.includes.udt-search-comparator"
+      ],
+      "sourceSha256": "1ff23a9c35cde351aa1ae5aad7ab21fc467da44f7638ce3f9565f5aeb03ed9e0",
+      "instructionsPath": "instructions/udt-search-includes-v51-v1-instructions-v1.md",
+      "instructionsSha256": "b80a325dc763f01d2516c0fa741f820673f4277f6dd8302f2fde7137c19fea2a",
+      "questions": [
+        "UDT includes: reference versus structural field comparison"
+      ],
+      "powerLimit": "Six reached search results discriminate the two named models; OTHER and refusal remain independent outcomes. No equality-operator, missing-field, arbitrary UDT or comparator-native claim before capture.",
+      "columns": [
+        "SAME_REFERENCE",
+        "DISTINCT_EQUAL_FIELDS",
+        "EQUAL_FIELDS_NOT_STORED",
+        "SAME_REFERENCE_AFTER_FIELD_WRITE",
+        "DISTINCT_AFTER_FIELD_WRITE",
+        "NOT_STORED_AFTER_FIELD_WRITE",
+        "BAR_INDEX"
+      ],
+      "candidateAnswers": {
+        "referenceIdentity": [
+          1,
+          1,
+          0,
+          1,
+          1,
+          0
+        ],
+        "structuralFieldEquality": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "reusedSource": false,
+      "intakeSource": "ledger/restart-20261006/udt-search-v51-intake-vmp-v1/ENTRIES-v1.json",
+      "intakeLocalPreflight": "Related six-case compiled engine witness GREEN; exact probe sources not executed; no native credit"
+    }
+  ]
+}
