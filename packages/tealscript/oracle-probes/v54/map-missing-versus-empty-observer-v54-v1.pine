@@ -1,0 +1,12 @@
+//@version=6
+indicator("V54 map-missing-versus-empty-observer", calc_bars_count=32)
+var int sample = 0
+map<string, float> missingMap = na
+emptyMap = map.new<string, float>()
+plot(na(missingMap) ? 1 : 0, "MISSING_MAP_NA")
+plot(na(emptyMap) ? 1 : 0, "EMPTY_MAP_NA")
+plot(emptyMap.size(), "EMPTY_MAP_SIZE")
+plot(sample, "SAMPLE_INDEX")
+plot(bar_index, "SOURCE_INDEX")
+plot(time, "SOURCE_TIME")
+sample += 1

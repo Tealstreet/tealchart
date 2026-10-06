@@ -1,0 +1,3182 @@
+{
+  "schemaVersion": 1,
+  "bundle": "v54",
+  "version": 1,
+  "owner": "codex-3rye5w",
+  "inventory": {
+    "base": "4a672295951a49014b30b13ff5d20a98c9239947",
+    "v53Sha": "4a672295951a49014b30b13ff5d20a98c9239947",
+    "distinctRows": 47,
+    "scope": "One bounded source per new row from all post-v53 lane-B HOLD-v1 packets, plus new finite TSI formula row. Existing v53 five rows are excluded.",
+    "sources": [
+      {
+        "path": "/home/sam/cs/docs/tealscript-parity-archive/ledger/restart-series-tkxtd0-v1/cum-missing-native-hold-v1/HOLD-v1.json",
+        "sha256": "b501785f69406e578b4065f70d16db9b683d37d9643df981909068976fe72506"
+      },
+      {
+        "path": "/home/sam/cs/docs/tealscript-parity-archive/ledger/restart-series-tkxtd0-v1/history-fixnan-boundary-holds-v1/HOLD-v1.json",
+        "sha256": "b541feae4771faab70ff89d449d5b162ae4aaa8b4595b89c41d7ecde3760d501"
+      },
+      {
+        "path": "/home/sam/cs/docs/tealscript-parity-archive/ledger/restart-series-tkxtd0-v1/nested-window-seed-holds-v1/HOLD-v1.json",
+        "sha256": "9ddb5e31d8bf80177d04d2d576c59f4b8a05f61215e8c14079caae62a3165866"
+      },
+      {
+        "path": "/home/sam/cs/docs/tealscript-parity-archive/ledger/restart-series-tkxtd0-v1/oscillator-band-boundary-holds-v1/HOLD-v1.json",
+        "sha256": "6b6a4de02c55e79bfde500cfbbb5d7b140af4bf2ab1fd09b2f2fa45a225d4174"
+      },
+      {
+        "path": "/home/sam/cs/docs/tealscript-parity-archive/ledger/restart-series-tkxtd0-v1/remaining-boundary-native-holds-v1/HOLD-v1.json",
+        "sha256": "4c1d9183df001bb537ac29164624f10c678df455f365568c2e57a82dc7db382e"
+      },
+      {
+        "path": "/home/sam/cs/docs/tealscript-parity-archive/ledger/restart-series-tkxtd0-v1/remaining-oscillator-context-holds-v1/HOLD-v1.json",
+        "sha256": "4c25a39208024b10e0e3bb79e4dd9e8e8049e622c4d4b3c278edfe6da69a78a3"
+      },
+      {
+        "path": "/home/sam/cs/docs/tealscript-parity-archive/ledger/restart-series-tkxtd0-v1/remaining-state-policy-holds-v1/HOLD-v1.json",
+        "sha256": "87f6deca340a8bfef6b671246ce51772a669b11c7c722fd8b255513d77371396"
+      },
+      {
+        "path": "/home/sam/cs/docs/tealscript-parity-archive/ledger/restart-series-tkxtd0-v1/sar-implicit-holes-native-hold-v1/HOLD-v1.json",
+        "sha256": "147fb0472b17a357da5bb7acc9d74d4d641a5e658a24077da8f0b0091da38675"
+      },
+      {
+        "path": "/home/sam/cs/docs/tealscript-parity-archive/ledger/restart-series-tkxtd0-v1/statistical-window-native-holds-v1/HOLD-v1.json",
+        "sha256": "080b0881939804fa4db35c8d1d032037e43ac05f31ec688127bd78ddc1e021ef"
+      },
+      {
+        "path": "/home/sam/cs/docs/tealscript-parity-archive/ledger/restart-series-tkxtd0-v1/valuewhen-direction-native-holds-v1/HOLD-v1.json",
+        "sha256": "b507cb02aaba7497b8b97ed1d7fac18ab8e3b73c2b3482afd3c8c0e8a9e954d5"
+      },
+      {
+        "path": "/home/sam/cs/docs/tealscript-parity-archive/ledger/restart-series-tkxtd0-v1/wpr-implicit-holes-native-hold-v1/HOLD-v1.json",
+        "sha256": "0bfea8ad4f4ef3cf3882e914b0fbc67b47bab2b82ca79d117ba14844fa919feb"
+      },
+      {
+        "path": "/home/sam/cs/docs/tealscript-parity-archive/ledger/restart-20261006/ta-values-w0bo0b-reconciliation-v1/NATIVE-PENDING-v3.json",
+        "sha256": "27beac3fe4290a875fc4082368db889a02eaab17bb9e7331b92e57b5b19c56ff"
+      }
+    ]
+  },
+  "scripts": [
+    {
+      "probe": "tsi-varied-sign-formula-v54-v1.pine",
+      "path": "tsi-varied-sign-formula-v54-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "tsi-exact-varied-sign-values-v1"
+      ],
+      "registerRowId": "tsi-exact-varied-sign-values-v1",
+      "pineVersion": 6,
+      "sourceSha256": "7131b07b910c341057e5ae2140d56ada2d7a8194acf34f6a4c53bc513bd0f350",
+      "instructionsPath": "instructions/tsi-varied-sign-formula-v54-v1-instructions-v1.md",
+      "instructionsSha256": "df89a99d5a697121b608fac6740410bc559de07b952eb36a49af8af4e8049a2d",
+      "questions": [
+        "What exact TSI(3,5) values and startup masks occur on source0=100 followed by64 changes [1,2,3,4,1,2,-30,-2,-3,-4,-1,-2,30], including reflection and named calls?"
+      ],
+      "competingHypotheses": [
+        "unit-normalized double smoothing",
+        "percent-scaled normalization",
+        "alternative EMA ordering/seed publication"
+      ],
+      "powerLimit": "Adjudicate only SAMPLE_INDEX0..64, price0=100 and the exact64 subsequent changes; the bound65 includes any live bar, so preserve the last cell phase or wait for its confirmation. Manual model columns are candidate observations, not substitute native outputs. Existing v2 TSI(5,14) seed/hole credit is retained separately; the new canonical column is a crosswalk control, not a universal seed proof.",
+      "columns": [
+        "INPUT_SOURCE",
+        "INPUT_CHANGE",
+        "ELIGIBLE_SAMPLE",
+        "TSI_3_5",
+        "TSI_3_5_NA",
+        "TSI_3_5_NZ_SENTINEL",
+        "TSI_NAMED_3_5",
+        "TSI_NAMED_3_5_NA",
+        "TSI_NAMED_3_5_NZ_SENTINEL",
+        "TSI_REFLECTED_3_5",
+        "TSI_REFLECTED_3_5_NA",
+        "TSI_REFLECTED_3_5_NZ_SENTINEL",
+        "TSI_5_14_CONTROL",
+        "TSI_5_14_CONTROL_NA",
+        "TSI_5_14_CONTROL_NZ_SENTINEL",
+        "MODEL_LONG_THEN_SHORT",
+        "MODEL_SHORT_THEN_LONG",
+        "MODEL_PERCENT_SCALE",
+        "SAMPLE_INDEX",
+        "SOURCE_INDEX",
+        "SOURCE_TIME"
+      ],
+      "attempts": [
+        {
+          "id": "default",
+          "inputs": {}
+        }
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 65,
+        "eligibleInputRequired": false
+      },
+      "observationWindow": {
+        "closedBars": 65,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 65
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "wpr-implicit-ohlc-holes-v54-v1.pine",
+      "path": "wpr-implicit-ohlc-holes-v54-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "lane-b:187"
+      ],
+      "registerRowId": "lane-b:187",
+      "pineVersion": 6,
+      "sourceSha256": "b0921bc7d689e86d78639c1b6e4d7a85ad59a9d7096cbda7ff289e03773fbb90",
+      "instructionsPath": "instructions/wpr-implicit-ohlc-holes-v54-v1-instructions-v1.md",
+      "instructionsSha256": "5f6111b157fa2b00d277eeb6504ae64a55eef9bce71bff349b5644b217ab4877",
+      "questions": [
+        "What does WPR(3) publish at actual implicit OHLC holes and finite recovery?"
+      ],
+      "competingHypotheses": [
+        "physical three-bar window with missing propagation",
+        "finite-sample window expansion",
+        "retained prior publication"
+      ],
+      "powerLimit": "Actual native high/low/close holes are mandatory. Finite BTC is a control only. Select and record a real standard-candle dataset/window with OHLC_MISSING=1 at startup and after mature state, plus finite neighbors; export the individual input masks. Do not assume a symbol has holes, inject a synthetic OHLC source, use custom candles, or count missing volume as missing OHLC. If no eligible event is reached the hole facet is INCONCLUSIVE; an unreached recovery stays HELD. This v6 capture gives no v5 result.",
+      "columns": [
+        "WPR_3",
+        "WPR_3_NA",
+        "WPR_3_NZ_SENTINEL",
+        "OHLC_MISSING",
+        "RECOVERY_AFTER_MISSING",
+        "INPUT_OPEN",
+        "INPUT_HIGH",
+        "INPUT_LOW",
+        "INPUT_CLOSE",
+        "INPUT_VOLUME",
+        "HIGH_NA",
+        "LOW_NA",
+        "CLOSE_NA",
+        "SAMPLE_INDEX",
+        "SOURCE_INDEX",
+        "SOURCE_TIME"
+      ],
+      "attempts": [
+        {
+          "id": "default",
+          "inputs": {}
+        }
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32,
+        "eligibleInputRequired": true
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "valuewhen-float-missing-event-v54-v1.pine",
+      "path": "valuewhen-float-missing-event-v54-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "lane-b:151"
+      ],
+      "registerRowId": "lane-b:151",
+      "pineVersion": 6,
+      "sourceSha256": "44ccfd33f1f6fd0cc6815da83691df33927d1c6ce5e5ac0dd0184fd6359064f9",
+      "instructionsPath": "instructions/valuewhen-float-missing-event-v54-v1-instructions-v1.md",
+      "instructionsSha256": "bc88684b5dd456a7461659710265ba630b45315996013493788c71d573c967ac",
+      "questions": [
+        "Does a true event with missing float source count toward occurrences0/1/2, and what is published before enough events?"
+      ],
+      "competingHypotheses": [
+        "missing-source event counts and publishes missing",
+        "missing-source event skipped",
+        "insufficient occurrence fallback"
+      ],
+      "powerLimit": "Only the selected float overload/event sequence (true,false,true,false,true), first-event missing source and startup0/1/2 occurrences. Do not generalize to other types. Finite source is3*sample+1. Raw cells and masks distinguish a counted missing event from skipping that event.",
+      "columns": [
+        "INPUT_EVENT",
+        "INPUT_SOURCE_ENCODED",
+        "INPUT_SOURCE_NA",
+        "OCCURRENCE_0_ENCODED",
+        "OCCURRENCE_0_NA",
+        "OCCURRENCE_1_ENCODED",
+        "OCCURRENCE_1_NA",
+        "OCCURRENCE_2_ENCODED",
+        "OCCURRENCE_2_NA",
+        "SAMPLE_INDEX",
+        "SOURCE_INDEX",
+        "SOURCE_TIME"
+      ],
+      "attempts": [
+        {
+          "id": "default",
+          "inputs": {}
+        }
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32,
+        "eligibleInputRequired": false
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "valuewhen-int-missing-event-v54-v1.pine",
+      "path": "valuewhen-int-missing-event-v54-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "lane-b:152"
+      ],
+      "registerRowId": "lane-b:152",
+      "pineVersion": 6,
+      "sourceSha256": "97c871ec060728f0d7cffbcbf21dd1b7b6b6868cfa1c083fc82bdc963e378103",
+      "instructionsPath": "instructions/valuewhen-int-missing-event-v54-v1-instructions-v1.md",
+      "instructionsSha256": "9d7c3509849ff0861c959211256be600157ca14d8c459bf23c6eaa21ab52909a",
+      "questions": [
+        "Does a true event with missing int source count toward occurrences0/1/2, and what is published before enough events?"
+      ],
+      "competingHypotheses": [
+        "missing-source event counts and publishes missing",
+        "missing-source event skipped",
+        "insufficient occurrence fallback"
+      ],
+      "powerLimit": "Only the selected int overload/event sequence (true,false,true,false,true), first-event missing source and startup0/1/2 occurrences. Do not generalize to other types. Finite source is3*sample+1. Raw cells and masks distinguish a counted missing event from skipping that event.",
+      "columns": [
+        "INPUT_EVENT",
+        "INPUT_SOURCE_ENCODED",
+        "INPUT_SOURCE_NA",
+        "OCCURRENCE_0_ENCODED",
+        "OCCURRENCE_0_NA",
+        "OCCURRENCE_1_ENCODED",
+        "OCCURRENCE_1_NA",
+        "OCCURRENCE_2_ENCODED",
+        "OCCURRENCE_2_NA",
+        "SAMPLE_INDEX",
+        "SOURCE_INDEX",
+        "SOURCE_TIME"
+      ],
+      "attempts": [
+        {
+          "id": "default",
+          "inputs": {}
+        }
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32,
+        "eligibleInputRequired": false
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "valuewhen-bool-missing-event-v54-v1.pine",
+      "path": "valuewhen-bool-missing-event-v54-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "lane-b:153"
+      ],
+      "registerRowId": "lane-b:153",
+      "pineVersion": 5,
+      "sourceSha256": "9a4e700e917df7fbaa54beb75366e741b31dc6b092d17937924a8becddc09495",
+      "instructionsPath": "instructions/valuewhen-bool-missing-event-v54-v1-instructions-v1.md",
+      "instructionsSha256": "954643b22689c00edb16d6bff0d8ead56ce9767c90cbbaadb8157b2c5cbd4c03",
+      "questions": [
+        "Does a true event with missing bool source count toward occurrences0/1/2, and what is published before enough events?"
+      ],
+      "competingHypotheses": [
+        "missing-source event counts and publishes missing",
+        "missing-source event skipped",
+        "insufficient occurrence fallback"
+      ],
+      "powerLimit": "Only the selected bool overload/event sequence (true,false,true,false,true), first-event missing source and startup0/1/2 occurrences. Do not generalize to other types. This source is deliberately Pine v5 so nullable bool is legal; v6 bool has no NA state, and no v6 nullable-bool outcome is inferred. Encoded2 means NA,0 false,1 true.",
+      "columns": [
+        "INPUT_EVENT",
+        "INPUT_SOURCE_ENCODED",
+        "INPUT_SOURCE_NA",
+        "OCCURRENCE_0_ENCODED",
+        "OCCURRENCE_0_NA",
+        "OCCURRENCE_1_ENCODED",
+        "OCCURRENCE_1_NA",
+        "OCCURRENCE_2_ENCODED",
+        "OCCURRENCE_2_NA",
+        "SAMPLE_INDEX",
+        "SOURCE_INDEX",
+        "SOURCE_TIME"
+      ],
+      "attempts": [
+        {
+          "id": "default",
+          "inputs": {}
+        }
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32,
+        "eligibleInputRequired": false
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "valuewhen-color-missing-event-v54-v1.pine",
+      "path": "valuewhen-color-missing-event-v54-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "lane-b:154"
+      ],
+      "registerRowId": "lane-b:154",
+      "pineVersion": 6,
+      "sourceSha256": "08d8e7a48f01764d01ec2df72d57ca08b293ee662834a193375a05206cd80f87",
+      "instructionsPath": "instructions/valuewhen-color-missing-event-v54-v1-instructions-v1.md",
+      "instructionsSha256": "ced89039f0229b45f275160c7500e68410f97228a2985082c6c617672174365a",
+      "questions": [
+        "Does a true event with missing color source count toward occurrences0/1/2, and what is published before enough events?"
+      ],
+      "competingHypotheses": [
+        "missing-source event counts and publishes missing",
+        "missing-source event skipped",
+        "insufficient occurrence fallback"
+      ],
+      "powerLimit": "Only the selected color overload/event sequence (true,false,true,false,true), first-event missing source and startup0/1/2 occurrences. Do not generalize to other types. Color RGB encoding is integer24-bit arithmetic with -1 for NA; it is not object identity or exact formatting credit.",
+      "columns": [
+        "INPUT_EVENT",
+        "INPUT_SOURCE_ENCODED",
+        "INPUT_SOURCE_NA",
+        "OCCURRENCE_0_ENCODED",
+        "OCCURRENCE_0_NA",
+        "OCCURRENCE_1_ENCODED",
+        "OCCURRENCE_1_NA",
+        "OCCURRENCE_2_ENCODED",
+        "OCCURRENCE_2_NA",
+        "SAMPLE_INDEX",
+        "SOURCE_INDEX",
+        "SOURCE_TIME"
+      ],
+      "attempts": [
+        {
+          "id": "default",
+          "inputs": {}
+        }
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32,
+        "eligibleInputRequired": false
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "valuewhen-insufficient-occurrence-v54-v1.pine",
+      "path": "valuewhen-insufficient-occurrence-v54-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "lane-b:207"
+      ],
+      "registerRowId": "lane-b:207",
+      "pineVersion": 6,
+      "sourceSha256": "df3248e45f07844fdb3c69defbee4fed9e038dc856d521e7e9c45388586dd73c",
+      "instructionsPath": "instructions/valuewhen-insufficient-occurrence-v54-v1-instructions-v1.md",
+      "instructionsSha256": "86379e250403be0baa2115916043fc6d3f9db5ba195405d121472f2f0db09b37",
+      "questions": [
+        "What is returned for occurrences0/1/2 before events3/7 and when occurrence2 never exists?"
+      ],
+      "competingHypotheses": [
+        "NA for nonexistent event",
+        "default or oldest-event fallback"
+      ],
+      "powerLimit": "Float source is fully finite, with exactly two events at local3/7. This isolates absent occurrence from selected-source NA; no other overload credit.",
+      "columns": [
+        "INPUT_EVENT",
+        "INPUT_SOURCE",
+        "OCCURRENCE_0",
+        "OCCURRENCE_0_NA",
+        "OCCURRENCE_0_NZ_SENTINEL",
+        "OCCURRENCE_1",
+        "OCCURRENCE_1_NA",
+        "OCCURRENCE_1_NZ_SENTINEL",
+        "OCCURRENCE_2",
+        "OCCURRENCE_2_NA",
+        "OCCURRENCE_2_NZ_SENTINEL",
+        "SAMPLE_INDEX",
+        "SOURCE_INDEX",
+        "SOURCE_TIME"
+      ],
+      "attempts": [
+        {
+          "id": "default",
+          "inputs": {}
+        }
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32,
+        "eligibleInputRequired": false
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "valuewhen-selected-missing-source-v54-v1.pine",
+      "path": "valuewhen-selected-missing-source-v54-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "lane-b:208"
+      ],
+      "registerRowId": "lane-b:208",
+      "pineVersion": 6,
+      "sourceSha256": "1a08a33f5e4f3869829bc1f08e81e039ffd6efd5a02840d4a1f9a852c1983e00",
+      "instructionsPath": "instructions/valuewhen-selected-missing-source-v54-v1-instructions-v1.md",
+      "instructionsSha256": "797ae35511501030f6af2e579b333d7ae59caa4fd14cd4c857873f7b2f767980",
+      "questions": [
+        "Does the missing-source first event remain selectable after two finite events?"
+      ],
+      "competingHypotheses": [
+        "count missing event and select NA",
+        "skip missing event",
+        "carry or fallback result"
+      ],
+      "powerLimit": "Float only; first event at0 missing, events2/4 finite. Occurrence2 after4 isolates retained missing-event counting from absent-event startup. No nullable-bool or color policy credit.",
+      "columns": [
+        "INPUT_EVENT",
+        "INPUT_SOURCE",
+        "SOURCE_NA",
+        "OCCURRENCE_0",
+        "OCCURRENCE_0_NA",
+        "OCCURRENCE_0_NZ_SENTINEL",
+        "OCCURRENCE_1",
+        "OCCURRENCE_1_NA",
+        "OCCURRENCE_1_NZ_SENTINEL",
+        "OCCURRENCE_2",
+        "OCCURRENCE_2_NA",
+        "OCCURRENCE_2_NZ_SENTINEL",
+        "SAMPLE_INDEX",
+        "SOURCE_INDEX",
+        "SOURCE_TIME"
+      ],
+      "attempts": [
+        {
+          "id": "default",
+          "inputs": {}
+        }
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32,
+        "eligibleInputRequired": false
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "falling-hole-span-row155-v54-v2.pine",
+      "path": "falling-hole-span-row155-v54-v2.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "lane-b:155"
+      ],
+      "registerRowId": "lane-b:155",
+      "pineVersion": 6,
+      "sourceSha256": "061375f115bfb5d5fd55894d670c2d469b20eb6a5f34be96ee1e4992b0aa6f09",
+      "instructionsPath": "instructions/falling-hole-span-row155-v54-v1-instructions-v2.md",
+      "instructionsSha256": "14854885416fc8be069292fec8471a2f79fb8d00fce861653483653214239514",
+      "questions": [
+        "What does falling(source,2) return on4,NA,3,NA,2,5,1?"
+      ],
+      "competingHypotheses": [
+        "compare current against physical lookback",
+        "compare current against prior finite samples",
+        "require consecutive adjacent directional changes"
+      ],
+      "powerLimit": "Repeated16-phase fixture starts4,NA,3,NA,2,5,1 then appends finite9,8,7,6,5,4,5,6,7 to expose both directions. The matched finite control fills the two holes with3.5/2.5. Retain all32 cells and physical history0..3. Missing policy models may differ on hole/recovery cells; dense ramps prevent a constant-output instrument. Only this member/length; no blanket ignore-NA or other-method credit.",
+      "columns": [
+        "PHASE",
+        "INPUT_SOURCE",
+        "SOURCE_NA",
+        "PHYSICAL_PREVIOUS_1",
+        "PHYSICAL_PREVIOUS_2",
+        "PHYSICAL_PREVIOUS_3",
+        "BUILTIN_RESULT",
+        "CLEAN_SOURCE_CONTROL",
+        "CLEAN_RESULT_CONTROL",
+        "SAMPLE_INDEX",
+        "SOURCE_INDEX",
+        "SOURCE_TIME"
+      ],
+      "attempts": [
+        {
+          "id": "default",
+          "inputs": {}
+        }
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32,
+        "eligibleInputRequired": false
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "rising-hole-span-row156-v54-v2.pine",
+      "path": "rising-hole-span-row156-v54-v2.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "lane-b:156"
+      ],
+      "registerRowId": "lane-b:156",
+      "pineVersion": 6,
+      "sourceSha256": "8548efc9df7606f93193a9d2993a0fd8a93364507d849e9ca32a095f0aa1acb8",
+      "instructionsPath": "instructions/rising-hole-span-row156-v54-v1-instructions-v2.md",
+      "instructionsSha256": "5a0576d35a4e52981042ffc367b7f1997ca5da89cda9aa593107e278c45b2da7",
+      "questions": [
+        "What does rising(source,2) return on4,NA,3,NA,2,5,1?"
+      ],
+      "competingHypotheses": [
+        "compare current against physical lookback",
+        "compare current against prior finite samples",
+        "require consecutive adjacent directional changes"
+      ],
+      "powerLimit": "Repeated16-phase fixture starts4,NA,3,NA,2,5,1 then appends finite9,8,7,6,5,4,5,6,7 to expose both directions. The matched finite control fills the two holes with3.5/2.5. Retain all32 cells and physical history0..3. Missing policy models may differ on hole/recovery cells; dense ramps prevent a constant-output instrument. Only this member/length; no blanket ignore-NA or other-method credit.",
+      "columns": [
+        "PHASE",
+        "INPUT_SOURCE",
+        "SOURCE_NA",
+        "PHYSICAL_PREVIOUS_1",
+        "PHYSICAL_PREVIOUS_2",
+        "PHYSICAL_PREVIOUS_3",
+        "BUILTIN_RESULT",
+        "CLEAN_SOURCE_CONTROL",
+        "CLEAN_RESULT_CONTROL",
+        "SAMPLE_INDEX",
+        "SOURCE_INDEX",
+        "SOURCE_TIME"
+      ],
+      "attempts": [
+        {
+          "id": "default",
+          "inputs": {}
+        }
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32,
+        "eligibleInputRequired": false
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "rising-hole-span-row262-v54-v2.pine",
+      "path": "rising-hole-span-row262-v54-v2.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "lane-b:262"
+      ],
+      "registerRowId": "lane-b:262",
+      "pineVersion": 6,
+      "sourceSha256": "44ec2c3b7decebe77893e5272190372b227cf2534b738aca76b09cab0b26659e",
+      "instructionsPath": "instructions/rising-hole-span-row262-v54-v1-instructions-v2.md",
+      "instructionsSha256": "d264bb5edcf4c242ee50deb5364a442d5821dee5a0a5d5f068831911f4a89948",
+      "questions": [
+        "What does rising(source,3) return on4,NA,3,NA,2,5,1?"
+      ],
+      "competingHypotheses": [
+        "compare current against physical lookback",
+        "compare current against prior finite samples",
+        "require consecutive adjacent directional changes"
+      ],
+      "powerLimit": "Repeated16-phase fixture starts4,NA,3,NA,2,5,1 then appends finite9,8,7,6,5,4,5,6,7 to expose both directions. The matched finite control fills the two holes with3.5/2.5. Retain all32 cells and physical history0..3. Missing policy models may differ on hole/recovery cells; dense ramps prevent a constant-output instrument. Only this member/length; no blanket ignore-NA or other-method credit.",
+      "columns": [
+        "PHASE",
+        "INPUT_SOURCE",
+        "SOURCE_NA",
+        "PHYSICAL_PREVIOUS_1",
+        "PHYSICAL_PREVIOUS_2",
+        "PHYSICAL_PREVIOUS_3",
+        "BUILTIN_RESULT",
+        "CLEAN_SOURCE_CONTROL",
+        "CLEAN_RESULT_CONTROL",
+        "SAMPLE_INDEX",
+        "SOURCE_INDEX",
+        "SOURCE_TIME"
+      ],
+      "attempts": [
+        {
+          "id": "default",
+          "inputs": {}
+        }
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32,
+        "eligibleInputRequired": false
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "rci-leading-interior-holes-v54-v1.pine",
+      "path": "rci-leading-interior-holes-v54-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "lane-b:165"
+      ],
+      "registerRowId": "lane-b:165",
+      "pineVersion": 6,
+      "sourceSha256": "4d1bc2e56db3e0c0743ff92138c31dc309d9908fe356afb10b59ed7977e91e49",
+      "instructionsPath": "instructions/rci-leading-interior-holes-v54-v1-instructions-v1.md",
+      "instructionsSha256": "ff24e3078b05d12257a2aa1208606fa667ce28164d707ac0f18a40cc918c337c",
+      "questions": [
+        "What does RCI(4) publish through leading and interior source holes?"
+      ],
+      "competingHypotheses": [
+        "physical-window NA mask",
+        "last4 finite observations",
+        "retention/reset on holes"
+      ],
+      "powerLimit": "Exact nonmonotonic eight-phase fixture, firsttwoNA and holesphase2/5. Raw source/masks and matched clean call preserve startup and recovery; no tie policy or all-length RCI formula proof.",
+      "columns": [
+        "PHASE",
+        "INPUT_SOURCE",
+        "CLEAN_SOURCE",
+        "SOURCE_NA",
+        "RCI_4",
+        "RCI_4_NA",
+        "RCI_4_NZ_SENTINEL",
+        "CLEAN_RCI_4",
+        "CLEAN_RCI_4_NA",
+        "CLEAN_RCI_4_NZ_SENTINEL",
+        "SAMPLE_INDEX",
+        "SOURCE_INDEX",
+        "SOURCE_TIME"
+      ],
+      "attempts": [
+        {
+          "id": "default",
+          "inputs": {}
+        }
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32,
+        "eligibleInputRequired": false
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "dmi-implicit-ohlc-holes-v54-v1.pine",
+      "path": "dmi-implicit-ohlc-holes-v54-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "lane-b:166"
+      ],
+      "registerRowId": "lane-b:166",
+      "pineVersion": 6,
+      "sourceSha256": "84af2709ad7c0b2c3f483ece077881b7cf48f789ef958800c80d08cd04fe11e5",
+      "instructionsPath": "instructions/dmi-implicit-ohlc-holes-v54-v1-instructions-v1.md",
+      "instructionsSha256": "874ea2ba4fbb03a7017b81aabf768b991449770b3fa13c04d67670a3d89d159e",
+      "questions": [
+        "What do DI+/DI-/ADX publish at actual implicit OHLC holes and after recovery?"
+      ],
+      "competingHypotheses": [
+        "missing mask with retained smoothing",
+        "missing resets both smoothing stages",
+        "holes skipped with delayed readiness"
+      ],
+      "powerLimit": "Actual native high/low/close holes are mandatory. Finite BTC is a control only. Select and record a real standard-candle dataset/window with OHLC_MISSING=1 at startup and after mature state, plus finite neighbors; export the individual input masks. Do not assume a symbol has holes, inject a synthetic OHLC source, use custom candles, or count missing volume as missing OHLC. If no eligible event is reached the hole facet is INCONCLUSIVE; an unreached recovery stays HELD. This v6 capture gives no v5 result.",
+      "columns": [
+        "OHLC_MISSING",
+        "RECOVERY_AFTER_MISSING",
+        "PLUS_DI_3",
+        "PLUS_DI_3_NA",
+        "PLUS_DI_3_NZ_SENTINEL",
+        "MINUS_DI_3",
+        "MINUS_DI_3_NA",
+        "MINUS_DI_3_NZ_SENTINEL",
+        "ADX_3",
+        "ADX_3_NA",
+        "ADX_3_NZ_SENTINEL",
+        "INPUT_OPEN",
+        "INPUT_HIGH",
+        "INPUT_LOW",
+        "INPUT_CLOSE",
+        "INPUT_VOLUME",
+        "HIGH_NA",
+        "LOW_NA",
+        "CLOSE_NA",
+        "SAMPLE_INDEX",
+        "SOURCE_INDEX",
+        "SOURCE_TIME"
+      ],
+      "attempts": [
+        {
+          "id": "default",
+          "inputs": {}
+        }
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32,
+        "eligibleInputRequired": true
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "correlation-disjoint-source-holes-v54-v1.pine",
+      "path": "correlation-disjoint-source-holes-v54-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "lane-b:167"
+      ],
+      "registerRowId": "lane-b:167",
+      "pineVersion": 6,
+      "sourceSha256": "b435fd835ec2315b2507ba3cb3fbb43dc95b69ea29aff6b7c7234df07f9aac83",
+      "instructionsPath": "instructions/correlation-disjoint-source-holes-v54-v1-instructions-v1.md",
+      "instructionsSha256": "8fbb00250169525672ce7d22985b97f6cb63f910853c9571621c318f8b15f099",
+      "questions": [
+        "Does correlation filter each source independently or select complete pairs when holes are disjoint?"
+      ],
+      "competingHypotheses": [
+        "independently retained finite source samples",
+        "pairwise qualifying observations",
+        "physical-window masking"
+      ],
+      "powerLimit": "The two non-affine sources have different holes and at least4 complete-pair phases per cycle. The complete-pair call is a labelled rival-control input, not assumed expected truth. Only length3 finite/missing startup and recovery.",
+      "columns": [
+        "PHASE",
+        "INPUT_LEFT",
+        "INPUT_RIGHT",
+        "LEFT_NA",
+        "RIGHT_NA",
+        "COMPLETE_PAIR",
+        "CORRELATION_3",
+        "CORRELATION_3_NA",
+        "CORRELATION_3_NZ_SENTINEL",
+        "COMPLETE_PAIR_CONTROL_3",
+        "COMPLETE_PAIR_CONTROL_3_NA",
+        "COMPLETE_PAIR_CONTROL_3_NZ_SENTINEL",
+        "SAMPLE_INDEX",
+        "SOURCE_INDEX",
+        "SOURCE_TIME"
+      ],
+      "attempts": [
+        {
+          "id": "default",
+          "inputs": {}
+        }
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32,
+        "eligibleInputRequired": false
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "tsi-leading-interior-holes-v54-v1.pine",
+      "path": "tsi-leading-interior-holes-v54-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "lane-b:168"
+      ],
+      "registerRowId": "lane-b:168",
+      "pineVersion": 6,
+      "sourceSha256": "ae7f3250b71117a8e451fd802545cf5b9ed290e06cfe3875e4587d149b7a836b",
+      "instructionsPath": "instructions/tsi-leading-interior-holes-v54-v1-instructions-v1.md",
+      "instructionsSha256": "89edad5fb6553489bea2a32691e3f51392c8d44dcb01a9db1965cfd1e6b5855a",
+      "questions": [
+        "How do TSI difference adjacency and double-smoothing startup/recovery behave around source holes?"
+      ],
+      "competingHypotheses": [
+        "difference against previous physical bar",
+        "difference against previous finite source",
+        "retain versus reset EMA stages"
+      ],
+      "powerLimit": "Nonmonotonic source with firsttwoNA and interiorholesphase3/5; direct native output and masks only. The clean call is a control. Separate from the finite TSI(3,5) formula row; no complete TSI formula or arbitrary seed closure.",
+      "columns": [
+        "PHASE",
+        "INPUT_SOURCE",
+        "PHYSICAL_PREVIOUS",
+        "SOURCE_NA",
+        "CLEAN_SOURCE",
+        "TSI_2_3",
+        "TSI_2_3_NA",
+        "TSI_2_3_NZ_SENTINEL",
+        "CLEAN_TSI_2_3",
+        "CLEAN_TSI_2_3_NA",
+        "CLEAN_TSI_2_3_NZ_SENTINEL",
+        "SAMPLE_INDEX",
+        "SOURCE_INDEX",
+        "SOURCE_TIME"
+      ],
+      "attempts": [
+        {
+          "id": "default",
+          "inputs": {}
+        }
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32,
+        "eligibleInputRequired": false
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "cum-hole-output-state-v54-v1.pine",
+      "path": "cum-hole-output-state-v54-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "lane-b:172"
+      ],
+      "registerRowId": "lane-b:172",
+      "pineVersion": 6,
+      "sourceSha256": "3d13c678472a9b2c42fd0c3e848e8130da78f1b3d5d6dc892e6b54d5bd2121f5",
+      "instructionsPath": "instructions/cum-hole-output-state-v54-v1-instructions-v1.md",
+      "instructionsSha256": "f7e4df898a86746e1bbc912401240639bcc0ce75e8947236e1e9a5206bd59624",
+      "questions": [
+        "Does cum mask, retain, reset, or become permanently missing after holes in2,-3,NA,5,NA,-2?"
+      ],
+      "competingHypotheses": [
+        "carry accumulator and mask hole",
+        "publish retained sum on hole",
+        "reset after hole",
+        "permanent NA poisoning"
+      ],
+      "powerLimit": "Repeated six-phase prefix with signed finite values and two distinct holes; capture first32 cells. No v5 result or global arithmetic/zero-division rule.",
+      "columns": [
+        "PHASE",
+        "INPUT_SOURCE",
+        "SOURCE_NA",
+        "CUM",
+        "CUM_NA",
+        "CUM_NZ_SENTINEL",
+        "SAMPLE_INDEX",
+        "SOURCE_INDEX",
+        "SOURCE_TIME"
+      ],
+      "attempts": [
+        {
+          "id": "default",
+          "inputs": {}
+        }
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32,
+        "eligibleInputRequired": false
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "sar-implicit-hole-state-row181-v54-v1.pine",
+      "path": "sar-implicit-hole-state-row181-v54-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "lane-b:181"
+      ],
+      "registerRowId": "lane-b:181",
+      "pineVersion": 6,
+      "sourceSha256": "efabfeaade95771d8b1420317df7bf98cd1e4910cc5d8a0f4503de3b75f4df4a",
+      "instructionsPath": "instructions/sar-implicit-hole-state-row181-v54-v1-instructions-v1.md",
+      "instructionsSha256": "1b92308c6ed4f0e7ceaf4d84368452d21c0910d68e84a9df9d7d080c05a55017",
+      "questions": [
+        "How does SAR retain or reset its output/state at actual missing implicit extrema?"
+      ],
+      "competingHypotheses": [
+        "masked hole and retained trend state",
+        "reset state after hole",
+        "permanent NA recurrence"
+      ],
+      "powerLimit": "Actual native high/low/close holes are mandatory. Finite BTC is a control only. Select and record a real standard-candle dataset/window with OHLC_MISSING=1 at startup and after mature state, plus finite neighbors; export the individual input masks. Do not assume a symbol has holes, inject a synthetic OHLC source, use custom candles, or count missing volume as missing OHLC. If no eligible event is reached the hole facet is INCONCLUSIVE; an unreached recovery stays HELD. This v6 capture gives no v5 result. Row181 remains independently mapped; the sibling SAR source is the same bounded discriminator with a distinct row label, not additional algorithm coverage.",
+      "columns": [
+        "OHLC_MISSING",
+        "RECOVERY_AFTER_MISSING",
+        "SAR",
+        "SAR_NA",
+        "SAR_NZ_SENTINEL",
+        "INPUT_OPEN",
+        "INPUT_HIGH",
+        "INPUT_LOW",
+        "INPUT_CLOSE",
+        "INPUT_VOLUME",
+        "HIGH_NA",
+        "LOW_NA",
+        "CLOSE_NA",
+        "SAMPLE_INDEX",
+        "SOURCE_INDEX",
+        "SOURCE_TIME"
+      ],
+      "attempts": [
+        {
+          "id": "default",
+          "inputs": {}
+        }
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32,
+        "eligibleInputRequired": true
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "sar-implicit-hole-state-row215-v54-v1.pine",
+      "path": "sar-implicit-hole-state-row215-v54-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "lane-b:215"
+      ],
+      "registerRowId": "lane-b:215",
+      "pineVersion": 6,
+      "sourceSha256": "b56cf87eacd71008b9cb49d0a2b09f60bd25450e35804c20fca444ee291f72e5",
+      "instructionsPath": "instructions/sar-implicit-hole-state-row215-v54-v1-instructions-v1.md",
+      "instructionsSha256": "a40587424b6fdda5ca87ccd1ebf78f1a16cede83c559a5b25596bd386f5c1460",
+      "questions": [
+        "How does SAR retain or reset its output/state at actual missing implicit extrema?"
+      ],
+      "competingHypotheses": [
+        "masked hole and retained trend state",
+        "reset state after hole",
+        "permanent NA recurrence"
+      ],
+      "powerLimit": "Actual native high/low/close holes are mandatory. Finite BTC is a control only. Select and record a real standard-candle dataset/window with OHLC_MISSING=1 at startup and after mature state, plus finite neighbors; export the individual input masks. Do not assume a symbol has holes, inject a synthetic OHLC source, use custom candles, or count missing volume as missing OHLC. If no eligible event is reached the hole facet is INCONCLUSIVE; an unreached recovery stays HELD. This v6 capture gives no v5 result. Row215 remains independently mapped; the sibling SAR source is the same bounded discriminator with a distinct row label, not additional algorithm coverage.",
+      "columns": [
+        "OHLC_MISSING",
+        "RECOVERY_AFTER_MISSING",
+        "SAR",
+        "SAR_NA",
+        "SAR_NZ_SENTINEL",
+        "INPUT_OPEN",
+        "INPUT_HIGH",
+        "INPUT_LOW",
+        "INPUT_CLOSE",
+        "INPUT_VOLUME",
+        "HIGH_NA",
+        "LOW_NA",
+        "CLOSE_NA",
+        "SAMPLE_INDEX",
+        "SOURCE_INDEX",
+        "SOURCE_TIME"
+      ],
+      "attempts": [
+        {
+          "id": "default",
+          "inputs": {}
+        }
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32,
+        "eligibleInputRequired": true
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "history-negative-fractional-offset-v54-v1.pine",
+      "path": "history-negative-fractional-offset-v54-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "lane-b:204"
+      ],
+      "registerRowId": "lane-b:204",
+      "pineVersion": 6,
+      "sourceSha256": "96aa1efcd1b5e46d89c41fc846d93d33dc1b7ecfb83085abb836f201a0026b85",
+      "instructionsPath": "instructions/history-negative-fractional-offset-v54-v1-instructions-v1.md",
+      "instructionsSha256": "357bb278b82fb7ffe12aa7d67d61874af60658d7ad63b52411ff4c2679928b53",
+      "questions": [
+        "Does an input-qualified negative fractional history offset refuse, floor to a negative index, or truncate toward zero?"
+      ],
+      "competingHypotheses": [
+        "compile refusal",
+        "runtime negative-depth refusal",
+        "towardzero depth conversion",
+        "floor conversion"
+      ],
+      "powerLimit": "Run all four input values in separate attempts, preserving earliest phase and distinct close controls. A failing negative attempt must not replace the positive attempt. This one v6 input-qualified source does not settle v5 or a separate const-literal qualifier rule; do not infer a value from refusal. The two negative values discriminate nearzero versus magnitude>1 when admitted.",
+      "columns": [
+        "INPUT_OFFSET",
+        "HISTORY_RESULT",
+        "HISTORY_RESULT_NA",
+        "HISTORY_RESULT_NZ_SENTINEL",
+        "CURRENT_CLOSE_CONTROL",
+        "PREVIOUS_CLOSE_CONTROL",
+        "SAMPLE_INDEX",
+        "SOURCE_INDEX",
+        "SOURCE_TIME"
+      ],
+      "attempts": [
+        {
+          "id": "negative-half",
+          "inputs": {
+            "History offset": -0.5
+          }
+        },
+        {
+          "id": "negative-one-half",
+          "inputs": {
+            "History offset": -1.5
+          }
+        },
+        {
+          "id": "positive-half-control",
+          "inputs": {
+            "History offset": 0.5
+          }
+        },
+        {
+          "id": "positive-one-half-control",
+          "inputs": {
+            "History offset": 1.5
+          }
+        }
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32,
+        "eligibleInputRequired": false
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "fixnan-predecessor-startup-v54-v1.pine",
+      "path": "fixnan-predecessor-startup-v54-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "lane-b:205"
+      ],
+      "registerRowId": "lane-b:205",
+      "pineVersion": 6,
+      "sourceSha256": "284fb69cf0ea1183852a24c1dfa0fa79cc9e8881e06da8604671f490cb538412",
+      "instructionsPath": "instructions/fixnan-predecessor-startup-v54-v1-instructions-v1.md",
+      "instructionsSha256": "7d733adb5e0ea511c8790184c84454bd69d45165c24d252b565fea9af83f0e8a",
+      "questions": [
+        "What does fixnan return before the first defined sample and on an allmissing stream?"
+      ],
+      "competingHypotheses": [
+        "NA until finite predecessor",
+        "default seed before first value",
+        "kind-specific seed"
+      ],
+      "powerLimit": "Independent int/float/color calls with NA,NA,3,NA (color uses#123456), plus allNAfloat control. Distinguish pre-first-defined behavior from known finite replacement. Color is RGB/NA encoded, not string/identity credit; v6 only.",
+      "columns": [
+        "INPUT_FLOAT",
+        "INPUT_INT",
+        "COLOR_SOURCE_NA",
+        "FLOAT_FIXNAN",
+        "FLOAT_FIXNAN_NA",
+        "FLOAT_FIXNAN_NZ_SENTINEL",
+        "INT_FIXNAN",
+        "INT_FIXNAN_NA",
+        "INT_FIXNAN_NZ_SENTINEL",
+        "COLOR_FIXNAN_NA",
+        "COLOR_FIXNAN_RGB",
+        "ALL_MISSING_FLOAT_FIXNAN",
+        "ALL_MISSING_FLOAT_FIXNAN_NA",
+        "ALL_MISSING_FLOAT_FIXNAN_NZ_SENTINEL",
+        "SAMPLE_INDEX",
+        "SOURCE_INDEX",
+        "SOURCE_TIME"
+      ],
+      "attempts": [
+        {
+          "id": "default",
+          "inputs": {}
+        }
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32,
+        "eligibleInputRequired": false
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "supertrend-warmup-direction-v54-v1.pine",
+      "path": "supertrend-warmup-direction-v54-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "lane-b:211"
+      ],
+      "registerRowId": "lane-b:211",
+      "pineVersion": 6,
+      "sourceSha256": "462bc6cc64d46c1ad619f6f799a57eb9a2992f38a71f7dfee8afdbe8af8754f4",
+      "instructionsPath": "instructions/supertrend-warmup-direction-v54-v1-instructions-v1.md",
+      "instructionsSha256": "4a4cc1c27151a2a6d17497ff0540ec91a1205982af47ccc4cb0cae0a5ec69cfc",
+      "questions": [
+        "What is Supertrend(3,3) direction before ATR/band warmup on loaded samples0..5?"
+      ],
+      "competingHypotheses": [
+        "direction1 before readiness",
+        "NA direction before readiness",
+        "another native startup publication"
+      ],
+      "powerLimit": "Adjudicate only firstloaded local samples0..5 and their exported actual OHLC. Later output is context only. Capture raw line/direction separately and masks, no synthetic OHLC override or v5/general Supertrend direction formula claim.",
+      "columns": [
+        "SUPERTREND_LINE",
+        "SUPERTREND_LINE_NA",
+        "SUPERTREND_LINE_NZ_SENTINEL",
+        "SUPERTREND_DIRECTION",
+        "SUPERTREND_DIRECTION_NA",
+        "SUPERTREND_DIRECTION_NZ_SENTINEL",
+        "ATR_3_CONTROL",
+        "ELIGIBLE_WARMUP",
+        "INPUT_OPEN",
+        "INPUT_HIGH",
+        "INPUT_LOW",
+        "INPUT_CLOSE",
+        "INPUT_VOLUME",
+        "HIGH_NA",
+        "LOW_NA",
+        "CLOSE_NA",
+        "SAMPLE_INDEX",
+        "SOURCE_INDEX",
+        "SOURCE_TIME"
+      ],
+      "attempts": [
+        {
+          "id": "default",
+          "inputs": {}
+        }
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32,
+        "eligibleInputRequired": false
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "stoch-flat-range-recovery-v54-v1.pine",
+      "path": "stoch-flat-range-recovery-v54-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "lane-b:223"
+      ],
+      "registerRowId": "lane-b:223",
+      "pineVersion": 6,
+      "sourceSha256": "908ad944ea46d5c8d812d368ad05d50ce77bbab38b53ac210e0453a394745f02",
+      "instructionsPath": "instructions/stoch-flat-range-recovery-v54-v1-instructions-v1.md",
+      "instructionsSha256": "a05e262fd950c25ddcea980f72cc794e48c6245d11c5bd74938d67fc487c2870",
+      "questions": [
+        "Does Stoch(1) return NA or retain a prior finite value on a zero range between finite25/75 cells?"
+      ],
+      "competingHypotheses": [
+        "mask each flat denominator",
+        "retain last output through flat range",
+        "zero/default or runtime error"
+      ],
+      "powerLimit": "Synthetic explicit source/high/low are legal builtin arguments (not replaced implicitOHLC). Exactcycle initialflat, finite25, flatagain, finite75. Do not infer v5, arbitrary length, or general division behavior.",
+      "columns": [
+        "PHASE",
+        "INPUT_LOW_SOURCE",
+        "INPUT_HIGH_SOURCE",
+        "INPUT_CLOSE_SOURCE",
+        "INPUT_RANGE",
+        "STOCH_1",
+        "STOCH_1_NA",
+        "STOCH_1_NZ_SENTINEL",
+        "SAMPLE_INDEX",
+        "SOURCE_INDEX",
+        "SOURCE_TIME"
+      ],
+      "attempts": [
+        {
+          "id": "default",
+          "inputs": {}
+        }
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32,
+        "eligibleInputRequired": false
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "bbw-zero-missing-basis-v54-v1.pine",
+      "path": "bbw-zero-missing-basis-v54-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "lane-b:225"
+      ],
+      "registerRowId": "lane-b:225",
+      "pineVersion": 6,
+      "sourceSha256": "59fd7e6cfdf6d8ed54ae45710a67b30ea0228c5214df46b510bf97a105b8f05e",
+      "instructionsPath": "instructions/bbw-zero-missing-basis-v54-v1-instructions-v1.md",
+      "instructionsSha256": "1897814fe9f8763ba081786b1844f9a698f40709d431ea548b787996a7d22a9e",
+      "questions": [
+        "What does BBW(2,2) publish for a zero basis and for an allmissing basis?"
+      ],
+      "competingHypotheses": [
+        "NA/infinite width on zero mean",
+        "zero/retained/default width",
+        "runtime refusal"
+      ],
+      "powerLimit": "Alternating -1/+1 yields zero maturebasis; allzero and allNA are separate written control calls. Observe direct width/mask separately from basis/upper/lower and preserve exact phase. No BB variance or broad singular-arithmetic proof.",
+      "columns": [
+        "INPUT_SOURCE",
+        "BASIS",
+        "BASIS_NA",
+        "BASIS_NZ_SENTINEL",
+        "UPPER",
+        "LOWER",
+        "BBW_ZERO_BASIS",
+        "BBW_ZERO_BASIS_NA",
+        "BBW_ZERO_BASIS_NZ_SENTINEL",
+        "BBW_ZERO_SOURCE",
+        "BBW_ZERO_SOURCE_NA",
+        "BBW_ZERO_SOURCE_NZ_SENTINEL",
+        "BBW_ALL_MISSING",
+        "BBW_ALL_MISSING_NA",
+        "BBW_ALL_MISSING_NZ_SENTINEL",
+        "SAMPLE_INDEX",
+        "SOURCE_INDEX",
+        "SOURCE_TIME"
+      ],
+      "attempts": [
+        {
+          "id": "default",
+          "inputs": {}
+        }
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32,
+        "eligibleInputRequired": false
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "kc-true-range-hole-startup-v54-v1.pine",
+      "path": "kc-true-range-hole-startup-v54-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "lane-b:227"
+      ],
+      "registerRowId": "lane-b:227",
+      "pineVersion": 6,
+      "sourceSha256": "7b9393f4a174f670b5370b4cbaa7ca370b7ef13bd37f0b5ad118cfdaefabe2f0",
+      "instructionsPath": "instructions/kc-true-range-hole-startup-v54-v1-instructions-v1.md",
+      "instructionsSha256": "60268b9bd266a884b7d4615612c7b01653c21f4b62e0031e122c45d5c163a952",
+      "questions": [
+        "How do omitted/true/false true-range selectors differ at firstloaded calculation and after actual missing previous close?"
+      ],
+      "competingHypotheses": [
+        "true/default handle prior-close NA using high-low",
+        "true/default propagate previous-close missing",
+        "different EMA seed/reset publication"
+      ],
+      "powerLimit": "Actual native high/low/close holes are mandatory. Finite BTC is a control only. Select and record a real standard-candle dataset/window with OHLC_MISSING=1 at startup and after mature state, plus finite neighbors; export the individual input masks. Do not assume a symbol has holes, inject a synthetic OHLC source, use custom candles, or count missing volume as missing OHLC. If no eligible event is reached the hole facet is INCONCLUSIVE; an unreached recovery stays HELD. This v6 capture gives no v5 result. Preserve startup independently even if no mature hole is found; startup alone does not settle mature-hole recovery. False-selector controls retain existing certificate credit separately.",
+      "columns": [
+        "OHLC_MISSING",
+        "PREVIOUS_CLOSE_NA",
+        "TR_VARIABLE",
+        "TR_TRUE_CONTROL",
+        "DEFAULT_BASIS",
+        "DEFAULT_BASIS_NA",
+        "DEFAULT_BASIS_NZ_SENTINEL",
+        "DEFAULT_UPPER",
+        "DEFAULT_LOWER",
+        "TRUE_BASIS",
+        "TRUE_BASIS_NA",
+        "TRUE_BASIS_NZ_SENTINEL",
+        "TRUE_UPPER",
+        "TRUE_LOWER",
+        "FALSE_BASIS",
+        "FALSE_BASIS_NA",
+        "FALSE_BASIS_NZ_SENTINEL",
+        "FALSE_UPPER",
+        "FALSE_LOWER",
+        "INPUT_OPEN",
+        "INPUT_HIGH",
+        "INPUT_LOW",
+        "INPUT_CLOSE",
+        "INPUT_VOLUME",
+        "HIGH_NA",
+        "LOW_NA",
+        "CLOSE_NA",
+        "SAMPLE_INDEX",
+        "SOURCE_INDEX",
+        "SOURCE_TIME"
+      ],
+      "attempts": [
+        {
+          "id": "default",
+          "inputs": {}
+        }
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32,
+        "eligibleInputRequired": true
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "kcw-true-range-hole-startup-v54-v1.pine",
+      "path": "kcw-true-range-hole-startup-v54-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "lane-b:229"
+      ],
+      "registerRowId": "lane-b:229",
+      "pineVersion": 6,
+      "sourceSha256": "6d387313009a5ded2f1bf639a762a928318c2de0e1f48136335ac680e0097ff5",
+      "instructionsPath": "instructions/kcw-true-range-hole-startup-v54-v1-instructions-v1.md",
+      "instructionsSha256": "69c08f538e5527b24af23ae10539df3a48f1bfdb3ac72af16e9b7b1f12006364",
+      "questions": [
+        "How do omitted/true/false true-range selectors differ at firstloaded calculation and after actual missing previous close?"
+      ],
+      "competingHypotheses": [
+        "true/default handle prior-close NA using high-low",
+        "true/default propagate previous-close missing",
+        "different EMA seed/reset publication"
+      ],
+      "powerLimit": "Actual native high/low/close holes are mandatory. Finite BTC is a control only. Select and record a real standard-candle dataset/window with OHLC_MISSING=1 at startup and after mature state, plus finite neighbors; export the individual input masks. Do not assume a symbol has holes, inject a synthetic OHLC source, use custom candles, or count missing volume as missing OHLC. If no eligible event is reached the hole facet is INCONCLUSIVE; an unreached recovery stays HELD. This v6 capture gives no v5 result. Preserve startup independently even if no mature hole is found; startup alone does not settle mature-hole recovery. False-selector controls retain existing certificate credit separately.",
+      "columns": [
+        "OHLC_MISSING",
+        "PREVIOUS_CLOSE_NA",
+        "TR_VARIABLE",
+        "TR_TRUE_CONTROL",
+        "DEFAULT_KCW",
+        "DEFAULT_KCW_NA",
+        "DEFAULT_KCW_NZ_SENTINEL",
+        "TRUE_KCW",
+        "TRUE_KCW_NA",
+        "TRUE_KCW_NZ_SENTINEL",
+        "FALSE_KCW",
+        "FALSE_KCW_NA",
+        "FALSE_KCW_NZ_SENTINEL",
+        "INPUT_OPEN",
+        "INPUT_HIGH",
+        "INPUT_LOW",
+        "INPUT_CLOSE",
+        "INPUT_VOLUME",
+        "HIGH_NA",
+        "LOW_NA",
+        "CLOSE_NA",
+        "SAMPLE_INDEX",
+        "SOURCE_INDEX",
+        "SOURCE_TIME"
+      ],
+      "attempts": [
+        {
+          "id": "default",
+          "inputs": {}
+        }
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32,
+        "eligibleInputRequired": true
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "pivothigh-candidate-window-holes-v54-v1.pine",
+      "path": "pivothigh-candidate-window-holes-v54-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "lane-b:245"
+      ],
+      "registerRowId": "lane-b:245",
+      "pineVersion": 6,
+      "sourceSha256": "def57777c6ebe7a9b4c1280fca5c1908434604982b94fbffbec55494f0256248",
+      "instructionsPath": "instructions/pivothigh-candidate-window-holes-v54-v1-instructions-v1.md",
+      "instructionsSha256": "b79e08b9e4b615ce969ad784fe4b185983f133476c3edcb83a1fc00f03765757",
+      "questions": [
+        "Does a candidate, left-neighbor or right-neighbor hole disqualify or alter a finite pivot window?"
+      ],
+      "competingHypotheses": [
+        "disqualify any hole in physical candidate window",
+        "skip hole comparisons",
+        "expand to finite neighbors",
+        "tie side asymmetry"
+      ],
+      "powerLimit": "Eachcase is a separate attempt. Localphase2 is the intended extreme; case1 removes candidate,2 leftneighbor,3 rightneighbor,4 tiesleft with candidate. Matched nohole1/1 and2/1 written calls preserve finite detection. Repeated8-phase fixture captures maturecycles and startup; no v5 or arbitrary scanning algorithm claim.",
+      "columns": [
+        "PHASE",
+        "CASE",
+        "INPUT_SOURCE",
+        "CLEAN_SOURCE",
+        "SOURCE_HOLE",
+        "PIVOT_1_1",
+        "PIVOT_1_1_NA",
+        "PIVOT_1_1_NZ_SENTINEL",
+        "PIVOT_2_1",
+        "PIVOT_2_1_NA",
+        "PIVOT_2_1_NZ_SENTINEL",
+        "CLEAN_PIVOT_1_1",
+        "CLEAN_PIVOT_2_1",
+        "SAMPLE_INDEX",
+        "SOURCE_INDEX",
+        "SOURCE_TIME"
+      ],
+      "attempts": [
+        {
+          "id": "nohole-control",
+          "inputs": {
+            "Hole case": 0
+          }
+        },
+        {
+          "id": "candidate-hole",
+          "inputs": {
+            "Hole case": 1
+          }
+        },
+        {
+          "id": "left-hole",
+          "inputs": {
+            "Hole case": 2
+          }
+        },
+        {
+          "id": "right-hole",
+          "inputs": {
+            "Hole case": 3
+          }
+        },
+        {
+          "id": "left-tie-control",
+          "inputs": {
+            "Hole case": 4
+          }
+        }
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32,
+        "eligibleInputRequired": false
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "pivotlow-candidate-window-holes-v54-v1.pine",
+      "path": "pivotlow-candidate-window-holes-v54-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "lane-b:246"
+      ],
+      "registerRowId": "lane-b:246",
+      "pineVersion": 6,
+      "sourceSha256": "db75587b7c867a8a3f5e69490b0dd0fdf5d48e1059b2ab4bddea5baa23114066",
+      "instructionsPath": "instructions/pivotlow-candidate-window-holes-v54-v1-instructions-v1.md",
+      "instructionsSha256": "c3807c47616aef42008687817f7c1274b95ad37364105947674f9f7cd2d86846",
+      "questions": [
+        "Does a candidate, left-neighbor or right-neighbor hole disqualify or alter a finite pivot window?"
+      ],
+      "competingHypotheses": [
+        "disqualify any hole in physical candidate window",
+        "skip hole comparisons",
+        "expand to finite neighbors",
+        "tie side asymmetry"
+      ],
+      "powerLimit": "Eachcase is a separate attempt. Localphase2 is the intended extreme; case1 removes candidate,2 leftneighbor,3 rightneighbor,4 tiesleft with candidate. Matched nohole1/1 and2/1 written calls preserve finite detection. Repeated8-phase fixture captures maturecycles and startup; no v5 or arbitrary scanning algorithm claim.",
+      "columns": [
+        "PHASE",
+        "CASE",
+        "INPUT_SOURCE",
+        "CLEAN_SOURCE",
+        "SOURCE_HOLE",
+        "PIVOT_1_1",
+        "PIVOT_1_1_NA",
+        "PIVOT_1_1_NZ_SENTINEL",
+        "PIVOT_2_1",
+        "PIVOT_2_1_NA",
+        "PIVOT_2_1_NZ_SENTINEL",
+        "CLEAN_PIVOT_1_1",
+        "CLEAN_PIVOT_2_1",
+        "SAMPLE_INDEX",
+        "SOURCE_INDEX",
+        "SOURCE_TIME"
+      ],
+      "attempts": [
+        {
+          "id": "nohole-control",
+          "inputs": {
+            "Hole case": 0
+          }
+        },
+        {
+          "id": "candidate-hole",
+          "inputs": {
+            "Hole case": 1
+          }
+        },
+        {
+          "id": "left-hole",
+          "inputs": {
+            "Hole case": 2
+          }
+        },
+        {
+          "id": "right-hole",
+          "inputs": {
+            "Hole case": 3
+          }
+        },
+        {
+          "id": "left-tie-control",
+          "inputs": {
+            "Hole case": 4
+          }
+        }
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32,
+        "eligibleInputRequired": false
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "hma-nested-rounding-startup-v54-v1.pine",
+      "path": "hma-nested-rounding-startup-v54-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "lane-b:231"
+      ],
+      "registerRowId": "lane-b:231",
+      "pineVersion": 6,
+      "sourceSha256": "a7bb7f7b47d0be1d144c3fee9589f821ca1284d717fb11ce4acf18343d6aec55",
+      "instructionsPath": "instructions/hma-nested-rounding-startup-v54-v1-instructions-v1.md",
+      "instructionsSha256": "3f128a62d39dd668cf566cd243e6142947c7844e395202b2e258b0c05c38adb7",
+      "questions": [
+        "What HMA(9/10) startup masks and values occur on ramp and impulse, and which explicit nested-WMA rounding candidates differ?"
+      ],
+      "competingHypotheses": [
+        "half-length floor or ceiling for9",
+        "square-root floor or ceiling for10",
+        "nested startup/mask conventions"
+      ],
+      "powerLimit": "Only v6 lengths9/10,32cells, risingramp and impulse at12. Floor/ceil models are separately labelled candidates using public WMA; no formula truth or general rounding policy is assumed. V5 remains unobserved.",
+      "columns": [
+        "INPUT_RAMP",
+        "INPUT_IMPULSE",
+        "RAMP_HMA_9",
+        "RAMP_HMA_9_NA",
+        "RAMP_HMA_9_NZ_SENTINEL",
+        "RAMP_MODEL_9_HALF_FLOOR",
+        "RAMP_MODEL_9_HALF_CEIL",
+        "RAMP_HMA_10",
+        "RAMP_HMA_10_NA",
+        "RAMP_HMA_10_NZ_SENTINEL",
+        "RAMP_MODEL_10_SQRT_FLOOR",
+        "RAMP_MODEL_10_SQRT_CEIL",
+        "IMPULSE_HMA_9",
+        "IMPULSE_HMA_9_NA",
+        "IMPULSE_HMA_9_NZ_SENTINEL",
+        "IMPULSE_MODEL_9_HALF_FLOOR",
+        "IMPULSE_MODEL_9_HALF_CEIL",
+        "IMPULSE_HMA_10",
+        "IMPULSE_HMA_10_NA",
+        "IMPULSE_HMA_10_NZ_SENTINEL",
+        "IMPULSE_MODEL_10_SQRT_FLOOR",
+        "IMPULSE_MODEL_10_SQRT_CEIL",
+        "SAMPLE_INDEX",
+        "SOURCE_INDEX",
+        "SOURCE_TIME"
+      ],
+      "attempts": [
+        {
+          "id": "default",
+          "inputs": {}
+        }
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32,
+        "eligibleInputRequired": false
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "macd-tuple-stage-startup-v54-v1.pine",
+      "path": "macd-tuple-stage-startup-v54-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "lane-b:232"
+      ],
+      "registerRowId": "lane-b:232",
+      "pineVersion": 6,
+      "sourceSha256": "a2edc10946c10f1dbe1bfc522fdbef5f4a2296cbd3477ccd71a3f2c30275cf6d",
+      "instructionsPath": "instructions/macd-tuple-stage-startup-v54-v1-instructions-v1.md",
+      "instructionsSha256": "7cd2a9547a37efd60545aaddd5613cd1a727dd03fc13561376aefe827723a851",
+      "questions": [
+        "What exact MACD(2,3,2) line/signal/histogram masks and values occur from firstloaded ramp and impulse samples?"
+      ],
+      "competingHypotheses": [
+        "EMA firstsample initialization",
+        "length-delayed initialization",
+        "signal-stage readiness differs from line"
+      ],
+      "powerLimit": "Allthree native tuple columns must be retained separately from sample0 on ramp100+sample and impulse7 at8. No synthetic formula replaces native MACD. V6only, no general seed/holes/otherlength claim.",
+      "columns": [
+        "INPUT_RAMP",
+        "INPUT_IMPULSE",
+        "RAMP_LINE",
+        "RAMP_LINE_NA",
+        "RAMP_LINE_NZ_SENTINEL",
+        "RAMP_SIGNAL",
+        "RAMP_SIGNAL_NA",
+        "RAMP_SIGNAL_NZ_SENTINEL",
+        "RAMP_HIST",
+        "RAMP_HIST_NA",
+        "RAMP_HIST_NZ_SENTINEL",
+        "IMPULSE_LINE",
+        "IMPULSE_LINE_NA",
+        "IMPULSE_LINE_NZ_SENTINEL",
+        "IMPULSE_SIGNAL",
+        "IMPULSE_SIGNAL_NA",
+        "IMPULSE_SIGNAL_NZ_SENTINEL",
+        "IMPULSE_HIST",
+        "IMPULSE_HIST_NA",
+        "IMPULSE_HIST_NZ_SENTINEL",
+        "SAMPLE_INDEX",
+        "SOURCE_INDEX",
+        "SOURCE_TIME"
+      ],
+      "attempts": [
+        {
+          "id": "default",
+          "inputs": {}
+        }
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32,
+        "eligibleInputRequired": false
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "tsi-flat-movement-seed-v54-v1.pine",
+      "path": "tsi-flat-movement-seed-v54-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "lane-b:233"
+      ],
+      "registerRowId": "lane-b:233",
+      "pineVersion": 6,
+      "sourceSha256": "607add74e68a375e9505f56b8ed89b7aae6bfd28947cf28271eb42dc8e3805a8",
+      "instructionsPath": "instructions/tsi-flat-movement-seed-v54-v1-instructions-v1.md",
+      "instructionsSha256": "8e91ba497ca79319d629eee7d7df3cfc0e2327a57e7481f43e67e898d90a0974",
+      "questions": [
+        "How does TSI(2,3) initialize on constant input and repeated movement-flat-movement transitions?"
+      ],
+      "competingHypotheses": [
+        "zero-denominator NA",
+        "zero/default/retained publication",
+        "smoothing readiness/seed differences"
+      ],
+      "powerLimit": "V6constant100 plus exacteightphase100,100,101,101,101,99,99,103; direct masks and values from local0. This is startup/zero-denominator only, separate from the finite formula and source-hole rows; no general zero-division conclusion.",
+      "columns": [
+        "PHASE",
+        "INPUT_SOURCE",
+        "INPUT_CHANGE",
+        "MOVEMENT_FLAT_TSI_2_3",
+        "MOVEMENT_FLAT_TSI_2_3_NA",
+        "MOVEMENT_FLAT_TSI_2_3_NZ_SENTINEL",
+        "CONSTANT_TSI_2_3",
+        "CONSTANT_TSI_2_3_NA",
+        "CONSTANT_TSI_2_3_NZ_SENTINEL",
+        "SAMPLE_INDEX",
+        "SOURCE_INDEX",
+        "SOURCE_TIME"
+      ],
+      "attempts": [
+        {
+          "id": "default",
+          "inputs": {}
+        }
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32,
+        "eligibleInputRequired": false
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "mfi-actual-volume-holes-v54-v1.pine",
+      "path": "mfi-actual-volume-holes-v54-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "lane-b:236"
+      ],
+      "registerRowId": "lane-b:236",
+      "pineVersion": 6,
+      "sourceSha256": "93c723511f87a52800d80c7459280b5554e1f146a3db1ce4031d38b40b5a80b2",
+      "instructionsPath": "instructions/mfi-actual-volume-holes-v54-v1-instructions-v1.md",
+      "instructionsSha256": "adea466a1f63697b4ef6798a931b2655259de3eda8c2e1f1213af4d2fbe5ae29",
+      "questions": [
+        "What does MFI(3) publish through actual missing volume, distinguished from an explicit source hole?"
+      ],
+      "competingHypotheses": [
+        "missing-volume output mask with retained flow",
+        "skip missing-volume sample",
+        "reset flow state after missing-volume bar"
+      ],
+      "powerLimit": "Actual native volumeNA, ideally after finite mature state with finite recovery, is mandatory. Missing source at local8 is an explicitly labelled control and cannot stand in for missing volume; volume0 is notNA. A finite or allNAvolume feed without required mature/recovery neighborhoods leaves those facets INCONCLUSIVE. V6only.",
+      "columns": [
+        "INPUT_SOURCE",
+        "SOURCE_HOLE_CONTROL",
+        "INPUT_VOLUME",
+        "ACTUAL_VOLUME_MISSING",
+        "RECOVERY_AFTER_VOLUME_MISSING",
+        "MFI_3",
+        "MFI_3_NA",
+        "MFI_3_NZ_SENTINEL",
+        "MFI_SOURCE_HOLE_CONTROL_3",
+        "MFI_SOURCE_HOLE_CONTROL_3_NA",
+        "MFI_SOURCE_HOLE_CONTROL_3_NZ_SENTINEL",
+        "SAMPLE_INDEX",
+        "SOURCE_INDEX",
+        "SOURCE_TIME"
+      ],
+      "attempts": [
+        {
+          "id": "default",
+          "inputs": {}
+        }
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32,
+        "eligibleInputRequired": true
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "stoch-independent-bound-holes-v54-v1.pine",
+      "path": "stoch-independent-bound-holes-v54-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "lane-b:237"
+      ],
+      "registerRowId": "lane-b:237",
+      "pineVersion": 6,
+      "sourceSha256": "294c19750592c5d7b150d260e3f159541ac8e9896f5b4f181770ed8a81e379cc",
+      "instructionsPath": "instructions/stoch-independent-bound-holes-v54-v1-instructions-v1.md",
+      "instructionsSha256": "0d68d14770b1cef943f6943c65e58193d5c66139f6f95f78a538e45da32f2a74",
+      "questions": [
+        "Do independent high-source and low-source holes behave like a source hole when Stoch has a finite asymmetric numerator?"
+      ],
+      "competingHypotheses": [
+        "independent finite bound filtering",
+        "physical-window NA propagation",
+        "retained publication on bound hole"
+      ],
+      "powerLimit": "Stoch has explicit source/high/low arguments, so synthetic argument holes are legal target stimuli; this does not replace any implicitOHLC builtin. Cases0/1/2/3 are separate native attempts with local8 nohole/highhole/lowhole/closehole. Numerator and remaining bounds stay finite and asymmetric. No flat range or arbitrary-length claim.",
+      "columns": [
+        "CASE",
+        "INPUT_HIGH_SOURCE",
+        "INPUT_LOW_SOURCE",
+        "INPUT_CLOSE_SOURCE",
+        "HIGH_SOURCE_NA",
+        "LOW_SOURCE_NA",
+        "CLOSE_SOURCE_NA",
+        "STOCH_3",
+        "STOCH_3_NA",
+        "STOCH_3_NZ_SENTINEL",
+        "FINITE_STOCH_3_CONTROL",
+        "FINITE_STOCH_3_CONTROL_NA",
+        "FINITE_STOCH_3_CONTROL_NZ_SENTINEL",
+        "SAMPLE_INDEX",
+        "SOURCE_INDEX",
+        "SOURCE_TIME"
+      ],
+      "attempts": [
+        {
+          "id": "finite-control",
+          "inputs": {
+            "Hole kind": 0
+          }
+        },
+        {
+          "id": "high-hole",
+          "inputs": {
+            "Hole kind": 1
+          }
+        },
+        {
+          "id": "low-hole",
+          "inputs": {
+            "Hole kind": 2
+          }
+        },
+        {
+          "id": "source-hole-control",
+          "inputs": {
+            "Hole kind": 3
+          }
+        }
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32,
+        "eligibleInputRequired": false
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "vwap-omitted-daily-anchor-context-v54-v1.pine",
+      "path": "vwap-omitted-daily-anchor-context-v54-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "lane-b:239"
+      ],
+      "registerRowId": "lane-b:239",
+      "pineVersion": 6,
+      "sourceSha256": "366148b6a4feb9b3651b75634701699d59b5258570cdfd3fca8dd506e5352b15",
+      "instructionsPath": "instructions/vwap-omitted-daily-anchor-context-v54-v1-instructions-v1.md",
+      "instructionsSha256": "4ff2d5e6f8005d2115eb0dd68ca32820cf09cf24d6d4f81ecd837fc05e45e15a",
+      "questions": [
+        "Does omitted VWAP anchor match explicit timeframe.change(1D) across a recorded session/day boundary?"
+      ],
+      "competingHypotheses": [
+        "omitted default follows daily period",
+        "omitted default follows a distinct session reset",
+        "context-specific initialization differs"
+      ],
+      "powerLimit": "Require actual exported EXPLICIT_DAY_ANCHOR=1 within the32-cell loaded window, with finite defined source/volume on both sides; select and record symbol/session/timezone/chart period to reach it (e.g.a larger standard timeframe), rather than assume BTC2m suffices. Capture identical context for both written calls. No boundary means INCONCLUSIVE; no universal session/calendar rule.",
+      "columns": [
+        "INPUT_SOURCE",
+        "INPUT_VOLUME",
+        "EXPLICIT_DAY_ANCHOR",
+        "TRADING_DAY",
+        "OMITTED_ANCHOR_VWAP",
+        "OMITTED_ANCHOR_VWAP_NA",
+        "OMITTED_ANCHOR_VWAP_NZ_SENTINEL",
+        "EXPLICIT_DAILY_VWAP",
+        "EXPLICIT_DAILY_VWAP_NA",
+        "EXPLICIT_DAILY_VWAP_NZ_SENTINEL",
+        "SAMPLE_INDEX",
+        "SOURCE_INDEX",
+        "SOURCE_TIME"
+      ],
+      "attempts": [
+        {
+          "id": "default",
+          "inputs": {}
+        }
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32,
+        "eligibleInputRequired": true
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "vwap-source-actual-volume-hole-state-v54-v1.pine",
+      "path": "vwap-source-actual-volume-hole-state-v54-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "lane-b:240"
+      ],
+      "registerRowId": "lane-b:240",
+      "pineVersion": 6,
+      "sourceSha256": "871242f99d02a6471122ef62f6a712313f51e3adeed7c2990ca4a1936a4366a7",
+      "instructionsPath": "instructions/vwap-source-actual-volume-hole-state-v54-v1-instructions-v1.md",
+      "instructionsSha256": "d3a2664b6b3ef8f1ca3ecc996c757c398895ff2e82e860a51d2d7522e14916ce",
+      "questions": [
+        "How does anchored VWAP retain or reset after an explicit source hole and actual missing volume?"
+      ],
+      "competingHypotheses": [
+        "mask output and preserve accumulator",
+        "skip source/volume missing sample",
+        "reset/poison accumulator"
+      ],
+      "powerLimit": "Anchor at local0/16; explicit sourceNA at10 follows finite state. Actual volumeNA must be observed separately with finite source, and recover without an intervening anchor to settle retention. A feed without that eligible volume event leaves the volume facet HELD; the source hole is not a volume substitute. V6function only; direct variable hold in v53 remains distinct.",
+      "columns": [
+        "INPUT_SOURCE",
+        "FINITE_SOURCE_CONTROL",
+        "INPUT_VOLUME",
+        "SOURCE_NA",
+        "ACTUAL_VOLUME_MISSING",
+        "EXPLICIT_ANCHOR",
+        "FINITE_RECOVERY",
+        "VWAP_SOURCE_HOLE",
+        "VWAP_SOURCE_HOLE_NA",
+        "VWAP_SOURCE_HOLE_NZ_SENTINEL",
+        "VWAP_SOURCE_CONTROL",
+        "VWAP_SOURCE_CONTROL_NA",
+        "VWAP_SOURCE_CONTROL_NZ_SENTINEL",
+        "SAMPLE_INDEX",
+        "SOURCE_INDEX",
+        "SOURCE_TIME"
+      ],
+      "attempts": [
+        {
+          "id": "default",
+          "inputs": {}
+        }
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32,
+        "eligibleInputRequired": true
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "vwap-tuple-missing-multiplier-v54-v1.pine",
+      "path": "vwap-tuple-missing-multiplier-v54-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "lane-b:241"
+      ],
+      "registerRowId": "lane-b:241",
+      "pineVersion": 6,
+      "sourceSha256": "cb2045c8b04f4812cf5c392fc49a7b6704ea3183c2ce6d3c86fec04d532743c4",
+      "instructionsPath": "instructions/vwap-tuple-missing-multiplier-v54-v1-instructions-v1.md",
+      "instructionsSha256": "c7109f540d59059809ab2d9dd3271eb8124b2cdc270197fe321c17b59a74759d",
+      "questions": [
+        "Does a missing VWAP band multiplier affect basis, either band, or subsequent state?"
+      ],
+      "competingHypotheses": [
+        "basis retained but bands masked",
+        "wholetuple missing",
+        "persistent state changed versus finite multiplier control"
+      ],
+      "powerLimit": "Use actual finite source/positivevolume for the multiplier-only facet. Anchor0/16 and multiplierNA at8 isolate one missing multiplier between finite1.5 samples. Capture basis and both bands individually plus exact masks and recovery. Only v6tuple overload; no general missing-argument rule.",
+      "columns": [
+        "INPUT_SOURCE",
+        "INPUT_VOLUME",
+        "EXPLICIT_ANCHOR",
+        "INPUT_MULTIPLIER",
+        "MULTIPLIER_NA",
+        "VWAP_BASIS",
+        "VWAP_BASIS_NA",
+        "VWAP_BASIS_NZ_SENTINEL",
+        "VWAP_UPPER",
+        "VWAP_UPPER_NA",
+        "VWAP_UPPER_NZ_SENTINEL",
+        "VWAP_LOWER",
+        "VWAP_LOWER_NA",
+        "VWAP_LOWER_NZ_SENTINEL",
+        "FINITE_MULT_BASIS_CONTROL",
+        "FINITE_MULT_UPPER_CONTROL",
+        "FINITE_MULT_LOWER_CONTROL",
+        "SAMPLE_INDEX",
+        "SOURCE_INDEX",
+        "SOURCE_TIME"
+      ],
+      "attempts": [
+        {
+          "id": "default",
+          "inputs": {}
+        }
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32,
+        "eligibleInputRequired": false
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "obv-implicit-feed-hole-state-v54-v1.pine",
+      "path": "obv-implicit-feed-hole-state-v54-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "lane-b:247"
+      ],
+      "registerRowId": "lane-b:247",
+      "pineVersion": 6,
+      "sourceSha256": "432792295426c82dce7f8907fcbd106f4c0dc29247aa954051730a5afd38400b",
+      "instructionsPath": "instructions/obv-implicit-feed-hole-state-v54-v1-instructions-v1.md",
+      "instructionsSha256": "d3920ee6942947a7fee6ca9881a0f0c78586918128899f8acecf503af0591a84",
+      "questions": [
+        "What does OBV publish through actual feed holes and recovery, compared with the explicitly labelled increment observer?"
+      ],
+      "competingHypotheses": [
+        "retain accumulated state",
+        "skip missing increment",
+        "mask/reset/poison after missing feed"
+      ],
+      "powerLimit": "Use actual native input masks at a mature missing bar and subsequent finite recovery. A finite chart or unreached recovery is INCONCLUSIVE; do not inject custom OHLC or equate volume0 with volumeNA. Capture startup separately. No broad formula or version claim. The increment and cum columns are hypothesis observers, not replacements for the native builtin.",
+      "columns": [
+        "INPUT_OPEN",
+        "INPUT_HIGH",
+        "INPUT_LOW",
+        "INPUT_CLOSE",
+        "INPUT_VOLUME",
+        "HIGH_NA",
+        "LOW_NA",
+        "CLOSE_NA",
+        "OHLC_MISSING",
+        "VOLUME_MISSING",
+        "FINITE_RECOVERY",
+        "MODEL_RAW_INCREMENT",
+        "OBV",
+        "OBV_NA",
+        "OBV_NZ_SENTINEL",
+        "MODEL_CUM_INCREMENT",
+        "SAMPLE_INDEX",
+        "SOURCE_INDEX",
+        "SOURCE_TIME"
+      ],
+      "attempts": [
+        {
+          "id": "default",
+          "inputs": {}
+        }
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32,
+        "eligibleInputRequired": true
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "pvt-implicit-feed-hole-state-v54-v1.pine",
+      "path": "pvt-implicit-feed-hole-state-v54-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "lane-b:248"
+      ],
+      "registerRowId": "lane-b:248",
+      "pineVersion": 6,
+      "sourceSha256": "fff5dbc4ec4b5343d9cbd1bd11004b357411520d05d00a6996a6afc55815d5af",
+      "instructionsPath": "instructions/pvt-implicit-feed-hole-state-v54-v1-instructions-v1.md",
+      "instructionsSha256": "6751219c25d3087c0db2f6922f28297ceb3223a2a943db4dd5f9a1da1d98bd98",
+      "questions": [
+        "What does PVT publish through actual feed holes and recovery, compared with the explicitly labelled increment observer?"
+      ],
+      "competingHypotheses": [
+        "retain accumulated state",
+        "skip missing increment",
+        "mask/reset/poison after missing feed"
+      ],
+      "powerLimit": "Use actual native input masks at a mature missing bar and subsequent finite recovery. A finite chart or unreached recovery is INCONCLUSIVE; do not inject custom OHLC or equate volume0 with volumeNA. Capture startup separately. No broad formula or version claim. The increment and cum columns are hypothesis observers, not replacements for the native builtin.",
+      "columns": [
+        "INPUT_OPEN",
+        "INPUT_HIGH",
+        "INPUT_LOW",
+        "INPUT_CLOSE",
+        "INPUT_VOLUME",
+        "HIGH_NA",
+        "LOW_NA",
+        "CLOSE_NA",
+        "OHLC_MISSING",
+        "VOLUME_MISSING",
+        "FINITE_RECOVERY",
+        "MODEL_RAW_INCREMENT",
+        "PVT",
+        "PVT_NA",
+        "PVT_NZ_SENTINEL",
+        "MODEL_CUM_INCREMENT",
+        "SAMPLE_INDEX",
+        "SOURCE_INDEX",
+        "SOURCE_TIME"
+      ],
+      "attempts": [
+        {
+          "id": "default",
+          "inputs": {}
+        }
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32,
+        "eligibleInputRequired": true
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "wad-implicit-feed-hole-state-v54-v1.pine",
+      "path": "wad-implicit-feed-hole-state-v54-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "lane-b:249"
+      ],
+      "registerRowId": "lane-b:249",
+      "pineVersion": 6,
+      "sourceSha256": "7789e77d87a49945848249522a37dab3057a842ebdca3cc5f2b1eb596eb8d7d8",
+      "instructionsPath": "instructions/wad-implicit-feed-hole-state-v54-v1-instructions-v1.md",
+      "instructionsSha256": "8d072a4a0b491126af08e7705761418cc65329fcc56a7eede87de38afe37f047",
+      "questions": [
+        "What does WAD publish through actual feed holes and recovery, compared with the explicitly labelled increment observer?"
+      ],
+      "competingHypotheses": [
+        "retain accumulated state",
+        "skip missing increment",
+        "mask/reset/poison after missing feed"
+      ],
+      "powerLimit": "Use actual native input masks at a mature missing bar and subsequent finite recovery. A finite chart or unreached recovery is INCONCLUSIVE; do not inject custom OHLC or equate volume0 with volumeNA. Capture startup separately. No broad formula or version claim. The increment and cum columns are hypothesis observers, not replacements for the native builtin.",
+      "columns": [
+        "INPUT_OPEN",
+        "INPUT_HIGH",
+        "INPUT_LOW",
+        "INPUT_CLOSE",
+        "INPUT_VOLUME",
+        "HIGH_NA",
+        "LOW_NA",
+        "CLOSE_NA",
+        "OHLC_MISSING",
+        "VOLUME_MISSING",
+        "FINITE_RECOVERY",
+        "MODEL_RAW_INCREMENT",
+        "WAD",
+        "WAD_NA",
+        "WAD_NZ_SENTINEL",
+        "MODEL_CUM_INCREMENT",
+        "SAMPLE_INDEX",
+        "SOURCE_INDEX",
+        "SOURCE_TIME"
+      ],
+      "attempts": [
+        {
+          "id": "default",
+          "inputs": {}
+        }
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32,
+        "eligibleInputRequired": true
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "iii-actual-missing-feed-v54-v1.pine",
+      "path": "iii-actual-missing-feed-v54-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "lane-b:250"
+      ],
+      "registerRowId": "lane-b:250",
+      "pineVersion": 6,
+      "sourceSha256": "ec1856206028bb93ce6e1c90aaaf1db9d90dbda5b8647e8c2b17debc53e0547b",
+      "instructionsPath": "instructions/iii-actual-missing-feed-v54-v1-instructions-v1.md",
+      "instructionsSha256": "5d3d33608c715a9864bc6c02ea2db0007a88fcbb6e6fbeae6265b18f3de1658d",
+      "questions": [
+        "How does III publish at actual missing OHLC or volume on otherwise nonflat feed bars?"
+      ],
+      "competingHypotheses": [
+        "NA propagation",
+        "zero/default publication",
+        "retained prior output"
+      ],
+      "powerLimit": "Use actual native input masks at a mature missing bar and subsequent finite recovery. A finite chart or unreached recovery is INCONCLUSIVE; do not inject custom OHLC or equate volume0 with volumeNA. Capture startup separately. No broad formula or version claim. Adjudicate only missing-feed neighborhoods; the flat0/0 companion was already shipped in v53 and is not recaptured here. If a flat range coincides with a hole, that does not isolate this missing-feed facet.",
+      "columns": [
+        "INPUT_OPEN",
+        "INPUT_HIGH",
+        "INPUT_LOW",
+        "INPUT_CLOSE",
+        "INPUT_VOLUME",
+        "HIGH_NA",
+        "LOW_NA",
+        "CLOSE_NA",
+        "OHLC_MISSING",
+        "VOLUME_MISSING",
+        "FINITE_RECOVERY",
+        "INPUT_RANGE",
+        "NONFLAT_OHLC_ELIGIBLE",
+        "III",
+        "III_NA",
+        "III_NZ_SENTINEL",
+        "SAMPLE_INDEX",
+        "SOURCE_INDEX",
+        "SOURCE_TIME"
+      ],
+      "attempts": [
+        {
+          "id": "default",
+          "inputs": {}
+        }
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32,
+        "eligibleInputRequired": true
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "wvad-actual-missing-feed-v54-v1.pine",
+      "path": "wvad-actual-missing-feed-v54-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "lane-b:251"
+      ],
+      "registerRowId": "lane-b:251",
+      "pineVersion": 6,
+      "sourceSha256": "ab239a8b39afd8ef408a30d5e1782cd073b81b1636daf49cfbe24f5b5e6d758d",
+      "instructionsPath": "instructions/wvad-actual-missing-feed-v54-v1-instructions-v1.md",
+      "instructionsSha256": "2963b18bec37daed0f7baa3f5092f23a319b17567f797c4ea96df15ba6c8d501",
+      "questions": [
+        "How does WVAD publish at actual missing OHLC or volume on otherwise nonflat feed bars?"
+      ],
+      "competingHypotheses": [
+        "NA propagation",
+        "zero/default publication",
+        "retained prior output"
+      ],
+      "powerLimit": "Use actual native input masks at a mature missing bar and subsequent finite recovery. A finite chart or unreached recovery is INCONCLUSIVE; do not inject custom OHLC or equate volume0 with volumeNA. Capture startup separately. No broad formula or version claim. Adjudicate only missing-feed neighborhoods; the flat0/0 companion was already shipped in v53 and is not recaptured here. If a flat range coincides with a hole, that does not isolate this missing-feed facet.",
+      "columns": [
+        "INPUT_OPEN",
+        "INPUT_HIGH",
+        "INPUT_LOW",
+        "INPUT_CLOSE",
+        "INPUT_VOLUME",
+        "HIGH_NA",
+        "LOW_NA",
+        "CLOSE_NA",
+        "OHLC_MISSING",
+        "VOLUME_MISSING",
+        "FINITE_RECOVERY",
+        "INPUT_RANGE",
+        "NONFLAT_OHLC_ELIGIBLE",
+        "WVAD",
+        "WVAD_NA",
+        "WVAD_NZ_SENTINEL",
+        "SAMPLE_INDEX",
+        "SOURCE_INDEX",
+        "SOURCE_TIME"
+      ],
+      "attempts": [
+        {
+          "id": "default",
+          "inputs": {}
+        }
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32,
+        "eligibleInputRequired": true
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "wma-interior-hole-window-v54-v1.pine",
+      "path": "wma-interior-hole-window-v54-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "lane-b:260"
+      ],
+      "registerRowId": "lane-b:260",
+      "pineVersion": 6,
+      "sourceSha256": "a1100e9f52791f3059611363a2c590b4ad52c04e1100e6acde495b2058611f69",
+      "instructionsPath": "instructions/wma-interior-hole-window-v54-v1-instructions-v1.md",
+      "instructionsSha256": "2cf6acef7690cacd3b4a02f0abec968e0e1895a87a875d0bcec696ac3180c6fe",
+      "questions": [
+        "What exact wma length3 values/masks occur across leading and interior holes on asymmetric input?"
+      ],
+      "competingHypotheses": [
+        "physical threebar window missing propagation",
+        "expand to last three finite samples",
+        "skip missing entries inside physical window"
+      ],
+      "powerLimit": "V6 length3 only; percentile60 for percentile members. Source is missing at loaded0/1 and phase2, so recovery neighborhoods repeat; export every source/value/mask. The clean call is a control only. V5 and arbitrary windows remain unobserved.",
+      "columns": [
+        "PHASE",
+        "INPUT_SOURCE",
+        "CLEAN_SOURCE",
+        "SOURCE_NA",
+        "BUILTIN_RESULT",
+        "BUILTIN_RESULT_NA",
+        "BUILTIN_RESULT_NZ_SENTINEL",
+        "CLEAN_CONTROL",
+        "SAMPLE_INDEX",
+        "SOURCE_INDEX",
+        "SOURCE_TIME"
+      ],
+      "attempts": [
+        {
+          "id": "default",
+          "inputs": {}
+        }
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32,
+        "eligibleInputRequired": false
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "percentile_nearest_rank-interior-hole-window-v54-v1.pine",
+      "path": "percentile_nearest_rank-interior-hole-window-v54-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "lane-b:261"
+      ],
+      "registerRowId": "lane-b:261",
+      "pineVersion": 6,
+      "sourceSha256": "01114a16dcd27a619ee37ba45028124691dd97e378cc1552903b1acb52addc5f",
+      "instructionsPath": "instructions/percentile_nearest_rank-interior-hole-window-v54-v1-instructions-v1.md",
+      "instructionsSha256": "abf0e88a041c51e5a01cc1e4c351f19dcd1cb81a7998ad3081e44837963df735",
+      "questions": [
+        "What exact percentile_nearest_rank length3 values/masks occur across leading and interior holes on asymmetric input?"
+      ],
+      "competingHypotheses": [
+        "physical threebar window missing propagation",
+        "expand to last three finite samples",
+        "skip missing entries inside physical window"
+      ],
+      "powerLimit": "V6 length3 only; percentile60 for percentile members. Source is missing at loaded0/1 and phase2, so recovery neighborhoods repeat; export every source/value/mask. The clean call is a control only. V5 and arbitrary windows remain unobserved.",
+      "columns": [
+        "PHASE",
+        "INPUT_SOURCE",
+        "CLEAN_SOURCE",
+        "SOURCE_NA",
+        "BUILTIN_RESULT",
+        "BUILTIN_RESULT_NA",
+        "BUILTIN_RESULT_NZ_SENTINEL",
+        "CLEAN_CONTROL",
+        "SAMPLE_INDEX",
+        "SOURCE_INDEX",
+        "SOURCE_TIME"
+      ],
+      "attempts": [
+        {
+          "id": "default",
+          "inputs": {}
+        }
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32,
+        "eligibleInputRequired": false
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "percentile_linear_interpolation-interior-hole-window-v54-v1.pine",
+      "path": "percentile_linear_interpolation-interior-hole-window-v54-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "lane-b:264"
+      ],
+      "registerRowId": "lane-b:264",
+      "pineVersion": 6,
+      "sourceSha256": "44d0a413d5367ae7fa49a514d62645501b4fa4967eaedd8017aa539f41ee523c",
+      "instructionsPath": "instructions/percentile_linear_interpolation-interior-hole-window-v54-v1-instructions-v1.md",
+      "instructionsSha256": "15bdb6775eb97f6676397849fcb0037b58a8d3c3040a01a761ad5796dd053a72",
+      "questions": [
+        "What exact percentile_linear_interpolation length3 values/masks occur across leading and interior holes on asymmetric input?"
+      ],
+      "competingHypotheses": [
+        "physical threebar window missing propagation",
+        "expand to last three finite samples",
+        "skip missing entries inside physical window"
+      ],
+      "powerLimit": "V6 length3 only; percentile60 for percentile members. Source is missing at loaded0/1 and phase2, so recovery neighborhoods repeat; export every source/value/mask. The clean call is a control only. V5 and arbitrary windows remain unobserved.",
+      "columns": [
+        "PHASE",
+        "INPUT_SOURCE",
+        "CLEAN_SOURCE",
+        "SOURCE_NA",
+        "BUILTIN_RESULT",
+        "BUILTIN_RESULT_NA",
+        "BUILTIN_RESULT_NZ_SENTINEL",
+        "CLEAN_CONTROL",
+        "SAMPLE_INDEX",
+        "SOURCE_INDEX",
+        "SOURCE_TIME"
+      ],
+      "attempts": [
+        {
+          "id": "default",
+          "inputs": {}
+        }
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32,
+        "eligibleInputRequired": false
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "correlation-paired-unpaired-hole-models-v54-v1.pine",
+      "path": "correlation-paired-unpaired-hole-models-v54-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "lane-b:263"
+      ],
+      "registerRowId": "lane-b:263",
+      "pineVersion": 6,
+      "sourceSha256": "a1261b741077c3f9583e06e193050c828bc02b775f30aa8011be8476d0e2a7cc",
+      "instructionsPath": "instructions/correlation-paired-unpaired-hole-models-v54-v1-instructions-v1.md",
+      "instructionsSha256": "e5f2d1e9cea830ed376b7d5609c4bb295e0175c37254abcf7e6965cb6422948d",
+      "questions": [
+        "Does correlation retain source samples independently or select pair-complete samples around disjoint holes?"
+      ],
+      "competingHypotheses": [
+        "independent finite-source selection",
+        "pair-complete selection",
+        "physical-window mask"
+      ],
+      "powerLimit": "V6 length3 only on two asymmetric non-affine streams; separate holes1/4 and2/5. Pair-complete call is a competing-input observer, not expected truth. Existing row167 capture is separate; no universal covariance/divisor or v5 claim.",
+      "columns": [
+        "PHASE",
+        "INPUT_LEFT",
+        "INPUT_RIGHT",
+        "LEFT_NA",
+        "RIGHT_NA",
+        "CORRELATION_3",
+        "CORRELATION_3_NA",
+        "CORRELATION_3_NZ_SENTINEL",
+        "PAIR_COMPLETE_CANDIDATE",
+        "SAMPLE_INDEX",
+        "SOURCE_INDEX",
+        "SOURCE_TIME"
+      ],
+      "attempts": [
+        {
+          "id": "default",
+          "inputs": {}
+        }
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32,
+        "eligibleInputRequired": false
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "fixnan-all-missing-kinds-v54-v1.pine",
+      "path": "fixnan-all-missing-kinds-v54-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "lane-b:303"
+      ],
+      "registerRowId": "lane-b:303",
+      "pineVersion": 6,
+      "sourceSha256": "d83af3db0382a42c33e3c11ddd5b794f93b429d99e95d13ae0d70e271fa42c50",
+      "instructionsPath": "instructions/fixnan-all-missing-kinds-v54-v1-instructions-v1.md",
+      "instructionsSha256": "e987f90d4354a018100b2ecc28ecb179b0ed1e0d45bd0d4986119c6db9517929",
+      "questions": [
+        "What does fixnan publish on allmissing int/float/color from the first loaded sample?"
+      ],
+      "competingHypotheses": [
+        "NA for every kind",
+        "kind-specific initial defaults",
+        "runtime or compile refusal"
+      ],
+      "powerLimit": "All32source samples are typed missing. No finite predecessor is introduced; colorRGB uses explicitNA sentinel-1. V6only; separate row205 finite-predecessor probe remains independent.",
+      "columns": [
+        "INT_ALL_MISSING",
+        "INT_ALL_MISSING_NA",
+        "INT_ALL_MISSING_NZ_SENTINEL",
+        "FLOAT_ALL_MISSING",
+        "FLOAT_ALL_MISSING_NA",
+        "FLOAT_ALL_MISSING_NZ_SENTINEL",
+        "COLOR_ALL_MISSING_NA",
+        "COLOR_ALL_MISSING_RGB",
+        "SAMPLE_INDEX",
+        "SOURCE_INDEX",
+        "SOURCE_TIME"
+      ],
+      "attempts": [
+        {
+          "id": "default",
+          "inputs": {}
+        }
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32,
+        "eligibleInputRequired": false
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "map-missing-versus-empty-observer-v54-v1.pine",
+      "path": "map-missing-versus-empty-observer-v54-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "lane-b:304"
+      ],
+      "registerRowId": "lane-b:304",
+      "pineVersion": 6,
+      "sourceSha256": "bb7acd1fd844735f5dcb59f2ba070392abd5201c4b151e08539a4bf3a2fb10f1",
+      "instructionsPath": "instructions/map-missing-versus-empty-observer-v54-v1-instructions-v1.md",
+      "instructionsSha256": "f6313d69662a6c5e1be2df41f09d559394c6240f03db3aa31321942db0d4146c",
+      "questions": [
+        "Does na distinguish a typed missing map from an allocated empty map?"
+      ],
+      "competingHypotheses": [
+        "missing-only na true",
+        "empty and missing both na true",
+        "compile/runtime refusal"
+      ],
+      "powerLimit": "Allocate exactly one empty map per calculation (32 maps total, zero entries), plus one typed missing declaration. Only na descriptor/value observations and empty size0; no mutation, identity, storage or collection NA policy claim.",
+      "columns": [
+        "MISSING_MAP_NA",
+        "EMPTY_MAP_NA",
+        "EMPTY_MAP_SIZE",
+        "SAMPLE_INDEX",
+        "SOURCE_INDEX",
+        "SOURCE_TIME"
+      ],
+      "attempts": [
+        {
+          "id": "default",
+          "inputs": {}
+        }
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32,
+        "eligibleInputRequired": false
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "udt-varip-field-live-updates-v54-v1.pine",
+      "path": "udt-varip-field-live-updates-v54-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "lane-b:308"
+      ],
+      "registerRowId": "lane-b:308",
+      "pineVersion": 6,
+      "sourceSha256": "05fc170710b7da573cd882730055a8b6d9929b1a93c2502580565aab34612409",
+      "instructionsPath": "instructions/udt-varip-field-live-updates-v54-v1-instructions-v1.md",
+      "instructionsSha256": "0f52fe7cc0249c51a5eb8910fae156ef43a06899c956f5bbf06ade4a27d85532",
+      "questions": [
+        "Does a marked UDT varip field retain changes across two or more updates of the same live bar while the ordinary field rolls back?"
+      ],
+      "competingHypotheses": [
+        "marked field retains and ordinary field rolls back",
+        "both retain",
+        "both roll back"
+      ],
+      "powerLimit": "Allocate one persistent UDT with exactly two scalar fields. Observe two or three same-SOURCE_INDEX realtime updates plus the closing update, then reload for a separate historical attempt. Native live phase/time and UPDATE_COUNT must be recorded with per-update DataWindow screenshots or logless screen capture; historical CSV alone gives NO live credit. Missing samebar updates is INCONCLUSIVE. This is marked-field isolation only, not general varip/reference persistence.",
+      "columns": [
+        "MARKED_FIELD",
+        "ORDINARY_FIELD",
+        "UPDATE_COUNT",
+        "IS_REALTIME",
+        "IS_NEW",
+        "IS_CONFIRMED",
+        "SAMPLE_INDEX",
+        "SOURCE_INDEX",
+        "SOURCE_TIME"
+      ],
+      "attempts": [
+        {
+          "id": "default",
+          "inputs": {}
+        }
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32,
+        "eligibleInputRequired": true
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32
+      },
+      "reusedSource": false
+    }
+  ]
+}

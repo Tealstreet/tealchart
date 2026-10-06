@@ -1,0 +1,28 @@
+//@version=6
+indicator("V54 fixnan-predecessor-startup", calc_bars_count=32)
+var int sample = 0
+float floatSource = sample < 2 ? na : sample == 2 ? 3.0 : na
+int intSource = sample < 2 ? int(na) : sample == 2 ? 3 : int(na)
+color colorSource = sample < 2 ? color(na) : sample == 2 ? #123456 : color(na)
+floatValue = fixnan(floatSource)
+intValue = fixnan(intSource)
+colorValue = fixnan(colorSource)
+allMissingValue = fixnan(float(na))
+plot(floatSource, "INPUT_FLOAT")
+plot(intSource, "INPUT_INT")
+plot(na(colorSource) ? 1 : 0, "COLOR_SOURCE_NA")
+plot(floatValue, "FLOAT_FIXNAN")
+plot(na(floatValue) ? 1 : 0, "FLOAT_FIXNAN_NA")
+plot(nz(floatValue, 123456.0), "FLOAT_FIXNAN_NZ_SENTINEL")
+plot(intValue, "INT_FIXNAN")
+plot(na(intValue) ? 1 : 0, "INT_FIXNAN_NA")
+plot(nz(intValue, 123456.0), "INT_FIXNAN_NZ_SENTINEL")
+plot(na(colorValue) ? 1 : 0, "COLOR_FIXNAN_NA")
+plot(na(colorValue) ? -1 : color.r(colorValue) * 65536 + color.g(colorValue) * 256 + color.b(colorValue), "COLOR_FIXNAN_RGB")
+plot(allMissingValue, "ALL_MISSING_FLOAT_FIXNAN")
+plot(na(allMissingValue) ? 1 : 0, "ALL_MISSING_FLOAT_FIXNAN_NA")
+plot(nz(allMissingValue, 123456.0), "ALL_MISSING_FLOAT_FIXNAN_NZ_SENTINEL")
+plot(sample, "SAMPLE_INDEX")
+plot(bar_index, "SOURCE_INDEX")
+plot(time, "SOURCE_TIME")
+sample += 1

@@ -1,0 +1,15 @@
+//@version=6
+indicator("V54 history-negative-fractional-offset", calc_bars_count=32)
+var int sample = 0
+offset = input.float(-0.5, "History offset", options=[-1.5, -0.5, 0.5, 1.5])
+value = close[offset]
+plot(offset, "INPUT_OFFSET")
+plot(value, "HISTORY_RESULT")
+plot(na(value) ? 1 : 0, "HISTORY_RESULT_NA")
+plot(nz(value, 123456.0), "HISTORY_RESULT_NZ_SENTINEL")
+plot(close, "CURRENT_CLOSE_CONTROL")
+plot(close[1], "PREVIOUS_CLOSE_CONTROL")
+plot(sample, "SAMPLE_INDEX")
+plot(bar_index, "SOURCE_INDEX")
+plot(time, "SOURCE_TIME")
+sample += 1

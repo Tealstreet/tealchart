@@ -1,0 +1,28 @@
+//@version=6
+indicator("V54 bbw-zero-missing-basis", calc_bars_count=32)
+var int sample = 0
+phase = sample % 4
+source = phase % 2 == 0 ? -1.0 : 1.0
+value = ta.bbw(source, 2, 2)
+[basis, upper, lower] = ta.bb(source, 2, 2)
+zeroValue = ta.bbw(0.0, 2, 2)
+allMissingValue = ta.bbw(float(na), 2, 2)
+plot(source, "INPUT_SOURCE")
+plot(basis, "BASIS")
+plot(na(basis) ? 1 : 0, "BASIS_NA")
+plot(nz(basis, 123456.0), "BASIS_NZ_SENTINEL")
+plot(upper, "UPPER")
+plot(lower, "LOWER")
+plot(value, "BBW_ZERO_BASIS")
+plot(na(value) ? 1 : 0, "BBW_ZERO_BASIS_NA")
+plot(nz(value, 123456.0), "BBW_ZERO_BASIS_NZ_SENTINEL")
+plot(zeroValue, "BBW_ZERO_SOURCE")
+plot(na(zeroValue) ? 1 : 0, "BBW_ZERO_SOURCE_NA")
+plot(nz(zeroValue, 123456.0), "BBW_ZERO_SOURCE_NZ_SENTINEL")
+plot(allMissingValue, "BBW_ALL_MISSING")
+plot(na(allMissingValue) ? 1 : 0, "BBW_ALL_MISSING_NA")
+plot(nz(allMissingValue, 123456.0), "BBW_ALL_MISSING_NZ_SENTINEL")
+plot(sample, "SAMPLE_INDEX")
+plot(bar_index, "SOURCE_INDEX")
+plot(time, "SOURCE_TIME")
+sample += 1

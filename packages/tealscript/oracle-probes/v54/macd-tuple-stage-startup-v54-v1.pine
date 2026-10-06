@@ -1,0 +1,31 @@
+//@version=6
+indicator("V54 macd-tuple-stage-startup", calc_bars_count=32)
+var int sample = 0
+ramp = 100.0 + sample
+impulse = sample == 8 ? 7.0 : 0.0
+[rampLine, rampSignal, rampHist] = ta.macd(ramp, 2, 3, 2)
+[impulseLine, impulseSignal, impulseHist] = ta.macd(impulse, 2, 3, 2)
+plot(ramp, "INPUT_RAMP")
+plot(impulse, "INPUT_IMPULSE")
+plot(rampLine, "RAMP_LINE")
+plot(na(rampLine) ? 1 : 0, "RAMP_LINE_NA")
+plot(nz(rampLine, 123456.0), "RAMP_LINE_NZ_SENTINEL")
+plot(rampSignal, "RAMP_SIGNAL")
+plot(na(rampSignal) ? 1 : 0, "RAMP_SIGNAL_NA")
+plot(nz(rampSignal, 123456.0), "RAMP_SIGNAL_NZ_SENTINEL")
+plot(rampHist, "RAMP_HIST")
+plot(na(rampHist) ? 1 : 0, "RAMP_HIST_NA")
+plot(nz(rampHist, 123456.0), "RAMP_HIST_NZ_SENTINEL")
+plot(impulseLine, "IMPULSE_LINE")
+plot(na(impulseLine) ? 1 : 0, "IMPULSE_LINE_NA")
+plot(nz(impulseLine, 123456.0), "IMPULSE_LINE_NZ_SENTINEL")
+plot(impulseSignal, "IMPULSE_SIGNAL")
+plot(na(impulseSignal) ? 1 : 0, "IMPULSE_SIGNAL_NA")
+plot(nz(impulseSignal, 123456.0), "IMPULSE_SIGNAL_NZ_SENTINEL")
+plot(impulseHist, "IMPULSE_HIST")
+plot(na(impulseHist) ? 1 : 0, "IMPULSE_HIST_NA")
+plot(nz(impulseHist, 123456.0), "IMPULSE_HIST_NZ_SENTINEL")
+plot(sample, "SAMPLE_INDEX")
+plot(bar_index, "SOURCE_INDEX")
+plot(time, "SOURCE_TIME")
+sample += 1

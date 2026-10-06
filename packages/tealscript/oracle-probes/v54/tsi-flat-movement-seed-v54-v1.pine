@@ -1,0 +1,28 @@
+//@version=6
+indicator("V54 tsi-flat-movement-seed", calc_bars_count=32)
+var int sample = 0
+phase = sample % 8
+source = switch phase
+    0 => 100
+    1 => 100
+    2 => 101
+    3 => 101
+    4 => 101
+    5 => 99
+    6 => 99
+    => 103
+value = ta.tsi(source, 2, 3)
+constantValue = ta.tsi(100.0, 2, 3)
+plot(phase, "PHASE")
+plot(source, "INPUT_SOURCE")
+plot(ta.change(source), "INPUT_CHANGE")
+plot(value, "MOVEMENT_FLAT_TSI_2_3")
+plot(na(value) ? 1 : 0, "MOVEMENT_FLAT_TSI_2_3_NA")
+plot(nz(value, 123456.0), "MOVEMENT_FLAT_TSI_2_3_NZ_SENTINEL")
+plot(constantValue, "CONSTANT_TSI_2_3")
+plot(na(constantValue) ? 1 : 0, "CONSTANT_TSI_2_3_NA")
+plot(nz(constantValue, 123456.0), "CONSTANT_TSI_2_3_NZ_SENTINEL")
+plot(sample, "SAMPLE_INDEX")
+plot(bar_index, "SOURCE_INDEX")
+plot(time, "SOURCE_TIME")
+sample += 1

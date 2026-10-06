@@ -1,0 +1,29 @@
+//@version=6
+indicator("V54 stoch-independent-bound-holes", calc_bars_count=32)
+var int sample = 0
+caseValue = input.int(1, "Hole kind", options=[0, 1, 2, 3])
+finiteHigh = 20.0 + sample % 3
+finiteLow = 1.0 + sample % 2
+finiteClose = 11.0 + sample % 4
+highSource = sample == 8 and caseValue == 1 ? float(na) : finiteHigh
+lowSource = sample == 8 and caseValue == 2 ? float(na) : finiteLow
+closeSource = sample == 8 and caseValue == 3 ? float(na) : finiteClose
+value = ta.stoch(closeSource, highSource, lowSource, 3)
+cleanValue = ta.stoch(finiteClose, finiteHigh, finiteLow, 3)
+plot(caseValue, "CASE")
+plot(highSource, "INPUT_HIGH_SOURCE")
+plot(lowSource, "INPUT_LOW_SOURCE")
+plot(closeSource, "INPUT_CLOSE_SOURCE")
+plot(na(highSource) ? 1 : 0, "HIGH_SOURCE_NA")
+plot(na(lowSource) ? 1 : 0, "LOW_SOURCE_NA")
+plot(na(closeSource) ? 1 : 0, "CLOSE_SOURCE_NA")
+plot(value, "STOCH_3")
+plot(na(value) ? 1 : 0, "STOCH_3_NA")
+plot(nz(value, 123456.0), "STOCH_3_NZ_SENTINEL")
+plot(cleanValue, "FINITE_STOCH_3_CONTROL")
+plot(na(cleanValue) ? 1 : 0, "FINITE_STOCH_3_CONTROL_NA")
+plot(nz(cleanValue, 123456.0), "FINITE_STOCH_3_CONTROL_NZ_SENTINEL")
+plot(sample, "SAMPLE_INDEX")
+plot(bar_index, "SOURCE_INDEX")
+plot(time, "SOURCE_TIME")
+sample += 1

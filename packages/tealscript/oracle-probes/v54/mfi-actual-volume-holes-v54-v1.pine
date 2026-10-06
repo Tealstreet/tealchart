@@ -1,0 +1,29 @@
+//@version=6
+indicator("V54 mfi-actual-volume-holes", calc_bars_count=32)
+var int sample = 0
+phase = sample % 6
+source = switch phase
+    0 => 10
+    1 => 12
+    2 => 8
+    3 => 15
+    4 => 11
+    => 16
+holeSource = sample == 8 ? float(na) : source
+value = ta.mfi(source, 3)
+sourceHoleControl = ta.mfi(holeSource, 3)
+plot(source, "INPUT_SOURCE")
+plot(holeSource, "SOURCE_HOLE_CONTROL")
+plot(volume, "INPUT_VOLUME")
+plot(na(volume) ? 1 : 0, "ACTUAL_VOLUME_MISSING")
+plot(not na(volume) and na(volume[1]) ? 1 : 0, "RECOVERY_AFTER_VOLUME_MISSING")
+plot(value, "MFI_3")
+plot(na(value) ? 1 : 0, "MFI_3_NA")
+plot(nz(value, 123456.0), "MFI_3_NZ_SENTINEL")
+plot(sourceHoleControl, "MFI_SOURCE_HOLE_CONTROL_3")
+plot(na(sourceHoleControl) ? 1 : 0, "MFI_SOURCE_HOLE_CONTROL_3_NA")
+plot(nz(sourceHoleControl, 123456.0), "MFI_SOURCE_HOLE_CONTROL_3_NZ_SENTINEL")
+plot(sample, "SAMPLE_INDEX")
+plot(bar_index, "SOURCE_INDEX")
+plot(time, "SOURCE_TIME")
+sample += 1

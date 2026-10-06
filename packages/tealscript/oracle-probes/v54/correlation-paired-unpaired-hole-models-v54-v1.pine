@@ -1,0 +1,40 @@
+//@version=6
+indicator("V54 correlation-paired-unpaired-hole-models", calc_bars_count=32)
+var int sample = 0
+phase = sample % 8
+leftClean = switch phase
+    0 => 3
+    1 => 9
+    2 => 1
+    3 => 8
+    4 => -2
+    5 => 7
+    6 => 4
+    => 11
+rightClean = switch phase
+    0 => 10
+    1 => 2
+    2 => 13
+    3 => -3
+    4 => 8
+    5 => 1
+    6 => 15
+    => 6
+leftSource = phase == 1 or phase == 4 ? float(na) : leftClean
+rightSource = phase == 2 or phase == 5 ? float(na) : rightClean
+pairMissing = na(leftSource) or na(rightSource)
+value = ta.correlation(leftSource, rightSource, 3)
+pairedValue = ta.correlation(pairMissing ? float(na) : leftSource, pairMissing ? float(na) : rightSource, 3)
+plot(phase, "PHASE")
+plot(leftSource, "INPUT_LEFT")
+plot(rightSource, "INPUT_RIGHT")
+plot(na(leftSource) ? 1 : 0, "LEFT_NA")
+plot(na(rightSource) ? 1 : 0, "RIGHT_NA")
+plot(value, "CORRELATION_3")
+plot(na(value) ? 1 : 0, "CORRELATION_3_NA")
+plot(nz(value, 123456.0), "CORRELATION_3_NZ_SENTINEL")
+plot(pairedValue, "PAIR_COMPLETE_CANDIDATE")
+plot(sample, "SAMPLE_INDEX")
+plot(bar_index, "SOURCE_INDEX")
+plot(time, "SOURCE_TIME")
+sample += 1

@@ -1,0 +1,28 @@
+//@version=6
+indicator("V54 vwap-tuple-missing-multiplier", calc_bars_count=32)
+var int sample = 0
+anchor = sample == 0 or sample == 16
+multiplier = sample == 8 ? float(na) : 1.5
+[basis, upper, lower] = ta.vwap(close, anchor, multiplier)
+[cleanBasis, cleanUpper, cleanLower] = ta.vwap(close, anchor, 1.5)
+plot(close, "INPUT_SOURCE")
+plot(volume, "INPUT_VOLUME")
+plot(anchor ? 1 : 0, "EXPLICIT_ANCHOR")
+plot(multiplier, "INPUT_MULTIPLIER")
+plot(na(multiplier) ? 1 : 0, "MULTIPLIER_NA")
+plot(basis, "VWAP_BASIS")
+plot(na(basis) ? 1 : 0, "VWAP_BASIS_NA")
+plot(nz(basis, 123456.0), "VWAP_BASIS_NZ_SENTINEL")
+plot(upper, "VWAP_UPPER")
+plot(na(upper) ? 1 : 0, "VWAP_UPPER_NA")
+plot(nz(upper, 123456.0), "VWAP_UPPER_NZ_SENTINEL")
+plot(lower, "VWAP_LOWER")
+plot(na(lower) ? 1 : 0, "VWAP_LOWER_NA")
+plot(nz(lower, 123456.0), "VWAP_LOWER_NZ_SENTINEL")
+plot(cleanBasis, "FINITE_MULT_BASIS_CONTROL")
+plot(cleanUpper, "FINITE_MULT_UPPER_CONTROL")
+plot(cleanLower, "FINITE_MULT_LOWER_CONTROL")
+plot(sample, "SAMPLE_INDEX")
+plot(bar_index, "SOURCE_INDEX")
+plot(time, "SOURCE_TIME")
+sample += 1

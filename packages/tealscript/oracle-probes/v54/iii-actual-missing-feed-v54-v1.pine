@@ -1,0 +1,26 @@
+//@version=6
+indicator("V54 iii-actual-missing-feed", calc_bars_count=32)
+var int sample = 0
+ohlcMissing = na(high) or na(low) or na(close)
+volumeMissing = na(volume)
+value = ta.iii
+plot(open, "INPUT_OPEN")
+plot(high, "INPUT_HIGH")
+plot(low, "INPUT_LOW")
+plot(close, "INPUT_CLOSE")
+plot(volume, "INPUT_VOLUME")
+plot(na(high) ? 1 : 0, "HIGH_NA")
+plot(na(low) ? 1 : 0, "LOW_NA")
+plot(na(close) ? 1 : 0, "CLOSE_NA")
+plot(ohlcMissing ? 1 : 0, "OHLC_MISSING")
+plot(volumeMissing ? 1 : 0, "VOLUME_MISSING")
+plot(not ohlcMissing and not volumeMissing and (ohlcMissing[1] or volumeMissing[1]) ? 1 : 0, "FINITE_RECOVERY")
+plot(high-low, "INPUT_RANGE")
+plot(high != low and not ohlcMissing ? 1 : 0, "NONFLAT_OHLC_ELIGIBLE")
+plot(value, "III")
+plot(na(value) ? 1 : 0, "III_NA")
+plot(nz(value, 123456.0), "III_NZ_SENTINEL")
+plot(sample, "SAMPLE_INDEX")
+plot(bar_index, "SOURCE_INDEX")
+plot(time, "SOURCE_TIME")
+sample += 1

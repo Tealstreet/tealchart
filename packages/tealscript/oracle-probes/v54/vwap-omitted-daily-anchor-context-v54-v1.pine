@@ -1,0 +1,20 @@
+//@version=6
+indicator("V54 vwap-omitted-daily-anchor-context", calc_bars_count=32)
+var int sample = 0
+dayAnchor = timeframe.change("1D")
+omittedValue = ta.vwap(close)
+explicitValue = ta.vwap(close, dayAnchor)
+plot(close, "INPUT_SOURCE")
+plot(volume, "INPUT_VOLUME")
+plot(dayAnchor ? 1 : 0, "EXPLICIT_DAY_ANCHOR")
+plot(time_tradingday, "TRADING_DAY")
+plot(omittedValue, "OMITTED_ANCHOR_VWAP")
+plot(na(omittedValue) ? 1 : 0, "OMITTED_ANCHOR_VWAP_NA")
+plot(nz(omittedValue, 123456.0), "OMITTED_ANCHOR_VWAP_NZ_SENTINEL")
+plot(explicitValue, "EXPLICIT_DAILY_VWAP")
+plot(na(explicitValue) ? 1 : 0, "EXPLICIT_DAILY_VWAP_NA")
+plot(nz(explicitValue, 123456.0), "EXPLICIT_DAILY_VWAP_NZ_SENTINEL")
+plot(sample, "SAMPLE_INDEX")
+plot(bar_index, "SOURCE_INDEX")
+plot(time, "SOURCE_TIME")
+sample += 1

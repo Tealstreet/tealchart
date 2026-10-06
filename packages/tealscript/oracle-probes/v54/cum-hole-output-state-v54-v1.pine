@@ -1,0 +1,22 @@
+//@version=6
+indicator("V54 cum-hole-output-state", calc_bars_count=32)
+var int sample = 0
+phase = sample % 6
+source = switch phase
+    0 => 2
+    1 => -3
+    2 => float(na)
+    3 => 5
+    4 => float(na)
+    => -2
+value = ta.cum(source)
+plot(phase, "PHASE")
+plot(source, "INPUT_SOURCE")
+plot(na(source) ? 1 : 0, "SOURCE_NA")
+plot(value, "CUM")
+plot(na(value) ? 1 : 0, "CUM_NA")
+plot(nz(value, 123456.0), "CUM_NZ_SENTINEL")
+plot(sample, "SAMPLE_INDEX")
+plot(bar_index, "SOURCE_INDEX")
+plot(time, "SOURCE_TIME")
+sample += 1

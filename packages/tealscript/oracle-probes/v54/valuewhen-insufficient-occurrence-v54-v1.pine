@@ -1,0 +1,23 @@
+//@version=6
+indicator("V54 valuewhen-insufficient-occurrence", calc_bars_count=32)
+var int sample = 0
+event = sample == 3 or sample == 7
+eventSource = 10.0 + sample
+v0 = ta.valuewhen(event, eventSource, 0)
+v1 = ta.valuewhen(event, eventSource, 1)
+v2 = ta.valuewhen(event, eventSource, 2)
+plot(event ? 1 : 0, "INPUT_EVENT")
+plot(eventSource, "INPUT_SOURCE")
+plot(v0, "OCCURRENCE_0")
+plot(na(v0) ? 1 : 0, "OCCURRENCE_0_NA")
+plot(nz(v0, 123456.0), "OCCURRENCE_0_NZ_SENTINEL")
+plot(v1, "OCCURRENCE_1")
+plot(na(v1) ? 1 : 0, "OCCURRENCE_1_NA")
+plot(nz(v1, 123456.0), "OCCURRENCE_1_NZ_SENTINEL")
+plot(v2, "OCCURRENCE_2")
+plot(na(v2) ? 1 : 0, "OCCURRENCE_2_NA")
+plot(nz(v2, 123456.0), "OCCURRENCE_2_NZ_SENTINEL")
+plot(sample, "SAMPLE_INDEX")
+plot(bar_index, "SOURCE_INDEX")
+plot(time, "SOURCE_TIME")
+sample += 1

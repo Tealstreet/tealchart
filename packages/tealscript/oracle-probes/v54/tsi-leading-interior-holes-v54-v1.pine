@@ -1,0 +1,31 @@
+//@version=6
+indicator("V54 tsi-leading-interior-holes", calc_bars_count=32)
+var int sample = 0
+phase = sample % 8
+clean = switch phase
+    0 => 10
+    1 => 14
+    2 => 7
+    3 => 16
+    4 => 11
+    5 => 4
+    6 => 18
+    => 9
+float source = sample < 2 or phase == 3 or phase == 5 ? na : clean
+value = ta.tsi(source, 2, 3)
+cleanValue = ta.tsi(clean, 2, 3)
+plot(phase, "PHASE")
+plot(source, "INPUT_SOURCE")
+plot(source[1], "PHYSICAL_PREVIOUS")
+plot(na(source) ? 1 : 0, "SOURCE_NA")
+plot(clean, "CLEAN_SOURCE")
+plot(value, "TSI_2_3")
+plot(na(value) ? 1 : 0, "TSI_2_3_NA")
+plot(nz(value, 123456.0), "TSI_2_3_NZ_SENTINEL")
+plot(cleanValue, "CLEAN_TSI_2_3")
+plot(na(cleanValue) ? 1 : 0, "CLEAN_TSI_2_3_NA")
+plot(nz(cleanValue, 123456.0), "CLEAN_TSI_2_3_NZ_SENTINEL")
+plot(sample, "SAMPLE_INDEX")
+plot(bar_index, "SOURCE_INDEX")
+plot(time, "SOURCE_TIME")
+sample += 1

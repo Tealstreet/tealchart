@@ -1,0 +1,54 @@
+//@version=6
+indicator("V54 tsi-varied-sign-formula", calc_bars_count=65)
+var int sample = 0
+deltaPhase = (sample - 1) % 13
+delta = switch deltaPhase
+    0 => 1
+    1 => 2
+    2 => 3
+    3 => 4
+    4 => 1
+    5 => 2
+    6 => -30
+    7 => -2
+    8 => -3
+    9 => -4
+    10 => -1
+    11 => -2
+    => 30
+var float price = 100.0
+if sample > 0
+    price += delta
+tsiValue = ta.tsi(price, 3, 5)
+namedValue = ta.tsi(source=price, short_length=3, long_length=5)
+reflectedValue = ta.tsi(200.0 - price, 3, 5)
+canonicalValue = ta.tsi(price, 5, 14)
+changeValue = ta.change(price)
+longNumerator = ta.ema(ta.ema(changeValue, 5), 3)
+longDenominator = ta.ema(ta.ema(math.abs(changeValue), 5), 3)
+shortNumerator = ta.ema(ta.ema(changeValue, 3), 5)
+shortDenominator = ta.ema(ta.ema(math.abs(changeValue), 3), 5)
+modelLong = longNumerator / longDenominator
+modelShort = shortNumerator / shortDenominator
+plot(price, "INPUT_SOURCE")
+plot(changeValue, "INPUT_CHANGE")
+plot(sample <= 64 ? 1 : 0, "ELIGIBLE_SAMPLE")
+plot(tsiValue, "TSI_3_5")
+plot(na(tsiValue) ? 1 : 0, "TSI_3_5_NA")
+plot(nz(tsiValue, 123456.0), "TSI_3_5_NZ_SENTINEL")
+plot(namedValue, "TSI_NAMED_3_5")
+plot(na(namedValue) ? 1 : 0, "TSI_NAMED_3_5_NA")
+plot(nz(namedValue, 123456.0), "TSI_NAMED_3_5_NZ_SENTINEL")
+plot(reflectedValue, "TSI_REFLECTED_3_5")
+plot(na(reflectedValue) ? 1 : 0, "TSI_REFLECTED_3_5_NA")
+plot(nz(reflectedValue, 123456.0), "TSI_REFLECTED_3_5_NZ_SENTINEL")
+plot(canonicalValue, "TSI_5_14_CONTROL")
+plot(na(canonicalValue) ? 1 : 0, "TSI_5_14_CONTROL_NA")
+plot(nz(canonicalValue, 123456.0), "TSI_5_14_CONTROL_NZ_SENTINEL")
+plot(modelLong, "MODEL_LONG_THEN_SHORT")
+plot(modelShort, "MODEL_SHORT_THEN_LONG")
+plot(modelLong * 100, "MODEL_PERCENT_SCALE")
+plot(sample, "SAMPLE_INDEX")
+plot(bar_index, "SOURCE_INDEX")
+plot(time, "SOURCE_TIME")
+sample += 1

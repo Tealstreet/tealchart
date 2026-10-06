@@ -1,0 +1,25 @@
+//@version=6
+indicator("V54 udt-varip-field-live-updates", calc_bars_count=32)
+var int sample = 0
+type TickState
+    varip int retained = 0
+    int ordinary = 0
+var state = TickState.new()
+varip int updateCount = 0
+if barstate.isnew
+    updateCount := 0
+    state.retained := 0
+    state.ordinary := 0
+updateCount += 1
+state.retained += 1
+state.ordinary += 1
+plot(state.retained, "MARKED_FIELD")
+plot(state.ordinary, "ORDINARY_FIELD")
+plot(updateCount, "UPDATE_COUNT")
+plot(barstate.isrealtime ? 1 : 0, "IS_REALTIME")
+plot(barstate.isnew ? 1 : 0, "IS_NEW")
+plot(barstate.isconfirmed ? 1 : 0, "IS_CONFIRMED")
+plot(sample, "SAMPLE_INDEX")
+plot(bar_index, "SOURCE_INDEX")
+plot(time, "SOURCE_TIME")
+sample += 1

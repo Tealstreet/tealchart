@@ -1,0 +1,28 @@
+//@version=6
+indicator("V54 percentile_linear_interpolation-interior-hole-window", calc_bars_count=32)
+var int sample = 0
+phase = sample % 8
+clean = switch phase
+    0 => 2
+    1 => 9
+    2 => 4
+    3 => -3
+    4 => 5
+    5 => 11
+    6 => 1
+    => 7
+float source = sample < 2 or phase == 2 ? na : clean
+value = ta.percentile_linear_interpolation(source, 3, 60)
+cleanValue = ta.percentile_linear_interpolation(clean, 3, 60)
+plot(phase, "PHASE")
+plot(source, "INPUT_SOURCE")
+plot(clean, "CLEAN_SOURCE")
+plot(na(source) ? 1 : 0, "SOURCE_NA")
+plot(value, "BUILTIN_RESULT")
+plot(na(value) ? 1 : 0, "BUILTIN_RESULT_NA")
+plot(nz(value, 123456.0), "BUILTIN_RESULT_NZ_SENTINEL")
+plot(cleanValue, "CLEAN_CONTROL")
+plot(sample, "SAMPLE_INDEX")
+plot(bar_index, "SOURCE_INDEX")
+plot(time, "SOURCE_TIME")
+sample += 1

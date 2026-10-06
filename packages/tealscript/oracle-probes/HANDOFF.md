@@ -314,3 +314,7 @@ Capture the 73 isolated indicators in [v52/bundle-manifest-v1.json](v52/bundle-m
 ## Then round v53 — supplementary singleton/flat/missing TA boundaries v1
 
 Capture the five bounded v6 indicators in [v53/bundle-manifest-v1.json](v53/bundle-manifest-v1.json), using [HANDOFF-v53-v1.md](v53/HANDOFF-v53-v1.md) and each per-source instruction. They cover only five supplementary rows absent from v52. Preserve exact signed-zero strings and separate reciprocals, actual native flat/missing OHLCV masks and recovery neighbors; an absent event is INCONCLUSIVE. Native outcomes are UNSPECIFIED, and the III/WVAD v5 facet remains unobserved. Verify v53/SHA256SUMS; return v53/captures/v53/RESPONSE-v53.md.
+
+## Then round v54 — new formula and missing-state boundaries v1
+
+Capture the 47 isolated sources in [v54/bundle-manifest-v1.json](v54/bundle-manifest-v1.json), using [HANDOFF-v54-v1.md](v54/HANDOFF-v54-v1.md) and each per-source instruction. One source per new row; v53 facets are unchanged. Preserve actual implicit-OHLC hole eligibility, deterministic source/control cells, earliest diagnostic phase and masks; absent events remain INCONCLUSIVE. Native outcomes are UNSPECIFIED. Verify v54/SHA256SUMS and return source-bound evidence to v54/captures/v54/RESPONSE-v54.md.

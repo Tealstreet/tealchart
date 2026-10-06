@@ -1,0 +1,42 @@
+//@version=6
+indicator("V54 correlation-disjoint-source-holes", calc_bars_count=32)
+var int sample = 0
+phase = sample % 8
+leftSource = switch phase
+    0 => 1
+    1 => float(na)
+    2 => 4
+    3 => 2
+    4 => float(na)
+    5 => 7
+    6 => 3
+    => 9
+rightSource = switch phase
+    0 => 5
+    1 => 2
+    2 => float(na)
+    3 => 11
+    4 => 13
+    5 => float(na)
+    6 => 4
+    => 20
+pairedLeft = na(leftSource) or na(rightSource) ? float(na) : leftSource
+pairedRight = na(leftSource) or na(rightSource) ? float(na) : rightSource
+result = ta.correlation(leftSource, rightSource, 3)
+pairedResult = ta.correlation(pairedLeft, pairedRight, 3)
+plot(phase, "PHASE")
+plot(leftSource, "INPUT_LEFT")
+plot(rightSource, "INPUT_RIGHT")
+plot(na(leftSource) ? 1 : 0, "LEFT_NA")
+plot(na(rightSource) ? 1 : 0, "RIGHT_NA")
+plot(not na(leftSource) and not na(rightSource) ? 1 : 0, "COMPLETE_PAIR")
+plot(result, "CORRELATION_3")
+plot(na(result) ? 1 : 0, "CORRELATION_3_NA")
+plot(nz(result, 123456.0), "CORRELATION_3_NZ_SENTINEL")
+plot(pairedResult, "COMPLETE_PAIR_CONTROL_3")
+plot(na(pairedResult) ? 1 : 0, "COMPLETE_PAIR_CONTROL_3_NA")
+plot(nz(pairedResult, 123456.0), "COMPLETE_PAIR_CONTROL_3_NZ_SENTINEL")
+plot(sample, "SAMPLE_INDEX")
+plot(bar_index, "SOURCE_INDEX")
+plot(time, "SOURCE_TIME")
+sample += 1

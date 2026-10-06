@@ -1,0 +1,22 @@
+# V54 fixnan-predecessor-startup capture instructions v1
+
+Row: 205. Pine version 6. This source targets this row only.
+
+Question: What does fixnan return before the first defined sample and on an allmissing stream?
+
+Competing hypotheses, not expected outcomes: NA until finite predecessor; default seed before first value; kind-specific seed.
+
+Use standard candles and Etc/UTC chart display timezone, default finite-control BINANCE:BTCUSDT at 2 minutes. Verify sha256sum -c SHA256SUMS; load the unchanged source, remove other probes, and use the listed attempts separately. No source repair on native refusal.
+
+Native phase/values are UNSPECIFIED. Retain RUNS, COMPILE-ERROR, RUNTIME-ERROR, OTHER and INCONCLUSIVE separately, with the first diagnostic, exact line/column/site, reached sample and screenshot. Preserve raw CSV empty/NA/zero cells, Data Window, settings, exact source/hash, inputs, symbol/tickerid/modifiers, timeframe/session, account/build, feed/index origin and closed/live cutoff. CSV missing cells are evidence, not numeric zero.
+
+Bound: calc_bars_count=32, no more than 32 reached calculation cells and 17 plot channels. SAMPLE_INDEX is the local calculation counter, not a reset native bar_index; align SOURCE_INDEX/SOURCE_TIME and closed/live phase. Capture the loaded startup prefix; do not substitute a mature tail after unrecorded calculation history. No collection/UDT allocation, broad ta.* algorithm, arbitrary length, precision, version or realtime closure.
+
+Independent int/float/color calls with NA,NA,3,NA (color uses#123456), plus allNAfloat control. Distinguish pre-first-defined behavior from known finite replacement. Color is RGB/NA encoded, not string/identity credit; v6 only.
+
+Attempts:
+- {"id": "default", "inputs": {}}
+
+Columns: INPUT_FLOAT, INPUT_INT, COLOR_SOURCE_NA, FLOAT_FIXNAN, FLOAT_FIXNAN_NA, FLOAT_FIXNAN_NZ_SENTINEL, INT_FIXNAN, INT_FIXNAN_NA, INT_FIXNAN_NZ_SENTINEL, COLOR_FIXNAN_NA, COLOR_FIXNAN_RGB, ALL_MISSING_FLOAT_FIXNAN, ALL_MISSING_FLOAT_FIXNAN_NA, ALL_MISSING_FLOAT_FIXNAN_NZ_SENTINEL, SAMPLE_INDEX, SOURCE_INDEX, SOURCE_TIME. Preserve native headers verbatim.
+
+Return source-bound artifacts at v54/captures/v54/RESPONSE-v54.md.
