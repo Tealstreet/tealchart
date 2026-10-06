@@ -1,0 +1,37 @@
+//@version=6
+indicator("V53 III WVAD actual flat bars", calc_bars_count=32)
+observeFormula = input.bool(false, "Enable formula-only controls")
+var int sample = 0
+rangeValue = high - low
+pricesDefined = not na(open) and not na(high) and not na(low) and not na(close)
+volumeDefined = not na(volume)
+flatPositive = pricesDefined and volumeDefined and volume > 0 and high == low and open == close and high == open
+finiteNonflat = pricesDefined and volumeDefined and rangeValue != 0
+iiiValue = ta.iii
+wvadValue = ta.wvad
+if barstate.isconfirmed
+    log.info("sample={0}; flatPositive={1}; range={2}; volume={3}; iii={4}; wvad={5}", sample, str.tostring(flatPositive), str.tostring(rangeValue), str.tostring(volume), str.tostring(iiiValue), str.tostring(wvadValue))
+iiiFormula = observeFormula ? (2 * close - high - low) / rangeValue * volume : float(na)
+wvadFormula = observeFormula ? (close - open) / rangeValue * volume : float(na)
+plot(iiiValue, "III_BUILTIN")
+plot(wvadValue, "WVAD_BUILTIN")
+plot(na(iiiValue) ? 1 : 0, "III_NA")
+plot(na(wvadValue) ? 1 : 0, "WVAD_NA")
+plot(nz(iiiValue, 123456.0), "III_NZ_SENTINEL")
+plot(nz(wvadValue, 123456.0), "WVAD_NZ_SENTINEL")
+plot(rangeValue, "INPUT_RANGE")
+plot(flatPositive ? 1 : 0, "ELIGIBLE_FLAT_POSITIVE_VOLUME")
+plot(finiteNonflat and flatPositive[1] ? 1 : 0, "RECOVERY_AFTER_ELIGIBLE_FLAT")
+plot(na(volume) ? 1 : 0, "VOLUME_NA")
+plot(pricesDefined ? 0 : 1, "PRICE_NA")
+plot(iiiFormula, "FORMULA_ONLY_III")
+plot(wvadFormula, "FORMULA_ONLY_WVAD")
+plot(open, "INPUT_OPEN")
+plot(high, "INPUT_HIGH")
+plot(low, "INPUT_LOW")
+plot(close, "INPUT_CLOSE")
+plot(volume, "INPUT_VOLUME")
+plot(sample, "SAMPLE_INDEX")
+plot(bar_index, "SOURCE_INDEX")
+plot(time, "SOURCE_TIME")
+sample += 1

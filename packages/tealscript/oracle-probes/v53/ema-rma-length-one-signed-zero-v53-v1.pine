@@ -1,0 +1,35 @@
+//@version=6
+indicator("V53 EMA RMA singleton signed zero", calc_bars_count=32)
+observeReciprocal = input.bool(false, "Enable reciprocal observers")
+var int sample = 0
+phase = sample % 8
+source = phase == 0 or phase == 3 or phase == 7 ? -3 * 0.0 : phase == 1 or phase == 6 ? 0.0 : phase == 2 ? -2.0 : phase == 4 ? float(na) : 2.0
+emaValue = ta.ema(source, 1)
+rmaValue = ta.rma(source, 1)
+sourceText = str.tostring(source)
+emaText = str.tostring(emaValue)
+rmaText = str.tostring(rmaValue)
+if barstate.isconfirmed
+    log.info("sample={0}; phase={1}; source={2}; ema={3}; rma={4}", sample, phase, sourceText, emaText, rmaText)
+sourceReciprocal = observeReciprocal ? 1.0 / source : float(na)
+emaReciprocal = observeReciprocal ? 1.0 / emaValue : float(na)
+rmaReciprocal = observeReciprocal ? 1.0 / rmaValue : float(na)
+if barstate.isconfirmed and observeReciprocal
+    log.info("sample={0}; reciprocal source={1}; ema={2}; rma={3}", sample, str.tostring(sourceReciprocal), str.tostring(emaReciprocal), str.tostring(rmaReciprocal))
+plot(phase, "PHASE")
+plot(source, "INPUT_SOURCE")
+plot(emaValue, "EMA_LENGTH_1")
+plot(rmaValue, "RMA_LENGTH_1")
+plot(na(source) ? 1 : 0, "SOURCE_NA")
+plot(na(emaValue) ? 1 : 0, "EMA_NA")
+plot(na(rmaValue) ? 1 : 0, "RMA_NA")
+plot(sourceText == "-0" ? 1 : 0, "SOURCE_TEXT_NEG_ZERO")
+plot(emaText == "-0" ? 1 : 0, "EMA_TEXT_NEG_ZERO")
+plot(rmaText == "-0" ? 1 : 0, "RMA_TEXT_NEG_ZERO")
+plot(sourceReciprocal, "SOURCE_RECIPROCAL")
+plot(emaReciprocal, "EMA_RECIPROCAL")
+plot(rmaReciprocal, "RMA_RECIPROCAL")
+plot(sample, "SAMPLE_INDEX")
+plot(bar_index, "SOURCE_INDEX")
+plot(time, "SOURCE_TIME")
+sample += 1

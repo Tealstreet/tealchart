@@ -310,3 +310,7 @@ Capture the twelve isolated indicators in [v51/bundle-manifest-v1.json](v51/bund
 ## Then round v52 — consolidated native-pending register rows v1
 
 Capture the 73 isolated indicators in [v52/bundle-manifest-v1.json](v52/bundle-manifest-v1.json), following [HANDOFF-v52-v1.md](v52/HANDOFF-v52-v1.md) and each literal instruction path. They cover 34 distinct rows: all 26 open v21 rows plus eight supplementary native holds. Each source targets one row; refusal-prone union kinds and qualifier consumers remain isolated. Native phase/values are UNSPECIFIED, and TA entries establish only parameter admission. Retain exact qualified diagnostics, raw text/CSV/screenshots and context; observe 32 closed bars. Verify v52/SHA256SUMS and return v52/captures/v52/RESPONSE-v52.md.
+
+## Then round v53 — supplementary singleton/flat/missing TA boundaries v1
+
+Capture the five bounded v6 indicators in [v53/bundle-manifest-v1.json](v53/bundle-manifest-v1.json), using [HANDOFF-v53-v1.md](v53/HANDOFF-v53-v1.md) and each per-source instruction. They cover only five supplementary rows absent from v52. Preserve exact signed-zero strings and separate reciprocals, actual native flat/missing OHLCV masks and recovery neighbors; an absent event is INCONCLUSIVE. Native outcomes are UNSPECIFIED, and the III/WVAD v5 facet remains unobserved. Verify v53/SHA256SUMS; return v53/captures/v53/RESPONSE-v53.md.

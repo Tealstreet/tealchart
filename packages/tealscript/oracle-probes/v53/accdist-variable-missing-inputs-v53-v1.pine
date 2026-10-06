@@ -1,0 +1,29 @@
+//@version=6
+indicator("V53 Accdist variable missing inputs", calc_bars_count=32)
+var int sample = 0
+pricesMissing = na(high) or na(low) or na(close)
+volumeMissing = na(volume)
+inputMissing = pricesMissing or volumeMissing
+rangeValue = high - low
+accdistValue = ta.accdist
+if barstate.isconfirmed
+    log.info("sample={0}; range={1}; volume={2}; priceNA={3}; volumeNA={4}; accdist={5}", sample, str.tostring(rangeValue), str.tostring(volume), str.tostring(pricesMissing), str.tostring(volumeMissing), str.tostring(accdistValue))
+plot(pricesMissing ? 1 : 0, "PRICE_NA")
+plot(volumeMissing ? 1 : 0, "VOLUME_NA")
+plot(inputMissing ? 1 : 0, "ELIGIBLE_MISSING_INPUT")
+plot(volumeMissing and not pricesMissing and rangeValue != 0 ? 1 : 0, "MISSING_VOLUME_NONZERO_RANGE")
+plot(not inputMissing and inputMissing[1] and rangeValue != 0 ? 1 : 0, "FINITE_NONFLAT_AFTER_MISSING")
+plot(rangeValue, "INPUT_RANGE")
+plot(accdistValue, "ACCDIST_VARIABLE")
+plot(na(accdistValue) ? 1 : 0, "ACCDIST_NA")
+plot(nz(accdistValue, 123456.0), "ACCDIST_NZ_SENTINEL")
+plot(accdistValue[1], "PREVIOUS_ACCDIST")
+plot(open, "INPUT_OPEN")
+plot(high, "INPUT_HIGH")
+plot(low, "INPUT_LOW")
+plot(close, "INPUT_CLOSE")
+plot(volume, "INPUT_VOLUME")
+plot(sample, "SAMPLE_INDEX")
+plot(bar_index, "SOURCE_INDEX")
+plot(time, "SOURCE_TIME")
+sample += 1
