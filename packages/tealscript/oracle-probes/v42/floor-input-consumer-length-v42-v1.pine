@@ -1,0 +1,6 @@
+//@version=6
+indicator("V42 floor-input-consumer-length")
+source = input.string("abc", "Source")
+value = str.length(source)
+plot(close, "WIDTH_CONSUMER", linewidth=value)
+plot(bar_index, "SOURCE_INDEX")

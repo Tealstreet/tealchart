@@ -1,0 +1,6 @@
+//@version=6
+indicator("V42 floor-input-consumer-substring")
+source = input.string("abc", "Source")
+value = str.substring(source, 0, 2)
+plot(close, title=value)
+plot(bar_index, "SOURCE_INDEX")

@@ -1,0 +1,6 @@
+//@version=6
+indicator("V42 floor-simple-consumer-format-time")
+consume(simple string sampleText) => str.length(sampleText)
+value = str.format_time(0, "yyyy", "UTC")
+plot(consume(value), "VALUE")
+plot(bar_index, "SOURCE_INDEX")

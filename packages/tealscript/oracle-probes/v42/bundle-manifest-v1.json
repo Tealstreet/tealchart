@@ -1,0 +1,926 @@
+{
+  "schemaVersion": 1,
+  "bundle": "v42",
+  "version": 1,
+  "scripts": [
+    {
+      "probe": "tostring-format-bool-v42-v1.pine",
+      "path": "tostring-format-bool-v42-v1.pine",
+      "sourceSha256": "2da4254a2a5eb8885764a21c3c2729c3233bafc4a15b3fec6ebc26f73f62bd9c",
+      "instructionsPath": "instructions/tostring-format-bool-instructions-v1.md",
+      "instructionsSha256": "6b8604d794e02851225e7e8bda1f94f15700ce5cc682e9ca4ad0defdece6fba8",
+      "componentIds": [
+        "str.tostring"
+      ],
+      "questions": [
+        "Does the two-argument str.tostring call admit this value, and what text does it produce? Numeric-only formatted overload metadata conflicts with general primitive/enum/collection prose; neither account is a native prediction."
+      ],
+      "captureMode": "EXPLICIT-CONSTANT-OR-DEFAULT-INPUT",
+      "powerLimit": "If a matrix/array element constructor is refused first, record that exact earlier boundary and hold the conversion facet. Capture text literally; do not infer it from collection size or LENGTH.",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      }
+    },
+    {
+      "probe": "tostring-format-string-v42-v1.pine",
+      "path": "tostring-format-string-v42-v1.pine",
+      "sourceSha256": "0cb24ea8e58bbbd57de8ba1f587a4dca3129cd3017aee55d088a783b427b97a1",
+      "instructionsPath": "instructions/tostring-format-string-instructions-v1.md",
+      "instructionsSha256": "70bd173af4bc1a75ee240ac2ef60a73236550ebfd0fa422860dfe7f987161cc4",
+      "componentIds": [
+        "str.tostring"
+      ],
+      "questions": [
+        "Does the two-argument str.tostring call admit this value, and what text does it produce? Numeric-only formatted overload metadata conflicts with general primitive/enum/collection prose; neither account is a native prediction."
+      ],
+      "captureMode": "EXPLICIT-CONSTANT-OR-DEFAULT-INPUT",
+      "powerLimit": "If a matrix/array element constructor is refused first, record that exact earlier boundary and hold the conversion facet. Capture text literally; do not infer it from collection size or LENGTH.",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      }
+    },
+    {
+      "probe": "tostring-format-enum-v42-v1.pine",
+      "path": "tostring-format-enum-v42-v1.pine",
+      "sourceSha256": "b87398c7e2b2d349d5d522210673bef88638f2e33484e75d8c073379fb746ab5",
+      "instructionsPath": "instructions/tostring-format-enum-instructions-v1.md",
+      "instructionsSha256": "7a41830996be97cfa2abd1b979dff3d1071eb209349866aa5c9cebc9d0680ce8",
+      "componentIds": [
+        "str.tostring"
+      ],
+      "questions": [
+        "Does the two-argument str.tostring call admit this value, and what text does it produce? Numeric-only formatted overload metadata conflicts with general primitive/enum/collection prose; neither account is a native prediction."
+      ],
+      "captureMode": "EXPLICIT-CONSTANT-OR-DEFAULT-INPUT",
+      "powerLimit": "If a matrix/array element constructor is refused first, record that exact earlier boundary and hold the conversion facet. Capture text literally; do not infer it from collection size or LENGTH.",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      }
+    },
+    {
+      "probe": "tostring-format-bool-array-v42-v1.pine",
+      "path": "tostring-format-bool-array-v42-v1.pine",
+      "sourceSha256": "cb04b4749523cc320f805afa01a78e4e11393de0c07fad5354fa24c0a84dfb66",
+      "instructionsPath": "instructions/tostring-format-bool-array-instructions-v1.md",
+      "instructionsSha256": "8137a95b39e4af46643eedb0abfb7cbc5ff3db51d9549af32916d698703c2301",
+      "componentIds": [
+        "str.tostring"
+      ],
+      "questions": [
+        "Does the two-argument str.tostring call admit this value, and what text does it produce? Numeric-only formatted overload metadata conflicts with general primitive/enum/collection prose; neither account is a native prediction."
+      ],
+      "captureMode": "EXPLICIT-CONSTANT-OR-DEFAULT-INPUT",
+      "powerLimit": "If a matrix/array element constructor is refused first, record that exact earlier boundary and hold the conversion facet. Capture text literally; do not infer it from collection size or LENGTH.",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      }
+    },
+    {
+      "probe": "tostring-format-string-array-v42-v1.pine",
+      "path": "tostring-format-string-array-v42-v1.pine",
+      "sourceSha256": "60b92059796f412e92448e5eea032623ba80d248c9e321d598af8fc653b28083",
+      "instructionsPath": "instructions/tostring-format-string-array-instructions-v1.md",
+      "instructionsSha256": "d8baf08ab4b3414f339744b1c33d83730b3788353ed7cb9ae6966812b838d653",
+      "componentIds": [
+        "str.tostring"
+      ],
+      "questions": [
+        "Does the two-argument str.tostring call admit this value, and what text does it produce? Numeric-only formatted overload metadata conflicts with general primitive/enum/collection prose; neither account is a native prediction."
+      ],
+      "captureMode": "EXPLICIT-CONSTANT-OR-DEFAULT-INPUT",
+      "powerLimit": "If a matrix/array element constructor is refused first, record that exact earlier boundary and hold the conversion facet. Capture text literally; do not infer it from collection size or LENGTH.",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      }
+    },
+    {
+      "probe": "tostring-format-enum-array-v42-v1.pine",
+      "path": "tostring-format-enum-array-v42-v1.pine",
+      "sourceSha256": "227b9cd44a9eb8fc11f98bb7a404d4a92f71bd68438876e79232e240e9e0c29c",
+      "instructionsPath": "instructions/tostring-format-enum-array-instructions-v1.md",
+      "instructionsSha256": "68c62141d74abf884c911560d4883671521ade529335d0339a0d555d452804c9",
+      "componentIds": [
+        "str.tostring"
+      ],
+      "questions": [
+        "Does the two-argument str.tostring call admit this value, and what text does it produce? Numeric-only formatted overload metadata conflicts with general primitive/enum/collection prose; neither account is a native prediction."
+      ],
+      "captureMode": "EXPLICIT-CONSTANT-OR-DEFAULT-INPUT",
+      "powerLimit": "If a matrix/array element constructor is refused first, record that exact earlier boundary and hold the conversion facet. Capture text literally; do not infer it from collection size or LENGTH.",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      }
+    },
+    {
+      "probe": "tostring-format-bool-matrix-v42-v1.pine",
+      "path": "tostring-format-bool-matrix-v42-v1.pine",
+      "sourceSha256": "71d8e32ff7daa8e9d2cc0e23ef02851052ea60eca4c3ed141a4dc385ff5d600d",
+      "instructionsPath": "instructions/tostring-format-bool-matrix-instructions-v1.md",
+      "instructionsSha256": "80284510d16999e5a28bf933c176d707fbd95054fa694b6640cb2647056eaff4",
+      "componentIds": [
+        "str.tostring"
+      ],
+      "questions": [
+        "Does the two-argument str.tostring call admit this value, and what text does it produce? Numeric-only formatted overload metadata conflicts with general primitive/enum/collection prose; neither account is a native prediction."
+      ],
+      "captureMode": "EXPLICIT-CONSTANT-OR-DEFAULT-INPUT",
+      "powerLimit": "If a matrix/array element constructor is refused first, record that exact earlier boundary and hold the conversion facet. Capture text literally; do not infer it from collection size or LENGTH.",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      }
+    },
+    {
+      "probe": "tostring-format-string-matrix-v42-v1.pine",
+      "path": "tostring-format-string-matrix-v42-v1.pine",
+      "sourceSha256": "f67f835161e467e0f21b85d8457e7aaa640bdd425e93cf29033273f550ad8bda",
+      "instructionsPath": "instructions/tostring-format-string-matrix-instructions-v1.md",
+      "instructionsSha256": "840b386e72ab5c3a1b0fbe3af8d424691c5d6f372ca31a0c10c20627977037d2",
+      "componentIds": [
+        "str.tostring"
+      ],
+      "questions": [
+        "Does the two-argument str.tostring call admit this value, and what text does it produce? Numeric-only formatted overload metadata conflicts with general primitive/enum/collection prose; neither account is a native prediction."
+      ],
+      "captureMode": "EXPLICIT-CONSTANT-OR-DEFAULT-INPUT",
+      "powerLimit": "If a matrix/array element constructor is refused first, record that exact earlier boundary and hold the conversion facet. Capture text literally; do not infer it from collection size or LENGTH.",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      }
+    },
+    {
+      "probe": "tostring-format-enum-matrix-v42-v1.pine",
+      "path": "tostring-format-enum-matrix-v42-v1.pine",
+      "sourceSha256": "da5095485b7a655948ae1c075de371441af4abcaf28d681b2f09ea32ebc5b2e2",
+      "instructionsPath": "instructions/tostring-format-enum-matrix-instructions-v1.md",
+      "instructionsSha256": "79cf43a185c68f90b2623466b893767f37a706eb77b351a9babbd6ac86d7c613",
+      "componentIds": [
+        "str.tostring"
+      ],
+      "questions": [
+        "Does the two-argument str.tostring call admit this value, and what text does it produce? Numeric-only formatted overload metadata conflicts with general primitive/enum/collection prose; neither account is a native prediction."
+      ],
+      "captureMode": "EXPLICIT-CONSTANT-OR-DEFAULT-INPUT",
+      "powerLimit": "If a matrix/array element constructor is refused first, record that exact earlier boundary and hold the conversion facet. Capture text literally; do not infer it from collection size or LENGTH.",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      }
+    },
+    {
+      "probe": "format-matrix-int-v42-v1.pine",
+      "path": "format-matrix-int-v42-v1.pine",
+      "sourceSha256": "002a2bb50c47cf193dac0556aa19861ba9e8252bb862f2737435c1c63ac5e933",
+      "instructionsPath": "instructions/format-matrix-int-instructions-v1.md",
+      "instructionsSha256": "a1c7a908132668b20da7587abccd89ecceebf4677ecb44bf226398da72bc9530",
+      "componentIds": [
+        "str.format"
+      ],
+      "questions": [
+        "Does str.format admit a matrix value for its plain placeholder? Record compile versus runtime refusal separately. The structured variadic union lists primitive arrays and omits matrices."
+      ],
+      "captureMode": "EXPLICIT-CONSTANT-OR-DEFAULT-INPUT",
+      "powerLimit": "The plain placeholder isolates admission and representation; it does not ask about numeric collection formatting modifiers.",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      }
+    },
+    {
+      "probe": "format-matrix-float-v42-v1.pine",
+      "path": "format-matrix-float-v42-v1.pine",
+      "sourceSha256": "3943b11353b8daab6e2a6f153b75110659e74177ca182540031f0f64bb88d389",
+      "instructionsPath": "instructions/format-matrix-float-instructions-v1.md",
+      "instructionsSha256": "6b01fef722410b09b78909ededb8c039f342aeedde71a1331fe4dfd41139cfcb",
+      "componentIds": [
+        "str.format"
+      ],
+      "questions": [
+        "Does str.format admit a matrix value for its plain placeholder? Record compile versus runtime refusal separately. The structured variadic union lists primitive arrays and omits matrices."
+      ],
+      "captureMode": "EXPLICIT-CONSTANT-OR-DEFAULT-INPUT",
+      "powerLimit": "The plain placeholder isolates admission and representation; it does not ask about numeric collection formatting modifiers.",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      }
+    },
+    {
+      "probe": "format-matrix-bool-v42-v1.pine",
+      "path": "format-matrix-bool-v42-v1.pine",
+      "sourceSha256": "75f8aeccaf172e2d878b412c302a5b29edce7b60d8a63acdd9631ce243a1b9fe",
+      "instructionsPath": "instructions/format-matrix-bool-instructions-v1.md",
+      "instructionsSha256": "ce3554f31b49ee08be84765875fddb9de2e5fe8c480dd7f9ad7d8e8e5eaefbaa",
+      "componentIds": [
+        "str.format"
+      ],
+      "questions": [
+        "Does str.format admit a matrix value for its plain placeholder? Record compile versus runtime refusal separately. The structured variadic union lists primitive arrays and omits matrices."
+      ],
+      "captureMode": "EXPLICIT-CONSTANT-OR-DEFAULT-INPUT",
+      "powerLimit": "The plain placeholder isolates admission and representation; it does not ask about numeric collection formatting modifiers.",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      }
+    },
+    {
+      "probe": "format-matrix-string-v42-v1.pine",
+      "path": "format-matrix-string-v42-v1.pine",
+      "sourceSha256": "24327124fff30077d16b6d1906157258077084870db14dd438d4eef99d43d128",
+      "instructionsPath": "instructions/format-matrix-string-instructions-v1.md",
+      "instructionsSha256": "cb4e2c41b005826a048125ac1c2b31804fbd1bbb3e3c9adeb6d67a971e72c296",
+      "componentIds": [
+        "str.format"
+      ],
+      "questions": [
+        "Does str.format admit a matrix value for its plain placeholder? Record compile versus runtime refusal separately. The structured variadic union lists primitive arrays and omits matrices."
+      ],
+      "captureMode": "EXPLICIT-CONSTANT-OR-DEFAULT-INPUT",
+      "powerLimit": "The plain placeholder isolates admission and representation; it does not ask about numeric collection formatting modifiers.",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      }
+    },
+    {
+      "probe": "format-enum-v42-v1.pine",
+      "path": "format-enum-v42-v1.pine",
+      "sourceSha256": "f62bb0c85b9919c34d5c003b7ae6c0a054768c5d5fe4852de6476ffdac421164",
+      "instructionsPath": "instructions/format-enum-instructions-v1.md",
+      "instructionsSha256": "52c7b90cb21ca4ccaf7d9fbc1167f5da4e75619eba5e5cb273e7f18e8166c6c0",
+      "componentIds": [
+        "str.format"
+      ],
+      "questions": [
+        "Does str.format admit an enum member as a variadic formatting value, and what literal text results?"
+      ],
+      "captureMode": "EXPLICIT-CONSTANT-OR-DEFAULT-INPUT",
+      "powerLimit": "An enum title or value representation is observed only if the exact target runs.",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      }
+    },
+    {
+      "probe": "floor-const-title-format-v42-v1.pine",
+      "path": "floor-const-title-format-v42-v1.pine",
+      "sourceSha256": "da00b4bc06d847a0dc2c966032b5d82312f647349463e3d28e0a9d8cca238524",
+      "instructionsPath": "instructions/floor-const-title-format-instructions-v1.md",
+      "instructionsSha256": "c53a0b7a6d0bdc17a3c0a6b5171de352635d81c32aca4640a261e16be10fab40",
+      "componentIds": [
+        "str.format"
+      ],
+      "questions": [
+        "Can this constant-argument scalar string result satisfy plot title (const string)? Specific reference floors and strongest-calculation prose require exact native consumer admission."
+      ],
+      "captureMode": "EXPLICIT-CONSTANT-OR-DEFAULT-INPUT",
+      "powerLimit": "A successful const consumer certifies this exact result is const-compatible; a qualified native diagnostic identifies a stronger result. No runtime string value is itself qualifier evidence.",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      }
+    },
+    {
+      "probe": "floor-const-title-format-time-v42-v1.pine",
+      "path": "floor-const-title-format-time-v42-v1.pine",
+      "sourceSha256": "a33acb5734c06c1598128824dbaa517a6550d7e9a6293c70cb0f286cea656463",
+      "instructionsPath": "instructions/floor-const-title-format-time-instructions-v1.md",
+      "instructionsSha256": "d46503feacb08516aa91832a2cd6475bd99152298aa12cb044ff9b31b29dfef5",
+      "componentIds": [
+        "str.format_time"
+      ],
+      "questions": [
+        "Can this constant-argument scalar string result satisfy plot title (const string)? Specific reference floors and strongest-calculation prose require exact native consumer admission."
+      ],
+      "captureMode": "EXPLICIT-CONSTANT-OR-DEFAULT-INPUT",
+      "powerLimit": "A successful const consumer certifies this exact result is const-compatible; a qualified native diagnostic identifies a stronger result. No runtime string value is itself qualifier evidence.",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      }
+    },
+    {
+      "probe": "floor-const-title-tostring-format-v42-v1.pine",
+      "path": "floor-const-title-tostring-format-v42-v1.pine",
+      "sourceSha256": "925072c431fd3eafdab5184912a63a567922e46beea20bcf45bc02c02f895344",
+      "instructionsPath": "instructions/floor-const-title-tostring-format-instructions-v1.md",
+      "instructionsSha256": "69cba170c4cb4a82032fd22077c809cbcd51f6d4324096c6abf5f6cc703611d3",
+      "componentIds": [
+        "str.tostring"
+      ],
+      "questions": [
+        "Can this constant-argument scalar string result satisfy plot title (const string)? Specific reference floors and strongest-calculation prose require exact native consumer admission."
+      ],
+      "captureMode": "EXPLICIT-CONSTANT-OR-DEFAULT-INPUT",
+      "powerLimit": "A successful const consumer certifies this exact result is const-compatible; a qualified native diagnostic identifies a stronger result. No runtime string value is itself qualifier evidence.",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      }
+    },
+    {
+      "probe": "floor-const-title-replace-all-v42-v1.pine",
+      "path": "floor-const-title-replace-all-v42-v1.pine",
+      "sourceSha256": "5b52df02eedbedebe1a9b154756e15e9c0c0bf6505e2032a5fedc498cf12cf72",
+      "instructionsPath": "instructions/floor-const-title-replace-all-instructions-v1.md",
+      "instructionsSha256": "33c5179cee53b87a0281a181445b6c68ed718b809b90e1a5730f1346324f86f7",
+      "componentIds": [
+        "str.replace_all"
+      ],
+      "questions": [
+        "Can this constant-argument scalar string result satisfy plot title (const string)? Specific reference floors and strongest-calculation prose require exact native consumer admission."
+      ],
+      "captureMode": "EXPLICIT-CONSTANT-OR-DEFAULT-INPUT",
+      "powerLimit": "A successful const consumer certifies this exact result is const-compatible; a qualified native diagnostic identifies a stronger result. No runtime string value is itself qualifier evidence.",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      }
+    },
+    {
+      "probe": "floor-const-title-match-v42-v1.pine",
+      "path": "floor-const-title-match-v42-v1.pine",
+      "sourceSha256": "62486bf12e9099c9c1bc08a465249f57742834ecce914fc8a757ddb9bed89715",
+      "instructionsPath": "instructions/floor-const-title-match-instructions-v1.md",
+      "instructionsSha256": "27284691487a6d609eec1787290189eca6d99bbec5ab631c7109f6e2fb69d7ed",
+      "componentIds": [
+        "str.match"
+      ],
+      "questions": [
+        "Can this constant-argument scalar string result satisfy plot title (const string)? Specific reference floors and strongest-calculation prose require exact native consumer admission."
+      ],
+      "captureMode": "EXPLICIT-CONSTANT-OR-DEFAULT-INPUT",
+      "powerLimit": "A successful const consumer certifies this exact result is const-compatible; a qualified native diagnostic identifies a stronger result. No runtime string value is itself qualifier evidence.",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      }
+    },
+    {
+      "probe": "floor-simple-consumer-format-time-v42-v1.pine",
+      "path": "floor-simple-consumer-format-time-v42-v1.pine",
+      "sourceSha256": "dfd09b0282f302010f2feb0db794557be0dfb51f119c53593c6bf540d3a3f067",
+      "instructionsPath": "instructions/floor-simple-consumer-format-time-instructions-v1.md",
+      "instructionsSha256": "a8d47bae836f510d899d389e981e4eb933a7bc93defb5468e819212c40208d87",
+      "componentIds": [
+        "str.format_time"
+      ],
+      "questions": [
+        "Can the constant-argument str.format_time result satisfy a simple-string UDF parameter, or does native identify a series result?"
+      ],
+      "captureMode": "EXPLICIT-CONSTANT-OR-DEFAULT-INPUT",
+      "powerLimit": "This is a separate simple ceiling from the const-title consumer. Preserve the exact returned-type diagnostic.",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      }
+    },
+    {
+      "probe": "floor-input-consumer-format-v42-v1.pine",
+      "path": "floor-input-consumer-format-v42-v1.pine",
+      "sourceSha256": "1cb87c69aee75a173a99f389e1884f1c77082e86915b487b81f5c8ee001d9be9",
+      "instructionsPath": "instructions/floor-input-consumer-format-instructions-v1.md",
+      "instructionsSha256": "22187383858c3ac33db6894d22f2494728d06be421d07306b7677e78eb3c8a47",
+      "componentIds": [
+        "str.format"
+      ],
+      "questions": [
+        "Determine the native consumer boundary and diagnostic actual qualifier for this input-qualified format result. Specific signature floors are candidates, not predictions."
+      ],
+      "captureMode": "EXPLICIT-CONSTANT-OR-DEFAULT-INPUT",
+      "powerLimit": "The consumer requires const string. Both input and simple may refuse, so refusal alone does not settle the return floor. Preserve actual qualified result type from the native diagnostic if available; otherwise qualifier is UNOBSERVED.",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      }
+    },
+    {
+      "probe": "floor-input-consumer-format-time-v42-v1.pine",
+      "path": "floor-input-consumer-format-time-v42-v1.pine",
+      "sourceSha256": "527dec2f28d208a71dd07d542cd52e8ef1298e7fb4f1ecbcd0aef7e0d7d81781",
+      "instructionsPath": "instructions/floor-input-consumer-format-time-instructions-v1.md",
+      "instructionsSha256": "171d361c1f008ee53d4181c102873be52733bb838438c69ea50b1744b00b86f2",
+      "componentIds": [
+        "str.format_time"
+      ],
+      "questions": [
+        "Determine the native consumer boundary and diagnostic actual qualifier for this input-qualified format-time result. Specific signature floors are candidates, not predictions."
+      ],
+      "captureMode": "EXPLICIT-CONSTANT-OR-DEFAULT-INPUT",
+      "powerLimit": "The consumer requires const string. Both input and simple may refuse, so refusal alone does not settle the return floor. Preserve actual qualified result type from the native diagnostic if available; otherwise qualifier is UNOBSERVED.",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      }
+    },
+    {
+      "probe": "floor-input-consumer-tostring-format-v42-v1.pine",
+      "path": "floor-input-consumer-tostring-format-v42-v1.pine",
+      "sourceSha256": "0e809aec01666e00a12547caeb089dede747a1649c673fc73b815e739da5be24",
+      "instructionsPath": "instructions/floor-input-consumer-tostring-format-instructions-v1.md",
+      "instructionsSha256": "7907f259687811f570621baa7f38f8a6f42d2ad2fb31ff903fa1797c4b4d1252",
+      "componentIds": [
+        "str.tostring"
+      ],
+      "questions": [
+        "Determine the native consumer boundary and diagnostic actual qualifier for this input-qualified tostring-format result. Specific signature floors are candidates, not predictions."
+      ],
+      "captureMode": "EXPLICIT-CONSTANT-OR-DEFAULT-INPUT",
+      "powerLimit": "The consumer requires const string. Both input and simple may refuse, so refusal alone does not settle the return floor. Preserve actual qualified result type from the native diagnostic if available; otherwise qualifier is UNOBSERVED.",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      }
+    },
+    {
+      "probe": "floor-input-consumer-replace-all-v42-v1.pine",
+      "path": "floor-input-consumer-replace-all-v42-v1.pine",
+      "sourceSha256": "9bfefa24315e23068af750cb46f83bd2f9e05200b24db2e5f699e646f533d6f8",
+      "instructionsPath": "instructions/floor-input-consumer-replace-all-instructions-v1.md",
+      "instructionsSha256": "b0b03b8009593b30b839f88028334879f83bfc03b82ccc0075c49bc654002388",
+      "componentIds": [
+        "str.replace_all"
+      ],
+      "questions": [
+        "Determine the native consumer boundary and diagnostic actual qualifier for this input-qualified replace-all result. Specific signature floors are candidates, not predictions."
+      ],
+      "captureMode": "EXPLICIT-CONSTANT-OR-DEFAULT-INPUT",
+      "powerLimit": "The consumer requires const string. Both input and simple may refuse, so refusal alone does not settle the return floor. Preserve actual qualified result type from the native diagnostic if available; otherwise qualifier is UNOBSERVED.",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      }
+    },
+    {
+      "probe": "floor-input-consumer-contains-v42-v1.pine",
+      "path": "floor-input-consumer-contains-v42-v1.pine",
+      "sourceSha256": "1482bb1c95df7202141cbe3683bf7115234ad63a646ebc25db68311d2b460729",
+      "instructionsPath": "instructions/floor-input-consumer-contains-instructions-v1.md",
+      "instructionsSha256": "0a991d9aff225670820d71fb91520e483f5469fd713afc31b7a86d4a215cbebd",
+      "componentIds": [
+        "str.contains"
+      ],
+      "questions": [
+        "Determine the native consumer boundary and diagnostic actual qualifier for this input-qualified contains result. Specific signature floors are candidates, not predictions."
+      ],
+      "captureMode": "EXPLICIT-CONSTANT-OR-DEFAULT-INPUT",
+      "powerLimit": "The consumer requires const bool. Both input and simple may refuse, so refusal alone does not settle the return floor. Only a diagnostic spelling out the actual qualified result type can discriminate them; otherwise qualifier is UNOBSERVED.",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      }
+    },
+    {
+      "probe": "floor-input-consumer-substring-v42-v1.pine",
+      "path": "floor-input-consumer-substring-v42-v1.pine",
+      "sourceSha256": "2a376222961f6e59189b18050b3e328d1c82c284deb1f11a3f300b1fd118bb83",
+      "instructionsPath": "instructions/floor-input-consumer-substring-instructions-v1.md",
+      "instructionsSha256": "1f17319fc19c8d7726296d9b6fc09dd7c0fe43a0e3beb9524833255e2aebed1c",
+      "componentIds": [
+        "str.substring"
+      ],
+      "questions": [
+        "Determine the native consumer boundary and diagnostic actual qualifier for this input-qualified substring result. Specific signature floors are candidates, not predictions."
+      ],
+      "captureMode": "EXPLICIT-CONSTANT-OR-DEFAULT-INPUT",
+      "powerLimit": "The consumer requires const string. Both input and simple may refuse, so refusal alone does not settle the return floor. Preserve actual qualified result type from the native diagnostic if available; otherwise qualifier is UNOBSERVED.",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      }
+    },
+    {
+      "probe": "floor-input-consumer-replace-v42-v1.pine",
+      "path": "floor-input-consumer-replace-v42-v1.pine",
+      "sourceSha256": "0d8c8d40df61f8d58aa6a9e6b53c3a27862c2dea7b708d332cf95ccc158678a6",
+      "instructionsPath": "instructions/floor-input-consumer-replace-instructions-v1.md",
+      "instructionsSha256": "1071d72efabd2bb59bd664ba861e8e8127f920f5765ba6189c0ded4d93da1e1c",
+      "componentIds": [
+        "str.replace"
+      ],
+      "questions": [
+        "Determine the native consumer boundary and diagnostic actual qualifier for this input-qualified replace result. Specific signature floors are candidates, not predictions."
+      ],
+      "captureMode": "EXPLICIT-CONSTANT-OR-DEFAULT-INPUT",
+      "powerLimit": "The consumer requires const string. Both input and simple may refuse, so refusal alone does not settle the return floor. Preserve actual qualified result type from the native diagnostic if available; otherwise qualifier is UNOBSERVED.",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      }
+    },
+    {
+      "probe": "floor-input-consumer-lower-v42-v1.pine",
+      "path": "floor-input-consumer-lower-v42-v1.pine",
+      "sourceSha256": "df79a0d5f6a3aa329b2075825b0611c9f51493da0bdb630bce25eff7f05fa037",
+      "instructionsPath": "instructions/floor-input-consumer-lower-instructions-v1.md",
+      "instructionsSha256": "5e3cfb1c5a03573f7dae035d44f400814cd3acf955bf9c6344e39d0292cad192",
+      "componentIds": [
+        "str.lower"
+      ],
+      "questions": [
+        "Determine the native consumer boundary and diagnostic actual qualifier for this input-qualified lower result. Specific signature floors are candidates, not predictions."
+      ],
+      "captureMode": "EXPLICIT-CONSTANT-OR-DEFAULT-INPUT",
+      "powerLimit": "The consumer requires const string. Both input and simple may refuse, so refusal alone does not settle the return floor. Preserve actual qualified result type from the native diagnostic if available; otherwise qualifier is UNOBSERVED.",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      }
+    },
+    {
+      "probe": "floor-input-consumer-upper-v42-v1.pine",
+      "path": "floor-input-consumer-upper-v42-v1.pine",
+      "sourceSha256": "fa8b030442c1c18e348ed1e9164d8820e232908e77aeb31c905dd935abb55c54",
+      "instructionsPath": "instructions/floor-input-consumer-upper-instructions-v1.md",
+      "instructionsSha256": "ee403054279ada34aac7754f0e17076b890b8c69a71814f8abfe1f35525f1c5e",
+      "componentIds": [
+        "str.upper"
+      ],
+      "questions": [
+        "Determine the native consumer boundary and diagnostic actual qualifier for this input-qualified upper result. Specific signature floors are candidates, not predictions."
+      ],
+      "captureMode": "EXPLICIT-CONSTANT-OR-DEFAULT-INPUT",
+      "powerLimit": "The consumer requires const string. Both input and simple may refuse, so refusal alone does not settle the return floor. Preserve actual qualified result type from the native diagnostic if available; otherwise qualifier is UNOBSERVED.",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      }
+    },
+    {
+      "probe": "floor-input-consumer-startswith-v42-v1.pine",
+      "path": "floor-input-consumer-startswith-v42-v1.pine",
+      "sourceSha256": "75d12589fcff20894d01b16fbc605e4375b660c00762af64ecd9f8be69829a29",
+      "instructionsPath": "instructions/floor-input-consumer-startswith-instructions-v1.md",
+      "instructionsSha256": "b0dd298b1024b9ba1d4d22a5a2ba688ebad4e2db7836da82d5307e4ba2e0d783",
+      "componentIds": [
+        "str.startswith"
+      ],
+      "questions": [
+        "Determine the native consumer boundary and diagnostic actual qualifier for this input-qualified startswith result. Specific signature floors are candidates, not predictions."
+      ],
+      "captureMode": "EXPLICIT-CONSTANT-OR-DEFAULT-INPUT",
+      "powerLimit": "The consumer requires const bool. Both input and simple may refuse, so refusal alone does not settle the return floor. Only a diagnostic spelling out the actual qualified result type can discriminate them; otherwise qualifier is UNOBSERVED.",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      }
+    },
+    {
+      "probe": "floor-input-consumer-endswith-v42-v1.pine",
+      "path": "floor-input-consumer-endswith-v42-v1.pine",
+      "sourceSha256": "011a438bb599e7a88e470ed8057bb71e0eee195b0508ddd038b6b7b08acfd018",
+      "instructionsPath": "instructions/floor-input-consumer-endswith-instructions-v1.md",
+      "instructionsSha256": "31cbd9287ba606e5bd4361212435dc790fdf9968a25080b955ebb83838226fea",
+      "componentIds": [
+        "str.endswith"
+      ],
+      "questions": [
+        "Determine the native consumer boundary and diagnostic actual qualifier for this input-qualified endswith result. Specific signature floors are candidates, not predictions."
+      ],
+      "captureMode": "EXPLICIT-CONSTANT-OR-DEFAULT-INPUT",
+      "powerLimit": "The consumer requires const bool. Both input and simple may refuse, so refusal alone does not settle the return floor. Only a diagnostic spelling out the actual qualified result type can discriminate them; otherwise qualifier is UNOBSERVED.",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      }
+    },
+    {
+      "probe": "floor-input-consumer-match-v42-v1.pine",
+      "path": "floor-input-consumer-match-v42-v1.pine",
+      "sourceSha256": "af8e0c57c3dedf8585953764a21dec40f91a43c5c50c4764fca7573fdc873cff",
+      "instructionsPath": "instructions/floor-input-consumer-match-instructions-v1.md",
+      "instructionsSha256": "994610478c7b2f675f0975f30a2615297c518385322f82f0b6628647673bd7d9",
+      "componentIds": [
+        "str.match"
+      ],
+      "questions": [
+        "Determine the native consumer boundary and diagnostic actual qualifier for this input-qualified match result. Specific signature floors are candidates, not predictions."
+      ],
+      "captureMode": "EXPLICIT-CONSTANT-OR-DEFAULT-INPUT",
+      "powerLimit": "The consumer requires const string. Both input and simple may refuse, so refusal alone does not settle the return floor. Preserve actual qualified result type from the native diagnostic if available; otherwise qualifier is UNOBSERVED.",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      }
+    },
+    {
+      "probe": "floor-input-consumer-pos-v42-v1.pine",
+      "path": "floor-input-consumer-pos-v42-v1.pine",
+      "sourceSha256": "e76430f8a9c2787d5a808803442a9edb11a7b261021a5767dbb27af2542703c8",
+      "instructionsPath": "instructions/floor-input-consumer-pos-instructions-v1.md",
+      "instructionsSha256": "116ba0ab1351d8df5d301d05f90613af2f52147ca173d0b5a2061f6fbb6ef9d7",
+      "componentIds": [
+        "str.pos"
+      ],
+      "questions": [
+        "Determine the native consumer boundary and diagnostic actual qualifier for this input-qualified pos result. Specific signature floors are candidates, not predictions."
+      ],
+      "captureMode": "EXPLICIT-CONSTANT-OR-DEFAULT-INPUT",
+      "powerLimit": "plot linewidth requires input int. Successful admission distinguishes input-compatible from a simple floor for this exact value; retain any earlier diagnostic separately.",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      }
+    },
+    {
+      "probe": "floor-input-consumer-length-v42-v1.pine",
+      "path": "floor-input-consumer-length-v42-v1.pine",
+      "sourceSha256": "da24ada1af113701a5b571f53a83ab5042a840ef34bf237f8b8cf30537b2d6ff",
+      "instructionsPath": "instructions/floor-input-consumer-length-instructions-v1.md",
+      "instructionsSha256": "26c14652e226e72225199f99b2a0a093f26fc5848e134e45e642d229704c8c68",
+      "componentIds": [
+        "str.length"
+      ],
+      "questions": [
+        "Determine the native consumer boundary and diagnostic actual qualifier for this input-qualified length result. Specific signature floors are candidates, not predictions."
+      ],
+      "captureMode": "EXPLICIT-CONSTANT-OR-DEFAULT-INPUT",
+      "powerLimit": "plot linewidth requires input int. Successful admission distinguishes input-compatible from a simple floor for this exact value; retain any earlier diagnostic separately.",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      }
+    }
+  ],
+  "scope": "Assigned string formatting unions and scalar return-floor consumer controls; native phase/values unspecified."
+}

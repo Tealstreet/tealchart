@@ -1,0 +1,7 @@
+//@version=6
+indicator("V42 floor-input-consumer-startswith")
+source = input.string("abc", "Source")
+value = str.startswith(source, "a")
+consumer = input.bool(value, "Const bool consumer")
+plot(consumer ? 1 : 0, "VALUE")
+plot(bar_index, "SOURCE_INDEX")

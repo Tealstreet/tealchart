@@ -1,0 +1,5 @@
+//@version=6
+indicator("V42 floor-const-title-match")
+value = str.match("abc", "[a-z]+")
+plot(close, title=value)
+plot(bar_index, "SOURCE_INDEX")

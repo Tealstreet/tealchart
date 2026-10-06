@@ -1,0 +1,11 @@
+//@version=6
+indicator("V42 tostring-format-enum-array")
+enum ReviewEnum
+    one = "One"
+    two = "Two"
+value = str.tostring(array.from(ReviewEnum.one, ReviewEnum.two), "#.00")
+plot(bar_index, "SOURCE_INDEX")
+plot(str.length(value), "LENGTH")
+if barstate.isfirst
+    log.info("{0}", value)
+    label.new(bar_index, high, text=value)

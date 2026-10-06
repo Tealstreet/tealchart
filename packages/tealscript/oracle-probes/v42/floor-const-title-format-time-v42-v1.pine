@@ -1,0 +1,5 @@
+//@version=6
+indicator("V42 floor-const-title-format-time")
+value = str.format_time(0, "yyyy", "UTC")
+plot(close, title=value)
+plot(bar_index, "SOURCE_INDEX")

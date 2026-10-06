@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "bundle": "v47",
-  "version": 2,
+  "version": 3,
   "scripts": [
     {
       "probe": "format-only-literal-v47-v1.pine",
@@ -270,82 +270,6 @@
         "chartDisplayTimezone": "Etc/UTC",
         "minimumHistoricalBars": 32
       }
-    },
-    {
-      "probe": "format-time-const-consumer-v47-v1.pine",
-      "path": "format-time-const-consumer-v47-v1.pine",
-      "owner": "codex-g6qooy",
-      "facetIds": [
-        "str.format_time.result-qualifier-floor",
-        "const-consumer"
-      ],
-      "reference": {
-        "member": "str.format_time",
-        "functionsEntry": 91
-      },
-      "sourceSha256": "063b714025141c437035e6d6a4525d3a06c8ee970d404f379da4c53df493ee31",
-      "instructionsPath": "instructions/format-time-const-consumer-v47-v1-instructions-v1.md",
-      "instructionsSha256": "ed2a41d0b1cecef8c2b4cb4c1ade478cdd72b7088c82b1571b5a15e4e6445d45",
-      "questions": [
-        "Does a literal-argument str.format_time result admit a const string consumer? Compare paired const/simple refusal phases without assuming the result qualifier."
-      ],
-      "columns": [
-        "INDEX",
-        "CONTROL_CLOSE",
-        "TARGET_NA",
-        "TARGET_LENGTH",
-        "CANDIDATE_SECONDS"
-      ],
-      "expectedOutcome": {
-        "phase": "UNSPECIFIED",
-        "values": "UNSPECIFIED"
-      },
-      "nativeStatus": "UNOBSERVED",
-      "chartContext": {
-        "symbol": "BINANCE:BTCUSDT",
-        "timeframe": "2",
-        "chartType": "STANDARD-CANDLES",
-        "chartDisplayTimezone": "Etc/UTC",
-        "minimumHistoricalBars": 32
-      }
-    },
-    {
-      "probe": "format-time-simple-consumer-v47-v1.pine",
-      "path": "format-time-simple-consumer-v47-v1.pine",
-      "owner": "codex-g6qooy",
-      "facetIds": [
-        "str.format_time.result-qualifier-floor",
-        "simple-consumer"
-      ],
-      "reference": {
-        "member": "str.format_time",
-        "functionsEntry": 91
-      },
-      "sourceSha256": "e4daab299e5a2d87ce257e474d6f080ce4f06a254ba1f6309067d456eb2d670b",
-      "instructionsPath": "instructions/format-time-simple-consumer-v47-v1-instructions-v1.md",
-      "instructionsSha256": "aa1a4be39b5f859d089aecb88416d099ccd417b34c228bbc588e3d6d0a42eaaf",
-      "questions": [
-        "Does a literal-argument str.format_time result admit a simple string consumer? Compare paired const/simple refusal phases without assuming the result qualifier."
-      ],
-      "columns": [
-        "INDEX",
-        "CONTROL_CLOSE",
-        "TARGET_NA",
-        "TARGET_LENGTH",
-        "CANDIDATE_SECONDS"
-      ],
-      "expectedOutcome": {
-        "phase": "UNSPECIFIED",
-        "values": "UNSPECIFIED"
-      },
-      "nativeStatus": "UNOBSERVED",
-      "chartContext": {
-        "symbol": "BINANCE:BTCUSDT",
-        "timeframe": "2",
-        "chartType": "STANDARD-CANDLES",
-        "chartDisplayTimezone": "Etc/UTC",
-        "minimumHistoricalBars": 32
-      }
     }
   ],
   "reusedLiteralBounds": [
@@ -356,5 +280,22 @@
     "Literal bounds reuse v40; v47 adds only delayed series bounds.",
     "Candidate flags are alternative observations; native phase/value unspecified.",
     "String text needs raw logs, not length/CSV guesses."
+  ],
+  "reusedQualifierConsumers": [
+    {
+      "path": "../v42/floor-const-title-format-time-v42-v1.pine",
+      "sourceSha256": "a33acb5734c06c1598128824dbaa517a6550d7e9a6293c70cb0f286cea656463",
+      "nativeStatus": "UNOBSERVED"
+    },
+    {
+      "path": "../v42/floor-simple-consumer-format-time-v42-v1.pine",
+      "sourceSha256": "dfd09b0282f302010f2feb0db794557be0dfb51f119c53593c6bf540d3a3f067",
+      "nativeStatus": "UNOBSERVED"
+    },
+    {
+      "path": "../v42/floor-input-consumer-format-time-v42-v1.pine",
+      "sourceSha256": "527dec2f28d208a71dd07d542cd52e8ef1298e7fb4f1ecbcd0aef7e0d7d81781",
+      "nativeStatus": "UNOBSERVED"
+    }
   ]
 }

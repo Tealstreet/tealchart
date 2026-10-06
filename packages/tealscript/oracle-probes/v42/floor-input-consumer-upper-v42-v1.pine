@@ -1,0 +1,6 @@
+//@version=6
+indicator("V42 floor-input-consumer-upper")
+source = input.string("abc", "Source")
+value = str.upper(source)
+plot(close, title=value)
+plot(bar_index, "SOURCE_INDEX")
