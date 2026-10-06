@@ -1,0 +1,10 @@
+//@version=6
+indicator("v40 tonumber-exponent v1", precision=16)
+plot(bar_index, "INDEX", display=display.data_window)
+target = str.tonumber("1e2")
+plot(na(target) ? 1 : 0, "TARGET_NA", display=display.data_window)
+plot(target, "TARGET_NUMBER", display=display.data_window)
+plot(target == 100 ? 1 : 0, "CANDIDATE_1_MATCH", display=display.data_window)
+plot(target == 1 ? 1 : 0, "CANDIDATE_2_MATCH", display=display.data_window)
+if barstate.islastconfirmedhistory
+    log.info("TARGET=[{0}]", target)

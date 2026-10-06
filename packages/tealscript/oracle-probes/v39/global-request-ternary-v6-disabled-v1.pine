@@ -1,0 +1,5 @@
+//@version=6
+indicator("Global request ternary", dynamic_requests=false)
+value = close > open ? request.security(syminfo.tickerid, timeframe.period, close) : 0
+plot(value, "VALUE")
+plot(close, "CONTROL_CLOSE")

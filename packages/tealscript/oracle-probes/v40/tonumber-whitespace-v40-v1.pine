@@ -1,0 +1,9 @@
+//@version=6
+indicator("v40 tonumber-whitespace v1", precision=16)
+plot(bar_index, "INDEX", display=display.data_window)
+target = str.tonumber(" 12 ")
+plot(na(target) ? 1 : 0, "TARGET_NA", display=display.data_window)
+plot(target, "TARGET_NUMBER", display=display.data_window)
+plot(target == 12 ? 1 : 0, "CANDIDATE_1_MATCH", display=display.data_window)
+if barstate.islastconfirmedhistory
+    log.info("TARGET=[{0}]", target)

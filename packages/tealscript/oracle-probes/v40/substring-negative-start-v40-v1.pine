@@ -1,0 +1,11 @@
+//@version=6
+indicator("v40 substring-negative-start v1", precision=16)
+plot(bar_index, "INDEX", display=display.data_window)
+target = str.substring("abc", -1, 2)
+plot(na(target) ? 1 : 0, "TARGET_NA", display=display.data_window)
+plot(str.length(target), "TARGET_LENGTH", display=display.data_window)
+plot(target == "ab" ? 1 : 0, "CANDIDATE_1_MATCH", display=display.data_window)
+plot(target == "bc" ? 1 : 0, "CANDIDATE_2_MATCH", display=display.data_window)
+plot(target == "" ? 1 : 0, "CANDIDATE_3_MATCH", display=display.data_window)
+if barstate.islastconfirmedhistory
+    log.info("TARGET=[{0}]", target)

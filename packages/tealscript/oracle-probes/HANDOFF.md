@@ -258,3 +258,10 @@ Capture the five PyneCore/native discriminators in [v38/HANDOFF-v38-v1.md](v38/H
 ## Then round v34 — TA-D admission v1
 
 Capture the five independent sources in [v34/bundle-manifest-v1.json](v34/bundle-manifest-v1.json), following [HANDOFF-v34-v1.md](v34/HANDOFF-v34-v1.md) and per-script instructions. Native outcomes are unspecified. Verify v34/SHA256SUMS and return exact diagnostics or raw CSV to v34/captures/v34/RESPONSE-v34.md.
+## Then round v39 — global request operand version boundaries v1
+
+Capture the nine indicator-only sources in [v39/bundle-manifest-v1.json](v39/bundle-manifest-v1.json) order, following [HANDOFF-v39-v1.md](v39/HANDOFF-v39-v1.md) and each per-script instruction. Six isolated ternary/and/or probes compare v5/v6 with dynamic_requests=false; three v6 true companions control source/context validity. Native compile/refusal outcomes are unspecified. Preserve exact source bytes and earliest diagnostics; export VALUE and CONTROL_CLOSE when a source runs. Return `v39/captures/v39/RESPONSE-v39.md` and verify `v39/SHA256SUMS` before capture.
+
+## Then round v40 — unresolved string boundaries v1
+
+Capture the nine independent scripts in [v40/bundle-manifest-v1.json](v40/bundle-manifest-v1.json) order, following [HANDOFF-v40-v1.md](v40/HANDOFF-v40-v1.md) and each literal instruction path. Eight literal witnesses discriminate exponent/whitespace conversion, negative/reversed substring bounds, empty-target replacement, apostrophe escaping, integer zero padding and percent formatting; the ninth is a valid-call companion. Native phases/values are unspecified. Export candidate flags and missing masks, copy exact Pine Logs text and record earliest refusals without repairing sources. Return source-bound artifacts to `v40/captures/v40/RESPONSE-v40.md`. Check `v40/SHA256SUMS` before capture.
