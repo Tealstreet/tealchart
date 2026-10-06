@@ -1,0 +1,1063 @@
+{
+  "schemaVersion": 1,
+  "bundle": "v49",
+  "version": 1,
+  "owner": "codex-g6qooy",
+  "scripts": [
+    {
+      "probe": "qualifier-consumer-controls-v49-v1.pine",
+      "path": "qualifier-consumer-controls-v49-v1.pine",
+      "owner": "codex-g6qooy",
+      "facetIds": [
+        "consumer-controls"
+      ],
+      "sourceSha256": "f1eac2d485925f7bc2ae6ca01c19688e18c79e119b3576462810e68dbe31c971",
+      "instructionsPath": "instructions/qualifier-consumer-controls-v49-v1-instructions-v1.md",
+      "instructionsSha256": "eb878e46feeae1ef36f8e019fe008a3701a0541a33725209a8009921ea2de572",
+      "questions": [
+        "Are the direct input-active, input-width and simple-parameter consumer shapes admitted on this native build?"
+      ],
+      "powerLimit": "Instrument companion only. The input-string comparison active control independently checks the qualifier propagation used by string-result probes.",
+      "columns": [
+        "WIDTH_CONTROL",
+        "SIMPLE_CONST_STRING",
+        "SIMPLE_INPUT_STRING",
+        "SIMPLE_SYMBOL_STRING",
+        "SIMPLE_INPUT_INT",
+        "SIMPLE_INPUT_BOOL",
+        "ACTIVE_DIRECT",
+        "ACTIVE_COMPARISON",
+        "INDEX",
+        "CONTROL_CLOSE"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "match-const-active-v49-v1.pine",
+      "path": "match-const-active-v49-v1.pine",
+      "owner": "codex-g6qooy",
+      "facetIds": [
+        "str.match.result-qualifier-floor",
+        "const",
+        "active"
+      ],
+      "sourceSha256": "26cbc2d0d3043a18f16295ef58dd5b8611c236bc9893d4561f75c37140dbb328",
+      "instructionsPath": "instructions/match-const-active-v49-v1-instructions-v1.md",
+      "instructionsSha256": "09bf964c2f2be7f9a21ddc1b4b6004ab30913ea47f1a213c762b9491afbc8483",
+      "questions": [
+        "What consumer boundary does str.match with const arguments meet?"
+      ],
+      "powerLimit": "input.bool active requires input-or-const bool. Combined with the comparison control, admission supports an input-compatible result; refusal must retain the actual qualifier. It does not by itself distinguish const from input.",
+      "columns": [
+        "CONSUMER",
+        "TARGET_LENGTH",
+        "TARGET_EQUAL",
+        "TARGET_NA",
+        "INDEX",
+        "CONTROL_CLOSE"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "match-const-simple-v49-v1.pine",
+      "path": "match-const-simple-v49-v1.pine",
+      "owner": "codex-g6qooy",
+      "facetIds": [
+        "str.match.result-qualifier-floor",
+        "const",
+        "simple"
+      ],
+      "sourceSha256": "d37cf36cf5981ece3dad49173d4d336bea14b75f54a2d1fc0b27a4593a7ae6f0",
+      "instructionsPath": "instructions/match-const-simple-v49-v1-instructions-v1.md",
+      "instructionsSha256": "433ed31063c89f5bce44c4585a100bffdc8dc87f9c6b5680ec2a34222d2ed638",
+      "questions": [
+        "What consumer boundary does str.match with const arguments meet?"
+      ],
+      "powerLimit": "The explicit simple string parameter separates simple-or-weaker from series. Rejection of const-title with simple admission supports a simple floor; qualified diagnostics remain the strongest evidence.",
+      "columns": [
+        "CONSUMER",
+        "TARGET_LENGTH",
+        "TARGET_EQUAL",
+        "TARGET_NA",
+        "INDEX",
+        "CONTROL_CLOSE"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "match-input-source-active-v49-v1.pine",
+      "path": "match-input-source-active-v49-v1.pine",
+      "owner": "codex-g6qooy",
+      "facetIds": [
+        "str.match.result-qualifier-floor",
+        "input-source",
+        "active"
+      ],
+      "sourceSha256": "d0376e89ec561b5bc29006b16181fccf9a6e8ed7c9851b707fccee88d83256f2",
+      "instructionsPath": "instructions/match-input-source-active-v49-v1-instructions-v1.md",
+      "instructionsSha256": "ce22a7315e548d421f54b3f876a39992ec249a115271c2a6c240fde5f224ffc2",
+      "questions": [
+        "What consumer boundary does str.match with input-source arguments meet?"
+      ],
+      "powerLimit": "input.bool active requires input-or-const bool. Combined with the comparison control, admission supports an input-compatible result; refusal must retain the actual qualifier. It does not by itself distinguish const from input.",
+      "columns": [
+        "CONSUMER",
+        "TARGET_LENGTH",
+        "TARGET_EQUAL",
+        "TARGET_NA",
+        "INDEX",
+        "CONTROL_CLOSE"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "match-input-source-simple-v49-v1.pine",
+      "path": "match-input-source-simple-v49-v1.pine",
+      "owner": "codex-g6qooy",
+      "facetIds": [
+        "str.match.result-qualifier-floor",
+        "input-source",
+        "simple"
+      ],
+      "sourceSha256": "caeca0d038ed0daf55c6300c3bbf8195c37e1a9a9ff02c671c75e2dbf2af168e",
+      "instructionsPath": "instructions/match-input-source-simple-v49-v1-instructions-v1.md",
+      "instructionsSha256": "c9879a12c55eb5a3f5ef4c389b8bd4f0fe9bbb1d303a0ca6731d06096654147f",
+      "questions": [
+        "What consumer boundary does str.match with input-source arguments meet?"
+      ],
+      "powerLimit": "The explicit simple string parameter separates simple-or-weaker from series. Rejection of const-title with simple admission supports a simple floor; qualified diagnostics remain the strongest evidence.",
+      "columns": [
+        "CONSUMER",
+        "TARGET_LENGTH",
+        "TARGET_EQUAL",
+        "TARGET_NA",
+        "INDEX",
+        "CONTROL_CLOSE"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "match-input-regex-active-v49-v1.pine",
+      "path": "match-input-regex-active-v49-v1.pine",
+      "owner": "codex-g6qooy",
+      "facetIds": [
+        "str.match.result-qualifier-floor",
+        "input-regex",
+        "active"
+      ],
+      "sourceSha256": "829115ac4ae11dc390bce04821019307e582136dda6fa61623349a402ed9056b",
+      "instructionsPath": "instructions/match-input-regex-active-v49-v1-instructions-v1.md",
+      "instructionsSha256": "e2c8f948c319a398f4e640d0e54f20159774163dde12bcfdd9f9a195832b3fbc",
+      "questions": [
+        "What consumer boundary does str.match with input-regex arguments meet?"
+      ],
+      "powerLimit": "input.bool active requires input-or-const bool. Combined with the comparison control, admission supports an input-compatible result; refusal must retain the actual qualifier. It does not by itself distinguish const from input.",
+      "columns": [
+        "CONSUMER",
+        "TARGET_LENGTH",
+        "TARGET_EQUAL",
+        "TARGET_NA",
+        "INDEX",
+        "CONTROL_CLOSE"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "match-input-regex-simple-v49-v1.pine",
+      "path": "match-input-regex-simple-v49-v1.pine",
+      "owner": "codex-g6qooy",
+      "facetIds": [
+        "str.match.result-qualifier-floor",
+        "input-regex",
+        "simple"
+      ],
+      "sourceSha256": "2f8229d67c4345dc499374227d3f0588a4dae058dd512b801d40688052bdb200",
+      "instructionsPath": "instructions/match-input-regex-simple-v49-v1-instructions-v1.md",
+      "instructionsSha256": "f0373399f465a20943fd31b694f351f76c92b664ed14e6f84af268f1f134328d",
+      "questions": [
+        "What consumer boundary does str.match with input-regex arguments meet?"
+      ],
+      "powerLimit": "The explicit simple string parameter separates simple-or-weaker from series. Rejection of const-title with simple admission supports a simple floor; qualified diagnostics remain the strongest evidence.",
+      "columns": [
+        "CONSUMER",
+        "TARGET_LENGTH",
+        "TARGET_EQUAL",
+        "TARGET_NA",
+        "INDEX",
+        "CONTROL_CLOSE"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "format-time-const-active-v49-v1.pine",
+      "path": "format-time-const-active-v49-v1.pine",
+      "owner": "codex-g6qooy",
+      "facetIds": [
+        "str.format_time.result-qualifier-floor",
+        "const",
+        "active"
+      ],
+      "sourceSha256": "b1a69ae2b2565d7d8967c7f1043af0341de4932ea2a23d8f176d6e1001090af7",
+      "instructionsPath": "instructions/format-time-const-active-v49-v1-instructions-v1.md",
+      "instructionsSha256": "09e771d7dc67d3350de8d57acaf9a87600fb999d14991d5ad7f8e2a33c9b0915",
+      "questions": [
+        "Does the const str.format_time result meet an input-bool active consumer after equality comparison?"
+      ],
+      "powerLimit": "Active requires input-or-const bool. Pair with the independent input-comparison control and reused const-title/simple consumers; refusal without actual qualified types remains inconclusive.",
+      "columns": [
+        "CONSUMER",
+        "TARGET_LENGTH",
+        "TARGET_EQUAL",
+        "TARGET_NA",
+        "INDEX",
+        "CONTROL_CLOSE"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "format-time-input-time-active-v49-v1.pine",
+      "path": "format-time-input-time-active-v49-v1.pine",
+      "owner": "codex-g6qooy",
+      "facetIds": [
+        "str.format_time.result-qualifier-floor",
+        "input-time",
+        "active"
+      ],
+      "sourceSha256": "41bd5d9561dc52d3ced84268fadbceeb729fb1f4ea2fe614cb85c05159f2b3e8",
+      "instructionsPath": "instructions/format-time-input-time-active-v49-v1-instructions-v1.md",
+      "instructionsSha256": "503399fa0da1539d7ad05d411e13f79706776fe0845327ee6bbad3ef18c7dd5b",
+      "questions": [
+        "Does the input-time str.format_time result meet an input-bool active consumer after equality comparison?"
+      ],
+      "powerLimit": "Active requires input-or-const bool. Pair with the independent input-comparison control and reused const-title/simple consumers; refusal without actual qualified types remains inconclusive.",
+      "columns": [
+        "CONSUMER",
+        "TARGET_LENGTH",
+        "TARGET_EQUAL",
+        "TARGET_NA",
+        "INDEX",
+        "CONTROL_CLOSE"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "format-time-input-format-active-v49-v1.pine",
+      "path": "format-time-input-format-active-v49-v1.pine",
+      "owner": "codex-g6qooy",
+      "facetIds": [
+        "str.format_time.result-qualifier-floor",
+        "input-format",
+        "active"
+      ],
+      "sourceSha256": "d556fc627d832ef6d2228568340dfc1664a72413589e6247d80eeb3536c150a9",
+      "instructionsPath": "instructions/format-time-input-format-active-v49-v1-instructions-v1.md",
+      "instructionsSha256": "868a92a11773f63894076b9b5eafbeed0d2c22c5e020a89a2786f6481ff48080",
+      "questions": [
+        "Does the input-format str.format_time result meet an input-bool active consumer after equality comparison?"
+      ],
+      "powerLimit": "Active requires input-or-const bool. Pair with the independent input-comparison control and reused const-title/simple consumers; refusal without actual qualified types remains inconclusive.",
+      "columns": [
+        "CONSUMER",
+        "TARGET_LENGTH",
+        "TARGET_EQUAL",
+        "TARGET_NA",
+        "INDEX",
+        "CONTROL_CLOSE"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "length-input-simple-v49-v1.pine",
+      "path": "length-input-simple-v49-v1.pine",
+      "owner": "codex-g6qooy",
+      "facetIds": [
+        "str.length.input-result-qualifier",
+        "simple"
+      ],
+      "sourceSha256": "3aacdfc72c43a3fd2225e7d768d02be52e96865a9cbc7adf99107404a0b06651",
+      "instructionsPath": "instructions/length-input-simple-v49-v1-instructions-v1.md",
+      "instructionsSha256": "dc2b920f0a199f10ae7f5c361c5b73e7c73175fa81d2f79b6a46eb0c2d75e9b9",
+      "questions": [
+        "Does input-qualified str.length return a value compatible with simple int?"
+      ],
+      "powerLimit": "Combined with its unchanged v42 input-width consumer, simple admission/input-width refusal distinguishes a simple floor from an input-compatible result. Both refusals require actual qualified diagnostics to identify series.",
+      "columns": [
+        "CONSUMER",
+        "TARGET",
+        "INDEX",
+        "CONTROL_CLOSE"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "pos-input-simple-v49-v1.pine",
+      "path": "pos-input-simple-v49-v1.pine",
+      "owner": "codex-g6qooy",
+      "facetIds": [
+        "str.pos.input-result-qualifier",
+        "simple"
+      ],
+      "sourceSha256": "9c84a32bf3b0230693ea6193d0d9e701fa80c11f8ba3378563851b5ce2303d7e",
+      "instructionsPath": "instructions/pos-input-simple-v49-v1-instructions-v1.md",
+      "instructionsSha256": "4e56dd5124e18338604fa9bc28c634435ad9abb0ad11a4fc3fa29af7dfa3cd51",
+      "questions": [
+        "Does input-qualified str.pos return a value compatible with simple int?"
+      ],
+      "powerLimit": "Combined with its unchanged v42 input-width consumer, simple admission/input-width refusal distinguishes a simple floor from an input-compatible result. Both refusals require actual qualified diagnostics to identify series.",
+      "columns": [
+        "CONSUMER",
+        "TARGET",
+        "INDEX",
+        "CONTROL_CLOSE"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "contains-input-source-active-v49-v1.pine",
+      "path": "contains-input-source-active-v49-v1.pine",
+      "owner": "codex-g6qooy",
+      "facetIds": [
+        "str.contains.input-predicate-qualifier",
+        "source",
+        "active"
+      ],
+      "sourceSha256": "cf2b9f658c6ddb9b04664013c34dce1a98416806ea09e49d9a2be31ecb5b0f28",
+      "instructionsPath": "instructions/contains-input-source-active-v49-v1-instructions-v1.md",
+      "instructionsSha256": "be11bfd8410304c3c5ee7615052301b1e2eb064e82952c384816ec74ea4b2176",
+      "questions": [
+        "What is the consumer boundary of str.contains when only its source argument is input-qualified?"
+      ],
+      "powerLimit": "The direct bool result is passed to input.bool active, which requires input-or-const bool. Success establishes that boundary, not exact input versus const identity. A refusal with actual simple/series bool distinguishes stronger floors.",
+      "columns": [
+        "CONSUMER",
+        "TARGET",
+        "INDEX",
+        "CONTROL_CLOSE"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "contains-input-source-simple-v49-v1.pine",
+      "path": "contains-input-source-simple-v49-v1.pine",
+      "owner": "codex-g6qooy",
+      "facetIds": [
+        "str.contains.input-predicate-qualifier",
+        "source",
+        "simple"
+      ],
+      "sourceSha256": "6243f736940160b1fb6994dffede7f1b999ff5528b62cbdc62e29217be53da68",
+      "instructionsPath": "instructions/contains-input-source-simple-v49-v1-instructions-v1.md",
+      "instructionsSha256": "aaa398b07f6eebcac72655cc8a4b41b05b3587418c63e0b98a1aa73bf9bcb04f",
+      "questions": [
+        "What is the consumer boundary of str.contains when only its source argument is input-qualified?"
+      ],
+      "powerLimit": "The explicit simple bool parameter separates simple-or-weaker from series. Pair with the corresponding active source to distinguish input-compatible, simple and series boundaries.",
+      "columns": [
+        "CONSUMER",
+        "TARGET",
+        "INDEX",
+        "CONTROL_CLOSE"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "contains-input-pattern-active-v49-v1.pine",
+      "path": "contains-input-pattern-active-v49-v1.pine",
+      "owner": "codex-g6qooy",
+      "facetIds": [
+        "str.contains.input-predicate-qualifier",
+        "pattern",
+        "active"
+      ],
+      "sourceSha256": "80389f84d87a952eec11495ef3eed90591bd37ca8ed3c59a99df08e5677b1f81",
+      "instructionsPath": "instructions/contains-input-pattern-active-v49-v1-instructions-v1.md",
+      "instructionsSha256": "1ebc1edb8fd7162349f76f90713bb8b9c87ad6e9bbc8327f09b80a72eed62db6",
+      "questions": [
+        "What is the consumer boundary of str.contains when only its pattern argument is input-qualified?"
+      ],
+      "powerLimit": "The direct bool result is passed to input.bool active, which requires input-or-const bool. Success establishes that boundary, not exact input versus const identity. A refusal with actual simple/series bool distinguishes stronger floors.",
+      "columns": [
+        "CONSUMER",
+        "TARGET",
+        "INDEX",
+        "CONTROL_CLOSE"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "contains-input-pattern-simple-v49-v1.pine",
+      "path": "contains-input-pattern-simple-v49-v1.pine",
+      "owner": "codex-g6qooy",
+      "facetIds": [
+        "str.contains.input-predicate-qualifier",
+        "pattern",
+        "simple"
+      ],
+      "sourceSha256": "252f1e6edf08cd6e2c7097c9fa6f3d17f4de135d9db754138917a7467155be4c",
+      "instructionsPath": "instructions/contains-input-pattern-simple-v49-v1-instructions-v1.md",
+      "instructionsSha256": "572597697edc2f16b082bb71084f6848087105e0a70b70133ff7bd29822c8411",
+      "questions": [
+        "What is the consumer boundary of str.contains when only its pattern argument is input-qualified?"
+      ],
+      "powerLimit": "The explicit simple bool parameter separates simple-or-weaker from series. Pair with the corresponding active source to distinguish input-compatible, simple and series boundaries.",
+      "columns": [
+        "CONSUMER",
+        "TARGET",
+        "INDEX",
+        "CONTROL_CLOSE"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "startswith-input-source-active-v49-v1.pine",
+      "path": "startswith-input-source-active-v49-v1.pine",
+      "owner": "codex-g6qooy",
+      "facetIds": [
+        "str.startswith.input-predicate-qualifier",
+        "source",
+        "active"
+      ],
+      "sourceSha256": "396f990ca8c820f9bda67a682fa77edbecbc98d130a086572257a6dd33ce40f9",
+      "instructionsPath": "instructions/startswith-input-source-active-v49-v1-instructions-v1.md",
+      "instructionsSha256": "6826370fb62340cbbfc1956bea8998a8cb266d7527942ba37477b54eddb583f7",
+      "questions": [
+        "What is the consumer boundary of str.startswith when only its source argument is input-qualified?"
+      ],
+      "powerLimit": "The direct bool result is passed to input.bool active, which requires input-or-const bool. Success establishes that boundary, not exact input versus const identity. A refusal with actual simple/series bool distinguishes stronger floors.",
+      "columns": [
+        "CONSUMER",
+        "TARGET",
+        "INDEX",
+        "CONTROL_CLOSE"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "startswith-input-source-simple-v49-v1.pine",
+      "path": "startswith-input-source-simple-v49-v1.pine",
+      "owner": "codex-g6qooy",
+      "facetIds": [
+        "str.startswith.input-predicate-qualifier",
+        "source",
+        "simple"
+      ],
+      "sourceSha256": "0321d599e8a73ad262ca05ce4bb423f2deadbcd6c51e7aeb92cfec5b5ed2b863",
+      "instructionsPath": "instructions/startswith-input-source-simple-v49-v1-instructions-v1.md",
+      "instructionsSha256": "e698ca2ae668f825d4553a0a534ca4fca626b464185ba813114fffd6e18ea3bf",
+      "questions": [
+        "What is the consumer boundary of str.startswith when only its source argument is input-qualified?"
+      ],
+      "powerLimit": "The explicit simple bool parameter separates simple-or-weaker from series. Pair with the corresponding active source to distinguish input-compatible, simple and series boundaries.",
+      "columns": [
+        "CONSUMER",
+        "TARGET",
+        "INDEX",
+        "CONTROL_CLOSE"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "startswith-input-pattern-active-v49-v1.pine",
+      "path": "startswith-input-pattern-active-v49-v1.pine",
+      "owner": "codex-g6qooy",
+      "facetIds": [
+        "str.startswith.input-predicate-qualifier",
+        "pattern",
+        "active"
+      ],
+      "sourceSha256": "71198d9ba3b97f4e55c6435b8a4c033eae8ed42c62861a5f30a1174ecf98ee16",
+      "instructionsPath": "instructions/startswith-input-pattern-active-v49-v1-instructions-v1.md",
+      "instructionsSha256": "dd5193b08608e6e2604723ca71a288361561584c151fcf9b861d74600b15416f",
+      "questions": [
+        "What is the consumer boundary of str.startswith when only its pattern argument is input-qualified?"
+      ],
+      "powerLimit": "The direct bool result is passed to input.bool active, which requires input-or-const bool. Success establishes that boundary, not exact input versus const identity. A refusal with actual simple/series bool distinguishes stronger floors.",
+      "columns": [
+        "CONSUMER",
+        "TARGET",
+        "INDEX",
+        "CONTROL_CLOSE"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "startswith-input-pattern-simple-v49-v1.pine",
+      "path": "startswith-input-pattern-simple-v49-v1.pine",
+      "owner": "codex-g6qooy",
+      "facetIds": [
+        "str.startswith.input-predicate-qualifier",
+        "pattern",
+        "simple"
+      ],
+      "sourceSha256": "18abb40f5071bb4c26d28018924df26d75e84970d17d1965c4991a3c66712e87",
+      "instructionsPath": "instructions/startswith-input-pattern-simple-v49-v1-instructions-v1.md",
+      "instructionsSha256": "d5d67ad93dd2eb4dadc0f7ab70b2b1ea913aafd88db21d761033d80f5749879b",
+      "questions": [
+        "What is the consumer boundary of str.startswith when only its pattern argument is input-qualified?"
+      ],
+      "powerLimit": "The explicit simple bool parameter separates simple-or-weaker from series. Pair with the corresponding active source to distinguish input-compatible, simple and series boundaries.",
+      "columns": [
+        "CONSUMER",
+        "TARGET",
+        "INDEX",
+        "CONTROL_CLOSE"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "endswith-input-source-active-v49-v1.pine",
+      "path": "endswith-input-source-active-v49-v1.pine",
+      "owner": "codex-g6qooy",
+      "facetIds": [
+        "str.endswith.input-predicate-qualifier",
+        "source",
+        "active"
+      ],
+      "sourceSha256": "b6996db83c0031c424ecec6f84242527ce7eef339fcbb6276aa2c7befce85d49",
+      "instructionsPath": "instructions/endswith-input-source-active-v49-v1-instructions-v1.md",
+      "instructionsSha256": "a0b4c80dfb20201950a7322acdad459f3f9315c39c274450c87077dfd4812e65",
+      "questions": [
+        "What is the consumer boundary of str.endswith when only its source argument is input-qualified?"
+      ],
+      "powerLimit": "The direct bool result is passed to input.bool active, which requires input-or-const bool. Success establishes that boundary, not exact input versus const identity. A refusal with actual simple/series bool distinguishes stronger floors.",
+      "columns": [
+        "CONSUMER",
+        "TARGET",
+        "INDEX",
+        "CONTROL_CLOSE"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "endswith-input-source-simple-v49-v1.pine",
+      "path": "endswith-input-source-simple-v49-v1.pine",
+      "owner": "codex-g6qooy",
+      "facetIds": [
+        "str.endswith.input-predicate-qualifier",
+        "source",
+        "simple"
+      ],
+      "sourceSha256": "67854b028f5d278c67d2a5351298b942f9d38df632f49723eb7eb7a3e330b7f6",
+      "instructionsPath": "instructions/endswith-input-source-simple-v49-v1-instructions-v1.md",
+      "instructionsSha256": "7f879ddf6265b730d47cd2f956a71a5e1cbd80227a77b21c3311ea8491df941f",
+      "questions": [
+        "What is the consumer boundary of str.endswith when only its source argument is input-qualified?"
+      ],
+      "powerLimit": "The explicit simple bool parameter separates simple-or-weaker from series. Pair with the corresponding active source to distinguish input-compatible, simple and series boundaries.",
+      "columns": [
+        "CONSUMER",
+        "TARGET",
+        "INDEX",
+        "CONTROL_CLOSE"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "endswith-input-pattern-active-v49-v1.pine",
+      "path": "endswith-input-pattern-active-v49-v1.pine",
+      "owner": "codex-g6qooy",
+      "facetIds": [
+        "str.endswith.input-predicate-qualifier",
+        "pattern",
+        "active"
+      ],
+      "sourceSha256": "6ed9c50c11057389d70bc4a9e48699124c0787e72d9f191ba5f0f8dce5b33742",
+      "instructionsPath": "instructions/endswith-input-pattern-active-v49-v1-instructions-v1.md",
+      "instructionsSha256": "18d4d6e0f291a68f51c69144f1dd5237b2c17ca7cacc7c29535dbab8023a9f01",
+      "questions": [
+        "What is the consumer boundary of str.endswith when only its pattern argument is input-qualified?"
+      ],
+      "powerLimit": "The direct bool result is passed to input.bool active, which requires input-or-const bool. Success establishes that boundary, not exact input versus const identity. A refusal with actual simple/series bool distinguishes stronger floors.",
+      "columns": [
+        "CONSUMER",
+        "TARGET",
+        "INDEX",
+        "CONTROL_CLOSE"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "endswith-input-pattern-simple-v49-v1.pine",
+      "path": "endswith-input-pattern-simple-v49-v1.pine",
+      "owner": "codex-g6qooy",
+      "facetIds": [
+        "str.endswith.input-predicate-qualifier",
+        "pattern",
+        "simple"
+      ],
+      "sourceSha256": "340c7329cf4ed92ec87ad16841e5aae1aa907f85e7dfc34d17f70b857124e5e3",
+      "instructionsPath": "instructions/endswith-input-pattern-simple-v49-v1-instructions-v1.md",
+      "instructionsSha256": "659b7bd0854782f98907817cd82f6d2e1df22488b6ef13e7cc5f220f63586306",
+      "questions": [
+        "What is the consumer boundary of str.endswith when only its pattern argument is input-qualified?"
+      ],
+      "powerLimit": "The explicit simple bool parameter separates simple-or-weaker from series. Pair with the corresponding active source to distinguish input-compatible, simple and series boundaries.",
+      "columns": [
+        "CONSUMER",
+        "TARGET",
+        "INDEX",
+        "CONTROL_CLOSE"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "match-const-title-v49-v1.pine",
+      "path": "../v42/floor-const-title-match-v42-v1.pine",
+      "owner": "codex-g6qooy",
+      "facetIds": [
+        "str.match.result-qualifier-floor",
+        "reused-v42"
+      ],
+      "sourceSha256": "62486bf12e9099c9c1bc08a465249f57742834ecce914fc8a757ddb9bed89715",
+      "instructionsPath": "instructions/match-const-title-v49-v1-instructions-v1.md",
+      "instructionsSha256": "a3b2065d6a5d0805042ceb37e3dfa22aa1e5a293d3027d9292b75ef82940792c",
+      "questions": [
+        "What exact qualified type/admission does this existing unchanged v42 consumer reveal?"
+      ],
+      "powerLimit": "Const plot title distinguishes const from stronger results.",
+      "columns": [
+        "SOURCE_INDEX"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "reusedSource": true
+    },
+    {
+      "probe": "format-time-const-title-v49-v1.pine",
+      "path": "../v42/floor-const-title-format-time-v42-v1.pine",
+      "owner": "codex-g6qooy",
+      "facetIds": [
+        "str.format_time.result-qualifier-floor",
+        "reused-v42"
+      ],
+      "sourceSha256": "a33acb5734c06c1598128824dbaa517a6550d7e9a6293c70cb0f286cea656463",
+      "instructionsPath": "instructions/format-time-const-title-v49-v1-instructions-v1.md",
+      "instructionsSha256": "7c6802f019e1eca2ab802ae66c38da3c2353880216b4a4c1377d33f931a5794b",
+      "questions": [
+        "What exact qualified type/admission does this existing unchanged v42 consumer reveal?"
+      ],
+      "powerLimit": "Const plot title distinguishes const from stronger results.",
+      "columns": [
+        "SOURCE_INDEX"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "reusedSource": true
+    },
+    {
+      "probe": "format-time-const-simple-v49-v1.pine",
+      "path": "../v42/floor-simple-consumer-format-time-v42-v1.pine",
+      "owner": "codex-g6qooy",
+      "facetIds": [
+        "str.format_time.result-qualifier-floor",
+        "reused-v42"
+      ],
+      "sourceSha256": "dfd09b0282f302010f2feb0db794557be0dfb51f119c53593c6bf540d3a3f067",
+      "instructionsPath": "instructions/format-time-const-simple-v49-v1-instructions-v1.md",
+      "instructionsSha256": "4985616971da7dc9e05186855d076f7f19f4d0bc0c173035883c09a57808d189",
+      "questions": [
+        "What exact qualified type/admission does this existing unchanged v42 consumer reveal?"
+      ],
+      "powerLimit": "Explicit simple string parameter distinguishes simple-or-weaker from series.",
+      "columns": [
+        "VALUE",
+        "SOURCE_INDEX"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "reusedSource": true
+    },
+    {
+      "probe": "length-input-width-v49-v1.pine",
+      "path": "../v42/floor-input-consumer-length-v42-v1.pine",
+      "owner": "codex-g6qooy",
+      "facetIds": [
+        "str.length.input-result-qualifier",
+        "reused-v42"
+      ],
+      "sourceSha256": "da24ada1af113701a5b571f53a83ab5042a840ef34bf237f8b8cf30537b2d6ff",
+      "instructionsPath": "instructions/length-input-width-v49-v1-instructions-v1.md",
+      "instructionsSha256": "307337c549278655839667721e913cbcc12304d4e325ff9f68ab45d8ef97d77b",
+      "questions": [
+        "What exact qualified type/admission does this existing unchanged v42 consumer reveal?"
+      ],
+      "powerLimit": "Input plot linewidth distinguishes input-compatible from simple or series.",
+      "columns": [
+        "WIDTH_CONSUMER",
+        "SOURCE_INDEX"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "reusedSource": true
+    },
+    {
+      "probe": "pos-input-width-v49-v1.pine",
+      "path": "../v42/floor-input-consumer-pos-v42-v1.pine",
+      "owner": "codex-g6qooy",
+      "facetIds": [
+        "str.pos.input-result-qualifier",
+        "reused-v42"
+      ],
+      "sourceSha256": "e76430f8a9c2787d5a808803442a9edb11a7b261021a5767dbb27af2542703c8",
+      "instructionsPath": "instructions/pos-input-width-v49-v1-instructions-v1.md",
+      "instructionsSha256": "52a578f945f81ebec1057d61c9a3e0f5a1fd76a8b28feca34ce3d60f8e60f8eb",
+      "questions": [
+        "What exact qualified type/admission does this existing unchanged v42 consumer reveal?"
+      ],
+      "powerLimit": "Input plot linewidth distinguishes input-compatible from simple or series.",
+      "columns": [
+        "WIDTH_CONSUMER",
+        "SOURCE_INDEX"
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32
+      },
+      "reusedSource": true
+    }
+  ],
+  "scope": "Native-held str.match and str.format_time floors plus input str.length/pos and contains/startswith/endswith consumer boundaries.",
+  "powerLimits": [
+    "Native outcomes remain UNSPECIFIED.",
+    "Consumer admission establishes a qualifier ceiling, not an exact qualifier.",
+    "Full native diagnostics must retain actual and required qualified types; silent or generic refusal is insufficient.",
+    "Existing v42 sources are reused byte-for-byte with v49-specific capture instructions.",
+    "One risky consumer per source; rejected sources cannot hide unrelated target outputs."
+  ]
+}

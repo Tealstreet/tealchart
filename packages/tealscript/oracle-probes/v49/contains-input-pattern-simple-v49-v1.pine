@@ -1,0 +1,10 @@
+//@version=6
+indicator("V49 contains-input-pattern-simple")
+sourceText = "abXab"
+patternText = input.string("ab", "Pattern")
+value = str.contains(source=sourceText, str=patternText)
+consume(simple bool sampleBool) => sampleBool ? 1 : 0
+plot(consume(value), "CONSUMER")
+plot(value ? 1 : 0, "TARGET")
+plot(bar_index, "INDEX")
+plot(close, "CONTROL_CLOSE")

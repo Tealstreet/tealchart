@@ -1,0 +1,10 @@
+//@version=6
+indicator("V49 endswith-input-source-active")
+sourceText = input.string("abXab", "Source")
+patternText = "ab"
+value = str.endswith(source=sourceText, str=patternText)
+consumer = input.bool(true, "Consumer", active=value)
+plot(consumer ? 1 : 0, "CONSUMER")
+plot(value ? 1 : 0, "TARGET")
+plot(bar_index, "INDEX")
+plot(close, "CONTROL_CLOSE")
