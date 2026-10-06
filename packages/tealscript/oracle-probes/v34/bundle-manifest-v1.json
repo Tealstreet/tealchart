@@ -1,0 +1,31 @@
+{
+  "round": 34,
+  "version": 1,
+  "scripts": [
+    {
+      "source": "tr-omitted-handle-na-v34-v1.pine",
+      "instructions": "instructions/tr-omitted-handle-na-v34-v1.md",
+      "sha256": "b0e7e8f298d76855612eae4fb36986a313028e131146346362ae2bdccd5cd948"
+    },
+    {
+      "source": "tr-series-handle-na-v34-v1.pine",
+      "instructions": "instructions/tr-series-handle-na-v34-v1.md",
+      "sha256": "28d8c9a974750f9848c73226356bfde577dd0413966d6be6acbc48eac8e2112d"
+    },
+    {
+      "source": "valuewhen-string-source-v34-v1.pine",
+      "instructions": "instructions/valuewhen-string-source-v34-v1.md",
+      "sha256": "b0f11b4722b1339628c46886c62db673611736ba470e250695d58c57cfcd776a"
+    },
+    {
+      "source": "vwap-omitted-source-v34-v1.pine",
+      "instructions": "instructions/vwap-omitted-source-v34-v1.md",
+      "sha256": "d1b808f3f5d990fbbe5b0b03206f7307fb00d0ad8ec8822c0bd8083b96c53d9f"
+    },
+    {
+      "source": "vwap-tuple-omitted-source-v34-v1.pine",
+      "instructions": "instructions/vwap-tuple-omitted-source-v34-v1.md",
+      "sha256": "8715851fea069c757a40fe3b2534c3b06efef870b54bc1a71cb824470825ad1c"
+    }
+  ]
+}

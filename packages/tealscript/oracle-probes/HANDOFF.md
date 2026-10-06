@@ -254,3 +254,7 @@ Capture the 15 indicator-only scripts in [v35/bundle-manifest-v1.json](v35/bundl
 ## Then round v38
 
 Capture the five PyneCore/native discriminators in [v38/HANDOFF-v38-v1.md](v38/HANDOFF-v38-v1.md). Follow each per-script instruction, preserve INDEX=0..239 and source/CSV hashes, and return `v38/captures/v38/RESPONSE-v38.md`. Native outcomes are unspecified.
+
+## Then round v34 — TA-D admission v1
+
+Capture the five independent sources in [v34/bundle-manifest-v1.json](v34/bundle-manifest-v1.json), following [HANDOFF-v34-v1.md](v34/HANDOFF-v34-v1.md) and per-script instructions. Native outcomes are unspecified. Verify v34/SHA256SUMS and return exact diagnostics or raw CSV to v34/captures/v34/RESPONSE-v34.md.

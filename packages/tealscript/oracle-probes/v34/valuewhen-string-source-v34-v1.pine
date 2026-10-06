@@ -1,0 +1,5 @@
+//@version=6
+indicator("V34 valuewhen-string-source", overlay=false)
+s = ta.valuewhen(true, "text", 0)
+plot(s == "text" ? 1 : 0, "TARGET", display=display.data_window)
+plot(bar_index, "INDEX", display=display.data_window)
