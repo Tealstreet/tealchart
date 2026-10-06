@@ -2490,13 +2490,26 @@ function resolveRuntimeLocalTimestamp(timezone: string, year: number, month: num
   return finalTimestamp;
 }
 
+const EXPLICIT_TIMESTAMP_DATE_STRING_ZONE = /(?:\b(?:GMT|UTC)(?:[+-]\d{1,2}(?::?\d{2})?)?|(?:T|\s)\d{1,2}:\d{2}(?::\d{2}(?:\.\d+)?)?\s*(?:Z|[+-]\d{1,2}(?::?\d{2})?))\s*$/i;
+
+function parseRuntimeTimestampDateString(value: string): number {
+  const source = value.trim();
+  const parsed = Date.parse(
+    EXPLICIT_TIMESTAMP_DATE_STRING_ZONE.test(source) || /^\d{4}-\d{2}-\d{2}$/.test(source)
+      ? source
+      : /^\d{4}-\d{2}-\d{2}T/.test(source)
+        ? `${source}Z`
+        : `${source} UTC`,
+  );
+  return Number.isFinite(parsed) ? parsed : Number.NaN;
+}
+
 function evaluateRuntimeTimestamp(args: unknown[], named: Record<string, unknown> | undefined, ctx: RuntimeTimeContext): number {
   const timestampDateArgs = ['year', 'month', 'day', 'hour', 'minute', 'second'] as const;
   if (args.length === 0 && Object.keys(named ?? {}).length === 0) return Number.NaN;
 
   if (Object.keys(named ?? {}).length === 0 && args.length === 1 && typeof args[0] === 'string') {
-    const parsed = Date.parse(args[0]);
-    return Number.isFinite(parsed) ? parsed : Number.NaN;
+    return parseRuntimeTimestampDateString(args[0]);
   }
 
   let timezone = ctx.syminfo.timezone;
