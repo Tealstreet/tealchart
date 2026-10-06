@@ -1,0 +1,20 @@
+//@version=6
+indicator("Map signed zero key v1", calc_bars_count=32)
+var int sample = 0
+m = map.new<float, int>()
+float positiveZero = 0.0
+float negativeZero = -0.0
+m.put(positiveZero, 11)
+previous = m.put(negativeZero, 23)
+plot(m.size(), "size_after_both")
+plot(m.get(positiveZero), "get_positive_zero")
+plot(m.get(negativeZero), "get_negative_zero")
+plot(previous, "negative_put_previous")
+removed = m.remove(negativeZero)
+plot(removed, "removed_negative_zero")
+plot(m.size(), "size_after_remove")
+plot(m.contains(positiveZero) ? 1 : 0, "positive_zero_remaining")
+plot(sample, "SAMPLE_INDEX")
+plot(bar_index, "SOURCE_INDEX")
+plot(time, "SOURCE_TIME")
+sample += 1

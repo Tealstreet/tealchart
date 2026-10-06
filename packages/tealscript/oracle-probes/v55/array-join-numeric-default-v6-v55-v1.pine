@@ -1,0 +1,23 @@
+//@version=6
+indicator("Numeric array join formatting v6", calc_bars_count=32)
+var int sample = 0
+x = 1.0 / 3.0
+y = -1.0 / 7.0
+z = 1.25
+values = array.from(x, y, z)
+namespaceJoined = array.join(values, "|")
+receiverJoined = values.join("|")
+defaultJoined = str.tostring(x) + "|" + str.tostring(y) + "|" + str.tostring(z)
+rawCandidate = "0.3333333333333333|-0.14285714285714285|1.25"
+plot(namespaceJoined == defaultJoined ? 1 : 0, "Namespace equals default tostring")
+plot(receiverJoined == defaultJoined ? 1 : 0, "Receiver equals default tostring")
+plot(namespaceJoined == rawCandidate ? 1 : 0, "Namespace equals raw candidate")
+plot(namespaceJoined == receiverJoined ? 1 : 0, "Call forms agree")
+control = array.from(1.25, 2.5)
+plot(control.join("|") == str.tostring(1.25) + "|" + str.tostring(2.5) ? 1 : 0, "Finite exact control")
+if barstate.islastconfirmedhistory
+    log.info("namespace={0}; receiver={1}; default={2}", namespaceJoined, receiverJoined, defaultJoined)
+plot(sample, "SAMPLE_INDEX")
+plot(bar_index, "SOURCE_INDEX")
+plot(time, "SOURCE_TIME")
+sample += 1

@@ -1,0 +1,352 @@
+{
+  "schemaVersion": 1,
+  "bundle": "v55",
+  "version": 1,
+  "owner": "codex-3rye5w",
+  "inventory": {
+    "base": "674b3b98d0287ea06726bdb4bb1cd1a60808ed38",
+    "registerPath": "/home/sam/cs/docs/tealscript-parity-archive/DEFECT_REGISTER_v28.json",
+    "registerSha256": "323d934f5d744ef9f459de784d6afe4c501bd18f03a48c3a8e5ff93c2f1f74e7",
+    "registerNativePendingRows": 41,
+    "registerRowsAlreadyShipped": 41,
+    "newRegisterRows": 0,
+    "scope": "Three map requests only; every native-pending DEFECT_REGISTER_v28 row already source-hash-mapped to v52/v53/v54. No duplicate register probes. Includes optional VMP v5/v6 numeric array.join formatting request received before freeze.",
+    "sources": [
+      {
+        "path": "/home/sam/cs/docs/tealscript-parity-archive/ledger/restart-20261006/maps-w0bo0b-v1/PROBE-REQUESTS-v1.md",
+        "sha256": "1de8ee9861514e88b0babeba8a8fdbeac4033d37e8dbc34e1ea57cd6934414ba"
+      },
+      {
+        "path": "/home/sam/cs/docs/tealscript-parity-archive/ledger/restart-20261006/array-join-format-screen-vmp-v1/V55-REQUEST-v1.json",
+        "sha256": "fb6a8490da21263e3d8ed7f4fcd6a62884fd4ac81238bf31822446fb07052e39"
+      },
+      {
+        "path": "/home/sam/cs/docs/tealscript-parity-archive/ledger/restart-20261006/array-join-format-screen-vmp-v1/NATIVE-SCREEN-v1.json",
+        "sha256": "05c6818b3075a43c9345162d069f03cec0895e58bd6d332a6aa884c506681476"
+      }
+    ],
+    "priorRoundManifests": [
+      {
+        "round": 52,
+        "path": "packages/tealscript/oracle-probes/v52/bundle-manifest-v1.json",
+        "sha256": "d97595c3052480b56478e150d3520af5c901bdd59fde1c9cb2bdf4ca991a22df"
+      },
+      {
+        "round": 53,
+        "path": "packages/tealscript/oracle-probes/v53/bundle-manifest-v1.json",
+        "sha256": "b22c75d534b7e11e21e305b61bec106832b18610b8ab4d75d4e601dd771d2e94"
+      },
+      {
+        "round": 54,
+        "path": "packages/tealscript/oracle-probes/v54/bundle-manifest-v1.json",
+        "sha256": "1fe555052c3416a78c966c90732d17dd5b5d43bde99e019a4da2c43c18ed5679"
+      }
+    ],
+    "newRequestedFacets": 5
+  },
+  "scripts": [
+    {
+      "probe": "map-missing-numeric-key-v55-v1.pine",
+      "path": "map-missing-numeric-key-v55-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "map.missing-numeric-key-identity-v1"
+      ],
+      "registerRowId": "map.missing-numeric-key-identity-v1",
+      "pineVersion": 6,
+      "sourceSha256": "9cfe622bbf0313bab98027f79cacab3b3d9d0a985fdd2d9d24f7c27e240bf211",
+      "instructionsPath": "instructions/map-missing-numeric-key-v55-v1-instructions-v1.md",
+      "instructionsSha256": "511ea897b1a33108db22e3a86a4d5400f96f30a08a4c07c2e6ae154d36e7cfd2",
+      "questions": [
+        "Do repeated float(na) keys share one pair, and what do contains/get/previous-value return?"
+      ],
+      "competingHypotheses": [
+        "refusal at constructor/put/lookup",
+        "one stable missing numeric key",
+        "new or absent missing key each access"
+      ],
+      "powerLimit": "Only repeated missing numeric-key put/get/contains observations with integer values11/23. Existing v7 admission of numeric NA keys is retained separately; this new repeated identity/previous-value fixture is not a recapture of generic eligibility. No nonfinite key representation or universal equality claim.",
+      "columns": [
+        "size_first",
+        "size_second",
+        "contains_na",
+        "get_na",
+        "first_previous_missing",
+        "second_previous",
+        "SAMPLE_INDEX",
+        "SOURCE_INDEX",
+        "SOURCE_TIME"
+      ],
+      "attempts": [
+        {
+          "id": "default",
+          "inputs": {}
+        }
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32,
+        "eligibleInputRequired": false
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32,
+        "maxMapPairsPerBar": 3
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "map-signed-zero-key-v55-v1.pine",
+      "path": "map-signed-zero-key-v55-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "map.signed-zero-key-identity-v1"
+      ],
+      "registerRowId": "map.signed-zero-key-identity-v1",
+      "pineVersion": 6,
+      "sourceSha256": "286dcf0f0cef279f0faeefc1b7ba12c919b40f8e5a4b47234c015e1911de6b26",
+      "instructionsPath": "instructions/map-signed-zero-key-v55-v1-instructions-v1.md",
+      "instructionsSha256": "8d9e7fac90be91b76bcfa117a4410c889952602018fed2ae21d59cea4cfea54f",
+      "questions": [
+        "Do these literal +0.0/-0.0 map keys share one pair, and does removing -0.0 remove the +0.0 lookup?"
+      ],
+      "competingHypotheses": [
+        "refusal",
+        "coincident zero keys",
+        "distinct signed-zero keys"
+      ],
+      "powerLimit": "Only the two literal key expressions +0.0 and -0.0, overwriting11 with23 and removal. No claim about signed-zero survival in arithmetic, formatting, TA or arbitrary key expressions.",
+      "columns": [
+        "size_after_both",
+        "get_positive_zero",
+        "get_negative_zero",
+        "negative_put_previous",
+        "removed_negative_zero",
+        "size_after_remove",
+        "positive_zero_remaining",
+        "SAMPLE_INDEX",
+        "SOURCE_INDEX",
+        "SOURCE_TIME"
+      ],
+      "attempts": [
+        {
+          "id": "default",
+          "inputs": {}
+        }
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32,
+        "eligibleInputRequired": false
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32,
+        "maxMapPairsPerBar": 3
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "map-unicode-key-identity-v55-v1.pine",
+      "path": "map-unicode-key-identity-v55-v1.pine",
+      "owner": "codex-3rye5w",
+      "facetIds": [
+        "map.unicode-key-identity-order-v1"
+      ],
+      "registerRowId": "map.unicode-key-identity-order-v1",
+      "pineVersion": 6,
+      "sourceSha256": "15cb4ea108bc44be33f5dc83eb044d0ff3271d6c98ccb599ea0027c80e22b319",
+      "instructionsPath": "instructions/map-unicode-key-identity-v55-v1-instructions-v1.md",
+      "instructionsSha256": "2e2954b668ce72b5029ea6fe2f0424796f496309442c8ac7682f2964be48b820",
+      "questions": [
+        "Do U+00E9 and U+0065 U+0301 string keys denote distinct pairs, retaining insertion order after z?"
+      ],
+      "competingHypotheses": [
+        "refusal",
+        "byte/codepoint-distinct keys",
+        "normalization-equivalent keys",
+        "unexpected reordered extraction"
+      ],
+      "powerLimit": "Exact UTF-8 composed/decomposed spellings and z insertion control only. No locale, casefold, all-Unicode normalization or comparator generalization. Guard third-value access with map size so neither hypothesis creates an observer bounds error.",
+      "columns": [
+        "size_unicode",
+        "get_composed",
+        "get_decomposed",
+        "decomposed_put_previous",
+        "first_key_z",
+        "first_value",
+        "second_value",
+        "third_value",
+        "SAMPLE_INDEX",
+        "SOURCE_INDEX",
+        "SOURCE_TIME"
+      ],
+      "attempts": [
+        {
+          "id": "default",
+          "inputs": {}
+        }
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32,
+        "eligibleInputRequired": false
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32,
+        "maxMapPairsPerBar": 3
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "array-join-numeric-default-v5-v55-v1.pine",
+      "path": "array-join-numeric-default-v5-v55-v1.pine",
+      "owner": "codex-vmp8l6",
+      "assembler": "codex-3rye5w",
+      "facetIds": [
+        "array.join.numeric-default-format-v5"
+      ],
+      "registerRowId": "array.join.numeric-default-format-v5",
+      "pineVersion": 5,
+      "sourceSha256": "a1aa569e12dce67e02c3750758acd7e7ec825ae8ab55f2bcf14d3a415b8cff4d",
+      "submittedSourceSha256": "d22784aa033f695564ba5e9e64eea8e6885895d8f065a685910b39283bf2bdbe",
+      "instructionsPath": "instructions/array-join-numeric-default-v5-v55-v1-instructions-v1.md",
+      "instructionsSha256": "9e05ca828ae745f80268e5929f083160b888db51766d876855fbc493deea3167",
+      "questions": [
+        "numeric array.join versus native default str.tostring fractional formatting"
+      ],
+      "competingHypotheses": [
+        "SAME-DEFAULT",
+        "RAW-JS-CANDIDATE",
+        "THIRD-POLICY",
+        "REFUSAL/UNOBSERVED"
+      ],
+      "powerLimit": "Exact v5 [1.0/3.0,-1.0/7.0,1.25] namespace/receiver join and default tostring, plus exact1.25/2.5 control. Literal lastconfirmedhistory logs settle strings; numeric boolean observers alone do not prove exact string representation. Refusal is an outcome; no other numeric values/formatting/TA credit.",
+      "columns": [
+        "Namespace equals default tostring",
+        "Receiver equals default tostring",
+        "Namespace equals raw candidate",
+        "Call forms agree",
+        "Finite exact control",
+        "SAMPLE_INDEX",
+        "SOURCE_INDEX",
+        "SOURCE_TIME"
+      ],
+      "attempts": [
+        {
+          "id": "default",
+          "inputs": {}
+        }
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32,
+        "eligibleInputRequired": false
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32,
+        "maxArraySlots": 3
+      },
+      "reusedSource": false
+    },
+    {
+      "probe": "array-join-numeric-default-v6-v55-v1.pine",
+      "path": "array-join-numeric-default-v6-v55-v1.pine",
+      "owner": "codex-vmp8l6",
+      "assembler": "codex-3rye5w",
+      "facetIds": [
+        "array.join.numeric-default-format-v6"
+      ],
+      "registerRowId": "array.join.numeric-default-format-v6",
+      "pineVersion": 6,
+      "sourceSha256": "7fc6983ec6b1bbd670a9143ae7570908acc1a388be48eb6ddb9037c621123713",
+      "submittedSourceSha256": "fc756f588c3db08834bd33bebcb4377f9c680c51c73e5b360302fa630b3ac691",
+      "instructionsPath": "instructions/array-join-numeric-default-v6-v55-v1-instructions-v1.md",
+      "instructionsSha256": "b2549f49135ba278ae5716a6355862a52060cf31028b5489516cea9b0ecf2bf7",
+      "questions": [
+        "numeric array.join versus native default str.tostring fractional formatting"
+      ],
+      "competingHypotheses": [
+        "SAME-DEFAULT",
+        "RAW-JS-CANDIDATE",
+        "THIRD-POLICY",
+        "REFUSAL/UNOBSERVED"
+      ],
+      "powerLimit": "Exact v6 [1.0/3.0,-1.0/7.0,1.25] namespace/receiver join and default tostring, plus exact1.25/2.5 control. Literal lastconfirmedhistory logs settle strings; numeric boolean observers alone do not prove exact string representation. Refusal is an outcome; no other numeric values/formatting/TA credit.",
+      "columns": [
+        "Namespace equals default tostring",
+        "Receiver equals default tostring",
+        "Namespace equals raw candidate",
+        "Call forms agree",
+        "Finite exact control",
+        "SAMPLE_INDEX",
+        "SOURCE_INDEX",
+        "SOURCE_TIME"
+      ],
+      "attempts": [
+        {
+          "id": "default",
+          "inputs": {}
+        }
+      ],
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 32,
+        "eligibleInputRequired": false
+      },
+      "observationWindow": {
+        "closedBars": 32,
+        "maxPlotChannels": 64,
+        "calcBarsCount": 32,
+        "maxArraySlots": 3
+      },
+      "reusedSource": false
+    }
+  ]
+}

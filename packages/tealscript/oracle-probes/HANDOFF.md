@@ -318,3 +318,7 @@ Capture the five bounded v6 indicators in [v53/bundle-manifest-v1.json](v53/bund
 ## Then round v54 — new formula and missing-state boundaries v1
 
 Capture the 47 isolated sources in [v54/bundle-manifest-v1.json](v54/bundle-manifest-v1.json), using [HANDOFF-v54-v1.md](v54/HANDOFF-v54-v1.md) and each per-source instruction. One source per new row; v53 facets are unchanged. Preserve actual implicit-OHLC hole eligibility, deterministic source/control cells, earliest diagnostic phase and masks; absent events remain INCONCLUSIVE. Native outcomes are UNSPECIFIED. Verify v54/SHA256SUMS and return source-bound evidence to v54/captures/v54/RESPONSE-v54.md.
+
+## Then round v55 — map key identity boundaries v1
+
+Capture the five bounded indicators in [v55/bundle-manifest-v1.json](v55/bundle-manifest-v1.json), using [HANDOFF-v55-v1.md](v55/HANDOFF-v55-v1.md) and per-source instructions. Missing-key repeated identity, literal signed-zero overwrite/removal and exact Unicode normalization/insertion-order cells stay isolated. All DEFECT_REGISTER_v28 native-pending rows already have v52/v53/v54 sources, so no register probes are duplicated. Separate v5/v6 numeric array.join probes retain exact logged strings and fractional/default controls. Native outcomes remain UNSPECIFIED. Preserve source UTF-8, raw blanks/zeros, diagnostics and context. Verify v55/SHA256SUMS; return v55/captures/v55/RESPONSE-v55.md.
