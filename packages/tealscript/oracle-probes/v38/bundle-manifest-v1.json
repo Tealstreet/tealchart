@@ -1,0 +1,157 @@
+{
+  "schemaVersion": 1,
+  "bundle": "v38",
+  "version": 1,
+  "scripts": [
+    {
+      "probe": "flat-rsi-v38-v1.pine",
+      "path": "flat-rsi-v38-v1.pine",
+      "sourceSha256": "a561e0eb60b0e774b780cedbc78dbd85d41487f328d9c30cab86add3a634c46e",
+      "instructionsPath": "instructions/flat-rsi-v38-v1-instructions-v1.md",
+      "instructionsSha256": "3439e141d2fd5156aecabc7b2ad85f3e6a15cade5fcd4cb3ea5b815394a7b4f9",
+      "questions": [
+        "RSI at constant source with zero upward and downward movement; length7 startup and later output."
+      ],
+      "columns": [
+        "INDEX",
+        "SOURCE",
+        "TARGET",
+        "UP_CONTROL",
+        "DOWN_CONTROL"
+      ],
+      "captureMode": "SYNTHETIC-EXPLICIT-INPUT",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 260
+      }
+    },
+    {
+      "probe": "all-na-percentrank-v38-v1.pine",
+      "path": "all-na-percentrank-v38-v1.pine",
+      "sourceSha256": "fc52a38afcb67e09a2eeea762c366ee4494c7ee81eb096f15f71ddfeb38dc72f",
+      "instructionsPath": "instructions/all-na-percentrank-v38-v1-instructions-v1.md",
+      "instructionsSha256": "bfe34ab84675a10410177b0845ce073ae9b2406e838a7cedcd5dfd7bca49d76e",
+      "questions": [
+        "ta.percentrank(float(na),7): all-missing startup and mature window, with a finite repeated-tie control."
+      ],
+      "columns": [
+        "INDEX",
+        "SOURCE",
+        "TARGET",
+        "CONTROL_SOURCE",
+        "CONTROL"
+      ],
+      "captureMode": "SYNTHETIC-EXPLICIT-INPUT",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 260
+      }
+    },
+    {
+      "probe": "interior-hole-pivotlow-v38-v1.pine",
+      "path": "interior-hole-pivotlow-v38-v1.pine",
+      "sourceSha256": "5c347ce2ee9a077cc3c3823d02a41755eb838813b318a64354b3a39163afc6c2",
+      "instructionsPath": "instructions/interior-hole-pivotlow-v38-v1-instructions-v1.md",
+      "instructionsSha256": "c9117b455d2fe04aaa71dc661bf21bc2f1e813378c856a34aaf1922afabf671d",
+      "questions": [
+        "Exact original synthetic close samples and holes20/21/40; ta.pivotlow(src,3,3) candidate/window behavior."
+      ],
+      "columns": [
+        "INDEX",
+        "CLEAN",
+        "SOURCE",
+        "TARGET",
+        "CONTROL"
+      ],
+      "captureMode": "SYNTHETIC-EXPLICIT-INPUT",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 260
+      }
+    },
+    {
+      "probe": "interior-hole-rsi7-v38-v1.pine",
+      "path": "interior-hole-rsi7-v38-v1.pine",
+      "sourceSha256": "9e3ba9b2a447a7d5901daaaa7280f0f95d786460d00ef9e81522afe6fa893938",
+      "instructionsPath": "instructions/interior-hole-rsi7-v38-v1-instructions-v1.md",
+      "instructionsSha256": "257ace3f334a10e996adee0d2f09da9466b9dec1cc257ac50d01c53f57f26de7",
+      "questions": [
+        "Exact original synthetic close samples and holes20/21/40; ta.rsi(src,7) missing-source recovery."
+      ],
+      "columns": [
+        "INDEX",
+        "CLEAN",
+        "SOURCE",
+        "TARGET",
+        "CONTROL"
+      ],
+      "captureMode": "SYNTHETIC-EXPLICIT-INPUT",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 260
+      }
+    },
+    {
+      "probe": "interior-hole-cog7-v38-v1.pine",
+      "path": "interior-hole-cog7-v38-v1.pine",
+      "sourceSha256": "da905ec18987d5de1508a19e6b0fa8b6f124df62bbaf9916387b16a7aa264972",
+      "instructionsPath": "instructions/interior-hole-cog7-v38-v1-instructions-v1.md",
+      "instructionsSha256": "aa1eb4daab9c304ac39599fee112ccb4ae43e3be322d13cae6f683d9f3efe308",
+      "questions": [
+        "Exact original synthetic close samples and holes20/21/40; ta.cog(src,7) raw-window versus hole skipping."
+      ],
+      "columns": [
+        "INDEX",
+        "CLEAN",
+        "SOURCE",
+        "TARGET",
+        "CONTROL"
+      ],
+      "captureMode": "SYNTHETIC-EXPLICIT-INPUT",
+      "expectedOutcome": {
+        "phase": "UNSPECIFIED",
+        "values": "UNSPECIFIED"
+      },
+      "nativeStatus": "UNOBSERVED",
+      "chartContext": {
+        "symbol": "BINANCE:BTCUSDT",
+        "timeframe": "2",
+        "chartType": "STANDARD-CANDLES",
+        "chartDisplayTimezone": "Etc/UTC",
+        "minimumHistoricalBars": 260
+      }
+    }
+  ]
+}

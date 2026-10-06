@@ -250,3 +250,7 @@ In `~/cs/docs/tealscript-parity-archive/`:
 ## Then round v35 — color and plot type boundaries v1
 
 Capture the 15 indicator-only scripts in [v35/bundle-manifest-v1.json](v35/bundle-manifest-v1.json) order, following [HANDOFF-v35-v1.md](v35/HANDOFF-v35-v1.md) and the per-script instructions. Fourteen exact substitutions discriminate documented type admission; one missing-gradient-endpoint probe preserves the original call and exports color channels/NA flags. Native outcomes are unspecified: retain exact first diagnostics, third outcomes, raw CSV and screenshots without repairing sources. Return to `v35/captures/v35/RESPONSE-v35.md`. Verify `v35/SHA256SUMS` before capture.
+
+## Then round v38
+
+Capture the five PyneCore/native discriminators in [v38/HANDOFF-v38-v1.md](v38/HANDOFF-v38-v1.md). Follow each per-script instruction, preserve INDEX=0..239 and source/CSV hashes, and return `v38/captures/v38/RESPONSE-v38.md`. Native outcomes are unspecified.

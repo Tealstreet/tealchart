@@ -1,0 +1,7 @@
+//@version=6
+indicator("V38 flat-rsi-v38-v1", precision=16, max_bars_back=500)
+plot(float(bar_index), "INDEX")
+plot(10.0, "SOURCE")
+plot(ta.rsi(10.0, 7), "TARGET")
+plot(ta.rsi(float(bar_index), 7), "UP_CONTROL")
+plot(ta.rsi(-float(bar_index), 7), "DOWN_CONTROL")
