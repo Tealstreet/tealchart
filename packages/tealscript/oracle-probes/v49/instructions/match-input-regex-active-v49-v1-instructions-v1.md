@@ -1,6 +1,6 @@
 # v49 match-input-regex-active capture instructions v1
 
-Copy `match-input-regex-active-v49-v1.pine` unchanged and verify its source SHA256. Use the common setup in HANDOFF-v49-v1.md. Leave every authored input at its default; retain a settings screenshot if the source runs. Native phase and values are UNSPECIFIED.
+Copy `match-input-regex-active-v49-v1.pine` unchanged and verify its source SHA256. Use the common setup in HANDOFF-v49-v2.md. Leave every authored input at its default; retain a settings screenshot if the source runs. Native phase and values are UNSPECIFIED.
 
 Question: What consumer boundary does str.match with input-regex arguments meet?
 

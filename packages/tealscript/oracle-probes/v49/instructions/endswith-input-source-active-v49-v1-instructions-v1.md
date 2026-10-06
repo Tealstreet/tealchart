@@ -1,6 +1,6 @@
 # v49 endswith-input-source-active capture instructions v1
 
-Copy `endswith-input-source-active-v49-v1.pine` unchanged and verify its source SHA256. Use the common setup in HANDOFF-v49-v1.md. Leave every authored input at its default; retain a settings screenshot if the source runs. Native phase and values are UNSPECIFIED.
+Copy `endswith-input-source-active-v49-v1.pine` unchanged and verify its source SHA256. Use the common setup in HANDOFF-v49-v2.md. Leave every authored input at its default; retain a settings screenshot if the source runs. Native phase and values are UNSPECIFIED.
 
 Question: What is the consumer boundary of str.endswith when only its source argument is input-qualified?
 

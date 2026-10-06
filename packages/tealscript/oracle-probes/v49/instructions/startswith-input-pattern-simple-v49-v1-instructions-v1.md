@@ -1,6 +1,6 @@
 # v49 startswith-input-pattern-simple capture instructions v1
 
-Copy `startswith-input-pattern-simple-v49-v1.pine` unchanged and verify its source SHA256. Use the common setup in HANDOFF-v49-v1.md. Leave every authored input at its default; retain a settings screenshot if the source runs. Native phase and values are UNSPECIFIED.
+Copy `startswith-input-pattern-simple-v49-v1.pine` unchanged and verify its source SHA256. Use the common setup in HANDOFF-v49-v2.md. Leave every authored input at its default; retain a settings screenshot if the source runs. Native phase and values are UNSPECIFIED.
 
 Question: What is the consumer boundary of str.startswith when only its pattern argument is input-qualified?
 
