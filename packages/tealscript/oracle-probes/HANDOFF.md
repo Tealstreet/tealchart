@@ -288,3 +288,5 @@ Capture the 7 independent scripts in [v47/bundle-manifest-v3.json](v47/bundle-ma
 ## Then round v42 — string unions and scalar qualifier consumers v1
 
 Capture the 34 independent indicators in [v42/bundle-manifest-v1.json](v42/bundle-manifest-v1.json) order, using [HANDOFF-v42-v1.md](v42/HANDOFF-v42-v1.md) and each literal per-script instruction path. Nine formatted tostring probes cover bool/string/enum and their arrays/matrices, five cover matrix/enum format admission, and 20 isolate scalar consumer boundaries. Native compile/runtime phase and values are unspecified. Preserve complete qualified diagnostics and raw text; a refusal without an actual qualified type cannot alone distinguish input from simple. Return source-bound artifacts under `v42/captures/v42/RESPONSE-v42.md`. Verify `v42/SHA256SUMS` before capture.
+
+> **Then round v45.** Capture [v45/HANDOFF-v45-v1.md](v45/HANDOFF-v45-v1.md) — four sources for zero-MAD CCI, zero-denominator COG, zero-variance correlation and live barssince rollback; reuse the pinned v29/v32 sources in place. Reply at `v45/captures/v45/RESPONSE-v45.md`.

@@ -1,0 +1,11 @@
+# TradingView v45 capture handoff v1
+
+Capture four independent sources in [bundle-manifest-v1.json](bundle-manifest-v1.json) order, following each per-script instruction. Native phase and values are UNSPECIFIED. This round asks zero-MAD CCI, zero-denominator COG, zero-variance correlation and live barssince rollback. It does not certify arbitrary near-zero thresholds, gap policies or full-member parity.
+
+Use BINANCE:BTCUSDT, 2-minute standard candles, regular session and Etc/UTC. No Bar Replay. Keep source bytes/defaults unchanged. Export at least64 closed rows with public time/OHLCV and every named column. Preserve raw numeric text and missing cells; INDEX means Pine bar_index, not CSV ordinal. Record actual origin/cutoff/history count, source hash, account/build, timestamp and settings. Save the earliest complete diagnostic if refused; its masked outputs stay UNOBSERVED.
+
+The barssince source also requires the COMPLETE live Pine Logs prefix from a new bar's first update through two closing confirmed updates. Keep the same script instance and retain a same-bar tick2 EVENT=true / tick3 EVENT=false pair. If updates are insufficient or the log prefix is clipped, mark live rollback UNOBSERVED. Closed-bar CSV cannot substitute for live tuples because historical recomputation uses a different event condition. The ordinary-var model is a comparator, not a native answer.
+
+Reuse the unchanged [v29 ATR actual-input-hole source](../v29/atr-actual-input-holes-r282-v29-v1.pine) with [its instructions](../v29/instructions/atr-actual-input-holes-r282-v29-v1.md), and [v32 group23 change source](../v32/corpus-same-source-group-23-v32-v1.pine) with [its instructions](../v32/instructions/corpus-same-source-group-23-instructions-v2.md). They are hash-pinned under reusedProbes, not copied or repaired. Capture only a question not already settled by a returned matching source/context. Clean OHLC cannot settle an implicit-hole question; an early group23 refusal leaves later questions masked.
+
+Run `sha256sum -c SHA256SUMS` here before capture. Return source-hash-bound outcomes and artifact paths/hashes at [captures/v45/RESPONSE-v45.md](captures/v45/RESPONSE-v45.md). Record third outcomes without forcing a binary choice. Local compile preflight gives no TV syntax/runtime credit. No native outputs ship in this round.

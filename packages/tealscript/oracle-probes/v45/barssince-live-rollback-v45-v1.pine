@@ -1,0 +1,28 @@
+//@version=6
+indicator("V45 barssince live rollback", precision=16)
+varip int tick = 0
+if barstate.isnew
+    tick := 0
+if barstate.isrealtime
+    tick += 1
+event = barstate.isrealtime ? tick % 3 == 2 : bar_index % 5 == 0
+value = ta.barssince(event)
+var int lastEvent = na
+priorEvent = lastEvent
+if event
+    lastEvent := bar_index
+model = na(lastEvent) ? na : bar_index - lastEvent
+plot(bar_index, "INDEX")
+plot(time, "BAR_TIME_MS")
+plot(tick, "LIVE_TICK")
+plot(event ? 1 : 0, "EVENT")
+plot(value, "BARSSINCE")
+plot(na(value) ? 1 : 0, "BARSSINCE_IS_NA")
+plot(priorEvent, "PRIOR_EVENT_INDEX")
+plot(model, "ORDINARY_VAR_MODEL")
+plot(barstate.isnew ? 1 : 0, "ISNEW")
+plot(barstate.isconfirmed ? 1 : 0, "ISCONFIRMED")
+plot(barstate.isrealtime ? 1 : 0, "ISREALTIME")
+plot(barstate.ishistory ? 1 : 0, "ISHISTORY")
+if barstate.isrealtime
+    log.info("V45|NOW=" + str.tostring(timenow) + "|TIME=" + str.tostring(time) + "|INDEX=" + str.tostring(bar_index) + "|TICK=" + str.tostring(tick) + "|NEW=" + str.tostring(barstate.isnew) + "|CONFIRMED=" + str.tostring(barstate.isconfirmed) + "|EVENT=" + str.tostring(event) + "|VALUE=" + str.tostring(value) + "|PRIOR=" + str.tostring(priorEvent) + "|MODEL=" + str.tostring(model))
