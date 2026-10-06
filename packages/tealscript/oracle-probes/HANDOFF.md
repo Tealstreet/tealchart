@@ -273,3 +273,7 @@ Capture the three independent sources in [v41/bundle-manifest-v1.json](v41/bundl
 ## Then round v43
 
 Capture the five TA-C discriminators in v43/bundle-manifest-v1.json using v43/HANDOFF-v43-v1.md and its literal per-source instructions. Native outcomes are unspecified; return source-hash-bound evidence under v43/captures/v43/RESPONSE-v43.md.
+
+## Then round v46 — Rising re-adjudication v1
+
+Capture the three independent sources in [v46/bundle-manifest-v1.json](v46/bundle-manifest-v1.json), following [HANDOFF-v46-v1.md](v46/HANDOFF-v46-v1.md) and per-script instructions. Compare native Rising with both explicitly labelled candidate models; neither is an expected outcome. Preserve INDEX/PHASE/source controls, exact diagnostics, all CSV columns and source/capture hashes. Verify v46/SHA256SUMS; return to v46/captures/v46/RESPONSE-v46.md.
