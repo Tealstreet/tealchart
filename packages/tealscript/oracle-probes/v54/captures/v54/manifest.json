@@ -2410,23 +2410,23 @@
       "exchangeTimezone": "Etc/UTC",
       "session": "24x7",
       "accountTier": "pro_premium",
-      "realtimeCutoff": 1791351120,
-      "closedRows": 33
+      "realtimeCutoff": 1791351360,
+      "closedRows": 31
     },
-    "capturedAt": "2026-10-07T05:32:36.481Z",
-    "totalRows": 34,
-    "retainedRows": 34,
+    "capturedAt": "2026-10-07T05:37:40.652Z",
+    "totalRows": 32,
+    "retainedRows": 32,
     "artifacts": "captures/v54/udt-varip-field-live-updates/historical-reload",
     "artifactSha256": {
-      "chart-export.csv": "d126a50ab0d0d0cd6955be9c03e1bfab4779f8f0da973cb7bd1e5ba59f3a5c6b",
-      "chart-export.json": "1de34952ff27ac5a4f1bad75b4ae1e53fc2dbe01a8544d0a7726c9b046bf6b95",
-      "data-window.jpg": "1dbdda939d398be0d0007445598880a283c61dafb79ea62def55cfaf40a429d7",
-      "data-window.txt": "dcc219cc8bcebe185604c1ff3ea93702709b94106404fc688293cec8edde4ba7",
+      "chart-export.csv": "b3c011744925293433b55bf559a85ea374604b8fbaa3ab65ce3961e32abcdac8",
+      "chart-export.json": "ae46805f29cd6f75da8a4b904235aff1c21c4416bbc5cc7528ebbe29789a11be",
+      "data-window.jpg": "9bb917d752b108d722482cd790d292c72711af9406350f054a0f5e7a276ecd59",
+      "data-window.txt": "13f7175d46f665ba8660199f659c14729cd91bbda459dffd90a52684eba5f979",
       "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "native.json": "1c552c1207df564a39088cad954b801ac373aa40833c6fe412b015419805e595",
-      "plots.csv": "4dc4f9702382445039edb66e1626f4d56c4989643b46640f00aa1f48bb24f16b",
-      "settings.jpg": "637d0e3a813b31142768019f027e12aa5e3916a7d1128e615acb14bae99c620a"
+      "native.json": "27a705876fa6cfcb814559575f7db1f98691ff9f592b0dd132fee08dd2b4afe7",
+      "plots.csv": "16ddc05b4a0aacb39b41684408a5c9960e4e1c2d207c2081140044c14cbd41d4",
+      "settings.jpg": "42761ffd2f8486bd76e15ab1052515c17422e1030599e71a353d30cbfef92bb1"
     },
     "errors": [],
     "logs": []
@@ -2480,23 +2480,23 @@
       "exchangeTimezone": "Etc/UTC",
       "session": "24x7",
       "accountTier": "pro_premium",
-      "realtimeCutoff": 1791350880,
+      "realtimeCutoff": 1791351360,
       "closedRows": 31
     },
-    "capturedAt": "2026-10-07T05:29:49.606Z",
+    "capturedAt": "2026-10-07T05:37:35.171Z",
     "totalRows": 32,
     "retainedRows": 32,
     "artifacts": "captures/v54/udt-varip-field-live-updates",
     "artifactSha256": {
-      "chart-export.csv": "f751a5d38c7fd07cfc5b525b1b35e701a165d327cbfdf9394a04b58693dce08a",
-      "chart-export.json": "0cd67fa1524dcd6051255b486b9fbd0e758f9715f4ceb354213242ea6429d4d4",
-      "data-window.jpg": "235356d257f8dcf2f8ff2b6d9064d9a719bf7af40b29f0e2bda307e216b6d693",
-      "data-window.txt": "8de384fc7490061b18ea087da652c3b261b6ac82fde82f341e7edf0ab4b3b935",
+      "chart-export.csv": "6bdeeefbdc5504f58fd8f78544bd191adb955c9c62ab31b5662b45e64e31a137",
+      "chart-export.json": "03007b284e265915de701d1b83066d191d8f987b3debc0c93b67bd5b09a54148",
+      "data-window.jpg": "5502310847774a3c96760871920d0c0f162b06c84b39ad3b2f9ad1ee3781ed50",
+      "data-window.txt": "905fc2feb16dd33d1b8e642d7894498f3d4bc334d8b04a996894c1fad3d3485b",
       "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "native.json": "19975ffed10801294d08a41f206469b0f99e4bb6b1ac47376c3991305a686f7d",
-      "plots.csv": "c07ad661ce37a6e37130295dab025232352988450d40aa5947380fd52a45a4b6",
-      "settings.jpg": "ba41c6b9d18335772a5995db4f5561463dd92980cbb95c1a7305e8fdece8a582"
+      "native.json": "93e756c7d0805ef9c1fed4562cb814d5f1613bb4f1ba5f26acf7a6d30366ea8e",
+      "plots.csv": "36b4cc6b3ba7761ea20aa27c4b90ac36f8952a79c0ecec425fe1cc837306cc49",
+      "settings.jpg": "a53aa07eff035e48c1334c2531ed1a544e7373356491d68f008e1e39fe5520ac"
     },
     "errors": [],
     "logs": []
