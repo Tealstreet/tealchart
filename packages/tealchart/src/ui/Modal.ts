@@ -217,6 +217,7 @@ export class Modal extends Component<ModalState> {
 
     // Setup overlay
     this.overlay = this.el;
+    this.overlay.setAttribute('role', 'dialog');
     Object.assign(this.overlay.style, styles.overlay);
     this.overlay.style.position = this.options.position!;
 

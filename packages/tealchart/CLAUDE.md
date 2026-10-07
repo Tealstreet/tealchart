@@ -64,6 +64,10 @@ existing app-origin dialogs; omitted callbacks keep browser prompt/confirm.
 Hosted calls mount the original modal in the chart root and use its existing
 Escape, overlay and close-button behavior. Pending hosted naming results are
 retired when that selector is unmounted.
+The shared web `ui/Modal` overlay declares `role="dialog"`, including its default
+absolute chart-contained form. Native Electron chart hosts use this semantic
+surface to hide their view while app-owned picker/settings/layout dialogs cover
+it; closed overlays retain `display:none` and do not occlude the chart.
 
 **Overlay UI rule:** Use real DOM nodes on web and real React Native nodes on mobile for controls, menus, buttons, popovers, context menus, floating action buttons, and toolbars whenever their size/value is not a high-frequency function of chart data. Canvas/Skia should own plot primitives and chart-derived labels that must stay inside the draw pass: candles, volume, grid, axes, crosshair, price/time labels, and projected drawing or trading geometry. The left drawing tool rail, reset-view affordance, context menus, price-axis plus menus, and similar chrome belong in overlay UI, not canvas/Skia.
 
