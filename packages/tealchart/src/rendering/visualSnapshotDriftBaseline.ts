@@ -147,12 +147,12 @@ export const VISUAL_SNAPSHOT_DRIFT_BASELINE: VisualSnapshotDriftBaselineEntry[] 
   },
   {
     // 2092d0fe48: normal box text uses Pine's 14px text-family font instead of 12px.
-    // Re-measured on the CI runners, which all agree; efcfc4be74's figure came from another Linux host.
+    // Ceiling is the mirror's ubuntu-latest reading; the self-hosted monorepo runner measures lower.
     name: 'drawing-boxes',
     platform: 'linux',
-    differingPixels: 284,
+    differingPixels: 287,
     totalPixels: 120000,
-    differingPixelRatio: 0.0023666666666666667,
+    differingPixelRatio: 0.0023916666666666665,
     channelTolerance: 16,
     maxDifferingPixelRatio: 0.08,
     width: 400,
@@ -215,12 +215,12 @@ export const VISUAL_SNAPSHOT_DRIFT_BASELINE: VisualSnapshotDriftBaselineEntry[] 
   },
   {
     // 2092d0fe48: normal table text uses Pine's 14px text-family font instead of 12px.
-    // Re-measured on the CI runners, which all agree; efcfc4be74's figure came from another Linux host.
+    // Ceiling is the mirror's ubuntu-latest reading; the self-hosted monorepo runner measures lower.
     name: 'drawing-table',
     platform: 'linux',
-    differingPixels: 951,
+    differingPixels: 1002,
     totalPixels: 120000,
-    differingPixelRatio: 0.007925,
+    differingPixelRatio: 0.00835,
     channelTolerance: 16,
     maxDifferingPixelRatio: 0.08,
     width: 400,

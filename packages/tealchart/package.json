@@ -80,6 +80,10 @@
     "optics-ts": "^2.4.1"
   },
   "devDependencies": {
+    "@babel/core": "^7.25.2",
+    "@babel/plugin-transform-modules-commonjs": "^7.29.7",
+    "@babel/plugin-transform-react-jsx": "^7.29.7",
+    "@babel/plugin-transform-typescript": "^7.29.7",
     "@ianvs/prettier-plugin-sort-imports": "^4.7.1",
     "@napi-rs/canvas": "^1.0.9",
     "@shopify/react-native-skia": "2.12.0",
