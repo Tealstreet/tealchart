@@ -1,0 +1,1 @@
+CE10123 {'line': 5, 'column': 41}: Cannot call "plot" with argument "linewidth"="value". An argument of "simple int" type was used but a "input int"  is expected.

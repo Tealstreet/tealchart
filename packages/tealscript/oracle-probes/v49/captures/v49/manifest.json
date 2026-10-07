@@ -1,0 +1,719 @@
+[
+  {
+    "probe": "qualifier-consumer-controls-v49-v1.pine",
+    "sourcePath": "qualifier-consumer-controls-v49-v1.pine",
+    "sourceSha256": "f1eac2d485925f7bc2ae6ca01c19688e18c79e119b3576462810e68dbe31c971",
+    "instructionsPath": "instructions/qualifier-consumer-controls-v49-v1-instructions-v1.md",
+    "outcome": "RUNS",
+    "capturedAt": "2026-10-07T05:02:42.283Z",
+    "totalRows": 21752,
+    "retainedRows": 21752,
+    "artifacts": "captures/v49/qualifier-consumer-controls",
+    "errors": [],
+    "logs": []
+  },
+  {
+    "probe": "match-const-active-v49-v1.pine",
+    "sourcePath": "match-const-active-v49-v1.pine",
+    "sourceSha256": "26cbc2d0d3043a18f16295ef58dd5b8611c236bc9893d4561f75c37140dbb328",
+    "instructionsPath": "instructions/match-const-active-v49-v1-instructions-v1.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T04:57:49.150Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v49/match-const-active",
+    "errors": [
+      {
+        "start": {
+          "line": 6,
+          "column": 48
+        },
+        "end": {
+          "line": 6,
+          "column": 61
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"input.bool\" with argument \"active\"=\"call \"operator ==\" (simple bool)\". An argument of \"simple bool\" type was used but a \"input bool\"  is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10123",
+        "time": "12:57:13 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "match-const-simple-v49-v1.pine",
+    "sourcePath": "match-const-simple-v49-v1.pine",
+    "sourceSha256": "d37cf36cf5981ece3dad49173d4d336bea14b75f54a2d1fc0b27a4593a7ae6f0",
+    "instructionsPath": "instructions/match-const-simple-v49-v1-instructions-v1.md",
+    "outcome": "RUNS",
+    "capturedAt": "2026-10-07T05:03:15.279Z",
+    "totalRows": 21752,
+    "retainedRows": 21752,
+    "artifacts": "captures/v49/match-const-simple",
+    "errors": [],
+    "logs": [
+      {
+        "barTime": 1788739200000,
+        "time": 1788739200000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 12,
+            "column": 5
+          },
+          "end": {
+            "line": 12,
+            "column": 35
+          }
+        },
+        "message": "TARGET=[ab]"
+      }
+    ]
+  },
+  {
+    "probe": "match-input-source-active-v49-v1.pine",
+    "sourcePath": "match-input-source-active-v49-v1.pine",
+    "sourceSha256": "d0376e89ec561b5bc29006b16181fccf9a6e8ed7c9851b707fccee88d83256f2",
+    "instructionsPath": "instructions/match-input-source-active-v49-v1-instructions-v1.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T04:59:29.096Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v49/match-input-source-active",
+    "errors": [
+      {
+        "start": {
+          "line": 6,
+          "column": 48
+        },
+        "end": {
+          "line": 6,
+          "column": 61
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"input.bool\" with argument \"active\"=\"call \"operator ==\" (simple bool)\". An argument of \"simple bool\" type was used but a \"input bool\"  is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10123",
+        "time": "12:59:28 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "match-input-source-simple-v49-v1.pine",
+    "sourcePath": "match-input-source-simple-v49-v1.pine",
+    "sourceSha256": "caeca0d038ed0daf55c6300c3bbf8195c37e1a9a9ff02c671c75e2dbf2af168e",
+    "instructionsPath": "instructions/match-input-source-simple-v49-v1-instructions-v1.md",
+    "outcome": "RUNS",
+    "capturedAt": "2026-10-07T05:02:56.131Z",
+    "totalRows": 21752,
+    "retainedRows": 21752,
+    "artifacts": "captures/v49/match-input-source-simple",
+    "errors": [],
+    "logs": [
+      {
+        "barTime": 1788739200000,
+        "time": 1788739200000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 12,
+            "column": 5
+          },
+          "end": {
+            "line": 12,
+            "column": 35
+          }
+        },
+        "message": "TARGET=[ab]"
+      }
+    ]
+  },
+  {
+    "probe": "match-input-regex-active-v49-v1.pine",
+    "sourcePath": "match-input-regex-active-v49-v1.pine",
+    "sourceSha256": "829115ac4ae11dc390bce04821019307e582136dda6fa61623349a402ed9056b",
+    "instructionsPath": "instructions/match-input-regex-active-v49-v1-instructions-v1.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T04:59:35.336Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v49/match-input-regex-active",
+    "errors": [
+      {
+        "start": {
+          "line": 6,
+          "column": 48
+        },
+        "end": {
+          "line": 6,
+          "column": 61
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"input.bool\" with argument \"active\"=\"call \"operator ==\" (simple bool)\". An argument of \"simple bool\" type was used but a \"input bool\"  is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10123",
+        "time": "12:59:34 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "match-input-regex-simple-v49-v1.pine",
+    "sourcePath": "match-input-regex-simple-v49-v1.pine",
+    "sourceSha256": "2f8229d67c4345dc499374227d3f0588a4dae058dd512b801d40688052bdb200",
+    "instructionsPath": "instructions/match-input-regex-simple-v49-v1-instructions-v1.md",
+    "outcome": "RUNS",
+    "capturedAt": "2026-10-07T05:03:18.951Z",
+    "totalRows": 21752,
+    "retainedRows": 21752,
+    "artifacts": "captures/v49/match-input-regex-simple",
+    "errors": [],
+    "logs": [
+      {
+        "barTime": 1788739200000,
+        "time": 1788739200000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 12,
+            "column": 5
+          },
+          "end": {
+            "line": 12,
+            "column": 35
+          }
+        },
+        "message": "TARGET=[ab]"
+      }
+    ]
+  },
+  {
+    "probe": "format-time-const-active-v49-v1.pine",
+    "sourcePath": "format-time-const-active-v49-v1.pine",
+    "sourceSha256": "b1a69ae2b2565d7d8967c7f1043af0341de4932ea2a23d8f176d6e1001090af7",
+    "instructionsPath": "instructions/format-time-const-active-v49-v1-instructions-v1.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T04:59:41.293Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v49/format-time-const-active",
+    "errors": [
+      {
+        "start": {
+          "line": 6,
+          "column": 48
+        },
+        "end": {
+          "line": 6,
+          "column": 63
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"input.bool\" with argument \"active\"=\"call \"operator ==\" (series bool)\". An argument of \"series bool\" type was used but a \"input bool\"  is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10123",
+        "time": "12:59:40 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "format-time-input-time-active-v49-v1.pine",
+    "sourcePath": "format-time-input-time-active-v49-v1.pine",
+    "sourceSha256": "41bd5d9561dc52d3ced84268fadbceeb729fb1f4ea2fe614cb85c05159f2b3e8",
+    "instructionsPath": "instructions/format-time-input-time-active-v49-v1-instructions-v1.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T04:59:43.880Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v49/format-time-input-time-active",
+    "errors": [
+      {
+        "start": {
+          "line": 6,
+          "column": 48
+        },
+        "end": {
+          "line": 6,
+          "column": 63
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"input.bool\" with argument \"active\"=\"call \"operator ==\" (series bool)\". An argument of \"series bool\" type was used but a \"input bool\"  is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10123",
+        "time": "12:59:43 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "format-time-input-format-active-v49-v1.pine",
+    "sourcePath": "format-time-input-format-active-v49-v1.pine",
+    "sourceSha256": "d556fc627d832ef6d2228568340dfc1664a72413589e6247d80eeb3536c150a9",
+    "instructionsPath": "instructions/format-time-input-format-active-v49-v1-instructions-v1.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T05:00:02.329Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v49/format-time-input-format-active",
+    "errors": [
+      {
+        "start": {
+          "line": 6,
+          "column": 48
+        },
+        "end": {
+          "line": 6,
+          "column": 63
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"input.bool\" with argument \"active\"=\"call \"operator ==\" (series bool)\". An argument of \"series bool\" type was used but a \"input bool\"  is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10123",
+        "time": "1:00:01 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "length-input-simple-v49-v1.pine",
+    "sourcePath": "length-input-simple-v49-v1.pine",
+    "sourceSha256": "3aacdfc72c43a3fd2225e7d768d02be52e96865a9cbc7adf99107404a0b06651",
+    "instructionsPath": "instructions/length-input-simple-v49-v1-instructions-v1.md",
+    "outcome": "RUNS",
+    "capturedAt": "2026-10-07T05:03:02.193Z",
+    "totalRows": 21752,
+    "retainedRows": 21752,
+    "artifacts": "captures/v49/length-input-simple",
+    "errors": [],
+    "logs": []
+  },
+  {
+    "probe": "pos-input-simple-v49-v1.pine",
+    "sourcePath": "pos-input-simple-v49-v1.pine",
+    "sourceSha256": "9c84a32bf3b0230693ea6193d0d9e701fa80c11f8ba3378563851b5ce2303d7e",
+    "instructionsPath": "instructions/pos-input-simple-v49-v1-instructions-v1.md",
+    "outcome": "RUNS",
+    "capturedAt": "2026-10-07T05:02:39.355Z",
+    "totalRows": 21752,
+    "retainedRows": 21752,
+    "artifacts": "captures/v49/pos-input-simple",
+    "errors": [],
+    "logs": []
+  },
+  {
+    "probe": "contains-input-source-active-v49-v1.pine",
+    "sourcePath": "contains-input-source-active-v49-v1.pine",
+    "sourceSha256": "cf2b9f658c6ddb9b04664013c34dce1a98416806ea09e49d9a2be31ecb5b0f28",
+    "instructionsPath": "instructions/contains-input-source-active-v49-v1-instructions-v1.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T05:00:11.712Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v49/contains-input-source-active",
+    "errors": [
+      {
+        "start": {
+          "line": 6,
+          "column": 48
+        },
+        "end": {
+          "line": 6,
+          "column": 53
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"input.bool\" with argument \"active\"=\"value\". An argument of \"simple bool\" type was used but a \"input bool\"  is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10123",
+        "time": "1:00:11 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "contains-input-source-simple-v49-v1.pine",
+    "sourcePath": "contains-input-source-simple-v49-v1.pine",
+    "sourceSha256": "6243f736940160b1fb6994dffede7f1b999ff5528b62cbdc62e29217be53da68",
+    "instructionsPath": "instructions/contains-input-source-simple-v49-v1-instructions-v1.md",
+    "outcome": "RUNS",
+    "capturedAt": "2026-10-07T05:02:45.402Z",
+    "totalRows": 21752,
+    "retainedRows": 21752,
+    "artifacts": "captures/v49/contains-input-source-simple",
+    "errors": [],
+    "logs": []
+  },
+  {
+    "probe": "contains-input-pattern-active-v49-v1.pine",
+    "sourcePath": "contains-input-pattern-active-v49-v1.pine",
+    "sourceSha256": "80389f84d87a952eec11495ef3eed90591bd37ca8ed3c59a99df08e5677b1f81",
+    "instructionsPath": "instructions/contains-input-pattern-active-v49-v1-instructions-v1.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T05:00:17.260Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v49/contains-input-pattern-active",
+    "errors": [
+      {
+        "start": {
+          "line": 6,
+          "column": 48
+        },
+        "end": {
+          "line": 6,
+          "column": 53
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"input.bool\" with argument \"active\"=\"value\". An argument of \"simple bool\" type was used but a \"input bool\"  is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10123",
+        "time": "1:00:16 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "contains-input-pattern-simple-v49-v1.pine",
+    "sourcePath": "contains-input-pattern-simple-v49-v1.pine",
+    "sourceSha256": "252f1e6edf08cd6e2c7097c9fa6f3d17f4de135d9db754138917a7467155be4c",
+    "instructionsPath": "instructions/contains-input-pattern-simple-v49-v1-instructions-v1.md",
+    "outcome": "RUNS",
+    "capturedAt": "2026-10-07T05:02:59.188Z",
+    "totalRows": 21752,
+    "retainedRows": 21752,
+    "artifacts": "captures/v49/contains-input-pattern-simple",
+    "errors": [],
+    "logs": []
+  },
+  {
+    "probe": "startswith-input-source-active-v49-v1.pine",
+    "sourcePath": "startswith-input-source-active-v49-v1.pine",
+    "sourceSha256": "396f990ca8c820f9bda67a682fa77edbecbc98d130a086572257a6dd33ce40f9",
+    "instructionsPath": "instructions/startswith-input-source-active-v49-v1-instructions-v1.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T05:00:53.107Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v49/startswith-input-source-active",
+    "errors": [
+      {
+        "start": {
+          "line": 6,
+          "column": 48
+        },
+        "end": {
+          "line": 6,
+          "column": 53
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"input.bool\" with argument \"active\"=\"value\". An argument of \"simple bool\" type was used but a \"input bool\"  is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10123",
+        "time": "1:00:52 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "startswith-input-source-simple-v49-v1.pine",
+    "sourcePath": "startswith-input-source-simple-v49-v1.pine",
+    "sourceSha256": "0321d599e8a73ad262ca05ce4bb423f2deadbcd6c51e7aeb92cfec5b5ed2b863",
+    "instructionsPath": "instructions/startswith-input-source-simple-v49-v1-instructions-v1.md",
+    "outcome": "RUNS",
+    "capturedAt": "2026-10-07T05:02:36.400Z",
+    "totalRows": 21752,
+    "retainedRows": 21752,
+    "artifacts": "captures/v49/startswith-input-source-simple",
+    "errors": [],
+    "logs": []
+  },
+  {
+    "probe": "startswith-input-pattern-active-v49-v1.pine",
+    "sourcePath": "startswith-input-pattern-active-v49-v1.pine",
+    "sourceSha256": "71198d9ba3b97f4e55c6435b8a4c033eae8ed42c62861a5f30a1174ecf98ee16",
+    "instructionsPath": "instructions/startswith-input-pattern-active-v49-v1-instructions-v1.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T05:00:58.724Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v49/startswith-input-pattern-active",
+    "errors": [
+      {
+        "start": {
+          "line": 6,
+          "column": 48
+        },
+        "end": {
+          "line": 6,
+          "column": 53
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"input.bool\" with argument \"active\"=\"value\". An argument of \"simple bool\" type was used but a \"input bool\"  is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10123",
+        "time": "1:00:57 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "startswith-input-pattern-simple-v49-v1.pine",
+    "sourcePath": "startswith-input-pattern-simple-v49-v1.pine",
+    "sourceSha256": "18abb40f5071bb4c26d28018924df26d75e84970d17d1965c4991a3c66712e87",
+    "instructionsPath": "instructions/startswith-input-pattern-simple-v49-v1-instructions-v1.md",
+    "outcome": "RUNS",
+    "capturedAt": "2026-10-07T05:03:05.271Z",
+    "totalRows": 21752,
+    "retainedRows": 21752,
+    "artifacts": "captures/v49/startswith-input-pattern-simple",
+    "errors": [],
+    "logs": []
+  },
+  {
+    "probe": "endswith-input-source-active-v49-v1.pine",
+    "sourcePath": "endswith-input-source-active-v49-v1.pine",
+    "sourceSha256": "b6996db83c0031c424ecec6f84242527ce7eef339fcbb6276aa2c7befce85d49",
+    "instructionsPath": "instructions/endswith-input-source-active-v49-v1-instructions-v1.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T05:01:04.155Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v49/endswith-input-source-active",
+    "errors": [
+      {
+        "start": {
+          "line": 6,
+          "column": 48
+        },
+        "end": {
+          "line": 6,
+          "column": 53
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"input.bool\" with argument \"active\"=\"value\". An argument of \"simple bool\" type was used but a \"input bool\"  is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10123",
+        "time": "1:01:03 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "endswith-input-source-simple-v49-v1.pine",
+    "sourcePath": "endswith-input-source-simple-v49-v1.pine",
+    "sourceSha256": "67854b028f5d278c67d2a5351298b942f9d38df632f49723eb7eb7a3e330b7f6",
+    "instructionsPath": "instructions/endswith-input-source-simple-v49-v1-instructions-v1.md",
+    "outcome": "RUNS",
+    "capturedAt": "2026-10-07T05:03:11.395Z",
+    "totalRows": 21752,
+    "retainedRows": 21752,
+    "artifacts": "captures/v49/endswith-input-source-simple",
+    "errors": [],
+    "logs": []
+  },
+  {
+    "probe": "endswith-input-pattern-active-v49-v1.pine",
+    "sourcePath": "endswith-input-pattern-active-v49-v1.pine",
+    "sourceSha256": "6ed9c50c11057389d70bc4a9e48699124c0787e72d9f191ba5f0f8dce5b33742",
+    "instructionsPath": "instructions/endswith-input-pattern-active-v49-v1-instructions-v1.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T05:01:18.953Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v49/endswith-input-pattern-active",
+    "errors": [
+      {
+        "start": {
+          "line": 6,
+          "column": 48
+        },
+        "end": {
+          "line": 6,
+          "column": 53
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"input.bool\" with argument \"active\"=\"value\". An argument of \"simple bool\" type was used but a \"input bool\"  is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10123",
+        "time": "1:01:18 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "endswith-input-pattern-simple-v49-v1.pine",
+    "sourcePath": "endswith-input-pattern-simple-v49-v1.pine",
+    "sourceSha256": "340c7329cf4ed92ec87ad16841e5aae1aa907f85e7dfc34d17f70b857124e5e3",
+    "instructionsPath": "instructions/endswith-input-pattern-simple-v49-v1-instructions-v1.md",
+    "outcome": "RUNS",
+    "capturedAt": "2026-10-07T05:03:08.365Z",
+    "totalRows": 21752,
+    "retainedRows": 21752,
+    "artifacts": "captures/v49/endswith-input-pattern-simple",
+    "errors": [],
+    "logs": []
+  },
+  {
+    "probe": "match-const-title-v49-v1.pine",
+    "sourcePath": "../v42/floor-const-title-match-v42-v1.pine",
+    "sourceSha256": "62486bf12e9099c9c1bc08a465249f57742834ecce914fc8a757ddb9bed89715",
+    "instructionsPath": "instructions/match-const-title-v49-v1-instructions-v2.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T05:01:25.585Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v49/match-const-title",
+    "errors": [
+      {
+        "start": {
+          "line": 4,
+          "column": 19
+        },
+        "end": {
+          "line": 4,
+          "column": 24
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"plot\" with argument \"title\"=\"value\". An argument of \"simple string\" type was used but a \"const string\"  is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10123",
+        "time": "1:01:24 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "format-time-const-title-v49-v1.pine",
+    "sourcePath": "../v42/floor-const-title-format-time-v42-v1.pine",
+    "sourceSha256": "a33acb5734c06c1598128824dbaa517a6550d7e9a6293c70cb0f286cea656463",
+    "instructionsPath": "instructions/format-time-const-title-v49-v1-instructions-v2.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T05:01:27.965Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v49/format-time-const-title",
+    "errors": [
+      {
+        "start": {
+          "line": 4,
+          "column": 19
+        },
+        "end": {
+          "line": 4,
+          "column": 24
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"plot\" with argument \"title\"=\"value\". An argument of \"series string\" type was used but a \"const string\"  is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10123",
+        "time": "1:01:27 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "format-time-const-simple-v49-v1.pine",
+    "sourcePath": "../v42/floor-simple-consumer-format-time-v42-v1.pine",
+    "sourceSha256": "dfd09b0282f302010f2feb0db794557be0dfb51f119c53593c6bf540d3a3f067",
+    "instructionsPath": "instructions/format-time-const-simple-v49-v1-instructions-v2.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T05:01:30.170Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v49/format-time-const-simple",
+    "errors": [
+      {
+        "start": {
+          "line": 5,
+          "column": 14
+        },
+        "end": {
+          "line": 5,
+          "column": 19
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"consume\" with argument \"sampleText\"=\"value\". An argument of \"series string\" type was used but a \"simple string\"  is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10123",
+        "time": "1:01:29 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "length-input-width-v49-v1.pine",
+    "sourcePath": "../v42/floor-input-consumer-length-v42-v1.pine",
+    "sourceSha256": "da24ada1af113701a5b571f53a83ab5042a840ef34bf237f8b8cf30537b2d6ff",
+    "instructionsPath": "instructions/length-input-width-v49-v1-instructions-v2.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T05:01:32.733Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v49/length-input-width",
+    "errors": [
+      {
+        "start": {
+          "line": 5,
+          "column": 41
+        },
+        "end": {
+          "line": 5,
+          "column": 46
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"plot\" with argument \"linewidth\"=\"value\". An argument of \"simple int\" type was used but a \"input int\"  is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10123",
+        "time": "1:01:31 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "pos-input-width-v49-v1.pine",
+    "sourcePath": "../v42/floor-input-consumer-pos-v42-v1.pine",
+    "sourceSha256": "e76430f8a9c2787d5a808803442a9edb11a7b261021a5767dbb27af2542703c8",
+    "instructionsPath": "instructions/pos-input-width-v49-v1-instructions-v2.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T05:01:35.276Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v49/pos-input-width",
+    "errors": [
+      {
+        "start": {
+          "line": 5,
+          "column": 41
+        },
+        "end": {
+          "line": 5,
+          "column": 46
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"plot\" with argument \"linewidth\"=\"value\". An argument of \"simple int\" type was used but a \"input int\"  is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10123",
+        "time": "1:01:34 PM"
+      }
+    ],
+    "logs": []
+  }
+]
