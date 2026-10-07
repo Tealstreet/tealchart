@@ -1,0 +1,2 @@
+1791351300000	4	ONCE bar=31 time=1,791,351,339,438 tick=1 confirmed=false retained=1
+1791351300000	4	TICK bar=31 time=1,791,351,339,438 tick=1 confirmed=false retained=1 closeCount=0

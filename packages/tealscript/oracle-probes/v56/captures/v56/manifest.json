@@ -1,0 +1,1670 @@
+[
+  {
+    "probe": "matrix-sort-tied-keys-v6-v56-v1.pine",
+    "sourcePath": "matrix-sort-tied-keys-v6-v56-v1.pine",
+    "sourceSha256": "fb65119032a37bbd753e48f6c0c3ec037aae03156bea07b068f212bfc6ce5d34",
+    "instructionsPath": "instructions/matrix-sort-tied-keys-v6-v56-v1-instructions-v1.md",
+    "outcome": "RUNS",
+    "attempt": "defaults",
+    "symbol": "BINANCE:BTCUSDT",
+    "timeframe": "2",
+    "context": {
+      "timezone": "Etc/UTC",
+      "exchangeTimezone": "Etc/UTC",
+      "session": "24x7",
+      "accountTier": "pro_premium",
+      "realtimeCutoff": 1791351240,
+      "closedRows": 31
+    },
+    "capturedAt": "2026-10-07T05:35:01.607Z",
+    "totalRows": 32,
+    "retainedRows": 32,
+    "artifacts": "captures/v56/matrix-sort-tied-keys-v6",
+    "artifactSha256": {
+      "chart-export.csv": "02d6a2c42c27a6ef1a7e874b4e949664288c3f781620bac90a4f8de14bd120e4",
+      "chart-export.json": "c4b49da5cd781de739b03ba9a216b495a99973e55dd4d8a13dd2db79f9930377",
+      "data-window.jpg": "f407f2046ea4839379e0f5b02d124903007e6997982354b8a4f76069ffde22cf",
+      "data-window.txt": "c3396199a8e89989b53b2d4a4419934612f9d8f60312f82379dc54b06bd34f3c",
+      "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "44ba0e189466e67d0ad58ede77761b8edd609f5298b3460a37606b2419758943",
+      "plots.csv": "e006762ef6300011331b9fa61606a855ba30cef95bfab7f887d37e77ed23b415",
+      "settings.jpg": "7878ccce9698cbe62f46ccfa4863403d89753d2a52f8706f6bf829e3e649c44e"
+    },
+    "errors": [],
+    "logs": []
+  },
+  {
+    "probe": "matrix-missing-predicates-v6-v56-v1.pine",
+    "sourcePath": "matrix-missing-predicates-v6-v56-v1.pine",
+    "sourceSha256": "eb61f09c90580293268006fffaa77ac2796daf7c184fdaefc2df6afdb5d56b94",
+    "instructionsPath": "instructions/matrix-missing-predicates-v6-v56-v1-instructions-v1.md",
+    "outcome": "RUNS",
+    "attempt": "defaults",
+    "symbol": "BINANCE:BTCUSDT",
+    "timeframe": "2",
+    "context": {
+      "timezone": "Etc/UTC",
+      "exchangeTimezone": "Etc/UTC",
+      "session": "24x7",
+      "accountTier": "pro_premium",
+      "realtimeCutoff": 1791351240,
+      "closedRows": 31
+    },
+    "capturedAt": "2026-10-07T05:35:07.741Z",
+    "totalRows": 32,
+    "retainedRows": 32,
+    "artifacts": "captures/v56/matrix-missing-predicates-v6",
+    "artifactSha256": {
+      "chart-export.csv": "97f00e289ec7897c8219fffbf342d76f1953496970fcc9ce3354f2227b788469",
+      "chart-export.json": "a2ec1d25b83f3edb05452b76f5e84af4b35accf03e04a1b53df54a02a46d6e11",
+      "data-window.jpg": "11734b3052bdb65806410fe2eae7643e8eaf13cb64b6e617e43e0ffa5d34b0b4",
+      "data-window.txt": "20b7155e48eeee9b29f81efc6791f54eed9f80f9700484d7da3b2e4fef95e358",
+      "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "b80ec0d597fd4771b5246d9de7a9de0dd826abef61833713759e944054bc5f55",
+      "plots.csv": "4a09f50eb0fb084c72528acee9c596f9bd82712518ea39d42443b97ab7bea117",
+      "settings.jpg": "9064552fdbd864c358c5c443c7bab1fe6236e66bdf3368b281698c0f5dc46913"
+    },
+    "errors": [],
+    "logs": []
+  },
+  {
+    "probe": "language-string-no-match-v5-v56-v1.pine",
+    "sourcePath": "language-string-no-match-v5-v56-v1.pine",
+    "sourceSha256": "702bf0d44bf185093bb54cc7a4088e414bbbf71019d20995dd9d69a5b304e6e6",
+    "instructionsPath": "instructions/language-string-no-match-v5-v56-v1-instructions-v1.md",
+    "outcome": "RUNS",
+    "attempt": "defaults",
+    "symbol": "BINANCE:BTCUSDT",
+    "timeframe": "2",
+    "context": {
+      "timezone": "Etc/UTC",
+      "exchangeTimezone": "Etc/UTC",
+      "session": "24x7",
+      "accountTier": "pro_premium",
+      "realtimeCutoff": 1791351240,
+      "closedRows": 31
+    },
+    "capturedAt": "2026-10-07T05:35:12.923Z",
+    "totalRows": 32,
+    "retainedRows": 32,
+    "artifacts": "captures/v56/language-string-no-match-v5",
+    "artifactSha256": {
+      "chart-export.csv": "07514bb97d4e160c950e9b128418afdaeb96e29ce2915609bb85a30e88a3864e",
+      "chart-export.json": "28eb6424fc6988347884304d61f5f35b970f1acacba8b9e3ae4cce696da353cf",
+      "data-window.jpg": "e41e7a47cce3a966381af7b89450f0a6ef6ff731e344284a74a203a32cb8c703",
+      "data-window.txt": "27850d955cb23309ecff82f780c98ae05fddbf4efc122a6a023817391a25c0cc",
+      "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "b5ee5ebd9efd88c206010037fbcf3227cd92dbd7b85547189405932cf63d8ce5",
+      "plots.csv": "62f08bc55fe736a34938ad2f77e988457a55577cedf114e2234144ec51e6152c",
+      "settings.jpg": "779ee3f2b145c5e0ba0f3d8e5f3a78b9cfe8867ffc1e2d5c463aff02642b2151"
+    },
+    "errors": [],
+    "logs": []
+  },
+  {
+    "probe": "language-string-no-match-v6-v56-v1.pine",
+    "sourcePath": "language-string-no-match-v6-v56-v1.pine",
+    "sourceSha256": "38190aa0daa743f593e1849b5c237c25e2639a195a0549d283385bf504475e15",
+    "instructionsPath": "instructions/language-string-no-match-v6-v56-v1-instructions-v1.md",
+    "outcome": "RUNS",
+    "attempt": "defaults",
+    "symbol": "BINANCE:BTCUSDT",
+    "timeframe": "2",
+    "context": {
+      "timezone": "Etc/UTC",
+      "exchangeTimezone": "Etc/UTC",
+      "session": "24x7",
+      "accountTier": "pro_premium",
+      "realtimeCutoff": 1791351240,
+      "closedRows": 31
+    },
+    "capturedAt": "2026-10-07T05:35:18.711Z",
+    "totalRows": 32,
+    "retainedRows": 32,
+    "artifacts": "captures/v56/language-string-no-match-v6",
+    "artifactSha256": {
+      "chart-export.csv": "2ecd26a660b903641744aa6e8d647a8ee8db8320c5c4ebe094ffb2519d29598c",
+      "chart-export.json": "1f31053351e61eaca931d33e1bb69c021141ad0b83de6c66d5dcc30bde5692d0",
+      "data-window.jpg": "f68399d569318b1c8899e836cdf3b64db5aacf01432a20df32b4cf639fb57507",
+      "data-window.txt": "3eb3c17483fa2158311e335ea3109c047e4986c2861b39d8a337beabc6bc3d42",
+      "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "e3c59f2ec6ed531a06527236464fc6798d359636e0f67d6510ca979486146c1e",
+      "plots.csv": "f7bc8d0e3fdd54df14106048e8d303d8b14a1a865e34cc29188bed936707cc97",
+      "settings.jpg": "89a5a3d90e195d92c04d54480d2cee67a7481f296ee5a897e4981b0b19b42a2c"
+    },
+    "errors": [],
+    "logs": []
+  },
+  {
+    "probe": "language-once-live-rollback-v56-v1.pine",
+    "sourcePath": "language-once-live-rollback-v56-v1.pine",
+    "sourceSha256": "5f281fc6b8a14fdbc5e34bcd500b2f12e30041e1d70ab0d9ea6e9584f3db7328",
+    "instructionsPath": "instructions/language-once-live-rollback-v56-v1-instructions-v1.md",
+    "outcome": "RUNS",
+    "attempt": "live-sequence-end",
+    "symbol": "BINANCE:BTCUSDT",
+    "timeframe": "1",
+    "context": {
+      "timezone": "Etc/UTC",
+      "exchangeTimezone": "Etc/UTC",
+      "session": "24x7",
+      "accountTier": "pro_premium",
+      "realtimeCutoff": 1791351360,
+      "closedRows": 32
+    },
+    "capturedAt": "2026-10-07T05:36:21.325Z",
+    "totalRows": 33,
+    "retainedRows": 33,
+    "artifacts": "captures/v56/language-once-live-rollback/live-sequence-end",
+    "artifactSha256": {
+      "chart-export.csv": "7dc81e29a9c942dfe90272a2d4cb0bbb0556713baee9d960cfbf0b51c6e378a7",
+      "chart-export.json": "22502d3f78f2890857bf90a5de2b446f0ffdfdd6d296d46451751ca253d6b02b",
+      "data-window.jpg": "fcd4d08a58972c1214a02a7b33c73a1d93d4029f6ef3e810f6ca3ccf5cdadf2b",
+      "data-window.txt": "2cef5f45c17856c12c3454c26e10ba2af96e1dad1b4aecf2405226f11444928a",
+      "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logs.txt": "3fc114238e892c6179351ce1b935bdabc4cdcc51434bf76f206618daa6a70b2a",
+      "native.json": "7df7134c389ae0a08d9fd4dff3528316a122dcac7add6d748f7505ae6e0ea468",
+      "plots.csv": "807d987558bf78354543adcbc230491bd8b2e0cb6b4aa6af22d23c602d6ba6cb",
+      "settings.jpg": "eb9f9e9471a43e5ee87b010339601d199c470396d3338c06fb61fc766914cdf9"
+    },
+    "errors": [],
+    "logs": [
+      {
+        "barTime": 1791351300000,
+        "time": 1791351339437.894,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 15,
+            "column": 9
+          },
+          "end": {
+            "line": 15,
+            "column": 147
+          }
+        },
+        "message": "ONCE bar=31 time=1,791,351,339,438 tick=1 confirmed=false retained=1"
+      },
+      {
+        "barTime": 1791351300000,
+        "time": 1791351339437.894,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 19,
+            "column": 5
+          },
+          "end": {
+            "line": 19,
+            "column": 174
+          }
+        },
+        "message": "TICK bar=31 time=1,791,351,339,438 tick=1 confirmed=false retained=1 closeCount=0"
+      },
+      {
+        "barTime": 1791351300000,
+        "time": 1791351340316.278,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 15,
+            "column": 9
+          },
+          "end": {
+            "line": 15,
+            "column": 147
+          }
+        },
+        "message": "ONCE bar=31 time=1,791,351,340,316 tick=2 confirmed=false retained=2"
+      },
+      {
+        "barTime": 1791351300000,
+        "time": 1791351340316.278,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 19,
+            "column": 5
+          },
+          "end": {
+            "line": 19,
+            "column": 174
+          }
+        },
+        "message": "TICK bar=31 time=1,791,351,340,316 tick=2 confirmed=false retained=2 closeCount=0"
+      },
+      {
+        "barTime": 1791351300000,
+        "time": 1791351340389.825,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 15,
+            "column": 9
+          },
+          "end": {
+            "line": 15,
+            "column": 147
+          }
+        },
+        "message": "ONCE bar=31 time=1,791,351,340,389 tick=3 confirmed=false retained=3"
+      },
+      {
+        "barTime": 1791351300000,
+        "time": 1791351340389.825,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 19,
+            "column": 5
+          },
+          "end": {
+            "line": 19,
+            "column": 174
+          }
+        },
+        "message": "TICK bar=31 time=1,791,351,340,389 tick=3 confirmed=false retained=3 closeCount=0"
+      },
+      {
+        "barTime": 1791351300000,
+        "time": 1791351341311.064,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 15,
+            "column": 9
+          },
+          "end": {
+            "line": 15,
+            "column": 147
+          }
+        },
+        "message": "ONCE bar=31 time=1,791,351,341,311 tick=4 confirmed=false retained=4"
+      },
+      {
+        "barTime": 1791351300000,
+        "time": 1791351341311.064,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 19,
+            "column": 5
+          },
+          "end": {
+            "line": 19,
+            "column": 174
+          }
+        },
+        "message": "TICK bar=31 time=1,791,351,341,311 tick=4 confirmed=false retained=4 closeCount=0"
+      },
+      {
+        "barTime": 1791351300000,
+        "time": 1791351341340.54,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 15,
+            "column": 9
+          },
+          "end": {
+            "line": 15,
+            "column": 147
+          }
+        },
+        "message": "ONCE bar=31 time=1,791,351,341,340 tick=5 confirmed=false retained=5"
+      },
+      {
+        "barTime": 1791351300000,
+        "time": 1791351341340.54,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 19,
+            "column": 5
+          },
+          "end": {
+            "line": 19,
+            "column": 174
+          }
+        },
+        "message": "TICK bar=31 time=1,791,351,341,340 tick=5 confirmed=false retained=5 closeCount=0"
+      },
+      {
+        "barTime": 1791351300000,
+        "time": 1791351342330.549,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 15,
+            "column": 9
+          },
+          "end": {
+            "line": 15,
+            "column": 147
+          }
+        },
+        "message": "ONCE bar=31 time=1,791,351,342,330 tick=6 confirmed=false retained=6"
+      },
+      {
+        "barTime": 1791351300000,
+        "time": 1791351342330.549,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 19,
+            "column": 5
+          },
+          "end": {
+            "line": 19,
+            "column": 174
+          }
+        },
+        "message": "TICK bar=31 time=1,791,351,342,330 tick=6 confirmed=false retained=6 closeCount=0"
+      },
+      {
+        "barTime": 1791351300000,
+        "time": 1791351342459.598,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 15,
+            "column": 9
+          },
+          "end": {
+            "line": 15,
+            "column": 147
+          }
+        },
+        "message": "ONCE bar=31 time=1,791,351,342,459 tick=7 confirmed=false retained=7"
+      },
+      {
+        "barTime": 1791351300000,
+        "time": 1791351342459.598,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 19,
+            "column": 5
+          },
+          "end": {
+            "line": 19,
+            "column": 174
+          }
+        },
+        "message": "TICK bar=31 time=1,791,351,342,459 tick=7 confirmed=false retained=7 closeCount=0"
+      },
+      {
+        "barTime": 1791351300000,
+        "time": 1791351343331.772,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 15,
+            "column": 9
+          },
+          "end": {
+            "line": 15,
+            "column": 147
+          }
+        },
+        "message": "ONCE bar=31 time=1,791,351,343,331 tick=8 confirmed=false retained=8"
+      },
+      {
+        "barTime": 1791351300000,
+        "time": 1791351343331.772,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 19,
+            "column": 5
+          },
+          "end": {
+            "line": 19,
+            "column": 174
+          }
+        },
+        "message": "TICK bar=31 time=1,791,351,343,331 tick=8 confirmed=false retained=8 closeCount=0"
+      },
+      {
+        "barTime": 1791351300000,
+        "time": 1791351343361.648,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 15,
+            "column": 9
+          },
+          "end": {
+            "line": 15,
+            "column": 147
+          }
+        },
+        "message": "ONCE bar=31 time=1,791,351,343,361 tick=9 confirmed=false retained=9"
+      },
+      {
+        "barTime": 1791351300000,
+        "time": 1791351343361.648,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 19,
+            "column": 5
+          },
+          "end": {
+            "line": 19,
+            "column": 174
+          }
+        },
+        "message": "TICK bar=31 time=1,791,351,343,361 tick=9 confirmed=false retained=9 closeCount=0"
+      },
+      {
+        "barTime": 1791351300000,
+        "time": 1791351344183.955,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 15,
+            "column": 9
+          },
+          "end": {
+            "line": 15,
+            "column": 147
+          }
+        },
+        "message": "ONCE bar=31 time=1,791,351,344,184 tick=10 confirmed=false retained=10"
+      },
+      {
+        "barTime": 1791351300000,
+        "time": 1791351344183.955,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 19,
+            "column": 5
+          },
+          "end": {
+            "line": 19,
+            "column": 174
+          }
+        },
+        "message": "TICK bar=31 time=1,791,351,344,184 tick=10 confirmed=false retained=10 closeCount=0"
+      },
+      {
+        "barTime": 1791351300000,
+        "time": 1791351344463.169,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 15,
+            "column": 9
+          },
+          "end": {
+            "line": 15,
+            "column": 147
+          }
+        },
+        "message": "ONCE bar=31 time=1,791,351,344,463 tick=11 confirmed=false retained=11"
+      },
+      {
+        "barTime": 1791351300000,
+        "time": 1791351344463.169,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 19,
+            "column": 5
+          },
+          "end": {
+            "line": 19,
+            "column": 174
+          }
+        },
+        "message": "TICK bar=31 time=1,791,351,344,463 tick=11 confirmed=false retained=11 closeCount=0"
+      },
+      {
+        "barTime": 1791351300000,
+        "time": 1791351345467.629,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 15,
+            "column": 9
+          },
+          "end": {
+            "line": 15,
+            "column": 147
+          }
+        },
+        "message": "ONCE bar=31 time=1,791,351,345,467 tick=12 confirmed=false retained=12"
+      },
+      {
+        "barTime": 1791351300000,
+        "time": 1791351345467.629,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 19,
+            "column": 5
+          },
+          "end": {
+            "line": 19,
+            "column": 174
+          }
+        },
+        "message": "TICK bar=31 time=1,791,351,345,467 tick=12 confirmed=false retained=12 closeCount=0"
+      },
+      {
+        "barTime": 1791351300000,
+        "time": 1791351346275.102,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 15,
+            "column": 9
+          },
+          "end": {
+            "line": 15,
+            "column": 147
+          }
+        },
+        "message": "ONCE bar=31 time=1,791,351,346,275 tick=13 confirmed=false retained=13"
+      },
+      {
+        "barTime": 1791351300000,
+        "time": 1791351346275.102,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 19,
+            "column": 5
+          },
+          "end": {
+            "line": 19,
+            "column": 174
+          }
+        },
+        "message": "TICK bar=31 time=1,791,351,346,275 tick=13 confirmed=false retained=13 closeCount=0"
+      },
+      {
+        "barTime": 1791351300000,
+        "time": 1791351347357.004,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 15,
+            "column": 9
+          },
+          "end": {
+            "line": 15,
+            "column": 147
+          }
+        },
+        "message": "ONCE bar=31 time=1,791,351,347,357 tick=14 confirmed=false retained=14"
+      },
+      {
+        "barTime": 1791351300000,
+        "time": 1791351347357.004,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 19,
+            "column": 5
+          },
+          "end": {
+            "line": 19,
+            "column": 174
+          }
+        },
+        "message": "TICK bar=31 time=1,791,351,347,357 tick=14 confirmed=false retained=14 closeCount=0"
+      },
+      {
+        "barTime": 1791351300000,
+        "time": 1791351348450.024,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 15,
+            "column": 9
+          },
+          "end": {
+            "line": 15,
+            "column": 147
+          }
+        },
+        "message": "ONCE bar=31 time=1,791,351,348,450 tick=15 confirmed=false retained=15"
+      },
+      {
+        "barTime": 1791351300000,
+        "time": 1791351348450.024,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 19,
+            "column": 5
+          },
+          "end": {
+            "line": 19,
+            "column": 174
+          }
+        },
+        "message": "TICK bar=31 time=1,791,351,348,450 tick=15 confirmed=false retained=15 closeCount=0"
+      },
+      {
+        "barTime": 1791351300000,
+        "time": 1791351349361.603,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 15,
+            "column": 9
+          },
+          "end": {
+            "line": 15,
+            "column": 147
+          }
+        },
+        "message": "ONCE bar=31 time=1,791,351,349,361 tick=16 confirmed=false retained=16"
+      },
+      {
+        "barTime": 1791351300000,
+        "time": 1791351349361.603,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 19,
+            "column": 5
+          },
+          "end": {
+            "line": 19,
+            "column": 174
+          }
+        },
+        "message": "TICK bar=31 time=1,791,351,349,361 tick=16 confirmed=false retained=16 closeCount=0"
+      },
+      {
+        "barTime": 1791351300000,
+        "time": 1791351350169.478,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 15,
+            "column": 9
+          },
+          "end": {
+            "line": 15,
+            "column": 147
+          }
+        },
+        "message": "ONCE bar=31 time=1,791,351,350,169 tick=17 confirmed=false retained=17"
+      },
+      {
+        "barTime": 1791351300000,
+        "time": 1791351350169.478,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 19,
+            "column": 5
+          },
+          "end": {
+            "line": 19,
+            "column": 174
+          }
+        },
+        "message": "TICK bar=31 time=1,791,351,350,169 tick=17 confirmed=false retained=17 closeCount=0"
+      },
+      {
+        "barTime": 1791351300000,
+        "time": 1791351350445.949,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 15,
+            "column": 9
+          },
+          "end": {
+            "line": 15,
+            "column": 147
+          }
+        },
+        "message": "ONCE bar=31 time=1,791,351,350,446 tick=18 confirmed=false retained=18"
+      },
+      {
+        "barTime": 1791351300000,
+        "time": 1791351350445.949,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 19,
+            "column": 5
+          },
+          "end": {
+            "line": 19,
+            "column": 174
+          }
+        },
+        "message": "TICK bar=31 time=1,791,351,350,446 tick=18 confirmed=false retained=18 closeCount=0"
+      },
+      {
+        "barTime": 1791351300000,
+        "time": 1791351351343.111,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 15,
+            "column": 9
+          },
+          "end": {
+            "line": 15,
+            "column": 147
+          }
+        },
+        "message": "ONCE bar=31 time=1,791,351,351,343 tick=19 confirmed=false retained=19"
+      },
+      {
+        "barTime": 1791351300000,
+        "time": 1791351351343.111,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 19,
+            "column": 5
+          },
+          "end": {
+            "line": 19,
+            "column": 174
+          }
+        },
+        "message": "TICK bar=31 time=1,791,351,351,343 tick=19 confirmed=false retained=19 closeCount=0"
+      },
+      {
+        "barTime": 1791351300000,
+        "time": 1791351352359.507,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 15,
+            "column": 9
+          },
+          "end": {
+            "line": 15,
+            "column": 147
+          }
+        },
+        "message": "ONCE bar=31 time=1,791,351,352,359 tick=20 confirmed=false retained=20"
+      },
+      {
+        "barTime": 1791351300000,
+        "time": 1791351352359.507,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 19,
+            "column": 5
+          },
+          "end": {
+            "line": 19,
+            "column": 174
+          }
+        },
+        "message": "TICK bar=31 time=1,791,351,352,359 tick=20 confirmed=false retained=20 closeCount=0"
+      },
+      {
+        "barTime": 1791351300000,
+        "time": 1791351353493.186,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 15,
+            "column": 9
+          },
+          "end": {
+            "line": 15,
+            "column": 147
+          }
+        },
+        "message": "ONCE bar=31 time=1,791,351,353,493 tick=21 confirmed=false retained=21"
+      },
+      {
+        "barTime": 1791351300000,
+        "time": 1791351353493.186,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 19,
+            "column": 5
+          },
+          "end": {
+            "line": 19,
+            "column": 174
+          }
+        },
+        "message": "TICK bar=31 time=1,791,351,353,493 tick=21 confirmed=false retained=21 closeCount=0"
+      },
+      {
+        "barTime": 1791351300000,
+        "time": 1791351354355.526,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 15,
+            "column": 9
+          },
+          "end": {
+            "line": 15,
+            "column": 147
+          }
+        },
+        "message": "ONCE bar=31 time=1,791,351,354,355 tick=22 confirmed=false retained=22"
+      },
+      {
+        "barTime": 1791351300000,
+        "time": 1791351354355.526,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 19,
+            "column": 5
+          },
+          "end": {
+            "line": 19,
+            "column": 174
+          }
+        },
+        "message": "TICK bar=31 time=1,791,351,354,355 tick=22 confirmed=false retained=22 closeCount=0"
+      },
+      {
+        "barTime": 1791351300000,
+        "time": 1791351355302.193,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 15,
+            "column": 9
+          },
+          "end": {
+            "line": 15,
+            "column": 147
+          }
+        },
+        "message": "ONCE bar=31 time=1,791,351,355,302 tick=23 confirmed=false retained=23"
+      },
+      {
+        "barTime": 1791351300000,
+        "time": 1791351355302.193,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 19,
+            "column": 5
+          },
+          "end": {
+            "line": 19,
+            "column": 174
+          }
+        },
+        "message": "TICK bar=31 time=1,791,351,355,302 tick=23 confirmed=false retained=23 closeCount=0"
+      },
+      {
+        "barTime": 1791351300000,
+        "time": 1791351355380.859,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 15,
+            "column": 9
+          },
+          "end": {
+            "line": 15,
+            "column": 147
+          }
+        },
+        "message": "ONCE bar=31 time=1,791,351,355,380 tick=24 confirmed=false retained=24"
+      },
+      {
+        "barTime": 1791351300000,
+        "time": 1791351355380.859,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 19,
+            "column": 5
+          },
+          "end": {
+            "line": 19,
+            "column": 174
+          }
+        },
+        "message": "TICK bar=31 time=1,791,351,355,381 tick=24 confirmed=false retained=24 closeCount=0"
+      },
+      {
+        "barTime": 1791351300000,
+        "time": 1791351356300.758,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 15,
+            "column": 9
+          },
+          "end": {
+            "line": 15,
+            "column": 147
+          }
+        },
+        "message": "ONCE bar=31 time=1,791,351,356,300 tick=25 confirmed=false retained=25"
+      },
+      {
+        "barTime": 1791351300000,
+        "time": 1791351356300.758,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 19,
+            "column": 5
+          },
+          "end": {
+            "line": 19,
+            "column": 174
+          }
+        },
+        "message": "TICK bar=31 time=1,791,351,356,301 tick=25 confirmed=false retained=25 closeCount=0"
+      },
+      {
+        "barTime": 1791351300000,
+        "time": 1791351356373.079,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 15,
+            "column": 9
+          },
+          "end": {
+            "line": 15,
+            "column": 147
+          }
+        },
+        "message": "ONCE bar=31 time=1,791,351,356,373 tick=26 confirmed=false retained=26"
+      },
+      {
+        "barTime": 1791351300000,
+        "time": 1791351356373.079,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 19,
+            "column": 5
+          },
+          "end": {
+            "line": 19,
+            "column": 174
+          }
+        },
+        "message": "TICK bar=31 time=1,791,351,356,373 tick=26 confirmed=false retained=26 closeCount=0"
+      },
+      {
+        "barTime": 1791351300000,
+        "time": 1791351357302.229,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 15,
+            "column": 9
+          },
+          "end": {
+            "line": 15,
+            "column": 147
+          }
+        },
+        "message": "ONCE bar=31 time=1,791,351,357,302 tick=27 confirmed=false retained=27"
+      },
+      {
+        "barTime": 1791351300000,
+        "time": 1791351357302.229,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 19,
+            "column": 5
+          },
+          "end": {
+            "line": 19,
+            "column": 174
+          }
+        },
+        "message": "TICK bar=31 time=1,791,351,357,302 tick=27 confirmed=false retained=27 closeCount=0"
+      },
+      {
+        "barTime": 1791351300000,
+        "time": 1791351357483.565,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 15,
+            "column": 9
+          },
+          "end": {
+            "line": 15,
+            "column": 147
+          }
+        },
+        "message": "ONCE bar=31 time=1,791,351,357,483 tick=28 confirmed=false retained=28"
+      },
+      {
+        "barTime": 1791351300000,
+        "time": 1791351357483.565,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 19,
+            "column": 5
+          },
+          "end": {
+            "line": 19,
+            "column": 174
+          }
+        },
+        "message": "TICK bar=31 time=1,791,351,357,483 tick=28 confirmed=false retained=28 closeCount=0"
+      },
+      {
+        "barTime": 1791351300000,
+        "time": 1791351358352.133,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 15,
+            "column": 9
+          },
+          "end": {
+            "line": 15,
+            "column": 147
+          }
+        },
+        "message": "ONCE bar=31 time=1,791,351,358,352 tick=29 confirmed=false retained=29"
+      },
+      {
+        "barTime": 1791351300000,
+        "time": 1791351358352.133,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 19,
+            "column": 5
+          },
+          "end": {
+            "line": 19,
+            "column": 174
+          }
+        },
+        "message": "TICK bar=31 time=1,791,351,358,352 tick=29 confirmed=false retained=29 closeCount=0"
+      },
+      {
+        "barTime": 1791351300000,
+        "time": 1791351359494.957,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 15,
+            "column": 9
+          },
+          "end": {
+            "line": 15,
+            "column": 147
+          }
+        },
+        "message": "ONCE bar=31 time=1,791,351,359,495 tick=30 confirmed=false retained=30"
+      },
+      {
+        "barTime": 1791351300000,
+        "time": 1791351359494.957,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 19,
+            "column": 5
+          },
+          "end": {
+            "line": 19,
+            "column": 174
+          }
+        },
+        "message": "TICK bar=31 time=1,791,351,359,495 tick=30 confirmed=false retained=30 closeCount=0"
+      },
+      {
+        "barTime": 1791351300000,
+        "time": 1791351360333.149,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 15,
+            "column": 9
+          },
+          "end": {
+            "line": 15,
+            "column": 147
+          }
+        },
+        "message": "ONCE bar=31 time=1,791,351,360,333 tick=31 confirmed=false retained=31"
+      },
+      {
+        "barTime": 1791351300000,
+        "time": 1791351360333.149,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 19,
+            "column": 5
+          },
+          "end": {
+            "line": 19,
+            "column": 174
+          }
+        },
+        "message": "TICK bar=31 time=1,791,351,360,333 tick=31 confirmed=false retained=31 closeCount=0"
+      },
+      {
+        "barTime": 1791351300000,
+        "time": 1791351361311.027,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 15,
+            "column": 9
+          },
+          "end": {
+            "line": 15,
+            "column": 147
+          }
+        },
+        "message": "ONCE bar=31 time=1,791,351,361,311 tick=32 confirmed=true retained=32"
+      },
+      {
+        "barTime": 1791351300000,
+        "time": 1791351361311.027,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 18,
+            "column": 9
+          },
+          "end": {
+            "line": 18,
+            "column": 118
+          }
+        },
+        "message": "CLOSE_ONCE bar=31 time=1,791,351,361,311 tick=32 retained=1"
+      },
+      {
+        "barTime": 1791351300000,
+        "time": 1791351361311.027,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 19,
+            "column": 5
+          },
+          "end": {
+            "line": 19,
+            "column": 174
+          }
+        },
+        "message": "TICK bar=31 time=1,791,351,361,311 tick=32 confirmed=true retained=32 closeCount=1"
+      },
+      {
+        "barTime": 1791351360000,
+        "time": 1791351361311.031,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 19,
+            "column": 5
+          },
+          "end": {
+            "line": 19,
+            "column": 174
+          }
+        },
+        "message": "TICK bar=32 time=1,791,351,361,311 tick=33 confirmed=false retained=32 closeCount=1"
+      },
+      {
+        "barTime": 1791351360000,
+        "time": 1791351362301.307,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 19,
+            "column": 5
+          },
+          "end": {
+            "line": 19,
+            "column": 174
+          }
+        },
+        "message": "TICK bar=32 time=1,791,351,362,301 tick=34 confirmed=false retained=32 closeCount=1"
+      },
+      {
+        "barTime": 1791351360000,
+        "time": 1791351363289.06,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 19,
+            "column": 5
+          },
+          "end": {
+            "line": 19,
+            "column": 174
+          }
+        },
+        "message": "TICK bar=32 time=1,791,351,363,289 tick=35 confirmed=false retained=32 closeCount=1"
+      },
+      {
+        "barTime": 1791351360000,
+        "time": 1791351363350.845,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 19,
+            "column": 5
+          },
+          "end": {
+            "line": 19,
+            "column": 174
+          }
+        },
+        "message": "TICK bar=32 time=1,791,351,363,351 tick=36 confirmed=false retained=32 closeCount=1"
+      },
+      {
+        "barTime": 1791351360000,
+        "time": 1791351364316.237,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 19,
+            "column": 5
+          },
+          "end": {
+            "line": 19,
+            "column": 174
+          }
+        },
+        "message": "TICK bar=32 time=1,791,351,364,316 tick=37 confirmed=false retained=32 closeCount=1"
+      },
+      {
+        "barTime": 1791351360000,
+        "time": 1791351365314.177,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 19,
+            "column": 5
+          },
+          "end": {
+            "line": 19,
+            "column": 174
+          }
+        },
+        "message": "TICK bar=32 time=1,791,351,365,314 tick=38 confirmed=false retained=32 closeCount=1"
+      },
+      {
+        "barTime": 1791351360000,
+        "time": 1791351366326.664,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 19,
+            "column": 5
+          },
+          "end": {
+            "line": 19,
+            "column": 174
+          }
+        },
+        "message": "TICK bar=32 time=1,791,351,366,326 tick=39 confirmed=false retained=32 closeCount=1"
+      },
+      {
+        "barTime": 1791351360000,
+        "time": 1791351367330.003,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 19,
+            "column": 5
+          },
+          "end": {
+            "line": 19,
+            "column": 174
+          }
+        },
+        "message": "TICK bar=32 time=1,791,351,367,330 tick=40 confirmed=false retained=32 closeCount=1"
+      },
+      {
+        "barTime": 1791351360000,
+        "time": 1791351368318.882,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 19,
+            "column": 5
+          },
+          "end": {
+            "line": 19,
+            "column": 174
+          }
+        },
+        "message": "TICK bar=32 time=1,791,351,368,319 tick=41 confirmed=false retained=32 closeCount=1"
+      },
+      {
+        "barTime": 1791351360000,
+        "time": 1791351368361.811,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 19,
+            "column": 5
+          },
+          "end": {
+            "line": 19,
+            "column": 174
+          }
+        },
+        "message": "TICK bar=32 time=1,791,351,368,361 tick=42 confirmed=false retained=32 closeCount=1"
+      },
+      {
+        "barTime": 1791351360000,
+        "time": 1791351369276.577,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 19,
+            "column": 5
+          },
+          "end": {
+            "line": 19,
+            "column": 174
+          }
+        },
+        "message": "TICK bar=32 time=1,791,351,369,276 tick=43 confirmed=false retained=32 closeCount=1"
+      },
+      {
+        "barTime": 1791351360000,
+        "time": 1791351369340.412,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 19,
+            "column": 5
+          },
+          "end": {
+            "line": 19,
+            "column": 174
+          }
+        },
+        "message": "TICK bar=32 time=1,791,351,369,340 tick=44 confirmed=false retained=32 closeCount=1"
+      },
+      {
+        "barTime": 1791351360000,
+        "time": 1791351370246.898,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 19,
+            "column": 5
+          },
+          "end": {
+            "line": 19,
+            "column": 174
+          }
+        },
+        "message": "TICK bar=32 time=1,791,351,370,247 tick=45 confirmed=false retained=32 closeCount=1"
+      },
+      {
+        "barTime": 1791351360000,
+        "time": 1791351370367.532,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 19,
+            "column": 5
+          },
+          "end": {
+            "line": 19,
+            "column": 174
+          }
+        },
+        "message": "TICK bar=32 time=1,791,351,370,367 tick=46 confirmed=false retained=32 closeCount=1"
+      },
+      {
+        "barTime": 1791351360000,
+        "time": 1791351371425.201,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 19,
+            "column": 5
+          },
+          "end": {
+            "line": 19,
+            "column": 174
+          }
+        },
+        "message": "TICK bar=32 time=1,791,351,371,425 tick=47 confirmed=false retained=32 closeCount=1"
+      },
+      {
+        "barTime": 1791351360000,
+        "time": 1791351372361.006,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 19,
+            "column": 5
+          },
+          "end": {
+            "line": 19,
+            "column": 174
+          }
+        },
+        "message": "TICK bar=32 time=1,791,351,372,361 tick=48 confirmed=false retained=32 closeCount=1"
+      },
+      {
+        "barTime": 1791351360000,
+        "time": 1791351373337.962,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 19,
+            "column": 5
+          },
+          "end": {
+            "line": 19,
+            "column": 174
+          }
+        },
+        "message": "TICK bar=32 time=1,791,351,373,338 tick=49 confirmed=false retained=32 closeCount=1"
+      },
+      {
+        "barTime": 1791351360000,
+        "time": 1791351374357.144,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 19,
+            "column": 5
+          },
+          "end": {
+            "line": 19,
+            "column": 174
+          }
+        },
+        "message": "TICK bar=32 time=1,791,351,374,357 tick=50 confirmed=false retained=32 closeCount=1"
+      },
+      {
+        "barTime": 1791351360000,
+        "time": 1791351375333.574,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 19,
+            "column": 5
+          },
+          "end": {
+            "line": 19,
+            "column": 174
+          }
+        },
+        "message": "TICK bar=32 time=1,791,351,375,334 tick=51 confirmed=false retained=32 closeCount=1"
+      },
+      {
+        "barTime": 1791351360000,
+        "time": 1791351376353.501,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 19,
+            "column": 5
+          },
+          "end": {
+            "line": 19,
+            "column": 174
+          }
+        },
+        "message": "TICK bar=32 time=1,791,351,376,353 tick=52 confirmed=false retained=32 closeCount=1"
+      },
+      {
+        "barTime": 1791351360000,
+        "time": 1791351377316.737,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 19,
+            "column": 5
+          },
+          "end": {
+            "line": 19,
+            "column": 174
+          }
+        },
+        "message": "TICK bar=32 time=1,791,351,377,316 tick=53 confirmed=false retained=32 closeCount=1"
+      },
+      {
+        "barTime": 1791351360000,
+        "time": 1791351378328.326,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 19,
+            "column": 5
+          },
+          "end": {
+            "line": 19,
+            "column": 174
+          }
+        },
+        "message": "TICK bar=32 time=1,791,351,378,328 tick=54 confirmed=false retained=32 closeCount=1"
+      },
+      {
+        "barTime": 1791351360000,
+        "time": 1791351379386.329,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 19,
+            "column": 5
+          },
+          "end": {
+            "line": 19,
+            "column": 174
+          }
+        },
+        "message": "TICK bar=32 time=1,791,351,379,386 tick=55 confirmed=false retained=32 closeCount=1"
+      },
+      {
+        "barTime": 1791351360000,
+        "time": 1791351380393.612,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 19,
+            "column": 5
+          },
+          "end": {
+            "line": 19,
+            "column": 174
+          }
+        },
+        "message": "TICK bar=32 time=1,791,351,380,393 tick=56 confirmed=false retained=32 closeCount=1"
+      }
+    ]
+  },
+  {
+    "probe": "language-once-live-rollback-v56-v1.pine",
+    "sourcePath": "language-once-live-rollback-v56-v1.pine",
+    "sourceSha256": "5f281fc6b8a14fdbc5e34bcd500b2f12e30041e1d70ab0d9ea6e9584f3db7328",
+    "instructionsPath": "instructions/language-once-live-rollback-v56-v1-instructions-v1.md",
+    "outcome": "RUNS",
+    "attempt": "defaults",
+    "symbol": "BINANCE:BTCUSDT",
+    "timeframe": "1",
+    "context": {
+      "timezone": "Etc/UTC",
+      "exchangeTimezone": "Etc/UTC",
+      "session": "24x7",
+      "accountTier": "pro_premium",
+      "realtimeCutoff": 1791351300,
+      "closedRows": 31
+    },
+    "capturedAt": "2026-10-07T05:35:39.771Z",
+    "totalRows": 32,
+    "retainedRows": 32,
+    "artifacts": "captures/v56/language-once-live-rollback",
+    "artifactSha256": {
+      "chart-export.csv": "e820a94ca7daf9bada320bbbbe7d2d667e7bc7963f2525af02baa9af81720a6b",
+      "chart-export.json": "5cd520a28953e39f586ea525f0abf1e5fa6d2108db227e5ff00fc21271861650",
+      "data-window.jpg": "9f96d31dffb5fa1a8e99ec5d7d7b571b498623da18c6ddef3c1c55612f8f9005",
+      "data-window.txt": "a8e98829f82703397728dc86f36bb63c9ae523d73dc9d5b13669226cb7814771",
+      "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logs.txt": "b6bff1351fe75b1fcdb5cbd65725c866f898315465bce892c5b5e5b3b2f19f5f",
+      "native.json": "e5a042ece871c70a3a08e42485d38e7bf458bb084cfebcb38afbb06fccf1c2bd",
+      "plots.csv": "697d0f319117903614e61ca7a9940687150733d79e05bdb30eb48a34b988ae85",
+      "settings.jpg": "4c6e202ee82653b93a4b809fc3077d2fbc0bdd64afdac517b368786713f02e61"
+    },
+    "errors": [],
+    "logs": [
+      {
+        "barTime": 1791351300000,
+        "time": 1791351339437.894,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 15,
+            "column": 9
+          },
+          "end": {
+            "line": 15,
+            "column": 147
+          }
+        },
+        "message": "ONCE bar=31 time=1,791,351,339,438 tick=1 confirmed=false retained=1"
+      },
+      {
+        "barTime": 1791351300000,
+        "time": 1791351339437.894,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 19,
+            "column": 5
+          },
+          "end": {
+            "line": 19,
+            "column": 174
+          }
+        },
+        "message": "TICK bar=31 time=1,791,351,339,438 tick=1 confirmed=false retained=1 closeCount=0"
+      }
+    ]
+  }
+]
