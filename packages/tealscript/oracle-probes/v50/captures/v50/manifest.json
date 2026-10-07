@@ -5,10 +5,31 @@
     "sourceSha256": "9308fbd4747fb859f762f3280d011fd22c7f24d0e95d66ad147db223b5b5148e",
     "instructionsPath": "instructions/tostring-onearg-int-const-title-v50-v1-instructions-v1.md",
     "outcome": "COMPILE_REFUSAL",
+    "attempt": "defaults",
+    "symbol": "BINANCE:BTCUSDT",
+    "timeframe": "2",
+    "context": {
+      "timezone": "Etc/UTC",
+      "exchangeTimezone": "Etc/UTC",
+      "session": null,
+      "accountTier": "pro_premium",
+      "realtimeCutoff": null,
+      "closedRows": null,
+      "startupCovered": null,
+      "firstSourceIndex": null
+    },
     "capturedAt": "2026-10-07T05:05:44.664Z",
     "totalRows": 0,
     "retainedRows": 0,
     "artifacts": "captures/v50/tostring-onearg-int-const-title",
+    "dataWindow": null,
+    "nativeCsv": null,
+    "artifactSha256": {
+      "diagnostic.jpg": "44aad8a52fc174404e8b2000d943f3e55cab2831dc3ae4a8dd30748382898423",
+      "diagnostics.txt": "232bf76be7312c452376b601d2b8c89519dbe0d25f64592baefb096c2f48649f",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "f3f36131741fa2a2860a925946228a51257fe21ec7abbc024f83df7ac4cb69f5"
+    },
     "errors": [
       {
         "start": {
@@ -25,6 +46,37 @@
         "scriptName": "Untitled script",
         "code": "CE10123",
         "time": "1:05:43 PM"
+      },
+      {
+        "phase": "runtime",
+        "code": null,
+        "start": null,
+        "text": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+        "nativeDescription": {
+          "error": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+          "editorError": {
+            "code": "CE10123",
+            "ctx": {
+              "argDisplayName": "title",
+              "argUserFriendlyRepresentation": "result",
+              "argumentType": "simple string",
+              "currentTypeDocStr": "const string",
+              "funId": "plot",
+              "typePostfix": ""
+            },
+            "end": {
+              "column": 24,
+              "line": 5
+            },
+            "message": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+            "start": {
+              "column": 19,
+              "line": 5
+            },
+            "id": "USER;64eb9fe01ecd4728859be8cb120fa590"
+          },
+          "title": "Compilation error"
+        }
       }
     ],
     "logs": []
@@ -35,10 +87,31 @@
     "sourceSha256": "1c9332a9a9196bb977961be40bc0bb98dada991cae571a85c4b4ca19cff08281",
     "instructionsPath": "instructions/tostring-onearg-int-input-title-v50-v1-instructions-v1.md",
     "outcome": "COMPILE_REFUSAL",
+    "attempt": "defaults",
+    "symbol": "BINANCE:BTCUSDT",
+    "timeframe": "2",
+    "context": {
+      "timezone": "Etc/UTC",
+      "exchangeTimezone": "Etc/UTC",
+      "session": null,
+      "accountTier": "pro_premium",
+      "realtimeCutoff": null,
+      "closedRows": null,
+      "startupCovered": null,
+      "firstSourceIndex": null
+    },
     "capturedAt": "2026-10-07T05:05:47.270Z",
     "totalRows": 0,
     "retainedRows": 0,
     "artifacts": "captures/v50/tostring-onearg-int-input-title",
+    "dataWindow": null,
+    "nativeCsv": null,
+    "artifactSha256": {
+      "diagnostic.jpg": "f132e1366fb9206c461aa7bce48f6fa0d793360479eb088fd085f3ea98aed065",
+      "diagnostics.txt": "232bf76be7312c452376b601d2b8c89519dbe0d25f64592baefb096c2f48649f",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "24af7eff401edfc8703e65158d2e85422e342650858730c153699d74fe44ba36"
+    },
     "errors": [
       {
         "start": {
@@ -55,6 +128,37 @@
         "scriptName": "Untitled script",
         "code": "CE10123",
         "time": "1:05:46 PM"
+      },
+      {
+        "phase": "runtime",
+        "code": null,
+        "start": null,
+        "text": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+        "nativeDescription": {
+          "error": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+          "editorError": {
+            "code": "CE10123",
+            "ctx": {
+              "argDisplayName": "title",
+              "argUserFriendlyRepresentation": "result",
+              "argumentType": "simple string",
+              "currentTypeDocStr": "const string",
+              "funId": "plot",
+              "typePostfix": ""
+            },
+            "end": {
+              "column": 24,
+              "line": 5
+            },
+            "message": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+            "start": {
+              "column": 19,
+              "line": 5
+            },
+            "id": "USER;64eb9fe01ecd4728859be8cb120fa590"
+          },
+          "title": "Compilation error"
+        }
       }
     ],
     "logs": []
@@ -65,10 +169,31 @@
     "sourceSha256": "079d7aa7ecb49e3be16f076b9a460437cc49cd9eeea3505144a8b7582c55c9de",
     "instructionsPath": "instructions/tostring-onearg-float-const-title-v50-v1-instructions-v1.md",
     "outcome": "COMPILE_REFUSAL",
+    "attempt": "defaults",
+    "symbol": "BINANCE:BTCUSDT",
+    "timeframe": "2",
+    "context": {
+      "timezone": "Etc/UTC",
+      "exchangeTimezone": "Etc/UTC",
+      "session": null,
+      "accountTier": "pro_premium",
+      "realtimeCutoff": null,
+      "closedRows": null,
+      "startupCovered": null,
+      "firstSourceIndex": null
+    },
     "capturedAt": "2026-10-07T05:05:49.700Z",
     "totalRows": 0,
     "retainedRows": 0,
     "artifacts": "captures/v50/tostring-onearg-float-const-title",
+    "dataWindow": null,
+    "nativeCsv": null,
+    "artifactSha256": {
+      "diagnostic.jpg": "4800fe6f9361a6b31c6b50e72aaf8c88d7088b3e4460c80f3077923341608faa",
+      "diagnostics.txt": "232bf76be7312c452376b601d2b8c89519dbe0d25f64592baefb096c2f48649f",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "1326eadfa2530bd949f18e7143f0fabf9fe6693d4f51d5ccf095fa1d552e8ec9"
+    },
     "errors": [
       {
         "start": {
@@ -85,6 +210,37 @@
         "scriptName": "Untitled script",
         "code": "CE10123",
         "time": "1:05:49 PM"
+      },
+      {
+        "phase": "runtime",
+        "code": null,
+        "start": null,
+        "text": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+        "nativeDescription": {
+          "error": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+          "editorError": {
+            "code": "CE10123",
+            "ctx": {
+              "argDisplayName": "title",
+              "argUserFriendlyRepresentation": "result",
+              "argumentType": "simple string",
+              "currentTypeDocStr": "const string",
+              "funId": "plot",
+              "typePostfix": ""
+            },
+            "end": {
+              "column": 24,
+              "line": 5
+            },
+            "message": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+            "start": {
+              "column": 19,
+              "line": 5
+            },
+            "id": "USER;64eb9fe01ecd4728859be8cb120fa590"
+          },
+          "title": "Compilation error"
+        }
       }
     ],
     "logs": []
@@ -95,10 +251,31 @@
     "sourceSha256": "05de8d854a6fc6c2a860cd8d164a6d38aa2b6efe94e77f49f9ac5f25517050f1",
     "instructionsPath": "instructions/tostring-onearg-float-input-title-v50-v1-instructions-v1.md",
     "outcome": "COMPILE_REFUSAL",
+    "attempt": "defaults",
+    "symbol": "BINANCE:BTCUSDT",
+    "timeframe": "2",
+    "context": {
+      "timezone": "Etc/UTC",
+      "exchangeTimezone": "Etc/UTC",
+      "session": null,
+      "accountTier": "pro_premium",
+      "realtimeCutoff": null,
+      "closedRows": null,
+      "startupCovered": null,
+      "firstSourceIndex": null
+    },
     "capturedAt": "2026-10-07T05:05:52.340Z",
     "totalRows": 0,
     "retainedRows": 0,
     "artifacts": "captures/v50/tostring-onearg-float-input-title",
+    "dataWindow": null,
+    "nativeCsv": null,
+    "artifactSha256": {
+      "diagnostic.jpg": "2cdd788b66c8ac8b3bb143fd08c0f96a2d7a79e9f16af9465c1687c52b0238b4",
+      "diagnostics.txt": "232bf76be7312c452376b601d2b8c89519dbe0d25f64592baefb096c2f48649f",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "45c4d0d3e47e3181e5b9bc929ae2fa4402ba317bb128d779f0964bf1526f2fe4"
+    },
     "errors": [
       {
         "start": {
@@ -115,6 +292,37 @@
         "scriptName": "Untitled script",
         "code": "CE10123",
         "time": "1:05:51 PM"
+      },
+      {
+        "phase": "runtime",
+        "code": null,
+        "start": null,
+        "text": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+        "nativeDescription": {
+          "error": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+          "editorError": {
+            "code": "CE10123",
+            "ctx": {
+              "argDisplayName": "title",
+              "argUserFriendlyRepresentation": "result",
+              "argumentType": "simple string",
+              "currentTypeDocStr": "const string",
+              "funId": "plot",
+              "typePostfix": ""
+            },
+            "end": {
+              "column": 24,
+              "line": 5
+            },
+            "message": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+            "start": {
+              "column": 19,
+              "line": 5
+            },
+            "id": "USER;64eb9fe01ecd4728859be8cb120fa590"
+          },
+          "title": "Compilation error"
+        }
       }
     ],
     "logs": []
@@ -125,10 +333,31 @@
     "sourceSha256": "1a51127e345428c1e5d3ebdac69db71299404cbc9d177a89f9750334a18a3dcd",
     "instructionsPath": "instructions/tostring-onearg-bool-const-title-v50-v1-instructions-v1.md",
     "outcome": "COMPILE_REFUSAL",
+    "attempt": "defaults",
+    "symbol": "BINANCE:BTCUSDT",
+    "timeframe": "2",
+    "context": {
+      "timezone": "Etc/UTC",
+      "exchangeTimezone": "Etc/UTC",
+      "session": null,
+      "accountTier": "pro_premium",
+      "realtimeCutoff": null,
+      "closedRows": null,
+      "startupCovered": null,
+      "firstSourceIndex": null
+    },
     "capturedAt": "2026-10-07T05:05:55.117Z",
     "totalRows": 0,
     "retainedRows": 0,
     "artifacts": "captures/v50/tostring-onearg-bool-const-title",
+    "dataWindow": null,
+    "nativeCsv": null,
+    "artifactSha256": {
+      "diagnostic.jpg": "c1845870dac377204bdb11ae7484bfecda2cc3b87c51c86950af774bae731a9a",
+      "diagnostics.txt": "232bf76be7312c452376b601d2b8c89519dbe0d25f64592baefb096c2f48649f",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "0a87b880f671975f123edd4f5dd744f9e015333b4df7451d7bffae669dd5a9ad"
+    },
     "errors": [
       {
         "start": {
@@ -145,6 +374,37 @@
         "scriptName": "Untitled script",
         "code": "CE10123",
         "time": "1:05:54 PM"
+      },
+      {
+        "phase": "runtime",
+        "code": null,
+        "start": null,
+        "text": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+        "nativeDescription": {
+          "error": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+          "editorError": {
+            "code": "CE10123",
+            "ctx": {
+              "argDisplayName": "title",
+              "argUserFriendlyRepresentation": "result",
+              "argumentType": "simple string",
+              "currentTypeDocStr": "const string",
+              "funId": "plot",
+              "typePostfix": ""
+            },
+            "end": {
+              "column": 24,
+              "line": 5
+            },
+            "message": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+            "start": {
+              "column": 19,
+              "line": 5
+            },
+            "id": "USER;64eb9fe01ecd4728859be8cb120fa590"
+          },
+          "title": "Compilation error"
+        }
       }
     ],
     "logs": []
@@ -155,10 +415,31 @@
     "sourceSha256": "ed1f237923169d2cdbfdd93b11bd3360dc57e77d167063f9c03e2a75264cacc3",
     "instructionsPath": "instructions/tostring-onearg-bool-input-title-v50-v1-instructions-v1.md",
     "outcome": "COMPILE_REFUSAL",
+    "attempt": "defaults",
+    "symbol": "BINANCE:BTCUSDT",
+    "timeframe": "2",
+    "context": {
+      "timezone": "Etc/UTC",
+      "exchangeTimezone": "Etc/UTC",
+      "session": null,
+      "accountTier": "pro_premium",
+      "realtimeCutoff": null,
+      "closedRows": null,
+      "startupCovered": null,
+      "firstSourceIndex": null
+    },
     "capturedAt": "2026-10-07T05:05:57.675Z",
     "totalRows": 0,
     "retainedRows": 0,
     "artifacts": "captures/v50/tostring-onearg-bool-input-title",
+    "dataWindow": null,
+    "nativeCsv": null,
+    "artifactSha256": {
+      "diagnostic.jpg": "f9fd7eb561cfaed842e89223fd03762fa68cc919c2459b3bd6a2019b960087f6",
+      "diagnostics.txt": "232bf76be7312c452376b601d2b8c89519dbe0d25f64592baefb096c2f48649f",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "d512435f4baa2125a3be5e8b6556ad06a3ce9491cf9a902bc5220ae9c479d1ef"
+    },
     "errors": [
       {
         "start": {
@@ -175,6 +456,37 @@
         "scriptName": "Untitled script",
         "code": "CE10123",
         "time": "1:05:56 PM"
+      },
+      {
+        "phase": "runtime",
+        "code": null,
+        "start": null,
+        "text": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+        "nativeDescription": {
+          "error": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+          "editorError": {
+            "code": "CE10123",
+            "ctx": {
+              "argDisplayName": "title",
+              "argUserFriendlyRepresentation": "result",
+              "argumentType": "simple string",
+              "currentTypeDocStr": "const string",
+              "funId": "plot",
+              "typePostfix": ""
+            },
+            "end": {
+              "column": 24,
+              "line": 5
+            },
+            "message": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+            "start": {
+              "column": 19,
+              "line": 5
+            },
+            "id": "USER;64eb9fe01ecd4728859be8cb120fa590"
+          },
+          "title": "Compilation error"
+        }
       }
     ],
     "logs": []
@@ -185,10 +497,31 @@
     "sourceSha256": "94a71e3348334cde3da4b4a5bdc61dfbcc54304f22a0d4ac0ef9bb5d9cd8a1f0",
     "instructionsPath": "instructions/tostring-onearg-string-const-title-v50-v1-instructions-v1.md",
     "outcome": "COMPILE_REFUSAL",
+    "attempt": "defaults",
+    "symbol": "BINANCE:BTCUSDT",
+    "timeframe": "2",
+    "context": {
+      "timezone": "Etc/UTC",
+      "exchangeTimezone": "Etc/UTC",
+      "session": null,
+      "accountTier": "pro_premium",
+      "realtimeCutoff": null,
+      "closedRows": null,
+      "startupCovered": null,
+      "firstSourceIndex": null
+    },
     "capturedAt": "2026-10-07T05:06:00.345Z",
     "totalRows": 0,
     "retainedRows": 0,
     "artifacts": "captures/v50/tostring-onearg-string-const-title",
+    "dataWindow": null,
+    "nativeCsv": null,
+    "artifactSha256": {
+      "diagnostic.jpg": "1b2abb8ec2b42035ce0671305067da839fd8011e1fe090cdc0718f84d0ac0912",
+      "diagnostics.txt": "232bf76be7312c452376b601d2b8c89519dbe0d25f64592baefb096c2f48649f",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "37059f9f041d3b85a38400fb817e09fdb901993dc5b35e338dfe342517d30669"
+    },
     "errors": [
       {
         "start": {
@@ -205,6 +538,37 @@
         "scriptName": "Untitled script",
         "code": "CE10123",
         "time": "1:05:59 PM"
+      },
+      {
+        "phase": "runtime",
+        "code": null,
+        "start": null,
+        "text": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+        "nativeDescription": {
+          "error": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+          "editorError": {
+            "code": "CE10123",
+            "ctx": {
+              "argDisplayName": "title",
+              "argUserFriendlyRepresentation": "result",
+              "argumentType": "simple string",
+              "currentTypeDocStr": "const string",
+              "funId": "plot",
+              "typePostfix": ""
+            },
+            "end": {
+              "column": 24,
+              "line": 5
+            },
+            "message": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+            "start": {
+              "column": 19,
+              "line": 5
+            },
+            "id": "USER;64eb9fe01ecd4728859be8cb120fa590"
+          },
+          "title": "Compilation error"
+        }
       }
     ],
     "logs": []
@@ -215,10 +579,31 @@
     "sourceSha256": "93e9d65d32504414dfef17e771eaa648bde5c6d96e0d28cd1b3e9c96c5951c34",
     "instructionsPath": "instructions/tostring-onearg-string-input-title-v50-v1-instructions-v1.md",
     "outcome": "COMPILE_REFUSAL",
+    "attempt": "defaults",
+    "symbol": "BINANCE:BTCUSDT",
+    "timeframe": "2",
+    "context": {
+      "timezone": "Etc/UTC",
+      "exchangeTimezone": "Etc/UTC",
+      "session": null,
+      "accountTier": "pro_premium",
+      "realtimeCutoff": null,
+      "closedRows": null,
+      "startupCovered": null,
+      "firstSourceIndex": null
+    },
     "capturedAt": "2026-10-07T05:06:02.878Z",
     "totalRows": 0,
     "retainedRows": 0,
     "artifacts": "captures/v50/tostring-onearg-string-input-title",
+    "dataWindow": null,
+    "nativeCsv": null,
+    "artifactSha256": {
+      "diagnostic.jpg": "e1b37363de7c997aacc80d7dfc384564904cbe79461a4d449aab8a348346d296",
+      "diagnostics.txt": "232bf76be7312c452376b601d2b8c89519dbe0d25f64592baefb096c2f48649f",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "dcc81e05ae318672482ce2091bdc05939ab4fced1cd10a2a18501d3ea8ebf9a6"
+    },
     "errors": [
       {
         "start": {
@@ -235,6 +620,37 @@
         "scriptName": "Untitled script",
         "code": "CE10123",
         "time": "1:06:02 PM"
+      },
+      {
+        "phase": "runtime",
+        "code": null,
+        "start": null,
+        "text": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+        "nativeDescription": {
+          "error": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+          "editorError": {
+            "code": "CE10123",
+            "ctx": {
+              "argDisplayName": "title",
+              "argUserFriendlyRepresentation": "result",
+              "argumentType": "simple string",
+              "currentTypeDocStr": "const string",
+              "funId": "plot",
+              "typePostfix": ""
+            },
+            "end": {
+              "column": 24,
+              "line": 5
+            },
+            "message": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+            "start": {
+              "column": 19,
+              "line": 5
+            },
+            "id": "USER;64eb9fe01ecd4728859be8cb120fa590"
+          },
+          "title": "Compilation error"
+        }
       }
     ],
     "logs": []
@@ -245,10 +661,73 @@
     "sourceSha256": "55f5daf03799eb3d21333915ccc54e97a5eeaa3b00ea8f1b476cd789ab891938",
     "instructionsPath": "instructions/tostring-onearg-enum-const-title-v50-v1-instructions-v1.md",
     "outcome": "RUNS",
+    "attempt": "defaults-ui-export",
+    "symbol": "BINANCE:BTCUSDT",
+    "timeframe": "2",
+    "context": {
+      "timezone": "Etc/UTC",
+      "exchangeTimezone": "Etc/UTC",
+      "session": "24x7",
+      "accountTier": "pro_premium",
+      "realtimeCutoff": 1791352200,
+      "closedRows": 306,
+      "startupCovered": false,
+      "firstSourceIndex": 21469
+    },
+    "capturedAt": "2026-10-07T05:51:31.621Z",
+    "totalRows": 307,
+    "retainedRows": 307,
+    "artifacts": "captures/v50/tostring-onearg-enum-const-title/defaults-ui-export",
+    "dataWindow": "captures/v50/tostring-onearg-enum-const-title/defaults-ui-export/data-window.jpg",
+    "nativeCsv": "captures/v50/tostring-onearg-enum-const-title/defaults-ui-export/chart-export.csv",
+    "artifactSha256": {
+      "chart-export.csv": "2c2dc21d8ee3fe7b97f949b0a2b08ec2033bb51d74fd60daa1195eac9e08d059",
+      "chart-export.json": "39761e1ae950eb0843b1296383bed87f359419345ffea5834bb1e6da6b077883",
+      "data-window.jpg": "4271fdf3ce7a905213163c991bb2e46b935ce90556c2fbc34275dbed2505709a",
+      "data-window.txt": "8bbe32c87cc7164058550f6a9ceeb9af35c793f3851a9f42b512c7fce364b99c",
+      "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "c2f9ad6d380ed89db56bf00fa49d2b79745df7a359914dde0271f083e68eaac2",
+      "plot-titles.jpg": "deb4678f7551fab3f170692b06fd4939cafe8127ff7705933010dba565396b1e",
+      "plots.csv": "57e59485b603185b70cf26aa0d723928338abfd580ede738e87e391bbec904f7",
+      "settings.jpg": "a5f092c422414820c2d151fa8b5272a9b553790d946941849f25b7121e71eb8d"
+    },
+    "errors": [],
+    "logs": []
+  },
+  {
+    "probe": "tostring-onearg-enum-const-title-v50-v1.pine",
+    "sourcePath": "tostring-onearg-enum-const-title-v50-v1.pine",
+    "sourceSha256": "55f5daf03799eb3d21333915ccc54e97a5eeaa3b00ea8f1b476cd789ab891938",
+    "instructionsPath": "instructions/tostring-onearg-enum-const-title-v50-v1-instructions-v1.md",
+    "outcome": "RUNS",
+    "attempt": "defaults",
+    "symbol": "BINANCE:BTCUSDT",
+    "timeframe": "2",
+    "context": {
+      "timezone": "Etc/UTC",
+      "exchangeTimezone": "Etc/UTC",
+      "session": null,
+      "accountTier": "pro_premium",
+      "realtimeCutoff": 1791349440,
+      "closedRows": 21752,
+      "startupCovered": true,
+      "firstSourceIndex": 0
+    },
     "capturedAt": "2026-10-07T05:05:14.972Z",
     "totalRows": 21753,
     "retainedRows": 21753,
     "artifacts": "captures/v50/tostring-onearg-enum-const-title",
+    "dataWindow": null,
+    "nativeCsv": null,
+    "artifactSha256": {
+      "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "8152e4d65bfa16a4600f8294026ab9efd3b2d44b4234c307b0986ac548fe7ae1",
+      "plot-titles.jpg": "421c10df73a34a19a1efa869c935e241d1224216067e58512d193cee9127db9c",
+      "plots.csv": "67a16a89f3ec02882c0ba2470bb6c38316a4661c22e81e322cb53be31b176e75",
+      "settings.jpg": "8bc0c3f8d2f94d2d9395fcb6511a4aa120c27a40ee318d8bd45cecb30e658186"
+    },
     "errors": [],
     "logs": []
   }

@@ -1,4 +1,4 @@
-time,open,high,low,close,volume,Namespace equals default tostring,Receiver equals default tostring,Namespace equals raw candidate,Call forms agree,Finite exact control,SAMPLE_INDEX,SOURCE_INDEX,SOURCE_TIME,IS_REALTIME
+time,open,high,low,close,volume,Namespace equals default tostring,Receiver equals default tostring,Namespace equals raw candidate,Call forms agree,Finite exact control,SAMPLE_INDEX,SOURCE_INDEX,SOURCE_TIME,CAPTURE_IS_OPEN_BAR
 1791347400,84149.84,84149.84,84094.55,84106,11.99938,0,0,0,1,1,0,0,1791347400000,0
 1791347520,84106,84106.01,84050,84064.01,13.90131,0,0,0,1,1,1,1,1791347520000,0
 1791347640,84064,84090.86,84064,84068.39,7.64625,0,0,0,1,1,2,2,1791347640000,0

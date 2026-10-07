@@ -1,2 +1,3 @@
 CE10123 {'line': 3, 'column': 22}: Cannot call "str.tostring" with argument "value"="true". An argument of "literal bool" type was used but a "simple float"  is expected.
 CE10122 {'line': 8, 'column': 30}: Cannot call "log.info" with argument "arg_1"="value". An argument of "unknown" type was used but one from "series int/float/bool/string/array<int/float/bool/string>" is expected
+None None: Cannot call "{funId}" with argument "{argDisplayName}"="{argUserFriendlyRepresentation}". An argument of "{argumentType}" type was used but a "{currentTypeDocStr}" {typePostfix} is expected.

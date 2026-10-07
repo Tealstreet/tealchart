@@ -1,1 +1,2 @@
 CE10123 {'line': 4, 'column': 79}: Cannot call "ta.kc" with argument "useTrueRange"="candidateArgument". An argument of "series bool" type was used but a "simple bool"  is expected.
+None None: Cannot call "{funId}" with argument "{argDisplayName}"="{argUserFriendlyRepresentation}". An argument of "{argumentType}" type was used but a "{currentTypeDocStr}" {typePostfix} is expected.

@@ -1,1 +1,2 @@
 CE10123 {'line': 8, 'column': 42}: Cannot call "array.sort_indices" with argument "sort_field"="fieldIndex". An argument of "series int" type was used but a "const int"  is expected.
+None None: Cannot call "{funId}" with argument "{argDisplayName}"="{argUserFriendlyRepresentation}". An argument of "{argumentType}" type was used but a "{currentTypeDocStr}" {typePostfix} is expected.

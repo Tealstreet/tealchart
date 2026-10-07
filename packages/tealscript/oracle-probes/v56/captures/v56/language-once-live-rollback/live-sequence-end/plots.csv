@@ -1,4 +1,4 @@
-time,open,high,low,close,volume,Once_RollbackVar,Once_RetainedVarip,CloseOnce_RetainedVarip,Tick_Control,FirstLiveBar_Control,Bar_Index_Control,Confirmed_Control,Realtime_Control,Close_Control,SAMPLE_INDEX,SOURCE_INDEX,SOURCE_TIME,IS_REALTIME
+time,open,high,low,close,volume,Once_RollbackVar,Once_RetainedVarip,CloseOnce_RetainedVarip,Tick_Control,FirstLiveBar_Control,Bar_Index_Control,Confirmed_Control,Realtime_Control,Close_Control,SAMPLE_INDEX,SOURCE_INDEX,SOURCE_TIME,CAPTURE_IS_OPEN_BAR
 1791349440,84130,84130.01,84100,84100,,0,0,0,0,,0,1,0,84100,0,0,1791349440000,0
 1791349500,84100.01,84140.01,84084.47,84140.01,,0,0,0,0,,1,1,0,84140.01,1,1,1791349500000,0
 1791349560,84140.01,84140.01,84126,84136.33,,0,0,0,0,,2,1,0,84136.33,2,2,1791349560000,0

@@ -1,2 +1,3 @@
 CE10123 {'line': 4, 'column': 17}: Cannot call "array.join" with argument "id"="values". An argument of "array<bool>" type was used but a "array<float>"  is expected.
 CE10122 {'line': 9, 'column': 31}: Cannot call "log.info" with argument "arg_1"="joined". An argument of "unknown" type was used but one from "series int/float/bool/string/array<int/float/bool/string>" is expected
+None None: Cannot call "{funId}" with argument "{argDisplayName}"="{argUserFriendlyRepresentation}". An argument of "{argumentType}" type was used but a "{currentTypeDocStr}" {typePostfix} is expected.

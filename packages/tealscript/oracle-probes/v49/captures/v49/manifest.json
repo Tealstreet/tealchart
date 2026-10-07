@@ -5,10 +5,71 @@
     "sourceSha256": "f1eac2d485925f7bc2ae6ca01c19688e18c79e119b3576462810e68dbe31c971",
     "instructionsPath": "instructions/qualifier-consumer-controls-v49-v1-instructions-v1.md",
     "outcome": "RUNS",
+    "attempt": "defaults-ui-export",
+    "symbol": "BINANCE:BTCUSDT",
+    "timeframe": "2",
+    "context": {
+      "timezone": "Etc/UTC",
+      "exchangeTimezone": "Etc/UTC",
+      "session": "24x7",
+      "accountTier": "pro_premium",
+      "realtimeCutoff": 1791351960,
+      "closedRows": 304,
+      "startupCovered": false,
+      "firstSourceIndex": 21469
+    },
+    "capturedAt": "2026-10-07T05:47:55.112Z",
+    "totalRows": 305,
+    "retainedRows": 305,
+    "artifacts": "captures/v49/qualifier-consumer-controls/defaults-ui-export",
+    "dataWindow": "captures/v49/qualifier-consumer-controls/defaults-ui-export/data-window.jpg",
+    "nativeCsv": "captures/v49/qualifier-consumer-controls/defaults-ui-export/chart-export.csv",
+    "artifactSha256": {
+      "chart-export.csv": "59c41ca0e88c3a5d94b2e08464e806c372d6671e26fbead63bc8adcf38184e51",
+      "chart-export.json": "ea91eaafbf8941129346189487cdd64048b158fedb9ceeaac8352d055cbeffe9",
+      "data-window.jpg": "4797df370b9ab717fdc268de6ca92bde04c5f8764a6bdbf68f6ee742aede15ad",
+      "data-window.txt": "4104504b932d9b707868a6db8b659839ab76175149daba2935a58c4c91a64747",
+      "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "4d216f3b3a6544315ebd9afe46c346e558803030201b64ce105cdc4c3b6ac7dc",
+      "plots.csv": "f12bdbaab84d5051d7b29ac8f75fa3c7b79900c0d74b7f20c969f4dbdaad8436",
+      "settings.jpg": "d5e92ab866eb344fbaf30ff72eb9270d7b11660a268479d138b8e75700dadb27"
+    },
+    "errors": [],
+    "logs": []
+  },
+  {
+    "probe": "qualifier-consumer-controls-v49-v1.pine",
+    "sourcePath": "qualifier-consumer-controls-v49-v1.pine",
+    "sourceSha256": "f1eac2d485925f7bc2ae6ca01c19688e18c79e119b3576462810e68dbe31c971",
+    "instructionsPath": "instructions/qualifier-consumer-controls-v49-v1-instructions-v1.md",
+    "outcome": "RUNS",
+    "attempt": "defaults",
+    "symbol": "BINANCE:BTCUSDT",
+    "timeframe": "2",
+    "context": {
+      "timezone": "Etc/UTC",
+      "exchangeTimezone": "Etc/UTC",
+      "session": null,
+      "accountTier": "pro_premium",
+      "realtimeCutoff": 1791349320,
+      "closedRows": 21751,
+      "startupCovered": true,
+      "firstSourceIndex": 0
+    },
     "capturedAt": "2026-10-07T05:02:42.283Z",
     "totalRows": 21752,
     "retainedRows": 21752,
     "artifacts": "captures/v49/qualifier-consumer-controls",
+    "dataWindow": null,
+    "nativeCsv": null,
+    "artifactSha256": {
+      "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "097c5312b3202045f5da3e7d82d6b3b09f1781099e2b907b12033ea02f542dd3",
+      "plots.csv": "c5598c56d579637856a2181a914102c9d75841965031cce3f4e9093256658843",
+      "settings.jpg": "1fe403d791917dea1dfd5de9cbd60d7f719be15cdf1916a8c100e0385bee042e"
+    },
     "errors": [],
     "logs": []
   },
@@ -18,10 +79,31 @@
     "sourceSha256": "26cbc2d0d3043a18f16295ef58dd5b8611c236bc9893d4561f75c37140dbb328",
     "instructionsPath": "instructions/match-const-active-v49-v1-instructions-v1.md",
     "outcome": "COMPILE_REFUSAL",
+    "attempt": "defaults",
+    "symbol": "BINANCE:BTCUSDT",
+    "timeframe": "2",
+    "context": {
+      "timezone": "Etc/UTC",
+      "exchangeTimezone": "Etc/UTC",
+      "session": null,
+      "accountTier": "pro_premium",
+      "realtimeCutoff": null,
+      "closedRows": null,
+      "startupCovered": null,
+      "firstSourceIndex": null
+    },
     "capturedAt": "2026-10-07T04:57:49.150Z",
     "totalRows": 0,
     "retainedRows": 0,
     "artifacts": "captures/v49/match-const-active",
+    "dataWindow": null,
+    "nativeCsv": null,
+    "artifactSha256": {
+      "diagnostic.jpg": "4a4db3a60ed391efea013169dcb479343eef74d042b3ff8c98c5d00d1c3b5002",
+      "diagnostics.txt": "f9f75b7884ce4713f795b2209009c46b8022bcf820eb3c110a3ea44c2a385401",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "1482a9021ed04074eab35e2404420e16a508280f9fd69689b8f23c7f8c3b570c"
+    },
     "errors": [
       {
         "start": {
@@ -38,6 +120,37 @@
         "scriptName": "Untitled script",
         "code": "CE10123",
         "time": "12:57:13 PM"
+      },
+      {
+        "phase": "runtime",
+        "code": null,
+        "start": null,
+        "text": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+        "nativeDescription": {
+          "error": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+          "editorError": {
+            "code": "CE10123",
+            "ctx": {
+              "argDisplayName": "active",
+              "argUserFriendlyRepresentation": "call \"operator ==\" (simple bool)",
+              "argumentType": "simple bool",
+              "currentTypeDocStr": "input bool",
+              "funId": "input.bool",
+              "typePostfix": ""
+            },
+            "end": {
+              "column": 60,
+              "line": 6
+            },
+            "message": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+            "start": {
+              "column": 48,
+              "line": 6
+            },
+            "id": "USER;64eb9fe01ecd4728859be8cb120fa590"
+          },
+          "title": "Compilation error"
+        }
       }
     ],
     "logs": []
@@ -48,10 +161,88 @@
     "sourceSha256": "d37cf36cf5981ece3dad49173d4d336bea14b75f54a2d1fc0b27a4593a7ae6f0",
     "instructionsPath": "instructions/match-const-simple-v49-v1-instructions-v1.md",
     "outcome": "RUNS",
+    "attempt": "defaults-ui-export",
+    "symbol": "BINANCE:BTCUSDT",
+    "timeframe": "2",
+    "context": {
+      "timezone": "Etc/UTC",
+      "exchangeTimezone": "Etc/UTC",
+      "session": "24x7",
+      "accountTier": "pro_premium",
+      "realtimeCutoff": 1791351960,
+      "closedRows": 304,
+      "startupCovered": false,
+      "firstSourceIndex": 21469
+    },
+    "capturedAt": "2026-10-07T05:47:06.103Z",
+    "totalRows": 305,
+    "retainedRows": 305,
+    "artifacts": "captures/v49/match-const-simple/defaults-ui-export",
+    "dataWindow": "captures/v49/match-const-simple/defaults-ui-export/data-window.jpg",
+    "nativeCsv": "captures/v49/match-const-simple/defaults-ui-export/chart-export.csv",
+    "artifactSha256": {
+      "chart-export.csv": "99b6b6e705b638808ce6427e60c5333a6e1acdc55e4f6f2bb27a489e62cf57a0",
+      "chart-export.json": "0bdad03c05cb2e2c66428fdd75660ee76f97ce5d143f6d537d6698d8448a1c0b",
+      "data-window.jpg": "4c61c262c69d0dbf9fc9365f73fb487097c64da5da63564c7f81ae494e57377d",
+      "data-window.txt": "d1111f09ec06ac785c671c8e17dddb3cbff4fedce6ba4927e46b55793830d096",
+      "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logs.txt": "bde3b90a62cd7c2f9904f7da97fead1fb6a2a077bcc360bdc6c343d4b967830f",
+      "native.json": "7f86616242905f8f3194320e487efdbbcb81386b71e11cb432fd2f2ba09660a2",
+      "plots.csv": "fdd8fc902742795da3cc53ca1bb5b1dfe09034dcacdb60e07da72d09053d0833",
+      "settings.jpg": "b6bd03b5e2936ecebdc1d501a1c8a8c6c6551d6ede2521e799632f3525007c90"
+    },
+    "errors": [],
+    "logs": [
+      {
+        "barTime": 1788739200000,
+        "time": 1788739200000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 12,
+            "column": 5
+          },
+          "end": {
+            "line": 12,
+            "column": 35
+          }
+        },
+        "message": "TARGET=[ab]"
+      }
+    ]
+  },
+  {
+    "probe": "match-const-simple-v49-v1.pine",
+    "sourcePath": "match-const-simple-v49-v1.pine",
+    "sourceSha256": "d37cf36cf5981ece3dad49173d4d336bea14b75f54a2d1fc0b27a4593a7ae6f0",
+    "instructionsPath": "instructions/match-const-simple-v49-v1-instructions-v1.md",
+    "outcome": "RUNS",
+    "attempt": "defaults",
+    "symbol": "BINANCE:BTCUSDT",
+    "timeframe": "2",
+    "context": {
+      "timezone": "Etc/UTC",
+      "exchangeTimezone": "Etc/UTC",
+      "session": null,
+      "accountTier": "pro_premium",
+      "realtimeCutoff": 1791349320,
+      "closedRows": 21751,
+      "startupCovered": true,
+      "firstSourceIndex": 0
+    },
     "capturedAt": "2026-10-07T05:03:15.279Z",
     "totalRows": 21752,
     "retainedRows": 21752,
     "artifacts": "captures/v49/match-const-simple",
+    "dataWindow": null,
+    "nativeCsv": null,
+    "artifactSha256": {
+      "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logs.txt": "bde3b90a62cd7c2f9904f7da97fead1fb6a2a077bcc360bdc6c343d4b967830f",
+      "native.json": "d9d1ffafeb42e749f88c349b76d60a7e200a89667eeea58d7bfe4cff444a10c5",
+      "plots.csv": "7a46f9778b3756c5e4e537196d99dbfc0570df5de85def0ca8a56dfe7990cb7a",
+      "settings.jpg": "2952e62f8671bcc391747a8e026fca6d0a0e576c92deaa257830234c68a5ebd6"
+    },
     "errors": [],
     "logs": [
       {
@@ -78,10 +269,31 @@
     "sourceSha256": "d0376e89ec561b5bc29006b16181fccf9a6e8ed7c9851b707fccee88d83256f2",
     "instructionsPath": "instructions/match-input-source-active-v49-v1-instructions-v1.md",
     "outcome": "COMPILE_REFUSAL",
+    "attempt": "defaults",
+    "symbol": "BINANCE:BTCUSDT",
+    "timeframe": "2",
+    "context": {
+      "timezone": "Etc/UTC",
+      "exchangeTimezone": "Etc/UTC",
+      "session": null,
+      "accountTier": "pro_premium",
+      "realtimeCutoff": null,
+      "closedRows": null,
+      "startupCovered": null,
+      "firstSourceIndex": null
+    },
     "capturedAt": "2026-10-07T04:59:29.096Z",
     "totalRows": 0,
     "retainedRows": 0,
     "artifacts": "captures/v49/match-input-source-active",
+    "dataWindow": null,
+    "nativeCsv": null,
+    "artifactSha256": {
+      "diagnostic.jpg": "4b3b7e264b5922d5523c3cee9fed8a7e24bd40fcf389c6372077403eb46db6df",
+      "diagnostics.txt": "f9f75b7884ce4713f795b2209009c46b8022bcf820eb3c110a3ea44c2a385401",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "7368baab3c8b99a45eea66857899dfb64e8dcb2ab8c68a59ec6e3087fb5e80cd"
+    },
     "errors": [
       {
         "start": {
@@ -98,6 +310,37 @@
         "scriptName": "Untitled script",
         "code": "CE10123",
         "time": "12:59:28 PM"
+      },
+      {
+        "phase": "runtime",
+        "code": null,
+        "start": null,
+        "text": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+        "nativeDescription": {
+          "error": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+          "editorError": {
+            "code": "CE10123",
+            "ctx": {
+              "argDisplayName": "active",
+              "argUserFriendlyRepresentation": "call \"operator ==\" (simple bool)",
+              "argumentType": "simple bool",
+              "currentTypeDocStr": "input bool",
+              "funId": "input.bool",
+              "typePostfix": ""
+            },
+            "end": {
+              "column": 60,
+              "line": 6
+            },
+            "message": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+            "start": {
+              "column": 48,
+              "line": 6
+            },
+            "id": "USER;64eb9fe01ecd4728859be8cb120fa590"
+          },
+          "title": "Compilation error"
+        }
       }
     ],
     "logs": []
@@ -108,10 +351,88 @@
     "sourceSha256": "caeca0d038ed0daf55c6300c3bbf8195c37e1a9a9ff02c671c75e2dbf2af168e",
     "instructionsPath": "instructions/match-input-source-simple-v49-v1-instructions-v1.md",
     "outcome": "RUNS",
+    "attempt": "defaults-ui-export",
+    "symbol": "BINANCE:BTCUSDT",
+    "timeframe": "2",
+    "context": {
+      "timezone": "Etc/UTC",
+      "exchangeTimezone": "Etc/UTC",
+      "session": "24x7",
+      "accountTier": "pro_premium",
+      "realtimeCutoff": 1791351960,
+      "closedRows": 304,
+      "startupCovered": false,
+      "firstSourceIndex": 21469
+    },
+    "capturedAt": "2026-10-07T05:47:43.146Z",
+    "totalRows": 305,
+    "retainedRows": 305,
+    "artifacts": "captures/v49/match-input-source-simple/defaults-ui-export",
+    "dataWindow": "captures/v49/match-input-source-simple/defaults-ui-export/data-window.jpg",
+    "nativeCsv": "captures/v49/match-input-source-simple/defaults-ui-export/chart-export.csv",
+    "artifactSha256": {
+      "chart-export.csv": "0e9d56290af39758f1e3c3d21a4517d10a9c43ca56c2866f36a1781108fd9ad7",
+      "chart-export.json": "e8be3afd5f2200a76cd9939b6cacbf50874897b0b3a94406c4579f162e3814cc",
+      "data-window.jpg": "b9eb9566505f1176a48f5cc97ce9f54e2c02be06b50e1f9a8bc23a63fc8a6e9e",
+      "data-window.txt": "18ef1dc2d9e4af99a699da16af1c5d3fd714f46358dd5f6b6f01a636110feb45",
+      "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logs.txt": "bde3b90a62cd7c2f9904f7da97fead1fb6a2a077bcc360bdc6c343d4b967830f",
+      "native.json": "a4735f3c0c99934b0e3a83131dd7941d906ecf7c477cd5326db1a10f4d6f2fb8",
+      "plots.csv": "3633aef5e73a7a211152029564aabc86fb43ee50c82069a5294763754dc4b568",
+      "settings.jpg": "52ea6d7556c357ab837097af355d5514ba1bd84867bd389abae696e49f078e7f"
+    },
+    "errors": [],
+    "logs": [
+      {
+        "barTime": 1788739200000,
+        "time": 1788739200000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 12,
+            "column": 5
+          },
+          "end": {
+            "line": 12,
+            "column": 35
+          }
+        },
+        "message": "TARGET=[ab]"
+      }
+    ]
+  },
+  {
+    "probe": "match-input-source-simple-v49-v1.pine",
+    "sourcePath": "match-input-source-simple-v49-v1.pine",
+    "sourceSha256": "caeca0d038ed0daf55c6300c3bbf8195c37e1a9a9ff02c671c75e2dbf2af168e",
+    "instructionsPath": "instructions/match-input-source-simple-v49-v1-instructions-v1.md",
+    "outcome": "RUNS",
+    "attempt": "defaults",
+    "symbol": "BINANCE:BTCUSDT",
+    "timeframe": "2",
+    "context": {
+      "timezone": "Etc/UTC",
+      "exchangeTimezone": "Etc/UTC",
+      "session": null,
+      "accountTier": "pro_premium",
+      "realtimeCutoff": 1791349320,
+      "closedRows": 21751,
+      "startupCovered": true,
+      "firstSourceIndex": 0
+    },
     "capturedAt": "2026-10-07T05:02:56.131Z",
     "totalRows": 21752,
     "retainedRows": 21752,
     "artifacts": "captures/v49/match-input-source-simple",
+    "dataWindow": null,
+    "nativeCsv": null,
+    "artifactSha256": {
+      "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logs.txt": "bde3b90a62cd7c2f9904f7da97fead1fb6a2a077bcc360bdc6c343d4b967830f",
+      "native.json": "ab4ae6293a88ea1bf6819feb70f7e4eb051d1e8e9050f90c1d5247af4293e3c6",
+      "plots.csv": "31659597d1ca8026b7159ea0dbcb34804d8e63dd9fa94964cb5fa52f1e3657f0",
+      "settings.jpg": "6531838052618def758515b3aa228bf69d4aa99aff34c3832a83437849fda399"
+    },
     "errors": [],
     "logs": [
       {
@@ -138,10 +459,31 @@
     "sourceSha256": "829115ac4ae11dc390bce04821019307e582136dda6fa61623349a402ed9056b",
     "instructionsPath": "instructions/match-input-regex-active-v49-v1-instructions-v1.md",
     "outcome": "COMPILE_REFUSAL",
+    "attempt": "defaults",
+    "symbol": "BINANCE:BTCUSDT",
+    "timeframe": "2",
+    "context": {
+      "timezone": "Etc/UTC",
+      "exchangeTimezone": "Etc/UTC",
+      "session": null,
+      "accountTier": "pro_premium",
+      "realtimeCutoff": null,
+      "closedRows": null,
+      "startupCovered": null,
+      "firstSourceIndex": null
+    },
     "capturedAt": "2026-10-07T04:59:35.336Z",
     "totalRows": 0,
     "retainedRows": 0,
     "artifacts": "captures/v49/match-input-regex-active",
+    "dataWindow": null,
+    "nativeCsv": null,
+    "artifactSha256": {
+      "diagnostic.jpg": "4eaf5de5e1bcf362263ef1dddb9af7fb59053f495669bffb6875c2a35381ca1d",
+      "diagnostics.txt": "f9f75b7884ce4713f795b2209009c46b8022bcf820eb3c110a3ea44c2a385401",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "42b3dbf16e95e8029beba254b034b0a059e24cd2f2825af5bf36e97b2b7280d6"
+    },
     "errors": [
       {
         "start": {
@@ -158,6 +500,37 @@
         "scriptName": "Untitled script",
         "code": "CE10123",
         "time": "12:59:34 PM"
+      },
+      {
+        "phase": "runtime",
+        "code": null,
+        "start": null,
+        "text": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+        "nativeDescription": {
+          "error": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+          "editorError": {
+            "code": "CE10123",
+            "ctx": {
+              "argDisplayName": "active",
+              "argUserFriendlyRepresentation": "call \"operator ==\" (simple bool)",
+              "argumentType": "simple bool",
+              "currentTypeDocStr": "input bool",
+              "funId": "input.bool",
+              "typePostfix": ""
+            },
+            "end": {
+              "column": 60,
+              "line": 6
+            },
+            "message": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+            "start": {
+              "column": 48,
+              "line": 6
+            },
+            "id": "USER;64eb9fe01ecd4728859be8cb120fa590"
+          },
+          "title": "Compilation error"
+        }
       }
     ],
     "logs": []
@@ -168,10 +541,88 @@
     "sourceSha256": "2f8229d67c4345dc499374227d3f0588a4dae058dd512b801d40688052bdb200",
     "instructionsPath": "instructions/match-input-regex-simple-v49-v1-instructions-v1.md",
     "outcome": "RUNS",
+    "attempt": "defaults-ui-export",
+    "symbol": "BINANCE:BTCUSDT",
+    "timeframe": "2",
+    "context": {
+      "timezone": "Etc/UTC",
+      "exchangeTimezone": "Etc/UTC",
+      "session": "24x7",
+      "accountTier": "pro_premium",
+      "realtimeCutoff": 1791351960,
+      "closedRows": 304,
+      "startupCovered": false,
+      "firstSourceIndex": 21469
+    },
+    "capturedAt": "2026-10-07T05:47:36.371Z",
+    "totalRows": 305,
+    "retainedRows": 305,
+    "artifacts": "captures/v49/match-input-regex-simple/defaults-ui-export",
+    "dataWindow": "captures/v49/match-input-regex-simple/defaults-ui-export/data-window.jpg",
+    "nativeCsv": "captures/v49/match-input-regex-simple/defaults-ui-export/chart-export.csv",
+    "artifactSha256": {
+      "chart-export.csv": "6a0dbbd73dd56f139571027c7d1d33ab0636950c9b660d51a4703163b7625883",
+      "chart-export.json": "6d288725bb10ff8b11a831c82f7d10b593f2e2fca32074cea636704f2176fb11",
+      "data-window.jpg": "095c9e94c27dc81b22cae2b92f3ed2d7b76150c038a1d84d9afe08272cad9b8a",
+      "data-window.txt": "4c2e7f0189a5e6d23dbbec2f94180cdfed3ff4d32385c7db196b1ccfa47740e1",
+      "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logs.txt": "bde3b90a62cd7c2f9904f7da97fead1fb6a2a077bcc360bdc6c343d4b967830f",
+      "native.json": "c48ccc026a6a3b27c6ad5d61c7126f996dfc9595a7a9a4ceea848f43c810ad99",
+      "plots.csv": "5e88237c709ae0145384d7fd9dbf2a97a5dd23cf5d179f3439e9e02b391025b0",
+      "settings.jpg": "e3aee724139d06141cbba95c38650d5a0955754d83d1cbe072d9ed5cfa9990ff"
+    },
+    "errors": [],
+    "logs": [
+      {
+        "barTime": 1788739200000,
+        "time": 1788739200000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 12,
+            "column": 5
+          },
+          "end": {
+            "line": 12,
+            "column": 35
+          }
+        },
+        "message": "TARGET=[ab]"
+      }
+    ]
+  },
+  {
+    "probe": "match-input-regex-simple-v49-v1.pine",
+    "sourcePath": "match-input-regex-simple-v49-v1.pine",
+    "sourceSha256": "2f8229d67c4345dc499374227d3f0588a4dae058dd512b801d40688052bdb200",
+    "instructionsPath": "instructions/match-input-regex-simple-v49-v1-instructions-v1.md",
+    "outcome": "RUNS",
+    "attempt": "defaults",
+    "symbol": "BINANCE:BTCUSDT",
+    "timeframe": "2",
+    "context": {
+      "timezone": "Etc/UTC",
+      "exchangeTimezone": "Etc/UTC",
+      "session": null,
+      "accountTier": "pro_premium",
+      "realtimeCutoff": 1791349320,
+      "closedRows": 21751,
+      "startupCovered": true,
+      "firstSourceIndex": 0
+    },
     "capturedAt": "2026-10-07T05:03:18.951Z",
     "totalRows": 21752,
     "retainedRows": 21752,
     "artifacts": "captures/v49/match-input-regex-simple",
+    "dataWindow": null,
+    "nativeCsv": null,
+    "artifactSha256": {
+      "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logs.txt": "bde3b90a62cd7c2f9904f7da97fead1fb6a2a077bcc360bdc6c343d4b967830f",
+      "native.json": "67e1e3d16990ac7e08aa0f5012c53b0310590586668991305fb873f8e885c9e0",
+      "plots.csv": "9d9bdb5dc7a393f02133126785df80e6ce2e2326615d6709ddf7951151c63053",
+      "settings.jpg": "57a5c7288bdb6cb9b416b55f5383739482a8c4a7b159934d8ff14bcabba33e94"
+    },
     "errors": [],
     "logs": [
       {
@@ -198,10 +649,31 @@
     "sourceSha256": "b1a69ae2b2565d7d8967c7f1043af0341de4932ea2a23d8f176d6e1001090af7",
     "instructionsPath": "instructions/format-time-const-active-v49-v1-instructions-v1.md",
     "outcome": "COMPILE_REFUSAL",
+    "attempt": "defaults",
+    "symbol": "BINANCE:BTCUSDT",
+    "timeframe": "2",
+    "context": {
+      "timezone": "Etc/UTC",
+      "exchangeTimezone": "Etc/UTC",
+      "session": null,
+      "accountTier": "pro_premium",
+      "realtimeCutoff": null,
+      "closedRows": null,
+      "startupCovered": null,
+      "firstSourceIndex": null
+    },
     "capturedAt": "2026-10-07T04:59:41.293Z",
     "totalRows": 0,
     "retainedRows": 0,
     "artifacts": "captures/v49/format-time-const-active",
+    "dataWindow": null,
+    "nativeCsv": null,
+    "artifactSha256": {
+      "diagnostic.jpg": "6d9b77128df95920d37d8140394d48c622a32ee0ec2ea33350085a44e30b5003",
+      "diagnostics.txt": "98843f45a7c1db1b020d20dd6c96af5f69ba5641888d896d5ebebdf307cdbb2b",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "09e4bfe71db6ae3e5978f6beafba6bddd3addd37376a0ffba87182e61ae8bd20"
+    },
     "errors": [
       {
         "start": {
@@ -218,6 +690,37 @@
         "scriptName": "Untitled script",
         "code": "CE10123",
         "time": "12:59:40 PM"
+      },
+      {
+        "phase": "runtime",
+        "code": null,
+        "start": null,
+        "text": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+        "nativeDescription": {
+          "error": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+          "editorError": {
+            "code": "CE10123",
+            "ctx": {
+              "argDisplayName": "active",
+              "argUserFriendlyRepresentation": "call \"operator ==\" (series bool)",
+              "argumentType": "series bool",
+              "currentTypeDocStr": "input bool",
+              "funId": "input.bool",
+              "typePostfix": ""
+            },
+            "end": {
+              "column": 62,
+              "line": 6
+            },
+            "message": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+            "start": {
+              "column": 48,
+              "line": 6
+            },
+            "id": "USER;64eb9fe01ecd4728859be8cb120fa590"
+          },
+          "title": "Compilation error"
+        }
       }
     ],
     "logs": []
@@ -228,10 +731,31 @@
     "sourceSha256": "41bd5d9561dc52d3ced84268fadbceeb729fb1f4ea2fe614cb85c05159f2b3e8",
     "instructionsPath": "instructions/format-time-input-time-active-v49-v1-instructions-v1.md",
     "outcome": "COMPILE_REFUSAL",
+    "attempt": "defaults",
+    "symbol": "BINANCE:BTCUSDT",
+    "timeframe": "2",
+    "context": {
+      "timezone": "Etc/UTC",
+      "exchangeTimezone": "Etc/UTC",
+      "session": null,
+      "accountTier": "pro_premium",
+      "realtimeCutoff": null,
+      "closedRows": null,
+      "startupCovered": null,
+      "firstSourceIndex": null
+    },
     "capturedAt": "2026-10-07T04:59:43.880Z",
     "totalRows": 0,
     "retainedRows": 0,
     "artifacts": "captures/v49/format-time-input-time-active",
+    "dataWindow": null,
+    "nativeCsv": null,
+    "artifactSha256": {
+      "diagnostic.jpg": "f1d9e832cacb5a2c36761f90c8f33a0929659469294c5a138515ab9c856b7f8f",
+      "diagnostics.txt": "98843f45a7c1db1b020d20dd6c96af5f69ba5641888d896d5ebebdf307cdbb2b",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "4290fa2c6bfb9f9f7ea0bccbbae142f522990a659a8ee497bef5925237322940"
+    },
     "errors": [
       {
         "start": {
@@ -248,6 +772,37 @@
         "scriptName": "Untitled script",
         "code": "CE10123",
         "time": "12:59:43 PM"
+      },
+      {
+        "phase": "runtime",
+        "code": null,
+        "start": null,
+        "text": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+        "nativeDescription": {
+          "error": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+          "editorError": {
+            "code": "CE10123",
+            "ctx": {
+              "argDisplayName": "active",
+              "argUserFriendlyRepresentation": "call \"operator ==\" (series bool)",
+              "argumentType": "series bool",
+              "currentTypeDocStr": "input bool",
+              "funId": "input.bool",
+              "typePostfix": ""
+            },
+            "end": {
+              "column": 62,
+              "line": 6
+            },
+            "message": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+            "start": {
+              "column": 48,
+              "line": 6
+            },
+            "id": "USER;64eb9fe01ecd4728859be8cb120fa590"
+          },
+          "title": "Compilation error"
+        }
       }
     ],
     "logs": []
@@ -258,10 +813,31 @@
     "sourceSha256": "d556fc627d832ef6d2228568340dfc1664a72413589e6247d80eeb3536c150a9",
     "instructionsPath": "instructions/format-time-input-format-active-v49-v1-instructions-v1.md",
     "outcome": "COMPILE_REFUSAL",
+    "attempt": "defaults",
+    "symbol": "BINANCE:BTCUSDT",
+    "timeframe": "2",
+    "context": {
+      "timezone": "Etc/UTC",
+      "exchangeTimezone": "Etc/UTC",
+      "session": null,
+      "accountTier": "pro_premium",
+      "realtimeCutoff": null,
+      "closedRows": null,
+      "startupCovered": null,
+      "firstSourceIndex": null
+    },
     "capturedAt": "2026-10-07T05:00:02.329Z",
     "totalRows": 0,
     "retainedRows": 0,
     "artifacts": "captures/v49/format-time-input-format-active",
+    "dataWindow": null,
+    "nativeCsv": null,
+    "artifactSha256": {
+      "diagnostic.jpg": "af19d8e3f1a3130b3d7a3b8e5eeb1aebb3cb6d4fe04ad388292e5b0d95f53b07",
+      "diagnostics.txt": "98843f45a7c1db1b020d20dd6c96af5f69ba5641888d896d5ebebdf307cdbb2b",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "dfbd5a59ff1bc2dc98d57b6efb380f72a13219426b2a4e491b44721ccae1c655"
+    },
     "errors": [
       {
         "start": {
@@ -278,6 +854,37 @@
         "scriptName": "Untitled script",
         "code": "CE10123",
         "time": "1:00:01 PM"
+      },
+      {
+        "phase": "runtime",
+        "code": null,
+        "start": null,
+        "text": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+        "nativeDescription": {
+          "error": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+          "editorError": {
+            "code": "CE10123",
+            "ctx": {
+              "argDisplayName": "active",
+              "argUserFriendlyRepresentation": "call \"operator ==\" (series bool)",
+              "argumentType": "series bool",
+              "currentTypeDocStr": "input bool",
+              "funId": "input.bool",
+              "typePostfix": ""
+            },
+            "end": {
+              "column": 62,
+              "line": 6
+            },
+            "message": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+            "start": {
+              "column": 48,
+              "line": 6
+            },
+            "id": "USER;64eb9fe01ecd4728859be8cb120fa590"
+          },
+          "title": "Compilation error"
+        }
       }
     ],
     "logs": []
@@ -288,10 +895,71 @@
     "sourceSha256": "3aacdfc72c43a3fd2225e7d768d02be52e96865a9cbc7adf99107404a0b06651",
     "instructionsPath": "instructions/length-input-simple-v49-v1-instructions-v1.md",
     "outcome": "RUNS",
+    "attempt": "defaults-ui-export",
+    "symbol": "BINANCE:BTCUSDT",
+    "timeframe": "2",
+    "context": {
+      "timezone": "Etc/UTC",
+      "exchangeTimezone": "Etc/UTC",
+      "session": "24x7",
+      "accountTier": "pro_premium",
+      "realtimeCutoff": 1791351960,
+      "closedRows": 304,
+      "startupCovered": false,
+      "firstSourceIndex": 21469
+    },
+    "capturedAt": "2026-10-07T05:46:59.451Z",
+    "totalRows": 305,
+    "retainedRows": 305,
+    "artifacts": "captures/v49/length-input-simple/defaults-ui-export",
+    "dataWindow": "captures/v49/length-input-simple/defaults-ui-export/data-window.jpg",
+    "nativeCsv": "captures/v49/length-input-simple/defaults-ui-export/chart-export.csv",
+    "artifactSha256": {
+      "chart-export.csv": "001f60a436746d18b137888a3d92ac5038f23508333fe71035eb7947bd6e7d52",
+      "chart-export.json": "2ad8b05273774bfb900110fefd91b0fd34832ec512bc68fdcd1eebb3eff4802d",
+      "data-window.jpg": "9a687f098a1d9b413b56f2e68c27f970a0d6f4a146e4277f87ef21baf2117ffe",
+      "data-window.txt": "e1a133aa41c47069921e9f209fd7fc60e31ea6d7a69058cc45c33aa07e06dc99",
+      "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "b6a75a7721b3629bb737450eae5e2c2020afb5c2b89ca47c8294603ab3d431bb",
+      "plots.csv": "014e8c7818d897f9a1344f23af43faa1e9444c57d409fbb50d6ee011c26cdc3f",
+      "settings.jpg": "e75a2b112c156bfec55e6c361f8410db1150c77e228d3314afcab845c21d453b"
+    },
+    "errors": [],
+    "logs": []
+  },
+  {
+    "probe": "length-input-simple-v49-v1.pine",
+    "sourcePath": "length-input-simple-v49-v1.pine",
+    "sourceSha256": "3aacdfc72c43a3fd2225e7d768d02be52e96865a9cbc7adf99107404a0b06651",
+    "instructionsPath": "instructions/length-input-simple-v49-v1-instructions-v1.md",
+    "outcome": "RUNS",
+    "attempt": "defaults",
+    "symbol": "BINANCE:BTCUSDT",
+    "timeframe": "2",
+    "context": {
+      "timezone": "Etc/UTC",
+      "exchangeTimezone": "Etc/UTC",
+      "session": null,
+      "accountTier": "pro_premium",
+      "realtimeCutoff": 1791349320,
+      "closedRows": 21751,
+      "startupCovered": true,
+      "firstSourceIndex": 0
+    },
     "capturedAt": "2026-10-07T05:03:02.193Z",
     "totalRows": 21752,
     "retainedRows": 21752,
     "artifacts": "captures/v49/length-input-simple",
+    "dataWindow": null,
+    "nativeCsv": null,
+    "artifactSha256": {
+      "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "c2e8b7107455ef89c07d56014484fdbd8dc509538053868187fcd4839007b3f8",
+      "plots.csv": "8b06e72d58bc0a44b7f6175f9ffa720ddf03d88cb07c4dab024ce2af1817944b",
+      "settings.jpg": "40628261efc7b47c76408009e23c2048d9c69fb8ace9a724211d4c1dbeca6ea7"
+    },
     "errors": [],
     "logs": []
   },
@@ -301,10 +969,71 @@
     "sourceSha256": "9c84a32bf3b0230693ea6193d0d9e701fa80c11f8ba3378563851b5ce2303d7e",
     "instructionsPath": "instructions/pos-input-simple-v49-v1-instructions-v1.md",
     "outcome": "RUNS",
+    "attempt": "defaults-ui-export",
+    "symbol": "BINANCE:BTCUSDT",
+    "timeframe": "2",
+    "context": {
+      "timezone": "Etc/UTC",
+      "exchangeTimezone": "Etc/UTC",
+      "session": "24x7",
+      "accountTier": "pro_premium",
+      "realtimeCutoff": 1791351960,
+      "closedRows": 304,
+      "startupCovered": false,
+      "firstSourceIndex": 21469
+    },
+    "capturedAt": "2026-10-07T05:47:49.243Z",
+    "totalRows": 305,
+    "retainedRows": 305,
+    "artifacts": "captures/v49/pos-input-simple/defaults-ui-export",
+    "dataWindow": "captures/v49/pos-input-simple/defaults-ui-export/data-window.jpg",
+    "nativeCsv": "captures/v49/pos-input-simple/defaults-ui-export/chart-export.csv",
+    "artifactSha256": {
+      "chart-export.csv": "deadc366944284e68bae96eaca5a12bcb0c313af37df5305009590c94dca5be6",
+      "chart-export.json": "8baf714bbf0c4fc7fc6aa213855d2c86f4911c250f7c95883ac5e171c7c5221e",
+      "data-window.jpg": "64cf59953300ddafbc9a857f2aba7e755d94704083095fb143504cd537811c94",
+      "data-window.txt": "3671f205fc9079db90fcd3395e3608128efd42c3c401ce5338901e5920b7dce7",
+      "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "b6c032a99684aa7183babf70ea8a7dad051a358b4cc010591ea57f42853ca4b1",
+      "plots.csv": "a228d06b68c1859c6919e1fbd16edd5333caf36d27de7e6a0e1eb1a238098b1a",
+      "settings.jpg": "2fefef61e0f69f600a63c33b70f034bb17fde7af8bea7540a40d8280d7f8129f"
+    },
+    "errors": [],
+    "logs": []
+  },
+  {
+    "probe": "pos-input-simple-v49-v1.pine",
+    "sourcePath": "pos-input-simple-v49-v1.pine",
+    "sourceSha256": "9c84a32bf3b0230693ea6193d0d9e701fa80c11f8ba3378563851b5ce2303d7e",
+    "instructionsPath": "instructions/pos-input-simple-v49-v1-instructions-v1.md",
+    "outcome": "RUNS",
+    "attempt": "defaults",
+    "symbol": "BINANCE:BTCUSDT",
+    "timeframe": "2",
+    "context": {
+      "timezone": "Etc/UTC",
+      "exchangeTimezone": "Etc/UTC",
+      "session": null,
+      "accountTier": "pro_premium",
+      "realtimeCutoff": 1791349320,
+      "closedRows": 21751,
+      "startupCovered": true,
+      "firstSourceIndex": 0
+    },
     "capturedAt": "2026-10-07T05:02:39.355Z",
     "totalRows": 21752,
     "retainedRows": 21752,
     "artifacts": "captures/v49/pos-input-simple",
+    "dataWindow": null,
+    "nativeCsv": null,
+    "artifactSha256": {
+      "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "3c50224bc04dc979b72422509d6edc0e8b48fa6908a5da293a2a053b6d0a2ba5",
+      "plots.csv": "b3e12dab5e048a535c29b0e6c013c1db0aa946e30f1e278d533d1e888c2ee449",
+      "settings.jpg": "f33a05584cb7af5b01380f6cde6783eda16889281f998c57711ab9443b636180"
+    },
     "errors": [],
     "logs": []
   },
@@ -314,10 +1043,31 @@
     "sourceSha256": "cf2b9f658c6ddb9b04664013c34dce1a98416806ea09e49d9a2be31ecb5b0f28",
     "instructionsPath": "instructions/contains-input-source-active-v49-v1-instructions-v1.md",
     "outcome": "COMPILE_REFUSAL",
+    "attempt": "defaults",
+    "symbol": "BINANCE:BTCUSDT",
+    "timeframe": "2",
+    "context": {
+      "timezone": "Etc/UTC",
+      "exchangeTimezone": "Etc/UTC",
+      "session": null,
+      "accountTier": "pro_premium",
+      "realtimeCutoff": null,
+      "closedRows": null,
+      "startupCovered": null,
+      "firstSourceIndex": null
+    },
     "capturedAt": "2026-10-07T05:00:11.712Z",
     "totalRows": 0,
     "retainedRows": 0,
     "artifacts": "captures/v49/contains-input-source-active",
+    "dataWindow": null,
+    "nativeCsv": null,
+    "artifactSha256": {
+      "diagnostic.jpg": "5f9d5374fa1802f184f9d6d963048aae320eba61a4af80ca2230b1b2242c750b",
+      "diagnostics.txt": "81d67965f15a220e7b23bd9850f03aa21ef0089c26870e7b5ac8fb0127dc04be",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "8fa3d9ea9b5a62f835d916aa64d6d44adfc218a5a6d97887046bcce583220a40"
+    },
     "errors": [
       {
         "start": {
@@ -334,6 +1084,37 @@
         "scriptName": "Untitled script",
         "code": "CE10123",
         "time": "1:00:11 PM"
+      },
+      {
+        "phase": "runtime",
+        "code": null,
+        "start": null,
+        "text": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+        "nativeDescription": {
+          "error": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+          "editorError": {
+            "code": "CE10123",
+            "ctx": {
+              "argDisplayName": "active",
+              "argUserFriendlyRepresentation": "value",
+              "argumentType": "simple bool",
+              "currentTypeDocStr": "input bool",
+              "funId": "input.bool",
+              "typePostfix": ""
+            },
+            "end": {
+              "column": 52,
+              "line": 6
+            },
+            "message": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+            "start": {
+              "column": 48,
+              "line": 6
+            },
+            "id": "USER;64eb9fe01ecd4728859be8cb120fa590"
+          },
+          "title": "Compilation error"
+        }
       }
     ],
     "logs": []
@@ -344,10 +1125,71 @@
     "sourceSha256": "6243f736940160b1fb6994dffede7f1b999ff5528b62cbdc62e29217be53da68",
     "instructionsPath": "instructions/contains-input-source-simple-v49-v1-instructions-v1.md",
     "outcome": "RUNS",
+    "attempt": "defaults-ui-export",
+    "symbol": "BINANCE:BTCUSDT",
+    "timeframe": "2",
+    "context": {
+      "timezone": "Etc/UTC",
+      "exchangeTimezone": "Etc/UTC",
+      "session": "24x7",
+      "accountTier": "pro_premium",
+      "realtimeCutoff": 1791351960,
+      "closedRows": 304,
+      "startupCovered": false,
+      "firstSourceIndex": 21469
+    },
+    "capturedAt": "2026-10-07T05:46:40.937Z",
+    "totalRows": 305,
+    "retainedRows": 305,
+    "artifacts": "captures/v49/contains-input-source-simple/defaults-ui-export",
+    "dataWindow": "captures/v49/contains-input-source-simple/defaults-ui-export/data-window.jpg",
+    "nativeCsv": "captures/v49/contains-input-source-simple/defaults-ui-export/chart-export.csv",
+    "artifactSha256": {
+      "chart-export.csv": "d1ff25dd365c32317346f9c38277bde2d94a67a1cecd5846717566ebf86911bd",
+      "chart-export.json": "6ab73e81e2452d4e8b1a4348243c0afaebda1956f77481b662cafb9b2c870495",
+      "data-window.jpg": "ed6afbbc9014740ed48a986231a7f77f1473d3dea06aad60e1da80afb82a9f33",
+      "data-window.txt": "1f88a9bffda565746775723ae92e675a2c573152c9933d660f99ba3ea5ce24eb",
+      "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "475cac7d532f63ebddad3c043154c8b722e078fa450568d5ff0f882ea8ab1d29",
+      "plots.csv": "53c7b7be2df51c73432f5cff7e74869073250b8858ecb1f1253ac11f6ae1fc41",
+      "settings.jpg": "6da38c6ab45815eb70c11b11a13fc40c72bfb52bc331b35a33a57e3482772fc5"
+    },
+    "errors": [],
+    "logs": []
+  },
+  {
+    "probe": "contains-input-source-simple-v49-v1.pine",
+    "sourcePath": "contains-input-source-simple-v49-v1.pine",
+    "sourceSha256": "6243f736940160b1fb6994dffede7f1b999ff5528b62cbdc62e29217be53da68",
+    "instructionsPath": "instructions/contains-input-source-simple-v49-v1-instructions-v1.md",
+    "outcome": "RUNS",
+    "attempt": "defaults",
+    "symbol": "BINANCE:BTCUSDT",
+    "timeframe": "2",
+    "context": {
+      "timezone": "Etc/UTC",
+      "exchangeTimezone": "Etc/UTC",
+      "session": null,
+      "accountTier": "pro_premium",
+      "realtimeCutoff": 1791349320,
+      "closedRows": 21751,
+      "startupCovered": true,
+      "firstSourceIndex": 0
+    },
     "capturedAt": "2026-10-07T05:02:45.402Z",
     "totalRows": 21752,
     "retainedRows": 21752,
     "artifacts": "captures/v49/contains-input-source-simple",
+    "dataWindow": null,
+    "nativeCsv": null,
+    "artifactSha256": {
+      "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "076c01a4c004fd90c85af7fa7311c9aedb75607cd656998db39e5c067513039d",
+      "plots.csv": "d8fa2d9b969948e3032234b06c32cb957dab136f77ef2e7410d96fc0ec595a8c",
+      "settings.jpg": "37ad1ebade2941d425ff1a499eacc35c6c52b301630b92948c6c67f1bd92e0f6"
+    },
     "errors": [],
     "logs": []
   },
@@ -357,10 +1199,31 @@
     "sourceSha256": "80389f84d87a952eec11495ef3eed90591bd37ca8ed3c59a99df08e5677b1f81",
     "instructionsPath": "instructions/contains-input-pattern-active-v49-v1-instructions-v1.md",
     "outcome": "COMPILE_REFUSAL",
+    "attempt": "defaults",
+    "symbol": "BINANCE:BTCUSDT",
+    "timeframe": "2",
+    "context": {
+      "timezone": "Etc/UTC",
+      "exchangeTimezone": "Etc/UTC",
+      "session": null,
+      "accountTier": "pro_premium",
+      "realtimeCutoff": null,
+      "closedRows": null,
+      "startupCovered": null,
+      "firstSourceIndex": null
+    },
     "capturedAt": "2026-10-07T05:00:17.260Z",
     "totalRows": 0,
     "retainedRows": 0,
     "artifacts": "captures/v49/contains-input-pattern-active",
+    "dataWindow": null,
+    "nativeCsv": null,
+    "artifactSha256": {
+      "diagnostic.jpg": "80bce1f2aa41773c4360375136a6a06dcdb23f87758e7e6937b66d4ed6c18934",
+      "diagnostics.txt": "81d67965f15a220e7b23bd9850f03aa21ef0089c26870e7b5ac8fb0127dc04be",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "ae49fc817a01c83b4ed8614d8314ba5f4c48f7016a5811b41f2f339e3418074f"
+    },
     "errors": [
       {
         "start": {
@@ -377,6 +1240,37 @@
         "scriptName": "Untitled script",
         "code": "CE10123",
         "time": "1:00:16 PM"
+      },
+      {
+        "phase": "runtime",
+        "code": null,
+        "start": null,
+        "text": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+        "nativeDescription": {
+          "error": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+          "editorError": {
+            "code": "CE10123",
+            "ctx": {
+              "argDisplayName": "active",
+              "argUserFriendlyRepresentation": "value",
+              "argumentType": "simple bool",
+              "currentTypeDocStr": "input bool",
+              "funId": "input.bool",
+              "typePostfix": ""
+            },
+            "end": {
+              "column": 52,
+              "line": 6
+            },
+            "message": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+            "start": {
+              "column": 48,
+              "line": 6
+            },
+            "id": "USER;64eb9fe01ecd4728859be8cb120fa590"
+          },
+          "title": "Compilation error"
+        }
       }
     ],
     "logs": []
@@ -387,10 +1281,71 @@
     "sourceSha256": "252f1e6edf08cd6e2c7097c9fa6f3d17f4de135d9db754138917a7467155be4c",
     "instructionsPath": "instructions/contains-input-pattern-simple-v49-v1-instructions-v1.md",
     "outcome": "RUNS",
+    "attempt": "defaults-ui-export",
+    "symbol": "BINANCE:BTCUSDT",
+    "timeframe": "2",
+    "context": {
+      "timezone": "Etc/UTC",
+      "exchangeTimezone": "Etc/UTC",
+      "session": "24x7",
+      "accountTier": "pro_premium",
+      "realtimeCutoff": 1791351960,
+      "closedRows": 304,
+      "startupCovered": false,
+      "firstSourceIndex": 21469
+    },
+    "capturedAt": "2026-10-07T05:46:34.622Z",
+    "totalRows": 305,
+    "retainedRows": 305,
+    "artifacts": "captures/v49/contains-input-pattern-simple/defaults-ui-export",
+    "dataWindow": "captures/v49/contains-input-pattern-simple/defaults-ui-export/data-window.jpg",
+    "nativeCsv": "captures/v49/contains-input-pattern-simple/defaults-ui-export/chart-export.csv",
+    "artifactSha256": {
+      "chart-export.csv": "b9d189d21d9ed86b3d23f3d2b9d91935efd4ae4c84248b16e0fe3d0a9c1926b9",
+      "chart-export.json": "f819aea8ff997718053f7644c4ca641efcb4d44dec7a28967a5e3300406d4d42",
+      "data-window.jpg": "f452e8636d93d7332cc8581ceb4c96597eb6552459df5e262e7907401948f662",
+      "data-window.txt": "fcfd75a8f5ce5d02e9681e03af707d6a429cf7688b4db093ee9c9f088c95589e",
+      "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "ab36c3050a683e1fdc0e6554a7f8fed1bd31fa5bd5a94100fa5d50e0fb9d7d09",
+      "plots.csv": "9d54c1a44fdad0f467893e9f087e3ff8d4c47e981274fc2585c137533a99cc59",
+      "settings.jpg": "5399bd4a89106953dd516c006922775775d5d876d9f6eb329e51ade3743269f2"
+    },
+    "errors": [],
+    "logs": []
+  },
+  {
+    "probe": "contains-input-pattern-simple-v49-v1.pine",
+    "sourcePath": "contains-input-pattern-simple-v49-v1.pine",
+    "sourceSha256": "252f1e6edf08cd6e2c7097c9fa6f3d17f4de135d9db754138917a7467155be4c",
+    "instructionsPath": "instructions/contains-input-pattern-simple-v49-v1-instructions-v1.md",
+    "outcome": "RUNS",
+    "attempt": "defaults",
+    "symbol": "BINANCE:BTCUSDT",
+    "timeframe": "2",
+    "context": {
+      "timezone": "Etc/UTC",
+      "exchangeTimezone": "Etc/UTC",
+      "session": null,
+      "accountTier": "pro_premium",
+      "realtimeCutoff": 1791349320,
+      "closedRows": 21751,
+      "startupCovered": true,
+      "firstSourceIndex": 0
+    },
     "capturedAt": "2026-10-07T05:02:59.188Z",
     "totalRows": 21752,
     "retainedRows": 21752,
     "artifacts": "captures/v49/contains-input-pattern-simple",
+    "dataWindow": null,
+    "nativeCsv": null,
+    "artifactSha256": {
+      "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "05d20432ee9354c35a4f1af52ca11595333250bb97c4f216b508dbf6391e3277",
+      "plots.csv": "a15bf298fbb47db2cbf2eabbe3aff4d0c356274914bdb113bebbcaee3e49cf3d",
+      "settings.jpg": "cf97744a20a15a771cf6e7245da7383c351ed371beb22bb197387e155c944b0f"
+    },
     "errors": [],
     "logs": []
   },
@@ -400,10 +1355,31 @@
     "sourceSha256": "396f990ca8c820f9bda67a682fa77edbecbc98d130a086572257a6dd33ce40f9",
     "instructionsPath": "instructions/startswith-input-source-active-v49-v1-instructions-v1.md",
     "outcome": "COMPILE_REFUSAL",
+    "attempt": "defaults",
+    "symbol": "BINANCE:BTCUSDT",
+    "timeframe": "2",
+    "context": {
+      "timezone": "Etc/UTC",
+      "exchangeTimezone": "Etc/UTC",
+      "session": null,
+      "accountTier": "pro_premium",
+      "realtimeCutoff": null,
+      "closedRows": null,
+      "startupCovered": null,
+      "firstSourceIndex": null
+    },
     "capturedAt": "2026-10-07T05:00:53.107Z",
     "totalRows": 0,
     "retainedRows": 0,
     "artifacts": "captures/v49/startswith-input-source-active",
+    "dataWindow": null,
+    "nativeCsv": null,
+    "artifactSha256": {
+      "diagnostic.jpg": "1a85311602e78f2d125041e13508e64395da6550d72383cce10aacd90630860c",
+      "diagnostics.txt": "81d67965f15a220e7b23bd9850f03aa21ef0089c26870e7b5ac8fb0127dc04be",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "dbddd5d62c7fa94cfadfe5759a09b57bc341512fa905ef49734896e61e4d919b"
+    },
     "errors": [
       {
         "start": {
@@ -420,6 +1396,37 @@
         "scriptName": "Untitled script",
         "code": "CE10123",
         "time": "1:00:52 PM"
+      },
+      {
+        "phase": "runtime",
+        "code": null,
+        "start": null,
+        "text": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+        "nativeDescription": {
+          "error": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+          "editorError": {
+            "code": "CE10123",
+            "ctx": {
+              "argDisplayName": "active",
+              "argUserFriendlyRepresentation": "value",
+              "argumentType": "simple bool",
+              "currentTypeDocStr": "input bool",
+              "funId": "input.bool",
+              "typePostfix": ""
+            },
+            "end": {
+              "column": 52,
+              "line": 6
+            },
+            "message": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+            "start": {
+              "column": 48,
+              "line": 6
+            },
+            "id": "USER;64eb9fe01ecd4728859be8cb120fa590"
+          },
+          "title": "Compilation error"
+        }
       }
     ],
     "logs": []
@@ -430,10 +1437,71 @@
     "sourceSha256": "0321d599e8a73ad262ca05ce4bb423f2deadbcd6c51e7aeb92cfec5b5ed2b863",
     "instructionsPath": "instructions/startswith-input-source-simple-v49-v1-instructions-v1.md",
     "outcome": "RUNS",
+    "attempt": "defaults-ui-export",
+    "symbol": "BINANCE:BTCUSDT",
+    "timeframe": "2",
+    "context": {
+      "timezone": "Etc/UTC",
+      "exchangeTimezone": "Etc/UTC",
+      "session": "24x7",
+      "accountTier": "pro_premium",
+      "realtimeCutoff": 1791352080,
+      "closedRows": 305,
+      "startupCovered": false,
+      "firstSourceIndex": 21469
+    },
+    "capturedAt": "2026-10-07T05:48:07.695Z",
+    "totalRows": 306,
+    "retainedRows": 306,
+    "artifacts": "captures/v49/startswith-input-source-simple/defaults-ui-export",
+    "dataWindow": "captures/v49/startswith-input-source-simple/defaults-ui-export/data-window.jpg",
+    "nativeCsv": "captures/v49/startswith-input-source-simple/defaults-ui-export/chart-export.csv",
+    "artifactSha256": {
+      "chart-export.csv": "77d79856300f1b33f9c874ec2488cc21761bfd1e282d4512854892b0617650c1",
+      "chart-export.json": "5e331fa9d277e5878644ac9eedcdfef0a9c7e866d4a681a868be1355328dfc92",
+      "data-window.jpg": "f60e74a822e96d162ee1700837b15d8b8b0d86dcbea8f8f7db3a7afb21264db5",
+      "data-window.txt": "0fa06dc1384fa162861c70b4aae97c21a83a71ad893a97068684647084bcef29",
+      "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "0fb780d3e6fffbf51bae26d16ca637a76c0b286369e4c9217f45498c65dfb5b6",
+      "plots.csv": "9ba71693e3ce61b867016f437a0484587a17850ef2ee03c840a0d51a09e0a590",
+      "settings.jpg": "cd94f7cb4ee0582bc39f29885b1ad9129399860c5858ef7f35585f5eab187ade"
+    },
+    "errors": [],
+    "logs": []
+  },
+  {
+    "probe": "startswith-input-source-simple-v49-v1.pine",
+    "sourcePath": "startswith-input-source-simple-v49-v1.pine",
+    "sourceSha256": "0321d599e8a73ad262ca05ce4bb423f2deadbcd6c51e7aeb92cfec5b5ed2b863",
+    "instructionsPath": "instructions/startswith-input-source-simple-v49-v1-instructions-v1.md",
+    "outcome": "RUNS",
+    "attempt": "defaults",
+    "symbol": "BINANCE:BTCUSDT",
+    "timeframe": "2",
+    "context": {
+      "timezone": "Etc/UTC",
+      "exchangeTimezone": "Etc/UTC",
+      "session": null,
+      "accountTier": "pro_premium",
+      "realtimeCutoff": 1791349320,
+      "closedRows": 21751,
+      "startupCovered": true,
+      "firstSourceIndex": 0
+    },
     "capturedAt": "2026-10-07T05:02:36.400Z",
     "totalRows": 21752,
     "retainedRows": 21752,
     "artifacts": "captures/v49/startswith-input-source-simple",
+    "dataWindow": null,
+    "nativeCsv": null,
+    "artifactSha256": {
+      "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "42bacb17700f627a57783c3f2fecb1f09fe792e117be461896df178c8e3567a0",
+      "plots.csv": "e3048a8d00f3e71793ee39de84b07670628dbc4a0dfab95509b37f6eac595148",
+      "settings.jpg": "27e6d333717316eca217ad11a2c38266fa8e3d5b9c4c330c87c2483bcab2bc8f"
+    },
     "errors": [],
     "logs": []
   },
@@ -443,10 +1511,31 @@
     "sourceSha256": "71198d9ba3b97f4e55c6435b8a4c033eae8ed42c62861a5f30a1174ecf98ee16",
     "instructionsPath": "instructions/startswith-input-pattern-active-v49-v1-instructions-v1.md",
     "outcome": "COMPILE_REFUSAL",
+    "attempt": "defaults",
+    "symbol": "BINANCE:BTCUSDT",
+    "timeframe": "2",
+    "context": {
+      "timezone": "Etc/UTC",
+      "exchangeTimezone": "Etc/UTC",
+      "session": null,
+      "accountTier": "pro_premium",
+      "realtimeCutoff": null,
+      "closedRows": null,
+      "startupCovered": null,
+      "firstSourceIndex": null
+    },
     "capturedAt": "2026-10-07T05:00:58.724Z",
     "totalRows": 0,
     "retainedRows": 0,
     "artifacts": "captures/v49/startswith-input-pattern-active",
+    "dataWindow": null,
+    "nativeCsv": null,
+    "artifactSha256": {
+      "diagnostic.jpg": "e92dc267b878f8246f0be352df6eef461b5c66090bdbfc1a607f66f934eb4851",
+      "diagnostics.txt": "81d67965f15a220e7b23bd9850f03aa21ef0089c26870e7b5ac8fb0127dc04be",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "5871600243d5b690d8c89d0cb2fba5565230d69db179fbeef6d8ef5531d286b1"
+    },
     "errors": [
       {
         "start": {
@@ -463,6 +1552,37 @@
         "scriptName": "Untitled script",
         "code": "CE10123",
         "time": "1:00:57 PM"
+      },
+      {
+        "phase": "runtime",
+        "code": null,
+        "start": null,
+        "text": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+        "nativeDescription": {
+          "error": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+          "editorError": {
+            "code": "CE10123",
+            "ctx": {
+              "argDisplayName": "active",
+              "argUserFriendlyRepresentation": "value",
+              "argumentType": "simple bool",
+              "currentTypeDocStr": "input bool",
+              "funId": "input.bool",
+              "typePostfix": ""
+            },
+            "end": {
+              "column": 52,
+              "line": 6
+            },
+            "message": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+            "start": {
+              "column": 48,
+              "line": 6
+            },
+            "id": "USER;64eb9fe01ecd4728859be8cb120fa590"
+          },
+          "title": "Compilation error"
+        }
       }
     ],
     "logs": []
@@ -473,10 +1593,71 @@
     "sourceSha256": "18abb40f5071bb4c26d28018924df26d75e84970d17d1965c4991a3c66712e87",
     "instructionsPath": "instructions/startswith-input-pattern-simple-v49-v1-instructions-v1.md",
     "outcome": "RUNS",
+    "attempt": "defaults-ui-export",
+    "symbol": "BINANCE:BTCUSDT",
+    "timeframe": "2",
+    "context": {
+      "timezone": "Etc/UTC",
+      "exchangeTimezone": "Etc/UTC",
+      "session": "24x7",
+      "accountTier": "pro_premium",
+      "realtimeCutoff": 1791352080,
+      "closedRows": 305,
+      "startupCovered": false,
+      "firstSourceIndex": 21469
+    },
+    "capturedAt": "2026-10-07T05:48:01.399Z",
+    "totalRows": 306,
+    "retainedRows": 306,
+    "artifacts": "captures/v49/startswith-input-pattern-simple/defaults-ui-export",
+    "dataWindow": "captures/v49/startswith-input-pattern-simple/defaults-ui-export/data-window.jpg",
+    "nativeCsv": "captures/v49/startswith-input-pattern-simple/defaults-ui-export/chart-export.csv",
+    "artifactSha256": {
+      "chart-export.csv": "1788815478bb8d2c479d790e36b9e0ef075cbe398aa157d42474be6f6947380d",
+      "chart-export.json": "2dd184d6e5ff659f0db4efc4745345517c31d645420d6190920093b441709001",
+      "data-window.jpg": "042c2f1a501d731beca06d6ef8939896041bdd7769cb3476794c098f07e9a5b3",
+      "data-window.txt": "05f63fdbba94ed9fc5c0d133b5f541c22b53f789044fb06b5063df691987433d",
+      "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "1b08165993b56e50177874122e1e69b3a7b8ef99d7e90f6a0c6a6b0121ae108d",
+      "plots.csv": "cc80565bb842aea0bb8a54c7eeee624269d4dfc7c1a534fe83277a65be4241d7",
+      "settings.jpg": "8ff223ec70e9cd39a35cce2f3a1214cc1d4cc8ba38b4fc2ae8a31246d84d1152"
+    },
+    "errors": [],
+    "logs": []
+  },
+  {
+    "probe": "startswith-input-pattern-simple-v49-v1.pine",
+    "sourcePath": "startswith-input-pattern-simple-v49-v1.pine",
+    "sourceSha256": "18abb40f5071bb4c26d28018924df26d75e84970d17d1965c4991a3c66712e87",
+    "instructionsPath": "instructions/startswith-input-pattern-simple-v49-v1-instructions-v1.md",
+    "outcome": "RUNS",
+    "attempt": "defaults",
+    "symbol": "BINANCE:BTCUSDT",
+    "timeframe": "2",
+    "context": {
+      "timezone": "Etc/UTC",
+      "exchangeTimezone": "Etc/UTC",
+      "session": null,
+      "accountTier": "pro_premium",
+      "realtimeCutoff": 1791349320,
+      "closedRows": 21751,
+      "startupCovered": true,
+      "firstSourceIndex": 0
+    },
     "capturedAt": "2026-10-07T05:03:05.271Z",
     "totalRows": 21752,
     "retainedRows": 21752,
     "artifacts": "captures/v49/startswith-input-pattern-simple",
+    "dataWindow": null,
+    "nativeCsv": null,
+    "artifactSha256": {
+      "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "88aba91f3ad7d0ed38cfcace3b16baa091230d9f9a78351c65cf7090d3383318",
+      "plots.csv": "bc8b6abe69720b826683ae23ea7a5b5c118be6f6b716bc5b4556a2eee2f190e4",
+      "settings.jpg": "302dccec7ca52eb8a8517dc31f7e2bee50c14bd649ecf4750458c79037e6ec88"
+    },
     "errors": [],
     "logs": []
   },
@@ -486,10 +1667,31 @@
     "sourceSha256": "b6996db83c0031c424ecec6f84242527ce7eef339fcbb6276aa2c7befce85d49",
     "instructionsPath": "instructions/endswith-input-source-active-v49-v1-instructions-v1.md",
     "outcome": "COMPILE_REFUSAL",
+    "attempt": "defaults",
+    "symbol": "BINANCE:BTCUSDT",
+    "timeframe": "2",
+    "context": {
+      "timezone": "Etc/UTC",
+      "exchangeTimezone": "Etc/UTC",
+      "session": null,
+      "accountTier": "pro_premium",
+      "realtimeCutoff": null,
+      "closedRows": null,
+      "startupCovered": null,
+      "firstSourceIndex": null
+    },
     "capturedAt": "2026-10-07T05:01:04.155Z",
     "totalRows": 0,
     "retainedRows": 0,
     "artifacts": "captures/v49/endswith-input-source-active",
+    "dataWindow": null,
+    "nativeCsv": null,
+    "artifactSha256": {
+      "diagnostic.jpg": "6ddd89b05be125f669dac3b2b53bb90539670780f77be38e2ae7e8c1891c0a37",
+      "diagnostics.txt": "81d67965f15a220e7b23bd9850f03aa21ef0089c26870e7b5ac8fb0127dc04be",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "0ef016a6715b21c343db95363a0663661c23c68df944908522ca31cd09b7254a"
+    },
     "errors": [
       {
         "start": {
@@ -506,6 +1708,37 @@
         "scriptName": "Untitled script",
         "code": "CE10123",
         "time": "1:01:03 PM"
+      },
+      {
+        "phase": "runtime",
+        "code": null,
+        "start": null,
+        "text": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+        "nativeDescription": {
+          "error": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+          "editorError": {
+            "code": "CE10123",
+            "ctx": {
+              "argDisplayName": "active",
+              "argUserFriendlyRepresentation": "value",
+              "argumentType": "simple bool",
+              "currentTypeDocStr": "input bool",
+              "funId": "input.bool",
+              "typePostfix": ""
+            },
+            "end": {
+              "column": 52,
+              "line": 6
+            },
+            "message": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+            "start": {
+              "column": 48,
+              "line": 6
+            },
+            "id": "USER;64eb9fe01ecd4728859be8cb120fa590"
+          },
+          "title": "Compilation error"
+        }
       }
     ],
     "logs": []
@@ -516,10 +1749,71 @@
     "sourceSha256": "67854b028f5d278c67d2a5351298b942f9d38df632f49723eb7eb7a3e330b7f6",
     "instructionsPath": "instructions/endswith-input-source-simple-v49-v1-instructions-v1.md",
     "outcome": "RUNS",
+    "attempt": "defaults-ui-export",
+    "symbol": "BINANCE:BTCUSDT",
+    "timeframe": "2",
+    "context": {
+      "timezone": "Etc/UTC",
+      "exchangeTimezone": "Etc/UTC",
+      "session": "24x7",
+      "accountTier": "pro_premium",
+      "realtimeCutoff": 1791351960,
+      "closedRows": 304,
+      "startupCovered": false,
+      "firstSourceIndex": 21469
+    },
+    "capturedAt": "2026-10-07T05:46:52.689Z",
+    "totalRows": 305,
+    "retainedRows": 305,
+    "artifacts": "captures/v49/endswith-input-source-simple/defaults-ui-export",
+    "dataWindow": "captures/v49/endswith-input-source-simple/defaults-ui-export/data-window.jpg",
+    "nativeCsv": "captures/v49/endswith-input-source-simple/defaults-ui-export/chart-export.csv",
+    "artifactSha256": {
+      "chart-export.csv": "d39cf1d9304a8b23f69a3ec6f9eb57456d09651eb57dd19924a0a46b9b8645da",
+      "chart-export.json": "124a6daf288f099303daa66df6e2af62d03e3f23277f8ce8cf14a6c453b0a1d8",
+      "data-window.jpg": "517c874590b5f4f57d6a943a08972464db11995e691c47a70d9e475254997d18",
+      "data-window.txt": "ad2df1e191fb31121db8b6e6b3d20ffbc577a9f567df11113197d0632d22eb58",
+      "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "f74e6f48b76463f873a460ae749f0a9305ac9e1b57c0a471d4fa8f4f1e11778b",
+      "plots.csv": "cd17a1a7fd0cbbde3f0d18a465c0f7e93396655333ba04610c2bfae2ead8f013",
+      "settings.jpg": "3ad2c4e92488fb9208dda54e3d726b1f8cdf667a9fe0d7cad1495737ec4d7c55"
+    },
+    "errors": [],
+    "logs": []
+  },
+  {
+    "probe": "endswith-input-source-simple-v49-v1.pine",
+    "sourcePath": "endswith-input-source-simple-v49-v1.pine",
+    "sourceSha256": "67854b028f5d278c67d2a5351298b942f9d38df632f49723eb7eb7a3e330b7f6",
+    "instructionsPath": "instructions/endswith-input-source-simple-v49-v1-instructions-v1.md",
+    "outcome": "RUNS",
+    "attempt": "defaults",
+    "symbol": "BINANCE:BTCUSDT",
+    "timeframe": "2",
+    "context": {
+      "timezone": "Etc/UTC",
+      "exchangeTimezone": "Etc/UTC",
+      "session": null,
+      "accountTier": "pro_premium",
+      "realtimeCutoff": 1791349320,
+      "closedRows": 21751,
+      "startupCovered": true,
+      "firstSourceIndex": 0
+    },
     "capturedAt": "2026-10-07T05:03:11.395Z",
     "totalRows": 21752,
     "retainedRows": 21752,
     "artifacts": "captures/v49/endswith-input-source-simple",
+    "dataWindow": null,
+    "nativeCsv": null,
+    "artifactSha256": {
+      "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "2b8f7db7c90e7064ac319e7a945c5a5f835e36c6cee602a0661ec1131092243e",
+      "plots.csv": "d3ad92823af009214c73115b6c562202dc8faf283a61d2588cd7caa7e94269e5",
+      "settings.jpg": "37809bc1eaaabb5b4722d0f4e9595200ef142329d23d9d60ec5a611f359e9880"
+    },
     "errors": [],
     "logs": []
   },
@@ -529,10 +1823,31 @@
     "sourceSha256": "6ed9c50c11057389d70bc4a9e48699124c0787e72d9f191ba5f0f8dce5b33742",
     "instructionsPath": "instructions/endswith-input-pattern-active-v49-v1-instructions-v1.md",
     "outcome": "COMPILE_REFUSAL",
+    "attempt": "defaults",
+    "symbol": "BINANCE:BTCUSDT",
+    "timeframe": "2",
+    "context": {
+      "timezone": "Etc/UTC",
+      "exchangeTimezone": "Etc/UTC",
+      "session": null,
+      "accountTier": "pro_premium",
+      "realtimeCutoff": null,
+      "closedRows": null,
+      "startupCovered": null,
+      "firstSourceIndex": null
+    },
     "capturedAt": "2026-10-07T05:01:18.953Z",
     "totalRows": 0,
     "retainedRows": 0,
     "artifacts": "captures/v49/endswith-input-pattern-active",
+    "dataWindow": null,
+    "nativeCsv": null,
+    "artifactSha256": {
+      "diagnostic.jpg": "4cd4cc1abe4d8a3a25d25c98e9cd6a76ec1df8949be33235d085149598b80441",
+      "diagnostics.txt": "81d67965f15a220e7b23bd9850f03aa21ef0089c26870e7b5ac8fb0127dc04be",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "2ddc7bd73d3e61a07cc70014a75698a89ad1ba9f9ac47de17ec0a6f3dc717565"
+    },
     "errors": [
       {
         "start": {
@@ -549,6 +1864,37 @@
         "scriptName": "Untitled script",
         "code": "CE10123",
         "time": "1:01:18 PM"
+      },
+      {
+        "phase": "runtime",
+        "code": null,
+        "start": null,
+        "text": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+        "nativeDescription": {
+          "error": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+          "editorError": {
+            "code": "CE10123",
+            "ctx": {
+              "argDisplayName": "active",
+              "argUserFriendlyRepresentation": "value",
+              "argumentType": "simple bool",
+              "currentTypeDocStr": "input bool",
+              "funId": "input.bool",
+              "typePostfix": ""
+            },
+            "end": {
+              "column": 52,
+              "line": 6
+            },
+            "message": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+            "start": {
+              "column": 48,
+              "line": 6
+            },
+            "id": "USER;64eb9fe01ecd4728859be8cb120fa590"
+          },
+          "title": "Compilation error"
+        }
       }
     ],
     "logs": []
@@ -559,10 +1905,71 @@
     "sourceSha256": "340c7329cf4ed92ec87ad16841e5aae1aa907f85e7dfc34d17f70b857124e5e3",
     "instructionsPath": "instructions/endswith-input-pattern-simple-v49-v1-instructions-v1.md",
     "outcome": "RUNS",
+    "attempt": "defaults-ui-export",
+    "symbol": "BINANCE:BTCUSDT",
+    "timeframe": "2",
+    "context": {
+      "timezone": "Etc/UTC",
+      "exchangeTimezone": "Etc/UTC",
+      "session": "24x7",
+      "accountTier": "pro_premium",
+      "realtimeCutoff": 1791351960,
+      "closedRows": 304,
+      "startupCovered": false,
+      "firstSourceIndex": 21469
+    },
+    "capturedAt": "2026-10-07T05:46:46.672Z",
+    "totalRows": 305,
+    "retainedRows": 305,
+    "artifacts": "captures/v49/endswith-input-pattern-simple/defaults-ui-export",
+    "dataWindow": "captures/v49/endswith-input-pattern-simple/defaults-ui-export/data-window.jpg",
+    "nativeCsv": "captures/v49/endswith-input-pattern-simple/defaults-ui-export/chart-export.csv",
+    "artifactSha256": {
+      "chart-export.csv": "d39cf1d9304a8b23f69a3ec6f9eb57456d09651eb57dd19924a0a46b9b8645da",
+      "chart-export.json": "50eea7cc1ff9d5bc72116c7c013fccbfebf349936bafa7203969875d3ee89213",
+      "data-window.jpg": "cf8dc38e6294782a1143772e7b1b78d3ec33f68c4b3a8577479f0d0ec4c81346",
+      "data-window.txt": "d46b849afc353cd595acdf3b194a2d27c4a651badb970e3796abbbf7dd3a1e36",
+      "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "fa8f1d8ac539f2e0bb43c39a1ce59a57dfbd95d544acfe735d43f8930928cc46",
+      "plots.csv": "cd17a1a7fd0cbbde3f0d18a465c0f7e93396655333ba04610c2bfae2ead8f013",
+      "settings.jpg": "4b688e36085f8c22a31f854b281b7641014762ffe6859a8fa3e302273e632251"
+    },
+    "errors": [],
+    "logs": []
+  },
+  {
+    "probe": "endswith-input-pattern-simple-v49-v1.pine",
+    "sourcePath": "endswith-input-pattern-simple-v49-v1.pine",
+    "sourceSha256": "340c7329cf4ed92ec87ad16841e5aae1aa907f85e7dfc34d17f70b857124e5e3",
+    "instructionsPath": "instructions/endswith-input-pattern-simple-v49-v1-instructions-v1.md",
+    "outcome": "RUNS",
+    "attempt": "defaults",
+    "symbol": "BINANCE:BTCUSDT",
+    "timeframe": "2",
+    "context": {
+      "timezone": "Etc/UTC",
+      "exchangeTimezone": "Etc/UTC",
+      "session": null,
+      "accountTier": "pro_premium",
+      "realtimeCutoff": 1791349320,
+      "closedRows": 21751,
+      "startupCovered": true,
+      "firstSourceIndex": 0
+    },
     "capturedAt": "2026-10-07T05:03:08.365Z",
     "totalRows": 21752,
     "retainedRows": 21752,
     "artifacts": "captures/v49/endswith-input-pattern-simple",
+    "dataWindow": null,
+    "nativeCsv": null,
+    "artifactSha256": {
+      "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "3a8f172ff7ae19a4641a34350ed4436dfc3f50f832fb81e385d954251509122a",
+      "plots.csv": "a7fab746d61a8265288028095ea5477ef473199dc39025adcaa2a3779d9c839d",
+      "settings.jpg": "d209a3dc7f6d1830facdc4221800b55bfb9c892124e5651d963d1d764263a4e7"
+    },
     "errors": [],
     "logs": []
   },
@@ -572,10 +1979,31 @@
     "sourceSha256": "62486bf12e9099c9c1bc08a465249f57742834ecce914fc8a757ddb9bed89715",
     "instructionsPath": "instructions/match-const-title-v49-v1-instructions-v2.md",
     "outcome": "COMPILE_REFUSAL",
+    "attempt": "defaults",
+    "symbol": "BINANCE:BTCUSDT",
+    "timeframe": "2",
+    "context": {
+      "timezone": "Etc/UTC",
+      "exchangeTimezone": "Etc/UTC",
+      "session": null,
+      "accountTier": "pro_premium",
+      "realtimeCutoff": null,
+      "closedRows": null,
+      "startupCovered": null,
+      "firstSourceIndex": null
+    },
     "capturedAt": "2026-10-07T05:01:25.585Z",
     "totalRows": 0,
     "retainedRows": 0,
     "artifacts": "captures/v49/match-const-title",
+    "dataWindow": null,
+    "nativeCsv": null,
+    "artifactSha256": {
+      "diagnostic.jpg": "0109ab3a13e3518be051b3eac4a8ccf3853e2efb6aa2b5c23029101f6edcd7f2",
+      "diagnostics.txt": "d17c099bbb9a50b7177449053b5160951736296246fb4dc12783b65ecfa37293",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "7c4f6216785c42c057fcde2cb2a408d8531dd8782ad807d70d73a15f21c701f7"
+    },
     "errors": [
       {
         "start": {
@@ -592,6 +2020,37 @@
         "scriptName": "Untitled script",
         "code": "CE10123",
         "time": "1:01:24 PM"
+      },
+      {
+        "phase": "runtime",
+        "code": null,
+        "start": null,
+        "text": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+        "nativeDescription": {
+          "error": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+          "editorError": {
+            "code": "CE10123",
+            "ctx": {
+              "argDisplayName": "title",
+              "argUserFriendlyRepresentation": "value",
+              "argumentType": "simple string",
+              "currentTypeDocStr": "const string",
+              "funId": "plot",
+              "typePostfix": ""
+            },
+            "end": {
+              "column": 23,
+              "line": 4
+            },
+            "message": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+            "start": {
+              "column": 19,
+              "line": 4
+            },
+            "id": "USER;64eb9fe01ecd4728859be8cb120fa590"
+          },
+          "title": "Compilation error"
+        }
       }
     ],
     "logs": []
@@ -602,10 +2061,31 @@
     "sourceSha256": "a33acb5734c06c1598128824dbaa517a6550d7e9a6293c70cb0f286cea656463",
     "instructionsPath": "instructions/format-time-const-title-v49-v1-instructions-v2.md",
     "outcome": "COMPILE_REFUSAL",
+    "attempt": "defaults",
+    "symbol": "BINANCE:BTCUSDT",
+    "timeframe": "2",
+    "context": {
+      "timezone": "Etc/UTC",
+      "exchangeTimezone": "Etc/UTC",
+      "session": null,
+      "accountTier": "pro_premium",
+      "realtimeCutoff": null,
+      "closedRows": null,
+      "startupCovered": null,
+      "firstSourceIndex": null
+    },
     "capturedAt": "2026-10-07T05:01:27.965Z",
     "totalRows": 0,
     "retainedRows": 0,
     "artifacts": "captures/v49/format-time-const-title",
+    "dataWindow": null,
+    "nativeCsv": null,
+    "artifactSha256": {
+      "diagnostic.jpg": "7515eccba768a2e03ad5bfffc50dd4eb88dbc5eb48565d998daf5013cf41290e",
+      "diagnostics.txt": "5d42ea23000aed3ae630e9033b2d86e615290827b44144e8b480a00434a95d62",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "9c11bb678de056f140346038c5459797332abc9c38b7709a321c9db5405b5027"
+    },
     "errors": [
       {
         "start": {
@@ -622,6 +2102,37 @@
         "scriptName": "Untitled script",
         "code": "CE10123",
         "time": "1:01:27 PM"
+      },
+      {
+        "phase": "runtime",
+        "code": null,
+        "start": null,
+        "text": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+        "nativeDescription": {
+          "error": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+          "editorError": {
+            "code": "CE10123",
+            "ctx": {
+              "argDisplayName": "title",
+              "argUserFriendlyRepresentation": "value",
+              "argumentType": "series string",
+              "currentTypeDocStr": "const string",
+              "funId": "plot",
+              "typePostfix": ""
+            },
+            "end": {
+              "column": 23,
+              "line": 4
+            },
+            "message": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+            "start": {
+              "column": 19,
+              "line": 4
+            },
+            "id": "USER;64eb9fe01ecd4728859be8cb120fa590"
+          },
+          "title": "Compilation error"
+        }
       }
     ],
     "logs": []
@@ -632,10 +2143,31 @@
     "sourceSha256": "dfd09b0282f302010f2feb0db794557be0dfb51f119c53593c6bf540d3a3f067",
     "instructionsPath": "instructions/format-time-const-simple-v49-v1-instructions-v2.md",
     "outcome": "COMPILE_REFUSAL",
+    "attempt": "defaults",
+    "symbol": "BINANCE:BTCUSDT",
+    "timeframe": "2",
+    "context": {
+      "timezone": "Etc/UTC",
+      "exchangeTimezone": "Etc/UTC",
+      "session": null,
+      "accountTier": "pro_premium",
+      "realtimeCutoff": null,
+      "closedRows": null,
+      "startupCovered": null,
+      "firstSourceIndex": null
+    },
     "capturedAt": "2026-10-07T05:01:30.170Z",
     "totalRows": 0,
     "retainedRows": 0,
     "artifacts": "captures/v49/format-time-const-simple",
+    "dataWindow": null,
+    "nativeCsv": null,
+    "artifactSha256": {
+      "diagnostic.jpg": "05e8dca6dad13fa513bb9bc4a05fa1900bd3a19d2034ded58df7532d2ebaebc8",
+      "diagnostics.txt": "021da26cdfe59ece61150a1a201990df991530f75680d0e26eb1d3121bbc5523",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "25a5369eb26c3ff57cd5a7c3513c94310732959d39004d8ddc6dd00824c8a937"
+    },
     "errors": [
       {
         "start": {
@@ -652,6 +2184,37 @@
         "scriptName": "Untitled script",
         "code": "CE10123",
         "time": "1:01:29 PM"
+      },
+      {
+        "phase": "runtime",
+        "code": null,
+        "start": null,
+        "text": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+        "nativeDescription": {
+          "error": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+          "editorError": {
+            "code": "CE10123",
+            "ctx": {
+              "argDisplayName": "sampleText",
+              "argUserFriendlyRepresentation": "value",
+              "argumentType": "series string",
+              "currentTypeDocStr": "simple string",
+              "funId": "consume",
+              "typePostfix": ""
+            },
+            "end": {
+              "column": 18,
+              "line": 5
+            },
+            "message": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+            "start": {
+              "column": 14,
+              "line": 5
+            },
+            "id": "USER;64eb9fe01ecd4728859be8cb120fa590"
+          },
+          "title": "Compilation error"
+        }
       }
     ],
     "logs": []
@@ -662,10 +2225,31 @@
     "sourceSha256": "da24ada1af113701a5b571f53a83ab5042a840ef34bf237f8b8cf30537b2d6ff",
     "instructionsPath": "instructions/length-input-width-v49-v1-instructions-v2.md",
     "outcome": "COMPILE_REFUSAL",
+    "attempt": "defaults",
+    "symbol": "BINANCE:BTCUSDT",
+    "timeframe": "2",
+    "context": {
+      "timezone": "Etc/UTC",
+      "exchangeTimezone": "Etc/UTC",
+      "session": null,
+      "accountTier": "pro_premium",
+      "realtimeCutoff": null,
+      "closedRows": null,
+      "startupCovered": null,
+      "firstSourceIndex": null
+    },
     "capturedAt": "2026-10-07T05:01:32.733Z",
     "totalRows": 0,
     "retainedRows": 0,
     "artifacts": "captures/v49/length-input-width",
+    "dataWindow": null,
+    "nativeCsv": null,
+    "artifactSha256": {
+      "diagnostic.jpg": "9ac88a1b561f2c007435d653e065e305477ccdc05db2f2ae9eb2d78facfe17ff",
+      "diagnostics.txt": "53d91b665f002bc2195f1ecfc364187085d7fac77655e0daf82255be6f017ef0",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "ff06acd1fd04f81a56215936f4c0aac9535fef3143e68d4099d35fe1645663e1"
+    },
     "errors": [
       {
         "start": {
@@ -682,6 +2266,37 @@
         "scriptName": "Untitled script",
         "code": "CE10123",
         "time": "1:01:31 PM"
+      },
+      {
+        "phase": "runtime",
+        "code": null,
+        "start": null,
+        "text": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+        "nativeDescription": {
+          "error": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+          "editorError": {
+            "code": "CE10123",
+            "ctx": {
+              "argDisplayName": "linewidth",
+              "argUserFriendlyRepresentation": "value",
+              "argumentType": "simple int",
+              "currentTypeDocStr": "input int",
+              "funId": "plot",
+              "typePostfix": ""
+            },
+            "end": {
+              "column": 45,
+              "line": 5
+            },
+            "message": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+            "start": {
+              "column": 41,
+              "line": 5
+            },
+            "id": "USER;64eb9fe01ecd4728859be8cb120fa590"
+          },
+          "title": "Compilation error"
+        }
       }
     ],
     "logs": []
@@ -692,10 +2307,31 @@
     "sourceSha256": "e76430f8a9c2787d5a808803442a9edb11a7b261021a5767dbb27af2542703c8",
     "instructionsPath": "instructions/pos-input-width-v49-v1-instructions-v2.md",
     "outcome": "COMPILE_REFUSAL",
+    "attempt": "defaults",
+    "symbol": "BINANCE:BTCUSDT",
+    "timeframe": "2",
+    "context": {
+      "timezone": "Etc/UTC",
+      "exchangeTimezone": "Etc/UTC",
+      "session": null,
+      "accountTier": "pro_premium",
+      "realtimeCutoff": null,
+      "closedRows": null,
+      "startupCovered": null,
+      "firstSourceIndex": null
+    },
     "capturedAt": "2026-10-07T05:01:35.276Z",
     "totalRows": 0,
     "retainedRows": 0,
     "artifacts": "captures/v49/pos-input-width",
+    "dataWindow": null,
+    "nativeCsv": null,
+    "artifactSha256": {
+      "diagnostic.jpg": "1752d53419c52e8dc3c4041602e22d4944f397a1d3cee3f1665281778fc3d3cc",
+      "diagnostics.txt": "53d91b665f002bc2195f1ecfc364187085d7fac77655e0daf82255be6f017ef0",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "8845c7673c83b9cae9a6c7f1b16c232efa448763aae5bd1cdb9bd97d0012b4be"
+    },
     "errors": [
       {
         "start": {
@@ -712,6 +2348,37 @@
         "scriptName": "Untitled script",
         "code": "CE10123",
         "time": "1:01:34 PM"
+      },
+      {
+        "phase": "runtime",
+        "code": null,
+        "start": null,
+        "text": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+        "nativeDescription": {
+          "error": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+          "editorError": {
+            "code": "CE10123",
+            "ctx": {
+              "argDisplayName": "linewidth",
+              "argUserFriendlyRepresentation": "value",
+              "argumentType": "simple int",
+              "currentTypeDocStr": "input int",
+              "funId": "plot",
+              "typePostfix": ""
+            },
+            "end": {
+              "column": 45,
+              "line": 5
+            },
+            "message": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+            "start": {
+              "column": 41,
+              "line": 5
+            },
+            "id": "USER;64eb9fe01ecd4728859be8cb120fa590"
+          },
+          "title": "Compilation error"
+        }
       }
     ],
     "logs": []

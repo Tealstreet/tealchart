@@ -1,1 +1,2 @@
 CE10123 {'line': 3, 'column': 17}: Cannot call "plotchar" with argument "series"="bad". An argument of "literal string" type was used but a "series bool"  is expected.
+None None: Cannot call "{funId}" with argument "{argDisplayName}"="{argUserFriendlyRepresentation}". An argument of "{argumentType}" type was used but a "{currentTypeDocStr}" {typePostfix} is expected.
