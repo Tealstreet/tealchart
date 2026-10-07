@@ -756,7 +756,7 @@
       "startupCovered": null,
       "firstSourceIndex": null
     },
-    "capturedAt": "2026-10-07T05:51:43.762Z",
+    "capturedAt": "2026-10-07T05:51:46.391752Z",
     "totalRows": 307,
     "retainedRows": 307,
     "artifacts": "captures/v51/udt-search-indexof/defaults-ui-export",
@@ -769,7 +769,7 @@
       "data-window.txt": "6c7eb79b448bc23dfa0798d155445ee10ed9ac5c2a17032e8c4cf0c239bf1455",
       "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "native.json": "6d1fa6e4ed770c734b29c9e9a3d0d277cb10d4f624bbba1f4cc51cf23edfa3c7",
+      "native.json": "e23b61cfd281cc57801691ae2a7afe58e797c02bd7709c24ab84231ace51cd35",
       "plots.csv": "2be08498d741da57c420c2398fd9ae5de4a298cae1982aec8bfc3bcdbf1b4b08",
       "settings.jpg": "e9084a22531f6e73b373deb1c4eeddc3733c9bf4960f10c05d5f98a592bee70a"
     },
@@ -832,7 +832,7 @@
       "startupCovered": null,
       "firstSourceIndex": null
     },
-    "capturedAt": "2026-10-07T05:51:49.856Z",
+    "capturedAt": "2026-10-07T05:51:52.374226Z",
     "totalRows": 307,
     "retainedRows": 307,
     "artifacts": "captures/v51/udt-search-lastindexof/defaults-ui-export",
@@ -845,7 +845,7 @@
       "data-window.txt": "1fc458627e8ece79d855793e2da81b0adbfe20e901a697e994ff29075b98f35c",
       "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "native.json": "6fd2b83393bbfe0aa2d709e3ca595857e2b1ba4f0085972286fe8ae5fd34c548",
+      "native.json": "8fd55693dd61ac9384551617d723d9bb380fe77dbd1667ea2c40b447f811c138",
       "plots.csv": "908b084b186fc0e06652021517458c0747f2046e2f1be7cc1753ad678812cd78",
       "settings.jpg": "8e1bbb3d8c29d93897b0f27acb95a3e5fb8deff12334f06ebb42224f72cd3e49"
     },
@@ -908,7 +908,7 @@
       "startupCovered": null,
       "firstSourceIndex": null
     },
-    "capturedAt": "2026-10-07T05:51:37.865Z",
+    "capturedAt": "2026-10-07T05:51:40.360995Z",
     "totalRows": 307,
     "retainedRows": 307,
     "artifacts": "captures/v51/udt-search-includes/defaults-ui-export",
@@ -921,7 +921,7 @@
       "data-window.txt": "5a0f165018863e356b502a4f904d73ed35d2ef29276659830b66cb80c84ce6ba",
       "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "native.json": "4f3d07f254b563540e7a1b1e19dcee402d41cc7dc7c41913a2d751877af9c75b",
+      "native.json": "80b809a9f8f148cb23cb6284a57939471621f80b93ee7353ab8d5376d7c039f8",
       "plots.csv": "20942068f713ebb7605bc3802e4d63f75058253517d6fc477d215e1a6a841db6",
       "settings.jpg": "8f9ae0381bb89ce39e6f997e3800b835bb44c87f610474d65b46cd5494e26a4f"
     },

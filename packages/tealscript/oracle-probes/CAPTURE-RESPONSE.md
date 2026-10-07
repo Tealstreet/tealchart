@@ -32,3 +32,25 @@ Original unbounded runs retain full loaded history and native startup INDEX/SOUR
 - Native CSV volume omissions and other absent channels must stay UNOBSERVED; the source or capture contract can be revised by the author if an additional channel is needed.
 
 Responses use stable filenames alongside each round's handoff. Existing bundle/source version names remain their original identities. Any reply from the receiving agent can go beside these files so the two machines can continue through master.
+
+## Supplemental native CSV receipts
+
+56 of 69 additional UI-download receipts were captured in separately timed *-ui-export attempts. These supplement the already complete 185-source capture inventory; they do not replace the earlier source-bound native rows, logs, diagnostics or screenshots. UI receipt capturedAt uses the downloaded CSV timestamp; metadataCapturedAt retains the preceding editor/settings capture time. Native CSV blanks remain missing values.
+
+The last batch stopped when Chrome MCP reported `Transport closed`. The configured service and debug browser were restarted; the official healthcheck subsequently passed, while this chat’s MCP client retained the closed transport. This is a capture-tool failure, not a Pine compile/runtime result. Reconnect Chrome MCP in the client before attempting the 13 optional receipts below. Original captures for these sources remain in the round 54 manifest.
+
+| Source | Optional receipt attempt |
+| --- | --- |
+| sar-implicit-hole-state-row215-v54-v1.pine | defaults-ui-export |
+| stoch-flat-range-recovery-v54-v1.pine | defaults-ui-export |
+| supertrend-warmup-direction-v54-v1.pine | defaults-ui-export |
+| tsi-leading-interior-holes-v54-v1.pine | defaults-ui-export |
+| tsi-varied-sign-formula-v54-v1.pine | confirmed-prefix-ui-export |
+| tsi-varied-sign-formula-v54-v1.pine | defaults-ui-export |
+| valuewhen-bool-missing-event-v54-v1.pine | defaults-ui-export |
+| valuewhen-color-missing-event-v54-v1.pine | defaults-ui-export |
+| valuewhen-float-missing-event-v54-v1.pine | defaults-ui-export |
+| valuewhen-insufficient-occurrence-v54-v1.pine | defaults-ui-export |
+| valuewhen-int-missing-event-v54-v1.pine | defaults-ui-export |
+| valuewhen-selected-missing-source-v54-v1.pine | defaults-ui-export |
+| wpr-implicit-ohlc-holes-v54-v1.pine | defaults-ui-export |

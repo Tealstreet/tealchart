@@ -18,7 +18,7 @@
       "startupCovered": false,
       "firstSourceIndex": 21469
     },
-    "capturedAt": "2026-10-07T05:47:55.112Z",
+    "capturedAt": "2026-10-07T05:47:57.700010Z",
     "totalRows": 305,
     "retainedRows": 305,
     "artifacts": "captures/v49/qualifier-consumer-controls/defaults-ui-export",
@@ -31,7 +31,7 @@
       "data-window.txt": "4104504b932d9b707868a6db8b659839ab76175149daba2935a58c4c91a64747",
       "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "native.json": "4d216f3b3a6544315ebd9afe46c346e558803030201b64ce105cdc4c3b6ac7dc",
+      "native.json": "ef95948a4619426bc3a0f68ef418913ddbed0af68f2761866ea8b410cf49942e",
       "plots.csv": "f12bdbaab84d5051d7b29ac8f75fa3c7b79900c0d74b7f20c969f4dbdaad8436",
       "settings.jpg": "d5e92ab866eb344fbaf30ff72eb9270d7b11660a268479d138b8e75700dadb27"
     },
@@ -174,7 +174,7 @@
       "startupCovered": false,
       "firstSourceIndex": 21469
     },
-    "capturedAt": "2026-10-07T05:47:06.103Z",
+    "capturedAt": "2026-10-07T05:47:08.572257Z",
     "totalRows": 305,
     "retainedRows": 305,
     "artifacts": "captures/v49/match-const-simple/defaults-ui-export",
@@ -187,7 +187,7 @@
       "data-window.txt": "d1111f09ec06ac785c671c8e17dddb3cbff4fedce6ba4927e46b55793830d096",
       "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "logs.txt": "bde3b90a62cd7c2f9904f7da97fead1fb6a2a077bcc360bdc6c343d4b967830f",
-      "native.json": "7f86616242905f8f3194320e487efdbbcb81386b71e11cb432fd2f2ba09660a2",
+      "native.json": "d8e49c46e9ea49952ea4a70156592125bcc6b258344baa4c8328853f9168a739",
       "plots.csv": "fdd8fc902742795da3cc53ca1bb5b1dfe09034dcacdb60e07da72d09053d0833",
       "settings.jpg": "b6bd03b5e2936ecebdc1d501a1c8a8c6c6551d6ede2521e799632f3525007c90"
     },
@@ -364,7 +364,7 @@
       "startupCovered": false,
       "firstSourceIndex": 21469
     },
-    "capturedAt": "2026-10-07T05:47:43.146Z",
+    "capturedAt": "2026-10-07T05:47:45.983086Z",
     "totalRows": 305,
     "retainedRows": 305,
     "artifacts": "captures/v49/match-input-source-simple/defaults-ui-export",
@@ -377,7 +377,7 @@
       "data-window.txt": "18ef1dc2d9e4af99a699da16af1c5d3fd714f46358dd5f6b6f01a636110feb45",
       "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "logs.txt": "bde3b90a62cd7c2f9904f7da97fead1fb6a2a077bcc360bdc6c343d4b967830f",
-      "native.json": "a4735f3c0c99934b0e3a83131dd7941d906ecf7c477cd5326db1a10f4d6f2fb8",
+      "native.json": "91c65bdb9fd4012c7cde18b73127d6134ee449ce5415850523c04980b078fdf8",
       "plots.csv": "3633aef5e73a7a211152029564aabc86fb43ee50c82069a5294763754dc4b568",
       "settings.jpg": "52ea6d7556c357ab837097af355d5514ba1bd84867bd389abae696e49f078e7f"
     },
@@ -554,7 +554,7 @@
       "startupCovered": false,
       "firstSourceIndex": 21469
     },
-    "capturedAt": "2026-10-07T05:47:36.371Z",
+    "capturedAt": "2026-10-07T05:47:38.927185Z",
     "totalRows": 305,
     "retainedRows": 305,
     "artifacts": "captures/v49/match-input-regex-simple/defaults-ui-export",
@@ -567,7 +567,7 @@
       "data-window.txt": "4c2e7f0189a5e6d23dbbec2f94180cdfed3ff4d32385c7db196b1ccfa47740e1",
       "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "logs.txt": "bde3b90a62cd7c2f9904f7da97fead1fb6a2a077bcc360bdc6c343d4b967830f",
-      "native.json": "c48ccc026a6a3b27c6ad5d61c7126f996dfc9595a7a9a4ceea848f43c810ad99",
+      "native.json": "1cdd6f817224dbaf338bf0a0294126b85da8b852ac0d30caa98b304024b6a288",
       "plots.csv": "5e88237c709ae0145384d7fd9dbf2a97a5dd23cf5d179f3439e9e02b391025b0",
       "settings.jpg": "e3aee724139d06141cbba95c38650d5a0955754d83d1cbe072d9ed5cfa9990ff"
     },
@@ -908,7 +908,7 @@
       "startupCovered": false,
       "firstSourceIndex": 21469
     },
-    "capturedAt": "2026-10-07T05:46:59.451Z",
+    "capturedAt": "2026-10-07T05:47:01.908471Z",
     "totalRows": 305,
     "retainedRows": 305,
     "artifacts": "captures/v49/length-input-simple/defaults-ui-export",
@@ -921,7 +921,7 @@
       "data-window.txt": "e1a133aa41c47069921e9f209fd7fc60e31ea6d7a69058cc45c33aa07e06dc99",
       "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "native.json": "b6a75a7721b3629bb737450eae5e2c2020afb5c2b89ca47c8294603ab3d431bb",
+      "native.json": "2375e29e6f6719c84fb828be53376550a1694c51018ba4100daaee6cce623d3c",
       "plots.csv": "014e8c7818d897f9a1344f23af43faa1e9444c57d409fbb50d6ee011c26cdc3f",
       "settings.jpg": "e75a2b112c156bfec55e6c361f8410db1150c77e228d3314afcab845c21d453b"
     },
@@ -982,7 +982,7 @@
       "startupCovered": false,
       "firstSourceIndex": 21469
     },
-    "capturedAt": "2026-10-07T05:47:49.243Z",
+    "capturedAt": "2026-10-07T05:47:51.899574Z",
     "totalRows": 305,
     "retainedRows": 305,
     "artifacts": "captures/v49/pos-input-simple/defaults-ui-export",
@@ -995,7 +995,7 @@
       "data-window.txt": "3671f205fc9079db90fcd3395e3608128efd42c3c401ce5338901e5920b7dce7",
       "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "native.json": "b6c032a99684aa7183babf70ea8a7dad051a358b4cc010591ea57f42853ca4b1",
+      "native.json": "78eb5b58dca6675e70539501069027729f5691e9ada16a6e66d69d685de75a6b",
       "plots.csv": "a228d06b68c1859c6919e1fbd16edd5333caf36d27de7e6a0e1eb1a238098b1a",
       "settings.jpg": "2fefef61e0f69f600a63c33b70f034bb17fde7af8bea7540a40d8280d7f8129f"
     },
@@ -1138,7 +1138,7 @@
       "startupCovered": false,
       "firstSourceIndex": 21469
     },
-    "capturedAt": "2026-10-07T05:46:40.937Z",
+    "capturedAt": "2026-10-07T05:46:43.409022Z",
     "totalRows": 305,
     "retainedRows": 305,
     "artifacts": "captures/v49/contains-input-source-simple/defaults-ui-export",
@@ -1151,7 +1151,7 @@
       "data-window.txt": "1f88a9bffda565746775723ae92e675a2c573152c9933d660f99ba3ea5ce24eb",
       "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "native.json": "475cac7d532f63ebddad3c043154c8b722e078fa450568d5ff0f882ea8ab1d29",
+      "native.json": "0d8438f7eb30d170bbe510ae9a6d0697433fc88d90794a343b9b9240b0b3a4ca",
       "plots.csv": "53c7b7be2df51c73432f5cff7e74869073250b8858ecb1f1253ac11f6ae1fc41",
       "settings.jpg": "6da38c6ab45815eb70c11b11a13fc40c72bfb52bc331b35a33a57e3482772fc5"
     },
@@ -1294,7 +1294,7 @@
       "startupCovered": false,
       "firstSourceIndex": 21469
     },
-    "capturedAt": "2026-10-07T05:46:34.622Z",
+    "capturedAt": "2026-10-07T05:46:37.372188Z",
     "totalRows": 305,
     "retainedRows": 305,
     "artifacts": "captures/v49/contains-input-pattern-simple/defaults-ui-export",
@@ -1307,7 +1307,7 @@
       "data-window.txt": "fcfd75a8f5ce5d02e9681e03af707d6a429cf7688b4db093ee9c9f088c95589e",
       "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "native.json": "ab36c3050a683e1fdc0e6554a7f8fed1bd31fa5bd5a94100fa5d50e0fb9d7d09",
+      "native.json": "9cca23cd8188ff8935cf659081b552b35aa50490af070d555e29e69b9aab4621",
       "plots.csv": "9d54c1a44fdad0f467893e9f087e3ff8d4c47e981274fc2585c137533a99cc59",
       "settings.jpg": "5399bd4a89106953dd516c006922775775d5d876d9f6eb329e51ade3743269f2"
     },
@@ -1450,7 +1450,7 @@
       "startupCovered": false,
       "firstSourceIndex": 21469
     },
-    "capturedAt": "2026-10-07T05:48:07.695Z",
+    "capturedAt": "2026-10-07T05:48:10.385264Z",
     "totalRows": 306,
     "retainedRows": 306,
     "artifacts": "captures/v49/startswith-input-source-simple/defaults-ui-export",
@@ -1463,7 +1463,7 @@
       "data-window.txt": "0fa06dc1384fa162861c70b4aae97c21a83a71ad893a97068684647084bcef29",
       "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "native.json": "0fb780d3e6fffbf51bae26d16ca637a76c0b286369e4c9217f45498c65dfb5b6",
+      "native.json": "2fd6112080c33da3f397ddea31bee4ae8c580969cc6b63ecbe0b6a1c16548aac",
       "plots.csv": "9ba71693e3ce61b867016f437a0484587a17850ef2ee03c840a0d51a09e0a590",
       "settings.jpg": "cd94f7cb4ee0582bc39f29885b1ad9129399860c5858ef7f35585f5eab187ade"
     },
@@ -1606,7 +1606,7 @@
       "startupCovered": false,
       "firstSourceIndex": 21469
     },
-    "capturedAt": "2026-10-07T05:48:01.399Z",
+    "capturedAt": "2026-10-07T05:48:04.481857Z",
     "totalRows": 306,
     "retainedRows": 306,
     "artifacts": "captures/v49/startswith-input-pattern-simple/defaults-ui-export",
@@ -1619,7 +1619,7 @@
       "data-window.txt": "05f63fdbba94ed9fc5c0d133b5f541c22b53f789044fb06b5063df691987433d",
       "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "native.json": "1b08165993b56e50177874122e1e69b3a7b8ef99d7e90f6a0c6a6b0121ae108d",
+      "native.json": "8c77baf997570477789228d47ed56828afcebf16a3c024966ec5b07f97e943c6",
       "plots.csv": "cc80565bb842aea0bb8a54c7eeee624269d4dfc7c1a534fe83277a65be4241d7",
       "settings.jpg": "8ff223ec70e9cd39a35cce2f3a1214cc1d4cc8ba38b4fc2ae8a31246d84d1152"
     },
@@ -1762,7 +1762,7 @@
       "startupCovered": false,
       "firstSourceIndex": 21469
     },
-    "capturedAt": "2026-10-07T05:46:52.689Z",
+    "capturedAt": "2026-10-07T05:46:55.410030Z",
     "totalRows": 305,
     "retainedRows": 305,
     "artifacts": "captures/v49/endswith-input-source-simple/defaults-ui-export",
@@ -1775,7 +1775,7 @@
       "data-window.txt": "ad2df1e191fb31121db8b6e6b3d20ffbc577a9f567df11113197d0632d22eb58",
       "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "native.json": "f74e6f48b76463f873a460ae749f0a9305ac9e1b57c0a471d4fa8f4f1e11778b",
+      "native.json": "5aa69e1f56db8e0c296c7cb6553c55d6f3b6df5d5024ce1f45b8d71d4780e7af",
       "plots.csv": "cd17a1a7fd0cbbde3f0d18a465c0f7e93396655333ba04610c2bfae2ead8f013",
       "settings.jpg": "3ad2c4e92488fb9208dda54e3d726b1f8cdf667a9fe0d7cad1495737ec4d7c55"
     },
@@ -1918,7 +1918,7 @@
       "startupCovered": false,
       "firstSourceIndex": 21469
     },
-    "capturedAt": "2026-10-07T05:46:46.672Z",
+    "capturedAt": "2026-10-07T05:46:49.366723Z",
     "totalRows": 305,
     "retainedRows": 305,
     "artifacts": "captures/v49/endswith-input-pattern-simple/defaults-ui-export",
@@ -1931,7 +1931,7 @@
       "data-window.txt": "d46b849afc353cd595acdf3b194a2d27c4a651badb970e3796abbbf7dd3a1e36",
       "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "native.json": "fa8f1d8ac539f2e0bb43c39a1ce59a57dfbd95d544acfe735d43f8930928cc46",
+      "native.json": "c17e917524af1a0b5ee8a236b245f882b0cd5d9750449983c1ef4425f6c919f7",
       "plots.csv": "cd17a1a7fd0cbbde3f0d18a465c0f7e93396655333ba04610c2bfae2ead8f013",
       "settings.jpg": "4b688e36085f8c22a31f854b281b7641014762ffe6859a8fa3e302273e632251"
     },
