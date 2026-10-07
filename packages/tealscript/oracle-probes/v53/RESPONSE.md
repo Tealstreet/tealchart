@@ -1,12 +1,12 @@
 # TradingView round 53 capture response
 
-Captured through Chrome MCP on 2026-10-07. Source bytes and authored defaults were unchanged.
+Captured through Chrome MCP on 2026-10-07. Source bytes were unchanged. Defaults were retained except the separately listed input/feed attempts, whose actual inputs and contexts are stored in native.json.
 
-Context: BINANCE:BTCUSDT, standard candles, 2 minutes, regular 24x7 session, display/exchange timezone Etc/UTC, account sours-lat (pro_premium/Premium), TradingView build 2026-10-06T09:00:32. Bar Replay was not active.
+Default context: BINANCE:BTCUSDT, standard candles, 2 minutes, regular 24x7 session, display/exchange timezone Etc/UTC, account sours-lat (pro_premium/Premium), TradingView build 2026-10-06T09:00:32. Bar Replay was not active.
 
-Attempts: 12 across 5 authored sources. Runs: 12; compile refusals: 0; other: 0.
+Attempts: 12 across 5 authored sources. Runs: 12; compile refusals: 0; runtime refusals: 0; other: 0.
 
-Each native.json contains the exact editor source, source hash, compiler console/markers, actual plot names, inputs, status, logs, and all loaded native plot rows. plots.csv serializes those native rows with matching time/OHLCV and every plot column. This uses TradingView’s chart PlotList through Chrome MCP rather than the UI CSV download; no TealScript evaluator produced these values. IS_REALTIME separates the currently open candle from closed rows. For unbounded sources, startup INDEX/SOURCE_INDEX 0..15 and at least 32 closed rows were checked. Sources specifying calc_bars_count=32 retain only the reached 32 calculated bars (typically 31 closed plus one live); their original index origin is retained, with no invented startup rows. They confer only the coverage in their instructions.
+Each native.json contains the exact editor source, source hash, compiler console/markers, actual plot names, inputs, status, logs, and all loaded native plot rows. plots.csv serializes those native rows with matching time/OHLCV and every plot column. Where present, chart-export.csv is the original Download chart data UI file, with its native headers and unmodified bytes; chart-export.json records its download identity/hash. The additional plots.csv uses TradingView’s chart PlotList through Chrome MCP serialization; no TealScript evaluator produced these values. IS_REALTIME separates the currently open candle from closed rows. For unbounded sources, startup INDEX/SOURCE_INDEX 0..15 and at least 32 closed rows were checked. Sources specifying calc_bars_count=32 retain only the reached 32 calculated bars (typically 31 closed plus one live); their original index origin is retained, with no invented startup rows. They confer only the coverage in their instructions.
 
 Compile refusals retain the full actual/required type message, native code/location and diagnostic screenshot. Hidden plots remain unobserved for refused sources. Admission establishes the authored consumer boundary only, not broader qualifier rules.
 
