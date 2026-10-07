@@ -101,3 +101,70 @@ it('shows authored external plot titles and saves the stable source binding', ()
   expect(saved).toEqual([{ input_Source: 'tealscript-source:provider:plot1' }]);
   modal.unmount(); document.body.innerHTML = '';
 });
+
+
+it('edits canvas palette colors without losing transparency and resets defaults', () => {
+  const modal = new IndicatorSettingsModal();
+  modal.mount(document.body);
+  const saved: Record<string, unknown>[] = [];
+  const styleInputs: InputDefinition[] = [
+    { id: 'palette_background', type: 'color', title: 'Background', defval: '#8888880a' },
+  ];
+  const open = () =>
+    modal.openWith(
+      { id: 'tpo', name: 'TPO', inputs: { length: 7, palette_background: '#12345633' } },
+      [{ id: 'length', type: 'int', title: 'Length', defval: 20 }],
+      [],
+      undefined,
+      (inputs) => saved.push(inputs),
+      [],
+      styleInputs,
+    );
+  open();
+  expect(screen.queryByLabelText('Background')).toBeNull();
+  fireEvent.click(screen.getByText('Style'));
+  expect(screen.queryByText('No style options available')).toBeNull();
+  expect((screen.getByLabelText('Background') as HTMLInputElement).value).toBe('#123456');
+  expect((screen.getByLabelText('Background opacity') as HTMLInputElement).value).toBe('51');
+  fireEvent.change(screen.getByLabelText('Background'), { target: { value: '#abcdef' } });
+  fireEvent.click(screen.getByText('Apply'));
+  expect(saved[0]).toEqual({ length: 7, palette_background: '#abcdef33' });
+  open();
+  fireEvent.click(screen.getByText('Style'));
+  fireEvent.input(screen.getByLabelText('Background opacity'), { target: { value: '0' } });
+  fireEvent.click(screen.getByText('Apply'));
+  expect(saved[1].palette_background).toBe('#12345600');
+  open();
+  fireEvent.change(screen.getByLabelText('Defaults'), { target: { value: 'reset' } });
+  fireEvent.click(screen.getByText('Apply'));
+  expect(saved[2]).toEqual({ length: 20, palette_background: '#8888880a' });
+  modal.openWith({ id: 'sma', name: 'SMA', inputs: {} }, [], [], undefined, () => {});
+  fireEvent.click(screen.getByText('Style'));
+  expect(screen.getByText('No style options available')).toBeTruthy();
+  expect(screen.queryByLabelText('Background')).toBeNull();
+  modal.unmount();
+  document.body.innerHTML = '';
+});
+
+it('initializes rgba palette defaults with their RGB channels and opacity', () => {
+  const modal = new IndicatorSettingsModal();
+  modal.mount(document.body);
+  const saved: Record<string, unknown>[] = [];
+  modal.openWith(
+    { id: 'dwmo', name: 'DWMO', inputs: {} },
+    [],
+    [],
+    undefined,
+    (inputs) => saved.push(inputs),
+    [],
+    [{ id: 'palette_daily', type: 'color', title: 'Daily Open', defval: 'rgba(56, 189, 248, 0.95)' }],
+  );
+  fireEvent.click(screen.getByText('Style'));
+  expect((screen.getByLabelText('Daily Open') as HTMLInputElement).value).toBe('#38bdf8');
+  expect((screen.getByLabelText('Daily Open opacity') as HTMLInputElement).value).toBe('242');
+  fireEvent.change(screen.getByLabelText('Daily Open'), { target: { value: '#abcdef' } });
+  fireEvent.click(screen.getByText('Apply'));
+  expect(saved[0].palette_daily).toBe('#abcdeff2');
+  modal.unmount();
+  document.body.innerHTML = '';
+});

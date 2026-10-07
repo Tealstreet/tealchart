@@ -10,6 +10,7 @@ import type { InputDefinition, PlotOutput } from '@tealstreet/tealscript';
 import type { LineStyle, PlotStyleOverride } from '../state/chartState';
 import type { ModalOptions } from './Modal';
 
+import { parseColorChannels } from '../utils/colorAlpha';
 import { Modal } from './Modal';
 
 // ============================================================================
@@ -268,6 +269,7 @@ export class IndicatorSettingsModal extends Modal {
   // Current indicator data
   private indicator: ActiveIndicator | null = null;
   private inputDefinitions: InputDefinition[] = [];
+  private styleInputDefinitions: InputDefinition[] = [];
   private plots: PlotOutput[] = [];
   private externalSourceOptions: { value: string; label: string }[] = [];
   private onSaveCallback: ((inputs: Record<string, unknown>, styleOverrides?: PlotStyleOverride[]) => void) | null =
@@ -310,7 +312,12 @@ export class IndicatorSettingsModal extends Modal {
     defaults.add(new Option(options.translations?.resetSettings || 'Reset settings', 'reset'));
     defaults.addEventListener('change', () => {
       if (defaults.value !== 'reset') return;
-      this.values = Object.fromEntries(this.inputDefinitions.map((definition) => [definition.id, definition.defval]));
+      this.values = Object.fromEntries(
+        [...this.inputDefinitions, ...this.styleInputDefinitions].map((definition) => [
+          definition.id,
+          definition.defval,
+        ]),
+      );
       this.styleOverrides = [];
       this.openPopoverId = null;
       defaults.value = '';
@@ -342,18 +349,20 @@ export class IndicatorSettingsModal extends Modal {
     styleOverrides: PlotStyleOverride[] | undefined,
     onSave: (inputs: Record<string, unknown>, styleOverrides?: PlotStyleOverride[]) => void,
     externalSourceOptions: { value: string; label: string }[] = [],
+    styleInputDefinitions: InputDefinition[] = [],
   ): void {
     if (this.state.isOpen) return;
 
     this.indicator = indicator;
     this.inputDefinitions = inputDefinitions;
+    this.styleInputDefinitions = styleInputDefinitions;
     this.plots = plots || [];
     this.externalSourceOptions = externalSourceOptions;
     this.onSaveCallback = onSave;
 
     // Initialize values from indicator inputs
     const initialValues: Record<string, unknown> = {};
-    for (const def of inputDefinitions) {
+    for (const def of [...inputDefinitions, ...styleInputDefinitions]) {
       initialValues[def.id] = indicator.inputs[def.id] ?? def.defval;
     }
     this.values = initialValues;
@@ -415,6 +424,7 @@ export class IndicatorSettingsModal extends Modal {
     // Clear references
     this.indicator = null;
     this.inputDefinitions = [];
+    this.styleInputDefinitions = [];
     this.plots = [];
     this.onSaveCallback = null;
     this.openPopoverId = null;
@@ -708,11 +718,33 @@ export class IndicatorSettingsModal extends Modal {
         colorInput.type = 'color';
         Object.assign(colorInput.style, contentStyles.colorInput);
         this.applyDisabledState(colorInput, active);
-        colorInput.value = String(currentValue);
+        const color = String(currentValue);
+        const channels = parseColorChannels(color);
+        const hex = (channel: number) => channel.toString(16).padStart(2, '0');
+        colorInput.value = channels ? `#${hex(channels.red)}${hex(channels.green)}${hex(channels.blue)}` : color;
+        colorInput.setAttribute('aria-label', def.title);
         colorInput.addEventListener('change', (e) => {
-          this.updateValue(def.id, (e.target as HTMLInputElement).value);
+          const previous = String(this.values[def.id]);
+          const alpha = parseColorChannels(previous)?.alpha ?? 1;
+          this.updateValue(
+            def.id,
+            (e.target as HTMLInputElement).value +
+              (alpha < 1 || /^#[0-9a-f]{8}$/i.test(previous) ? hex(Math.round(alpha * 255)) : ''),
+          );
         });
         row.appendChild(colorInput);
+        const opacity = document.createElement('input');
+        opacity.type = 'range';
+        opacity.min = '0';
+        opacity.max = '255';
+        opacity.value = String(Math.round((channels?.alpha ?? 1) * 255));
+        opacity.setAttribute('aria-label', `${def.title} opacity`);
+        opacity.title = `${def.title} opacity`;
+        this.applyDisabledState(opacity, active);
+        opacity.addEventListener('input', () => {
+          this.updateValue(def.id, colorInput.value + Number(opacity.value).toString(16).padStart(2, '0'));
+        });
+        row.appendChild(opacity);
         break;
       }
 
@@ -756,7 +788,7 @@ export class IndicatorSettingsModal extends Modal {
 
   private renderStyleTab(): void {
     const editablePlots = this.plots?.filter((plot) => plot.editable !== false) ?? [];
-    if (editablePlots.length === 0) {
+    if (editablePlots.length === 0 && this.styleInputDefinitions.length === 0) {
       const empty = this.createElement('div', {
         style: contentStyles.emptyState,
         textContent: this.getTranslation('noStyleOptions', 'No style options available'),
@@ -764,6 +796,8 @@ export class IndicatorSettingsModal extends Modal {
       this.contentEl.appendChild(empty);
       return;
     }
+
+    for (const definition of this.styleInputDefinitions) this.contentEl.appendChild(this.renderFormInput(definition));
 
     for (let i = 0; i < editablePlots.length; i++) {
       const plot = editablePlots[i];

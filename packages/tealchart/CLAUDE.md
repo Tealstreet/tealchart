@@ -1424,3 +1424,7 @@ true mounts its control; legend status values remain available by default.
 Native background pictures retain the axis-exclusive clip width
 `frame.priceAxisLeft - frame.contentLeft` in live and static branches. Gesture
 tests retain the mounted picture before changing shared viewport values.
+
+`IndicatorSettingsModal.openWith` accepts optional Style input definitions for
+canvas indicators without plot outputs. Colors preserve hex alpha and expose
+opacity; Defaults resets both Inputs and Style input values.
