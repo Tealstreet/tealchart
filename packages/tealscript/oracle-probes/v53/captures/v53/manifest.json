@@ -1,0 +1,6890 @@
+[
+  {
+    "probe": "ema-rma-length-one-signed-zero-v53-v1.pine",
+    "sourcePath": "ema-rma-length-one-signed-zero-v53-v1.pine",
+    "sourceSha256": "88396db30021cc3b0f113dcad2d266764983ba4e86f0154e137df3a1ac4d2d80",
+    "instructionsPath": "instructions/ema-rma-length-one-signed-zero-v53-v1-instructions-v1.md",
+    "outcome": "RUNS",
+    "attempt": "defaults",
+    "symbol": "BINANCE:BTCUSDT",
+    "timeframe": "2",
+    "context": {
+      "timezone": "Etc/UTC",
+      "exchangeTimezone": "Etc/UTC",
+      "session": "24x7",
+      "accountTier": "pro_premium",
+      "realtimeCutoff": 1791350040,
+      "closedRows": 31
+    },
+    "capturedAt": "2026-10-07T05:15:24.740Z",
+    "totalRows": 32,
+    "retainedRows": 32,
+    "artifacts": "captures/v53/ema-rma-length-one-signed-zero",
+    "artifactSha256": {
+      "data-window.jpg": "815e7f3a1f6173dd77673f924a68d499d26c8e4e7f94c3ec0145a2617ec607bf",
+      "data-window.txt": "3e9a7fe82a3ad5c78719583136220f3c8c80d154706f712833ef2da6fd078b01",
+      "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logs.txt": "970519a5f1ce0786471e4a0dd5b565ebb7a581397f2b49b440d072db4f4a91f8",
+      "native.json": "d45ec3c598d55d61463ae8d7a895fb568305ecca6204a77e50bac19e3799343c",
+      "plots.csv": "78b7b8511c34dfd1375f88c441bbd2a37f38a19eb0546d17edad0daf610cc377",
+      "settings.jpg": "3de5f9f0927107c00af45edb038d98b4663ac63d7ec2d94f2e0306ef93d6f813"
+    },
+    "errors": [],
+    "logs": [
+      {
+        "barTime": 1791346320000,
+        "time": 1791346320000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 112
+          }
+        },
+        "message": "sample=0; phase=0; source=0; ema=0; rma=0"
+      },
+      {
+        "barTime": 1791346440000,
+        "time": 1791346440000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 112
+          }
+        },
+        "message": "sample=1; phase=1; source=0; ema=0; rma=0"
+      },
+      {
+        "barTime": 1791346560000,
+        "time": 1791346560000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 112
+          }
+        },
+        "message": "sample=2; phase=2; source=-2; ema=-2; rma=-2"
+      },
+      {
+        "barTime": 1791346680000,
+        "time": 1791346680000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 112
+          }
+        },
+        "message": "sample=3; phase=3; source=0; ema=0; rma=0"
+      },
+      {
+        "barTime": 1791346800000,
+        "time": 1791346800000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 112
+          }
+        },
+        "message": "sample=4; phase=4; source=NaN; ema=NaN; rma=NaN"
+      },
+      {
+        "barTime": 1791346920000,
+        "time": 1791346920000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 112
+          }
+        },
+        "message": "sample=5; phase=5; source=2; ema=2; rma=2"
+      },
+      {
+        "barTime": 1791347040000,
+        "time": 1791347040000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 112
+          }
+        },
+        "message": "sample=6; phase=6; source=0; ema=0; rma=0"
+      },
+      {
+        "barTime": 1791347160000,
+        "time": 1791347160000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 112
+          }
+        },
+        "message": "sample=7; phase=7; source=0; ema=0; rma=0"
+      },
+      {
+        "barTime": 1791347280000,
+        "time": 1791347280000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 112
+          }
+        },
+        "message": "sample=8; phase=0; source=0; ema=0; rma=0"
+      },
+      {
+        "barTime": 1791347400000,
+        "time": 1791347400000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 112
+          }
+        },
+        "message": "sample=9; phase=1; source=0; ema=0; rma=0"
+      },
+      {
+        "barTime": 1791347520000,
+        "time": 1791347520000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 112
+          }
+        },
+        "message": "sample=10; phase=2; source=-2; ema=-2; rma=-2"
+      },
+      {
+        "barTime": 1791347640000,
+        "time": 1791347640000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 112
+          }
+        },
+        "message": "sample=11; phase=3; source=0; ema=0; rma=0"
+      },
+      {
+        "barTime": 1791347760000,
+        "time": 1791347760000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 112
+          }
+        },
+        "message": "sample=12; phase=4; source=NaN; ema=NaN; rma=NaN"
+      },
+      {
+        "barTime": 1791347880000,
+        "time": 1791347880000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 112
+          }
+        },
+        "message": "sample=13; phase=5; source=2; ema=2; rma=2"
+      },
+      {
+        "barTime": 1791348000000,
+        "time": 1791348000000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 112
+          }
+        },
+        "message": "sample=14; phase=6; source=0; ema=0; rma=0"
+      },
+      {
+        "barTime": 1791348120000,
+        "time": 1791348120000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 112
+          }
+        },
+        "message": "sample=15; phase=7; source=0; ema=0; rma=0"
+      },
+      {
+        "barTime": 1791348240000,
+        "time": 1791348240000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 112
+          }
+        },
+        "message": "sample=16; phase=0; source=0; ema=0; rma=0"
+      },
+      {
+        "barTime": 1791348360000,
+        "time": 1791348360000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 112
+          }
+        },
+        "message": "sample=17; phase=1; source=0; ema=0; rma=0"
+      },
+      {
+        "barTime": 1791348480000,
+        "time": 1791348480000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 112
+          }
+        },
+        "message": "sample=18; phase=2; source=-2; ema=-2; rma=-2"
+      },
+      {
+        "barTime": 1791348600000,
+        "time": 1791348600000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 112
+          }
+        },
+        "message": "sample=19; phase=3; source=0; ema=0; rma=0"
+      },
+      {
+        "barTime": 1791348720000,
+        "time": 1791348720000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 112
+          }
+        },
+        "message": "sample=20; phase=4; source=NaN; ema=NaN; rma=NaN"
+      },
+      {
+        "barTime": 1791348840000,
+        "time": 1791348840000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 112
+          }
+        },
+        "message": "sample=21; phase=5; source=2; ema=2; rma=2"
+      },
+      {
+        "barTime": 1791348960000,
+        "time": 1791348960000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 112
+          }
+        },
+        "message": "sample=22; phase=6; source=0; ema=0; rma=0"
+      },
+      {
+        "barTime": 1791349080000,
+        "time": 1791349080000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 112
+          }
+        },
+        "message": "sample=23; phase=7; source=0; ema=0; rma=0"
+      },
+      {
+        "barTime": 1791349200000,
+        "time": 1791349200000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 112
+          }
+        },
+        "message": "sample=24; phase=0; source=0; ema=0; rma=0"
+      },
+      {
+        "barTime": 1791349320000,
+        "time": 1791349320000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 112
+          }
+        },
+        "message": "sample=25; phase=1; source=0; ema=0; rma=0"
+      },
+      {
+        "barTime": 1791349440000,
+        "time": 1791349440000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 112
+          }
+        },
+        "message": "sample=26; phase=2; source=-2; ema=-2; rma=-2"
+      },
+      {
+        "barTime": 1791349560000,
+        "time": 1791349560000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 112
+          }
+        },
+        "message": "sample=27; phase=3; source=0; ema=0; rma=0"
+      },
+      {
+        "barTime": 1791349680000,
+        "time": 1791349680000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 112
+          }
+        },
+        "message": "sample=28; phase=4; source=NaN; ema=NaN; rma=NaN"
+      },
+      {
+        "barTime": 1791349800000,
+        "time": 1791349800000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 112
+          }
+        },
+        "message": "sample=29; phase=5; source=2; ema=2; rma=2"
+      },
+      {
+        "barTime": 1791349920000,
+        "time": 1791349920000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 112
+          }
+        },
+        "message": "sample=30; phase=6; source=0; ema=0; rma=0"
+      }
+    ]
+  },
+  {
+    "probe": "ema-rma-length-one-signed-zero-v53-v1.pine",
+    "sourcePath": "ema-rma-length-one-signed-zero-v53-v1.pine",
+    "sourceSha256": "88396db30021cc3b0f113dcad2d266764983ba4e86f0154e137df3a1ac4d2d80",
+    "instructionsPath": "instructions/ema-rma-length-one-signed-zero-v53-v1-instructions-v1.md",
+    "outcome": "RUNS",
+    "attempt": "reciprocal",
+    "symbol": "BINANCE:BTCUSDT",
+    "timeframe": "2",
+    "context": {
+      "timezone": "Etc/UTC",
+      "exchangeTimezone": "Etc/UTC",
+      "session": "24x7",
+      "accountTier": "pro_premium",
+      "realtimeCutoff": 1791350160,
+      "closedRows": 31
+    },
+    "capturedAt": "2026-10-07T05:16:04.098Z",
+    "totalRows": 32,
+    "retainedRows": 32,
+    "artifacts": "captures/v53/ema-rma-length-one-signed-zero/reciprocal",
+    "artifactSha256": {
+      "data-window.jpg": "9a155b4faaf9dbfa80bfc573b514b1b1b3f233164db27d1f5df78595aa9ad2d9",
+      "data-window.txt": "ef734b41fc86674867a3652f5b8a78a9227149bdf332f48fb1d43774fdff3d8c",
+      "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logs.txt": "e76f6cfb37a92a88baf53a1b014ace4e71f1dd9f4a26e2afefdc2b917a367696",
+      "native.json": "df934e672886b6621f23110d87e75f1b0294d118038f96e04bbb717640ac6e6a",
+      "plots.csv": "feab695bf8526a8c8ba4a03794989ee5efea0b0f83ae6f79cc0fbe06ddfc6ed9",
+      "settings.jpg": "95aa191c629be99866aedc5f5248d2cca7f4095c375e6331c6b6af690104c939"
+    },
+    "errors": [],
+    "logs": [
+      {
+        "barTime": 1791346440000,
+        "time": 1791346440000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 112
+          }
+        },
+        "message": "sample=0; phase=0; source=0; ema=0; rma=0"
+      },
+      {
+        "barTime": 1791346440000,
+        "time": 1791346440000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 18,
+            "column": 5
+          },
+          "end": {
+            "line": 18,
+            "column": 165
+          }
+        },
+        "message": "sample=0; reciprocal source=NaN; ema=NaN; rma=NaN"
+      },
+      {
+        "barTime": 1791346560000,
+        "time": 1791346560000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 112
+          }
+        },
+        "message": "sample=1; phase=1; source=0; ema=0; rma=0"
+      },
+      {
+        "barTime": 1791346560000,
+        "time": 1791346560000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 18,
+            "column": 5
+          },
+          "end": {
+            "line": 18,
+            "column": 165
+          }
+        },
+        "message": "sample=1; reciprocal source=NaN; ema=NaN; rma=NaN"
+      },
+      {
+        "barTime": 1791346680000,
+        "time": 1791346680000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 112
+          }
+        },
+        "message": "sample=2; phase=2; source=-2; ema=-2; rma=-2"
+      },
+      {
+        "barTime": 1791346680000,
+        "time": 1791346680000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 18,
+            "column": 5
+          },
+          "end": {
+            "line": 18,
+            "column": 165
+          }
+        },
+        "message": "sample=2; reciprocal source=-0.5; ema=-0.5; rma=-0.5"
+      },
+      {
+        "barTime": 1791346800000,
+        "time": 1791346800000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 112
+          }
+        },
+        "message": "sample=3; phase=3; source=0; ema=0; rma=0"
+      },
+      {
+        "barTime": 1791346800000,
+        "time": 1791346800000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 18,
+            "column": 5
+          },
+          "end": {
+            "line": 18,
+            "column": 165
+          }
+        },
+        "message": "sample=3; reciprocal source=NaN; ema=NaN; rma=NaN"
+      },
+      {
+        "barTime": 1791346920000,
+        "time": 1791346920000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 112
+          }
+        },
+        "message": "sample=4; phase=4; source=NaN; ema=NaN; rma=NaN"
+      },
+      {
+        "barTime": 1791346920000,
+        "time": 1791346920000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 18,
+            "column": 5
+          },
+          "end": {
+            "line": 18,
+            "column": 165
+          }
+        },
+        "message": "sample=4; reciprocal source=NaN; ema=NaN; rma=NaN"
+      },
+      {
+        "barTime": 1791347040000,
+        "time": 1791347040000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 112
+          }
+        },
+        "message": "sample=5; phase=5; source=2; ema=2; rma=2"
+      },
+      {
+        "barTime": 1791347040000,
+        "time": 1791347040000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 18,
+            "column": 5
+          },
+          "end": {
+            "line": 18,
+            "column": 165
+          }
+        },
+        "message": "sample=5; reciprocal source=0.5; ema=0.5; rma=0.5"
+      },
+      {
+        "barTime": 1791347160000,
+        "time": 1791347160000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 112
+          }
+        },
+        "message": "sample=6; phase=6; source=0; ema=0; rma=0"
+      },
+      {
+        "barTime": 1791347160000,
+        "time": 1791347160000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 18,
+            "column": 5
+          },
+          "end": {
+            "line": 18,
+            "column": 165
+          }
+        },
+        "message": "sample=6; reciprocal source=NaN; ema=NaN; rma=NaN"
+      },
+      {
+        "barTime": 1791347280000,
+        "time": 1791347280000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 112
+          }
+        },
+        "message": "sample=7; phase=7; source=0; ema=0; rma=0"
+      },
+      {
+        "barTime": 1791347280000,
+        "time": 1791347280000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 18,
+            "column": 5
+          },
+          "end": {
+            "line": 18,
+            "column": 165
+          }
+        },
+        "message": "sample=7; reciprocal source=NaN; ema=NaN; rma=NaN"
+      },
+      {
+        "barTime": 1791347400000,
+        "time": 1791347400000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 112
+          }
+        },
+        "message": "sample=8; phase=0; source=0; ema=0; rma=0"
+      },
+      {
+        "barTime": 1791347400000,
+        "time": 1791347400000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 18,
+            "column": 5
+          },
+          "end": {
+            "line": 18,
+            "column": 165
+          }
+        },
+        "message": "sample=8; reciprocal source=NaN; ema=NaN; rma=NaN"
+      },
+      {
+        "barTime": 1791347520000,
+        "time": 1791347520000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 112
+          }
+        },
+        "message": "sample=9; phase=1; source=0; ema=0; rma=0"
+      },
+      {
+        "barTime": 1791347520000,
+        "time": 1791347520000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 18,
+            "column": 5
+          },
+          "end": {
+            "line": 18,
+            "column": 165
+          }
+        },
+        "message": "sample=9; reciprocal source=NaN; ema=NaN; rma=NaN"
+      },
+      {
+        "barTime": 1791347640000,
+        "time": 1791347640000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 112
+          }
+        },
+        "message": "sample=10; phase=2; source=-2; ema=-2; rma=-2"
+      },
+      {
+        "barTime": 1791347640000,
+        "time": 1791347640000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 18,
+            "column": 5
+          },
+          "end": {
+            "line": 18,
+            "column": 165
+          }
+        },
+        "message": "sample=10; reciprocal source=-0.5; ema=-0.5; rma=-0.5"
+      },
+      {
+        "barTime": 1791347760000,
+        "time": 1791347760000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 112
+          }
+        },
+        "message": "sample=11; phase=3; source=0; ema=0; rma=0"
+      },
+      {
+        "barTime": 1791347760000,
+        "time": 1791347760000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 18,
+            "column": 5
+          },
+          "end": {
+            "line": 18,
+            "column": 165
+          }
+        },
+        "message": "sample=11; reciprocal source=NaN; ema=NaN; rma=NaN"
+      },
+      {
+        "barTime": 1791347880000,
+        "time": 1791347880000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 112
+          }
+        },
+        "message": "sample=12; phase=4; source=NaN; ema=NaN; rma=NaN"
+      },
+      {
+        "barTime": 1791347880000,
+        "time": 1791347880000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 18,
+            "column": 5
+          },
+          "end": {
+            "line": 18,
+            "column": 165
+          }
+        },
+        "message": "sample=12; reciprocal source=NaN; ema=NaN; rma=NaN"
+      },
+      {
+        "barTime": 1791348000000,
+        "time": 1791348000000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 112
+          }
+        },
+        "message": "sample=13; phase=5; source=2; ema=2; rma=2"
+      },
+      {
+        "barTime": 1791348000000,
+        "time": 1791348000000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 18,
+            "column": 5
+          },
+          "end": {
+            "line": 18,
+            "column": 165
+          }
+        },
+        "message": "sample=13; reciprocal source=0.5; ema=0.5; rma=0.5"
+      },
+      {
+        "barTime": 1791348120000,
+        "time": 1791348120000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 112
+          }
+        },
+        "message": "sample=14; phase=6; source=0; ema=0; rma=0"
+      },
+      {
+        "barTime": 1791348120000,
+        "time": 1791348120000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 18,
+            "column": 5
+          },
+          "end": {
+            "line": 18,
+            "column": 165
+          }
+        },
+        "message": "sample=14; reciprocal source=NaN; ema=NaN; rma=NaN"
+      },
+      {
+        "barTime": 1791348240000,
+        "time": 1791348240000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 112
+          }
+        },
+        "message": "sample=15; phase=7; source=0; ema=0; rma=0"
+      },
+      {
+        "barTime": 1791348240000,
+        "time": 1791348240000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 18,
+            "column": 5
+          },
+          "end": {
+            "line": 18,
+            "column": 165
+          }
+        },
+        "message": "sample=15; reciprocal source=NaN; ema=NaN; rma=NaN"
+      },
+      {
+        "barTime": 1791348360000,
+        "time": 1791348360000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 112
+          }
+        },
+        "message": "sample=16; phase=0; source=0; ema=0; rma=0"
+      },
+      {
+        "barTime": 1791348360000,
+        "time": 1791348360000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 18,
+            "column": 5
+          },
+          "end": {
+            "line": 18,
+            "column": 165
+          }
+        },
+        "message": "sample=16; reciprocal source=NaN; ema=NaN; rma=NaN"
+      },
+      {
+        "barTime": 1791348480000,
+        "time": 1791348480000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 112
+          }
+        },
+        "message": "sample=17; phase=1; source=0; ema=0; rma=0"
+      },
+      {
+        "barTime": 1791348480000,
+        "time": 1791348480000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 18,
+            "column": 5
+          },
+          "end": {
+            "line": 18,
+            "column": 165
+          }
+        },
+        "message": "sample=17; reciprocal source=NaN; ema=NaN; rma=NaN"
+      },
+      {
+        "barTime": 1791348600000,
+        "time": 1791348600000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 112
+          }
+        },
+        "message": "sample=18; phase=2; source=-2; ema=-2; rma=-2"
+      },
+      {
+        "barTime": 1791348600000,
+        "time": 1791348600000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 18,
+            "column": 5
+          },
+          "end": {
+            "line": 18,
+            "column": 165
+          }
+        },
+        "message": "sample=18; reciprocal source=-0.5; ema=-0.5; rma=-0.5"
+      },
+      {
+        "barTime": 1791348720000,
+        "time": 1791348720000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 112
+          }
+        },
+        "message": "sample=19; phase=3; source=0; ema=0; rma=0"
+      },
+      {
+        "barTime": 1791348720000,
+        "time": 1791348720000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 18,
+            "column": 5
+          },
+          "end": {
+            "line": 18,
+            "column": 165
+          }
+        },
+        "message": "sample=19; reciprocal source=NaN; ema=NaN; rma=NaN"
+      },
+      {
+        "barTime": 1791348840000,
+        "time": 1791348840000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 112
+          }
+        },
+        "message": "sample=20; phase=4; source=NaN; ema=NaN; rma=NaN"
+      },
+      {
+        "barTime": 1791348840000,
+        "time": 1791348840000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 18,
+            "column": 5
+          },
+          "end": {
+            "line": 18,
+            "column": 165
+          }
+        },
+        "message": "sample=20; reciprocal source=NaN; ema=NaN; rma=NaN"
+      },
+      {
+        "barTime": 1791348960000,
+        "time": 1791348960000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 112
+          }
+        },
+        "message": "sample=21; phase=5; source=2; ema=2; rma=2"
+      },
+      {
+        "barTime": 1791348960000,
+        "time": 1791348960000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 18,
+            "column": 5
+          },
+          "end": {
+            "line": 18,
+            "column": 165
+          }
+        },
+        "message": "sample=21; reciprocal source=0.5; ema=0.5; rma=0.5"
+      },
+      {
+        "barTime": 1791349080000,
+        "time": 1791349080000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 112
+          }
+        },
+        "message": "sample=22; phase=6; source=0; ema=0; rma=0"
+      },
+      {
+        "barTime": 1791349080000,
+        "time": 1791349080000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 18,
+            "column": 5
+          },
+          "end": {
+            "line": 18,
+            "column": 165
+          }
+        },
+        "message": "sample=22; reciprocal source=NaN; ema=NaN; rma=NaN"
+      },
+      {
+        "barTime": 1791349200000,
+        "time": 1791349200000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 112
+          }
+        },
+        "message": "sample=23; phase=7; source=0; ema=0; rma=0"
+      },
+      {
+        "barTime": 1791349200000,
+        "time": 1791349200000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 18,
+            "column": 5
+          },
+          "end": {
+            "line": 18,
+            "column": 165
+          }
+        },
+        "message": "sample=23; reciprocal source=NaN; ema=NaN; rma=NaN"
+      },
+      {
+        "barTime": 1791349320000,
+        "time": 1791349320000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 112
+          }
+        },
+        "message": "sample=24; phase=0; source=0; ema=0; rma=0"
+      },
+      {
+        "barTime": 1791349320000,
+        "time": 1791349320000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 18,
+            "column": 5
+          },
+          "end": {
+            "line": 18,
+            "column": 165
+          }
+        },
+        "message": "sample=24; reciprocal source=NaN; ema=NaN; rma=NaN"
+      },
+      {
+        "barTime": 1791349440000,
+        "time": 1791349440000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 112
+          }
+        },
+        "message": "sample=25; phase=1; source=0; ema=0; rma=0"
+      },
+      {
+        "barTime": 1791349440000,
+        "time": 1791349440000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 18,
+            "column": 5
+          },
+          "end": {
+            "line": 18,
+            "column": 165
+          }
+        },
+        "message": "sample=25; reciprocal source=NaN; ema=NaN; rma=NaN"
+      },
+      {
+        "barTime": 1791349560000,
+        "time": 1791349560000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 112
+          }
+        },
+        "message": "sample=26; phase=2; source=-2; ema=-2; rma=-2"
+      },
+      {
+        "barTime": 1791349560000,
+        "time": 1791349560000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 18,
+            "column": 5
+          },
+          "end": {
+            "line": 18,
+            "column": 165
+          }
+        },
+        "message": "sample=26; reciprocal source=-0.5; ema=-0.5; rma=-0.5"
+      },
+      {
+        "barTime": 1791349680000,
+        "time": 1791349680000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 112
+          }
+        },
+        "message": "sample=27; phase=3; source=0; ema=0; rma=0"
+      },
+      {
+        "barTime": 1791349680000,
+        "time": 1791349680000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 18,
+            "column": 5
+          },
+          "end": {
+            "line": 18,
+            "column": 165
+          }
+        },
+        "message": "sample=27; reciprocal source=NaN; ema=NaN; rma=NaN"
+      },
+      {
+        "barTime": 1791349800000,
+        "time": 1791349800000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 112
+          }
+        },
+        "message": "sample=28; phase=4; source=NaN; ema=NaN; rma=NaN"
+      },
+      {
+        "barTime": 1791349800000,
+        "time": 1791349800000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 18,
+            "column": 5
+          },
+          "end": {
+            "line": 18,
+            "column": 165
+          }
+        },
+        "message": "sample=28; reciprocal source=NaN; ema=NaN; rma=NaN"
+      },
+      {
+        "barTime": 1791349920000,
+        "time": 1791349920000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 112
+          }
+        },
+        "message": "sample=29; phase=5; source=2; ema=2; rma=2"
+      },
+      {
+        "barTime": 1791349920000,
+        "time": 1791349920000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 18,
+            "column": 5
+          },
+          "end": {
+            "line": 18,
+            "column": 165
+          }
+        },
+        "message": "sample=29; reciprocal source=0.5; ema=0.5; rma=0.5"
+      },
+      {
+        "barTime": 1791350040000,
+        "time": 1791350040000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 112
+          }
+        },
+        "message": "sample=30; phase=6; source=0; ema=0; rma=0"
+      },
+      {
+        "barTime": 1791350040000,
+        "time": 1791350040000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 18,
+            "column": 5
+          },
+          "end": {
+            "line": 18,
+            "column": 165
+          }
+        },
+        "message": "sample=30; reciprocal source=NaN; ema=NaN; rma=NaN"
+      }
+    ]
+  },
+  {
+    "probe": "iii-wvad-flat-zero-range-v53-v1.pine",
+    "sourcePath": "iii-wvad-flat-zero-range-v53-v1.pine",
+    "sourceSha256": "e63718a8b2dfa7d8c716962fd6aade7883f3074afbfdfe8b11be792f8d871b3b",
+    "instructionsPath": "instructions/iii-wvad-flat-zero-range-v53-v1-instructions-v1.md",
+    "outcome": "RUNS",
+    "attempt": "flat-dogebtc",
+    "symbol": "BINANCE:DOGEBTC",
+    "timeframe": "2",
+    "context": {
+      "timezone": "Etc/UTC",
+      "exchangeTimezone": "Etc/UTC",
+      "session": "24x7",
+      "accountTier": "pro_premium",
+      "realtimeCutoff": 1791350160,
+      "closedRows": 32
+    },
+    "capturedAt": "2026-10-07T05:16:56.111Z",
+    "totalRows": 32,
+    "retainedRows": 32,
+    "artifacts": "captures/v53/iii-wvad-flat-zero-range/flat-dogebtc",
+    "artifactSha256": {
+      "data-window.jpg": "5e97830691ba4cdc9352c1a6fab383a3b38c8924020202a8f3579d31d688672c",
+      "data-window.txt": "9a94ac3aa6e5b226c497946658303161755882a0a2177b8a879d9356d6b0deab",
+      "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logs.txt": "635350f4b21be069bbfca03b2bbd97a90b23588c1af53a173b01ae18f8fd38be",
+      "native.json": "2f2a4291c7d109b3f32c33daace5d279beb1046f7d0d6a5841a3e146fadb4d2e",
+      "plots.csv": "ddc3079885900f8827d645379028eac2e6e5410e9aa10e30562e976897b21e3f",
+      "settings.jpg": "4f3a66dd249d42068ede69df274a89c19954f193db0a9b715bd31037ead6c372"
+    },
+    "errors": [],
+    "logs": [
+      {
+        "barTime": 1791338760000,
+        "time": 1791338760000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=0; flatPositive=false; range=0.00000001; volume=20974; iii=20974; wvad=20974"
+      },
+      {
+        "barTime": 1791338880000,
+        "time": 1791338880000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=1; flatPositive=true; range=0; volume=10961; iii=NaN; wvad=NaN"
+      },
+      {
+        "barTime": 1791339000000,
+        "time": 1791339000000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=2; flatPositive=true; range=0; volume=10611; iii=NaN; wvad=NaN"
+      },
+      {
+        "barTime": 1791339240000,
+        "time": 1791339240000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=3; flatPositive=true; range=0; volume=370; iii=NaN; wvad=NaN"
+      },
+      {
+        "barTime": 1791339720000,
+        "time": 1791339720000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=4; flatPositive=true; range=0; volume=114; iii=NaN; wvad=NaN"
+      },
+      {
+        "barTime": 1791340440000,
+        "time": 1791340440000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=5; flatPositive=true; range=0; volume=120; iii=NaN; wvad=NaN"
+      },
+      {
+        "barTime": 1791341160000,
+        "time": 1791341160000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=6; flatPositive=true; range=0; volume=10505; iii=NaN; wvad=NaN"
+      },
+      {
+        "barTime": 1791341400000,
+        "time": 1791341400000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=7; flatPositive=true; range=0; volume=145; iii=NaN; wvad=NaN"
+      },
+      {
+        "barTime": 1791341520000,
+        "time": 1791341520000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=8; flatPositive=true; range=0; volume=1111; iii=NaN; wvad=NaN"
+      },
+      {
+        "barTime": 1791342000000,
+        "time": 1791342000000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=9; flatPositive=true; range=0; volume=3673; iii=NaN; wvad=NaN"
+      },
+      {
+        "barTime": 1791342120000,
+        "time": 1791342120000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=10; flatPositive=true; range=0; volume=2770; iii=NaN; wvad=NaN"
+      },
+      {
+        "barTime": 1791343920000,
+        "time": 1791343920000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=11; flatPositive=true; range=0; volume=23914; iii=NaN; wvad=NaN"
+      },
+      {
+        "barTime": 1791344160000,
+        "time": 1791344160000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=12; flatPositive=true; range=0; volume=19425; iii=NaN; wvad=NaN"
+      },
+      {
+        "barTime": 1791345600000,
+        "time": 1791345600000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=13; flatPositive=true; range=0; volume=118417; iii=NaN; wvad=NaN"
+      },
+      {
+        "barTime": 1791345840000,
+        "time": 1791345840000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=14; flatPositive=true; range=0; volume=3345; iii=NaN; wvad=NaN"
+      },
+      {
+        "barTime": 1791346080000,
+        "time": 1791346080000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=15; flatPositive=true; range=0; volume=18918; iii=NaN; wvad=NaN"
+      },
+      {
+        "barTime": 1791346680000,
+        "time": 1791346680000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=16; flatPositive=true; range=0; volume=3321; iii=NaN; wvad=NaN"
+      },
+      {
+        "barTime": 1791346920000,
+        "time": 1791346920000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=17; flatPositive=true; range=0; volume=9345; iii=NaN; wvad=NaN"
+      },
+      {
+        "barTime": 1791347040000,
+        "time": 1791347040000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=18; flatPositive=true; range=0; volume=201; iii=NaN; wvad=NaN"
+      },
+      {
+        "barTime": 1791347520000,
+        "time": 1791347520000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=19; flatPositive=true; range=0; volume=7662; iii=NaN; wvad=NaN"
+      },
+      {
+        "barTime": 1791347640000,
+        "time": 1791347640000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=20; flatPositive=true; range=0; volume=127; iii=NaN; wvad=NaN"
+      },
+      {
+        "barTime": 1791347760000,
+        "time": 1791347760000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=21; flatPositive=true; range=0; volume=370; iii=NaN; wvad=NaN"
+      },
+      {
+        "barTime": 1791348120000,
+        "time": 1791348120000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=22; flatPositive=true; range=0; volume=4000; iii=NaN; wvad=NaN"
+      },
+      {
+        "barTime": 1791348360000,
+        "time": 1791348360000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=23; flatPositive=true; range=0; volume=311; iii=NaN; wvad=NaN"
+      },
+      {
+        "barTime": 1791348840000,
+        "time": 1791348840000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=24; flatPositive=true; range=0; volume=238; iii=NaN; wvad=NaN"
+      },
+      {
+        "barTime": 1791348960000,
+        "time": 1791348960000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=25; flatPositive=true; range=0; volume=291; iii=NaN; wvad=NaN"
+      },
+      {
+        "barTime": 1791349080000,
+        "time": 1791349080000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=26; flatPositive=true; range=0; volume=1000; iii=NaN; wvad=NaN"
+      },
+      {
+        "barTime": 1791349320000,
+        "time": 1791349320000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=27; flatPositive=true; range=0; volume=118; iii=NaN; wvad=NaN"
+      },
+      {
+        "barTime": 1791349680000,
+        "time": 1791349680000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=28; flatPositive=true; range=0; volume=4046; iii=NaN; wvad=NaN"
+      },
+      {
+        "barTime": 1791349800000,
+        "time": 1791349800000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=29; flatPositive=true; range=0; volume=265136; iii=NaN; wvad=NaN"
+      },
+      {
+        "barTime": 1791349920000,
+        "time": 1791349920000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=30; flatPositive=true; range=0; volume=13390; iii=NaN; wvad=NaN"
+      }
+    ]
+  },
+  {
+    "probe": "iii-wvad-flat-zero-range-v53-v1.pine",
+    "sourcePath": "iii-wvad-flat-zero-range-v53-v1.pine",
+    "sourceSha256": "e63718a8b2dfa7d8c716962fd6aade7883f3074afbfdfe8b11be792f8d871b3b",
+    "instructionsPath": "instructions/iii-wvad-flat-zero-range-v53-v1-instructions-v1.md",
+    "outcome": "RUNS",
+    "attempt": "flat-recovery-dogebtc-5m",
+    "symbol": "BINANCE:DOGEBTC",
+    "timeframe": "5",
+    "context": {
+      "timezone": "Etc/UTC",
+      "exchangeTimezone": "Etc/UTC",
+      "session": "24x7",
+      "accountTier": "pro_premium",
+      "realtimeCutoff": 1791350100,
+      "closedRows": 31
+    },
+    "capturedAt": "2026-10-07T05:17:32.098Z",
+    "totalRows": 32,
+    "retainedRows": 32,
+    "artifacts": "captures/v53/iii-wvad-flat-zero-range/flat-recovery-dogebtc-5m",
+    "artifactSha256": {
+      "data-window.jpg": "d94a68cdd5dcefcf3d0736ab8156f5191b78d6f04f2baeaac7ef7bbc505551b8",
+      "data-window.txt": "b84d06b4f248ebccd814635968a9f4587d2a640b4bb1572746ac742f6cc376e8",
+      "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logs.txt": "62d0d542ef974d4b8f6de23341a8c4bf3c917c5adec6ebda8de89b0d872f85fc",
+      "native.json": "f3fac631db099d81f3128b196fffde6e15f152e244d1b471d3446c3db6fab0f3",
+      "plots.csv": "a168a13d654f6b7ee4f9d0d65263e7de60515927e3a2cdf3de2fefbe5ed7f4ae",
+      "settings.jpg": "67c6d0d67dd3108cf4dc5bd67cc48de1d75c55eb436500a40123254ea4c5bb4f"
+    },
+    "errors": [],
+    "logs": [
+      {
+        "barTime": 1791333600000,
+        "time": 1791333600000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=0; flatPositive=true; range=0; volume=188; iii=NaN; wvad=NaN"
+      },
+      {
+        "barTime": 1791333900000,
+        "time": 1791333900000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=1; flatPositive=true; range=0; volume=387; iii=NaN; wvad=NaN"
+      },
+      {
+        "barTime": 1791334200000,
+        "time": 1791334200000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=2; flatPositive=true; range=0; volume=138; iii=NaN; wvad=NaN"
+      },
+      {
+        "barTime": 1791334800000,
+        "time": 1791334800000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=3; flatPositive=true; range=0; volume=689; iii=NaN; wvad=NaN"
+      },
+      {
+        "barTime": 1791336300000,
+        "time": 1791336300000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=4; flatPositive=true; range=0; volume=168; iii=NaN; wvad=NaN"
+      },
+      {
+        "barTime": 1791336600000,
+        "time": 1791336600000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=5; flatPositive=false; range=0.00000001; volume=8572; iii=8572; wvad=8572"
+      },
+      {
+        "barTime": 1791337500000,
+        "time": 1791337500000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=6; flatPositive=true; range=0; volume=129; iii=NaN; wvad=NaN"
+      },
+      {
+        "barTime": 1791338100000,
+        "time": 1791338100000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=7; flatPositive=true; range=0; volume=33747; iii=NaN; wvad=NaN"
+      },
+      {
+        "barTime": 1791338400000,
+        "time": 1791338400000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=8; flatPositive=false; range=0.00000003; volume=2838502; iii=-946167.3333333466; wvad=-1892334.6666666735"
+      },
+      {
+        "barTime": 1791338700000,
+        "time": 1791338700000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=9; flatPositive=false; range=0.00000001; volume=40991; iii=40991; wvad=0"
+      },
+      {
+        "barTime": 1791339000000,
+        "time": 1791339000000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=10; flatPositive=true; range=0; volume=10981; iii=NaN; wvad=NaN"
+      },
+      {
+        "barTime": 1791339600000,
+        "time": 1791339600000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=11; flatPositive=true; range=0; volume=114; iii=NaN; wvad=NaN"
+      },
+      {
+        "barTime": 1791340200000,
+        "time": 1791340200000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=12; flatPositive=true; range=0; volume=120; iii=NaN; wvad=NaN"
+      },
+      {
+        "barTime": 1791341100000,
+        "time": 1791341100000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=13; flatPositive=true; range=0; volume=10505; iii=NaN; wvad=NaN"
+      },
+      {
+        "barTime": 1791341400000,
+        "time": 1791341400000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=14; flatPositive=true; range=0; volume=1256; iii=NaN; wvad=NaN"
+      },
+      {
+        "barTime": 1791342000000,
+        "time": 1791342000000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=15; flatPositive=false; range=0.00000001; volume=6443; iii=6443; wvad=6443"
+      },
+      {
+        "barTime": 1791343800000,
+        "time": 1791343800000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=16; flatPositive=true; range=0; volume=23914; iii=NaN; wvad=NaN"
+      },
+      {
+        "barTime": 1791344100000,
+        "time": 1791344100000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=17; flatPositive=true; range=0; volume=19425; iii=NaN; wvad=NaN"
+      },
+      {
+        "barTime": 1791345600000,
+        "time": 1791345600000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=18; flatPositive=true; range=0; volume=121762; iii=NaN; wvad=NaN"
+      },
+      {
+        "barTime": 1791345900000,
+        "time": 1791345900000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=19; flatPositive=true; range=0; volume=18918; iii=NaN; wvad=NaN"
+      },
+      {
+        "barTime": 1791346500000,
+        "time": 1791346500000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=20; flatPositive=true; range=0; volume=3321; iii=NaN; wvad=NaN"
+      },
+      {
+        "barTime": 1791346800000,
+        "time": 1791346800000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=21; flatPositive=true; range=0; volume=9546; iii=NaN; wvad=NaN"
+      },
+      {
+        "barTime": 1791347400000,
+        "time": 1791347400000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=22; flatPositive=false; range=0.00000001; volume=7789; iii=7789; wvad=7789"
+      },
+      {
+        "barTime": 1791347700000,
+        "time": 1791347700000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=23; flatPositive=true; range=0; volume=370; iii=NaN; wvad=NaN"
+      },
+      {
+        "barTime": 1791348000000,
+        "time": 1791348000000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=24; flatPositive=true; range=0; volume=4000; iii=NaN; wvad=NaN"
+      },
+      {
+        "barTime": 1791348300000,
+        "time": 1791348300000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=25; flatPositive=true; range=0; volume=311; iii=NaN; wvad=NaN"
+      },
+      {
+        "barTime": 1791348600000,
+        "time": 1791348600000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=26; flatPositive=true; range=0; volume=238; iii=NaN; wvad=NaN"
+      },
+      {
+        "barTime": 1791348900000,
+        "time": 1791348900000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=27; flatPositive=true; range=0; volume=1291; iii=NaN; wvad=NaN"
+      },
+      {
+        "barTime": 1791349200000,
+        "time": 1791349200000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=28; flatPositive=true; range=0; volume=118; iii=NaN; wvad=NaN"
+      },
+      {
+        "barTime": 1791349500000,
+        "time": 1791349500000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=29; flatPositive=true; range=0; volume=4046; iii=NaN; wvad=NaN"
+      },
+      {
+        "barTime": 1791349800000,
+        "time": 1791349800000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=30; flatPositive=true; range=0; volume=278526; iii=NaN; wvad=NaN"
+      }
+    ]
+  },
+  {
+    "probe": "iii-wvad-flat-zero-range-v53-v1.pine",
+    "sourcePath": "iii-wvad-flat-zero-range-v53-v1.pine",
+    "sourceSha256": "e63718a8b2dfa7d8c716962fd6aade7883f3074afbfdfe8b11be792f8d871b3b",
+    "instructionsPath": "instructions/iii-wvad-flat-zero-range-v53-v1-instructions-v1.md",
+    "outcome": "RUNS",
+    "attempt": "defaults",
+    "symbol": "BINANCE:BTCUSDT",
+    "timeframe": "2",
+    "context": {
+      "timezone": "Etc/UTC",
+      "exchangeTimezone": "Etc/UTC",
+      "session": "24x7",
+      "accountTier": "pro_premium",
+      "realtimeCutoff": 1791350040,
+      "closedRows": 31
+    },
+    "capturedAt": "2026-10-07T05:15:29.672Z",
+    "totalRows": 32,
+    "retainedRows": 32,
+    "artifacts": "captures/v53/iii-wvad-flat-zero-range",
+    "artifactSha256": {
+      "data-window.jpg": "75903878f690dc17d960d03633b5d3eef17c21f17e8ba134a9e9c16dcb6c51b5",
+      "data-window.txt": "af10c5b774d2fd053955a7c31619775f475c8eda5e98a261627d39d7eb411c23",
+      "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logs.txt": "6731b6fb718d97012fa9765d3d72e3889c97eefcc7cf08d34be5a753a3b6b1bf",
+      "native.json": "3749bdd8a680908325fce6a379a8ea7d9d213b0092a44811977d5625addd05f2",
+      "plots.csv": "72b8520e4ece11df1dd09ca5ad0827fea03b5a27769bd5f77f01d5b94075e5ed",
+      "settings.jpg": "2f32eedc7a11401e6308408d09762748ab4b70df6694aaf69b031305c251d505"
+    },
+    "errors": [],
+    "logs": [
+      {
+        "barTime": 1791346320000,
+        "time": 1791346320000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=0; flatPositive=false; range=10.99; volume=15.92774; iii=11.6378300455; wvad=1.0579845496"
+      },
+      {
+        "barTime": 1791346440000,
+        "time": 1791346440000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=1; flatPositive=false; range=12; volume=12.56301; iii=-12.56301; wvad=-9.94571625"
+      },
+      {
+        "barTime": 1791346560000,
+        "time": 1791346560000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=2; flatPositive=false; range=68.66; volume=18.78356; iii=1.657855718; wvad=-8.5601164055"
+      },
+      {
+        "barTime": 1791346680000,
+        "time": 1791346680000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=3; flatPositive=false; range=41.31; volume=14.06332; iii=6.8665496103; wvad=-3.0707128153"
+      },
+      {
+        "barTime": 1791346800000,
+        "time": 1791346800000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=4; flatPositive=false; range=69.28; volume=17.82428; iii=14.0680085219; wvad=3.6816606062"
+      },
+      {
+        "barTime": 1791346920000,
+        "time": 1791346920000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=5; flatPositive=false; range=26; volume=11.10668; iii=11.0981364; wvad=1.70872"
+      },
+      {
+        "barTime": 1791347040000,
+        "time": 1791347040000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=6; flatPositive=false; range=61.08; volume=19.29179; iii=19.2854731074; wvad=13.4991994859"
+      },
+      {
+        "barTime": 1791347160000,
+        "time": 1791347160000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=7; flatPositive=false; range=34.01; volume=12.55068; iii=-5.1627172361; wvad=-3.2253144134"
+      },
+      {
+        "barTime": 1791347280000,
+        "time": 1791347280000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=8; flatPositive=false; range=33.69; volume=10.78091; iii=-3.2096327486; wvad=-0.0544005551"
+      },
+      {
+        "barTime": 1791347400000,
+        "time": 1791347400000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=9; flatPositive=false; range=55.29; volume=11.99938; iii=-7.0294794393; wvad=-9.5144297197"
+      },
+      {
+        "barTime": 1791347520000,
+        "time": 1791347520000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=10; flatPositive=false; range=56.01; volume=13.90131; iii=-6.9469320996; wvad=-10.4216391162"
+      },
+      {
+        "barTime": 1791347640000,
+        "time": 1791347640000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=11; flatPositive=false; range=26.86; volume=7.64625; iii=-5.1468428891; wvad=1.2497035555"
+      },
+      {
+        "barTime": 1791347760000,
+        "time": 1791347760000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=12; flatPositive=false; range=75.63; volume=14.45186; iii=-3.1319051355; wvad=5.6580665688"
+      },
+      {
+        "barTime": 1791347880000,
+        "time": 1791347880000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=13; flatPositive=false; range=34.01; volume=15.62663; iii=-2.7430456072; wvad=6.4417921964"
+      },
+      {
+        "barTime": 1791348000000,
+        "time": 1791348000000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=14; flatPositive=false; range=37.88; volume=7.98104; iii=7.3026094615; wvad=-0.3371083421"
+      },
+      {
+        "barTime": 1791348120000,
+        "time": 1791348120000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=15; flatPositive=false; range=74.01; volume=19.56364; iii=-19.5583532442; wvad=-17.5520294014"
+      },
+      {
+        "barTime": 1791348240000,
+        "time": 1791348240000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=16; flatPositive=false; range=76.09; volume=35.02038; iii=25.7325462715; wvad=30.3718606413"
+      },
+      {
+        "barTime": 1791348360000,
+        "time": 1791348360000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=17; flatPositive=false; range=23.95; volume=7.42079; iii=7.4145930981; wvad=7.4176915491"
+      },
+      {
+        "barTime": 1791348480000,
+        "time": 1791348480000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=18; flatPositive=false; range=23.89; volume=12.45629; iii=11.7784676057; wvad=0.7351765969"
+      },
+      {
+        "barTime": 1791348600000,
+        "time": 1791348600000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=19; flatPositive=false; range=38.66; volume=11.83342; iii=5.6565339265; wvad=8.7449769633"
+      },
+      {
+        "barTime": 1791348720000,
+        "time": 1791348720000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=20; flatPositive=false; range=37.72; volume=17.16558; iii=-17.16558; wvad=-9.4201353659"
+      },
+      {
+        "barTime": 1791348840000,
+        "time": 1791348840000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=21; flatPositive=false; range=43.23; volume=25.81208; iii=-25.81208; wvad=-25.81208"
+      },
+      {
+        "barTime": 1791348960000,
+        "time": 1791348960000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=22; flatPositive=false; range=20.16; volume=9.52226; iii=9.5128133135; wvad=3.2685535317"
+      },
+      {
+        "barTime": 1791349080000,
+        "time": 1791349080000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=23; flatPositive=false; range=9.26; volume=4.75529; iii=0.7702953564; wvad=-1.9873620194"
+      },
+      {
+        "barTime": 1791349200000,
+        "time": 1791349200000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=24; flatPositive=false; range=14.47; volume=10.47898; iii=-7.393945114; wvad=1.5352755771"
+      },
+      {
+        "barTime": 1791349320000,
+        "time": 1791349320000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=25; flatPositive=false; range=32.98; volume=13.33656; iii=6.7451128199; wvad=10.0367925773"
+      },
+      {
+        "barTime": 1791349440000,
+        "time": 1791349440000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=26; flatPositive=false; range=55.54; volume=28.7438; iii=28.7438; wvad=5.1805084264"
+      },
+      {
+        "barTime": 1791349560000,
+        "time": 1791349560000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=27; flatPositive=false; range=23.04; volume=8.25951; iii=8.25951; wvad=3.2371256641"
+      },
+      {
+        "barTime": 1791349680000,
+        "time": 1791349680000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=28; flatPositive=false; range=50.98; volume=9.75256; iii=9.7487339663; wvad=9.7506469831"
+      },
+      {
+        "barTime": 1791349800000,
+        "time": 1791349800000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=29; flatPositive=false; range=26.85; volume=20.86357; iii=7.9646775605; wvad=6.643706648"
+      },
+      {
+        "barTime": 1791349920000,
+        "time": 1791349920000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 13,
+            "column": 5
+          },
+          "end": {
+            "line": 13,
+            "column": 219
+          }
+        },
+        "message": "sample=30; flatPositive=false; range=50.3; volume=19.44016; iii=-6.3538017972; wvad=-12.1472013678"
+      }
+    ]
+  },
+  {
+    "probe": "max-all-missing-seed-v53-v1.pine",
+    "sourcePath": "max-all-missing-seed-v53-v1.pine",
+    "sourceSha256": "6f8a60b1f92ff4854179688025c2e0471296b2f24e514a60481dcdbf437e8f56",
+    "instructionsPath": "instructions/max-all-missing-seed-v53-v1-instructions-v1.md",
+    "outcome": "RUNS",
+    "attempt": "defaults",
+    "symbol": "BINANCE:BTCUSDT",
+    "timeframe": "2",
+    "context": {
+      "timezone": "Etc/UTC",
+      "exchangeTimezone": "Etc/UTC",
+      "session": "24x7",
+      "accountTier": "pro_premium",
+      "realtimeCutoff": 1791350040,
+      "closedRows": 31
+    },
+    "capturedAt": "2026-10-07T05:15:33.643Z",
+    "totalRows": 32,
+    "retainedRows": 32,
+    "artifacts": "captures/v53/max-all-missing-seed",
+    "artifactSha256": {
+      "data-window.jpg": "a723aa79c81215ff7bbad8977df3d3937247bdae4660a8bc11e45a759af3c7b9",
+      "data-window.txt": "6404fd2f933c6e4a67bfbffe91a455c69979aa43ab5e994021c7db2d312c59ee",
+      "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logs.txt": "811696ba730f5e94eb891a40d53893673c9b283bd6691e34a7a1f307bb91a146",
+      "native.json": "05b522d1746713c261abdb70ee76d6df15efd41a6b2c3522694263f57cabb596",
+      "plots.csv": "99e62e43ea337820a3c19dc61d20fb092b6dc2b9d5c9311d0165068249fb9031",
+      "settings.jpg": "fda4dc7425357ba51dcdecdb3c01465d265c612c5ac011bb47868b0a18913677"
+    },
+    "errors": [],
+    "logs": [
+      {
+        "barTime": 1791346320000,
+        "time": 1791346320000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 264
+          }
+        },
+        "message": "sample=0; allMissingSource=NaN; allMissingMax=NaN; delayedSource=NaN; delayedMax=NaN; finiteControl=-2"
+      },
+      {
+        "barTime": 1791346440000,
+        "time": 1791346440000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 264
+          }
+        },
+        "message": "sample=1; allMissingSource=NaN; allMissingMax=NaN; delayedSource=NaN; delayedMax=NaN; finiteControl=-2"
+      },
+      {
+        "barTime": 1791346560000,
+        "time": 1791346560000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 264
+          }
+        },
+        "message": "sample=2; allMissingSource=NaN; allMissingMax=NaN; delayedSource=NaN; delayedMax=NaN; finiteControl=-2"
+      },
+      {
+        "barTime": 1791346680000,
+        "time": 1791346680000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 264
+          }
+        },
+        "message": "sample=3; allMissingSource=NaN; allMissingMax=NaN; delayedSource=-2; delayedMax=-2; finiteControl=-2"
+      },
+      {
+        "barTime": 1791346800000,
+        "time": 1791346800000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 264
+          }
+        },
+        "message": "sample=4; allMissingSource=NaN; allMissingMax=NaN; delayedSource=NaN; delayedMax=-2; finiteControl=-2"
+      },
+      {
+        "barTime": 1791346920000,
+        "time": 1791346920000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 264
+          }
+        },
+        "message": "sample=5; allMissingSource=NaN; allMissingMax=NaN; delayedSource=4; delayedMax=4; finiteControl=-2"
+      },
+      {
+        "barTime": 1791347040000,
+        "time": 1791347040000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 264
+          }
+        },
+        "message": "sample=6; allMissingSource=NaN; allMissingMax=NaN; delayedSource=NaN; delayedMax=4; finiteControl=-2"
+      },
+      {
+        "barTime": 1791347160000,
+        "time": 1791347160000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 264
+          }
+        },
+        "message": "sample=7; allMissingSource=NaN; allMissingMax=NaN; delayedSource=NaN; delayedMax=4; finiteControl=-2"
+      },
+      {
+        "barTime": 1791347280000,
+        "time": 1791347280000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 264
+          }
+        },
+        "message": "sample=8; allMissingSource=NaN; allMissingMax=NaN; delayedSource=NaN; delayedMax=4; finiteControl=-2"
+      },
+      {
+        "barTime": 1791347400000,
+        "time": 1791347400000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 264
+          }
+        },
+        "message": "sample=9; allMissingSource=NaN; allMissingMax=NaN; delayedSource=NaN; delayedMax=4; finiteControl=-2"
+      },
+      {
+        "barTime": 1791347520000,
+        "time": 1791347520000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 264
+          }
+        },
+        "message": "sample=10; allMissingSource=NaN; allMissingMax=NaN; delayedSource=NaN; delayedMax=4; finiteControl=-2"
+      },
+      {
+        "barTime": 1791347640000,
+        "time": 1791347640000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 264
+          }
+        },
+        "message": "sample=11; allMissingSource=NaN; allMissingMax=NaN; delayedSource=NaN; delayedMax=4; finiteControl=-2"
+      },
+      {
+        "barTime": 1791347760000,
+        "time": 1791347760000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 264
+          }
+        },
+        "message": "sample=12; allMissingSource=NaN; allMissingMax=NaN; delayedSource=NaN; delayedMax=4; finiteControl=-2"
+      },
+      {
+        "barTime": 1791347880000,
+        "time": 1791347880000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 264
+          }
+        },
+        "message": "sample=13; allMissingSource=NaN; allMissingMax=NaN; delayedSource=NaN; delayedMax=4; finiteControl=-2"
+      },
+      {
+        "barTime": 1791348000000,
+        "time": 1791348000000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 264
+          }
+        },
+        "message": "sample=14; allMissingSource=NaN; allMissingMax=NaN; delayedSource=NaN; delayedMax=4; finiteControl=-2"
+      },
+      {
+        "barTime": 1791348120000,
+        "time": 1791348120000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 264
+          }
+        },
+        "message": "sample=15; allMissingSource=NaN; allMissingMax=NaN; delayedSource=NaN; delayedMax=4; finiteControl=-2"
+      },
+      {
+        "barTime": 1791348240000,
+        "time": 1791348240000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 264
+          }
+        },
+        "message": "sample=16; allMissingSource=NaN; allMissingMax=NaN; delayedSource=NaN; delayedMax=4; finiteControl=-2"
+      },
+      {
+        "barTime": 1791348360000,
+        "time": 1791348360000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 264
+          }
+        },
+        "message": "sample=17; allMissingSource=NaN; allMissingMax=NaN; delayedSource=NaN; delayedMax=4; finiteControl=-2"
+      },
+      {
+        "barTime": 1791348480000,
+        "time": 1791348480000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 264
+          }
+        },
+        "message": "sample=18; allMissingSource=NaN; allMissingMax=NaN; delayedSource=NaN; delayedMax=4; finiteControl=-2"
+      },
+      {
+        "barTime": 1791348600000,
+        "time": 1791348600000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 264
+          }
+        },
+        "message": "sample=19; allMissingSource=NaN; allMissingMax=NaN; delayedSource=NaN; delayedMax=4; finiteControl=-2"
+      },
+      {
+        "barTime": 1791348720000,
+        "time": 1791348720000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 264
+          }
+        },
+        "message": "sample=20; allMissingSource=NaN; allMissingMax=NaN; delayedSource=NaN; delayedMax=4; finiteControl=-2"
+      },
+      {
+        "barTime": 1791348840000,
+        "time": 1791348840000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 264
+          }
+        },
+        "message": "sample=21; allMissingSource=NaN; allMissingMax=NaN; delayedSource=NaN; delayedMax=4; finiteControl=-2"
+      },
+      {
+        "barTime": 1791348960000,
+        "time": 1791348960000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 264
+          }
+        },
+        "message": "sample=22; allMissingSource=NaN; allMissingMax=NaN; delayedSource=NaN; delayedMax=4; finiteControl=-2"
+      },
+      {
+        "barTime": 1791349080000,
+        "time": 1791349080000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 264
+          }
+        },
+        "message": "sample=23; allMissingSource=NaN; allMissingMax=NaN; delayedSource=NaN; delayedMax=4; finiteControl=-2"
+      },
+      {
+        "barTime": 1791349200000,
+        "time": 1791349200000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 264
+          }
+        },
+        "message": "sample=24; allMissingSource=NaN; allMissingMax=NaN; delayedSource=NaN; delayedMax=4; finiteControl=-2"
+      },
+      {
+        "barTime": 1791349320000,
+        "time": 1791349320000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 264
+          }
+        },
+        "message": "sample=25; allMissingSource=NaN; allMissingMax=NaN; delayedSource=NaN; delayedMax=4; finiteControl=-2"
+      },
+      {
+        "barTime": 1791349440000,
+        "time": 1791349440000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 264
+          }
+        },
+        "message": "sample=26; allMissingSource=NaN; allMissingMax=NaN; delayedSource=NaN; delayedMax=4; finiteControl=-2"
+      },
+      {
+        "barTime": 1791349560000,
+        "time": 1791349560000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 264
+          }
+        },
+        "message": "sample=27; allMissingSource=NaN; allMissingMax=NaN; delayedSource=NaN; delayedMax=4; finiteControl=-2"
+      },
+      {
+        "barTime": 1791349680000,
+        "time": 1791349680000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 264
+          }
+        },
+        "message": "sample=28; allMissingSource=NaN; allMissingMax=NaN; delayedSource=NaN; delayedMax=4; finiteControl=-2"
+      },
+      {
+        "barTime": 1791349800000,
+        "time": 1791349800000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 264
+          }
+        },
+        "message": "sample=29; allMissingSource=NaN; allMissingMax=NaN; delayedSource=NaN; delayedMax=4; finiteControl=-2"
+      },
+      {
+        "barTime": 1791349920000,
+        "time": 1791349920000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 264
+          }
+        },
+        "message": "sample=30; allMissingSource=NaN; allMissingMax=NaN; delayedSource=NaN; delayedMax=4; finiteControl=-2"
+      }
+    ]
+  },
+  {
+    "probe": "vwap-variable-missing-inputs-v53-v1.pine",
+    "sourcePath": "vwap-variable-missing-inputs-v53-v1.pine",
+    "sourceSha256": "17f1817414fc5d8ed29b4a527d714a4a0f9354065de161ce5b17e8f74cfc3ef1",
+    "instructionsPath": "instructions/vwap-variable-missing-inputs-v53-v1-instructions-v1.md",
+    "outcome": "RUNS",
+    "attempt": "missing-volume-dxy",
+    "symbol": "TVC:DXY",
+    "timeframe": "2",
+    "context": {
+      "timezone": "Etc/UTC",
+      "exchangeTimezone": "America/New_York",
+      "session": "1900-1900:3456|1700F-1900:2",
+      "accountTier": "pro_premium",
+      "realtimeCutoff": 1791350160,
+      "closedRows": 31
+    },
+    "capturedAt": "2026-10-07T05:17:00.313Z",
+    "totalRows": 32,
+    "retainedRows": 32,
+    "artifacts": "captures/v53/vwap-variable-missing-inputs/missing-volume-dxy",
+    "artifactSha256": {
+      "data-window.jpg": "b2d3fce55d120043beaaeb5b78a33d5516be2569f735bb0fec306912c674763e",
+      "data-window.txt": "085abbe47d6560f97475500b8aa4655fd68c27b88f3ecb284ff3a2b1336f95ea",
+      "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logs.txt": "9bf766895b987912fd291afe06e0a8a79c9fed73a4272db0801a56de59b9c122",
+      "native.json": "92173c4d913222d203f3a68d58cb799595e7943b745416a5160d2aac47a26e24",
+      "plots.csv": "bebb3b6fafaeec80091d88bb154e2aab72723acef1e7a8029e8a7ee3d4a663e9",
+      "settings.jpg": "a5b4ee66a3de0030cd7a6fc7f0a2f06a074b2793c1fce1bd5399ed3665917ab4"
+    },
+    "errors": [],
+    "logs": [
+      {
+        "barTime": 1791346440000,
+        "time": 1791346440000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=0; hlc3=102.0456666667; volume=NaN; sourceNA=false; volumeNA=true; vwap=NaN"
+      },
+      {
+        "barTime": 1791346560000,
+        "time": 1791346560000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=1; hlc3=102.051; volume=NaN; sourceNA=false; volumeNA=true; vwap=NaN"
+      },
+      {
+        "barTime": 1791346680000,
+        "time": 1791346680000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=2; hlc3=102.0616666667; volume=NaN; sourceNA=false; volumeNA=true; vwap=NaN"
+      },
+      {
+        "barTime": 1791346800000,
+        "time": 1791346800000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=3; hlc3=102.0646666667; volume=NaN; sourceNA=false; volumeNA=true; vwap=NaN"
+      },
+      {
+        "barTime": 1791346920000,
+        "time": 1791346920000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=4; hlc3=102.066; volume=NaN; sourceNA=false; volumeNA=true; vwap=NaN"
+      },
+      {
+        "barTime": 1791347040000,
+        "time": 1791347040000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=5; hlc3=102.0673333333; volume=NaN; sourceNA=false; volumeNA=true; vwap=NaN"
+      },
+      {
+        "barTime": 1791347160000,
+        "time": 1791347160000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=6; hlc3=102.084; volume=NaN; sourceNA=false; volumeNA=true; vwap=NaN"
+      },
+      {
+        "barTime": 1791347280000,
+        "time": 1791347280000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=7; hlc3=102.0863333333; volume=NaN; sourceNA=false; volumeNA=true; vwap=NaN"
+      },
+      {
+        "barTime": 1791347400000,
+        "time": 1791347400000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=8; hlc3=102.0793333333; volume=NaN; sourceNA=false; volumeNA=true; vwap=NaN"
+      },
+      {
+        "barTime": 1791347520000,
+        "time": 1791347520000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=9; hlc3=102.0773333333; volume=NaN; sourceNA=false; volumeNA=true; vwap=NaN"
+      },
+      {
+        "barTime": 1791347640000,
+        "time": 1791347640000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=10; hlc3=102.077; volume=NaN; sourceNA=false; volumeNA=true; vwap=NaN"
+      },
+      {
+        "barTime": 1791347760000,
+        "time": 1791347760000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=11; hlc3=102.0783333333; volume=NaN; sourceNA=false; volumeNA=true; vwap=NaN"
+      },
+      {
+        "barTime": 1791347880000,
+        "time": 1791347880000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=12; hlc3=102.0763333333; volume=NaN; sourceNA=false; volumeNA=true; vwap=NaN"
+      },
+      {
+        "barTime": 1791348000000,
+        "time": 1791348000000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=13; hlc3=102.0743333333; volume=NaN; sourceNA=false; volumeNA=true; vwap=NaN"
+      },
+      {
+        "barTime": 1791348120000,
+        "time": 1791348120000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=14; hlc3=102.0766666667; volume=NaN; sourceNA=false; volumeNA=true; vwap=NaN"
+      },
+      {
+        "barTime": 1791348240000,
+        "time": 1791348240000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=15; hlc3=102.0746666667; volume=NaN; sourceNA=false; volumeNA=true; vwap=NaN"
+      },
+      {
+        "barTime": 1791348360000,
+        "time": 1791348360000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=16; hlc3=102.071; volume=NaN; sourceNA=false; volumeNA=true; vwap=NaN"
+      },
+      {
+        "barTime": 1791348480000,
+        "time": 1791348480000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=17; hlc3=102.0663333333; volume=NaN; sourceNA=false; volumeNA=true; vwap=NaN"
+      },
+      {
+        "barTime": 1791348600000,
+        "time": 1791348600000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=18; hlc3=102.063; volume=NaN; sourceNA=false; volumeNA=true; vwap=NaN"
+      },
+      {
+        "barTime": 1791348720000,
+        "time": 1791348720000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=19; hlc3=102.0653333333; volume=NaN; sourceNA=false; volumeNA=true; vwap=NaN"
+      },
+      {
+        "barTime": 1791348840000,
+        "time": 1791348840000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=20; hlc3=102.0656666667; volume=NaN; sourceNA=false; volumeNA=true; vwap=NaN"
+      },
+      {
+        "barTime": 1791348960000,
+        "time": 1791348960000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=21; hlc3=102.061; volume=NaN; sourceNA=false; volumeNA=true; vwap=NaN"
+      },
+      {
+        "barTime": 1791349080000,
+        "time": 1791349080000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=22; hlc3=102.064; volume=NaN; sourceNA=false; volumeNA=true; vwap=NaN"
+      },
+      {
+        "barTime": 1791349200000,
+        "time": 1791349200000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=23; hlc3=102.0706666667; volume=NaN; sourceNA=false; volumeNA=true; vwap=NaN"
+      },
+      {
+        "barTime": 1791349320000,
+        "time": 1791349320000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=24; hlc3=102.0726666667; volume=NaN; sourceNA=false; volumeNA=true; vwap=NaN"
+      },
+      {
+        "barTime": 1791349440000,
+        "time": 1791349440000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=25; hlc3=102.065; volume=NaN; sourceNA=false; volumeNA=true; vwap=NaN"
+      },
+      {
+        "barTime": 1791349560000,
+        "time": 1791349560000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=26; hlc3=102.0626666667; volume=NaN; sourceNA=false; volumeNA=true; vwap=NaN"
+      },
+      {
+        "barTime": 1791349680000,
+        "time": 1791349680000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=27; hlc3=102.0673333333; volume=NaN; sourceNA=false; volumeNA=true; vwap=NaN"
+      },
+      {
+        "barTime": 1791349800000,
+        "time": 1791349800000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=28; hlc3=102.0646666667; volume=NaN; sourceNA=false; volumeNA=true; vwap=NaN"
+      },
+      {
+        "barTime": 1791349920000,
+        "time": 1791349920000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=29; hlc3=102.0716666667; volume=NaN; sourceNA=false; volumeNA=true; vwap=NaN"
+      },
+      {
+        "barTime": 1791350040000,
+        "time": 1791350040000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=30; hlc3=102.0816666667; volume=NaN; sourceNA=false; volumeNA=true; vwap=NaN"
+      }
+    ]
+  },
+  {
+    "probe": "vwap-variable-missing-inputs-v53-v1.pine",
+    "sourcePath": "vwap-variable-missing-inputs-v53-v1.pine",
+    "sourceSha256": "17f1817414fc5d8ed29b4a527d714a4a0f9354065de161ce5b17e8f74cfc3ef1",
+    "instructionsPath": "instructions/vwap-variable-missing-inputs-v53-v1-instructions-v1.md",
+    "outcome": "RUNS",
+    "attempt": "missing-volume-spx",
+    "symbol": "SP_DLY:SPX",
+    "timeframe": "2",
+    "context": {
+      "timezone": "Etc/UTC",
+      "exchangeTimezone": "America/New_York",
+      "session": "0930-1610",
+      "accountTier": "pro_premium",
+      "realtimeCutoff": 1791350160,
+      "closedRows": 32
+    },
+    "capturedAt": "2026-10-07T05:16:19.457Z",
+    "totalRows": 32,
+    "retainedRows": 32,
+    "artifacts": "captures/v53/vwap-variable-missing-inputs/missing-volume-spx",
+    "artifactSha256": {
+      "data-window.jpg": "a3db78d1b4586059fc1563f24bb518347ffdd89447b3c412a5a2491d4e176e33",
+      "data-window.txt": "71247a8182715236abe439300d6ec22ab57b500dfaf7806a52d59b48bf0ed520",
+      "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logs.txt": "a471ec9adb24bd741b3f332259a24ae8d634b91a678f45c46443d8edfdef6040",
+      "native.json": "5e370ada5646b23d545fc085436592a2694946691c5619e7ad6ec26591066b48",
+      "plots.csv": "6b34812eef0e4f5a219c05cf7c7f7e5b81d403cb18d6338c3dbb1b293e82d305",
+      "settings.jpg": "143a3ff7501101de65cefd34e06188a6ff4bf6564c4eb2e5a4f71ed1009abbb1"
+    },
+    "errors": [],
+    "logs": [
+      {
+        "barTime": 1791313560000,
+        "time": 1791313560000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=0; hlc3=7828.71; volume=7739860; sourceNA=false; volumeNA=false; vwap=7828.71"
+      },
+      {
+        "barTime": 1791313680000,
+        "time": 1791313680000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=1; hlc3=7826.4166666667; volume=7743304; sourceNA=false; volumeNA=false; vwap=7827.5630782744"
+      },
+      {
+        "barTime": 1791313800000,
+        "time": 1791313800000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=2; hlc3=7826.5233333333; volume=9057851; sourceNA=false; volumeNA=false; vwap=7827.1793184847"
+      },
+      {
+        "barTime": 1791313920000,
+        "time": 1791313920000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=3; hlc3=7826.83; volume=8473693; sourceNA=false; volumeNA=false; vwap=7827.0896609418"
+      },
+      {
+        "barTime": 1791314040000,
+        "time": 1791314040000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=4; hlc3=7827.1133333333; volume=10298223; sourceNA=false; volumeNA=false; vwap=7827.0952893664"
+      },
+      {
+        "barTime": 1791314160000,
+        "time": 1791314160000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=5; hlc3=7827.46; volume=9574998; sourceNA=false; volumeNA=false; vwap=7827.1613177335"
+      },
+      {
+        "barTime": 1791314280000,
+        "time": 1791314280000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=6; hlc3=7826.2133333333; volume=10132136; sourceNA=false; volumeNA=false; vwap=7827.0089042622"
+      },
+      {
+        "barTime": 1791314400000,
+        "time": 1791314400000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=7; hlc3=7826.21; volume=9362301; sourceNA=false; volumeNA=false; vwap=7826.9055699477"
+      },
+      {
+        "barTime": 1791314520000,
+        "time": 1791314520000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=8; hlc3=7825.3833333333; volume=10514072; sourceNA=false; volumeNA=false; vwap=7826.712498861"
+      },
+      {
+        "barTime": 1791314640000,
+        "time": 1791314640000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=9; hlc3=7824.69; volume=11373727; sourceNA=false; volumeNA=false; vwap=7826.4684836956"
+      },
+      {
+        "barTime": 1791314760000,
+        "time": 1791314760000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=10; hlc3=7824.75; volume=11506106; sourceNA=false; volumeNA=false; vwap=7826.2815508857"
+      },
+      {
+        "barTime": 1791314880000,
+        "time": 1791314880000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=11; hlc3=7825.1833333333; volume=11682867; sourceNA=false; volumeNA=false; vwap=7826.1723186044"
+      },
+      {
+        "barTime": 1791315000000,
+        "time": 1791315000000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=12; hlc3=7825.3166666667; volume=15323193; sourceNA=false; volumeNA=false; vwap=7826.0735756491"
+      },
+      {
+        "barTime": 1791315120000,
+        "time": 1791315120000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=13; hlc3=7824.6366666667; volume=15350462; sourceNA=false; volumeNA=false; vwap=7825.9246740029"
+      },
+      {
+        "barTime": 1791315240000,
+        "time": 1791315240000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=14; hlc3=7824.3533333333; volume=12725343; sourceNA=false; volumeNA=false; vwap=7825.8003666505"
+      },
+      {
+        "barTime": 1791315360000,
+        "time": 1791315360000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=15; hlc3=7823.68; volume=11808971; sourceNA=false; volumeNA=false; vwap=7825.6553514897"
+      },
+      {
+        "barTime": 1791315480000,
+        "time": 1791315480000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=16; hlc3=7823.41; volume=12249976; sourceNA=false; volumeNA=false; vwap=7825.5066064338"
+      },
+      {
+        "barTime": 1791315600000,
+        "time": 1791315600000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=17; hlc3=7824.3033333333; volume=14391825; sourceNA=false; volumeNA=false; vwap=7825.4197197208"
+      },
+      {
+        "barTime": 1791315720000,
+        "time": 1791315720000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=18; hlc3=7823.2766666667; volume=14042137; sourceNA=false; volumeNA=false; vwap=7825.2786702847"
+      },
+      {
+        "barTime": 1791315840000,
+        "time": 1791315840000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=19; hlc3=7823.1666666667; volume=16857821; sourceNA=false; volumeNA=false; vwap=7825.1240116933"
+      },
+      {
+        "barTime": 1791315960000,
+        "time": 1791315960000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=20; hlc3=7823.5066666667; volume=15327617; sourceNA=false; volumeNA=false; vwap=7825.0230489165"
+      },
+      {
+        "barTime": 1791316080000,
+        "time": 1791316080000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=21; hlc3=7823.38; volume=16091828; sourceNA=false; volumeNA=false; vwap=7824.9219908144"
+      },
+      {
+        "barTime": 1791316200000,
+        "time": 1791316200000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=22; hlc3=7821.6466666667; volume=25185187; sourceNA=false; volumeNA=false; vwap=7824.6343835305"
+      },
+      {
+        "barTime": 1791316320000,
+        "time": 1791316320000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=23; hlc3=7820.5166666667; volume=25215274; sourceNA=false; volumeNA=false; vwap=7824.3016278096"
+      },
+      {
+        "barTime": 1791316440000,
+        "time": 1791316440000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=24; hlc3=7819.41; volume=39769018; sourceNA=false; volumeNA=false; vwap=7823.7486532318"
+      },
+      {
+        "barTime": 1791316560000,
+        "time": 1791316560000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=25; hlc3=7819.1766666667; volume=49549227; sourceNA=false; volumeNA=false; vwap=7823.1842080246"
+      },
+      {
+        "barTime": 1791316680000,
+        "time": 1791316680000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=26; hlc3=7819.7966666667; volume=111946620; sourceNA=false; volumeNA=false; vwap=7822.4454032201"
+      },
+      {
+        "barTime": 1791316800000,
+        "time": 1791316800000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=27; hlc3=7819.0666666667; volume=427431992; sourceNA=false; volumeNA=false; vwap=7820.9102264895"
+      },
+      {
+        "barTime": 1791316920000,
+        "time": 1791316920000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=28; hlc3=7818.9466666667; volume=70105854; sourceNA=false; volumeNA=false; vwap=7820.7740445041"
+      },
+      {
+        "barTime": 1791317040000,
+        "time": 1791317040000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=29; hlc3=7818.9233333333; volume=32133580; sourceNA=false; volumeNA=false; vwap=7820.717024401"
+      },
+      {
+        "barTime": 1791317160000,
+        "time": 1791317160000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=30; hlc3=7818.93; volume=3400265; sourceNA=false; volumeNA=false; vwap=7820.7112172929"
+      },
+      {
+        "barTime": 1791317280000,
+        "time": 1791317280000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=31; hlc3=7818.93; volume=8860020; sourceNA=false; volumeNA=false; vwap=7820.6962616052"
+      }
+    ]
+  },
+  {
+    "probe": "vwap-variable-missing-inputs-v53-v1.pine",
+    "sourcePath": "vwap-variable-missing-inputs-v53-v1.pine",
+    "sourceSha256": "17f1817414fc5d8ed29b4a527d714a4a0f9354065de161ce5b17e8f74cfc3ef1",
+    "instructionsPath": "instructions/vwap-variable-missing-inputs-v53-v1-instructions-v1.md",
+    "outcome": "RUNS",
+    "attempt": "defaults",
+    "symbol": "BINANCE:BTCUSDT",
+    "timeframe": "2",
+    "context": {
+      "timezone": "Etc/UTC",
+      "exchangeTimezone": "Etc/UTC",
+      "session": "24x7",
+      "accountTier": "pro_premium",
+      "realtimeCutoff": 1791350040,
+      "closedRows": 31
+    },
+    "capturedAt": "2026-10-07T05:15:38.115Z",
+    "totalRows": 32,
+    "retainedRows": 32,
+    "artifacts": "captures/v53/vwap-variable-missing-inputs",
+    "artifactSha256": {
+      "data-window.jpg": "83e7b2586442f8baa5c8bc2a6430eb41434b2974d364c2cd030733c2195da143",
+      "data-window.txt": "4fd5306070772c4451a3ebde4e1f7870bb28222f15ab4439e00e9584f121dd54",
+      "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logs.txt": "363602bdc1f52e597fb841ec3b6a50eaf43fb361d41b4cacbb6e5d717e2632d2",
+      "native.json": "8b3f271d59a3d8de3ebed16ddcf82c9c5175b655930b55c30d092825820b286a",
+      "plots.csv": "22363ad67f0796e65203dfb2c876f1b794df4135ea3e9033239f395fa193c875",
+      "settings.jpg": "1a691ca0bc31ca5dedc8c74359fbae87058cfd3e681f927d2c324711a575baa6"
+    },
+    "errors": [],
+    "logs": [
+      {
+        "barTime": 1791346320000,
+        "time": 1791346320000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=0; hlc3=84144.8333333333; volume=15.92774; sourceNA=false; volumeNA=false; vwap=84144.8333333333"
+      },
+      {
+        "barTime": 1791346440000,
+        "time": 1791346440000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=1; hlc3=84142.01; volume=12.56301; sourceNA=false; volumeNA=false; vwap=84143.5883831337"
+      },
+      {
+        "barTime": 1791346560000,
+        "time": 1791346560000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=2; hlc3=84104.7; volume=18.78356; sourceNA=false; volumeNA=false; vwap=84128.1368138164"
+      },
+      {
+        "barTime": 1791346680000,
+        "time": 1791346680000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=3; hlc3=84090.9766666667; volume=14.06332; sourceNA=false; volumeNA=false; vwap=84119.6168393633"
+      },
+      {
+        "barTime": 1791346800000,
+        "time": 1791346800000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=4; hlc3=84093.7733333333; volume=17.82428; sourceNA=false; volumeNA=false; vwap=84113.7978553638"
+      },
+      {
+        "barTime": 1791346920000,
+        "time": 1791346920000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=5; hlc3=84107.34; volume=11.10668; sourceNA=false; volumeNA=false; vwap=84113.0032785014"
+      },
+      {
+        "barTime": 1791347040000,
+        "time": 1791347040000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=6; hlc3=84138.3966666667; volume=19.29179; sourceNA=false; volumeNA=false; vwap=84117.4746386032"
+      },
+      {
+        "barTime": 1791347160000,
+        "time": 1791347160000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=7; hlc3=84154.6733333333; volume=12.55068; sourceNA=false; volumeNA=false; vwap=84121.2979525109"
+      },
+      {
+        "barTime": 1791347280000,
+        "time": 1791347280000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=8; hlc3=84153.1733333333; volume=10.78091; sourceNA=false; volumeNA=false; vwap=84123.8838545173"
+      },
+      {
+        "barTime": 1791347400000,
+        "time": 1791347400000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=9; hlc3=84116.7966666667; volume=11.99938; sourceNA=false; volumeNA=false; vwap=84123.2969191333"
+      },
+      {
+        "barTime": 1791347520000,
+        "time": 1791347520000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=10; hlc3=84073.34; volume=13.90131; sourceNA=false; volumeNA=false; vwap=84118.9235014985"
+      },
+      {
+        "barTime": 1791347640000,
+        "time": 1791347640000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=11; hlc3=84074.4166666667; volume=7.64625; sourceNA=false; volumeNA=false; vwap=84116.8788450787"
+      },
+      {
+        "barTime": 1791347760000,
+        "time": 1791347760000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=12; hlc3=84103.4633333333; volume=14.45186; sourceNA=false; volumeNA=false; vwap=84115.8070430317"
+      },
+      {
+        "barTime": 1791347880000,
+        "time": 1791347880000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=13; hlc3=84114.01; volume=15.62663; sourceNA=false; volumeNA=false; vwap=84115.6641461353"
+      },
+      {
+        "barTime": 1791348000000,
+        "time": 1791348000000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=14; hlc3=84098.8566666667; volume=7.98104; sourceNA=false; volumeNA=false; vwap=84115.0081941098"
+      },
+      {
+        "barTime": 1791348120000,
+        "time": 1791348120000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=15; hlc3=84068.6733333333; volume=19.56364; sourceNA=false; volumeNA=false; vwap=84110.9625361578"
+      },
+      {
+        "barTime": 1791348240000,
+        "time": 1791348240000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=16; hlc3=84091.3633333333; volume=35.02038; sourceNA=false; volumeNA=false; vwap=84108.3132964887"
+      },
+      {
+        "barTime": 1791348360000,
+        "time": 1791348360000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=17; hlc3=84125.9633333333; volume=7.42079; sourceNA=false; volumeNA=false; vwap=84108.8047622285"
+      },
+      {
+        "barTime": 1791348480000,
+        "time": 1791348480000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=18; hlc3=84127.83; volume=12.45629; sourceNA=false; volumeNA=false; vwap=84109.6542900095"
+      },
+      {
+        "barTime": 1791348600000,
+        "time": 1791348600000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=19; hlc3=84157.76; volume=11.83342; sourceNA=false; volumeNA=false; vwap=84111.6118857873"
+      },
+      {
+        "barTime": 1791348720000,
+        "time": 1791348720000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=20; hlc3=84155.8033333333; volume=17.16558; sourceNA=false; volumeNA=false; vwap=84114.0751129092"
+      },
+      {
+        "barTime": 1791348840000,
+        "time": 1791348840000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=21; hlc3=84114.41; volume=25.81208; sourceNA=false; volumeNA=false; vwap=84114.1010113313"
+      },
+      {
+        "barTime": 1791348960000,
+        "time": 1791348960000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=22; hlc3=84100.2166666667; volume=9.52226; sourceNA=false; volumeNA=false; vwap=84113.7158872942"
+      },
+      {
+        "barTime": 1791349080000,
+        "time": 1791349080000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=23; hlc3=84102.56; volume=4.75529; sourceNA=false; volumeNA=false; vwap=84113.5634673597"
+      },
+      {
+        "barTime": 1791349200000,
+        "time": 1791349200000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=24; hlc3=84108.5933333333; volume=10.47898; sourceNA=false; volumeNA=false; vwap=84113.4182009969"
+      },
+      {
+        "barTime": 1791349320000,
+        "time": 1791349320000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=25; hlc3=84124.45; volume=13.33656; sourceNA=false; volumeNA=false; vwap=84113.8138466201"
+      },
+      {
+        "barTime": 1791349440000,
+        "time": 1791349440000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=26; hlc3=84121.4966666667; volume=28.7438; sourceNA=false; volumeNA=false; vwap=84114.365093008"
+      },
+      {
+        "barTime": 1791349560000,
+        "time": 1791349560000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=27; hlc3=84141.36; volume=8.25951; sourceNA=false; volumeNA=false; vwap=84114.9104162876"
+      },
+      {
+        "barTime": 1791349680000,
+        "time": 1791349680000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=28; hlc3=84183.0133333333; volume=9.75256; sourceNA=false; volumeNA=false; vwap=84116.4970066345"
+      },
+      {
+        "barTime": 1791349800000,
+        "time": 1791349800000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=29; hlc3=84205.1433333333; volume=20.86357; sourceNA=false; volumeNA=false; vwap=84120.7053109627"
+      },
+      {
+        "barTime": 1791349920000,
+        "time": 1791349920000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 219
+          }
+        },
+        "message": "sample=30; hlc3=84182.61; volume=19.44016; sourceNA=false; volumeNA=false; vwap=84123.3276163314"
+      }
+    ]
+  },
+  {
+    "probe": "accdist-variable-missing-inputs-v53-v1.pine",
+    "sourcePath": "accdist-variable-missing-inputs-v53-v1.pine",
+    "sourceSha256": "bf0179164612da5f01b553094752177a39137170608065ac3dc53c9cd993c07a",
+    "instructionsPath": "instructions/accdist-variable-missing-inputs-v53-v1-instructions-v1.md",
+    "outcome": "RUNS",
+    "attempt": "missing-volume-dxy",
+    "symbol": "TVC:DXY",
+    "timeframe": "2",
+    "context": {
+      "timezone": "Etc/UTC",
+      "exchangeTimezone": "America/New_York",
+      "session": "1900-1900:3456|1700F-1900:2",
+      "accountTier": "pro_premium",
+      "realtimeCutoff": 1791350160,
+      "closedRows": 31
+    },
+    "capturedAt": "2026-10-07T05:17:04.419Z",
+    "totalRows": 32,
+    "retainedRows": 32,
+    "artifacts": "captures/v53/accdist-variable-missing-inputs/missing-volume-dxy",
+    "artifactSha256": {
+      "data-window.jpg": "a566ccc75194f6327fc024780149799eab3db8de464b65fd347eca3b8fa769c6",
+      "data-window.txt": "a1416f351d0539556d1a493e3ae403ffb760ca51e355280306a00b7971b352fd",
+      "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logs.txt": "7d0f6057d10fc181ed0dd5da43a173970bfa1d0acac0aa93b5d1cb24c57555aa",
+      "native.json": "81cca6b89acccf48461c73dab140f34b0750168727f35495dd8fa74f8355a750",
+      "plots.csv": "0a2ada20ef3cc92e7e6378db3e2645d5e5aa88e77e4bc3ab6ef087fd1c8c03c3",
+      "settings.jpg": "eb42c7789fd341123c99c7186bcf119a72eea5703d7675a4822c30349b7b4046"
+    },
+    "errors": [],
+    "logs": [
+      {
+        "barTime": 1791346440000,
+        "time": 1791346440000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=0; range=0.012; volume=NaN; priceNA=false; volumeNA=true; accdist=NaN"
+      },
+      {
+        "barTime": 1791346560000,
+        "time": 1791346560000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=1; range=0.013; volume=NaN; priceNA=false; volumeNA=true; accdist=NaN"
+      },
+      {
+        "barTime": 1791346680000,
+        "time": 1791346680000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=2; range=0.01; volume=NaN; priceNA=false; volumeNA=true; accdist=NaN"
+      },
+      {
+        "barTime": 1791346800000,
+        "time": 1791346800000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=3; range=0.008; volume=NaN; priceNA=false; volumeNA=true; accdist=NaN"
+      },
+      {
+        "barTime": 1791346920000,
+        "time": 1791346920000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=4; range=0.005; volume=NaN; priceNA=false; volumeNA=true; accdist=NaN"
+      },
+      {
+        "barTime": 1791347040000,
+        "time": 1791347040000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=5; range=0.005; volume=NaN; priceNA=false; volumeNA=true; accdist=NaN"
+      },
+      {
+        "barTime": 1791347160000,
+        "time": 1791347160000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=6; range=0.023; volume=NaN; priceNA=false; volumeNA=true; accdist=NaN"
+      },
+      {
+        "barTime": 1791347280000,
+        "time": 1791347280000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=7; range=0.01; volume=NaN; priceNA=false; volumeNA=true; accdist=NaN"
+      },
+      {
+        "barTime": 1791347400000,
+        "time": 1791347400000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=8; range=0.007; volume=NaN; priceNA=false; volumeNA=true; accdist=NaN"
+      },
+      {
+        "barTime": 1791347520000,
+        "time": 1791347520000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=9; range=0.008; volume=NaN; priceNA=false; volumeNA=true; accdist=NaN"
+      },
+      {
+        "barTime": 1791347640000,
+        "time": 1791347640000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=10; range=0.007; volume=NaN; priceNA=false; volumeNA=true; accdist=NaN"
+      },
+      {
+        "barTime": 1791347760000,
+        "time": 1791347760000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=11; range=0.006; volume=NaN; priceNA=false; volumeNA=true; accdist=NaN"
+      },
+      {
+        "barTime": 1791347880000,
+        "time": 1791347880000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=12; range=0.008; volume=NaN; priceNA=false; volumeNA=true; accdist=NaN"
+      },
+      {
+        "barTime": 1791348000000,
+        "time": 1791348000000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=13; range=0.005; volume=NaN; priceNA=false; volumeNA=true; accdist=NaN"
+      },
+      {
+        "barTime": 1791348120000,
+        "time": 1791348120000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=14; range=0.006; volume=NaN; priceNA=false; volumeNA=true; accdist=NaN"
+      },
+      {
+        "barTime": 1791348240000,
+        "time": 1791348240000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=15; range=0.011; volume=NaN; priceNA=false; volumeNA=true; accdist=NaN"
+      },
+      {
+        "barTime": 1791348360000,
+        "time": 1791348360000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=16; range=0.009; volume=NaN; priceNA=false; volumeNA=true; accdist=NaN"
+      },
+      {
+        "barTime": 1791348480000,
+        "time": 1791348480000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=17; range=0.012; volume=NaN; priceNA=false; volumeNA=true; accdist=NaN"
+      },
+      {
+        "barTime": 1791348600000,
+        "time": 1791348600000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=18; range=0.009; volume=NaN; priceNA=false; volumeNA=true; accdist=NaN"
+      },
+      {
+        "barTime": 1791348720000,
+        "time": 1791348720000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=19; range=0.009; volume=NaN; priceNA=false; volumeNA=true; accdist=NaN"
+      },
+      {
+        "barTime": 1791348840000,
+        "time": 1791348840000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=20; range=0.009; volume=NaN; priceNA=false; volumeNA=true; accdist=NaN"
+      },
+      {
+        "barTime": 1791348960000,
+        "time": 1791348960000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=21; range=0.011; volume=NaN; priceNA=false; volumeNA=true; accdist=NaN"
+      },
+      {
+        "barTime": 1791349080000,
+        "time": 1791349080000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=22; range=0.015; volume=NaN; priceNA=false; volumeNA=true; accdist=NaN"
+      },
+      {
+        "barTime": 1791349200000,
+        "time": 1791349200000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=23; range=0.01; volume=NaN; priceNA=false; volumeNA=true; accdist=NaN"
+      },
+      {
+        "barTime": 1791349320000,
+        "time": 1791349320000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=24; range=0.012; volume=NaN; priceNA=false; volumeNA=true; accdist=NaN"
+      },
+      {
+        "barTime": 1791349440000,
+        "time": 1791349440000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=25; range=0.011; volume=NaN; priceNA=false; volumeNA=true; accdist=NaN"
+      },
+      {
+        "barTime": 1791349560000,
+        "time": 1791349560000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=26; range=0.008; volume=NaN; priceNA=false; volumeNA=true; accdist=NaN"
+      },
+      {
+        "barTime": 1791349680000,
+        "time": 1791349680000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=27; range=0.012; volume=NaN; priceNA=false; volumeNA=true; accdist=NaN"
+      },
+      {
+        "barTime": 1791349800000,
+        "time": 1791349800000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=28; range=0.012; volume=NaN; priceNA=false; volumeNA=true; accdist=NaN"
+      },
+      {
+        "barTime": 1791349920000,
+        "time": 1791349920000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=29; range=0.019; volume=NaN; priceNA=false; volumeNA=true; accdist=NaN"
+      },
+      {
+        "barTime": 1791350040000,
+        "time": 1791350040000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=30; range=0.016; volume=NaN; priceNA=false; volumeNA=true; accdist=NaN"
+      }
+    ]
+  },
+  {
+    "probe": "accdist-variable-missing-inputs-v53-v1.pine",
+    "sourcePath": "accdist-variable-missing-inputs-v53-v1.pine",
+    "sourceSha256": "bf0179164612da5f01b553094752177a39137170608065ac3dc53c9cd993c07a",
+    "instructionsPath": "instructions/accdist-variable-missing-inputs-v53-v1-instructions-v1.md",
+    "outcome": "RUNS",
+    "attempt": "missing-volume-spx",
+    "symbol": "SP_DLY:SPX",
+    "timeframe": "2",
+    "context": {
+      "timezone": "Etc/UTC",
+      "exchangeTimezone": "America/New_York",
+      "session": "0930-1610",
+      "accountTier": "pro_premium",
+      "realtimeCutoff": 1791350160,
+      "closedRows": 32
+    },
+    "capturedAt": "2026-10-07T05:16:23.242Z",
+    "totalRows": 32,
+    "retainedRows": 32,
+    "artifacts": "captures/v53/accdist-variable-missing-inputs/missing-volume-spx",
+    "artifactSha256": {
+      "data-window.jpg": "f16ad5a345b08441165b02870a9679034a9074a2e3fddbfc274e8effeda0226e",
+      "data-window.txt": "a539cbbc3b5d0ec32c78b0576f2903092ca497d67ae1f5c3b1733539757c80fd",
+      "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logs.txt": "9219f1a2392708c64c874d95bd4a8aeed0c1f2822bbb19992a7a9c81338f74c0",
+      "native.json": "3b06046ac9f5359df1235fe2a5f1ecd6c9a611a9e45c37822251f1f25ab7649f",
+      "plots.csv": "8d393091926a66e9b3e79537a88f8143e47227ee3835719b6648502ff0fb414b",
+      "settings.jpg": "5c81e0ea98b8c6e69a137def54beceb04801e35fa9e79ea5804809ad23bb4be8"
+    },
+    "errors": [],
+    "logs": [
+      {
+        "barTime": 1791313560000,
+        "time": 1791313560000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=0; range=3.06; volume=7739860; priceNA=false; volumeNA=false; accdist=-7436336.078433898"
+      },
+      {
+        "barTime": 1791313680000,
+        "time": 1791313680000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=1; range=2.12; volume=7743304; priceNA=false; volumeNA=false; accdist=-15179640.078433897"
+      },
+      {
+        "barTime": 1791313800000,
+        "time": 1791313800000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=2; range=1.46; volume=9057851; priceNA=false; volumeNA=false; accdist=-9099712.69486947"
+      },
+      {
+        "barTime": 1791313920000,
+        "time": 1791313920000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=3; range=0.94; volume=8473693; priceNA=false; volumeNA=false; accdist=-13426704.865075957"
+      },
+      {
+        "barTime": 1791314040000,
+        "time": 1791314040000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=4; range=1; volume=10298223; priceNA=false; volumeNA=false; accdist=-5188126.465064717"
+      },
+      {
+        "barTime": 1791314160000,
+        "time": 1791314160000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=5; range=1.04; volume=9574998; priceNA=false; volumeNA=false; accdist=-14026586.157373054"
+      },
+      {
+        "barTime": 1791314280000,
+        "time": 1791314280000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=6; range=1.63; volume=10132136; priceNA=false; volumeNA=false; accdist=-18191329.17578379"
+      },
+      {
+        "barTime": 1791314400000,
+        "time": 1791314400000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=7; range=1.02; volume=9362301; priceNA=false; volumeNA=false; accdist=-19292776.352253888"
+      },
+      {
+        "barTime": 1791314520000,
+        "time": 1791314520000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=8; range=1.43; volume=10514072; priceNA=false; volumeNA=false; accdist=-22013200.57602207"
+      },
+      {
+        "barTime": 1791314640000,
+        "time": 1791314640000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=9; range=1.13; volume=11373727; priceNA=false; volumeNA=false; accdist=-32581707.96540341"
+      },
+      {
+        "barTime": 1791314760000,
+        "time": 1791314760000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=10; range=0.99; volume=11506106; priceNA=false; volumeNA=false; accdist=-30838358.57145889"
+      },
+      {
+        "barTime": 1791314880000,
+        "time": 1791314880000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=11; range=1.48; volume=11682867; priceNA=false; volumeNA=false; accdist=-38732187.62550324"
+      },
+      {
+        "barTime": 1791315000000,
+        "time": 1791315000000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=12; range=1.36; volume=15323193; priceNA=false; volumeNA=false; accdist=-26113087.507873062"
+      },
+      {
+        "barTime": 1791315120000,
+        "time": 1791315120000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=13; range=2.3; volume=15350462; priceNA=false; volumeNA=false; accdist=-41063102.67308174"
+      },
+      {
+        "barTime": 1791315240000,
+        "time": 1791315240000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=14; range=1.63; volume=12725343; priceNA=false; volumeNA=false; accdist=-28493898.850985136"
+      },
+      {
+        "barTime": 1791315360000,
+        "time": 1791315360000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=15; range=1.65; volume=11808971; priceNA=false; volumeNA=false; accdist=-40302869.85098514"
+      },
+      {
+        "barTime": 1791315480000,
+        "time": 1791315480000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=16; range=0.92; volume=12249976; priceNA=false; volumeNA=false; accdist=-33911578.024904504"
+      },
+      {
+        "barTime": 1791315600000,
+        "time": 1791315600000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=17; range=1.73; volume=14391825; priceNA=false; volumeNA=false; accdist=-32497352.44687717"
+      },
+      {
+        "barTime": 1791315720000,
+        "time": 1791315720000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=18; range=2.2; volume=14042137; priceNA=false; volumeNA=false; accdist=-38369518.8286905"
+      },
+      {
+        "barTime": 1791315840000,
+        "time": 1791315840000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=19; range=1.27; volume=16857821; priceNA=false; volumeNA=false; accdist=-39033212.56886224"
+      },
+      {
+        "barTime": 1791315960000,
+        "time": 1791315960000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=20; range=1.78; volume=15327617; priceNA=false; volumeNA=false; accdist=-24738918.063235637"
+      },
+      {
+        "barTime": 1791316080000,
+        "time": 1791316080000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=21; range=1.39; volume=16091828; priceNA=false; volumeNA=false; accdist=-34810781.63157733"
+      },
+      {
+        "barTime": 1791316200000,
+        "time": 1791316200000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=22; range=2.53; volume=25185187; priceNA=false; volumeNA=false; accdist=-47851333.003124125"
+      },
+      {
+        "barTime": 1791316320000,
+        "time": 1791316320000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=23; range=2.48; volume=25215274; priceNA=false; volumeNA=false; accdist=-67576184.43861665"
+      },
+      {
+        "barTime": 1791316440000,
+        "time": 1791316440000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=24; range=2.44; volume=39769018; priceNA=false; volumeNA=false; accdist=-34326677.58615278"
+      },
+      {
+        "barTime": 1791316560000,
+        "time": 1791316560000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=25; range=2.31; volume=49549227; priceNA=false; volumeNA=false; accdist=-40547143.31342365"
+      },
+      {
+        "barTime": 1791316680000,
+        "time": 1791316680000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=26; range=2.04; volume=111946620; priceNA=false; volumeNA=false; accdist=-35059563.90168879"
+      },
+      {
+        "barTime": 1791316800000,
+        "time": 1791316800000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=27; range=0.26; volume=427431992; priceNA=false; volumeNA=false; accdist=-462491555.9016888"
+      },
+      {
+        "barTime": 1791316920000,
+        "time": 1791316920000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=28; range=0.05; volume=70105854; priceNA=false; volumeNA=false; accdist=-532597409.9016888"
+      },
+      {
+        "barTime": 1791317040000,
+        "time": 1791317040000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=29; range=0.02; volume=32133580; priceNA=false; volumeNA=false; accdist=-500463829.9016888"
+      },
+      {
+        "barTime": 1791317160000,
+        "time": 1791317160000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=30; range=0; volume=3400265; priceNA=false; volumeNA=false; accdist=-500463829.9016888"
+      },
+      {
+        "barTime": 1791317280000,
+        "time": 1791317280000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=31; range=0; volume=8860020; priceNA=false; volumeNA=false; accdist=-500463829.9016888"
+      }
+    ]
+  },
+  {
+    "probe": "accdist-variable-missing-inputs-v53-v1.pine",
+    "sourcePath": "accdist-variable-missing-inputs-v53-v1.pine",
+    "sourceSha256": "bf0179164612da5f01b553094752177a39137170608065ac3dc53c9cd993c07a",
+    "instructionsPath": "instructions/accdist-variable-missing-inputs-v53-v1-instructions-v1.md",
+    "outcome": "RUNS",
+    "attempt": "defaults",
+    "symbol": "BINANCE:BTCUSDT",
+    "timeframe": "2",
+    "context": {
+      "timezone": "Etc/UTC",
+      "exchangeTimezone": "Etc/UTC",
+      "session": "24x7",
+      "accountTier": "pro_premium",
+      "realtimeCutoff": 1791350040,
+      "closedRows": 31
+    },
+    "capturedAt": "2026-10-07T05:15:42.854Z",
+    "totalRows": 32,
+    "retainedRows": 32,
+    "artifacts": "captures/v53/accdist-variable-missing-inputs",
+    "artifactSha256": {
+      "data-window.jpg": "a225b4cd27f3508e10820673ba8f3910f217e60c18af6be2c8779abfa1b01df7",
+      "data-window.txt": "0d3c1cc90fa08ecca5d93cc13c2f086f1485f1b0b0eaccc9d1e4e09c124bbe3c",
+      "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logs.txt": "ed0ff3b67bfa97707ec0501c6099cbb1e89187543c27e3430d708aeb3e5189e3",
+      "native.json": "af8e4d6c4d7ba72741bbcff91b3ddf75a5196242523885bd9531421b0a394c63",
+      "plots.csv": "6f464b013eab593f00b1e8b4ecfe98d8fb4615b0e4dc9e8195c9de605919d7db",
+      "settings.jpg": "010d34c6c922318dae6e2e78a432324921f523cc163fae7e3de613ea88c11396"
+    },
+    "errors": [],
+    "logs": [
+      {
+        "barTime": 1791346320000,
+        "time": 1791346320000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=0; range=10.99; volume=15.92774; priceNA=false; volumeNA=false; accdist=11.6378300455"
+      },
+      {
+        "barTime": 1791346440000,
+        "time": 1791346440000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=1; range=12; volume=12.56301; priceNA=false; volumeNA=false; accdist=-0.9251799545"
+      },
+      {
+        "barTime": 1791346560000,
+        "time": 1791346560000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=2; range=68.66; volume=18.78356; priceNA=false; volumeNA=false; accdist=0.7326757635"
+      },
+      {
+        "barTime": 1791346680000,
+        "time": 1791346680000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=3; range=41.31; volume=14.06332; priceNA=false; volumeNA=false; accdist=7.5992253738"
+      },
+      {
+        "barTime": 1791346800000,
+        "time": 1791346800000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=4; range=69.28; volume=17.82428; priceNA=false; volumeNA=false; accdist=21.6672338957"
+      },
+      {
+        "barTime": 1791346920000,
+        "time": 1791346920000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=5; range=26; volume=11.10668; priceNA=false; volumeNA=false; accdist=32.7653702957"
+      },
+      {
+        "barTime": 1791347040000,
+        "time": 1791347040000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=6; range=61.08; volume=19.29179; priceNA=false; volumeNA=false; accdist=52.0508434031"
+      },
+      {
+        "barTime": 1791347160000,
+        "time": 1791347160000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=7; range=34.01; volume=12.55068; priceNA=false; volumeNA=false; accdist=46.888126167"
+      },
+      {
+        "barTime": 1791347280000,
+        "time": 1791347280000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=8; range=33.69; volume=10.78091; priceNA=false; volumeNA=false; accdist=43.6784934184"
+      },
+      {
+        "barTime": 1791347400000,
+        "time": 1791347400000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=9; range=55.29; volume=11.99938; priceNA=false; volumeNA=false; accdist=36.6490139791"
+      },
+      {
+        "barTime": 1791347520000,
+        "time": 1791347520000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=10; range=56.01; volume=13.90131; priceNA=false; volumeNA=false; accdist=29.7020818795"
+      },
+      {
+        "barTime": 1791347640000,
+        "time": 1791347640000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=11; range=26.86; volume=7.64625; priceNA=false; volumeNA=false; accdist=24.5552389904"
+      },
+      {
+        "barTime": 1791347760000,
+        "time": 1791347760000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=12; range=75.63; volume=14.45186; priceNA=false; volumeNA=false; accdist=21.4233338549"
+      },
+      {
+        "barTime": 1791347880000,
+        "time": 1791347880000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=13; range=34.01; volume=15.62663; priceNA=false; volumeNA=false; accdist=18.6802882477"
+      },
+      {
+        "barTime": 1791348000000,
+        "time": 1791348000000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=14; range=37.88; volume=7.98104; priceNA=false; volumeNA=false; accdist=25.9828977092"
+      },
+      {
+        "barTime": 1791348120000,
+        "time": 1791348120000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=15; range=74.01; volume=19.56364; priceNA=false; volumeNA=false; accdist=6.424544465"
+      },
+      {
+        "barTime": 1791348240000,
+        "time": 1791348240000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=16; range=76.09; volume=35.02038; priceNA=false; volumeNA=false; accdist=32.1570907365"
+      },
+      {
+        "barTime": 1791348360000,
+        "time": 1791348360000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=17; range=23.95; volume=7.42079; priceNA=false; volumeNA=false; accdist=39.5716838346"
+      },
+      {
+        "barTime": 1791348480000,
+        "time": 1791348480000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=18; range=23.89; volume=12.45629; priceNA=false; volumeNA=false; accdist=51.3501514403"
+      },
+      {
+        "barTime": 1791348600000,
+        "time": 1791348600000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=19; range=38.66; volume=11.83342; priceNA=false; volumeNA=false; accdist=57.0066853669"
+      },
+      {
+        "barTime": 1791348720000,
+        "time": 1791348720000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=20; range=37.72; volume=17.16558; priceNA=false; volumeNA=false; accdist=39.8411053669"
+      },
+      {
+        "barTime": 1791348840000,
+        "time": 1791348840000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=21; range=43.23; volume=25.81208; priceNA=false; volumeNA=false; accdist=14.0290253669"
+      },
+      {
+        "barTime": 1791348960000,
+        "time": 1791348960000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=22; range=20.16; volume=9.52226; priceNA=false; volumeNA=false; accdist=23.5418386804"
+      },
+      {
+        "barTime": 1791349080000,
+        "time": 1791349080000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=23; range=9.26; volume=4.75529; priceNA=false; volumeNA=false; accdist=24.3121340367"
+      },
+      {
+        "barTime": 1791349200000,
+        "time": 1791349200000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=24; range=14.47; volume=10.47898; priceNA=false; volumeNA=false; accdist=16.9181889227"
+      },
+      {
+        "barTime": 1791349320000,
+        "time": 1791349320000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=25; range=32.98; volume=13.33656; priceNA=false; volumeNA=false; accdist=23.6633017426"
+      },
+      {
+        "barTime": 1791349440000,
+        "time": 1791349440000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=26; range=55.54; volume=28.7438; priceNA=false; volumeNA=false; accdist=52.4071017426"
+      },
+      {
+        "barTime": 1791349560000,
+        "time": 1791349560000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=27; range=23.04; volume=8.25951; priceNA=false; volumeNA=false; accdist=60.6666117426"
+      },
+      {
+        "barTime": 1791349680000,
+        "time": 1791349680000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=28; range=50.98; volume=9.75256; priceNA=false; volumeNA=false; accdist=70.4153457089"
+      },
+      {
+        "barTime": 1791349800000,
+        "time": 1791349800000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=29; range=26.85; volume=20.86357; priceNA=false; volumeNA=false; accdist=78.3800232694"
+      },
+      {
+        "barTime": 1791349920000,
+        "time": 1791349920000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 10,
+            "column": 5
+          },
+          "end": {
+            "line": 10,
+            "column": 231
+          }
+        },
+        "message": "sample=30; range=50.3; volume=19.44016; priceNA=false; volumeNA=false; accdist=72.0262214722"
+      }
+    ]
+  }
+]

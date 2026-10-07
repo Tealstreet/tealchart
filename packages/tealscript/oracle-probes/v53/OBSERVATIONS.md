@@ -1,0 +1,10 @@
+# Round 53 observations
+
+All five unchanged sources run. The capture manifest separates twelve attempts, their settings, chart contexts and artifact hashes.
+
+- **EMA/RMA signed zero: INCONCLUSIVE.** Both the defaults and reciprocal-enabled attempts retain exact logs. At negative-zero and positive-zero phases the strings are `0`; reciprocal strings are `NaN`. These observers do not distinguish the sign bit. Finite +/-2 controls yield the corresponding finite values and reciprocals.
+- **III/WVAD flat bars: observed in v6.** BTCUSDT is a finite control with no eligible flat bars. DOGEBTC at 2 and 5 minutes has actual positive-volume flat candles. Both direct builtin outputs are missing (`NaN` in logs), with NA flags set and nz sentinel 123456. The 5-minute attempt also reaches four finite nonzero-range recovery neighbors; both outputs are finite there. Formula controls remain disabled. The v5 facet is unobserved.
+- **All-missing ta.max: observed missing startup/output.** All 31 closed calculations have the direct missing flag set and sentinel 123456; raw logs say `allMissingMax=NaN`. The finite negative and delayed-finite controls are retained. This is bounded startup evidence only.
+- **Direct VWAP and accdist variables: actual all-missing volume observed.** BTCUSDT and the SPX candidate have defined volume. TradingView resolves SP:SPX to SP_DLY:SPX on this account; no missing-input credit comes from those controls. TVC:DXY has actual missing volume on all 31 closed calculations, with defined nonflat prices. Both variables publish missing outputs. Neither missing-feed attempt reaches a finite-after-missing neighbor, so interior-hole/recovery and missing-price policies remain INCONCLUSIVE.
+
+The full source-bound evidence is indexed in [RESPONSE.md](RESPONSE.md) and [captures/v53/manifest.json](captures/v53/manifest.json). Each CSV retains every native plot, OHLCV and closed/live alignment. Native data was serialized through Chrome MCP; this is not an engine-generated or predicted result.
