@@ -1,0 +1,1 @@
+CE10122 {'line': 3, 'column': 27}: Cannot call "str.format" with argument "arg_1"="call "matrix.new" (matrix<int>)". An argument of "matrix<int>" type was used but one from "simple int/float/bool/string" is expected

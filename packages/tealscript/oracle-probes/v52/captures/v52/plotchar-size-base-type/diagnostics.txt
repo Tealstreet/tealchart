@@ -1,0 +1,1 @@
+CE10123 {'line': 3, 'column': 28}: Cannot call "plotchar" with argument "size"="7". An argument of "literal int" type was used but a "const string"  is expected.

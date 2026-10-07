@@ -1,0 +1,2592 @@
+[
+  {
+    "probe": "array-bool-join-control-v52-v1.pine",
+    "sourcePath": "array-bool-join-control-v52-v1.pine",
+    "sourceSha256": "33499cdad9186492f504486b05d41d25c694ce9fe22d677600dc60f2b8f293bc",
+    "instructionsPath": "instructions/array-bool-join-control-v52-v1-instructions-v1.md",
+    "outcome": "RUNS",
+    "capturedAt": "2026-10-07T05:10:31.983Z",
+    "totalRows": 32,
+    "retainedRows": 32,
+    "artifacts": "captures/v52/array-bool-join-control",
+    "artifactSha256": {
+      "data-window.jpg": "01200c80a075e93c32728ef46e9ba0b27a00d9ae2f06d4e1e1e96ae268f3f046",
+      "data-window.txt": "f55852b57b62c81e0de68f89d7bdb941d032d67edc900c1f73c42e058d32d413",
+      "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logs.txt": "a150a9d5c798cc7b5080647687b6c86ba57fa49cc4a02ed041d1c14964fbe59c",
+      "native.json": "6fc55185b34481ae492d92d94fd272c838b37d43454860e7048496f22a260754",
+      "plots.csv": "881bcbfee1648b463950b14e762bc9870926b18b137b16e1cce6c1d1825cfb14",
+      "settings.jpg": "d7bd825f38bdf60e70abbb274d31e6f476c8f5f8e650862ac2f62447660b6318"
+    },
+    "errors": [],
+    "logs": [
+      {
+        "barTime": 1791349680000,
+        "time": 1791349680000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 9,
+            "column": 5
+          },
+          "end": {
+            "line": 9,
+            "column": 37
+          }
+        },
+        "message": "JOIN_TEXT=true|false|true"
+      }
+    ]
+  },
+  {
+    "probe": "array-bool-join-namespace-v52-v1.pine",
+    "sourcePath": "array-bool-join-namespace-v52-v1.pine",
+    "sourceSha256": "fedf0a035377c5fa187804983796e522812d4150972eb957734877e866686fd6",
+    "instructionsPath": "instructions/array-bool-join-namespace-v52-v1-instructions-v1.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T05:10:34.809Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v52/array-bool-join-namespace",
+    "artifactSha256": {
+      "diagnostic.jpg": "39ba873af211a9db964097fb730f5cdca458619ef61e3f89568c3027a19aaf89",
+      "diagnostics.txt": "f5d4129f62e3b1276baad8ebe0ca2436b404901052f762b14cab47e963ff9aab",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "cf903352dd6d382a68ce2c604aaf1dbb15be77d3693f29c55f239cff7e31c755"
+    },
+    "errors": [
+      {
+        "start": {
+          "line": 4,
+          "column": 28
+        },
+        "end": {
+          "line": 4,
+          "column": 34
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"array.join\" with argument \"id\"=\"values\". An argument of \"array<bool>\" type was used but a \"array<float>\"  is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10123",
+        "time": "1:10:34 PM"
+      },
+      {
+        "start": {
+          "line": 9,
+          "column": 31
+        },
+        "end": {
+          "line": 9,
+          "column": 37
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"log.info\" with argument \"arg_1\"=\"joined\". An argument of \"unknown\" type was used but one from \"series int/float/bool/string/array<int/float/bool/string>\" is expected",
+        "scriptName": "Untitled script",
+        "code": "CE10122",
+        "time": "1:10:34 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "array-bool-join-method-v52-v1.pine",
+    "sourcePath": "array-bool-join-method-v52-v1.pine",
+    "sourceSha256": "49ee9899fcc524b1f47b1e73700a87e112906b4c39ffceaab63f8ea90d136fe3",
+    "instructionsPath": "instructions/array-bool-join-method-v52-v1-instructions-v1.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T05:10:36.907Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v52/array-bool-join-method",
+    "artifactSha256": {
+      "diagnostic.jpg": "d31f2c6aa86605a7a3818f1ae81554a7899ad2e909d47bb6de06e2bf4ba4fac1",
+      "diagnostics.txt": "43d7a0b9cf6f17294513eef714502a721135073337bad77c20de5a51badc40cd",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "875cbf22f2cdbce58fffd533b652605339992c18f8020c9f958637d4e16d3171"
+    },
+    "errors": [
+      {
+        "start": {
+          "line": 4,
+          "column": 17
+        },
+        "end": {
+          "line": 4,
+          "column": 23
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"array.join\" with argument \"id\"=\"values\". An argument of \"array<bool>\" type was used but a \"array<float>\"  is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10123",
+        "time": "1:10:36 PM"
+      },
+      {
+        "start": {
+          "line": 9,
+          "column": 31
+        },
+        "end": {
+          "line": 9,
+          "column": 37
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"log.info\" with argument \"arg_1\"=\"joined\". An argument of \"unknown\" type was used but one from \"series int/float/bool/string/array<int/float/bool/string>\" is expected",
+        "scriptName": "Untitled script",
+        "code": "CE10122",
+        "time": "1:10:36 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "array-sort-indices-control-v52-v1.pine",
+    "sourcePath": "array-sort-indices-control-v52-v1.pine",
+    "sourceSha256": "5302adce03798868880709200fd8bda8e38876415e0a67cb9836c24053378ec7",
+    "instructionsPath": "instructions/array-sort-indices-control-v52-v1-instructions-v1.md",
+    "outcome": "RUNS",
+    "capturedAt": "2026-10-07T05:10:39.375Z",
+    "totalRows": 32,
+    "retainedRows": 32,
+    "artifacts": "captures/v52/array-sort-indices-control",
+    "artifactSha256": {
+      "data-window.jpg": "6d96347f5b67aeb6bf61aa93132159ee92d8c8840417e60a2b6e28ddf2b77491",
+      "data-window.txt": "5955aea8b83dd99ec8f1c4aee444a37d7002958f81dd1dfbc798e2081ae2b569",
+      "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "7834be62c882c5d419c959b7a25277de3f0b67df0aea3669483b376561346cb2",
+      "plots.csv": "099b55efc44d091836d7942ac2014a306c2eb50b7a20eba5f45c69ca25f24cf0",
+      "settings.jpg": "7f90a23a71d42132eb4e6c040b6ce4c2347feea1bdb0a9ce21e2dc563a1448d1"
+    },
+    "errors": [],
+    "logs": []
+  },
+  {
+    "probe": "array-sort-indices-namespace-v52-v1.pine",
+    "sourcePath": "array-sort-indices-namespace-v52-v1.pine",
+    "sourceSha256": "3d332b1b8124dd5f51b97f0b4a5122f4d10da5f10aec73c9bbe35866830ce751",
+    "instructionsPath": "instructions/array-sort-indices-namespace-v52-v1-instructions-v1.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T05:10:42.251Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v52/array-sort-indices-namespace",
+    "artifactSha256": {
+      "diagnostic.jpg": "d23ad4de1f4537a265405d59f228e3e837bbaea362307c23712ac874d5883123",
+      "diagnostics.txt": "6adabdc9f2e3f28225a59338dfd438aa3560dfba4c89ce7d5bec475a1424cbc8",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "5596b360e5a318ca1f0a7a11b9f748551bec8b931f25114cc83147e4df2ba06c"
+    },
+    "errors": [
+      {
+        "start": {
+          "line": 8,
+          "column": 49
+        },
+        "end": {
+          "line": 8,
+          "column": 59
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"array.sort_indices\" with argument \"sort_field\"=\"fieldIndex\". An argument of \"series int\" type was used but a \"const int\"  is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10123",
+        "time": "1:10:41 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "array-sort-indices-method-v52-v1.pine",
+    "sourcePath": "array-sort-indices-method-v52-v1.pine",
+    "sourceSha256": "a923180f40b8274e6b0c4db282d11cb178b2db9c0e4e7a3734da9a1300f69bd1",
+    "instructionsPath": "instructions/array-sort-indices-method-v52-v1-instructions-v1.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T05:10:44.834Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v52/array-sort-indices-method",
+    "artifactSha256": {
+      "diagnostic.jpg": "a2f846931c82655a849dbbd7913c614e1c56271f0a849cce6ecb5d5fe2b781fe",
+      "diagnostics.txt": "c0dbc542ee56bb37335bd7a6aa43bde5321580606c17275588bba0692c4d2072",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "ee3e19251c6072a507c942f6ff0aa4fd5f16f4af5a174c0ee5d841cae44a3a92"
+    },
+    "errors": [
+      {
+        "start": {
+          "line": 8,
+          "column": 42
+        },
+        "end": {
+          "line": 8,
+          "column": 52
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"array.sort_indices\" with argument \"sort_field\"=\"fieldIndex\". An argument of \"series int\" type was used but a \"const int\"  is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10123",
+        "time": "1:10:44 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "gradient-missing-lower-endpoint-v52-v1.pine",
+    "sourcePath": "gradient-missing-lower-endpoint-v52-v1.pine",
+    "sourceSha256": "41b87743cd52f7a3b7b19a1b7b5d32de03219839fa45e50b0ca29ff2e62ae1fa",
+    "instructionsPath": "instructions/gradient-missing-lower-endpoint-v52-v1-instructions-v1.md",
+    "outcome": "RUNS",
+    "capturedAt": "2026-10-07T05:10:47.216Z",
+    "totalRows": 32,
+    "retainedRows": 32,
+    "artifacts": "captures/v52/gradient-missing-lower-endpoint",
+    "artifactSha256": {
+      "data-window.jpg": "bdbd383a0886eaf6f6712687e8c019dbb76876a748926d28c9bbe6bb33b173ed",
+      "data-window.txt": "d72c8fc389f9f710e658a9cf3828a3a8345f655cc0fad81051fa3675d4ac0114",
+      "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "db46fad36a804c0ed656c1445d7c55a0d668b90b0e3718ab3b1531f853c6b54a",
+      "plots.csv": "73443b3e0e8d2d461f481a51c891f751d02cc67528c7f8dd9520608c66b92fd5",
+      "settings.jpg": "ea47b39f172dd0bf75fcb76e44bbc0ed12bb74954c1df04a514064a674703010"
+    },
+    "errors": [],
+    "logs": []
+  },
+  {
+    "probe": "plot-format-base-type-v52-v1.pine",
+    "sourcePath": "plot-format-base-type-v52-v1.pine",
+    "sourceSha256": "e08e36ad758acd23ef317e097f4f8ef3103f0b23787ab645ff8930deda424470",
+    "instructionsPath": "instructions/plot-format-base-type-v52-v1-instructions-v1.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T05:10:51.168Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v52/plot-format-base-type",
+    "artifactSha256": {
+      "diagnostic.jpg": "5836dae8566f551a9f3357caee16dfda3bcec1919a833f5e7ca4c7941d6b59f4",
+      "diagnostics.txt": "301f6e7fd41425a93f431b34f4094001090fa26a412555e029283a279e3a86fc",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "8a9703b5c03ae3905eda02e0b2bc5aa4f9200ca6404cd338b9c8963cd253841d"
+    },
+    "errors": [
+      {
+        "start": {
+          "line": 3,
+          "column": 25
+        },
+        "end": {
+          "line": 3,
+          "column": 26
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"plot\" with argument \"format\"=\"7\". An argument of \"literal int\" type was used but a \"input string\"  is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10123",
+        "time": "1:10:49 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "plot-series-base-type-v52-v1.pine",
+    "sourcePath": "plot-series-base-type-v52-v1.pine",
+    "sourceSha256": "bcb818cae35a51c77f0a6a8672eec558761a1c18e9f6ea82f9c23ea8afba88bf",
+    "instructionsPath": "instructions/plot-series-base-type-v52-v1-instructions-v1.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T05:11:09.681Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v52/plot-series-base-type",
+    "artifactSha256": {
+      "diagnostic.jpg": "57079662247820d47618eb726103e99e62a3a8c28db9456482960b0ff8734085",
+      "diagnostics.txt": "f2e9971c1b983b024a3e0a61a7922dc65d9371b64f55b2bac2aad79dab9536a6",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "3eabb05e0a5aa918e0e7c1498a7ce0f0d9ccbebd30bfef68466c9ffe2b5916e4"
+    },
+    "errors": [
+      {
+        "start": {
+          "line": 3,
+          "column": 13
+        },
+        "end": {
+          "line": 3,
+          "column": 18
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"plot\" with argument \"series\"=\"bad\". An argument of \"literal string\" type was used but a \"series float\"  is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10123",
+        "time": "1:11:08 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "plotarrow-format-base-type-v52-v1.pine",
+    "sourcePath": "plotarrow-format-base-type-v52-v1.pine",
+    "sourceSha256": "a3528184606779dc1f684607ba0c6207e5f70f51518cdd6c9a82cef3b4838fff",
+    "instructionsPath": "instructions/plotarrow-format-base-type-v52-v1-instructions-v1.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T05:11:12.602Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v52/plotarrow-format-base-type",
+    "artifactSha256": {
+      "diagnostic.jpg": "d3290e939898e83f8844f83f6c230ac965ed7a00387be38354d5456f5bd16964",
+      "diagnostics.txt": "a5a161d41b54ed5ad89b2e0bc279eb33c2575884dca826cb2df62945ef713fa4",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "68c12ca0e66a42df554d003f03ae886ae8b03aa9037205c929ffdaede2e02261"
+    },
+    "errors": [
+      {
+        "start": {
+          "line": 3,
+          "column": 30
+        },
+        "end": {
+          "line": 3,
+          "column": 31
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"plotarrow\" with argument \"format\"=\"7\". An argument of \"literal int\" type was used but a \"input string\"  is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10123",
+        "time": "1:11:11 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "plotbar-format-base-type-v52-v1.pine",
+    "sourcePath": "plotbar-format-base-type-v52-v1.pine",
+    "sourceSha256": "c2a5ed2b4bb93eb6bc017c8ae454c06c982b39fe1ba6b726ddbc3308cde7b8ee",
+    "instructionsPath": "instructions/plotbar-format-base-type-v52-v1-instructions-v1.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T05:11:15.265Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v52/plotbar-format-base-type",
+    "artifactSha256": {
+      "diagnostic.jpg": "1252efa2be67befe24ac5f4730f5d7a3a7311694c7974f15b0287e899ab3b25e",
+      "diagnostics.txt": "3341aa5c3204b42e00de502a8f0987bd90174ce26bdd65f19e2531a6b6a64e94",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "7f3b95d0e3142014ab3715c2464e250de415f51f93345a8337acbc7f332eb590"
+    },
+    "errors": [
+      {
+        "start": {
+          "line": 3,
+          "column": 56
+        },
+        "end": {
+          "line": 3,
+          "column": 57
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"plotbar\" with argument \"format\"=\"7\". An argument of \"literal int\" type was used but a \"input string\"  is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10123",
+        "time": "1:11:14 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "plotcandle-format-base-type-v52-v1.pine",
+    "sourcePath": "plotcandle-format-base-type-v52-v1.pine",
+    "sourceSha256": "04014851cad275986a12c64df1e8d015b102c30a352e7fb12398bed5bf65f332",
+    "instructionsPath": "instructions/plotcandle-format-base-type-v52-v1-instructions-v1.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T05:11:18.110Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v52/plotcandle-format-base-type",
+    "artifactSha256": {
+      "diagnostic.jpg": "5fbc591cf8691c6066168a2503dc2926b01910f85e8e4070654bb8797bcd3e26",
+      "diagnostics.txt": "c6164d1ddb7b6f48bc235d237ecf5ce2e3816a33d74222872fe67895fcefc84a",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "4983904fd049613e25d53d9a9a83366c27c8ce67026bb606affdaef233fa448a"
+    },
+    "errors": [
+      {
+        "start": {
+          "line": 3,
+          "column": 59
+        },
+        "end": {
+          "line": 3,
+          "column": 60
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"plotcandle\" with argument \"format\"=\"7\". An argument of \"literal int\" type was used but a \"input string\"  is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10123",
+        "time": "1:11:17 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "plotchar-format-base-type-v52-v1.pine",
+    "sourcePath": "plotchar-format-base-type-v52-v1.pine",
+    "sourceSha256": "96ad10677229f9c6ae15178ece1ed8ecce6c053efbf021261a2c6b8edb2b4287",
+    "instructionsPath": "instructions/plotchar-format-base-type-v52-v1-instructions-v1.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T05:11:21.202Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v52/plotchar-format-base-type",
+    "artifactSha256": {
+      "diagnostic.jpg": "e9e5950651dc26f83650c2ddde969cfd157b3e75fa9a3d142c3185effc5db681",
+      "diagnostics.txt": "6868ce1be9443ef32f5564d265e37243f86c31717d45579dffb0a8c2640e9e85",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "99053cf12014a52475519e4a1aa16b67693c7660c27740fea93d0ab24ab65b8d"
+    },
+    "errors": [
+      {
+        "start": {
+          "line": 3,
+          "column": 30
+        },
+        "end": {
+          "line": 3,
+          "column": 31
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"plotchar\" with argument \"format\"=\"7\". An argument of \"literal int\" type was used but a \"input string\"  is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10123",
+        "time": "1:11:20 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "plotchar-location-base-type-v52-v1.pine",
+    "sourcePath": "plotchar-location-base-type-v52-v1.pine",
+    "sourceSha256": "f705085bc47d7d794e7d28f2cd03564d53b150d47d2fec74e0e13f2839dd5866",
+    "instructionsPath": "instructions/plotchar-location-base-type-v52-v1-instructions-v1.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T05:11:23.748Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v52/plotchar-location-base-type",
+    "artifactSha256": {
+      "diagnostic.jpg": "4ffd5cb79992497bb4e99e47357a9f2c34cd0722e0262f16feb30e3b79cd116a",
+      "diagnostics.txt": "2a9ed219fc5f359a2c1eef67e41b29395cbd018ef9a6a7d3bf897c7ee3865555",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "df64882c67f1de80a39d6e6f36862e5cd28f468b4812054e035ce7c2b9a4a021"
+    },
+    "errors": [
+      {
+        "start": {
+          "line": 3,
+          "column": 32
+        },
+        "end": {
+          "line": 3,
+          "column": 33
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"plotchar\" with argument \"location\"=\"7\". An argument of \"literal int\" type was used but a \"input string\"  is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10123",
+        "time": "1:11:22 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "plotchar-series-base-type-v52-v1.pine",
+    "sourcePath": "plotchar-series-base-type-v52-v1.pine",
+    "sourceSha256": "f5de4dfe3a2e1d94fddddbd7d175aa1737a321231ca473da8aed59a7d2bbe357",
+    "instructionsPath": "instructions/plotchar-series-base-type-v52-v1-instructions-v1.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T05:11:26.670Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v52/plotchar-series-base-type",
+    "artifactSha256": {
+      "diagnostic.jpg": "02191bc713494cdd69c86657be1e7c078e6e0486ed2403383c1c5a72ff44d39a",
+      "diagnostics.txt": "a653efcdec7d15b636ddc62821ed3a4feba714903dac8e99012180baeb2770c9",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "9217a46706b2dee8fa401d163f78311a7f13bd62f1a3f6a543348eb88bd6f339"
+    },
+    "errors": [
+      {
+        "start": {
+          "line": 3,
+          "column": 17
+        },
+        "end": {
+          "line": 3,
+          "column": 22
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"plotchar\" with argument \"series\"=\"bad\". An argument of \"literal string\" type was used but a \"series bool\"  is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10123",
+        "time": "1:11:25 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "plotchar-size-base-type-v52-v1.pine",
+    "sourcePath": "plotchar-size-base-type-v52-v1.pine",
+    "sourceSha256": "ec60b54a268481589488cae66679ac327c5afddf8bb4064de4bc9db4cebca60e",
+    "instructionsPath": "instructions/plotchar-size-base-type-v52-v1-instructions-v1.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T05:11:29.596Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v52/plotchar-size-base-type",
+    "artifactSha256": {
+      "diagnostic.jpg": "572d2cae4c724e7237334b08455aece98c3bc10579bea3b9f4ca2758aa943e41",
+      "diagnostics.txt": "bfaaedd782afb68ccd31b647534ea415d73306f3ea1a92448cdd0314c892e0f5",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "c3f18d5531cdfa4829690a9a12f63647a8f757687337ceb164c0fb9ffa7985d4"
+    },
+    "errors": [
+      {
+        "start": {
+          "line": 3,
+          "column": 28
+        },
+        "end": {
+          "line": 3,
+          "column": 29
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"plotchar\" with argument \"size\"=\"7\". An argument of \"literal int\" type was used but a \"const string\"  is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10123",
+        "time": "1:11:28 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "plotshape-format-base-type-v52-v1.pine",
+    "sourcePath": "plotshape-format-base-type-v52-v1.pine",
+    "sourceSha256": "c216c0fca592ea5c3afddd3d84c0292bd3838b4d2e2aa454481e6271f0db28c8",
+    "instructionsPath": "instructions/plotshape-format-base-type-v52-v1-instructions-v1.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T05:11:38.608Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v52/plotshape-format-base-type",
+    "artifactSha256": {
+      "diagnostic.jpg": "d2f0e791c6ed7a15ced489a383be5e0191392297883267819824f77aea4e6e8e",
+      "diagnostics.txt": "9f743c2c95546a273f1adf8c8bea90f14ff6fa02e6fef2b1494c310e3f97e743",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "56a06e8ecdc0a6e7bad3a59b3844214757c56a05af5ff8f9ac9abc37da70fe11"
+    },
+    "errors": [
+      {
+        "start": {
+          "line": 3,
+          "column": 31
+        },
+        "end": {
+          "line": 3,
+          "column": 32
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"plotshape\" with argument \"format\"=\"7\". An argument of \"literal int\" type was used but a \"input string\"  is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10123",
+        "time": "1:11:37 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "plotshape-location-base-type-v52-v1.pine",
+    "sourcePath": "plotshape-location-base-type-v52-v1.pine",
+    "sourceSha256": "0057da6efb4012bad96c474628553c94a16b4bc0aa914fe418be988ed2715813",
+    "instructionsPath": "instructions/plotshape-location-base-type-v52-v1-instructions-v1.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T05:11:41.681Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v52/plotshape-location-base-type",
+    "artifactSha256": {
+      "diagnostic.jpg": "2b5c8972de8f5b4a568c245a7e676219bb968835b571e0bac7290e80d1f532f3",
+      "diagnostics.txt": "8c679a88082ac8bdc3ece509879f9053dc2933db8aebcfca40b0a65c6fd4edda",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "9a828f0479e937a28d5877e32897f464198866e3523e1bff7ba22bfb0eb3a5b9"
+    },
+    "errors": [
+      {
+        "start": {
+          "line": 3,
+          "column": 33
+        },
+        "end": {
+          "line": 3,
+          "column": 34
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"plotshape\" with argument \"location\"=\"7\". An argument of \"literal int\" type was used but a \"input string\"  is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10123",
+        "time": "1:11:40 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "plotshape-series-base-type-v52-v1.pine",
+    "sourcePath": "plotshape-series-base-type-v52-v1.pine",
+    "sourceSha256": "bdb9248ab5267b276b5b730810dbf42f700a7719aed8f06966f81e46501f6d9d",
+    "instructionsPath": "instructions/plotshape-series-base-type-v52-v1-instructions-v1.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T05:11:44.144Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v52/plotshape-series-base-type",
+    "artifactSha256": {
+      "diagnostic.jpg": "1e3759fc4287e014de1bf4ba8955bce26707849b5f5ef7ad29651bb6fd44ba31",
+      "diagnostics.txt": "fd120b65065b128478b091241a45d1b431b3a28697c173dd16135de7ca05c7c6",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "d4d6a81332707845a8fa3e6e33536df33e181fc62d1f74aeb6d5423cbc4112a3"
+    },
+    "errors": [
+      {
+        "start": {
+          "line": 3,
+          "column": 18
+        },
+        "end": {
+          "line": 3,
+          "column": 23
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"plotshape\" with argument \"series\"=\"bad\". An argument of \"literal string\" type was used but a \"series bool\"  is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10123",
+        "time": "1:11:43 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "plotshape-size-base-type-v52-v1.pine",
+    "sourcePath": "plotshape-size-base-type-v52-v1.pine",
+    "sourceSha256": "3a7c4adbad09c3af1265f783c4274d307e6d8c7028560b697939f9bdfe505dfc",
+    "instructionsPath": "instructions/plotshape-size-base-type-v52-v1-instructions-v1.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T05:11:46.700Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v52/plotshape-size-base-type",
+    "artifactSha256": {
+      "diagnostic.jpg": "f2bf473b429bb61e0fbda7110a835ad98d035af55ca95e08dca701d3a3f4d134",
+      "diagnostics.txt": "b81f74d991e467bf0329ae26ae987bb1f215e7fec15b1c72a4f162a27e0b6e19",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "b538fe102287efd5e942fa578820c05d1ec2062742a1d644acb04e54c6560497"
+    },
+    "errors": [
+      {
+        "start": {
+          "line": 3,
+          "column": 29
+        },
+        "end": {
+          "line": 3,
+          "column": 30
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"plotshape\" with argument \"size\"=\"7\". An argument of \"literal int\" type was used but a \"const string\"  is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10123",
+        "time": "1:11:45 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "plotshape-style-base-type-v52-v1.pine",
+    "sourcePath": "plotshape-style-base-type-v52-v1.pine",
+    "sourceSha256": "67796f6386ba05221d504cad8b0eb1e0adc03392039fd96c78cc1f3ab47f7dd7",
+    "instructionsPath": "instructions/plotshape-style-base-type-v52-v1-instructions-v1.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T05:11:49.245Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v52/plotshape-style-base-type",
+    "artifactSha256": {
+      "diagnostic.jpg": "92098585908a2142cd231dbb018b135164a18027812e42c5b597db8a38d2f77a",
+      "diagnostics.txt": "72340d542f65321e64ddfa2fefcc595765f1822a53f1e9c56ac648d275f2f0fd",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "65acb7d4fa4569e5d37f72329dacac9e4f0e658a07566f271a6a8267c93aa886"
+    },
+    "errors": [
+      {
+        "start": {
+          "line": 3,
+          "column": 30
+        },
+        "end": {
+          "line": 3,
+          "column": 31
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"plotshape\" with argument \"style\"=\"7\". An argument of \"literal int\" type was used but a \"input string\"  is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10123",
+        "time": "1:11:48 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "format-union-enum-v52-v1.pine",
+    "sourcePath": "format-union-enum-v52-v1.pine",
+    "sourceSha256": "b11dd8a03a1373ab89ead07fee4e0cce3c3f9455d531232cdf74a2dd3e1309d8",
+    "instructionsPath": "instructions/format-union-enum-v52-v1-instructions-v1.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T05:11:51.602Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v52/format-union-enum",
+    "artifactSha256": {
+      "diagnostic.jpg": "adb46399f6539e79473a2a850b6aa51cf01c94a00e8a0220720ca4d7c13d345a",
+      "diagnostics.txt": "eb499d98ae341e7b6542bf44b5d1ad729cdd9c365f548085654622b5f3b7c200",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "08edf95652baa023ebd2e51310b9b9ba9a036eacb98643b54b7c2f81050dc065"
+    },
+    "errors": [
+      {
+        "start": {
+          "line": 5,
+          "column": 27
+        },
+        "end": {
+          "line": 5,
+          "column": 41
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"str.format()\" to collect the \"one\" field from an object of the \"ReviewEnum\" type. The field\"s type is \"const ReviewEnum\", but the \"simple int/float/bool/string\" type is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10124",
+        "time": "1:11:50 PM"
+      },
+      {
+        "start": {
+          "line": 10,
+          "column": 30
+        },
+        "end": {
+          "line": 10,
+          "column": 35
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"log.info\" with argument \"arg_1\"=\"value\". An argument of \"unknown\" type was used but one from \"series int/float/bool/string/array<int/float/bool/string>\" is expected",
+        "scriptName": "Untitled script",
+        "code": "CE10122",
+        "time": "1:11:50 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "format-union-matrix-int-v52-v1.pine",
+    "sourcePath": "format-union-matrix-int-v52-v1.pine",
+    "sourceSha256": "1a2476bf45b1e2e2a2e1f2dd419cf11c8219cc20510ea14d8da1162529804828",
+    "instructionsPath": "instructions/format-union-matrix-int-v52-v1-instructions-v1.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T05:11:54.098Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v52/format-union-matrix-int",
+    "artifactSha256": {
+      "diagnostic.jpg": "d7193b0311ec2538585d90053c702ea30938f8a1c632a157f81a65721e2248c1",
+      "diagnostics.txt": "14311748fa78952d7eeb814dd4cd8d8aab832411d9568f7b9bb92565384b6134",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "f80d1aa5b2a63a4384c021e455df466ce201fddc4e6fd519ba2faa647faeff2c"
+    },
+    "errors": [
+      {
+        "start": {
+          "line": 3,
+          "column": 27
+        },
+        "end": {
+          "line": 3,
+          "column": 51
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"str.format\" with argument \"arg_1\"=\"call \"matrix.new\" (matrix<int>)\". An argument of \"matrix<int>\" type was used but one from \"simple int/float/bool/string\" is expected",
+        "scriptName": "Untitled script",
+        "code": "CE10122",
+        "time": "1:11:53 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "format-union-matrix-float-v52-v1.pine",
+    "sourcePath": "format-union-matrix-float-v52-v1.pine",
+    "sourceSha256": "98662e0e8a4ee1a6d3b5a7fd96a99a611ed0111f4e73bec297772bbf0b548e9b",
+    "instructionsPath": "instructions/format-union-matrix-float-v52-v1-instructions-v1.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T05:11:56.417Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v52/format-union-matrix-float",
+    "artifactSha256": {
+      "diagnostic.jpg": "1737f8f9dffbfa0ac7c5482bc094a2c2b1113837b10a09c3fd7a02769662b50b",
+      "diagnostics.txt": "55c869c0e28fc383b939445205ecca5fd0e993a9c0d375605039f030cd65f142",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "5157ddf50112e9d9ef6d003d0beefe13f34ca90a0830a729f72da40b9896e04e"
+    },
+    "errors": [
+      {
+        "start": {
+          "line": 3,
+          "column": 27
+        },
+        "end": {
+          "line": 3,
+          "column": 55
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"str.format\" with argument \"arg_1\"=\"call \"matrix.new\" (matrix<float>)\". An argument of \"matrix<float>\" type was used but one from \"simple int/float/bool/string\" is expected",
+        "scriptName": "Untitled script",
+        "code": "CE10122",
+        "time": "1:11:55 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "format-union-matrix-bool-v52-v1.pine",
+    "sourcePath": "format-union-matrix-bool-v52-v1.pine",
+    "sourceSha256": "ffd44bf4e8a5d2cb8ecdb6fffdb3bd730a7c882fca605c662bcb1956a8ce6d7f",
+    "instructionsPath": "instructions/format-union-matrix-bool-v52-v1-instructions-v1.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T05:12:03.852Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v52/format-union-matrix-bool",
+    "artifactSha256": {
+      "diagnostic.jpg": "1a16f6dbdff67c0ed328a5a1522928dc4baf8069d4ab64cab8330e2a4a760fb1",
+      "diagnostics.txt": "c7c164312cd82bf1a4ac7a083374d0b0d48be429876027cef81f6f60c8383533",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "26c5cae2ec97902a07bab1089494cd8a3397575f3a9654c89db6552c42e1823c"
+    },
+    "errors": [
+      {
+        "start": {
+          "line": 3,
+          "column": 27
+        },
+        "end": {
+          "line": 3,
+          "column": 55
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"str.format\" with argument \"arg_1\"=\"call \"matrix.new\" (matrix<bool>)\". An argument of \"matrix<bool>\" type was used but one from \"simple int/float/bool/string\" is expected",
+        "scriptName": "Untitled script",
+        "code": "CE10122",
+        "time": "1:12:02 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "format-union-matrix-string-v52-v1.pine",
+    "sourcePath": "format-union-matrix-string-v52-v1.pine",
+    "sourceSha256": "d57cffdca42decf217cf297b54dafee4d81f2b0042fbdc2ffbf03be7d7f0f297",
+    "instructionsPath": "instructions/format-union-matrix-string-v52-v1-instructions-v1.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T05:12:06.942Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v52/format-union-matrix-string",
+    "artifactSha256": {
+      "diagnostic.jpg": "d439d1d08b6690a7dafbc2046feda9d426de55f1860783ecfcdb652818f9eb93",
+      "diagnostics.txt": "9129c43d06e4f292b6ae369659f411ecc01ae59a3ca24d8dd65d477d3a119488",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "619310d44f24c836470ad30145b1c8a6c5c82285a177141ed28cb3269f1ce81e"
+    },
+    "errors": [
+      {
+        "start": {
+          "line": 3,
+          "column": 27
+        },
+        "end": {
+          "line": 3,
+          "column": 58
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"str.format\" with argument \"arg_1\"=\"call \"matrix.new\" (matrix<string>)\". An argument of \"matrix<string>\" type was used but one from \"simple int/float/bool/string\" is expected",
+        "scriptName": "Untitled script",
+        "code": "CE10122",
+        "time": "1:12:05 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "tostring-union-bool-v52-v1.pine",
+    "sourcePath": "tostring-union-bool-v52-v1.pine",
+    "sourceSha256": "0838e1f353482c0b0012bed2f2476c0272aad7b8df26c627e263b5cc0d26cefc",
+    "instructionsPath": "instructions/tostring-union-bool-v52-v1-instructions-v1.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T05:12:09.252Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v52/tostring-union-bool",
+    "artifactSha256": {
+      "diagnostic.jpg": "cc222c546d240a4507e6b62fc5fe137a22c81463a761d2ce59b76327e8d523b4",
+      "diagnostics.txt": "96d4fd5d0b772e24604245373bcc1b7dd61ed9d6ee7b5cdd6433a30af08af18e",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "70fcec9e1c644547de42b4118d0ee9b9077ae89f713f8b447eaffd60a634ab43"
+    },
+    "errors": [
+      {
+        "start": {
+          "line": 3,
+          "column": 22
+        },
+        "end": {
+          "line": 3,
+          "column": 26
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"str.tostring\" with argument \"value\"=\"true\". An argument of \"literal bool\" type was used but a \"simple float\"  is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10123",
+        "time": "1:12:08 PM"
+      },
+      {
+        "start": {
+          "line": 8,
+          "column": 30
+        },
+        "end": {
+          "line": 8,
+          "column": 35
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"log.info\" with argument \"arg_1\"=\"value\". An argument of \"unknown\" type was used but one from \"series int/float/bool/string/array<int/float/bool/string>\" is expected",
+        "scriptName": "Untitled script",
+        "code": "CE10122",
+        "time": "1:12:08 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "tostring-union-string-v52-v1.pine",
+    "sourcePath": "tostring-union-string-v52-v1.pine",
+    "sourceSha256": "35f882e257581eb242cd1298bd9a477e4490df2b9eb09f49f83acbeee54e15f2",
+    "instructionsPath": "instructions/tostring-union-string-v52-v1-instructions-v1.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T05:12:11.132Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v52/tostring-union-string",
+    "artifactSha256": {
+      "diagnostic.jpg": "02542fea5773a5b058838de0e1dea5dc698d32a5929593e734447452f75052bf",
+      "diagnostics.txt": "7eadb2f6471ec903f84a17302f5c95489abe404d3aaacdcb06520055ca52353f",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "e95e37ebebf2c4e3ac8051b0bbfcda0c1d31d44398df211a78e49f77771756bf"
+    },
+    "errors": [
+      {
+        "start": {
+          "line": 3,
+          "column": 22
+        },
+        "end": {
+          "line": 3,
+          "column": 27
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"str.tostring\" with argument \"value\"=\"abc\". An argument of \"literal string\" type was used but a \"simple float\"  is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10123",
+        "time": "1:12:10 PM"
+      },
+      {
+        "start": {
+          "line": 8,
+          "column": 30
+        },
+        "end": {
+          "line": 8,
+          "column": 35
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"log.info\" with argument \"arg_1\"=\"value\". An argument of \"unknown\" type was used but one from \"series int/float/bool/string/array<int/float/bool/string>\" is expected",
+        "scriptName": "Untitled script",
+        "code": "CE10122",
+        "time": "1:12:10 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "tostring-union-enum-v52-v1.pine",
+    "sourcePath": "tostring-union-enum-v52-v1.pine",
+    "sourceSha256": "9e6f7b216ce65e1730e07d789df9bc912c9f2fc387291dc979628b04633549e3",
+    "instructionsPath": "instructions/tostring-union-enum-v52-v1-instructions-v1.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T05:12:13.295Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v52/tostring-union-enum",
+    "artifactSha256": {
+      "diagnostic.jpg": "4d4178ea3377bde070fa0582c6fc45df7eab38783b1149b3ea4144f40ad9d6ce",
+      "diagnostics.txt": "7e20f654a743908df619b0298f190faad3870ab70d7d24c499115666b775e61b",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "5b7e46566cbddb0f34aee845aebb70f199b074d3d0e18570192b6cc57811af3d"
+    },
+    "errors": [
+      {
+        "start": {
+          "line": 5,
+          "column": 22
+        },
+        "end": {
+          "line": 5,
+          "column": 36
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"str.tostring\" with argument \"value\"=\"ReviewEnum.one\". An argument of \"const ReviewEnum\" type was used but a \"simple float\"  is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10123",
+        "time": "1:12:13 PM"
+      },
+      {
+        "start": {
+          "line": 10,
+          "column": 30
+        },
+        "end": {
+          "line": 10,
+          "column": 35
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"log.info\" with argument \"arg_1\"=\"value\". An argument of \"unknown\" type was used but one from \"series int/float/bool/string/array<int/float/bool/string>\" is expected",
+        "scriptName": "Untitled script",
+        "code": "CE10122",
+        "time": "1:12:13 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "tostring-union-array-bool-v52-v1.pine",
+    "sourcePath": "tostring-union-array-bool-v52-v1.pine",
+    "sourceSha256": "23613fbebfe1100ac00337cd72a17705cab5f9daceca94adb57a4eaf2a0f6668",
+    "instructionsPath": "instructions/tostring-union-array-bool-v52-v1-instructions-v1.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T05:12:15.349Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v52/tostring-union-array-bool",
+    "artifactSha256": {
+      "diagnostic.jpg": "bfcd5cb7b6f8877de1857cca46ae663ff1221146f7a257c3356be9bc8ae42c9d",
+      "diagnostics.txt": "395fc4dcbc83c8081547cf11ac3c844a78aa1a704a7305cc49412c7f321323f6",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "5307ce30bb9c838153fa8ccf340ca2fa08717e8f10554bcea72f8e1a9d386583"
+    },
+    "errors": [
+      {
+        "start": {
+          "line": 3,
+          "column": 22
+        },
+        "end": {
+          "line": 3,
+          "column": 46
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"str.tostring\" with argument \"value\"=\"call \"array.new\" (array<bool>)\". An argument of \"array<bool>\" type was used but a \"simple float\"  is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10123",
+        "time": "1:12:15 PM"
+      },
+      {
+        "start": {
+          "line": 8,
+          "column": 30
+        },
+        "end": {
+          "line": 8,
+          "column": 35
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"log.info\" with argument \"arg_1\"=\"value\". An argument of \"unknown\" type was used but one from \"series int/float/bool/string/array<int/float/bool/string>\" is expected",
+        "scriptName": "Untitled script",
+        "code": "CE10122",
+        "time": "1:12:15 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "tostring-union-array-string-v52-v1.pine",
+    "sourcePath": "tostring-union-array-string-v52-v1.pine",
+    "sourceSha256": "1408e652877e6e7ed2035e15736fdb84510e6a79d42acf54c962fe8bee954135",
+    "instructionsPath": "instructions/tostring-union-array-string-v52-v1-instructions-v1.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T05:12:17.753Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v52/tostring-union-array-string",
+    "artifactSha256": {
+      "diagnostic.jpg": "27f3f85ced5fb5ce358244dceb123a7426eb9aae458e15e39ce5ef1d3039fa44",
+      "diagnostics.txt": "3db12d0f1675ed606fd2c88bf0a7a8c184a80b280ce7cf7ea0c0b13090527645",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "da644306a6713efbb8397cc229adfb09b289eaf53be70b9da15dffdb29c18380"
+    },
+    "errors": [
+      {
+        "start": {
+          "line": 3,
+          "column": 22
+        },
+        "end": {
+          "line": 3,
+          "column": 49
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"str.tostring\" with argument \"value\"=\"call \"array.new\" (array<string>)\". An argument of \"array<string>\" type was used but a \"simple float\"  is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10123",
+        "time": "1:12:17 PM"
+      },
+      {
+        "start": {
+          "line": 8,
+          "column": 30
+        },
+        "end": {
+          "line": 8,
+          "column": 35
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"log.info\" with argument \"arg_1\"=\"value\". An argument of \"unknown\" type was used but one from \"series int/float/bool/string/array<int/float/bool/string>\" is expected",
+        "scriptName": "Untitled script",
+        "code": "CE10122",
+        "time": "1:12:17 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "tostring-union-matrix-bool-v52-v1.pine",
+    "sourcePath": "tostring-union-matrix-bool-v52-v1.pine",
+    "sourceSha256": "a495d866c95c3984cd74e43037e83b1bd22d4a781194b890a2e79a629188aec1",
+    "instructionsPath": "instructions/tostring-union-matrix-bool-v52-v1-instructions-v1.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T05:12:19.908Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v52/tostring-union-matrix-bool",
+    "artifactSha256": {
+      "diagnostic.jpg": "5e89eebaee347537f2c52240b7fbf020dc90913abae88e276983b8562c44d4e7",
+      "diagnostics.txt": "f2b148631ba7929f8d5f3fed22097b01b61345162c460ee0b946bf34906535af",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "e37dc53b928ddfc8d86477e985ed220bb62847d54f8568919bd7c8e3cb5bbcb1"
+    },
+    "errors": [
+      {
+        "start": {
+          "line": 3,
+          "column": 22
+        },
+        "end": {
+          "line": 3,
+          "column": 50
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"str.tostring\" with argument \"value\"=\"call \"matrix.new\" (matrix<bool>)\". An argument of \"matrix<bool>\" type was used but a \"simple float\"  is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10123",
+        "time": "1:12:19 PM"
+      },
+      {
+        "start": {
+          "line": 8,
+          "column": 30
+        },
+        "end": {
+          "line": 8,
+          "column": 35
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"log.info\" with argument \"arg_1\"=\"value\". An argument of \"unknown\" type was used but one from \"series int/float/bool/string/array<int/float/bool/string>\" is expected",
+        "scriptName": "Untitled script",
+        "code": "CE10122",
+        "time": "1:12:19 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "tostring-union-matrix-string-v52-v1.pine",
+    "sourcePath": "tostring-union-matrix-string-v52-v1.pine",
+    "sourceSha256": "d9cc29d342fed9ea50edcc083c81c25468366a5f21096d89fbce1d75946a45e3",
+    "instructionsPath": "instructions/tostring-union-matrix-string-v52-v1-instructions-v1.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T05:12:27.712Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v52/tostring-union-matrix-string",
+    "artifactSha256": {
+      "diagnostic.jpg": "d6ca0a49b2a6e981759a3e2311854c7fee280265e054c89f1fafe7ef6ffc0c66",
+      "diagnostics.txt": "373b510dcef4d7de5cbcb8aa8d06b098b8f3765ca10adbedc4ea41947530244c",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "11f395ce5884514704bdffa0f5f9e895595d9f9fd00aee2ee9df88e8bdf36dc4"
+    },
+    "errors": [
+      {
+        "start": {
+          "line": 3,
+          "column": 22
+        },
+        "end": {
+          "line": 3,
+          "column": 53
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"str.tostring\" with argument \"value\"=\"call \"matrix.new\" (matrix<string>)\". An argument of \"matrix<string>\" type was used but a \"simple float\"  is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10123",
+        "time": "1:12:27 PM"
+      },
+      {
+        "start": {
+          "line": 8,
+          "column": 30
+        },
+        "end": {
+          "line": 8,
+          "column": 35
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"log.info\" with argument \"arg_1\"=\"value\". An argument of \"unknown\" type was used but one from \"series int/float/bool/string/array<int/float/bool/string>\" is expected",
+        "scriptName": "Untitled script",
+        "code": "CE10122",
+        "time": "1:12:27 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "falling-float-length-v52-v1.pine",
+    "sourcePath": "falling-float-length-v52-v1.pine",
+    "sourceSha256": "a7bb8e717a6a4bac01b043331bb07ea7166059119b5e015ec2502ee69b808154",
+    "instructionsPath": "instructions/falling-float-length-v52-v1-instructions-v1.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T05:12:30.191Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v52/falling-float-length",
+    "artifactSha256": {
+      "diagnostic.jpg": "d7ee571be096f641acb5e280d68363b71ccbab8f969272d14384100ad8682d08",
+      "diagnostics.txt": "84fe2baa38f050426c536892d30330a893e837cad7f7c439346c6378e5be650a",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "6859cd1876972abfb116e47e6dc533cebb59dad308e30e24566e7c45e76b581a"
+    },
+    "errors": [
+      {
+        "start": {
+          "line": 3,
+          "column": 24
+        },
+        "end": {
+          "line": 3,
+          "column": 27
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"ta.falling\" with argument \"length\"=\"3\". An argument of \"literal float\" type was used but a \"series int\"  is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10123",
+        "time": "1:12:29 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "kc-float-length-v52-v1.pine",
+    "sourcePath": "kc-float-length-v52-v1.pine",
+    "sourceSha256": "aac83cf9a08f1475e27a368e2c50a27d15182e131d81c2899c561f460231d013",
+    "instructionsPath": "instructions/kc-float-length-v52-v1-instructions-v1.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T05:12:32.725Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v52/kc-float-length",
+    "artifactSha256": {
+      "diagnostic.jpg": "022b0957e39d1e080d2e2af8f8eb693affa556b666dfa938463bc0509161e856",
+      "diagnostics.txt": "378447e6c24a9b9aee527176bfdaaf52c4465f9c54f9ed869d0e5cf576c9a39f",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "d2193a33b680ba7b48d39c35cdff2090d38dc18222e2678c6e07bf4ffceafd06"
+    },
+    "errors": [
+      {
+        "start": {
+          "line": 3,
+          "column": 39
+        },
+        "end": {
+          "line": 3,
+          "column": 42
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"ta.kc\" with argument \"length\"=\"3\". An argument of \"literal float\" type was used but a \"simple int\"  is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10123",
+        "time": "1:12:31 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "kc-series-mult-v52-v1.pine",
+    "sourcePath": "kc-series-mult-v52-v1.pine",
+    "sourceSha256": "11d2ca50df96e55e8b589ad8a854fc550a62a7c657d570cf00460d01db73f608",
+    "instructionsPath": "instructions/kc-series-mult-v52-v1-instructions-v1.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T05:12:35.165Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v52/kc-series-mult",
+    "artifactSha256": {
+      "diagnostic.jpg": "5ce449ed46b931c9cc3266153e0a495fe6a39c6e4ac833f105da1d2865976e9c",
+      "diagnostics.txt": "5ea5b65be6ea18fbfbbdb8abb8fad0e72fa30e25b2ee1b12b30499bb92bae3f7",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "dc80481378de6033ce32c4dd1a779f751bc0051e62ea9516d8400a3d7cc3a142"
+    },
+    "errors": [
+      {
+        "start": {
+          "line": 4,
+          "column": 61
+        },
+        "end": {
+          "line": 4,
+          "column": 78
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"ta.kc\" with argument \"mult\"=\"candidateArgument\". An argument of \"series int\" type was used but a \"simple float\"  is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10123",
+        "time": "1:12:34 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "kc-series-usetruerange-v52-v1.pine",
+    "sourcePath": "kc-series-usetruerange-v52-v1.pine",
+    "sourceSha256": "40e4d21ae4e4db1a99724bf904914aa977b1b161df82f17eedbdcabb00419319",
+    "instructionsPath": "instructions/kc-series-usetruerange-v52-v1-instructions-v1.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T05:12:37.743Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v52/kc-series-usetruerange",
+    "artifactSha256": {
+      "diagnostic.jpg": "297ef52fcf67a06beb07c3642af46471f0de92469dd35a8d0ffad038c08b641e",
+      "diagnostics.txt": "509a6b73f79ab6a48519b2d9c5a5b127863aeff9e0de5bcf3fc3049bc01bb684",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "a0c050158cc21a4b41ef4543d197eceddfd378e92e5071e9ba0aed9af6fc0bd9"
+    },
+    "errors": [
+      {
+        "start": {
+          "line": 4,
+          "column": 79
+        },
+        "end": {
+          "line": 4,
+          "column": 96
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"ta.kc\" with argument \"useTrueRange\"=\"candidateArgument\". An argument of \"series bool\" type was used but a \"simple bool\"  is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10123",
+        "time": "1:12:37 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "kcw-float-length-v52-v1.pine",
+    "sourcePath": "kcw-float-length-v52-v1.pine",
+    "sourceSha256": "5a673565d347087b3467ee78e7617e447dd7c096ebc3a7848ba0fa1a4088f066",
+    "instructionsPath": "instructions/kcw-float-length-v52-v1-instructions-v1.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T05:12:40.249Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v52/kcw-float-length",
+    "artifactSha256": {
+      "diagnostic.jpg": "6c446b72c19b1d38da5dc9432dbf6d034716bac152bfcc6926f55075b3643759",
+      "diagnostics.txt": "7da18c64a214ca79e3458883ba83c02c14875e1ca13a0bb073650dea745a3443",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "53832da7fe77074a5ff1cf86c975c88f177e6d59fea6bf7bbe91f20aef05e447"
+    },
+    "errors": [
+      {
+        "start": {
+          "line": 3,
+          "column": 20
+        },
+        "end": {
+          "line": 3,
+          "column": 23
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"ta.kcw\" with argument \"length\"=\"3\". An argument of \"literal float\" type was used but a \"simple int\"  is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10123",
+        "time": "1:12:39 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "kcw-series-mult-v52-v1.pine",
+    "sourcePath": "kcw-series-mult-v52-v1.pine",
+    "sourceSha256": "d25ed1280c3476ca67ddfe01c53c07836c7442eb4b51cdcaa3f0341ade358677",
+    "instructionsPath": "instructions/kcw-series-mult-v52-v1-instructions-v1.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T05:12:42.696Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v52/kcw-series-mult",
+    "artifactSha256": {
+      "diagnostic.jpg": "8b0b64e7027dd980090b3a1922b3ab36678713805b3f354dfce4170675f7017d",
+      "diagnostics.txt": "ee04b80129bcc26226c034b85c6de96d1601e757ac96247a26f84c2ca9dde503",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "3b8154190744b1fa3b9cebe7d26dcbeafc161bdb7356debaae4c6bcc4723ab3e"
+    },
+    "errors": [
+      {
+        "start": {
+          "line": 4,
+          "column": 42
+        },
+        "end": {
+          "line": 4,
+          "column": 59
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"ta.kcw\" with argument \"mult\"=\"candidateArgument\". An argument of \"series int\" type was used but a \"simple float\"  is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10123",
+        "time": "1:12:41 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "kcw-series-usetruerange-v52-v1.pine",
+    "sourcePath": "kcw-series-usetruerange-v52-v1.pine",
+    "sourceSha256": "286a0abe38315508710be4ff01073447f58c4113a733580affd4f91371f8732a",
+    "instructionsPath": "instructions/kcw-series-usetruerange-v52-v1-instructions-v1.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T05:12:45.096Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v52/kcw-series-usetruerange",
+    "artifactSha256": {
+      "diagnostic.jpg": "f9b3c5cc829cc2af4c663d4ae57ecc8d567ea50651995ff30c36e7865616b099",
+      "diagnostics.txt": "6ed1cfd5e474e25861d398c482c6b84e811bbc866a1f4b61ccbc71f5af961c03",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "bd9f80faa617f638a72490ea9314635a580baa3c5ca621e7720a7dee80e37d9d"
+    },
+    "errors": [
+      {
+        "start": {
+          "line": 4,
+          "column": 60
+        },
+        "end": {
+          "line": 4,
+          "column": 77
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"ta.kcw\" with argument \"useTrueRange\"=\"candidateArgument\". An argument of \"series bool\" type was used but a \"simple bool\"  is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10123",
+        "time": "1:12:44 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "qualifier-format-time-consumer-control-v52-v1.pine",
+    "sourcePath": "qualifier-format-time-consumer-control-v52-v1.pine",
+    "sourceSha256": "c23d8e918da3740e96a08e88a8091f36c571c41165145ad82e0752479d30c200",
+    "instructionsPath": "instructions/qualifier-format-time-consumer-control-v52-v1-instructions-v1.md",
+    "outcome": "RUNS",
+    "capturedAt": "2026-10-07T05:12:53.874Z",
+    "totalRows": 32,
+    "retainedRows": 32,
+    "artifacts": "captures/v52/qualifier-format-time-consumer-control",
+    "artifactSha256": {
+      "data-window.jpg": "69ab75e4e81a37d5af6892bdcb9c0a3630d8a24bd68056172ae6e509463e67d1",
+      "data-window.txt": "207b0e4101a01d1c476a71e6310b431b3532c895875dbbc7eee02d2410de4e04",
+      "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "598f8a1b8efdb847cd62046744f5d03b387419cd3c9afe5b39f3161a861344ac",
+      "plots.csv": "3d65cf8b00558fe8f998d5d6377c67dcf8fadc742e4e7bb33d75345c094bd466",
+      "settings.jpg": "31e223de52f73932a69b0cd361eef477be457cf8fc9f99513302ba0de80fcacd"
+    },
+    "errors": [],
+    "logs": []
+  },
+  {
+    "probe": "qualifier-format-time-const-active-v52-v1.pine",
+    "sourcePath": "qualifier-format-time-const-active-v52-v1.pine",
+    "sourceSha256": "e65322bbaec4107fe02bdf6473b96738cf9df5d1d343abfcfa71d4095082c883",
+    "instructionsPath": "instructions/qualifier-format-time-const-active-v52-v1-instructions-v1.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T05:12:57.002Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v52/qualifier-format-time-const-active",
+    "artifactSha256": {
+      "diagnostic.jpg": "2180ad740d507939195930fcb14b91c5ef440aa7a635bc870c14d5a1f6e8760d",
+      "diagnostics.txt": "4f41b442aa6c5b06be89c3331ab0efa80ed794c3c55cdcd4b25b25a91ac2af28",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "475662b5701fc0883610bb8853dc6d2083ee680554dc8bbd8794532267d15c14"
+    },
+    "errors": [
+      {
+        "start": {
+          "line": 6,
+          "column": 48
+        },
+        "end": {
+          "line": 6,
+          "column": 63
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"input.bool\" with argument \"active\"=\"call \"operator ==\" (series bool)\". An argument of \"series bool\" type was used but a \"input bool\"  is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10123",
+        "time": "1:12:56 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "qualifier-format-time-input-time-active-v52-v1.pine",
+    "sourcePath": "qualifier-format-time-input-time-active-v52-v1.pine",
+    "sourceSha256": "01474aac5dceeab91977f8022e643ac794be0fec8b9ba3ac983d1af6bae225ef",
+    "instructionsPath": "instructions/qualifier-format-time-input-time-active-v52-v1-instructions-v1.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T05:12:59.785Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v52/qualifier-format-time-input-time-active",
+    "artifactSha256": {
+      "diagnostic.jpg": "4a43ca3c03e6d0f7c8ee7c7603b7640e2cc705d2a69ad77b8c7f6e4a1106dd8b",
+      "diagnostics.txt": "4f41b442aa6c5b06be89c3331ab0efa80ed794c3c55cdcd4b25b25a91ac2af28",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "3136eb9a8953ac7e33f73ae7a184900d169732dd7d5b97bc8a4899c18ddb1a13"
+    },
+    "errors": [
+      {
+        "start": {
+          "line": 6,
+          "column": 48
+        },
+        "end": {
+          "line": 6,
+          "column": 63
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"input.bool\" with argument \"active\"=\"call \"operator ==\" (series bool)\". An argument of \"series bool\" type was used but a \"input bool\"  is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10123",
+        "time": "1:12:58 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "qualifier-format-time-input-format-active-v52-v1.pine",
+    "sourcePath": "qualifier-format-time-input-format-active-v52-v1.pine",
+    "sourceSha256": "e6bdf566d4cc715ccf8ca048788f95f5bd790029a4c4250241d07a4521eb1d90",
+    "instructionsPath": "instructions/qualifier-format-time-input-format-active-v52-v1-instructions-v1.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T05:13:02.105Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v52/qualifier-format-time-input-format-active",
+    "artifactSha256": {
+      "diagnostic.jpg": "f49e6b79b8c057ce87caa4d210d37ed12852d596ede388a0806385200ee781a1",
+      "diagnostics.txt": "4f41b442aa6c5b06be89c3331ab0efa80ed794c3c55cdcd4b25b25a91ac2af28",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "abdc10490bfae78bc57c3b4f4aa5442adb83480336fe5cfeede5b2593912dda6"
+    },
+    "errors": [
+      {
+        "start": {
+          "line": 6,
+          "column": 48
+        },
+        "end": {
+          "line": 6,
+          "column": 63
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"input.bool\" with argument \"active\"=\"call \"operator ==\" (series bool)\". An argument of \"series bool\" type was used but a \"input bool\"  is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10123",
+        "time": "1:13:01 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "qualifier-format-time-const-title-v52-v1.pine",
+    "sourcePath": "qualifier-format-time-const-title-v52-v1.pine",
+    "sourceSha256": "33662a3e3f8e3c0d3695c9763d36fdf5eb40c52efb8b982d219778c88e38d02f",
+    "instructionsPath": "instructions/qualifier-format-time-const-title-v52-v1-instructions-v1.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T05:13:04.390Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v52/qualifier-format-time-const-title",
+    "artifactSha256": {
+      "diagnostic.jpg": "ace894d0af93a4e1e66618395ae2a7f22035f7e35a19f039f5dcb918990d7c7d",
+      "diagnostics.txt": "29d1ae26a0382354b29537f358e3d6c864ad8960045db5b4c582982f2cc5fd80",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "4ce260749afa0d8b343f6a62e51e0ce3e3805fbec89245694e7008cc240cbd59"
+    },
+    "errors": [
+      {
+        "start": {
+          "line": 4,
+          "column": 19
+        },
+        "end": {
+          "line": 4,
+          "column": 24
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"plot\" with argument \"title\"=\"value\". An argument of \"series string\" type was used but a \"const string\"  is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10123",
+        "time": "1:13:03 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "qualifier-format-time-const-simple-v52-v1.pine",
+    "sourcePath": "qualifier-format-time-const-simple-v52-v1.pine",
+    "sourceSha256": "b1d3e4de6a7cf2e4b705d9e2c491bba1eacdce7ff150e4c46ab9c12400fd7247",
+    "instructionsPath": "instructions/qualifier-format-time-const-simple-v52-v1-instructions-v1.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T05:13:06.918Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v52/qualifier-format-time-const-simple",
+    "artifactSha256": {
+      "diagnostic.jpg": "a96dc2f47673d13ea7b3d113897243c1e9057b7f7365bae77b334551dd4e661c",
+      "diagnostics.txt": "f2c4188a779ccdc873e0202ff9376e1b2488675f01b47a84cc830a08412e9f3c",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "db83cdb09566a3570c902498c32a3b1f6d0c9c4c311e1ea4e6261c7cc3cb925b"
+    },
+    "errors": [
+      {
+        "start": {
+          "line": 5,
+          "column": 14
+        },
+        "end": {
+          "line": 5,
+          "column": 19
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"consume\" with argument \"sampleText\"=\"value\". An argument of \"series string\" type was used but a \"simple string\"  is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10123",
+        "time": "1:13:06 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "qualifier-match-consumer-control-v52-v1.pine",
+    "sourcePath": "qualifier-match-consumer-control-v52-v1.pine",
+    "sourceSha256": "bb895678fced4c674d52cd691977a8add6882ea75799004a66dcae5a6bf28db0",
+    "instructionsPath": "instructions/qualifier-match-consumer-control-v52-v1-instructions-v1.md",
+    "outcome": "RUNS",
+    "capturedAt": "2026-10-07T05:13:09.598Z",
+    "totalRows": 32,
+    "retainedRows": 32,
+    "artifacts": "captures/v52/qualifier-match-consumer-control",
+    "artifactSha256": {
+      "data-window.jpg": "b49cef5e876316ab13b8db4f5cde53da9c2b20d8571c4c939bdaf6118825a904",
+      "data-window.txt": "edd8a157056531db32fdc11521bb94847417289d540f93698d4b5c5c96329bb5",
+      "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "fd9a2912a1bf8edbbaeae4349eb8501254aa91c0cc66f3756212986a85022c47",
+      "plots.csv": "55bb4731fd091603dfa42a73f46494b4f68e99f56b85b570bb27a35472d60497",
+      "settings.jpg": "124093f59b4c2e165aad230b5f60a34b33f4554c1c327d0f08a935707286dcad"
+    },
+    "errors": [],
+    "logs": []
+  },
+  {
+    "probe": "qualifier-match-const-active-v52-v1.pine",
+    "sourcePath": "qualifier-match-const-active-v52-v1.pine",
+    "sourceSha256": "619d2a8bae8a92ec9d2131b8bdead7c1fc9d8313089b0c6034ea938971c92932",
+    "instructionsPath": "instructions/qualifier-match-const-active-v52-v1-instructions-v1.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T05:13:13.415Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v52/qualifier-match-const-active",
+    "artifactSha256": {
+      "diagnostic.jpg": "8bb3f9d938faacf74d76f6b624bc3b09141c05ce2e6bc90752494017e9b869d8",
+      "diagnostics.txt": "b4c938cbdc08e9c37144ada48328017743182e3b0d63ecc2aa2058db19b4b9a0",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "4de11c198bcad89213a52ddb0fb504a50d34b41ff701ab0e69371cef09a6a2ad"
+    },
+    "errors": [
+      {
+        "start": {
+          "line": 6,
+          "column": 48
+        },
+        "end": {
+          "line": 6,
+          "column": 61
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"input.bool\" with argument \"active\"=\"call \"operator ==\" (simple bool)\". An argument of \"simple bool\" type was used but a \"input bool\"  is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10123",
+        "time": "1:13:12 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "qualifier-match-const-simple-v52-v1.pine",
+    "sourcePath": "qualifier-match-const-simple-v52-v1.pine",
+    "sourceSha256": "8360e8f5a5f6007e3553aa7801d76cc83f9301877a71b5c6f7f244e744b88309",
+    "instructionsPath": "instructions/qualifier-match-const-simple-v52-v1-instructions-v1.md",
+    "outcome": "RUNS",
+    "capturedAt": "2026-10-07T05:13:21.825Z",
+    "totalRows": 32,
+    "retainedRows": 32,
+    "artifacts": "captures/v52/qualifier-match-const-simple",
+    "artifactSha256": {
+      "data-window.jpg": "a5f2b795f10c83397fb29c411e25bd3c873a7b9a239e65b71b38b221522472df",
+      "data-window.txt": "f15bab8321271e2fdd797d450e591ce15b046c607637f266a512a751772bd50b",
+      "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logs.txt": "3fd354e0989a2d127eda627d7b7d158153b7762d344684d2c7a623e8ee21a76a",
+      "native.json": "39acb9b0993eb45b62680ffe3f5a5e735cc583f492c076aacd8de7e330f4184e",
+      "plots.csv": "1e88c75e25028bff42abe3b63535ab535f939902c23c1cdba1f93b25a276e7b4",
+      "settings.jpg": "923dd729823020d20253d3db67b818573fc84a2f25dc21013e480d19a1b319da"
+    },
+    "errors": [],
+    "logs": [
+      {
+        "barTime": 1791346200000,
+        "time": 1791346200000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 12,
+            "column": 5
+          },
+          "end": {
+            "line": 12,
+            "column": 35
+          }
+        },
+        "message": "TARGET=[ab]"
+      }
+    ]
+  },
+  {
+    "probe": "qualifier-match-input-source-active-v52-v1.pine",
+    "sourcePath": "qualifier-match-input-source-active-v52-v1.pine",
+    "sourceSha256": "f3ce29eac7a315dfa66ea3285f1de09939275e7450ebded4228e4d755aacbc5c",
+    "instructionsPath": "instructions/qualifier-match-input-source-active-v52-v1-instructions-v1.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T05:13:24.593Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v52/qualifier-match-input-source-active",
+    "artifactSha256": {
+      "diagnostic.jpg": "b91a4f82fcb568ef84cdd8ecdc835f32631058d4a200fe6f79e018d143bb364e",
+      "diagnostics.txt": "b4c938cbdc08e9c37144ada48328017743182e3b0d63ecc2aa2058db19b4b9a0",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "b869042b64adc01da7e94cdb8b74f6b41a0a465c25890a99f25255a421ae2ac2"
+    },
+    "errors": [
+      {
+        "start": {
+          "line": 6,
+          "column": 48
+        },
+        "end": {
+          "line": 6,
+          "column": 61
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"input.bool\" with argument \"active\"=\"call \"operator ==\" (simple bool)\". An argument of \"simple bool\" type was used but a \"input bool\"  is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10123",
+        "time": "1:13:23 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "qualifier-match-input-source-simple-v52-v1.pine",
+    "sourcePath": "qualifier-match-input-source-simple-v52-v1.pine",
+    "sourceSha256": "61e540f774c96f9abd5daf8feb350b55674b6be7952539721ea799813da4cb30",
+    "instructionsPath": "instructions/qualifier-match-input-source-simple-v52-v1-instructions-v1.md",
+    "outcome": "RUNS",
+    "capturedAt": "2026-10-07T05:13:28.099Z",
+    "totalRows": 32,
+    "retainedRows": 32,
+    "artifacts": "captures/v52/qualifier-match-input-source-simple",
+    "artifactSha256": {
+      "data-window.jpg": "bc3d928a594b3e172c597fbb6c6f380abeaf9e6ded6209691911f9cd2a2790fb",
+      "data-window.txt": "5d998fad7f953cb85a1f90756d182b49484b06e25740fc11192125c685ac7a7d",
+      "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logs.txt": "3fd354e0989a2d127eda627d7b7d158153b7762d344684d2c7a623e8ee21a76a",
+      "native.json": "7362ef11d993bbe0a0c222ebba966f56c480d3ebbb2b8cdc549d0a0acda5d9bd",
+      "plots.csv": "f531bb689d1bb8cadc6316edc2073126be6ac5c3c82666b11a6eda1545b58aa0",
+      "settings.jpg": "55591a0bdff4e780a609861573b7d13e421ac3fb66d0eb1291bdc385adde17e1"
+    },
+    "errors": [],
+    "logs": [
+      {
+        "barTime": 1791346200000,
+        "time": 1791346200000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 12,
+            "column": 5
+          },
+          "end": {
+            "line": 12,
+            "column": 35
+          }
+        },
+        "message": "TARGET=[ab]"
+      }
+    ]
+  },
+  {
+    "probe": "qualifier-match-input-regex-active-v52-v1.pine",
+    "sourcePath": "qualifier-match-input-regex-active-v52-v1.pine",
+    "sourceSha256": "ace1debcbb537f71bfa9a0b61e27bcb42f59eed181ffd0534e7fb4dca07a0022",
+    "instructionsPath": "instructions/qualifier-match-input-regex-active-v52-v1-instructions-v1.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T05:13:31.318Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v52/qualifier-match-input-regex-active",
+    "artifactSha256": {
+      "diagnostic.jpg": "d9f104b1f57fc77d01f7a0ff71f2fd765a8ee1942ff9db70487ae7acb642265e",
+      "diagnostics.txt": "b4c938cbdc08e9c37144ada48328017743182e3b0d63ecc2aa2058db19b4b9a0",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "c8553926e1ea6045e63adc00966b8ab45a2880c8764654cd2ae7932964b6e1a2"
+    },
+    "errors": [
+      {
+        "start": {
+          "line": 6,
+          "column": 48
+        },
+        "end": {
+          "line": 6,
+          "column": 61
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"input.bool\" with argument \"active\"=\"call \"operator ==\" (simple bool)\". An argument of \"simple bool\" type was used but a \"input bool\"  is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10123",
+        "time": "1:13:30 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "qualifier-match-input-regex-simple-v52-v1.pine",
+    "sourcePath": "qualifier-match-input-regex-simple-v52-v1.pine",
+    "sourceSha256": "78fc922f9ff1a414059de000d1a198bc7abceb50f9aa64acb4bf2061a3cb2a1d",
+    "instructionsPath": "instructions/qualifier-match-input-regex-simple-v52-v1-instructions-v1.md",
+    "outcome": "RUNS",
+    "capturedAt": "2026-10-07T05:13:35.101Z",
+    "totalRows": 32,
+    "retainedRows": 32,
+    "artifacts": "captures/v52/qualifier-match-input-regex-simple",
+    "artifactSha256": {
+      "data-window.jpg": "48b4afce89f45d8481fc608c1d893576774b5d293331db9ee4c8ad8e013181dd",
+      "data-window.txt": "9e75062ddb181fe72c9aced404c573f6da30f523194ba9c58e32d73121aab76f",
+      "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logs.txt": "3fd354e0989a2d127eda627d7b7d158153b7762d344684d2c7a623e8ee21a76a",
+      "native.json": "45020b892ca35ce8b417b43e125ec5c98884546570e8d96ed90ffd853db1455a",
+      "plots.csv": "99ae5d2f2b5fddb98d957d95e0ff652b54f0268427dab6e8c835ae1281f37ef9",
+      "settings.jpg": "6624bcf41d2cb60c272e06a35e7821ea01d8368421654261e0c533b546a51a2a"
+    },
+    "errors": [],
+    "logs": [
+      {
+        "barTime": 1791346200000,
+        "time": 1791346200000,
+        "level": 4,
+        "source": {
+          "start": {
+            "line": 12,
+            "column": 5
+          },
+          "end": {
+            "line": 12,
+            "column": 35
+          }
+        },
+        "message": "TARGET=[ab]"
+      }
+    ]
+  },
+  {
+    "probe": "qualifier-match-const-title-v52-v1.pine",
+    "sourcePath": "qualifier-match-const-title-v52-v1.pine",
+    "sourceSha256": "af29eba2c726671b06e4c719af43cdccd4d7774d915e40aa25c1e86797fc7e98",
+    "instructionsPath": "instructions/qualifier-match-const-title-v52-v1-instructions-v1.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T05:13:38.860Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v52/qualifier-match-const-title",
+    "artifactSha256": {
+      "diagnostic.jpg": "ff7118ca1765e09f8cbd52a0a45e702a81059013230a8976b308929cc7ef2ae2",
+      "diagnostics.txt": "d49d049a6b428e0fa6e2445ea5d9a17ef37eca2f8ff6d94ff332aaa1e0879a1c",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "7132171a5b5b481f236aa63d47ae6d1ffca06f8ba5c1d121daeb9ec5d0e040e8"
+    },
+    "errors": [
+      {
+        "start": {
+          "line": 4,
+          "column": 19
+        },
+        "end": {
+          "line": 4,
+          "column": 24
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"plot\" with argument \"title\"=\"value\". An argument of \"simple string\" type was used but a \"const string\"  is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10123",
+        "time": "1:13:38 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "qualifier-length-input-simple-v52-v1.pine",
+    "sourcePath": "qualifier-length-input-simple-v52-v1.pine",
+    "sourceSha256": "38011683e9b82bfa9301b243b865e4cec7a1908e5c258897387176b671910dfb",
+    "instructionsPath": "instructions/qualifier-length-input-simple-v52-v1-instructions-v1.md",
+    "outcome": "RUNS",
+    "capturedAt": "2026-10-07T05:13:41.599Z",
+    "totalRows": 32,
+    "retainedRows": 32,
+    "artifacts": "captures/v52/qualifier-length-input-simple",
+    "artifactSha256": {
+      "data-window.jpg": "a79882375e1b9422ec2eec7e7a66e6e8ed6de5e92590f912379cac8c2918db09",
+      "data-window.txt": "fec1f3d16c18d922df6707f7a56d30fd8d7f85a58cd31f3edf80874c2f782c2e",
+      "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "23941bb31922f8b286ec6c3cfa93c22af1ce060d03066151827c7b5e8d4a7af0",
+      "plots.csv": "b4199ef83925c8cadc724bf50e2b4c9259b2c551862a70456555777a5cd31e80",
+      "settings.jpg": "8fd563103dde129e05607c74835994fd70b76a69bc192f08986849d1bb510153"
+    },
+    "errors": [],
+    "logs": []
+  },
+  {
+    "probe": "qualifier-length-input-width-v52-v1.pine",
+    "sourcePath": "qualifier-length-input-width-v52-v1.pine",
+    "sourceSha256": "93048f20e1c539616cc6faa8816f482005f0db2b0ab396f2b0c39a9bad8b8650",
+    "instructionsPath": "instructions/qualifier-length-input-width-v52-v1-instructions-v1.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T05:13:44.614Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v52/qualifier-length-input-width",
+    "artifactSha256": {
+      "diagnostic.jpg": "bdf724e4e2cf69a0db7387deae51ab305856689c4fa397628fb9b71dbda3e24f",
+      "diagnostics.txt": "269be4651a5d7b2add429341c37c53b946d5c969db0fdb215c688aee8afe7aef",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "a44dc01ea1394c980337d8e59ddb8bd33ff55bb0095413fe23ceaff832468783"
+    },
+    "errors": [
+      {
+        "start": {
+          "line": 5,
+          "column": 41
+        },
+        "end": {
+          "line": 5,
+          "column": 46
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"plot\" with argument \"linewidth\"=\"value\". An argument of \"simple int\" type was used but a \"input int\"  is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10123",
+        "time": "1:13:43 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "qualifier-pos-input-simple-v52-v1.pine",
+    "sourcePath": "qualifier-pos-input-simple-v52-v1.pine",
+    "sourceSha256": "06ef0fe3f00535de05f268edf4ca44595f55cd0b0781c36f9b64d10ac3a6d0da",
+    "instructionsPath": "instructions/qualifier-pos-input-simple-v52-v1-instructions-v1.md",
+    "outcome": "RUNS",
+    "capturedAt": "2026-10-07T05:13:54.177Z",
+    "totalRows": 32,
+    "retainedRows": 32,
+    "artifacts": "captures/v52/qualifier-pos-input-simple",
+    "artifactSha256": {
+      "data-window.jpg": "eea76d82bfc8997a65469f08380f693a7c9757f1e665df7e5cce2c9b3f457361",
+      "data-window.txt": "5d7fd95aece8d16feee16148e66050ab59d0d079e12aa340847872c9429bd8d1",
+      "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "59b1e6ea028b7f5b743ee793166dea50edf52c81d4d52ea7c699c7ee67e1fdac",
+      "plots.csv": "888fe0f90fa0d34d415dfa259451377b9f50c8bed14e883e32c34dadbe382062",
+      "settings.jpg": "33ec161f3d09d471eb481db0b625e8d92af99a65fa7917df07dcb93395705090"
+    },
+    "errors": [],
+    "logs": []
+  },
+  {
+    "probe": "qualifier-pos-input-width-v52-v1.pine",
+    "sourcePath": "qualifier-pos-input-width-v52-v1.pine",
+    "sourceSha256": "65d2dc37648b1000f685f28b984d9c177d851e027228b63eaca731a61e6548f5",
+    "instructionsPath": "instructions/qualifier-pos-input-width-v52-v1-instructions-v1.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T05:13:58.097Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v52/qualifier-pos-input-width",
+    "artifactSha256": {
+      "diagnostic.jpg": "33465de65a156be16c337276af322f54a3969ec88cd9a07d7fad6f3c3cc31df9",
+      "diagnostics.txt": "269be4651a5d7b2add429341c37c53b946d5c969db0fdb215c688aee8afe7aef",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "401fcb789efffd3259944c8d44bd0af77898ceb9a59ff4841b21e2aebbcb7842"
+    },
+    "errors": [
+      {
+        "start": {
+          "line": 5,
+          "column": 41
+        },
+        "end": {
+          "line": 5,
+          "column": 46
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"plot\" with argument \"linewidth\"=\"value\". An argument of \"simple int\" type was used but a \"input int\"  is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10123",
+        "time": "1:13:57 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "qualifier-contains-input-source-active-v52-v1.pine",
+    "sourcePath": "qualifier-contains-input-source-active-v52-v1.pine",
+    "sourceSha256": "00d0fea92d2b9177f048bf7458ce5d247741a450f3c83292752206c922819309",
+    "instructionsPath": "instructions/qualifier-contains-input-source-active-v52-v1-instructions-v1.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T05:14:00.532Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v52/qualifier-contains-input-source-active",
+    "artifactSha256": {
+      "diagnostic.jpg": "2c345dcf4a2a998d0ec0ea7e585cdc503a6aabf0ca15b66f3a73b8428c1bf046",
+      "diagnostics.txt": "0574caab979b5a984a9b51b8231c20f5250a5cbe1303157f85c0655eb02f228d",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "de7ab813777b199febe893cdf3856da6590f05e9baee0f80ebdf56c0263a3f86"
+    },
+    "errors": [
+      {
+        "start": {
+          "line": 6,
+          "column": 48
+        },
+        "end": {
+          "line": 6,
+          "column": 53
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"input.bool\" with argument \"active\"=\"value\". An argument of \"simple bool\" type was used but a \"input bool\"  is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10123",
+        "time": "1:14:00 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "qualifier-contains-input-source-simple-v52-v1.pine",
+    "sourcePath": "qualifier-contains-input-source-simple-v52-v1.pine",
+    "sourceSha256": "304655f89e0a8f432af452e94ba718eab699435b11f6f4b8e2e1af309c906acc",
+    "instructionsPath": "instructions/qualifier-contains-input-source-simple-v52-v1-instructions-v1.md",
+    "outcome": "RUNS",
+    "capturedAt": "2026-10-07T05:14:03.932Z",
+    "totalRows": 32,
+    "retainedRows": 32,
+    "artifacts": "captures/v52/qualifier-contains-input-source-simple",
+    "artifactSha256": {
+      "data-window.jpg": "08a4953100250c7cec0a466b7653356d550b0011bcaf15db666f99d95912fe34",
+      "data-window.txt": "e292fcee861053fc442613e926242139d672c5798beabf5652ba701f7fad8704",
+      "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "3aaf3dd0e49fbc18850bfa03d6b7bbe63812a4b438a9e9fc7ed911497df0c0d8",
+      "plots.csv": "59c2e1a5932661e98c2fd3b9974bb324430d3872f02b710171b32e233e374ecb",
+      "settings.jpg": "1e0d1e5ae57f96f471bb2ba9f005ba5118482e43232c35260ce956b0161f4e38"
+    },
+    "errors": [],
+    "logs": []
+  },
+  {
+    "probe": "qualifier-contains-input-pattern-active-v52-v1.pine",
+    "sourcePath": "qualifier-contains-input-pattern-active-v52-v1.pine",
+    "sourceSha256": "0b3e0832af8191251361783e3f8277ea9bd8f2f010e2892cab279393b69901a5",
+    "instructionsPath": "instructions/qualifier-contains-input-pattern-active-v52-v1-instructions-v1.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T05:14:06.903Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v52/qualifier-contains-input-pattern-active",
+    "artifactSha256": {
+      "diagnostic.jpg": "4873fc9b9f7bd7884b96b9f180bfd7fddcf5a7fa4a2ce372e2be30bcf1a036ef",
+      "diagnostics.txt": "0574caab979b5a984a9b51b8231c20f5250a5cbe1303157f85c0655eb02f228d",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "de666b2814649140eed5df2cb02c23cf269aad20350dca93f47863cee88e704d"
+    },
+    "errors": [
+      {
+        "start": {
+          "line": 6,
+          "column": 48
+        },
+        "end": {
+          "line": 6,
+          "column": 53
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"input.bool\" with argument \"active\"=\"value\". An argument of \"simple bool\" type was used but a \"input bool\"  is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10123",
+        "time": "1:14:06 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "qualifier-contains-input-pattern-simple-v52-v1.pine",
+    "sourcePath": "qualifier-contains-input-pattern-simple-v52-v1.pine",
+    "sourceSha256": "fd6365c5cc1f51fcd768249545891fecaa87b1f90f0560a5700a62cd0821d410",
+    "instructionsPath": "instructions/qualifier-contains-input-pattern-simple-v52-v1-instructions-v1.md",
+    "outcome": "RUNS",
+    "capturedAt": "2026-10-07T05:14:09.638Z",
+    "totalRows": 32,
+    "retainedRows": 32,
+    "artifacts": "captures/v52/qualifier-contains-input-pattern-simple",
+    "artifactSha256": {
+      "data-window.jpg": "ae38b42ad508ce94260202db6e84bdfb9266c8bf3d9f005f7a0e0816bd8bfa7f",
+      "data-window.txt": "adedf7c5c8f83638b740e5591420c874a7f724809b75d10b38d88adc316228ab",
+      "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "13fc117f1f502e1718abc2550f9010fa8914c3139b2e2e23ef3fcf8ccbee3977",
+      "plots.csv": "c79eafe844c7889ae83860bc160efcef57cd8a24e7b56b6a85cb481ebcab515e",
+      "settings.jpg": "3d0f52ba40a921b713dfe2672c2fcd81b1dbd2dd7569dbe1b35996cf9568817c"
+    },
+    "errors": [],
+    "logs": []
+  },
+  {
+    "probe": "qualifier-startswith-input-source-active-v52-v1.pine",
+    "sourcePath": "qualifier-startswith-input-source-active-v52-v1.pine",
+    "sourceSha256": "6a6eea36a215c9b07cc33478be2ba1f099c1304048bbe3bfa140d53433b65e41",
+    "instructionsPath": "instructions/qualifier-startswith-input-source-active-v52-v1-instructions-v1.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T05:14:12.964Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v52/qualifier-startswith-input-source-active",
+    "artifactSha256": {
+      "diagnostic.jpg": "7e92ccbd7b2b6ab5c116da66caeadfb0fc58f0349f25a102084fb7838d17ddd0",
+      "diagnostics.txt": "0574caab979b5a984a9b51b8231c20f5250a5cbe1303157f85c0655eb02f228d",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "049a1b2ec4a8ac14ee61ecfbbf6912fef13801ad91d277304c9f84a90ee30cd7"
+    },
+    "errors": [
+      {
+        "start": {
+          "line": 6,
+          "column": 48
+        },
+        "end": {
+          "line": 6,
+          "column": 53
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"input.bool\" with argument \"active\"=\"value\". An argument of \"simple bool\" type was used but a \"input bool\"  is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10123",
+        "time": "1:14:12 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "qualifier-startswith-input-source-simple-v52-v1.pine",
+    "sourcePath": "qualifier-startswith-input-source-simple-v52-v1.pine",
+    "sourceSha256": "fe4e02b8159381165408bf3978e855b3f3c83a9fb60140e043b7472fa5e587ff",
+    "instructionsPath": "instructions/qualifier-startswith-input-source-simple-v52-v1-instructions-v1.md",
+    "outcome": "RUNS",
+    "capturedAt": "2026-10-07T05:14:15.733Z",
+    "totalRows": 32,
+    "retainedRows": 32,
+    "artifacts": "captures/v52/qualifier-startswith-input-source-simple",
+    "artifactSha256": {
+      "data-window.jpg": "90c7b15d2008f9f1d0d7dbc10dd8ad4fdabc145d2df27c9b88fd11e06923b120",
+      "data-window.txt": "b752e37ecc83e78a9ddb7bcad6b05e04f61784faef35179eb5d5a7d8213acb08",
+      "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "d6403e578af1f6ddf33f379b1cdb300d1355254dd53697c98807d3dabbe34e4e",
+      "plots.csv": "75e2292ac609099cc224d096a9bf6468e4846461134480e811a1e3afddc0554f",
+      "settings.jpg": "676d32edcfcc75eaea5ef520e98f0901e330aca177ecae720a41bd2510cc100f"
+    },
+    "errors": [],
+    "logs": []
+  },
+  {
+    "probe": "qualifier-startswith-input-pattern-active-v52-v1.pine",
+    "sourcePath": "qualifier-startswith-input-pattern-active-v52-v1.pine",
+    "sourceSha256": "e74f161d2ebc15eb8743e4b51a48d764d5df7845b707eb67c27b4687ea4718f9",
+    "instructionsPath": "instructions/qualifier-startswith-input-pattern-active-v52-v1-instructions-v1.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T05:14:23.768Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v52/qualifier-startswith-input-pattern-active",
+    "artifactSha256": {
+      "diagnostic.jpg": "e75e334ccbf5c7d9ff209ca86c312472346a80764de6a73c2805c59f80a62730",
+      "diagnostics.txt": "0574caab979b5a984a9b51b8231c20f5250a5cbe1303157f85c0655eb02f228d",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "549762dbfaa1a661f1983bc1a0fefd3186f86f444ca2beb069fd6335a2cbb578"
+    },
+    "errors": [
+      {
+        "start": {
+          "line": 6,
+          "column": 48
+        },
+        "end": {
+          "line": 6,
+          "column": 53
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"input.bool\" with argument \"active\"=\"value\". An argument of \"simple bool\" type was used but a \"input bool\"  is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10123",
+        "time": "1:14:23 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "qualifier-startswith-input-pattern-simple-v52-v1.pine",
+    "sourcePath": "qualifier-startswith-input-pattern-simple-v52-v1.pine",
+    "sourceSha256": "5fee7188c795c983908f2123a48e01e09321591c6d2710bd2686ea1c85d846a2",
+    "instructionsPath": "instructions/qualifier-startswith-input-pattern-simple-v52-v1-instructions-v1.md",
+    "outcome": "RUNS",
+    "capturedAt": "2026-10-07T05:14:26.592Z",
+    "totalRows": 32,
+    "retainedRows": 32,
+    "artifacts": "captures/v52/qualifier-startswith-input-pattern-simple",
+    "artifactSha256": {
+      "data-window.jpg": "9fc675ba48f7c196064e30b17b5bde0aaf51bcbda410014538b00b3cc202d4b4",
+      "data-window.txt": "7106c57e36ce7644545ba978922301c4c29173cf3b54165a39197fded869f949",
+      "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "6218e2ed8f9bec7606e662f2d1a60eb5c4ad72e31e1b9a205b1b56c891670815",
+      "plots.csv": "da028e1feeba0452f248413585fc845c0341d3f8531179b0b484bf69d41b3363",
+      "settings.jpg": "6fcb57af382066d9d28f25f33bc92570bf52a40592587492768d28b0f3585bb6"
+    },
+    "errors": [],
+    "logs": []
+  },
+  {
+    "probe": "qualifier-endswith-input-source-active-v52-v1.pine",
+    "sourcePath": "qualifier-endswith-input-source-active-v52-v1.pine",
+    "sourceSha256": "79df0f6da428854d35476b3d301d3248b2b4f41cef189e8853562deb183b5a5b",
+    "instructionsPath": "instructions/qualifier-endswith-input-source-active-v52-v1-instructions-v1.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T05:14:30.189Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v52/qualifier-endswith-input-source-active",
+    "artifactSha256": {
+      "diagnostic.jpg": "26093b18c3215fe379ff645fc63f4df3274ddd8968c10c414816959fab4f65cb",
+      "diagnostics.txt": "0574caab979b5a984a9b51b8231c20f5250a5cbe1303157f85c0655eb02f228d",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "b0f7fcd383f7b5edd591a8331fa8f39457fa6337b9411b15661f524cb8c74c7f"
+    },
+    "errors": [
+      {
+        "start": {
+          "line": 6,
+          "column": 48
+        },
+        "end": {
+          "line": 6,
+          "column": 53
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"input.bool\" with argument \"active\"=\"value\". An argument of \"simple bool\" type was used but a \"input bool\"  is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10123",
+        "time": "1:14:29 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "qualifier-endswith-input-source-simple-v52-v1.pine",
+    "sourcePath": "qualifier-endswith-input-source-simple-v52-v1.pine",
+    "sourceSha256": "de2ad9e400b551cb6de12bd7ccdf5964a4ad330f3d8337b558833ae55a28c6bf",
+    "instructionsPath": "instructions/qualifier-endswith-input-source-simple-v52-v1-instructions-v1.md",
+    "outcome": "RUNS",
+    "capturedAt": "2026-10-07T05:14:33.260Z",
+    "totalRows": 32,
+    "retainedRows": 32,
+    "artifacts": "captures/v52/qualifier-endswith-input-source-simple",
+    "artifactSha256": {
+      "data-window.jpg": "693860b9fad5810a4b61509dec53c03589ef941d6fd6aa0b4cd0b29a3f51758d",
+      "data-window.txt": "372412d34b8eca28666684156fb6e198c5c6d7aa67652e3e782f067557144e15",
+      "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "39704c9590960add5ef349af5c736dbea9375ed6b2d03ecc0cddb1eaa543a0a1",
+      "plots.csv": "f4d0cec1563a31c45702b64e49894a712d41a91f7c2fe92b5ee800f03a7977aa",
+      "settings.jpg": "dcdbe9357cbc2ceacdaf72aeea758aaebdcc66236cbb79bf6fd26cc4217ea42f"
+    },
+    "errors": [],
+    "logs": []
+  },
+  {
+    "probe": "qualifier-endswith-input-pattern-active-v52-v1.pine",
+    "sourcePath": "qualifier-endswith-input-pattern-active-v52-v1.pine",
+    "sourceSha256": "502905613394fa8dd7c2b29c3a2f380ca49d683c238deb83cdfa1b04916059a5",
+    "instructionsPath": "instructions/qualifier-endswith-input-pattern-active-v52-v1-instructions-v1.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T05:14:36.272Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v52/qualifier-endswith-input-pattern-active",
+    "artifactSha256": {
+      "diagnostic.jpg": "6c74cb35af27a77dc7e77dee8746d087c0724ede2ad73b2e2aa676eb9e3bd055",
+      "diagnostics.txt": "0574caab979b5a984a9b51b8231c20f5250a5cbe1303157f85c0655eb02f228d",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "c53d4c7946227253da6655fe1a79a3c4085178da5f4638b06fbd16a404fb39f8"
+    },
+    "errors": [
+      {
+        "start": {
+          "line": 6,
+          "column": 48
+        },
+        "end": {
+          "line": 6,
+          "column": 53
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"input.bool\" with argument \"active\"=\"value\". An argument of \"simple bool\" type was used but a \"input bool\"  is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10123",
+        "time": "1:14:35 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "qualifier-endswith-input-pattern-simple-v52-v1.pine",
+    "sourcePath": "qualifier-endswith-input-pattern-simple-v52-v1.pine",
+    "sourceSha256": "14387da11383390203c7bf84f5617f1a2c35905281bc682e38a33000b331f959",
+    "instructionsPath": "instructions/qualifier-endswith-input-pattern-simple-v52-v1-instructions-v1.md",
+    "outcome": "RUNS",
+    "capturedAt": "2026-10-07T05:14:39.130Z",
+    "totalRows": 32,
+    "retainedRows": 32,
+    "artifacts": "captures/v52/qualifier-endswith-input-pattern-simple",
+    "artifactSha256": {
+      "data-window.jpg": "5cc11444e3bed45473eae1fc41492f3bde78059446644d84c1f0bf756171a910",
+      "data-window.txt": "36ddbe1a607d0b20eac4206d1c4fa2069d16a61560421442f3563a355593458a",
+      "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "52a6244953576ff6761c921edd40322a9400be17b1286ad4172fbe9510050314",
+      "plots.csv": "4da71d0520ec067cb2f20f7c9a369dc43edafb84e12d22d57f7f42aca29f79ad",
+      "settings.jpg": "7e93861601c73e6381cee2ad5a720a0e12fddb2b1a8066b40d4b1f433234af35"
+    },
+    "errors": [],
+    "logs": []
+  },
+  {
+    "probe": "udt-search-indexof-v52-v1.pine",
+    "sourcePath": "udt-search-indexof-v52-v1.pine",
+    "sourceSha256": "c7b3bc6b116134a004034ab3bd69c971a221853250641cf4a2f5b8bb7efa195e",
+    "instructionsPath": "instructions/udt-search-indexof-v52-v1-instructions-v1.md",
+    "outcome": "RUNS",
+    "capturedAt": "2026-10-07T05:14:42.681Z",
+    "totalRows": 32,
+    "retainedRows": 32,
+    "artifacts": "captures/v52/udt-search-indexof",
+    "artifactSha256": {
+      "data-window.jpg": "8003eed115e44950e9aacfc52875af4bdb5065a340cb0a4c5458ca0f9928ea34",
+      "data-window.txt": "fa9b1bb93298ae253d0b45fbee4934e39925cd75683e0830fec320ccd46c2833",
+      "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "10142fad3b8a4d0b4aea18397aa0528f66d830bef437a9cb91f65576313ad30e",
+      "plots.csv": "802a0ccc14687010d0bc94b7230d9a6db0b4ec4488a31b13ded40a540419c8dd",
+      "settings.jpg": "c1a9ea340267c8b67b94ad08ab16ccb8a40e19bd23e840ad464cf13900a836b5"
+    },
+    "errors": [],
+    "logs": []
+  },
+  {
+    "probe": "udt-search-lastindexof-v52-v1.pine",
+    "sourcePath": "udt-search-lastindexof-v52-v1.pine",
+    "sourceSha256": "55c1ab817ba2694bdff41c6ef1f17158a7332c3d8567851c164c3cf6aea94f4c",
+    "instructionsPath": "instructions/udt-search-lastindexof-v52-v1-instructions-v1.md",
+    "outcome": "RUNS",
+    "capturedAt": "2026-10-07T05:14:46.305Z",
+    "totalRows": 32,
+    "retainedRows": 32,
+    "artifacts": "captures/v52/udt-search-lastindexof",
+    "artifactSha256": {
+      "data-window.jpg": "8a369af0d4a7ec38b9f6de2bc848fbc17ce543466989be76e79243f2535902e6",
+      "data-window.txt": "82883f2e947a8a53e0a1a6660a26a1b8650a7fde0b0a6503a9631995c9e50fc5",
+      "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "b2c089c7d7e0842aa565114c0dc668dedd7c7c1ba5c32b44d58cf0ae48d3aada",
+      "plots.csv": "019c12880cf4203ae10024e655d6cd8ed187a7d4d8226c5b1f46988e2273723e",
+      "settings.jpg": "72475d0f51ef87b679315b06b055ff99124a0d1f66d17fb1fe1c323dd23fb242"
+    },
+    "errors": [],
+    "logs": []
+  },
+  {
+    "probe": "udt-search-includes-v52-v1.pine",
+    "sourcePath": "udt-search-includes-v52-v1.pine",
+    "sourceSha256": "061f5451d0704a2aad89f97605264acbd2bc453e1e23733afb9f7d517e8f09a0",
+    "instructionsPath": "instructions/udt-search-includes-v52-v1-instructions-v1.md",
+    "outcome": "RUNS",
+    "capturedAt": "2026-10-07T05:14:49.491Z",
+    "totalRows": 32,
+    "retainedRows": 32,
+    "artifacts": "captures/v52/udt-search-includes",
+    "artifactSha256": {
+      "data-window.jpg": "a23efe6445b3c2d0322279b2154f0ccbefe081caa15af293ddd867040cd2182f",
+      "data-window.txt": "6b058b466dd380fb8881877c57c58e4983b8e7f4316703c6816636a78bffd96f",
+      "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "44404d9746e8fd226e2dbfcd029d6843339c37f5741290905b65500753016f5c",
+      "plots.csv": "aaad7c410186ede5edae6f629fde9f504a649ac6d5edaeb69a7e60a994702576",
+      "settings.jpg": "93a78aa2297b63ecbd70dab01eaad74fce82c4f57cf7d9f592cc8954c4ceabcf"
+    },
+    "errors": [],
+    "logs": []
+  }
+]

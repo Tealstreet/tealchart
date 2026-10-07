@@ -1,0 +1,1 @@
+CE10123 {'line': 4, 'column': 61}: Cannot call "ta.kc" with argument "mult"="candidateArgument". An argument of "series int" type was used but a "simple float"  is expected.
