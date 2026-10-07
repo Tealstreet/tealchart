@@ -1,0 +1,3 @@
+//@version=6
+indicator("v57 precision float arithmetic", precision=1 + 0.5)
+plot(close, "CONTROL")

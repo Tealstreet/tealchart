@@ -1,0 +1,4 @@
+//@version=6
+const int BASE = 500
+indicator("Label above-ceiling phase v1", max_labels_count=BASE + 1)
+plot(close, title="Close control")

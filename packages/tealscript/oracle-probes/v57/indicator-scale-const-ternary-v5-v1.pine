@@ -1,0 +1,3 @@
+//@version=5
+indicator("Conditional domain", scale=true ? "not_a_scale" : "not_a_scale")
+plot(close)

@@ -1,0 +1,4 @@
+//@version=6
+const int LIMIT = -1
+indicator("Precision lower alias", precision=LIMIT)
+plot(close, "Close")

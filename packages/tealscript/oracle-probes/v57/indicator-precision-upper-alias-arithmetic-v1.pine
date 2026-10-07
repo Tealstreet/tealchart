@@ -1,0 +1,4 @@
+//@version=6
+const int LIMIT = 16
+indicator("Precision upper alias-arithmetic", precision=LIMIT + 1)
+plot(close, "Close")

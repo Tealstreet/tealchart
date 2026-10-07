@@ -1,0 +1,4 @@
+//@version=6
+const float VALUE = 2.0
+indicator("v57 precision float alias", precision=VALUE)
+plot(close, "CONTROL")

@@ -1,0 +1,4 @@
+//@version=6
+indicator("box minimum 1 v57", max_boxes_count=1)
+box.new(bar_index, high, bar_index + 1, low)
+plot(close, "CLOSE_CONTROL")

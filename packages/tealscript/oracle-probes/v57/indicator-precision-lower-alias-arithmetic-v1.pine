@@ -1,0 +1,4 @@
+//@version=6
+const int ZERO = 0
+indicator("Precision lower alias-arithmetic", precision=ZERO - 1)
+plot(close, "Close")

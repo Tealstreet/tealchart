@@ -1,0 +1,9 @@
+//@version=6
+indicator("udt_na_object v57 v1")
+type Cell
+    bool flag
+Cell c = na
+x = c.flag
+plot(str.tostring(x) == "false" ? 1 : 0, "returned_false")
+plot(str.tostring(x) == "true" ? 1 : 0, "returned_true")
+plot(na(c) ? 1 : 0, "receiver_na")

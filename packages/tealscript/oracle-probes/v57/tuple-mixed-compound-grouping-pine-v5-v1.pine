@@ -1,0 +1,31 @@
+//@version=5
+indicator("Tuple context mixed grouping v5", overlay=false)
+plain(source, removed) =>
+    float result = 1e16
+    result += source - removed
+    result
+grouped(source, removed) =>
+    float result = 1e16
+    result += (source - removed)
+    result
+pair(source, removed) =>
+    float associated = 1e16
+    associated += source - removed
+    float explicit = 1e16
+    explicit += (source - removed)
+    [associated, explicit]
+seriesSource = -1e16 + close * 0.0
+seriesRemoved = -1.0 + close * 0.0
+[constPlain, constGrouped] = pair(-1e16, -1.0)
+[mixedPlain, mixedGrouped] = pair(seriesSource, -1.0)
+[seriesPlain, seriesGrouped] = pair(seriesSource, seriesRemoved)
+plot(constPlain, "tuple_const_plain")
+plot(constGrouped, "tuple_const_grouped")
+plot(mixedPlain, "tuple_mixed_plain")
+plot(mixedGrouped, "tuple_mixed_grouped")
+plot(seriesPlain, "tuple_series_plain")
+plot(seriesGrouped, "tuple_series_grouped")
+plot(plain(seriesSource, -1.0), "scalar_mixed_plain")
+plot(grouped(seriesSource, -1.0), "scalar_mixed_grouped")
+plot(1e16 + (seriesSource - -1.0), "binary_mixed_grouped")
+plot((1e16 + seriesSource) - -1.0, "binary_mixed_left")

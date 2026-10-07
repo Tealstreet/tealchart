@@ -1,0 +1,3 @@
+//@version=6
+indicator("max_boxes_count float arithmetic", max_boxes_count=1 + 0.5)
+plot(close)

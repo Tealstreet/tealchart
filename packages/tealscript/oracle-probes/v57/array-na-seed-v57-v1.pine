@@ -1,0 +1,7 @@
+//@version=6
+indicator("array_na_seed v57 v1")
+a = array.new<bool>(2, na)
+x = a.get(0)
+plot(str.tostring(x) == "false" ? 1 : 0, "returned_false")
+plot(str.tostring(x) == "true" ? 1 : 0, "returned_true")
+plot(a.size(), "array_size")

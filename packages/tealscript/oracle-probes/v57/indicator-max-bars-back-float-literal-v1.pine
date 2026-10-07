@@ -1,0 +1,3 @@
+//@version=6
+indicator("max_bars_back float literal", max_bars_back=2.0)
+plot(close)

@@ -1,0 +1,3 @@
+//@version=6
+indicator("Precision upper arithmetic", precision=16 + 1)
+plot(close, "Close")

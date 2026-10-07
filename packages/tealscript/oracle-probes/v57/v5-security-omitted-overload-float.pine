@@ -1,0 +1,10 @@
+//@version=5
+indicator("Default method context frame")
+method width(array<int> values) => values.size()
+method width(array<float> values) => values.size() + 3
+seed = array.new_float(2, 1.5)
+
+read(value = seed.width()) => value
+
+value = request.security("REMOTE:ALT", "1", read())
+plot(value, "Length")

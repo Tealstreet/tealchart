@@ -1,0 +1,4 @@
+//@version=6
+const float VALUE = 2.0
+indicator("max_bars_back float alias", max_bars_back=VALUE)
+plot(close)

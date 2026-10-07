@@ -1,0 +1,4 @@
+//@version=6
+const int VALUE = -1
+indicator("Calculated bars domain", calc_bars_count=VALUE)
+plot(close)

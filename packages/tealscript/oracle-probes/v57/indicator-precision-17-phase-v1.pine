@@ -1,0 +1,3 @@
+//@version=6
+indicator("Precision domain", precision=17)
+plot(close)

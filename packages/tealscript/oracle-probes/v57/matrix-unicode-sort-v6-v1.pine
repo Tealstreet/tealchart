@@ -1,0 +1,9 @@
+//@version=6
+indicator("Unicode sort discriminator")
+a = matrix.new<string>(3, 1, "A")
+a.set(0, 0, "😀")
+a.set(1, 0, "")
+a.sort(0, order.ascending)
+plot(a.get(0, 0) == "😀" ? 1 : a.get(0, 0) == "" ? 2 : 3, "SLOT_0")
+plot(a.get(1, 0) == "😀" ? 1 : a.get(1, 0) == "" ? 2 : 3, "SLOT_1")
+plot(a.get(2, 0) == "😀" ? 1 : a.get(2, 0) == "" ? 2 : 3, "SLOT_2")

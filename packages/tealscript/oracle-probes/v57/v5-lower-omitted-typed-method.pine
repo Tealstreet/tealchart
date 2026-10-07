@@ -1,0 +1,10 @@
+//@version=5
+indicator("Default method context frame")
+method width(array<int> values) => values.size()
+seed = array.new_int(2, 1)
+
+read(int value = seed.width()) => value
+
+values = request.security_lower_tf("REMOTE:ALT", "1", read())
+value = array.size(values) > 0 ? array.get(values, 0) : na
+plot(value, "Length")

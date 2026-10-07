@@ -1,0 +1,5 @@
+//@version=6
+indicator("matrix-det-series-to-const-v57-v1")
+m = matrix.new<int>(1, 1, 2)
+const int result = m.det()
+plot(result)

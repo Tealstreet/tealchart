@@ -1,0 +1,9 @@
+//@version=6
+indicator("Even signed matrix median")
+m = matrix.new<float>(2, 2, 0)
+m.set(0, 0, -31.0)
+m.set(0, 1, 5.0)
+m.set(1, 0, 17.0)
+m.set(1, 1, -8.0)
+plot(matrix.median(m), "EVEN_MEDIAN")
+plot(matrix.elements_count(m), "ELEMENT_COUNT")

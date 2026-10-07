@@ -1,0 +1,5 @@
+//@version=6
+indicator("matrix-min-float-to-int-v57-v1")
+m = matrix.new<float>(1, 1, 2.5)
+int result = m.min()
+plot(result)

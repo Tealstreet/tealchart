@@ -1,0 +1,8 @@
+//@version=6
+indicator("Map bool absent put v57 v1")
+m = map.new<string, bool>()
+m.put("known", true)
+x = m.put("absent", true)
+plot(str.tostring(x) == "false" ? 1 : 0, "returned_false")
+plot(m.get("known") ? 1 : 0, "known_true")
+plot(m.size(), "size_after")

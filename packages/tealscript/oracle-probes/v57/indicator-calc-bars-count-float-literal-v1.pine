@@ -1,0 +1,3 @@
+//@version=6
+indicator("calc_bars_count float literal", calc_bars_count=2.0)
+plot(close)

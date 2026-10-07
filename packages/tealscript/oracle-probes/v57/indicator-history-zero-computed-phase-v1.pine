@@ -1,0 +1,4 @@
+//@version=6
+const int ZERO = 0
+indicator("History depth domain", max_bars_back=ZERO + 0)
+plot(close, "Close")
