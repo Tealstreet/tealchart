@@ -1,0 +1,392 @@
+[
+  {
+    "probe": "str-lower-input-source-title-v51-v1.pine",
+    "sourcePath": "str-lower-input-source-title-v51-v1.pine",
+    "sourceSha256": "36cfc834fb9564d47adbb17e0a71bbda5ca14f33d5bc405a2ccaef73c0c1ec50",
+    "instructionsPath": "instructions/str-lower-input-source-title-v51-v1-instructions-v1.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T05:08:39.216Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v51/str-lower-input-source-title",
+    "artifactSha256": {
+      "diagnostic.jpg": "18e50e80027f6ce0e0d30f878bc37069642629eb5d79d20bd42f05cd0907207c",
+      "diagnostics.txt": "fa43a908836cfa5a1446290a0082f6997836a3b641df20249ded35a07df72f4a",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "61cc2a12670e46b3a4891933c29cfd7cfab0e74926f29c785174f5899b84c475"
+    },
+    "errors": [
+      {
+        "start": {
+          "line": 5,
+          "column": 19
+        },
+        "end": {
+          "line": 5,
+          "column": 25
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"plot\" with argument \"title\"=\"result\". An argument of \"simple string\" type was used but a \"const string\"  is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10123",
+        "time": "1:08:38 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "str-upper-input-source-title-v51-v1.pine",
+    "sourcePath": "str-upper-input-source-title-v51-v1.pine",
+    "sourceSha256": "eeec2a49edc58f871529f194c0964e01aaeaf88e9d151f0f46232aa4ec72a64a",
+    "instructionsPath": "instructions/str-upper-input-source-title-v51-v1-instructions-v1.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T05:08:42.333Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v51/str-upper-input-source-title",
+    "artifactSha256": {
+      "diagnostic.jpg": "371153d653fc446507c889e2f03a09a5c4f05e4cd1e904cf4a66de0c18c763d7",
+      "diagnostics.txt": "fa43a908836cfa5a1446290a0082f6997836a3b641df20249ded35a07df72f4a",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "1d2a0a54ec62bdbbd90a82d619537fa46940b2a051df12e5c69be5eb0f525943"
+    },
+    "errors": [
+      {
+        "start": {
+          "line": 5,
+          "column": 19
+        },
+        "end": {
+          "line": 5,
+          "column": 25
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"plot\" with argument \"title\"=\"result\". An argument of \"simple string\" type was used but a \"const string\"  is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10123",
+        "time": "1:08:41 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "str-substring-input-source-title-v51-v1.pine",
+    "sourcePath": "str-substring-input-source-title-v51-v1.pine",
+    "sourceSha256": "f6fd9e05bb82d3040023bf5e658df2dd8572b285f3faa9d2af8e90dea5e94d7c",
+    "instructionsPath": "instructions/str-substring-input-source-title-v51-v1-instructions-v1.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T05:08:44.785Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v51/str-substring-input-source-title",
+    "artifactSha256": {
+      "diagnostic.jpg": "bbbeaec16a7b60b3a09be5c7266aef1bfde041b32b3fefa095e656bd647c630f",
+      "diagnostics.txt": "fa43a908836cfa5a1446290a0082f6997836a3b641df20249ded35a07df72f4a",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "bf5adf313c1462b5403f3791b9178744172cb7606bbe0de1853a07cd2e318ce1"
+    },
+    "errors": [
+      {
+        "start": {
+          "line": 5,
+          "column": 19
+        },
+        "end": {
+          "line": 5,
+          "column": 25
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"plot\" with argument \"title\"=\"result\". An argument of \"simple string\" type was used but a \"const string\"  is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10123",
+        "time": "1:08:44 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "str-substring-input-begin-pos-title-v51-v1.pine",
+    "sourcePath": "str-substring-input-begin-pos-title-v51-v1.pine",
+    "sourceSha256": "e5adccfa281082040b06325171062cbb6a5d4e84cba8e73f47706fdc7fd0b27a",
+    "instructionsPath": "instructions/str-substring-input-begin-pos-title-v51-v1-instructions-v1.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T05:08:47.281Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v51/str-substring-input-begin-pos-title",
+    "artifactSha256": {
+      "diagnostic.jpg": "3041fde448152f0b0380d216525c093653a1ee01de3673f288b7cb677ca204a9",
+      "diagnostics.txt": "fa43a908836cfa5a1446290a0082f6997836a3b641df20249ded35a07df72f4a",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "9875bc29d6258fd97de62523b53b7a2546453b71db311e3d340db7e07943cf2f"
+    },
+    "errors": [
+      {
+        "start": {
+          "line": 5,
+          "column": 19
+        },
+        "end": {
+          "line": 5,
+          "column": 25
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"plot\" with argument \"title\"=\"result\". An argument of \"simple string\" type was used but a \"const string\"  is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10123",
+        "time": "1:08:46 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "str-substring-input-end-pos-title-v51-v1.pine",
+    "sourcePath": "str-substring-input-end-pos-title-v51-v1.pine",
+    "sourceSha256": "e1fd79651b41c211a193682cf507de6c88c88109afc4d6303917aa9ab77775aa",
+    "instructionsPath": "instructions/str-substring-input-end-pos-title-v51-v1-instructions-v1.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T05:08:49.876Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v51/str-substring-input-end-pos-title",
+    "artifactSha256": {
+      "diagnostic.jpg": "a230c60635e90f4c03b5fc35b7dd214c3671e1eec6d849eda5b7d2c2d30f0b55",
+      "diagnostics.txt": "fa43a908836cfa5a1446290a0082f6997836a3b641df20249ded35a07df72f4a",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "19f7fdc2e7f6895d93ba86260de410b4b6499515ea6ab370bc912cb52f4f16f5"
+    },
+    "errors": [
+      {
+        "start": {
+          "line": 5,
+          "column": 19
+        },
+        "end": {
+          "line": 5,
+          "column": 25
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"plot\" with argument \"title\"=\"result\". An argument of \"simple string\" type was used but a \"const string\"  is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10123",
+        "time": "1:08:49 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "str-replace-input-source-title-v51-v1.pine",
+    "sourcePath": "str-replace-input-source-title-v51-v1.pine",
+    "sourceSha256": "2a986c792fdd3237871a4fd9b5ac7ab77987cf54794065aa69558e505c4b34d0",
+    "instructionsPath": "instructions/str-replace-input-source-title-v51-v1-instructions-v1.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T05:08:52.598Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v51/str-replace-input-source-title",
+    "artifactSha256": {
+      "diagnostic.jpg": "46f27d049908fc2e7dcc0e8209801370280acff0672bcaf3dc551721e7545a93",
+      "diagnostics.txt": "fa43a908836cfa5a1446290a0082f6997836a3b641df20249ded35a07df72f4a",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "c2c6ac0d40d45e089cce9f9621baac3abfe8719a097da5b10ee5cf4e19dfe0fc"
+    },
+    "errors": [
+      {
+        "start": {
+          "line": 5,
+          "column": 19
+        },
+        "end": {
+          "line": 5,
+          "column": 25
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"plot\" with argument \"title\"=\"result\". An argument of \"simple string\" type was used but a \"const string\"  is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10123",
+        "time": "1:08:51 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "str-replace-input-target-title-v51-v1.pine",
+    "sourcePath": "str-replace-input-target-title-v51-v1.pine",
+    "sourceSha256": "8dc569a8f07add3bf24b0166039cc97c0e7894e5d5abcb1d3121f0e75ab6e7eb",
+    "instructionsPath": "instructions/str-replace-input-target-title-v51-v1-instructions-v1.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T05:09:06.330Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v51/str-replace-input-target-title",
+    "artifactSha256": {
+      "diagnostic.jpg": "edc8e8c464bbecaf60f066a7aec1c1658f8958590f0dcaec60201aa6f30cdb22",
+      "diagnostics.txt": "fa43a908836cfa5a1446290a0082f6997836a3b641df20249ded35a07df72f4a",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "c2db7a6249d159c67ef83ce992308cf1fded44b694308ae9ab696d015a82fa44"
+    },
+    "errors": [
+      {
+        "start": {
+          "line": 5,
+          "column": 19
+        },
+        "end": {
+          "line": 5,
+          "column": 25
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"plot\" with argument \"title\"=\"result\". An argument of \"simple string\" type was used but a \"const string\"  is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10123",
+        "time": "1:09:05 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "str-replace-input-replacement-title-v51-v1.pine",
+    "sourcePath": "str-replace-input-replacement-title-v51-v1.pine",
+    "sourceSha256": "6b2f53ac433417360712c173ae37ef2aa0b6d5e2c5b8bfc98577eddbd3346c85",
+    "instructionsPath": "instructions/str-replace-input-replacement-title-v51-v1-instructions-v1.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T05:09:08.798Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v51/str-replace-input-replacement-title",
+    "artifactSha256": {
+      "diagnostic.jpg": "e14685951136e4400f5b65c79de09e3037574087ebcd4043bf1ee794c824f09c",
+      "diagnostics.txt": "fa43a908836cfa5a1446290a0082f6997836a3b641df20249ded35a07df72f4a",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "1501caac1c7f2117574583a11d2bc693543fefa3f7fa466390f4ea3eb41a8750"
+    },
+    "errors": [
+      {
+        "start": {
+          "line": 5,
+          "column": 19
+        },
+        "end": {
+          "line": 5,
+          "column": 25
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"plot\" with argument \"title\"=\"result\". An argument of \"simple string\" type was used but a \"const string\"  is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10123",
+        "time": "1:09:08 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "str-replace-input-occurrence-title-v51-v1.pine",
+    "sourcePath": "str-replace-input-occurrence-title-v51-v1.pine",
+    "sourceSha256": "4c1161deb527d0aea0a024c1eb3847a49aa31cced33d472cc28f45902beffa86",
+    "instructionsPath": "instructions/str-replace-input-occurrence-title-v51-v1-instructions-v1.md",
+    "outcome": "COMPILE_REFUSAL",
+    "capturedAt": "2026-10-07T05:09:11.694Z",
+    "totalRows": 0,
+    "retainedRows": 0,
+    "artifacts": "captures/v51/str-replace-input-occurrence-title",
+    "artifactSha256": {
+      "diagnostic.jpg": "2b811b5cbff81d9b39556c8745ee7e3762cc50a5585c4d74afe2ddec219b070e",
+      "diagnostics.txt": "fa43a908836cfa5a1446290a0082f6997836a3b641df20249ded35a07df72f4a",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "b5fb4bf170ff6c93cda2f8067d97ee71e6b1473dad6c78e6cf8058091a69b638"
+    },
+    "errors": [
+      {
+        "start": {
+          "line": 5,
+          "column": 19
+        },
+        "end": {
+          "line": 5,
+          "column": 25
+        },
+        "level": "error",
+        "showConsole": true,
+        "text": "Cannot call \"plot\" with argument \"title\"=\"result\". An argument of \"simple string\" type was used but a \"const string\"  is expected.",
+        "scriptName": "Untitled script",
+        "code": "CE10123",
+        "time": "1:09:10 PM"
+      }
+    ],
+    "logs": []
+  },
+  {
+    "probe": "udt-search-indexof-v51-v1.pine",
+    "sourcePath": "udt-search-indexof-v51-v1.pine",
+    "sourceSha256": "97e1a5ab2ebf545ae1748f46bcf0304f3c406a91bb46467cc98d46cb8e6a8c6e",
+    "instructionsPath": "instructions/udt-search-indexof-v51-v1-instructions-v1.md",
+    "outcome": "RUNS",
+    "capturedAt": "2026-10-07T05:10:09.652Z",
+    "totalRows": 21756,
+    "retainedRows": 21756,
+    "artifacts": "captures/v51/udt-search-indexof",
+    "artifactSha256": {
+      "data-window.jpg": "b19172af158fe87c7a2189386f14793fba963151162140f7da53ab83d91ea7fe",
+      "data-window.txt": "3f59e202f9f5904863747e5cbaf02a83e65a9c4753ad90cf08b2ef49f472a289",
+      "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "87dcccf84af55eee7a77253932cda541bd8bca32e7aee6851f809fe81260e831",
+      "plots.csv": "28e039de0c18fde89d6f73604380444aebdbc9075db2b4a9263a10316c222323",
+      "settings.jpg": "0087153bc20c76775b8ae4076306b6f356a4fd7cbd827434bdaaa8d4d65e775d"
+    },
+    "errors": [],
+    "logs": []
+  },
+  {
+    "probe": "udt-search-lastindexof-v51-v1.pine",
+    "sourcePath": "udt-search-lastindexof-v51-v1.pine",
+    "sourceSha256": "f1cc21c1bf5e3f2923f245a111ef128a6309f3db2b4a7c75aac6afd76e202c14",
+    "instructionsPath": "instructions/udt-search-lastindexof-v51-v1-instructions-v1.md",
+    "outcome": "RUNS",
+    "capturedAt": "2026-10-07T05:10:13.189Z",
+    "totalRows": 21756,
+    "retainedRows": 21756,
+    "artifacts": "captures/v51/udt-search-lastindexof",
+    "artifactSha256": {
+      "data-window.jpg": "453c1132961879ddb68c9bbdf4c1f4f5fe190dca20b961980e892520b24ead13",
+      "data-window.txt": "b2c2a75b07d84ecc75060900fc8089bf0956ef5d771eb9b47ed91b65d30c7366",
+      "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "a4ef5423f18940714f51fc0cbd2860e9d5fe7e124c9d0b0396825a4585437f9a",
+      "plots.csv": "747f2c57a32b047a30787127912b5908e364e9d97e69870cf8b0449bfed96c59",
+      "settings.jpg": "cc23b6f2043806d348fa332dab8ecd5bd4eb4b8be0dad9ed526aac1a2cfa2eb6"
+    },
+    "errors": [],
+    "logs": []
+  },
+  {
+    "probe": "udt-search-includes-v51-v1.pine",
+    "sourcePath": "udt-search-includes-v51-v1.pine",
+    "sourceSha256": "1ff23a9c35cde351aa1ae5aad7ab21fc467da44f7638ce3f9565f5aeb03ed9e0",
+    "instructionsPath": "instructions/udt-search-includes-v51-v1-instructions-v1.md",
+    "outcome": "RUNS",
+    "capturedAt": "2026-10-07T05:10:16.670Z",
+    "totalRows": 21756,
+    "retainedRows": 21756,
+    "artifacts": "captures/v51/udt-search-includes",
+    "artifactSha256": {
+      "data-window.jpg": "dd1f22f6ddcb8773fd8212b30a35022b0bfa9e2781ea8fda2599e4d65260f17d",
+      "data-window.txt": "ce7aa769f9d9d892d84765c1bd94962e539c0c9fe0a87925a4bd62819b695da0",
+      "diagnostics.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logs.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native.json": "a6fec71bebed3e09c352e874abfaea5a651f6afff6575eb37956e21c99a19c9a",
+      "plots.csv": "530647f9c583cd2420aed09a48f273eb3f5ddeabea59f3dbe699cd118000787d",
+      "settings.jpg": "aacca77b2928f3418d7832ee1356b03502c21318bd8dad9d2a4dea793bde5ad6"
+    },
+    "errors": [],
+    "logs": []
+  }
+]
