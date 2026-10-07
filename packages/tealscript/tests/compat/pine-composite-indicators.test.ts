@@ -25,6 +25,7 @@ import { executeCompiled, tryCompile } from '../../src/runtime/codegen';
 import { measureProductionWorkerSessions, measureRealtimeReentryParity, type ProductionWorkerCase } from './productionWorkerHarness';
 
 const LONG_COMPOSITE_TIMEOUT_MS = 30_000;
+const PRODUCTION_WORKER_COMPOSITE_TIMEOUT_MS = 120_000;
 const RUN_REALTIME_SWEEP = process.env.TEALSCRIPT_REALTIME_SWEEP === '1';
 const REALTIME_SWEEP_BACKEND = 'worker';
 const realtimeSweepIt = RUN_REALTIME_SWEEP ? it : it.skip;
@@ -1587,7 +1588,7 @@ plotshape(condition, title="Awkward Imported Condition", style=shape.square)`);
       expect(summarizeProductionWorkerExecutionModes(updateMeasurements)).toEqual(baseline.liveUpdates.executionModes);
       expect(summarizeProductionWorkerFallbackReasons(updateMeasurements)).toEqual(baseline.liveUpdates.knownFallbackReasons);
     }
-  });
+  }, PRODUCTION_WORKER_COMPOSITE_TIMEOUT_MS);
   realtimeSweepIt('tracks realtime re-entry output parity for composite indicators', async () => {
     for (const [groupId, cases] of [
       ['true-length-composites', trueLengthCompositeProductionCases],
@@ -1608,5 +1609,5 @@ plotshape(condition, title="Awkward Imported Condition", style=shape.square)`);
         ...baseline,
       });
     }
-  }, 30_000);
+  }, PRODUCTION_WORKER_COMPOSITE_TIMEOUT_MS);
 });

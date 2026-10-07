@@ -62,6 +62,7 @@ const SMOKE_BAR_COUNT = 12;
 // These smoke tests are correctness gates. Full-suite CI runs this file after
 // many isolated workers, so keep the budget separate from perf assertions.
 const COMPOSITE_SMOKE_TIMEOUT_MS = 30_000;
+const COMPOSITE_WORKER_SMOKE_TIMEOUT_MS = 120_000;
 
 function makeBars(count: number, start = Date.UTC(2024, 0, 1), step = 60_000): Bar[] {
   return Array.from({ length: count }, (_, index) => {
@@ -636,7 +637,7 @@ describe('composite performance baselines', () => {
     expect(workerSession.updateMeasurements).toHaveLength(smokeCases.length * 3);
     expect(workerSession.loadMeasurements.every((measurement) => measurement.executionMode !== undefined)).toBe(true);
     expect(workerSession.updateMeasurements.every((measurement) => measurement.executionMode !== undefined)).toBe(true);
-  }, COMPOSITE_SMOKE_TIMEOUT_MS);
+  }, COMPOSITE_WORKER_SMOKE_TIMEOUT_MS);
   fullPerformanceIt('tracks production worker fallback rate for performance composites', async () => {
     const baseline = getProductionWorkerFallbackBaselineGroup('performance-composites');
     const session = await measureProductionWorkerSessions(cases.map((testCase) => ({

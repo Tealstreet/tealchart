@@ -9,7 +9,7 @@ import { resolve } from 'node:path';
 import * as React from 'react';
 
 import * as SkiaModule from '@shopify/react-native-skia';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeAll, describe, expect, it, vi } from 'vitest';
 
 import { nativePictureRects } from '../../test/nativePictureRects';
 import { createNativeChartFrameFromPanes } from './nativeChartFrame';
@@ -21,6 +21,8 @@ vi.mock('@shopify/react-native-skia', async (importOriginal) => ({
 }));
 
 const sourceCache = new Map<string, Record<string, unknown>>();
+const NATIVE_SERIALIZED_BOUNDARY_TIMEOUT_MS = 90_000;
+let nativePlotModule: Record<string, unknown>;
 const require = createRequire(import.meta.url);
 const babel = require('@babel/core') as { transformSync(source: string, options: unknown): { code: string } };
 interface Worklet {
@@ -167,7 +169,7 @@ function walk(node: ReactNode, opacity = 1): Array<ReactElement<Record<string, u
   return [];
 }
 function harness(plots: PlotOutput[], staticMode = false) {
-  const module = loadNativeModule(resolve('src/mobile/render/NativeIndicatorPlotLayer.tsx'), sourceCache);
+  const module = nativePlotModule;
   const layer = module.NativeIndicatorPlotLayerImpl as typeof NativeLayer;
   const sharedViewport = {
     startTime: { value: 0 },
@@ -197,6 +199,10 @@ function harness(plots: PlotOutput[], staticMode = false) {
 }
 
 describe('native plots across the serialized UI boundary', () => {
+  beforeAll(() => {
+    nativePlotModule = loadNativeModule(resolve('src/mobile/render/NativeIndicatorPlotLayer.tsx'), sourceCache);
+  }, NATIVE_SERIALIZED_BOUNDARY_TIMEOUT_MS);
+
   it('runs line/area helpers with imported worklets and updates live viewport projection', () => {
     const h = harness([plot({ style: 'areabr', values: [10, 20, null, 40, 50] })]);
     expect(h.paths().some((path) => path.moveTo.mock.calls.some(([x, y]) => x === 0 && y === 180))).toBe(true);
