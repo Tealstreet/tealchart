@@ -332,8 +332,44 @@ describe('chartState', () => {
 
       expect(getChartStore('ui-timeframe-favorites', { uiPreferencesStorage: storage }).uiPreferences.get()).toEqual({
         leftToolRailCollapsed: false,
+        rightSidebarCollapsed: false,
         favoriteTimeframeValues: ['15', '60', '1D'],
       });
+    });
+    it('persists the right sidebar independently and normalizes invalid or missing saved values', () => {
+      const storage = createMemoryStorage();
+      const chart = getChartStore('ui-right-sidebar', { uiPreferencesStorage: storage });
+      chart.uiPreferences.setKey('rightSidebarCollapsed', true);
+      clearChartStoreCache();
+      expect(getChartStore('ui-right-sidebar', { uiPreferencesStorage: storage }).uiPreferences.get()).toEqual({
+        ...DEFAULT_CHART_UI_PREFERENCES,
+        rightSidebarCollapsed: true,
+      });
+      for (const invalid of ['yes', 1, null, undefined]) {
+        const key = `ui-right-invalid-${String(invalid)}`;
+        storage.values.set(
+          `tealstreet:tealchart:${key}:ui-preferences`,
+          JSON.stringify({ rightSidebarCollapsed: invalid }),
+        );
+        expect(getChartStore(key, { uiPreferencesStorage: storage }).uiPreferences.get().rightSidebarCollapsed).toBe(
+          false,
+        );
+      }
+    });
+    it('hydrates an async right sidebar preference without overwriting it with the default', async () => {
+      const writes: string[] = [];
+      const storage: TealchartKeyValueStorage = {
+        getItem: async () => JSON.stringify({ rightSidebarCollapsed: true }),
+        setItem: async (_key, value) => {
+          writes.push(value);
+        },
+        removeItem: async () => undefined,
+      };
+      const chart = getChartStore('ui-right-async', { uiPreferencesStorage: storage });
+      expect(chart.uiPreferences.get().rightSidebarCollapsed).toBe(false);
+      await Promise.resolve();
+      expect(chart.uiPreferences.get()).toEqual({ ...DEFAULT_CHART_UI_PREFERENCES, rightSidebarCollapsed: true });
+      expect(writes).toEqual([]);
     });
   });
 });

@@ -196,12 +196,15 @@ const DEFAULT_CHART_UI_FAVORITE_TIMEFRAME_VALUES = [
 export interface ChartUiPreferences {
   /** Whether the left drawing tool rail is collapsed to its toggle affordance. */
   leftToolRailCollapsed: boolean;
+  /** Whether the linked TradingView website's right sidebar is hidden. */
+  rightSidebarCollapsed: boolean;
   /** Timeframes pinned into the compact toolbar selector. */
   favoriteTimeframeValues: ResolutionString[];
 }
 
 export const DEFAULT_CHART_UI_PREFERENCES: ChartUiPreferences = {
   leftToolRailCollapsed: false,
+  rightSidebarCollapsed: false,
   favoriteTimeframeValues: DEFAULT_CHART_UI_FAVORITE_TIMEFRAME_VALUES,
 };
 
@@ -307,6 +310,8 @@ function normalizeChartUiPreferences(
   return {
     leftToolRailCollapsed:
       typeof input.leftToolRailCollapsed === 'boolean' ? input.leftToolRailCollapsed : defaults.leftToolRailCollapsed,
+    rightSidebarCollapsed:
+      typeof input.rightSidebarCollapsed === 'boolean' ? input.rightSidebarCollapsed : defaults.rightSidebarCollapsed,
     favoriteTimeframeValues,
   };
 }

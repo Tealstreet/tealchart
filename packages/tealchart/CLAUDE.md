@@ -538,6 +538,7 @@ getChartStore(chartKey).uiPreferences → shared UI preference store
 - Legacy helpers such as `createChartFocusAtoms` and `getChartSettingsAtom` remain compatibility wrappers; new code should use `getChartStore`.
 - UI chrome preferences must use `getChartStore(chartKey).uiPreferences` and the `TealchartKeyValueStorage` contract. Web defaults to `createLocalStorageKeyValueStorage()`, while native hosts pass `createAsyncStorageKeyValueStorage(AsyncStorage)` through `SkiaTealchart.uiPreferencesStorage`.
 - Do not read or write `localStorage`, `AsyncStorage`, or cwd-scoped memory directly for Tealchart UI settings. Add preferences to `ChartUiPreferences`, normalize them in `chartState.ts`, and test both sync and async storage hydration.
+- `rightSidebarCollapsed` defaults to false and stores the linked TradingView website rail visibility independently from `leftToolRailCollapsed`. Unsupported hosts retain the preference without creating a rail; old or invalid saved values normalize to the default, and asynchronous hydration uses the existing shared store subscription.
 
 ## Tealscript Integration
 
