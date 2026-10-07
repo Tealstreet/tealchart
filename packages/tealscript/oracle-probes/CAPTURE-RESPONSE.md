@@ -35,22 +35,8 @@ Responses use stable filenames alongside each round's handoff. Existing bundle/s
 
 ## Supplemental native CSV receipts
 
-56 of 69 additional UI-download receipts were captured in separately timed *-ui-export attempts. These supplement the already complete 185-source capture inventory; they do not replace the earlier source-bound native rows, logs, diagnostics or screenshots. UI receipt capturedAt uses the downloaded CSV timestamp; metadataCapturedAt retains the preceding editor/settings capture time. Native CSV blanks remain missing values.
+All 69 planned additional UI-download receipts are captured in separately timed *-ui-export attempts. These supplement the complete 185-source inventory; they do not replace the earlier source-bound native rows, logs, diagnostics or screenshots. UI receipt capturedAt uses the downloaded CSV timestamp; metadataCapturedAt retains the preceding editor/settings capture time. Native CSV blanks remain missing values.
 
-The last batch stopped when Chrome MCP reported `Transport closed`. The configured service and debug browser were restarted; the official healthcheck subsequently passed, while this chat’s MCP client retained the closed transport. This is a capture-tool failure, not a Pine compile/runtime result. Reconnect Chrome MCP in the client before attempting the 13 optional receipts below. Original captures for these sources remain in the round 54 manifest.
+The interrupted batch resumed through Chrome MCP on 2026-10-07 after its connection recovered. All 13 remaining attempts ran and now have original CSV downloads, matching named columns, native source/context metadata, settings and Data Window screenshots. No supplemental CSV receipts remain pending. This connection interruption was a capture-tool failure, not a Pine compile/runtime result.
 
-| Source | Optional receipt attempt |
-| --- | --- |
-| sar-implicit-hole-state-row215-v54-v1.pine | defaults-ui-export |
-| stoch-flat-range-recovery-v54-v1.pine | defaults-ui-export |
-| supertrend-warmup-direction-v54-v1.pine | defaults-ui-export |
-| tsi-leading-interior-holes-v54-v1.pine | defaults-ui-export |
-| tsi-varied-sign-formula-v54-v1.pine | confirmed-prefix-ui-export |
-| tsi-varied-sign-formula-v54-v1.pine | defaults-ui-export |
-| valuewhen-bool-missing-event-v54-v1.pine | defaults-ui-export |
-| valuewhen-color-missing-event-v54-v1.pine | defaults-ui-export |
-| valuewhen-float-missing-event-v54-v1.pine | defaults-ui-export |
-| valuewhen-insufficient-occurrence-v54-v1.pine | defaults-ui-export |
-| valuewhen-int-missing-event-v54-v1.pine | defaults-ui-export |
-| valuewhen-selected-missing-source-v54-v1.pine | defaults-ui-export |
-| wpr-implicit-ohlc-holes-v54-v1.pine | defaults-ui-export |
+The TSI(3,5) default UI receipt retains samples 0..64 with its last cell live. Its separate confirmed-prefix-ui-export receipt was taken from that same uninterrupted attachment after the next bar: all eligible samples 0..64 are closed, and sample 65 is retained as ineligible context. Source bytes and defaults were unchanged.
