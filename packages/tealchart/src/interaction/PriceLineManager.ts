@@ -15,6 +15,7 @@ import { TRADE_LINE_ACCENT_RAIL_WIDTH, TRADE_LINE_DOTTED_DASH_PATTERN } from '..
 import { PRICE_AXIS_RIGHT_PADDING } from '../types';
 import { resolvePriceLineAxisTagDomain, WEB_PRICE_AXIS_TAG_SIZING } from '../utils/priceAxisTagSizing';
 import { resolvePriceAxisTagStyle } from '../utils/priceAxisTagStyle';
+import { getTradeLineLabelHeight, resolveTradeLineFont } from '../utils/tradeLineFont';
 import { splitTradeLineButtonsForDisplay } from '../utils/tradeLineLabel';
 import { calculatePartialBracketPercent } from './partialBrackets';
 import { resolveTradingLineRowHitRect } from './tradingLineHitGeometry';
@@ -110,7 +111,6 @@ export interface CrosshairState {
 // ============================================================================
 
 const TOUCH_TARGET_HEIGHT = 44; // Minimum 44px for touch-friendly hit area
-const LABEL_HEIGHT = 18;
 const DRAG_THRESHOLD = 5;
 const SEGMENT_HORIZONTAL_PADDING = 14;
 const ACTION_ICON_STROKE_WIDTH = 2;
@@ -126,6 +126,12 @@ const TRADE_LINE_BASE_DRAW_TIER: Record<string, number> = { order: 1, position: 
 function baseDrawRank(bound: PriceLineLabelBounds): number {
   const tier = bound.fixed ? 3 : (TRADE_LINE_BASE_DRAW_TIER[bound.type ?? 'price'] ?? 0);
   return (bound.floatingLabel ? 10 : 0) + tier;
+}
+
+function compareBaseDrawOrder(a: PriceLineLabelBounds, b: PriceLineLabelBounds): number {
+  const tierDifference = baseDrawRank(a) - baseDrawRank(b);
+  if (tierDifference || a.type !== 'order' || b.type !== 'order') return tierDifference;
+  return (a.priority ?? 50) - (b.priority ?? 50);
 }
 
 interface CachedLineContentRefs {
@@ -209,8 +215,12 @@ function measureLabelTextWidth(text: string, fontSize = 11, fontFamily = 'sans-s
   return textMeasureContext.measureText(text).width;
 }
 
-function getSegmentWidth(text: string, fontFamily: string): number {
-  return Math.ceil(measureLabelTextWidth(text, 11, fontFamily)) + SEGMENT_HORIZONTAL_PADDING;
+function getSegmentWidth(text: string, fontFamily: string, font?: string): number {
+  const resolved = resolveTradeLineFont(font, fontFamily);
+  return (
+    Math.ceil(measureLabelTextWidth(text, resolved.fontSize, resolved.fontFamily, resolved.fontStyle)) +
+    SEGMENT_HORIZONTAL_PADDING
+  );
 }
 
 function getPriceAxisTagFontSize(bound: PriceLineLabelBounds): number {
@@ -445,6 +455,7 @@ export class PriceLineManager {
               [
                 segment.text,
                 segment.textShort ?? '',
+                segment.font ?? '',
                 segment.textColor,
                 segment.backgroundColor,
                 segment.borderColor,
@@ -463,6 +474,7 @@ export class PriceLineManager {
         return [
           b.lineId,
           b.type,
+          b.priority ?? '',
           b.color,
           b.lineStyle,
           b.draggable ? '1' : '0',
@@ -781,7 +793,7 @@ export class PriceLineManager {
     // Plain price lines, then orders, then positions; floating labels above
     // their own tier. The rendered index is stored so a promoted line can be
     // put back exactly where it belongs when the hover or selection ends.
-    const ordered = [...this.labelBounds].sort((a, b) => baseDrawRank(a) - baseDrawRank(b));
+    const ordered = [...this.labelBounds].sort(compareBaseDrawOrder);
 
     let baseOrder = 0;
     for (const bound of ordered) {
@@ -809,11 +821,12 @@ export class PriceLineManager {
   }
 
   private findTradingLineAtPoint(x: number, y: number): string | null {
-    let nearest: { distance: number; lineId: string } | null = null;
+    let nearest: { distance: number; lineId: string; zIndex: number } | null = null;
 
     for (const bound of this.labelBounds) {
       if ((bound.type !== 'order' && bound.type !== 'position') || !bound.chartLabel?.segments.length) continue;
-      const lineY = this.cachedLineGroups.get(bound.lineId)?.getAttr('lineY') ?? this.options.priceToY(bound.price);
+      const group = this.cachedLineGroups.get(bound.lineId);
+      const lineY = group?.getAttr('lineY') ?? this.options.priceToY(bound.price);
       const priceAxisLabelX = this.options.width - this.options.margins.right;
       const { chartLabelWidth, chartLabelX, lineStartX, rightLineEndX } = this.resolveTradingLineChartLabelLayout(
         bound,
@@ -823,7 +836,7 @@ export class PriceLineManager {
         chartLabelWidth,
         chartLabelX,
         interactionKind: 'mouseHover',
-        labelHeight: LABEL_HEIGHT,
+        labelHeight: getTradeLineLabelHeight(bound.chartLabel),
         lineStartX,
         lineY,
         rightLineEndX,
@@ -839,8 +852,9 @@ export class PriceLineManager {
       }
 
       const distance = Math.abs(y - lineY);
-      if (!nearest || distance < nearest.distance) {
-        nearest = { distance, lineId: bound.lineId };
+      const zIndex = group?.zIndex() ?? -1;
+      if (!nearest || distance < nearest.distance || (distance === nearest.distance && zIndex > nearest.zIndex)) {
+        nearest = { distance, lineId: bound.lineId, zIndex };
       }
     }
 
@@ -867,7 +881,7 @@ export class PriceLineManager {
     if (chartLabel && chartLabel.segments.length > 0) {
       for (const segment of chartLabel.segments) {
         const text = useNarrowText && segment.textShort ? segment.textShort : segment.text;
-        segmentsWidth += getSegmentWidth(text, fontFamily);
+        segmentsWidth += getSegmentWidth(text, fontFamily, segment.font);
       }
       chartLabelWidth = segmentsWidth + tpslGap;
       for (const button of orderedButtons) {
@@ -1098,6 +1112,7 @@ export class PriceLineManager {
     const { yToPrice } = this.options;
     const fontFamily = this.getTextFontFamily();
     const chartLabel = bound.chartLabel;
+    const labelHeight = getTradeLineLabelHeight(chartLabel);
     const isDraggable = bound.draggable ?? false;
     const {
       chartLabelWidth,
@@ -1145,7 +1160,7 @@ export class PriceLineManager {
         chartLabelWidth,
         chartLabelX,
         interactionKind: 'mouseHover',
-        labelHeight: LABEL_HEIGHT,
+        labelHeight,
         lineStartX,
         lineY,
         rightLineEndX,
@@ -1301,16 +1316,17 @@ export class PriceLineManager {
       for (let i = 0; i < chartLabel.segments.length; i++) {
         const segment = chartLabel.segments[i];
         const text = useNarrowText && segment.textShort ? segment.textShort : segment.text;
-        const textWidth = getSegmentWidth(text, fontFamily);
+        const textWidth = getSegmentWidth(text, fontFamily, segment.font);
+        const segmentFont = resolveTradeLineFont(segment.font, fontFamily);
         const isFirst = i === 0;
         const isLast = i === chartLabel.segments.length - 1;
         const isLastInMainPill = isLast && !hasInlineButtons;
 
         const segmentRect = new Konva.Rect({
           x: currentX,
-          y: lineY - LABEL_HEIGHT / 2,
+          y: lineY - labelHeight / 2,
           width: textWidth,
-          height: LABEL_HEIGHT,
+          height: labelHeight,
           fill: segment.backgroundColor,
           stroke: segment.borderColor,
           strokeWidth: 1,
@@ -1318,12 +1334,11 @@ export class PriceLineManager {
         });
         const segmentText = new Konva.Text({
           x: currentX,
-          y: lineY - LABEL_HEIGHT / 2,
+          y: lineY - labelHeight / 2,
           width: textWidth,
-          height: LABEL_HEIGHT,
+          height: labelHeight,
           text,
-          fontSize: 11,
-          fontFamily,
+          ...segmentFont,
           fill: segment.textColor,
           align: 'center',
           verticalAlign: 'middle',
@@ -1333,9 +1348,9 @@ export class PriceLineManager {
         const accentRect = segment.accentColor
           ? new Konva.Rect({
               x: currentX + 0.5,
-              y: lineY - LABEL_HEIGHT / 2 + 0.5,
+              y: lineY - labelHeight / 2 + 0.5,
               width: TRADE_LINE_ACCENT_RAIL_WIDTH,
-              height: LABEL_HEIGHT - 1,
+              height: labelHeight - 1,
               fill: segment.accentColor,
               cornerRadius: isFirst ? [2, 0, 0, 2] : 0,
               listening: false,
@@ -1388,9 +1403,9 @@ export class PriceLineManager {
         const buttonGroup = new Konva.Group();
         const buttonRect = new Konva.Rect({
           x: currentX,
-          y: lineY - LABEL_HEIGHT / 2,
+          y: lineY - labelHeight / 2,
           width: buttonWidth,
-          height: LABEL_HEIGHT,
+          height: labelHeight,
           fill: button.backgroundColor,
           stroke: button.borderColor,
           strokeWidth: 1,
@@ -1406,9 +1421,9 @@ export class PriceLineManager {
         if (button.type === 'tp' || button.type === 'sl') {
           const buttonText = new Konva.Text({
             x: currentX,
-            y: lineY - LABEL_HEIGHT / 2,
+            y: lineY - labelHeight / 2,
             width: buttonWidth,
-            height: LABEL_HEIGHT,
+            height: labelHeight,
             text: button.type === 'tp' ? 'TP' : 'SL',
             fontSize: 10,
             fontFamily,
@@ -1423,9 +1438,9 @@ export class PriceLineManager {
 
           const hitRect = new Konva.Rect({
             x: currentX,
-            y: lineY - LABEL_HEIGHT / 2,
+            y: lineY - labelHeight / 2,
             width: buttonWidth,
-            height: LABEL_HEIGHT,
+            height: labelHeight,
             fill: 'rgba(0, 0, 0, 0.01)',
             draggable: true,
             listening: true,
@@ -1434,7 +1449,7 @@ export class PriceLineManager {
           hitRect.dragDistance(0);
           const buttonType = button.type;
           const originalX = currentX;
-          const originalY = lineY - LABEL_HEIGHT / 2;
+          const originalY = lineY - labelHeight / 2;
           const startCenterX = originalX + buttonWidth / 2;
 
           hitRect.on('mousedown touchstart', (e) => {
@@ -1466,7 +1481,7 @@ export class PriceLineManager {
               originalX,
               originalY,
               originalPrice: currentBound.price,
-              originalAbsoluteY: startPosition.y + LABEL_HEIGHT / 2,
+              originalAbsoluteY: startPosition.y + labelHeight / 2,
               originalPointerX: startPointer?.x,
               originalPointerY: startPointer?.y,
               startCenterX: startPosition.x + buttonWidth / 2,
@@ -1487,7 +1502,7 @@ export class PriceLineManager {
             const currentPosition = hitRect.getAbsolutePosition();
             const currentPointer = this.getStagePointerPosition(hitRect);
             const currentCenterX = currentPointer?.x ?? currentPosition.x + buttonWidth / 2;
-            const currentCenterY = currentPointer?.y ?? currentPosition.y + LABEL_HEIGHT / 2;
+            const currentCenterY = currentPointer?.y ?? currentPosition.y + labelHeight / 2;
             const price = yToPrice(currentCenterY);
             const currentBound = this.getCurrentBound(group, bound);
             const partialPercent = activeDrag.partialEnabled
@@ -1529,10 +1544,10 @@ export class PriceLineManager {
             const currentPosition = hitRect.getAbsolutePosition();
             const currentPointer = this.getStagePointerPosition(hitRect);
             const currentCenterX = currentPointer?.x ?? currentPosition.x + buttonWidth / 2;
-            const currentCenterY = currentPointer?.y ?? currentPosition.y + LABEL_HEIGHT / 2;
+            const currentCenterY = currentPointer?.y ?? currentPosition.y + labelHeight / 2;
             const dragStartX = activeDrag.originalPointerX ?? activeDrag.startCenterX ?? startCenterX;
             const dragStartY =
-              activeDrag.originalPointerY ?? activeDrag.originalAbsoluteY ?? activeDrag.originalY + LABEL_HEIGHT / 2;
+              activeDrag.originalPointerY ?? activeDrag.originalAbsoluteY ?? activeDrag.originalY + labelHeight / 2;
             const deltaX = Math.abs(currentCenterX - dragStartX);
             const deltaY = Math.abs(currentCenterY - dragStartY);
             const price = yToPrice(currentCenterY);

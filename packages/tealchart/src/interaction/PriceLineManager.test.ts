@@ -5,6 +5,9 @@ import type { PriceLineLabelBounds } from '../types';
 import Konva from 'konva';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import { computeProjectedPriceLineLabelBounds } from '../rendering/priceLineLayout';
+import { getTealchartApiLineRenderSnapshot, TealchartApi } from '../TealchartApi';
+import { orderLineToPriceLine } from '../utils/tradingPriceLines';
 import { PriceLineManager } from './PriceLineManager';
 
 interface PriceLineManagerProbe {
@@ -18,7 +21,10 @@ interface CachedLineContentRefsProbe {
   buttonIcons?: Array<Konva.Shape[] | undefined>;
 }
 
-function stubCanvasContext(): void {
+let measureFontSizeForTest = false;
+
+function stubCanvasContext(measureFontSize = false): void {
+  measureFontSizeForTest = measureFontSize;
   const mockCtx = {
     canvas: { width: 800, height: 600 },
     font: '',
@@ -41,7 +47,9 @@ function stubCanvasContext(): void {
     clearRect: () => {},
     strokeRect: () => {},
     fillText: () => {},
-    measureText: (text: string) => ({ width: text.length * 7 }),
+    measureText: (text: string) => ({
+      width: text.length * (measureFontSizeForTest ? Number(mockCtx.font.match(/([\d.]+)px/)?.[1] ?? 11) : 7),
+    }),
     setLineDash: () => {},
     arc: () => {},
     clip: () => {},
@@ -563,9 +571,13 @@ describe('PriceLineManager order dragging', () => {
         handle.y(handle.y() + 20);
         handle.fire('dragmove');
         expect(onOrderMoving).toHaveBeenLastCalledWith('order-1', 100 + 20 / scale);
-        expect(manager.getRenderedPriceAxisLabelBounds()[0]).toEqual(expect.objectContaining({
-          originalY: 100 * scale + 20, adjustedY: 100 * scale + 20, fixed: true,
-        }));
+        expect(manager.getRenderedPriceAxisLabelBounds()[0]).toEqual(
+          expect.objectContaining({
+            originalY: 100 * scale + 20,
+            adjustedY: 100 * scale + 20,
+            fixed: true,
+          }),
+        );
         handle.fire('dragend');
         expect(onOrderMove).toHaveBeenLastCalledWith('order-1', 100 + 20 / scale);
       },
@@ -794,6 +806,77 @@ describe('PriceLineManager TP/SL gating while an action is unconfirmed', () => {
   });
 });
 
+describe('PriceLineManager adapter label fonts', () => {
+  afterEach(() => {
+    document.body.innerHTML = '';
+    vi.unstubAllGlobals();
+  });
+
+  it('updates existing adapter fonts, measured widths and control geometry without resizing axis tags', async () => {
+    stubCanvasContext(true);
+    const stage = new Konva.Stage({ container: createContainer(), width: 800, height: 600 });
+    const layer = new Konva.Layer();
+    stage.add(layer);
+    const manager = new PriceLineManager({
+      layer,
+      width: 800,
+      height: 600,
+      margins: { top: 0, right: 80, bottom: 0, left: 0 },
+      priceToY: (price) => price,
+      yToPrice: (y) => y,
+    });
+    const api = new TealchartApi('BTCUSDT', '15');
+    const adapter = await api.createOrderLine();
+    adapter
+      .setPrice(100)
+      .setText('Long')
+      .setQuantity('2 BTC')
+      .setBodyFont('bold 8px Arial')
+      .setQuantityFont('12px Verdana');
+    adapter.setBrackets({ takeProfit: 110, stopLoss: 90 });
+    const renderAdapter = () => {
+      const order = getTealchartApiLineRenderSnapshot(api).orderLines[0];
+      const line = orderLineToPriceLine(order, String, '#00ff00');
+      manager.update([{ ...makeOrderBound(100), lineId: order.id, chartLabel: line.chartLabel }]);
+      return (manager as unknown as PriceLineManagerProbe).cachedLineGroups.get(order.id)!;
+    };
+
+    try {
+      const smallGroup = renderAdapter();
+      const smallRefs = smallGroup.getAttr('contentRefs');
+      const initialWidth = smallRefs.segmentRects[0].width();
+      const axisSize = smallRefs.priceAxisPrimaryText.fontSize();
+      expect(smallRefs.segmentTexts[0].fontSize()).toBe(8);
+      expect(smallRefs.segmentTexts[0].fontFamily()).toBe('Arial');
+      expect(smallRefs.segmentTexts[0].fontStyle()).toBe('bold');
+      expect(smallRefs.segmentTexts[1].fontSize()).toBe(12);
+      expect(smallRefs.segmentTexts[1].fontFamily()).toBe('Verdana');
+
+      adapter.setBodyFont('italic bold 20px "Fira Sans", sans-serif');
+      const largeGroup = renderAdapter();
+      const largeRefs = largeGroup.getAttr('contentRefs');
+      expect(largeRefs.segmentTexts[0].fontSize()).toBe(20);
+      expect(largeRefs.segmentTexts[0].fontStyle()).toBe('italic bold');
+      expect(largeRefs.segmentTexts[0].fontFamily()).toBe('"Fira Sans", sans-serif');
+      expect(largeRefs.segmentRects[0].width()).toBeGreaterThan(initialWidth);
+      expect(largeRefs.segmentRects[0].height()).toBeGreaterThanOrEqual(26);
+      expect(
+        largeRefs.buttonRects.every((rect: Konva.Rect) => rect.height() === largeRefs.segmentRects[0].height()),
+      ).toBe(true);
+      expect(largeRefs.priceAxisPrimaryText.fontSize()).toBe(axisSize);
+      const bracketHit = largeGroup.find(
+        (node: Konva.Node) => node instanceof Konva.Rect && node.draggable(),
+      ) as Konva.Rect[];
+      expect(bracketHit.some((rect) => rect.height() === largeRefs.segmentRects[0].height())).toBe(true);
+      expect(manager.updateHoverAt(largeRefs.segmentRects[0].x() + 4, 111)).toBe('passive');
+    } finally {
+      api.dispose();
+      manager.dispose();
+      stage.destroy();
+    }
+  });
+});
+
 describe('PriceLineManager trade line draw order', () => {
   afterEach(() => {
     document.body.innerHTML = '';
@@ -826,6 +909,165 @@ describe('PriceLineManager trade line draw order', () => {
 
     return { manager, orderAbovePosition, stage };
   }
+
+  it('keeps Average Fill above later-created scaled entries through price updates and temporary interaction promotion', async () => {
+    const { manager, stage } = setup();
+    const api = new TealchartApi('BTCUSDT', '15');
+    const average = await api.createOrderLine();
+    average.setPrice(300).setText('Average Fill').setQuantity('').setCancelAsSubmit(true).setEditable(true);
+    const entry = await api.createOrderLine();
+    entry.setPrice(304).setText('Buy').setQuantity('1').setEditable(true);
+    entry.onMove(vi.fn());
+    const render = () => {
+      const lines = getTealchartApiLineRenderSnapshot(api).orderLines.map((line) =>
+        orderLineToPriceLine(line, String, '#00ff00'),
+      );
+      const bounds = computeProjectedPriceLineLabelBounds(
+        lines,
+        {
+          panes: [
+            {
+              id: 'main',
+              type: 'main',
+              heightRatio: 1,
+              yMin: 0,
+              yMax: 600,
+              fixedRange: false,
+              top: 0,
+              bottom: 600,
+              height: 600,
+            },
+          ],
+          priceToY: (price) => price,
+        },
+        { font: () => '11px Arial', width: () => 84, height: () => 18 },
+      );
+      manager.update([...bounds, makePositionBound(302), makeLastTradeBound(303)]);
+      return (manager as unknown as PriceLineManagerProbe).cachedLineGroups;
+    };
+    const above = (groups: Map<string, Konva.Group>, high: string, low: string) =>
+      expect(groups.get(high)!.zIndex()).toBeGreaterThan(groups.get(low)!.zIndex());
+    const ids = getTealchartApiLineRenderSnapshot(api).orderLines.map((line) => line.id);
+
+    try {
+      let groups = render();
+      above(groups, ids[0], ids[1]);
+      above(groups, 'position-1', ids[0]);
+      above(groups, 'last-trade', 'position-1');
+      entry.setPrice(298);
+      groups = render();
+      above(groups, ids[0], ids[1]);
+      entry.setPrice(305);
+      groups = render();
+      above(groups, ids[0], ids[1]);
+
+      expect(manager.updateHoverAt(400, 305)).toBe('passive');
+      above(groups, ids[1], ids[0]);
+      manager.clearHover();
+      above(groups, ids[0], ids[1]);
+      manager.selectLine(ids[1]);
+      above(groups, ids[1], ids[0]);
+      manager.clearSelectedLine();
+      above(groups, ids[0], ids[1]);
+      const dragRect = groups
+        .get(ids[1])!
+        .find((node: Konva.Node) => node instanceof Konva.Rect && node.draggable())[0] as Konva.Rect;
+      dragRect.fire('dragstart');
+      expect(manager.isDragging()).toBe(true);
+      above(groups, ids[1], ids[0]);
+      dragRect.fire('dragend');
+      manager.clearSelectedLine();
+      above(groups, ids[0], ids[1]);
+    } finally {
+      api.dispose();
+      manager.dispose();
+      stage.destroy();
+    }
+  });
+
+  it('rebuilds resting order paint rank when only priority changes', () => {
+    const { manager, stage } = setup();
+    const entry = { ...makeOrderBound(300), priority: 50 };
+    const average = { ...makeOrderBound(304), lineId: 'average', priority: 60 };
+    try {
+      manager.update([entry, average]);
+      let groups = (manager as unknown as PriceLineManagerProbe).cachedLineGroups;
+      expect(groups.get('average')!.zIndex()).toBeGreaterThan(groups.get('order-1')!.zIndex());
+      manager.update([entry, { ...average, priority: 40 }]);
+      groups = (manager as unknown as PriceLineManagerProbe).cachedLineGroups;
+      expect(groups.get('average')!.zIndex()).toBeLessThan(groups.get('order-1')!.zIndex());
+    } finally {
+      manager.dispose();
+      stage.destroy();
+    }
+  });
+
+  it.each([false, true])('keeps exact-price hover on the painted top row (Average Fill created first: %s)', async (averageFirst) => {
+    const { manager, stage } = setup();
+    const api = new TealchartApi('BTCUSDT', '15');
+    const createAverage = async () => (await api.createOrderLine())
+      .setPrice(300).setText('Average Fill').setQuantity('').setCancelAsSubmit(true).setEditable(true);
+    const createEntry = async () => (await api.createOrderLine())
+      .setPrice(300).setText('Buy').setQuantity('1').setEditable(true);
+    let entry;
+    if (averageFirst) {
+      await createAverage();
+      entry = await createEntry();
+    } else {
+      entry = await createEntry();
+      await createAverage();
+    }
+    entry.onMove(vi.fn());
+    const snapshot = getTealchartApiLineRenderSnapshot(api).orderLines;
+    const averageId = snapshot.find((line) => line.text === 'Average Fill')!.id;
+    const entryId = snapshot.find((line) => line.text === 'Buy')!.id;
+    const groups = (manager as unknown as PriceLineManagerProbe).cachedLineGroups;
+    const above = (high: string, low: string) => expect(groups.get(high)!.zIndex()).toBeGreaterThan(groups.get(low)!.zIndex());
+    const render = () => manager.update(computeProjectedPriceLineLabelBounds(
+      getTealchartApiLineRenderSnapshot(api).orderLines.map((line) => orderLineToPriceLine(line, String, '#00ff00')),
+      { panes: [{ id: 'main', type: 'main', heightRatio: 1, yMin: 0, yMax: 600, fixedRange: false, top: 0, bottom: 600, height: 600 }], priceToY: (price) => price },
+      { font: () => '11px Arial', width: () => 84, height: () => 18 },
+    ));
+
+    try {
+      render();
+      const averageRect = groups.get(averageId)!.getAttr('contentRefs').segmentRects[0] as Konva.Rect;
+      const entryRect = groups.get(entryId)!.getAttr('contentRefs').segmentRects[0] as Konva.Rect;
+      const x = Math.max(averageRect.x(), entryRect.x()) + 4;
+      above(averageId, entryId);
+      expect(manager.updateHoverAt(x, 300)).toBe('passive');
+      above(averageId, entryId);
+      manager.clearHover();
+      manager.selectLine(entryId);
+      above(entryId, averageId);
+      expect(manager.updateHoverAt(x, 300)).toBe('passive');
+      above(entryId, averageId);
+      manager.clearHover();
+      manager.clearSelectedLine();
+      above(averageId, entryId);
+
+      const dragRect = groups.get(entryId)!.find((node: Konva.Node) => node instanceof Konva.Rect && node.draggable())[0] as Konva.Rect;
+      dragRect.fire('dragstart');
+      expect(manager.isDragging()).toBe(true);
+      manager.updateHoverAt(x, 300);
+      above(entryId, averageId);
+      dragRect.fire('dragend');
+      manager.clearHover();
+      manager.clearSelectedLine();
+      above(averageId, entryId);
+
+      entry.setPrice(304);
+      render();
+      manager.updateHoverAt(x, 304);
+      above(entryId, averageId);
+      manager.clearHover();
+      above(averageId, entryId);
+    } finally {
+      api.dispose();
+      manager.dispose();
+      stage.destroy();
+    }
+  });
 
   it('draws the last-trade tag above every trade line label', () => {
     const { manager, stage } = setup();

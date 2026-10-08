@@ -93,6 +93,18 @@ function createPositionLine(overrides: Partial<PositionLineRenderData> = {}): Po
 }
 
 describe('trade line label resolver', () => {
+  it('preserves independent body and quantity fonts and uses body font for position pnl', () => {
+    const fonts = { bodyFont: 'bold 20px Arial', quantityFont: 'italic 14px Verdana' };
+    const order = resolveOrderTradeLineLabel(createOrderLine(fonts), '#12c48b');
+    const position = resolvePositionTradeLineLabel(createPositionLine(fonts), '#12c48b', '#ff4d67');
+    expect(order.segments.map((segment) => segment.font)).toEqual([fonts.bodyFont, fonts.quantityFont]);
+    expect(position.segments.map((segment) => segment.font)).toEqual([
+      fonts.bodyFont,
+      fonts.quantityFont,
+      fonts.bodyFont,
+    ]);
+  });
+
   it('builds order segments and action buttons in the shared OEMS order', () => {
     const label = resolveOrderTradeLineLabel(createOrderLine(), '#12c48b');
 

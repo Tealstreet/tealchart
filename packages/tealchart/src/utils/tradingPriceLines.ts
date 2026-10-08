@@ -26,7 +26,7 @@ export function orderLineToPriceLine(
     lineLengthUnit: order.lineLengthUnit,
     extendLeft: order.extendLeft,
     lineWidth: order.lineWidth,
-    priority: 50,
+    priority: order.cancelAsSubmit ? 60 : 50,
     draggable: order.editable,
     label: {
       primaryText: formatPrice(order.price),

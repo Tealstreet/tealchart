@@ -286,6 +286,8 @@ export interface ChartLabelSegment {
   text: string;
   /** Compact version for narrow displays */
   textShort?: string;
+  /** CSS font shorthand supplied by the trading adapter. */
+  font?: string;
   /** Background color of the segment box */
   backgroundColor: string;
   /** Text color */

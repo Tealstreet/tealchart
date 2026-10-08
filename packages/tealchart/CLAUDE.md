@@ -61,6 +61,12 @@ financial down/drag handlers mutate state. Hosted frames require the original
 trusted DOM event; omitted predicates retain ordinary Tealchart behavior.
 Programmatic drag cancellation restores geometry without submitting callbacks.
 
+Trading adapter body/quantity fonts flow into shared label segments; PnL uses
+the body font. Bounded pixel-font parsing drives both text measurement and Konva
+rendering. The largest visible font sets pill/control height with an 18px minimum;
+axis typography remains independent. Segment fonts participate in the retained
+node signature, so updates rebuild text and hit geometry together.
+
 **Hybrid rendering model:**
 
 - **Canvas 2D API**: Candlesticks, volume, grid, time/price axes, crosshair (high-frequency updates)
@@ -1343,6 +1349,12 @@ other instance of the same shape.
   once left it permanently above the positions it covered. Each line group now
   carries a `baseOrder` attr assigned at render time and the whole order is
   re-applied by `zIndex` on every hover/selection change.
+  Submit previews such as Average Fill use existing priority 60 within the order
+  tier; ordinary orders use 50. Priority changes rebuild resting paint order.
+  Positions/fixed tags retain their tiers and interaction promotions still reset.
+  Equal-distance hover ties follow the current painted group's z-index, so a
+  covered entry cannot displace a same-price Average Fill label. Selected/drag
+  promotions keep their precedence; unequal centers still choose the nearer row.
 - The last-trade tag is king: it is the only `fixed` price line, it never moves
   in collision resolution, nothing is drawn over it, and the crosshair is the
   only thing allowed to cover it. Both halves had holes. Its draw tier sits

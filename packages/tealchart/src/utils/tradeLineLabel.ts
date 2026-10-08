@@ -6,11 +6,7 @@ import type {
   PositionLineRenderData,
 } from '../types';
 
-import {
-  STOP_LOSS_COLOR,
-  TRADE_LINE_SEGMENT_TINT_ALPHA,
-  TRADE_LINE_WARM_SEGMENT_TINT_ALPHA,
-} from '../constants';
+import { STOP_LOSS_COLOR, TRADE_LINE_SEGMENT_TINT_ALPHA, TRADE_LINE_WARM_SEGMENT_TINT_ALPHA } from '../constants';
 import { tintOver } from './colorAlpha';
 
 /**
@@ -65,6 +61,7 @@ export function resolveOrderTradeLineLabel(order: OrderLineRenderData, positiveC
         order.bodyBackgroundColor,
         order.bodyTextColor,
         order.bodyBorderColor,
+        order.bodyFont,
       ),
       ...buildBodySegments(
         order.quantity,
@@ -72,6 +69,7 @@ export function resolveOrderTradeLineLabel(order: OrderLineRenderData, positiveC
         order.quantityBackgroundColor,
         order.quantityTextColor,
         order.quantityBorderColor,
+        order.quantityFont,
       ),
     ],
     buttons: [
@@ -117,40 +115,46 @@ export function resolvePositionTradeLineLabel(
 
   return {
     offsetPercent: position.lineLength,
-    segments: withLeadingAccent([
-      ...buildBodySegments(
-        position.text,
-        position.textShort,
-        position.bodyBackgroundColor,
-        position.bodyTextColor,
-        position.bodyBorderColor,
-      ),
-      ...buildBodySegments(
-        position.quantity,
-        position.quantityShort,
-        position.quantityBackgroundColor,
-        position.quantityTextColor,
-        position.quantityBorderColor,
-      ),
-      ...(position.pnl
-        ? [
-            {
-              text: position.pnl,
-              textShort: position.pnlShort || undefined,
-              backgroundColor: tintOver(
-                position.bodyBackgroundColor,
-                pnlStateColor ?? position.lineColor,
-                TRADE_LINE_SEGMENT_TINT_ALPHA,
-              ),
-              textColor: pnlStateColor ?? position.bodyTextColor,
-              // Same outline as the segments beside it: a hairline here broke
-              // the pill's top and bottom edge, which read as the neighbouring
-              // segments being brighter rather than as PnL being quieter.
-              borderColor: position.bodyBorderColor,
-            },
-          ]
-        : []),
-    ], position.lineColor),
+    segments: withLeadingAccent(
+      [
+        ...buildBodySegments(
+          position.text,
+          position.textShort,
+          position.bodyBackgroundColor,
+          position.bodyTextColor,
+          position.bodyBorderColor,
+          position.bodyFont,
+        ),
+        ...buildBodySegments(
+          position.quantity,
+          position.quantityShort,
+          position.quantityBackgroundColor,
+          position.quantityTextColor,
+          position.quantityBorderColor,
+          position.quantityFont,
+        ),
+        ...(position.pnl
+          ? [
+              {
+                text: position.pnl,
+                textShort: position.pnlShort || undefined,
+                backgroundColor: tintOver(
+                  position.bodyBackgroundColor,
+                  pnlStateColor ?? position.lineColor,
+                  TRADE_LINE_SEGMENT_TINT_ALPHA,
+                ),
+                textColor: pnlStateColor ?? position.bodyTextColor,
+                // Same outline as the segments beside it: a hairline here broke
+                // the pill's top and bottom edge, which read as the neighbouring
+                // segments being brighter rather than as PnL being quieter.
+                borderColor: position.bodyBorderColor,
+                font: position.bodyFont,
+              },
+            ]
+          : []),
+      ],
+      position.lineColor,
+    ),
     buttons: [
       ...(position.reversible
         ? [
@@ -194,6 +198,7 @@ function buildBodySegments(
   backgroundColor: string,
   textColor: string,
   borderColor: string,
+  font: string,
 ): ChartLabelSegment[] {
   if (!text) return [];
   return [
@@ -203,6 +208,7 @@ function buildBodySegments(
       backgroundColor,
       textColor,
       borderColor,
+      font,
     },
   ];
 }
