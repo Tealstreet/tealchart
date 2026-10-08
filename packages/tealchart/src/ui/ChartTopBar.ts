@@ -59,6 +59,7 @@ import { applyChromeThemeVars } from './chromeTheme';
 import { Component } from './Component';
 import { renderDrawingIcon } from './dom';
 import { mountWebFloatingElement, positionFixedFloatingElement } from './FloatingLayer';
+import { showWebOverlayError, type WebOverlayHost, type WebOverlayHostFactory, type WebOverlayEnvironment } from './OverlayHost';
 import { LayoutSelector } from './LayoutSelector';
 
 /**
@@ -82,6 +83,7 @@ function drawingToolTitleWithHotkey(tool: UserDrawingTool, label: string): strin
 // ============================================================================
 
 export interface ChartTopBarOptions extends ComponentOptions {
+  overlayHost?: WebOverlayHostFactory;
   /** Unique key for this chart instance */
   chartKey: string;
   /** Current symbol */
@@ -853,6 +855,9 @@ export class ChartTopBar extends Component<ChartTopBarState> {
   private drawingFavoritesBarCleanup: Array<() => void> = [];
   private intervalDropdownEl: HTMLElement | null = null;
   private intervalDropdownOutsideHandler: ((event: PointerEvent) => void) | null = null;
+  private intervalDropdownHost?: WebOverlayHost;
+  private intervalDropdownEnvironment?: WebOverlayEnvironment;
+  private intervalDropdownHostCleanup?: () => void;
   private uiPreferencesUnsubscribe: (() => void) | null = null;
   private pinnedDrawingToolCategoryId: string | null = null;
   private recentDrawingToolsByCategory: Record<string, UserDrawingTool | undefined> = {};
@@ -2197,6 +2202,11 @@ export class ChartTopBar extends Component<ChartTopBarState> {
   }
 
   private removeIntervalDropdown(options: { keepOutsideHandler?: boolean } = {}): void {
+    this.intervalDropdownHostCleanup?.();
+    this.intervalDropdownHostCleanup = undefined;
+    this.intervalDropdownHost?.dispose();
+    this.intervalDropdownHost = undefined;
+    this.intervalDropdownEnvironment = undefined;
     this.intervalDropdownEl?.remove();
     this.intervalDropdownEl = null;
 
@@ -2291,8 +2301,51 @@ export class ChartTopBar extends Component<ChartTopBarState> {
       }
     }
 
-    mountWebFloatingElement(dropdown);
     this.intervalDropdownEl = dropdown;
+    if (this.options.overlayHost) {
+      const failed = (error: string) => queueMicrotask(() => {
+        if (this.intervalDropdownEl !== dropdown) return;
+        showWebOverlayError(this.el, error);
+        this.closeIntervalDropdown();
+      });
+      try {
+        const host = this.options.overlayHost({ kind: 'floating', source: this.el, onError: failed });
+        this.intervalDropdownHost = host;
+        void host.ready.then((environment) => {
+          if (this.intervalDropdownEl !== dropdown) return;
+          this.intervalDropdownEnvironment = environment;
+          environment.portalRoot.append(dropdown);
+          this.positionIntervalDropdown(anchorEl, dropdown);
+          host.setContent(dropdown);
+          const unsubscribeInput = host.subscribeInput((input) => {
+            if (input.type === 'pointerdown' && !input.inside && !this.el.contains(input.event.target as Node | null)) this.closeIntervalDropdown();
+            if (input.type === 'keydown' && (!input.sourceId || input.sourceId === host.surfaceId) && (input.event as KeyboardEvent).key === 'Escape') {
+              input.event.preventDefault();
+              this.closeIntervalDropdown();
+            }
+          });
+          const reposition = () => {
+            if (this.intervalDropdownEl === dropdown && this.intervalDropdownHost === host) this.positionIntervalDropdown(anchorEl, dropdown);
+          };
+          const owners = new Set([environment.sourceWindow, anchorEl.ownerDocument.defaultView!]);
+          owners.forEach((owner) => { owner.addEventListener('resize', reposition); owner.addEventListener('scroll', reposition, true); });
+          const Resize = (anchorEl.ownerDocument.defaultView as Window & typeof globalThis).ResizeObserver;
+          const resize = Resize ? new Resize(reposition) : undefined;
+          resize?.observe(anchorEl);
+          resize?.observe(this.el);
+          resize?.observe(dropdown);
+          environment.window.addEventListener('desktop-overlay-styles-updated', reposition);
+          this.intervalDropdownHostCleanup = () => {
+            unsubscribeInput();
+            owners.forEach((owner) => { owner.removeEventListener('resize', reposition); owner.removeEventListener('scroll', reposition, true); });
+            environment.window.removeEventListener('desktop-overlay-styles-updated', reposition);
+            resize?.disconnect();
+          };
+        }).catch((error: unknown) => failed(error instanceof Error ? error.message : String(error)));
+      } catch (error) { failed(error instanceof Error ? error.message : String(error)); }
+      return;
+    }
+    mountWebFloatingElement(dropdown);
     this.positionIntervalDropdown(anchorEl, dropdown);
 
     if (!this.intervalDropdownOutsideHandler) {
@@ -2309,14 +2362,21 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     const anchorRect = anchorEl.getBoundingClientRect();
     const dropdownWidth = dropdown.offsetWidth || 260;
     const dropdownHeight = dropdown.offsetHeight || 0;
+    const anchor = this.intervalDropdownHost?.sourcePoint({ clientX: anchorRect.left, clientY: anchorRect.bottom }) ?? { x: anchorRect.left, y: anchorRect.bottom };
 
-    positionFixedFloatingElement(dropdown, {
-      desiredLeft: anchorRect.left,
-      desiredTop: anchorRect.bottom + 4,
+    const position = positionFixedFloatingElement(dropdown, {
+      desiredLeft: anchor.x,
+      desiredTop: anchor.y + 4,
       fallbackWidth: dropdownWidth,
       fallbackHeight: dropdownHeight,
       margin: 8,
+      viewport: this.intervalDropdownEnvironment ? { width: this.intervalDropdownEnvironment.sourceWindow.innerWidth, height: this.intervalDropdownEnvironment.sourceWindow.innerHeight } : undefined,
     });
+    if (this.intervalDropdownEnvironment) {
+      const target = this.intervalDropdownEnvironment.targetPoint({ x: position.left, y: position.top });
+      dropdown.style.left = `${target.x}px`;
+      dropdown.style.top = `${target.y}px`;
+    }
   }
 
   // ============================================================================

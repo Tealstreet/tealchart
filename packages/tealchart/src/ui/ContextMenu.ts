@@ -10,6 +10,7 @@ import type { ContextMenuItem, RenderOptions } from '../types';
 import { applyChromeThemeVars } from './chromeTheme';
 import { div, span } from './dom';
 import { mountWebFloatingElement, positionFixedFloatingElement } from './FloatingLayer';
+import { showWebOverlayError, type WebOverlayHost, type WebOverlayHostFactory, type WebOverlayEnvironment } from './OverlayHost';
 
 // ============================================================================
 // Types
@@ -28,6 +29,8 @@ export interface ContextMenuOptions {
   onClose?: () => void;
   /** Chart render options used to theme the menu (it portals to document.body). */
   renderOptions?: Partial<RenderOptions>;
+  overlayHost?: WebOverlayHostFactory;
+  source?: HTMLElement;
 }
 
 // ============================================================================
@@ -118,12 +121,15 @@ export class ContextMenu {
   private keyHandler: ((e: KeyboardEvent) => void) | null = null;
   private scrollHandler: (() => void) | null = null;
   private attachTimeoutId: ReturnType<typeof setTimeout> | null = null;
+  private host?: WebOverlayHost;
+  private environment?: WebOverlayEnvironment;
+  private hostCleanup?: () => void;
 
   constructor(options: ContextMenuOptions) {
     this.options = options;
     this.el = this.createMenu();
-    this.positionMenu();
-    this.attachEventListeners();
+    if (options.overlayHost) this.openHosted();
+    else { this.positionMenu(); this.attachEventListeners(); }
   }
 
   // ============================================================================
@@ -136,6 +142,8 @@ export class ContextMenu {
   close(): void {
     if (this.closed) return;
     this.closed = true;
+    this.hostCleanup?.();
+    this.host?.dispose();
     this.detachEventListeners();
     this.el.remove();
     this.options.onClose?.();
@@ -171,7 +179,7 @@ export class ContextMenu {
       menu.appendChild(menuItem);
     }
 
-    mountWebFloatingElement(menu);
+    if (!this.options.overlayHost) mountWebFloatingElement(menu);
     return menu;
   }
 
@@ -215,12 +223,46 @@ export class ContextMenu {
 
   private positionMenu(): void {
     const width = this.el.getBoundingClientRect().width || this.el.offsetWidth || 160;
-    positionFixedFloatingElement(this.el, {
-      desiredLeft: this.options.x - (this.options.openDirection === 'left' ? width : 0),
-      desiredTop: this.options.y,
+    const anchor = this.host?.sourcePoint({ clientX: this.options.x, clientY: this.options.y }) ?? { x: this.options.x, y: this.options.y };
+    const position = positionFixedFloatingElement(this.el, {
+      desiredLeft: anchor.x - (this.options.openDirection === 'left' ? width : 0),
+      desiredTop: anchor.y,
       fallbackWidth: 160,
       margin: 10,
+      viewport: this.environment ? { width: this.environment.sourceWindow.innerWidth, height: this.environment.sourceWindow.innerHeight } : undefined,
     });
+    if (this.environment) {
+      const point = this.environment.targetPoint({ x: position.left, y: position.top });
+      this.el.style.left = `${point.x}px`;
+      this.el.style.top = `${point.y}px`;
+    }
+  }
+
+  private openHosted(): void {
+    const source = this.options.source ?? document.body;
+    const failed = (error: string) => queueMicrotask(() => { if (!this.closed) { showWebOverlayError(source, error); this.close(); } });
+    try {
+      const host = this.options.overlayHost!({ kind: 'floating', source, onError: failed });
+      this.host = host;
+      void host.ready.then((environment) => {
+        if (this.closed || this.host !== host) return;
+        this.environment = environment;
+        environment.portalRoot.append(this.el);
+        this.positionMenu();
+        host.setContent(this.el);
+        this.hostCleanup = host.subscribeInput((input) => {
+          if (input.type === 'pointerdown' && !input.inside) this.close();
+          if (input.type === 'keydown' && (input.event as KeyboardEvent).key === 'Escape' &&
+            ((input.inside && (!input.sourceId || input.sourceId === host.surfaceId)) ||
+              (input.event.target as Node | null)?.ownerDocument === environment.sourceWindow.document)) {
+            input.event.preventDefault();
+            this.close();
+          }
+        });
+        this.scrollHandler = () => this.close();
+        environment.sourceWindow.addEventListener('scroll', this.scrollHandler, { once: true, capture: true });
+      }).catch((error: unknown) => failed(error instanceof Error ? error.message : String(error)));
+    } catch (error) { failed(error instanceof Error ? error.message : String(error)); }
   }
 
   // ============================================================================
@@ -270,7 +312,7 @@ export class ContextMenu {
       this.keyHandler = null;
     }
     if (this.scrollHandler) {
-      window.removeEventListener('scroll', this.scrollHandler, { capture: true });
+      (this.environment?.sourceWindow ?? window).removeEventListener('scroll', this.scrollHandler, { capture: true });
       this.scrollHandler = null;
     }
   }

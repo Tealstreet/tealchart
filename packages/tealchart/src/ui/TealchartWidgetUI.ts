@@ -43,6 +43,7 @@ import type {
 import type { IndicatorPaneInfo } from './ChartCore';
 import type { ActiveIndicator } from './ChartLegend';
 import type { LayoutSelectorCallbacks } from './LayoutSelector';
+import type { WebOverlayHostFactory } from './OverlayHost';
 
 import {
   LOADING_DOT_COUNT,
@@ -113,6 +114,7 @@ const TOP_BAR_HEIGHT = WEB_CHART_CHROME_METRICS.topBarHeight;
 export interface TealchartWidgetUIOptions {
   /** Container element */
   container: HTMLElement;
+  overlayHost?: WebOverlayHostFactory;
   /** Chart key for state persistence */
   chartKey: string;
   /** Initial symbol */
@@ -394,6 +396,7 @@ export class TealchartWidgetUI {
       });
 
       this.topBar = new ChartTopBar({
+        overlayHost: options.overlayHost,
         chartKey: options.chartKey,
         symbol: options.symbol,
         onSymbolClick: options.onSymbolClick,
@@ -501,18 +504,22 @@ export class TealchartWidgetUI {
         options.onAddIndicator?.(indicator);
       },
     });
+    this.indicatorsModal.setOverlayHost(options.overlayHost);
     this.indicatorsModal.mount(this.rootEl);
 
     this.settingsModal = new IndicatorSettingsModal();
+    this.settingsModal.setOverlayHost(options.overlayHost);
     this.settingsModal.mount(this.rootEl);
 
     if (this.options.chartSettingsContext) {
       this.chartSettingsModal = new ChartSettingsModal(this.options.chartSettingsContext);
+      this.chartSettingsModal.setOverlayHost(options.overlayHost);
       this.chartSettingsModal.mount(this.rootEl);
       this.chartArea.appendChild(this.createChartSettingsButton());
     }
 
     // Mount layout selector modal to rootEl (if layout callbacks are provided)
+    this.topBar?.getLayoutSelector()?.setOverlayHost(options.overlayHost);
     this.topBar?.getLayoutSelector()?.mount(this.rootEl);
 
     // No loading overlay — empty canvas grid renders while bars load
@@ -583,6 +590,7 @@ export class TealchartWidgetUI {
 
     this.chartCore = new ChartCore({
       container: this.chartArea,
+      overlayHost: this.options.overlayHost,
       width,
       height,
       interval: this.options.interval,

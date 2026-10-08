@@ -12,6 +12,7 @@ import type { LayoutMetadata } from '../transformer/saveLoadIntegration';
 
 import { DEFAULT_LAYOUT_NAME } from '../layoutDefaults';
 import { Modal } from './Modal';
+import type { WebOverlayHostFactory } from './OverlayHost';
 
 // ============================================================================
 // Types
@@ -418,6 +419,8 @@ export class LayoutSelector {
   mount(container: HTMLElement): void {
     this.modal.mount(container);
   }
+
+  setOverlayHost(factory?: WebOverlayHostFactory): void { this.modal.setOverlayHost(factory); }
 
   getElement(): HTMLButtonElement {
     return this.buttonEl;

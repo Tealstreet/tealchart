@@ -54,3 +54,4 @@ export {
 
 // Core chart component
 export { ChartCore, type ChartCoreOptions, type IndicatorPaneInfo } from './ChartCore';
+export type { WebOverlayHost, WebOverlayHostFactory, WebOverlayEnvironment, WebOverlayInput } from './OverlayHost';

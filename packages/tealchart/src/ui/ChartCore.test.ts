@@ -18,6 +18,7 @@ import { DIRTY } from '../rendering/RenderScheduler';
 import { clearChartStoreCache } from '../state/chartState';
 import { TealchartRenderer } from '../TealchartRenderer';
 import { withPriceAxisTagBackgroundAlpha } from '../utils/priceAxisTagStyle';
+import type { WebOverlayEnvironment, WebOverlayHost, WebOverlayHostFactory, WebOverlayInput } from './OverlayHost';
 
 interface EventManagerCallbackProbe {
   onDrawingDragStart?: (x: number, y: number, source: 'mouse' | 'touch') => boolean;
@@ -2341,6 +2342,66 @@ describe('ChartCore host-rendered context menu', () => {
 
   afterEach(() => {
     document.body.innerHTML = '';
+  });
+
+  it('maps nested source coordinates while adopting original item and custom menus and callbacks', async () => {
+    const { ChartCore } = await import('./ChartCore');
+    const frame = document.createElement('iframe');
+    const sourceFrame = document.createElement('iframe');
+    document.body.append(frame, sourceFrame);
+    sourceFrame.contentDocument!.body.append(container);
+    const target = frame.contentWindow!;
+    const listeners = new Set<(input: WebOverlayInput) => void>();
+    const environment: WebOverlayEnvironment = {
+      document: target.document, window: target, sourceWindow: window, portalRoot: target.document.body,
+      sourcePoint: (point) => ({ x: point.clientX + 10, y: point.clientY + 15 }),
+      targetPoint: (point) => ({ x: point.x - 10, y: point.y - 15 }), getZoom: () => 1,
+    };
+    const hosts: WebOverlayHost[] = [];
+    const factory: WebOverlayHostFactory = () => {
+      const host: WebOverlayHost = {
+        surfaceId: `chart-menu-${hosts.length}`, ready: Promise.resolve(environment),
+        sourcePoint: (point) => ({ x: point.clientX + 200, y: point.clientY + 100 }),
+        sourceRect: () => ({ x: 0, y: 0, width: 800, height: 600 }),
+        setContent: vi.fn(), setActive: vi.fn(), dispose: vi.fn(),
+        subscribeInput: (listener) => { listeners.add(listener); return () => { listeners.delete(listener); }; },
+      };
+      hosts.push(host);
+      return host;
+    };
+    const itemClick = vi.fn();
+    const customClick = vi.fn();
+    const custom = document.createElement('button');
+    custom.textContent = 'Original custom action';
+    custom.addEventListener('click', customClick);
+    const core = new ChartCore({ container, width: 800, height: 600, overlayHost: factory,
+      onContextMenu: () => [{ position: 'top', text: 'Original item action', click: itemClick }], renderContextMenu: () => custom });
+    core.setViewport({ startTime: 0, endTime: 100, priceMin: 0, priceMax: 100 });
+    const testCore = core as unknown as { handleContextMenu(x: number, y: number, price: number, time: number, placement?: string): void };
+    testCore.handleContextMenu(100, 100, 10, 20);
+    expect(document.body.textContent).not.toContain('Original item action');
+    await Promise.resolve();
+    const menu = target.document.body.firstElementChild as HTMLElement;
+    expect(container.ownerDocument).toBe(sourceFrame.contentDocument);
+    expect(menu.style.left).toBe('290px');
+    expect(menu.style.top).toBe('185px');
+    expect(hosts[0].setContent).toHaveBeenCalledWith(menu);
+    (menu.firstElementChild as HTMLElement).click();
+    expect(itemClick).toHaveBeenCalledOnce();
+    expect(hosts[0].dispose).toHaveBeenCalledOnce();
+    testCore.handleContextMenu(300, 100, 10, 20, 'crosshairButton');
+    await Promise.resolve();
+    expect(custom.ownerDocument).toBe(target.document);
+    expect(target.document.body.contains(custom)).toBe(true);
+    custom.click();
+    expect(customClick).toHaveBeenCalledOnce();
+    expect(eventManagerInstances.at(-1)?.crosshairPinned).toBe(true);
+    listeners.forEach((listener) => listener({ type: 'keydown', inside: true,
+      event: new KeyboardEvent('keydown', { key: 'Escape' }) }));
+    expect(hosts[1].dispose).toHaveBeenCalledOnce();
+    expect(custom.isConnected).toBe(false);
+    expect(eventManagerInstances.at(-1)?.crosshairPinned).toBe(false);
+    core.dispose();
   });
 
   // The "+" is where a host asks for its own widget. Right-click and long-press

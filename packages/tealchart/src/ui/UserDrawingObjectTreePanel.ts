@@ -12,6 +12,7 @@ import {
 import type { RenderOptions } from '../types';
 import { applyChromeThemeVars } from './chromeTheme';
 import { button, div, input, span } from './dom';
+import { showWebOverlayError, type WebOverlayHost, type WebOverlayHostFactory } from './OverlayHost';
 
 export interface UserDrawingObjectTreePanelOptions {
   model: UserDrawingObjectTreeModel;
@@ -20,6 +21,7 @@ export interface UserDrawingObjectTreePanelOptions {
   onDispatch: (action: UserDrawingObjectTreeDispatchAction) => boolean;
   onClose?: () => void;
   renderOptions?: Partial<RenderOptions>;
+  overlayHost?: WebOverlayHostFactory;
 }
 
 const styles = {
@@ -165,6 +167,9 @@ export class UserDrawingObjectTreePanel {
   private readonly el: HTMLDivElement;
   private editingDrawingId: string | null = null;
   private editingName = '';
+  private host?: WebOverlayHost;
+  private hostCleanup: Array<() => void> = [];
+  private closed = false;
 
   constructor(options: UserDrawingObjectTreePanelOptions) {
     this.options = options;
@@ -182,8 +187,9 @@ export class UserDrawingObjectTreePanel {
     this.el.addEventListener('mouseup', (event) => event.stopPropagation());
     this.el.addEventListener('click', (event) => event.stopPropagation());
     this.el.addEventListener('contextmenu', (event) => event.stopPropagation());
-    options.parent.appendChild(this.el);
     this.render();
+    if (options.overlayHost) this.mountHosted();
+    else options.parent.appendChild(this.el);
   }
 
   /** Re-apply theme vars explicitly; the overlay layer does not restyle children. */
@@ -201,8 +207,50 @@ export class UserDrawingObjectTreePanel {
   }
 
   close(): void {
+    if (this.closed) return;
+    this.closed = true;
+    this.hostCleanup.forEach((cleanup) => cleanup());
+    this.host?.dispose();
     this.el.remove();
     this.options.onClose?.();
+  }
+
+  getElement(): HTMLElement { return this.el; }
+
+  private mountHosted(): void {
+    const source = this.options.parent;
+    const failed = (error: string) => queueMicrotask(() => { if (!this.closed) { showWebOverlayError(source, error); this.close(); } });
+    try {
+      const host = this.options.overlayHost!({ kind: 'floating', source, onError: failed });
+      this.host = host;
+      void host.ready.then((environment) => {
+        if (this.closed || this.host !== host) return;
+        const position = () => {
+          const rect = host.sourceRect();
+          const width = Math.min(320, Math.max(0, rect.width - 32));
+          const point = environment.targetPoint({ x: rect.x + rect.width - width - 16, y: rect.y + 56 });
+          Object.assign(this.el.style, { position: 'fixed', left: `${point.x}px`, top: `${point.y}px`, right: 'auto',
+            width: `${width}px`, maxWidth: `${width}px`, maxHeight: `${Math.max(0, rect.height - 72)}px` });
+        };
+        environment.portalRoot.append(this.el);
+        position();
+        host.setContent(this.el);
+        this.hostCleanup.push(host.subscribeInput((input) => {
+          if (input.type === 'keydown' && input.inside && (!input.sourceId || input.sourceId === host.surfaceId) && (input.event as KeyboardEvent).key === 'Escape') {
+            input.event.preventDefault();
+            this.close();
+          }
+        }));
+        const owner = environment.sourceWindow;
+        owner.addEventListener('resize', position);
+        owner.addEventListener('scroll', position, true);
+        const Resize = (owner as Window & typeof globalThis).ResizeObserver;
+        const resize = Resize ? new Resize(position) : undefined;
+        resize?.observe(source);
+        this.hostCleanup.push(() => owner.removeEventListener('resize', position),
+          () => owner.removeEventListener('scroll', position, true), () => resize?.disconnect());
+      }).catch((error: unknown) => failed(error instanceof Error ? error.message : String(error)));
+    } catch (error) { failed(error instanceof Error ? error.message : String(error)); }
   }
 
   private render(): void {

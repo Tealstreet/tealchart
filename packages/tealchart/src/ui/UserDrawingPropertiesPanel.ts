@@ -8,12 +8,15 @@ import type { RenderOptions } from '../types';
 import { Component } from './Component';
 import { applyChromeThemeVars } from './chromeTheme';
 import { button, div, span } from './dom';
+import { showWebOverlayError, type WebOverlayHost, type WebOverlayHostFactory } from './OverlayHost';
 
 export interface UserDrawingPropertiesPanelOptions {
   surface: UserDrawingPropertiesSurface;
   onDispatch: (command: UserDrawingPropertiesSurfaceCommand) => boolean;
   onClose?: () => void;
   renderOptions?: Partial<RenderOptions>;
+  overlayHost?: WebOverlayHostFactory;
+  source?: HTMLElement;
 }
 
 interface UserDrawingPropertiesPanelState {
@@ -125,6 +128,9 @@ const styles = {
 
 export class UserDrawingPropertiesPanel extends Component<UserDrawingPropertiesPanelState> {
   private readonly options: UserDrawingPropertiesPanelOptions;
+  private host?: WebOverlayHost;
+  private hostCleanup?: () => void;
+  private closed = false;
 
   constructor(options: UserDrawingPropertiesPanelOptions) {
     super('div', { surface: options.surface }, { style: styles.panel });
@@ -137,7 +143,8 @@ export class UserDrawingPropertiesPanel extends Component<UserDrawingPropertiesP
     this.el.addEventListener('mouseup', (event) => event.stopPropagation());
     this.el.addEventListener('click', (event) => event.stopPropagation());
     this.el.addEventListener('contextmenu', (event) => event.stopPropagation());
-    this.mount(document.body);
+    if (options.overlayHost) this.mountHosted();
+    else this.mount(document.body);
   }
 
   updateSurface(surface: UserDrawingPropertiesSurface): void {
@@ -145,8 +152,38 @@ export class UserDrawingPropertiesPanel extends Component<UserDrawingPropertiesP
   }
 
   close(): void {
+    if (this.closed) return;
+    this.closed = true;
     this.unmount();
     this.options.onClose?.();
+  }
+
+  unmount(): void {
+    this.closed = true;
+    this.hostCleanup?.();
+    this.host?.dispose();
+    this.host = undefined;
+    super.unmount();
+  }
+
+  private mountHosted(): void {
+    const source = this.options.source ?? document.body;
+    const failed = (error: string) => queueMicrotask(() => { if (!this.closed) { showWebOverlayError(source, error); this.close(); } });
+    try {
+      const host = this.options.overlayHost!({ kind: 'floating', source, onError: failed });
+      this.host = host;
+      void host.ready.then((environment) => {
+        if (this.closed || this.host !== host) return;
+        this.mount(environment.portalRoot);
+        host.setContent(this.el);
+        this.hostCleanup = host.subscribeInput((input) => {
+          if (input.type === 'keydown' && input.inside && (!input.sourceId || input.sourceId === host.surfaceId) && (input.event as KeyboardEvent).key === 'Escape') {
+            input.event.preventDefault();
+            this.close();
+          }
+        });
+      }).catch((error: unknown) => failed(error instanceof Error ? error.message : String(error)));
+    } catch (error) { failed(error instanceof Error ? error.message : String(error)); }
   }
 
   protected render(): void {

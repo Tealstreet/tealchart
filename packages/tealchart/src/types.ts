@@ -22,6 +22,7 @@ import type {
 } from './drawings';
 import type { BuiltinIndicator, IndicatorCategory } from './indicators/builtinIndicators';
 import type { ChartThemeInput } from './theme';
+import type { WebOverlayHostFactory } from './ui/OverlayHost';
 
 import { DEFAULT_BUY_CANDLE_COLOR, DEFAULT_SELL_CANDLE_COLOR } from './constants';
 
@@ -1139,6 +1140,7 @@ export interface PeriodParams {
  */
 export interface TealchartWidgetOptions {
   container: HTMLElement;
+  overlayHost?: WebOverlayHostFactory;
   symbol: string;
   /** Initial interval. Numeric legacy values are stringified; null/empty values use the persisted/default interval. */
   interval?: ResolutionString | number | null;

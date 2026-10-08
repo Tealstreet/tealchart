@@ -61,3 +61,4 @@ export type {
 export { resolveChromeThemeVars } from '../chromeTheme';
 
 export { getChartStore } from '../state/chartState';
+export type { WebOverlayHost, WebOverlayHostFactory, WebOverlayEnvironment, WebOverlayInput } from '../ui/OverlayHost';

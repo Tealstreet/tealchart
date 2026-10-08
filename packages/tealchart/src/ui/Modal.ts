@@ -1,6 +1,7 @@
 import type { ComponentOptions } from './Component';
 
 import { Component } from './Component';
+import { showWebOverlayError, type WebOverlayHost, type WebOverlayHostFactory, type WebOverlayEnvironment } from './OverlayHost';
 
 /**
  * Modal - Base class for modal dialogs
@@ -198,6 +199,12 @@ export class Modal extends Component<ModalState> {
   protected footerEl: HTMLElement | null = null;
   protected titleEl: HTMLElement | null = null;
   protected boundKeyDown: (e: KeyboardEvent) => void;
+  private overlayHostFactory?: WebOverlayHostFactory;
+  private overlayHost?: WebOverlayHost;
+  private hostEnvironment?: WebOverlayEnvironment;
+  private sourceParent?: HTMLElement;
+  private hostCleanup: Array<() => void> = [];
+  private hostError?: HTMLElement;
 
   constructor(options: ModalOptions = {}) {
     const initialState: ModalState = {
@@ -375,11 +382,13 @@ export class Modal extends Component<ModalState> {
     this.setState({ isOpen: true });
     this.overlay.style.display = 'flex';
 
-    if (this.options.closeOnEscape) {
-      document.addEventListener('keydown', this.boundKeyDown);
-    }
+    if (this.overlayHostFactory) this.openHosted();
+    else if (this.options.closeOnEscape) this.el.ownerDocument.addEventListener('keydown', this.boundKeyDown);
 
     this.onOpen();
+    if (this.overlayHostFactory && this.hostEnvironment) queueMicrotask(() => {
+      if (this.hostEnvironment && this.state.isOpen) this.focusHosted();
+    });
   }
 
   /**
@@ -391,9 +400,8 @@ export class Modal extends Component<ModalState> {
     this.setState({ isOpen: false });
     this.overlay.style.display = 'none';
 
-    if (this.options.closeOnEscape) {
-      document.removeEventListener('keydown', this.boundKeyDown);
-    }
+    this.overlayHost?.setActive(false);
+    if (this.options.closeOnEscape) this.el.ownerDocument.removeEventListener('keydown', this.boundKeyDown);
 
     this.onClose();
     this.options.onClose?.();
@@ -415,6 +423,93 @@ export class Modal extends Component<ModalState> {
    */
   isOpen(): boolean {
     return this.state.isOpen;
+  }
+
+  setOverlayHost(factory?: WebOverlayHostFactory): void {
+    if (this.overlayHost) throw new Error('Cannot replace an active chart overlay host');
+    this.overlayHostFactory = factory;
+  }
+
+  mount(parent: HTMLElement): void {
+    this.sourceParent = parent;
+    if (!this.overlayHostFactory) super.mount(parent);
+  }
+
+  isMounted(): boolean { return super.isMounted() || Boolean(this.sourceParent?.isConnected); }
+
+  unmount(): void {
+    this.close();
+    this.hostCleanup.forEach((cleanup) => cleanup());
+    this.hostCleanup = [];
+    this.overlayHost?.dispose();
+    this.overlayHost = undefined;
+    this.hostEnvironment = undefined;
+    this.sourceParent = undefined;
+    this.hostError?.remove();
+    this.hostError = undefined;
+    super.unmount();
+  }
+
+  private positionHosted(): void {
+    if (!this.overlayHost || !this.hostEnvironment || this.options.position !== 'absolute') return;
+    const rect = this.overlayHost.sourceRect();
+    const point = this.hostEnvironment.targetPoint(rect);
+    Object.assign(this.overlay.style, { position: 'fixed', left: `${point.x}px`, top: `${point.y}px`,
+      right: 'auto', bottom: 'auto', width: `${rect.width}px`, height: `${rect.height}px` });
+  }
+
+  private openHosted(): void {
+    if (this.overlayHost) { this.positionHosted(); this.overlayHost.setActive(true); return; }
+    const source = this.sourceParent;
+    if (!source) throw new Error('Chart modal must be mounted before opening its overlay');
+    const failed = (error: string) => {
+      this.hostError?.remove();
+      this.hostError = showWebOverlayError(source, error);
+      this.close();
+      this.hostCleanup.forEach((cleanup) => cleanup());
+      this.hostCleanup = [];
+      this.overlayHost?.dispose();
+      this.overlayHost = undefined;
+      this.hostEnvironment = undefined;
+      super.unmount();
+    };
+    try {
+      const host = this.overlayHostFactory!({ kind: 'modal', source, onError: failed });
+      this.hostError?.remove();
+      this.hostError = undefined;
+      this.overlayHost = host;
+      void host.ready.then((environment) => {
+        if (this.overlayHost !== host || !this.sourceParent) return;
+        this.hostEnvironment = environment;
+        super.mount(environment.portalRoot);
+        this.positionHosted();
+        host.setContent(this.overlay);
+        host.setActive(this.state.isOpen);
+        if (this.options.closeOnEscape) this.hostCleanup.push(host.subscribeInput((input) => {
+          const target = input.event.target as Node | null;
+          if (input.type !== 'keydown' || !this.state.isOpen ||
+            !((input.inside && (!input.sourceId || input.sourceId === host.surfaceId)) || target?.ownerDocument === environment.sourceWindow.document)) return;
+          const event = input.event as KeyboardEvent;
+          if (event.key === 'Escape') queueMicrotask(() => this.boundKeyDown(event));
+          else this.boundKeyDown(event);
+        }));
+        const reposition = () => this.positionHosted();
+        const owner = environment.sourceWindow;
+        owner.addEventListener('resize', reposition);
+        owner.addEventListener('scroll', reposition, true);
+        const Resize = (owner as Window & typeof globalThis).ResizeObserver;
+        const resize = Resize ? new Resize(reposition) : undefined;
+        resize?.observe(source);
+        this.hostCleanup.push(() => owner.removeEventListener('resize', reposition),
+          () => owner.removeEventListener('scroll', reposition, true), () => resize?.disconnect());
+        if (this.state.isOpen) this.focusHosted();
+      }).catch((error: unknown) => { if (this.overlayHost === host) failed(error instanceof Error ? error.message : String(error)); });
+    } catch (error) { failed(error instanceof Error ? error.message : String(error)); }
+  }
+
+  private focusHosted(): void {
+    (this.modalEl.querySelector<HTMLElement>('input:not([type="hidden"]),textarea,select') ??
+      this.modalEl.querySelector<HTMLElement>('button,[tabindex="0"]'))?.focus();
   }
 
   /**
@@ -486,7 +581,8 @@ export class Modal extends Component<ModalState> {
    * Handle keydown - can be overridden by subclasses for custom escape behavior
    */
   protected handleKeyDown(e: KeyboardEvent): void {
-    if (e.key === 'Escape') {
+    if (e.key === 'Escape' && !e.defaultPrevented) {
+      e.preventDefault();
       this.close();
     }
   }
@@ -496,6 +592,6 @@ export class Modal extends Component<ModalState> {
   }
 
   protected onUnmount(): void {
-    document.removeEventListener('keydown', this.boundKeyDown);
+    this.el.ownerDocument.removeEventListener('keydown', this.boundKeyDown);
   }
 }

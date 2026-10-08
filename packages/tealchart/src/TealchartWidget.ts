@@ -1417,6 +1417,7 @@ export class TealchartWidget implements ITealchartWebWidget {
 
     const showTopBar = this._options.showTopBar !== false; // Default to true
     this._ui = new TealchartWidgetUI({
+      overlayHost: this._options.overlayHost,
       container: this._container,
       chartKey: this._chartKey,
       symbol: this._symbol,
@@ -3554,6 +3555,8 @@ export class TealchartWidget implements ITealchartWebWidget {
     }
 
     this._userDrawingPropertiesPanel = new UserDrawingPropertiesPanel({
+      overlayHost: this._options.overlayHost,
+      source: this._ui?.getOverlayRoot() ?? this._container,
       surface,
       onDispatch: (command) =>
         this.dispatchUserDrawingPropertiesSurfaceCommand(command, {
@@ -3583,6 +3586,7 @@ export class TealchartWidget implements ITealchartWebWidget {
     if (!overlayRoot) return;
 
     this._userDrawingObjectTreePanel = new UserDrawingObjectTreePanel({
+      overlayHost: this._options.overlayHost,
       model,
       parent: overlayRoot,
       renderOptions: this._renderOptions,

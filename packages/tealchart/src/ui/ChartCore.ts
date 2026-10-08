@@ -95,7 +95,8 @@ import { orderLineToPriceLine, positionLineToPriceLine } from '../utils/tradingP
 import { applyAutoScale, intervalToMs } from '../viewport/viewScale';
 import { applyChromeThemeVars } from './chromeTheme';
 import { button, div, icons } from './dom';
-import { mountWebFloatingElement, positionFixedFloatingElement } from './FloatingLayer';
+import { mountWebFloatingElement, positionFixedFloatingElement, resolveFixedFloatingPosition } from './FloatingLayer';
+import { showWebOverlayError, type WebOverlayEnvironment, type WebOverlayHost, type WebOverlayHostFactory } from './OverlayHost';
 
 // ============================================================================
 // Types
@@ -115,6 +116,7 @@ export interface IndicatorPaneInfo {
 export interface ChartCoreOptions {
   /** Container element */
   container: HTMLElement;
+  overlayHost?: WebOverlayHostFactory;
   /** Initial width */
   width: number;
   /** Initial height */
@@ -349,6 +351,9 @@ export class ChartCore {
   private _plusButtonBounds: CrosshairPlusButtonBounds | null = null;
   private contextMenuResizeObserver: ResizeObserver | null = null;
   private contextMenuIsCustom = false;
+  private contextMenuHost?: WebOverlayHost;
+  private contextMenuEnvironment?: WebOverlayEnvironment;
+  private contextMenuHostCleanup?: () => void;
   // Bound handler for + button click — stored so it can be removed on dispose
   private plusButtonClickHandler: (e: MouseEvent) => void;
 
@@ -1506,6 +1511,10 @@ export class ChartCore {
       this.contextMenu.appendChild(menuItem);
     }
 
+    if (this.options.overlayHost) {
+      this.mountHostedContextMenu(this.contextMenu, screenX, screenY, placement);
+      return;
+    }
     mountWebFloatingElement(this.contextMenu);
     this.positionContextMenu(screenX, screenY, placement);
     // Host content is commonly mounted a tick later - a React root rendering
@@ -1528,14 +1537,58 @@ export class ChartCore {
     }, 0);
   }
 
+  private mountHostedContextMenu(menu: HTMLDivElement, x: number, y: number, placement: 'default' | 'crosshairButton'): void {
+    const fail = (error: string) => queueMicrotask(() => {
+      if (this.contextMenu !== menu) return;
+      showWebOverlayError(this.container, error);
+      this.closeContextMenu();
+    });
+    try {
+      const host = this.options.overlayHost!({ kind: 'floating', source: this.container, onError: fail });
+      this.contextMenuHost = host;
+      void host.ready.then((environment) => {
+        if (this.contextMenu !== menu || this.contextMenuHost !== host) return;
+        this.contextMenuEnvironment = environment;
+        environment.portalRoot.append(menu);
+        this.positionContextMenu(x, y, placement);
+        host.setContent(menu);
+        this.contextMenuHostCleanup = host.subscribeInput((input) => {
+          if ((input.type === 'pointerdown' && !input.inside) ||
+            (input.type === 'keydown' && ((input.inside && (!input.sourceId || input.sourceId === host.surfaceId)) ||
+              (input.event.target as Node | null)?.ownerDocument === environment.sourceWindow.document) &&
+              (input.event as KeyboardEvent).key === 'Escape')) {
+            if (input.type === 'keydown') input.event.preventDefault();
+            this.closeContextMenu();
+          }
+        });
+        const Resize = (environment.window as Window & typeof globalThis).ResizeObserver;
+        if (Resize) {
+          this.contextMenuResizeObserver = new Resize(() => this.positionContextMenu(x, y, placement));
+          this.contextMenuResizeObserver.observe(menu);
+        }
+      }).catch((error: unknown) => fail(error instanceof Error ? error.message : String(error)));
+    } catch (error) { fail(error instanceof Error ? error.message : String(error)); }
+  }
+
   private positionContextMenu(screenX: number, screenY: number, placement: 'default' | 'crosshairButton'): void {
     if (!this.contextMenu) return;
     const rect = this.contextMenu.getBoundingClientRect();
     const menuWidth = rect.width || 150;
     const menuHeight = rect.height || this.contextMenu.offsetHeight || 0;
     const gap = 6;
-    const desiredLeft = placement === 'crosshairButton' ? screenX - menuWidth - gap : screenX;
-    const desiredTop = placement === 'crosshairButton' ? screenY + gap : screenY;
+    const anchor = this.contextMenuHost?.sourcePoint({ clientX: screenX, clientY: screenY }) ?? { x: screenX, y: screenY };
+    const desiredLeft = placement === 'crosshairButton' ? anchor.x - menuWidth - gap : anchor.x;
+    const desiredTop = placement === 'crosshairButton' ? anchor.y + gap : anchor.y;
+
+    if (this.contextMenuEnvironment) {
+      const environment = this.contextMenuEnvironment;
+      const position = resolveFixedFloatingPosition({ desiredLeft, desiredTop, width: menuWidth, height: menuHeight,
+        viewport: { width: environment.sourceWindow.innerWidth, height: environment.sourceWindow.innerHeight } });
+      const target = environment.targetPoint({ x: position.left, y: position.top });
+      this.contextMenu.style.left = `${target.x}px`;
+      this.contextMenu.style.top = `${target.y}px`;
+      return;
+    }
 
     positionFixedFloatingElement(this.contextMenu, {
       desiredLeft,
@@ -1549,6 +1602,11 @@ export class ChartCore {
   private closeContextMenu(options?: ContextMenuCloseOptions): void {
     const hadCustomMenu = this.contextMenuIsCustom;
     this.contextMenuIsCustom = false;
+    this.contextMenuHostCleanup?.();
+    this.contextMenuHostCleanup = undefined;
+    this.contextMenuHost?.dispose();
+    this.contextMenuHost = undefined;
+    this.contextMenuEnvironment = undefined;
     if (this.contextMenuCloseTimer) {
       clearTimeout(this.contextMenuCloseTimer);
       this.contextMenuCloseTimer = null;

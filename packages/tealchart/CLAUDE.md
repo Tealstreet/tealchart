@@ -5,6 +5,21 @@ shared output formatter; explicit script precision still wins.
 
 # CLAUDE.md — @tealstreet/tealchart
 
+Web widget hosts may inject `TealchartWidgetOptions.overlayHost`, a package-neutral
+`WebOverlayHostFactory`. Modal subclasses, saved layouts, context menus, interval
+pickers and drawing properties/object-tree panels adopt their original DOM into
+the admitted document; callbacks, drafts and widget owners remain unchanged.
+`Modal.setOverlayHost` and `LayoutSelector.setOverlayHost` must run before opening.
+Host input ancestry includes descendants for outside-pointer dismissal, while
+Escape targets the exact surface so a nested popup does not close its parent.
+The web app adapter uses the shared desktop registry and copies chart theme vars;
+the package never imports Electron or creates another React root or state store.
+Raw anchors first pass through the host's `sourcePoint`, then clamp in the source
+app viewport and pass through the admitted document's `targetPoint`. Retained
+interval menus observe source/target layout changes and release those listeners.
+Constructor-time host failures retire through a guarded microtask, after caller
+ownership is assigned. Retained modal focus runs after subclass form rebuilding.
+
 The native canvas mounts the Pine drawing worklet only while drawing outputs
 exist. Empty charts never capture their bar history for an empty picture;
 removing the last drawing unmounts its derived-value mapper.
