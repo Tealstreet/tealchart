@@ -4,7 +4,7 @@ import { parse } from '../../src/parser';
 import { executeScript, type Bar } from '../../src/runtime';
 import { getPlot } from './fixtures';
 
-// Reference: ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json, type/bool.
+// Reference: https://www.tradingview.com/pine-script-reference/v6/, type/bool.
 // V5 contrast: https://www.tradingview.com/pine-script-docs/v5/language/operators/#-history-referencing-operator.
 // V5 unavailable operands propagate na; the v6 type/bool manual excludes bool na.
 const bars: Bar[] = [-3, 0, 5].map((close, index) => ({

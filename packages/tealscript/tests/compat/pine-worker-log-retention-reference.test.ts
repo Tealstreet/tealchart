@@ -5,6 +5,10 @@ import { expect, it, vi } from 'vitest';
 
 import { getResultOutput } from '../../src/worker/protocol';
 
+import { createWorkerTestModule } from '../helpers/workerTestModule';
+
+const workerModule = createWorkerTestModule();
+
 const bar = (index: number, close: number): Bar => ({
   time: (index + 1) * 60_000,
   open: 1,
@@ -18,15 +22,13 @@ async function withWorker(
   script: string,
   check: (send: (message: ToWorkerMessage) => void, latest: () => ReturnType<typeof getResultOutput>) => void,
 ) {
-  vi.resetModules();
   const messages: FromWorkerMessage[] = [];
   const worker = {
     onmessage: undefined as ((event: MessageEvent<ToWorkerMessage>) => void) | undefined,
     postMessage: (message: FromWorkerMessage) => messages.push(structuredClone(message)),
   };
-  vi.stubGlobal('self', worker);
   try {
-    await import('../../src/worker/worker');
+    await workerModule.attach(worker);
     const send = (message: ToWorkerMessage) => worker.onmessage!({ data: message } as MessageEvent<ToWorkerMessage>);
     const latest = () => {
       expect(messages.at(-1)?.type).toBe('result');
@@ -36,7 +38,6 @@ async function withWorker(
     check(send, latest);
   } finally {
     vi.unstubAllGlobals();
-    vi.resetModules();
   }
 }
 

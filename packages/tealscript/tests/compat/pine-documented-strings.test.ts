@@ -206,12 +206,13 @@ const contracts: StringContract[] = [
     rejects: 'leading/trailing separator, repeat as extra copies, and zero as one',
   },
   {
-    name: 'repeat preserves na source rather than stringifying it',
+    name: 'repeat preserves the native empty missing-string representation',
     entry: 322,
     member: 'str.repeat',
-    expressions: ['str.tostring(str.repeat(missing, 3))'],
-    expected: ['NaN'],
-    rejects: 'repeating literal NaN and returning empty',
+    expressions: ['str.tostring(str.repeat(missing, 3))', 'na(str.repeat(missing, 3)) ? "missing" : "present"'],
+    expected: ['', 'missing'],
+    rejects: 'stringifying missing as NaN or treating the empty result as present',
+    manual: 'V56 v5/v6 declared-missing equality=empty and length=0; empty NA flag=1.',
   },
   {
     name: 'tonumber parses decimal digits with an initial sign',

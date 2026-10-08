@@ -5,7 +5,7 @@ import { getPlot, runCompatScript } from './fixtures';
 
 // Previously registered defects fixed by verified integration commits are ordinary
 // tests. Preserve the assertions and the bounded authority of each witness.
-// Authority for each entry: ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json
+// Authority for each entry: https://www.tradingview.com/pine-script-reference/v6/
 // SHA256 eba108f8975d3fcd3e66f7b69c81979bb671c887607a7914aa4c7495e805fb1d.
 function values(body: string, closes: Array<number | null>, volumes?: number[], ranges?: Array<[number, number]>) {
   const bars: Bar[] = closes.map((close, index) => ({

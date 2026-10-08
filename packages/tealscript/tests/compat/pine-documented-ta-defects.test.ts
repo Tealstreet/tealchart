@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import type { Bar } from '../../src/runtime';
 import { runCompatScript } from './fixtures';
 
-// Authority for every case: ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json.
+// Authority for every case: https://www.tradingview.com/pine-script-reference/v6/.
 // Inverse proof (2026-10-03): all 12 ordinary tests failed in an unmodified
 // isolated copy, then all 12 passed after reference-derived implementation
 // patches with these literal expectations unchanged. Discarded the copy.

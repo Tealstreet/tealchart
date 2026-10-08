@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { compatibilityBars, getPlot, runCompatScript } from './fixtures';
 
-const reference = '~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json';
+const reference = 'https://www.tradingview.com/pine-script-reference/v6/';
 
 describe(`Ledger gap560: ${reference} functions[462] remarks[0]`, () => {
   it('indexes the first and second array.new_line handles at zero and one', () => {

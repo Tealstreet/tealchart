@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest';
 import { parse } from '../../src/parser';
 import { executeCompiled, tryCompile } from '../../src/runtime/codegen/execute';
 
-// Reference: ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json /entries/652.
+// Reference: https://www.tradingview.com/pine-script-reference/v6/ /entries/652.
 // Constructor lookup counts are an engine performance gate; EMA values follow the documented recurrence.
 const bars = Array.from({ length: 3 }, (_, index) => ({
   time: index * 120_000,

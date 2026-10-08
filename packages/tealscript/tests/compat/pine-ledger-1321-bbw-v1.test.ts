@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { compatibilityBars, getPlot, runCompatScript } from './fixtures';
 
-// Authority: ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json, functions281.
+// Authority: https://www.tradingview.com/pine-script-reference/v6/, functions281.
 describe('ledger1347–1348 BBW missing-value contracts', () => {
   // Rank1347: calculation uses length non-NA samples; no disputed scale constant is asserted.
   it('ignores missing source slots when collecting and retaining three samples', () => {

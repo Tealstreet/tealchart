@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { currencyRateRequestKey, InMemoryRequestDatafeed } from '../../src/runtime';
 import { compatibilityBars, getPlot, runCompatScript } from './fixtures';
 
-// Rank1610: ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json functions[227].
+// Rank1610: https://www.tradingview.com/pine-script-reference/v6/ functions[227].
 // Nested evaluation: https://www.tradingview.com/pine-script-docs/concepts/other-timeframes-and-data/#nested-requests
 const source = '//@version=6\nindicator("nested currency", dynamic_requests=true)\nplot(request.currency_rate("USD", "GBP"), "direct")\nplot(request.security("NASDAQ:AAPL", "1", request.currency_rate("USD", "GBP")), "nested")';
 

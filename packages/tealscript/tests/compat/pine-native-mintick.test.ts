@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { compatibilityBars, getPlot, runCompatScript } from './fixtures';
 
-// Authority: ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json, fun_str.tostring.
+// Authority: https://www.tradingview.com/pine-script-reference/v6/, fun_str.tostring.
 // Native CF029: oracle-probes/v2/captures/v2/conflicts-batch-1-v1.csv (bar0) and evidence/conflicts-batch-1-v1-attempt1-logs.txt.
 describe('native CF029: mintick trailing zeros', () => {
   it('formats one as 1.00 at the captured host mintick0.01', () => {

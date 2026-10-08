@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { parse } from '../../src/parser';
 import { checkProgram } from '../../src/semantic';
 
-// Authority for each parameter: ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json.
+// Authority for each parameter: https://www.tradingview.com/pine-script-reference/v6/.
 function errors(body: string) {
   return checkProgram(parse(`//@version=6\nindicator("Integer TA slots")\n${body}`)).diagnostics.filter((d) => d.severity === 'error');
 }

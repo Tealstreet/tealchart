@@ -18,7 +18,7 @@ ${body}`), bars, undefined, options);
 }
 
 describe('Pine control flow reference contracts', () => {
-  // ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json entries[3].
+  // https://www.tradingview.com/pine-script-reference/v6/ entries[3].
   // Rank1823: an unselected numeric branch returns na.
   it('returns na on each unselected numeric if branch', () => {
     expect(values(`value = if bar_index % 2 == 0
@@ -26,7 +26,7 @@ describe('Pine control flow reference contracts', () => {
 plot(value)`)).toEqual([[17, null, 37, null]]);
   });
 
-  // ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json entries[4].
+  // https://www.tradingview.com/pine-script-reference/v6/ entries[4].
   // Rank1824: the selected block returns its final statement, including nested structures.
   it('returns the selected switch block nested if and for tails', () => {
     expect(values(`value = switch bar_index

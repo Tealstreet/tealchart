@@ -5,7 +5,7 @@ import { checkProgram } from '../../src/semantic';
 import { getPlot, runCompatScript } from './fixtures';
 
 // Authority for every case:
-// ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json.
+// https://www.tradingview.com/pine-script-reference/v6/.
 // Expected-red cases are retained only after an isolated documented patch makes
 
 // the ordinary assertion green; inverse proof details accompany each case.

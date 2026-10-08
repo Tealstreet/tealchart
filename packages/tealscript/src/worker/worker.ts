@@ -16,6 +16,8 @@ import {
 } from '../runtime/backendSelection';
 import { collectCompiledRequestDataQueryCollection, executeCompiledScript } from '../runtime/codegen';
 import type { CompiledExecutionOptions, CompiledRequestDataQuery } from '../runtime/codegen';
+import { prepareCompiledScript } from '../runtime/codegen/execute';
+import type { SemanticTypeAnalysis } from '../runtime/codegen/analyzer';
 import { checkProgram } from '../semantic';
 import type { Program } from '../parser/ast';
 import type { Bar, InputDefinition } from '../runtime/context';
@@ -46,6 +48,7 @@ import type {
 interface ScriptState {
   scriptId: string;
   ast: Program;
+  semanticTypes?: SemanticTypeAnalysis;
   bars: Bar[];
   inputs: Record<string, unknown>;
   runtime?: TealscriptRuntimeOptions;
@@ -76,7 +79,7 @@ interface ScriptState {
 
 // Current script state
 let state: ScriptState | null = null;
-let validatedProgram: { script: string; options: string; ast: Program } | undefined;
+let validatedProgram: { script: string; options: string; ast: Program; semanticTypes: SemanticTypeAnalysis } | undefined;
 let nextRequestDataId = 0;
 const pendingRequestData = new Map<number, { generation: number; cacheKey: string; query: WorkerRequestDataCacheQuery }>();
 const MAX_RUNTIME_REQUEST_DISCOVERY_FETCH_ROUNDS = 3;
@@ -150,9 +153,16 @@ function handleInit(
       ? previousProgram.ast
       : undefined;
     const ast = cachedAst ?? parse(script);
-    const semanticErrors = cachedAst ? [] : checkProgram(ast, {
-      ...semanticOptionsFromLibraries(libraries), requireDeclaration: true,
-    }).diagnostics.filter((diagnostic) => diagnostic.severity === 'error');
+    const recordedExpressionTypes: SemanticTypeAnalysis['recordedExpressionTypes'] = new WeakMap();
+    const loopResultTypes: SemanticTypeAnalysis['loopResultTypes'] = new WeakMap();
+    const semanticTypes = cachedAst ? previousProgram!.semanticTypes : {
+      ast, libraries, recordedExpressionTypes, loopResultTypes,
+      result: checkProgram(ast, {
+        ...semanticOptionsFromLibraries(libraries), requireDeclaration: true,
+        expressionTypes: recordedExpressionTypes, loopResultTypes,
+      }),
+    };
+    const semanticErrors = cachedAst ? [] : semanticTypes.result.diagnostics.filter((diagnostic) => diagnostic.severity === 'error');
     if (semanticErrors[0]) {
       postResult(createSemanticErrorMessage(
         scriptId,
@@ -163,12 +173,13 @@ function handleInit(
       return;
     }
 
-    validatedProgram = { script, options: validationOptions, ast };
+    validatedProgram = { script, options: validationOptions, ast, semanticTypes };
 
     // Store state
     state = {
       scriptId,
       ast,
+      semanticTypes,
       bars,
       inputs,
       runtime,
@@ -349,7 +360,7 @@ function executeAndSendResults(metadata?: WorkerOutputMetadata): void {
     const preloadCollection = collectCompiledRequestDataQueryCollection(state.ast, inputsMap, {
       runtime: state.runtime,
       libraries: state.libraries,
-    });
+    }, prepareCompiledScript(state.ast, { libraries: state.libraries }, state.semanticTypes));
     const preloadQueries = preloadCollection.queries;
     const generation = metadata?.generation ?? 0;
     const missingQueries = preloadQueries.filter(({ kind, query }) => !state?.requestCache.has(workerRequestDataCacheKey(kind, query)));

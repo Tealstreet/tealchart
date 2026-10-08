@@ -4,8 +4,7 @@ import { describe, expect, it } from 'vitest';
 
 import { ExecutionContext } from '../../src/runtime/context';
 
-// Evidence: ~/cs/docs/tealscript-parity-archive/performance-udf-invocation-27-v1/.
-// Reference: ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json.
+// Reference: https://www.tradingview.com/pine-script-reference/v6/.
 // entries[409..411] alert.freq_* and entries[1016] alert.freq; timing is an engine budget.
 function recordAlerts(frequency: AlertFrequency): number {
   const context = new ExecutionContext();

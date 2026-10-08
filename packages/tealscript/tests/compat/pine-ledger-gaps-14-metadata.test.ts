@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { compatibilityBars, getPlot, runCompatScript } from './fixtures';
 
-const reference = '~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json';
+const reference = 'https://www.tradingview.com/pine-script-reference/v6/';
 
 describe(`Ledger gap542: ${reference} variables[127]`, () => {
   it('identifies dataset index zero on new and updated realtime bars', () => {

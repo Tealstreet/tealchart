@@ -1,5 +1,7 @@
+import { decomposeSingularValues } from './singular-value-decomposition';
 import {
   avgArrayValue,
+  compareStrings,
   createPineArray,
   getArraySize,
   getArrayValue,
@@ -133,6 +135,7 @@ export function isSymmetricMatrix(matrix: PineMatrix): boolean {
 
 export function isAntisymmetricMatrix(matrix: PineMatrix): boolean {
   if (!isSquareMatrix(matrix)) return false;
+  if (matrix.rows === 1 && Number.isNaN(getMatrixValue(matrix, 0, 0))) return true;
   for (let row = 0; row < matrix.rows; row++) {
     for (let column = 0; column < matrix.columns; column++) {
       if (!approxEqual(Number(getMatrixValue(matrix, row, column)), -Number(getMatrixValue(matrix, column, row)))) {
@@ -247,6 +250,9 @@ export function fillMatrix<T = unknown>(
 ): void {
   const rowRange = normalizeRange(fromRow, toRow, matrix.rows, 'row');
   const columnRange = normalizeRange(fromColumn, toColumn, matrix.columns, 'column');
+  if (rowRange.from === rowRange.to || columnRange.from === columnRange.to) {
+    throw new Error('Matrix fill range must have from_row/column less than to_row/column');
+  }
   for (let row = rowRange.from; row < rowRange.to; row++) {
     for (let column = columnRange.from; column < columnRange.to; column++) {
       setMatrixValue(matrix, row, column, value);
@@ -522,48 +528,43 @@ export function invMatrixValue(matrix: PineMatrix): PineMatrix<number> {
 }
 
 export function pinvMatrixValue(matrix: PineMatrix): PineMatrix<number> {
-  if (matrix.rows === 0 || matrix.columns === 0) {
-    return createPineMatrix<number>(matrix.columns, matrix.rows, 0);
+  const result = createPineMatrix<number>(matrix.columns, matrix.rows, 0);
+  if (matrix.rows === 0 || matrix.columns === 0) return result;
+
+  const rows = numericRows(matrix);
+  if (!rows.every((row) => row.every(Number.isFinite))) {
+    result.values.fill(Number.NaN);
+    return result;
   }
-
-  const columns = matrixColumns(matrix);
-  const finiteInputs = columns.every((column) => column.every(Number.isFinite));
-  const cutoff = pinvCutoff(columns, finiteInputs);
-  let inverse = initialPseudoinverse(columns[0], cutoff);
-  let fullColumnRank = Math.sqrt(dotVector(columns[0], columns[0])) > cutoff;
-  const basisColumns = [columns[0]];
-
-  for (let columnIndex = 1; columnIndex < columns.length; columnIndex++) {
-    const column = columns[columnIndex];
-    const projection = multiplyMatrixByVector(inverse, column);
-    const residual = subtractVectors(column, multiplyColumnsByVector(basisColumns, projection));
-    const residualNormSquared = dotVector(residual, residual);
-    fullColumnRank &&= Math.sqrt(residualNormSquared) > cutoff;
-    const correction = Math.sqrt(residualNormSquared) > cutoff
-      ? residual.map((value) => value / residualNormSquared)
-      : multiplyTransposeMatrixByVector(inverse, projection).map((value) => value / (1 + dotVector(projection, projection)));
-
-    inverse = [
-      ...inverse.map((row, rowIndex) => subtractVectors(row, correction.map((value) => projection[rowIndex] * value))),
-      correction,
-    ];
-    basisColumns.push(column);
-  }
-
-  const grevilleValues = inverse.flat();
-  if (matrix.rows === matrix.columns && fullColumnRank && finiteInputs) {
-    const decomposition = decomposeLu(numericRows(matrix));
-    if (decomposition) {
-      const result = inverseFromLu(matrix.rows, decomposition);
-      result.values.forEach((value, index) => {
-        if (value === 0 && grevilleValues[index] === 0) result.values[index] = grevilleValues[index];
-      });
-      return result;
+  const transposed = matrix.rows < matrix.columns;
+  const input = transposed
+    ? Array.from({ length: matrix.columns }, (_, column) => rows.map((row) => row[column]))
+    : rows;
+  const decomposition = decomposeSingularValues(input);
+  if (decomposition.scale === 0) return result;
+  const largest = Math.max(...decomposition.singularValues);
+  const cutoff = Math.max(matrix.rows, matrix.columns) * Number.EPSILON * largest;
+  const fullRank = decomposition.singularValues.every((value) => value > cutoff);
+  if (matrix.rows === matrix.columns && fullRank) {
+    const lu = decomposeLu(rows);
+    if (lu) {
+      const inverse = inverseFromLu(matrix.rows, lu);
+      inverse.values = inverse.values.map((value) => (value === 0 ? 0 : value));
+      return inverse;
     }
   }
-
-  const result = createPineMatrix<number>(matrix.columns, matrix.rows, 0);
-  result.values = grevilleValues;
+  for (let k = 0; k < decomposition.singularValues.length; k++) {
+    const singular = decomposition.singularValues[k];
+    if (singular <= cutoff) continue;
+    const right = decomposition.rightVectors[k];
+    const left = decomposition.columns[k];
+    for (let row = 0; row < right.length; row++) {
+      for (let column = 0; column < left.length; column++) {
+        const index = transposed ? column * matrix.rows + row : row * matrix.rows + column;
+        result.values[index] += ((right[row] / singular) * (left[column] / singular)) / decomposition.scale;
+      }
+    }
+  }
   return result;
 }
 
@@ -576,10 +577,11 @@ export function eigenvaluesMatrixValue(matrix: PineMatrix): PineArray<number> {
 
 export function eigenvectorsMatrixValue(matrix: PineMatrix): PineMatrix<number> {
   assertSquareMatrix(matrix, 'Matrix eigenvectors');
-  if (matrix.rows > 2) {
+  if (matrix.rows >= 2) {
     const rows = numericRows(matrix);
     if (isFiniteSymmetricRows(rows)) {
       const decomposition = symmetricQlDecomposition(rows);
+      if (matrix.rows === 2) decomposition.vectors.forEach((row) => row.reverse());
       const result = createPineMatrix<number>(matrix.rows, matrix.columns, 0);
       // Preserve the existing first-nonzero-positive convention without
       // reconstructing repeated-root vectors from the same nullspace column.
@@ -593,17 +595,22 @@ export function eigenvectorsMatrixValue(matrix: PineMatrix): PineMatrix<number> 
       return result;
     }
   }
-  const eigenvalues = computeEigenvaluesOrNa(matrix);
   const result = createPineMatrix<number>(matrix.rows, matrix.columns, 0);
-
-  eigenvalues.forEach((eigenvalue, column) => {
-    if (Number.isNaN(eigenvalue)) {
-      for (let row = 0; row < matrix.rows; row++) {
-        setMatrixValue(result, row, column, Number.NaN);
-      }
-      return;
-    }
-    const vector = eigenvectorForValue(matrix, eigenvalue, column);
+  if (matrix.rows < 2) {
+    if (matrix.rows === 1) result.values[0] = 1;
+    return result;
+  }
+  const eigenvalues = computeEigenvaluesOrNa(matrix);
+  if (eigenvalues.some(Number.isNaN)) {
+    result.values.fill(Number.NaN);
+    return result;
+  }
+  const decomposition = nonsymmetricQlDecomposition(numericRows(matrix));
+  const columns = Array.from({ length: matrix.rows }, (_, index) => matrix.rows - 1 - index);
+  if (matrix.rows === 2)
+    columns.sort((left, right) => decomposition.schur[right][right] - decomposition.schur[left][left]);
+  columns.forEach((index, column) => {
+    const vector = schurEigenvector(decomposition.schur, decomposition.vectors, index);
     vector.forEach((value, row) => setMatrixValue(result, row, column, value));
   });
 
@@ -644,8 +651,9 @@ export function sortMatrixRows(matrix: PineMatrix, column: number = 0, order: un
       comparableMatrixSortValue(left[columnIndex], sortField, shouldSortByField),
       comparableMatrixSortValue(right[columnIndex], sortField, shouldSortByField),
     );
-    return descending ? -result : result;
+    return result;
   });
+  if (descending) rows.reverse();
   matrix.values = rows.flat();
 }
 
@@ -927,31 +935,109 @@ function symmetricQlDecomposition(V: number[][]): { values: number[]; vectors: n
 function computeEigenvalues(matrix: PineMatrix, publishComplexRealParts = false): number[] {
   if (matrix.rows === 0) return [];
   if (matrix.rows === 1) return [Number(getMatrixValue(matrix, 0, 0))];
-  if (matrix.rows === 2) return computeTwoByTwoEigenvalues(matrix);
-
-  let rows = numericRows(matrix);
+  const rows = numericRows(matrix);
   if (isFiniteSymmetricRows(rows)) return symmetricQlDecomposition(rows).values.reverse();
-  let nextRows = createNumericSquare(matrix.rows);
-  const workspace = createQrWorkspace(matrix.rows);
-  const iterations = 128;
-  for (let iteration = 0; iteration < iterations; iteration++) {
-    const { q, r } = qrDecomposition(rows, workspace);
-    multiplyNumericMatrices(r, q, nextRows);
-    const previousRows = rows;
-    rows = nextRows;
-    nextRows = previousRows;
-    if (offDiagonalNorm(rows) <= MATRIX_EPSILON) break;
-  }
-
-  if (offDiagonalNorm(rows) > MATRIX_EPSILON) {
-    if (publishComplexRealParts) {
-      const realParts = complexSchurRealParts(rows);
-      if (realParts) return realParts;
+  const decomposition = nonsymmetricQlDecomposition(rows);
+  if (decomposition.complex) {
+    if (publishComplexRealParts && matrix.rows > 2) {
+      const realParts = complexSchurRealParts(decomposition.schur);
+      if (realParts) return realParts.reverse();
     }
-    throw new Error('Matrix eigenvalues are complex or QR iteration did not converge to real diagonal values');
+    throw new Error('Matrix eigenvalues are complex and cannot be represented as real values');
   }
+  const values = decomposition.schur.map((row, index) => cleanMatrixNumber(row[index])).reverse();
+  return matrix.rows === 2 ? values.sort((left, right) => right - left) : values;
+}
 
-  return rows.map((row, index) => cleanMatrixNumber(row[index]));
+// Reversing the basis converts implicit upper-Hessenberg bulge chasing into
+// implicit QL: J(QR)J = (JQJ)(JRJ), with the triangular factor lower.
+function nonsymmetricQlDecomposition(rows: number[][]): { schur: number[][]; vectors: number[][]; complex: boolean } {
+  const size = rows.length;
+  const schur = rows.map((row) => row.slice().reverse()).reverse();
+  const vectors = createNumericSquare(size);
+  for (let i = 0; i < size; i++) vectors[i][i] = 1;
+  if (rows.some((row) => row.some((value) => !Number.isFinite(value)))) {
+    throw new Error('Matrix eigenvalues are complex or implicit QL did not converge to real diagonal values');
+  }
+  for (let column = 0; column < size - 2; column++) {
+    const reflector = schur.slice(column + 1).map((row) => row[column]);
+    const scale = Math.max(...reflector.map(Math.abs));
+    if (scale === 0) continue;
+    for (let i = 0; i < reflector.length; i++) reflector[i] /= scale;
+    reflector[0] += (reflector[0] < 0 ? -1 : 1) * Math.hypot(...reflector);
+    const norm = Math.hypot(...reflector);
+    for (let i = 0; i < reflector.length; i++) reflector[i] /= norm;
+    for (let j = column; j < size; j++) {
+      let projection = 0;
+      for (let i = 0; i < reflector.length; i++) projection += reflector[i] * schur[column + 1 + i][j];
+      for (let i = 0; i < reflector.length; i++) schur[column + 1 + i][j] -= 2 * reflector[i] * projection;
+    }
+    for (const target of [schur, vectors]) {
+      for (let i = 0; i < size; i++) {
+        let projection = 0;
+        for (let j = 0; j < reflector.length; j++) projection += target[i][column + 1 + j] * reflector[j];
+        for (let j = 0; j < reflector.length; j++) target[i][column + 1 + j] -= 2 * projection * reflector[j];
+      }
+    }
+    for (let i = column + 2; i < size; i++) schur[i][column] = 0;
+  }
+  let end = size - 1;
+  let complex = false;
+  let iterations = 0;
+  while (end > 0) {
+    for (let i = 1; i <= end; i++) {
+      const tolerance = Number.EPSILON * (Math.abs(schur[i - 1][i - 1]) + Math.abs(schur[i][i]));
+      if (Math.abs(schur[i][i - 1]) <= tolerance) schur[i][i - 1] = 0;
+    }
+    if (schur[end][end - 1] === 0) {
+      end--;
+      iterations = 0;
+      continue;
+    }
+    let start = end - 1;
+    while (start > 0 && schur[start][start - 1] !== 0) start--;
+    const a = schur[end - 1][end - 1];
+    const b = schur[end - 1][end];
+    const c = schur[end][end - 1];
+    const d = schur[end][end];
+    const halfDifference = (a - d) / 2;
+    const discriminant = halfDifference * halfDifference + b * c;
+    if (start === end - 1 && discriminant < 0) {
+      complex = true;
+      end -= 2;
+      iterations = 0;
+      continue;
+    }
+    if (++iterations > 128)
+      throw new Error('Matrix eigenvalues are complex or implicit QL did not converge to real diagonal values');
+    const shift = discriminant >= 0 ? d + halfDifference - (halfDifference < 0 ? -1 : 1) * Math.sqrt(discriminant) : d;
+    for (let i = start; i <= end; i++) schur[i][i] -= shift;
+    for (let k = start; k < end; k++) {
+      const x = k === start ? schur[k][k] : schur[k][k - 1];
+      const y = k === start ? schur[k + 1][k] : schur[k + 1][k - 1];
+      const norm = Math.hypot(x, y);
+      if (norm === 0) continue;
+      const cosine = x / norm;
+      const sine = y / norm;
+      for (let j = Math.max(0, k - 1); j < size; j++) {
+        const upper = schur[k][j];
+        const lower = schur[k + 1][j];
+        schur[k][j] = cosine * upper + sine * lower;
+        schur[k + 1][j] = -sine * upper + cosine * lower;
+      }
+      for (const target of [schur, vectors]) {
+        for (let i = 0; i < size; i++) {
+          const left = target[i][k];
+          const right = target[i][k + 1];
+          target[i][k] = cosine * left + sine * right;
+          target[i][k + 1] = -sine * left + cosine * right;
+        }
+      }
+      if (k > start) schur[k + 1][k - 1] = 0;
+    }
+    for (let i = start; i <= end; i++) schur[i][i] += shift;
+  }
+  return { schur, vectors, complex };
 }
 
 function complexSchurRealParts(rows: number[][]): number[] | undefined {
@@ -994,88 +1080,20 @@ function computeEigenvaluesOrNa(matrix: PineMatrix, publishComplexRealParts = fa
   }
 }
 
-function computeTwoByTwoEigenvalues(matrix: PineMatrix): number[] {
-  const a = Number(getMatrixValue(matrix, 0, 0));
-  const b = Number(getMatrixValue(matrix, 0, 1));
-  const c = Number(getMatrixValue(matrix, 1, 0));
-  const d = Number(getMatrixValue(matrix, 1, 1));
-  if (Number.isFinite(a) && Number.isFinite(b) && Number.isFinite(c) && Number.isFinite(d) && (b === 0 || c === 0)) {
-    return a >= d ? [a, d] : [d, a];
-  }
-  const trace = a + d;
-  const determinant = a * d - b * c;
-  const discriminant = trace * trace - 4 * determinant;
-  if (discriminant < -MATRIX_EPSILON) {
-    throw new Error('Matrix eigenvalues are complex and cannot be represented as real values');
-  }
-  const root = Math.sqrt(Math.max(0, discriminant));
-  return [(trace + root) / 2, (trace - root) / 2];
-}
-
-function eigenvectorForValue(matrix: PineMatrix, eigenvalue: number, preferredFreeColumn: number): number[] {
-  const rows = numericRows(matrix).map((row, rowIndex) => {
-    return row.map((value, columnIndex) => value - (rowIndex === columnIndex ? eigenvalue : 0));
-  });
-  const { reduced, pivotColumns } = reducedRowEchelon(rows);
-  const freeColumn = chooseFreeColumn(matrix.columns, pivotColumns, preferredFreeColumn);
-  const vector = Array.from({ length: matrix.columns }, () => 0);
-  vector[freeColumn] = 1;
-
-  for (let row = pivotColumns.length - 1; row >= 0; row--) {
-    const pivotColumn = pivotColumns[row];
+function schurEigenvector(schur: number[][], basis: number[][], index: number): number[] {
+  const size = schur.length;
+  const root = schur[index][index];
+  const coordinates = Array<number>(size).fill(0);
+  coordinates[index] = 1;
+  for (let row = index - 1; row >= 0; row--) {
     let total = 0;
-    for (let column = pivotColumn + 1; column < matrix.columns; column++) {
-      total += reduced[row][column] * vector[column];
-    }
-    vector[pivotColumn] = -total;
+    for (let column = row + 1; column <= index; column++) total += schur[row][column] * coordinates[column];
+    const denominator = schur[row][row] - root;
+    if (denominator === 0 && total !== 0) return schurEigenvector(schur, basis, row);
+    coordinates[row] = denominator === 0 ? 0 : -total / denominator;
   }
-
+  const vector = basis.map((row) => dotVector(row, coordinates)).reverse();
   return normalizeEigenvector(vector);
-}
-
-function reducedRowEchelon(rows: number[][]): { reduced: number[][]; pivotColumns: number[] } {
-  const reduced = rows.map((row) => [...row]);
-  const pivotColumns: number[] = [];
-  let pivotRow = 0;
-
-  for (let column = 0; column < reduced[0].length && pivotRow < reduced.length; column++) {
-    let bestRow = pivotRow;
-    for (let row = pivotRow + 1; row < reduced.length; row++) {
-      if (Math.abs(reduced[row][column]) > Math.abs(reduced[bestRow][column])) {
-        bestRow = row;
-      }
-    }
-    if (Math.abs(reduced[bestRow][column]) <= MATRIX_EPSILON) continue;
-
-    [reduced[pivotRow], reduced[bestRow]] = [reduced[bestRow], reduced[pivotRow]];
-    const pivot = reduced[pivotRow][column];
-    for (let currentColumn = column; currentColumn < reduced[pivotRow].length; currentColumn++) {
-      reduced[pivotRow][currentColumn] /= pivot;
-    }
-
-    for (let row = 0; row < reduced.length; row++) {
-      if (row === pivotRow) continue;
-      const factor = reduced[row][column];
-      for (let currentColumn = column; currentColumn < reduced[row].length; currentColumn++) {
-        reduced[row][currentColumn] -= factor * reduced[pivotRow][currentColumn];
-      }
-    }
-
-    pivotColumns.push(column);
-    pivotRow += 1;
-  }
-
-  return { reduced, pivotColumns };
-}
-
-function chooseFreeColumn(size: number, pivotColumns: number[], preferredFreeColumn: number): number {
-  const pivots = new Set(pivotColumns);
-  const preferred = preferredFreeColumn % size;
-  if (!pivots.has(preferred)) return preferred;
-  for (let column = size - 1; column >= 0; column--) {
-    if (!pivots.has(column)) return column;
-  }
-  throw new Error('Failed to compute eigenvector basis: no free variable found for eigenvalue');
 }
 
 function normalizeEigenvector(vector: number[]): number[] {
@@ -1088,66 +1106,8 @@ function normalizeEigenvector(vector: number[]): number[] {
   return normalized;
 }
 
-interface QrWorkspace {
-  q: number[][];
-  r: number[][];
-  qColumns: number[][];
-  vector: number[];
-}
-
 function createNumericSquare(size: number): number[][] {
   return Array.from({ length: size }, () => Array.from({ length: size }, () => 0));
-}
-
-function createQrWorkspace(size: number): QrWorkspace {
-  return {
-    q: createNumericSquare(size),
-    r: createNumericSquare(size),
-    qColumns: createNumericSquare(size),
-    vector: Array.from({ length: size }, () => 0),
-  };
-}
-
-function qrDecomposition(matrix: number[][], workspace: QrWorkspace): QrWorkspace {
-  const size = matrix.length;
-  const { qColumns, q, r, vector } = workspace;
-
-  for (let column = 0; column < size; column++) {
-    for (let row = 0; row < size; row++) vector[row] = matrix[row][column];
-    for (let basis = 0; basis < column; basis++) {
-      const basisVector = qColumns[basis];
-      const projection = dotVector(basisVector, vector);
-      r[basis][column] = projection;
-      // Keep the multiply then subtract order of the former temporary vectors.
-      for (let row = 0; row < size; row++) vector[row] = vector[row] - projection * basisVector[row];
-    }
-
-    const norm = Math.sqrt(dotVector(vector, vector));
-    r[column][column] = norm;
-    const normalized = qColumns[column];
-    for (let row = 0; row < size; row++) {
-      normalized[row] = norm <= MATRIX_EPSILON ? (row === column ? 1 : 0) : vector[row] / norm;
-      q[row][column] = normalized[row];
-    }
-  }
-
-  return workspace;
-}
-
-function multiplyNumericMatrices(left: number[][], right: number[][], result: number[][]): void {
-  for (let row = 0; row < left.length; row++) {
-    for (let column = 0; column < right[0].length; column++) {
-      let total = 0;
-      for (let inner = 0; inner < left[row].length; inner++) total += left[row][inner] * right[inner][column];
-      result[row][column] = total;
-    }
-  }
-}
-
-function offDiagonalNorm(matrix: number[][]): number {
-  return matrix.reduce((total, row, rowIndex) => {
-    return total + row.reduce((rowTotal, value, columnIndex) => rowTotal + (rowIndex === columnIndex ? 0 : Math.abs(value)), 0);
-  }, 0);
 }
 
 function unitVector(size: number, index: number): number[] {
@@ -1156,61 +1116,6 @@ function unitVector(size: number, index: number): number[] {
 
 function cleanMatrixNumber(value: number): number {
   return Math.abs(value) <= MATRIX_EPSILON ? 0 : value;
-}
-
-function matrixColumns(matrix: PineMatrix): number[][] {
-  return Array.from({ length: matrix.columns }, (_columnValue, column) => {
-    return Array.from({ length: matrix.rows }, (_rowValue, row) => Number(getMatrixValue(matrix, row, column)));
-  });
-}
-
-function pinvCutoff(columns: number[][], finiteInputs: boolean): number {
-  if (!finiteInputs) return MATRIX_EPSILON;
-  let scale = 0;
-  for (const column of columns) {
-    for (const value of column) scale = Math.max(scale, Math.abs(value));
-  }
-  if (scale === 0) return 0;
-  const rows = columns[0].length;
-  const vectors = rows < columns.length
-    ? Array.from({ length: rows }, (_, row) => columns.map(column => column[row] / scale))
-    : columns.map(column => column.map(value => value / scale));
-  const gram = vectors.map(left => vectors.map(right => dotVector(left, right)));
-  const eigenvalues = symmetricQlDecomposition(gram).values;
-  let largest = 0;
-  for (const value of eigenvalues) largest = Math.max(largest, value);
-  const tolerance = Math.max(rows, columns.length) * Number.EPSILON * scale * Math.sqrt(largest);
-  return tolerance;
-}
-
-function initialPseudoinverse(column: number[], cutoff: number): number[][] {
-  const normSquared = dotVector(column, column);
-  if (Math.sqrt(normSquared) <= cutoff) {
-    return [Array.from({ length: column.length }, () => 0)];
-  }
-  return [column.map((value) => value / normSquared)];
-}
-
-function multiplyMatrixByVector(matrix: number[][], vector: number[]): number[] {
-  return matrix.map((row) => dotVector(row, vector));
-}
-
-function multiplyTransposeMatrixByVector(matrix: number[][], vector: number[]): number[] {
-  if (matrix.length === 0) return [];
-  return Array.from({ length: matrix[0].length }, (_value, column) => {
-    return matrix.reduce((total, row, rowIndex) => total + row[column] * vector[rowIndex], 0);
-  });
-}
-
-function multiplyColumnsByVector(columns: number[][], vector: number[]): number[] {
-  if (columns.length === 0) return [];
-  return Array.from({ length: columns[0].length }, (_value, row) => {
-    return columns.reduce((total, column, columnIndex) => total + column[row] * vector[columnIndex], 0);
-  });
-}
-
-function subtractVectors(left: number[], right: number[]): number[] {
-  return left.map((value, index) => value - right[index]);
 }
 
 function dotVector(left: number[], right: number[]): number {
@@ -1241,7 +1146,7 @@ function compareMatrixValues(left: unknown, right: unknown): number {
   if (typeof left === 'number' && typeof right === 'number') {
     return left - right;
   }
-  return String(left).localeCompare(String(right));
+  return compareStrings(String(left), String(right));
 }
 
 function comparableMatrixSortValue(value: unknown, sortField: unknown, byField: boolean): unknown {

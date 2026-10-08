@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { compatibilityBars, getPlot, runCompatScript } from './fixtures';
 
-// Reference: ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json, functions[546]/[554].
+// Reference: https://www.tradingview.com/pine-script-reference/v6/, functions[546]/[554].
 // Repeated calls check cell attributes; the production TS-loader benchmark proves the timing change.
 describe('table cell argument binding performance', () => {
   it('preserves mixed cell arguments across repeated updates', () => {

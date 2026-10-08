@@ -36,7 +36,7 @@ plot(regular, "regular")`,
   ],
 ] as const;
 
-// ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json
+// https://www.tradingview.com/pine-script-reference/v6/
 // entries[9].detailedDesc[2]: varip references retain ordinary-field rollback.
 describe('varip UDT reference rollback', () => {
   it.each(scripts)(

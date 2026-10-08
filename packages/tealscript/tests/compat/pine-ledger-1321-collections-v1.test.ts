@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { compatibilityBars, getPlot, runCompatScript } from './fixtures';
 
-// Authority: ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json.
+// Authority: https://www.tradingview.com/pine-script-reference/v6/.
 describe('ledger1321–1360 collection remarks', () => {
   // Ranks1326/1327/1330/1331; functions599/600 and methods180/181: mode excludes NA elements.
   it.each(['int', 'float'].flatMap((kind) => ['namespace', 'method'].map((binding) => ({ kind, binding }))))('matrix<$kind> $binding mode excludes a majority of missing elements', ({ kind, binding }) => {

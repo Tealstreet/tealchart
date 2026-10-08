@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { compatibilityBars, getPlot, runCompatScript } from './fixtures';
 
-// Reference: ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json,
+// Reference: https://www.tradingview.com/pine-script-reference/v6/,
 // functions[10]/[13]/[17]/[21]/[25]/[29]/[445]. The CPU budget is an engine performance gate.
 describe('color conversion performance', () => {
   it('preserves RGB channels and label colors within the conversion CPU budget', () => {

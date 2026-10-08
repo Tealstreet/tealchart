@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { getPlot, runCompatScript } from './fixtures';
 
-// Authority: ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json variables[23].
+// Authority: https://www.tradingview.com/pine-script-reference/v6/ variables[23].
 // Ranks1615/1618: the pointwise example uses OHLCV; no cumulative missing-state rule is inferred.
 const base = { time: 1700000000000, open: 10, high: 14, low: 6, close: 12, volume: 200 };
 const source = '//@version=6\nindicator("Williams variable accumulation distribution")\nplot(ta.wvad, "value")';

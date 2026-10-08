@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { compatibilityBars, getPlot, runCompatScript } from './fixtures';
 
-const reference = '~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json';
+const reference = 'https://www.tradingview.com/pine-script-reference/v6/';
 const typeSystem = 'https://www.tradingview.com/pine-script-docs/language/type-system/#bool';
 
 describe(`TYPE-BOOL-MISSING-HISTORY: ${reference} type/bool, operator/[]; ${typeSystem}`, () => {

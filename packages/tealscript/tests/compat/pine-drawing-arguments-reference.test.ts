@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { parse } from '../../src/parser';
+import { createSemanticFixture } from '../helpers/semanticFixture';
 import { checkProgram } from '../../src/semantic';
 import { compatibilityBars, getPlot, runCompatScript } from './fixtures';
 
@@ -333,13 +333,10 @@ function parameters(contract: string) {
     });
 }
 
+const parseDrawingArguments = createSemanticFixture('//@version=6\nindicator("Drawing arguments")\n', setup);
+
 function errors(source: string) {
-  return checkProgram(
-    parse(`//@version=6
-indicator("Drawing arguments")
-${setup}
-${source}`),
-  ).diagnostics.filter((diagnostic) => diagnostic.severity === 'error');
+  return checkProgram(parseDrawingArguments(source)).diagnostics.filter((diagnostic) => diagnostic.severity === 'error');
 }
 
 function call(name: string, contract: string, method: boolean, replacement?: { name: string; value?: string }): string {

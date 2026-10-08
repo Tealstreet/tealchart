@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { getPlot, runCompatScript } from './fixtures';
 
-// Reference: ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json.
+// Reference: https://www.tradingview.com/pine-script-reference/v6/.
 // Each case cites its namespace or method entry; these are bounded runtime facets.
 const cases = [
   {

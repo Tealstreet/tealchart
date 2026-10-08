@@ -86,7 +86,7 @@ plot(right)`),
     ]);
   });
 
-  // ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json entries[30], reassignment example.
+  // https://www.tradingview.com/pine-script-reference/v6/ entries[30], reassignment example.
   it('1796 updates the existing outer variable from a nested scope', () => {
     expect(
       values(`int target = 1
@@ -98,7 +98,7 @@ plot(target)`),
     ).toEqual([[7, 7, 7, 7]]);
   });
 
-  // ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json entries[30], local-scope example.
+  // https://www.tradingview.com/pine-script-reference/v6/ entries[30], local-scope example.
   // Ranks1679/1798: https://www.tradingview.com/pine-script-docs/language/variable-declarations/#scopes
   it('1798 permits inner scopes to read earlier outer declarations', () => {
     expect(

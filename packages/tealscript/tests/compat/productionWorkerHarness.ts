@@ -1,4 +1,4 @@
-import { vi } from 'vitest';
+import { createWorkerTestModule } from '../helpers/workerTestModule';
 
 import {
   InMemoryRequestDatafeed,
@@ -31,6 +31,8 @@ import type {
   ToWorkerMessage,
 } from '../../src/worker/protocol';
 import { getResultOutput } from '../../src/worker/protocol';
+
+const workerModule = createWorkerTestModule();
 
 export interface ProductionWorkerCase {
   scriptId: string;
@@ -210,10 +212,8 @@ export async function measureProductionWorkerSessions(
       posted.push(message);
     },
   };
-  vi.resetModules();
-  vi.stubGlobal('self', workerGlobal);
 
-  await import('../../src/worker/worker');
+  await workerModule.attach(workerGlobal);
 
   const loadMeasurements: ProductionWorkerMeasurement[] = [];
   const updateMeasurements: ProductionWorkerLiveUpdateMeasurement[] = [];

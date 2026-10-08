@@ -42,3 +42,18 @@ describe('Pine value vectors', () => {
     ]);
   });
 });
+
+it('reuses official-member patterns without rebuilding module setup per source', async () => {
+  const { inferOfficialMembersForValueVector } = await import('../scripts/run-pine-value-vectors.ts');
+  const spy = vi.spyOn(globalThis, 'RegExp');
+  try {
+    const source = 'a = array.from(1, 2)\nplot(array.sum(a) + math.max(1, 2))\n// line.new(1, 2, 3, 4)';
+    const first = inferOfficialMembersForValueVector(source);
+    expect(inferOfficialMembersForValueVector(source)).toEqual(first);
+    expect(first).toEqual(expect.arrayContaining(['array.from', 'array.sum', 'math.max']));
+    expect(first).not.toContain('line.new');
+    expect(spy).not.toHaveBeenCalled();
+  } finally {
+    spy.mockRestore();
+  }
+});

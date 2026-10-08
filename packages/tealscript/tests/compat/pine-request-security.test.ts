@@ -302,7 +302,7 @@ plot(htfAverage, title="HTF Average")
     expect(getPlot(result, 'HTF Average').values).toEqual([null, null, 15, 15, 25, 25]);
   });
 
-  // Native admission: 642da77ee1, ledger/verify-division-recovery-bbi6nl-v1/REPORT-v1.md.
+  // Functional regression: preserve the argument and result contract.
   it('admits an integer-derived fractional SMA length in a request expression', () => {
     const result = runCompatScript(`
 indicator("HTF integer-derived length")

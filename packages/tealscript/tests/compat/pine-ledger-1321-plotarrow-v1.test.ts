@@ -3,7 +3,7 @@ import { expect, it, vi } from 'vitest';
 import type { Bar } from '../../src/runtime';
 import { getResultOutput, type FromWorkerMessage, type ToWorkerMessage } from '../../src/worker/protocol';
 
-// Rank1358; ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json, functions4.
+// Rank1358; https://www.tradingview.com/pine-script-reference/v6/, functions4.
 // https://www.tradingview.com/pine-script-docs/language/execution-model/#realtime-bars
 it('replaces same-bar plotarrow direction and absence while retaining earlier bars', async () => {
   vi.resetModules();

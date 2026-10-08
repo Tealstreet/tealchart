@@ -807,7 +807,7 @@ plot(histLine, title="Hist")
       35.612429,
       24.215938,
     ]);
-    // Authority: ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json fun_ta.sar; native lb679c7143bdd54e, coverage-ta-3-v1.csv bar0.
+    // Authority: https://www.tradingview.com/pine-script-reference/v6/ fun_ta.sar; native lb679c7143bdd54e, coverage-ta-3-v1.csv bar0.
     expect(roundSeries(getPlot(named, 'SAR').values)).toEqual([null, 99, 99, 99.36, 109, 109, 108.48, 96, 96.28, 96.8688, 97.776672, 99.074538]);
     expect(roundSeries(getPlot(named, 'Pivot High').values)).toEqual([
       null,

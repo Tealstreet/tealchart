@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { parse } from '../../src/parser';
 import { checkProgram } from '../../src/semantic/checker';
 
-// Authority: ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json.
+// Authority: https://www.tradingview.com/pine-script-reference/v6/.
 // Core rules use the type-system manual linked by the type/int,float,bool entries.
 // Ledger: type-qualifier-system-v1. No strategy/order semantics are involved.
 function check(body: string) {

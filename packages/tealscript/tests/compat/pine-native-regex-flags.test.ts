@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { compatibilityBars, getPlot, runCompatScript } from './fixtures';
 
-// Authority: ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json, fun_str.match.
+// Authority: https://www.tradingview.com/pine-script-reference/v6/, fun_str.match.
 // Native CF030: oracle-probes/v2/captures/v2/conflicts-batch-25-v1.csv, bar0.
 describe('native CF030: regex inline flags', () => {
   it('treats m as multiline anchors and s as dotall on the captured newline witness', () => {

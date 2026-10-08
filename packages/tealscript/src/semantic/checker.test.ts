@@ -1792,17 +1792,20 @@ plotarrow(close - open, format=format.bad, precision=3.5)
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
       'Invalid plot format: bad',
-      'plot precision must be a non-negative integer',
+      'plot precision must be an integer from 0 to 16',
       'Invalid plotbar format: format.bad',
-      'plotbar precision must be a non-negative integer',
+      'plotbar precision must be an integer from 0 to 16',
+      'plotbar precision must be an integer, got float',
       'Invalid plotcandle format: ticks',
-      'plotcandle precision must be a non-negative integer',
+      'plotcandle precision must be an integer from 0 to 16',
       'Invalid plotshape format: format.bad',
-      'plotshape precision must be a non-negative integer',
+      'plotshape precision must be an integer from 0 to 16',
+      'plotshape precision must be an integer, got float',
       'Invalid plotchar format: invalid',
-      'plotchar precision must be a non-negative integer',
+      'plotchar precision must be an integer from 0 to 16',
       'Invalid plotarrow format: format.bad',
-      'plotarrow precision must be a non-negative integer',
+      'plotarrow precision must be an integer from 0 to 16',
+      'plotarrow precision must be an integer, got float',
     ]);
   });
 
@@ -1839,6 +1842,7 @@ plotarrow(close - open, minheight=0, maxheight=1.5)
       'hline linewidth must be a positive integer',
       'plotarrow minheight must be a positive integer',
       'plotarrow maxheight must be a positive integer',
+      'plotarrow maxheight must be an integer, got float',
     ]);
   });
 
@@ -2272,38 +2276,38 @@ plotarrow(series="spread", offset=false, minheight="5", maxheight=false, show_la
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
       'plot linewidth must be a number, got string',
       'plot histbase must be a number, got string',
-      'plot offset must be a number, got string',
-      'plot show_last must be a number, got string',
-      'plot precision must be a number, got string',
+      'plot offset must be an integer, got string',
+      'plot show_last must be an integer, got string',
+      'plot precision must be an integer, got string',
       'hline price must be a number, got string',
       'hline linewidth must be a number, got string',
-      'fill show_last must be a number, got string',
-      'barcolor offset must be a number, got string',
-      'barcolor show_last must be a number, got bool',
-      'bgcolor offset must be a number, got bool',
-      'bgcolor show_last must be a number, got string',
+      'fill show_last must be an integer, got string',
+      'barcolor offset must be an integer, got string',
+      'barcolor show_last must be an integer, got bool',
+      'bgcolor offset must be an integer, got bool',
+      'bgcolor show_last must be an integer, got string',
       'plotbar open must be a number, got string',
       'plotbar high must be a number, got bool',
       'plotbar low must be a number, got string',
       'plotbar close must be a number, got bool',
-      'plotbar show_last must be a number, got string',
+      'plotbar show_last must be an integer, got string',
       'plotcandle open must be a number, got string',
       'plotcandle high must be a number, got bool',
       'plotcandle low must be a number, got string',
       'plotcandle close must be a number, got bool',
-      'plotcandle show_last must be a number, got string',
-      'plotshape offset must be a number, got string',
-      'plotshape show_last must be a number, got bool',
-      'plotshape precision must be a number, got string',
-      'plotchar offset must be a number, got bool',
-      'plotchar show_last must be a number, got string',
-      'plotchar precision must be a number, got string',
+      'plotcandle show_last must be an integer, got string',
+      'plotshape offset must be an integer, got string',
+      'plotshape show_last must be an integer, got bool',
+      'plotshape precision must be an integer, got string',
+      'plotchar offset must be an integer, got bool',
+      'plotchar show_last must be an integer, got string',
+      'plotchar precision must be an integer, got string',
       'plotarrow series must be a number, got string',
-      'plotarrow offset must be a number, got bool',
-      'plotarrow minheight must be a number, got string',
-      'plotarrow maxheight must be a number, got bool',
-      'plotarrow show_last must be a number, got string',
-      'plotarrow precision must be a number, got string',
+      'plotarrow offset must be an integer, got bool',
+      'plotarrow minheight must be an integer, got string',
+      'plotarrow maxheight must be an integer, got bool',
+      'plotarrow show_last must be an integer, got string',
+      'plotarrow precision must be an integer, got string',
     ]);
   });
 
@@ -5845,7 +5849,7 @@ float widened = namespaceValue
     ]);
   });
 
-  // Authority: ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json, type/const and type/int.
+  // https://www.tradingview.com/pine-script-docs/language/type-system/#const
   // Bare int annotations preserve literal const inference; qualifier-loss mutation failed this test, restored passed.
   it('validates matrix sort_field const int and string requirements', () => {
     const result = checkProgram(parse(`
@@ -5881,7 +5885,7 @@ values.sort(0, order.ascending, true)
     expect(result.symbols.find((symbol) => symbol.name === 'inferredConstField')?.type).toEqual({ kind: 'int', qualifier: 'const' });
   });
 
-  // Authority: ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json, type/const and type/int.
+  // https://www.tradingview.com/pine-script-docs/language/type-system/#const
   // Bare int annotations preserve literal const inference; qualifier-loss mutation failed this test, restored passed.
   it('validates array sort_field const int and string requirements', () => {
     const result = checkProgram(parse(`
@@ -7848,10 +7852,12 @@ barcolor(color.red, display=display.none)
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
       'Invalid plot display: display.sidebar',
+      'plot display must be a number, got string',
       'Invalid plot display: display.none',
       'Invalid plotbar display: display.sidebar',
       'Invalid plotcandle display: display.sidebar',
       'Invalid plotshape display: display.sidebar',
+      'hline display must be a number, got string',
       'Invalid hline display: hidden',
       'Invalid fill display: display.typo',
       'Invalid input.int display: display.panel',
@@ -7950,6 +7956,7 @@ plot(since + highestOffset + highestInt + defaultHighest + average + spread + (c
     const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'ta.valuewhen source must be int, float, bool or color, got string',
       'Cannot assign string value to int variable since',
       'Cannot assign int value to string variable lastText',
       'Cannot assign string value to float variable changedClose',
@@ -8362,7 +8369,7 @@ badIff = iff(1, close, open)
       'ta.alma sigma must be a number, got bool',
       'ta.alma floor must be a boolean, got int',
       'ta.kc series must be a number, got string',
-      'ta.kc length must be a number, got bool',
+      'ta.kc length must be an integer, got bool',
       'ta.kc mult must be a number, got string',
       'ta.kc useTrueRange must be a boolean, got string',
       'ta.macd source must be a number, got string',
@@ -8684,7 +8691,7 @@ plot(hasUsdt and starts ? 1 : 0)
     expect(types.get('matched')).toMatchObject({ kind: 'string', qualifier: 'series' });
     expect(types.get('repeated')).toMatchObject({ kind: 'string', qualifier: 'series' });
     expect(types.get('upper')).toMatchObject({ kind: 'string', qualifier: 'series' });
-    expect(types.get('parts')).toMatchObject({ kind: 'array', qualifier: 'const', elementType: { kind: 'string' } });
+    expect(types.get('parts')).toMatchObject({ kind: 'array', qualifier: 'series', elementType: { kind: 'string' } });
   });
 
   it('reports invalid string helper named arguments', () => {
@@ -8732,27 +8739,27 @@ badDuplicate = str.contains("BTC", 1, source="ETH")
       'str.tonumber string must be a string, got int',
       'str.format_time format must be a string, got int',
       'str.format_time timezone must be a string, got int',
-      'str.format_time time must be a number, got string',
+      'str.format_time time must be an integer, got string',
       'str.format format must be a string, got int',
       'str.format format must be a string, got int',
       'str.length source must be a string, got int',
       'str.contains source must be a string, got int',
       'str.contains str must be a string, got int',
       'str.substring source must be a string, got int',
-      'str.substring begin_pos must be a number, got string',
-      'str.substring end_pos must be a number, got string',
+      'str.substring begin_pos must be an integer, got string',
+      'str.substring end_pos must be an integer, got string',
       'str.match source must be a string, got int',
       'str.match regex must be a string, got int',
       'str.repeat source must be a string, got int',
       'str.repeat separator must be a string, got int',
-      'str.repeat repeat must be a number, got string',
+      'str.repeat repeat must be an integer, got string',
       'str.split source must be a string, got int',
       'str.split separator must be a string, got int',
       'str.upper source must be a string, got int',
       'str.replace source must be a string, got int',
       'str.replace target must be a string, got int',
       'str.replace replacement must be a string, got int',
-      'str.replace occurrence must be a number, got string',
+      'str.replace occurrence must be an integer, got string',
       'str.replace_all source must be a string, got int',
       'str.replace_all target must be a string, got int',
       'str.replace_all replacement must be a string, got int',
@@ -8905,12 +8912,12 @@ badDuplicate = math.round("1", number=2)
       'math.pow base must be a number, got string',
       'math.pow exponent must be a number, got bool',
       'math.round number must be a number, got string',
-      'math.round precision must be a number, got string',
+      'math.round precision must be an integer, got string',
       'math.sum source must be a number, got string',
-      'math.sum length must be a number, got string',
+      'math.sum length must be an integer, got string',
       'math.random min must be a number, got string',
       'math.random max must be a number, got bool',
-      'math.random seed must be a number, got string',
+      'math.random seed must be an integer, got string',
       'math.max number1 must be a number, got string',
       'math.max number2 must be a number, got bool',
       'math.avg number0 must be a number, got string',

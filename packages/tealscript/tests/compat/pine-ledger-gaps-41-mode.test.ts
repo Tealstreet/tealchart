@@ -4,7 +4,7 @@ import { parse } from '../../src/parser';
 import { checkProgram } from '../../src/semantic/checker';
 import { getPlot, runCompatScript } from './fixtures';
 
-// Rank1620: ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json functions[166]/[167].
+// Rank1620: https://www.tradingview.com/pine-script-reference/v6/ functions[166]/[167].
 const bars = [3, 1, 3, 2, 2].map((close, index) => ({
   time: 1700000000000 + index * 60000,
   open: close,

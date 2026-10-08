@@ -14,7 +14,7 @@ const bars = [11, 23, 37, 53].map((close, i) => ({
 }));
 const errors = (source: string) => checkProgram(parse(source)).diagnostics.filter((x) => x.severity === 'error');
 
-// ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json entry66 ta.accdist.
+// https://www.tradingview.com/pine-script-reference/v6/ entry66 ta.accdist.
 // V5 migration: /to-pine-version-5/#ta-namespace-for-technical-analysis-functions-and-variables.
 describe('worklist1463 accdist variable namespace boundary', () => {
   for (const version of [4, 5, 6]) {

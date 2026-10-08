@@ -2380,7 +2380,7 @@ export class Stoch implements Saveable {
     this.samples += 1;
     if (this.samples < this.length) return NaN;
     if (src !== src) return this.value;
-    if (hh !== hh || ll !== ll) return NaN;
+    if (hh !== hh || ll !== ll) return this.value;
     const range = hh - ll;
     const value = 100 * (src - ll) / range;
     if (value === value) this.value = value;
@@ -2957,12 +2957,22 @@ export class PercentRank implements Saveable {
 
   private _advance(src: number): number {
     this.series.push(src);
-    if (this.series.length <= this.length) return NaN;
+    return PercentRank.rank(this.series, src, this.length);
+  }
+
+  static computeWindow(series: { size: number; capacity: number; get(offset: number): unknown }, length: number): number {
+    const count = validatePositiveIntegerLength(length);
+    series.get(Math.min(count, series.capacity - 1));
+    return PercentRank.rank(series, Number(series.get(0)), count);
+  }
+
+  private static rank(series: { size: number; get(offset: number): unknown }, src: number, length: number): number {
+    if (series.size <= length) return NaN;
     let belowOrEqual = 0;
-    for (let offset = 1; offset <= this.length; offset += 1) {
-      if (this.series.get(offset) <= src) belowOrEqual += 1;
+    for (let offset = 1; offset <= length; offset += 1) {
+      if (Number(series.get(offset)) <= src) belowOrEqual += 1;
     }
-    return (100 * belowOrEqual) / this.length;
+    return (100 * belowOrEqual) / length;
   }
 
   save(): StdDevSnapshot {
@@ -3585,32 +3595,32 @@ export class VWAP implements Saveable {
   private readonly stdevMult: number;
   private snap: VWAPSnapshot | null = null;
 
-  constructor(hasBands: boolean, stdevMult: number) {
+  constructor(hasBands: boolean, stdevMult: number, private readonly hasExplicitAnchor = false) {
     this.hasBands = hasBands;
     this.stdevMult = stdevMult;
   }
 
-  compute(source: number, anchor: boolean, volume: number): number | [number, number, number] {
+  compute(source: number, anchor: boolean, volume: number, stdevMult = this.stdevMult): number | [number, number, number] {
     this.snap = this.save();
-    return this._advance(source, anchor, volume);
+    return this._advance(source, anchor, volume, stdevMult);
   }
 
-  recompute(source: number, anchor: boolean, volume: number): number | [number, number, number] {
+  recompute(source: number, anchor: boolean, volume: number, stdevMult = this.stdevMult): number | [number, number, number] {
     if (this.snap) {
       this.initialized = this.snap.initialized;
       this.cumTpv = this.snap.cumTpv;
       this.cumVolume = this.snap.cumVolume;
       this.cumSourceSquaredVolume = this.snap.cumSourceSquaredVolume;
     }
-    return this._advance(source, anchor, volume);
+    return this._advance(source, anchor, volume, stdevMult);
   }
 
-  private _advance(source: number, anchor: boolean, volume: number): number | [number, number, number] {
+  private _advance(source: number, anchor: boolean, volume: number, stdevMult: number): number | [number, number, number] {
     if (anchor) this.initialized = true;
     if (!this.initialized) return this.hasBands ? [NaN, NaN, NaN] : NaN;
-    // A missing reset sample poisons this period. Interior holes return na
-    // without changing its accumulators, preserving the existing hole policy.
-    if (!anchor && (source !== source || volume !== volume)) return this.hasBands ? [NaN, NaN, NaN] : NaN;
+    // Capture201 settles explicit-anchor source holes only. Omitted anchors
+    // retain their held source-hole policy; interior volume holes still skip.
+    if (!anchor && (volume !== volume || (!this.hasExplicitAnchor && source !== source))) return this.hasBands ? [NaN, NaN, NaN] : NaN;
 
     const prevCumTpv = anchor ? 0 : this.cumTpv;
     const prevCumVolume = anchor ? 0 : this.cumVolume;
@@ -3622,11 +3632,11 @@ export class VWAP implements Saveable {
 
     const vwap = this.cumVolume > 0 ? this.cumTpv / this.cumVolume : NaN;
     if (!this.hasBands) return vwap;
-    if (vwap !== vwap || this.stdevMult !== this.stdevMult) return [vwap, NaN, NaN];
+    if (vwap !== vwap || stdevMult !== stdevMult) return [vwap, NaN, NaN];
 
     const weightedVariance = Math.max(this.cumSourceSquaredVolume / this.cumVolume - vwap * vwap, 0);
     const stdev = Math.sqrt(weightedVariance);
-    return [vwap, vwap + this.stdevMult * stdev, vwap - this.stdevMult * stdev];
+    return [vwap, vwap + stdevMult * stdev, vwap - stdevMult * stdev];
   }
 
   save(): VWAPSnapshot {

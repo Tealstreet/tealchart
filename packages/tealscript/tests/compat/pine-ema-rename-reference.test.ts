@@ -22,7 +22,6 @@ describe('published v5 ema to ta.ema rename', () => {
 
   // CF040 is settled by native TV v2 conflicts-batch-1-v1.csv: SMA warmup,
   // missing output on source holes, retained accumulator state afterwards.
-  // ~/cs/docs/tealscript-parity-archive/conflicts-adjudicated-v1.md#cf040
   // packages/tealscript/oracle-probes/v2/captures/v2/conflicts-batch-1-v1.csv
   // Derived for length 2: seed=(102+105)/2=103.5; next=103.5+(2/3)*3.5.
   // The capture settles v6; v4/v5 cases retain versioned namespace coverage.

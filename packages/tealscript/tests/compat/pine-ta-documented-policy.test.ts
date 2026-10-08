@@ -4,7 +4,7 @@ import type { Bar } from '../../src/runtime';
 import { getPlot, runCompatScript } from './fixtures';
 
 // Authority for each named entry below:
-// ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json
+// https://www.tradingview.com/pine-script-reference/v6/
 // retrieved 2026-10-03; SHA256 eba108f8975d3fcd3e66f7b69c81979bb671c887607a7914aa4c7495e805fb1d.
 // Expectations are hand-derived from that entry, never captured engine values.
 const source = [null, -6, 9, -3, 12, null, -9, 6, 3, -12];

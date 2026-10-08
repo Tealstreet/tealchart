@@ -3,7 +3,7 @@ import { expect, it } from 'vitest';
 import { corporateActionRequestKey, InMemoryRequestDatafeed } from '../../src/runtime';
 import { compatibilityBars, getPlot, runCompatScript } from './fixtures';
 
-// Ranks1338/1339; ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json, constants206.
+// Ranks1338/1339; https://www.tradingview.com/pine-script-reference/v6/, constants206.
 it('earnings.estimate selects the estimated earnings field', () => {
   const datafeed = new InMemoryRequestDatafeed([], ['estimate', 'actual'].map((field) => ({
     family: 'earnings' as const,

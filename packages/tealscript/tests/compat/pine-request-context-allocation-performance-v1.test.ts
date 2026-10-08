@@ -7,7 +7,7 @@ import { parse } from '../../src/parser';
 import { InMemoryRequestDatafeed } from '../../src/runtime';
 import { executeCompiled, tryCompile } from '../../src/runtime/codegen/execute';
 
-// Reference: ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json /entries/704.
+// Reference: https://www.tradingview.com/pine-script-reference/v6/ /entries/704.
 // Callback reuse is a deterministic allocation gate; requested bar values remain distinct.
 it('reuses requested callbacks while advancing bar values and timestamps', () => {
   const bars: Bar[] = [1, 2, 3].map((close, index) => ({

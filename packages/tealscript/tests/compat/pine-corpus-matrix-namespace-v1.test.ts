@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { getPlot, runCompatScript } from './fixtures';
 
-// Reference: ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json, functions571/572.
+// Reference: https://www.tradingview.com/pine-script-reference/v6/, functions571/572.
 // Corpus v56:1452/1536 uses explicit matrix IDs in namespace calls alongside a variable named matrix.
 describe('corpus matrix namespace arguments', () => {
   for (const version of [5, 6]) {

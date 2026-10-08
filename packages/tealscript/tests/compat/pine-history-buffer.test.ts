@@ -65,6 +65,9 @@ describe('documented historical buffer sizing', () => {
     const result = run('indicator("declared minimum", max_bars_back=2)\noffset = bar_index > 800 ? 800 : 1\nplot(close[offset], "Past")');
     expect(result.errors).toEqual([]);
     expect(result.plots[0].values[801]).toBe(2);
+    const expected = bars.map((_, i) => i === 0 ? null : i <= 800 ? i : i - 799);
+    expect(result.plots[0].values).toEqual(expected);
+    expect(result.plots[0].values.slice(799, 803)).toEqual([799, 800, 2, 3]);
   });
 
   it('grows requested-context history independently of chart history', () => {

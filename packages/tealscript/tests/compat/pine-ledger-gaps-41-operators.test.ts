@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { getPlot, runCompatScript } from './fixtures';
 
-// Ranks1629,1632-1640: ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json operators entries below.
+// Ranks1629,1632-1640: https://www.tradingview.com/pine-script-reference/v6/ operators entries below.
 // Negative remainder authorities conflict, so neither % nor %= is asserted here.
 const bars = [3, 1, 3, 2, 2].map((close, index) => ({
   time: 1700000000000 + index * 60000,

@@ -1,3 +1,57 @@
+Native v5/v6 missing strings use the empty-string representation for no-match
+if results and explicit string na initializers; na("") is true. Earlier versions
+retain their existing representation and code generation.
+
+Native v5 numeric array.join uses sixteen significant digits for finite fractional
+values in both namespace and receiver calls. The version flag is emitted only at
+those call sites; v6 joins and str.tostring retain their existing behavior.
+
+Visual boolean-kind contracts cover each documented boolean option across all
+plot-family signatures, including three fill overloads. Keep false/true controls
+and wrong scalar/reference kinds separate from qualifier and rendering evidence.
+Visual numeric-kind contracts distinguish fractional/signed coordinates from
+boolean, string, color and reference arguments. V6 builtin plot series validates
+inferred numeric kinds; user callables and legacy checks keep their own contracts.
+
+Value-vector member detection compiles its fixed, non-global regex inventory once
+per module; source scanning and every deterministic vector still run by default.
+
+`str.split` results always carry the series qualifier of an array reference,
+independently of the source and separator qualifiers.
+
+`str.replace` inserts dollar-pattern replacement characters literally, including
+when the selected occurrence is zero.
+
+V6 string calls require the documented format/time arguments and integer numeric
+slots. Color and line formatting values are refused; disputed unions stay unchanged.
+
+Leading regex `(?i)` folds ASCII only and publishes the original matched text;
+character ranges and escaped letters retain their case-equivalent membership.
+The existing leading `m` and `s` modes remain independent of case folding.
+
+V6 TA nearest-rank and linear-percentile lengths require integer kind through the
+shared argument checker. Receiver methods retain their own signatures.
+
+Native v52 v6 falling/kc/kcw length slots also require integer kind. Preserve
+falling series lengths, Keltner simple length ceilings and earlier-version routes.
+
+Pivot-point type requires string kind through the resolved builtin argument
+checker. Invalid string domains remain runtime checks.
+
+Drawing argument contracts parse their common setup once, clone its AST per case,
+and pad the suffix to preserve original source spans. Semantic checks stay fresh.
+
+Default arity suites sample one maximum boundary per distinct limit and exercise
+small calls for every element kind. `TEALSCRIPT_ARITY_SWEEP=1` restores every
+maximum/+1 case in the CI semantic sweep step.
+
+Composite fallback metadata uses the compilation already checked and executed by
+the parity helper. Keep the independent source classifier and output assertions.
+
+Worker tests can reuse `createWorkerTestModule` within a file: it imports once,
+attaches each fresh worker global, and sends dispose before each case. Keep all
+initialization, request, retirement and output assertions in the default suite.
+
 Windowed TA reservations stop at the existing source capacity; declared lengths cannot manufacture deeper history reads or enlarge demand metadata. Actual source reads retain their history guards and late warmup reservations.
 
 History discovery shrinks only a reached positive lookback; current-slot maintenance cannot establish a zero-sized historical requirement.
@@ -6,6 +60,15 @@ Reached windowed TA calls reserve available window capacity before warmup. Late 
 Supplied user-library tuples reuse function-body member inference and the tuple
 qualifier floor. Bind function arguments without a method-receiver offset;
 registered official adapters and existing fill overload checks stay independent.
+
+Requested programs discover local function dependencies from checker-resolved
+call identities and their nested call contexts. Expand only defaults omitted by
+reachable calls, and share the resulting function/global set between capture
+preparation and requested AST construction; unrelated method overloads do not replay globals.
+
+Requested arithmetic expressions proven bar-invariant from their AST evaluate once
+when every actually read capture is primitive and has no requested source. Their
+ordinary output arrays retain all requested slots; history, TA and UDF calls replay normally.
 
 Imported function and method results qualify exported UDT identities through the caller alias, including local-variable tails and collection members. Preserve already-qualified names, chosen callable binding and the simple/series return qualifier rule.
 
@@ -24,6 +87,25 @@ proof; scaled settings and arbitrary native eigenvector bases remain held.
 Dynamic integer time/time_close offsets outside [-500..5000] raise RE10002.
 Keep bars_back and timeframe_bars_back argument names in the error; fractional
 and nonfinite offset handling remains outside this captured rule.
+
+Visual color-kind contracts distinguish color literals and color.new results from
+numeric, quoted-hex, boolean and reference arguments across all plot signatures.
+Const hline controls keep kind checks separate from its native qualifier rule.
+Visual string contracts distinguish titles/text/characters from unrelated kinds.
+V6 builtin marker style/location/size and plot formats also require strings.
+Resolve aliases and builtin binding independently of the existing domain checks.
+V6 builtin visual offsets, show_last, arrow heights and precision require
+inferred integers; float aliases do not become integers by rounding. Known
+precision literals, aliases and input defaults must remain within 0 through 16.
+Visual required-argument contracts keep positional and reordered named controls.
+An optional title cannot substitute for a required series, OHLC coordinate, color,
+price or fill handle, even when the total argument count is otherwise sufficient.
+V6 builtin marker series accepts numeric and boolean inputs at ordinary and
+absolute locations, rejecting unrelated inferred kinds. Resolve builtin binding
+before checking series so local marker callables retain their own contracts.
+V6 builtin visual display options reject unrelated inferred kinds while retaining
+named constants and mask arithmetic. Numeric encoding and host presentation
+remain separate contracts; local callables do not inherit builtin display checks.
 
 Gradient fill overload detection reads positional bottom_value independently of
 a named title. Hline and plot masks share gradient endpoint binding; flat
@@ -164,9 +246,10 @@ sum, preserving the native v2 captured binary64 values. Keep direct near-unity
 evaluation to avoid cancellation, and retain native Math.log domain/NA handling.
 This scalar leaf does not change `math.log10`, argument binding, callable shadows,
 or the shared TA kernels.
-Captured finite square `matrix.pinv` values use the existing LU inverse only
-after every column passes the unchanged Greville squared-norm thresholds.
-Singular, nonfinite and rectangular cases retain Greville; the SVD procedure gap remains open.
+Matrix pseudoinverses use scaled one-sided Jacobi SVD to determine rank.
+Full-rank square matrices retain the native-matching LU inverse arithmetic;
+rank-deficient and rectangular matrices use the SVD pseudoinverse. Native
+binary64 output outranks the reference's algorithm-name remark.
 
 Compiled IANA calendar/session conversions reuse successful offsets for the
 exact timezone string and timestamp in an 8192-entry FIFO cache. Keep the
@@ -336,6 +419,40 @@ types. Equally specific viable UDF calls are refused by checking and compilation
 they must not fall through to a builtin call with the same name.
 
 ### Declaration checks
+Indicator calc_bars_count refuses inferred float kinds, including integral-valued floats.
+Existing range and qualifier diagnostics and strategy behavior remain unchanged.
+
+Indicator format and scale arguments reject inferred numeric operands before
+their existing domain checks. Strategy and library declaration checks stay separate.
+
+Indicator precision constants, including arithmetic and aliases, must stay within 0..16.
+Literal precision diagnostics remain single; strategy declaration checks stay separate.
+Indicator precision requires an int kind, including integral-valued floats being refused.
+Existing literal range diagnostics, const qualifier checks and strategy behavior remain unchanged.
+The existing nonnegative integer and const qualifier checks remain separate.
+
+Indicator max_bars_back constants, including arithmetic and aliases, must be within 0..5000.
+The resolved lower-bound check is indicator-only; strategy declaration checks stay separate.
+Indicator max_bars_back refuses inferred float kinds, including integral-valued floats.
+Existing range and qualifier diagnostics and strategy behavior remain unchanged.
+
+Indicator max_labels_count arithmetic and aliases retain the 500 ceiling.
+Literal bounds and qualifier checks stay separate; strategy checks are unchanged.
+Indicator max_labels_count refuses inferred float kinds, including integral-valued floats.
+Existing range and qualifier diagnostics and strategy behavior remain unchanged.
+
+Indicator max_polylines_count rejects literal and resolved constants above 100.
+Indicator max_polylines_count requires at least 1, including resolved arithmetic and aliases.
+Indicator max_polylines_count refuses inferred float kinds, including integral-valued floats.
+Existing range and qualifier diagnostics and strategy behavior remain unchanged.
+
+Indicator max_boxes_count rejects literal and resolved constants above 500.
+Indicator max_boxes_count refuses inferred float kinds, including integral-valued floats.
+Existing range and qualifier diagnostics and strategy behavior remain unchanged.
+
+Indicator max_lines_count arithmetic and aliases retain the 500 ceiling.
+Indicator max_lines_count refuses inferred float kinds, including integral-valued floats.
+Existing range and qualifier diagnostics and strategy behavior remain unchanged.
 
 Tuple declarations infer their member types and cannot carry type, qualifier,
 or var/varip keywords. UDT fields require explicit type annotations, as do UDF
@@ -482,13 +599,39 @@ unused bound does not suppress an otherwise defined contribution.
 contexts. Changing its series length reuses retained source and eviction
 history rather than rebuilding a window from the current width.
 Collection scalar reads preserve their documented return qualifiers:
+`array.percentrank()` namespace and receiver calls retain the existing float kind
+with a `series` qualifier. Selected custom methods retain their declared returns.
+`array.covariance()` namespace and receiver calls return `series float`;
+selected custom methods retain their own result types.
+
+Builtin `matrix.is_identity/is_symmetric/is_square` receiver calls retain the
+documented `series bool` floor; user-defined methods keep their declared returns.
+
+Builtin `matrix.det/min/max` namespace and receiver calls return the numeric
+element kind with a `series` qualifier. Selected user methods keep their own
+returns; this inference does not change matrix numerical kernels.
+
+`array.binary_search()` and its receiver method return `series int` when the
+builtin is selected. User methods preserve their own return types.
 `array.last()` and its receiver method return the element type with a `series`
 floor; `matrix.columns()` and its receiver method return `series int`.
 Keep element metadata when applying the floor. The collection ranks 281–320
 regression independently checks inference and bounded runtime values.
+- Builtin `array.binary_search_leftmost()` returns `series int` through both
+  namespace and array receiver calls, independently of the searched value's
+  qualifier or the numeric field selected from a UDT. Selected custom methods
+  retain their own return types.
 Array `lastindexof`, `some`, and `binary_search_rightmost` return explicit `series`
 scalar types in namespace and receiver calls. Their result qualifier comes from
 the collection operation, so literal elements cannot make the result `const`.
+
+Ranked collection clauses 841–880 have bounded namespace and receiver witnesses
+in `pine-collection-ranked-22-{insert,aggregates}.test.ts`. `array.mode` preserves
+the numeric element kind and returns `series`, including constant-content arrays;
+it cannot initialize a `const` numeric variable. The mode no-winner/tie outcome
+remains outside these witnesses because the reference and arrays manual conflict;
+qualifier admission does not settle that outcome. Selected custom methods retain
+their own return types. Insert index omission is also unpinned: absent requiredness metadata is not a default.
 
 
 - `compiledOnly.ts` — Public compiled execution wrapper that fails loudly when codegen cannot run a script.
@@ -772,6 +915,10 @@ the collection operation, so literal elements cannot make the result `const`.
 - Two-argument `math.round` preserves the number argument's qualifier when
   precision is const, input, or simple; series precision produces a series float.
   Native CF016 captures confirm const/input results despite simple precision.
+- Pine v6 math integer slots require int operands: round precision, random seed,
+  and sum length. Other numeric operands and older-version admission are unchanged.
+- Mintick decimal compensation cannot move an exact tick or a clear non-tie
+  to a farther tick; the existing decimal half-tick controls retain compensation.
 - `syminfo.ticker(symbol)` selects its series-string return overload for a series
   symbol; constant, input, and simple symbols select its simple-string overload.
   Both overloads require a string-kind symbol argument.
@@ -859,6 +1006,9 @@ the collection operation, so literal elements cannot make the result `const`.
   history series need one current slot plus the provisioned history depth.
   The explicit host `maxBarsBack` option still controls the runtime offset limit.
   `max_bars_back(var, num)` is target-scoped and sizes only that series.
+- Indicator `max_bars_back` accepts constant integer depths from 0 through 5000,
+  including constant arithmetic and aliases. This declaration range does not
+  replace adaptive history growth or the explicit host execution limit.
 - Generated history buffers include one current slot in addition to past values.
   Declaration `max_bars_back` and `max_bars_back(var, num)` set initial minimum
   depths; function hints apply only to their targets. Historical dynamic reads
@@ -1123,6 +1273,10 @@ the collection operation, so literal elements cannot make the result `const`.
   float arrays return series float values.
   Resolve those array receivers before bare TA aliases, including when the
   receiver is itself a call result.
+- Actual builtin `array.avg()` namespace/receiver calls infer a `series int`
+  result for integer arrays and `series float` for float arrays. Keep that
+  inference separate from same-name user methods and from runtime averaging:
+  integral-mean witnesses do not settle fractional integer rounding.
 - Live-reference integrity comparisons must include zero-argument callable
   entries and normalize packed variadic labels such as
   `number0, number1, ...` on both sides before diffing. Otherwise the report
@@ -1427,6 +1581,9 @@ the collection operation, so literal elements cannot make the result `const`.
 - Local method overloads keep distinct generated identities by receiver type
   and arity. Resolve user/imported methods before generic collection method
   fallback so script methods named like `copy` or `size` are not swallowed.
+- Imported array methods use their declared array receiver kind for runtime
+  matching, independently of qualified library type names. Typed-array calls
+  retain compatible selected imported methods before builtin dispatch.
 - Imported receiver methods resolve before the same-named ordinary chart
   function fallback. A wrapper `update() => zigzag.update()` must call the
   imported method; resolving by the member name alone recursively calls the
@@ -1761,8 +1918,10 @@ the collection operation, so literal elements cannot make the result `const`.
   and the reference example rather than its ratio-only prose.
 - KC/KCW compute the source and range EMAs independently. True range uses the
   `ta.tr` variable's initial `na`, and source holes neither suppress the chart
-  range nor erase the known chart close. Stochastic advances chart extrema but
-  holds its last output when its explicit source is missing.
+  range nor erase the known chart close. Stochastic advances its supplied high/low extrema but
+  holds its last output when its explicit source is missing. The v54 independent
+  bound-hole captures also retain that output when the current high or low is
+  missing; each bound keeps its existing contiguous finite suffix independently.
 - CCI and `ta.dev` use contiguous chart-bar windows: a source hole poisons the
   deviation window until it expires. `ta.stdev` retains its separately observed
   non-na sample window. CMO composes adjacent changes and independent gain/loss
@@ -1772,9 +1931,14 @@ the collection operation, so literal elements cannot make the result `const`.
 - TradingView volume captures settle **VWAP startup/reset**: `ta.vwap` uses
   `hlc3`, and omitted-anchor calls reset daily (including initialization on the
   first loaded bar). Explicit-anchor calls stay `na` until the first true
-  anchor. A missing source on an anchor poisons that period until a valid reset;
-  the captures do not settle arbitrary interior-hole behavior. Snapshot/restore
-  must preserve initialization along with all three weighted accumulators.
+  anchor. The v54 finite-volume source-hole capture settles explicit-anchor
+  calls only: their weighted accumulators stay poisoned until a valid anchor.
+  Omitted-anchor calls and the variable retain their prior interior source-hole
+  skip behavior; the explicit-anchor capture does not settle those calls.
+  Explicit-anchor bands and recomputation use
+  the same accumulators. Interior missing-volume behavior remains separately
+  held. Snapshot/restore must preserve initialization along
+  with all three weighted accumulators.
   `timeframe.change()` itself is false without a previous bar.
 - **MFI flows stay signed** and follow the published comparison predicates:
   unavailable change contributes the current signed flow to both rolling sums,
@@ -2128,6 +2292,14 @@ as adjacent active/inactive bars. The native v5/v6 BTCUSDT 24x7 captures reset a
 UTC midnight, restoring prior-session extrema; non-midnight anchors and timezone
 changes retain their configured cycle. Classification, closures and edge-bar behavior
 remain separate checks; this does not establish other exchanges' native schedules.
+
+Compiled `time_tradingday` returns UTC midnight of the last day in the
+exchange session, rather than exchange-local midnight of the bar opening.
+Root and requested contexts use their own session metadata, including overnight
+and weekday-specific feed schedules. Above 1D the final session in the bar
+sets the date. Native DXY/SPX labels and overnight/DST/history controls are
+pinned in `pine-tradingday-session-boundary-native-v1.test.ts`; other clocks,
+session classification and VWAP arithmetic retain their separate contracts.
 
 `session.ispremarket` and `session.ispostmarket` always return false on
 nonintraday timeframes, even when a bar opens inside the host-provided
@@ -2615,6 +2787,10 @@ Function and method definitions belong to global scope. A nested definition
 retains the established `function-scope` diagnostic inside a function; other
 local definitions report `function-definition-scope`. Global-to-global calls remain allowed.
 
+Version annotation detection ignores quoted markers using the parser’s existing protected string ranges. Real compiler comments retain their source order and may appear after executable statements.
+
+Explicit v6 single-line quoted continuations insert one space per wrapped line, without a line terminator. The parser passes its detected version into the grammar; triple-quoted literal contents and pre-v6 behavior remain independent.
+
 Supported: version annotations, indicator and strategy declarations, library declarations, imports, function definitions, methods, user-defined types, enums, variable declarations (var/varip/typed), tuple declarations/reassignments, if/else, switch, for, for-in, while, break/continue, binary/unary/ternary operators, function calls with named and mixed args, member access, index/history access, literals (number, string, boolean, color, na), comments.
 
 Measured v6 grammar coverage is committed in `src/compat/pineV6GrammarReference.ts` and pinned by `tests/compat/pine-grammar-coverage.test.ts`. The current inventory covers 63/63 official-doc and manual-index construct snippets and the known-missing grammar allowlist is empty. Run `yarn vitest run packages/tealscript/tests/compat/pine-grammar-coverage.test.ts` after parser/checker grammar changes, and rebuild/commit generated parser files when `grammar.peggy` changes.
@@ -2778,6 +2954,15 @@ yarn lint             # ESLint
 - Dynamic `ta.variance`/`ta.stdev` biased flags select the current divisor without
   splitting the callsite source history; constructor-cache keys retain length
   identity, and compute/recompute receives the current flag.
+
+- Series-length ALMA/BB/BBW/CCI/CMO/COG/Correlation constructors share timestamped
+  call-site source history. A selected tuple catches up on intervening samples
+  before computing; same-bar replacement and snapshots preserve its cursor.
+  Keep the existing TA classes as the arithmetic and missing-value authorities.
+
+- ALMA offset/sigma/floor and BB/BBW mult use the shared simple-parameter
+  qualifier table. Their sources and integer lengths still admit series values;
+  positional and named tuning arguments admit const/input/simple values only.
 
 - **Canonical compiled SMA (`2955028898`):** local or conditional calls advance
   their call-site machine only when reached; unconditional global calls may use
@@ -3525,7 +3710,7 @@ symbol. Inherited root seed merging remains; native EOD/gaps timing is separate.
 primitive values and arrays of int, float, bool, or string elements. Apply this
 check after builtin resolution so local receiver methods keep their contracts.
 
-Finite exactly symmetric matrices larger than 2x2 reuse original 54c094545e Householder/Implicit QL decomposition for eigenvalues and eigenvectors. Preserve the existing QR workspace for nonsymmetric matrices and the 2x2 path. Sorted spectral tests do not establish native order/sign, nonsymmetric algorithm policy or SVD cutoff; pinv keeps its existing arithmetic pending native adjudication.
+Finite exactly symmetric matrices larger than 2x2 reuse original 54c094545e Householder/Implicit QL decomposition for eigenvalues and eigenvectors. Preserve the existing QR workspace for nonsymmetric matrices and the 2x2 path. Sorted spectral tests do not establish native order/sign, nonsymmetric algorithm policy or SVD cutoff; pinv arithmetic is separate and requires its own native adjudication.
 
 Dynamic pivot-low strengths use the existing pivot-high source-window routing.
 Both collect the same physical samples, then evaluate the shared Pivot window
@@ -3784,8 +3969,12 @@ Tiny captured prefixes are certified; scaled stress settings remain native-held.
 Native v12 refuses enum elements in varip arrays, matrices and map values. Keep the collection eligibility check distinct from scalar enum varip admission and ordinary enum collections; retain transitive drawing-field refusal.
 
 Public matrix eigenvalues publish real components for isolated complex Schur pairs.
-Eigenvectors retain their existing fallback; the native complex proof covers two
-captured historical rows, and scaled stress remains native-held.
+Eigenvectors retain missing publication for complex roots; the native complex proof
+covers two captured historical rows, and scaled stress remains native-held.
+
+Finite real eigen decomposition uses implicit QL for all sizes. Nonsymmetric matrices
+use a reversed Hessenberg basis and accumulated orthogonal transformations; vectors
+come from Schur back-substitution. Ordering and arbitrary native bases remain held.
 
 Known unstructured Pine runtime errors become fatal runtime.error records.
 Workers retain the halt across feed updates until reload, preserving prior output;
@@ -3801,10 +3990,14 @@ Native v23 v6 plot/hline variable type annotations use the captured invalid-keyw
 text at the existing start, retaining invalid-type-annotation internally. CE10149
 mapping is unclaimed; parameter messages, v6/UDT and legacy guards are unchanged.
 
-Matrix pinv uses a private max(m,n)*Number.EPSILON*sigma_max cutoff, retaining Greville/LU arithmetic and the shared matrix epsilon.
+Matrix pinv keeps its private max(m,n)*Number.EPSILON*sigma_max cutoff while SVD supplies singular modes; the shared matrix epsilon is unchanged.
 Native v12 brackets it:1e-12 is inverted and1e-16 is zero beside unit scale; exact cutoff/scale behavior remains trace-required.
 
-Declaration numeric properties share semantic operand kinds with executable expressions: v4/v5 const-int division truncates through `divideV5ConstInts`; v6 and float operands retain fractional results.
+Semantic constant folding and declaration numeric properties share operand kinds with executable expressions: v4/v5 const-int division truncates through `divideV5ConstInts`; v6 and float operands retain fractional results.
+
+Indicator dynamic request permission resolves known const bool expressions through
+the checker and carries one value into compile policy, requested children and runtime.
+Other declarations, unresolved options and version defaults retain their existing routes.
 
 User-callable reference-type parameters ignore value-only qualifier ceilings, including explicit simple annotations and inferred wrapper requirements. Preserve value-type qualifiers and reference kind/identity checks; this exemption does not change variable declaration rules.
 
@@ -3840,5 +4033,299 @@ and the existing plots, drawings, alerts, and strategy comparisons.
 Worker initialization retains one validated program for an identical source and
 serialized library contents and runtime options. Every init retires execution state; changed source,
 library content or options, failed validation, or explicit disposal invalidates reuse.
+Worker request preloading reuses execution's prepared compilation, including across provider replies
+and realtime updates. Query bindings are still collected from the current inputs and runtime each time.
 
 Compiled loops share one counter and sample the bound clock every 64 iterations, including nested/UDF loops. Outermost entries sample their own start, excluding prior non-loop work; nested and UDF-called inner loops inherit that active start. Sampled checks enforce the outermost deadline, and outermost exits read the clock to preserve the exact 500ms exit boundary and error record. Nested entries and exits reuse the active clock state.
+
+V6 integer-derived TA lengths retain dynamic admission but reject constant-folded fractional results. The folder handles constant arithmetic, math max/min/abs/round/floor/ceil and fully constant ternaries; rounding shares the runtime helper. V5 truncating admission is unchanged.
+
+TA analysis reuses worker validation types only for identical AST and library identities, then carries expression and loop-result maps into emission. Changed programs or library maps are checked independently; declaration diagnostics still run at worker validation.
+
+Nested polymorphic expression history normalizes unavailable boolean results to
+false in v6, using the current result kind without evaluating the call twice.
+Numeric missing history and v5 boolean missing history remain unavailable.
+
+Enum title lowering follows resolved request expressions and their tuple members,
+including local UDF tuple returns and lower-timeframe arrays. Register each tuple
+binding in its own scope so enum-spelled ordinary strings retain string conversion.
+
+Enum title inference uses the selected custom method return before interpreting
+a receiver get as built-in collection access. Overloaded methods follow their selected
+declaration; built-in calls infer array/matrix elements or map values.
+
+VWAP band multipliers are per-call presentation inputs. Changing a series multiplier
+retains the written call's accumulated source/volume and anchor period; it must not
+select a different constructor-cache entry.
+
+Enum title metadata follows typed matrix/map constructors, explicit collection
+annotations and namespace/method get results across requests. Selected custom
+get return types remain authoritative; ordinary string results keep their text.
+
+Series-length TA PercentRank retains physical source slots and scans each current
+window once through shared rank arithmetic. Fixed/input/simple lengths advance
+one retained instance; never reconstruct and replay every window prefix.
+
+Compiled line/label/box copy dispatch counts each written call's invocations per
+bar, retaining its first-call ID and distinguishing repeated UDF/loop copies.
+Each family caches its last written call and counts interleaved sites separately;
+both states reset on the next bar, without changing constructor invocation state.
+
+Imported callable enum members resolve through their defining library alias,
+including requested execution and enum-title inference. Library parameters and
+local fields that shadow enum names retain ordinary field access.
+
+Request tuple-arity metadata follows resolved imported callable identities as well
+as bare UDF calls. Lower-timeframe requests preserve separate arrays for imported
+tuple members; existing tuple-budget policy and scalar-return behavior remain intact.
+
+Return metadata inspecting a selected callable consults that callable's bound locals.
+The caller's live emission scope must not shadow the callee's enum declarations;
+direct member emission retains its current lexical shadow checks.
+
+Enum title metadata resolves library-local UDT constructors in their defining
+callable scope and qualifies scalar and array/matrix/map enum field annotations
+through the UDT's library alias. Declared nested UDT names also retain that alias
+across scalar and collection fields, so their own enum fields remain resolvable;
+primitive fields and selected custom method returns stay distinct.
+
+Map keys/values title metadata follows the map's declared key/value type into the
+returned array, including requested imported UDT fields. Selected custom methods
+keep their own return metadata instead of inheriting built-in extraction types.
+
+Imported callable enum/UDT parameter and local annotations retain their defining
+alias for both return inspection and conversions emitted inside the function.
+String annotations remain primitive even when values match serialized enum IDs.
+
+Enum title return metadata follows terminal if/switch UDF branches when their
+returned enum types agree. Branch declarations resolve in their own local scope
+and defining library; ordinary string returns retain string conversion.
+
+A scalar terminal declaration supplies its enum-related return metadata in UDFs
+and conditional blocks. The same local bindings used for expressions determine
+its type; primitive string declarations keep string conversion.
+
+An if result without an else retains its consequent enum metadata; the implicit
+missing return does not change the enum type. Missing values and ordinary string
+branches retain their existing runtime behavior.
+
+Request tuple-width analysis follows equal-width literal tuple results in terminal
+if/switch UDF branches, including imported functions. Lower-timeframe requests
+retain one independent array per tuple member; execution and tuple budgets are unchanged.
+
+Numeric-for and while UDF results retain their loop-body enum return metadata.
+Body declarations use the defining library scope, while numeric loop counters
+remain primitive bindings; loop execution, budgets and state are unchanged.
+
+Array for-in return metadata binds the value variable to the array element type
+and the optional index to a primitive type. Enum elements retain title metadata
+through UDF returns; primitive string elements keep string conversion.
+
+Map for-in return metadata binds the pair variables to their declared key and
+value types. Either enum component retains title conversion through UDF returns;
+array index/value inference and runtime map iteration are unchanged.
+
+Matrix for-in return metadata binds each row as an array of the matrix element
+type and keeps the optional row index primitive. Requested enum row elements
+retain titles; primitive string rows and runtime matrix iteration are unchanged.
+
+Requested child ASTs retain local method declarations referenced by member calls,
+along with their transitive callable/global dependencies. Retain method overload
+sets so child checking preserves custom versus built-in selection.
+
+Inferred generic array/matrix/map constructors qualify enum and UDT type arguments
+in the defining library scope, using the annotation qualification rule. Primitive
+string type arguments retain ordinary string conversion through requested returns.
+
+Builtin array first/last/pop/shift/remove return metadata retains the array element
+type through local and imported UDF requests. Selected custom methods keep their own
+return types, and primitive string elements retain ordinary string conversion.
+
+Builtin array copy/slice return metadata retains the array element type in the
+returned collection, including namespace and method calls through requested UDFs.
+Selected custom methods and primitive string arrays retain their own return types.
+
+Builtin matrix/map copies retain their declared collection type in requested UDF
+return metadata, including enum elements, keys and values. Selected custom copy
+methods keep their own return types; runtime copying and storage are unchanged.
+
+Builtin matrix row/column extraction and removal retain an array of the declared
+matrix element type in requested UDF metadata. Selected custom row/col and
+remove_row/remove_col return types remain authoritative; runtime axes are unchanged.
+
+Builtin array concat preserves the first array element type in requested return
+metadata. Namespace metadata binds its documented id1/id2 arguments, including
+named order; custom methods and primitive string arrays retain their own types.
+
+Builtin map put/remove retain the declared previous-value type in requested UDF
+return metadata, including named arguments. Selected custom methods retain their
+own return types; runtime map mutation, previous values and ordering are unchanged.
+
+Builtin matrix submatrix/transpose preserve the declared matrix element type in
+requested UDF return metadata. Selected custom methods retain their own return
+types; runtime slicing, transposition, storage and sharing are unchanged.
+
+Builtin UDT receiver copy() retains its declared object type in requested UDF
+return metadata, so enum fields keep title conversion. Selected custom copy
+methods retain their own return types; runtime copying and storage are unchanged.
+
+Static UDT.copy(id) resolves the defining library type namespace before dispatch,
+using the same namespace resolution as UDT.new. Positional and named id binding
+remain unchanged; local type namespaces retain their existing dispatch.
+
+Static UDT.copy(id) return metadata retains the defining-library object type.
+Caller variables with the type name do not replace that library binding; selected
+copy functions retain their own return types and primitive string conversion.
+
+Callable statement arrays normalize transient comma-chain wrappers during parsing,
+including declaration-led single-line UDF bodies. Emission receives each body
+statement in source order and returns the final statement result.
+
+Explicit primitive UDF parameter annotations use canonical type assignability
+at each call. Integer-to-float widening, missing values and versioned numeric
+to bool conversion retain their existing type-system rules.
+
+Imported function enum/UDT return metadata uses the existing selected overload
+identity. Consuming libraries retain selected dependency calls in their defining
+import namespace; collection method dispatch and overload admission stay unchanged.
+
+Untyped local UDF parameters inherit enum/UDT return metadata from their written
+call arguments in the caller's scope. Explicit annotations remain authoritative;
+runtime argument binding and selected method dispatch are unchanged.
+
+Untyped local UDF body conversions inherit enum/UDT parameter types per written
+call, using the existing call-scope path to select inferred body metadata.
+Typed parameters and ordinary string calls retain their own conversion rules.
+
+Local UDF return metadata uses the declared default expression when an untyped
+parameter argument is omitted. Explicit annotations and supplied positional or
+named arguments retain precedence over default types.
+
+Local UDF body profiles infer omitted enum/UDT defaults in their defining scope.
+Default types follow identifier forwarding only when semantic argument types are
+unknown; supplied types, annotations and imported callable scope stay authoritative.
+
+Omitted UDF defaults emit in the defining library/global scope, with caller local,
+persistent, source and history bindings suspended during expression emission.
+Supplied arguments retain their caller bindings; body profiles are unchanged.
+
+Requested child dependencies include UDF header defaults omitted at written calls.
+Defaults add global references after body-local exclusions; functions without
+defaults and supplied-only calls retain their existing dependency graph.
+
+Local UDF body profiles retain array/matrix/map enum and UDT metadata from omitted
+untyped defaults. Explicit annotations, supplied arguments and imported defaults
+keep their existing type paths; runtime default evaluation is unchanged.
+
+Generic `matrix.new<bool>` calls with omitted `initial_value` emit a `false` seed
+in Pine v6, preserving its two-state boolean rule. Pine v5, explicit seeds and
+non-boolean matrix constructors retain their existing emitted arguments.
+
+Omitted `array_id` for v6 boolean matrix axis insertion emits a false-filled array.
+Explicit arrays, v5 missing defaults and numeric matrix insertion retain their
+existing arguments; receiver and index expressions are each evaluated once.
+
+For v6 bool-valued maps, emitted `get`, `put` and `remove` calls replace a missing
+return with false. Stored values, v5 returns and non-boolean value maps retain
+the existing helper behavior.
+
+Builtin array stdev, variance and linear percentile retain the integer element
+kind for documented int overloads. Float arrays and selected custom methods keep
+their own types; runtime arithmetic and rounding are unchanged.
+
+Tuple destructuring records the enclosing initializer call context when metadata
+inference requests per-call contexts. Nested untyped UDF body profiles keep their
+written-call paths in v6; ordinary tuple binding and runtime evaluation are unchanged.
+The arithmetic-only type pass excludes this tuple initializer recording so a
+metadata repair cannot introduce new additive or division decisions. Existing
+const/series association rules and other calls' arithmetic contexts are retained.
+
+Local UDF body profiles retain collection types forwarded from an outer untyped
+parameter's omitted default through an identifier argument. Explicit annotations
+and known supplied types keep precedence; imported profiles are unchanged.
+
+The existing series-float association branch comes from native-backed `2b690b9f0c`.
+SHA-pinned v5/v6 probes explicitly plot series `x + (a - b)` and capture
+`[1, -1, 1, -1]`, matching the branch rather than grouped binary64 zeros.
+This pins captured outputs, not TradingView internal evaluation order or exact
+Phasor/Classic/Woodie source parity; preserve the existing native association rule.
+
+Local untyped UDF body profiles inherit supplied semantic array/matrix/map types
+when their enum or UDT components require title metadata, per written call.
+Explicit annotations and string collections retain their existing paths; omitted
+defaults, imported callables and runtime argument binding are unchanged.
+
+Local method body metadata uses the checker-selected local overload and excludes
+the bound receiver when ordering explicit arguments. Imported method dispatch and
+function-syntax calls retain their existing metadata paths.
+
+Local function-syntax method calls record per-call body metadata only when the
+body-profile checker requests it. Arithmetic and method-dispatch checks keep
+their existing contexts; the explicit receiver remains the first argument.
+
+Local UDT receiver method bodies retain selected declaration metadata in their own semantic call contexts.
+The body profile falls back to that identity only when the shared dispatch map has no entry; explicit builtin selections remain authoritative.
+
+Builtin `map.contains` returns series bool in v5 and v6, including receiver calls.
+User-defined methods keep their own return types and qualifiers.
+
+Builtin map value reads retain series provenance from dynamic writes in v5/v6.
+V6 get/put/remove results always have a series floor; v5 static results keep their
+existing qualifiers. Aliases share provenance; copies preserve their own state.
+
+Builtin matrix.get results have the series qualifier in v6 while preserving
+the element kind. V5 qualification, runtime values and custom methods stay unchanged.
+
+Omitted UDF defaults resolve names in their definition scope without creating a
+runtime function frame. Method-context arguments use the actual function-state
+stack. Selected methods also retain checker overload selection while definition
+defaults suspend caller local bindings inside an existing function frame.
+
+Local helpers in omitted UDF defaults retain child state owned by the receiving
+written call. Their header state IDs preserve the existing arithmetic/method context
+IDs, while imported defaults and imported helper registrations keep their original paths.
+
+Nonliteral indicator dynamic_requests options resolve before request-context
+qualifier diagnostics are published, independent of declaration order. Check
+arguments in their original scope and retain static-error ordering.
+
+V52 native consumers require v6 input string predicate/length/position results to be simple,
+str.match results to be at least simple, and str.format_time results to be series.
+The shared string-result qualifier policy preserves admitted const/simple/series controls
+and leaves v5 behavior unchanged; captured consumer refusals pin each qualifier kind.
+
+Explicit realtime closing updates retain the preceding varip state and record
+their closing before/after snapshots. Replaying an earlier confirmed bar starts
+from its pre-update snapshot, preserving synthetic worker confirmation counts.
+
+Pine v6 Keltner calls require simple multipliers and useTrueRange flags.
+Apply these qualifier ceilings through the versioned TA argument table; earlier
+versions retain their existing admission and all Keltner arithmetic is unchanged.
+
+TA calls written directly in omitted local UDF or method defaults retain state
+under the receiving written call. Their sampled histories remain independent;
+imported default ownership and TA arithmetic keep their existing paths.
+
+V5 explicit bool casts preserve a missing numeric argument as missing and evaluate
+the argument once. Finite truth conversion stays the same; v6 retains its
+two-state bool cast. Valuewhen receives the preserved v5 source directly.
+
+### Gradient missing lower endpoint
+
+A missing lower colour in `color.from_gradient` fades the upper colour alpha by the clamped interpolation ratio while preserving its RGB.
+The v52 midpoint observers pin this route; finite endpoints and missing numeric bounds retain their existing behaviour.
+
+### Native string overload admission
+
+Pine v6 captured `str.format` matrix/enum arguments are refused. A supplied
+`str.tostring` format refuses bool/string/enum and bool/string collections;
+one-argument and numeric collection overloads retain their existing admission.
+
+Polymorphic UDF request sites split requested dependency programs when their
+selected callable/global sets differ. The executing call context selects the
+program ID; sibling specializations never replay each other’s global initializers.
+
+Requested call contexts select callable identities at both root and nested calls,
+including typed method wrappers invoked with receiver or function syntax. Pass
+that selected context through each wrapper before selecting its request program;
+JavaScript number-kind dispatch cannot distinguish Pine int and float receivers.

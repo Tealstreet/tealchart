@@ -14,7 +14,7 @@ const bars = Array.from({ length: 6 }, (_, i) => ({
   volume: 1,
 }));
 
-// ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json: request.dividends gaps argument.
+// https://www.tradingview.com/pine-script-reference/v6/: request.dividends gaps argument.
 // Default gaps_off carries the last event; gaps_on publishes only a new event.
 describe('PARTIAL request and time boundaries', () => {
   it('distinguishes omitted dividend gaps from explicit sparse event publication, ranks1740/1741', () => {

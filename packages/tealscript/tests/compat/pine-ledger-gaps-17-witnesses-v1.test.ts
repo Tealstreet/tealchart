@@ -4,7 +4,7 @@ import { parse } from '../../src/parser';
 import { checkProgram } from '../../src/semantic';
 import { compatibilityBars, getPlot, runCompatScript } from './fixtures';
 
-// Authority: ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json.
+// Authority: https://www.tradingview.com/pine-script-reference/v6/.
 const errors = (body: string) => checkProgram(parse(`//@version=6\nindicator("Ledger witnesses")\n${body}`)).diagnostics.filter((d) => d.severity === 'error');
 
 describe('ledger gaps 641–680 documented witnesses', () => {

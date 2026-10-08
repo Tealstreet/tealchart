@@ -6,7 +6,7 @@ import { parse } from '../../src/parser';
 import { InMemoryRequestDatafeed } from '../../src/runtime';
 import { executeCompiled, tryCompile } from '../../src/runtime/codegen/execute';
 
-// Reference: ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json
+// Reference: https://www.tradingview.com/pine-script-reference/v6/
 // /entries/704: requested expressions; /entries/511–516: input overloads.
 const bars: Bar[] = [1, 2, 3].map((close, index) => ({
   time: 1_700_000_000_000 + index * 120_000,

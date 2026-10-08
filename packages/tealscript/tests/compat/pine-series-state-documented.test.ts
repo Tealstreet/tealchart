@@ -8,7 +8,7 @@ import * as ta from '../../src/runtime/codegen/ta-classes';
 import { getPlot, runCompatScript } from './fixtures';
 
 // Every case cites entries in:
-// ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json.
+// https://www.tradingview.com/pine-script-reference/v6/.
 // Supporting scope/rollback authority: language/execution-model/#time-series-in-scopes.
 
 // Exercise generated Pine programs, not isolated Series/TA helper arithmetic.

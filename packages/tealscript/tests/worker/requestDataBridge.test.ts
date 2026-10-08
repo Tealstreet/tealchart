@@ -1,5 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { createWorkerTestModule } from '../helpers/workerTestModule';
+
+const workerModule = createWorkerTestModule();
+
 const codegenMocks = vi.hoisted(() => ({
   executeCompiledScript: vi.fn(),
   actualExecuteCompiledScript: undefined as undefined | typeof import('../../src/runtime/codegen').executeCompiledScript,
@@ -15,7 +19,6 @@ vi.mock('../../src/runtime/codegen', async (importOriginal) => {
   };
 });
 
-import { InMemoryRequestDatafeed } from '../../src/runtime';
 import type { Bar } from '../../src/runtime';
 import { parse } from '../../src/parser';
 import type {
@@ -56,7 +59,6 @@ describe('worker requestData bridge', () => {
 
   afterEach(() => {
     codegenMocks.executeCompiledScript.mockClear();
-    vi.resetModules();
     vi.unstubAllGlobals();
   });
 
@@ -68,9 +70,8 @@ describe('worker requestData bridge', () => {
         posted.push(message);
       },
     };
-    vi.stubGlobal('self', workerGlobal);
 
-    await import('../../src/worker/worker');
+    await workerModule.attach(workerGlobal);
 
     const chartBars = makeBars([10, 11, 12, 13, 14, 15]);
     const requestedBars = [
@@ -135,8 +136,7 @@ plot(reqClose, "Requested Close")`;
       onmessage: null as ((event: MessageEvent<ToWorkerMessage>) => void) | null,
       postMessage: (message: FromWorkerMessage) => { posted.push(message); },
     };
-    vi.stubGlobal('self', workerGlobal);
-    await import('../../src/worker/worker');
+    await workerModule.attach(workerGlobal);
     workerGlobal.onmessage?.({ data: {
       type: 'init', scriptId: 'deprecated-quandl',
       script: '//@version=6\nindicator("Deprecated Quandl")\nplot(request.quandl("CFTC/SB_FO_ALL"))',
@@ -156,9 +156,8 @@ plot(reqClose, "Requested Close")`;
         posted.push(message);
       },
     };
-    vi.stubGlobal('self', workerGlobal);
 
-    await import('../../src/worker/worker');
+    await workerModule.attach(workerGlobal);
 
     const baseTime = Date.UTC(2024, 0, 1);
     const chartBars = makeBars([10, 11, 12, 13, 14, 15], baseTime);
@@ -363,9 +362,8 @@ plot(firstBuyImbalance ? 1 : 0, "First Buy Imbalance")`,
         posted.push(message);
       },
     };
-    vi.stubGlobal('self', workerGlobal);
 
-    await import('../../src/worker/worker');
+    await workerModule.attach(workerGlobal);
 
     const chartBars = makeBars([10, 11, 12]);
     const script = `//@version=6
@@ -465,9 +463,8 @@ plot(na(missingFootprintTotal) ? 1 : 0, "Footprint Accessor NA")`;
         posted.push(message);
       },
     };
-    vi.stubGlobal('self', workerGlobal);
 
-    await import('../../src/worker/worker');
+    await workerModule.attach(workerGlobal);
 
     const chartBars = makeBars([10, 11, 12]);
     const script = `//@version=6
@@ -527,9 +524,8 @@ plot(na(rate) ? 1 : 0, "Rate NA")`;
         posted.push(message);
       },
     };
-    vi.stubGlobal('self', workerGlobal);
 
-    await import('../../src/worker/worker');
+    await workerModule.attach(workerGlobal);
 
     const chartBars = makeBars([10, 11, 12]);
     const script = `//@version=6
@@ -613,9 +609,8 @@ plot(financialValue, "Financial")`;
         posted.push(message);
       },
     };
-    vi.stubGlobal('self', workerGlobal);
 
-    await import('../../src/worker/worker');
+    await workerModule.attach(workerGlobal);
 
     const librarySource = `//@version=6
 library("RealtimeTools", true)

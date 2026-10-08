@@ -4,7 +4,7 @@ import type { Bar } from '../../src/runtime';
 import { getPlot, runCompatScript } from './fixtures';
 
 // Authority for every case below:
-// ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json
+// https://www.tradingview.com/pine-script-reference/v6/
 // Defect names are the indicator-only DEFECT_REGISTER_v1 IDs. Expectations
 // are derived from that reference, never captured from TealScript output.
 // Inverse proof (2026-10-03): eight ordinary it() tests RED in an unmodified

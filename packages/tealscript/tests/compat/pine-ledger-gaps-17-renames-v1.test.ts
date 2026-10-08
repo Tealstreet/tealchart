@@ -4,7 +4,7 @@ import { parse } from '../../src/parser';
 import { checkProgram } from '../../src/semantic';
 import { getPlot, runCompatScript } from './fixtures';
 
-// Authorities: ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json, ta.macd/ta.cross/ta.valuewhen/ta.vwma;
+// Authorities: https://www.tradingview.com/pine-script-reference/v6/, ta.macd/ta.cross/ta.valuewhen/ta.vwma;
 // migration-guides/to-pine-version-5/#ta-namespace-for-technical-analysis-functions-and-variables.
 const source = (version: number, body: string) => `//@version=${version}\n${version === 4 ? 'study' : 'indicator'}("TA rename")\n${body}\nplot(x, title="Value")`;
 const errors = (script: string) => checkProgram(parse(script)).diagnostics.filter((d) => d.severity === 'error');

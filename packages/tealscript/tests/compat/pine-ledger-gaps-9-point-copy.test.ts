@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { compatibilityBars, getPlot, runCompatScript } from './fixtures';
 
 // Rank359: visual-output-v1#1122; line.new copies each point's coordinates.
-// ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json
+// https://www.tradingview.com/pine-script-reference/v6/
 const modes = [
   { xloc: 'bar_index', firstX: 1, secondX: 2 },
   { xloc: 'bar_time', firstX: 1_700_000_000_000, secondX: 1_700_000_060_000 },

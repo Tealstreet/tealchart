@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { parse } from '../../src/parser';
 import { checkProgram } from '../../src/semantic';
 
-// Authority: ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json, functions203/204.
+// Authority: https://www.tradingview.com/pine-script-reference/v6/, functions203/204.
 const errors = (body: string) => checkProgram(parse(`//@version=6\nindicator("Duration types")\n${body}`)).diagnostics.filter((d) => d.severity === 'error');
 
 describe('ledger1340–1346 timeframe.from_seconds', () => {

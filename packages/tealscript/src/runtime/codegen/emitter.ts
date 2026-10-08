@@ -463,6 +463,7 @@ type CollectionKind = 'array' | 'map' | 'matrix';
 interface FunctionEmitContext {
   localVars: Map<string, VarDeclInfo[]>;
   callSites: Map<CallExpression, number>;
+  defaultCallSites: Map<CallExpression, number>;
   callSiteFunctions: Map<CallExpression, string[]>;
   nestedCallSites: Set<CallExpression>;
   calledFunctions: Map<string, Set<string>>;
@@ -761,6 +762,8 @@ function inferFunctionEmitContext(
   const functionNames = new Set(funcInfos.keys());
   const localVars = new Map<string, VarDeclInfo[]>();
   const callSites = new Map<CallExpression, number>();
+  const defaultCallSites = new Map<CallExpression, number>();
+  let defaultCallOwnerName: string | undefined;
   const callSiteFunctions = new Map<CallExpression, string[]>();
   const nestedCallSites = new Set<CallExpression>();
   const calledFunctions = new Map<string, Set<string>>();
@@ -833,8 +836,12 @@ function inferFunctionEmitContext(
           ?? expr.callee.property.name];
       }
     }
-    names = [...new Set(names.filter((name) => functionNames.has(name)))];
+    names = [...new Set(names.filter((name) => functionNames.has(name) && (!defaultCallOwnerName || !importedFunctionOwners.has(name))))];
     if (names.length === 0) return;
+    if (defaultCallOwnerName) {
+      if (!defaultCallSites.has(expr)) defaultCallSites.set(expr, callSiteIndex++);
+      return;
+    }
     callSites.set(expr, callSiteIndex++);
     callSiteFunctions.set(expr, names);
     if (ownerName) {
@@ -1105,7 +1112,13 @@ function inferFunctionEmitContext(
 
   for (const stmt of ast.body) walkStmt(stmt);
   for (const [name, fi] of funcInfos) walkFunctionInfo(name, fi);
-  return { localVars, callSites, callSiteFunctions, nestedCallSites, calledFunctions, paramHistory, deepParamHistory, conditionalCallSites, localHistory };
+  for (const [name, fi] of funcInfos) {
+    if (importedFunctionOwners.has(name)) continue;
+    defaultCallOwnerName = name;
+    for (const value of fi.paramDefaults) if (value) walkExpr(value);
+  }
+  defaultCallOwnerName = undefined;
+  return { localVars, callSites, defaultCallSites, callSiteFunctions, nestedCallSites, calledFunctions, paramHistory, deepParamHistory, conditionalCallSites, localHistory };
 }
 
 function inferRootRegularVars(ast: Program, includeBranchDeclarations = true): Set<string> {
@@ -1310,17 +1323,37 @@ function collectIdentifierReferences(expr: Expression, references = new Set<stri
   return references;
 }
 
-export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string, Program>): string {
+export interface RequestContextSelection {
+  ids: WeakMap<SemanticExpressionTypeContext, Map<CallExpression, number>>;
+  callTypes: WeakMap<CallExpression, SemanticExpressionTypeContext>;
+  nodes: WeakSet<CallExpression>;
+}
+
+export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string, Program>, requestedContexts?: RequestContextSelection): string {
   const versionRules = pineVersionRules(ctx.pineVersion);
   let literalTimestampCount: number | undefined;
-  const loopResultTypes = new WeakMap<ForStatement | WhileStatement, SemanticType[]>();
-  let recordedExpressionTypes: WeakMap<Expression | IfStatement, SemanticType> | undefined;
+  const loopResultTypes = ctx.loopResultTypes ?? new WeakMap<ForStatement | WhileStatement, SemanticType[]>();
+  let recordedExpressionTypes = ctx.recordedExpressionTypes;
   function expressionType(expression: Expression | IfStatement): SemanticType | undefined {
     if (!recordedExpressionTypes) {
       recordedExpressionTypes = new WeakMap();
       checkProgram(ast, { expressionTypes: recordedExpressionTypes, loopResultTypes, libraries });
     }
     return recordedExpressionTypes.get(expression);
+  }
+  function emitOmittedBoolMatrixAxis(name: string, receiverExpression: Expression | undefined, receiver: string, args: string[]): string | undefined {
+    if (versionRules.allowsBoolNaHelpers || !receiverExpression || args.length >= 2
+      || (name !== 'matrix.add_row' && name !== 'matrix.add_col')) return undefined;
+    const type = expressionType(receiverExpression);
+    if (type?.kind !== 'matrix' || type.elementType?.kind !== 'bool') return undefined;
+    const row = name === 'matrix.add_row';
+    return `((_m, _i) => deps._mtx.${row ? 'addRow' : 'addCol'}(_m, _i, deps._arr.create(${row ? '_m.columns' : '_m.rows'}, false)))(${receiver}, ${args[0] ?? 'undefined'})`;
+  }
+  function emitBoolMapReturn(name: string, receiverExpression: Expression | undefined, call: string): string {
+    if (versionRules.allowsBoolNaHelpers || !receiverExpression
+      || !['map.get', 'map.put', 'map.remove'].includes(name)) return call;
+    const type = expressionType(receiverExpression);
+    return type?.kind === 'map' && type.valueType?.kind === 'bool' ? `_nz(${call}, false)` : call;
   }
   function expressionKind(expression: Expression | IfStatement): SemanticType['kind'] | undefined {
     return expressionType(expression)?.kind;
@@ -1354,13 +1387,14 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
   }
   const needsAdditiveContexts = ctx.pineVersion >= 5 && additionSites.size > 0;
   const arithmeticTypes = needsAdditiveContexts || (ctx.pineVersion >= 4 && !versionRules.constIntDivisionCanReturnFractional)
-    ? checkProgram(ast, { libraries, recordCallTypeContexts: needsAdditiveContexts }) : undefined;
+    ? checkProgram(ast, { libraries, recordCallTypeContexts: needsAdditiveContexts, recordTupleInitializerCallTypeContexts: false }) : undefined;
   const expressionTypes = arithmeticTypes?.expressionTypes;
   const resolvedUserMethods = new WeakMap<CallExpression, FunctionDeclaration | null>();
   let methodTypes: ReturnType<typeof checkProgram> | undefined;
-  if (ctx.localMethodOverloads.size > 0) {
+  if (ctx.localMethodOverloads.size > 0 || requestedContexts?.ids) {
     recordedExpressionTypes ??= new WeakMap();
     methodTypes = checkProgram(ast, { expressionTypes: recordedExpressionTypes, loopResultTypes, resolvedUserMethods, libraries });
+    if (requestedContexts?.callTypes) methodTypes.callTypeContexts = requestedContexts.callTypes;
 
   }
   const udtArrayExpressions = inferUdtArrayExpressions(ast, ctx.typeDecls, resolvedUserMethods);
@@ -1407,8 +1441,14 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
     if (!context) return null;
     const selected = context.resolvedUserMethod;
     const method = selected && [...ctx.funcInfos].find(([, info]) => info.body === selected.body)?.[0];
+    const callable = requestedContexts && (context.resolvedUserMethod ?? context.resolvedUserFunction);
+    const callableName = callable && [...ctx.funcInfos].find(([, info]) => info.body === callable.body)?.[0];
     return {
       method,
+      ...(requestedContexts?.ids ? { callable: callableName, requests: Object.fromEntries(ctx.securitySites.flatMap(site => {
+        const id = requestedContexts.ids.get(context)?.get(site.node);
+        return id === undefined ? [] : [[site.id, id]];
+      })) } : {}),
       calls: Object.fromEntries([...functionEmitContext.callSites].flatMap(([call, id]) => {
         const child = context.callTypeContexts.get(call);
         return child ? [[id, methodContextDescriptor(child)]] : [];
@@ -1483,12 +1523,26 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
   const taSiteFunctionNames = new Map<TACallSite, string>();
   for (const [name, fi] of ctx.funcInfos) {
     for (const site of ctx.taCallSites) {
-      if (containsNode(fi.body, site.node)) taSiteFunctionNames.set(site, name);
+      if (containsNode(fi.body, site.node)
+        || (!ctx.importedFunctionOwners.has(name) && fi.paramDefaults.some((value) => value && containsNode(value, site.node)))) {
+        taSiteFunctionNames.set(site, name);
+      }
     }
   }
   const localEvaluationNodes = indexLocalEvaluationNodes(ast);
   const localTASites = new Set(ctx.taCallSites.filter((site) => taSiteFunctionNames.has(site) || localEvaluationNodes.has(site.node)));
   const dynamicWindowClasses = new Set(['Highest', 'Lowest', 'HighestBars', 'LowestBars', 'LinReg', 'Range', 'Median', 'Mode', 'PivotHigh', 'PivotLow', 'Dev', 'WMA']);
+  const sharedHistoryClasses = new Set(['ALMA', 'BB', 'BBW', 'CCI', 'CMO', 'COG', 'Correlation']);
+  const sharedHistorySites = new Set(ctx.taCallSites.filter((site) => {
+    const length = site.dynamicCtorArgExprs?.[0];
+    const qualifier = length && expressionType(length)?.qualifier;
+    return length && sharedHistoryClasses.has(site.className) && qualifier !== 'const' && qualifier !== 'input' && qualifier !== 'simple';
+  }));
+  const percentRankHistorySites = new Set(ctx.taCallSites.filter((site) => {
+    const length = site.dynamicCtorArgExprs?.[0];
+    const qualifier = length && expressionType(length)?.qualifier;
+    return length && site.className === 'PercentRank' && qualifier !== 'const' && qualifier !== 'input' && qualifier !== 'simple';
+  }));
   const taSourceSeries = new Map<TACallSite, string>();
   const inlineTASourceSeries = new Set<TACallSite>();
   const sourceSeriesSMASites = ctx.taCallSites.filter((site) => site.className === 'SMA'
@@ -1499,7 +1553,7 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
     return !length || qualifier === 'const' || qualifier === 'input' || qualifier === 'simple';
   }));
   for (const site of ctx.taCallSites) {
-    if (site.dynamicCtorArgExprs && dynamicWindowClasses.has(site.className)) {
+    if (site.dynamicCtorArgExprs && (dynamicWindowClasses.has(site.className) || sharedHistorySites.has(site) || percentRankHistorySites.has(site))) {
       taSourceSeries.set(site, `_ta_source_${site.memberName.replace(/^_ta_/, '')}`);
       inlineTASourceSeries.add(site);
     }
@@ -1511,6 +1565,10 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
       }
     }
   }
+
+  const hasSharedHistoryCalls = [...taSourceSeries.keys()].some((site) => sharedHistoryClasses.has(site.className));
+  const taHistoryEntryField = hasSharedHistoryCalls ? ', entry.historyBar' : '';
+  const taHistoryBinding = hasSharedHistoryCalls ? ', historyBar' : '';
 
   const lines: string[] = [];
   const udtFactories = new Map<string, { member: string; names: string[]; varip: string[] }>();
@@ -1530,9 +1588,14 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
   const rootBlockPersistentInitByValue = new Map<string, string>();
   const functionNameStack: string[] = [];
   const functionStateNameStack: string[] = [];
-  const globalEnumValueTypes = new Map<string, string>();
-  const localEnumValueTypes = new WeakMap<Map<string, string>, Map<string, string>>();
+  const defaultArgumentStateStack: string[] = [];
+  type EnumRelatedType = string | (EnumRelatedType | undefined)[];
+  const globalEnumValueTypes = new Map<string, EnumRelatedType>();
+  const localEnumValueTypes = new WeakMap<Map<string, string>, Map<string, EnumRelatedType>>();
   const enumTypeNames = new Set([...ctx.enumValues.keys(), ...ctx.importedEnumValues.keys()].map((name) => name.slice(0, name.lastIndexOf('.'))));
+  const enumArrayScalarMembers = new Set(['first', 'last', 'pop', 'shift', 'remove']);
+  const enumArrayCollectionMembers = new Set(['copy', 'slice', 'concat']);
+  const enumRequestSites = new Map(ctx.securitySites.filter((site) => site.kind !== 'seed').map((site) => [site.node, site]));
   const enumTitlesByValue = Object.fromEntries([
     ...[...ctx.enumValues].map(([name, value]) => [value, ctx.enumTitles.get(name)]),
     ...[...ctx.importedEnumValues].map(([name, value]) => [value, ctx.importedEnumTitles.get(name)]),
@@ -1547,87 +1610,245 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
     return undefined;
   }
 
-  function enumRelatedAnnotationType(annotation?: TypeAnnotation | null): string | undefined {
-    if (annotation?.baseType === 'udt') return annotation.name;
-    if (annotation?.baseType === 'array') return `array<${annotation.elementType}>`;
+  function enumRelatedTypeName(name?: string, importedAlias?: string): string | undefined {
+    const qualifiedType = importedAlias && name ? `${importedAlias}.${name}` : undefined;
+    return qualifiedType && (enumTypeNames.has(qualifiedType) || ctx.typeDecls.has(qualifiedType)) ? qualifiedType : name;
+  }
+
+  function enumRelatedAnnotationType(annotation?: TypeAnnotation | null, importedAlias?: string): string | undefined {
+    if (annotation?.baseType === 'udt') return enumRelatedTypeName(annotation.name, importedAlias);
+    if (annotation?.baseType === 'array' || annotation?.baseType === 'matrix') return `${annotation.baseType}<${enumRelatedTypeName(annotation.elementType, importedAlias)}>`;
+    if (annotation?.baseType === 'map') return `map<${enumRelatedTypeName(annotation.keyType, importedAlias)},${enumRelatedTypeName(annotation.valueType, importedAlias)}>`;
     return undefined;
   }
 
-  function enumRelatedValueType(expr: Expression | IfStatement, bindings?: Map<string, string>, activeFunctions = new Set<string>()): string | undefined {
+  function enumRelatedBlockValueType(body: Statement[], bindings: Map<string, EnumRelatedType> | undefined, activeFunctions: Set<string>): EnumRelatedType | undefined {
+    const locals = new Map(bindings);
+    const functionName = [...activeFunctions].at(-1);
+    const importedAlias = functionName ? ctx.importedFunctionOwners.get(functionName) : currentImportedAlias();
+    for (const statement of body) {
+      const declarations = statement.type === 'VariableDeclaration' ? [statement] : statement.type === 'MultiDeclaration' ? statement.declarations : [];
+      for (const declaration of declarations) {
+        if (declaration.names.type === 'VariableDeclarator') {
+          locals.set(declaration.names.name.name, enumRelatedAnnotationType(declaration.typeAnnotation, importedAlias) ?? enumRelatedValueType(declaration.init, locals, activeFunctions) ?? '');
+        } else {
+          const types = enumRelatedValueType(declaration.init, locals, activeFunctions);
+          declaration.names.names.forEach((variable, index) => locals.set(variable.name, Array.isArray(types) ? types[index] ?? '' : ''));
+        }
+      }
+    }
+    const tail = body.at(-1);
+    if (tail?.type === 'VariableDeclaration' && tail.names.type === 'VariableDeclarator') return locals.get(tail.names.name.name) || undefined;
+    if (tail?.type === 'IfStatement' || tail?.type === 'WhileStatement' || tail?.type === 'ForStatement') return enumRelatedValueType(tail, locals, activeFunctions);
+    return tail?.type === 'ExpressionStatement' ? enumRelatedValueType(tail.expression, locals, activeFunctions) : undefined;
+  }
+
+  function commonEnumRelatedType(types: Array<EnumRelatedType | undefined>): EnumRelatedType | undefined {
+    return types[0] && types.every((type) => JSON.stringify(type) === JSON.stringify(types[0])) ? types[0] : undefined;
+  }
+
+  function importedArrayGetUsesBuiltinIndex(expr: CallExpression, overloads: readonly { internalName: string }[]): boolean {
+    if (expr.callee.type !== 'MemberExpression' || expr.callee.property.name !== 'get' || overloads.length === 0) return false;
+    const index = orderedArgExpression(expr.arguments, ['index'], 'index', 0);
+    return !!index && expressionKind(index) === 'int' && expressionType(expr.callee.object)?.kind === 'array'
+      && overloads.every((overload) => {
+        const info = ctx.funcInfos.get(overload.internalName);
+        return info?.params.length === 2 && info.paramTypes[0]?.baseType === 'array' && info.paramTypes[1]?.baseType === 'string';
+      });
+  }
+
+  function enumRelatedValueType(expr: Expression | IfStatement, bindings?: Map<string, EnumRelatedType>, activeFunctions = new Set<string>()): EnumRelatedType | undefined {
+    if (expr.type === 'WhileStatement' || expr.type === 'ForStatement') {
+      const locals = new Map(bindings);
+      if (expr.type === 'ForStatement') {
+        if (expr.kind === 'numeric') locals.set(expr.counter.name, '');
+        else {
+          const iterableType = enumRelatedValueType(expr.iterable, bindings, activeFunctions);
+          if (typeof iterableType !== 'string') return undefined;
+          if (iterableType.startsWith('array<')) {
+            locals.set(expr.counter.name, iterableType.slice(6, -1));
+            if (expr.indexCounter) locals.set(expr.indexCounter.name, '');
+          } else if (iterableType.startsWith('matrix<')) {
+            locals.set(expr.counter.name, `array<${iterableType.slice(7, -1)}>`);
+            if (expr.indexCounter) locals.set(expr.indexCounter.name, '');
+          } else if (iterableType.startsWith('map<')) {
+            const separator = iterableType.indexOf(',');
+            locals.set(expr.counter.name, iterableType.slice(separator + 1, -1));
+            if (expr.indexCounter) locals.set(expr.indexCounter.name, iterableType.slice(4, separator));
+          } else return undefined;
+        }
+      }
+      return enumRelatedBlockValueType(expr.body, locals, activeFunctions);
+    }
+    if (expr.type === 'IfStatement') {
+      const consequent = enumRelatedBlockValueType(expr.consequent, bindings, activeFunctions);
+      if (!expr.alternate) return consequent;
+      const alternate = Array.isArray(expr.alternate)
+        ? enumRelatedBlockValueType(expr.alternate, bindings, activeFunctions)
+        : expr.alternate ? enumRelatedValueType(expr.alternate, bindings, activeFunctions) : undefined;
+      return commonEnumRelatedType([consequent, alternate]);
+    }
+    if (expr.type === 'SwitchExpression') {
+      return commonEnumRelatedType(expr.cases.map((entry) => Array.isArray(entry.consequent)
+        ? enumRelatedBlockValueType(entry.consequent, bindings, activeFunctions)
+        : enumRelatedValueType(entry.consequent, bindings, activeFunctions)));
+    }
     if (expr.type === 'Identifier') {
       if (bindings?.has(expr.name)) return bindings.get(expr.name) || undefined;
       const scope = enumVariableScope(expr.name);
       return scope ? localEnumValueTypes.get(scope)?.get(expr.name) : globalEnumValueTypes.get(expr.name);
     }
     if (expr.type === 'MemberExpression') {
-      const name = getMemberChainName(expr);
+      const rawName = getMemberChainName(expr);
+      const name = rawName ? enumMemberName(rawName, [...activeFunctions].at(-1), bindings) : undefined;
       if (name && (ctx.enumValues.has(name) || ctx.importedEnumValues.has(name))) return name.slice(0, name.lastIndexOf('.'));
       const typeName = enumRelatedValueType(expr.object, bindings, activeFunctions);
-      const field = typeName ? ctx.typeDecls.get(typeName)?.node.fields.find((field) => field.name.name === expr.property.name) : undefined;
-      return enumRelatedAnnotationType(field?.typeAnnotation);
+      const typeInfo = typeof typeName === 'string' ? ctx.typeDecls.get(typeName) : undefined;
+      const field = typeInfo?.node.fields.find((field) => field.name.name === expr.property.name);
+      const importedAlias = typeInfo?.name.includes('.') ? typeInfo.name.slice(0, typeInfo.name.lastIndexOf('.')) : undefined;
+      return enumRelatedAnnotationType(field?.typeAnnotation, importedAlias);
     }
     if (expr.type === 'ConditionalExpression') {
       const consequent = enumRelatedValueType(expr.consequent, bindings, activeFunctions);
       const alternate = enumRelatedValueType(expr.alternate, bindings, activeFunctions);
       if (expr.alternate.type === 'NaExpression') return consequent;
       if (expr.consequent.type === 'NaExpression') return alternate;
-      return consequent === alternate ? consequent : undefined;
+      return JSON.stringify(consequent) === JSON.stringify(alternate) ? consequent : undefined;
     }
+    if (expr.type === 'ArrayExpression') return expr.elements.map((element) => enumRelatedValueType(element, bindings, activeFunctions));
     if (expr.type === 'IndexExpression') return enumRelatedValueType(expr.object, bindings, activeFunctions);
     if (expr.type !== 'CallExpression') return undefined;
     const name = getMemberChainName(expr.callee);
+    const requestSite = enumRequestSites.get(expr);
+    if (requestSite) {
+      const type = enumRelatedValueType(requestSite.expressionExpr, bindings, activeFunctions);
+      if (requestSite.kind === 'security') return type;
+      const arrayType = (member: EnumRelatedType | undefined) => typeof member === 'string' ? `array<${member}>` : undefined;
+      return Array.isArray(type) ? type.map(arrayType) : arrayType(type);
+    }
     if (name === 'input.enum') {
       const defval = orderedArgExpression(expr.arguments, ['defval'], 'defval', 0);
       return defval ? enumRelatedValueType(defval, bindings, activeFunctions) : undefined;
     }
-    if (name === 'array.new') return expr.typeArguments?.[0] ? `array<${expr.typeArguments[0]}>` : undefined;
+    if (name === 'array.new' || name === 'matrix.new' || name === 'map.new') {
+      const functionName = [...activeFunctions].at(-1);
+      const importedAlias = functionName ? ctx.importedFunctionOwners.get(functionName) : currentImportedAlias();
+      if (name === 'map.new') return expr.typeArguments?.[1] ? `map<${enumRelatedTypeName(expr.typeArguments[0], importedAlias)},${enumRelatedTypeName(expr.typeArguments[1], importedAlias)}>` : undefined;
+      return expr.typeArguments?.[0] ? `${name.slice(0, -4)}<${enumRelatedTypeName(expr.typeArguments[0], importedAlias)}>` : undefined;
+    }
     if (name === 'array.from') {
       const types = expr.arguments.map((arg) => enumRelatedValueType(arg.value, bindings, activeFunctions));
-      return types[0] && types.every((type) => type === types[0]) ? `array<${types[0]}>` : undefined;
+      return typeof types[0] === 'string' && types.every((type) => type === types[0]) ? `array<${types[0]}>` : undefined;
     }
-    const receiver = name === 'array.get'
-      ? orderedArgExpression(expr.arguments, ['id', 'index'], 'id', 0)
+    const selectedMethod = resolvedUserMethods.get(expr);
+    const selectedFunction = ctx.resolvedUserFunctionCalls.get(expr);
+    const callables = (selectedFunction ? [selectedFunction] : functionEmitContext.callSiteFunctions.get(expr) ?? (name && ctx.funcInfos.has(name) ? [name] : [])).filter((functionName) => {
+      if (expr.callee.type !== 'MemberExpression') return true;
+      const importedMethods = ctx.importedMethodOverloads.get(expr.callee.property.name) ?? [];
+      if (!importedMethods.some((method) => method.internalName === functionName)) return true;
+      if (isStaticNamespaceReceiver(expr.callee.object) || importedArrayGetUsesBuiltinIndex(expr, importedMethods)) return false;
+      return !validateUserFunctionCall(functionName, expr, 1, true);
+    });
+    const extraction = name === 'map.keys' || name === 'map.values'
+      ? name.slice(4)
+      : expr.callee.type === 'MemberExpression' ? expr.callee.property.name : undefined;
+    const extractionReceiver = name === 'map.keys' || name === 'map.values'
+      ? orderedArgExpression(expr.arguments, ['id'], 'id', 0)
+      : expr.callee.type === 'MemberExpression' ? expr.callee.object : undefined;
+    if ((extraction === 'keys' || extraction === 'values') && extractionReceiver && !selectedMethod && (selectedMethod === null || callables.length === 0)) {
+      const type = enumRelatedValueType(extractionReceiver, bindings, activeFunctions);
+      if (typeof type === 'string' && type.startsWith('map<')) {
+        const separator = type.indexOf(',');
+        const elementType = extraction === 'keys' ? type.slice(4, separator) : type.slice(separator + 1, -1);
+        return `array<${elementType}>`;
+      }
+    }
+    const mapValueMember = name?.startsWith('map.') ? name.slice(4) : expr.callee.type === 'MemberExpression' ? expr.callee.property.name : undefined;
+    if ((mapValueMember === 'put' || mapValueMember === 'remove') && !selectedMethod && (selectedMethod === null || callables.length === 0)) {
+      const mapValueParameters = mapValueMember === 'put' ? ['id', 'key', 'value'] : ['id', 'key'];
+      const mapReceiver = name === `map.${mapValueMember}` ? orderedArgExpression(expr.arguments, mapValueParameters, 'id', 0) : expr.callee.type === 'MemberExpression' ? expr.callee.object : undefined;
+      const type = mapReceiver ? enumRelatedValueType(mapReceiver, bindings, activeFunctions) : undefined;
+      if (typeof type === 'string' && type.startsWith('map<')) return type.slice(type.indexOf(',') + 1, -1);
+    }
+    const getParameters = name === 'array.get' ? ['id', 'index'] : name === 'matrix.get' ? ['id', 'row', 'column'] : name === 'map.get' ? ['id', 'key'] : undefined;
+    const receiver = getParameters
+      ? orderedArgExpression(expr.arguments, getParameters, 'id', 0)
       : expr.callee.type === 'MemberExpression' && expr.callee.property.name === 'get' ? expr.callee.object : undefined;
-    if (receiver) {
+    if (receiver && !selectedMethod && (selectedMethod === null || callables.length === 0)) {
       const type = enumRelatedValueType(receiver, bindings, activeFunctions);
-      if (type?.startsWith('array<')) return type.slice(6, -1);
+      if (typeof type === 'string' && (type.startsWith('array<') || type.startsWith('matrix<'))) return type.slice(type.indexOf('<') + 1, -1);
+      if (typeof type === 'string' && type.startsWith('map<')) return type.slice(type.indexOf(',') + 1, -1);
     }
-    if (name?.endsWith('.new') && ctx.typeDecls.has(name.slice(0, -4))) return name.slice(0, -4);
-    const functionNames = functionEmitContext.callSiteFunctions.get(expr) ?? (name && ctx.funcInfos.has(name) ? [name] : []);
+    const matrixAxisMember = name?.startsWith('matrix.') ? name.slice(7) : expr.callee.type === 'MemberExpression' ? expr.callee.property.name : undefined;
+    if ((matrixAxisMember === 'row' || matrixAxisMember === 'col' || matrixAxisMember === 'remove_row' || matrixAxisMember === 'remove_col') && !selectedMethod && (selectedMethod === null || callables.length === 0)) {
+      const matrixReceiver = name === `matrix.${matrixAxisMember}` ? orderedArgExpression(expr.arguments, ['id'], 'id', 0) : expr.callee.type === 'MemberExpression' ? expr.callee.object : undefined;
+      const type = matrixReceiver ? enumRelatedValueType(matrixReceiver, bindings, activeFunctions) : undefined;
+      if (typeof type === 'string' && type.startsWith('matrix<')) return `array<${type.slice(7, -1)}>`;
+    }
+    const collectionPreservingReceiver = name === 'matrix.copy' || name === 'map.copy' || name === 'matrix.submatrix' || name === 'matrix.transpose'
+      ? orderedArgExpression(expr.arguments, ['id'], 'id', 0)
+      : expr.callee.type === 'MemberExpression' && ['copy', 'submatrix', 'transpose'].includes(expr.callee.property.name) ? expr.callee.object : undefined;
+    if (collectionPreservingReceiver && !selectedMethod && (selectedMethod === null || callables.length === 0)) {
+      const type = enumRelatedValueType(collectionPreservingReceiver, bindings, activeFunctions);
+      if (typeof type === 'string' && (type.startsWith('matrix<') || type.startsWith('map<') || ctx.typeDecls.has(type))) return type;
+    }
+    const arrayReturnMember = name?.startsWith('array.') ? name.slice(6) : expr.callee.type === 'MemberExpression' ? expr.callee.property.name : undefined;
+    if (arrayReturnMember && (enumArrayScalarMembers.has(arrayReturnMember) || enumArrayCollectionMembers.has(arrayReturnMember)) && !selectedMethod && (selectedMethod === null || callables.length === 0)) {
+      const arrayReturnParameters = arrayReturnMember === 'concat' ? ['id1', 'id2'] : ['id'];
+      const arrayReceiver = name === `array.${arrayReturnMember}` ? orderedArgExpression(expr.arguments, arrayReturnParameters, arrayReturnParameters[0]!, 0) : expr.callee.type === 'MemberExpression' ? expr.callee.object : undefined;
+      const type = arrayReceiver ? enumRelatedValueType(arrayReceiver, bindings, activeFunctions) : undefined;
+      if (typeof type === 'string' && type.startsWith('array<')) return enumArrayCollectionMembers.has(arrayReturnMember) ? type : type.slice(6, -1);
+    }
+    if (name?.endsWith('.copy') && !selectedMethod && (selectedMethod === null || callables.length === 0)) {
+      const functionName = [...activeFunctions].at(-1);
+      const alias = functionName ? ctx.importedFunctionOwners.get(functionName) : currentImportedAlias();
+      const typeName = enumRelatedTypeName(name.slice(0, -5), alias);
+      if (typeName && ctx.typeDecls.has(typeName)) return typeName;
+    }
+    if (name?.endsWith('.new')) {
+      const typeName = name.slice(0, -4);
+      const functionName = [...activeFunctions].at(-1);
+      const alias = functionName ? ctx.importedFunctionOwners.get(functionName) : currentImportedAlias();
+      const qualifiedType = alias ? ctx.importedLocalTypes.get(`${alias}.${typeName}`) : undefined;
+      if (qualifiedType && ctx.typeDecls.has(qualifiedType)) return qualifiedType;
+      if (ctx.typeDecls.has(typeName)) return typeName;
+    }
+    const functionNames = selectedMethod
+      ? callables.filter((name) => ctx.funcInfos.get(name)?.body === selectedMethod.body)
+      : callables;
     const returnTypes = functionNames.map((functionName) => {
       const info = ctx.funcInfos.get(functionName);
       if (!info || activeFunctions.has(functionName)) return undefined;
       const nestedActive = new Set([...activeFunctions, functionName]);
-      const locals = new Map(info.params.map((param, index) => [param, enumRelatedAnnotationType(info.paramTypeAnnotations[index]) ?? '']));
+      const importedAlias = ctx.importedFunctionOwners.get(functionName);
+      const locals = new Map<string, EnumRelatedType>(info.params.map((param, index) => {
+        const annotation = info.paramTypeAnnotations[index];
+        const argument = orderedArgExpression(expr.arguments, info.params, param, index) ?? info.paramDefaults[index];
+        const inherited = !annotation && expr.callee.type === 'Identifier' && argument ? enumRelatedValueType(argument, bindings, activeFunctions) : undefined;
+        return [param, enumRelatedAnnotationType(annotation, importedAlias) ?? inherited ?? ''];
+      }));
       if (!Array.isArray(info.body)) return enumRelatedValueType(info.body, locals, nestedActive);
-      for (const statement of info.body) {
-        const declarations = statement.type === 'VariableDeclaration' ? [statement] : statement.type === 'MultiDeclaration' ? statement.declarations : [];
-        for (const declaration of declarations) {
-          if (declaration.names.type === 'VariableDeclarator') {
-            locals.set(declaration.names.name.name, enumRelatedAnnotationType(declaration.typeAnnotation) ?? enumRelatedValueType(declaration.init, locals, nestedActive) ?? '');
-          }
-        }
-      }
-      const tail = info.body.at(-1);
-      return tail?.type === 'ExpressionStatement' ? enumRelatedValueType(tail.expression, locals, nestedActive) : undefined;
+      return enumRelatedBlockValueType(info.body, locals, nestedActive);
     });
-    return returnTypes[0] && returnTypes.every((type) => type === returnTypes[0]) ? returnTypes[0] : undefined;
+    return commonEnumRelatedType(returnTypes);
   }
 
   function isEnumValue(expr: Expression | IfStatement): boolean {
     const type = enumRelatedValueType(expr);
-    return type !== undefined && enumTypeNames.has(type);
+    return typeof type === 'string' && enumTypeNames.has(type);
   }
 
   function registerEnumVariable(stmt: VariableDeclaration): void {
-    if (stmt.names.type !== 'VariableDeclarator') return;
-    const type = enumRelatedAnnotationType(stmt.typeAnnotation) ?? enumRelatedValueType(stmt.init);
-    const name = stmt.names.name.name;
-    const scope = enumVariableScope(name);
-    const vars = scope ? (localEnumValueTypes.get(scope) ?? new Map<string, string>()) : globalEnumValueTypes;
-    if (scope) localEnumValueTypes.set(scope, vars);
-    if (type) vars.set(name, type);
-    else vars.delete(name);
+    const type = enumRelatedAnnotationType(stmt.typeAnnotation, currentImportedAlias()) ?? enumRelatedValueType(stmt.init);
+    const variables = stmt.names.type === 'VariableDeclarator' ? [stmt.names.name] : stmt.names.names;
+    variables.forEach((variable, index) => {
+      const valueType = stmt.names.type === 'VariableDeclarator' ? type : Array.isArray(type) ? type[index] : undefined;
+      const scope = enumVariableScope(variable.name);
+      const vars = scope ? (localEnumValueTypes.get(scope) ?? new Map<string, EnumRelatedType>()) : globalEnumValueTypes;
+      if (scope) localEnumValueTypes.set(scope, vars);
+      if (valueType) vars.set(variable.name, valueType);
+      else vars.delete(variable.name);
+    });
   }
 
   for (const stmt of ast.body) {
@@ -1636,7 +1857,7 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
   }
 
   function currentFunctionStateName(): string {
-    return functionStateNameStack[functionStateNameStack.length - 1] ?? '_state';
+    return defaultArgumentStateStack.at(-1) ?? functionStateNameStack[functionStateNameStack.length - 1] ?? '_state';
   }
 
   function sameImportedLibraryFunctionName(calleeName: string): string | undefined {
@@ -1652,6 +1873,14 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
   function currentImportedAlias(): string | undefined {
     const currentFunctionName = functionNameStack[functionNameStack.length - 1];
     return (currentFunctionName ? ctx.importedFunctionOwners.get(currentFunctionName) : undefined) ?? ctx.importedAliasContext;
+  }
+
+  function enumMemberName(name: string, functionName?: string, bindings?: Map<string, EnumRelatedType>): string | undefined {
+    const root = name.split('.')[0]!;
+    if (bindings?.has(root) || (!functionName && (currentLocalName(root) || currentPersistentLocalName(root)))) return undefined;
+    const alias = functionName ? ctx.importedFunctionOwners.get(functionName) : currentImportedAlias();
+    const qualified = alias ? `${alias}.${name}` : undefined;
+    return qualified && ctx.importedEnumValues.has(qualified) ? qualified : importedMemberName(name);
   }
 
   function sameImportedLibraryTypeName(typeName: string): string | undefined {
@@ -1687,6 +1916,29 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
     const methodOverloads = ctx.localMethodOverloads.get(functionName) ?? [];
     const compatibleMethods = methodOverloads.filter((overload) => !validateUserFunctionCall(overload.internalName, expr, 0, true));
     return compatibleMethods.length === 1 ? compatibleMethods[0]!.internalName : undefined;
+  }
+
+  function emitRequestedCallableCall(name: string, expr: CallExpression): string | undefined {
+    if (!requestedContexts) return undefined;
+    if (functionNameStack.length === 0) {
+      const context = requestedContexts.callTypes.get(expr);
+      const declaration = context?.resolvedUserMethod ?? context?.resolvedUserFunction;
+      const selected = declaration && [...ctx.funcInfos].find(([, info]) => info.body === declaration.body)?.[0];
+      return selected ? emitUserFunctionCall(selected, expr) : undefined;
+    }
+    const candidates = [...new Set([
+      ...(ctx.localMethodOverloads.get(name) ?? []).map(overload => overload.internalName),
+      ...(ctx.userFunctionOverloads.get(name) ?? []),
+      ...(ctx.funcInfos.has(name) ? [name] : []),
+    ])].filter(candidate => !validateUserFunctionCall(candidate, expr, 0, false));
+    if (candidates.length < 2) return undefined;
+    const id = functionEmitContext.callSites.get(expr);
+    const branches = candidates.map(candidate =>
+      `if (_methodContext?.calls[${id}]?.callable === ${JSON.stringify(candidate)}) return ${emitUserFunctionCall(candidate, expr)};`);
+    const fallback = emitFunctionSyntaxMethodCall(name, expr);
+    const regular = fallback ? undefined : resolveUserFunctionCallName(name, expr);
+    const call = fallback ?? (regular ? emitUserFunctionCall(regular, expr) : runtimeErrorExpr(`No requested callable matched ${name}`));
+    return `(() => { ${branches.join(' ')} return ${call}; })()`;
   }
 
   function emitFunctionSyntaxMethodCall(name: string, expr: CallExpression): string | undefined {
@@ -2282,7 +2534,7 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
 
   function emitMemberExpr(expr: MemberExpression): string {
     const rawChainName = getMemberChainName(expr);
-    const chainName = rawChainName ? importedMemberName(rawChainName) : undefined;
+    const chainName = rawChainName ? enumMemberName(rawChainName) : undefined;
     if (chainName) {
       const enumValue = ctx.enumValues.get(chainName);
       if (enumValue) return JSON.stringify(enumValue);
@@ -2425,7 +2677,11 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
     if (historyMember) {
       const value = emitExpr(expr.object);
       const state = functionNameStack.length > 0 ? currentFunctionStateName() : 'undefined';
-      return `(() => { const _value = ${value}; const _series = this._expressionHistory(${state}, "${historyMember}", _value, ctx.barIndex); return _series.get(${historyIdx}); })()`;
+      const history = `_series.get(${historyIdx})`;
+      const result = !versionRules.allowsBoolNaHelpers && expressionKind(expr.object) === 'unknown'
+        ? `_boolHistory(${history}, typeof _value === "boolean")`
+        : history;
+      return `(() => { const _value = ${value}; const _series = this._expressionHistory(${state}, "${historyMember}", _value, ctx.barIndex); return ${result}; })()`;
     }
     return `_idx(${emitExpr(expr.object)}, ${idx})`;
   }
@@ -2502,6 +2758,8 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
       if (sameLibraryFunction) return emitUserFunctionCall(sameLibraryFunction, expr);
     }
     if (expr.callee.type === 'Identifier') {
+      const requestedCall = emitRequestedCallableCall(fullName, expr);
+      if (requestedCall) return requestedCall;
       const methodCall = emitFunctionSyntaxMethodCall(fullName, expr);
       if (methodCall) return methodCall;
       const resolvedFunction = resolveUserFunctionCallName(fullName, expr);
@@ -2582,6 +2840,7 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
       const value = emitExpr(operand);
       const kind = expressionKind(operand);
       if (kind === 'int' || kind === 'float') return `_isNa(${value})`;
+      if (ctx.pineVersion >= 5 && kind === 'string') return `((_value) => _value === "" || _isNa(_value))(${value})`;
       return `_isNa(ctx.callBuiltin("__resolveTableReference", [${value}]))`;
     }
     if (fullName === 'fixnan') {
@@ -2596,7 +2855,12 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
     // Type casts
     if (fullName === 'int') return `Math.trunc(${emitOrderedArg(expr.arguments, ['x'], 'x', 0) ?? 'NaN'})`;
     if (fullName === 'float') return `+(${emitOrderedArg(expr.arguments, ['x'], 'x', 0) ?? 'NaN'})`;
-    if (fullName === 'bool') return `_isTruthy(${emitOrderedArg(expr.arguments, ['x'], 'x', 0) ?? 'NaN'})`;
+    if (fullName === 'bool') {
+      const value = emitOrderedArg(expr.arguments, ['x'], 'x', 0) ?? 'NaN';
+      return ctx.pineVersion === 5
+        ? `((_value) => _isNa(_value) ? NaN : _isTruthy(_value))(${value})`
+        : `_isTruthy(${value})`;
+    }
     if (fullName === 'string') return `_string(${emitOrderedArg(expr.arguments, ['x'], 'x', 0) ?? 'NaN'})`;
 
     // String functions
@@ -2656,7 +2920,7 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
         return `ctx.runtimeError(["map call receiver was supplied multiple times (positional and named 'id')"])`;
       }
       const mapped = MAP_FUNC_MAP[fullName];
-      if (mapped) return `deps._map.${mapped}(${args.join(', ')})`;
+      if (mapped) return emitBoolMapReturn(fullName, orderedArgExpression(expr.arguments, argNames ?? [], 'id', 0), `deps._map.${mapped}(${args.join(', ')})`);
       return `deps._map.${fullName.replace('map.', '')}(${args.join(', ')})`;
     }
 
@@ -2709,6 +2973,12 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
       if (argNames?.[0] === 'id' && hasPositionalReceiverBeforeNamedArg(expr.arguments, 'id')) {
         return `ctx.runtimeError(["matrix call receiver was supplied multiple times (positional and named 'id')"])`;
       }
+      if (fullName === 'matrix.new' && expr.typeArguments?.[0] === 'bool'
+        && !versionRules.allowsBoolNaHelpers && args.length < 3) {
+        return `deps._mtx.create(${args[0] ?? '0'}, ${args[1] ?? '0'}, false)`;
+      }
+      const boolAxis = emitOmittedBoolMatrixAxis(fullName, orderedArgExpression(expr.arguments, argNames ?? [], 'id', 0), args[0] ?? 'undefined', args.slice(1));
+      if (boolAxis) return boolAxis;
       const mapped = MATRIX_FUNC_MAP[fullName];
       if (mapped) return `deps._mtx.${mapped}(${args.join(', ')})`;
       return `deps._mtx.${fullName.replace('matrix.', '')}(${args.join(', ')})`;
@@ -2718,6 +2988,8 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
     if (fullName === 'request.security' || fullName === 'security' || fullName === 'request.security_lower_tf' || fullName === 'request.seed') {
       const secSite = ctx.securitySites.find((s) => s.node === expr);
       if (secSite) {
+        const requestId = requestedContexts?.nodes.has(secSite.node) && functionNameStack.length > 0
+          ? `(_methodContext?.requests?.[${secSite.id}] ?? ${secSite.id})` : String(secSite.id);
         if (secSite.kind === 'seed') {
           const sourceExpr = secSite.sourceExpr ? emitExpr(secSite.sourceExpr) : '""';
           const symExpr = emitExpr(secSite.symbolExpr);
@@ -2727,7 +2999,7 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
             ? { type: 'Identifier', name: secSite.expressionSourceParam, loc: undefined }
             : undefined);
           const captureExpr = emitRequestCaptureObject(secSite.expressionCaptureParams, secSite.independentRequestCaptures);
-          return `ctx.requestSeed(${secSite.id}, ${sourceExpr}, ${symExpr}, ${ignoreSymbolExpr}, ${calcExpr}, ${sourceDescriptorExpr}, ${captureExpr})`;
+          return `ctx.requestSeed(${requestId}, ${sourceExpr}, ${symExpr}, ${ignoreSymbolExpr}, ${calcExpr}, ${sourceDescriptorExpr}, ${captureExpr})`;
         }
         const symExpr = emitExpr(secSite.symbolExpr);
         const tfExpr = emitExpr(secSite.timeframeExpr);
@@ -2740,7 +3012,7 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
             ? { type: 'Identifier', name: secSite.expressionSourceParam, loc: undefined }
             : undefined);
           const captureExpr = emitRequestCaptureObject(secSite.expressionCaptureParams, secSite.independentRequestCaptures);
-          return `ctx.requestSecurityLowerTf(${secSite.id}, ${symExpr}, ${tfExpr}, ${ignoreSymbolExpr}, ${currencyExpr}, ${ignoreTfExpr}, ${calcExpr}, ${sourceDescriptorExpr}, ${captureExpr}, ${secSite.expressionTupleArity ?? 'undefined'})`;
+          return `ctx.requestSecurityLowerTf(${requestId}, ${symExpr}, ${tfExpr}, ${ignoreSymbolExpr}, ${currencyExpr}, ${ignoreTfExpr}, ${calcExpr}, ${sourceDescriptorExpr}, ${captureExpr}, ${secSite.expressionTupleArity ?? 'undefined'})`;
         }
         const gapsExpr = secSite.gapsExpr ? emitExpr(secSite.gapsExpr) : '"barmerge.gaps_off"';
         const laExpr = secSite.lookaheadExpr ? emitExpr(secSite.lookaheadExpr) : '"barmerge.lookahead_off"';
@@ -2751,7 +3023,7 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
           ? { type: 'Identifier', name: secSite.expressionSourceParam, loc: undefined }
           : undefined);
         const captureExpr = emitRequestCaptureObject(secSite.expressionCaptureParams, secSite.independentRequestCaptures);
-        return `ctx.requestSecurity(${secSite.id}, ${symExpr}, ${tfExpr}, ${gapsExpr}, ${laExpr}, ${ignoreSymbolExpr}, ${currencyExpr}, ${calcExpr}, ${sourceDescriptorExpr}, ${captureExpr})`;
+        return `ctx.requestSecurity(${requestId}, ${symExpr}, ${tfExpr}, ${gapsExpr}, ${laExpr}, ${ignoreSymbolExpr}, ${currencyExpr}, ${calcExpr}, ${sourceDescriptorExpr}, ${captureExpr})`;
       }
     }
     if (fullName === 'request.currency_rate') {
@@ -2870,12 +3142,15 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
     const staticCopyTypeName = expr.callee.type === 'MemberExpression' && expr.callee.property.name === 'copy'
       ? getMemberChainName(expr.callee.object)
       : undefined;
+    const resolvedStaticCopyTypeName = staticCopyTypeName
+      ? (sameImportedLibraryTypeName(staticCopyTypeName) ?? (ctx.typeDecls.has(staticCopyTypeName) ? staticCopyTypeName : undefined))
+      : undefined;
     if (
-      staticCopyTypeName
+      resolvedStaticCopyTypeName
       && expr.callee.type === 'MemberExpression'
-      && ctx.typeDecls.has(staticCopyTypeName)
+      && ctx.typeDecls.has(resolvedStaticCopyTypeName)
     ) {
-      const copyArg = emitCollectionCallArgs(`${staticCopyTypeName}.copy`, expr.arguments, ['id'])[0] ?? posArgs[0] ?? 'undefined';
+      const copyArg = emitCollectionCallArgs(`${resolvedStaticCopyTypeName}.copy`, expr.arguments, ['id'])[0] ?? posArgs[0] ?? 'undefined';
       return `deps._udt.copy(${copyArg})`;
     }
 
@@ -2887,6 +3162,13 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
       );
       if (overloads.length === 1) return emitUserFunctionCall(overloads[0]!.internalName, methodExpr, emitExpr(methodExpr.callee.object));
       if (overloads.length > 0) return emitLocalMethodCall(overloads, methodExpr);
+      const importedOverloads = (sameImportedLibraryMethodOverloads(methodExpr.callee.property.name)
+        ?? ctx.importedMethodOverloads.get(methodExpr.callee.property.name) ?? []).filter((overload) =>
+        ctx.funcInfos.get(overload.internalName)?.paramTypes[0]?.baseType === collectionMethodKind
+        && !validateUserFunctionCall(overload.internalName, methodExpr, 1, true)
+        && (!resolvedUserMethods.has(methodExpr) || ctx.funcInfos.get(overload.internalName)?.body === resolvedUserMethods.get(methodExpr)?.body)
+      );
+      if (importedOverloads.length > 0) return emitImportedMethodCall(importedOverloads, methodExpr);
       const receiver = emitExpr((expr.callee as MemberExpression).object);
       const method = (expr.callee as MemberExpression).property.name;
       const resolvedRuntimeMethod = collectionRuntimeMethodName(collectionMethodKind, method);
@@ -2896,6 +3178,9 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
       const methodArgs = methodArgNames
         ? emitCollectionCallArgs(methodFullName, expr.arguments, methodArgNames)
         : posArgs;
+      const boolAxis = collectionMethodKind === 'matrix'
+        ? emitOmittedBoolMatrixAxis(methodFullName, (expr.callee as MemberExpression).object, receiver, methodArgs) : undefined;
+      if (boolAxis) return boolAxis;
       const needsLegacyIndexGuard = collectionMethodKind === 'array'
         && !versionRules.allowsNegativeArrayIndices
         && ['get', 'set', 'insert', 'remove'].includes(runtimeMethod);
@@ -2903,8 +3188,13 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
         return `_legacyArray_${runtimeMethod}(${[receiver, ...methodArgs].join(', ')})`;
       }
       if (resolvedRuntimeMethod && !needsLegacyIndexGuard) {
+        if (ctx.pineVersion === 5 && methodFullName === 'array.join') {
+          methodArgs[0] ??= 'undefined';
+          methodArgs[1] = 'true';
+        }
         const helpers = collectionMethodKind === 'array' ? '_arr' : collectionMethodKind === 'map' ? '_map' : '_mtx';
-        return `deps.${helpers}.${runtimeMethod}(${[receiver, ...methodArgs].join(', ')})`;
+        const call = `deps.${helpers}.${runtimeMethod}(${[receiver, ...methodArgs].join(', ')})`;
+        return collectionMethodKind === 'map' ? emitBoolMapReturn(methodFullName, (expr.callee as MemberExpression).object, call) : call;
       }
       return `_callCollectionMethod("${collectionMethodKind}", ${receiver}, "${runtimeMethod}", [${methodArgs.join(', ')}])`;
     }
@@ -2927,6 +3217,10 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
       const importedOverloads = sameImportedLibraryMethodOverloads(expr.callee.property.name)
         ?? ctx.importedMethodOverloads.get(expr.callee.property.name);
       if (importedOverloads && importedOverloads.length > 0) {
+        const index = expr.callee.property.name === 'get' ? orderedArgExpression(expr.arguments, ['index'], 'index', 0) : undefined;
+        if (index && importedArrayGetUsesBuiltinIndex(expr, importedOverloads)) {
+          return `deps._arr.get(${emitExpr(expr.callee.object)}, ${emitExpr(index)})`;
+        }
         return emitImportedMethodCall(importedOverloads, expr as CallExpression & { callee: MemberExpression });
       }
 
@@ -3000,6 +3294,8 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
 
     // User-defined function
     if (expr.callee.type === 'Identifier') {
+      const requestedCall = emitRequestedCallableCall(fullName, expr);
+      if (requestedCall) return requestedCall;
       const methodCall = emitFunctionSyntaxMethodCall(fullName, expr);
       if (methodCall) return methodCall;
       const resolvedFunction = resolveUserFunctionCallName(fullName, expr);
@@ -3035,15 +3331,27 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
     const branches = overloads.map((overload) => {
       const call = emitUserFunctionCall(overload.internalName, expr, temp);
       if (!overload.receiverType) return `return ${call};`;
+      const collectionReceiver = ctx.funcInfos.get(overload.internalName)?.paramTypes[0]?.baseType;
+      if (collectionReceiver === 'array' || collectionReceiver === 'matrix' || collectionReceiver === 'map') {
+        return `if (${localReceiverCondition(temp, collectionReceiver)}) return ${call};`;
+      }
+      const enumReceiver = enumRelatedAnnotationType(ctx.funcInfos.get(overload.internalName)?.paramTypeAnnotations[0], ctx.importedFunctionOwners.get(overload.internalName));
+      if (typeof enumReceiver === 'string' && enumTypeNames.has(enumReceiver) && enumRelatedValueType(expr.callee.object) === enumReceiver) {
+        const members = [...ctx.enumValues, ...ctx.importedEnumValues]
+          .filter(([name]) => name.slice(0, name.lastIndexOf('.')) === enumReceiver).map(([, value]) => value);
+        return `if (_isNa(${temp}) || ${JSON.stringify(members)}.includes(${temp})) return ${call};`;
+      }
       return `if (${importedReceiverCondition(temp, overload.receiverType)}) return ${call};`;
     });
     return `(() => { const ${temp} = ${receiver}; ${branches.join(' ')} throw new Error("No imported method overload matched ${expr.callee.property.name} for receiver " + (${temp} && ${temp}.__tealscriptUdt ? ${temp}.typeName : typeof ${temp})); })()`;
   }
 
   function emitLocalMethodCall(overloads: LocalMethodOverloadInfo[], expr: CallExpression & { callee: MemberExpression }): string {
-    const selected = resolvedUserMethods.get(expr);
+    const selected = functionNameStack.length === 0 && requestedContexts
+      ? requestedContexts.callTypes.get(expr)?.resolvedUserMethod ?? resolvedUserMethods.get(expr)
+      : resolvedUserMethods.get(expr);
     const selectedOverload = selected && overloads.find((overload) => ctx.funcInfos.get(overload.internalName)?.body === selected.body);
-    if (selectedOverload && functionNameStack.length === 0) return emitUserFunctionCall(selectedOverload.internalName, expr, emitExpr(expr.callee.object));
+    if (selectedOverload && (functionStateNameStack.length === 0 || localNameStack.length === 0)) return emitUserFunctionCall(selectedOverload.internalName, expr, emitExpr(expr.callee.object));
     const receiver = emitExpr(expr.callee.object);
     const temp = `_method_receiver_${functionEmitContext.callSites.get(expr) ?? 'x'}`;
     const receiverKind = expressionKind(expr.callee.object);
@@ -3148,23 +3456,24 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
       ?? validateUserFunctionCall(name, expr, start, receiver !== undefined);
     if (validationError) return runtimeErrorExpr(validationError);
     const callSiteId = functionEmitContext.callSites.get(expr);
-    const arithmeticContextArgs = arithmeticTypes ? [functionNameStack.length > 0
+    const stateCallSiteId = callSiteId ?? functionEmitContext.defaultCallSites.get(expr);
+    const arithmeticContextArgs = arithmeticTypes ? [functionStateNameStack.length > 0
       ? `_arithmeticContext?.calls[${callSiteId}]`
       : JSON.stringify(arithmeticContextDescriptor(arithmeticTypes.callTypeContexts?.get(expr)))] : [];
-    const methodContextArgs = methodTypes ? [functionNameStack.length > 0
+    const methodContextArgs = methodTypes ? [functionStateNameStack.length > 0
       ? `_methodContext?.calls[${callSiteId}]`
       : JSON.stringify(methodContextDescriptor(methodTypes.callTypeContexts?.get(expr)))] : [];
     const localVars = functionEmitContext.localVars.get(name) ?? [];
     const hasTACalls = ctx.funcInfos.get(name)?.hasTACalls ?? false;
     const historyParams = functionEmitContext.paramHistory.get(name) ?? new Set();
     const historyLocals = functionEmitContext.localHistory.get(name) ?? new Set();
-    const needsHistory = (historyParams.size > 0 || historyLocals.size > 0) && callSiteId !== undefined;
+    const needsHistory = (historyParams.size > 0 || historyLocals.size > 0) && stateCallSiteId !== undefined;
     const currentFunctionName = functionNameStack[functionNameStack.length - 1];
-    const hasState = (functionNeedsState(name) || Boolean(currentFunctionName) && needsHistory) && callSiteId !== undefined;
+    const hasState = (functionNeedsState(name) || Boolean(currentFunctionName) && needsHistory) && stateCallSiteId !== undefined;
     const stateArg = hasState
       ? currentFunctionName
-        ? `this._childFnState(_state, ${callSiteId}, [${localVars.map((localVar) => JSON.stringify(jsPineName(localVar.name))).join(', ')}], ${hasTACalls ? 'true' : 'false'}, ${expressionHistoryFunctions.has(name) ? 'true' : 'false'}, [${localVars.filter((localVar) => localVar.kind === 'varip').map((localVar) => JSON.stringify(jsPineName(localVar.name))).join(', ')}], [${localVars.filter((localVar) => localVar.kind === 'var').map((localVar) => JSON.stringify(jsPineName(localVar.name))).join(', ')}])`
-        : `this.${jsStateMember('_fn_state_', String(callSiteId))}`
+        ? `this._childFnState(${defaultArgumentStateStack.at(-1) ?? '_state'}, ${stateCallSiteId}, [${localVars.map((localVar) => JSON.stringify(jsPineName(localVar.name))).join(', ')}], ${hasTACalls ? 'true' : 'false'}, ${expressionHistoryFunctions.has(name) ? 'true' : 'false'}, [${localVars.filter((localVar) => localVar.kind === 'varip').map((localVar) => JSON.stringify(jsPineName(localVar.name))).join(', ')}], [${localVars.filter((localVar) => localVar.kind === 'var').map((localVar) => JSON.stringify(jsPineName(localVar.name))).join(', ')}])`
+        : `this.${jsStateMember('_fn_state_', String(stateCallSiteId))}`
       : 'undefined';
     const values = receiver ? [receiver] : [];
     const positional = args.filter((arg) => !arg.name).map((arg) => arg.value);
@@ -3183,13 +3492,22 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
       const defaultArg = fi.paramDefaults[i];
       const valueArg = positionalArg ?? defaultArg;
       if (!positionalArg && defaultArg) {
-        // Default expressions belong to the called function's library, while
-        // explicit arguments retain the caller's name resolution.
+        // Defaults use the definition scope; supplied arguments keep caller bindings.
+        const callerLocals = localNameStack.splice(0);
+        const callerPersistent = persistentLocalStack.splice(0);
+        const callerSources = localSourceNameStack.splice(0);
+        const callerHistory = localHistoryNameStack.splice(0);
         functionNameStack.push(name);
+        defaultArgumentStateStack.push(ctx.importedFunctionOwners.has(name) ? '_state' : stateArg);
         try {
           values.push(emitExpr(defaultArg));
         } finally {
+          defaultArgumentStateStack.pop();
           functionNameStack.pop();
+          localNameStack.push(...callerLocals);
+          persistentLocalStack.push(...callerPersistent);
+          localSourceNameStack.push(...callerSources);
+          localHistoryNameStack.push(...callerHistory);
         }
       } else {
         values.push(valueArg ? argumentValues?.get(valueArg) ?? emitExpr(valueArg) : 'undefined');
@@ -3201,13 +3519,13 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
       return `this.${jsFunctionMember(name)}(${['ctx', stateArg, ...arithmeticContextArgs, ...methodContextArgs, ...values, ...sourceDescriptors, ...fi.params.map(() => 'undefined'), ...historyLocals].join(', ')})`;
 
     }
-    const tempPrefix = `_fn_arg_${callSiteId}_`;
+    const tempPrefix = `_fn_arg_${stateCallSiteId}_`;
     const scopedState = `${tempPrefix}state`;
     const setup = values.map((value, index) => `const ${tempPrefix}${index} = ${value};`).join(' ')
       + (currentFunctionName ? ` const ${scopedState} = ${stateArg};` : '');
     const historyMember = (kind: string, variable: string): string => currentFunctionName
       ? `this._functionHistory(${scopedState}, ${JSON.stringify(`${kind}:${variable}`)})`
-      : `this.${jsStateMember(kind === 'param' ? '_fn_param_series_' : '_fn_local_series_', `${callSiteId}_${variable}`)}`;
+      : `this.${jsStateMember(kind === 'param' ? '_fn_param_series_' : '_fn_local_series_', `${stateCallSiteId}_${variable}`)}`;
     const historyUpdates: string[] = [];
     const historyArgs = fi.params.map((param, index) => {
       if (!historyParams.has(param)) return 'undefined';
@@ -3476,7 +3794,7 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
       } else if (field.defaultExpr) {
         value = emitExpr(field.defaultExpr);
       } else {
-        value = 'NaN';
+        value = typeInfo.node.fields[i].typeAnnotation?.baseType === 'bool' && !versionRules.allowsBoolNaHelpers ? 'false' : 'NaN';
       }
       fieldEntries.push(value);
       if (field.varip) varipFields.push(`"${field.name}"`);
@@ -3572,6 +3890,16 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
     }
 
     const windowSeries = taSourceSeries.get(site);
+    if (percentRankHistorySites.has(site) && windowSeries) {
+      const state = scoped ? currentFunctionStateName() : 'undefined';
+      const history = `this._expressionHistory(${state}, ${JSON.stringify(windowSeries)}, ${args[0]}, ctx.barIndex)`;
+      return `this._deps.PercentRank.computeWindow(${history}, ${emitExpr(site.dynamicCtorArgExprs![0])})`;
+    }
+    if (site.dynamicCtorArgExprs && sharedHistorySites.has(site) && windowSeries) {
+      const state = scoped ? currentFunctionStateName() : 'undefined';
+      const source = `[ctx.barIndex, [${args.join(', ')}]]`;
+      return `this._historyTAFromSeries(${state}, ${JSON.stringify(site.memberName)}, ${JSON.stringify(site.className)}, ${ctorArgExpr}, this._expressionHistory(${state}, ${JSON.stringify(windowSeries)}, ${source}, ctx.barIndex), ctx.barIndex)`;
+    }
     if (site.dynamicCtorArgExprs && dynamicWindowClasses.has(site.className) && windowSeries) {
       const source = args[0] ?? (site.className.startsWith('Highest') || site.className === 'PivotHigh' ? 'ctx.bar.high' : 'ctx.bar.low');
       const state = scoped ? currentFunctionStateName() : 'undefined';
@@ -3631,7 +3959,9 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
       const source = sourceArg ? emitExpr(sourceArg) : '((ctx.bar.high + ctx.bar.low + ctx.bar.close) / 3)';
       const anchor = anchorArg ? emitExpr(anchorArg)
         : `(ctx.barIndex === 0 || ctx.callBuiltin("timeframe.change", ["1D"], {}, ${nextBuiltinCallId('timeframe.change')}))`;
-      return `(ctx.isFirstTick ? ${member}.compute(${source}, ${anchor}, ctx.bar.volume) : ${member}.recompute(${source}, ${anchor}, ctx.bar.volume))`;
+      const multiplierArg = readOrderedCallArg(site.node.arguments, ['source', 'anchor', 'stdev_mult'], 'stdev_mult', 2);
+      const multiplier = multiplierArg ? emitExpr(multiplierArg) : 'NaN';
+      return `(ctx.isFirstTick ? ${member}.compute(${source}, ${anchor}, ctx.bar.volume, ${multiplier}) : ${member}.recompute(${source}, ${anchor}, ctx.bar.volume, ${multiplier}))`;
     }
 
     if (site.className === 'WPR') {
@@ -3970,6 +4300,10 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
     if (isBoolConstructor && !versionRules.allowsBoolNaHelpers && posArgs.length < 2) {
       return `deps._arr.create(${posArgs[0] ?? '0'}, false)`;
     }
+    if (ctx.pineVersion === 5 && fullName === 'array.join') {
+      posArgs[1] ??= 'undefined';
+      posArgs[2] = 'true';
+    }
     const mapped = ARRAY_FUNC_MAP[fullName];
     if (mapped) return `deps._arr.${mapped}(${posArgs.join(', ')})`;
     return `deps._arr.${fullName.replace('array.', '')}(${posArgs.join(', ')})`;
@@ -4258,7 +4592,8 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
     }
 
     const name = stmt.names.name.name;
-    const ifDefault = stmt.typeAnnotation?.baseType === 'bool' && !versionRules.allowsBoolNaHelpers ? 'false' : 'NaN';
+    const ifDefault = ctx.pineVersion >= 5 && expressionKind(stmt.init) === 'string' ? '""'
+      : stmt.typeAnnotation?.baseType === 'bool' && !versionRules.allowsBoolNaHelpers ? 'false' : 'NaN';
     const isRootExecutionScope = depth === 2 && functionNameStack.length === 0;
     const blockLocal = stmt.kind === 'var' || stmt.kind === 'varip' ? undefined : rootBlockDeclarationName(name, stmt);
     const isRootRegularTarget = !blockLocal && rootRegularVars.has(name) && functionNameStack.length === 0;
@@ -4387,7 +4722,8 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
       return;
     }
 
-    const rhs = emitExpr(stmt.init);
+    const rhs = ctx.pineVersion >= 5 && stmt.typeAnnotation?.baseType === 'string' && stmt.init.type === 'NaExpression'
+      ? '""' : emitExpr(stmt.init);
     bindRootBlockDeclaration(name, blockLocal);
         activateLocalDeclaration(name);
 
@@ -4613,7 +4949,10 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
         emitIf(stmt.alternate, depth, assignTarget);
       }
     } else {
-      if (assignTarget && !versionRules.allowsBoolNaHelpers && expressionKind(stmt) === 'bool') {
+      if (assignTarget && ctx.pineVersion >= 5 && expressionKind(stmt) === 'string') {
+        lines.push(`${pad}} else {`);
+        lines.push(`${pad}  ${assignTarget} = "";`);
+      } else if (assignTarget && !versionRules.allowsBoolNaHelpers && expressionKind(stmt) === 'bool') {
         lines.push(`${pad}} else {`);
         lines.push(`${pad}  ${assignTarget} = false;`);
       }
@@ -5147,6 +5486,24 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
   lines.push('    series.update({ source: Number(source), filled: defined ? Number(source) : (previous?.filled ?? NaN), valid: (previous?.valid ?? 0) + (defined ? 1 : 0) });');
   lines.push('    return series;');
   lines.push('  }');
+  if (hasSharedHistoryCalls) {
+    lines.push('  _historyTAFromSeries(state, memberName, className, args, series, barIndex) {');
+    lines.push('    const instance = this._scopedTA(state, memberName, className, args);');
+    lines.push('    const entry = state ? state.__taLast.get(memberName) : this._dynamicTALast.get(memberName);');
+    lines.push('    if (entry.historyBar === barIndex) return instance.recompute(...series.get(0)[1]);');
+    lines.push('    const samples = [];');
+    lines.push('    for (let index = 0; index < series.size; index++) {');
+    lines.push('      const sample = series.get(index);');
+    lines.push('      if (!Array.isArray(sample)) continue;');
+    lines.push('      if (sample[0] <= entry.historyBar) break;');
+    lines.push('      if (samples.length === 0 || samples[samples.length - 1][0] !== sample[0]) samples.push(sample);');
+    lines.push('    }');
+    lines.push('    let result = NaN;');
+    lines.push('    for (let index = samples.length - 1; index >= 0; index--) result = instance.compute(...samples[index][1]);');
+    lines.push('    entry.historyBar = barIndex;');
+    lines.push('    return result;');
+    lines.push('  }');
+  }
   lines.push('  _windowTAFromSeries(series, className, args, barIndex) {');
   lines.push('    if (["Highest", "Lowest", "HighestBars", "LowestBars"].includes(className)) {');
   lines.push('      const n = Number(args[0]);');
@@ -5267,7 +5624,7 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
   lines.push('      if (key !== "__taCache" && key !== "__taSeries" && key !== "__taLast" && key !== "__fnStates" && key !== "__expressionHistories" && key !== "__functionHistories" && key !== "__fixnan") snap[key] = value;');
   lines.push('    }');
   lines.push('    if (state.__fixnan) snap.__fixnan = Array.from(state.__fixnan.entries());');
-  lines.push('    if (state.__taCache) snap.__taCache = Array.from(state.__taCache.entries()).map(([key, entry]) => [key, entry.className, entry.args, entry.instance.save()]);');
+  lines.push(`    if (state.__taCache) snap.__taCache = Array.from(state.__taCache.entries()).map(([key, entry]) => [key, entry.className, entry.args, entry.instance.save()${taHistoryEntryField}]);`);
   lines.push('    if (state.__taSeries) snap.__taSeries = Array.from(state.__taSeries.entries()).map(([key, series]) => [key, series.save()]);');
   lines.push('    if (state.__fnStates) snap.__fnStates = this._saveChildFnStates(state.__fnStates);');
   lines.push('    if (state.__expressionHistories) snap.__expressionHistories = Array.from(state.__expressionHistories.entries()).map(([key, entry]) => [key, entry.lastBar, entry.series.save()]);');
@@ -5289,10 +5646,10 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
   lines.push('    }');
   lines.push('    state.__fixnan = new Map(snap?.__fixnan ?? []);');
   lines.push('    state.__taCache = new Map();');
-  lines.push('    for (const [key, className, args, saved] of snap?.__taCache ?? []) {');
+  lines.push(`    for (const [key, className, args, saved${taHistoryBinding}] of snap?.__taCache ?? []) {`);
   lines.push('      const instance = new this._deps[className](...args);');
   lines.push('      instance.restore(saved);');
-  lines.push('      state.__taCache.set(key, { className, args, instance });');
+  lines.push(`      state.__taCache.set(key, { className, args, instance${taHistoryBinding} });`);
   lines.push('    }');
   lines.push('    state.__taSeries = new Map();');
   lines.push('    for (const [key, saved] of snap?.__taSeries ?? []) {');
@@ -5317,6 +5674,56 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
   lines.push('  }');
 
   // User-defined functions
+  const bodyParameterTypes = new Map<string, { path: string; types: Map<string, EnumRelatedType> }[]>();
+  if ((enumTypeNames.size > 0 || ctx.typeDecls.size > 0) && [...ctx.funcInfos.values()].some((info) => info.paramTypeAnnotations.some((annotation) => !annotation))) {
+    const types = checkProgram(ast, { libraries, recordCallTypeContexts: true, recordMethodFunctionCallTypeContexts: true, resolvedUserMethods: new WeakMap() });
+    const collectBodyParameterTypes = (parent: SemanticExpressionTypeContext, path?: string, inheritedDefaults?: Map<string, EnumRelatedType>): void => {
+      for (const [call, id] of functionEmitContext.callSites) {
+        if (!path && functionEmitContext.nestedCallSites.has(call)) continue;
+        const child = parent.callTypeContexts.get(call);
+        if (!child) continue;
+        const callPath = path ? `${path}/${id}` : `fn_${id}`;
+        const selectedMethod = call.callee.type === 'MemberExpression'
+          ? resolvedUserMethods.has(call) ? resolvedUserMethods.get(call) : child.resolvedUserMethod
+          : undefined;
+        const localMethod = selectedMethod && call.callee.type === 'MemberExpression'
+          ? ctx.localMethodOverloads.get(call.callee.property.name)?.find((overload) => ctx.funcInfos.get(overload.internalName)?.body === selectedMethod.body)
+          : undefined;
+        const name = call.callee.type === 'Identifier' ? resolveUserFunctionCallName(call.callee.name, call) : localMethod?.internalName;
+        const info = name ? ctx.funcInfos.get(name) : undefined;
+        let nestedDefaults: Map<string, EnumRelatedType> | undefined;
+        if (name && info && !ctx.importedFunctionOwners.has(name)) {
+          const parameters = new Map<string, EnumRelatedType>();
+          info.params.forEach((param, index) => {
+            if (info.paramTypeAnnotations[index]) return;
+            const argument = localMethod && call.callee.type === 'MemberExpression'
+              ? index === 0 ? call.callee.object : orderedArgExpression(call.arguments, info.params.slice(1), param, index - 1)
+              : orderedArgExpression(call.arguments, info.params, param, index);
+            const type = argument ? parent.expressionTypes.get(argument) : undefined;
+            const defaultValue = !argument ? info.paramDefaults[index] : undefined;
+            const defaultType = defaultValue ? enumRelatedValueType(defaultValue)
+              : argument?.type === 'Identifier' && (!type || type.kind === 'unknown') ? inheritedDefaults?.get(argument.name) : undefined;
+            if (typeof defaultType === 'string' && (enumTypeNames.has(defaultType) || ctx.typeDecls.has(defaultType) || ((defaultValue || (argument?.type === 'Identifier' && inheritedDefaults?.has(argument.name))) && defaultType.match(/^(?:array|matrix|map)<(.+)>$/)?.[1]?.split(',').some((name) => enumTypeNames.has(name.trim()) || ctx.typeDecls.has(name.trim()))))) {
+              parameters.set(param, defaultType);
+              (nestedDefaults ??= new Map()).set(param, defaultType);
+            }
+            if (type?.kind === 'udt' && type.name && (enumTypeNames.has(type.name) || ctx.typeDecls.has(type.name))) parameters.set(param, type.name);
+            const collectionType = type?.kind === 'array' || type?.kind === 'matrix'
+              ? `${type.kind}<${type.elementType?.name ?? type.elementType?.kind}>`
+              : type?.kind === 'map' ? `map<${type.keyType?.name ?? type.keyType?.kind},${type.valueType?.name ?? type.valueType?.kind}>` : undefined;
+            if (collectionType?.match(/^(?:array|matrix|map)<(.+)>$/)?.[1]?.split(',').some((name) => enumTypeNames.has(name.trim()) || ctx.typeDecls.has(name.trim()))) parameters.set(param, collectionType);
+          });
+          if (parameters.size > 0) {
+            const profiles = bodyParameterTypes.get(name) ?? [];
+            profiles.push({ path: callPath, types: parameters });
+            bodyParameterTypes.set(name, profiles);
+          }
+        }
+        collectBodyParameterTypes(child, callPath, nestedDefaults);
+      }
+    };
+    if (types.expressionTypes && types.callTypeContexts) collectBodyParameterTypes({ expressionTypes: types.expressionTypes, callTypeContexts: types.callTypeContexts });
+  }
   for (const [name, fi] of ctx.funcInfos) {
     const paramNames = fi.params.map(localParamName);
     const functionStateName = '_state';
@@ -5337,10 +5744,11 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
     functionNameStack.push(name);
     functionStateNameStack.push(functionStateName);
     localNameStack.push(localNames);
-    localEnumValueTypes.set(localNames, new Map(fi.params.flatMap((param, index) => {
-      const type = enumRelatedAnnotationType(fi.paramTypeAnnotations[index]);
+    const declaredParameterTypes = new Map(fi.params.flatMap((param, index) => {
+      const type = enumRelatedAnnotationType(fi.paramTypeAnnotations[index], currentImportedAlias());
       return type ? [[param, type] as [string, string]] : [];
-    })));
+    }));
+    localEnumValueTypes.set(localNames, declaredParameterTypes);
     localSourceNameStack.push(localSourceNames);
     localHistoryNameStack.push(localHistoryNames);
     persistentLocalStack.push(localVars);
@@ -5350,11 +5758,19 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
         lines.push(`    if (${paramNames[i]} === undefined) ${paramNames[i]} = ${emitExpr(defaultExpr)};`);
       }
     }
-    if (Array.isArray(fi.body)) {
-      emitFunctionBody(fi.body);
-    } else {
-      lines.push(`    return ${emitExpr(fi.body)};`);
+    const emitBody = (): void => {
+      if (Array.isArray(fi.body)) emitFunctionBody(fi.body);
+      else lines.push(`    return ${emitExpr(fi.body)};`);
+    };
+    for (const profile of bodyParameterTypes.get(name) ?? []) {
+      lines.push(`    if (_state?.__callPath === ${JSON.stringify(profile.path)}) {`);
+      localEnumValueTypes.set(localNames, new Map([...declaredParameterTypes, ...profile.types]));
+      emitBody();
+      lines.push('      return;');
+      lines.push('    }');
     }
+    localEnumValueTypes.set(localNames, declaredParameterTypes);
+    emitBody();
     persistentLocalStack.pop();
     localHistoryNameStack.pop();
     localSourceNameStack.pop();
@@ -5588,7 +6004,7 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
     lines.push(`      ${memberName}: this.${memberName}.save(),`);
     lines.push(`      ${memberName}_bar: this.${memberName}_bar,`);
   }
-  lines.push('      _dynamicTACache: Array.from(this._dynamicTACache.entries()).map(([key, entry]) => [key, entry.className, entry.args, entry.instance.save()]),');
+  lines.push(`      _dynamicTACache: Array.from(this._dynamicTACache.entries()).map(([key, entry]) => [key, entry.className, entry.args, entry.instance.save()${taHistoryEntryField}]),`);
   for (const site of ctx.taVarSites) {
     lines.push(`      ${site.memberName}: this.${site.memberName}.save(),`);
     lines.push(`      ${site.seriesName}: this.${site.seriesName}.save(),`);
@@ -5713,10 +6129,10 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
   }
   lines.push('    this._dynamicTACache = new Map();');
   lines.push('    this._dynamicTALast = new Map();');
-  lines.push('    for (const [key, className, args, state] of snap._dynamicTACache ?? []) {');
+  lines.push(`    for (const [key, className, args, state${taHistoryBinding}] of snap._dynamicTACache ?? []) {`);
   lines.push('      const instance = new this._deps[className](...args);');
   lines.push('      instance.restore(state);');
-  lines.push('      this._dynamicTACache.set(key, { className, args, instance });');
+  lines.push(`      this._dynamicTACache.set(key, { className, args, instance${taHistoryBinding} });`);
   lines.push('    }');
   for (const site of ctx.taVarSites) {
     lines.push(`    this.${site.memberName}.restore(snap.${site.memberName});`);

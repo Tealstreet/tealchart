@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { parse } from '../../src/parser';
 import { checkProgram } from '../../src/semantic/checker';
 
-// Reference: ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json.
+// Reference: https://www.tradingview.com/pine-script-reference/v6/.
 const cases = [
   {
     "id": "reshape-id-int-refusal",

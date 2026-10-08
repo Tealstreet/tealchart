@@ -5,7 +5,7 @@ import { executeScript } from '../../src/runtime/compiledOnly';
 import { checkProgram } from '../../src/semantic/checker';
 import { compatibilityBars, getPlot } from './fixtures';
 
-// ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json
+// https://www.tradingview.com/pine-script-reference/v6/
 // functions[624], methods[205] signatures explicitly return matrix<int>.
 describe('collection integer power overload', () => {
   it.each([

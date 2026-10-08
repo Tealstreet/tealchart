@@ -15,7 +15,7 @@ class InvalidCurrencyDatafeed extends InMemoryRequestDatafeed {
   }
 }
 
-// Authority: ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json entries[703].params[2] (ignore_invalid_currency).
+// Authority: https://www.tradingview.com/pine-script-reference/v6/ entries[703].params[2] (ignore_invalid_currency).
 // Explicit provider failure distinguishes this contract from an unseeded host fixture.
 describe('documented invalid currency response', () => {
   for (const nested of [false, true]) {

@@ -3,6 +3,10 @@ import type { FromWorkerMessage, ResultMessage, ToWorkerMessage } from '../../sr
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import { createWorkerTestModule } from '../helpers/workerTestModule';
+
+const workerModule = createWorkerTestModule();
+
 function bars(closes: number[], startTime = 60_000): Bar[] {
   return closes.map((close, index) => ({
     time: startTime + index * 60_000,
@@ -20,8 +24,7 @@ async function worker() {
     onmessage: null as ((event: MessageEvent<ToWorkerMessage>) => void) | null,
     postMessage: (message: FromWorkerMessage) => posted.push(message),
   };
-  vi.stubGlobal('self', global);
-  await import('../../src/worker/worker');
+  await workerModule.attach(global);
   return (data: ToWorkerMessage): ResultMessage['output'] => {
     posted.length = 0;
     global.onmessage?.({ data } as MessageEvent<ToWorkerMessage>);
@@ -43,7 +46,6 @@ plot(barstate.ishistory ? 1 : 0)`;
 
 describe('ledger gaps 45: worker execution lifecycle', () => {
   afterEach(() => {
-    vi.resetModules();
     vi.unstubAllGlobals();
   });
 

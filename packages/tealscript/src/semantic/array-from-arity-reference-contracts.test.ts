@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
+import { arityBoundaryCases } from '../../tests/helpers/arityBoundaryCases';
+
 import { parse } from '../parser';
 import { checkProgram } from './checker';
 
@@ -25,7 +27,12 @@ a = array.from(${Array.from({ length: count }, () => value).join(', ')})
 `;
 
 describe('documented array.from variadic argument limits', () => {
-  for (const { name, value, limit } of cases) {
+  for (const { name, value } of cases) {
+    it(`accepts a small ${name} call`, () => {
+      expect(checkProgram(parse(source(value, 3))).diagnostics, reference).toEqual([]);
+    });
+  }
+  for (const { name, value, limit } of arityBoundaryCases(cases)) {
     it(`accepts ${limit} ${name} arguments and rejects ${limit + 1}`, () => {
       expect(checkProgram(parse(source(value, limit))).diagnostics, reference).toEqual([]);
       expect(checkProgram(parse(source(value, limit + 1))).diagnostics, reference).toEqual([

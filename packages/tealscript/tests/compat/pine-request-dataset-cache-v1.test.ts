@@ -3,7 +3,7 @@ import { expect, it } from 'vitest';
 import { parse } from '../../src/parser';
 import { executeCompiled, tryCompile } from '../../src/runtime/codegen/execute';
 
-// Reference: ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json /entries/704.
+// Reference: https://www.tradingview.com/pine-script-reference/v6/ /entries/704.
 // Provider datasets are independent of the changing captured expression values.
 it('fetches a nested requested dataset once while evaluating changing captures separately', () => {
   const bars = [1, 2, 3].map((close, index) => ({

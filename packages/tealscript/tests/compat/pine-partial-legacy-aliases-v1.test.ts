@@ -14,7 +14,7 @@ const bars = [7, 11, 3].map((close, i) => ({
 }));
 const errors = (source: string) => checkProgram(parse(source)).diagnostics.filter((d) => d.severity === 'error');
 
-// ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json: bar_index and input.
+// https://www.tradingview.com/pine-script-reference/v6/: bar_index and input.
 // https://www.tradingview.com/pine-script-docs/migration-guides/to-pine-version-4/#renaming-of-built-in-constants-variables-and-functions
 // V4 renamed n to bar_index and integer to input.integer.
 describe('PARTIAL legacy alias boundaries', () => {

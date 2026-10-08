@@ -7,7 +7,7 @@ const a = (...values: number[]) => {
   values.forEach((x) => pushArrayValue(result, x));
   return result;
 };
-// Native boundary/slot captures: archive ledger/collection-singles-ymk07v-v1/NATIVE-EVIDENCE-v1.json.
+// Functional regression: preserve the argument and result contract.
 describe('native collection single standardize-slots', () => {
   it.each([
     [1, NaN, 3],

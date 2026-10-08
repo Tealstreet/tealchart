@@ -6,7 +6,7 @@ import { parse } from '../../src/parser';
 import { compatibilityBars } from './fixtures';
 import { measureProductionWorkerSessions } from './productionWorkerHarness';
 
-// Rank1609: ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json functions[680].
+// Rank1609: https://www.tradingview.com/pine-script-reference/v6/ functions[680].
 // Caller execution authority: https://www.tradingview.com/pine-script-docs/language/execution-model/#realtime-bars
 const library = parse(
   '//@version=6\nlibrary("Live", true)\nexport sample(float value) => value * 2\nexport live() => barstate.isrealtime ? 1 : 0',

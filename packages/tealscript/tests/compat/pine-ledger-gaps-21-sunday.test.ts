@@ -4,7 +4,7 @@ import { parse } from '../../src/parser';
 import { checkProgram } from '../../src/semantic/checker';
 import { compatibilityBars, getPlot, runCompatScript } from './fixtures';
 
-// Authority: ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json, const_dayofweek.sunday.
+// Authority: https://www.tradingview.com/pine-script-reference/v6/, const_dayofweek.sunday.
 // Rename: https://www.tradingview.com/pine-script-docs/migration-guides/to-pine-version-4/#renaming-of-built-in-constants-variables-and-functions
 describe('ledger823 Sunday namespace boundary', () => {
   it.each([[3, 'sunday'], [4, 'dayofweek.sunday'], [6, 'dayofweek.sunday']] as const)('accepts Pine%s %s', (version, expression) => {

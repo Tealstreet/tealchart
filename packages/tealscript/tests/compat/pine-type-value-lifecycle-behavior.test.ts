@@ -4,7 +4,7 @@ import { parse } from '../../src/parser';
 import { executeScript, type Bar } from '../../src/runtime';
 import { getPlot } from './fixtures';
 
-// Authority: ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json.
+// Authority: https://www.tradingview.com/pine-script-reference/v6/.
 // Ledger: type-qualifier-system-v1. Narrow cases do not certify sibling objects.
 const closes = [5, -3, 0, 9, 2, -7];
 const bars: Bar[] = closes.map((close, index) => ({

@@ -7,6 +7,8 @@ import type {
   IndicatorDeclaration,
   LibraryDeclaration,
   IfStatement,
+  ForStatement,
+  WhileStatement,
   CallExpression,
   CallArgument,
   MemberExpression,
@@ -136,6 +138,8 @@ export interface RequestSourceSite {
 }
 
 export interface AnalysisContext {
+  recordedExpressionTypes?: WeakMap<Expression | IfStatement, SemanticType>;
+  loopResultTypes?: WeakMap<ForStatement | WhileStatement, SemanticType[]>;
   pineVersion: number;
   discardedFootprintCalls?: Set<Expression>;
   seriesVars: Set<string>;
@@ -180,7 +184,16 @@ export interface AnalysisContext {
   maxBarsBackHints: Map<string, number>;
 }
 
+export interface SemanticTypeAnalysis {
+  ast: Program;
+  libraries?: Map<string, Program>;
+  result: ReturnType<typeof checkProgram>;
+  recordedExpressionTypes: WeakMap<Expression | IfStatement, SemanticType>;
+  loopResultTypes: WeakMap<ForStatement | WhileStatement, SemanticType[]>;
+}
+
 export interface AnalyzeOptions {
+  semanticTypes?: SemanticTypeAnalysis;
   libraries?: Map<string, Program>;
   capturedParams?: Set<string>;
   importedAliasContext?: string;
@@ -757,19 +770,30 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
       : functionName;
   }
 
-  function inferExpressionTupleArity(expr: Expression): number | undefined {
-    if (expr.type === 'ArrayExpression') return expr.elements.length;
-    if (expr.type !== 'CallExpression' || expr.callee.type !== 'Identifier') return undefined;
-
-    const body = functionBodies.get(ctx.resolvedUserFunctionCalls.get(expr) ?? userFunctionInternalName(expr.callee.name, expr.arguments.length));
-    if (!body) return undefined;
-    if (!Array.isArray(body)) return body.type === 'ArrayExpression' ? body.elements.length : undefined;
-
-    const lastStmt = body.at(-1);
-    if (lastStmt?.type === 'ExpressionStatement' && lastStmt.expression.type === 'ArrayExpression') {
-      return lastStmt.expression.elements.length;
+  function inferReturnedTupleArity(node: Expression | IfStatement | Statement[]): number | undefined {
+    if (Array.isArray(node)) {
+      const tail = node.at(-1);
+      return tail?.type === 'ExpressionStatement' ? inferReturnedTupleArity(tail.expression)
+        : tail?.type === 'IfStatement' ? inferReturnedTupleArity(tail) : undefined;
     }
-    return undefined;
+    if (node.type === 'ArrayExpression') return node.elements.length;
+    const arities = node.type === 'IfStatement'
+      ? [inferReturnedTupleArity(node.consequent), node.alternate ? inferReturnedTupleArity(node.alternate) : undefined]
+      : node.type === 'SwitchExpression' ? node.cases.map((entry) => inferReturnedTupleArity(entry.consequent)) : [];
+    return arities[0] && arities.every((arity) => arity === arities[0]) ? arities[0] : undefined;
+  }
+
+  function inferExpressionTupleArity(expr: Expression): number | undefined {
+    const directArity = inferReturnedTupleArity(expr);
+    if (directArity !== undefined) return directArity;
+    if (expr.type !== 'CallExpression') return undefined;
+
+    const fullName = resolveDependencyMember(resolveCallee(expr.callee).fullName, activeFunctionName, ctx.importedDependencyScopes);
+    const functionName = ctx.resolvedUserFunctionCalls.get(expr) ?? ctx.importedFunctions.get(fullName)
+      ?? (expr.callee.type === 'Identifier' ? userFunctionInternalName(fullName, expr.arguments.length) : undefined);
+    const body = functionName ? functionBodies.get(functionName) : undefined;
+    if (!body) return undefined;
+    return inferReturnedTupleArity(body);
   }
 
   function walkFunctionBody(name: string, params: string[], body: Expression | Statement[]): void {
@@ -1139,11 +1163,20 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
       }
     }
 
-    if ([...importedFunctionCounts.values()].some((count) => count > 1)) {
+    if ([...importedFunctionCounts.values()].some((count) => count > 1) || dependencyScope.size > 0) {
       for (const program of [ast, libraryAst]) {
         const declarations = checkProgram(program, { libraries: options.libraries }).userFunctionCallDeclarations;
         for (const [call, declaration] of declarations) {
-          const name = importedFunctionNames.get(declaration);
+          let name = importedFunctionNames.get(declaration);
+          if (!name && program === libraryAst) {
+            const namespace = resolveCallee(call.callee).namespace;
+            const dependencyOwner = namespace ? dependencyScope.get(namespace) : undefined;
+            if (dependencyOwner) {
+              name = [...ctx.funcInfos].find(([internalName, info]) =>
+                ctx.importedFunctionOwners.get(internalName) === dependencyOwner && info.body === declaration.body
+              )?.[0];
+            }
+          }
           if (name) ctx.resolvedUserFunctionCalls.set(call, name);
         }
       }
@@ -1844,7 +1877,13 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
   const legacyDeclarationDivision = !!ctx.declarationInfo && ast.version >= 4
     && !versionRules.constIntDivisionCanReturnFractional;
   if (legacyDeclarationDivision || ctx.taCallSites.some(site => ['Highest', 'Lowest', 'SMA', 'EMA', 'WMA'].includes(site.className))) {
-    const types = checkProgram(ast, { libraries: options.libraries }).expressionTypes;
+    const prepared = options.semanticTypes?.ast === ast && options.semanticTypes.libraries === options.libraries
+      ? options.semanticTypes : undefined;
+    const recordedExpressionTypes = prepared?.recordedExpressionTypes ?? new WeakMap<Expression | IfStatement, SemanticType>();
+    const loopResultTypes = prepared?.loopResultTypes ?? new WeakMap<ForStatement | WhileStatement, SemanticType[]>();
+    const types = (prepared?.result ?? checkProgram(ast, { libraries: options.libraries, expressionTypes: recordedExpressionTypes, loopResultTypes })).expressionTypes;
+    ctx.recordedExpressionTypes = recordedExpressionTypes;
+    ctx.loopResultTypes = loopResultTypes;
     if (legacyDeclarationDivision && ctx.declarationInfo) ctx.declarationInfo.constantExpressionTypes = types;
     let v6Types: typeof types;
     for (const site of ctx.taCallSites) {
@@ -2304,10 +2343,11 @@ function extractCtorArgs(fullName: string, args: CallArgument[]): unknown[] {
       return ctorArgs;
     }
     case 'ta.vwap': {
-      const stdevMultArg = readOrderedArg(args, ['source', 'anchor', 'stdev_mult'], 'stdev_mult', 2);
-      if (!stdevMultArg) return [false, NaN];
-      const stdevMult = extractStaticNumber(stdevMultArg);
-      return stdevMult === null ? [] : [true, stdevMult];
+      const names = ['source', 'anchor', 'stdev_mult'];
+      const hasExplicitAnchor = Boolean(readOrderedArg(args, names, 'anchor', 1));
+      const stdevMultArg = readOrderedArg(args, names, 'stdev_mult', 2);
+      const ctorArgs = stdevMultArg ? [true, extractStaticNumber(stdevMultArg) ?? NaN] : [false, NaN];
+      return hasExplicitAnchor ? [...ctorArgs, true] : ctorArgs;
     }
     case 'ta.stoch': {
       const len = extractStaticNumber(args.find((a) => a.name?.name === 'length')?.value ?? positional[3]);
@@ -2522,11 +2562,6 @@ function extractCtorArgExprs(fullName: string, args: CallArgument[]): Expression
     case 'ta.change': {
       const names = ['source', 'length'];
       return [readAliasedArg(names, 'length', 1) ?? numericLiteral(1)];
-    }
-    case 'ta.vwap': {
-      const names = ['source', 'anchor', 'stdev_mult'];
-      const stdevMult = readAliasedArg(names, 'stdev_mult', 2);
-      return stdevMult ? [booleanLiteral(true), stdevMult] : [];
     }
     case 'ta.macd': {
       const names = ['source', 'fastlen', 'slowlen', 'siglen'];

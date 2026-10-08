@@ -4,7 +4,7 @@ import { parse } from '../../src/parser';
 import { executeScript, type Bar } from '../../src/runtime';
 import { getPlot } from './fixtures';
 
-// Authority: ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json.
+// Authority: https://www.tradingview.com/pine-script-reference/v6/.
 // Ledger: type-qualifier-system-v1. All vectors are calculated from the cited
 // definitions and explicit script branches, never captured from engine output.
 const closes = [-2.8, 0, 5.9, -0.4, 2.2, -7.6];
@@ -57,18 +57,17 @@ describe('documented typed missing values', () => {
     });
   }
 
-  // Reference variable/na remarks and type/<type> remarks: an explicit type gives
-  // na its context. function/na returns true only for missing values. Defined
-  // zero, transparent black and empty string reject falsey-is-missing readings.
-  // RED for each: _isNa always false; failed on first missing bar, restored pass.
+  // Reference na/type remarks preserve numeric zero and transparent black.
+  // V56 v5/v6 Empty_NA_Control=1 supersedes the old empty-string assumption.
+  // The string assignment remains missing; numeric/color controls stay present.
   for (const entry of [
-    { type: 'int', defined: '0' },
-    { type: 'float', defined: '0.0' },
-    { type: 'color', defined: '#00000000' },
-    { type: 'string', defined: '""' },
+    { type: 'int', defined: '0', expected: [1, 0, 0, 0, 0, 0] },
+    { type: 'float', defined: '0.0', expected: [1, 0, 0, 0, 0, 0] },
+    { type: 'color', defined: '#00000000', expected: [1, 0, 0, 0, 0, 0] },
+    { type: 'string', defined: '""', expected: [1, 1, 1, 1, 1, 1] },
   ]) {
-    it(`${entry.type} na initialization differs from a defined falsey value`, () => {
-      expect(values(`var ${entry.type} value = na\nif bar_index == 1\n    value := ${entry.defined}\nplot(na(value) ? 1 : 0, title="Value")`)).toEqual([1, 0, 0, 0, 0, 0]);
+    it(`${entry.type} na initialization and falsey assignment preserve their missingness`, () => {
+      expect(values(`var ${entry.type} value = na\nif bar_index == 1\n    value := ${entry.defined}\nplot(na(value) ? 1 : 0, title="Value")`)).toEqual(entry.expected);
     });
   }
 });

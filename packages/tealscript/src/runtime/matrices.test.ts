@@ -483,10 +483,10 @@ describe('PineMatrix', () => {
     expect(eigenvectorsMatrixValue(blockRotation).values).toEqual(Array(9).fill(Number.NaN));
   });
 
-  it('retains missing publication for an unresolved real Jordan block', () => {
+  it('resolves the repeated real roots of a Jordan block', () => {
     const matrix = createPineMatrix<number>(3, 3, 0);
     matrix.values = [2, 1, 0, 0, 2, 1, 0, 0, 2];
-    expect(eigenvaluesMatrixValue(matrix).values).toEqual(Array(3).fill(Number.NaN));
+    expect(eigenvaluesMatrixValue(matrix).values).toEqual([2, 2, 2]);
   });
 
   it('rejects matrix inverses for non-square or singular matrices', () => {

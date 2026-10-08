@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { parse } from '../../src/parser';
 import { checkProgram } from '../../src/semantic';
 
-// Reference: ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json, types8/9/13/14/18 and collection templates.
+// Reference: https://www.tradingview.com/pine-script-reference/v6/, types8/9/13/14/18 and collection templates.
 // https://www.tradingview.com/pine-script-docs/language/user-defined-functions/#type-keywords
 // Corpus v56:1679: label[] cannot satisfy a declared line[] parameter; sibling collection templates share the rule.
 const cases = [

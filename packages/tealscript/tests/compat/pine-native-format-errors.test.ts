@@ -5,7 +5,7 @@ import { checkProgram } from '../../src/semantic/checker';
 import { executeCompiled, tryCompile } from '../../src/runtime/codegen';
 import { compatibilityBars, getPlot, runCompatScript } from './fixtures';
 
-// Authority: ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json, fun_str.format.
+// Authority: https://www.tradingview.com/pine-script-reference/v6/, fun_str.format.
 // Native CF027: oracle-probes/v2/captures/v2/evidence/conflicts-batch-23-v1-attempt1-error-v2.txt.
 // Native CF028: oracle-probes/v2/captures/v2/evidence/conflicts-batch-24-v1-attempt1-error-v2.txt.
 describe('native CF027/28: formatting runtime refusal', () => {

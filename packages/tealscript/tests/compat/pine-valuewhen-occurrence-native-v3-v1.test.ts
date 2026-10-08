@@ -7,7 +7,7 @@ import { checkProgram } from '../../src/semantic/checker';
 import { getPlot, runCompatScript } from './fixtures';
 
 // Authority: oracle-probes/v3/bounds-05-ta-valuewhen-occurrence--1.pine and captures/v3/evidence/bounds-05-ta-valuewhen-occurrence--1-attempt1-error.png (RE10001, bar0).
-// Reference: ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json functions[186], occurrence >=0.
+// Reference: https://www.tradingview.com/pine-script-reference/v6/ functions[186], occurrence >=0.
 const capturedSource = readFileSync(
   new URL('../../oracle-probes/v3/bounds-05-ta-valuewhen-occurrence--1.pine', import.meta.url),
   'utf8',

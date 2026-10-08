@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { compatibilityBars, getPlot, runCompatScript } from './fixtures';
 
-// Authority: ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json, fun_str.tostring.
+// Authority: https://www.tradingview.com/pine-script-reference/v6/, fun_str.tostring.
 // Native CF024: oracle-probes/v2/captures/v2/conflicts-batch-1-v1.csv (bar0) and evidence/conflicts-batch-1-v1-attempt1-logs.txt.
 describe('native CF024: omitted numeric tostring format', () => {
   it('matches ten optional fractional places and preserves the captured exact text', () => {

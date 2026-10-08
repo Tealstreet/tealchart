@@ -7,7 +7,7 @@ const currencies = [
   [1605, 'USDT', 105], [1606, 'VES', 139], [1607, 'VND', 140], [1608, 'ZAR', 99],
 ] as const;
 
-// Authority: ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json constants[index].
+// Authority: https://www.tradingview.com/pine-script-reference/v6/ constants[index].
 describe('ledger gaps41 currency values', () => {
   it.each(currencies)('rank%s currency.%s is its named currency code (constants[%s])', (_rank, code) => {
     const result = runCompatScript(`//@version=6\nindicator("currency code")\nplot(currency.${code} == "${code}" ? 1 : 0, "matching")\nplot(currency.${code} == "USD" ? 1 : 0, "distinct")`);

@@ -418,7 +418,7 @@ plot(close)`);
         if (decl?.type === 'VariableDeclaration') {
           expect(decl.init.type).toBe('StringLiteral');
           if (decl.init.type === 'StringLiteral') {
-            expect(decl.init.value).toBe('first line\n     second line');
+            expect(decl.init.value).toBe('first line second line');
           }
         }
       });

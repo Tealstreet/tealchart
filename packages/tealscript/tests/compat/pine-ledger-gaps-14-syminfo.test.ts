@@ -4,7 +4,7 @@ import { parse } from '../../src/parser';
 import { checkProgram } from '../../src/semantic/checker';
 import { compatibilityBars, getPlot, runCompatScript } from './fixtures';
 
-const reference = '~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json';
+const reference = 'https://www.tradingview.com/pine-script-reference/v6/';
 
 describe(`Ledger gaps524/525: ${reference} functions[238/239]`, () => {
   it('selects series-string ticker results and preserves the simple-string overload', () => {

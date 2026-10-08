@@ -4,7 +4,7 @@ import { parse } from '../../src/parser';
 import { checkProgram } from '../../src/semantic/checker';
 import { getPlot, runCompatScript } from './fixtures';
 
-const reference = '~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json';
+const reference = 'https://www.tradingview.com/pine-script-reference/v6/';
 
 describe(`Ledger gaps521/522: ${reference} functions[202]`, () => {
   it('preserves series int for positional and named series-string arguments', () => {

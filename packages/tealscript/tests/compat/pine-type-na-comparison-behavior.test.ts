@@ -4,7 +4,7 @@ import { parse } from '../../src/parser';
 import { executeScript, type Bar } from '../../src/runtime';
 import { getPlot } from './fixtures';
 
-// Authority: ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json.
+// Authority: https://www.tradingview.com/pine-script-reference/v6/.
 // variable/na remarks link the operators manual: comparisons with unavailable
 // operands return false. Typed variables avoid forbidden direct comparisons to na.
 const values = [-3, 0, 5];

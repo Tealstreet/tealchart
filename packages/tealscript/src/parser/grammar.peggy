@@ -39,6 +39,9 @@
   }
 
   function flattenTransientStatement(statement) {
+    if (statement.type === 'FunctionDeclaration' && Array.isArray(statement.body)) {
+      statement.body = statement.body.flatMap(flattenTransientStatement);
+    }
     if (statement.type === 'MultiDeclaration') return statement.declarations;
     if (statement.type === 'MultiAssignment') return statement.assignments;
     if (statement.type === 'MultiExpressionStatement') {
@@ -266,7 +269,25 @@ IndicatorDeclaration
       };
 
       // Process arguments
-      const params = [
+      const params = declarationKind === 'indicator' ? [
+        'title',
+        'shorttitle',
+        'overlay',
+        'format',
+        'precision',
+        'scale',
+        'max_bars_back',
+        'timeframe',
+        'timeframe_gaps',
+        'explicit_plot_zorder',
+        'max_lines_count',
+        'max_labels_count',
+        'max_boxes_count',
+        'calc_bars_count',
+        'max_polylines_count',
+        'dynamic_requests',
+        'behind_chart',
+      ] : [
         'title',
         'shorttitle',
         'overlay',
@@ -3390,12 +3411,12 @@ TripleDoubleStringChar
 
 DoubleStringChar
   = !('"' / "\\" / LineTerminatorChar) . { return text(); }
-  / LineTerminator chars:WhiteSpace* { return text(); }
+  / LineTerminator chars:WhiteSpace* { return options.pineVersion === 6 ? ' ' : text(); }
   / "\\" seq:EscapeSequence { return seq; }
 
 SingleStringChar
   = !("'" / "\\" / LineTerminatorChar) . { return text(); }
-  / LineTerminator chars:WhiteSpace* { return text(); }
+  / LineTerminator chars:WhiteSpace* { return options.pineVersion === 6 ? ' ' : text(); }
   / "\\" seq:EscapeSequence { return seq; }
 
 EscapeSequence

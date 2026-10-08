@@ -1,10 +1,11 @@
+import { roundRuntimeNumber } from '../mathRounding';
 import { createLiteralTimestampCache } from './literalTimestampCache';
 import type { LiteralTimestampCache } from './literalTimestampCache';
 import { POSITIONAL_DRAWING_GETTERS } from '../drawings/singleIdGetters';
 import { parseRuntimeTimeframeSpec } from './runtimeTimeframeSpec';
 import { parseRuntimeSessionDescriptor, parseRuntimeSessionMinute, type RuntimeSessionPeriod } from './runtimeSessionDescriptor';
 import { pineExp } from './pineExp';
-import type { CallExpression, Expression, Program, Statement } from '../../parser/ast';
+import type { CallExpression, Expression, Program } from '../../parser/ast';
 import type { Bar, PlotOutput, InputDefinition, SessionClassificationInfo, SessionClosureKind, SymInfo } from '../context';
 import { ExecutionContext, mergeChartInfo } from '../context';
 import { CALCULATED_BARS_INPUT_ID, projectCalculatedBarOutputs } from '../calculatedBars';
@@ -96,7 +97,6 @@ import { Scope, cloneRuntimeSnapshot } from '../scope';
 import type { ValueSeries } from './runtime';
 import { HistoryBufferSizing, isHistoryBufferResize } from './history';
 import { divideV5ConstInts } from './runtime';
-import { NumericSeries } from './runtime';
 import * as ta from './ta-classes';
 import { advanceRollingSum, createRollingSumState } from './rolling-sum';
 import type { RollingSumState } from './rolling-sum';
@@ -259,12 +259,7 @@ export function tryCompile(ast: Program, maxBarsBack?: number, options?: Compile
 const compiledCache = new WeakMap<Program, CompiledScript>();
 const compiledLibraryCache = new WeakMap<Program, WeakMap<Map<string, Program>, CompiledScript>>();
 
-export function executeCompiledScript(
-  ast: Program,
-  bars: Bar[],
-  inputs?: Map<string, unknown>,
-  options?: CompiledExecutionOptions,
-): CompiledScriptExecution {
+export function prepareCompiledScript(ast: Program, options?: Pick<CompiledExecutionOptions, 'libraries' | 'maxBarsBack'>, semanticTypes?: CompileOptions['semanticTypes']): CompiledScript {
   let compiled: CompiledScript | undefined;
   if (options?.libraries) {
     compiled = compiledLibraryCache.get(ast)?.get(options.libraries);
@@ -272,7 +267,7 @@ export function executeCompiledScript(
     compiled = compiledCache.get(ast);
   }
   if (!compiled) {
-    compiled = compile(ast, options?.maxBarsBack, { libraries: options?.libraries });
+    compiled = compile(ast, options?.maxBarsBack, { libraries: options?.libraries, semanticTypes });
     if (options?.libraries) {
       let cache = compiledLibraryCache.get(ast);
       if (!cache) {
@@ -284,6 +279,16 @@ export function executeCompiledScript(
       compiledCache.set(ast, compiled);
     }
   }
+  return compiled;
+}
+
+export function executeCompiledScript(
+  ast: Program,
+  bars: Bar[],
+  inputs?: Map<string, unknown>,
+  options?: CompiledExecutionOptions,
+): CompiledScriptExecution {
+  const compiled = prepareCompiledScript(ast, options);
   if (!compiled.success) {
     return {
       status: 'failure',
@@ -322,8 +327,9 @@ export function collectCompiledRequestDataQueryCollection(
   ast: Program,
   inputs?: Map<string, unknown>,
   options?: Pick<CompiledExecutionOptions, 'libraries' | 'maxBarsBack' | 'runtime'>,
+  prepared?: CompiledScript,
 ): CompiledRequestDataQueryCollection {
-  const compiled = compile(ast, options?.maxBarsBack, { libraries: options?.libraries });
+  const compiled = prepared ?? compile(ast, options?.maxBarsBack, { libraries: options?.libraries });
   if (!compiled.success) {
     return { queries: [], hasUnpreloadableQueries: false, unpreloadableReasons: [] };
   }
@@ -722,11 +728,38 @@ function toRuntimeString(value: unknown, numericFormat?: string): string {
   return String(value);
 }
 
+function foldRuntimeAsciiCase(value: string): string {
+  return value.replace(/[A-Z]/g, (letter) => letter.toLowerCase());
+}
+
+function foldRuntimeRegexAsciiCase(expression: string): string {
+  const foldToken = (token: string): string => {
+    if (!token.startsWith('\\')) return foldRuntimeAsciiCase(token);
+    if (!/^\\[xu][\da-fA-F]+$/.test(token)) return token;
+    const code = Number.parseInt(token.slice(2), 16);
+    return code >= 65 && code <= 90 ? `\\${token[1]}${(code + 32).toString(16).padStart(token.length - 2, '0')}` : token;
+  };
+  return expression.replace(/\[(?:\\.|[^\]\\])*\]|\\k<[^>]+>|\(\?<[^=!][^>]+>|\\[pP]\{[^}]*\}|\\(?:u[\da-fA-F]{4}|x[\da-fA-F]{2}|.)|[A-Z]/g, (token) => {
+    if (token.startsWith('(?<') || token.startsWith('\\k<') || /^\\[pP]\{/.test(token)) return token;
+    if (!token.startsWith('[')) return foldToken(token);
+    const body = token.slice(1, -1).replace(/(\\u[\da-fA-F]{4}|\\x[\da-fA-F]{2}|[^\\])-(\\u[\da-fA-F]{4}|\\x[\da-fA-F]{2}|[^\\])|\\(?:u[\da-fA-F]{4}|x[\da-fA-F]{2}|.)|[A-Z]/g, (part, start: string | undefined, end: string | undefined) => {
+      if (start === undefined || end === undefined) return foldToken(part);
+      const point = (value: string) => value.startsWith('\\') ? Number.parseInt(value.slice(2), 16) : value.charCodeAt(0);
+      let folded = part;
+      for (let code = Math.max(point(start), 65); code <= Math.min(point(end), 90); code += 1) {
+        folded += `\\x${(code + 32).toString(16)}`;
+      }
+      return folded;
+    });
+    return `[${body}]`;
+  });
+}
+
 function replaceRuntimeStringOccurrence(source: string, target: string, replacement: string, occurrenceArg: unknown): string {
   const occurrence = occurrenceArg === undefined ? 0 : Math.trunc(toRuntimeNumber(occurrenceArg));
   if (!Number.isFinite(occurrence) || occurrence < 0) return source;
-  if (target === '') return occurrence === 0 ? source.replace(target, replacement) : source;
-  if (occurrence === 0) return source.replace(target, replacement);
+  if (target === '') return occurrence === 0 ? source.replace(target, () => replacement) : source;
+  if (occurrence === 0) return source.replace(target, () => replacement);
 
   let fromIndex = 0;
   for (let index = 0; index <= occurrence; index += 1) {
@@ -1371,8 +1404,6 @@ function collectPointRequestQuery(
     const family = fullName.slice('request.'.length) as 'dividends' | 'earnings' | 'splits';
     const ticker = staticRequestCallStringArg(call, names, 0, inputs, runtime)?.trim();
     if (!ticker) return null;
-    const defaultField = family === 'dividends' ? 'dividends.gross' : family === 'earnings' ? 'earnings.actual' : 'splits.denominator';
-    const field = staticRequestCallStringArg(call, names, 1, inputs, runtime)?.trim() || defaultField;
     const currency = family === 'splits'
       ? undefined
       : normalizeRuntimeRequestCurrency(staticRequestCallStringArg(call, names, 5, inputs, runtime));
@@ -1742,18 +1773,92 @@ function getRuntimeCalendarPart(part: string, timestamp: number, timezone: strin
   }
 }
 
-function getRuntimeTradingDayTime(timestamp: unknown, timezone: string): number {
+interface RuntimeTradingDayPeriod {
+  days: string;
+  start: number;
+  end: number;
+}
+
+function getRuntimeTradingDayPeriods(session: string): RuntimeTradingDayPeriod[] {
+  const descriptor = parseRuntimeSessionDescriptor(session);
+  if (descriptor.unrestricted) return [{ days: '1234567', start: 0, end: 1440 }];
+  const groups = session.split('|').map((group) => group.split(':', 2));
+  const overriddenDays = groups.flatMap(([, days]) => (days ? [...days] : [])).join('');
+  const periods: RuntimeTradingDayPeriod[] = [];
+  for (const [hours, explicitDays] of groups) {
+    const days =
+      explicitDays ??
+      (groups.length === 1 ? descriptor.days : [...'23456'].filter((day) => !overriddenDays.includes(day)).join(''));
+    for (const period of hours.split(',')) {
+      const match = /^(\d{4})(F[1-6]?)?-(\d{4})(F[1-6]?)?$/.exec(period.trim());
+      if (!match) continue;
+      const startMinute = parseRuntimeSessionMinute(match[1]);
+      const endMinute = parseRuntimeSessionMinute(match[3]);
+      if (startMinute === null || endMinute === null) continue;
+      const dayOffset = (suffix: string | undefined) => (suffix ? -Number(suffix.slice(1) || 1) * 1440 : 0);
+      let start = startMinute + dayOffset(match[2]);
+      let end = endMinute + dayOffset(match[4]);
+      if (!match[2] && !match[4] && start >= end) {
+        if (start === 0) end = 1440;
+        else start -= 1440;
+      }
+      if (start < end) periods.push({ days, start, end });
+    }
+  }
+  return periods;
+}
+
+function getRuntimeTradingDayTime(
+  timestamp: unknown,
+  ctx: ExecutionContext,
+  runtimeOptions: TealscriptRuntimeOptions | undefined,
+): number {
   const value = toRuntimeNumber(timestamp);
   if (!Number.isFinite(value)) return Number.NaN;
-  return resolveRuntimeLocalTimestamp(
-    timezone,
+  const session = resolveRuntimeSessionOptions(runtimeOptions, ctx).session!;
+  const timezone = session.timezone || ctx.syminfo.timezone;
+  const periods = getRuntimeTradingDayPeriods(session.regular ?? '24x7');
+  const localDay = Date.UTC(
     getRuntimeCalendarPart('year', value, timezone),
-    getRuntimeCalendarPart('month', value, timezone),
+    getRuntimeCalendarPart('month', value, timezone) - 1,
     getRuntimeCalendarPart('dayofmonth', value, timezone),
-    0,
-    0,
-    0,
   );
+  const localMinute =
+    getRuntimeCalendarPart('hour', value, timezone) * 60 + getRuntimeCalendarPart('minute', value, timezone);
+  const spec = parseRuntimeTimeframeSpec(ctx.timeframe.period, ctx.timeframe.period);
+  const multipleDays = spec?.unit === 'week' || spec?.unit === 'month' || (spec?.unit === 'day' && spec.multiplier > 1);
+  const finalTime = multipleDays
+    ? getRuntimeTimeframeCloseTime(value, ctx.timeframe.period, timezone, ctx.timeframe.period)
+    : value;
+  const referenceDay = multipleDays
+    ? Date.UTC(
+        getRuntimeCalendarPart('year', finalTime, timezone),
+        getRuntimeCalendarPart('month', finalTime, timezone) - 1,
+        getRuntimeCalendarPart('dayofmonth', finalTime, timezone),
+      )
+    : localDay;
+  let finalSessionEnd = Number.NaN;
+  for (let offset = -7; offset <= 6; offset++) {
+    const day = new Date(referenceDay + offset * 86_400_000);
+    const dayPeriods = periods.filter((period) => period.days.includes(String(day.getUTCDay() + 1)));
+    const minute = (localDay - day.getTime()) / 60_000 + localMinute;
+    if (!multipleDays && !dayPeriods.some((period) => minute >= period.start && minute < period.end)) continue;
+    for (const period of dayPeriods) {
+      const endDate = new Date(day.getTime() + period.end * 60_000);
+      const end = resolveRuntimeLocalTimestamp(
+        timezone,
+        endDate.getUTCFullYear(),
+        endDate.getUTCMonth() + 1,
+        endDate.getUTCDate(),
+        endDate.getUTCHours(),
+        endDate.getUTCMinutes(),
+        0,
+      );
+      if (multipleDays && (end <= value || end > finalTime)) continue;
+      if (!Number.isFinite(finalSessionEnd) || end > finalSessionEnd) finalSessionEnd = end;
+    }
+  }
+  return Math.floor((Number.isFinite(finalSessionEnd) ? finalSessionEnd - 1 : value) / 86_400_000) * 86_400_000;
 }
 
 function evaluateRuntimeCalendarPart(
@@ -1769,7 +1874,14 @@ function evaluateRuntimeCalendarPart(
   return getRuntimeCalendarPart(part, timestamp, timezone);
 }
 
-function getRuntimeTimeValue(ctx: ExecutionContext, bars: Bar[], name: string, offset = 0, maxBarsBack = 500): number {
+function getRuntimeTimeValue(
+  ctx: ExecutionContext,
+  bars: Bar[],
+  name: string,
+  offset = 0,
+  maxBarsBack = 500,
+  runtimeOptions?: TealscriptRuntimeOptions,
+): number {
   const normalizedOffset = Math.trunc(toRuntimeNumber(offset));
   if (!Number.isFinite(normalizedOffset) || normalizedOffset < 0) return Number.NaN;
   if (normalizedOffset > maxBarsBack) {
@@ -1783,7 +1895,7 @@ function getRuntimeTimeValue(ctx: ExecutionContext, bars: Bar[], name: string, o
       return getRuntimeTimeframeCloseTime(toRuntimeNumber(openTime), ctx.timeframe.period, ctx.syminfo.timezone, ctx.timeframe.period);
     }
     case 'time_tradingday':
-      return getRuntimeTradingDayTime(ctx.time.get(normalizedOffset), ctx.syminfo.timezone);
+      return getRuntimeTradingDayTime(ctx.time.get(normalizedOffset), ctx, runtimeOptions);
     case 'timenow':
       return toRuntimeNumber(ctx.timenow.get(normalizedOffset) ?? Number.NaN);
     case 'last_bar_time':
@@ -2713,8 +2825,7 @@ function createRuntimeMathEvaluator(
         const value = toRuntimeNumber(orderedRuntimeArg(args, named, names, 0));
         const precisionArg = orderedRuntimeArg(args, named, names, 1);
         const precision = precisionArg === undefined ? 0 : Math.trunc(toRuntimeNumber(precisionArg));
-        const factor = 10 ** precision;
-        return (Math.sign(value) * Math.round(Math.abs(value) * factor)) / factor;
+        return roundRuntimeNumber(value, precision);
       };
     case 'math.round_to_mintick':
       return (args, named) => {
@@ -2722,7 +2833,14 @@ function createRuntimeMathEvaluator(
         if (!Number.isFinite(value) || !Number.isFinite(mintick) || mintick <= 0) return Number.NaN;
         const quotient = value / mintick;
         const epsilon = Number.EPSILON * Math.max(1, Math.abs(quotient));
-        return Number((Math.round(quotient + epsilon) * mintick).toFixed(runtimeDecimalPlacesForTick(mintick)));
+        const nearest = Math.round(quotient);
+        let rounded = Math.round(quotient + epsilon);
+        if (rounded !== nearest) {
+          const distanceDifference = Math.abs(value - rounded * mintick) - Math.abs(value - nearest * mintick);
+          // Decimal half-tick compensation must not move an exact tick or a clear non-tie.
+          if (Number.isInteger(quotient) || distanceDifference > Number.EPSILON * Math.abs(value)) rounded = nearest;
+        }
+        return Number((rounded * mintick).toFixed(runtimeDecimalPlacesForTick(mintick)));
       };
     case 'math.sum':
       return (args, named) => {
@@ -4252,10 +4370,14 @@ function registerCompiledStringBuiltins(builtins: BuiltinRegistry): void {
   });
   builtins.set('str.match', (args, named) => {
     const regex = toRuntimeString(orderedRuntimeAliasedArg(args, named, stringMatchArgs, 1));
-    const inlineFlags = /^\(\?([ms]+)\)/.exec(regex);
+    const inlineFlags = /^\(\?([ims]+)\)/.exec(regex);
     const expression = inlineFlags ? regex.slice(inlineFlags[0].length) : regex;
-    const flags = inlineFlags ? [...new Set(inlineFlags[1])].join('') : '';
-    return toRuntimeString(sourceArg(args, named)).match(new RegExp(expression, flags))?.[0] ?? '';
+    const insensitive = inlineFlags?.[1].includes('i') === true;
+    const flags = inlineFlags ? [...new Set(inlineFlags[1])].filter((flag) => flag !== 'i').join('') : '';
+    const source = toRuntimeString(sourceArg(args, named));
+    const matcher = new RegExp(insensitive ? foldRuntimeRegexAsciiCase(expression) : expression, flags);
+    const match = matcher.exec(insensitive ? foldRuntimeAsciiCase(source) : source);
+    return match ? source.slice(match.index, match.index + match[0].length) : '';
   });
   builtins.set('str.repeat', (args, named) => {
     const source = sourceArg(args, named);
@@ -4716,10 +4838,24 @@ function evaluateSecuritySeries(
   );
   let cursor: ReturnType<typeof create> | undefined;
   const values: unknown[] = [];
+  const primitive = (value: unknown): boolean => value === null || value === undefined
+    || typeof value === 'number' || typeof value === 'string' || typeof value === 'boolean';
+  const invariant = secScript.invariantCaptureNames?.every(name => {
+    const value = captures?.[name];
+    return primitive(value) || (isRuntimeCaptureDescriptor(value)
+      && value.source === undefined && primitive(value.value));
+  }) ?? false;
   const advance = (count: number): void => {
     history.run(() => {
       if (values.length < Math.min(count, requestContext.bars.length)) {
         cursor ??= create();
+        if (invariant) {
+          const value = values.length ? values[0] : cursor(0);
+          const start = values.length;
+          values.length = Math.min(count, requestContext.bars.length);
+          values.fill(value, start);
+          return;
+        }
         const isSettled = cursor.isSettled;
         if (isSettled) {
           while (values.length < Math.min(count, requestContext.bars.length)) {
@@ -5115,7 +5251,7 @@ function evaluateSecuritySeriesPass(
     runtimeTimeValue(name: string, offset = 0, hint = 0) {
       syncBuiltinContext();
       deps.historyCheck(`calendar:${name}`, offset, hint);
-      return getRuntimeTimeValue(builtinCtx, requestBars, name, offset, Infinity);
+      return getRuntimeTimeValue(builtinCtx, requestBars, name, offset, Infinity, requestRuntimeOptions);
     },
     sessionValue(name: string) {
       syncBuiltinContext();
@@ -5875,9 +6011,9 @@ function executeCompiledPass(
 
   const versionRules = pineVersionRules(compiled.analysis.pineVersion);
   ctx.timeframe.period = normalizeVersionedTimeframePeriod(ctx.timeframe.period, compiled.analysis.pineVersion);
-  const dynamicRequestsEnabled = declarationNode && 'dynamic_requests' in declarationNode
+  const dynamicRequestsEnabled = compiled.indicatorDynamicRequests ?? (declarationNode && 'dynamic_requests' in declarationNode
     ? staticBooleanValue(declarationNode.dynamic_requests) ?? versionRules.dynamicRequestsDefault
-    : versionRules.dynamicRequestsDefault;
+    : versionRules.dynamicRequestsDefault);
   const indicatorDeclarationNode = declarationNode?.type === 'IndicatorDeclaration'
     ? declarationNode
     : undefined;
@@ -6223,6 +6359,33 @@ function executeCompiledPass(
     runtimeBuiltinCallCounts.set(name, index + 1);
     return `${name}_${index}`;
   };
+  for (const name of ['line.copy', 'label.copy', 'box.copy']) {
+    const copyBuiltin = builtinRegistry.get(name)!;
+    const interleavedCallCounts = new Map<string, number>();
+    let copyBarIndex = -1;
+    let previousCallId = '';
+    let previousCallCount = 0;
+    builtinRegistry.delete(name);
+    builtinRegistry.set(name, (args, named, context, scope, callId) => {
+      const id = callId ?? name;
+      let index: number;
+      if (context.bar_index !== copyBarIndex) {
+        copyBarIndex = context.bar_index;
+        previousCallId = id;
+        previousCallCount = 1;
+        interleavedCallCounts.clear();
+        index = 0;
+      } else if (id === previousCallId) {
+        index = previousCallCount++;
+      } else {
+        interleavedCallCounts.set(previousCallId, previousCallCount);
+        index = interleavedCallCounts.get(id) ?? 0;
+        previousCallId = id;
+        previousCallCount = index + 1;
+      }
+      return copyBuiltin(args, named, context, scope, index === 0 ? id : `${id}:copy:${index}`);
+    });
+  }
   const visualOutputId = (kind: string, uniqueId: string, legacyId: string): string => {
     let id = ctx.plots.has(legacyId) ? uniqueId : legacyId;
     let suffix = 1;
@@ -7656,7 +7819,7 @@ function executeCompiledPass(
       },
       runtimeTimeValue(name: string, offset = 0, hint = 0) {
         deps.historyCheck(`calendar:${name}`, offset, hint);
-        return getRuntimeTimeValue(ctx, bars, name, offset, Infinity);
+        return getRuntimeTimeValue(ctx, bars, name, offset, Infinity, options?.runtime);
       },
       sessionValue(name: string) {
         return getRuntimeSessionValue(options?.runtime, ctx, bars, name);
@@ -7768,17 +7931,23 @@ function executeCompiledPass(
         const value = orderedRuntimeArg(args, named, names, 0);
         const bottomValue = orderedRuntimeArg(args, named, names, 1);
         const topValue = orderedRuntimeArg(args, named, names, 2);
-        const bottomColor = parseRuntimeColorInput(orderedRuntimeArg(args, named, names, 3));
+        const bottomColorInput = orderedRuntimeArg(args, named, names, 3);
+        const bottomColor = parseRuntimeColorInput(bottomColorInput);
         const topColor = parseRuntimeColorInput(orderedRuntimeArg(args, named, names, 4));
 
-        if (!isFiniteRuntimeNumber(bottomValue) || !isFiniteRuntimeNumber(topValue) || !bottomColor || !topColor) {
+        if (!isFiniteRuntimeNumber(bottomValue) || !isFiniteRuntimeNumber(topValue) || !topColor
+          || (!bottomColor && !isRuntimeNa(bottomColorInput))) {
           return Number.NaN;
         }
 
         const range = topValue - bottomValue;
-        if (range === 0) return formatRuntimeColorAlpha(0, 0, 0, 0);
+        if (range === 0) return bottomColor ? formatRuntimeColorAlpha(0, 0, 0, 0) : Number.NaN;
         if (!isFiniteRuntimeNumber(value)) return Number.NaN;
         const ratio = Math.min(1, Math.max(0, (value - bottomValue) / range));
+        if (!bottomColor) {
+          if (ratio === 0) return Number.NaN;
+          return formatRuntimeColorAlpha(topColor.red, topColor.green, topColor.blue, topColor.alpha * ratio);
+        }
         const interpolate = (from: number, to: number): number => from + (to - from) * ratio;
         return formatRuntimeColorAlpha(
           interpolate(bottomColor.red, topColor.red),
@@ -7929,7 +8098,7 @@ function executeCompiledPass(
     const intrabarState = ctx.barstate.isrealtime ? options?.intrabarState : undefined;
     const previousIntrabarState = intrabarState?.get(bar.time);
     if (previousIntrabarState) {
-      inst.restoreVarip(cloneRuntimeSnapshot(ctx.barstate.isconfirmed ? previousIntrabarState.before : previousIntrabarState.after));
+      inst.restoreVarip(cloneRuntimeSnapshot(ctx.barstate.isconfirmed && !isLastBar ? previousIntrabarState.before : previousIntrabarState.after));
     }
     const varipBefore = intrabarState ? cloneRuntimeSnapshot(inst.saveVarip(bar.time, true)) : undefined;
     const executeStrategyCalculation = (): boolean => {
@@ -8010,7 +8179,7 @@ function executeCompiledPass(
       ctx.truncatePlots(barIndex);
       if (executeStrategyCalculation()) break;
     }
-    if (intrabarState && !ctx.barstate.isconfirmed) {
+    if (intrabarState && (!ctx.barstate.isconfirmed || isLastBar)) {
       intrabarState.set(bar.time, { before: varipBefore, after: cloneRuntimeSnapshot(inst.saveVarip(bar.time)) });
     }
 
@@ -8080,7 +8249,6 @@ function executeCompiledPass(
     declaration.behindChart = staticBooleanValue(node.behind_chart);
     declaration.calcBarsCount = declarationNumberValue(node.calc_bars_count ?? undefined, decl);
     declaration.maxBarsBack = declarationNumberValue(node.max_bars_back ?? undefined, decl);
-    declaration.dynamicRequests = staticBooleanValue(node.dynamic_requests) ?? declaration.dynamicRequests;
     declaration.drawingLimits = {
       label: declarationNumberValue(node.max_labels_count ?? undefined, decl) ?? declaration.drawingLimits.label,
       line: declarationNumberValue(node.max_lines_count ?? undefined, decl) ?? declaration.drawingLimits.line,

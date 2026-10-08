@@ -4,7 +4,7 @@ import { parse } from '../../src/parser';
 import { checkProgram } from '../../src/semantic/checker';
 import { compatibilityBars, getPlot, runCompatScript } from './fixtures';
 
-// Authority: ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json fun_ta.supertrend.
+// Authority: https://www.tradingview.com/pine-script-reference/v6/ fun_ta.supertrend.
 // Rename: https://www.tradingview.com/pine-script-docs/migration-guides/to-pine-version-5/#ta-namespace-for-technical-analysis-functions-and-variables
 describe('ledger817 Supertrend namespace migration', () => {
   it.each([[4, 'supertrend'], [5, 'ta.supertrend']] as const)('runs Pine%s %s', (version, name) => {

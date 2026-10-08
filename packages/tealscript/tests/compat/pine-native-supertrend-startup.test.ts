@@ -15,7 +15,7 @@ function capturedBars(rows: Array<Record<string, string>>): Bar[] {
   return rows.map((row) => ({ time: Number(row.time) * 1000, open: Number(row.open), high: Number(row.high), low: Number(row.low), close: Number(row.close), volume: Number(row.input_volume) }));
 }
 
-// Authority: ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json, fun_ta.supertrend.
+// Authority: https://www.tradingview.com/pine-script-reference/v6/, fun_ta.supertrend.
 // Native: coverage-ta-3-v1.csv and coverage-tad-1-v1.csv, bars0–29.
 describe('native Supertrend startup output', () => {
   it.each([5, 14, 28, 3])('matches captured line and direction with ATR period%s', (period) => {

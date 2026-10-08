@@ -40,6 +40,7 @@ export type ParseResult<T extends ParseStartRule> =
 export interface ParseOptions<T extends ParseStartRule = 'Program'> {
   startRule?: T;
   grammarSource?: string;
+  pineVersion?: number;
 }
 
 export interface SyntaxError extends Error {

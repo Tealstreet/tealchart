@@ -5,6 +5,10 @@ import { expect, it, vi } from 'vitest';
 
 import { getResultOutput } from '../../src/worker/protocol';
 
+import { createWorkerTestModule } from '../helpers/workerTestModule';
+
+const workerModule = createWorkerTestModule();
+
 const bar = (index: number, close: number): Bar => ({
   time: (index + 1) * 60_000,
   open: close,
@@ -15,21 +19,18 @@ const bar = (index: number, close: number): Bar => ({
 });
 
 async function withWorker(check: (send: (message: ToWorkerMessage) => void, messages: FromWorkerMessage[]) => void) {
-  vi.resetModules();
   const messages: FromWorkerMessage[] = [];
   const worker = {
     onmessage: undefined as ((event: MessageEvent<ToWorkerMessage>) => void) | undefined,
     postMessage: (message: FromWorkerMessage) => messages.push(structuredClone(message)),
   };
-  vi.stubGlobal('self', worker);
   const warning = vi.spyOn(console, 'warn').mockImplementation(() => {});
   try {
-    await import('../../src/worker/worker');
+    await workerModule.attach(worker);
     check((message) => worker.onmessage!({ data: message } as MessageEvent<ToWorkerMessage>), messages);
   } finally {
     warning.mockRestore();
     vi.unstubAllGlobals();
-    vi.resetModules();
   }
 }
 

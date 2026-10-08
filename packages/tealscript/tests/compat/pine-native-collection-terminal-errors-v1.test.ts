@@ -5,7 +5,7 @@ import { runCompatScript } from './fixtures';
 const header = '//@version=6\nindicator("Native collection terminal errors")\n';
 
 // Native v7 unequal-size, percentage-domain and fill-endpoint captures.
-// Source/capture hashes: ledger/collection-singles-ymk07v-v1/NATIVE-EVIDENCE-v1.json.
+// Functional regression: preserve the argument and result contract.
 describe('captured collection terminal errors', () => {
   it.each([
     [

@@ -5,7 +5,7 @@ import { checkProgram } from '../../src/semantic';
 import { type Bar } from '../../src/runtime';
 import { getPlot, runCompatScript } from './fixtures';
 
-// Authority: ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json.
+// Authority: https://www.tradingview.com/pine-script-reference/v6/.
 // Each case names its entry; values below are derived from that entry, never captured.
 const bars: Bar[] = [8, -3, 12, 0, -7].map((close, i) => ({
   time: 1_700_000_000_000 + i * 60_000,
@@ -208,12 +208,10 @@ describe('documented remaining type and initialization behavior', () => {
     expect(values(`${declaration}\n${type} x = ${present}\nplot(na(x[1]) ? 1 : 0, "value")`)).toEqual([1, 0, 0, 0, 0]);
   });
 
-  // Reference: na(series) lists string/reference types. Do not initialize a
-  // string to na: its reference example conflicts with the manual. Empty strings
-  // and empty containers are PRESENT, rejecting empty/truthy-value detection.
-  // Red proof: emitted _isNa(value) -> true for the na() call; failed/restored/passed.
-  it('na(): empty string and empty reference objects are present', () => {
-    expect(values('string text = ""\na = array.new<float>()\nm = matrix.new<float>(0, 0)\nplot((na(text) ? 1 : 0) + (na(a) ? 10 : 0) + (na(m) ? 100 : 0), "value")')).toEqual([0, 0, 0, 0, 0]);
+  // V56 v5/v6 Empty_NA_Control is 1 on every captured bar.
+  // Empty arrays and matrices retain the documented present-reference controls.
+  it('na(): empty string is missing and empty reference objects are present', () => {
+    expect(values('string text = ""\na = array.new<float>()\nm = matrix.new<float>(0, 0)\nplot((na(text) ? 1 : 0) + (na(a) ? 10 : 0) + (na(m) ? 100 : 0), "value")')).toEqual([1, 1, 1, 1, 1]);
   });
 
   // Reference: var example b retains the FIRST green bar's close, even though

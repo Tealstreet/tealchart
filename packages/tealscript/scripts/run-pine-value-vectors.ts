@@ -869,6 +869,9 @@ function taInvalidLengthCases(): ValueVectorCase[] {
       rule: TA_INVALID_LENGTH_RULE,
       expected: nullVector,
       expectedDiagnostics: ({
+        "falling.fractional": ["falling length must be an integer, got float"], /* Native v52 capture SHA256 6859cd1876972abfb116e47e6dc533cebb59dad308e30e24566e7c45e76b581a */
+        "kc.fractional": ["kc length must be an integer, got float"], /* Native v52 capture SHA256 d2193a33b680ba7b48d39c35cdff2090d38dc18222e2678c6e07bf4ffceafd06 */
+        "kcw.fractional": ["kcw length must be an integer, got float"], /* Native v52 capture SHA256 53832da7fe77074a5ff1cf86c975c88f177e6d59fea6bf7bbe91f20aef05e447 */
         "alma.fractional": ["alma length must be an integer, got float"], /* Authority entry SHA256 d20ec0410fdf98044b6c0586ff0e214c17e3cb0a3550ffef3779ab6a784bfb6e */
         "atr.fractional": ["atr length must be an integer, got float"], /* Authority entry SHA256 fbe5bd3edebd040fb910d3ef7fb0f6518186c03fc87902d07d2d0a5d9b7cc460 */
         "cci.fractional": ["cci length must be an integer, got float"], /* Authority entry SHA256 4a926a26c838a9df60ffd317298599b54a92a7224997275473bb19c15d011f76 */
@@ -882,6 +885,8 @@ function taInvalidLengthCases(): ValueVectorCase[] {
         "highestbars.fractional": ["highestbars length must be an integer, got float"], /* Authority entry SHA256 46bdab67c0ef36addaff77a1600320b5cb33434df8d16564e31a6d10dd14fe66 */
         "hma.fractional": ["hma length must be an integer, got float"], /* Authority entry SHA256 8508b3cbb995efab43dd961fa8d13dc8dacf1833c4b80c4bb90cc4cabb6874bc */
         "linreg.fractional": ["linreg length must be an integer, got float"], /* Authority entry SHA256 07f5a0cbfcffcd94f63e6883e567090bc5c27ec9b350e7ab1fe498d46e601b44 */
+        "percentile_linear_interpolation.fractional": ["percentile_linear_interpolation length must be an integer, got float"],
+        "percentile_nearest_rank.fractional": ["percentile_nearest_rank length must be an integer, got float"],
       } as Record<string, readonly string[]>)[`${name}.${kind}`] ?? (kind === 'fractional' && [
         'lowest',
         'lowestbars',
@@ -1024,10 +1029,13 @@ function memberPattern(member: string): RegExp {
   return new RegExp(`(?<![A-Za-z0-9_])${escaped}(?![A-Za-z0-9_])`);
 }
 
+const officialMemberPatterns = OFFICIAL_VALUE_VECTOR_MEMBER_NAMES.map((member) => ({ member, pattern: memberPattern(member) }));
+
 export function inferOfficialMembersForValueVector(source: string): string[] {
   const stripped = stripPineLiteralsAndComments(source);
-  return OFFICIAL_VALUE_VECTOR_MEMBER_NAMES
-    .filter((member) => memberPattern(member).test(stripped));
+  return officialMemberPatterns
+    .filter(({ pattern }) => pattern.test(stripped))
+    .map(({ member }) => member);
 }
 
 export function officialMembersForValueVectorCase(testCase: ValueVectorCase): string[] {

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { compatibilityBars, getPlot, runCompatScript } from './fixtures';
 
-// Authority: ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json, functions203/204.
+// Authority: https://www.tradingview.com/pine-script-reference/v6/, functions203/204.
 describe('ledger1342–1345 timeframe.from_seconds duration selection', () => {
   // Ranks1342–1344: explicit boundary examples and cap from remarks0–2, excluding guessed month durations.
   it.each([

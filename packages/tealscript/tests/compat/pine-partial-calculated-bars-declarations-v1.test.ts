@@ -4,7 +4,7 @@ import { parse } from '../../src/parser/parser';
 import { executeScript } from '../../src/runtime/compiledOnly';
 import { checkProgram } from '../../src/semantic/checker';
 
-// Reference: ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json
+// Reference: https://www.tradingview.com/pine-script-reference/v6/
 // entries[476], indicator.args calc_bars_count: const int; zero starts at dataset first bar.
 const bars = Array.from({ length: 5 }, (_, index) => ({
   time: (index + 1) * 60_000,

@@ -23,7 +23,6 @@ const ENTRY_DIR = path.join(path.dirname(fileURLToPath(import.meta.url)), 'corpu
 // https://www.tradingview.com/pine-script-docs/concepts/strategies/#commission
 // Columns: entry SIGNAL bar, exit SIGNAL bar, entry/exit OPEN prices,
 // total entry+exit commission, commission-inclusive closed P/L. Zero-based bars.
-// Working derivation: ~/cs/docs/tealscript-parity-archive/001-sma-cross-independent-derivation-20261002.txt
 // This corroborates ONE historical input under those assumptions, not a TV trace.
 const EXPECTED_TRADES = [
   [13, 14, 92.68, 89.90, 0.18258, -2.96258],

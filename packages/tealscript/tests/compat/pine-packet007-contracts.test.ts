@@ -126,11 +126,15 @@ describe('packet007 builtin admission', () => {
     it.each(['', 'id=4', 'id=array.new_int()', 'id=matrix.new<bool>(1,1,true)', 'id=matrix.new<string>(1,1,"x")'])(
       `${member} refuses omitted or nonnumeric ID %s`,
       (arg) => {
-        expect(errors(`plot(matrix.${member}(${arg}))`)).not.toEqual([]);
+        const call = `matrix.${member}(${arg})`;
+        expect(errors(`plot(${member.startsWith('is_') ? `${call} ? 1 : 0` : call})`)).not.toEqual([]);
       },
     );
     it.each(['int', 'float'])(`${member} admits named numeric %s`, (kind) => {
-      expect(errors(`m=matrix.new<${kind}>(2,2,1)\nplot(matrix.${member}(id=m))\nplot(m.${member}())`)).toEqual([]);
+      const namespace = `matrix.${member}(id=m)`;
+      const receiver = `m.${member}()`;
+      const numeric = (call: string) => member.startsWith('is_') ? `${call} ? 1 : 0` : call;
+      expect(errors(`m=matrix.new<${kind}>(2,2,1)\nplot(${numeric(namespace)})\nplot(${numeric(receiver)})`)).toEqual([]);
     });
   }
   it.each(['bool', 'string', 'Point'])('rank admits documented any-matrix %s', (kind) => {

@@ -4,7 +4,7 @@ import { parse } from '../../src/parser';
 import { checkProgram } from '../../src/semantic/checker';
 import { getPlot, runCompatScript } from './fixtures';
 
-const reference = '~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json';
+const reference = 'https://www.tradingview.com/pine-script-reference/v6/';
 const capturedBars = [
   { time: 1788134400000, open: 77682, high: 77682.01, low: 77572, close: 77674.04, volume: 0 },
   { time: 1788134520000, open: 77674.5, high: 77780.34, low: 77646, close: 77758.24, volume: 0 },

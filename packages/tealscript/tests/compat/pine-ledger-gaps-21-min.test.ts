@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { compatibilityBars, getPlot, runCompatScript } from './fixtures';
 
-// Authority: ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json, fun_array.min/method_array.min.
+// Authority: https://www.tradingview.com/pine-script-reference/v6/, fun_array.min/method_array.min.
 // Ledger805–808: omitted nth is disputed; these min witnesses specify nth0.
 describe('documented empty array min', () => {
   it.each([['int', false], ['float', false], ['int', true], ['float', true]] as const)('returns na for empty%s array, receiver%s', (kind, receiver) => {

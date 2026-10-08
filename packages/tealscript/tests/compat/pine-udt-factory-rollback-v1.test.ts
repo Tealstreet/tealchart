@@ -2,7 +2,7 @@ import { expect, it } from 'vitest';
 
 import { workerPlots } from './ledgerGaps24Worker';
 
-// ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json
+// https://www.tradingview.com/pine-script-reference/v6/
 // entries[9].detailedDesc[2]: ordinary fields roll back on varip references.
 it('registers initial ordinary fields through compiled UDT factories', async () => {
   const values = await workerPlots(`type Counter

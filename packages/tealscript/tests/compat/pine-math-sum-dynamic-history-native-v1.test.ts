@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest';
 import { InMemoryRequestDatafeed } from '../../src/runtime';
 import { getPlot, runCompatScript } from './fixtures';
 
-// Authority: ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json functions[173].
+// Authority: https://www.tradingview.com/pine-script-reference/v6/ functions[173].
 // Native v2 coverage-math-2-v1.csv rows0–191 include the hole97 growth witness at bar137.
 const [header, ...lines] = readFileSync(
   new URL('../../oracle-probes/v2/captures/v2/coverage-math-2-v1.csv', import.meta.url),

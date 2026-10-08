@@ -6,7 +6,7 @@ import { compatibilityBars } from './fixtures';
 import { measureProductionWorkerSessions } from './productionWorkerHarness';
 
 // Rank334: realtime-barstate-v1#33; fill outputs replace the open bar on updates.
-// ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json functions[58]/[59].
+// https://www.tradingview.com/pine-script-reference/v6/ functions[58]/[59].
 // https://www.tradingview.com/pine-script-docs/language/execution-model/#realtime-bars
 afterEach(() => vi.unstubAllGlobals());
 

@@ -4,7 +4,7 @@ import { parse } from '../../src/parser';
 import { executeScript } from '../../src/runtime/compiledOnly';
 import { checkProgram } from '../../src/semantic';
 
-// Each citation lists entries in ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json.
+// Each citation lists entries in https://www.tradingview.com/pine-script-reference/v6/.
 // Entries28/53 define history and missing values; entries12/14/459/460/464 define the transported kinds.
 const bars = [11, 23, 37, 53].map((close, i) => ({
   time: i * 60000,

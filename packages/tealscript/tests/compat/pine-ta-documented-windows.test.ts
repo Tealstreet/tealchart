@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import type { Bar } from '../../src/runtime';
 import { getPlot, runCompatScript } from './fixtures';
 
-// Authority: ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json
+// Authority: https://www.tradingview.com/pine-script-reference/v6/
 // SHA256 eba108f8975d3fcd3e66f7b69c81979bb671c887607a7914aa4c7495e805fb1d.
 // Each test names its entry. All values are derived from those definitions.
 function run(expression: string, closes: Array<number | null>, volumes?: number[]) {

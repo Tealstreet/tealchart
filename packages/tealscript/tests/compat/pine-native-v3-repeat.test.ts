@@ -4,7 +4,7 @@ import { parse } from '../../src/parser';
 import { checkProgram } from '../../src/semantic/checker';
 import { compatibilityBars, runCompatScript } from './fixtures';
 
-// Authority: ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json, fun_str.repeat.
+// Authority: https://www.tradingview.com/pine-script-reference/v6/, fun_str.repeat.
 // Native: oracle-probes/v3/captures/v3/evidence/bounds-06-str-repeat-repeat--1-attempt1-error.png.
 describe('native negative str.repeat count', () => {
   it('accepts the script but raises a runtime error for repeat=-1', () => {

@@ -4,7 +4,7 @@ import { parse } from '../../src/parser';
 import { checkProgram } from '../../src/semantic/checker';
 import { compatibilityBars, getPlot, runCompatScript } from './fixtures';
 
-const reference = '~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json';
+const reference = 'https://www.tradingview.com/pine-script-reference/v6/';
 const migration = 'https://www.tradingview.com/pine-script-docs/migration-guides/to-pine-version-5/';
 
 for (const [legacy, modern, argument, value, selector] of [

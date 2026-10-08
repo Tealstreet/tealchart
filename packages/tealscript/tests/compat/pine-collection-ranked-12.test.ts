@@ -26,7 +26,7 @@ const percentages = [
   ['series float', 'series float percentage = 50.5 + bar_index * 24.75', true],
 ] as const;
 
-// ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json
+// https://www.tradingview.com/pine-script-reference/v6/
 // functions[509] percentage; methods[97,98] descriptions, empty remarks and percentage.
 describe('collection ranks441–449: nearest-rank percentage and receiver', () => {
   for (const [type, receiver] of [
@@ -56,12 +56,12 @@ describe('collection ranks441–449: nearest-rank percentage and receiver', () =
   }
 
   it.each(['int', 'float'] as const)('empty %s method returns na', (type) => {
-    const result = run(`values = array.new<${type}>()\nplot(na(values.percentile_nearest_rank(50)), title="Missing")`);
-    expect(getPlot(result, 'Missing').values).toEqual([true, true, true]);
+    const result = run(`values = array.new<${type}>()\nplot(na(values.percentile_nearest_rank(50)) ? 1 : 0, title="Missing")`);
+    expect(getPlot(result, 'Missing').values).toEqual([1, 1, 1]);
   });
 });
 
-// ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json
+// https://www.tradingview.com/pine-script-reference/v6/
 // functions[604,605] and methods[185,186]: id1 is subtracted from; id2 is subtracted; result is new.
 describe('collection ranks450–464: matrix subtraction', () => {
   for (const type of ['int', 'float'] as const) {
@@ -110,7 +110,7 @@ plot(matrix.get(right, 0, 0), title="Right")`);
   }
 });
 
-// ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json
+// https://www.tradingview.com/pine-script-reference/v6/
 // functions[623,624], methods[204,205]: matrix self-product and required integer power.
 describe('collection ranks465–479: matrix power', () => {
   for (const type of ['int', 'float'] as const) {
@@ -146,7 +146,7 @@ plot(matrix.get(source, 0, 0), title="Source")`);
   }
 });
 
-// ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json functions[465].
+// https://www.tradingview.com/pine-script-reference/v6/ functions[465].
 it('collection rank480: label array IDs store label handles independently', () => {
   const result = run(`first = array.new_label()
 second = array.new_label()

@@ -6,7 +6,7 @@ import { parse } from '../../src/parser';
 import { InMemoryRequestDatafeed } from '../../src/runtime';
 import { executeCompiled, tryCompile } from '../../src/runtime/codegen/execute';
 
-// Reference: ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json /entries/652,704.
+// Reference: https://www.tradingview.com/pine-script-reference/v6/ /entries/652,704.
 // Work bounds apply only after invariant inputs and the complete EMA state are proven fixed.
 function execute(expression: string, captured = false) {
   const bars: Bar[] = Array.from({ length: 100 }, (_, index) => ({

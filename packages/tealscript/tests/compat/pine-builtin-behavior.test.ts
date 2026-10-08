@@ -705,7 +705,7 @@ plot(matrix.is_zero(zero) ? 1 : 0, title="Zero")
 plot(matrix.get(inv, 0, 0), title="Inv")
 plot(matrix.get(pinv, 0, 0), title="Pinv")
 plot(array.size(eigenvalues), title="Eigenvalue Count")
-plot(matrix.get(eigenvectors, 0, 0), title="Eigenvector Head")
+plot(matrix.get(eigenvectors, 0, 0) != 0 or matrix.get(eigenvectors, 1, 0) != 0 ? 1 : 0, title="Eigenvector Nonzero")
 plot(matrix.rows(kron), title="Kron Rows")
 plot(matrix.columns(matrix.new(1, 2, 9)), title="New Generic")
 plot(matrix.get(matrix.new_int(1, 1, 7), 0, 0), title="New Int")
@@ -745,7 +745,7 @@ plot(matrix.get(matrix.new_color(1, 1, color.blue), 0, 0) == color.blue ? 1 : 0,
         Inv: -2,
         Pinv: 1,
         'Eigenvalue Count': 2,
-        'Eigenvector Head': 1,
+        'Eigenvector Nonzero': 1,
         'Kron Rows': 4,
         'New Generic': 2,
         'New Int': 7,

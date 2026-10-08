@@ -89,10 +89,6 @@ export function pushArrayRuntimeApproximationReporter(reporter: ArrayRuntimeAppr
   };
 }
 
-function reportArrayRuntimeApproximation(approximation: ArrayRuntimeApproximation): void {
-  arrayRuntimeApproximationReporters[arrayRuntimeApproximationReporters.length - 1]?.(approximation);
-}
-
 export function normalizeArraySize(size: number): number {
   const safeSize = Math.trunc(Number(size));
   if (!Number.isFinite(safeSize) || safeSize < 0) {
@@ -463,7 +459,7 @@ export function sortIndicesArrayValue(
   return result;
 }
 
-function compareStrings(left: string, right: string): number {
+export function compareStrings(left: string, right: string): number {
   if (left < right) return -1;
   if (left > right) return 1;
   return 0;
@@ -474,8 +470,13 @@ export function reverseArray(array: PineArray): void {
   values.forEach((value, index) => setArrayValue(array, index, value));
 }
 
-export function joinArray(array: PineArray, separator: unknown = ''): string {
-  return getArrayValues(array).join(String(separator));
+export function joinArray(array: PineArray, separator: unknown = '', useV5NumericFormatting = false): string {
+  const values = getArrayValues(array);
+  const formatted = useV5NumericFormatting ? values.map((value) => (
+    typeof value === 'number' && Number.isFinite(value) && !Number.isInteger(value)
+      ? Number(value.toPrecision(16)) : value
+  )) : values;
+  return formatted.join(String(separator));
 }
 
 export function concatArray<T = unknown>(array: PineArray<T>, other: PineArray<T>): PineArray<T> {

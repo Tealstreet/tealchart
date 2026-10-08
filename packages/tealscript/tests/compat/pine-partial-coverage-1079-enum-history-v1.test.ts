@@ -4,7 +4,7 @@ import { parse } from '../../src/parser';
 import { executeScript } from '../../src/runtime/compiledOnly';
 
 describe('PARTIAL 1079: enum unavailable history through typed parameters', () => {
-  // ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json:
+  // https://www.tradingview.com/pine-script-reference/v6/:
   // entries12 (enum),28 (history initial-na example),53 (unavailable value).
   for (const parameter of [false, true]) {
     it(`${parameter ? 'typed parameter' : 'root'} preserves unavailable and previous enum values`, () => {

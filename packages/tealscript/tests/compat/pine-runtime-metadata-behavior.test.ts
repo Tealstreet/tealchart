@@ -177,7 +177,7 @@ plot(timeframe.in_seconds("12M"), "12M")
 plot(timeframe.in_seconds("1H"), "Invalid Hour")
 plot(timeframe.from_seconds(1) == "1S" ? 1 : 0, "From 1S")
 plot(timeframe.from_seconds(46) == "1" ? 1 : 0, "From Rounded Minute")
-// Authority: ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json, functions203/204.
+// Authority: https://www.tradingview.com/pine-script-reference/v6/, functions203/204.
 plot(timeframe.from_seconds(604801) == "8D" ? 1 : 0, "From Rounded Week")
 plot(timeframe.change("1D") ? 1 : 0, "Daily Change")
 `,

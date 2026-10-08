@@ -8,7 +8,7 @@ import { HistoryBufferSizing } from '../../src/runtime/codegen/history';
 import type { Bar } from '../../src/runtime/context';
 import { getPlot, runCompatScript } from './fixtures';
 
-// Authority: ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json.
+// Authority: https://www.tradingview.com/pine-script-reference/v6/.
 // Each written UDF call owns independent history: language/user-defined-functions/#scope-of-a-function-call.
 const bars: Bar[] = [8, -3, 12, 0, -7].map((close, index) => ({
   time: index * 60_000, open: 1, high: Math.max(1, close), low: Math.min(1, close), close, volume: 100,

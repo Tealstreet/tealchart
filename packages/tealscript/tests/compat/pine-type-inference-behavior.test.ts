@@ -4,7 +4,7 @@ import { parse } from '../../src/parser';
 import { executeScript } from '../../src/runtime/compiledOnly';
 import { checkProgram } from '../../src/semantic/checker';
 
-// Authority: ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json.
+// Authority: https://www.tradingview.com/pine-script-reference/v6/.
 // Each case cites an entry selector, not an implementation-derived expectation.
 // Ledger: type-qualifier-system-v1; narrow member tests do not certify a namespace.
 function check(body: string) {

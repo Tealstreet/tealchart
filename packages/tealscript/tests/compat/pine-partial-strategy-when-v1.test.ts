@@ -13,7 +13,7 @@ const bars = [10, 10].map((close, index) => ({
   volume: 1,
 }));
 
-// ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json: strategy.cancel/cancel_all/close_all.
+// https://www.tradingview.com/pine-script-reference/v6/: strategy.cancel/cancel_all/close_all.
 // https://www.tradingview.com/pine-script-docs/migration-guides/to-pine-version-6/#removal-of-when-parameter
 // The migration lists these calls: v5 when conditions execution; v6 removes the argument.
 describe('PARTIAL1870 legacy strategy when', () => {

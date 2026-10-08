@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { parse } from '../../src/parser';
 import { checkProgram } from '../../src/semantic/checker';
 
-const reference = '~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json';
+const reference = 'https://www.tradingview.com/pine-script-reference/v6/';
 
 for (const [name, index] of [['wma', 177], ['rma', 198]] as const) {
   describe(`Ledger gaps529/536: ${reference} functions[${index}] length`, () => {

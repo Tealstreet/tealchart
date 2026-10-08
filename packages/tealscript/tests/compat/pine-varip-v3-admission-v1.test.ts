@@ -4,7 +4,7 @@ import { parse } from '../../src/parser';
 import { checkProgram } from '../../src/semantic';
 import { compatibilityBars, getPlot, runCompatScript } from './fixtures';
 
-// Reference: ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json, keyword varip (keywords9).
+// Reference: https://www.tradingview.com/pine-script-reference/v6/, keyword varip (keywords9).
 // Admission conflict settled by v3-adjudicated-v2.json, varip-01 through varip-06, and native TV CSVs.
 const cases = [
   ['chart.point', 'varip chart.point value = chart.point.now(close)', 'value.price', compatibilityBars[0].close],

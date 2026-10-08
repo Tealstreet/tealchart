@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { parse } from '../../src/parser';
 import { checkProgram } from '../../src/semantic/checker';
 
-// Authority: ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json.
+// Authority: https://www.tradingview.com/pine-script-reference/v6/.
 // Entry selectors below use kind/name (and parameter name for overloaded functions).
 // Ledger: type-qualifier-system-v1. These are source-level functional checks.
 const header = '//@version=6\nindicator("Documented types")\n';

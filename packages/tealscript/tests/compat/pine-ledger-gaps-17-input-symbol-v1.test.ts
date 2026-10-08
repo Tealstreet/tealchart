@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { parse } from '../../src/parser';
 import { checkProgram } from '../../src/semantic';
 
-// Authority: ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json, functions[48].
+// Authority: https://www.tradingview.com/pine-script-reference/v6/, functions[48].
 const errors = (declaration: string, option: string, value: string) => checkProgram(parse(`//@version=6
 indicator("Symbol qualifiers")
 ${declaration}

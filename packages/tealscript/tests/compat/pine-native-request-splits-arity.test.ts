@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { parse } from '../../src/parser';
 import { checkProgram } from '../../src/semantic/checker';
 
-const reference = '~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json';
+const reference = 'https://www.tradingview.com/pine-script-reference/v6/';
 const evidence = 'oracle-probes/v3/captures/v3/evidence/request-05-request-splits-invalid-provider-key-attempt1-error.txt';
 
 describe(`Native v3 ${evidence}; ${reference} functions[543]`, () => {

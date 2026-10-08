@@ -14,7 +14,7 @@ const bars = [11, 23, 37, 53].map((close, i) => ({
 }));
 const errors = (source: string) => checkProgram(parse(source)).diagnostics.filter((x) => x.severity === 'error');
 
-// ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json entries683/755.
+// https://www.tradingview.com/pine-script-reference/v6/ entries683/755.
 // V5 migration: /to-pine-version-5/#ta-namespace-for-technical-analysis-functions-and-variables.
 describe('worklist1443/1444 function namespace boundaries', () => {
   for (const member of ['tsi', 'wpr'] as const) {

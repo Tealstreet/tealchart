@@ -41,7 +41,7 @@ for index = -3 to 2
   });
 
   // https://www.tradingview.com/pine-script-docs/language/type-system/#na-value
-  it('distinguishes unavailable string history from a defined empty string (239)', () => {
+  it('recognizes unavailable string history and empty strings as missing (239)', () => {
     const source = `//@version=6
 indicator("Missing string history")
 message = bar_index == 0 ? "" : "defined"
@@ -50,7 +50,7 @@ plot(message[1] == "" ? 1 : 0, title="Empty")`;
     expect(checkProgram(parse(source)).diagnostics).toEqual([]);
     const result = runCompatScript(source, { bars: compatibilityBars.slice(0, 3) });
     expect(result.errors).toEqual([]);
-    expect(getPlot(result, 'Missing').values).toEqual([1, 0, 0]);
+    expect(getPlot(result, 'Missing').values).toEqual([1, 1, 0]);
     expect(getPlot(result, 'Empty').values).toEqual([0, 1, 0]);
   });
 
@@ -74,7 +74,7 @@ plot(na(empty) ? 1 : 0, title="Empty")`;
     const result = runCompatScript(source, { bars: compatibilityBars.slice(0, 3) });
     expect(result.errors).toEqual([]);
     expect(getPlot(result, 'Missing').values).toEqual([1, 1, 1]);
-    expect(getPlot(result, 'Empty').values).toEqual([0, 0, 0]);
+    expect(getPlot(result, 'Empty').values).toEqual([1, 1, 1]);
   });
 });
 

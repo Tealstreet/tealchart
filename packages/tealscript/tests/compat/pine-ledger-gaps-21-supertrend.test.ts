@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import type { Bar } from '../../src/runtime';
 import { getPlot, runCompatScript } from './fixtures';
 
-// Authority: ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json
+// Authority: https://www.tradingview.com/pine-script-reference/v6/
 // fun_ta.supertrend and fun_ta.atr examples; ledger gaps812/814.
 // Known prior high/close make both ATR authorities agree; no next-bar pin.
 const firstBar: Bar = { time: 60_000, open: 10, high: 13, low: 8, close: 10, volume: 100 };

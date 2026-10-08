@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { compatibilityBars, getPlot, runCompatScript } from './fixtures';
 
-// Reference: ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json, functions[437]/[452].
+// Reference: https://www.tradingview.com/pine-script-reference/v6/, functions[437]/[452].
 // The CPU bound is an engine regression gate; Pine specifies the setter/getter effects.
 describe('named drawing binding performance', () => {
   it('preserves named setter identities within the binding CPU budget', () => {

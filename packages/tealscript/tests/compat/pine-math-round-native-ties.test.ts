@@ -2,8 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { compatibilityBars, getPlot, runCompatScript } from './fixtures';
 
-const reference = '~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json';
-const captures = '~/cs/tealstreet-next/packages/tealscript/oracle-probes/v2/captures/v2';
+const reference = 'https://www.tradingview.com/pine-script-reference/v6/';
 const bars = Array.from({ length: 50 }, (_, index) => ({
   ...compatibilityBars[0],
   time: compatibilityBars[0].time + index * 120000,
@@ -11,7 +10,6 @@ const bars = Array.from({ length: 50 }, (_, index) => ({
 
 const cases = [
   {
-    capture: 'coverage-math-1-v1-attempt2.csv',
     column: 'round_clean',
     expression: 'math.round(clean)',
     expected: [
@@ -21,7 +19,6 @@ const cases = [
     ],
   },
   {
-    capture: 'coverage-math-1-v1-attempt2.csv',
     column: 'round_hole97',
     expression: 'math.round(holes)',
     expected: [
@@ -78,7 +75,6 @@ const cases = [
     ],
   },
   {
-    capture: 'coverage-math-1-v1-attempt2.csv',
     column: 'round_warm0_7',
     expression: 'math.round(warm)',
     expected: [
@@ -135,7 +131,6 @@ const cases = [
     ],
   },
   {
-    capture: 'coverage-math-1-v1-attempt2.csv',
     column: 'round_floor_control_delta',
     expression: 'math.round(clean) - math.floor(clean + 0.5)',
     expected: [
@@ -145,7 +140,6 @@ const cases = [
     ],
   },
   {
-    capture: 'coverage-math-2-v1.csv',
     column: 'round_m050',
     expression: 'math.round(-0.5)',
     expected: [
@@ -155,7 +149,6 @@ const cases = [
     ],
   },
   {
-    capture: 'coverage-math-2-v1.csv',
     column: 'round_m150',
     expression: 'math.round(-1.5)',
     expected: [
@@ -165,7 +158,6 @@ const cases = [
     ],
   },
   {
-    capture: 'coverage-math-2-v1.csv',
     column: 'round_prec0',
     expression: 'math.round(clean, 0)',
     expected: [
@@ -175,7 +167,6 @@ const cases = [
     ],
   },
   {
-    capture: 'coverage-math-2-v1.csv',
     column: 'round_prec_dynamic',
     expression: 'math.round(clean / 3, b % 3)',
     expected: [
@@ -186,8 +177,8 @@ const cases = [
   },
 ] as const;
 
-for (const { capture, column, expression, expected } of cases) {
-  describe(`${reference} functions[152-159]; ${captures}/${capture} bars 0-49`, () => {
+for (const { column, expression, expected } of cases) {
+  describe(`${reference} rounding ${expression}`, () => {
     it(`matches native ${column} values including negative half ties`, () => {
       const result = runCompatScript(
         `//@version=6

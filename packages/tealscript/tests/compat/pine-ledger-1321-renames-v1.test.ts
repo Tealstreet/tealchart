@@ -4,7 +4,7 @@ import { parse } from '../../src/parser';
 import { checkProgram } from '../../src/semantic';
 import { compatibilityBars, getPlot, runCompatScript } from './fixtures';
 
-// Authority: ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json and migration-guides/to-pine-version-5.
+// Authority: https://www.tradingview.com/pine-script-reference/v6/ and migration-guides/to-pine-version-5.
 const script = (version: number, call: string) => `//@version=${version}\n${version === 4 ? 'study' : 'indicator'}("Published rename")\nplot(${call}, title="Value")`;
 const errors = (source: string) => checkProgram(parse(source)).diagnostics.filter((d) => d.severity === 'error');
 

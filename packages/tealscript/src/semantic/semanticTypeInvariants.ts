@@ -1,3 +1,4 @@
+import { stringResultQualifier } from './stringResultQualifier';
 import type {
   ArrayExpression,
   BinaryExpression,
@@ -814,10 +815,12 @@ function inferColorCallExpression(expression: CallExpression, scope: InvariantSc
 }
 
 function inferStringCallExpression(expression: CallExpression, scope: InvariantScope, calleeName: string): SemanticType | undefined {
-  void expression;
-  void scope;
+  const argumentQualifier = maxQualifier(...expression.arguments.map((argument) => inferKnown(argument.value, scope)));
+  const qualifier = argumentQualifier ? stringResultQualifier(calleeName, argumentQualifier, scope.pineVersion) : undefined;
+  if (scope.pineVersion >= 6 && (calleeName === 'str.match' || calleeName === 'str.format_time')) return { kind: 'string', qualifier };
   if (STRING_RETURN_CALLS.has(calleeName)) return { kind: 'string' };
-  if (STRING_INT_RETURN_CALLS.has(calleeName)) return { kind: 'int' };
+  if (STRING_INT_RETURN_CALLS.has(calleeName)) return { kind: 'int', ...(scope.pineVersion >= 6 ? { qualifier } : {}) };
+  if (scope.pineVersion >= 6 && ['str.contains', 'str.startswith', 'str.endswith'].includes(calleeName)) return { kind: 'bool', qualifier };
   return undefined;
 }
 

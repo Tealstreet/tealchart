@@ -1,4 +1,4 @@
-import { afterAll, describe, expect, it } from 'vitest';
+import { afterAll, describe, expect, it, vi } from 'vitest';
 
 import {
   InMemoryRequestDatafeed,
@@ -21,6 +21,7 @@ import {
   summarizeProductionWorkerFallbackReasons,
 } from '../../src/compat/productionWorkerFallbackBaseline';
 import { checkProgram } from '../../src/semantic/checker';
+import * as codegen from '../../src/runtime/codegen';
 import { executeCompiled, tryCompile } from '../../src/runtime/codegen';
 import { measureProductionWorkerSessions, measureRealtimeReentryParity, type ProductionWorkerCase } from './productionWorkerHarness';
 
@@ -101,7 +102,7 @@ function assertCompositeParity(source: string, options: TealscriptExecutionOptio
     }
   }
 
-  return { compiledResult, interpretedResult };
+  return { compiledResult, interpretedResult, compiled };
 }
 
 function assertLongCompositeParity(source: string) {
@@ -121,8 +122,8 @@ function assertTrueLengthCompositeParity(source: string) {
   expect(lineCount).toBeGreaterThanOrEqual(200);
   expect(lineCount).toBeLessThanOrEqual(300);
   const scriptId = source.match(/indicator\("([^"]+)"/)?.[1] ?? `true-length-${trueLengthCompositeCompileResults.length + 1}`;
-  const ast = parse(source);
-  const compiled = tryCompile(ast, undefined, { libraries: longEngineOptions.libraries });
+  const result = assertCompositeParity(source, longEngineOptions, longChartBars);
+  const { compiled } = result;
   trueLengthCompositeCompileResults.push({
     scriptId,
     reasons: compiled.success ? [] : compiled.unsupported,
@@ -133,13 +134,13 @@ function assertTrueLengthCompositeParity(source: string) {
     bars: longChartBars,
     engineOptions: longEngineOptions,
   });
-  return assertCompositeParity(source, longEngineOptions, longChartBars);
+  return result;
 }
 
 function assertAwkwardCompositeParity(source: string) {
   const scriptId = source.match(/indicator\("([^"]+)"/)?.[1] ?? `awkward-${awkwardCompositeCompileResults.length + 1}`;
-  const ast = parse(source);
-  const compiled = tryCompile(ast, undefined, { libraries: longEngineOptions.libraries });
+  const result = assertCompositeParity(source, longEngineOptions, longChartBars);
+  const { compiled } = result;
   awkwardCompositeCompileResults.push({
     scriptId,
     reasons: compiled.success ? [] : compiled.unsupported,
@@ -150,7 +151,7 @@ function assertAwkwardCompositeParity(source: string) {
     bars: longChartBars,
     engineOptions: longEngineOptions,
   });
-  return assertCompositeParity(source, longEngineOptions, longChartBars);
+  return result;
 }
 
 const chartBars = makeBars([100, 101.5, 99.5, 103, 104.5, 102, 106, 107.5, 105, 108.5, 110, 109]);
@@ -547,6 +548,8 @@ alertcondition(delta > remoteBias, title="Swing Break", message="Swing break")`,
     expect(findPlot(compiledResult, 'Swing').values.some((value) => value !== null)).toBe(true);
   });
 
+  // str.format arguments exclude color (Pine v6 reference functions 89/90).
+  // The controlled #eeeeee foreground has RGB components 0xee = 238.
   it('runs a request metadata dashboard composite with tables and labels', () => {
     const { compiledResult } = assertCompositeParity(`//@version=6
 indicator("Composite Metadata Dashboard", overlay=false, max_labels_count=20)
@@ -578,7 +581,7 @@ if barstate.islast
     table.cell(dash, 1, 0, sym)
     table.cell(dash, 0, 1, "Value")
     table.cell(dash, 1, 1, formatRow(row, timeframe.period))
-    note := label.new(bar_index, local, str.format("{0} {1}", chart.fg_color, formatRow(row, "now")))
+    note := label.new(bar_index, local, str.format("rgb({0},{1},{2}) {3}", color.r(chart.fg_color), color.g(chart.fg_color), color.b(chart.fg_color), formatRow(row, "now")))
 plot(map.get(values, "remote"), "Remote")
 plot(local, "Local")
 plot(spread, "Spread")
@@ -586,6 +589,9 @@ plotshape(spread > 0, title="Spread Up", style=shape.circle, text="M")
 alertcondition(spread > 0 and timeframe.isintraday, title="Metadata Up", message="Metadata up")`, engineOptions);
 
     expect(findPlot(compiledResult, 'Remote').values.some((value) => value !== null)).toBe(true);
+    const labels = compiledResult.drawings.filter((drawing) => drawing.type === 'label');
+    expect(labels).toHaveLength(1);
+    expect(labels[0]!.text).toMatch(/^rgb\(238,238,238\) /);
   });
 
   it('runs a loop-weighted request composite with varip UDT state', () => {
@@ -1610,4 +1616,18 @@ plotshape(condition, title="Awkward Imported Condition", style=shape.square)`);
       });
     }
   }, PRODUCTION_WORKER_COMPOSITE_TIMEOUT_MS);
+});
+
+it('reuses composite compilation for fallback metadata', () => {
+  const source = ['//@version=6', 'indicator("Shared setup")', ...Array(197).fill('// setup'), 'plot(close)'].join('\n');
+  const spy = vi.spyOn(codegen, 'tryCompile');
+  try {
+    const { compiledResult } = assertTrueLengthCompositeParity(source);
+    expect(compiledResult.plots[0].values).toEqual(longChartBars.map((bar) => bar.close));
+    expect(spy).toHaveBeenCalledTimes(2);
+  } finally {
+    trueLengthCompositeCompileResults.pop();
+    trueLengthCompositeProductionCases.pop();
+    spy.mockRestore();
+  }
 });

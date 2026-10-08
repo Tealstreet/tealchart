@@ -4,7 +4,7 @@ import { parse } from '../../src/parser';
 import { checkProgram } from '../../src/semantic/checker';
 import { getPlot, runCompatScript } from './fixtures';
 
-// Ranks1622-1624: ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json variables[23]/[24], functions[166].
+// Ranks1622-1624: https://www.tradingview.com/pine-script-reference/v6/ variables[23]/[24], functions[166].
 // Namespace migration: https://www.tradingview.com/pine-script-docs/migration-guides/to-pine-version-5/#renamed-functions-and-variables
 const bars = [3, 1, 3, 2, 2].map((close, index) => ({ time: 1700000000000 + index * 60000, open: close - 0.5, high: close + 1, low: close - 1, close, volume: 100 }));
 const cases = [

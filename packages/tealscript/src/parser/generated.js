@@ -433,7 +433,25 @@ function peg$parse(input, options) {
     };
 
     // Process arguments
-    const params = [
+    const params = declarationKind === 'indicator' ? [
+      'title',
+      'shorttitle',
+      'overlay',
+      'format',
+      'precision',
+      'scale',
+      'max_bars_back',
+      'timeframe',
+      'timeframe_gaps',
+      'explicit_plot_zorder',
+      'max_lines_count',
+      'max_labels_count',
+      'max_boxes_count',
+      'calc_bars_count',
+      'max_polylines_count',
+      'dynamic_requests',
+      'behind_chart',
+    ] : [
       'title',
       'shorttitle',
       'overlay',
@@ -2024,10 +2042,10 @@ function peg$parse(input, options) {
   function peg$f244() {    return text();  }
   function peg$f245() {    return text();  }
   function peg$f246() {    return text();  }
-  function peg$f247(chars) {    return text();  }
+  function peg$f247(chars) {    return options.pineVersion === 6 ? ' ' : text();  }
   function peg$f248(seq) {    return seq;  }
   function peg$f249() {    return text();  }
-  function peg$f250(chars) {    return text();  }
+  function peg$f250(chars) {    return options.pineVersion === 6 ? ' ' : text();  }
   function peg$f251(seq) {    return seq;  }
   function peg$f252() {    return '\n';  }
   function peg$f253() {    return '\r';  }
@@ -21423,6 +21441,9 @@ function peg$parse(input, options) {
   }
 
   function flattenTransientStatement(statement) {
+    if (statement.type === 'FunctionDeclaration' && Array.isArray(statement.body)) {
+      statement.body = statement.body.flatMap(flattenTransientStatement);
+    }
     if (statement.type === 'MultiDeclaration') return statement.declarations;
     if (statement.type === 'MultiAssignment') return statement.assignments;
     if (statement.type === 'MultiExpressionStatement') {

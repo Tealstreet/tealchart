@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { getPlot, runCompatScript } from './fixtures';
 
-// Authority: ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json variables[24].
+// Authority: https://www.tradingview.com/pine-script-reference/v6/ variables[24].
 // Rank1616: only the selected momentum branch contributes; cumulative na inputs remain unasserted.
 const source = '//@version=6\nindicator("Williams accumulation distribution")\nplot(ta.wad, "value")';
 const first = { time: 1700000000000, open: 10, high: 12, low: 8, close: 10, volume: 100 };

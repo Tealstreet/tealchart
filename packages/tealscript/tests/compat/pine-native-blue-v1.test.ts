@@ -4,7 +4,7 @@ import { compatibilityBars, getPlot, runCompatScript } from './fixtures';
 
 // Native CF009: oracle-probes/v2/captures/v2/conflicts-batch-1-v1.csv,
 // CF009_blue_r/g/b = 41/98/255 on all 24,143 historical rows.
-// Adjudication: ~/cs/docs/tealscript-parity-archive/conflicts-adjudicated-v1.md.
+// https://www.tradingview.com/pine-script-reference/v6/#const_color.blue
 describe('native v6 blue constant (CF009)', () => {
   it('matches captured RGB channels and literal identity', () => {
     const result = runCompatScript(`//@version=6

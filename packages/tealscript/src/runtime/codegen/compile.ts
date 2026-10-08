@@ -1,10 +1,10 @@
 import { PineRuntimeArgumentError } from '../runtimeArgumentError';
-import type { Program, Expression, FunctionDeclaration, Statement } from '../../parser/ast';
-import { checkProgram, normalizeV5DuplicateCallArguments } from '../../semantic/checker';
+import type { Program, Expression, FunctionDeclaration, Statement, CallExpression } from '../../parser/ast';
+import { checkProgram, normalizeV5DuplicateCallArguments, type SemanticExpressionTypeContext, type SemanticType } from '../../semantic/checker';
 import { pineVersionRules } from '../../pineVersionRules';
 import { analyze } from './analyzer';
 import type { AnalysisContext, AnalyzeOptions, SecurityCallSite } from './analyzer';
-import { emit, RUNTIME_HELPERS } from './emitter';
+import { type RequestContextSelection, emit, RUNTIME_HELPERS } from './emitter';
 import {
   NumericSeries, ValueSeries,
   SMA, EMA, RMA, RSI, BarsSince, ValueWhen, Cross, Crossover, Crossunder, Change,
@@ -33,11 +33,13 @@ export interface CompiledSecurityScript {
   securitySites?: SecurityCallSite[];
   independentScalarProgram?: boolean;
   scalarBuiltinContextProgram?: boolean;
+  invariantCaptureNames?: string[];
 }
 
 export interface CompiledScript {
   ScriptClass: new (deps: ScriptDependencies) => GeneratedScriptInstance;
   analysis: AnalysisContext;
+  indicatorDynamicRequests?: boolean;
   success: boolean;
   unsupported: string[];
   generatedCode?: string;
@@ -534,7 +536,7 @@ export const ARRAY_HELPERS: ArrayHelpers = withCollectionReceiverChecks({
   some: someArray,
   map: mapArray,
   filter: filterArray,
-} as ArrayHelpers, arrFuncs.isPineArray, 'Array', ['create', 'from', 'readOnlyFrom']);
+} as ArrayHelpers, arrFuncs.isPineArray, 'Array', ['create', 'from', 'readOnlyFrom', 'withUdtElementType']);
 
 export const MAP_HELPERS: MapHelpers = {
   beginIteration: mapFuncs.beginMapIteration,
@@ -711,18 +713,19 @@ function nodeContainsRequest(
   return false;
 }
 
-function allowsNestedRequests(ast: Program): boolean {
-  const declaration = ast.body.find((stmt) => stmt.type === 'IndicatorDeclaration' || stmt.type === 'LibraryDeclaration');
-  const setting = declaration && 'dynamic_requests' in declaration ? declaration.dynamic_requests : undefined;
-  return setting?.type === 'BooleanLiteral' ? setting.value : pineVersionRules(ast.version).dynamicRequestsDefault;
-}
-
 interface SecurityParentContext {
   ownerIndices: WeakMap<object, number>;
   functionContainsRequest: (name: string) => boolean;
+  dynamicRequestsEnabled: boolean;
+  rootTypes: SemanticExpressionTypeContext;
+  callDeclarations: Map<CallExpression, FunctionDeclaration>;
+  resolvedMethods: WeakMap<CallExpression, FunctionDeclaration | null>;
+  siteTypes: WeakMap<object, Set<SemanticExpressionTypeContext>>;
+  dependencies: WeakMap<SecurityCallSite, SecurityDependencies>;
+  dependencyTypes: WeakMap<SecurityCallSite, SemanticExpressionTypeContext>;
 }
 
-function buildSecurityParentContext(parentAST: Program, securityNodes: Set<unknown>): SecurityParentContext {
+function buildSecurityParentContext(parentAST: Program, securityNodes: Set<unknown>, dynamicRequestsEnabled: boolean, options: CompileOptions): SecurityParentContext {
   const requestFunctionMap = buildRequestFunctionMap(parentAST, securityNodes);
   const ownerIndices = new WeakMap<object, number>();
   const visit = (node: unknown, index: number): void => {
@@ -733,7 +736,27 @@ function buildSecurityParentContext(parentAST: Program, securityNodes: Set<unkno
     for (const child of Object.values(node)) visit(child, index);
   };
   if (securityNodes.size > 0) parentAST.body.forEach((stmt, index) => visit(stmt, index));
-  return { ownerIndices, functionContainsRequest: (name) => requestFunctionMap.get(name) === true };
+  const resolvedMethods = new WeakMap<CallExpression, FunctionDeclaration | null>();
+  const expressionTypes = new WeakMap<Expression, SemanticType>();
+  const types = securityNodes.size > 0 ? checkProgram(parentAST, {
+    libraries: options.libraries, expressionTypes, resolvedUserMethods: resolvedMethods,
+    recordCallTypeContexts: true, recordMethodFunctionCallTypeContexts: true,
+  }) : undefined;
+  const context: SecurityParentContext = {
+    ownerIndices, functionContainsRequest: (name) => requestFunctionMap.get(name) === true, dynamicRequestsEnabled,
+    rootTypes: { expressionTypes, callTypeContexts: types?.callTypeContexts ?? new WeakMap() },
+    callDeclarations: types?.userFunctionCallDeclarations ?? new Map(), resolvedMethods,
+    siteTypes: new WeakMap(), dependencies: new WeakMap(), dependencyTypes: new WeakMap(),
+  };
+  if (securityNodes.size > 0) {
+    walkRequestedCalls(parentAST.body, context.rootTypes, context, (node, scope) => {
+      if (!securityNodes.has(node)) return;
+      const scopes = context.siteTypes.get(node) ?? new Set();
+      scopes.add(scope);
+      context.siteTypes.set(node, scopes);
+    });
+  }
+  return context;
 }
 
 function variableDeclarationNames(stmt: Statement): string[] {
@@ -846,6 +869,62 @@ function collectStatementReferences(stmt: Statement, references = new Set<string
   return references;
 }
 
+interface SecurityDependencies {
+  globals: Set<Statement>;
+  functions: Set<FunctionDeclaration>;
+}
+
+function requestedCallDeclaration(call: CallExpression, types: SemanticExpressionTypeContext, context: SecurityParentContext): FunctionDeclaration | undefined {
+  const child = types.callTypeContexts.get(call);
+  if (call.callee.type === 'MemberExpression') {
+    return child?.resolvedUserMethod ?? context.resolvedMethods.get(call) ?? undefined;
+  }
+  return child?.resolvedUserFunction ?? context.callDeclarations.get(call);
+}
+
+function omittedCallDefaults(call: CallExpression, declaration: FunctionDeclaration): Expression[] {
+  const receiver = declaration.isMethod && call.callee.type === 'MemberExpression';
+  const parameters = declaration.params.slice(receiver ? 1 : 0);
+  const named = new Set(call.arguments.flatMap((argument) => argument.name ? [argument.name.name] : []));
+  const positional = call.arguments.filter((argument) => !argument.name);
+  let position = 0;
+  return parameters.flatMap((parameter) => {
+    const supplied = named.has(parameter.name) || Boolean(positional[position++]);
+    return !supplied && parameter.defaultValue ? [parameter.defaultValue] : [];
+  });
+}
+
+function walkRequestedCalls(
+  node: unknown,
+  types: SemanticExpressionTypeContext,
+  context: SecurityParentContext,
+  visit: (node: object, types: SemanticExpressionTypeContext) => void,
+  seen = new WeakMap<object, Set<SemanticExpressionTypeContext>>(),
+): void {
+  if (!node || typeof node !== 'object') return;
+  const scopes = seen.get(node) ?? new Set();
+  if (scopes.has(types)) return;
+  scopes.add(types);
+  seen.set(node, scopes);
+  visit(node, types);
+  if (Array.isArray(node)) {
+    node.forEach((child) => walkRequestedCalls(child, types, context, visit, seen));
+    return;
+  }
+  if ('type' in node && node.type === 'FunctionDeclaration') return;
+  if ('type' in node && node.type === 'CallExpression') {
+    const call = node as CallExpression;
+    const declaration = requestedCallDeclaration(call, types, context);
+    if (declaration) {
+      for (const value of omittedCallDefaults(call, declaration)) walkRequestedCalls(value, types, context, visit, seen);
+      walkRequestedCalls(declaration.body, types.callTypeContexts.get(call) ?? types, context, visit, seen);
+    }
+  }
+  for (const [key, value] of Object.entries(node)) {
+    if (key !== 'loc') walkRequestedCalls(value, types, context, visit, seen);
+  }
+}
+
 function collectFunctionBodyReferences(fn: FunctionDeclaration): Set<string> {
   const references = new Set<string>();
   if (Array.isArray(fn.body)) {
@@ -853,7 +932,6 @@ function collectFunctionBodyReferences(fn: FunctionDeclaration): Set<string> {
   } else {
     collectExpressionReferences(fn.body, references);
   }
-
   for (const param of fn.params) references.delete(param.name);
   if (Array.isArray(fn.body)) {
     for (const stmt of fn.body) {
@@ -867,9 +945,9 @@ function collectSecurityGlobalDependencies(
   site: SecurityCallSite,
   parentAST: Program,
   ownerIndex: number,
-  captureNames?: Set<string>,
-  parentContext?: SecurityParentContext,
-): Set<Statement> {
+  captureNames: Set<string> | undefined,
+  parentContext: SecurityParentContext,
+): SecurityDependencies {
   const priorDeclarations = parentAST.body.slice(0, ownerIndex === -1 ? parentAST.body.length : ownerIndex)
     .filter((stmt): stmt is Extract<Statement, { type: 'VariableDeclaration' }> => stmt.type === 'VariableDeclaration');
   const declarationByName = new Map<string, Extract<Statement, { type: 'VariableDeclaration' }>>();
@@ -877,41 +955,45 @@ function collectSecurityGlobalDependencies(
     for (const name of variableDeclarationNames(stmt)) declarationByName.set(name, stmt);
   }
   const securityNodes = new Set<unknown>();
-  const requestFunctions = parentContext ? undefined : buildRequestFunctionMap(parentAST, securityNodes);
-  const functionContainsRequest = parentContext?.functionContainsRequest ?? ((name: string) => requestFunctions?.get(name) === true);
-  const replayRequests = allowsNestedRequests(parentAST);
+  const functionContainsRequest = parentContext.functionContainsRequest;
+  const replayRequests = parentContext.dynamicRequestsEnabled;
   const candidates = priorDeclarations
     .filter((stmt): stmt is Extract<Statement, { type: 'VariableDeclaration' }> => (
       isRequestReplayableGlobalStatement(stmt)
       && (replayRequests || !nodeContainsRequest(stmt.init, securityNodes, functionContainsRequest))
     ));
-  const functionDecls = new Map<string, FunctionDeclaration>();
-  for (const stmt of parentAST.body) {
-    if (stmt.type === 'FunctionDeclaration') functionDecls.set(stmt.name.name, stmt);
-  }
+  const localFunctions = new Set(parentAST.body.filter((stmt): stmt is FunctionDeclaration => stmt.type === 'FunctionDeclaration'));
+  const functions = new Set<FunctionDeclaration>();
   const needed = collectSecuritySiteReferences(site);
   const capturedNames = new Set(site.expressionCaptureParams ?? []);
-  const expandedFunctions = new Set<string>();
   const included = new Set<Statement>();
+  const collectCalls = (node: unknown, types: SemanticExpressionTypeContext): void => {
+    walkRequestedCalls(node, types, parentContext, (child, scope) => {
+      if (!('type' in child) || child.type !== 'CallExpression') return;
+      const call = child as CallExpression;
+      const declaration = requestedCallDeclaration(call, scope, parentContext);
+      if (!declaration || !localFunctions.has(declaration)) return;
+      functions.add(declaration);
+      for (const name of collectFunctionBodyReferences(declaration)) needed.add(name);
+      for (const value of omittedCallDefaults(call, declaration)) collectExpressionReferences(value, needed);
+    });
+  };
+  for (const types of parentContext.dependencyTypes.has(site)
+    ? [parentContext.dependencyTypes.get(site)!]
+    : parentContext.siteTypes.get(site.node) ?? [parentContext.rootTypes]) {
+    for (const node of [site.expressionExpr, site.sourceExpr, site.symbolExpr, site.timeframeExpr,
+      site.gapsExpr, site.lookaheadExpr, site.ignoreInvalidSymbolExpr, site.currencyExpr,
+      site.ignoreInvalidTimeframeExpr, site.calcBarsCountExpr, site.expressionLocalStatements]) collectCalls(node, types);
+  }
   let changed = true;
   while (changed) {
     changed = false;
-    for (const name of Array.from(needed)) {
-      if (expandedFunctions.has(name)) continue;
-      const fn = functionDecls.get(name);
-      if (!fn) continue;
-      expandedFunctions.add(name);
-      for (const reference of collectFunctionBodyReferences(fn)) {
-        if (!needed.has(reference)) {
-          needed.add(reference);
-          changed = true;
-        }
-      }
-    }
     for (const stmt of candidates) {
       if (included.has(stmt)) continue;
       if (!variableDeclarationNames(stmt).some((name) => needed.has(name) && !capturedNames.has(name))) continue;
       included.add(stmt);
+      changed = true;
+      collectCalls(stmt, parentContext.rootTypes);
       for (const reference of collectStatementReferences(stmt)) {
         if (!needed.has(reference)) {
           needed.add(reference);
@@ -926,7 +1008,9 @@ function collectSecurityGlobalDependencies(
       if (declaration && !included.has(declaration)) captureNames.add(name);
     }
   }
-  return included;
+  const dependencies = { globals: included, functions };
+  parentContext.dependencies.set(site, dependencies);
+  return dependencies;
 }
 
 function isRequestReplayableGlobalStatement(
@@ -961,8 +1045,59 @@ function collectSecuritySiteReferences(site: SecurityCallSite): Set<string> {
   return references;
 }
 
+function specializeSecurityDependencies(parentAST: Program, analysis: AnalysisContext, context: SecurityParentContext): RequestContextSelection | undefined {
+  let nextId = Math.max(-1, ...analysis.securitySites.map(site => site.id)) + 1;
+  const variants: SecurityCallSite[] = [];
+  const contextIds = new WeakMap<SemanticExpressionTypeContext, Map<CallExpression, number>>();
+  let specialized = false;
+  const nodes = new WeakSet<CallExpression>();
+  for (const site of analysis.securitySites) {
+    const scopes = context.siteTypes.get(site.node);
+    if (!site.ownerFunctionName || !scopes || scopes.size < 2) {
+      variants.push(site);
+      continue;
+    }
+    const ownerIndex = Math.min(context.ownerIndices.get(site.node) ?? parentAST.body.length,
+      context.ownerIndices.get(site.expressionExpr) ?? parentAST.body.length);
+    const groups = new Map<string, SecurityCallSite>();
+    const selections: [SemanticExpressionTypeContext, SecurityCallSite][] = [];
+    for (const scope of scopes) {
+      const variant = { ...site };
+      context.dependencyTypes.set(variant, scope);
+      const dependencies = collectSecurityGlobalDependencies(variant, parentAST, ownerIndex, undefined, context);
+      const key = JSON.stringify(parentAST.body.map((statement, index) =>
+        dependencies.globals.has(statement) || statement.type === 'FunctionDeclaration' && dependencies.functions.has(statement) ? index : null));
+      let selected = groups.get(key);
+      if (!selected) {
+        selected = variant;
+        groups.set(key, selected);
+      }
+      selections.push([scope, selected]);
+    }
+    if (groups.size < 2) {
+      variants.push(site);
+      continue;
+    }
+    specialized = true;
+    for (const [index, variant] of [...groups.values()].entries()) {
+      variant.id = index === 0 ? site.id : nextId++;
+      nodes.add(variant.node);
+      variants.push(variant);
+    }
+    for (const [scope, variant] of selections) {
+      const ids = contextIds.get(scope) ?? new Map();
+      ids.set(site.node, variant.id);
+      contextIds.set(scope, ids);
+    }
+  }
+  if (specialized) {
+    analysis.securitySites = variants;
+    return { ids: contextIds, callTypes: context.rootTypes.callTypeContexts, nodes };
+  }
+}
+
 function prepareSecurityCaptureParams(parentAST: Program, analysis: AnalysisContext, parentContext: SecurityParentContext): void {
-  const independentRequests = !allowsNestedRequests(parentAST);
+  const independentRequests = !parentContext.dynamicRequestsEnabled;
   const requestsByNode = new Map(analysis.securitySites.map((site) => [site.node, site]));
   const usedNames = new Set<string>();
   for (const stmt of parentAST.body) collectStatementReferences(stmt, usedNames);
@@ -971,7 +1106,7 @@ function prepareSecurityCaptureParams(parentAST: Program, analysis: AnalysisCont
     const captureNames = new Set(site.expressionCaptureParams ?? []);
     if (site.expressionSourceParam) captureNames.add(site.expressionSourceParam);
     const dependencies = collectSecurityGlobalDependencies(site, parentAST, ownerIndex, captureNames, parentContext);
-    for (const statement of dependencies) {
+    for (const statement of dependencies.globals) {
       for (const name of collectStatementReferences(statement)) {
         if (analysis.capturedParams.has(name)) captureNames.add(name);
       }
@@ -1002,6 +1137,16 @@ function prepareSecurityCaptureParams(parentAST: Program, analysis: AnalysisCont
     }
     site.expressionCaptureParams = captureNames.size > 0 ? [...captureNames].sort() : undefined;
   }
+  const capturesByNode = new Map<CallExpression, Set<string>>();
+  for (const site of analysis.securitySites) {
+    const captures = capturesByNode.get(site.node) ?? new Set();
+    for (const name of site.expressionCaptureParams ?? []) captures.add(name);
+    capturesByNode.set(site.node, captures);
+  }
+  for (const site of analysis.securitySites) {
+    const captures = capturesByNode.get(site.node)!;
+    if (captures.size) site.expressionCaptureParams = [...captures].sort();
+  }
 }
 
 function independentSecurityExpression(site: SecurityCallSite): Expression {
@@ -1023,29 +1168,17 @@ function buildSecurityAST(site: SecurityCallSite, parentAST: Program, parentCont
       type: 'IndicatorDeclaration',
       declarationKind: 'indicator',
       title: { type: 'StringLiteral', value: `security_${site.id}`, raw: JSON.stringify(`security_${site.id}`) },
-      dynamic_requests: { type: 'BooleanLiteral', value: allowsNestedRequests(parentAST) },
+      dynamic_requests: { type: 'BooleanLiteral', value: parentContext.dynamicRequestsEnabled },
     } as Statement,
   ];
   const ownerIndex = Math.min(parentContext.ownerIndices.get(site.node) ?? parentAST.body.length, parentContext.ownerIndices.get(site.expressionExpr) ?? parentAST.body.length);
-  const dependencyGlobals = collectSecurityGlobalDependencies(site, parentAST, ownerIndex, undefined, parentContext);
-
-  const neededFunctions = collectSecuritySiteReferences(site);
-  for (const stmt of dependencyGlobals) collectStatementReferences(stmt, neededFunctions);
-  let expanded = true;
-  while (expanded) {
-    expanded = false;
-    for (const stmt of parentAST.body) {
-      if (stmt.type !== 'FunctionDeclaration' || !neededFunctions.has(stmt.name.name)) continue;
-      for (const name of collectFunctionBodyReferences(stmt)) {
-        if (!neededFunctions.has(name)) { neededFunctions.add(name); expanded = true; }
-      }
-    }
-  }
+  const dependencies = parentContext.dependencies.get(site)!;
+  const dependencyGlobals = dependencies.globals;
 
   for (let index = 0; index < parentAST.body.length; index += 1) {
     const stmt = parentAST.body[index]!;
     if (
-      (stmt.type === 'FunctionDeclaration' && neededFunctions.has(stmt.name.name))
+      (stmt.type === 'FunctionDeclaration' && dependencies.functions.has(stmt))
       || stmt.type === 'ImportDeclaration'
       || stmt.type === 'TypeDeclaration'
       || stmt.type === 'EnumDeclaration'
@@ -1142,6 +1275,40 @@ function fixedRequestedEmaProgram(ast: Program, captures: string[]): CompiledSec
   return plotted && count > 0 ? { captures, count } : undefined;
 }
 
+function requestedInvariantCaptureNames(ast: Program, captures: string[]): string[] | undefined {
+  const captured = new Set(captures);
+  const names = new Set(captures);
+  const required = new Set<string>();
+  const numeric = (value: Expression): boolean => {
+    if (value.type === 'NumericLiteral') return true;
+    if (value.type === 'Identifier') {
+      if (captured.has(value.name)) required.add(value.name);
+      return names.has(value.name) || value.name === 'na';
+    }
+    if (value.type === 'UnaryExpression') return ['+', '-'].includes(value.operator) && numeric(value.argument);
+    return value.type === 'BinaryExpression' && ['+', '-', '*', '/', '%'].includes(value.operator)
+      && numeric(value.left) && numeric(value.right);
+  };
+  let plotted = false;
+  for (const statement of ast.body) {
+    if (statement.type === 'IndicatorDeclaration' && statement.declarationKind === 'indicator') continue;
+    if (statement.type === 'FunctionDeclaration' && statement.name.name !== 'plot') continue;
+    if (plotted) return undefined;
+    if (statement.type === 'VariableDeclaration' && statement.kind === 'none'
+      && statement.names.type === 'VariableDeclarator' && !names.has(statement.names.name.name)
+      && statement.init.type !== 'IfStatement' && numeric(statement.init)) {
+      names.add(statement.names.name.name);
+      continue;
+    }
+    if (statement.type !== 'ExpressionStatement' || statement.expression.type !== 'CallExpression') return undefined;
+    const call = statement.expression;
+    if (call.callee.type !== 'Identifier' || call.callee.name !== 'plot' || call.arguments.length !== 1
+      || !numeric(call.arguments[0]!.value)) return undefined;
+    plotted = true;
+  }
+  return plotted ? [...required] : undefined;
+}
+
 function compileSecurityExpression(
   site: SecurityCallSite,
   parentAST: Program,
@@ -1167,6 +1334,7 @@ function compileSecurityExpression(
     securitySites: compiled.analysis.securitySites,
     independentScalarProgram: !site.expressionCaptureParams?.length && scalarProgram,
     scalarBuiltinContextProgram: scalarProgram,
+    invariantCaptureNames: requestedInvariantCaptureNames(secAST, site.expressionCaptureParams ?? []),
   } : null;
 }
 
@@ -1257,9 +1425,17 @@ export function compile(ast: Program, maxBarsBack?: number, options: CompileOpti
     analysis.unsupported.push(`request.* calls cannot collectively return more than 127 tuple elements (got ${requestedTupleElements}).`);
   }
   const dynamicOption = analysis.declarationInfo?.node.dynamic_requests;
-  const dynamicRequestsEnabled = dynamicOption?.type === 'BooleanLiteral'
+  let dynamicRequestsEnabled = dynamicOption?.type === 'BooleanLiteral'
     ? dynamicOption.value
     : pineVersionRules(ast.version).dynamicRequestsDefault;
+  if (analysis.declarationInfo?.kind === 'indicator') {
+    if (dynamicOption && dynamicOption.type !== 'BooleanLiteral') {
+      const prepared = options.semanticTypes?.ast === ast && options.semanticTypes.libraries === options.libraries
+        ? options.semanticTypes.result : undefined;
+      dynamicRequestsEnabled = (prepared ?? checkProgram(ast, { libraries: options.libraries })).indicatorDynamicRequests
+        ?? dynamicRequestsEnabled;
+    }
+  }
   if (!dynamicRequestsEnabled) {
     for (const site of analysis.securitySites) {
       if (site.requiresDynamicRequestsReason !== 'local-scope') continue;
@@ -1291,10 +1467,11 @@ export function compile(ast: Program, maxBarsBack?: number, options: CompileOpti
   }
 
   const securityNodes = new Set<unknown>(analysis.securitySites.map((site) => site.node));
-  const parentContext = buildSecurityParentContext(ast, securityNodes);
+  const parentContext = buildSecurityParentContext(ast, securityNodes, dynamicRequestsEnabled, options);
+  const requestedContexts = specializeSecurityDependencies(ast, analysis, parentContext);
   prepareSecurityCaptureParams(ast, analysis, parentContext);
   analysis.discardedFootprintCalls = discardedFootprintCalls(ast, analysis);
-  const code = emit(ast, analysis, options.libraries);
+  const code = emit(ast, analysis, options.libraries, requestedContexts);
 
   try {
     const factory = new Function(
@@ -1342,7 +1519,7 @@ export function compile(ast: Program, maxBarsBack?: number, options: CompileOpti
       };
       const ownerIndex = parentContext.ownerIndices.get(source.expression) ?? -1;
       const captures = new Set(source.params);
-      collectSecurityGlobalDependencies(site, ast, ownerIndex, captures);
+      collectSecurityGlobalDependencies(site, ast, ownerIndex, captures, parentContext);
       site.expressionCaptureParams = [...captures];
       const sourceScript = compileSecurityExpression(site, ast, parentContext, maxBarsBack, options);
       if (!sourceScript) throw new Error(`Request source expression ${source.id} could not be compiled`);
@@ -1352,6 +1529,7 @@ export function compile(ast: Program, maxBarsBack?: number, options: CompileOpti
     return {
       ScriptClass,
       analysis,
+      indicatorDynamicRequests: analysis.declarationInfo?.kind === 'indicator' ? dynamicRequestsEnabled : undefined,
       success: true,
       unsupported: [],
       generatedCode: code,

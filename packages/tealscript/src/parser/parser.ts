@@ -94,14 +94,15 @@ export function parse(source: string, options: ParseOptions<ParseStartRule> = {}
   if (preflightError) throw preflightError;
 
   try {
+    const detectedVersion = detectPineVersion(normalized);
     const result = generatedParser.parse(normalized, {
       startRule: options.startRule || 'Program',
       grammarSource: options.grammarSource || 'input',
+      pineVersion: detectedVersion,
     });
 
     if ((options.startRule ?? 'Program') === 'Program' && isProgramNode(result)) {
       assertGlobalStatementIndentation(result, normalized);
-      const detectedVersion = detectPineVersion(normalized);
       if (detectedVersion === 6) assertUndelimitedContinuationIndentation(result, normalized);
       result.version = detectedVersion ?? result.version;
       result.explicitVersion = detectedVersion !== undefined;
@@ -541,7 +542,9 @@ function assertGlobalStatementIndentation(program: Program, source: string): voi
 }
 
 function detectPineVersion(source: string): number | undefined {
-  const match = source.match(/\/\/\s*@version\s*=\s*(\d+)/i);
+  const strings = protectedSourceRanges(source).filter(({ kind }) => kind === 'string');
+  const match = [...source.matchAll(/\/\/\s*@version\s*=\s*(\d+)/gi)]
+    .find((candidate) => !strings.some(({ start, end }) => start <= candidate.index && candidate.index < end));
   return match ? Number(match[1]) : undefined;
 }
 

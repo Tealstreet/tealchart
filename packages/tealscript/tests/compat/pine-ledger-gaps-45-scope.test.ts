@@ -9,7 +9,7 @@ function check(body: string) {
 }
 
 describe('ledger gaps 45: discard-only names and scope', () => {
-  // ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json entries[30] contextual example.
+  // https://www.tradingview.com/pine-script-reference/v6/ entries[30] contextual example.
   // Rank1668: https://www.tradingview.com/pine-script-docs/language/variable-declarations/#scopes
   it('1668 exposes a variable only after its declaration in global and nested scopes', () => {
     for (const body of [
@@ -94,7 +94,7 @@ plot(array.size(entries))`);
     expect(result.plots[0]?.values).toEqual([2, 4, 6]);
   });
 
-  // ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json entries[30] is scope context, not a discard rule.
+  // https://www.tradingview.com/pine-script-reference/v6/ entries[30] is scope context, not a discard rule.
   // Ranks1671/1797: https://www.tradingview.com/pine-script-docs/language/variable-declarations/#using-an-underscore-_-as-an-identifier
   it('1797 refuses a tuple discard read while accepting repeated tuple discards', () => {
     expect(check('pair() => [1, 2]\n[_, _] = pair()\nplot(_)').diagnostics).toEqual(

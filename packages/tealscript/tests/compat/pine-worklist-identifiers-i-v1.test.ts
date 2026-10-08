@@ -4,7 +4,7 @@ import { parse } from '../../src/parser';
 import { executeCompiled, tryCompile } from '../../src/runtime/codegen/execute';
 import { checkProgram } from '../../src/semantic/checker';
 
-// ~/cs/docs/tealscript-parity-archive/reference/pine-v6-reference-v1.json: reference context only; no identifier grammar entry.
+// https://www.tradingview.com/pine-script-reference/v6/: reference context only; no identifier grammar entry.
 // https://www.tradingview.com/pine-script-docs/language/identifiers/ supplies the three identifier clauses.
 describe('I identifier clauses', () => {
   it('rank1662: admits each ASCII letter and underscore at the start', () => {
