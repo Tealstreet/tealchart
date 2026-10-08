@@ -1,0 +1,6 @@
+//@version=6
+indicator("Namespace methods")
+import CAPTURE_OWNER/R2Ns8ffdca5e384d/1 as lib
+read(value) => lib.pick(value)
+plot(read(close))
+plot(read(int(close)))

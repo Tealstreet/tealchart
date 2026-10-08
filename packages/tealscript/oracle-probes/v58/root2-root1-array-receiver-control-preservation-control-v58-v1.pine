@@ -1,0 +1,5 @@
+//@version=6
+indicator("Imported array method")
+import CAPTURE_OWNER/R2Nsa36e17be5cdc/1 as lib
+a = array.from(3.0)
+plot(a.pick())

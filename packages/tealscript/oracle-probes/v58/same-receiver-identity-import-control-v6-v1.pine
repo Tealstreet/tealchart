@@ -1,0 +1,4 @@
+//@version=6
+indicator("same-receiver-identity import-control v6")
+import Test/IX6Signature/1 as lib
+plot(float(3.0).combine(float(3.0)), "IMPORT_FLOAT_ARG")

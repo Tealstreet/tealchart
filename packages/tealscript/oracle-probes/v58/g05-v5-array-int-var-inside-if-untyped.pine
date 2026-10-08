@@ -1,0 +1,13 @@
+//@version=5
+indicator("G6 persistent alias state")
+score(array<int> values) => 100+array.get(values,0)
+score(array<float> values) => 200+array.get(values,0)
+relay(xs,ys) =>
+    if barstate.isfirst or bar_index > 0
+        var copied = xs
+        score(copied)
+    else
+        0
+xs = array.new<int>(1,int(close))
+ys = array.new<int>(1,int(close)+70)
+plot(relay(xs,ys))

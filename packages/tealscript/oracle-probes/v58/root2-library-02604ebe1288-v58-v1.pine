@@ -1,0 +1,4 @@
+//@version=5
+library("R2Ns02604ebe1288")
+export method pick(float self) => self
+export method pick(float self) => self + 1

@@ -1,0 +1,10 @@
+//@version=5
+indicator("G6 field alias")
+type Holder
+    array<int> value
+score(array<int> xs) => 10
+score(array<float> xs) => 20
+relay(Holder xs) =>
+    copied = xs.value
+    score(copied)
+plot(relay(Holder.new(array.new<int>(1,3))))

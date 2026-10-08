@@ -1,0 +1,4 @@
+//@version=5
+library("IX5Precedence")
+export method choose(int self) => self + 200
+export method choose(float self) => self + 100

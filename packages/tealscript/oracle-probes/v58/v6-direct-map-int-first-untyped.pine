@@ -1,0 +1,10 @@
+//@version=6
+indicator("Forwarded regular collection overload")
+score(map<string,int> xs) => 10
+score(map<string,float> xs) => 20
+relay(xs) =>
+    copied = xs
+    score(copied)
+[x,y] = [relay(map.new<string,int>()),relay(map.new<string,float>())]
+plot(x)
+plot(y)

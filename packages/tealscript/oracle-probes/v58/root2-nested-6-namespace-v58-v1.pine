@@ -1,0 +1,6 @@
+//@version=6
+indicator("Namespace methods")
+import CAPTURE_OWNER/R2Nsad4a19ecf824/1 as lib
+outer(value) => request.security("BINANCE:BTCUSDT", "1D", request.security("BINANCE:BTCUSDT", "1D", lib.pick(value) + lib.pick(int(7)), lookahead=barmerge.lookahead_on), lookahead=barmerge.lookahead_on)
+plot(outer(close))
+plot(request.security("BINANCE:BTCUSDT", "1D", close, lookahead=barmerge.lookahead_on), title="REQUESTED_CLOSE_CONTROL")

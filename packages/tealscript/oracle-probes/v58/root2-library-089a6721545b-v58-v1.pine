@@ -1,0 +1,3 @@
+//@version=6
+library("R2Ns089a6721545b")
+export pick(float self)=>self+10

@@ -1,0 +1,7 @@
+//@version=6
+indicator("1X default-request-omitted-reversed", dynamic_requests=false)
+seed()=>request.security("REMOTE","1D",close,lookahead=barmerge.lookahead_on)
+sample(float value,float extra=seed())=>value+extra
+float selected = sample(close)
+plot(selected,"Chart")
+plot(request.security("REMOTE","1D",selected,lookahead=barmerge.lookahead_on),"Result")

@@ -1,0 +1,10 @@
+//@version=6
+indicator("G6 adversarial alias")
+score(map<string,int> xs) => 10
+score(map<string,float> xs) => 20
+relay(map<string,float> xs, map<string,int> ys) =>
+    copied = xs
+    copied := ys
+    second = copied
+    score(second)
+plot(relay(map.new<string,float>(),map.new<string,int>()))

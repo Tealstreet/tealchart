@@ -1,0 +1,3 @@
+//@version=6
+library("R2Nsa36e17be5cdc")
+export method pick(array<float> self)=>self.get(0)+10

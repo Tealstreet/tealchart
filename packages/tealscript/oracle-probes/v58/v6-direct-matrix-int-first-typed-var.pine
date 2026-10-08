@@ -1,0 +1,13 @@
+//@version=6
+indicator("Persistent collection alias overload")
+score(matrix<int> xs) => 10
+score(matrix<float> xs) => 20
+relayInt(matrix<int> xs) =>
+    var copied = xs
+    score(copied)
+relayFloat(matrix<float> xs) =>
+    var copied = xs
+    score(copied)
+[x,y] = [relayInt(matrix.new<int>(1,1,0)),relayFloat(matrix.new<float>(1,1,0))]
+plot(x)
+plot(y)

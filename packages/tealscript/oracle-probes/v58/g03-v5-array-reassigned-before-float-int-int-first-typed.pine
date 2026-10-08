@@ -1,0 +1,9 @@
+//@version=5
+indicator("G6 adversarial alias")
+score(array<int> xs) => 10
+score(array<float> xs) => 20
+relay(array<float> xs, array<int> ys) =>
+    copied = xs
+    copied := ys
+    score(copied)
+plot(relay(array.new<float>(1,1.5),array.new<int>(1,3)))

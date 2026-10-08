@@ -1,0 +1,8 @@
+//@version=6
+indicator("Forwarded regular collection overload")
+score(array<int> xs) => 10
+score(array<float> xs) => 20
+relay(xs) => score(xs)
+[x,y] = [relay(array.new<float>(1,0)),relay(array.new<int>(1,0))]
+plot(x)
+plot(y)

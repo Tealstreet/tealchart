@@ -1,0 +1,14 @@
+//@version=5
+indicator("Independent omitted defaults")
+measure() =>
+    var int count = 0
+    count += 1
+    count
+read(value = measure()) => value
+both() =>
+    left = read()
+    right = bar_index >= 1 ? read() : na
+    [left, right]
+[left, right] = both()
+plot(left, "Always")
+plot(right, "Delayed")

@@ -1,0 +1,5 @@
+//@version=6
+library("R2Nsb4ecc84ae239")
+export type Point
+    float value
+export method pick(Point self)=>self.value+10

@@ -1,0 +1,5 @@
+//@version=6
+indicator("TK library",dynamic_requests=true)
+import TK/Lib/1 as l
+tkRun()=>l.read()
+plot(tkRun())

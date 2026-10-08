@@ -1,0 +1,6 @@
+//@version=6
+indicator("Static replay selection", dynamic_requests=false)
+sample(int value) => request.security("REMOTE", "1D", close)
+sample(float value) => value
+float selected = sample(close)
+plot(request.security("REMOTE", "1D", selected, lookahead=barmerge.lookahead_on))

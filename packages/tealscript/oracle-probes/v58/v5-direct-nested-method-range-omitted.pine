@@ -1,0 +1,12 @@
+//@version=5
+indicator("Omitted expression history")
+seed = array.new_int(1,1)
+
+method read(array<int> receiver, value = (close + high - low)[1]) => value
+observe() =>
+    always = seed.read()
+    occasional = bar_index % 2 == 0 ? seed.read() : na
+    [always,occasional]
+[always,occasional] = observe()
+plot(always,"Always")
+plot(occasional,"Occasional")

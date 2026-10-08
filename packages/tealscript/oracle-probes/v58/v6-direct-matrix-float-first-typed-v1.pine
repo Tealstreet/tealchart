@@ -1,0 +1,9 @@
+//@version=6
+indicator("Forwarded regular collection overload")
+score(matrix<int> xs) => 10
+score(matrix<float> xs) => 20
+relayInt(matrix<int> xs) => score(xs)
+relayFloat(matrix<float> xs) => score(xs)
+[x,y] = [relayFloat(matrix.new<float>(1,1,0)),relayInt(matrix.new<int>(1,1,0))]
+plot(x)
+plot(y)

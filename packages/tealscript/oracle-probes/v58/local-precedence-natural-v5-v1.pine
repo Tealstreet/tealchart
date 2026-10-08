@@ -1,0 +1,9 @@
+//@version=5
+indicator("local-precedence natural v5")
+import Test/IX5Precedence/1 as lib
+type Holder
+    float value
+method choose(Holder self) => self.value + 300
+plot(float(3.0).choose(), "IMPORTED_FLOAT")
+plot(int(3).choose(), "IMPORTED_INT")
+plot(Holder.new(4).choose(), "LOCAL_UDT")

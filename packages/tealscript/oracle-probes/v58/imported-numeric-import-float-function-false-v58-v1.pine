@@ -1,0 +1,4 @@
+//@version=6
+indicator("1X imported control")
+import Test/Nums/1 as lib
+plot(lib.pick(float(3.0)))

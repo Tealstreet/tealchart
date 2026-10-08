@@ -1,0 +1,7 @@
+//@version=6
+indicator("1X method-int-function-reversed", dynamic_requests=false)
+method sample(float self)=>request.security(syminfo.tickerid,"1D",close,lookahead=barmerge.lookahead_on)
+method sample(int self)=>self
+float selected = sample(int(close))
+plot(selected,"Chart")
+plot(request.security(syminfo.tickerid,"1D",selected,lookahead=barmerge.lookahead_on),"Result")

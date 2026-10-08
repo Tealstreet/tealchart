@@ -1,0 +1,4 @@
+//@version=6
+indicator("1X imported control")
+import CAPTURE_OWNER/R2Ns0c3e7d5d2afc/1 as lib
+plot(int(3).pick())

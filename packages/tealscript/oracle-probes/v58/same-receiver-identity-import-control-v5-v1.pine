@@ -1,0 +1,4 @@
+//@version=5
+indicator("same-receiver-identity import-control v5")
+import Test/IX5Signature/1 as lib
+plot(float(3.0).combine(float(3.0)), "IMPORT_FLOAT_ARG")

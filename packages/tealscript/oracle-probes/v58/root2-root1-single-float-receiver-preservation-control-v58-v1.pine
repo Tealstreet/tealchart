@@ -1,0 +1,4 @@
+//@version=6
+indicator("Single imported method")
+import CAPTURE_OWNER/R2Ns9121292987f2/1 as lib
+plot(float(3.0).pick())

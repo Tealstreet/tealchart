@@ -1,0 +1,3 @@
+//@version=6
+library("R2Ns9121292987f2")
+export method pick(float self)=>100

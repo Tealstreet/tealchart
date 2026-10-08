@@ -1,0 +1,13 @@
+//@version=5
+indicator("Persistent collection alias overload")
+score(map<string,int> xs) => 10
+score(map<string,float> xs) => 20
+relayInt(map<string,int> xs) =>
+    var copied = xs
+    score(copied)
+relayFloat(map<string,float> xs) =>
+    var copied = xs
+    score(copied)
+[x,y] = [relayInt(map.new<string,int>()),relayFloat(map.new<string,float>())]
+plot(x)
+plot(y)

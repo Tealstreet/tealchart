@@ -1,0 +1,14 @@
+//@version=5
+indicator("Independent TA default clocks")
+seed=array.new_int(1,1)
+
+method read(array<int> receiver, value = ta.sma(close,2)) => value
+observe() =>
+    always = seed.read()
+    var float occasional = na
+    if bar_index % 2 == 0
+        occasional := seed.read()
+    [always,occasional]
+[always,occasional] = observe()
+plot(always,"Always")
+plot(occasional,"Occasional")

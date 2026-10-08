@@ -1,0 +1,5 @@
+//@version=6
+indicator("Minimal method kind")
+method sample(int self)=>-97.0
+method sample(float self)=>self
+plot(close.sample())

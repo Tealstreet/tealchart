@@ -1,0 +1,5 @@
+//@version=5
+indicator("local-precedence import-control v5")
+import Test/IX5Precedence/1 as lib
+plot(float(3.0).choose(), "IMPORTED_FLOAT")
+plot(int(3).choose(), "IMPORTED_INT")

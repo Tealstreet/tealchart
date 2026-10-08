@@ -1,0 +1,4 @@
+//@version=6
+indicator("Imported function control")
+import CAPTURE_OWNER/R2Ns089a6721545b/1 as lib
+plot(lib.pick(float(3.0)))

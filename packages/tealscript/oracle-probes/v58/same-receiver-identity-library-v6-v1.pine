@@ -1,0 +1,4 @@
+//@version=6
+library("IX6Signature")
+export method combine(float self, int other) => self + other + 100
+export method combine(float self, float other) => self + other + 200

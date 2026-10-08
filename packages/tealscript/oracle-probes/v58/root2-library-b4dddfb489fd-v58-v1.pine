@@ -1,0 +1,3 @@
+//@version=6
+library("R2Nsb4dddfb489fd")
+export method pick(int self)=>200

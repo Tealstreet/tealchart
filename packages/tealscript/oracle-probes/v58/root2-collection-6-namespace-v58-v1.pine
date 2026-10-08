@@ -1,0 +1,7 @@
+//@version=6
+indicator("Namespace methods")
+import CAPTURE_OWNER/R2Nse97e9c211f29/1 as lib
+p = lib.Point.new(3)
+a = array.from(float(4))
+plot(lib.pick(p))
+plot(lib.pick(self=a))

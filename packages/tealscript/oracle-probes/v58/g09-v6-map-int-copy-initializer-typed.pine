@@ -1,0 +1,12 @@
+//@version=6
+indicator("G6 persistent alias state")
+score(map<string,int> values) => 100+map.get(values,"v")
+score(map<string,float> values) => 200+map.get(values,"v")
+relay(map<string,int> xs,map<string,int> ys) =>
+    var copied = map.copy(xs)
+    score(copied)
+xs = map.new<string,int>()
+map.put(xs,"v",int(close))
+ys = map.new<string,int>()
+map.put(ys,"v",int(close)+70)
+plot(relay(xs,ys))
