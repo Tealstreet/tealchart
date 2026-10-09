@@ -62,3 +62,7 @@ git branch -d feat/my-change
 - If Git reports a conflict, stop and ask in the PR.
 - Keep PRs focused. A maintainer reviews and merges accepted changes.
 - Merged mirror PRs sync upstream automatically.
+
+Native oracle tests require the pinned public fixtures. Run `yarn oracle:fetch`
+from `packages/tealscript` before testing; see [ORACLE.md](packages/tealscript/ORACLE.md).
+Capture requests and raw evidence belong in [tealscript-oracle](https://github.com/Tealstreet/tealscript-oracle).

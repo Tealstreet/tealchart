@@ -40,7 +40,10 @@
     "test-unit": "vitest run",
     "test-unit-watch": "vitest watch --ui",
     "typecheck": "NODE_OPTIONS=--max-old-space-size=12288 node ../../scripts/tsc-ts6.mjs --project ./tsconfig.json --noEmit",
-    "typecheck:ts7": "node ../../scripts/tsc-ts7.mjs --project ./tsconfig.json --noEmit"
+    "typecheck:ts7": "node ../../scripts/tsc-ts7.mjs --project ./tsconfig.json --noEmit",
+    "oracle:fetch": "node scripts/oracle-fixtures.mjs fetch",
+    "oracle:verify": "node scripts/oracle-fixtures.mjs verify",
+    "oracle:guard": "node scripts/oracle-fixtures.mjs guard"
   },
   "dependencies": {
     "peggy": "^5.1.0"

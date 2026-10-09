@@ -13,3 +13,7 @@ out/
 *.bun-build
 .DS_Store
 *.log
+
+# Public native evidence is fetched explicitly for tests.
+packages/tealscript/oracle-probes/
+packages/tealscript/.oracle-fixtures-*/

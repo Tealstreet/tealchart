@@ -29,4 +29,10 @@ jobs:
           PUPPETEER_SKIP_DOWNLOAD: 'true'
       - run: yarn typecheck
       - run: yarn lint
+      - name: Prepare pinned native oracle fixtures
+        working-directory: packages/tealscript
+        run: |
+          node scripts/oracle-fixtures.mjs guard
+          node --test scripts/oracle-fixtures.test.mjs
+          node scripts/oracle-fixtures.mjs fetch
       - run: yarn test

@@ -1,3 +1,7 @@
+Native capture requests and evidence belong in the public `Tealstreet/tealscript-oracle`
+repository. Read [ORACLE.md](ORACLE.md) for pinned sparse test fixtures, capture
+handoffs and promotion. Missing fixtures fail explicitly; tests are never skipped.
+
 Native v5/v6 missing strings use the empty-string representation for no-match
 if results and explicit string na initializers; na("") is true. Earlier versions
 retain their existing representation and code generation.
