@@ -920,6 +920,12 @@ Snapshots clone only finite OHLCV fields from sorted unique timestamps.
 generations, retaining a stable identity during ticks and viewport movement.
 The package owns no AI provider credentials, prompts, transport or extra history.
 
+`AnalysisSelector` is reusable presentation for external hosts. Frozen frames can
+supply ordered millisecond/CSS-pixel candle anchors for native index-based time
+scales; affine first-party projections retain their existing path. Hosts can admit
+trusted DOM events and synchronously block financial input while selection is
+active. Geometry or ownership changes cancel the frozen selection visibly.
+
 `TealchartApi.addBuiltinIndicator(id)` is the awaitable saved-indicator capability.
 The web owner uses the picker path, including instance mapping, layout dirtiness,
 save/restore and removal through the returned study. Raw `createStudy` retains

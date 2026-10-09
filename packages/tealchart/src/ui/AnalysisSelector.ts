@@ -12,6 +12,8 @@ export interface AnalysisSelectorOptions {
   getFrame: () => AnalysisSelectionFrame | null;
   canStart: () => boolean;
   onAnalysisRequest?: (intent: AnalysisRequestIntent) => void;
+  acceptsEvent?: (event: Event) => boolean;
+  onActiveChange?: (active: boolean) => void;
 }
 
 export class AnalysisSelector {
@@ -66,7 +68,14 @@ export class AnalysisSelector {
       pointerEvents: 'none',
     },
   });
-  private readonly selection = new AnalysisSelection((state) => this.render(state));
+  private active = false;
+  private readonly selection = new AnalysisSelection((state) => {
+    if (this.active !== state.active) {
+      this.active = state.active;
+      this.options.onActiveChange?.(state.active);
+    }
+    this.render(this.selection.getState());
+  });
   private handler?: (intent: AnalysisRequestIntent) => void;
   private pointerId?: number;
   private disposed = false;
@@ -117,6 +126,7 @@ export class AnalysisSelector {
   }
 
   setHandler(handler: ((intent: AnalysisRequestIntent) => void) | undefined): void {
+    if (this.disposed) return;
     this.handler = handler;
     if (!handler) this.cancel();
     this.update();
@@ -142,7 +152,7 @@ export class AnalysisSelector {
       return false;
     }
     const started = this.selection.start();
-    if (started) {
+    if (started && this.isActive()) {
       this.focusingSelection = true;
       try {
         this.surface.focus({ preventScroll: true });
@@ -150,7 +160,11 @@ export class AnalysisSelector {
         this.focusingSelection = false;
       }
     }
-    return started;
+    return started && this.isActive();
+  }
+
+  isActive(): boolean {
+    return !this.disposed && this.selection.getState().active;
   }
 
   cancel(message?: string): void {
@@ -159,6 +173,7 @@ export class AnalysisSelector {
   }
 
   dispose(): void {
+    if (this.disposed) return;
     this.disposed = true;
     this.handler = undefined;
     this.cancel();
@@ -190,6 +205,10 @@ export class AnalysisSelector {
       },
       onClick: (event) => {
         event.stopPropagation();
+        if (!this.acceptsEvent(event)) {
+          event.preventDefault();
+          return;
+        }
         action();
       },
     });
@@ -227,6 +246,7 @@ export class AnalysisSelector {
     this.message.textContent =
       state.message ?? (state.active && !state.range ? 'Drag across a pattern on the main chart.' : '');
     this.message.style.display = this.message.textContent ? 'block' : 'none';
+    this.highlight.style.display = state.range ? 'block' : 'none';
     if (!frame) return;
     Object.assign(this.surface.style, {
       left: `${frame.plot.left}px`,
@@ -240,7 +260,6 @@ export class AnalysisSelector {
     this.message.style.top = `${Math.max(frame.plot.top + 6, controlsTop - 38)}px`;
     for (const control of this.actions.querySelectorAll<HTMLButtonElement>('button'))
       control.disabled = control.textContent !== 'Cancel' && !state.range;
-    this.highlight.style.display = state.range ? 'block' : 'none';
     if (state.range) {
       const left = Math.max(
         frame.plot.left,
@@ -270,10 +289,10 @@ export class AnalysisSelector {
 
   private readonly contain = (event: Event): void => {
     event.stopPropagation();
-    if (event.type === 'contextmenu' || event.type === 'wheel') event.preventDefault();
+    if (!this.acceptsEvent(event) || event.type === 'contextmenu' || event.type === 'wheel') event.preventDefault();
   };
   private readonly pointerDown = (event: PointerEvent): void => {
-    if (event.button !== 0 || this.pointerId !== undefined) return;
+    if (!this.acceptsEvent(event) || event.button !== 0 || this.pointerId !== undefined) return;
     event.preventDefault();
     event.stopPropagation();
     this.update();
@@ -281,14 +300,14 @@ export class AnalysisSelector {
     if (this.selection.begin(point.x, point.y)) this.pointerId = event.pointerId;
   };
   private readonly pointerMove = (event: PointerEvent): void => {
-    if (this.pointerId !== event.pointerId) return;
+    if (!this.acceptsEvent(event) || this.pointerId !== event.pointerId) return;
     event.preventDefault();
     event.stopPropagation();
     this.update();
     this.selection.move(this.localPoint(event).x);
   };
   private readonly pointerUp = (event: PointerEvent): void => {
-    if (this.pointerId !== event.pointerId) return;
+    if (!this.acceptsEvent(event) || this.pointerId !== event.pointerId) return;
     event.preventDefault();
     event.stopPropagation();
     this.update();
@@ -296,18 +315,29 @@ export class AnalysisSelector {
     this.pointerId = undefined;
   };
   private readonly pointerCancel = (event: PointerEvent): void => {
+    if (!this.acceptsEvent(event)) return;
     if (this.pointerId === event.pointerId) this.cancel('Pattern selection was interrupted. Select the pattern again.');
   };
   private readonly blur = (event: Event): void => {
-    if (!this.focusingSelection && !(event.target instanceof Element) && this.selection.getState().active)
+    if (
+      this.acceptsEvent(event) &&
+      !this.focusingSelection &&
+      !(event.target instanceof Element) &&
+      this.selection.getState().active
+    )
       this.cancel('Selection cancelled because the chart lost focus.');
   };
   private readonly outsideInput = (event: Event): void => {
-    if (this.selection.getState().active && event.target instanceof Node && !this.root.contains(event.target))
+    if (
+      this.acceptsEvent(event) &&
+      this.selection.getState().active &&
+      event.target instanceof Node &&
+      !this.root.contains(event.target)
+    )
       this.cancel('Selection cancelled because the chart lost focus.');
   };
   private readonly keyDown = (event: KeyboardEvent): void => {
-    if (!this.selection.getState().active) return;
+    if (!this.acceptsEvent(event) || !this.selection.getState().active) return;
     if (
       event.target instanceof Element &&
       !this.root.contains(event.target) &&
@@ -328,4 +358,8 @@ export class AnalysisSelector {
       ['Enter', ' '].includes(event.key);
     if (event.key !== 'Tab' && !buttonKey) event.preventDefault();
   };
+
+  private acceptsEvent(event: Event): boolean {
+    return !this.disposed && (this.options.acceptsEvent?.(event) ?? true);
+  }
 }

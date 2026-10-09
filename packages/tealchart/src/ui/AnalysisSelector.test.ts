@@ -1,3 +1,6 @@
+import type { AnalysisSelectionFrame } from '../analysis/analysisSelection';
+import type { AnalysisSelectorOptions } from './AnalysisSelector';
+
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { EventManager } from '../interaction/EventManager';
@@ -17,18 +20,19 @@ afterEach(() => {
   document.body.replaceChildren();
 });
 
-function fixture() {
+function fixture(options: Partial<AnalysisSelectorOptions> = {}) {
   const root = document.createElement('div');
   document.body.append(root);
   Object.defineProperties(root, { clientWidth: { value: 1020 }, clientHeight: { value: 600 } });
   root.getBoundingClientRect = () => ({ left: 40, top: 60, width: 2040, height: 1200 }) as DOMRect;
   const handler = vi.fn();
-  let geometry = frame;
+  let geometry: AnalysisSelectionFrame = frame;
   selector = new AnalysisSelector({
     container: root,
     getFrame: () => geometry,
     canStart: () => true,
     onAnalysisRequest: handler,
+    ...options,
   });
   const control = (name: string) => root.querySelector<HTMLButtonElement>(`button[aria-label="${name}"]`)!;
   const pointer = (target: EventTarget, type: string, x: number) => {
@@ -51,10 +55,145 @@ function fixture() {
       geometry = { ...frame, identity: 'OTHER:1:2' };
       selector!.update();
     },
+    setFrame: (next: AnalysisSelectionFrame) => {
+      geometry = next;
+      selector!.update();
+    },
   };
 }
 
 describe('web analysis controls', () => {
+  it('uses exact native anchor projection under CSS zoom for the requested range and highlight', () => {
+    const { root, handler, control, pointer, setFrame } = fixture();
+    setFrame({
+      ...frame,
+      timeRange: { from: 1000, to: 8000 },
+      timeAnchors: [
+        { time: 1000, x: 20 },
+        { time: 2000, x: 420 },
+        { time: 8000, x: 820 },
+      ],
+    });
+    control('Select pattern').click();
+    const surface = root.querySelector('[aria-label="Select chart pattern"]')!;
+    pointer(surface, 'pointerdown', 420);
+    pointer(window, 'pointerup', 620);
+    const highlight = surface.nextElementSibling as HTMLElement;
+    expect(highlight.style.left).toBe('420px');
+    expect(highlight.style.width).toBe('200px');
+    control('Find similar TA').click();
+    expect(handler).toHaveBeenLastCalledWith({ action: 'similar', range: { from: 2000, to: 5000 } });
+  });
+
+  it('rejects synthetic controls and gesture events while keeping imperative cancellation authoritative', () => {
+    const active = vi.fn();
+    const { root, handler, control, pointer, change } = fixture({
+      acceptsEvent: (event) => event.isTrusted,
+      onActiveChange: active,
+    });
+    control('Analyze chart').click();
+    control('Select pattern').click();
+    expect(handler).not.toHaveBeenCalled();
+    expect(selector!.isActive()).toBe(false);
+    expect(selector!.start()).toBe(true);
+    expect(active).toHaveBeenLastCalledWith(true);
+    const surface = root.querySelector('[aria-label="Select chart pattern"]')!;
+    pointer(surface, 'pointerdown', 120);
+    pointer(window, 'pointermove', 520);
+    pointer(window, 'pointerup', 520);
+    control('Describe this TA pattern').click();
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    window.dispatchEvent(new Event('blur'));
+    document.body.dispatchEvent(new Event('focusin', { bubbles: true }));
+    control('Cancel').click();
+    expect(selector!.isActive()).toBe(true);
+    expect(control('Find similar TA').disabled).toBe(true);
+    expect(handler).not.toHaveBeenCalled();
+    change();
+    expect(selector!.isActive()).toBe(false);
+    expect(active).toHaveBeenLastCalledWith(false);
+    expect(selector!.start()).toBe(true);
+    selector!.cancel();
+    expect(selector!.isActive()).toBe(false);
+  });
+
+  it('reports active transitions synchronously before focus and request callbacks, and retires every gate', () => {
+    const order: string[] = [];
+    const { root, control, pointer, change } = fixture({
+      onActiveChange: (active) => order.push(String(active)),
+      onAnalysisRequest: () => {
+        expect(selector!.isActive()).toBe(false);
+        order.push('request');
+      },
+    });
+    root.addEventListener('focusin', () => order.push('focus'));
+    control('Select pattern').click();
+    expect(order).toEqual(['true', 'focus']);
+    const surface = root.querySelector('[aria-label="Select chart pattern"]')!;
+    pointer(surface, 'pointerdown', 120);
+    pointer(window, 'pointerup', 520);
+    control('Describe this TA pattern').click();
+    expect(order.slice(-2)).toEqual(['false', 'request']);
+    for (const retire of [
+      () => selector!.cancel(),
+      () => window.dispatchEvent(new Event('blur')),
+      () => document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })),
+      () => document.body.dispatchEvent(new Event('pointerdown', { bubbles: true })),
+      change,
+      () => selector!.setHandler(undefined),
+      () => selector!.dispose(),
+    ]) {
+      selector!.setHandler(vi.fn());
+      selector!.start();
+      expect(selector!.isActive()).toBe(true);
+      retire();
+      expect(selector!.isActive()).toBe(false);
+      expect(order.at(-1)).toBe('false');
+    }
+    selector!.dispose();
+    expect(order.filter((value) => value === 'false')).toHaveLength(8);
+  });
+
+  it('rejects unadmitted continuation and request events without changing the admitted drag', () => {
+    let admitted = true;
+    const { root, handler, control, pointer } = fixture({ acceptsEvent: () => admitted });
+    selector!.start();
+    const surface = root.querySelector('[aria-label="Select chart pattern"]')!;
+    pointer(surface, 'pointerdown', 120);
+    pointer(window, 'pointermove', 320);
+    const highlight = surface.nextElementSibling as HTMLElement;
+    expect(highlight.style.width).toBe('200px');
+    admitted = false;
+    pointer(window, 'pointermove', 720);
+    pointer(window, 'pointerup', 720);
+    pointer(window, 'pointercancel', 720);
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    document.body.dispatchEvent(new Event('pointerdown', { bubbles: true }));
+    control('Describe this TA pattern').click();
+    expect(selector!.isActive()).toBe(true);
+    expect(highlight.style.width).toBe('200px');
+    expect(handler).not.toHaveBeenCalled();
+    admitted = true;
+    pointer(window, 'pointerup', 320);
+    control('Describe this TA pattern').click();
+    expect(handler).toHaveBeenCalledExactlyOnceWith({ action: 'describe', range: { from: 1100, to: 1300 } });
+  });
+
+  it('clears the highlight and visibly refuses selection when native projection becomes invalid', () => {
+    const { root, pointer, setFrame } = fixture();
+    selector!.start();
+    const surface = root.querySelector('[aria-label="Select chart pattern"]')!;
+    pointer(surface, 'pointerdown', 120);
+    pointer(window, 'pointerup', 520);
+    const highlight = surface.nextElementSibling as HTMLElement;
+    expect(highlight.style.display).toBe('block');
+    setFrame({ ...frame, timeAnchors: [] });
+    expect(selector!.isActive()).toBe(false);
+    expect(highlight.style.display).toBe('none');
+    expect(selector!.start()).toBe(false);
+    expect(root.querySelector('[role="status"]')!.textContent).toContain('not ready');
+  });
+
   it('emits visible-chart and selected-range intents and contains financial mouse events under CSS zoom', () => {
     const { root, handler, control, pointer } = fixture();
     const mouse = vi.fn();

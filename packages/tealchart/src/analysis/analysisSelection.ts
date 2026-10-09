@@ -13,6 +13,7 @@ export interface AnalysisSelectionFrame {
   projectionLeft: number;
   projectionRight: number;
   plot: { left: number; top: number; width: number; height: number };
+  timeAnchors?: readonly { readonly time: number; readonly x: number }[];
 }
 
 export interface AnalysisSelectionState {
@@ -24,6 +25,7 @@ export interface AnalysisSelectionState {
 export function analysisSelectionTimeAtX(frame: AnalysisSelectionFrame, x: number): number {
   'worklet';
   const clamped = Math.max(frame.plot.left, Math.min(frame.plot.left + frame.plot.width, x));
+  if (frame.timeAnchors) return analysisAnchorValueAt(frame.timeAnchors, clamped, false);
   return (
     frame.timeRange.from +
     ((clamped - frame.projectionLeft) / (frame.projectionRight - frame.projectionLeft)) *
@@ -33,11 +35,35 @@ export function analysisSelectionTimeAtX(frame: AnalysisSelectionFrame, x: numbe
 
 export function analysisSelectionXAtTime(frame: AnalysisSelectionFrame, time: number): number {
   'worklet';
+  if (frame.timeAnchors) return analysisAnchorValueAt(frame.timeAnchors, time, true);
   return (
     frame.projectionLeft +
     ((time - frame.timeRange.from) / (frame.timeRange.to - frame.timeRange.from)) *
       (frame.projectionRight - frame.projectionLeft)
   );
+}
+
+function analysisAnchorValueAt(
+  anchors: NonNullable<AnalysisSelectionFrame['timeAnchors']>,
+  value: number,
+  fromTime: boolean,
+): number {
+  'worklet';
+  if (!Number.isFinite(value) || anchors.length < 2) return NaN;
+  const from = fromTime ? 'time' : 'x';
+  const to = fromTime ? 'x' : 'time';
+  let left = 0;
+  let right = anchors.length - 1;
+  if (value <= anchors[left][from]) return anchors[left][to];
+  if (value >= anchors[right][from]) return anchors[right][to];
+  while (right - left > 1) {
+    const middle = Math.floor((left + right) / 2);
+    if (anchors[middle][from] <= value) left = middle;
+    else right = middle;
+  }
+  const span = anchors[right][from] - anchors[left][from];
+  if (!Number.isFinite(span) || span <= 0) return NaN;
+  return anchors[left][to] + ((value - anchors[left][from]) / span) * (anchors[right][to] - anchors[left][to]);
 }
 
 export function validAnalysisSelectionFrame(frame: AnalysisSelectionFrame | null): frame is AnalysisSelectionFrame {
@@ -52,12 +78,35 @@ export function validAnalysisSelectionFrame(frame: AnalysisSelectionFrame | null
       frame.plot.top,
       frame.plot.width,
       frame.plot.height,
+      frame.timeRange.to - frame.timeRange.from,
+      frame.projectionRight - frame.projectionLeft,
+      frame.plot.left + frame.plot.width,
+      frame.plot.top + frame.plot.height,
     ].every(Number.isFinite) &&
     frame.timeRange.to > frame.timeRange.from &&
     frame.projectionRight > frame.projectionLeft &&
     frame.plot.width > 0 &&
-    frame.plot.height > 0
+    frame.plot.height > 0 &&
+    validAnalysisTimeAnchors(frame.timeAnchors)
   );
+}
+
+function validAnalysisTimeAnchors(anchors: AnalysisSelectionFrame['timeAnchors']): boolean {
+  if (anchors === undefined) return true;
+  if (!Array.isArray(anchors) || anchors.length < 2) return false;
+  for (let index = 0; index < anchors.length; index++) {
+    const anchor = anchors[index];
+    if (!anchor || !Number.isFinite(anchor.time) || anchor.time < 0 || !Number.isFinite(anchor.x)) return false;
+    if (
+      index > 0 &&
+      (anchor.time <= anchors[index - 1].time ||
+        anchor.x <= anchors[index - 1].x ||
+        !Number.isFinite(anchor.time - anchors[index - 1].time) ||
+        !Number.isFinite(anchor.x - anchors[index - 1].x))
+    )
+      return false;
+  }
+  return true;
 }
 
 export class AnalysisSelection {
@@ -77,10 +126,10 @@ export class AnalysisSelection {
   }
 
   updateFrame(frame: AnalysisSelectionFrame | null): void {
-    this.currentFrame = frame;
-    if (!this.state.active && this.state.range && frame?.identity !== this.selectedIdentity)
+    this.currentFrame = validAnalysisSelectionFrame(frame) ? frame : null;
+    if (!this.state.active && this.state.range && this.currentFrame?.identity !== this.selectedIdentity)
       this.cancel('Selection cleared because the chart changed.');
-    if (this.state.active && JSON.stringify(frame) !== JSON.stringify(this.frozenFrame))
+    if (this.state.active && JSON.stringify(this.currentFrame) !== JSON.stringify(this.frozenFrame))
       this.cancel('Selection cancelled because the chart changed. Select the pattern again.');
   }
 
@@ -94,6 +143,9 @@ export class AnalysisSelection {
       timeRange: { ...this.currentFrame.timeRange },
       plot: { ...this.currentFrame.plot },
       ...(this.currentFrame.priceRange ? { priceRange: { ...this.currentFrame.priceRange } } : {}),
+      ...(this.currentFrame.timeAnchors
+        ? { timeAnchors: this.currentFrame.timeAnchors.map((anchor) => ({ ...anchor })) }
+        : {}),
     };
     this.startTime = undefined;
     this.selectedIdentity = undefined;
@@ -114,7 +166,12 @@ export class AnalysisSelection {
       y > frame.plot.top + frame.plot.height
     )
       return false;
-    this.startTime = analysisSelectionTimeAtX(frame, x);
+    const time = analysisSelectionTimeAtX(frame, x);
+    if (!Number.isFinite(time)) {
+      this.cancel('Chart projection is not ready for pattern selection.');
+      return false;
+    }
+    this.startTime = time;
     this.setState({ active: true });
     return true;
   }
@@ -122,6 +179,10 @@ export class AnalysisSelection {
   move(x: number): void {
     if (this.startTime === undefined || !this.frozenFrame || !Number.isFinite(x)) return;
     const time = analysisSelectionTimeAtX(this.frozenFrame, x);
+    if (!Number.isFinite(time)) {
+      this.cancel('Chart projection is not ready for pattern selection.');
+      return;
+    }
     this.setState({
       active: true,
       range: { from: Math.min(this.startTime, time), to: Math.max(this.startTime, time) },

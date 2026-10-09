@@ -36,6 +36,8 @@ export { IndicatorsModal } from '../ui/IndicatorsModal';
 export type { CustomIndicatorEditorActions } from '../ui/IndicatorsModal';
 export { LayoutSelector } from '../ui/LayoutSelector';
 export type { LayoutSelectorCallbacks } from '../ui/LayoutSelector';
+export { AnalysisSelector } from '../ui/AnalysisSelector';
+export type { AnalysisSelectorOptions } from '../ui/AnalysisSelector';
 export type { LayoutMetadata } from '../transformer/saveLoadIntegration';
 export { IndicatorSettingsModal } from '../ui/IndicatorSettingsModal';
 export type { PlotStyleOverride } from '../state/chartState';

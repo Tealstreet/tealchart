@@ -1,5 +1,11 @@
 export * from './types';
-export type { AnalysisRequestIntent } from './analysisSelection';
+export type { AnalysisRequestIntent, AnalysisSelectionFrame, AnalysisSelectionState } from './analysisSelection';
+export {
+  AnalysisSelection,
+  analysisSelectionTimeAtX,
+  analysisSelectionXAtTime,
+  validAnalysisSelectionFrame,
+} from './analysisSelection';
 export { getLoadedAnalysisSnapshot, MAX_ANALYSIS_SNAPSHOT_BARS, selectLoadedAnalysisRange } from './loadedBars';
 export {
   findLoadedSimilarPatterns,
